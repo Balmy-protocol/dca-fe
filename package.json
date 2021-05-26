@@ -9,7 +9,10 @@
     "lint": "run-p lint-es lint-ts",
     "lint-es": "eslint --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "lint-ts": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "prettier": "prettier --write --ignore-unknown ./src",
+    "prepare-husky": "husky install",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -19,6 +22,11 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Mean-Finance/dca-fe/issues"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   },
   "homepage": "https://github.com/Mean-Finance/dca-fe#readme",
   "devDependencies": {
@@ -37,6 +45,7 @@
     "babel-loader": "^8.2.2",
     "babel-plugin-formatjs": "^10.2.15",
     "css-loader": "^5.2.6",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.27.0",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-prettier": "^8.3.0",
@@ -50,9 +59,12 @@
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
     "html-webpack-plugin": "^5.3.1",
+    "husky": "^6.0.0",
     "jest": "^27.0.1",
+    "lint-staged": ">=10",
     "lodash": "^4.17.21",
     "npm-run-all": "^4.1.5",
+    "prettier": "^2.3.0",
     "react-hot-loader": "^4.13.0",
     "style-loader": "^2.0.0",
     "ts-loader": "^9.2.2",
@@ -69,5 +81,10 @@
     "react-dom": "^17.0.2",
     "react-intl": "^5.18.1",
     "ts-jest": "^27.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,md}": [
+      "prettier --write"
+    ]
   }
 }

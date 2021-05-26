@@ -1,7 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const tsTransformer = require("@formatjs/ts-transformer");
-import { formatDiagnostic } from 'typescript';
+const tsTransformer = require('@formatjs/ts-transformer');
 
 module.exports = {
   entry: {
@@ -18,19 +17,19 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },
-  resolve: { extensions: ["*", ".js", ".jsx", '.ts', '.tsx'] },
+  resolve: { extensions: ['*', '.js', '.jsx', '.ts', '.tsx'] },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        options: { presets: ['@babel/env'] }
+        options: { presets: ['@babel/env'] },
       },
       {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        use: ['ts-loader'],
+        loader: 'ts-loader',
         options: {
           getCustomTransformers() {
             return {
@@ -39,14 +38,14 @@ module.exports = {
                   overrideIdFn: '[sha512:contenthash:base64:6]',
                 }),
               ],
-            }
+            };
           },
         },
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      }
-    ]
-  }
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
 };
