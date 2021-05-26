@@ -8,14 +8,4 @@ type AppProps = {
 // Easiest way to declare a Function Component; return type is inferred.
 const App: React.FunctionComponent<AppProps> = ({ message = 'Hello World' }: AppProps) => <div>{message}</div>;
 
-var something = 'ble';
-
-var something = 'ble';
-
-var something = 'ble';
-
-var something = 'ble';
-
-var something = 'ble';
-
 export default App;
