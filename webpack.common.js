@@ -17,7 +17,10 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },
-  resolve: { extensions: ['*', '.js', '.jsx', '.ts', '.tsx'] },
+  resolve: {
+    root: path.resolve('./src'),
+    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
+  },
   module: {
     rules: [
       {
