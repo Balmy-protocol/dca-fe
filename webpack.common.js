@@ -4,7 +4,7 @@ const tsTransformer = require('@formatjs/ts-transformer');
 
 module.exports = {
   entry: {
-    app: './src/index.jsx',
+    app: './src/index.tsx',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -18,7 +18,7 @@ module.exports = {
     clean: true,
   },
   resolve: {
-    root: path.resolve('./src'),
+    modules: [path.resolve(__dirname, 'src'), 'node_modules'],
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
   },
   module: {
