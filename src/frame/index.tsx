@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import NavBar from 'common/navbar';
 import Home from 'home';
 
-const AppFrame: React.FunctionComponent<null> = () => (
+const AppFrame = () => (
   <Router>
     <CssBaseline />
     <div>

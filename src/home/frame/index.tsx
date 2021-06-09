@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AppFrame: React.FunctionComponent<null> = () => (
+const AppFrame = () => (
   <div>
     <div>Intro goes here</div>
     <div>Exchange goes here</div>

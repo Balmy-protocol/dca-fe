@@ -1,6 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const tsTransformer = require('@formatjs/ts-transformer');
+const webpack = require('webpack');
+const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
+
+const styledComponentsTransformer = createStyledComponentsTransformer();
 
 module.exports = {
   entry: {
@@ -11,6 +15,10 @@ module.exports = {
       title: 'Production',
       template: './public/index.html',
     }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+      process: 'process/browser',
+    }),
   ],
   output: {
     filename: 'bundle.js',
@@ -20,6 +28,14 @@ module.exports = {
   resolve: {
     modules: [path.resolve(__dirname, 'src'), 'node_modules'],
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
+    fallback: {
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      assert: require.resolve('assert/'),
+      http: require.resolve('stream-http'),
+      https: require.resolve('https-browserify'),
+      os: require.resolve('os-browserify/browser'),
+    },
   },
   module: {
     rules: [
@@ -40,6 +56,7 @@ module.exports = {
                 tsTransformer.transform({
                   overrideIdFn: '[sha512:contenthash:base64:6]',
                 }),
+                styledComponentsTransformer,
               ],
             };
           },
