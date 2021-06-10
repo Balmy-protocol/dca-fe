@@ -14,6 +14,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Production',
       template: './public/index.html',
+      inject: false,
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],

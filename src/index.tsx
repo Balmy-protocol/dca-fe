@@ -3,14 +3,20 @@ import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
 import MainApp from './frame';
 import EnMessages from 'config/lang/en_US.json';
-import { Web3ReactProvider } from '@web3-react/core';
-import Web3 from 'web3';
-// import your favorite web3 convenience library here
-let web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
-function getLibrary(provider: any) {
-  return new Web3(provider); // this will vary according to whether you use e.g. ethers or web3.js
-}
+type web3WalletState = null | {};
+
+type WalletProviderValue = {
+  web3Wallet: web3WalletState;
+  setWeb3Wallet: React.Dispatch<React.SetStateAction<null>>;
+};
+
+const WalletProviderDefaultValue: WalletProviderValue = {
+  web3Wallet: null,
+  setWeb3Wallet: () => {},
+};
+
+const WalletProvider = React.createContext(WalletProviderDefaultValue);
 
 type AppProps = {
   messages: any;
@@ -25,12 +31,19 @@ function loadLocaleData(locale: string) {
 }
 
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
+  const [web3Wallet, setWeb3Wallet] = React.useState(null);
+
   return (
-    <Web3ReactProvider getLibrary={getLibrary}>
+    <WalletProvider.Provider
+      value={{
+        web3Wallet,
+        setWeb3Wallet,
+      }}
+    >
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
         <MainApp />
       </IntlProvider>
-    </Web3ReactProvider>
+    </WalletProvider.Provider>
   );
 };
 
