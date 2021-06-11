@@ -4,11 +4,15 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import NavBar from 'common/navbar';
 import Home from 'home';
 
-const AppFrame = () => (
+interface AppFrameProps {
+  isLoading: Boolean;
+}
+
+const AppFrame = ({ isLoading }: AppFrameProps) => (
   <Router>
     <CssBaseline />
     <div>
-      <NavBar />
+      <NavBar isLoading={isLoading} />
       <Switch>
         <Route path="/">
           <Home />
