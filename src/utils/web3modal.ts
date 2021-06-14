@@ -39,16 +39,11 @@ export async function connecToWallet(
   web3Modal: web3ModalState,
   setAccount: setAccountState
 ) {
-  console.log('prob fails here');
   const provider = await web3Modal?.connect();
-  console.log('nor does it fail here');
 
   const web3 = new Web3(provider);
 
-  console.log('does not fail here');
-
   const accounts = await web3.eth.getAccounts();
-  console.log('this should not be the case');
 
   if (window.ethereum && window.ethereum.isMetamask) {
     // handle metamask account change
@@ -56,12 +51,12 @@ export async function connecToWallet(
       setAccount(newAccounts[0]);
     });
 
-    window.ethereum.on('chainChanged', () => {
-      // Handle the new chain.
-      // Correctly handling chain changes can be complicated.
-      // We recommend reloading the page unless you have good reason not to.
-      window.location.reload();
-    });
+    // window.ethereum.on('chainChanged', () => {
+    //   // Handle the new chain.
+    //   // Correctly handling chain changes can be complicated.
+    //   // We recommend reloading the page unless you have good reason not to.
+    //   window.location.reload();
+    // });
 
     // extremely recommended by metamask
     window.ethereum.on('chainChanged', () => window.location.reload());

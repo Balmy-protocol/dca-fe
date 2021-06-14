@@ -1,12 +1,8 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Menu, { MenuProps } from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
-import styled from 'styled-components';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {
@@ -18,6 +14,7 @@ import {
 } from 'common/wallet-context';
 import { FormattedMessage } from 'react-intl';
 import { disconnecWallet } from 'utils/web3modal';
+import FloatingMenu from '../floating-menu';
 
 interface ConnectWalletButtonProps {
   setWeb3Wallet: setWeb3WalletState;
@@ -28,31 +25,6 @@ interface ConnectWalletButtonProps {
   isLoading: Boolean;
 }
 
-const StyledMenu = withStyles({
-  paper: {
-    border: '1px solid #d3d4d5',
-  },
-})((props: MenuProps) => (
-  <Menu
-    elevation={0}
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    {...props}
-  />
-));
-
-const StyledButton = styled(Button)`
-  max-width: 200px;
-  text-transform: none;
-`;
-
 const WalletButton = ({
   web3Wallet,
   web3Modal,
@@ -61,31 +33,14 @@ const WalletButton = ({
   setAccount,
   isLoading,
 }: ConnectWalletButtonProps) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  debugger;
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  // const
-
+  const buttonContent = isLoading ? (
+    <CircularProgress color="secondary" />
+  ) : (
+    <Typography noWrap={true}>{account}</Typography>
+  );
   return (
     <div>
-      <StyledButton
-        aria-controls="customized-menu"
-        aria-haspopup="true"
-        variant="contained"
-        color="primary"
-        onClick={handleClick}
-      >
-        {isLoading ? <CircularProgress color="secondary" /> : <Typography noWrap={true}>{account}</Typography>}
-      </StyledButton>
-      <StyledMenu id="customized-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+      <FloatingMenu buttonContent={buttonContent} buttonStyles={{ maxWidth: '200px', textTransform: 'none' }}>
         <MenuItem onClick={() => disconnecWallet(web3Wallet, web3Modal, setWeb3Wallet, setAccount)}>
           <ListItemIcon>
             <LinkOffIcon fontSize="small" />
@@ -94,7 +49,7 @@ const WalletButton = ({
             <FormattedMessage description="Disconnect" defaultMessage="Disconnect" />
           </ListItemText>
         </MenuItem>
-      </StyledMenu>
+      </FloatingMenu>
     </div>
   );
 };

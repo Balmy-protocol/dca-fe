@@ -2,76 +2,80 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
-import { DataGrid } from '@material-ui/data-grid';
-import type { GridColDef, GridRowsProp } from '@material-ui/data-grid';
-import { COLUMNS } from './constants';
+import PastPosition from './components/position';
 
-const mockData: GridRowsProp = [
+const mockData = [
   {
-    id: '1',
-    coinFrom: 'ETH',
-    coinTo: 'DAI',
-    initialAmmount: '0.00001',
-    exchangedAmmount: '2',
-    executedFrom: '11/06/2021',
-    daysSet: '8 days',
+    from: 'ETH',
+    to: 'DAI',
+    initialAmmount: 0.00001,
+    exercised: 2,
+    startedAt: new Date('05-11-2021'),
+    daysSet: 8,
   },
   {
-    id: '2',
-    coinFrom: 'ETH',
-    coinTo: 'DAI',
-    initialAmmount: '5',
-    exchangedAmmount: '345200',
-    executedFrom: '11/06/2021',
-    daysSet: '8 days',
+    from: 'ETH',
+    to: 'DAI',
+    initialAmmount: 5,
+    exercised: 345200,
+    startedAt: new Date('05-20-2021'),
+    daysSet: 8,
   },
   {
-    id: '3',
-    coinFrom: 'DAI',
-    coinTo: 'ETH',
-    initialAmmount: '4',
-    exchangedAmmount: '0.0002',
-    executedFrom: '11/06/2021',
-    daysSet: '8 days',
+    from: 'DAI',
+    to: 'ETH',
+    initialAmmount: 4,
+    exercised: 0.0002,
+    startedAt: new Date('04-17-2021'),
+    daysSet: 8,
   },
   {
     id: '4',
-    coinFrom: 'ETH',
-    coinTo: 'DAI',
-    initialAmmount: '0.00001',
-    exchangedAmmount: '2',
-    executedFrom: '11/06/2021',
-    daysSet: '8 days',
+    from: 'ETH',
+    to: 'DAI',
+    initialAmmount: 0.00001,
+    exercised: 2,
+    startedAt: new Date('03-05-2021'),
+    daysSet: 8,
   },
   {
-    id: '5',
-    coinFrom: 'DAI',
-    coinTo: 'EYH',
-    initialAmmount: '2',
-    exchangedAmmount: '0.05',
-    executedFrom: '11/06/2021',
-    daysSet: '8 days',
+    from: 'DAI',
+    to: 'EYH',
+    initialAmmount: 2,
+    exercised: 0.05,
+    startedAt: new Date('03-13-2021'),
+    daysSet: 8,
   },
   {
-    id: '6',
-    coinFrom: 'ETH',
-    coinTo: 'DAI',
-    initialAmmount: '0.04',
-    exchangedAmmount: '2000',
-    executedFrom: '11/06/2021',
-    daysSet: '8 days',
+    from: 'ETH',
+    to: 'DAI',
+    initialAmmount: 0.04,
+    exercised: 2000,
+    startedAt: new Date('02-20-2021'),
+    daysSet: 8,
   },
 ];
 
 const History = () => (
-  <Grid container alignItems="flex-start" justify="center" style={{ height: '100%' }}>
-    <Grid xs={12}>
+  <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
+    <Grid item xs={12}>
       <Typography variant="h3">
         <FormattedMessage description="Previous positions" defaultMessage="Your previous positions" />
       </Typography>
     </Grid>
-    <Grid xs={12} style={{ height: 500 }}>
-      <DataGrid rows={mockData} columns={COLUMNS} />
+    <Grid item xs={12}>
+      <Grid container spacing={2}>
+        {mockData.map(({ from, to, daysSet, startedAt, exercised, initialAmmount }) => (
+          <PastPosition
+            from={from}
+            to={to}
+            daysSet={daysSet}
+            startedAt={startedAt}
+            exercised={exercised}
+            initialAmmount={initialAmmount}
+          />
+        ))}
+      </Grid>
     </Grid>
   </Grid>
 );
