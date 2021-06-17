@@ -65,8 +65,9 @@ const History = () => (
     </Grid>
     <Grid item xs={12}>
       <Grid container spacing={2}>
-        {mockData.map(({ from, to, daysSet, startedAt, exercised, initialAmmount }) => (
+        {mockData.map(({ from, to, daysSet, startedAt, exercised, initialAmmount }, index) => (
           <PastPosition
+            key={index}
             from={from}
             to={to}
             daysSet={daysSet}

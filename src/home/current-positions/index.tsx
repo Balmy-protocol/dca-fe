@@ -48,8 +48,9 @@ const CurrentPositions = () => (
     </Grid>
     <Grid item xs={12}>
       <Grid container spacing={2}>
-        {mockedCurrentPositions.map(({ from, to, remainingDays, startedAt, exercised, remainingLiquidity }) => (
+        {mockedCurrentPositions.map(({ from, to, remainingDays, startedAt, exercised, remainingLiquidity }, index) => (
           <ActivePosition
+            key={index}
             from={from}
             to={to}
             remainingDays={remainingDays}

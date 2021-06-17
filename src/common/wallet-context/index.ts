@@ -2,6 +2,17 @@ import * as React from 'react';
 import Web3Modal from 'web3modal';
 import type Web3 from 'web3';
 
+export type Token = {
+  chainId: number;
+  decimals: number;
+  address: string;
+  name: string;
+  symbol: string;
+  logoUri: string;
+};
+
+export type TokenList = Token[];
+
 export type web3WalletState = null | {};
 
 export type web3ModalState = null | Web3Modal;
@@ -20,6 +31,7 @@ export type WalletContextValue = {
   web3Modal: web3ModalState;
   account: accountState;
   setAccount: setAccountState;
+  tokenList: TokenList;
 };
 
 const WalletContextDefaultValue: WalletContextValue = {
@@ -28,6 +40,7 @@ const WalletContextDefaultValue: WalletContextValue = {
   setWeb3Wallet: () => {},
   account: '',
   setAccount: () => {},
+  tokenList: [],
 };
 
 const WalletContext = React.createContext(WalletContextDefaultValue);
