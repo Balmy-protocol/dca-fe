@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
 import MainApp from './frame';
 import EnMessages from 'config/lang/en_US.json';
-import WalletContext, { web3ModalState, TokenList } from 'common/wallet-context';
+import WalletContext, { WalletContextDefaultValue, web3ModalState, TokenList } from 'common/wallet-context';
 import { setUpWeb3Modal } from 'utils/web3modal';
 import axios from 'axios';
 
@@ -34,7 +34,6 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
     }
 
     async function setTokenListEffect() {
-      debugger;
       const geckoTokens = await axios.get<{ tokens: TokenList }>('https://tokens.coingecko.com/uniswap/all.json');
 
       setTokenList(geckoTokens.data.tokens);
@@ -61,6 +60,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
         account,
         setAccount,
         tokenList,
+        graphPricesClient: WalletContextDefaultValue.graphPricesClient,
       }}
     >
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
