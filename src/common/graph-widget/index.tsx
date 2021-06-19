@@ -37,11 +37,7 @@ const GraphWidget = ({ from, to, fromLabel, toLabel, client }: GraphWidgetProps)
     tokenBLabel = fromLabel;
   }
 
-  const {
-    loading: loadingPool,
-    error: errorPool,
-    data,
-  } = useQuery(getPool, {
+  const { loading: loadingPool, data } = useQuery(getPool, {
     variables: { tokenA, tokenB },
     skip: !(tokenA && tokenB),
     client,
@@ -50,15 +46,10 @@ const GraphWidget = ({ from, to, fromLabel, toLabel, client }: GraphWidgetProps)
   const { pools } = data || {};
 
   if (pools && pools.length) {
-    debugger;
     poolId = pools[0].id;
   }
 
-  const {
-    loading: loadingPrices,
-    error,
-    data: dataPrices,
-  } = useQuery(getTokenPrices, {
+  const { loading: loadingPrices, data: dataPrices } = useQuery(getTokenPrices, {
     variables: { pool: poolId },
     skip: !poolId,
     client,

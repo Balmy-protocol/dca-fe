@@ -37,7 +37,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       const geckoTokens = await axios.get<{ tokens: TokenList }>('https://tokens.coingecko.com/uniswap/all.json');
 
       setTokenList(geckoTokens.data.tokens);
-      setIsLoadingTokens(true);
+      setIsLoadingTokens(false);
     }
 
     if (!web3Modal) {
