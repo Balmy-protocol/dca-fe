@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
-import MainApp from './frame';
 import EnMessages from 'config/lang/en_US.json';
-import WalletContext, { WalletContextDefaultValue, web3ModalState, TokenList } from 'common/wallet-context';
+import WalletContext, { WalletContextDefaultValue, Web3ModalState, TokenList } from 'common/wallet-context';
 import { setUpWeb3Modal } from 'utils/web3modal';
 import axios from 'axios';
+import MainApp from './frame';
 
 type AppProps = {
   messages: any;
@@ -21,7 +21,7 @@ function loadLocaleData(locale: string) {
 
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
   const [web3Wallet, setWeb3Wallet] = React.useState(null);
-  const [web3Modal, setWeb3Modal] = React.useState<web3ModalState>(null);
+  const [web3Modal, setWeb3Modal] = React.useState<Web3ModalState>(null);
   const [tokenList, setTokenList] = React.useState<TokenList>([]);
   const [account, setAccount] = React.useState('');
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
@@ -41,10 +41,12 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
     }
 
     if (!web3Modal) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       setWeb3ModalEffect();
     }
 
     if (!tokenList.length) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       setTokenListEffect();
     }
   }, [web3Modal, tokenList]);
@@ -63,6 +65,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
         graphPricesClient: WalletContextDefaultValue.graphPricesClient,
       }}
     >
+      {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
         <MainApp isLoading={isLoading} />
       </IntlProvider>

@@ -7,7 +7,7 @@ import Home from 'home';
 import { styled as materialStyled } from '@material-ui/core/styles';
 
 interface AppFrameProps {
-  isLoading: Boolean;
+  isLoading: boolean;
 }
 
 const StyledGridContainer = materialStyled(Grid)(({ isLoading }: AppFrameProps) => ({

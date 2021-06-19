@@ -7,8 +7,9 @@ import styled from 'styled-components';
 
 interface FloatingMenuProps {
   buttonContent: React.ReactNode;
-  buttonStyles?: React.CSSProperties;
-  isIcon?: boolean;
+  buttonStyles: React.CSSProperties;
+  isIcon: boolean;
+  children: React.ReactNode;
 }
 
 const StyledMenu = withStyles({
@@ -36,7 +37,12 @@ const StyledButton = styled(Button)`
   text-transform: none;
 `;
 
-const WalletButton: React.FC<FloatingMenuProps> = ({ buttonContent, buttonStyles, children, isIcon }) => {
+const WalletButton: React.FC<FloatingMenuProps> = ({
+  buttonContent,
+  buttonStyles,
+  children,
+  isIcon,
+}: FloatingMenuProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

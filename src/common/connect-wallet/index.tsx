@@ -2,12 +2,12 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import { FormattedMessage } from 'react-intl';
 import { connecToWallet } from 'utils/web3modal';
-import { setWeb3WalletState, web3ModalState, setAccountState } from 'common/wallet-context';
+import { SetWeb3WalletState, Web3ModalState, SetAccountState } from 'common/wallet-context';
 
 interface ConnectWalletButtonProps {
-  setWeb3Wallet: setWeb3WalletState;
-  web3Modal: web3ModalState;
-  setAccount: setAccountState;
+  setWeb3Wallet: SetWeb3WalletState;
+  web3Modal: Web3ModalState;
+  setAccount: SetAccountState;
 }
 
 const ConnectWalletButton = ({ setWeb3Wallet, web3Modal, setAccount }: ConnectWalletButtonProps) => (

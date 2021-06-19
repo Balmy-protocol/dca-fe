@@ -20,14 +20,15 @@ module.exports = {
   rules: {
     // Too restrictive, writing ugly code to defend against a very unlikely scenario: https://eslint.org/docs/rules/no-prototype-builtins
     'no-prototype-builtins': 'off',
-    // Too restrictive: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/destructuring-assignment.md
-    'react/destructuring-assignment': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/destructuring-assignment': ['error'],
     // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
-    'react/jsx-filename-extension': 'off',
+    'react/jsx-filename-extension': ['error'],
     // Use function hoisting to improve code readability
     'no-use-before-define': ['error'],
-    // Allow most functions to rely on type inference. If the function is exported, then `@typescript-eslint/explicit-module-boundary-types` will ensure it's typed.
-    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    'react/no-array-index-key': 'off',
+    'import/prefer-default-export': 'off',
     '@typescript-eslint/no-use-before-define': [
       'error',
       { functions: false, classes: true, variables: true, typedefs: true },

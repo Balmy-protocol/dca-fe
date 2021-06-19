@@ -3,8 +3,8 @@ import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
 import Select from 'common/select';
-import { SwapContextValue } from '../../SwapContext';
 import { TokenList } from 'common/wallet-context';
+import { SwapContextValue } from '../../SwapContext';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -52,7 +52,7 @@ const Swap = ({ from, to, fromValue, toValue, setFrom, setTo, setFromValue, setT
       <Grid container>
         <Grid container alignItems="center">
           <Grid item xs={2}>
-            <Select options={mappedTokenList} onChange={setFrom} selected={from} />
+            {/* <Select options={mappedTokenList} onChange={setFrom} selected={from} /> */}
           </Grid>
           <Grid item xs={10}>
             input
@@ -60,7 +60,7 @@ const Swap = ({ from, to, fromValue, toValue, setFrom, setTo, setFromValue, setT
         </Grid>
         <Grid container alignItems="center">
           <Grid item xs={2}>
-            <Select options={mappedTokenList} onChange={setTo} selected={to} />
+            {/* <Select options={mappedTokenList} onChange={setTo} selected={to} /> */}
           </Grid>
           <Grid item xs={10}>
             input

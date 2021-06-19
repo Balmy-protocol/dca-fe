@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Grid from '@material-ui/core/Grid';
-import Swap from './components/swap';
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
+import Swap from './components/swap';
 
 const SwapContainer = () => {
   const [from, setFrom] = React.useState('');

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "start": "webpack serve --config webpack.dev.js",
-    "lint": "run-p lint-es lint-ts",
+    "lint": "run-p lint-es",
     "lint-es": "eslint --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "lint-ts": "tsc --noEmit",
     "test": "jest",

@@ -1,18 +1,18 @@
 import * as React from 'react';
 
-export type setFromToState = React.Dispatch<React.SetStateAction<String>>;
+export type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
 
-export type setFromToValueState = React.Dispatch<React.SetStateAction<number>>;
+export type SetFromToValueState = React.Dispatch<React.SetStateAction<number>>;
 
 export type SwapContextValue = {
   from: string;
   fromValue: number;
   to: string;
   toValue: number;
-  setFrom: setFromToState;
-  setTo: setFromToState;
-  setToValue: setFromToValueState;
-  setFromValue: setFromToValueState;
+  setFrom: SetFromToState;
+  setTo: SetFromToState;
+  setToValue: SetFromToValueState;
+  setFromValue: SetFromToValueState;
 };
 
 const SwapContextDefaultValue: SwapContextValue = {

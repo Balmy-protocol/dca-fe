@@ -6,8 +6,9 @@ import styled from 'styled-components';
 import SwapContainer from '../swap-container';
 import History from '../history';
 import CurrentPositions from '../current-positions';
+
 interface HomeFrameProps {
-  isLoading: Boolean;
+  isLoading: boolean;
 }
 
 const StyledContainer = styled(Container)<HomeFrameProps>`

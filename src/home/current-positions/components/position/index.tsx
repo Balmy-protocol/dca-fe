@@ -53,7 +53,7 @@ const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remaini
             <ArrowForwardIcon />
             <Typography variant="h6">{to}</Typography>
           </StyledCardTitleHeader>
-          <FloatingMenu buttonContent={buttonContent} isIcon>
+          <FloatingMenu buttonContent={buttonContent} buttonStyles={{}} isIcon>
             <MenuItem onClick={() => alert('are you fucking sure?')}>
               <StyledListItemIcon>
                 <DeleteForeverIcon fontSize="small" />

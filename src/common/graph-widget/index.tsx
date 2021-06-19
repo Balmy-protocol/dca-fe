@@ -37,7 +37,7 @@ const GraphWidget = ({ from, to, fromLabel, toLabel, client }: GraphWidgetProps)
     tokenBLabel = fromLabel;
   }
 
-  const { loading: loadingPool, data } = useQuery(getPool, {
+  const { loading: loadingPool, data } = useQuery<{ pools: { id: string }[] }>(getPool, {
     variables: { tokenA, tokenB },
     skip: !(tokenA && tokenB),
     client,
@@ -49,7 +49,7 @@ const GraphWidget = ({ from, to, fromLabel, toLabel, client }: GraphWidgetProps)
     poolId = pools[0].id;
   }
 
-  const { loading: loadingPrices, data: dataPrices } = useQuery(getTokenPrices, {
+  const { loading: loadingPrices, data: dataPrices } = useQuery<{ poolDayDatas: Price[] }>(getTokenPrices, {
     variables: { pool: poolId },
     skip: !poolId,
     client,
@@ -76,10 +76,6 @@ const GraphWidget = ({ from, to, fromLabel, toLabel, client }: GraphWidgetProps)
     ],
     []
   );
-
-  if (dataPrices) {
-    console.log('got prices!!', dataPrices);
-  }
 
   const isLoading = loadingPool || loadingPrices;
 
