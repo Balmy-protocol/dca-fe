@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
-import WalletContext, { WalletContextDefaultValue, Web3ModalState, TokenList } from 'common/wallet-context';
+import WalletContext, { WalletContextDefaultValue, Web3ModalState, TokenList, Token } from 'common/wallet-context';
 import { setUpWeb3Modal } from 'utils/web3modal';
 import axios from 'axios';
 import MainApp from './frame';
@@ -22,7 +22,7 @@ function loadLocaleData(locale: string) {
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
   const [web3Wallet, setWeb3Wallet] = React.useState(null);
   const [web3Modal, setWeb3Modal] = React.useState<Web3ModalState>(null);
-  const [tokenList, setTokenList] = React.useState<TokenList>([]);
+  const [tokenList, setTokenList] = React.useState<TokenList>({});
   const [account, setAccount] = React.useState('');
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
   const [isLoadingTokens, setIsLoadingTokens] = React.useState(true);
@@ -34,9 +34,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
     }
 
     async function setTokenListEffect() {
-      const geckoTokens = await axios.get<{ tokens: TokenList }>('https://tokens.coingecko.com/uniswap/all.json');
+      const geckoTokens = await axios.get<{ tokens: Token[] }>('https://tokens.coingecko.com/uniswap/all.json');
 
-      setTokenList(geckoTokens.data.tokens);
+      const reducedTokens = geckoTokens.data.tokens.reduce(
+        (acc, token) => ({ ...acc, [token.address]: { ...token } }),
+        {}
+      );
+      setTokenList(reducedTokens);
       setIsLoadingTokens(false);
     }
 
@@ -45,7 +49,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       setWeb3ModalEffect();
     }
 
-    if (!tokenList.length) {
+    if (!Object.keys(tokenList).length) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       setTokenListEffect();
     }

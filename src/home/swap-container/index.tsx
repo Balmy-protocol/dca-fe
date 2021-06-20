@@ -32,8 +32,8 @@ const SwapContainer = () => {
               <GraphWidget
                 from={from}
                 to={to}
-                fromLabel={tokenList.find((el) => el.address === from)?.symbol || ''}
-                toLabel={tokenList.find((el) => el.address === to)?.symbol || ''}
+                fromLabel={tokenList[from]?.symbol || ''}
+                toLabel={tokenList[to]?.symbol || ''}
                 client={graphPricesClient}
               />
             </Grid>

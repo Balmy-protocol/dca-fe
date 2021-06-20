@@ -10,10 +10,10 @@ export type Token = {
   address: string;
   name: string;
   symbol: string;
-  logoUri: string;
+  logoURI: string;
 };
 
-export type TokenList = Token[];
+export type TokenList = Record<string, Token>;
 
 export type Web3WalletState = null | Web3;
 
@@ -41,7 +41,7 @@ export const WalletContextDefaultValue: WalletContextValue = {
   setWeb3Wallet: () => {},
   account: '',
   setAccount: () => {},
-  tokenList: [],
+  tokenList: {},
   graphPricesClient,
 };
 

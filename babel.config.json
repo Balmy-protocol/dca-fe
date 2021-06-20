@@ -13,6 +13,6 @@
       }
     ],
     ["babel-plugin-styled-components"],
-    ["babel-plugin-graphql-tag"]
+    ["babel-plugin-graphql-tag"],
   ]
 }
