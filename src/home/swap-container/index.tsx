@@ -7,8 +7,10 @@ import Swap from './components/swap';
 const SwapContainer = () => {
   const [from, setFrom] = React.useState('');
   const [to, setTo] = React.useState('');
-  const [fromValue, setFromValue] = React.useState(0);
-  const [toValue, setToValue] = React.useState(0);
+  const [fromValue, setFromValue] = React.useState('');
+  const [toValue, setToValue] = React.useState('');
+  const [frequencyType, setFrequencyType] = React.useState('');
+  const [frequencyValue, setFrequencyValue] = React.useState('1');
 
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">
@@ -21,6 +23,10 @@ const SwapContainer = () => {
                 to={to}
                 setFrom={setFrom}
                 setTo={setTo}
+                frequencyType={frequencyType}
+                frequencyValue={frequencyValue}
+                setFrequencyType={setFrequencyType}
+                setFrequencyValue={setFrequencyValue}
                 fromValue={fromValue}
                 toValue={toValue}
                 setFromValue={setFromValue}

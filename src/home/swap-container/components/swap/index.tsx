@@ -2,11 +2,15 @@ import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { TokenList } from 'common/wallet-context';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
 import TokenButton from 'common/token-button';
+import TokenInput from 'common/token-input';
+import FrequencyInput from 'common/frequency-input';
 import { SwapContextValue } from '../../SwapContext';
 
 const StyledPaper = styled(Paper)`
@@ -31,7 +35,21 @@ interface SwapProps extends SwapContextValue {
   tokenList: TokenList;
 }
 
-const Swap = ({ from, to, fromValue, toValue, setFrom, setTo, setFromValue, setToValue, tokenList }: SwapProps) => {
+const Swap = ({
+  from,
+  to,
+  fromValue,
+  toValue,
+  setFrom,
+  setTo,
+  setFromValue,
+  setToValue,
+  tokenList,
+  setFrequencyType,
+  setFrequencyValue,
+  frequencyType,
+  frequencyValue,
+}: SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
 
   React.useEffect(() => {
@@ -49,7 +67,7 @@ const Swap = ({ from, to, fromValue, toValue, setFrom, setTo, setFromValue, setT
     <StyledPaper elevation={3}>
       <TokenPicker shouldShow={shouldShowPicker} tokenList={tokenList} />
       <Grid container>
-        <Grid container alignItems="center">
+        <Grid container alignItems="center" justify="space-between">
           <Grid item xs={12}>
             <Typography variant="h6">
               <FormattedMessage description="You pay" defaultMessage="You pay" />
@@ -58,11 +76,11 @@ const Swap = ({ from, to, fromValue, toValue, setFrom, setTo, setFromValue, setT
           <Grid item xs={3}>
             <TokenButton token={tokenList[from]} onClick={() => setShouldShowPicker(true)} />
           </Grid>
-          <Grid item xs={6} onClick={() => setShouldShowPicker(true)}>
-            input
+          <Grid item xs={6}>
+            <TokenInput id="from-value" value={fromValue} label={tokenList[from]?.symbol} onChange={setFromValue} />
           </Grid>
         </Grid>
-        <Grid container alignItems="center">
+        <Grid container alignItems="center" justify="space-between">
           <Grid item xs={12}>
             <Typography variant="h6">
               <FormattedMessage description="You get" defaultMessage="You get" />
@@ -72,10 +90,15 @@ const Swap = ({ from, to, fromValue, toValue, setFrom, setTo, setFromValue, setT
             <TokenButton token={tokenList[to]} onClick={() => setShouldShowPicker(true)} />
           </Grid>
           <Grid item xs={6}>
-            input
+            <TokenInput id="to-value" value={toValue} disabled label={tokenList[to]?.symbol} onChange={setToValue} />
           </Grid>
         </Grid>
-        <Grid container alignItems="center"></Grid>
+        <Grid container alignItems="center">
+          <Typography variant="body1">
+            <FormattedMessage description="Set for" defaultMessage="Set for" />
+          </Typography>
+          <FrequencyInput id="frequency-value" value={frequencyValue} label="" onChange={setFrequencyValue} />
+        </Grid>
       </Grid>
     </StyledPaper>
   );

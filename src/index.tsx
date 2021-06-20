@@ -6,6 +6,9 @@ import WalletContext, { WalletContextDefaultValue, Web3ModalState, TokenList, To
 import { setUpWeb3Modal } from 'utils/web3modal';
 import axios from 'axios';
 import MainApp from './frame';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+const theme = createMuiTheme();
 
 type AppProps = {
   messages: any;
@@ -71,7 +74,9 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
     >
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
-        <MainApp isLoading={isLoading} />
+        <ThemeProvider theme={theme}>
+          <MainApp isLoading={isLoading} />
+        </ThemeProvider>
       </IntlProvider>
     </WalletContext.Provider>
   );
