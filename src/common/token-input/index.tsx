@@ -26,7 +26,6 @@ const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
   const inputLabelStyles = roundTextFieldStylesHook.useInputLabel();
   const helperTextStyles = roundTextFieldStylesHook.useHelperText();
 
-  console.log(inputBaseStyles);
   return (
     <TextField
       id={id}

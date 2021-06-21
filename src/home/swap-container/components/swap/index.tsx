@@ -2,8 +2,6 @@ import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import { TokenList } from 'common/wallet-context';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -18,6 +16,7 @@ const StyledPaper = styled(Paper)`
   max-width: 500px;
   position: relative;
   overflow: hidden;
+  border-radius: 20px;
 `;
 
 const selectOptions = [

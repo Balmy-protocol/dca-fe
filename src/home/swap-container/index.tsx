@@ -34,14 +34,8 @@ const SwapContainer = () => {
                 tokenList={tokenList}
               />
             </Grid>
-            <Grid item xs={6}>
-              <GraphWidget
-                from={from}
-                to={to}
-                fromLabel={tokenList[from]?.symbol || ''}
-                toLabel={tokenList[to]?.symbol || ''}
-                client={graphPricesClient}
-              />
+            <Grid item xs={6} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
+              <GraphWidget from={tokenList[from]} to={tokenList[to]} client={graphPricesClient} />
             </Grid>
           </>
         )}
