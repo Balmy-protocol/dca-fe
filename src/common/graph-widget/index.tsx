@@ -130,4 +130,4 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   );
 };
 
-export default GraphWidget;
+export default React.memo(GraphWidget);

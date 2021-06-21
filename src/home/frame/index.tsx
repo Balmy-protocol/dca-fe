@@ -28,9 +28,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => (
         </Grid>
       ) : (
         <>
-          <Grid item xs={12}>
-            Intro goes here
-          </Grid>
+          <Grid item xs={12}></Grid>
           <Grid item xs={12}>
             <SwapContainer />
           </Grid>

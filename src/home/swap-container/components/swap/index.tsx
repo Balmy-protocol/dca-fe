@@ -9,7 +9,9 @@ import TokenPicker from 'common/token-picker';
 import TokenButton from 'common/token-button';
 import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-input';
+import FrequencyTypeInput from 'common/frequency-type-input';
 import { SwapContextValue } from '../../SwapContext';
+import Button from '@material-ui/core/Button';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -19,14 +21,15 @@ const StyledPaper = styled(Paper)`
   border-radius: 20px;
 `;
 
-const selectOptions = [
+const frequencyTypeOptions = [
   {
-    label: 'ETH',
-    value: '0x6b175474e89094c44da98b954eedeac495271d0f',
+    value: 'Days',
   },
   {
-    label: 'DAI',
-    value: 'DAI',
+    value: 'Weeks',
+  },
+  {
+    value: 'Months',
   },
 ];
 
@@ -60,6 +63,10 @@ const Swap = ({
         setTo('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2');
       }
     }
+
+    if (!frequencyType) {
+      setFrequencyType(frequencyTypeOptions[0].value);
+    }
   }, [tokenList]);
 
   return (
@@ -92,11 +99,30 @@ const Swap = ({
             <TokenInput id="to-value" value={toValue} disabled label={tokenList[to]?.symbol} onChange={setToValue} />
           </Grid>
         </Grid>
-        <Grid container alignItems="center">
-          <Typography variant="body1">
-            <FormattedMessage description="Set for" defaultMessage="Set for" />
-          </Typography>
-          <FrequencyInput id="frequency-value" value={frequencyValue} label="" onChange={setFrequencyValue} />
+        <Grid container alignItems="center" justify="space-between">
+          <Grid item xs={12}>
+            <Typography variant="h6">
+              <FormattedMessage description="Set for" defaultMessage="Set for" />
+            </Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <FrequencyInput id="frequency-value" value={frequencyValue} label="" onChange={setFrequencyValue} />
+          </Grid>
+          <Grid item xs={6}>
+            <FrequencyTypeInput
+              id="frequency-type-value"
+              options={frequencyTypeOptions}
+              selected={frequencyType}
+              onChange={setFrequencyType}
+            />
+          </Grid>
+        </Grid>
+        <Grid container alignItems="stretch">
+          <Button size="large" variant="contained" color="primary" style={{ width: '100%' }}>
+            <Typography variant="button">
+              <FormattedMessage description="Start trading" defaultMessage="Start trading" />
+            </Typography>
+          </Button>
         </Grid>
       </Grid>
     </StyledPaper>

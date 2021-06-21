@@ -1,6 +1,8 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { SetFromToValueState } from 'home/swap-container/SwapContext';
+import { roundTextFieldStylesHook } from '@mui-treasury/styles/textField/round';
 
 interface TokenInputProps {
   id: string;
@@ -10,7 +12,7 @@ interface TokenInputProps {
   onChange: (newValue: string) => void | SetFromToValueState;
 }
 
-const inputRegex = RegExp(`^[1-9]\d*$`);
+const inputRegex = RegExp(/^\d*$/);
 
 const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
   const validator = (nextValue: string) => {
@@ -20,26 +22,36 @@ const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
     }
   };
 
+  const inputBaseStyles = roundTextFieldStylesHook.useInputBase();
+  const inputLabelStyles = roundTextFieldStylesHook.useInputLabel();
+  const helperTextStyles = roundTextFieldStylesHook.useHelperText();
+
   return (
     <TextField
       id={id}
-      label={label}
       value={value}
-      variant="filled"
+      placeholder="0"
       inputMode="decimal"
       autoComplete="off"
       autoCorrect="off"
       type="text"
-      placeholder="1"
-      fullWidth
+      margin={'normal'}
       disabled={disabled}
+      spellCheck="false"
+      onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+      InputLabelProps={{ shrink: true, classes: inputLabelStyles }}
+      InputProps={{
+        classes: inputBaseStyles,
+        disableUnderline: true,
+        endAdornment: <InputAdornment position="end">{label}</InputAdornment>,
+        fullWidth: false,
+      }}
       inputProps={{
         pattern: '^[0-9]*[.,]?[0-9]*$',
         minLength: 1,
         maxLength: 79,
       }}
-      spellCheck="false"
-      onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+      FormHelperTextProps={{ classes: helperTextStyles }}
     />
   );
 };
