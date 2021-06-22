@@ -15,6 +15,7 @@ import Button from '@material-ui/core/Button';
 import Divider from 'common/divider-wit-content';
 import IconButton from '@material-ui/core/IconButton';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
+import find from 'lodash/find';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -54,6 +55,7 @@ const Swap = ({
   setFrequencyValue,
   frequencyType,
   frequencyValue,
+  availablePairs,
 }: SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
@@ -82,6 +84,12 @@ const Swap = ({
     setFrom(to);
     setTo(from);
   };
+
+  const isPairExisting = React.useMemo(() => {
+    let token0 = from < to ? from : to;
+    let token1 = from < to ? to : from;
+    return find(availablePairs, { token0, token1 });
+  }, [from, to]);
 
   return (
     <StyledPaper elevation={3}>
@@ -144,7 +152,7 @@ const Swap = ({
           </Grid>
         </Grid>
         <Grid container alignItems="stretch">
-          <Button size="large" variant="contained" color="primary" style={{ width: '100%' }}>
+          <Button size="large" variant="contained" disabled={!isPairExisting} color="primary" style={{ width: '100%' }}>
             <Typography variant="button">
               <FormattedMessage description="Start trading" defaultMessage="Start trading" />
             </Typography>
