@@ -9,7 +9,6 @@ interface TokenButtonProps {
 }
 
 const TokenIcon = ({ token }: TokenButtonProps) => {
-  console.log(token);
   return CryptoIcons[token?.symbol as keyof typeof CryptoIcons] ? (
     <SvgIcon component={CryptoIcons[token?.symbol as keyof typeof CryptoIcons]} viewBox="0 0 32 32" />
   ) : (

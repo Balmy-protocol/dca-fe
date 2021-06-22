@@ -53,6 +53,7 @@ const Swap = ({
   frequencyValue,
 }: SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
+  const [selecting, setSelecting] = React.useState(from);
 
   React.useEffect(() => {
     if (Object.keys(tokenList).length) {
@@ -69,9 +70,23 @@ const Swap = ({
     }
   }, [tokenList]);
 
+  const startSelectingCoin = (token: string) => {
+    setSelecting(token);
+    setShouldShowPicker(true);
+  };
+
+  console.log(selecting === from, selecting, from);
+
   return (
     <StyledPaper elevation={3}>
-      <TokenPicker shouldShow={shouldShowPicker} tokenList={tokenList} />
+      <TokenPicker
+        shouldShow={shouldShowPicker}
+        onClose={() => setShouldShowPicker(false)}
+        isFrom={selecting === from}
+        selected={selecting}
+        onChange={selecting === from ? setFrom : setTo}
+        tokenList={tokenList}
+      />
       <Grid container>
         <Grid container alignItems="center" justify="space-between">
           <Grid item xs={12}>
@@ -80,7 +95,7 @@ const Swap = ({
             </Typography>
           </Grid>
           <Grid item xs={3}>
-            <TokenButton token={tokenList[from]} onClick={() => setShouldShowPicker(true)} />
+            <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
           </Grid>
           <Grid item xs={6}>
             <TokenInput id="from-value" value={fromValue} label={tokenList[from]?.symbol} onChange={setFromValue} />
@@ -93,7 +108,7 @@ const Swap = ({
             </Typography>
           </Grid>
           <Grid item xs={3}>
-            <TokenButton token={tokenList[to]} onClick={() => setShouldShowPicker(true)} />
+            <TokenButton token={tokenList[to]} onClick={() => startSelectingCoin(to)} />
           </Grid>
           <Grid item xs={6}>
             <TokenInput id="to-value" value={toValue} disabled label={tokenList[to]?.symbol} onChange={setToValue} />

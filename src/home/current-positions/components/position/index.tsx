@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
@@ -9,6 +10,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import BlockIcon from '@material-ui/icons/Block';
+import CallSplitIcon from '@material-ui/icons/CallSplit';
+import SettingsIcon from '@material-ui/icons/Settings';
 import { FormattedMessage } from 'react-intl';
 import { DateTime } from 'luxon';
 import FloatingMenu from 'common/floating-menu';
@@ -32,6 +36,14 @@ const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 28px;
 `;
 
+const useDeletedStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      backgroundColor: theme.palette.error.main,
+    },
+  })
+);
+
 interface ActivePositionProps {
   from: string;
   to: string;
@@ -43,6 +55,7 @@ interface ActivePositionProps {
 
 const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remainingLiquidity }: ActivePositionProps) => {
   const buttonContent = <MoreVertIcon />;
+  const classNames = useDeletedStyles();
 
   return (
     <StyledCard>
@@ -56,7 +69,23 @@ const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remaini
           <FloatingMenu buttonContent={buttonContent} buttonStyles={{}} isIcon>
             <MenuItem onClick={() => alert('are you fucking sure?')}>
               <StyledListItemIcon>
-                <DeleteForeverIcon fontSize="small" />
+                <CallSplitIcon fontSize="small" />
+              </StyledListItemIcon>
+              <ListItemText>
+                <FormattedMessage description="Withdraw" defaultMessage="Withdraw" />
+              </ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => alert('are you fucking sure?')}>
+              <StyledListItemIcon>
+                <SettingsIcon fontSize="small" />
+              </StyledListItemIcon>
+              <ListItemText>
+                <FormattedMessage description="Modify frequency" defaultMessage="Modify Frequency" />
+              </ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => alert('are you fucking sure?')} classes={classNames}>
+              <StyledListItemIcon>
+                <BlockIcon fontSize="small" />
               </StyledListItemIcon>
               <ListItemText>
                 <FormattedMessage description="Drop out" defaultMessage="Drop out" />
