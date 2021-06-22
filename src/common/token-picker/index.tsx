@@ -83,6 +83,11 @@ const TokenPicker = ({ shouldShow, tokenList, isFrom, onClose, onChange }: Token
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const inputStyles = useSearchInputStyles();
 
+  const handleItemSelected = (item: string) => {
+    onChange(item);
+    onClose();
+  };
+
   const memoizedTokenKeys = React.useMemo(
     () =>
       tokenKeys.filter(
@@ -131,7 +136,7 @@ const TokenPicker = ({ shouldShow, tokenList, isFrom, onClose, onChange }: Token
                   itemCount={memoizedTokenKeys.length}
                   itemSize={35}
                   width={width}
-                  itemData={{ onClick: onChange, tokenList, tokenKeys: memoizedTokenKeys }}
+                  itemData={{ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }}
                 >
                   {Row}
                 </List>

@@ -1,14 +1,17 @@
 import React from 'react';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { useQuery } from '@apollo/client';
+import styled from 'styled-components';
 import { Chart } from 'react-charts';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import getPool from 'graphql/getPool.graphql';
 import getTokenPrices from 'graphql/getTokenPrices.graphql';
 import { Token } from 'common/wallet-context';
 import { DateTime } from 'luxon';
+import { FormattedMessage } from 'react-intl';
 
 interface GraphWidgetProps {
   from: Token;
@@ -23,6 +26,13 @@ interface Price {
 }
 
 type graphToken = Token | { address: string; symbol: string };
+
+const StyledLoadingIndicatorWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
 
 const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   let tokenA: graphToken = { address: '', symbol: '' };
@@ -81,20 +91,6 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
     []
   );
 
-  // const primaryCursor = React.useMemo(
-  //   () => ({
-  //     render: ({ formattedValue }: { formattedValue: null | string }) => (
-  //       <div style={{
-  //         display: 'flex',
-  //         alignItems: 'center',
-  //       }}>
-  //           <Typography variant="body2">{`${(formattedValue || '').toString()}`}</Typography>
-  //       </div>
-  //     )
-  //   }),
-  //   [tokenA, tokenB]
-  // )
-
   const tooltip = React.useMemo(
     () => ({
       render: ({ datum }: { datum: { yValue: string } }) => {
@@ -106,26 +102,43 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
     [tokenA, tokenB]
   );
 
-  const isLoading = loadingPool || loadingPrices || prices.length === 0;
+  const isLoading = loadingPool || loadingPrices;
+  console.log(isLoading);
+  const noData = prices.length === 0;
 
-  return isLoading ? null : (
+  return (
     <Grid container spacing={2} direction="column">
-      <Typography variant="h4">{`${tokenA.symbol}/${tokenB.symbol}`}</Typography>
-      <div style={{ flex: 1 }}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <div style={{ height, width }}>
-              <Chart
-                data={graphData}
-                axes={axes}
-                primaryCursor
-                tooltip={tooltip}
-                // secondaryCursor={secondaryCursor}
-              />
-            </div>
+      {isLoading ? (
+        <StyledLoadingIndicatorWrapper>
+          <CircularProgress />
+        </StyledLoadingIndicatorWrapper>
+      ) : (
+        <>
+          {noData ? (
+            <StyledLoadingIndicatorWrapper>
+              <Typography variant="h6">
+                <FormattedMessage
+                  description="No data available"
+                  defaultMessage="There is no data available about this pair"
+                />
+              </Typography>
+            </StyledLoadingIndicatorWrapper>
+          ) : (
+            <>
+              <Typography variant="h4">{`${tokenA.symbol}/${tokenB.symbol}`}</Typography>
+              <div style={{ flex: 1 }}>
+                <AutoSizer>
+                  {({ height, width }) => (
+                    <div style={{ height, width }}>
+                      <Chart data={graphData} axes={axes} primaryCursor tooltip={tooltip} />
+                    </div>
+                  )}
+                </AutoSizer>
+              </div>
+            </>
           )}
-        </AutoSizer>
-      </div>
+        </>
+      )}
     </Grid>
   );
 };

@@ -12,6 +12,9 @@ import FrequencyInput from 'common/frequency-input';
 import FrequencyTypeInput from 'common/frequency-type-input';
 import { SwapContextValue } from '../../SwapContext';
 import Button from '@material-ui/core/Button';
+import Divider from 'common/divider-wit-content';
+import IconButton from '@material-ui/core/IconButton';
+import SwapVertIcon from '@material-ui/icons/SwapVert';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -75,7 +78,10 @@ const Swap = ({
     setShouldShowPicker(true);
   };
 
-  console.log(selecting === from, selecting, from);
+  const toggleFromTo = () => {
+    setFrom(to);
+    setTo(from);
+  };
 
   return (
     <StyledPaper elevation={3}>
@@ -101,6 +107,11 @@ const Swap = ({
             <TokenInput id="from-value" value={fromValue} label={tokenList[from]?.symbol} onChange={setFromValue} />
           </Grid>
         </Grid>
+        <Divider>
+          <IconButton onClick={toggleFromTo}>
+            <SwapVertIcon />
+          </IconButton>
+        </Divider>
         <Grid container alignItems="center" justify="space-between">
           <Grid item xs={12}>
             <Typography variant="h6">
