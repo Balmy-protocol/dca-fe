@@ -25,18 +25,11 @@ const NavBar = ({ isLoading }: NavBarProps) => (
         </Typography>
       </StyledBox>
       <WalletContext.Consumer>
-        {({ web3Wallet, setWeb3Wallet, web3Modal, setAccount, account }) =>
-          !web3Wallet && !isLoading ? (
-            <ConnectWalletButtom setAccount={setAccount} setWeb3Wallet={setWeb3Wallet} web3Modal={web3Modal} />
+        {({ web3Service }) =>
+          !web3Service.getAccount() && !isLoading ? (
+            <ConnectWalletButtom web3Service={web3Service} />
           ) : (
-            <WalletButtom
-              isLoading={isLoading}
-              setAccount={setAccount}
-              account={account}
-              web3Wallet={web3Wallet}
-              setWeb3Wallet={setWeb3Wallet}
-              web3Modal={web3Modal}
-            />
+            <WalletButtom isLoading={isLoading} web3Service={web3Service} />
           )
         }
       </WalletContext.Consumer>

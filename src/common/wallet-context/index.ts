@@ -3,6 +3,7 @@ import Web3Modal from 'web3modal';
 import type Web3 from 'web3';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import graphPricesClient from 'utils/graphPricesApolloClient';
+import Web3Service from 'services/web3Service';
 
 export type Token = {
   chainId: number;
@@ -15,34 +16,18 @@ export type Token = {
 
 export type TokenList = Record<string, Token>;
 
-export type Web3WalletState = null | Web3;
-
-export type Web3ModalState = null | Web3Modal;
-
-export type SetWeb3WalletState = React.Dispatch<React.SetStateAction<Web3WalletState>>;
-
-export type AccountState = string;
-
-export type SetAccountState = React.Dispatch<React.SetStateAction<AccountState>>;
-
 export type WalletContextValue = {
-  web3Wallet: Web3WalletState;
-  setWeb3Wallet: SetWeb3WalletState;
-  web3Modal: Web3ModalState;
-  account: AccountState;
-  setAccount: SetAccountState;
+  web3Service: Web3Service;
   tokenList: TokenList;
   graphPricesClient: ApolloClient<NormalizedCacheObject>;
+  account: string;
 };
 
 export const WalletContextDefaultValue: WalletContextValue = {
-  web3Wallet: null,
-  web3Modal: null,
-  setWeb3Wallet: () => {},
-  account: '',
-  setAccount: () => {},
+  web3Service: new Web3Service(),
   tokenList: {},
   graphPricesClient,
+  account: '',
 };
 
 const WalletContext = React.createContext(WalletContextDefaultValue);

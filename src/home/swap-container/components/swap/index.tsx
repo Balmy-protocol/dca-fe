@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
 import { TokenList } from 'common/wallet-context';
 import Typography from '@material-ui/core/Typography';
+import Grow from '@material-ui/core/Grow';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
 import TokenButton from 'common/token-button';
@@ -16,6 +17,7 @@ import Divider from 'common/divider-wit-content';
 import IconButton from '@material-ui/core/IconButton';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 import find from 'lodash/find';
+import WarningIcon from '@material-ui/icons/Warning';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -23,6 +25,20 @@ const StyledPaper = styled(Paper)`
   position: relative;
   overflow: hidden;
   border-radius: 20px;
+`;
+
+const StyledWarningContainer = styled(Paper)<{ in: boolean }>`
+  border-radius: 3px;
+  background-color: ${(props) => props.theme.palette.warning.light};
+  display: ${(props) => (props.in ? 'flex' : 'none')};
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+`;
+
+const StyledWarningIcon = styled(WarningIcon)`
+  color: ${(props) => props.theme.palette.warning.dark};
 `;
 
 const frequencyTypeOptions = [
@@ -88,7 +104,7 @@ const Swap = ({
   const isPairExisting = React.useMemo(() => {
     let token0 = from < to ? from : to;
     let token1 = from < to ? to : from;
-    return find(availablePairs, { token0, token1 });
+    return !!find(availablePairs, { token0, token1 });
   }, [from, to]);
 
   return (
@@ -151,12 +167,41 @@ const Swap = ({
             />
           </Grid>
         </Grid>
-        <Grid container alignItems="stretch">
-          <Button size="large" variant="contained" disabled={!isPairExisting} color="primary" style={{ width: '100%' }}>
-            <Typography variant="button">
-              <FormattedMessage description="Start trading" defaultMessage="Start trading" />
-            </Typography>
-          </Button>
+        <Grid container alignItems="stretch" spacing={2}>
+          <Grid item xs={12}>
+            <Grow in={!isPairExisting}>
+              <StyledWarningContainer elevation={0} in={!isPairExisting}>
+                <StyledWarningIcon />
+                <Typography variant="body1">
+                  <FormattedMessage
+                    description="This pair does not exist yet"
+                    defaultMessage="This pair does not exist yet"
+                  />
+                </Typography>
+                <Button size="small" variant="contained" disabled={isPairExisting} color="primary">
+                  <Typography variant="button">
+                    <FormattedMessage
+                      description="Be the first to create it"
+                      defaultMessage="Be the first to create it"
+                    />
+                  </Typography>
+                </Button>
+              </StyledWarningContainer>
+            </Grow>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              size="large"
+              variant="contained"
+              disabled={!isPairExisting}
+              color="primary"
+              style={{ width: '100%' }}
+            >
+              <Typography variant="button">
+                <FormattedMessage description="Start trading" defaultMessage="Start trading" />
+              </Typography>
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
     </StyledPaper>

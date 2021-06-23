@@ -2,11 +2,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
-import WalletContext, { WalletContextDefaultValue, Web3ModalState, TokenList, Token } from 'common/wallet-context';
-import { setUpWeb3Modal } from 'utils/web3modal';
+import WalletContext, { WalletContextDefaultValue, TokenList, Token } from 'common/wallet-context';
 import axios from 'axios';
 import MainApp from './frame';
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from 'styled-components';
+import Web3Service from 'services/web3Service';
 
 const theme = createMuiTheme();
 
@@ -23,16 +24,15 @@ function loadLocaleData(locale: string) {
 }
 
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
-  const [web3Wallet, setWeb3Wallet] = React.useState(null);
-  const [web3Modal, setWeb3Modal] = React.useState<Web3ModalState>(null);
-  const [tokenList, setTokenList] = React.useState<TokenList>({});
   const [account, setAccount] = React.useState('');
+  const [web3Service, setWeb3Service] = React.useState(new Web3Service(setAccount));
+  const [tokenList, setTokenList] = React.useState<TokenList>({});
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
   const [isLoadingTokens, setIsLoadingTokens] = React.useState(true);
 
   React.useEffect(() => {
     async function setWeb3ModalEffect() {
-      setWeb3Modal(await setUpWeb3Modal(setWeb3Wallet, setAccount));
+      await web3Service.setUpModal();
       setIsLoadingWeb3(false);
     }
 
@@ -47,7 +47,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       setIsLoadingTokens(false);
     }
 
-    if (!web3Modal) {
+    if (!web3Service.getModal()) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       setWeb3ModalEffect();
     }
@@ -56,27 +56,26 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       setTokenListEffect();
     }
-  }, [web3Modal, tokenList]);
+  }, [web3Service, tokenList]);
 
   const isLoading = isLoadingTokens || isLoadingWeb3;
 
   return (
     <WalletContext.Provider
       value={{
-        web3Wallet,
-        setWeb3Wallet,
-        web3Modal,
-        account,
-        setAccount,
+        web3Service,
         tokenList,
+        account,
         graphPricesClient: WalletContextDefaultValue.graphPricesClient,
       }}
     >
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
-        <ThemeProvider theme={theme}>
-          <MainApp isLoading={isLoading} />
-        </ThemeProvider>
+        <MuiThemeProvider theme={theme}>
+          <ThemeProvider theme={theme}>
+            <MainApp isLoading={isLoading} />
+          </ThemeProvider>
+        </MuiThemeProvider>
       </IntlProvider>
     </WalletContext.Provider>
   );

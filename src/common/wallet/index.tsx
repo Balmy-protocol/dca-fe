@@ -5,35 +5,21 @@ import ListItemText from '@material-ui/core/ListItemText';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {
-  SetWeb3WalletState,
-  Web3ModalState,
-  SetAccountState,
-  Web3WalletState,
-  AccountState,
-} from 'common/wallet-context';
+import Web3Service from 'services/web3Service';
 import { FormattedMessage } from 'react-intl';
-import { disconnecWallet } from 'utils/web3modal';
 import FloatingMenu from '../floating-menu';
 
 interface ConnectWalletButtonProps {
-  setWeb3Wallet: SetWeb3WalletState;
-  web3Modal: Web3ModalState;
-  setAccount: SetAccountState;
-  web3Wallet: Web3WalletState;
-  account: AccountState;
+  web3Service: Web3Service;
   isLoading: boolean;
 }
 
-const WalletButton = ({
-  web3Wallet,
-  web3Modal,
-  setWeb3Wallet,
-  account,
-  setAccount,
-  isLoading,
-}: ConnectWalletButtonProps) => {
-  const buttonContent = isLoading ? <CircularProgress color="secondary" /> : <Typography noWrap>{account}</Typography>;
+const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
+  const buttonContent = isLoading ? (
+    <CircularProgress color="secondary" />
+  ) : (
+    <Typography noWrap>{web3Service.getAccount()}</Typography>
+  );
   return (
     <div>
       <FloatingMenu
@@ -41,7 +27,7 @@ const WalletButton = ({
         buttonStyles={{ maxWidth: '200px', textTransform: 'none' }}
         isIcon={false}
       >
-        <MenuItem onClick={() => disconnecWallet(web3Wallet, web3Modal, setWeb3Wallet, setAccount)}>
+        <MenuItem onClick={() => web3Service.disconnect()}>
           <ListItemIcon>
             <LinkOffIcon fontSize="small" />
           </ListItemIcon>

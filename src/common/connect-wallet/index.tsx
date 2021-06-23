@@ -1,17 +1,14 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import { FormattedMessage } from 'react-intl';
-import { connecToWallet } from 'utils/web3modal';
-import { SetWeb3WalletState, Web3ModalState, SetAccountState } from 'common/wallet-context';
+import Web3Service from 'services/web3Service';
 
 interface ConnectWalletButtonProps {
-  setWeb3Wallet: SetWeb3WalletState;
-  web3Modal: Web3ModalState;
-  setAccount: SetAccountState;
+  web3Service: Web3Service;
 }
 
-const ConnectWalletButton = ({ setWeb3Wallet, web3Modal, setAccount }: ConnectWalletButtonProps) => (
-  <Button color="inherit" onClick={() => connecToWallet(setWeb3Wallet, web3Modal, setAccount)}>
+const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => (
+  <Button color="inherit" onClick={() => web3Service.connect()}>
     <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
   </Button>
 );
