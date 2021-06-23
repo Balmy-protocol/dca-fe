@@ -3,6 +3,9 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { SetFromToValueState } from 'home/swap-container/SwapContext';
 import { roundTextFieldStylesHook } from '@mui-treasury/styles/textField/round';
+import Typography from '@material-ui/core/Typography';
+import { FormattedMessage } from 'react-intl';
+import { BigNumber } from 'ethers';
 
 interface TokenInputProps {
   id: string;
@@ -10,11 +13,13 @@ interface TokenInputProps {
   value: string;
   disabled?: boolean;
   onChange: (newValue: string) => void | SetFromToValueState;
+  withBalance?: boolean;
+  balance?: string;
 }
 
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`);
 
-const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
+const Swap = ({ id, label, onChange, value, disabled, withBalance, balance }: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
@@ -27,31 +32,42 @@ const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
   const helperTextStyles = roundTextFieldStylesHook.useHelperText();
 
   return (
-    <TextField
-      id={id}
-      value={value}
-      placeholder="0"
-      inputMode="decimal"
-      autoComplete="off"
-      autoCorrect="off"
-      type="text"
-      margin={'normal'}
-      disabled={disabled}
-      spellCheck="false"
-      onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-      InputLabelProps={{ shrink: true, classes: inputLabelStyles }}
-      InputProps={{
-        classes: inputBaseStyles,
-        disableUnderline: true,
-        endAdornment: <InputAdornment position="end">{label}</InputAdornment>,
-      }}
-      inputProps={{
-        pattern: '^[0-9]*[.,]?[0-9]*$',
-        minLength: 1,
-        maxLength: 79,
-      }}
-      FormHelperTextProps={{ classes: helperTextStyles }}
-    />
+    <>
+      <TextField
+        id={id}
+        value={value}
+        placeholder="0"
+        inputMode="decimal"
+        autoComplete="off"
+        autoCorrect="off"
+        type="text"
+        margin={'normal'}
+        disabled={disabled}
+        spellCheck="false"
+        onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+        InputLabelProps={{ shrink: true, classes: inputLabelStyles }}
+        InputProps={{
+          classes: inputBaseStyles,
+          disableUnderline: true,
+          endAdornment: <InputAdornment position="end">{label}</InputAdornment>,
+        }}
+        inputProps={{
+          pattern: '^[0-9]*[.,]?[0-9]*$',
+          minLength: 1,
+          maxLength: 79,
+        }}
+        FormHelperTextProps={{ classes: helperTextStyles }}
+      />
+      {withBalance && (
+        <Typography variant="body2">
+          <FormattedMessage
+            description="current balance"
+            defaultMessage="Balance: {balance} {token}"
+            values={{ balance: balance ? BigNumber.from(balance).toString() : '', token: label }}
+          />
+        </Typography>
+      )}
+    </>
   );
 };
 export default Swap;

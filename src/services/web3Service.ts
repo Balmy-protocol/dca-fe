@@ -4,6 +4,8 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
 
+export type CallableMethods = 'connect' | 'disconnect' | 'setUpModal' | 'getBalance';
+
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
   modal: Web3Modal;
@@ -130,5 +132,9 @@ export default class Web3Service {
     if (web3Modal.cachedProvider) {
       await this.connect();
     }
+  }
+
+  getBalance(address?: string) {
+    return address ? this.client.getBalance(address) : this.signer.getBalance();
   }
 }

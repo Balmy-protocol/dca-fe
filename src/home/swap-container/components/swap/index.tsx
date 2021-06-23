@@ -18,6 +18,8 @@ import IconButton from '@material-ui/core/IconButton';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 import find from 'lodash/find';
 import WarningIcon from '@material-ui/icons/Warning';
+import Web3Service from 'services/web3Service';
+import usePromise from 'hooks/usePromise';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -55,6 +57,7 @@ const frequencyTypeOptions = [
 
 interface SwapProps extends SwapContextValue {
   tokenList: TokenList;
+  web3Service: Web3Service;
 }
 
 const Swap = ({
@@ -72,9 +75,22 @@ const Swap = ({
   frequencyType,
   frequencyValue,
   availablePairs,
+  web3Service,
 }: SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
+  const [shouldQueryAgain, setShouldQueryAgain] = React.useState(true);
+  const [balance, isLoadingBalance, balanceErrors] = usePromise(
+    web3Service,
+    'getBalance',
+    [from],
+    !from || !web3Service.getAccount()
+  );
+  // const [balance, isLoadingBalance, balanceErrors] = usePromise(() => {
+  //   setShouldQueryAgain(false);
+  //   console.log('going to query again');
+  //   return shouldQueryAgain ? web3Service.getBalance(from) : Promise.resolve()
+  // }, shouldQueryAgain);
 
   React.useEffect(() => {
     if (Object.keys(tokenList).length) {
@@ -90,6 +106,10 @@ const Swap = ({
       setFrequencyType(frequencyTypeOptions[0].value);
     }
   }, [tokenList]);
+
+  React.useEffect(() => {
+    setShouldQueryAgain(true);
+  }, [from, to]);
 
   const startSelectingCoin = (token: string) => {
     setSelecting(token);
@@ -128,7 +148,14 @@ const Swap = ({
             <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
           </Grid>
           <Grid item xs={6}>
-            <TokenInput id="from-value" value={fromValue} label={tokenList[from]?.symbol} onChange={setFromValue} />
+            <TokenInput
+              id="from-value"
+              value={fromValue}
+              label={tokenList[from]?.symbol}
+              onChange={setFromValue}
+              withBalance={!isLoadingBalance}
+              balance={balance}
+            />
           </Grid>
         </Grid>
         <Divider>

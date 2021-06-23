@@ -52,7 +52,8 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
 
   const { loading: loadingPool, data } = useQuery<{ pools: { id: string }[] }>(getPool, {
     variables: { tokenA: tokenA.address, tokenB: tokenB.address },
-    skip: !(from && to),
+    skip: true,
+    // skip: !(from && to),
     client,
   });
 
@@ -64,7 +65,8 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
 
   const { loading: loadingPrices, data: dataPrices } = useQuery<{ poolDayDatas: Price[] }>(getTokenPrices, {
     variables: { pool: poolId, from: parseInt(DateTime.now().minus({ days: 14 }).toFormat('X'), 10) },
-    skip: !poolId,
+    skip: true,
+    // skip: !poolId,
     client,
   });
 
@@ -103,7 +105,6 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   );
 
   const isLoading = loadingPool || loadingPrices;
-  console.log(isLoading);
   const noData = prices.length === 0;
 
   return (
