@@ -18,6 +18,7 @@ import IconButton from '@material-ui/core/IconButton';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 import find from 'lodash/find';
 import WarningIcon from '@material-ui/icons/Warning';
+import { BigNumber } from 'ethers';
 import Web3Service from 'services/web3Service';
 import usePromise from 'hooks/usePromise';
 
@@ -119,6 +120,8 @@ const Swap = ({
     return !!find(availablePairs, { token0, token1 });
   }, [from, to]);
 
+  const hasError = fromValue && balance && BigNumber.from(fromValue).gt(BigNumber.from(balance));
+
   return (
     <StyledPaper elevation={3}>
       <TokenPicker
@@ -142,6 +145,7 @@ const Swap = ({
           <Grid item xs={6}>
             <TokenInput
               id="from-value"
+              error={hasError ? 'Ammount cannot exceed balance' : ''}
               value={fromValue}
               label={tokenList[from]?.symbol}
               onChange={setFromValue}
@@ -213,7 +217,7 @@ const Swap = ({
             <Button
               size="large"
               variant="contained"
-              disabled={!isPairExisting}
+              disabled={!isPairExisting || !fromValue || hasError}
               color="primary"
               style={{ width: '100%' }}
             >

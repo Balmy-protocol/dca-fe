@@ -12,7 +12,7 @@ interface TokenInputProps {
   onChange: (newValue: string) => void | SetFromToValueState;
 }
 
-const inputRegex = RegExp(/^\d*$/);
+const inputRegex = RegExp(/^[1-9]+[0-9]*$/);
 
 const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
   const validator = (nextValue: string) => {

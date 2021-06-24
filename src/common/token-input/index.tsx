@@ -17,11 +17,22 @@ interface TokenInputProps {
   withBalance?: boolean;
   isLoadingBalance?: boolean;
   balance?: string;
+  error?: string;
 }
 
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`);
 
-const Swap = ({ id, label, onChange, value, disabled, withBalance, isLoadingBalance, balance }: TokenInputProps) => {
+const Swap = ({
+  id,
+  label,
+  onChange,
+  value,
+  disabled,
+  withBalance,
+  isLoadingBalance,
+  balance,
+  error,
+}: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
@@ -38,6 +49,8 @@ const Swap = ({ id, label, onChange, value, disabled, withBalance, isLoadingBala
       <TextField
         id={id}
         value={value}
+        error={!!error}
+        helperText={error}
         placeholder="0"
         inputMode="decimal"
         autoComplete="off"
