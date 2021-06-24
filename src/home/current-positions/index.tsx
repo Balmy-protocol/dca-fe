@@ -16,10 +16,9 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
     web3Service,
     'getCurrentPositions',
     [],
-    false
+    !web3Service.getAccount()
   );
 
-  console.log(currentPositions, isLoadingCurrentPositions);
   return (
     <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
       <Grid item xs={12}>
@@ -29,7 +28,7 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
       </Grid>
       <Grid item xs={12}>
         <Grid container spacing={2}>
-          {!isLoadingCurrentPositions
+          {!isLoadingCurrentPositions && currentPositions
             ? (currentPositions as CurrentPositions).map(
                 ({ from, to, remainingDays, startedAt, exercised, remainingLiquidity }, index) => (
                   <ActivePosition

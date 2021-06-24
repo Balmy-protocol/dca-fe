@@ -9,7 +9,7 @@ function usePromise(
   parameters: any[] = [],
   skip: boolean = false
 ) {
-  const [isLoading, setIsLoading] = React.useState(!skip);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [result, setResult] = React.useState<any>(undefined);
   const [error, setError] = React.useState<any>(undefined);
   const prevParameters = usePrevious(parameters);

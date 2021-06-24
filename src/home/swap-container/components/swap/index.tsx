@@ -22,6 +22,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import { BigNumber } from 'ethers';
 import usePromise from 'hooks/usePromise';
 import CreatePairModal from 'common/create-pair-modal';
+import { NETWORKS } from 'config/constants';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -89,6 +90,14 @@ const Swap = ({
     [from],
     !from || !web3Service.getAccount()
   );
+  const [currentNetwork, isLoadingNetwork, networkErrors] = usePromise(
+    web3Service,
+    'getNetwork',
+    [],
+    !web3Service.getAccount()
+  );
+
+  console.log(balance, isLoadingBalance, balanceErrors);
 
   React.useEffect(() => {
     if (Object.keys(tokenList).length) {
@@ -122,6 +131,11 @@ const Swap = ({
   }, [from, to]);
 
   const hasError = fromValue && balance && BigNumber.from(fromValue).gt(BigNumber.from(balance));
+
+  const networkError =
+    !isLoadingNetwork &&
+    currentNetwork &&
+    currentNetwork.chainId !== NETWORKS[process.env.ETH_NETWORK as keyof typeof NETWORKS];
 
   return (
     <StyledPaper elevation={3}>
@@ -228,10 +242,25 @@ const Swap = ({
             </Grow>
           </Grid>
           <Grid item xs={12}>
+            <Grow in={networkError}>
+              <StyledWarningContainer elevation={0} in={networkError}>
+                <StyledWarningIcon />
+                <Typography variant="body1">
+                  <FormattedMessage
+                    description="wrong chainId"
+                    defaultMessage="You are not currently connected to the mainnet"
+                  />
+                </Typography>
+              </StyledWarningContainer>
+            </Grow>
+          </Grid>
+          <Grid item xs={12}>
             <Button
               size="large"
               variant="contained"
-              disabled={!isPairExisting || !fromValue || hasError}
+              disabled={
+                !isPairExisting || !fromValue || hasError || networkError || isLoadingNetwork || isLoadingBalance
+              }
               color="primary"
               style={{ width: '100%' }}
             >

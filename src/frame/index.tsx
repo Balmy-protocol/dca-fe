@@ -12,6 +12,7 @@ interface AppFrameProps {
 
 const StyledGridContainer = materialStyled(Grid)(({ isLoading }: AppFrameProps) => ({
   ...(isLoading ? { height: '100%' } : {}),
+  backgroundColor: '#e9e3ec',
 }));
 
 const StyledNavBarGridContainer = materialStyled(Grid)({

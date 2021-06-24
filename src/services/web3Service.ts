@@ -80,7 +80,7 @@ export default class Web3Service {
 
     this.setAccount(account);
 
-    if (window.ethereum && window.ethereum.isMetamask) {
+    if (window.ethereum) {
       // handle metamask account change
       window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
         this.setAccount(newAccounts[0]);
@@ -89,6 +89,20 @@ export default class Web3Service {
       // extremely recommended by metamask
       window.ethereum.on('chainChanged', () => window.location.reload());
     }
+
+    provider.on('network', (newNetwork: any, oldNetwork: any) => {
+      // When a Provider makes its initial connection, it emits a "network"
+      // event with a null oldNetwork along with the newNetwork. So, if the
+      // oldNetwork exists, it represents a changing network
+
+      if (oldNetwork) {
+        window.location.reload();
+      }
+    });
+  }
+
+  getNetwork() {
+    return this.client.getNetwork();
   }
 
   getAccount() {
@@ -128,7 +142,7 @@ export default class Web3Service {
     };
 
     const web3Modal = new Web3Modal({
-      network: 'mainnet', // optional
+      network: process.env.ETH_NETWORK, // optional
       cacheProvider: true, // optional
       providerOptions, // required
     });
