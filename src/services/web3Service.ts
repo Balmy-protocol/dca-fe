@@ -1,13 +1,15 @@
-import { ethers, Signer } from 'ethers';
+import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
-// import { Interface } from '@ethersproject/abi'
 import ERC20ABI from 'abis/erc20.json';
+import Factory from 'abis/factory.json';
 
-export type CallableMethods = 'connect' | 'disconnect' | 'setUpModal' | 'getBalance';
+export type CallableMethods = 'connect' | 'disconnect' | 'setUpModal' | 'getBalance' | 'getEstimatedPairCreation';
+
+export const FACTORY_ADDRESS = '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9';
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
@@ -145,5 +147,23 @@ export default class Web3Service {
     const erc20 = new ethers.Contract(address, ERC20Interface, this.client);
 
     return erc20.balanceOf(this.getAccount());
+  }
+
+  getEstimatedPairCreation(token0?: string, token1?: string) {
+    if (!token0 || !token1) return Promise.resolve();
+
+    let tokenA = token0;
+    let tokenB = token1;
+
+    if (token0 > token1) {
+      tokenA = token1;
+      tokenB = token0;
+    }
+
+    // const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi);
+
+    // return factory.estimateGas.createPair(token0, token1);
+
+    return Promise.resolve(BigNumber.from('15'));
   }
 }

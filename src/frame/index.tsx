@@ -32,7 +32,10 @@ const AppFrame = ({ isLoading }: AppFrameProps) => (
       </StyledNavBarGridContainer>
       <StyledAppGridContainer item xs={12} isLoading={isLoading}>
         <Switch>
-          <Route path="/">
+          <Route path="/swap/:from?/:to?">
+            <Home isLoading={isLoading} />
+          </Route>
+          <Route path="*">
             <Home isLoading={isLoading} />
           </Route>
         </Switch>

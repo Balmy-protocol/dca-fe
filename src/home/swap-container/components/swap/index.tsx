@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
@@ -21,6 +22,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import { BigNumber } from 'ethers';
 import Web3Service from 'services/web3Service';
 import usePromise from 'hooks/usePromise';
+import CreatePairModal from 'common/create-pair-modal';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -80,6 +82,9 @@ const Swap = ({
 }: SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
+  const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
+  const routeParams = useParams<{ from: string; to: string }>();
+  console.log('params', routeParams);
   const [balance, isLoadingBalance, balanceErrors] = usePromise(
     web3Service,
     'getBalance',
@@ -87,15 +92,13 @@ const Swap = ({
     !from || !web3Service.getAccount()
   );
 
-  console.log(isLoadingBalance);
-
   React.useEffect(() => {
     if (Object.keys(tokenList).length) {
       if (!from) {
-        setFrom('0x6b175474e89094c44da98b954eedeac495271d0f');
+        setFrom(routeParams && routeParams.from);
       }
       if (!to) {
-        setTo('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2');
+        setTo(routeParams && routeParams.to);
       }
     }
 
@@ -124,6 +127,13 @@ const Swap = ({
 
   return (
     <StyledPaper elevation={3}>
+      <CreatePairModal
+        open={shouldShowPairModal}
+        onCancel={() => setShouldShowPairModal(false)}
+        web3Service={web3Service}
+        from={tokenList[from]}
+        to={tokenList[to]}
+      />
       <TokenPicker
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
@@ -202,7 +212,13 @@ const Swap = ({
                     defaultMessage="This pair does not exist yet"
                   />
                 </Typography>
-                <Button size="small" variant="contained" disabled={isPairExisting} color="primary">
+                <Button
+                  size="small"
+                  variant="contained"
+                  disabled={isPairExisting}
+                  onClick={() => setShouldShowPairModal(true)}
+                  color="primary"
+                >
                   <Typography variant="button">
                     <FormattedMessage
                       description="Be the first to create it"
