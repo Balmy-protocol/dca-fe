@@ -1,16 +1,20 @@
 import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
+import { formatEther, formatUnits } from '@ethersproject/units';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
 import ERC20ABI from 'abis/erc20.json';
 import Factory from 'abis/factory.json';
+import axios, { AxiosResponse } from 'axios';
+import { GasNowResponse, CoinGeckoPriceResponse } from 'types';
 
 // MOCKS
 import currentPositionMocks from 'mocks/currentPositions';
 
-export const FACTORY_ADDRESS = '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9';
+// export const FACTORY_ADDRESS = '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9';
+export const FACTORY_ADDRESS = '0x19B7F4424106a5A15d50043Ad92D8f4066FF2687';
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
@@ -109,6 +113,10 @@ export default class Web3Service {
     return this.account;
   }
 
+  getSigner() {
+    return this.signer;
+  }
+
   async disconnect() {
     if (this.client && (this.client as any).disconnect) {
       await (this.client as any).disconnect();
@@ -175,15 +183,36 @@ export default class Web3Service {
       tokenB = token0;
     }
 
-    // const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi);
+    const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
 
-    // return factory.estimateGas.createPair(token0, token1);
+    return Promise.all([
+      factory.estimateGas.createPair(token0, token1),
+      axios.get<GasNowResponse>('https://www.gasnow.org/api/v3/gas/price'),
+      axios.get<CoinGeckoPriceResponse>(
+        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=1&page=1&sparkline=false'
+      ),
+    ]).then((values: [BigNumber, AxiosResponse<GasNowResponse>, AxiosResponse<CoinGeckoPriceResponse>]) => {
+      const [gasLimitRaw, gasPriceResponse, ethPriceResponse] = values;
 
-    return Promise.resolve(BigNumber.from('15'));
+      const gasLimit = BigNumber.from(gasLimitRaw);
+      const gasPrice = BigNumber.from(gasPriceResponse.data.data.standard);
+      const ethPrice = ethPriceResponse.data[0].current_price;
+
+      const gas = gasLimit.mul(gasPrice);
+
+      return {
+        gas: formatUnits(gas, 'gwei'),
+        gasUsd: parseFloat(formatEther(gas)) * ethPrice,
+      };
+    });
   }
 
   // TODO: CHANGE FOR GRAPHQL HOOK WHEN INTEGRATED
   getCurrentPositions() {
     return Promise.resolve(currentPositionMocks);
+  }
+
+  getGasPrice() {
+    return axios.get<GasNowResponse>('https://www.gasnow.org/api/v3/gas/price');
   }
 }

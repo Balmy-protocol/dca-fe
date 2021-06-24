@@ -97,8 +97,6 @@ const Swap = ({
     !web3Service.getAccount()
   );
 
-  console.log(balance, isLoadingBalance, balanceErrors);
-
   React.useEffect(() => {
     if (Object.keys(tokenList).length) {
       if (!from) {
@@ -137,6 +135,15 @@ const Swap = ({
     currentNetwork &&
     currentNetwork.chainId !== NETWORKS[process.env.ETH_NETWORK as keyof typeof NETWORKS];
 
+  const shouldDisableButton =
+    !isPairExisting ||
+    !fromValue ||
+    hasError ||
+    networkError ||
+    isLoadingNetwork ||
+    isLoadingBalance ||
+    balanceErrors ||
+    networkErrors;
   return (
     <StyledPaper elevation={3}>
       <CreatePairModal
@@ -258,9 +265,7 @@ const Swap = ({
             <Button
               size="large"
               variant="contained"
-              disabled={
-                !isPairExisting || !fromValue || hasError || networkError || isLoadingNetwork || isLoadingBalance
-              }
+              disabled={shouldDisableButton}
               color="primary"
               style={{ width: '100%' }}
             >

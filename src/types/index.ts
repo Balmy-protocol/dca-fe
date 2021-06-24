@@ -43,6 +43,26 @@ interface CurrentPosition {
 
 type CurrentPositions = CurrentPosition[];
 
+interface GasNowResponseData {
+  rapid: number;
+  fast: number;
+  standard: number;
+  slow: number;
+  timestamp: number;
+}
+
+interface GasNowResponse {
+  code: number;
+  data: GasNowResponseData;
+}
+
+interface CoinGeckoTokenPriceResponse {
+  id: string;
+  current_price: number;
+}
+
+type CoinGeckoPriceResponse = CoinGeckoTokenPriceResponse[];
+
 export {
   Web3Service,
   SetStateCallback,
@@ -53,4 +73,6 @@ export {
   Web3ServicePromisableMethods,
   CurrentPosition,
   CurrentPositions,
+  GasNowResponse,
+  CoinGeckoPriceResponse,
 };

@@ -15,29 +15,25 @@ function usePromise(
   const prevParameters = usePrevious(parameters);
 
   React.useEffect(() => {
-    // setResult(undefined);
-    setError(undefined);
-  }, [functionName, parameters]);
-
-  React.useEffect(() => {
     async function callPromise() {
       try {
         const promiseResult = await promise[functionName](...parameters);
         setResult(promiseResult);
-        setIsLoading(false);
         setError(undefined);
       } catch (e) {
         setError(e);
       }
+      setIsLoading(false);
     }
 
-    if (!skip && !isLoading && (!result || !isEqual(prevParameters, parameters))) {
+    if ((!skip && !isLoading && !result && !error) || !isEqual(prevParameters, parameters)) {
+      console.log('going to call with', functionName);
       setIsLoading(true);
       setResult(undefined);
       setError(undefined);
       callPromise();
     }
-  }, [functionName, parameters, skip, isLoading, result]);
+  }, [functionName, parameters, skip, isLoading, result, error]);
 
   return [result, isLoading, error];
 }

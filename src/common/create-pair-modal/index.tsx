@@ -32,10 +32,12 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
   const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise(
     web3Service,
     'getEstimatedPairCreation',
-    [from, to],
+    // [from, to],
+    ['0xc778417E063141139Fce010982780140Aa0cD5Ab', '0x1efc75f5c6e29b18489b5a5e1e66a91427b661d8'],
     !from || !to || !web3Service.getAccount()
   );
 
+  console.log(estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors);
   return (
     <Dialog open={open} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">
@@ -52,8 +54,8 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
           <DialogContentText id="alert-dialog-description">
             <FormattedMessage
               description="Create pair"
-              defaultMessage="The estimated cost of the operation is {cost}"
-              values={{ cost: estimatedPrice.toString() }}
+              defaultMessage="The estimated cost of the operation is {cost} gwei (aprox. {costUsd} USD)"
+              values={{ cost: estimatedPrice.gas, costUsd: estimatedPrice.gasUsd.toFixed(2) }}
             />
           </DialogContentText>
         )}
