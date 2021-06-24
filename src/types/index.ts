@@ -1,5 +1,6 @@
 import type Web3Service from 'services/web3Service';
 import React from 'react';
+import { BigNumber } from 'ethers';
 
 type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -22,7 +23,7 @@ type AvailablePair = {
 
 type AvailablePairs = AvailablePair[];
 
-export type Web3ServicePromisableMethods =
+type Web3ServicePromisableMethods =
   | 'connect'
   | 'disconnect'
   | 'setUpModal'
@@ -30,4 +31,25 @@ export type Web3ServicePromisableMethods =
   | 'getEstimatedPairCreation'
   | 'getCurrentPositions';
 
-export { Web3Service, SetStateCallback, Token, TokenList, AvailablePair, AvailablePairs };
+interface CurrentPosition {
+  from: string;
+  to: string;
+  remainingDays: number;
+  startedAt: Date;
+  exercised: BigNumber;
+  remainingLiquidity: BigNumber;
+}
+
+type CurrentPositions = CurrentPosition[];
+
+export {
+  Web3Service,
+  SetStateCallback,
+  Token,
+  TokenList,
+  AvailablePair,
+  AvailablePairs,
+  Web3ServicePromisableMethods,
+  CurrentPosition,
+  CurrentPositions,
+};

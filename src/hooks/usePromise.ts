@@ -6,8 +6,8 @@ import usePrevious from 'hooks/usePrevious';
 function usePromise(
   promise: Web3Service,
   functionName: Web3ServicePromisableMethods,
-  parameters: any[],
-  skip: boolean
+  parameters: any[] = [],
+  skip: boolean = false
 ) {
   const [isLoading, setIsLoading] = React.useState(!skip);
   const [result, setResult] = React.useState<any>(undefined);

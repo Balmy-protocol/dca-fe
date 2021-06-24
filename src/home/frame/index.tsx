@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import SwapContainer from '../swap-container';
 import History from '../history';
 import CurrentPositions from '../current-positions';
+import WalletContext from 'common/wallet-context';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 
 interface HomeFrameProps {
@@ -29,16 +30,22 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => (
         </Grid>
       ) : (
         <>
-          <Grid item xs={12}></Grid>
-          <Grid item xs={12}>
-            <SwapContainer />
-          </Grid>
-          <Grid item xs={12}>
-            <CurrentPositions />
-          </Grid>
-          <Grid item xs={12}>
-            <History />
-          </Grid>
+          <WalletContext.Consumer>
+            {({ tokenList, web3Service }) => (
+              <>
+                <Grid item xs={12}></Grid>
+                <Grid item xs={12}>
+                  <SwapContainer />
+                </Grid>
+                <Grid item xs={12}>
+                  <CurrentPositions web3Service={web3Service} tokenList={tokenList} />
+                </Grid>
+                <Grid item xs={12}>
+                  <History tokenList={tokenList} />
+                </Grid>
+              </>
+            )}
+          </WalletContext.Consumer>
         </>
       )}
     </StyledGridContainer>

@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import PastPosition from './components/position';
+import { TokenList } from 'types';
 
 const mockData = [
   {
@@ -56,7 +57,11 @@ const mockData = [
   },
 ];
 
-const History = () => (
+interface HistoryProps {
+  tokenList: TokenList;
+}
+
+const History = ({ tokenList }: HistoryProps) => (
   <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
     <Grid item xs={12}>
       <Typography variant="h3">

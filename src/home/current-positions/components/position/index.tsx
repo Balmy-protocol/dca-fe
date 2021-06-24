@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { BigNumber } from 'ethers';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
@@ -49,8 +50,8 @@ interface ActivePositionProps {
   to: string;
   remainingDays: number;
   startedAt: Date;
-  exercised: number;
-  remainingLiquidity: number;
+  exercised: BigNumber;
+  remainingLiquidity: BigNumber;
 }
 
 const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remainingLiquidity }: ActivePositionProps) => {
@@ -97,14 +98,14 @@ const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remaini
           <FormattedMessage
             description="current exercised"
             defaultMessage="{exercised} {to} swapped"
-            values={{ exercised, to }}
+            values={{ exercised: exercised.toString(), to }}
           />
         </Typography>
         <Typography variant="body2">
           <FormattedMessage
             description="current remaining"
             defaultMessage="{remainingLiquidity} {from} remaining"
-            values={{ remainingLiquidity, from }}
+            values={{ remainingLiquidity: remainingLiquidity.toString(), from }}
           />
         </Typography>
         <Typography variant="caption">
