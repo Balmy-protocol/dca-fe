@@ -1,14 +1,9 @@
 import * as React from 'react';
+import { AvailablePairs } from 'types';
 
 export type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
 
 export type SetFromToValueState = React.Dispatch<React.SetStateAction<string>>;
-
-export type AvailablePair = {
-  token0: string;
-  token1: string;
-  id: string;
-};
 
 export type SwapContextValue = {
   from: string;
@@ -23,7 +18,7 @@ export type SwapContextValue = {
   setFromValue: SetFromToValueState;
   setFrequencyType: SetFromToValueState;
   setFrequencyValue: SetFromToValueState;
-  availablePairs: AvailablePair[];
+  availablePairs: AvailablePairs;
 };
 
 const SwapContextDefaultValue: SwapContextValue = {

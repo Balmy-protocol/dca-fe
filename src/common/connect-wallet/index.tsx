@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import { FormattedMessage } from 'react-intl';
-import Web3Service from 'services/web3Service';
+import { Web3Service } from 'types';
 
 interface ConnectWalletButtonProps {
   web3Service: Web3Service;

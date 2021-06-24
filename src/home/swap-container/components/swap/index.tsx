@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import { TokenList } from 'common/wallet-context';
+import { TokenList, Web3Service } from 'types';
 import Typography from '@material-ui/core/Typography';
 import Grow from '@material-ui/core/Grow';
 import { FormattedMessage } from 'react-intl';
@@ -20,7 +20,6 @@ import SwapVertIcon from '@material-ui/icons/SwapVert';
 import find from 'lodash/find';
 import WarningIcon from '@material-ui/icons/Warning';
 import { BigNumber } from 'ethers';
-import Web3Service from 'services/web3Service';
 import usePromise from 'hooks/usePromise';
 import CreatePairModal from 'common/create-pair-modal';
 
@@ -84,7 +83,6 @@ const Swap = ({
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const routeParams = useParams<{ from: string; to: string }>();
-  console.log('params', routeParams);
   const [balance, isLoadingBalance, balanceErrors] = usePromise(
     web3Service,
     'getBalance',

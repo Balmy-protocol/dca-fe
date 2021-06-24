@@ -5,7 +5,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Web3Service from 'services/web3Service';
+import { Web3Service } from 'types';
 import { FormattedMessage } from 'react-intl';
 import FloatingMenu from '../floating-menu';
 

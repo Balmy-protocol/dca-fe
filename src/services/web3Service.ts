@@ -7,7 +7,8 @@ import Torus from '@toruslabs/torus-embed';
 import ERC20ABI from 'abis/erc20.json';
 import Factory from 'abis/factory.json';
 
-export type CallableMethods = 'connect' | 'disconnect' | 'setUpModal' | 'getBalance' | 'getEstimatedPairCreation';
+// MOCKS
+import currentPositionMocks from 'mocks/currentPositions';
 
 export const FACTORY_ADDRESS = '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9';
 
@@ -165,5 +166,10 @@ export default class Web3Service {
     // return factory.estimateGas.createPair(token0, token1);
 
     return Promise.resolve(BigNumber.from('15'));
+  }
+
+  // TODO: CHANGE FOR GRAPHQL HOOK WHEN INTEGRATED
+  getCurrentPositions() {
+    return Promise.resolve(currentPositionMocks);
   }
 }

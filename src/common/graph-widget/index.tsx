@@ -9,7 +9,7 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Grid from '@material-ui/core/Grid';
 import getPool from 'graphql/getPool.graphql';
 import getTokenPrices from 'graphql/getTokenPrices.graphql';
-import { Token } from 'common/wallet-context';
+import { Token } from 'types';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 

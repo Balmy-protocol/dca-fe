@@ -3,7 +3,7 @@ import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@material-ui/core/Slide';
-import { TokenList } from 'common/wallet-context';
+import { TokenList } from 'types';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';

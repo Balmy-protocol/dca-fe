@@ -1,6 +1,6 @@
 import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import { Token } from 'common/wallet-context';
+import { Token } from 'types';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import CryptoIcons from 'assets/svg/color';
 

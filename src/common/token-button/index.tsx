@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
-import { Token } from 'common/wallet-context';
+import { Token } from 'types';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import TokenIcon from 'common/token-icon';
 

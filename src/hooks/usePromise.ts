@@ -1,9 +1,14 @@
 import React from 'react';
-import Web3Service, { CallableMethods } from 'services/web3Service';
+import { Web3Service, Web3ServicePromisableMethods } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 
-function usePromise(promise: Web3Service, functionName: CallableMethods, parameters: any[], skip: boolean) {
+function usePromise(
+  promise: Web3Service,
+  functionName: Web3ServicePromisableMethods,
+  parameters: any[],
+  skip: boolean
+) {
   const [isLoading, setIsLoading] = React.useState(!skip);
   const [result, setResult] = React.useState<any>(undefined);
   const [error, setError] = React.useState<any>(undefined);

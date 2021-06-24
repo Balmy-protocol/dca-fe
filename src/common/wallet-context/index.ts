@@ -1,20 +1,8 @@
 import * as React from 'react';
-import Web3Modal from 'web3modal';
-import type Web3 from 'web3';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import graphPricesClient from 'utils/graphPricesApolloClient';
 import Web3Service from 'services/web3Service';
-
-export type Token = {
-  chainId: number;
-  decimals: number;
-  address: string;
-  name: string;
-  symbol: string;
-  logoURI: string;
-};
-
-export type TokenList = Record<string, Token>;
+import { TokenList } from 'types';
 
 export type WalletContextValue = {
   web3Service: Web3Service;

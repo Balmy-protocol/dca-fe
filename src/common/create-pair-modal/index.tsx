@@ -1,7 +1,6 @@
 import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
-import Web3Service from 'services/web3Service';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -9,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import LoadingIndicator from 'common/centered-loading-indicator';
-import { Token } from 'common/wallet-context';
+import { Token, Web3Service } from 'types';
 import { FormattedMessage } from 'react-intl';
 import usePromise from 'hooks/usePromise';
 
