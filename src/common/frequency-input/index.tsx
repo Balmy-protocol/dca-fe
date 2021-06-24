@@ -43,7 +43,7 @@ const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
       InputProps={{
         classes: inputBaseStyles,
         disableUnderline: true,
-        endAdornment: <InputAdornment position="end">{label}</InputAdornment>,
+        endAdornment: <InputAdornment position="end">{label || ''}</InputAdornment>,
         fullWidth: false,
       }}
       inputProps={{

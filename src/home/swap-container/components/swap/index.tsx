@@ -79,18 +79,14 @@ const Swap = ({
 }: SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
-  const [shouldQueryAgain, setShouldQueryAgain] = React.useState(true);
   const [balance, isLoadingBalance, balanceErrors] = usePromise(
     web3Service,
     'getBalance',
     [from],
     !from || !web3Service.getAccount()
   );
-  // const [balance, isLoadingBalance, balanceErrors] = usePromise(() => {
-  //   setShouldQueryAgain(false);
-  //   console.log('going to query again');
-  //   return shouldQueryAgain ? web3Service.getBalance(from) : Promise.resolve()
-  // }, shouldQueryAgain);
+
+  console.log(isLoadingBalance);
 
   React.useEffect(() => {
     if (Object.keys(tokenList).length) {
@@ -106,10 +102,6 @@ const Swap = ({
       setFrequencyType(frequencyTypeOptions[0].value);
     }
   }, [tokenList]);
-
-  React.useEffect(() => {
-    setShouldQueryAgain(true);
-  }, [from, to]);
 
   const startSelectingCoin = (token: string) => {
     setSelecting(token);
@@ -154,6 +146,7 @@ const Swap = ({
               label={tokenList[from]?.symbol}
               onChange={setFromValue}
               withBalance={!isLoadingBalance}
+              isLoadingBalance={isLoadingBalance}
               balance={balance}
             />
           </Grid>

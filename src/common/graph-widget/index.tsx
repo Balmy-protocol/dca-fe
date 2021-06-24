@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { Chart } from 'react-charts';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Grid from '@material-ui/core/Grid';
 import getPool from 'graphql/getPool.graphql';
 import getTokenPrices from 'graphql/getTokenPrices.graphql';
@@ -27,7 +27,7 @@ interface Price {
 
 type graphToken = Token | { address: string; symbol: string };
 
-const StyledLoadingIndicatorWrapper = styled.div`
+const StyledCenteredWrapper = styled.div`
   display: flex;
   flex: 1;
   align-items: center;
@@ -110,20 +110,18 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   return (
     <Grid container spacing={2} direction="column">
       {isLoading ? (
-        <StyledLoadingIndicatorWrapper>
-          <CircularProgress />
-        </StyledLoadingIndicatorWrapper>
+        <CenteredLoadingIndicator />
       ) : (
         <>
           {noData ? (
-            <StyledLoadingIndicatorWrapper>
+            <StyledCenteredWrapper>
               <Typography variant="h6">
                 <FormattedMessage
                   description="No data available"
                   defaultMessage="There is no data available about this pair"
                 />
               </Typography>
-            </StyledLoadingIndicatorWrapper>
+            </StyledCenteredWrapper>
           ) : (
             <>
               <Typography variant="h4">{`${tokenA.symbol}/${tokenB.symbol}`}</Typography>

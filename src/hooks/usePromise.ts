@@ -39,39 +39,41 @@
 // export default usePromise;
 import React from 'react';
 import Web3Service, { CallableMethods } from 'services/web3Service';
+import isEqual from 'lodash/isEqual';
+import usePrevious from 'hooks/usePrevious';
 
 function usePromise(promise: Web3Service, functionName: CallableMethods, parameters: any[], skip: boolean) {
   const [isLoading, setIsLoading] = React.useState(!skip);
   const [result, setResult] = React.useState<any>(undefined);
   const [error, setError] = React.useState<any>(undefined);
-  const id = React.useState(Math.random() * 10);
-  // reset states when promise or skip changes
-  // React.useEffect(() => {
-  //   setIsLoading(!skip);
-  //   setResult(undefined);
-  //   setError(undefined);
-  // }, [skip, functionName]);
+  const prevParameters = usePrevious(parameters);
+
+  React.useEffect(() => {
+    // setResult(undefined);
+    setError(undefined);
+  }, [functionName, parameters]);
 
   React.useEffect(() => {
     async function callPromise() {
       try {
         const promiseResult = await promise[functionName](...parameters);
-        console.log('result is', promiseResult);
         setResult(promiseResult);
         setIsLoading(false);
         setError(undefined);
       } catch (e) {
-        console.log(e);
+        setError(e);
       }
     }
 
-    if (!skip && !isLoading && !result) {
+    console.log('should call the promise', skip, isLoading, result);
+    if (!skip && !isLoading && (!result || !isEqual(prevParameters, parameters))) {
+      console.log('calling the promise with', parameters);
       setIsLoading(true);
-      console.log('going to call with', functionName, parameters, skip, isLoading, result, id);
+      setResult(undefined);
+      setError(undefined);
       callPromise();
     }
   }, [functionName, parameters, skip, isLoading, result]);
-  // React.useMemo(() => { console.log('callingBalance', functionName, parameters, skip); return !skip && promise[functionName](...parameters).then(setResult).catch(setError) }, [functionName, parameters, skip]);
 
   return [result, isLoading, error];
 }

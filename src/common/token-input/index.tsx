@@ -6,6 +6,7 @@ import { roundTextFieldStylesHook } from '@mui-treasury/styles/textField/round';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 interface TokenInputProps {
   id: string;
@@ -14,12 +15,13 @@ interface TokenInputProps {
   disabled?: boolean;
   onChange: (newValue: string) => void | SetFromToValueState;
   withBalance?: boolean;
+  isLoadingBalance?: boolean;
   balance?: string;
 }
 
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`);
 
-const Swap = ({ id, label, onChange, value, disabled, withBalance, balance }: TokenInputProps) => {
+const Swap = ({ id, label, onChange, value, disabled, withBalance, isLoadingBalance, balance }: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
@@ -49,7 +51,7 @@ const Swap = ({ id, label, onChange, value, disabled, withBalance, balance }: To
         InputProps={{
           classes: inputBaseStyles,
           disableUnderline: true,
-          endAdornment: <InputAdornment position="end">{label}</InputAdornment>,
+          endAdornment: <InputAdornment position="end">{label || ''}</InputAdornment>,
         }}
         inputProps={{
           pattern: '^[0-9]*[.,]?[0-9]*$',
@@ -60,11 +62,15 @@ const Swap = ({ id, label, onChange, value, disabled, withBalance, balance }: To
       />
       {withBalance && (
         <Typography variant="body2">
-          <FormattedMessage
-            description="current balance"
-            defaultMessage="Balance: {balance} {token}"
-            values={{ balance: balance ? BigNumber.from(balance).toString() : '', token: label }}
-          />
+          {isLoadingBalance ? (
+            <CircularProgress size={10} />
+          ) : (
+            <FormattedMessage
+              description="current balance"
+              defaultMessage="Balance: {balance} {token}"
+              values={{ balance: balance ? BigNumber.from(balance).toString() : '', token: label }}
+            />
+          )}
         </Typography>
       )}
     </>

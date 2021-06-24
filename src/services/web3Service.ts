@@ -1,8 +1,11 @@
 import { ethers, Signer } from 'ethers';
+import { Interface } from '@ethersproject/abi';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
+// import { Interface } from '@ethersproject/abi'
+import ERC20ABI from 'abis/erc20.json';
 
 export type CallableMethods = 'connect' | 'disconnect' | 'setUpModal' | 'getBalance';
 
@@ -135,6 +138,12 @@ export default class Web3Service {
   }
 
   getBalance(address?: string) {
-    return address ? this.client.getBalance(address) : this.signer.getBalance();
+    if (!address) return Promise.resolve();
+
+    const ERC20Interface = new Interface(ERC20ABI) as any;
+
+    const erc20 = new ethers.Contract(address, ERC20Interface, this.client);
+
+    return erc20.balanceOf(this.getAccount());
   }
 }

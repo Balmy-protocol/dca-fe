@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import SwapContainer from '../swap-container';
 import History from '../history';
 import CurrentPositions from '../current-positions';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -23,8 +24,8 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => (
   <StyledContainer isLoading={isLoading}>
     <StyledGridContainer container spacing={8} isLoading={isLoading}>
       {isLoading ? (
-        <Grid item xs={12} alignItems="center" justify="center" style={{ display: 'flex' }}>
-          <CircularProgress size={70} />
+        <Grid item xs={12} style={{ display: 'flex' }}>
+          <CenteredLoadingIndicator size={70} />
         </Grid>
       ) : (
         <>
