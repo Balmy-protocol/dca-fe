@@ -23,6 +23,7 @@ import { BigNumber } from 'ethers';
 import usePromise from 'hooks/usePromise';
 import CreatePairModal from 'common/create-pair-modal';
 import { NETWORKS } from 'config/constants';
+import { WETH, DAI } from 'mocks/tokens';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -96,14 +97,20 @@ const Swap = ({
     [],
     !web3Service.getAccount()
   );
+  const [usedTokens, isLoadingUsedTokens, usedTokensErrors] = usePromise(
+    web3Service,
+    'getUsedTokens',
+    [],
+    !web3Service.getAccount()
+  );
 
   React.useEffect(() => {
     if (Object.keys(tokenList).length) {
       if (!from) {
-        setFrom(routeParams && routeParams.from);
+        setFrom((routeParams && routeParams.from) || DAI.address);
       }
       if (!to) {
-        setTo(routeParams && routeParams.to);
+        setTo((routeParams && routeParams.to) || WETH.address);
       }
     }
 
@@ -144,6 +151,8 @@ const Swap = ({
     isLoadingBalance ||
     balanceErrors ||
     networkErrors;
+
+  console.log(usedTokens);
   return (
     <StyledPaper elevation={3}>
       <CreatePairModal

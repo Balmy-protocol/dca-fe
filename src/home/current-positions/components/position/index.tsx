@@ -10,7 +10,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import { Token } from 'types';
 import BlockIcon from '@material-ui/icons/Block';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -46,8 +46,8 @@ const useDeletedStyles = makeStyles((theme: Theme) =>
 );
 
 interface ActivePositionProps {
-  from: string;
-  to: string;
+  from: Token;
+  to: Token;
   remainingDays: number;
   startedAt: Date;
   exercised: BigNumber;
@@ -63,9 +63,9 @@ const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remaini
       <CardContent>
         <StyledCardHeader>
           <StyledCardTitleHeader>
-            <Typography variant="h6">{from}</Typography>
+            <Typography variant="h6">{from.symbol}</Typography>
             <ArrowForwardIcon />
-            <Typography variant="h6">{to}</Typography>
+            <Typography variant="h6">{to.symbol}</Typography>
           </StyledCardTitleHeader>
           <FloatingMenu buttonContent={buttonContent} buttonStyles={{}} isIcon>
             <MenuItem onClick={() => alert('are you fucking sure?')}>
@@ -98,14 +98,14 @@ const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remaini
           <FormattedMessage
             description="current exercised"
             defaultMessage="{exercised} {to} swapped"
-            values={{ exercised: exercised.toString(), to }}
+            values={{ exercised: exercised.toString(), to: to.symbol }}
           />
         </Typography>
         <Typography variant="body2">
           <FormattedMessage
             description="current remaining"
             defaultMessage="{remainingLiquidity} {from} remaining"
-            values={{ remainingLiquidity: remainingLiquidity.toString(), from }}
+            values={{ remainingLiquidity: remainingLiquidity.toString(), from: from.symbol }}
           />
         </Typography>
         <Typography variant="caption">

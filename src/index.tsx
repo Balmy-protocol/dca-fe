@@ -4,11 +4,12 @@ import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
 import WalletContext, { WalletContextDefaultValue } from 'common/wallet-context';
 import { Token, TokenList } from 'types';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import MainApp from './frame';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from 'styled-components';
 import Web3Service from 'services/web3Service';
+import { WETH, DAI } from 'mocks/tokens';
 
 const theme = createMuiTheme();
 
@@ -38,7 +39,10 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
     }
 
     async function setTokenListEffect() {
-      const geckoTokens = await axios.get<{ tokens: Token[] }>('https://tokens.coingecko.com/uniswap/all.json');
+      const geckoTokens =
+        process.env.ETH_NETWORK === 'mainnet'
+          ? await axios.get<{ tokens: Token[] }>('https://tokens.coingecko.com/uniswap/all.json')
+          : { status: 200, statusText: 'OK', config: {}, headers: {}, data: { tokens: [WETH, DAI] } };
 
       const reducedTokens = geckoTokens.data.tokens.reduce(
         (acc, token) => ({ ...acc, [token.address]: { ...token } }),

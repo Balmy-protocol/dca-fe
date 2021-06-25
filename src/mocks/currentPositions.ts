@@ -1,31 +1,33 @@
+import { WETH, DAI } from './tokens';
+
 const mockedCurrentPositions = [
   {
-    from: 'ETH',
-    to: 'DAI',
+    from: WETH.address,
+    to: DAI.address,
     remainingDays: 6,
     startedAt: new Date(1623624089 * 1000),
     exercised: 50,
     remainingLiquidity: 0.00004,
   },
   {
-    from: 'ETH',
-    to: 'DAI',
+    from: WETH.address,
+    to: DAI.address,
     remainingDays: 4,
     startedAt: new Date(1623462089 * 1000),
     exercised: 50,
     remainingLiquidity: 0.00004,
   },
   {
-    from: 'DAI',
-    to: 'ETH',
+    from: WETH.address,
+    to: DAI.address,
     remainingDays: 2,
     startedAt: new Date(1623289289 * 1000),
     exercised: 50,
     remainingLiquidity: 0.00004,
   },
   {
-    from: 'ETH',
-    to: 'DAI',
+    from: WETH.address,
+    to: DAI.address,
     remainingDays: 1,
     startedAt: new Date(1623030089 * 1000),
     exercised: 50,

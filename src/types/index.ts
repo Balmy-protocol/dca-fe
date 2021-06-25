@@ -30,7 +30,8 @@ type Web3ServicePromisableMethods =
   | 'getBalance'
   | 'getEstimatedPairCreation'
   | 'getCurrentPositions'
-  | 'getNetwork';
+  | 'getNetwork'
+  | 'getUsedTokens';
 
 interface CurrentPosition {
   from: string;

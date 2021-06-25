@@ -27,7 +27,6 @@ function usePromise(
     }
 
     if ((!skip && !isLoading && !result && !error) || !isEqual(prevParameters, parameters)) {
-      console.log('going to call with', functionName);
       setIsLoading(true);
       setResult(undefined);
       setError(undefined);

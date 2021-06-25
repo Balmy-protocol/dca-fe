@@ -20,6 +20,9 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser',
     }),
+    new webpack.DefinePlugin({
+      'process.env.ETHPLORER_KEY': JSON.stringify('EK-7xNxe-HDazjQ3-smGdU'),
+    }),
   ],
   output: {
     filename: 'bundle.js',

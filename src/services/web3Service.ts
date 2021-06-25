@@ -215,4 +215,10 @@ export default class Web3Service {
   getGasPrice() {
     return axios.get<GasNowResponse>('https://www.gasnow.org/api/v3/gas/price');
   }
+
+  getUsedTokens() {
+    return axios.get(
+      `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
+    );
+  }
 }

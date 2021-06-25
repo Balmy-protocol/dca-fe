@@ -37,7 +37,6 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
     !from || !to || !web3Service.getAccount()
   );
 
-  console.log(estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors);
   return (
     <Dialog open={open} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">

@@ -6,7 +6,7 @@ module.exports = merge(common, {
   mode: 'development',
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.ETH_NETWORK': JSON.stringify('ropsten'),
+      'process.env.ETH_NETWORK': JSON.stringify('mainnet'),
     }),
   ],
   devtool: 'inline-source-map',
