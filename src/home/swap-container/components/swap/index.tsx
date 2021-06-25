@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import { TokenList, Web3Service } from 'types';
+import { TokenList, Web3Service, Network, GetUsedTokensDataResponse } from 'types';
 import Typography from '@material-ui/core/Typography';
 import Grow from '@material-ui/core/Grow';
 import { FormattedMessage } from 'react-intl';
@@ -85,19 +85,20 @@ const Swap = ({
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const routeParams = useParams<{ from: string; to: string }>();
-  const [balance, isLoadingBalance, balanceErrors] = usePromise(
+  console.log('my from is', from);
+  const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
     'getBalance',
     [from],
     !from || !web3Service.getAccount()
   );
-  const [currentNetwork, isLoadingNetwork, networkErrors] = usePromise(
+  const [currentNetwork, isLoadingNetwork, networkErrors] = usePromise<Network>(
     web3Service,
     'getNetwork',
     [],
     !web3Service.getAccount()
   );
-  const [usedTokens, isLoadingUsedTokens, usedTokensErrors] = usePromise(
+  const [usedTokensData, isLoadingUsedTokens, usedTokensErrors] = usePromise<GetUsedTokensDataResponse>(
     web3Service,
     'getUsedTokens',
     [],
@@ -152,7 +153,14 @@ const Swap = ({
     balanceErrors ||
     networkErrors;
 
-  console.log(usedTokens);
+  const usedTokens =
+    (!isLoadingUsedTokens &&
+      !usedTokensErrors &&
+      usedTokensData &&
+      usedTokensData.data.tokens &&
+      usedTokensData.data.tokens.map((token) => token.tokenInfo.address)) ||
+    [];
+
   return (
     <StyledPaper elevation={3}>
       <CreatePairModal
@@ -169,6 +177,7 @@ const Swap = ({
         selected={selecting}
         onChange={selecting === from ? setFrom : setTo}
         tokenList={tokenList}
+        usedTokens={usedTokens}
       />
       <Grid container>
         <Grid container alignItems="center" justify="space-between">

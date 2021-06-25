@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import LoadingIndicator from 'common/centered-loading-indicator';
-import { Token, Web3Service } from 'types';
+import { Token, Web3Service, EstimatedPairResponse } from 'types';
 import { FormattedMessage } from 'react-intl';
 import usePromise from 'hooks/usePromise';
 
@@ -29,7 +29,7 @@ interface CreatePairModalProps {
 }
 
 const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairModalProps) => {
-  const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise(
+  const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise<EstimatedPairResponse>(
     web3Service,
     'getEstimatedPairCreation',
     // [from, to],

@@ -2,25 +2,48 @@ import * as React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { BigNumber } from 'ethers';
 import Card from '@material-ui/core/Card';
+import Grid from '@material-ui/core/Grid';
 import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import Grow from '@material-ui/core/Grow';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Token } from 'types';
+import { Token, Web3Service } from 'types';
 import BlockIcon from '@material-ui/icons/Block';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { FormattedMessage } from 'react-intl';
 import { DateTime } from 'luxon';
 import FloatingMenu from 'common/floating-menu';
+import TokenInput from 'common/token-input';
+import usePromise from 'hooks/usePromise';
 
 const StyledCard = styled(Card)`
   margin: 10px;
   width: 250px;
+`;
+
+const StyledCardContent = styled(CardContent)`
+  padding-bottom: 0px;
+`;
+
+const StyledCardActions = styled(CardActions)`
+  padding-top: 0px;
+  justify-content: flex-end;
+`;
+
+const StyledIconButton = styled(IconButton)`
+  padding: 0px;
+  padding-right: 12px;
 `;
 
 const StyledCardHeader = styled.div`
@@ -35,6 +58,10 @@ const StyledCardTitleHeader = styled.div`
 
 const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 28px;
+`;
+
+const StyledAddCircleOutlineIcon = styled(AddCircleOutlineIcon)`
+  color: rgb(17 147 34);
 `;
 
 const useDeletedStyles = makeStyles((theme: Theme) =>
@@ -52,15 +79,34 @@ interface ActivePositionProps {
   startedAt: Date;
   exercised: BigNumber;
   remainingLiquidity: BigNumber;
+  web3Service: Web3Service;
 }
 
-const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remainingLiquidity }: ActivePositionProps) => {
+const ActivePosition = ({
+  from,
+  to,
+  remainingDays,
+  startedAt,
+  exercised,
+  remainingLiquidity,
+  web3Service,
+}: ActivePositionProps) => {
+  const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
+  const [fromValue, setFromValue] = React.useState('');
   const buttonContent = <MoreVertIcon />;
   const classNames = useDeletedStyles();
+  const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
+    web3Service,
+    'getBalance',
+    [from.address],
+    !from || !web3Service.getAccount() || !shouldShowAddForm
+  );
+
+  const hasError = fromValue && balance && BigNumber.from(fromValue).gt(BigNumber.from(balance));
 
   return (
     <StyledCard>
-      <CardContent>
+      <StyledCardContent>
         <StyledCardHeader>
           <StyledCardTitleHeader>
             <Typography variant="h6">{from.symbol}</Typography>
@@ -115,7 +161,37 @@ const ActivePosition = ({ from, to, remainingDays, startedAt, exercised, remaini
             values={{ startedAt: DateTime.fromJSDate(startedAt).toLocaleString(), remainingDays }}
           />
         </Typography>
-      </CardContent>
+      </StyledCardContent>
+      <StyledCardActions>
+        <StyledIconButton aria-label="add" onClick={() => setShouldShowAddForm(true)}>
+          <StyledAddCircleOutlineIcon fontSize="inherit" />
+        </StyledIconButton>
+      </StyledCardActions>
+      <Grow in={shouldShowAddForm} mountOnEnter unmountOnExit>
+        <Paper elevation={4}>
+          <Grid container alignItems="center" justify="space-around">
+            <Grid item xs={7}>
+              <TokenInput
+                id="add-from-value"
+                error={hasError ? 'Ammount cannot exceed balance' : ''}
+                value={fromValue}
+                label={from.symbol}
+                onChange={setFromValue}
+                withBalance={!isLoadingBalance}
+                isLoadingBalance={isLoadingBalance}
+                balance={balance}
+              />
+            </Grid>
+            <Grid item xs={3} style={{ marginTop: '8px' }}>
+              <Button size="small" variant="contained" disabled={!shouldShowAddForm} color="primary">
+                <Typography variant="button">
+                  <FormattedMessage description="Add" defaultMessage="Add" />
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Grow>
     </StyledCard>
   );
 };

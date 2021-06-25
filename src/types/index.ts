@@ -42,6 +42,10 @@ interface CurrentPosition {
   remainingLiquidity: BigNumber;
 }
 
+interface Network {
+  chainId: number;
+}
+
 type CurrentPositions = CurrentPosition[];
 
 interface GasNowResponseData {
@@ -64,6 +68,27 @@ interface CoinGeckoTokenPriceResponse {
 
 type CoinGeckoPriceResponse = CoinGeckoTokenPriceResponse[];
 
+interface UsedTokenInfo {
+  address: string;
+}
+
+interface UsedToken {
+  tokenInfo: UsedTokenInfo;
+}
+
+interface GetUsedTokensData {
+  tokens: UsedToken[];
+}
+
+interface GetUsedTokensDataResponse {
+  data: GetUsedTokensData;
+}
+
+interface EstimatedPairResponse {
+  gas: string;
+  gasUsd: number;
+}
+
 export {
   Web3Service,
   SetStateCallback,
@@ -76,4 +101,7 @@ export {
   CurrentPositions,
   GasNowResponse,
   CoinGeckoPriceResponse,
+  Network,
+  GetUsedTokensDataResponse,
+  EstimatedPairResponse,
 };

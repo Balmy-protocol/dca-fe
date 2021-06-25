@@ -169,6 +169,7 @@ export default class Web3Service {
 
     const erc20 = new ethers.Contract(address, ERC20Interface, this.client);
 
+    console.log('at least gets here before failing', address, this.getAccount());
     return erc20.balanceOf(this.getAccount());
   }
 
@@ -216,9 +217,12 @@ export default class Web3Service {
     return axios.get<GasNowResponse>('https://www.gasnow.org/api/v3/gas/price');
   }
 
+  // TODO: ENABLE FOR PROD
   getUsedTokens() {
-    return axios.get(
-      `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
-    );
+    // return axios.get(
+    //   `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
+    // );
+
+    return Promise.resolve({ data: {} });
   }
 }

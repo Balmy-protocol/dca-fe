@@ -16,6 +16,7 @@ import Search from '@material-ui/icons/Search';
 import { useSearchInputStyles } from '@mui-treasury/styles/input/search';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
@@ -30,6 +31,10 @@ const StyledOverlay = styled.div`
   background-color: white;
   padding: 20px;
   display: flex;
+`;
+
+const StyledChip = styled(Chip)`
+  margin-right: 5px;
 `;
 
 interface RowData {
@@ -51,6 +56,7 @@ interface TokenPickerProps {
   onChange: SetFromToState;
   onClose: () => void;
   isFrom: boolean;
+  usedTokens: string[];
 }
 
 const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps) => {
@@ -88,14 +94,17 @@ const TokenPicker = ({ shouldShow, tokenList, isFrom, onClose, onChange }: Token
     onClose();
   };
 
+  const usedTokens = [tokenKeys[0], tokenKeys[1]];
+
   const memoizedTokenKeys = React.useMemo(
     () =>
       tokenKeys.filter(
         (el) =>
-          tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
-          tokenList[el].symbol.toLowerCase().includes(search.toLowerCase())
+          (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
+            tokenList[el].symbol.toLowerCase().includes(search.toLowerCase())) &&
+          !usedTokens.includes(el)
       ),
-    [tokenKeys, search]
+    [tokenKeys, search, usedTokens]
   );
 
   return (
@@ -128,6 +137,17 @@ const TokenPicker = ({ shouldShow, tokenList, isFrom, onClose, onChange }: Token
               onChange={(evt) => setSearch(evt.currentTarget.value)}
             />
           </Grid>
+          {!!usedTokens.length && (
+            <Grid item xs={12} style={{ flexBasis: 'auto' }}>
+              {usedTokens.map((token) => (
+                <StyledChip
+                  icon={<TokenIcon token={tokenList[token]} isInChip />}
+                  label={tokenList[token].symbol}
+                  onClick={() => handleItemSelected(token)}
+                />
+              ))}
+            </Grid>
+          )}
           <Grid item xs={12} style={{ flexGrow: 1 }}>
             <AutoSizer>
               {({ height, width }) => (

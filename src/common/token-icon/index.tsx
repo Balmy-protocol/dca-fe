@@ -6,13 +6,23 @@ import CryptoIcons from 'assets/svg/color';
 
 interface TokenButtonProps {
   token?: Token;
+  isInChip?: boolean;
 }
 
-const TokenIcon = ({ token }: TokenButtonProps) => {
+const TokenIcon = ({ token, isInChip }: TokenButtonProps) => {
   return CryptoIcons[token?.symbol as keyof typeof CryptoIcons] ? (
-    <SvgIcon component={CryptoIcons[token?.symbol as keyof typeof CryptoIcons]} viewBox="0 0 32 32" />
+    <SvgIcon
+      component={CryptoIcons[token?.symbol as keyof typeof CryptoIcons]}
+      viewBox="0 0 32 32"
+      className={isInChip ? 'MuiChip-icon' : ''}
+    />
   ) : (
-    <Avatar style={{ height: '18px', width: '18px' }} alt={token?.name} src={token?.logoURI} />
+    <Avatar
+      style={{ height: '18px', width: '18px' }}
+      alt={token?.name}
+      src={token?.logoURI}
+      className={isInChip ? 'MuiChip-avatar' : ''}
+    />
   );
 };
 
