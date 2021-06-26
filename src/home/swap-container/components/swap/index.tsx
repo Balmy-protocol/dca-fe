@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { parseUnits } from '@ethersproject/units';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
@@ -19,11 +20,10 @@ import IconButton from '@material-ui/core/IconButton';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 import find from 'lodash/find';
 import WarningIcon from '@material-ui/icons/Warning';
-import { BigNumber } from 'ethers';
 import usePromise from 'hooks/usePromise';
 import CreatePairModal from 'common/create-pair-modal';
 import { NETWORKS } from 'config/constants';
-import { WETH, DAI } from 'mocks/tokens';
+import { ETH, DAI } from 'mocks/tokens';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -85,13 +85,13 @@ const Swap = ({
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const routeParams = useParams<{ from: string; to: string }>();
-  console.log('my from is', from);
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
     'getBalance',
-    [from],
+    [from, (tokenList[from] && tokenList[from].decimals) || 18],
     !from || !web3Service.getAccount()
   );
+
   const [currentNetwork, isLoadingNetwork, networkErrors] = usePromise<Network>(
     web3Service,
     'getNetwork',
@@ -108,10 +108,10 @@ const Swap = ({
   React.useEffect(() => {
     if (Object.keys(tokenList).length) {
       if (!from) {
-        setFrom((routeParams && routeParams.from) || DAI.address);
+        setFrom((routeParams && routeParams.from) || ETH.address);
       }
       if (!to) {
-        setTo((routeParams && routeParams.to) || WETH.address);
+        setTo((routeParams && routeParams.to) || DAI.address);
       }
     }
 
@@ -136,7 +136,10 @@ const Swap = ({
     return !!find(availablePairs, { token0, token1 });
   }, [from, to]);
 
-  const hasError = fromValue && balance && BigNumber.from(fromValue).gt(BigNumber.from(balance));
+  const hasError =
+    fromValue &&
+    balance &&
+    parseUnits(fromValue, tokenList[from].decimals).gt(parseUnits(balance, tokenList[from].decimals));
 
   const networkError =
     !isLoadingNetwork &&
@@ -161,6 +164,7 @@ const Swap = ({
       usedTokensData.data.tokens.map((token) => token.tokenInfo.address)) ||
     [];
 
+  const ignoreValues = [from, to];
   return (
     <StyledPaper elevation={3}>
       <CreatePairModal
@@ -178,6 +182,7 @@ const Swap = ({
         onChange={selecting === from ? setFrom : setTo}
         tokenList={tokenList}
         usedTokens={usedTokens}
+        ignoreValues={ignoreValues}
       />
       <Grid container>
         <Grid container alignItems="center" justify="space-between">

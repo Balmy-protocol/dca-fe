@@ -9,7 +9,8 @@ import MainApp from './frame';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from 'styled-components';
 import Web3Service from 'services/web3Service';
-import { WETH, DAI } from 'mocks/tokens';
+import { WETH, DAI, ETH, UNI } from 'mocks/tokens';
+import TransactionModalProvider from 'common/transaction-modal';
 
 const theme = createMuiTheme();
 
@@ -42,13 +43,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       const geckoTokens =
         process.env.ETH_NETWORK === 'mainnet'
           ? await axios.get<{ tokens: Token[] }>('https://tokens.coingecko.com/uniswap/all.json')
-          : { status: 200, statusText: 'OK', config: {}, headers: {}, data: { tokens: [WETH, DAI] } };
+          : { status: 200, statusText: 'OK', config: {}, headers: {}, data: { tokens: [ETH, WETH, DAI, UNI] } };
 
       const reducedTokens = geckoTokens.data.tokens.reduce(
         (acc, token) => ({ ...acc, [token.address]: { ...token } }),
         {}
       );
-      setTokenList(reducedTokens);
+      setTokenList({ ETH, ...reducedTokens });
       setIsLoadingTokens(false);
     }
 
@@ -78,7 +79,9 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
         <MuiThemeProvider theme={theme}>
           <ThemeProvider theme={theme}>
-            <MainApp isLoading={isLoading} />
+            <TransactionModalProvider>
+              <MainApp isLoading={isLoading} />
+            </TransactionModalProvider>
           </ThemeProvider>
         </MuiThemeProvider>
       </IntlProvider>

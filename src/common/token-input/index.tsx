@@ -81,7 +81,7 @@ const Swap = ({
             <FormattedMessage
               description="current balance"
               defaultMessage="Balance: {balance} {token}"
-              values={{ balance: balance ? BigNumber.from(balance).toString() : '', token: label }}
+              values={{ balance: balance ? balance : '', token: label }}
             />
           )}
         </Typography>

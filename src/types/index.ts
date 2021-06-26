@@ -31,7 +31,8 @@ type Web3ServicePromisableMethods =
   | 'getEstimatedPairCreation'
   | 'getCurrentPositions'
   | 'getNetwork'
-  | 'getUsedTokens';
+  | 'getUsedTokens'
+  | 'createPair';
 
 interface CurrentPosition {
   from: string;
@@ -87,6 +88,7 @@ interface GetUsedTokensDataResponse {
 interface EstimatedPairResponse {
   gas: string;
   gasUsd: number;
+  gasEth: string;
 }
 
 export {

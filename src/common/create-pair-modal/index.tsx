@@ -1,5 +1,6 @@
 import React from 'react';
 import Paper from '@material-ui/core/Paper';
+import { ethers, Signer, BigNumber } from 'ethers';
 import styled from 'styled-components';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -11,6 +12,7 @@ import LoadingIndicator from 'common/centered-loading-indicator';
 import { Token, Web3Service, EstimatedPairResponse } from 'types';
 import { FormattedMessage } from 'react-intl';
 import usePromise from 'hooks/usePromise';
+import useTransactionModal from 'hooks/useTransactionModal';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -37,6 +39,18 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
     !from || !to || !web3Service.getAccount()
   );
 
+  const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
+
+  const handleCreatePair = async () => {
+    try {
+      // const result = await web3Service.createPair(from.address, to.address)
+      setModalSuccess({});
+      // console.log(result)
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <Dialog open={open} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">
@@ -53,8 +67,12 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
           <DialogContentText id="alert-dialog-description">
             <FormattedMessage
               description="Create pair"
-              defaultMessage="The estimated cost of the operation is {cost} gwei (aprox. {costUsd} USD)"
-              values={{ cost: estimatedPrice.gas, costUsd: estimatedPrice.gasUsd.toFixed(2) }}
+              defaultMessage="The estimated cost of the operation is {cost} gwei (aprox. {costUsd} USD or {costEth} ETH)"
+              values={{
+                cost: estimatedPrice.gas,
+                costUsd: estimatedPrice.gasUsd.toFixed(2),
+                costEth: estimatedPrice.gasEth,
+              }}
             />
           </DialogContentText>
         )}
@@ -63,7 +81,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
         <Button onClick={onCancel} color="primary">
           <FormattedMessage description="Cancel" defaultMessage="Cancel" />
         </Button>
-        <Button onClick={() => {}} color="primary" disabled={isLoadingEstimatedPrice} autoFocus>
+        <Button color="primary" disabled={isLoadingEstimatedPrice} onClick={handleCreatePair} autoFocus>
           <FormattedMessage description="Create pair submit" defaultMessage="Create pair" />
         </Button>
       </DialogActions>

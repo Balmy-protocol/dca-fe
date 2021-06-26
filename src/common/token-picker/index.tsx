@@ -57,6 +57,7 @@ interface TokenPickerProps {
   onClose: () => void;
   isFrom: boolean;
   usedTokens: string[];
+  ignoreValues: string[];
 }
 
 const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps) => {
@@ -84,9 +85,21 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps
   );
 };
 
-const TokenPicker = ({ shouldShow, tokenList, isFrom, onClose, onChange }: TokenPickerProps) => {
+const TokenPicker = ({
+  shouldShow,
+  tokenList,
+  isFrom,
+  onClose,
+  onChange,
+  ignoreValues,
+  usedTokens,
+}: TokenPickerProps) => {
   const [search, setSearch] = React.useState('');
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
+  const memoizedUsedTokens = React.useMemo(
+    () => usedTokens.filter((el) => !ignoreValues.includes(el)),
+    [usedTokens, ignoreValues]
+  );
   const inputStyles = useSearchInputStyles();
 
   const handleItemSelected = (item: string) => {
@@ -94,17 +107,16 @@ const TokenPicker = ({ shouldShow, tokenList, isFrom, onClose, onChange }: Token
     onClose();
   };
 
-  const usedTokens = [tokenKeys[0], tokenKeys[1]];
-
   const memoizedTokenKeys = React.useMemo(
     () =>
       tokenKeys.filter(
         (el) =>
           (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].symbol.toLowerCase().includes(search.toLowerCase())) &&
-          !usedTokens.includes(el)
+          !usedTokens.includes(el) &&
+          !ignoreValues.includes(el)
       ),
-    [tokenKeys, search, usedTokens]
+    [tokenKeys, search, usedTokens, ignoreValues]
   );
 
   return (
@@ -137,9 +149,9 @@ const TokenPicker = ({ shouldShow, tokenList, isFrom, onClose, onChange }: Token
               onChange={(evt) => setSearch(evt.currentTarget.value)}
             />
           </Grid>
-          {!!usedTokens.length && (
+          {!!memoizedUsedTokens.length && (
             <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-              {usedTokens.map((token) => (
+              {memoizedUsedTokens.map((token) => (
                 <StyledChip
                   icon={<TokenIcon token={tokenList[token]} isInChip />}
                   label={tokenList[token].symbol}

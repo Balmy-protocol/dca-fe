@@ -12,7 +12,7 @@ import { GasNowResponse, CoinGeckoPriceResponse } from 'types';
 
 // MOCKS
 import currentPositionMocks from 'mocks/currentPositions';
-
+import { ETH } from 'mocks/tokens';
 // export const FACTORY_ADDRESS = '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9';
 export const FACTORY_ADDRESS = '0x19B7F4424106a5A15d50043Ad92D8f4066FF2687';
 
@@ -162,15 +162,16 @@ export default class Web3Service {
     }
   }
 
-  getBalance(address?: string) {
+  getBalance(address?: string, decimals?: number) {
     if (!address) return Promise.resolve();
+
+    if (address === ETH.address) return this.signer.getBalance().then((balance: BigNumber) => formatEther(balance));
 
     const ERC20Interface = new Interface(ERC20ABI) as any;
 
     const erc20 = new ethers.Contract(address, ERC20Interface, this.client);
 
-    console.log('at least gets here before failing', address, this.getAccount());
-    return erc20.balanceOf(this.getAccount());
+    return erc20.balanceOf(this.getAccount()).then((balance: string) => formatUnits(BigNumber.from(balance), decimals));
   }
 
   getEstimatedPairCreation(token0?: string, token1?: string) {
@@ -204,8 +205,25 @@ export default class Web3Service {
       return {
         gas: formatUnits(gas, 'gwei'),
         gasUsd: parseFloat(formatEther(gas)) * ethPrice,
+        gasEth: formatEther(gas),
       };
     });
+  }
+
+  createPair(token0: string, token1: string) {
+    if (!token0 || !token1) return Promise.resolve();
+
+    let tokenA = token0;
+    let tokenB = token1;
+
+    if (token0 > token1) {
+      tokenA = token1;
+      tokenB = token0;
+    }
+
+    const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
+
+    return factory.createPair(token0, token1);
   }
 
   // TODO: CHANGE FOR GRAPHQL HOOK WHEN INTEGRATED

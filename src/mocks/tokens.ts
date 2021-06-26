@@ -21,3 +21,21 @@ export const WETH = {
   symbol: 'WETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
 };
+
+export const ETH = {
+  chainId: 1,
+  decimals: 18,
+  address: 'ETH',
+  name: 'Ether',
+  symbol: 'ETH',
+  logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+};
+
+export const UNI = {
+  chainId: 1,
+  decimals: 18,
+  address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+  name: 'Uniswap',
+  symbol: 'UNI',
+  logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+};

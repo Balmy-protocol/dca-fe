@@ -17,7 +17,7 @@ function usePromise<T>(
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const promiseResult = await promise[functionName](...parameters);
+        const promiseResult = await promise[functionName].apply(promise, parameters);
         setResult(promiseResult);
         setError(undefined);
       } catch (e) {

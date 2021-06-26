@@ -98,7 +98,7 @@ const ActivePosition = ({
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
     'getBalance',
-    [from.address],
+    [from.address, from.decimals],
     !from || !web3Service.getAccount() || !shouldShowAddForm
   );
 
