@@ -11,8 +11,12 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import LoadingIndicator from 'common/centered-loading-indicator';
 import { Token, Web3Service, EstimatedPairResponse } from 'types';
 import { FormattedMessage } from 'react-intl';
+import Typography from '@material-ui/core/Typography';
 import usePromise from 'hooks/usePromise';
 import useTransactionModal from 'hooks/useTransactionModal';
+import Link from '@material-ui/core/Link';
+import { buildEtherscanTransaction } from 'utils/etherscan';
+import { TRANSACTION_ERRORS } from 'utils/errors';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -34,8 +38,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
   const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise<EstimatedPairResponse>(
     web3Service,
     'getEstimatedPairCreation',
-    // [from, to],
-    ['0xc778417E063141139Fce010982780140Aa0cD5Ab', '0x1efc75f5c6e29b18489b5a5e1e66a91427b661d8'],
+    [from, to],
     !from || !to || !web3Service.getAccount()
   );
 
@@ -43,11 +46,36 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
 
   const handleCreatePair = async () => {
     try {
-      // const result = await web3Service.createPair(from.address, to.address)
-      setModalSuccess({});
-      // console.log(result)
+      setModalLoading({
+        content: (
+          <Typography variant="subtitle2">
+            <FormattedMessage
+              description="Creating pair"
+              defaultMessage="Creating pair for {from} and {to}"
+              values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.createPair(from.address, to.address);
+      setModalSuccess({
+        content: (
+          <Link href={buildEtherscanTransaction(result.hash)} target="_blank" rel="noreferrer">
+            <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
+          </Link>
+        ),
+      });
     } catch (e) {
-      console.log(e);
+      console.log(TRANSACTION_ERRORS[e.code as keyof typeof TRANSACTION_ERRORS]);
+      setModalError({
+        content: (
+          <Typography variant="subtitle2">
+            {TRANSACTION_ERRORS[e.code as keyof typeof TRANSACTION_ERRORS] || (
+              <FormattedMessage description="unkown_error" defaultMessage={e.message} />
+            )}
+          </Typography>
+        ),
+      });
     }
   };
 
