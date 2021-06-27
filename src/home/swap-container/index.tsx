@@ -4,14 +4,6 @@ import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
 import Swap from './components/swap';
 
-const MOCKED_AVAILABLE_PAIRS = [
-  {
-    token0: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    token1: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    id: '1',
-  },
-];
-
 const SwapContainer = () => {
   const [from, setFrom] = React.useState('');
   const [to, setTo] = React.useState('');
@@ -40,7 +32,6 @@ const SwapContainer = () => {
                 setFromValue={setFromValue}
                 setToValue={setToValue}
                 tokenList={tokenList}
-                availablePairs={MOCKED_AVAILABLE_PAIRS}
                 web3Service={web3Service}
               />
             </Grid>

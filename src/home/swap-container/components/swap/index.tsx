@@ -4,7 +4,15 @@ import { parseUnits } from '@ethersproject/units';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import { TokenList, Web3Service, Network, GetUsedTokensDataResponse } from 'types';
+import {
+  TokenList,
+  Web3Service,
+  Network,
+  GetUsedTokensDataResponse,
+  AvailablePairs,
+  GetAllowanceResponse,
+  AvailablePair,
+} from 'types';
 import Typography from '@material-ui/core/Typography';
 import Grow from '@material-ui/core/Grow';
 import { FormattedMessage } from 'react-intl';
@@ -15,6 +23,7 @@ import FrequencyInput from 'common/frequency-input';
 import FrequencyTypeInput from 'common/frequency-type-input';
 import { SwapContextValue } from '../../SwapContext';
 import Button from '@material-ui/core/Button';
+import Tooltip from '@material-ui/core/Tooltip';
 import Divider from 'common/divider-wit-content';
 import IconButton from '@material-ui/core/IconButton';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
@@ -24,6 +33,11 @@ import usePromise from 'hooks/usePromise';
 import CreatePairModal from 'common/create-pair-modal';
 import { NETWORKS } from 'config/constants';
 import { ETH, DAI } from 'mocks/tokens';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { buildEtherscanTransaction } from 'utils/etherscan';
+import { TRANSACTION_ERRORS } from 'utils/errors';
+import Link from '@material-ui/core/Link';
+import useTransactionModal from 'hooks/useTransactionModal';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -41,6 +55,10 @@ const StyledWarningContainer = styled(Paper)<{ in: boolean }>`
   align-items: center;
   justify-content: center;
   padding: 10px;
+`;
+
+const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
+  margin-left: 10px;
 `;
 
 const StyledWarningIcon = styled(WarningIcon)`
@@ -78,13 +96,13 @@ const Swap = ({
   setFrequencyValue,
   frequencyType,
   frequencyValue,
-  availablePairs,
   web3Service,
 }: SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const routeParams = useParams<{ from: string; to: string }>();
+  const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
     'getBalance',
@@ -98,11 +116,32 @@ const Swap = ({
     [],
     !web3Service.getAccount()
   );
+
   const [usedTokensData, isLoadingUsedTokens, usedTokensErrors] = usePromise<GetUsedTokensDataResponse>(
     web3Service,
     'getUsedTokens',
     [],
     !web3Service.getAccount()
+  );
+
+  const [availablePairs, isLoadingAvailablePairs, availablePairsErrors] = usePromise<AvailablePairs>(
+    web3Service,
+    'getAvailablePairs',
+    [],
+    false
+  );
+
+  const existingPair = React.useMemo(() => {
+    let token0 = from < to ? from : to;
+    let token1 = from < to ? to : from;
+    return isLoadingAvailablePairs || (availablePairs && find(availablePairs, { token0, token1 }));
+  }, [from, to, availablePairs, isLoadingAvailablePairs]);
+
+  const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
+    web3Service,
+    'getAllowance',
+    [tokenList[from], existingPair],
+    !tokenList[from] || !web3Service.getAccount() || !existingPair || isLoadingAvailablePairs
   );
 
   React.useEffect(() => {
@@ -120,6 +159,91 @@ const Swap = ({
     }
   }, [tokenList]);
 
+  const handleApproveToken = async () => {
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="subtitle2">
+            <FormattedMessage
+              description="approving token"
+              defaultMessage="Approving use of {from}"
+              values={{ from: (from && tokenList[from].symbol) || '' }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.approveToken(tokenList[from], existingPair as AvailablePair);
+      setModalSuccess({
+        content: (
+          <Link href={buildEtherscanTransaction(result.hash)} target="_blank" rel="noreferrer">
+            <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
+          </Link>
+        ),
+      });
+    } catch (e) {
+      setModalError({
+        content: (
+          <Typography variant="subtitle2">
+            {TRANSACTION_ERRORS[e.code as keyof typeof TRANSACTION_ERRORS] || (
+              <FormattedMessage
+                description="unkown_error"
+                defaultMessage="Encountered unknown error: {message}"
+                values={{ message: e.message }}
+              />
+            )}
+          </Typography>
+        ),
+      });
+    }
+  };
+
+  const handleSwap = async () => {
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="subtitle2">
+            <FormattedMessage
+              description="creating position"
+              defaultMessage="Creating a position to swap {from} to {to}"
+              values={{ from: (from && tokenList[from].symbol) || '', to: (to && tokenList[to].symbol) || '' }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.deposit(
+        tokenList[from],
+        tokenList[to],
+        fromValue,
+        frequencyType,
+        frequencyValue,
+        existingPair as AvailablePair
+      );
+      setModalSuccess({
+        content: (
+          <Link href={buildEtherscanTransaction(result.hash)} target="_blank" rel="noreferrer">
+            <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
+          </Link>
+        ),
+      });
+
+      setFromValue('');
+    } catch (e) {
+      setModalError({
+        content: (
+          <Typography variant="subtitle2">
+            {TRANSACTION_ERRORS[e.code as keyof typeof TRANSACTION_ERRORS] || (
+              <FormattedMessage
+                description="unkown_error"
+                defaultMessage="Encountered unknown error: {message}"
+                values={{ message: e.message }}
+              />
+            )}
+          </Typography>
+        ),
+      });
+    }
+  };
+
   const startSelectingCoin = (token: string) => {
     setSelecting(token);
     setShouldShowPicker(true);
@@ -129,12 +253,6 @@ const Swap = ({
     setFrom(to);
     setTo(from);
   };
-
-  const isPairExisting = React.useMemo(() => {
-    let token0 = from < to ? from : to;
-    let token1 = from < to ? to : from;
-    return !!find(availablePairs, { token0, token1 });
-  }, [from, to]);
 
   const hasError =
     fromValue &&
@@ -146,14 +264,25 @@ const Swap = ({
     currentNetwork &&
     currentNetwork.chainId !== NETWORKS[process.env.ETH_NETWORK as keyof typeof NETWORKS];
 
+  const isApproved = !fromValue
+    ? true
+    : !isLoadingAllowance &&
+      allowance &&
+      parseUnits(allowance, tokenList[from].decimals).gte(parseUnits(fromValue, tokenList[from].decimals));
+
+  const pairExists = existingPair || from === ETH.address;
   const shouldDisableButton =
-    !isPairExisting ||
+    !pairExists ||
     !fromValue ||
     hasError ||
     networkError ||
     isLoadingNetwork ||
     isLoadingBalance ||
     balanceErrors ||
+    isLoadingAvailablePairs ||
+    availablePairsErrors ||
+    allowanceErrors ||
+    !isApproved ||
     networkErrors;
 
   const usedTokens =
@@ -165,6 +294,7 @@ const Swap = ({
     [];
 
   const ignoreValues = [from, to];
+
   return (
     <StyledPaper elevation={3}>
       <CreatePairModal
@@ -244,46 +374,77 @@ const Swap = ({
           </Grid>
         </Grid>
         <Grid container alignItems="stretch" spacing={2}>
-          <Grid item xs={12}>
-            <Grow in={!isPairExisting}>
-              <StyledWarningContainer elevation={0} in={!isPairExisting}>
-                <StyledWarningIcon />
-                <Typography variant="body1">
-                  <FormattedMessage
-                    description="This pair does not exist yet"
-                    defaultMessage="This pair does not exist yet"
-                  />
-                </Typography>
-                <Button
-                  size="small"
-                  variant="contained"
-                  disabled={isPairExisting}
-                  onClick={() => setShouldShowPairModal(true)}
-                  color="primary"
-                >
-                  <Typography variant="button">
+          {!pairExists ? (
+            <Grid item xs={12}>
+              <Grow in={!pairExists}>
+                <StyledWarningContainer elevation={0} in={!pairExists}>
+                  <StyledWarningIcon />
+                  <Typography variant="body1">
                     <FormattedMessage
-                      description="Be the first to create it"
-                      defaultMessage="Be the first to create it"
+                      description="This pair does not exist yet"
+                      defaultMessage="This pair does not exist yet"
                     />
                   </Typography>
-                </Button>
-              </StyledWarningContainer>
-            </Grow>
-          </Grid>
-          <Grid item xs={12}>
-            <Grow in={networkError}>
-              <StyledWarningContainer elevation={0} in={networkError}>
-                <StyledWarningIcon />
-                <Typography variant="body1">
-                  <FormattedMessage
-                    description="wrong chainId"
-                    defaultMessage="You are not currently connected to the mainnet"
-                  />
-                </Typography>
-              </StyledWarningContainer>
-            </Grow>
-          </Grid>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    disabled={!!pairExists}
+                    onClick={() => setShouldShowPairModal(true)}
+                    color="primary"
+                  >
+                    <Typography variant="button">
+                      <FormattedMessage
+                        description="Be the first to create it"
+                        defaultMessage="Be the first to create it"
+                      />
+                    </Typography>
+                  </Button>
+                </StyledWarningContainer>
+              </Grow>
+            </Grid>
+          ) : null}
+          {networkError ? (
+            <Grid item xs={12}>
+              <Grow in={networkError}>
+                <StyledWarningContainer elevation={0} in={networkError}>
+                  <StyledWarningIcon />
+                  <Typography variant="body1">
+                    <FormattedMessage
+                      description="wrong chainId"
+                      defaultMessage="You are not currently connected to the mainnet"
+                    />
+                  </Typography>
+                </StyledWarningContainer>
+              </Grow>
+            </Grid>
+          ) : null}
+          {!isApproved ? (
+            <Grid item xs={12}>
+              <Grow in={!isApproved}>
+                <StyledWarningContainer elevation={0} in={!isApproved}>
+                  <Button
+                    size="large"
+                    variant="contained"
+                    disabled={!!isApproved}
+                    color="primary"
+                    style={{ width: '100%' }}
+                    onClick={handleApproveToken}
+                  >
+                    <Typography variant="button">
+                      <FormattedMessage
+                        description="Allow us to use your coin"
+                        defaultMessage="Allow us to use your {token}"
+                        values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
+                      />
+                    </Typography>
+                    <Tooltip title="You only have to do this once per token" arrow placement="top">
+                      <StyledHelpOutlineIcon fontSize="small" />
+                    </Tooltip>
+                  </Button>
+                </StyledWarningContainer>
+              </Grow>
+            </Grid>
+          ) : null}
           <Grid item xs={12}>
             <Button
               size="large"
@@ -291,6 +452,7 @@ const Swap = ({
               disabled={shouldDisableButton}
               color="primary"
               style={{ width: '100%' }}
+              onClick={handleSwap}
             >
               <Typography variant="button">
                 <FormattedMessage description="Start trading" defaultMessage="Start trading" />

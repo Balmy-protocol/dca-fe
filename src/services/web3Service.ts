@@ -1,20 +1,28 @@
 import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
-import { formatEther, formatUnits } from '@ethersproject/units';
+import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
+import axios, { AxiosResponse } from 'axios';
+import { GasNowResponse, CoinGeckoPriceResponse, Token, AvailablePair } from 'types';
+import { MaxUint256 } from '@ethersproject/constants';
+import { calculateSeconds } from 'utils/parsing';
+// ABIS
 import ERC20ABI from 'abis/erc20.json';
 import Factory from 'abis/factory.json';
-import axios, { AxiosResponse } from 'axios';
-import { GasNowResponse, CoinGeckoPriceResponse } from 'types';
+import DCAPair from 'abis/DCAPair.json';
 
 // MOCKS
 import currentPositionMocks from 'mocks/currentPositions';
+import availablePairsMocks from 'mocks/availablePairs';
 import { ETH } from 'mocks/tokens';
-// export const FACTORY_ADDRESS = '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9';
-export const FACTORY_ADDRESS = '0x19B7F4424106a5A15d50043Ad92D8f4066FF2687';
+
+export const FACTORY_ADDRESS =
+  process.env.ETH_NETWORK === 'mainnet'
+    ? '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9'
+    : '0x19B7F4424106a5A15d50043Ad92D8f4066FF2687';
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
@@ -231,6 +239,11 @@ export default class Web3Service {
     return Promise.resolve(currentPositionMocks);
   }
 
+  // TODO: CHANGE FOR GRAPHQL HOOK WHEN INTEGRATED
+  getAvailablePairs() {
+    return Promise.resolve(availablePairsMocks);
+  }
+
   getGasPrice() {
     return axios.get<GasNowResponse>('https://www.gasnow.org/api/v3/gas/price');
   }
@@ -242,5 +255,54 @@ export default class Web3Service {
     // );
 
     return Promise.resolve({ data: {} });
+  }
+
+  getAllowance(token: Token, pairContract: AvailablePair) {
+    if (token.address === ETH.address) return formatEther(MaxUint256);
+
+    const ERC20Interface = new Interface(ERC20ABI) as any;
+
+    const erc20 = new ethers.Contract(token.address, ERC20Interface, this.client);
+
+    return erc20
+      .allowance(this.getAccount(), pairContract.id)
+      .then((allowance: string) => formatUnits(allowance, token.decimals));
+  }
+
+  approveToken(token: Token, pairContract: AvailablePair) {
+    if (token.address === ETH.address) return Promise.resolve();
+
+    const ERC20Interface = new Interface(ERC20ABI) as any;
+
+    const erc20 = new ethers.Contract(token.address, ERC20Interface, this.getSigner());
+
+    return erc20.approve(pairContract.id, MaxUint256);
+  }
+
+  deposit(
+    from: Token,
+    to: Token,
+    fromValue: string,
+    frequencyType: string,
+    frequencyValue: string,
+    existingPair: AvailablePair
+  ) {
+    let token = from;
+
+    if (from > to) {
+      token = to;
+    }
+
+    const weiValue = parseUnits(fromValue, token.decimals);
+
+    const rate = weiValue.div(BigNumber.from(frequencyValue));
+    const amountOfSwaps = BigNumber.from(frequencyValue);
+    const swapInterval = calculateSeconds(frequencyType);
+
+    const factory = new ethers.Contract(existingPair.id, DCAPair.abi, this.getSigner());
+
+    console.log('going to call deposit with', token.address, rate, amountOfSwaps, swapInterval);
+    return factory.deposit(token.address, rate, amountOfSwaps, swapInterval);
+    // return { hash: '0x0000'}
   }
 }

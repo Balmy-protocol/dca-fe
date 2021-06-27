@@ -18,7 +18,6 @@ export type SwapContextValue = {
   setFromValue: SetFromToValueState;
   setFrequencyType: SetFromToValueState;
   setFrequencyValue: SetFromToValueState;
-  availablePairs: AvailablePairs;
 };
 
 const SwapContextDefaultValue: SwapContextValue = {
@@ -34,7 +33,6 @@ const SwapContextDefaultValue: SwapContextValue = {
   setTo: () => {},
   setToValue: () => {},
   setFromValue: () => {},
-  availablePairs: [],
 };
 
 const SwapContext = React.createContext(SwapContextDefaultValue);

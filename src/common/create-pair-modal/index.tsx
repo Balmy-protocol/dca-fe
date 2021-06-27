@@ -66,7 +66,6 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
         ),
       });
     } catch (e) {
-      console.log(TRANSACTION_ERRORS[e.code as keyof typeof TRANSACTION_ERRORS]);
       setModalError({
         content: (
           <Typography variant="subtitle2">
