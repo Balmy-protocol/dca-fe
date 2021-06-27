@@ -270,7 +270,7 @@ const Swap = ({
       allowance &&
       parseUnits(allowance, tokenList[from].decimals).gte(parseUnits(fromValue, tokenList[from].decimals));
 
-  const pairExists = existingPair || from === ETH.address;
+  const pairExists = existingPair;
   const shouldDisableButton =
     !pairExists ||
     !fromValue ||

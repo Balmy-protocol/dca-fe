@@ -6,7 +6,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
 import axios, { AxiosResponse } from 'axios';
-import { GasNowResponse, CoinGeckoPriceResponse, Token, AvailablePair } from 'types';
+import { GasNowResponse, CoinGeckoPriceResponse, Token, AvailablePair, CurrentPosition } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { calculateSeconds } from 'utils/parsing';
 // ABIS
@@ -301,8 +301,12 @@ export default class Web3Service {
 
     const factory = new ethers.Contract(existingPair.id, DCAPair.abi, this.getSigner());
 
-    console.log('going to call deposit with', token.address, rate, amountOfSwaps, swapInterval);
     return factory.deposit(token.address, rate, amountOfSwaps, swapInterval);
-    // return { hash: '0x0000'}
+  }
+
+  withdraw(position: CurrentPosition, pair: AvailablePair) {
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+
+    return factory.withdrawSwapped(position.id);
   }
 }

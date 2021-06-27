@@ -41,11 +41,13 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
     [from, to],
     !from || !to || !web3Service.getAccount()
   );
+  console.log(estimatedPriceErrors);
 
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
 
   const handleCreatePair = async () => {
     try {
+      onCancel();
       setModalLoading({
         content: (
           <Typography variant="subtitle2">

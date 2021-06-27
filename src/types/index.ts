@@ -43,6 +43,7 @@ interface CurrentPosition {
   startedAt: Date;
   exercised: BigNumber;
   remainingLiquidity: BigNumber;
+  id: number;
 }
 
 interface Network {
