@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { formatUnits } from '@ethersproject/units';
 import { BigNumber } from 'ethers';
 import Card from '@material-ui/core/Card';
 import Grid from '@material-ui/core/Grid';
@@ -26,6 +27,8 @@ import { DateTime } from 'luxon';
 import FloatingMenu from 'common/floating-menu';
 import TokenInput from 'common/token-input';
 import usePromise from 'hooks/usePromise';
+import { CurrentPosition as ActivePositionInterface } from 'types';
+import { STRING_SWAP_INTERVALS } from 'utils/parsing';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -72,23 +75,22 @@ const useDeletedStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface ActivePositionProps {
+interface ActivePositionProps extends Omit<ActivePositionInterface, 'from' | 'to'> {
   from: Token;
   to: Token;
-  remainingDays: number;
-  startedAt: Date;
-  exercised: BigNumber;
-  remainingLiquidity: BigNumber;
   web3Service: Web3Service;
 }
 
 const ActivePosition = ({
   from,
   to,
-  remainingDays,
+  swapInterval,
+  swapped,
   startedAt,
-  exercised,
   remainingLiquidity,
+  remainingSwaps,
+  withdrawn,
+  id,
   web3Service,
 }: ActivePositionProps) => {
   const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
@@ -144,21 +146,25 @@ const ActivePosition = ({
           <FormattedMessage
             description="current exercised"
             defaultMessage="{exercised} {to} swapped"
-            values={{ exercised: exercised.toString(), to: to.symbol }}
+            values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
           />
         </Typography>
         <Typography variant="body2">
           <FormattedMessage
             description="current remaining"
             defaultMessage="{remainingLiquidity} {from} remaining"
-            values={{ remainingLiquidity: remainingLiquidity.toString(), from: from.symbol }}
+            values={{ remainingLiquidity: formatUnits(remainingLiquidity, from.decimals), from: from.symbol }}
           />
         </Typography>
         <Typography variant="caption">
           <FormattedMessage
             description="days to finish"
-            defaultMessage="Started at: {startedAt} with {remainingDays} days to close"
-            values={{ startedAt: DateTime.fromJSDate(startedAt).toLocaleString(), remainingDays }}
+            defaultMessage="Started at: {startedAt} with {remainingDays} {type} to close"
+            values={{
+              startedAt: DateTime.fromJSDate(startedAt).toLocaleString(),
+              remainingDays: remainingSwaps,
+              type: STRING_SWAP_INTERVALS[swapInterval as keyof typeof STRING_SWAP_INTERVALS],
+            }}
           />
         </Typography>
       </StyledCardContent>

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { parseUnits } from '@ethersproject/units';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
@@ -38,6 +37,7 @@ import { buildEtherscanTransaction } from 'utils/etherscan';
 import { TRANSACTION_ERRORS } from 'utils/errors';
 import Link from '@material-ui/core/Link';
 import useTransactionModal from 'hooks/useTransactionModal';
+import { DAY_IN_SECONDS, WEEK_IN_SECONDS, MONTH_IN_SECONDS, STRING_SWAP_INTERVALS } from 'utils/parsing';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -67,13 +67,16 @@ const StyledWarningIcon = styled(WarningIcon)`
 
 const frequencyTypeOptions = [
   {
-    value: 'Days',
+    label: STRING_SWAP_INTERVALS[DAY_IN_SECONDS.toString()],
+    value: DAY_IN_SECONDS,
   },
   {
-    value: 'Weeks',
+    label: STRING_SWAP_INTERVALS[WEEK_IN_SECONDS.toString()],
+    value: WEEK_IN_SECONDS,
   },
   {
-    value: 'Months',
+    label: STRING_SWAP_INTERVALS[MONTH_IN_SECONDS.toString()],
+    value: MONTH_IN_SECONDS,
   },
 ];
 
@@ -101,7 +104,6 @@ const Swap = ({
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
-  const routeParams = useParams<{ from: string; to: string }>();
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
@@ -144,21 +146,6 @@ const Swap = ({
     !tokenList[from] || !web3Service.getAccount() || !existingPair || isLoadingAvailablePairs
   );
 
-  React.useEffect(() => {
-    if (Object.keys(tokenList).length) {
-      if (!from) {
-        setFrom((routeParams && routeParams.from) || ETH.address);
-      }
-      if (!to) {
-        setTo((routeParams && routeParams.to) || DAI.address);
-      }
-    }
-
-    if (!frequencyType) {
-      setFrequencyType(frequencyTypeOptions[0].value);
-    }
-  }, [tokenList]);
-
   const handleApproveToken = async () => {
     try {
       setModalLoading({
@@ -174,25 +161,11 @@ const Swap = ({
       });
       const result = await web3Service.approveToken(tokenList[from], existingPair as AvailablePair);
       setModalSuccess({
-        content: (
-          <Link href={buildEtherscanTransaction(result.hash)} target="_blank" rel="noreferrer">
-            <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
-          </Link>
-        ),
+        hash: result.hash,
       });
     } catch (e) {
       setModalError({
-        content: (
-          <Typography variant="subtitle2">
-            {TRANSACTION_ERRORS[e.code as keyof typeof TRANSACTION_ERRORS] || (
-              <FormattedMessage
-                description="unkown_error"
-                defaultMessage="Encountered unknown error: {message}"
-                values={{ message: e.message }}
-              />
-            )}
-          </Typography>
-        ),
+        error: e,
       });
     }
   };

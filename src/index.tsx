@@ -43,13 +43,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       const geckoTokens =
         process.env.ETH_NETWORK === 'mainnet'
           ? await axios.get<{ tokens: Token[] }>('https://tokens.coingecko.com/uniswap/all.json')
-          : { status: 200, statusText: 'OK', config: {}, headers: {}, data: { tokens: [ETH, WETH, DAI, UNI] } };
+          : { status: 200, statusText: 'OK', config: {}, headers: {}, data: { tokens: [WETH, DAI, UNI] } };
 
       const reducedTokens = geckoTokens.data.tokens.reduce(
         (acc, token) => ({ ...acc, [token.address]: { ...token } }),
         {}
       );
-      setTokenList({ ETH, ...reducedTokens });
+      setTokenList(reducedTokens);
       setIsLoadingTokens(false);
     }
 

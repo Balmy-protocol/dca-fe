@@ -8,7 +8,7 @@ import Torus from '@toruslabs/torus-embed';
 import axios, { AxiosResponse } from 'axios';
 import { GasNowResponse, CoinGeckoPriceResponse, Token, AvailablePair, CurrentPosition } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
-import { calculateSeconds } from 'utils/parsing';
+import { SWAP_INTERVALS } from 'utils/parsing';
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
 import Factory from 'abis/factory.json';
@@ -283,7 +283,7 @@ export default class Web3Service {
     from: Token,
     to: Token,
     fromValue: string,
-    frequencyType: string,
+    frequencyType: BigNumber,
     frequencyValue: string,
     existingPair: AvailablePair
   ) {
@@ -297,7 +297,7 @@ export default class Web3Service {
 
     const rate = weiValue.div(BigNumber.from(frequencyValue));
     const amountOfSwaps = BigNumber.from(frequencyValue);
-    const swapInterval = calculateSeconds(frequencyType);
+    const swapInterval = frequencyType;
 
     const factory = new ethers.Contract(existingPair.id, DCAPair.abi, this.getSigner());
 

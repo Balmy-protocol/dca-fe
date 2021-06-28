@@ -1,31 +1,31 @@
 import * as React from 'react';
 import { AvailablePairs } from 'types';
-
-export type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
-
-export type SetFromToValueState = React.Dispatch<React.SetStateAction<string>>;
+import { BigNumber } from 'ethers';
+import { DAY_IN_SECONDS } from 'utils/parsing';
+import { WETH, DAI } from 'mocks/tokens';
+import { SetStateCallback } from 'types';
 
 export type SwapContextValue = {
   from: string;
   fromValue: string;
   to: string;
   toValue: string;
-  frequencyType: string;
+  frequencyType: BigNumber;
   frequencyValue: string;
-  setFrom: SetFromToState;
-  setTo: SetFromToState;
-  setToValue: SetFromToValueState;
-  setFromValue: SetFromToValueState;
-  setFrequencyType: SetFromToValueState;
-  setFrequencyValue: SetFromToValueState;
+  setFrom: SetStateCallback<string>;
+  setTo: SetStateCallback<string>;
+  setToValue: SetStateCallback<string>;
+  setFromValue: SetStateCallback<string>;
+  setFrequencyType: SetStateCallback<BigNumber>;
+  setFrequencyValue: SetStateCallback<string>;
 };
 
 const SwapContextDefaultValue: SwapContextValue = {
-  from: '',
-  to: '',
+  from: WETH.address,
+  to: DAI.address,
   fromValue: '',
   toValue: '',
-  frequencyType: 'days',
+  frequencyType: DAY_IN_SECONDS,
   frequencyValue: '1',
   setFrequencyType: () => {},
   setFrequencyValue: () => {},

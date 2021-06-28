@@ -15,8 +15,6 @@ import Typography from '@material-ui/core/Typography';
 import usePromise from 'hooks/usePromise';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Link from '@material-ui/core/Link';
-import { buildEtherscanTransaction } from 'utils/etherscan';
-import { TRANSACTION_ERRORS } from 'utils/errors';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -38,10 +36,9 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
   const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise<EstimatedPairResponse>(
     web3Service,
     'getEstimatedPairCreation',
-    [from, to],
-    !from || !to || !web3Service.getAccount()
+    [from.address, to.address],
+    !from || !to || !web3Service.getAccount() || !open
   );
-  console.log(estimatedPriceErrors);
 
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
 
@@ -61,21 +58,11 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
       });
       const result = await web3Service.createPair(from.address, to.address);
       setModalSuccess({
-        content: (
-          <Link href={buildEtherscanTransaction(result.hash)} target="_blank" rel="noreferrer">
-            <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
-          </Link>
-        ),
+        hash: result.hash,
       });
     } catch (e) {
       setModalError({
-        content: (
-          <Typography variant="subtitle2">
-            {TRANSACTION_ERRORS[e.code as keyof typeof TRANSACTION_ERRORS] || (
-              <FormattedMessage description="unkown_error" defaultMessage={e.message} />
-            )}
-          </Typography>
-        ),
+        error: e,
       });
     }
   };

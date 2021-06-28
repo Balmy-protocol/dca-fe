@@ -19,6 +19,7 @@ type AvailablePair = {
   token0: string;
   token1: string;
   id: string;
+  status: string; // active, stale
 };
 
 type AvailablePairs = AvailablePair[];
@@ -39,11 +40,26 @@ type Web3ServicePromisableMethods =
 interface CurrentPosition {
   from: string;
   to: string;
-  remainingDays: number;
+  swapInterval: number; // daily/weekly/etc
+  swapped: BigNumber; // total de swappeado
   startedAt: Date;
-  exercised: BigNumber;
   remainingLiquidity: BigNumber;
+  remainingSwaps: number;
+  withdrawn: BigNumber; // cuanto saque
   id: number;
+  status: string; // current
+}
+
+interface PastPosition {
+  from: string;
+  to: string;
+  swapInterval: number; // daily/weekly/etc
+  swapped: BigNumber;
+  startedAt: Date;
+  totalDeposit: BigNumber;
+  swapsExecuted: number;
+  id: number;
+  status: string; // terminated
 }
 
 interface Network {

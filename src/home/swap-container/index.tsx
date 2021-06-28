@@ -1,15 +1,19 @@
 import * as React from 'react';
 import Grid from '@material-ui/core/Grid';
+import { useParams } from 'react-router-dom';
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
 import Swap from './components/swap';
+import { DAY_IN_SECONDS } from 'utils/parsing';
+import { WETH, DAI } from 'mocks/tokens';
 
 const SwapContainer = () => {
-  const [from, setFrom] = React.useState('');
-  const [to, setTo] = React.useState('');
+  const routeParams = useParams<{ from: string; to: string }>();
+  const [from, setFrom] = React.useState((routeParams && routeParams.from) || WETH.address);
+  const [to, setTo] = React.useState((routeParams && routeParams.to) || DAI.address);
   const [fromValue, setFromValue] = React.useState('');
   const [toValue, setToValue] = React.useState('');
-  const [frequencyType, setFrequencyType] = React.useState('');
+  const [frequencyType, setFrequencyType] = React.useState(DAY_IN_SECONDS);
   const [frequencyValue, setFrequencyValue] = React.useState('1');
 
   return (

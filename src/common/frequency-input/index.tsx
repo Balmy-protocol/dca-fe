@@ -1,7 +1,7 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import { SetFromToValueState } from 'home/swap-container/SwapContext';
+import { SetStateCallback } from 'types';
 import { roundTextFieldStylesHook } from '@mui-treasury/styles/textField/round';
 
 interface TokenInputProps {
@@ -9,7 +9,7 @@ interface TokenInputProps {
   label: string;
   value: string;
   disabled?: boolean;
-  onChange: (newValue: string) => void | SetFromToValueState;
+  onChange: (newValue: string) => void | SetStateCallback<string>;
 }
 
 const inputRegex = RegExp(/^[1-9]+[0-9]*$/);

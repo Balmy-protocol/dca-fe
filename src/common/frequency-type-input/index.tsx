@@ -5,22 +5,25 @@ import { MenuProps } from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { BigNumber } from 'ethers';
+import { SetStateCallback } from 'types';
 
 interface selectOption {
-  value: string;
+  value: any;
+  label: string;
 }
 
 type selectOptionsType = selectOption[];
 
 interface minimalSelectProps {
   options: selectOptionsType;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
-  selected: string;
+  onChange: SetStateCallback<BigNumber>;
+  selected: BigNumber;
   id: string;
 }
 
 const MinimalSelect = ({ options, selected, onChange, id }: minimalSelectProps) => {
-  const handleChange = (event: React.ChangeEvent<{ value: string }>) => {
+  const handleChange = (event: React.ChangeEvent<{ value: BigNumber }>) => {
     onChange(event.target.value);
   };
 
@@ -58,9 +61,9 @@ const MinimalSelect = ({ options, selected, onChange, id }: minimalSelectProps) 
         onChange={handleChange}
         id={id}
       >
-        {options.map(({ value }: selectOption) => (
+        {options.map(({ value, label }: selectOption) => (
           <MenuItem key={value} value={value}>
-            {value}
+            {label}
           </MenuItem>
         ))}
       </Select>

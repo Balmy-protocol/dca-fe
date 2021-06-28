@@ -26,7 +26,7 @@ function usePromise<T>(
       setIsLoading(false);
     }
 
-    if ((!skip && !isLoading && !result && !error) || !isEqual(prevParameters, parameters)) {
+    if (!skip && ((!isLoading && !result && !error) || !isEqual(prevParameters, parameters))) {
       setIsLoading(true);
       setResult(undefined);
       setError(undefined);

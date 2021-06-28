@@ -9,9 +9,12 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import Link from '@material-ui/core/Link';
 import { Token, Web3Service, EstimatedPairResponse } from 'types';
 import usePromise from 'hooks/usePromise';
 import { SetStateCallback } from 'types';
+import { buildEtherscanTransaction } from 'utils/etherscan';
+import { TRANSACTION_ERRORS } from 'utils/errors';
 
 const StyledDialog = styled(Dialog)`
   display: flex;
@@ -38,15 +41,20 @@ const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)`
 `;
 
 interface LoadingConfig {
-  content: React.ReactNode;
+  content?: React.ReactNode;
 }
 
 interface SuccessConfig {
-  content: React.ReactNode;
+  content?: React.ReactNode;
+  hash?: string;
 }
 
 interface ErrorConfig {
-  content: React.ReactNode;
+  content?: React.ReactNode;
+  error?: {
+    code: number;
+    message: string;
+  };
 }
 
 export interface TransactionModalContextValue {
@@ -61,6 +69,19 @@ export const TransactionModalContextDefaultValue: TransactionModalContextValue =
   setSuccessConfig: (config: SuccessConfig) => {},
   setErrorConfig: (config: ErrorConfig) => {},
   setClosedConfig: () => {},
+};
+
+const defaultLoadingConfig: LoadingConfig = {
+  content: null,
+};
+
+const defaultSuccessConfig: SuccessConfig = {
+  content: null,
+};
+
+const defaultErrorConfig: ErrorConfig = {
+  content: null,
+  error: { message: 'something went wrong', code: -9999999 },
 };
 
 export const TransactionModalContext = React.createContext(TransactionModalContextDefaultValue);
@@ -108,6 +129,11 @@ export const TransactionModal = ({
         <FormattedMessage description="Operation successfull" defaultMessage="The operation was successfull!" />
       </Typography>
       {successConfig.content}
+      {successConfig.hash && (
+        <Link href={buildEtherscanTransaction(successConfig.hash)} target="_blank" rel="noreferrer">
+          <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
+        </Link>
+      )}
     </>
   );
 
@@ -122,6 +148,11 @@ export const TransactionModal = ({
         <FormattedMessage description="Operation erro" defaultMessage="Error encountered" />
       </Typography>
       {errorConfig.content}
+      <Typography variant="subtitle2">
+        {TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] || (
+          <FormattedMessage description="unkown_error" defaultMessage={errorConfig.error?.message} />
+        )}
+      </Typography>
     </>
   );
   return (
@@ -149,15 +180,24 @@ const TransactionModalProvider: React.FC<{}> = ({ children }) => {
   const [selectedConfig, setSelectedConfig] = React.useState<'loading' | 'success' | 'error' | 'closed'>('closed');
 
   const setLoadingConfigContext = (config: LoadingConfig) => {
-    setLoadingConfig(config);
+    setLoadingConfig({
+      ...defaultLoadingConfig,
+      ...config,
+    });
     setSelectedConfig('loading');
   };
   const setSuccessConfigContext = (config: SuccessConfig) => {
-    setSuccessConfig(config);
+    setSuccessConfig({
+      ...defaultSuccessConfig,
+      ...config,
+    });
     setSelectedConfig('success');
   };
   const setErrorConfigContext = (config: ErrorConfig) => {
-    setErrorConfig(config);
+    setErrorConfig({
+      ...defaultErrorConfig,
+      ...config,
+    });
     setSelectedConfig('error');
   };
   const setClosedConfigContext = () => {

@@ -1,11 +1,10 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import { SetFromToValueState } from 'home/swap-container/SwapContext';
+import { SetStateCallback } from 'types';
 import { roundTextFieldStylesHook } from '@mui-treasury/styles/textField/round';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
-import { BigNumber } from 'ethers';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 interface TokenInputProps {
@@ -13,7 +12,7 @@ interface TokenInputProps {
   label: string;
   value: string;
   disabled?: boolean;
-  onChange: (newValue: string) => void | SetFromToValueState;
+  onChange: (newValue: string) => void | SetStateCallback<string>;
   withBalance?: boolean;
   isLoadingBalance?: boolean;
   balance?: string;

@@ -30,15 +30,33 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
         <Grid container spacing={2} alignItems="flex-start">
           {!isLoadingCurrentPositions && currentPositions
             ? (currentPositions as CurrentPositions).map(
-                ({ from, to, remainingDays, startedAt, exercised, remainingLiquidity }, index) => (
+                (
+                  {
+                    from,
+                    to,
+                    swapInterval,
+                    swapped,
+                    startedAt,
+                    remainingLiquidity,
+                    remainingSwaps,
+                    id,
+                    status,
+                    withdrawn,
+                  },
+                  index
+                ) => (
                   <ActivePosition
                     key={index}
                     from={tokenList[from]}
                     to={tokenList[to]}
-                    remainingDays={remainingDays}
+                    swapInterval={swapInterval}
+                    swapped={swapped}
                     startedAt={startedAt}
-                    exercised={exercised}
+                    withdrawn={withdrawn}
                     remainingLiquidity={remainingLiquidity}
+                    remainingSwaps={remainingSwaps}
+                    id={id}
+                    status={status}
                     web3Service={web3Service}
                   />
                 )
