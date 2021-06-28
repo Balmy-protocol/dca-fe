@@ -17,7 +17,7 @@ interface NavBarProps {
 }
 
 const NavBar = ({ isLoading }: NavBarProps) => (
-  <AppBar position="static">
+  <AppBar position="fixed">
     <Toolbar>
       <StyledBox>
         <Typography variant="h6" color="inherit">

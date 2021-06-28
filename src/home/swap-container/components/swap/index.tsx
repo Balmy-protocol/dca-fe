@@ -83,6 +83,7 @@ const frequencyTypeOptions = [
 interface SwapProps extends SwapContextValue {
   tokenList: TokenList;
   web3Service: Web3Service;
+  availablePairs: AvailablePairs;
 }
 
 const Swap = ({
@@ -100,6 +101,7 @@ const Swap = ({
   frequencyType,
   frequencyValue,
   web3Service,
+  availablePairs,
 }: SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
@@ -126,24 +128,17 @@ const Swap = ({
     !web3Service.getAccount()
   );
 
-  const [availablePairs, isLoadingAvailablePairs, availablePairsErrors] = usePromise<AvailablePairs>(
-    web3Service,
-    'getAvailablePairs',
-    [],
-    false
-  );
-
   const existingPair = React.useMemo(() => {
     let token0 = from < to ? from : to;
     let token1 = from < to ? to : from;
-    return isLoadingAvailablePairs || (availablePairs && find(availablePairs, { token0, token1 }));
-  }, [from, to, availablePairs, isLoadingAvailablePairs]);
+    return find(availablePairs, { token0, token1 });
+  }, [from, to, availablePairs]);
 
   const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
     web3Service,
     'getAllowance',
     [tokenList[from], existingPair],
-    !tokenList[from] || !web3Service.getAccount() || !existingPair || isLoadingAvailablePairs
+    !tokenList[from] || !web3Service.getAccount() || !existingPair
   );
 
   const handleApproveToken = async () => {
@@ -192,27 +187,13 @@ const Swap = ({
         existingPair as AvailablePair
       );
       setModalSuccess({
-        content: (
-          <Link href={buildEtherscanTransaction(result.hash)} target="_blank" rel="noreferrer">
-            <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
-          </Link>
-        ),
+        hash: result.hash,
       });
 
       setFromValue('');
     } catch (e) {
       setModalError({
-        content: (
-          <Typography variant="subtitle2">
-            {TRANSACTION_ERRORS[e.code as keyof typeof TRANSACTION_ERRORS] || (
-              <FormattedMessage
-                description="unkown_error"
-                defaultMessage="Encountered unknown error: {message}"
-                values={{ message: e.message }}
-              />
-            )}
-          </Typography>
-        ),
+        error: e,
       });
     }
   };
@@ -252,8 +233,6 @@ const Swap = ({
     isLoadingNetwork ||
     isLoadingBalance ||
     balanceErrors ||
-    isLoadingAvailablePairs ||
-    availablePairsErrors ||
     allowanceErrors ||
     !isApproved ||
     networkErrors;
@@ -294,10 +273,10 @@ const Swap = ({
               <FormattedMessage description="You pay" defaultMessage="You pay" />
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={12} sm={3}>
             <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <TokenInput
               id="from-value"
               error={hasError ? 'Ammount cannot exceed balance' : ''}
@@ -321,10 +300,10 @@ const Swap = ({
               <FormattedMessage description="You get" defaultMessage="You get" />
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={12} sm={3}>
             <TokenButton token={tokenList[to]} onClick={() => startSelectingCoin(to)} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <TokenInput id="to-value" value={toValue} disabled label={tokenList[to]?.symbol} onChange={setToValue} />
           </Grid>
         </Grid>
@@ -334,10 +313,10 @@ const Swap = ({
               <FormattedMessage description="Set for" defaultMessage="Set for" />
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={12} sm={3}>
             <FrequencyInput id="frequency-value" value={frequencyValue} label="" onChange={setFrequencyValue} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <FrequencyTypeInput
               id="frequency-type-value"
               options={frequencyTypeOptions}

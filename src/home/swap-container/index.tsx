@@ -6,6 +6,7 @@ import WalletContext from 'common/wallet-context';
 import Swap from './components/swap';
 import { DAY_IN_SECONDS } from 'utils/parsing';
 import { WETH, DAI } from 'mocks/tokens';
+import Hidden from '@material-ui/core/Hidden';
 
 const SwapContainer = () => {
   const routeParams = useParams<{ from: string; to: string }>();
@@ -19,9 +20,9 @@ const SwapContainer = () => {
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">
       <WalletContext.Consumer>
-        {({ tokenList, graphPricesClient, web3Service }) => (
+        {({ tokenList, graphPricesClient, web3Service, availablePairs }) => (
           <>
-            <Grid item xs={6}>
+            <Grid item xs={9} md={6}>
               <Swap
                 from={from}
                 to={to}
@@ -37,11 +38,14 @@ const SwapContainer = () => {
                 setToValue={setToValue}
                 tokenList={tokenList}
                 web3Service={web3Service}
+                availablePairs={availablePairs}
               />
             </Grid>
-            <Grid item xs={6} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
-              <GraphWidget from={tokenList[from]} to={tokenList[to]} client={graphPricesClient} />
-            </Grid>
+            <Hidden mdDown>
+              <Grid item xs={6} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
+                <GraphWidget from={tokenList[from]} to={tokenList[to]} client={graphPricesClient} />
+              </Grid>
+            </Hidden>
           </>
         )}
       </WalletContext.Consumer>

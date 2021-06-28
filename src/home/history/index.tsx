@@ -69,17 +69,19 @@ const History = ({ tokenList }: HistoryProps) => (
       </Typography>
     </Grid>
     <Grid item xs={12}>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} alignItems="flex-start">
         {mockData.map(({ from, to, daysSet, startedAt, exercised, initialAmmount }, index) => (
-          <PastPosition
-            key={index}
-            from={from}
-            to={to}
-            daysSet={daysSet}
-            startedAt={startedAt}
-            exercised={exercised}
-            initialAmmount={initialAmmount}
-          />
+          <Grid item xs={12} sm={6} md={3}>
+            <PastPosition
+              key={index}
+              from={from}
+              to={to}
+              daysSet={daysSet}
+              startedAt={startedAt}
+              exercised={exercised}
+              initialAmmount={initialAmmount}
+            />
+          </Grid>
         ))}
       </Grid>
     </Grid>

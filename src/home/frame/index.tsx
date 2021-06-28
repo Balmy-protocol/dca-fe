@@ -15,6 +15,7 @@ interface HomeFrameProps {
 
 const StyledContainer = styled(Container)<HomeFrameProps>`
   height: ${(props) => (props.isLoading ? '100%' : 'auto')};
+  background-color: #e9e3ec;
 `;
 
 const StyledGridContainer = styled(Grid)<HomeFrameProps>`
@@ -33,16 +34,19 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => (
           <WalletContext.Consumer>
             {({ tokenList, web3Service }) => (
               <>
-                <Grid item xs={12}></Grid>
                 <Grid item xs={12}>
                   <SwapContainer />
                 </Grid>
-                <Grid item xs={12}>
-                  <CurrentPositions web3Service={web3Service} tokenList={tokenList} />
-                </Grid>
-                <Grid item xs={12}>
-                  <History tokenList={tokenList} />
-                </Grid>
+                {web3Service.getAccount() && (
+                  <>
+                    <Grid item xs={12}>
+                      <CurrentPositions web3Service={web3Service} tokenList={tokenList} />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <History tokenList={tokenList} />
+                    </Grid>
+                  </>
+                )}
               </>
             )}
           </WalletContext.Consumer>

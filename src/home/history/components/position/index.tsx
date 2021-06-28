@@ -9,7 +9,10 @@ import { DateTime } from 'luxon';
 
 const StyledCard = styled(Card)`
   margin: 10px;
-  width: 250px;
+`;
+
+const StyledCardContent = styled(CardContent)`
+  padding-bottom: 0px;
 `;
 
 const StyledCardHeader = styled.div`
@@ -33,7 +36,7 @@ interface PastPositionProps {
 
 const PastPosition = ({ from, to, daysSet, startedAt, exercised, initialAmmount }: PastPositionProps) => (
   <StyledCard>
-    <CardContent>
+    <StyledCardContent>
       <StyledCardHeader>
         <StyledCardTitleHeader>
           <Typography variant="h6">{from}</Typography>
@@ -48,7 +51,7 @@ const PastPosition = ({ from, to, daysSet, startedAt, exercised, initialAmmount 
           values={{ exercised, to }}
         />
       </Typography>
-      <Typography variant="body2">
+      <Typography variant="subtitle2">
         <FormattedMessage
           description="current remaining"
           defaultMessage="From {initialAmmount} {from}"
@@ -62,7 +65,7 @@ const PastPosition = ({ from, to, daysSet, startedAt, exercised, initialAmmount 
           values={{ startedAt: DateTime.fromJSDate(startedAt).toLocaleString(), daysSet }}
         />
       </Typography>
-    </CardContent>
+    </StyledCardContent>
   </StyledCard>
 );
 

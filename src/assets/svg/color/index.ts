@@ -868,6 +868,7 @@ const manifest = {
   WAVES,
   WAX,
   WBTC,
+  WETH: ETH,
   WGR,
   WICC,
   WINGS,

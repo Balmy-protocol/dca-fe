@@ -26,7 +26,8 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
           <FormattedMessage description="Current positions" defaultMessage="Your current positions" />
         </Typography>
       </Grid>
-      <Grid item xs={12}>
+      {/* dont know why I need the 100% width :shrug: */}
+      <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">
           {!isLoadingCurrentPositions && currentPositions
             ? (currentPositions as CurrentPositions).map(
@@ -45,20 +46,22 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
                   },
                   index
                 ) => (
-                  <ActivePosition
-                    key={index}
-                    from={tokenList[from]}
-                    to={tokenList[to]}
-                    swapInterval={swapInterval}
-                    swapped={swapped}
-                    startedAt={startedAt}
-                    withdrawn={withdrawn}
-                    remainingLiquidity={remainingLiquidity}
-                    remainingSwaps={remainingSwaps}
-                    id={id}
-                    status={status}
-                    web3Service={web3Service}
-                  />
+                  <Grid item xs={12} sm={6} md={3}>
+                    <ActivePosition
+                      key={index}
+                      from={tokenList[from]}
+                      to={tokenList[to]}
+                      swapInterval={swapInterval}
+                      swapped={swapped}
+                      startedAt={startedAt}
+                      withdrawn={withdrawn}
+                      remainingLiquidity={remainingLiquidity}
+                      remainingSwaps={remainingSwaps}
+                      id={id}
+                      status={status}
+                      web3Service={web3Service}
+                    />
+                  </Grid>
                 )
               )
             : null}

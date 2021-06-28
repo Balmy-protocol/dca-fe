@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
 import WalletContext, { WalletContextDefaultValue } from 'common/wallet-context';
-import { Token, TokenList } from 'types';
+import { Token, TokenList, AvailablePairs } from 'types';
 import axios, { AxiosResponse } from 'axios';
 import MainApp from './frame';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
@@ -11,6 +11,7 @@ import { ThemeProvider } from 'styled-components';
 import Web3Service from 'services/web3Service';
 import { WETH, DAI, ETH, UNI } from 'mocks/tokens';
 import TransactionModalProvider from 'common/transaction-modal';
+import usePromise from 'hooks/usePromise';
 
 const theme = createMuiTheme();
 
@@ -32,6 +33,12 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
   const [tokenList, setTokenList] = React.useState<TokenList>({});
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
   const [isLoadingTokens, setIsLoadingTokens] = React.useState(true);
+  const [availablePairs, isLoadingAvailablePairs, availablePairsErrors] = usePromise<AvailablePairs>(
+    web3Service,
+    'getAvailablePairs',
+    [],
+    isLoadingWeb3
+  );
 
   React.useEffect(() => {
     async function setWeb3ModalEffect() {
@@ -64,7 +71,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
     }
   }, [web3Service, tokenList]);
 
-  const isLoading = isLoadingTokens || isLoadingWeb3;
+  const isLoading = isLoadingTokens || isLoadingWeb3 || isLoadingAvailablePairs;
 
   return (
     <WalletContext.Provider
@@ -73,6 +80,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
         tokenList,
         account,
         graphPricesClient: WalletContextDefaultValue.graphPricesClient,
+        availablePairs: availablePairs || [],
       }}
     >
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}

@@ -32,7 +32,6 @@ import { STRING_SWAP_INTERVALS } from 'utils/parsing';
 
 const StyledCard = styled(Card)`
   margin: 10px;
-  width: 250px;
 `;
 
 const StyledCardContent = styled(CardContent)`
@@ -149,21 +148,29 @@ const ActivePosition = ({
             values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
           />
         </Typography>
-        <Typography variant="body2">
+        <Typography variant="subtitle2">
           <FormattedMessage
             description="current remaining"
             defaultMessage="{remainingLiquidity} {from} remaining"
             values={{ remainingLiquidity: formatUnits(remainingLiquidity, from.decimals), from: from.symbol }}
           />
         </Typography>
-        <Typography variant="caption">
+        <Typography variant="body2" component="p">
           <FormattedMessage
             description="days to finish"
-            defaultMessage="Started at: {startedAt} with {remainingDays} {type} to close"
+            defaultMessage="{remainingDays} {type} to close"
             values={{
-              startedAt: DateTime.fromJSDate(startedAt).toLocaleString(),
               remainingDays: remainingSwaps,
               type: STRING_SWAP_INTERVALS[swapInterval as keyof typeof STRING_SWAP_INTERVALS],
+            }}
+          />
+        </Typography>
+        <Typography variant="caption" component="p">
+          <FormattedMessage
+            description="days to finish"
+            defaultMessage="Started at: {startedAt}"
+            values={{
+              startedAt: DateTime.fromJSDate(startedAt).toLocaleString(),
             }}
           />
         </Typography>

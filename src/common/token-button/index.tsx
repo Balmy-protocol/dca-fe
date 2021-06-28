@@ -11,7 +11,7 @@ interface TokenButtonProps {
 
 const Swap = ({ token, onClick }: TokenButtonProps) => {
   return (
-    <Button size="small" startIcon={<TokenIcon token={token} />} endIcon={<ExpandMoreIcon />} onClick={onClick}>
+    <Button size="large" startIcon={<TokenIcon token={token} />} endIcon={<ExpandMoreIcon />} onClick={onClick}>
       {token?.symbol}
     </Button>
   );

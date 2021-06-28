@@ -4,25 +4,26 @@ import Grid from '@material-ui/core/Grid';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import NavBar from 'common/navbar';
 import Home from 'home';
-import { styled as materialStyled } from '@material-ui/core/styles';
+import styled from 'styled-components';
 
 interface AppFrameProps {
   isLoading: boolean;
 }
 
-const StyledGridContainer = materialStyled(Grid)(({ isLoading }: AppFrameProps) => ({
-  ...(isLoading ? { height: '100%' } : {}),
-  backgroundColor: '#e9e3ec',
-}));
+const StyledGridContainer = styled(Grid)<{ isLoading: boolean }>`
+  ${(props) => (props.isLoading ? 'height: 100%;' : '')}
+  background-color: #e9e3ec;
+`;
 
-const StyledNavBarGridContainer = materialStyled(Grid)({
-  flex: 0,
-});
+const StyledNavBarGridContainer = styled(Grid)`
+  flex: 0;
+`;
 
-const StyledAppGridContainer = materialStyled(Grid)(({ isLoading }: AppFrameProps) => ({
-  flex: 1,
-  ...(isLoading ? { height: '100%' } : {}),
-}));
+const StyledAppGridContainer = styled(Grid)<{ isLoading: boolean }>`
+  ${(props) => (props.isLoading ? 'height: 100%;' : '')}
+  flex: 1;
+  margin-top: 85px;
+`;
 
 const AppFrame = ({ isLoading }: AppFrameProps) => (
   <Router>
