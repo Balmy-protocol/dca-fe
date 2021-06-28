@@ -20,7 +20,7 @@ const mockedCurrentPositions = [
     swapInterval: SWAP_INTERVALS['day'],
     startedAt: new Date(1623624089 * 1000),
     swapped: parseUnits('2', DAI.decimals),
-    remainingLiquidity: parseUnits('0.00015', UNI.decimals),
+    remainingLiquidity: parseUnits('0.000000015', UNI.decimals),
     remainingSwaps: 5,
     withdrawn: parseUnits('4', DAI.decimals),
     id: 2,

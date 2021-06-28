@@ -37,9 +37,22 @@ type Web3ServicePromisableMethods =
   | 'getAvailablePairs'
   | 'getAllowance';
 
-interface CurrentPosition {
+interface CurrentPositionRaw {
   from: string;
   to: string;
+  swapInterval: number; // daily/weekly/etc
+  swapped: BigNumber; // total de swappeado
+  startedAt: Date;
+  remainingLiquidity: BigNumber;
+  remainingSwaps: number;
+  withdrawn: BigNumber; // cuanto saque
+  id: number;
+  status: string; // current
+}
+
+interface CurrentPosition {
+  from: Token;
+  to: Token;
   swapInterval: number; // daily/weekly/etc
   swapped: BigNumber; // total de swappeado
   startedAt: Date;
@@ -66,7 +79,7 @@ interface Network {
   chainId: number;
 }
 
-type CurrentPositions = CurrentPosition[];
+type CurrentPositions = CurrentPositionRaw[];
 
 interface GasNowResponseData {
   rapid: number;

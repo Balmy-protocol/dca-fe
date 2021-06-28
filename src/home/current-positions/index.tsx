@@ -4,7 +4,9 @@ import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import ActivePosition from './components/position';
 import usePromise from 'hooks/usePromise';
-import { Web3Service, TokenList, CurrentPositions } from 'types';
+import { Web3Service, TokenList, CurrentPositions, CurrentPosition } from 'types';
+import WithdrawModal from 'common/withdraw-modal';
+import TerminateModal from 'common/terminate-modal';
 
 interface CurrentPositionsProps {
   web3Service: Web3Service;
@@ -18,9 +20,35 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
     [],
     !web3Service.getAccount()
   );
+  const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
+  const [showTerminateModal, setShowTerminateModal] = React.useState(false);
+  const [selectedPosition, setSelectedPosition] = React.useState<CurrentPosition | null>(null);
+
+  const onWithdraw = (position: CurrentPosition) => {
+    setSelectedPosition(position);
+    setShowWithdrawModal(true);
+  };
+  const onTerminate = (position: CurrentPosition) => {
+    setSelectedPosition(position);
+    setShowTerminateModal(true);
+  };
 
   return (
     <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
+      {!isLoadingCurrentPositions && selectedPosition && (
+        <>
+          <WithdrawModal
+            open={showWithdrawModal}
+            position={selectedPosition}
+            onCancel={() => setShowWithdrawModal(false)}
+          />
+          <TerminateModal
+            open={showTerminateModal}
+            position={selectedPosition}
+            onCancel={() => setShowTerminateModal(false)}
+          />
+        </>
+      )}
       <Grid item xs={12}>
         <Typography variant="h3">
           <FormattedMessage description="Current positions" defaultMessage="Your current positions" />
@@ -31,24 +59,20 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
         <Grid container spacing={2} alignItems="flex-start">
           {!isLoadingCurrentPositions && currentPositions
             ? (currentPositions as CurrentPositions).map(
-                (
-                  {
-                    from,
-                    to,
-                    swapInterval,
-                    swapped,
-                    startedAt,
-                    remainingLiquidity,
-                    remainingSwaps,
-                    id,
-                    status,
-                    withdrawn,
-                  },
-                  index
-                ) => (
-                  <Grid item xs={12} sm={6} md={3}>
+                ({
+                  from,
+                  to,
+                  swapInterval,
+                  swapped,
+                  startedAt,
+                  remainingLiquidity,
+                  remainingSwaps,
+                  id,
+                  status,
+                  withdrawn,
+                }) => (
+                  <Grid item xs={12} sm={6} md={3} key={id}>
                     <ActivePosition
-                      key={index}
                       from={tokenList[from]}
                       to={tokenList[to]}
                       swapInterval={swapInterval}
@@ -60,6 +84,8 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
                       id={id}
                       status={status}
                       web3Service={web3Service}
+                      onWithdraw={onWithdraw}
+                      onTerminate={onTerminate}
                     />
                   </Grid>
                 )

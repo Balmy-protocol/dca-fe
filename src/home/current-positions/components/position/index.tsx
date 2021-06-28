@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits } from '@ethersproject/units';
 import { BigNumber } from 'ethers';
+import find from 'lodash/find';
 import Card from '@material-ui/core/Card';
 import Grid from '@material-ui/core/Grid';
 import CardContent from '@material-ui/core/CardContent';
@@ -18,7 +19,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Token, Web3Service } from 'types';
+import { CurrentPosition, Token, Web3Service } from 'types';
 import BlockIcon from '@material-ui/icons/Block';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -27,8 +28,11 @@ import { DateTime } from 'luxon';
 import FloatingMenu from 'common/floating-menu';
 import TokenInput from 'common/token-input';
 import usePromise from 'hooks/usePromise';
-import { CurrentPosition as ActivePositionInterface } from 'types';
+import { CurrentPosition as ActivePositionInterface, AvailablePair } from 'types';
 import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import WalletContext from 'common/wallet-context';
+import useTransactionModal from 'hooks/useTransactionModal';
+import { sortTokens } from 'utils/parsing';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -74,10 +78,10 @@ const useDeletedStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface ActivePositionProps extends Omit<ActivePositionInterface, 'from' | 'to'> {
-  from: Token;
-  to: Token;
+interface ActivePositionProps extends ActivePositionInterface {
   web3Service: Web3Service;
+  onWithdraw: (position: CurrentPosition) => void;
+  onTerminate: (position: CurrentPosition) => void;
 }
 
 const ActivePosition = ({
@@ -90,12 +94,17 @@ const ActivePosition = ({
   remainingSwaps,
   withdrawn,
   id,
+  onWithdraw,
+  onTerminate,
+  status,
   web3Service,
 }: ActivePositionProps) => {
   const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
   const [fromValue, setFromValue] = React.useState('');
   const buttonContent = <MoreVertIcon />;
   const classNames = useDeletedStyles();
+  const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
+  const { availablePairs } = React.useContext(WalletContext);
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
     'getBalance',
@@ -103,7 +112,40 @@ const ActivePosition = ({
     !from || !web3Service.getAccount() || !shouldShowAddForm
   );
 
-  const hasError = fromValue && balance && BigNumber.from(fromValue).gt(BigNumber.from(balance));
+  const hasError = fromValue && balance && parseUnits(fromValue, from.decimals).gt(parseUnits(balance, from.decimals));
+
+  const [token0, token1] = sortTokens(from.address, to.address);
+  const pair = find(availablePairs, { token0, token1 });
+
+  const handleAddFunds = async () => {
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="subtitle2">
+            <FormattedMessage
+              description="Adding funds"
+              defaultMessage="Adding funds to {from}:{to} position"
+              values={{ from: from.symbol, to: to.symbol }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.addFunds(
+        { from, to, swapInterval, swapped, startedAt, remainingLiquidity, remainingSwaps, withdrawn, status, id },
+        pair as AvailablePair,
+        fromValue
+      );
+      setModalSuccess({
+        hash: result.hash,
+      });
+      setShouldShowAddForm(false);
+      setFromValue('');
+    } catch (e) {
+      setModalError({
+        error: e,
+      });
+    }
+  };
 
   return (
     <StyledCard>
@@ -115,7 +157,22 @@ const ActivePosition = ({
             <Typography variant="h6">{to.symbol}</Typography>
           </StyledCardTitleHeader>
           <FloatingMenu buttonContent={buttonContent} buttonStyles={{}} isIcon>
-            <MenuItem onClick={() => alert('are you fucking sure?')}>
+            <MenuItem
+              onClick={() =>
+                onWithdraw({
+                  from,
+                  to,
+                  swapInterval,
+                  swapped,
+                  startedAt,
+                  remainingLiquidity,
+                  remainingSwaps,
+                  withdrawn,
+                  status,
+                  id,
+                })
+              }
+            >
               <StyledListItemIcon>
                 <CallSplitIcon fontSize="small" />
               </StyledListItemIcon>
@@ -131,7 +188,23 @@ const ActivePosition = ({
                 <FormattedMessage description="Modify frequency" defaultMessage="Modify Frequency" />
               </ListItemText>
             </MenuItem>
-            <MenuItem onClick={() => alert('are you fucking sure?')} classes={classNames}>
+            <MenuItem
+              onClick={() =>
+                onTerminate({
+                  from,
+                  to,
+                  swapInterval,
+                  swapped,
+                  startedAt,
+                  remainingLiquidity,
+                  remainingSwaps,
+                  withdrawn,
+                  status,
+                  id,
+                })
+              }
+              classes={classNames}
+            >
               <StyledListItemIcon>
                 <BlockIcon fontSize="small" />
               </StyledListItemIcon>
@@ -196,7 +269,13 @@ const ActivePosition = ({
               />
             </Grid>
             <Grid item xs={3} style={{ marginTop: '8px' }}>
-              <Button size="small" variant="contained" disabled={!shouldShowAddForm} color="primary">
+              <Button
+                size="small"
+                variant="contained"
+                disabled={!shouldShowAddForm}
+                color="primary"
+                onClick={handleAddFunds}
+              >
                 <Typography variant="button">
                   <FormattedMessage description="Add" defaultMessage="Add" />
                 </Typography>

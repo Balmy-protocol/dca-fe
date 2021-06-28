@@ -10,9 +10,6 @@ import Typography from '@material-ui/core/Typography';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import Link from '@material-ui/core/Link';
-import { Token, Web3Service, EstimatedPairResponse } from 'types';
-import usePromise from 'hooks/usePromise';
-import { SetStateCallback } from 'types';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import { TRANSACTION_ERRORS } from 'utils/errors';
 
@@ -150,7 +147,11 @@ export const TransactionModal = ({
       {errorConfig.content}
       <Typography variant="subtitle2">
         {TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] || (
-          <FormattedMessage description="unkown_error" defaultMessage={errorConfig.error?.message} />
+          <FormattedMessage
+            description="unkown_error"
+            defaultMessage="Unknown error: {message}"
+            values={{ message: errorConfig.error?.message }}
+          />
         )}
       </Typography>
     </>

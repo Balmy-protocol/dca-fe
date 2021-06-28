@@ -309,4 +309,20 @@ export default class Web3Service {
 
     return factory.withdrawSwapped(position.id);
   }
+
+  terminate(position: CurrentPosition, pair: AvailablePair) {
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+
+    return factory.terminate(position.id);
+  }
+
+  addFunds(position: CurrentPosition, pair: AvailablePair, newDeposit: string) {
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+
+    const newRate = parseUnits(newDeposit, position.from.decimals)
+      .add(position.remainingLiquidity)
+      .div(BigNumber.from(position.remainingSwaps));
+
+    return factory.modifyRateAndSwaps(position.id, newRate, position.remainingSwaps);
+  }
 }
