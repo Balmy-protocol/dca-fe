@@ -15,6 +15,17 @@ type Token = {
 
 type TokenList = Record<string, Token>;
 
+type AvailablePairResponse = {
+  token0: {
+    id: string;
+  };
+  token1: {
+    id: string;
+  };
+  id: string;
+  status: string; // active, stale
+};
+
 type AvailablePair = {
   token0: string;
   token1: string;
@@ -141,4 +152,5 @@ export {
   GetUsedTokensDataResponse,
   EstimatedPairResponse,
   GetAllowanceResponse,
+  AvailablePairResponse,
 };

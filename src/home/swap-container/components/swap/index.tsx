@@ -31,11 +31,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import usePromise from 'hooks/usePromise';
 import CreatePairModal from 'common/create-pair-modal';
 import { NETWORKS } from 'config/constants';
-import { ETH, DAI } from 'mocks/tokens';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import { buildEtherscanTransaction } from 'utils/etherscan';
-import { TRANSACTION_ERRORS } from 'utils/errors';
-import Link from '@material-ui/core/Link';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { DAY_IN_SECONDS, WEEK_IN_SECONDS, MONTH_IN_SECONDS, STRING_SWAP_INTERVALS } from 'utils/parsing';
 

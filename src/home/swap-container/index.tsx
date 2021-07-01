@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import { useParams } from 'react-router-dom';
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
+import { useQuery } from '@apollo/client';
 import Swap from './components/swap';
 import { DAY_IN_SECONDS } from 'utils/parsing';
 import { WETH, DAI } from 'mocks/tokens';

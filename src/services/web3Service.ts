@@ -1,14 +1,24 @@
 import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
 import axios, { AxiosResponse } from 'axios';
-import { GasNowResponse, CoinGeckoPriceResponse, Token, AvailablePair, CurrentPosition } from 'types';
+import {
+  GasNowResponse,
+  CoinGeckoPriceResponse,
+  Token,
+  AvailablePairResponse,
+  CurrentPosition,
+  AvailablePairs,
+  AvailablePair,
+} from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
-import { SWAP_INTERVALS } from 'utils/parsing';
+import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
+import gqlFetchAll from 'utils/gqlFetchAll';
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
 import Factory from 'abis/factory.json';
@@ -17,25 +27,33 @@ import DCAPair from 'abis/DCAPair.json';
 // MOCKS
 import currentPositionMocks from 'mocks/currentPositions';
 import availablePairsMocks from 'mocks/availablePairs';
+import usedTokensMocks from 'mocks/usedTokens';
 import { ETH } from 'mocks/tokens';
 
 export const FACTORY_ADDRESS =
   process.env.ETH_NETWORK === 'mainnet'
     ? '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9'
-    : '0x19B7F4424106a5A15d50043Ad92D8f4066FF2687';
+    : '0xBCb011FB225aFe1a0B9Ac56c9231C772DeF6805A';
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
   modal: Web3Modal;
   signer: Signer;
+  availablePairs: AvailablePairs;
+  apolloClient: ApolloClient<NormalizedCacheObject>;
   account: string;
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
 
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
+    apolloClient?: ApolloClient<NormalizedCacheObject>,
     client?: ethers.providers.Web3Provider,
     modal?: Web3Modal
   ) {
+    if (apolloClient) {
+      this.apolloClient = apolloClient;
+    }
+
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
     }
@@ -111,6 +129,14 @@ export default class Web3Service {
         window.location.reload();
       }
     });
+
+    const availablePairsResponse = await gqlFetchAll(this.apolloClient, GET_AVAILABLE_PAIRS, {}, 'pairs');
+
+    this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
+      token0: pair.token0.id,
+      token1: pair.token1.id,
+      id: pair.id,
+    }));
   }
 
   getNetwork() {
@@ -241,7 +267,7 @@ export default class Web3Service {
 
   // TODO: CHANGE FOR GRAPHQL HOOK WHEN INTEGRATED
   getAvailablePairs() {
-    return Promise.resolve(availablePairsMocks);
+    return this.availablePairs;
   }
 
   getGasPrice() {
@@ -254,7 +280,7 @@ export default class Web3Service {
     //   `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
     // );
 
-    return Promise.resolve({ data: {} });
+    return Promise.resolve(usedTokensMocks);
   }
 
   getAllowance(token: Token, pairContract: AvailablePair) {

@@ -27,81 +27,6 @@
       "type": "constructor"
     },
     {
-      "inputs": [],
-      "name": "InsufficientLiquidity",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidInterval",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidPosition",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "InvalidToken",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "LiquidityNotReturned",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "MandatoryWithdraw",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "Paused",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "PositionCompleted",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "UnauthorizedCaller",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "WithinInterval",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "ZeroAddress",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "ZeroAmount",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "ZeroLoan",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "ZeroRate",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "ZeroSwaps",
-      "type": "error"
-    },
-    {
       "anonymous": false,
       "inputs": [
         {
@@ -174,9 +99,9 @@
         },
         {
           "indexed": false,
-          "internalType": "uint192",
+          "internalType": "uint160",
           "name": "_rate",
-          "type": "uint192"
+          "type": "uint160"
         },
         {
           "indexed": false,
@@ -254,9 +179,9 @@
         },
         {
           "indexed": false,
-          "internalType": "uint192",
+          "internalType": "uint160",
           "name": "_rate",
-          "type": "uint192"
+          "type": "uint160"
         },
         {
           "indexed": false,
@@ -304,19 +229,36 @@
         {
           "components": [
             {
-              "internalType": "uint32",
-              "name": "swapToPerform",
-              "type": "uint32"
+              "components": [
+                {
+                  "internalType": "uint32",
+                  "name": "interval",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "swapToPerform",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountToSwapTokenA",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountToSwapTokenB",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct IDCAPairSwapHandler.SwapInformation[]",
+              "name": "swapsToPerform",
+              "type": "tuple[]"
             },
             {
-              "internalType": "uint256",
-              "name": "amountToSwapTokenA",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amountToSwapTokenB",
-              "type": "uint256"
+              "internalType": "uint8",
+              "name": "amountOfSwaps",
+              "type": "uint8"
             },
             {
               "internalType": "uint256",
@@ -497,6 +439,19 @@
       "type": "event"
     },
     {
+      "inputs": [],
+      "name": "activeSwapIntervals",
+      "outputs": [
+        {
+          "internalType": "uint32[]",
+          "name": "__activeSwapIntervals",
+          "type": "uint32[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -564,9 +519,9 @@
           "type": "address"
         },
         {
-          "internalType": "uint192",
+          "internalType": "uint160",
           "name": "_rate",
-          "type": "uint192"
+          "type": "uint160"
         },
         {
           "internalType": "uint32",
@@ -610,31 +565,42 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint32",
-          "name": "_swapInterval",
-          "type": "uint32"
-        }
-      ],
+      "inputs": [],
       "name": "getNextSwapInfo",
       "outputs": [
         {
           "components": [
             {
-              "internalType": "uint32",
-              "name": "swapToPerform",
-              "type": "uint32"
+              "components": [
+                {
+                  "internalType": "uint32",
+                  "name": "interval",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "swapToPerform",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountToSwapTokenA",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountToSwapTokenB",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct IDCAPairSwapHandler.SwapInformation[]",
+              "name": "swapsToPerform",
+              "type": "tuple[]"
             },
             {
-              "internalType": "uint256",
-              "name": "amountToSwapTokenA",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amountToSwapTokenB",
-              "type": "uint256"
+              "internalType": "uint8",
+              "name": "amountOfSwaps",
+              "type": "uint8"
             },
             {
               "internalType": "uint256",
@@ -735,25 +701,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint32",
-          "name": "",
-          "type": "uint32"
-        }
-      ],
-      "name": "lastSwapPerformed",
-      "outputs": [
-        {
-          "internalType": "uint32",
-          "name": "",
-          "type": "uint32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "uint256",
           "name": "_amountToBorrowTokenA",
           "type": "uint256"
@@ -787,9 +734,9 @@
           "type": "uint256"
         },
         {
-          "internalType": "uint192",
+          "internalType": "uint160",
           "name": "_newRate",
-          "type": "uint192"
+          "type": "uint160"
         }
       ],
       "name": "modifyRate",
@@ -805,9 +752,9 @@
           "type": "uint256"
         },
         {
-          "internalType": "uint192",
+          "internalType": "uint160",
           "name": "_newRate",
-          "type": "uint192"
+          "type": "uint160"
         },
         {
           "internalType": "uint32",
@@ -846,6 +793,25 @@
           "internalType": "string",
           "name": "",
           "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "name": "nextSwapAvailable",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
         }
       ],
       "stateMutability": "view",
@@ -954,6 +920,19 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "secondsUntilNextSwap",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "_secondsUntil",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -993,11 +972,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint32",
-          "name": "_swapInterval",
-          "type": "uint32"
-        },
-        {
           "internalType": "uint256",
           "name": "_amountToBorrowTokenA",
           "type": "uint256"
@@ -1024,13 +998,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint32",
-          "name": "_swapInterval",
-          "type": "uint32"
-        }
-      ],
+      "inputs": [],
       "name": "swap",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -1231,9 +1199,9 @@
               "type": "uint256"
             },
             {
-              "internalType": "uint192",
+              "internalType": "uint160",
               "name": "rate",
-              "type": "uint192"
+              "type": "uint160"
             }
           ],
           "internalType": "struct IDCAPairPositionHandler.UserPosition",

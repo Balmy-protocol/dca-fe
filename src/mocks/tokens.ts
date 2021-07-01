@@ -39,3 +39,21 @@ export const UNI = {
   symbol: 'UNI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
 };
+
+export const YFI = {
+  chainId: 1,
+  decimals: 18,
+  address: '0x99fda92878c1d2f1e0971d1937c50cc578a33e3d',
+  name: 'Yearn Finance',
+  symbol: 'YFI',
+  logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+};
+
+export const USDC = {
+  chainId: 1,
+  decimals: 18,
+  address: '0x1349806aee89aa7acb7c321e7ce0a4f0dbdaafa4',
+  name: 'USD Coin',
+  symbol: 'USDC',
+  logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+};
