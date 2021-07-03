@@ -16,6 +16,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
+import useAvailablePairs from 'hooks/useAvailablePairs';
 
 const StyledIconWrapper = styled.div`
   margin: 20px;
@@ -35,8 +36,9 @@ interface WithdrawModalProps {
 
 const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
-  const { web3Service, availablePairs } = React.useContext(WalletContext);
+  const { web3Service } = React.useContext(WalletContext);
 
+  const availablePairs = useAvailablePairs();
   const [token0, token1] = sortTokens(position.from.address, position.to.address);
   const pair = find(availablePairs, { token0, token1 });
   const addTransaction = useTransactionAdder();

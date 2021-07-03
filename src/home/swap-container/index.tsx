@@ -21,7 +21,7 @@ const SwapContainer = () => {
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">
       <WalletContext.Consumer>
-        {({ tokenList, graphPricesClient, web3Service, availablePairs }) => (
+        {({ tokenList, graphPricesClient, web3Service }) => (
           <>
             <Grid item xs={9} md={6}>
               <Swap
@@ -39,7 +39,7 @@ const SwapContainer = () => {
                 setToValue={setToValue}
                 tokenList={tokenList}
                 web3Service={web3Service}
-                availablePairs={availablePairs}
+                // availablePairs={availablePairs}
               />
             </Grid>
             <Hidden mdDown>

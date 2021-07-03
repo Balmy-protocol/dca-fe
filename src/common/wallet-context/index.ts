@@ -9,7 +9,7 @@ export type WalletContextValue = {
   tokenList: TokenList;
   graphPricesClient: ApolloClient<NormalizedCacheObject>;
   account: string;
-  availablePairs: AvailablePairs;
+  // availablePairs: AvailablePairs;
 };
 
 export const WalletContextDefaultValue: WalletContextValue = {
@@ -17,7 +17,7 @@ export const WalletContextDefaultValue: WalletContextValue = {
   tokenList: {},
   graphPricesClient,
   account: '',
-  availablePairs: [],
+  // availablePairs: [],
 };
 
 const WalletContext = React.createContext(WalletContextDefaultValue);

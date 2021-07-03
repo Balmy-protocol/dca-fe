@@ -9,7 +9,7 @@ import MainApp from './frame';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from 'styled-components';
 import Web3Service from 'services/web3Service';
-import { WETH, DAI, USDC, YFI, UNI } from 'mocks/tokens';
+import { WETH, DAI, USDC, YFI, UNI, T0 } from 'mocks/tokens';
 import TransactionModalProvider from 'common/transaction-modal';
 import usePromise from 'hooks/usePromise';
 import { ApolloProvider } from '@apollo/client';
@@ -50,7 +50,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       const geckoTokens =
         process.env.ETH_NETWORK === 'mainnet'
           ? await axios.get<{ tokens: Token[] }>('https://tokens.coingecko.com/uniswap/all.json')
-          : { status: 200, statusText: 'OK', config: {}, headers: {}, data: { tokens: [WETH, DAI, UNI, USDC, YFI] } };
+          : {
+              status: 200,
+              statusText: 'OK',
+              config: {},
+              headers: {},
+              data: { tokens: [WETH, DAI, UNI, USDC, YFI, T0] },
+            };
 
       const reducedTokens = geckoTokens.data.tokens.reduce(
         (acc, token) => ({ ...acc, [token.address]: { ...token } }),
@@ -80,7 +86,6 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
         tokenList,
         account,
         graphPricesClient: WalletContextDefaultValue.graphPricesClient,
-        availablePairs: web3Service.getAvailablePairs() || [],
       }}
     >
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}

@@ -49,6 +49,15 @@ export const YFI = {
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
 };
 
+export const T0 = {
+  chainId: 1,
+  decimals: 18,
+  address: '0xdf3b9be4cf50befc1e946e53fb72be0b56ed7335',
+  name: 'T0',
+  symbol: 'T0',
+  logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+};
+
 export const USDC = {
   chainId: 1,
   decimals: 18,

@@ -34,6 +34,7 @@ import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { sortTokens } from 'utils/parsing';
 import { TRANSACTION_TYPES } from 'config/constants';
+import useAvailablePairs from 'hooks/useAvailablePairs';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -107,7 +108,7 @@ const ActivePosition = ({
   const buttonContent = <MoreVertIcon />;
   const classNames = useDeletedStyles();
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
-  const { availablePairs } = React.useContext(WalletContext);
+  const availablePairs = useAvailablePairs();
   const addTransaction = useTransactionAdder();
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,

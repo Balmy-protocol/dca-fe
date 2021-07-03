@@ -196,6 +196,7 @@ export interface TerminatePositionTypeData {
 
 export interface ApproveTokenTypeData {
   id: number | string;
+  pair: number | string;
 }
 
 export interface NewPositionTypeData {

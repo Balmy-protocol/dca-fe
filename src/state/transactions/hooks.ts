@@ -1,6 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { useCallback, useMemo } from 'react';
-import { TransactionDetails, TransactionTypes, TransactionTypeDataOptions } from 'types';
+import { TransactionDetails, TransactionTypes, TransactionTypeDataOptions, ApproveTokenTypeData } from 'types';
 import { useAppDispatch, useAppSelector } from 'hooks/state';
 
 import useWeb3Service from 'hooks/useWeb3Service';
@@ -91,15 +91,38 @@ export function useHasPendingApproval(tokenAddress: string | undefined, spender:
       typeof tokenAddress === 'string' &&
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {
+        if (!allTransactions[hash]) return false;
+        if (allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN) return false;
         const tx = allTransactions[hash];
-        if (!tx) return false;
         if (tx.receipt) {
           return false;
         } else {
-          const approval = tx.approval;
-          if (!approval) return false;
-          return approval.spender === spender && approval.tokenAddress === tokenAddress && isTransactionRecent(tx);
+          return (
+            (<ApproveTokenTypeData>tx.typeData).pair === spender &&
+            (<ApproveTokenTypeData>tx.typeData).id === tokenAddress
+          );
         }
+      }),
+    [allTransactions, spender, tokenAddress]
+  );
+}
+
+// returns whether a token has been approved transaction
+export function useHasConfirmedApproval(tokenAddress: string | undefined, spender: string | undefined): boolean {
+  const allTransactions = useAllTransactions();
+  return useMemo(
+    () =>
+      typeof tokenAddress === 'string' &&
+      typeof spender === 'string' &&
+      Object.keys(allTransactions).some((hash) => {
+        if (!allTransactions[hash]) return false;
+        if (allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN) return false;
+        const tx = allTransactions[hash];
+        return (
+          tx.receipt &&
+          (<ApproveTokenTypeData>tx.typeData).pair === spender &&
+          (<ApproveTokenTypeData>tx.typeData).id === tokenAddress
+        );
       }),
     [allTransactions, spender, tokenAddress]
   );

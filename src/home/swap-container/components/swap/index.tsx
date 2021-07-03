@@ -33,8 +33,9 @@ import CreatePairModal from 'common/create-pair-modal';
 import { NETWORKS, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { useTransactionAdder } from 'state/transactions/hooks';
+import { useTransactionAdder, useHasPendingApproval, useHasConfirmedApproval } from 'state/transactions/hooks';
 import { DAY_IN_SECONDS, WEEK_IN_SECONDS, MONTH_IN_SECONDS, STRING_SWAP_INTERVALS } from 'utils/parsing';
+import useAvailablePairs from 'hooks/useAvailablePairs';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -80,7 +81,7 @@ const frequencyTypeOptions = [
 interface SwapProps extends SwapContextValue {
   tokenList: TokenList;
   web3Service: Web3Service;
-  availablePairs: AvailablePairs;
+  // availablePairs: AvailablePairs;
 }
 
 const Swap = ({
@@ -98,13 +99,14 @@ const Swap = ({
   frequencyType,
   frequencyValue,
   web3Service,
-  availablePairs,
-}: SwapProps) => {
+}: // availablePairs,
+SwapProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const addTransaction = useTransactionAdder();
+  const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
     'getBalance',
@@ -132,11 +134,14 @@ const Swap = ({
     return find(availablePairs, { token0, token1 });
   }, [from, to, availablePairs]);
 
+  const hasPendingApproval = useHasPendingApproval(from, existingPair?.id);
+  const hasConfirmedApproval = useHasConfirmedApproval(from, existingPair?.id);
+
   const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
     web3Service,
     'getAllowance',
     [tokenList[from], existingPair],
-    !tokenList[from] || !web3Service.getAccount() || !existingPair
+    !tokenList[from] || !web3Service.getAccount() || !existingPair || hasPendingApproval
   );
 
   const handleApproveToken = async () => {
@@ -153,7 +158,7 @@ const Swap = ({
         ),
       });
       const result = await web3Service.approveToken(tokenList[from], existingPair as AvailablePair);
-      addTransaction(result, { type: TRANSACTION_TYPES.APPROVE_TOKEN, typeData: { id: from } });
+      addTransaction(result, { type: TRANSACTION_TYPES.APPROVE_TOKEN, typeData: { id: from, pair: existingPair?.id } });
       setModalSuccess({
         hash: result.hash,
       });
@@ -231,9 +236,10 @@ const Swap = ({
 
   const isApproved = !fromValue
     ? true
-    : !isLoadingAllowance &&
-      allowance &&
-      parseUnits(allowance, tokenList[from].decimals).gte(parseUnits(fromValue, tokenList[from].decimals));
+    : (!isLoadingAllowance &&
+        allowance &&
+        parseUnits(allowance, tokenList[from].decimals).gte(parseUnits(fromValue, tokenList[from].decimals))) ||
+      hasConfirmedApproval;
 
   const pairExists = existingPair;
   const shouldDisableButton =
@@ -257,6 +263,8 @@ const Swap = ({
     [];
 
   const ignoreValues = [from, to];
+
+  console.log('allowance', allowance, hasPendingApproval, hasConfirmedApproval, isApproved);
 
   return (
     <StyledPaper elevation={3}>
@@ -388,17 +396,25 @@ const Swap = ({
                   <Button
                     size="large"
                     variant="contained"
-                    disabled={!!isApproved}
+                    disabled={!!isApproved || hasPendingApproval}
                     color="primary"
                     style={{ width: '100%' }}
                     onClick={handleApproveToken}
                   >
                     <Typography variant="button">
-                      <FormattedMessage
-                        description="Allow us to use your coin"
-                        defaultMessage="Allow us to use your {token}"
-                        values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
-                      />
+                      {hasPendingApproval ? (
+                        <FormattedMessage
+                          description="waiting for approval"
+                          defaultMessage="Waiting for your {token} to be approved"
+                          values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
+                        />
+                      ) : (
+                        <FormattedMessage
+                          description="Allow us to use your coin"
+                          defaultMessage="Allow us to use your {token}"
+                          values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
+                        />
+                      )}
                     </Typography>
                     <Tooltip title="You only have to do this once per token" arrow placement="top">
                       <StyledHelpOutlineIcon fontSize="small" />
