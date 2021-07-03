@@ -6,6 +6,9 @@ import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
+import values from 'lodash/values';
+import orderBy from 'lodash/orderBy';
+import keyBy from 'lodash/keyBy';
 import axios, { AxiosResponse } from 'axios';
 import {
   GasNowResponse,
@@ -17,6 +20,15 @@ import {
   PositionResponse,
   PositionsRaw,
   Position,
+  PositionRaw,
+  PositionRawKeyBy,
+  TransactionDetails,
+  NewPositionTypeData,
+  TerminatePositionTypeData,
+  WithdrawTypeData,
+  AddFundsTypeData,
+  ModifyRatePositionTypeData,
+  NewPairTypeData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
@@ -28,10 +40,9 @@ import Factory from 'abis/factory.json';
 import DCAPair from 'abis/DCAPair.json';
 
 // MOCKS
-import currentPositionMocks from 'mocks/currentPositions';
-import availablePairsMocks from 'mocks/availablePairs';
 import usedTokensMocks from 'mocks/usedTokens';
 import { ETH } from 'mocks/tokens';
+import { TRANSACTION_TYPES } from 'config/constants';
 
 export const FACTORY_ADDRESS =
   process.env.ETH_NETWORK === 'mainnet'
@@ -46,8 +57,8 @@ export default class Web3Service {
   apolloClient: ApolloClient<NormalizedCacheObject>;
   account: string;
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
-  currentPositions: PositionsRaw;
-  pastPositions: PositionsRaw;
+  currentPositions: PositionRawKeyBy;
+  pastPositions: PositionRawKeyBy;
 
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
@@ -153,17 +164,21 @@ export default class Web3Service {
       'positions'
     );
 
-    this.currentPositions = currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
-      from: position.from.id,
-      to: position.to.id,
-      swapInterval: BigNumber.from(position.swapInterval.interval),
-      swapped: BigNumber.from(position.current.swapped),
-      remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-      remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-      withdrawn: BigNumber.from(position.current.withdrawn),
-      id: position.id,
-      status: position.status,
-    }));
+    this.currentPositions = keyBy(
+      currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
+        from: position.from.id,
+        to: position.to.id,
+        swapInterval: BigNumber.from(position.swapInterval.interval),
+        swapped: BigNumber.from(position.current.swapped),
+        remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+        remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+        withdrawn: BigNumber.from(position.current.withdrawn),
+        id: position.id,
+        status: position.status,
+        startedAt: position.createdAtTimestamp,
+      })),
+      'id'
+    );
 
     const pastPositionsResponse = await gqlFetchAll(
       this.apolloClient,
@@ -175,17 +190,21 @@ export default class Web3Service {
       'positions'
     );
 
-    this.pastPositions = pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
-      from: position.from.id,
-      to: position.to.id,
-      swapInterval: BigNumber.from(position.swapInterval.interval),
-      swapped: BigNumber.from(position.current.swapped),
-      remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-      remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-      withdrawn: BigNumber.from(position.current.withdrawn),
-      id: position.id,
-      status: position.status,
-    }));
+    this.pastPositions = keyBy(
+      pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
+        from: position.from.id,
+        to: position.to.id,
+        swapInterval: BigNumber.from(position.swapInterval.interval),
+        swapped: BigNumber.from(position.current.swapped),
+        remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+        remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+        withdrawn: BigNumber.from(position.current.withdrawn),
+        id: position.id,
+        status: position.status,
+        startedAt: position.createdAtTimestamp,
+      })),
+      'id'
+    );
   }
 
   getNetwork() {
@@ -314,11 +333,11 @@ export default class Web3Service {
   }
 
   getCurrentPositions() {
-    return this.currentPositions;
+    return orderBy(values(this.currentPositions), 'startedAt', 'desc');
   }
 
   getPastPositions() {
-    return this.pastPositions;
+    return orderBy(values(this.pastPositions), 'startedAt', 'desc');
   }
 
   getAvailablePairs() {
@@ -421,5 +440,57 @@ export default class Web3Service {
 
   removeOnBlock() {
     return this.client.off('block');
+  }
+
+  handleTransaction(transaction: TransactionDetails) {
+    switch (transaction.type) {
+      case TRANSACTION_TYPES.NEW_POSITION:
+        const newPositionTypeData = transaction.typeData as NewPositionTypeData;
+        this.currentPositions[newPositionTypeData.id as number] = {
+          from: newPositionTypeData.from.address,
+          to: newPositionTypeData.to.address,
+          swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
+          swapped: BigNumber.from(0),
+          remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
+          remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
+          withdrawn: BigNumber.from(0),
+          id: newPositionTypeData.id as number,
+          startedAt: newPositionTypeData.startedAt,
+          status: 'ACTIVE',
+        };
+        break;
+      case TRANSACTION_TYPES.TERMINATE_POSITION:
+        const terminatePositionTypeData = transaction.typeData as TerminatePositionTypeData;
+        this.pastPositions[terminatePositionTypeData.id] = {
+          ...this.currentPositions[terminatePositionTypeData.id],
+        };
+        delete this.currentPositions[terminatePositionTypeData.id];
+        break;
+      case TRANSACTION_TYPES.WITHDRAW_POSITION:
+        const withdrawPositionTypeData = transaction.typeData as WithdrawTypeData;
+        this.currentPositions[withdrawPositionTypeData.id].withdrawn = this.currentPositions[
+          withdrawPositionTypeData.id
+        ].withdrawn.add(this.currentPositions[withdrawPositionTypeData.id].swapped);
+        break;
+      case TRANSACTION_TYPES.ADD_FUNDS_POSITION:
+        const addFundsTypeData = transaction.typeData as AddFundsTypeData;
+        this.currentPositions[addFundsTypeData.id].remainingLiquidity = this.currentPositions[
+          addFundsTypeData.id
+        ].remainingLiquidity.add(BigNumber.from(addFundsTypeData.newFunds));
+        break;
+      case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
+        const modifyRatePositionTypeData = transaction.typeData as ModifyRatePositionTypeData;
+        this.currentPositions[modifyRatePositionTypeData.id].remainingSwaps = modifyRatePositionTypeData.newRate;
+        break;
+      case TRANSACTION_TYPES.NEW_PAIR:
+        const newPairTypeData = transaction.typeData as NewPairTypeData;
+        this.availablePairs.push({
+          token0: newPairTypeData.token0,
+          token1: newPairTypeData.token1,
+          id: newPairTypeData.id as string,
+          status: 'ACTIVE',
+        });
+        break;
+    }
   }
 }

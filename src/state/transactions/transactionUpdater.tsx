@@ -42,13 +42,7 @@ export default function Updater(): null {
   const getReceipt = useCallback(
     (hash: string) => {
       if (!web3Service.getAccount()) throw new Error('No library or chainId');
-      return web3Service.getTransactionReceipt(hash).then((receipt: any) => {
-        if (receipt === null) {
-          console.debug('Retrying for hash', hash);
-          throw new Error(`Unable to fetch ${hash}`);
-        }
-        return receipt;
-      });
+      return web3Service.getTransactionReceipt(hash).then((receipt: any) => receipt);
     },
     [web3Service]
   );
@@ -63,6 +57,7 @@ export default function Updater(): null {
         promise
           .then((receipt: any) => {
             if (receipt) {
+              web3Service.handleTransaction(transactions[hash]);
               dispatch(
                 finalizeTransaction({
                   hash,
@@ -79,7 +74,6 @@ export default function Updater(): null {
                 })
               );
 
-              // web3Service.addTransactionResponse(transactions);
               // the receipt was fetched before the block, fast forward to that block to trigger balance updates
               if (receipt.blockNumber > lastBlockNumber) {
                 dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber }));

@@ -16,6 +16,7 @@ import usePromise from 'hooks/usePromise';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Link from '@material-ui/core/Link';
 import { useTransactionAdder } from 'state/transactions/hooks';
+import { TRANSACTION_TYPES } from 'config/constants';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -59,7 +60,10 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
         ),
       });
       const result = await web3Service.createPair(from.address, to.address);
-      addTransaction(result);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.NEW_PAIR,
+        typeData: { token0: from.address, token1: to.address },
+      });
       setModalSuccess({
         hash: result.hash,
       });

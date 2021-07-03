@@ -30,7 +30,7 @@ import find from 'lodash/find';
 import WarningIcon from '@material-ui/icons/Warning';
 import usePromise from 'hooks/usePromise';
 import CreatePairModal from 'common/create-pair-modal';
-import { NETWORKS } from 'config/constants';
+import { NETWORKS, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
@@ -153,7 +153,7 @@ const Swap = ({
         ),
       });
       const result = await web3Service.approveToken(tokenList[from], existingPair as AvailablePair);
-      addTransaction(result);
+      addTransaction(result, { type: TRANSACTION_TYPES.APPROVE_TOKEN, typeData: { id: from } });
       setModalSuccess({
         hash: result.hash,
       });
@@ -185,7 +185,18 @@ const Swap = ({
         frequencyValue,
         existingPair as AvailablePair
       );
-      addTransaction(result);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.NEW_POSITION,
+        typeData: {
+          from: tokenList[from],
+          to: tokenList[to],
+          fromValue,
+          frequencyType: frequencyType.toString(),
+          frequencyValue,
+          existingPair: existingPair as AvailablePair,
+          startedAt: Date.now(),
+        },
+      });
       setModalSuccess({
         hash: result.hash,
       });

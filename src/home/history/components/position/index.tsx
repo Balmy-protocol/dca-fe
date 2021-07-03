@@ -32,7 +32,6 @@ const PastPosition = ({
   to,
   swapInterval,
   swapped,
-  startedAt,
   remainingLiquidity,
   remainingSwaps,
   withdrawn,

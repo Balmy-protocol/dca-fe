@@ -1,15 +1,22 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { useCallback, useMemo } from 'react';
-import { TransactionDetails } from 'types';
+import { TransactionDetails, TransactionTypes, TransactionTypeDataOptions } from 'types';
 import { useAppDispatch, useAppSelector } from 'hooks/state';
 
 import useWeb3Service from 'hooks/useWeb3Service';
 import { addTransaction } from './actions';
+import { TRANSACTION_TYPES } from 'config/constants';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
   response: TransactionResponse,
-  customData?: { summary?: string; approval?: { tokenAddress: string; spender: string }; claim?: { recipient: string } }
+  customData: {
+    summary?: string;
+    approval?: { tokenAddress: string; spender: string };
+    claim?: { recipient: string };
+    type: TransactionTypes;
+    typeData: TransactionTypeDataOptions;
+  }
 ) => void {
   const web3Service = useWeb3Service();
   const dispatch = useAppDispatch();
@@ -21,7 +28,15 @@ export function useTransactionAdder(): (
         summary,
         approval,
         claim,
-      }: { summary?: string; claim?: { recipient: string }; approval?: { tokenAddress: string; spender: string } } = {}
+        type,
+        typeData,
+      }: {
+        type: TransactionTypes;
+        typeData: TransactionTypeDataOptions;
+        summary?: string;
+        claim?: { recipient: string };
+        approval?: { tokenAddress: string; spender: string };
+      } = { type: TRANSACTION_TYPES.NO_OP, typeData: { id: 'NO_OP' } }
     ) => {
       if (!web3Service.getAccount()) return;
 
@@ -29,7 +44,7 @@ export function useTransactionAdder(): (
       if (!hash) {
         throw Error('No transaction hash found.');
       }
-      dispatch(addTransaction({ hash, from: web3Service.getAccount(), approval, summary, claim }));
+      dispatch(addTransaction({ hash, from: web3Service.getAccount(), approval, summary, claim, type, typeData }));
     },
     [dispatch, web3Service.getAccount()]
   );
@@ -62,6 +77,10 @@ export function useHasPendingTransactions(): boolean {
  */
 export function isTransactionRecent(tx: TransactionDetails): boolean {
   return new Date().getTime() - tx.addedTime < 86_400_000;
+}
+
+export function isTransactionPending(tx: TransactionDetails): boolean {
+  return !tx.receipt;
 }
 
 // returns whether a token has a pending approval transaction

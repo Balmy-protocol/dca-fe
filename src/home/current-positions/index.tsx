@@ -7,6 +7,7 @@ import usePromise from 'hooks/usePromise';
 import { Web3Service, TokenList, Positions, PositionsRaw, Position } from 'types';
 import WithdrawModal from 'common/withdraw-modal';
 import TerminateModal from 'common/terminate-modal';
+import useCurrentPositions from 'hooks/useCurrentPositions';
 
 interface CurrentPositionsProps {
   web3Service: Web3Service;
@@ -14,12 +15,7 @@ interface CurrentPositionsProps {
 }
 
 const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => {
-  const [currentPositions, isLoadingCurrentPositions, currentPositionErrors] = usePromise(
-    web3Service,
-    'getCurrentPositions',
-    [],
-    !web3Service.getAccount()
-  );
+  const currentPositions = useCurrentPositions();
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState<Position | null>(null);
@@ -35,7 +31,7 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
 
   return (
     <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
-      {!isLoadingCurrentPositions && selectedPosition && (
+      {selectedPosition && (
         <>
           <WithdrawModal
             open={showWithdrawModal}
@@ -57,19 +53,19 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
       {/* dont know why I need the 100% width :shrug: */}
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">
-          {!isLoadingCurrentPositions && currentPositions
+          {currentPositions
             ? (currentPositions as PositionsRaw).map(
                 ({
                   from,
                   to,
                   swapInterval,
                   swapped,
-                  startedAt,
                   remainingLiquidity,
                   remainingSwaps,
                   id,
                   status,
                   withdrawn,
+                  startedAt,
                 }) => (
                   <Grid item xs={12} sm={6} md={3} key={id}>
                     <ActivePosition
@@ -77,7 +73,6 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
                       to={tokenList[to]}
                       swapInterval={swapInterval}
                       swapped={swapped}
-                      startedAt={startedAt}
                       withdrawn={withdrawn}
                       remainingLiquidity={remainingLiquidity}
                       remainingSwaps={remainingSwaps}
@@ -86,6 +81,7 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
                       web3Service={web3Service}
                       onWithdraw={onWithdraw}
                       onTerminate={onTerminate}
+                      startedAt={startedAt}
                     />
                   </Grid>
                 )

@@ -15,6 +15,7 @@ import { sortTokens } from 'utils/parsing';
 import WarningIcon from '@material-ui/icons/Warning';
 import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
+import { TRANSACTION_TYPES } from 'config/constants';
 
 const StyledIconWrapper = styled.div`
   margin: 20px;
@@ -55,7 +56,7 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         ),
       });
       const result = await web3Service.withdraw(position, pair as AvailablePair);
-      addTransaction(result);
+      addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,
       });

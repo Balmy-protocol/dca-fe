@@ -84,12 +84,17 @@ export interface PositionRaw {
   to: string;
   swapInterval: BigNumber; // daily/weekly/etc
   swapped: BigNumber; // total de swappeado
-  startedAt: Date;
+  // startedAt: Date;
   remainingLiquidity: BigNumber;
   remainingSwaps: BigNumber;
   withdrawn: BigNumber; // cuanto saque
   id: number;
   status: string;
+  startedAt: number;
+}
+
+export interface PositionRawKeyBy {
+  [key: string]: PositionRaw;
 }
 
 export interface Position extends Omit<PositionRaw, 'to' | 'from'> {
@@ -159,6 +164,66 @@ export interface TransactionReceipt {
   status?: number;
 }
 
+export type TransactionTypes =
+  | 'NEW_POSITION'
+  | 'NEW_PAIR'
+  | 'APPROVE_TOKEN'
+  | 'TERMINATE_POSITION'
+  | 'WITHDRAW_POSITION'
+  | 'ADD_FUNDS_POSITION'
+  | 'NO_OP'
+  | 'MODIFY_RATE_POSITION';
+
+export interface TransactionTypesConstant {
+  [key: string]: TransactionTypes;
+}
+
+export interface WithdrawTypeData {
+  id: number | string;
+}
+
+export interface AddFundsTypeData {
+  id: number | string;
+  newFunds: BigNumber;
+}
+export interface ModifyRatePositionTypeData {
+  id: number | string;
+  newRate: BigNumber;
+}
+export interface TerminatePositionTypeData {
+  id: number | string;
+}
+
+export interface ApproveTokenTypeData {
+  id: number | string;
+}
+
+export interface NewPositionTypeData {
+  from: Token;
+  to: Token;
+  fromValue: string;
+  frequencyType: string;
+  frequencyValue: string;
+  existingPair: AvailablePair;
+  id?: number | string;
+  startedAt: number;
+}
+
+export interface NewPairTypeData {
+  id?: number | string;
+  token0: string;
+  token1: string;
+}
+
+export type TransactionTypeDataOptions =
+  | WithdrawTypeData
+  | AddFundsTypeData
+  | ModifyRatePositionTypeData
+  | TerminatePositionTypeData
+  | ApproveTokenTypeData
+  | NewPositionTypeData
+  | NewPairTypeData;
+
 export interface TransactionDetails {
   hash: string;
   approval?: { tokenAddress: string; spender: string };
@@ -169,13 +234,6 @@ export interface TransactionDetails {
   addedTime: number;
   confirmedTime?: number;
   from: string;
+  type: TransactionTypes;
+  typeData: TransactionTypeDataOptions;
 }
-
-export type TransactionTypes =
-  | 'NEW_POSITION'
-  | 'NEW_PAIR'
-  | 'APPROVE_TOKEN'
-  | 'TERMINATE_POSITION'
-  | 'WITHDRAW_POSITION'
-  | 'ADD_FUNDS_POSITION'
-  | 'MODIFY_RATE_POSITION';

@@ -33,6 +33,7 @@ import { STRING_SWAP_INTERVALS } from 'utils/parsing';
 import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { sortTokens } from 'utils/parsing';
+import { TRANSACTION_TYPES } from 'config/constants';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -91,7 +92,6 @@ const ActivePosition = ({
   to,
   swapInterval,
   swapped,
-  startedAt,
   remainingLiquidity,
   remainingSwaps,
   withdrawn,
@@ -100,6 +100,7 @@ const ActivePosition = ({
   onTerminate,
   status,
   web3Service,
+  startedAt,
 }: ActivePositionProps) => {
   const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
   const [fromValue, setFromValue] = React.useState('');
@@ -134,11 +135,14 @@ const ActivePosition = ({
         ),
       });
       const result = await web3Service.addFunds(
-        { from, to, swapInterval, swapped, startedAt, remainingLiquidity, remainingSwaps, withdrawn, status, id },
+        { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, withdrawn, status, id, startedAt },
         pair as AvailablePair,
         fromValue
       );
-      addTransaction(result);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.ADD_FUNDS_POSITION,
+        typeData: { id, newRate: BigNumber.from(fromValue) },
+      });
       setModalSuccess({
         hash: result.hash,
       });
@@ -168,12 +172,12 @@ const ActivePosition = ({
                   to,
                   swapInterval,
                   swapped,
-                  startedAt,
                   remainingLiquidity,
                   remainingSwaps,
                   withdrawn,
                   status,
                   id,
+                  startedAt,
                 })
               }
             >
@@ -199,12 +203,12 @@ const ActivePosition = ({
                   to,
                   swapInterval,
                   swapped,
-                  startedAt,
                   remainingLiquidity,
                   remainingSwaps,
                   withdrawn,
                   status,
                   id,
+                  startedAt,
                 })
               }
               classes={classNames}

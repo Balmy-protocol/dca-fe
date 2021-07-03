@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import PastPosition from './components/position';
 import { TokenList, Web3Service, PositionsRaw } from 'types';
 import usePromise from 'hooks/usePromise';
+import usePastPositions from 'hooks/usePastPositions';
 
 interface HistoryProps {
   tokenList: TokenList;
@@ -12,12 +13,7 @@ interface HistoryProps {
 }
 
 const History = ({ tokenList, web3Service }: HistoryProps) => {
-  const [pastPositionsPositions, isLoadingPastPositions, pastPositionErrors] = usePromise(
-    web3Service,
-    'getPastPositions',
-    [],
-    !web3Service.getAccount()
-  );
+  const pastPositions = usePastPositions();
 
   return (
     <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
@@ -28,19 +24,19 @@ const History = ({ tokenList, web3Service }: HistoryProps) => {
       </Grid>
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">
-          {!isLoadingPastPositions && pastPositionsPositions
-            ? (pastPositionsPositions as PositionsRaw).map(
+          {pastPositions
+            ? (pastPositions as PositionsRaw).map(
                 ({
                   from,
                   to,
                   swapInterval,
                   swapped,
-                  startedAt,
                   remainingLiquidity,
                   remainingSwaps,
                   id,
                   status,
                   withdrawn,
+                  startedAt,
                 }) => (
                   <Grid item xs={12} sm={6} md={3} key={id}>
                     <PastPosition
@@ -48,12 +44,12 @@ const History = ({ tokenList, web3Service }: HistoryProps) => {
                       to={tokenList[to]}
                       swapInterval={swapInterval}
                       swapped={swapped}
-                      startedAt={startedAt}
                       withdrawn={withdrawn}
                       remainingLiquidity={remainingLiquidity}
                       remainingSwaps={remainingSwaps}
                       id={id}
                       status={status}
+                      startedAt={startedAt}
                     />
                   </Grid>
                 )
