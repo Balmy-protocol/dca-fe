@@ -14,6 +14,9 @@ module.exports = merge(common, {
     new webpack.DefinePlugin({
       'process.env.DCA_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/alejoamiras/dca-ropsten-stable'),
     }),
+    new webpack.DefinePlugin({
+      'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
+    }),
   ],
   devtool: 'inline-source-map',
   devServer: {

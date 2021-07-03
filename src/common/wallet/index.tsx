@@ -1,5 +1,7 @@
 import React from 'react';
 import MenuItem from '@material-ui/core/MenuItem';
+import { useAppSelector } from 'state/hooks';
+import { useHasPendingTransactions } from 'state/transactions/hooks';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
@@ -15,17 +17,23 @@ interface ConnectWalletButtonProps {
 }
 
 const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
+  const transactions = useAppSelector((state: any) => state.transactions);
+  const hasPendingTransactions = useHasPendingTransactions();
+
   const buttonContent = isLoading ? (
     <CircularProgress color="secondary" />
   ) : (
     <Typography noWrap>{web3Service.getAccount()}</Typography>
   );
+
   return (
     <div>
       <FloatingMenu
         buttonContent={buttonContent}
         buttonStyles={{ maxWidth: '200px', textTransform: 'none' }}
         isIcon={false}
+        badge={Object.keys(transactions).length}
+        isLoading={hasPendingTransactions}
       >
         <MenuItem onClick={() => web3Service.disconnect()}>
           <ListItemIcon>

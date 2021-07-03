@@ -135,6 +135,7 @@ const ActivePosition = ({
         pair as AvailablePair,
         fromValue
       );
+      await web3Service.waitForTransaction(result.hash);
       setModalSuccess({
         hash: result.hash,
       });

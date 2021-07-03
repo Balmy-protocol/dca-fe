@@ -53,6 +53,7 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         ),
       });
       const result = await web3Service.withdraw(position, pair as AvailablePair);
+      await web3Service.waitForTransaction(result.hash);
       setModalSuccess({
         hash: result.hash,
       });

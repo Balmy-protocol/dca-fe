@@ -33,6 +33,7 @@ import CreatePairModal from 'common/create-pair-modal';
 import { NETWORKS } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
+import { useTransactionAdder } from 'state/transactions/hooks';
 import { DAY_IN_SECONDS, WEEK_IN_SECONDS, MONTH_IN_SECONDS, STRING_SWAP_INTERVALS } from 'utils/parsing';
 
 const StyledPaper = styled(Paper)`
@@ -103,6 +104,7 @@ const Swap = ({
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
+  const addTransaction = useTransactionAdder();
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
     'getBalance',
@@ -151,6 +153,7 @@ const Swap = ({
         ),
       });
       const result = await web3Service.approveToken(tokenList[from], existingPair as AvailablePair);
+      await web3Service.waitForTransaction(result.hash);
       setModalSuccess({
         hash: result.hash,
       });
@@ -182,6 +185,7 @@ const Swap = ({
         frequencyValue,
         existingPair as AvailablePair
       );
+      addTransaction(result);
       setModalSuccess({
         hash: result.hash,
       });

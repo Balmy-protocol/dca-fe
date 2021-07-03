@@ -151,6 +151,10 @@ export default class Web3Service {
     return this.signer;
   }
 
+  waitForTransaction(hash: string) {
+    return this.client.waitForTransaction(hash);
+  }
+
   async disconnect() {
     if (this.client && (this.client as any).disconnect) {
       await (this.client as any).disconnect();
@@ -350,5 +354,21 @@ export default class Web3Service {
       .div(BigNumber.from(position.remainingSwaps));
 
     return factory.modifyRateAndSwaps(position.id, newRate, position.remainingSwaps);
+  }
+
+  getTransactionReceipt(txHash: string) {
+    return this.client.getTransactionReceipt(txHash);
+  }
+
+  getBlockNumber() {
+    return this.client.getBlockNumber();
+  }
+
+  onBlock(callback: (blockNumber: number) => void) {
+    return this.client.on('block', callback);
+  }
+
+  removeOnBlock() {
+    return this.client.off('block');
   }
 }

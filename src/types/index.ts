@@ -136,6 +136,29 @@ interface EstimatedPairResponse {
   gasEth: string;
 }
 
+interface TransactionReceipt {
+  to: string;
+  from: string;
+  contractAddress: string;
+  transactionIndex: number;
+  blockHash: string;
+  transactionHash: string;
+  blockNumber: number;
+  status?: number;
+}
+
+interface TransactionDetails {
+  hash: string;
+  approval?: { tokenAddress: string; spender: string };
+  summary?: string;
+  claim?: { recipient: string };
+  receipt?: TransactionReceipt;
+  lastCheckedBlockNumber?: number;
+  addedTime: number;
+  confirmedTime?: number;
+  from: string;
+}
+
 export {
   Web3Service,
   SetStateCallback,
@@ -152,5 +175,7 @@ export {
   GetUsedTokensDataResponse,
   EstimatedPairResponse,
   GetAllowanceResponse,
+  TransactionReceipt,
   AvailablePairResponse,
+  TransactionDetails,
 };

@@ -14,6 +14,10 @@ import TransactionModalProvider from 'common/transaction-modal';
 import usePromise from 'hooks/usePromise';
 import { ApolloProvider } from '@apollo/client';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';
+import { Provider } from 'react-redux';
+import store from 'state';
+import TransactionUpdater from 'state/transactions/transactionUpdater';
+import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
 
 const theme = createMuiTheme();
 
@@ -84,9 +88,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
         <MuiThemeProvider theme={theme}>
           <ThemeProvider theme={theme}>
             <ApolloProvider client={DCASubgraph}>
-              <TransactionModalProvider>
-                <MainApp isLoading={isLoading} />
-              </TransactionModalProvider>
+              <Provider store={store}>
+                <TransactionModalProvider>
+                  <TransactionUpdater />
+                  <BlockNumberUpdater />
+                  <MainApp isLoading={isLoading} />
+                </TransactionModalProvider>
+              </Provider>
             </ApolloProvider>
           </ThemeProvider>
         </MuiThemeProvider>

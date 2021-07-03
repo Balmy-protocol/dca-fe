@@ -50,6 +50,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         ),
       });
       const result = await web3Service.terminate(position, pair as AvailablePair);
+      await web3Service.waitForTransaction(result.hash);
       setModalSuccess({
         hash: result.hash,
       });
