@@ -14,6 +14,7 @@ export const addTransaction =
 export const finalizeTransaction = createAction<{
   hash: string;
   receipt: TransactionReceipt;
+  extendedTypeData: TransactionTypeDataOptions | {};
 }>('transactions/finalizeTransaction');
 export const checkedTransaction = createAction<{
   hash: string;

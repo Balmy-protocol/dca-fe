@@ -52,7 +52,7 @@ export const YFI = {
 export const T0 = {
   chainId: 1,
   decimals: 18,
-  address: '0xdf3b9be4cf50befc1e946e53fb72be0b56ed7335',
+  address: '0xbae9e0f04435467a976eb3d3fdfa00f8502cb072',
   name: 'T0',
   symbol: 'T0',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',

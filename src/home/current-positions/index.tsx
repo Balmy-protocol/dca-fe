@@ -8,6 +8,8 @@ import { Web3Service, TokenList, Positions, PositionsRaw, Position } from 'types
 import WithdrawModal from 'common/withdraw-modal';
 import TerminateModal from 'common/terminate-modal';
 import useCurrentPositions from 'hooks/useCurrentPositions';
+import ModifyRateModal from 'common/modify-rate-modal';
+import RemoveFundsModal from 'common/remove-funds-modal';
 
 interface CurrentPositionsProps {
   web3Service: Web3Service;
@@ -17,6 +19,8 @@ interface CurrentPositionsProps {
 const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => {
   const currentPositions = useCurrentPositions();
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
+  const [showModifyRateModal, setShowModifyRateModal] = React.useState(false);
+  const [showRemoveFundsModal, setShowRemoveFunds] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState<Position | null>(null);
 
@@ -27,6 +31,14 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
   const onTerminate = (position: Position) => {
     setSelectedPosition(position);
     setShowTerminateModal(true);
+  };
+  const onModifyRate = (position: Position) => {
+    setSelectedPosition(position);
+    setShowModifyRateModal(true);
+  };
+  const onRemoveFunds = (position: Position) => {
+    setSelectedPosition(position);
+    setShowRemoveFunds(true);
   };
 
   return (
@@ -42,6 +54,16 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
             open={showTerminateModal}
             position={selectedPosition}
             onCancel={() => setShowTerminateModal(false)}
+          />
+          <ModifyRateModal
+            open={showModifyRateModal}
+            position={selectedPosition}
+            onCancel={() => setShowModifyRateModal(false)}
+          />
+          <RemoveFundsModal
+            open={showRemoveFundsModal}
+            position={selectedPosition}
+            onCancel={() => setShowRemoveFunds(false)}
           />
         </>
       )}
@@ -81,6 +103,8 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
                       web3Service={web3Service}
                       onWithdraw={onWithdraw}
                       onTerminate={onTerminate}
+                      onModifyRate={onModifyRate}
+                      onRemoveFunds={onRemoveFunds}
                       startedAt={startedAt}
                     />
                   </Grid>

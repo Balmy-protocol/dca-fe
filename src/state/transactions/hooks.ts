@@ -1,6 +1,12 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { useCallback, useMemo } from 'react';
-import { TransactionDetails, TransactionTypes, TransactionTypeDataOptions, ApproveTokenTypeData } from 'types';
+import {
+  TransactionDetails,
+  TransactionTypes,
+  TransactionTypeDataOptions,
+  ApproveTokenTypeData,
+  NewPairTypeData,
+} from 'types';
 import { useAppDispatch, useAppSelector } from 'hooks/state';
 
 import useWeb3Service from 'hooks/useWeb3Service';
@@ -104,6 +110,27 @@ export function useHasPendingApproval(tokenAddress: string | undefined, spender:
         }
       }),
     [allTransactions, spender, tokenAddress]
+  );
+}
+
+// returns whether a token has a pending approval transaction
+export function useHasPendingPairCreation(from: string | undefined, to: string | undefined): boolean {
+  const allTransactions = useAllTransactions();
+  return useMemo(
+    () =>
+      typeof from === 'string' &&
+      typeof to === 'string' &&
+      Object.keys(allTransactions).some((hash) => {
+        if (!allTransactions[hash]) return false;
+        if (allTransactions[hash].type !== TRANSACTION_TYPES.NEW_PAIR) return false;
+        const tx = allTransactions[hash];
+        if (tx.receipt) {
+          return false;
+        } else {
+          return (<NewPairTypeData>tx.typeData).token0 === from && (<NewPairTypeData>tx.typeData).token1 === to;
+        }
+      }),
+    [allTransactions, from, to]
   );
 }
 

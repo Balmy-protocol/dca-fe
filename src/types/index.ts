@@ -172,6 +172,7 @@ export type TransactionTypes =
   | 'WITHDRAW_POSITION'
   | 'ADD_FUNDS_POSITION'
   | 'NO_OP'
+  | 'REMOVE_FUNDS'
   | 'MODIFY_RATE_POSITION';
 
 export interface TransactionTypesConstant {
@@ -184,11 +185,17 @@ export interface WithdrawTypeData {
 
 export interface AddFundsTypeData {
   id: number | string;
-  newFunds: BigNumber;
+  newFunds: string;
+  decimals: number;
+}
+export interface RemoveFundsTypeData {
+  id: number | string;
+  ammountToRemove: string;
+  decimals: number;
 }
 export interface ModifyRatePositionTypeData {
   id: number | string;
-  newRate: BigNumber;
+  newRate: string;
 }
 export interface TerminatePositionTypeData {
   id: number | string;
@@ -222,6 +229,7 @@ export type TransactionTypeDataOptions =
   | ModifyRatePositionTypeData
   | TerminatePositionTypeData
   | ApproveTokenTypeData
+  | RemoveFundsTypeData
   | NewPositionTypeData
   | NewPairTypeData;
 

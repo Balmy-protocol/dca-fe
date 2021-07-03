@@ -29,12 +29,16 @@ export default createReducer(initialState, (builder) =>
         tx.lastCheckedBlockNumber = Math.max(blockNumber, tx.lastCheckedBlockNumber);
       }
     })
-    .addCase(finalizeTransaction, (transactions, { payload: { hash, receipt } }) => {
+    .addCase(finalizeTransaction, (transactions, { payload: { hash, receipt, extendedTypeData } }) => {
       const tx = transactions[hash];
       if (!tx) {
         return;
       }
       tx.receipt = receipt;
       tx.confirmedTime = now();
+      tx.typeData = {
+        ...tx.typeData,
+        ...extendedTypeData,
+      };
     })
 );

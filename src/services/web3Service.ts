@@ -29,11 +29,14 @@ import {
   AddFundsTypeData,
   ModifyRatePositionTypeData,
   NewPairTypeData,
+  RemoveFundsTypeData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
 import GET_POSITIONS from 'graphql/getPositions.graphql';
 import gqlFetchAll from 'utils/gqlFetchAll';
+import { sortTokens } from 'utils/parsing';
+
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
 import Factory from 'abis/factory.json';
@@ -426,6 +429,24 @@ export default class Web3Service {
     return factory.modifyRateAndSwaps(position.id, newRate, position.remainingSwaps);
   }
 
+  modifyRate(position: Position, pair: AvailablePair, newSwaps: string) {
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+
+    const newRate = position.remainingLiquidity.div(BigNumber.from(newSwaps));
+
+    return factory.modifyRateAndSwaps(position.id, newRate, newSwaps);
+  }
+
+  removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string) {
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+
+    const newRate = position.remainingLiquidity
+      .sub(parseUnits(ammountToRemove, position.from.decimals))
+      .div(BigNumber.from(position.remainingSwaps));
+
+    return factory.modifyRateAndSwaps(position.id, newRate, position.remainingSwaps);
+  }
+
   getTransactionReceipt(txHash: string) {
     return this.client.getTransactionReceipt(txHash);
   }
@@ -476,17 +497,26 @@ export default class Web3Service {
         const addFundsTypeData = transaction.typeData as AddFundsTypeData;
         this.currentPositions[addFundsTypeData.id].remainingLiquidity = this.currentPositions[
           addFundsTypeData.id
-        ].remainingLiquidity.add(BigNumber.from(addFundsTypeData.newFunds));
+        ].remainingLiquidity.add(parseUnits(addFundsTypeData.newFunds, addFundsTypeData.decimals));
+        break;
+      case TRANSACTION_TYPES.REMOVE_FUNDS:
+        const removeFundsTypeData = transaction.typeData as RemoveFundsTypeData;
+        this.currentPositions[removeFundsTypeData.id].remainingLiquidity = this.currentPositions[
+          removeFundsTypeData.id
+        ].remainingLiquidity.sub(parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals));
         break;
       case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
         const modifyRatePositionTypeData = transaction.typeData as ModifyRatePositionTypeData;
-        this.currentPositions[modifyRatePositionTypeData.id].remainingSwaps = modifyRatePositionTypeData.newRate;
+        this.currentPositions[modifyRatePositionTypeData.id].remainingSwaps = BigNumber.from(
+          modifyRatePositionTypeData.newRate
+        );
         break;
       case TRANSACTION_TYPES.NEW_PAIR:
         const newPairTypeData = transaction.typeData as NewPairTypeData;
+        const [token0, token1] = sortTokens(newPairTypeData.token0, newPairTypeData.token1);
         this.availablePairs.push({
-          token0: newPairTypeData.token0,
-          token1: newPairTypeData.token1,
+          token0,
+          token1,
           id: newPairTypeData.id as string,
           status: 'ACTIVE',
         });

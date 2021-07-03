@@ -86,6 +86,8 @@ interface ActivePositionProps extends Omit<Position, 'from' | 'to'> {
   web3Service: Web3Service;
   onWithdraw: (position: Position) => void;
   onTerminate: (position: Position) => void;
+  onModifyRate: (position: Position) => void;
+  onRemoveFunds: (position: Position) => void;
 }
 
 const ActivePosition = ({
@@ -99,6 +101,8 @@ const ActivePosition = ({
   id,
   onWithdraw,
   onTerminate,
+  onModifyRate,
+  onRemoveFunds,
   status,
   web3Service,
   startedAt,
@@ -142,7 +146,7 @@ const ActivePosition = ({
       );
       addTransaction(result, {
         type: TRANSACTION_TYPES.ADD_FUNDS_POSITION,
-        typeData: { id, newRate: BigNumber.from(fromValue) },
+        typeData: { id, newFunds: fromValue, decimals: from.decimals },
       });
       setModalSuccess({
         hash: result.hash,
@@ -189,12 +193,50 @@ const ActivePosition = ({
                 <FormattedMessage description="Withdraw" defaultMessage="Withdraw" />
               </ListItemText>
             </MenuItem>
-            <MenuItem onClick={() => alert('are you fucking sure?')}>
+            <MenuItem
+              onClick={() =>
+                onModifyRate({
+                  from,
+                  to,
+                  swapInterval,
+                  swapped,
+                  remainingLiquidity,
+                  remainingSwaps,
+                  withdrawn,
+                  status,
+                  id,
+                  startedAt,
+                })
+              }
+            >
               <StyledListItemIcon>
                 <SettingsIcon fontSize="small" />
               </StyledListItemIcon>
               <ListItemText>
                 <FormattedMessage description="Modify frequency" defaultMessage="Modify Frequency" />
+              </ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() =>
+                onRemoveFunds({
+                  from,
+                  to,
+                  swapInterval,
+                  swapped,
+                  remainingLiquidity,
+                  remainingSwaps,
+                  withdrawn,
+                  status,
+                  id,
+                  startedAt,
+                })
+              }
+            >
+              <StyledListItemIcon>
+                <CallSplitIcon fontSize="small" />
+              </StyledListItemIcon>
+              <ListItemText>
+                <FormattedMessage description="Remove funds" defaultMessage="Withdraw funds" />
               </ListItemText>
             </MenuItem>
             <MenuItem

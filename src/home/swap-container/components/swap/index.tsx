@@ -33,7 +33,12 @@ import CreatePairModal from 'common/create-pair-modal';
 import { NETWORKS, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { useTransactionAdder, useHasPendingApproval, useHasConfirmedApproval } from 'state/transactions/hooks';
+import {
+  useTransactionAdder,
+  useHasPendingApproval,
+  useHasConfirmedApproval,
+  useHasPendingPairCreation,
+} from 'state/transactions/hooks';
 import { DAY_IN_SECONDS, WEEK_IN_SECONDS, MONTH_IN_SECONDS, STRING_SWAP_INTERVALS } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 
@@ -131,11 +136,13 @@ SwapProps) => {
   const existingPair = React.useMemo(() => {
     let token0 = from < to ? from : to;
     let token1 = from < to ? to : from;
+    console.log('it is not finding the pair again', find(availablePairs, { token0, token1 }));
     return find(availablePairs, { token0, token1 });
-  }, [from, to, availablePairs]);
+  }, [from, to, availablePairs, availablePairs.length]);
 
   const hasPendingApproval = useHasPendingApproval(from, existingPair?.id);
   const hasConfirmedApproval = useHasConfirmedApproval(from, existingPair?.id);
+  const hasPendingPairCreation = useHasPendingPairCreation(from, to);
 
   const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
     web3Service,
@@ -264,7 +271,7 @@ SwapProps) => {
 
   const ignoreValues = [from, to];
 
-  console.log('allowance', allowance, hasPendingApproval, hasConfirmedApproval, isApproved);
+  console.log('availablePairs', availablePairs);
 
   return (
     <StyledPaper elevation={3}>
@@ -359,15 +366,22 @@ SwapProps) => {
                   <Button
                     size="small"
                     variant="contained"
-                    disabled={!!pairExists}
+                    disabled={!!pairExists || hasPendingPairCreation}
                     onClick={() => setShouldShowPairModal(true)}
                     color="primary"
                   >
                     <Typography variant="button">
-                      <FormattedMessage
-                        description="Be the first to create it"
-                        defaultMessage="Be the first to create it"
-                      />
+                      {hasPendingPairCreation ? (
+                        <FormattedMessage
+                          description="pair being created"
+                          defaultMessage="This pair is being created"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          description="Be the first to create it"
+                          defaultMessage="Be the first to create it"
+                        />
+                      )}
                     </Typography>
                   </Button>
                 </StyledWarningContainer>

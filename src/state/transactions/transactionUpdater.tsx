@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo } from 'react';
+import { ethers } from 'ethers';
+
 import { useAppDispatch, useAppSelector } from '../hooks';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { checkedTransaction, finalizeTransaction } from './actions';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
+import { TRANSACTION_TYPES } from 'config/constants';
 
 interface TxInterface {
   addedTime: number;
@@ -57,7 +60,22 @@ export default function Updater(): null {
         promise
           .then((receipt: any) => {
             if (receipt) {
-              web3Service.handleTransaction(transactions[hash]);
+              let extendedTypeData = {};
+
+              if (transactions[hash].type === TRANSACTION_TYPES.NEW_PAIR) {
+                extendedTypeData = {
+                  id: ethers.utils.hexValue(receipt.logs[0].data),
+                };
+              }
+
+              web3Service.handleTransaction({
+                ...transactions[hash],
+                typeData: {
+                  ...transactions[hash].typeData,
+                  ...extendedTypeData,
+                },
+              });
+
               dispatch(
                 finalizeTransaction({
                   hash,
@@ -71,6 +89,7 @@ export default function Updater(): null {
                     transactionHash: receipt.transactionHash,
                     transactionIndex: receipt.transactionIndex,
                   },
+                  extendedTypeData,
                 })
               );
 
