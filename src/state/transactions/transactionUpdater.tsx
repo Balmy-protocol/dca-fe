@@ -79,6 +79,7 @@ export default function Updater(): null {
                 })
               );
 
+              // web3Service.addTransactionResponse(transactions);
               // the receipt was fetched before the block, fast forward to that block to trigger balance updates
               if (receipt.blockNumber > lastBlockNumber) {
                 dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber }));

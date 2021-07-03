@@ -7,13 +7,14 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import { AvailablePair, CurrentPosition } from 'types';
+import { AvailablePair, Position } from 'types';
 import { FormattedMessage } from 'react-intl';
 import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { sortTokens } from 'utils/parsing';
 import ErrorIcon from '@material-ui/icons/Error';
 import Typography from '@material-ui/core/Typography';
+import { useTransactionAdder } from 'state/transactions/hooks';
 
 const StyledIconWrapper = styled.div`
   margin: 20px;
@@ -27,7 +28,7 @@ const StyledErrorIcon = styled(ErrorIcon)`
 `;
 
 interface WithdrawModalProps {
-  position: CurrentPosition;
+  position: Position;
   onCancel: () => void;
   open: boolean;
 }
@@ -38,6 +39,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
 
   const [token0, token1] = sortTokens(position.from.address, position.to.address);
   const pair = find(availablePairs, { token0, token1 });
+  const addTransaction = useTransactionAdder();
 
   const handleTerminate = async () => {
     try {
@@ -50,7 +52,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         ),
       });
       const result = await web3Service.terminate(position, pair as AvailablePair);
-      await web3Service.waitForTransaction(result.hash);
+      addTransaction(result);
       setModalSuccess({
         hash: result.hash,
       });

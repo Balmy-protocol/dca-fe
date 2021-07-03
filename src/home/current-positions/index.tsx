@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import ActivePosition from './components/position';
 import usePromise from 'hooks/usePromise';
-import { Web3Service, TokenList, CurrentPositions, CurrentPosition } from 'types';
+import { Web3Service, TokenList, Positions, PositionsRaw, Position } from 'types';
 import WithdrawModal from 'common/withdraw-modal';
 import TerminateModal from 'common/terminate-modal';
 
@@ -22,13 +22,13 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
   );
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
-  const [selectedPosition, setSelectedPosition] = React.useState<CurrentPosition | null>(null);
+  const [selectedPosition, setSelectedPosition] = React.useState<Position | null>(null);
 
-  const onWithdraw = (position: CurrentPosition) => {
+  const onWithdraw = (position: Position) => {
     setSelectedPosition(position);
     setShowWithdrawModal(true);
   };
-  const onTerminate = (position: CurrentPosition) => {
+  const onTerminate = (position: Position) => {
     setSelectedPosition(position);
     setShowTerminateModal(true);
   };
@@ -58,7 +58,7 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">
           {!isLoadingCurrentPositions && currentPositions
-            ? (currentPositions as CurrentPositions).map(
+            ? (currentPositions as PositionsRaw).map(
                 ({
                   from,
                   to,

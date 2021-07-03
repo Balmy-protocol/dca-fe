@@ -153,7 +153,7 @@ const Swap = ({
         ),
       });
       const result = await web3Service.approveToken(tokenList[from], existingPair as AvailablePair);
-      await web3Service.waitForTransaction(result.hash);
+      addTransaction(result);
       setModalSuccess({
         hash: result.hash,
       });

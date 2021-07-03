@@ -2,9 +2,11 @@ import type Web3Service from 'services/web3Service';
 import React from 'react';
 import { BigNumber } from 'ethers';
 
-type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
+export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
-type Token = {
+export { Web3Service };
+
+export type Token = {
   chainId: number;
   decimals: number;
   address: string;
@@ -13,9 +15,9 @@ type Token = {
   logoURI: string;
 };
 
-type TokenList = Record<string, Token>;
+export type TokenList = Record<string, Token>;
 
-type AvailablePairResponse = {
+export type AvailablePairResponse = {
   token0: {
     id: string;
   };
@@ -26,16 +28,16 @@ type AvailablePairResponse = {
   status: string; // active, stale
 };
 
-type AvailablePair = {
+export type AvailablePair = {
   token0: string;
   token1: string;
   id: string;
   status: string; // active, stale
 };
 
-type AvailablePairs = AvailablePair[];
+export type AvailablePairs = AvailablePair[];
 
-type Web3ServicePromisableMethods =
+export type Web3ServicePromisableMethods =
   | 'connect'
   | 'disconnect'
   | 'setUpModal'
@@ -46,53 +48,63 @@ type Web3ServicePromisableMethods =
   | 'getUsedTokens'
   | 'createPair'
   | 'getAvailablePairs'
-  | 'getAllowance';
+  | 'getAllowance'
+  | 'getPastPositions';
 
-interface CurrentPositionRaw {
+export type PositionResponse = {
+  id: string;
+  from: {
+    id: string;
+  };
+  to: {
+    id: string;
+  };
+  pair: {
+    id: string;
+  };
+  status: string;
+  swapInterval: {
+    id: string;
+    interval: BigNumber;
+    description: BigNumber;
+  };
+  current: {
+    id: string;
+    rate: BigNumber;
+    remainingSwaps: BigNumber;
+    swapped: BigNumber;
+    withdrawn: BigNumber;
+    remainingLiquidity: BigNumber;
+  };
+  createdAtTimestamp: number;
+};
+
+export interface PositionRaw {
   from: string;
   to: string;
-  swapInterval: number; // daily/weekly/etc
+  swapInterval: BigNumber; // daily/weekly/etc
   swapped: BigNumber; // total de swappeado
   startedAt: Date;
   remainingLiquidity: BigNumber;
-  remainingSwaps: number;
+  remainingSwaps: BigNumber;
   withdrawn: BigNumber; // cuanto saque
   id: number;
-  status: string; // current
+  status: string;
 }
 
-interface CurrentPosition {
+export interface Position extends Omit<PositionRaw, 'to' | 'from'> {
   from: Token;
   to: Token;
-  swapInterval: number; // daily/weekly/etc
-  swapped: BigNumber; // total de swappeado
-  startedAt: Date;
-  remainingLiquidity: BigNumber;
-  remainingSwaps: number;
-  withdrawn: BigNumber; // cuanto saque
-  id: number;
-  status: string; // current
 }
 
-interface PastPosition {
-  from: string;
-  to: string;
-  swapInterval: number; // daily/weekly/etc
-  swapped: BigNumber;
-  startedAt: Date;
-  totalDeposit: BigNumber;
-  swapsExecuted: number;
-  id: number;
-  status: string; // terminated
-}
-
-interface Network {
+export interface Network {
   chainId: number;
 }
 
-type CurrentPositions = CurrentPositionRaw[];
+export type PositionsRaw = PositionRaw[];
+export type Positions = Position[];
 
-interface GasNowResponseData {
+export interface GasNowResponseData {
   rapid: number;
   fast: number;
   standard: number;
@@ -100,43 +112,43 @@ interface GasNowResponseData {
   timestamp: number;
 }
 
-interface GasNowResponse {
+export interface GasNowResponse {
   code: number;
   data: GasNowResponseData;
 }
 
-interface CoinGeckoTokenPriceResponse {
+export interface CoinGeckoTokenPriceResponse {
   id: string;
   current_price: number;
 }
 
-type CoinGeckoPriceResponse = CoinGeckoTokenPriceResponse[];
+export type CoinGeckoPriceResponse = CoinGeckoTokenPriceResponse[];
 
-interface UsedTokenInfo {
+export interface UsedTokenInfo {
   address: string;
 }
 
-interface UsedToken {
+export interface UsedToken {
   tokenInfo: UsedTokenInfo;
 }
 
-interface GetUsedTokensData {
+export interface GetUsedTokensData {
   tokens: UsedToken[];
 }
 
-interface GetUsedTokensDataResponse {
+export interface GetUsedTokensDataResponse {
   data: GetUsedTokensData;
 }
 
-type GetAllowanceResponse = string;
+export type GetAllowanceResponse = string;
 
-interface EstimatedPairResponse {
+export interface EstimatedPairResponse {
   gas: string;
   gasUsd: number;
   gasEth: string;
 }
 
-interface TransactionReceipt {
+export interface TransactionReceipt {
   to: string;
   from: string;
   contractAddress: string;
@@ -147,7 +159,7 @@ interface TransactionReceipt {
   status?: number;
 }
 
-interface TransactionDetails {
+export interface TransactionDetails {
   hash: string;
   approval?: { tokenAddress: string; spender: string };
   summary?: string;
@@ -159,23 +171,11 @@ interface TransactionDetails {
   from: string;
 }
 
-export {
-  Web3Service,
-  SetStateCallback,
-  Token,
-  TokenList,
-  AvailablePair,
-  AvailablePairs,
-  Web3ServicePromisableMethods,
-  CurrentPosition,
-  CurrentPositions,
-  GasNowResponse,
-  CoinGeckoPriceResponse,
-  Network,
-  GetUsedTokensDataResponse,
-  EstimatedPairResponse,
-  GetAllowanceResponse,
-  TransactionReceipt,
-  AvailablePairResponse,
-  TransactionDetails,
-};
+export type TransactionTypes =
+  | 'NEW_POSITION'
+  | 'NEW_PAIR'
+  | 'APPROVE_TOKEN'
+  | 'TERMINATE_POSITION'
+  | 'WITHDRAW_POSITION'
+  | 'ADD_FUNDS_POSITION'
+  | 'MODIFY_RATE_POSITION';

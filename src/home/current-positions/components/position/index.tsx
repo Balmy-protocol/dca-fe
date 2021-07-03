@@ -19,7 +19,6 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { CurrentPosition, Token, Web3Service } from 'types';
 import BlockIcon from '@material-ui/icons/Block';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -28,7 +27,8 @@ import { DateTime } from 'luxon';
 import FloatingMenu from 'common/floating-menu';
 import TokenInput from 'common/token-input';
 import usePromise from 'hooks/usePromise';
-import { CurrentPosition as ActivePositionInterface, AvailablePair } from 'types';
+import { Position, Token, Web3Service, AvailablePair } from 'types';
+import { useTransactionAdder } from 'state/transactions/hooks';
 import { STRING_SWAP_INTERVALS } from 'utils/parsing';
 import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -78,10 +78,12 @@ const useDeletedStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface ActivePositionProps extends ActivePositionInterface {
+interface ActivePositionProps extends Omit<Position, 'from' | 'to'> {
+  from: Token;
+  to: Token;
   web3Service: Web3Service;
-  onWithdraw: (position: CurrentPosition) => void;
-  onTerminate: (position: CurrentPosition) => void;
+  onWithdraw: (position: Position) => void;
+  onTerminate: (position: Position) => void;
 }
 
 const ActivePosition = ({
@@ -105,6 +107,7 @@ const ActivePosition = ({
   const classNames = useDeletedStyles();
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const { availablePairs } = React.useContext(WalletContext);
+  const addTransaction = useTransactionAdder();
   const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
     web3Service,
     'getBalance',
@@ -135,7 +138,7 @@ const ActivePosition = ({
         pair as AvailablePair,
         fromValue
       );
-      await web3Service.waitForTransaction(result.hash);
+      addTransaction(result);
       setModalSuccess({
         hash: result.hash,
       });
@@ -234,17 +237,8 @@ const ActivePosition = ({
             description="days to finish"
             defaultMessage="{remainingDays} {type} to close"
             values={{
-              remainingDays: remainingSwaps,
-              type: STRING_SWAP_INTERVALS[swapInterval as keyof typeof STRING_SWAP_INTERVALS],
-            }}
-          />
-        </Typography>
-        <Typography variant="caption" component="p">
-          <FormattedMessage
-            description="days to finish"
-            defaultMessage="Started at: {startedAt}"
-            values={{
-              startedAt: DateTime.fromJSDate(startedAt).toLocaleString(),
+              remainingDays: remainingSwaps.toString(),
+              type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
             }}
           />
         </Typography>

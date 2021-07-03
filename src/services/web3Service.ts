@@ -12,12 +12,15 @@ import {
   CoinGeckoPriceResponse,
   Token,
   AvailablePairResponse,
-  CurrentPosition,
   AvailablePairs,
   AvailablePair,
+  PositionResponse,
+  PositionsRaw,
+  Position,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
+import GET_POSITIONS from 'graphql/getPositions.graphql';
 import gqlFetchAll from 'utils/gqlFetchAll';
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
@@ -43,6 +46,8 @@ export default class Web3Service {
   apolloClient: ApolloClient<NormalizedCacheObject>;
   account: string;
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
+  currentPositions: PositionsRaw;
+  pastPositions: PositionsRaw;
 
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
@@ -136,6 +141,50 @@ export default class Web3Service {
       token0: pair.token0.id,
       token1: pair.token1.id,
       id: pair.id,
+    }));
+
+    const currentPositionsResponse = await gqlFetchAll(
+      this.apolloClient,
+      GET_POSITIONS,
+      {
+        address: account,
+        status: 'ACTIVE',
+      },
+      'positions'
+    );
+
+    this.currentPositions = currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
+      from: position.from.id,
+      to: position.to.id,
+      swapInterval: BigNumber.from(position.swapInterval.interval),
+      swapped: BigNumber.from(position.current.swapped),
+      remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+      remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+      withdrawn: BigNumber.from(position.current.withdrawn),
+      id: position.id,
+      status: position.status,
+    }));
+
+    const pastPositionsResponse = await gqlFetchAll(
+      this.apolloClient,
+      GET_POSITIONS,
+      {
+        address: account,
+        status: 'TERMINATED',
+      },
+      'positions'
+    );
+
+    this.pastPositions = pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
+      from: position.from.id,
+      to: position.to.id,
+      swapInterval: BigNumber.from(position.swapInterval.interval),
+      swapped: BigNumber.from(position.current.swapped),
+      remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+      remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+      withdrawn: BigNumber.from(position.current.withdrawn),
+      id: position.id,
+      status: position.status,
     }));
   }
 
@@ -261,15 +310,17 @@ export default class Web3Service {
 
     const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
 
-    return factory.createPair(token0, token1);
+    return factory.createPair(tokenA, tokenB);
   }
 
-  // TODO: CHANGE FOR GRAPHQL HOOK WHEN INTEGRATED
   getCurrentPositions() {
-    return Promise.resolve(currentPositionMocks);
+    return this.currentPositions;
   }
 
-  // TODO: CHANGE FOR GRAPHQL HOOK WHEN INTEGRATED
+  getPastPositions() {
+    return this.pastPositions;
+  }
+
   getAvailablePairs() {
     return this.availablePairs;
   }
@@ -334,19 +385,19 @@ export default class Web3Service {
     return factory.deposit(token.address, rate, amountOfSwaps, swapInterval);
   }
 
-  withdraw(position: CurrentPosition, pair: AvailablePair) {
+  withdraw(position: Position, pair: AvailablePair) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     return factory.withdrawSwapped(position.id);
   }
 
-  terminate(position: CurrentPosition, pair: AvailablePair) {
+  terminate(position: Position, pair: AvailablePair) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     return factory.terminate(position.id);
   }
 
-  addFunds(position: CurrentPosition, pair: AvailablePair, newDeposit: string) {
+  addFunds(position: Position, pair: AvailablePair, newDeposit: string) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     const newRate = parseUnits(newDeposit, position.from.decimals)

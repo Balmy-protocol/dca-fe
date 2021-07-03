@@ -43,7 +43,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => (
                       <CurrentPositions web3Service={web3Service} tokenList={tokenList} />
                     </Grid>
                     <Grid item xs={12}>
-                      <History tokenList={tokenList} />
+                      <History web3Service={web3Service} tokenList={tokenList} />
                     </Grid>
                   </>
                 )}

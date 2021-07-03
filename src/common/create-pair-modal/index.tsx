@@ -15,6 +15,7 @@ import Typography from '@material-ui/core/Typography';
 import usePromise from 'hooks/usePromise';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Link from '@material-ui/core/Link';
+import { useTransactionAdder } from 'state/transactions/hooks';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -39,6 +40,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
     [from.address, to.address],
     !from || !to || !web3Service.getAccount() || !open
   );
+  const addTransaction = useTransactionAdder();
 
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
 
@@ -57,7 +59,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
         ),
       });
       const result = await web3Service.createPair(from.address, to.address);
-      await web3Service.waitForTransaction(result.hash);
+      addTransaction(result);
       setModalSuccess({
         hash: result.hash,
       });

@@ -1,11 +1,13 @@
 import * as React from 'react';
 import Card from '@material-ui/core/Card';
+import { formatUnits } from '@ethersproject/units';
 import CardContent from '@material-ui/core/CardContent';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { DateTime } from 'luxon';
+import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { Position } from 'types';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -25,44 +27,48 @@ const StyledCardTitleHeader = styled.div`
   align-items: center;
 `;
 
-interface PastPositionProps {
-  from: string;
-  to: string;
-  initialAmmount: number;
-  exercised: number;
-  startedAt: Date;
-  daysSet: number;
-}
-
-const PastPosition = ({ from, to, daysSet, startedAt, exercised, initialAmmount }: PastPositionProps) => (
+const PastPosition = ({
+  from,
+  to,
+  swapInterval,
+  swapped,
+  startedAt,
+  remainingLiquidity,
+  remainingSwaps,
+  withdrawn,
+  id,
+}: Position) => (
   <StyledCard>
     <StyledCardContent>
       <StyledCardHeader>
         <StyledCardTitleHeader>
-          <Typography variant="h6">{from}</Typography>
+          <Typography variant="h6">{from.symbol}</Typography>
           <ArrowForwardIcon />
-          <Typography variant="h6">{to}</Typography>
+          <Typography variant="h6">{to.symbol}</Typography>
         </StyledCardTitleHeader>
       </StyledCardHeader>
       <Typography variant="subtitle1">
         <FormattedMessage
           description="current exercised"
           defaultMessage="{exercised} {to} swapped"
-          values={{ exercised, to }}
+          values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
         />
       </Typography>
       <Typography variant="subtitle2">
         <FormattedMessage
-          description="current remaining"
-          defaultMessage="From {initialAmmount} {from}"
-          values={{ initialAmmount, from }}
+          description="current deposited"
+          defaultMessage="{remainingLiquidity} {from} deposited"
+          values={{ remainingLiquidity: formatUnits(remainingLiquidity, from.decimals), from: from.symbol }}
         />
       </Typography>
-      <Typography variant="caption">
+      <Typography variant="body2" component="p">
         <FormattedMessage
-          description="days to finish"
-          defaultMessage="Started at: {startedAt} for {daysSet} days"
-          values={{ startedAt: DateTime.fromJSDate(startedAt).toLocaleString(), daysSet }}
+          description="ran for"
+          defaultMessage="Ran for {remainingDays} {type}"
+          values={{
+            remainingDays: remainingSwaps.toString(),
+            type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+          }}
         />
       </Typography>
     </StyledCardContent>
