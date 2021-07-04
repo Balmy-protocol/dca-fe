@@ -35,7 +35,9 @@ function loadLocaleData(locale: string) {
 
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
   const [account, setAccount] = React.useState('');
-  const [web3Service, setWeb3Service] = React.useState(new Web3Service(setAccount, DCASubgraph));
+  const [web3Service, setWeb3Service] = React.useState(
+    new Web3Service(setAccount, DCASubgraph, WalletContextDefaultValue.graphPricesClient)
+  );
   const [tokenList, setTokenList] = React.useState<TokenList>({});
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
   const [isLoadingTokens, setIsLoadingTokens] = React.useState(true);

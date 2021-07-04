@@ -7,12 +7,28 @@ export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 export { Web3Service };
 
 export type Token = {
-  chainId: number;
   decimals: number;
   address: string;
   name: string;
   symbol: string;
-  logoURI: string;
+  logoURI?: string;
+  pairableTokens: string[];
+};
+
+export type PoolResponse = {
+  token0: {
+    decimals: string;
+    id: string;
+    name: string;
+    symbol: string;
+  };
+  token1: {
+    decimals: string;
+    id: string;
+    name: string;
+    symbol: string;
+  };
+  id: string;
 };
 
 export type TokenList = Record<string, Token>;
@@ -26,6 +42,12 @@ export type AvailablePairResponse = {
   };
   id: string;
   status: string; // active, stale
+};
+
+export type SwapInterval = {
+  id: string;
+  interval: BigNumber;
+  description: string;
 };
 
 export type AvailablePair = {

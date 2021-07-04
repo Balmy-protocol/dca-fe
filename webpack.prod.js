@@ -6,7 +6,16 @@ module.exports = merge(common, {
   mode: 'production',
   plugins: [
     new webpack.DefinePlugin({
-      ETH_NETWORK: JSON.stringify('mainnet'),
+      'process.env.ETH_NETWORK': JSON.stringify('mainnet'),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.UNI_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-prod'),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.DCA_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/alejoamiras/dca-ropsten-stable'),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
     }),
   ],
 });

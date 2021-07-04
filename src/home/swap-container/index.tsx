@@ -2,8 +2,10 @@ import * as React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { useParams } from 'react-router-dom';
 import GraphWidget from 'common/graph-widget';
+import find from 'lodash/find';
 import WalletContext from 'common/wallet-context';
 import { useQuery } from '@apollo/client';
+import useTokenList from 'hooks/useTokenList';
 import Swap from './components/swap';
 import { DAY_IN_SECONDS } from 'utils/parsing';
 import { WETH, DAI } from 'mocks/tokens';
@@ -17,11 +19,14 @@ const SwapContainer = () => {
   const [toValue, setToValue] = React.useState('');
   const [frequencyType, setFrequencyType] = React.useState(DAY_IN_SECONDS);
   const [frequencyValue, setFrequencyValue] = React.useState('1');
+  const tokenList = useTokenList();
+
+  console.log(from, to, tokenList[from], tokenList[to]);
 
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">
       <WalletContext.Consumer>
-        {({ tokenList, graphPricesClient, web3Service }) => (
+        {({ graphPricesClient, web3Service }) => (
           <>
             <Grid item xs={9} md={6}>
               <Swap
@@ -37,8 +42,8 @@ const SwapContainer = () => {
                 toValue={toValue}
                 setFromValue={setFromValue}
                 setToValue={setToValue}
-                tokenList={tokenList}
                 web3Service={web3Service}
+                tokenList={tokenList}
                 // availablePairs={availablePairs}
               />
             </Grid>

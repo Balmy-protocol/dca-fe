@@ -87,6 +87,9 @@ function useBuildTransactionMessages() {
           break;
         case TRANSACTION_TYPES.NEW_PAIR:
           const newPairTypeData = tx.typeData as NewPairTypeData;
+          message = `The pair ${tokenList[newPairTypeData.token0].symbol}:${
+            tokenList[newPairTypeData.token1].symbol
+          } has been created`;
           break;
       }
 

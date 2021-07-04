@@ -19,6 +19,7 @@ import {
   AvailablePair,
   PositionResponse,
   PositionsRaw,
+  PoolResponse,
   Position,
   PositionRaw,
   PositionRawKeyBy,
@@ -30,11 +31,14 @@ import {
   ModifyRatePositionTypeData,
   NewPairTypeData,
   RemoveFundsTypeData,
+  TokenList,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
+import GET_TOKEN_LIST from 'graphql/getTokenList.graphql';
 import GET_POSITIONS from 'graphql/getPositions.graphql';
 import gqlFetchAll from 'utils/gqlFetchAll';
+import gqlFetchAllById from 'utils/gqlFetchAllById';
 import { sortTokens } from 'utils/parsing';
 
 // ABIS
@@ -58,19 +62,26 @@ export default class Web3Service {
   signer: Signer;
   availablePairs: AvailablePairs;
   apolloClient: ApolloClient<NormalizedCacheObject>;
+  uniClient: ApolloClient<NormalizedCacheObject>;
   account: string;
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
   currentPositions: PositionRawKeyBy;
   pastPositions: PositionRawKeyBy;
+  tokenList: TokenList;
 
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
     apolloClient?: ApolloClient<NormalizedCacheObject>,
+    uniClient?: ApolloClient<NormalizedCacheObject>,
     client?: ethers.providers.Web3Provider,
     modal?: Web3Modal
   ) {
     if (apolloClient) {
       this.apolloClient = apolloClient;
+    }
+
+    if (uniClient) {
+      this.uniClient = uniClient;
     }
 
     if (setAccountCallback) {
@@ -157,11 +168,46 @@ export default class Web3Service {
       id: pair.id,
     }));
 
+    const tokenListResponse = await gqlFetchAllById(this.uniClient, GET_TOKEN_LIST, {}, 'pools');
+
+    this.tokenList = tokenListResponse.data.pools.reduce((acc: TokenList, pool: PoolResponse) => {
+      if (!acc[pool.token0.id]) {
+        acc[pool.token0.id] = {
+          decimals: BigNumber.from(pool.token0.decimals).toNumber(),
+          address: pool.token0.id,
+          name: pool.token0.name,
+          symbol: pool.token0.symbol,
+          pairableTokens: [],
+        };
+      }
+      if (!acc[pool.token1.id]) {
+        acc[pool.token1.id] = {
+          decimals: BigNumber.from(pool.token1.decimals).toNumber(),
+          address: pool.token1.id,
+          name: pool.token1.name,
+          symbol: pool.token1.symbol,
+          pairableTokens: [],
+        };
+      }
+
+      return {
+        ...acc,
+        [pool.token0.id]: {
+          ...acc[pool.token0.id],
+          pairableTokens: [...acc[pool.token0.id].pairableTokens, pool.token1.id],
+        },
+        [pool.token1.id]: {
+          ...acc[pool.token1.id],
+          pairableTokens: [...acc[pool.token1.id].pairableTokens, pool.token0.id],
+        },
+      };
+    }, {});
+
     const currentPositionsResponse = await gqlFetchAll(
       this.apolloClient,
       GET_POSITIONS,
       {
-        address: account,
+        address: account.toLowerCase(),
         status: 'ACTIVE',
       },
       'positions'
@@ -187,7 +233,7 @@ export default class Web3Service {
       this.apolloClient,
       GET_POSITIONS,
       {
-        address: account,
+        address: account.toLowerCase(),
         status: 'TERMINATED',
       },
       'positions'
@@ -345,6 +391,10 @@ export default class Web3Service {
 
   getAvailablePairs() {
     return this.availablePairs;
+  }
+
+  getTokenList() {
+    return this.tokenList;
   }
 
   getGasPrice() {

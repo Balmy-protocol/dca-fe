@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 
-const getPool = gql`
+const getAvailablePairs = gql`
   query getAvailablePairs($first: Int, $skip: Int) {
     pairs(first: $first, skip: $skip) {
       id
@@ -14,4 +14,4 @@ const getPool = gql`
   }
 `;
 
-export default getPool;
+export default getAvailablePairs;

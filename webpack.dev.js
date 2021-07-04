@@ -9,7 +9,7 @@ module.exports = merge(common, {
       'process.env.ETH_NETWORK': JSON.stringify('ropsten'),
     }),
     new webpack.DefinePlugin({
-      'process.env.UNI_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-prod'),
+      'process.env.UNI_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/alejoamiras/uniswap-v3-ropsten'),
     }),
     new webpack.DefinePlugin({
       'process.env.DCA_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/alejoamiras/dca-ropsten-stable'),

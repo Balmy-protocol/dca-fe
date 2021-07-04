@@ -137,7 +137,7 @@ SwapProps) => {
     let token0 = from < to ? from : to;
     let token1 = from < to ? to : from;
     return find(availablePairs, { token0, token1 });
-  }, [from, to, availablePairs, availablePairs.length]);
+  }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
 
   const hasPendingApproval = useHasPendingApproval(from, existingPair?.id);
   const hasConfirmedApproval = useHasConfirmedApproval(from, existingPair?.id);

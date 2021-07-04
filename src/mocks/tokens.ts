@@ -8,6 +8,7 @@ export const DAI = {
   name: 'Dai stable coin',
   symbol: 'DAI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+  pairableTokens: [],
 };
 
 export const WETH = {
@@ -20,6 +21,7 @@ export const WETH = {
   name: 'Wrapped Ether',
   symbol: 'WETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+  pairableTokens: [],
 };
 
 export const ETH = {
@@ -29,6 +31,7 @@ export const ETH = {
   name: 'Ether',
   symbol: 'ETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+  pairableTokens: [],
 };
 
 export const UNI = {
@@ -38,6 +41,7 @@ export const UNI = {
   name: 'Uniswap',
   symbol: 'UNI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+  pairableTokens: [],
 };
 
 export const YFI = {
@@ -47,6 +51,7 @@ export const YFI = {
   name: 'Yearn Finance',
   symbol: 'YFI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+  pairableTokens: [],
 };
 
 export const T0 = {
@@ -56,6 +61,7 @@ export const T0 = {
   name: 'T0',
   symbol: 'T0',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+  pairableTokens: [],
 };
 
 export const USDC = {
@@ -65,4 +71,5 @@ export const USDC = {
   name: 'USD Coin',
   symbol: 'USDC',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+  pairableTokens: [],
 };

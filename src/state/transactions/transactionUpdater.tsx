@@ -77,7 +77,10 @@ export default function Updater(): null {
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
                 extendedTypeData = {
                   id: web3Service
-                    .parseLog(receipt.logs[3], (transactions[hash].typeData as NewPositionTypeData).existingPair)
+                    .parseLog(
+                      receipt.logs[receipt.logs.length - 1],
+                      (transactions[hash].typeData as NewPositionTypeData).existingPair
+                    )
                     .args._dcaId.toString(),
                 };
               }
