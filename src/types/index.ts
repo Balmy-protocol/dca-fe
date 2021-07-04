@@ -75,6 +75,7 @@ export type Web3ServicePromisableMethods =
 
 export type PositionResponse = {
   id: string;
+  dcaId: string;
   from: {
     id: string;
   };

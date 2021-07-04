@@ -160,49 +160,6 @@ export default class Web3Service {
       }
     });
 
-    const availablePairsResponse = await gqlFetchAll(this.apolloClient, GET_AVAILABLE_PAIRS, {}, 'pairs');
-
-    this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
-      token0: pair.token0.id,
-      token1: pair.token1.id,
-      id: pair.id,
-    }));
-
-    const tokenListResponse = await gqlFetchAllById(this.uniClient, GET_TOKEN_LIST, {}, 'pools');
-
-    this.tokenList = tokenListResponse.data.pools.reduce((acc: TokenList, pool: PoolResponse) => {
-      if (!acc[pool.token0.id]) {
-        acc[pool.token0.id] = {
-          decimals: BigNumber.from(pool.token0.decimals).toNumber(),
-          address: pool.token0.id,
-          name: pool.token0.name,
-          symbol: pool.token0.symbol,
-          pairableTokens: [],
-        };
-      }
-      if (!acc[pool.token1.id]) {
-        acc[pool.token1.id] = {
-          decimals: BigNumber.from(pool.token1.decimals).toNumber(),
-          address: pool.token1.id,
-          name: pool.token1.name,
-          symbol: pool.token1.symbol,
-          pairableTokens: [],
-        };
-      }
-
-      return {
-        ...acc,
-        [pool.token0.id]: {
-          ...acc[pool.token0.id],
-          pairableTokens: [...acc[pool.token0.id].pairableTokens, pool.token1.id],
-        },
-        [pool.token1.id]: {
-          ...acc[pool.token1.id],
-          pairableTokens: [...acc[pool.token1.id].pairableTokens, pool.token0.id],
-        },
-      };
-    }, {});
-
     const currentPositionsResponse = await gqlFetchAll(
       this.apolloClient,
       GET_POSITIONS,
@@ -222,7 +179,7 @@ export default class Web3Service {
         remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         withdrawn: BigNumber.from(position.current.withdrawn),
-        id: position.id,
+        id: position.dcaId,
         status: position.status,
         startedAt: position.createdAtTimestamp,
       })),
@@ -315,6 +272,49 @@ export default class Web3Service {
     if (web3Modal.cachedProvider) {
       await this.connect();
     }
+
+    const availablePairsResponse = await gqlFetchAll(this.apolloClient, GET_AVAILABLE_PAIRS, {}, 'pairs');
+
+    this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
+      token0: pair.token0.id,
+      token1: pair.token1.id,
+      id: pair.id,
+    }));
+
+    const tokenListResponse = await gqlFetchAllById(this.uniClient, GET_TOKEN_LIST, {}, 'pools');
+
+    this.tokenList = tokenListResponse.data.pools.reduce((acc: TokenList, pool: PoolResponse) => {
+      if (!acc[pool.token0.id]) {
+        acc[pool.token0.id] = {
+          decimals: BigNumber.from(pool.token0.decimals).toNumber(),
+          address: pool.token0.id,
+          name: pool.token0.name,
+          symbol: pool.token0.symbol,
+          pairableTokens: [],
+        };
+      }
+      if (!acc[pool.token1.id]) {
+        acc[pool.token1.id] = {
+          decimals: BigNumber.from(pool.token1.decimals).toNumber(),
+          address: pool.token1.id,
+          name: pool.token1.name,
+          symbol: pool.token1.symbol,
+          pairableTokens: [],
+        };
+      }
+
+      return {
+        ...acc,
+        [pool.token0.id]: {
+          ...acc[pool.token0.id],
+          pairableTokens: [...acc[pool.token0.id].pairableTokens, pool.token1.id],
+        },
+        [pool.token1.id]: {
+          ...acc[pool.token1.id],
+          pairableTokens: [...acc[pool.token1.id].pairableTokens, pool.token0.id],
+        },
+      };
+    }, {});
   }
 
   getBalance(address?: string, decimals?: number) {

@@ -10,6 +10,7 @@ const getCurrentPositions = gql`
       skip: $skip
     ) {
       id
+      dcaId
       createdAtTimestamp
       from {
         id

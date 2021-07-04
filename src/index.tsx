@@ -44,8 +44,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
 
   React.useEffect(() => {
     async function setWeb3ModalEffect() {
-      await web3Service.setUpModal();
-      setIsLoadingWeb3(false);
+      try {
+        await web3Service.setUpModal();
+        setIsLoadingWeb3(false);
+      } catch (e) {
+        console.log(e);
+        debugger;
+      }
     }
 
     async function setTokenListEffect() {
@@ -81,6 +86,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
 
   const isLoading = isLoadingTokens || isLoadingWeb3;
 
+  console.log(isLoading, isLoadingTokens, isLoadingWeb3);
   return (
     <WalletContext.Provider
       value={{
@@ -102,9 +108,9 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
                       <>
                         <TransactionUpdater />
                         <BlockNumberUpdater />
+                        <MainApp isLoading={isLoading} />
                       </>
                     )}
-                    <MainApp isLoading={isLoading} />
                   </TransactionModalProvider>
                 </SnackbarProvider>
               </Provider>
