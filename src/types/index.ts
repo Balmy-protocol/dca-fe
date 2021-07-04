@@ -153,6 +153,10 @@ export interface EstimatedPairResponse {
   gasEth: string;
 }
 
+interface TransactionReceiptLog {
+  data: string;
+}
+
 export interface TransactionReceipt {
   to: string;
   from: string;
@@ -162,6 +166,7 @@ export interface TransactionReceipt {
   transactionHash: string;
   blockNumber: number;
   status?: number;
+  logs: TransactionReceiptLog[];
 }
 
 export type TransactionTypes =

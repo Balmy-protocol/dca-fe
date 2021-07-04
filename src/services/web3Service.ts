@@ -523,4 +523,10 @@ export default class Web3Service {
         break;
     }
   }
+
+  parseLog(log: any, pairContract: AvailablePair) {
+    const factory = new ethers.Contract(pairContract.id, DCAPair.abi, this.getSigner());
+
+    return factory.interface.parseLog(log);
+  }
 }

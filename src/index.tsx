@@ -11,13 +11,13 @@ import { ThemeProvider } from 'styled-components';
 import Web3Service from 'services/web3Service';
 import { WETH, DAI, USDC, YFI, UNI, T0 } from 'mocks/tokens';
 import TransactionModalProvider from 'common/transaction-modal';
-import usePromise from 'hooks/usePromise';
 import { ApolloProvider } from '@apollo/client';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
 import store from 'state';
 import TransactionUpdater from 'state/transactions/transactionUpdater';
 import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
+import { SnackbarProvider } from 'notistack';
 
 const theme = createMuiTheme();
 
@@ -94,11 +94,17 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
           <ThemeProvider theme={theme}>
             <ApolloProvider client={DCASubgraph}>
               <Provider store={store}>
-                <TransactionModalProvider>
-                  <TransactionUpdater />
-                  <BlockNumberUpdater />
-                  <MainApp isLoading={isLoading} />
-                </TransactionModalProvider>
+                <SnackbarProvider>
+                  <TransactionModalProvider>
+                    {!isLoading && (
+                      <>
+                        <TransactionUpdater />
+                        <BlockNumberUpdater />
+                      </>
+                    )}
+                    <MainApp isLoading={isLoading} />
+                  </TransactionModalProvider>
+                </SnackbarProvider>
               </Provider>
             </ApolloProvider>
           </ThemeProvider>

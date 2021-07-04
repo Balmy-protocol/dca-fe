@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers';
-import find from 'lodash/find';
 
 const HOURS_IN_MONTH = BigNumber.from(732);
 const DAYS_IN_WEEK = BigNumber.from(7);

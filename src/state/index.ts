@@ -3,13 +3,15 @@ import { save, load } from 'redux-localstorage-simple';
 
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
+import badge from './transactions-badge/reducer';
 
-const PERSISTED_STATES: string[] = ['transactions'];
+const PERSISTED_STATES: string[] = ['transactions', 'badge'];
 
 const store = configureStore({
   reducer: {
     transactions,
     blockNumber,
+    badge,
   },
   middleware: [...getDefaultMiddleware({ thunk: false }), save({ states: PERSISTED_STATES, debounce: 1000 })],
   preloadedState: load({ states: PERSISTED_STATES }),

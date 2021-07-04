@@ -136,7 +136,6 @@ SwapProps) => {
   const existingPair = React.useMemo(() => {
     let token0 = from < to ? from : to;
     let token1 = from < to ? to : from;
-    console.log('it is not finding the pair again', find(availablePairs, { token0, token1 }));
     return find(availablePairs, { token0, token1 });
   }, [from, to, availablePairs, availablePairs.length]);
 
@@ -270,8 +269,6 @@ SwapProps) => {
     [];
 
   const ignoreValues = [from, to];
-
-  console.log('availablePairs', availablePairs);
 
   return (
     <StyledPaper elevation={3}>

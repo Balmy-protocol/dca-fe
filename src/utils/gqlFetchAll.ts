@@ -18,9 +18,6 @@ export default async function gqlFetchAll(
 
       updateQuery: (previousResult, { fetchMoreResult }) => {
         const newEntries = fetchMoreResult[dataToSearch];
-        console.log('fetchMoreResult', fetchMoreResult, previousResult, {
-          [dataToSearch]: [...previousResult[dataToSearch], ...newEntries],
-        });
         return {
           [dataToSearch]: [...previousResult[dataToSearch], ...newEntries],
         };

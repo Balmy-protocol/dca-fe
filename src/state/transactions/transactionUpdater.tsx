@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers';
-
+import { useSnackbar } from 'notistack';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import useWeb3Service from 'hooks/useWeb3Service';
+import useBuildTransactionMessage from 'hooks/useBuildTransactionMessage';
+import Zoom from '@material-ui/core/Zoom';
 import { checkedTransaction, finalizeTransaction } from './actions';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
+import { NewPositionTypeData } from 'types';
 
 interface TxInterface {
   addedTime: number;
@@ -42,6 +45,10 @@ export default function Updater(): null {
 
   const transactions = useMemo(() => state || {}, [state]);
 
+  const { enqueueSnackbar } = useSnackbar();
+
+  const buildTransactionMessage = useBuildTransactionMessage();
+
   const getReceipt = useCallback(
     (hash: string) => {
       if (!web3Service.getAccount()) throw new Error('No library or chainId');
@@ -67,6 +74,13 @@ export default function Updater(): null {
                   id: ethers.utils.hexValue(receipt.logs[0].data),
                 };
               }
+              if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
+                extendedTypeData = {
+                  id: web3Service
+                    .parseLog(receipt.logs[3], (transactions[hash].typeData as NewPositionTypeData).existingPair)
+                    .args._dcaId.toString(),
+                };
+              }
 
               web3Service.handleTransaction({
                 ...transactions[hash],
@@ -88,9 +102,28 @@ export default function Updater(): null {
                     to: receipt.to,
                     transactionHash: receipt.transactionHash,
                     transactionIndex: receipt.transactionIndex,
+                    logs: receipt.logs,
                   },
                   extendedTypeData,
                 })
+              );
+
+              enqueueSnackbar(
+                buildTransactionMessage({
+                  ...transactions[hash],
+                  typeData: {
+                    ...transactions[hash].typeData,
+                    ...extendedTypeData,
+                  },
+                }),
+                {
+                  variant: 'success',
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  },
+                  TransitionComponent: Zoom,
+                }
               );
 
               // the receipt was fetched before the block, fast forward to that block to trigger balance updates

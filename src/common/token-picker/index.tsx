@@ -156,6 +156,7 @@ const TokenPicker = ({
                   icon={<TokenIcon token={tokenList[token]} isInChip />}
                   label={tokenList[token].symbol}
                   onClick={() => handleItemSelected(token)}
+                  key={tokenList[token].address}
                 />
               ))}
             </Grid>

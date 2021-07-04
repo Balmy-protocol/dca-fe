@@ -14,6 +14,7 @@ interface FloatingMenuProps {
   children: React.ReactNode;
   badge?: number;
   isLoading?: boolean;
+  onOpen?: () => void;
 }
 
 const StyledMenu = withStyles({
@@ -46,6 +47,7 @@ const WalletButton: React.FC<FloatingMenuProps> = ({
   buttonStyles,
   children,
   isIcon,
+  onOpen,
   badge = 0,
   isLoading = false,
 }: FloatingMenuProps) => {
@@ -53,6 +55,7 @@ const WalletButton: React.FC<FloatingMenuProps> = ({
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    onOpen && onOpen();
   };
 
   const handleClose = () => {
