@@ -52,6 +52,7 @@ interface RowProps {
 interface TokenPickerProps {
   shouldShow: boolean;
   tokenList: TokenList;
+  availableFrom?: string[];
   selected: string;
   onChange: SetFromToState;
   onClose: () => void;
@@ -89,12 +90,14 @@ const TokenPicker = ({
   shouldShow,
   tokenList,
   isFrom,
+  availableFrom = [],
   onClose,
   onChange,
   ignoreValues,
   usedTokens,
 }: TokenPickerProps) => {
   const [search, setSearch] = React.useState('');
+  let tokenKeysToUse: string[] = [];
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const memoizedUsedTokens = React.useMemo(
     () => usedTokens.filter((el) => !ignoreValues.includes(el)),
@@ -107,16 +110,18 @@ const TokenPicker = ({
     onClose();
   };
 
+  tokenKeysToUse = isFrom ? tokenKeys : availableFrom;
+
   const memoizedTokenKeys = React.useMemo(
     () =>
-      tokenKeys.filter(
+      tokenKeysToUse.filter(
         (el) =>
           (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].symbol.toLowerCase().includes(search.toLowerCase())) &&
           !usedTokens.includes(el) &&
           !ignoreValues.includes(el)
       ),
-    [tokenKeys, search, usedTokens, ignoreValues]
+    [tokenKeys, search, usedTokens, ignoreValues, tokenKeysToUse, availableFrom]
   );
 
   return (

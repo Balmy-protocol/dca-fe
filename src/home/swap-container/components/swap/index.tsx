@@ -288,6 +288,7 @@ SwapProps) => {
         tokenList={tokenList}
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
+        availableFrom={tokenList[from].pairableTokens}
       />
       <Grid container>
         <Grid container alignItems="center" justify="space-between">
