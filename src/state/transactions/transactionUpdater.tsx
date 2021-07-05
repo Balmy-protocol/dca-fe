@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import { useAppDispatch, useAppSelector } from '../hooks';
@@ -9,6 +9,7 @@ import { checkedTransaction, finalizeTransaction } from './actions';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
+import EtherscanLink from 'common/view-on-etherscan';
 import { NewPositionTypeData } from 'types';
 
 interface TxInterface {
@@ -125,6 +126,7 @@ export default function Updater(): null {
                     vertical: 'bottom',
                     horizontal: 'right',
                   },
+                  action: () => <EtherscanLink hash={hash} />,
                   TransitionComponent: Zoom,
                 }
               );

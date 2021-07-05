@@ -76,40 +76,18 @@ const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => 
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">
           {currentPositions
-            ? (currentPositions as PositionsRaw).map(
-                ({
-                  from,
-                  to,
-                  swapInterval,
-                  swapped,
-                  remainingLiquidity,
-                  remainingSwaps,
-                  id,
-                  status,
-                  withdrawn,
-                  startedAt,
-                }) => (
-                  <Grid item xs={12} sm={6} md={3} key={id}>
-                    <ActivePosition
-                      from={tokenList[from]}
-                      to={tokenList[to]}
-                      swapInterval={swapInterval}
-                      swapped={swapped}
-                      withdrawn={withdrawn}
-                      remainingLiquidity={remainingLiquidity}
-                      remainingSwaps={remainingSwaps}
-                      id={id}
-                      status={status}
-                      web3Service={web3Service}
-                      onWithdraw={onWithdraw}
-                      onTerminate={onTerminate}
-                      onModifyRate={onModifyRate}
-                      onRemoveFunds={onRemoveFunds}
-                      startedAt={startedAt}
-                    />
-                  </Grid>
-                )
-              )
+            ? (currentPositions as PositionsRaw).map((position) => (
+                <Grid item xs={12} sm={6} md={3} key={position.id}>
+                  <ActivePosition
+                    position={{ ...position, from: tokenList[position.from], to: tokenList[position.to] }}
+                    web3Service={web3Service}
+                    onWithdraw={onWithdraw}
+                    onTerminate={onTerminate}
+                    onModifyRate={onModifyRate}
+                    onRemoveFunds={onRemoveFunds}
+                  />
+                </Grid>
+              ))
             : null}
         </Grid>
       </Grid>

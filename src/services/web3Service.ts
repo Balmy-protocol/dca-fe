@@ -182,6 +182,7 @@ export default class Web3Service {
         id: position.dcaId,
         status: position.status,
         startedAt: position.createdAtTimestamp,
+        totalDeposits: BigNumber.from(position.totalDeposits),
       })),
       'id'
     );
@@ -200,6 +201,7 @@ export default class Web3Service {
       pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
         from: position.from.id,
         to: position.to.id,
+        totalDeposits: BigNumber.from(position.totalDeposits),
         swapInterval: BigNumber.from(position.swapInterval.interval),
         swapped: BigNumber.from(position.current.swapped),
         remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
@@ -527,6 +529,7 @@ export default class Web3Service {
           withdrawn: BigNumber.from(0),
           id: newPositionTypeData.id as number,
           startedAt: newPositionTypeData.startedAt,
+          totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
           status: 'ACTIVE',
         };
         break;

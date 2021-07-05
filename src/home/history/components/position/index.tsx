@@ -27,16 +27,7 @@ const StyledCardTitleHeader = styled.div`
   align-items: center;
 `;
 
-const PastPosition = ({
-  from,
-  to,
-  swapInterval,
-  swapped,
-  remainingLiquidity,
-  remainingSwaps,
-  withdrawn,
-  id,
-}: Position) => (
+const PastPosition = ({ from, to, swapInterval, swapped, totalDeposits, remainingSwaps, withdrawn, id }: Position) => (
   <StyledCard>
     <StyledCardContent>
       <StyledCardHeader>
@@ -56,8 +47,8 @@ const PastPosition = ({
       <Typography variant="subtitle2">
         <FormattedMessage
           description="current deposited"
-          defaultMessage="{remainingLiquidity} {from} deposited"
-          values={{ remainingLiquidity: formatUnits(remainingLiquidity, from.decimals), from: from.symbol }}
+          defaultMessage="{totalDeposits} {from} deposited"
+          values={{ totalDeposits: formatUnits(totalDeposits, from.decimals), from: from.symbol }}
         />
       </Typography>
       <Typography variant="body2" component="p">

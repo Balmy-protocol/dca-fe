@@ -11,6 +11,7 @@ import {
   ModifyRatePositionTypeData,
   NewPairTypeData,
   PositionRaw,
+  ApproveTokenTypeData,
 } from 'types';
 import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -90,6 +91,17 @@ function useBuildTransactionMessages() {
           message = `The pair ${tokenList[newPairTypeData.token0].symbol}:${
             tokenList[newPairTypeData.token1].symbol
           } has been created`;
+          break;
+        case TRANSACTION_TYPES.NEW_PAIR:
+          const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
+          const pair = find(availablePairs, { id: tokenApprovalTypeData.pair });
+          if (pair) {
+            message = `${tokenList[tokenApprovalTypeData.id].symbol} is now ready to be used in the pair ${
+              tokenList[pair.token0]
+            }:${tokenList[pair.token1]}`;
+          } else {
+            message = `${tokenList[tokenApprovalTypeData.id].symbol} is now ready to be used`;
+          }
           break;
       }
 

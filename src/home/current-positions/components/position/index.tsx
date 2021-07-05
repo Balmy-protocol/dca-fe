@@ -80,9 +80,13 @@ const useDeletedStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface ActivePositionProps extends Omit<Position, 'from' | 'to'> {
+interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
+}
+
+interface ActivePositionProps {
+  position: PositionProp;
   web3Service: Web3Service;
   onWithdraw: (position: Position) => void;
   onTerminate: (position: Position) => void;
@@ -91,22 +95,14 @@ interface ActivePositionProps extends Omit<Position, 'from' | 'to'> {
 }
 
 const ActivePosition = ({
-  from,
-  to,
-  swapInterval,
-  swapped,
-  remainingLiquidity,
-  remainingSwaps,
-  withdrawn,
-  id,
+  position,
   onWithdraw,
   onTerminate,
   onModifyRate,
   onRemoveFunds,
-  status,
   web3Service,
-  startedAt,
 }: ActivePositionProps) => {
+  const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, id } = position;
   const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
   const [fromValue, setFromValue] = React.useState('');
   const buttonContent = <MoreVertIcon />;
@@ -139,11 +135,7 @@ const ActivePosition = ({
           </Typography>
         ),
       });
-      const result = await web3Service.addFunds(
-        { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, withdrawn, status, id, startedAt },
-        pair as AvailablePair,
-        fromValue
-      );
+      const result = await web3Service.addFunds(position, pair as AvailablePair, fromValue);
       addTransaction(result, {
         type: TRANSACTION_TYPES.ADD_FUNDS_POSITION,
         typeData: { id, newFunds: fromValue, decimals: from.decimals },
@@ -170,22 +162,7 @@ const ActivePosition = ({
             <Typography variant="h6">{to.symbol}</Typography>
           </StyledCardTitleHeader>
           <FloatingMenu buttonContent={buttonContent} buttonStyles={{}} isIcon>
-            <MenuItem
-              onClick={() =>
-                onWithdraw({
-                  from,
-                  to,
-                  swapInterval,
-                  swapped,
-                  remainingLiquidity,
-                  remainingSwaps,
-                  withdrawn,
-                  status,
-                  id,
-                  startedAt,
-                })
-              }
-            >
+            <MenuItem onClick={() => onWithdraw(position)}>
               <StyledListItemIcon>
                 <CallSplitIcon fontSize="small" />
               </StyledListItemIcon>
@@ -193,22 +170,7 @@ const ActivePosition = ({
                 <FormattedMessage description="Withdraw" defaultMessage="Withdraw" />
               </ListItemText>
             </MenuItem>
-            <MenuItem
-              onClick={() =>
-                onModifyRate({
-                  from,
-                  to,
-                  swapInterval,
-                  swapped,
-                  remainingLiquidity,
-                  remainingSwaps,
-                  withdrawn,
-                  status,
-                  id,
-                  startedAt,
-                })
-              }
-            >
+            <MenuItem onClick={() => onModifyRate(position)}>
               <StyledListItemIcon>
                 <SettingsIcon fontSize="small" />
               </StyledListItemIcon>
@@ -216,22 +178,7 @@ const ActivePosition = ({
                 <FormattedMessage description="Modify frequency" defaultMessage="Modify Frequency" />
               </ListItemText>
             </MenuItem>
-            <MenuItem
-              onClick={() =>
-                onRemoveFunds({
-                  from,
-                  to,
-                  swapInterval,
-                  swapped,
-                  remainingLiquidity,
-                  remainingSwaps,
-                  withdrawn,
-                  status,
-                  id,
-                  startedAt,
-                })
-              }
-            >
+            <MenuItem onClick={() => onRemoveFunds(position)}>
               <StyledListItemIcon>
                 <CallSplitIcon fontSize="small" />
               </StyledListItemIcon>
@@ -239,23 +186,7 @@ const ActivePosition = ({
                 <FormattedMessage description="Remove funds" defaultMessage="Withdraw funds" />
               </ListItemText>
             </MenuItem>
-            <MenuItem
-              onClick={() =>
-                onTerminate({
-                  from,
-                  to,
-                  swapInterval,
-                  swapped,
-                  remainingLiquidity,
-                  remainingSwaps,
-                  withdrawn,
-                  status,
-                  id,
-                  startedAt,
-                })
-              }
-              classes={classNames}
-            >
+            <MenuItem onClick={() => onTerminate(position)} classes={classNames}>
               <StyledListItemIcon>
                 <BlockIcon fontSize="small" />
               </StyledListItemIcon>

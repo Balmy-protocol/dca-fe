@@ -43,6 +43,14 @@ const Swap = ({
   const inputLabelStyles = roundTextFieldStylesHook.useInputLabel();
   const helperTextStyles = roundTextFieldStylesHook.useHelperText();
 
+  // suppress MUI warnings
+  if (inputBaseStyles.adornedEnd) {
+    delete inputBaseStyles.adornedEnd;
+  }
+  if (inputBaseStyles.adornedStart) {
+    delete inputBaseStyles.adornedStart;
+  }
+
   return (
     <>
       <TextField

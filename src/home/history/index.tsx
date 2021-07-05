@@ -25,35 +25,11 @@ const History = ({ tokenList, web3Service }: HistoryProps) => {
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">
           {pastPositions
-            ? (pastPositions as PositionsRaw).map(
-                ({
-                  from,
-                  to,
-                  swapInterval,
-                  swapped,
-                  remainingLiquidity,
-                  remainingSwaps,
-                  id,
-                  status,
-                  withdrawn,
-                  startedAt,
-                }) => (
-                  <Grid item xs={12} sm={6} md={3} key={id}>
-                    <PastPosition
-                      from={tokenList[from]}
-                      to={tokenList[to]}
-                      swapInterval={swapInterval}
-                      swapped={swapped}
-                      withdrawn={withdrawn}
-                      remainingLiquidity={remainingLiquidity}
-                      remainingSwaps={remainingSwaps}
-                      id={id}
-                      status={status}
-                      startedAt={startedAt}
-                    />
-                  </Grid>
-                )
-              )
+            ? (pastPositions as PositionsRaw).map((position) => (
+                <Grid item xs={12} sm={6} md={3} key={position.id}>
+                  <PastPosition {...{ ...position, from: tokenList[position.from], to: tokenList[position.to] }} />
+                </Grid>
+              ))
             : null}
         </Grid>
       </Grid>

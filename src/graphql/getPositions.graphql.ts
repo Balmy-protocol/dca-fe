@@ -12,6 +12,7 @@ const getCurrentPositions = gql`
       id
       dcaId
       createdAtTimestamp
+      totalDeposits
       from {
         id
       }

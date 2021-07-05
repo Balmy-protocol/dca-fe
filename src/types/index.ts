@@ -99,6 +99,7 @@ export type PositionResponse = {
     withdrawn: BigNumber;
     remainingLiquidity: BigNumber;
   };
+  totalDeposits: BigNumber;
   createdAtTimestamp: number;
 };
 
@@ -107,9 +108,9 @@ export interface PositionRaw {
   to: string;
   swapInterval: BigNumber; // daily/weekly/etc
   swapped: BigNumber; // total de swappeado
-  // startedAt: Date;
   remainingLiquidity: BigNumber;
   remainingSwaps: BigNumber;
+  totalDeposits: BigNumber;
   withdrawn: BigNumber; // cuanto saque
   id: number;
   status: string;
@@ -231,7 +232,7 @@ export interface TerminatePositionTypeData {
 
 export interface ApproveTokenTypeData {
   id: number | string;
-  pair: number | string;
+  pair: string;
 }
 
 export interface NewPositionTypeData {
