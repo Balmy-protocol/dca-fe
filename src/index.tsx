@@ -44,13 +44,8 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
 
   React.useEffect(() => {
     async function setWeb3ModalEffect() {
-      try {
-        await web3Service.setUpModal();
-        setIsLoadingWeb3(false);
-      } catch (e) {
-        console.log(e);
-        debugger;
-      }
+      await web3Service.setUpModal();
+      setIsLoadingWeb3(false);
     }
 
     async function setTokenListEffect() {
@@ -108,9 +103,9 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
                       <>
                         <TransactionUpdater />
                         <BlockNumberUpdater />
-                        <MainApp isLoading={isLoading} />
                       </>
                     )}
+                    <MainApp isLoading={isLoading} />
                   </TransactionModalProvider>
                 </SnackbarProvider>
               </Provider>

@@ -22,7 +22,7 @@ const StyledNavBarGridContainer = styled(Grid)`
 const StyledAppGridContainer = styled(Grid)<{ isLoading: boolean }>`
   ${(props) => (props.isLoading ? 'height: 100%;' : '')}
   flex: 1;
-  margin-top: 85px;
+  margin-top: 85px !important;
 `;
 
 const AppFrame = ({ isLoading }: AppFrameProps) => (
