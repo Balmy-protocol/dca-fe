@@ -179,6 +179,7 @@ export default class Web3Service {
         remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         withdrawn: BigNumber.from(position.current.withdrawn),
+        dcaId: position.dcaId,
         id: position.dcaId,
         status: position.status,
         startedAt: position.createdAtTimestamp,
@@ -207,6 +208,7 @@ export default class Web3Service {
         remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         withdrawn: BigNumber.from(position.current.withdrawn),
+        dcaId: position.dcaId,
         id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
@@ -462,13 +464,13 @@ export default class Web3Service {
   withdraw(position: Position, pair: AvailablePair) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
-    return factory.withdrawSwapped(position.id);
+    return factory.withdrawSwapped(position.dcaId);
   }
 
   terminate(position: Position, pair: AvailablePair) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
-    return factory.terminate(position.id);
+    return factory.terminate(position.dcaId);
   }
 
   addFunds(position: Position, pair: AvailablePair, newDeposit: string) {
@@ -478,7 +480,7 @@ export default class Web3Service {
       .add(position.remainingLiquidity)
       .div(BigNumber.from(position.remainingSwaps));
 
-    return factory.modifyRateAndSwaps(position.id, newRate, position.remainingSwaps);
+    return factory.modifyRateAndSwaps(position.dcaId, newRate, position.remainingSwaps);
   }
 
   modifyRate(position: Position, pair: AvailablePair, newSwaps: string) {
@@ -486,7 +488,7 @@ export default class Web3Service {
 
     const newRate = position.remainingLiquidity.div(BigNumber.from(newSwaps));
 
-    return factory.modifyRateAndSwaps(position.id, newRate, newSwaps);
+    return factory.modifyRateAndSwaps(position.dcaId, newRate, newSwaps);
   }
 
   removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string) {
@@ -496,7 +498,7 @@ export default class Web3Service {
       .sub(parseUnits(ammountToRemove, position.from.decimals))
       .div(BigNumber.from(position.remainingSwaps));
 
-    return factory.modifyRateAndSwaps(position.id, newRate, position.remainingSwaps);
+    return factory.modifyRateAndSwaps(position.dcaId, newRate, position.remainingSwaps);
   }
 
   getTransactionReceipt(txHash: string) {
@@ -519,7 +521,8 @@ export default class Web3Service {
     switch (transaction.type) {
       case TRANSACTION_TYPES.NEW_POSITION:
         const newPositionTypeData = transaction.typeData as NewPositionTypeData;
-        this.currentPositions[newPositionTypeData.id as number] = {
+        const newId = `${newPositionTypeData.existingPair.id}-${newPositionTypeData.id}`;
+        this.currentPositions[newId] = {
           from: newPositionTypeData.from.address,
           to: newPositionTypeData.to.address,
           swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
@@ -527,7 +530,8 @@ export default class Web3Service {
           remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
           remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
           withdrawn: BigNumber.from(0),
-          id: newPositionTypeData.id as number,
+          dcaId: newPositionTypeData.id as number,
+          id: newId,
           startedAt: newPositionTypeData.startedAt,
           totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
           status: 'ACTIVE',

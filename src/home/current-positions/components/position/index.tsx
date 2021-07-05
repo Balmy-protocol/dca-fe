@@ -102,6 +102,7 @@ const ActivePosition = ({
   onRemoveFunds,
   web3Service,
 }: ActivePositionProps) => {
+  if (!position.from || !position.to) return null;
   const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, id } = position;
   const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
   const [fromValue, setFromValue] = React.useState('');
