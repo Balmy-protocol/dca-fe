@@ -41,6 +41,7 @@ import {
 } from 'state/transactions/hooks';
 import { DAY_IN_SECONDS, WEEK_IN_SECONDS, MONTH_IN_SECONDS, STRING_SWAP_INTERVALS } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
+import { BigNumber } from 'ethers';
 
 const StyledPaper = styled(Paper)`
   padding: 20px;
@@ -258,7 +259,9 @@ SwapProps) => {
     balanceErrors ||
     allowanceErrors ||
     !isApproved ||
-    networkErrors;
+    networkErrors ||
+    parseUnits(fromValue, tokenList[from].decimals).lte(BigNumber.from(0)) ||
+    BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 
   const usedTokens =
     (!isLoadingUsedTokens &&

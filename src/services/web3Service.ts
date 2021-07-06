@@ -180,7 +180,7 @@ export default class Web3Service {
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         withdrawn: BigNumber.from(position.current.withdrawn),
         dcaId: position.dcaId,
-        id: position.dcaId,
+        id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
         totalDeposits: BigNumber.from(position.totalDeposits),

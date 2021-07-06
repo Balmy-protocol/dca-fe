@@ -12,7 +12,7 @@ interface TokenInputProps {
   onChange: (newValue: string) => void | SetStateCallback<string>;
 }
 
-const inputRegex = RegExp(/^[1-9]+[0-9]*$/);
+const inputRegex = RegExp(/^[0-9]*$/);
 
 const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
   const validator = (nextValue: string) => {
@@ -25,14 +25,6 @@ const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
   const inputBaseStyles = roundTextFieldStylesHook.useInputBase();
   const inputLabelStyles = roundTextFieldStylesHook.useInputLabel();
   const helperTextStyles = roundTextFieldStylesHook.useHelperText();
-
-  // suppress MUI warnings
-  if (inputBaseStyles.adornedEnd) {
-    delete inputBaseStyles.adornedEnd;
-  }
-  if (inputBaseStyles.adornedStart) {
-    delete inputBaseStyles.adornedStart;
-  }
 
   return (
     <TextField

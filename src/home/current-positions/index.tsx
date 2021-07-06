@@ -10,13 +10,14 @@ import TerminateModal from 'common/terminate-modal';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import ModifyRateModal from 'common/modify-rate-modal';
 import RemoveFundsModal from 'common/remove-funds-modal';
+import useTokenList from 'hooks/useTokenList';
 
 interface CurrentPositionsProps {
   web3Service: Web3Service;
-  tokenList: TokenList;
 }
 
-const CurrentPositions = ({ web3Service, tokenList }: CurrentPositionsProps) => {
+const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
+  const tokenList = useTokenList();
   const currentPositions = useCurrentPositions();
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showModifyRateModal, setShowModifyRateModal] = React.useState(false);

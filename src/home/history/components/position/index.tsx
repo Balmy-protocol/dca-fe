@@ -64,5 +64,4 @@ const PastPosition = ({ from, to, swapInterval, swapped, totalDeposits, remainin
     </StyledCardContent>
   </StyledCard>
 );
-
 export default PastPosition;

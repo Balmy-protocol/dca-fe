@@ -32,7 +32,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => (
       ) : (
         <>
           <WalletContext.Consumer>
-            {({ tokenList, web3Service }) => (
+            {({ web3Service }) => (
               <>
                 <Grid item xs={12}>
                   <SwapContainer />
@@ -40,10 +40,10 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => (
                 {web3Service.getAccount() && (
                   <>
                     <Grid item xs={12}>
-                      <CurrentPositions web3Service={web3Service} tokenList={tokenList} />
+                      <CurrentPositions web3Service={web3Service} />
                     </Grid>
                     <Grid item xs={12}>
-                      <History web3Service={web3Service} tokenList={tokenList} />
+                      <History web3Service={web3Service} />
                     </Grid>
                   </>
                 )}

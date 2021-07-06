@@ -6,14 +6,15 @@ import PastPosition from './components/position';
 import { TokenList, Web3Service, PositionsRaw } from 'types';
 import usePromise from 'hooks/usePromise';
 import usePastPositions from 'hooks/usePastPositions';
+import useTokenList from 'hooks/useTokenList';
 
 interface HistoryProps {
-  tokenList: TokenList;
   web3Service: Web3Service;
 }
 
-const History = ({ tokenList, web3Service }: HistoryProps) => {
+const History = ({ web3Service }: HistoryProps) => {
   const pastPositions = usePastPositions();
+  const tokenList = useTokenList();
 
   return (
     <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>

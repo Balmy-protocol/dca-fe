@@ -6,18 +6,14 @@ import { TokenList, AvailablePairs } from 'types';
 
 export type WalletContextValue = {
   web3Service: Web3Service;
-  tokenList: TokenList;
   graphPricesClient: ApolloClient<NormalizedCacheObject>;
   account: string;
-  // availablePairs: AvailablePairs;
 };
 
 export const WalletContextDefaultValue: WalletContextValue = {
   web3Service: new Web3Service(),
-  tokenList: {},
   graphPricesClient,
   account: '',
-  // availablePairs: [],
 };
 
 const WalletContext = React.createContext(WalletContextDefaultValue);

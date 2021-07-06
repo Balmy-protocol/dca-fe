@@ -18,9 +18,10 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import useTokenList from './useTokenList';
 
 function useBuildTransactionMessages() {
-  const { tokenList } = React.useContext(WalletContext);
+  const tokenList = useTokenList();
   const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
@@ -36,7 +37,7 @@ function useBuildTransactionMessages() {
           break;
         case TRANSACTION_TYPES.TERMINATE_POSITION:
           const terminatePositionTypeData = tx.typeData as TerminatePositionTypeData;
-          const terminatedPosition = find(pastPositions, { id: terminatePositionTypeData.id });
+          const terminatedPosition = find(currentPositions, { id: terminatePositionTypeData.id });
           if (terminatedPosition) {
             message = `Your ${tokenList[(terminatedPosition as PositionRaw).from].symbol}:${
               tokenList[(terminatedPosition as PositionRaw).to].symbol
@@ -57,9 +58,9 @@ function useBuildTransactionMessages() {
           const fundedPosition = find(currentPositions, { id: addFundsTypeData.id });
           if (fundedPosition) {
             message = `${addFundsTypeData.newFunds} ${
-              tokenList[(withdrawnPosition as PositionRaw).from].symbol
-            } have been added to your ${tokenList[(withdrawnPosition as PositionRaw).from]}:${
-              tokenList[(withdrawnPosition as PositionRaw).to]
+              tokenList[(fundedPosition as PositionRaw).from].symbol
+            } have been added to your ${tokenList[(fundedPosition as PositionRaw).from].symbol}:${
+              tokenList[(fundedPosition as PositionRaw).to].symbol
             } position`;
           }
           break;
@@ -68,20 +69,22 @@ function useBuildTransactionMessages() {
           const removeFundedPosition = find(currentPositions, { id: removeFundsTypeData.id });
           if (removeFundedPosition) {
             message = `${removeFundsTypeData.ammountToRemove} ${
-              tokenList[(withdrawnPosition as PositionRaw).from].symbol
-            } have been removed from your ${tokenList[(withdrawnPosition as PositionRaw).from]}:${
-              tokenList[(withdrawnPosition as PositionRaw).to]
+              tokenList[(removeFundedPosition as PositionRaw).from].symbol
+            } have been removed from your ${tokenList[(removeFundedPosition as PositionRaw).from].symbol}:${
+              tokenList[(removeFundedPosition as PositionRaw).to].symbol
             } position`;
           }
+          break;
+
         case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
           const modifyRatePositionTypeData = tx.typeData as ModifyRatePositionTypeData;
           const modifiedPosition = find(currentPositions, { id: modifyRatePositionTypeData.id });
           if (modifiedPosition) {
-            message = `Your ${tokenList[(withdrawnPosition as PositionRaw).from]}:${
-              tokenList[(withdrawnPosition as PositionRaw).to]
+            message = `Your ${tokenList[(modifiedPosition as PositionRaw).from].symbol}:${
+              tokenList[(modifiedPosition as PositionRaw).to].symbol
             } position has now been set to run for ${modifyRatePositionTypeData.newRate} ${
               STRING_SWAP_INTERVALS[
-                (withdrawnPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
+                (modifiedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
               ]
             }`;
           }
@@ -92,13 +95,13 @@ function useBuildTransactionMessages() {
             tokenList[newPairTypeData.token1].symbol
           } has been created`;
           break;
-        case TRANSACTION_TYPES.NEW_PAIR:
+        case TRANSACTION_TYPES.APPROVE_TOKEN:
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
           const pair = find(availablePairs, { id: tokenApprovalTypeData.pair });
           if (pair) {
             message = `${tokenList[tokenApprovalTypeData.id].symbol} is now ready to be used in the pair ${
-              tokenList[pair.token0]
-            }:${tokenList[pair.token1]}`;
+              tokenList[pair.token0].symbol
+            }:${tokenList[pair.token1].symbol}`;
           } else {
             message = `${tokenList[tokenApprovalTypeData.id].symbol} is now ready to be used`;
           }

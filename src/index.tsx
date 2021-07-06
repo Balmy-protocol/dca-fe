@@ -38,9 +38,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
   const [web3Service, setWeb3Service] = React.useState(
     new Web3Service(setAccount, DCASubgraph, WalletContextDefaultValue.graphPricesClient)
   );
-  const [tokenList, setTokenList] = React.useState<TokenList>({});
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
-  const [isLoadingTokens, setIsLoadingTokens] = React.useState(true);
 
   React.useEffect(() => {
     async function setWeb3ModalEffect() {
@@ -48,45 +46,18 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       setIsLoadingWeb3(false);
     }
 
-    async function setTokenListEffect() {
-      const geckoTokens =
-        process.env.ETH_NETWORK === 'mainnet'
-          ? await axios.get<{ tokens: Token[] }>('https://tokens.coingecko.com/uniswap/all.json')
-          : {
-              status: 200,
-              statusText: 'OK',
-              config: {},
-              headers: {},
-              data: { tokens: [WETH, DAI, UNI, USDC, YFI, T0] },
-            };
-
-      const reducedTokens = geckoTokens.data.tokens.reduce(
-        (acc, token) => ({ ...acc, [token.address]: { ...token } }),
-        {}
-      );
-      setTokenList(reducedTokens);
-      setIsLoadingTokens(false);
-    }
-
     if (!web3Service.getModal()) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       setWeb3ModalEffect();
     }
+  }, [web3Service]);
 
-    if (!Object.keys(tokenList).length) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      setTokenListEffect();
-    }
-  }, [web3Service, tokenList]);
+  const isLoading = isLoadingWeb3;
 
-  const isLoading = isLoadingTokens || isLoadingWeb3;
-
-  console.log(isLoading, isLoadingTokens, isLoadingWeb3);
   return (
     <WalletContext.Provider
       value={{
         web3Service,
-        tokenList,
         account,
         graphPricesClient: WalletContextDefaultValue.graphPricesClient,
       }}
