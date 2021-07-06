@@ -39,7 +39,13 @@ import {
   useHasConfirmedApproval,
   useHasPendingPairCreation,
 } from 'state/transactions/hooks';
-import { DAY_IN_SECONDS, WEEK_IN_SECONDS, MONTH_IN_SECONDS, STRING_SWAP_INTERVALS } from 'utils/parsing';
+import {
+  DAY_IN_SECONDS,
+  WEEK_IN_SECONDS,
+  MONTH_IN_SECONDS,
+  STRING_SWAP_INTERVALS,
+  FIVE_MINUTES_IN_SECONDS,
+} from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 
@@ -70,6 +76,14 @@ const StyledWarningIcon = styled(WarningIcon)`
 `;
 
 const frequencyTypeOptions = [
+  ...(process.env.ETH_NETWORK === 'ropsten'
+    ? [
+        {
+          label: STRING_SWAP_INTERVALS[FIVE_MINUTES_IN_SECONDS.toString()],
+          value: FIVE_MINUTES_IN_SECONDS,
+        },
+      ]
+    : []),
   {
     label: STRING_SWAP_INTERVALS[DAY_IN_SECONDS.toString()],
     value: DAY_IN_SECONDS,
@@ -87,7 +101,6 @@ const frequencyTypeOptions = [
 interface SwapProps extends SwapContextValue {
   tokenList: TokenList;
   web3Service: Web3Service;
-  // availablePairs: AvailablePairs;
 }
 
 const Swap = ({
