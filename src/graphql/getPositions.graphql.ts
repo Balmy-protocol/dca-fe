@@ -13,6 +13,9 @@ const getCurrentPositions = gql`
       dcaId
       createdAtTimestamp
       totalDeposits
+      totalSwaps
+      totalSwapped
+      totalWithdrawn
       from {
         id
       }
@@ -32,8 +35,6 @@ const getCurrentPositions = gql`
         id
         rate
         remainingSwaps
-        swapped
-        withdrawn
         remainingLiquidity
       }
     }

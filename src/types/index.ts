@@ -100,6 +100,9 @@ export type PositionResponse = {
     remainingLiquidity: BigNumber;
   };
   totalDeposits: BigNumber;
+  totalSwaps: BigNumber;
+  totalSwapped: BigNumber;
+  totalWithdrawn: BigNumber;
   createdAtTimestamp: number;
 };
 
@@ -112,6 +115,7 @@ export interface PositionRaw {
   remainingSwaps: BigNumber;
   totalDeposits: BigNumber;
   withdrawn: BigNumber; // cuanto saque
+  totalSwaps: BigNumber; // cuanto puse originalmente
   dcaId: number;
   id: string;
   status: string;

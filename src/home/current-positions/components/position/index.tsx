@@ -5,6 +5,7 @@ import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import Card from '@material-ui/core/Card';
 import Grid from '@material-ui/core/Grid';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
@@ -23,7 +24,7 @@ import BlockIcon from '@material-ui/icons/Block';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { FormattedMessage } from 'react-intl';
-import { DateTime } from 'luxon';
+import TokenIcon from 'common/token-icon';
 import FloatingMenu from 'common/floating-menu';
 import TokenInput from 'common/token-input';
 import usePromise from 'hooks/usePromise';
@@ -35,9 +36,11 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import { sortTokens } from 'utils/parsing';
 import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
+import ArrowRight from 'assets/svg/atom/arrow-right';
 
 const StyledCard = styled(Card)`
   margin: 10px;
+  border-radius: 10px;
 `;
 
 const StyledCardContent = styled(CardContent)`
@@ -57,11 +60,16 @@ const StyledIconButton = styled(IconButton)`
 const StyledCardHeader = styled.div`
   display: flex;
   justify-content: space-between;
+  margin-bottom: 15px;
 `;
 
 const StyledCardTitleHeader = styled.div`
   display: flex;
   align-items: center;
+  *:not(:first-child) {
+    margin-left: 4px;
+    font-weight: 500;
+  }
 `;
 
 const StyledListItemIcon = styled(ListItemIcon)`
@@ -70,6 +78,36 @@ const StyledListItemIcon = styled(ListItemIcon)`
 
 const StyledAddCircleOutlineIcon = styled(AddCircleOutlineIcon)`
   color: rgb(17 147 34);
+`;
+
+const StyledDetailWrapper = styled.div`
+  margin-bottom: 5px;
+`;
+
+const StyledProgressWrapper = styled.div`
+  margin-top: 14px;
+  margin-bottom: 21px;
+`;
+
+const StyledCardFooter = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+`;
+
+const StyledCardFooterItem = styled.div``;
+
+const StyledAddButon = styled(Button)`
+  color: #239f33;
+  border-color: #239f33;
+  text-transform: none;
+`;
+
+const StyledFreqLeft = styled.div`
+  padding: 8px 11px;
+  border-radius: 5px;
+  background-color: #dceff9;
+  color: #0088cc;
 `;
 
 const useDeletedStyles = makeStyles((theme: Theme) =>
@@ -102,7 +140,7 @@ const ActivePosition = ({
   onRemoveFunds,
   web3Service,
 }: ActivePositionProps) => {
-  const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, id } = position;
+  const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, id, totalSwaps } = position;
   const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
   const [fromValue, setFromValue] = React.useState('');
   const buttonContent = <MoreVertIcon />;
@@ -157,9 +195,11 @@ const ActivePosition = ({
       <StyledCardContent>
         <StyledCardHeader>
           <StyledCardTitleHeader>
-            <Typography variant="h6">{from.symbol}</Typography>
-            <ArrowForwardIcon />
-            <Typography variant="h6">{to.symbol}</Typography>
+            <TokenIcon token={from} size="16px" />
+            <Typography variant="body1">{from.symbol}</Typography>
+            <ArrowRight size="20px" />
+            <TokenIcon token={to} size="16px" />
+            <Typography variant="body1">{to.symbol}</Typography>
           </StyledCardTitleHeader>
           <FloatingMenu buttonContent={buttonContent} buttonStyles={{}} isIcon>
             <MenuItem onClick={() => onWithdraw(position)}>
@@ -196,36 +236,49 @@ const ActivePosition = ({
             </MenuItem>
           </FloatingMenu>
         </StyledCardHeader>
-        <Typography variant="subtitle1">
-          <FormattedMessage
-            description="current exercised"
-            defaultMessage="{exercised} {to} swapped"
-            values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
-          />
-        </Typography>
-        <Typography variant="subtitle2">
-          <FormattedMessage
-            description="current remaining"
-            defaultMessage="{remainingLiquidity} {from} remaining"
-            values={{ remainingLiquidity: formatUnits(remainingLiquidity, from.decimals), from: from.symbol }}
-          />
-        </Typography>
-        <Typography variant="body2" component="p">
-          <FormattedMessage
-            description="days to finish"
-            defaultMessage="{remainingDays} {type} to close"
-            values={{
-              remainingDays: remainingSwaps.toString(),
-              type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
-            }}
-          />
-        </Typography>
+        <StyledDetailWrapper>
+          <Typography variant="body2">
+            <FormattedMessage
+              description="current exercised"
+              defaultMessage="{exercised} {to} swapped"
+              values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
+            />
+          </Typography>
+        </StyledDetailWrapper>
+        <StyledDetailWrapper>
+          <Typography variant="body2">
+            <FormattedMessage
+              description="current remaining"
+              defaultMessage="{remainingLiquidity} {from} remain"
+              values={{ remainingLiquidity: formatUnits(remainingLiquidity, from.decimals), from: from.symbol }}
+            />
+          </Typography>
+        </StyledDetailWrapper>
+        <StyledProgressWrapper>
+          <LinearProgress variant="determinate" value={100 * (remainingSwaps.toNumber() / totalSwaps.toNumber())} />
+        </StyledProgressWrapper>
+        <StyledCardFooter>
+          <StyledFreqLeft>
+            <Typography variant="body2">
+              <FormattedMessage
+                description="days to finish"
+                defaultMessage="{remainingDays} {type} left"
+                values={{
+                  remainingDays: remainingSwaps.toString(),
+                  type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                }}
+              />
+            </Typography>
+          </StyledFreqLeft>
+          <StyledCardFooterItem>
+            <StyledAddButon variant="outlined" onClick={() => setShouldShowAddForm(true)}>
+              <Typography variant="body2">
+                <FormattedMessage description="add to position" defaultMessage="Add to position" />
+              </Typography>
+            </StyledAddButon>
+          </StyledCardFooterItem>
+        </StyledCardFooter>
       </StyledCardContent>
-      <StyledCardActions>
-        <StyledIconButton aria-label="add" onClick={() => setShouldShowAddForm(true)}>
-          <StyledAddCircleOutlineIcon fontSize="inherit" />
-        </StyledIconButton>
-      </StyledCardActions>
       <Grow in={shouldShowAddForm} mountOnEnter unmountOnExit>
         <Paper elevation={4}>
           <Grid container alignItems="center" justify="space-around">
