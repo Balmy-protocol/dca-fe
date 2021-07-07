@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { TransactionDetails } from 'types';
-import { addTransaction, checkedTransaction, finalizeTransaction } from './actions';
+import { addTransaction, checkedTransaction, finalizeTransaction, clearAllTransactions } from './actions';
 
 const now = () => new Date().getTime();
 
@@ -40,5 +40,8 @@ export default createReducer(initialState, (builder) =>
         ...tx.typeData,
         ...extendedTypeData,
       };
+    })
+    .addCase(clearAllTransactions, () => {
+      return initialState;
     })
 );

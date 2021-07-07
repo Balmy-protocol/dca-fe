@@ -20,3 +20,4 @@ export const checkedTransaction = createAction<{
   hash: string;
   blockNumber: number;
 }>('transactions/checkedTransaction');
+export const clearAllTransactions = createAction('transactions/clearAllTransactions');

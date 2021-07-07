@@ -63,12 +63,16 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   return state || {};
 }
 
-export function useIsTransactionPending(transactionHash?: string): boolean {
+export function useIsTransactionPending(): (transactionHash?: string) => boolean {
   const transactions = useAllTransactions();
 
-  if (!transactionHash || !transactions[transactionHash]) return false;
-
-  return !transactions[transactionHash].receipt;
+  return useCallback(
+    (transactionHash?: string) => {
+      if (!transactionHash || !transactions[transactionHash]) return false;
+      return !transactions[transactionHash].receipt;
+    },
+    [transactions]
+  );
 }
 
 export function useHasPendingTransactions(): boolean {

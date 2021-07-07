@@ -2,7 +2,7 @@ import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
-import Web3Modal from 'web3modal';
+import Web3Modal, { getProviderInfo } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
@@ -68,6 +68,7 @@ export default class Web3Service {
   currentPositions: PositionRawKeyBy;
   pastPositions: PositionRawKeyBy;
   tokenList: TokenList;
+  providerInfo: { id: string; logo: string; name: string };
 
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
@@ -108,6 +109,10 @@ export default class Web3Service {
     return this.client;
   }
 
+  getProviderInfo() {
+    return this.providerInfo;
+  }
+
   setModal(modal: Web3Modal) {
     this.modal = modal;
   }
@@ -124,6 +129,7 @@ export default class Web3Service {
   async connect() {
     const provider = await this.modal?.connect();
 
+    this.providerInfo = getProviderInfo(provider);
     // A Web3Provider wraps a standard Web3 provider, which is
     // what Metamask injects as window.ethereum into each page
     const ethersProvider = new ethers.providers.Web3Provider(provider);
@@ -143,7 +149,7 @@ export default class Web3Service {
     if (window.ethereum) {
       // handle metamask account change
       window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
-        this.setAccount(newAccounts[0]);
+        window.location.reload();
       });
 
       // extremely recommended by metamask
