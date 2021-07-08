@@ -16,35 +16,30 @@ import Grow from '@material-ui/core/Grow';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import BlockIcon from '@material-ui/icons/Block';
-import CallSplitIcon from '@material-ui/icons/CallSplit';
-import SettingsIcon from '@material-ui/icons/Settings';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
-import FloatingMenu from 'common/floating-menu';
 import TokenInput from 'common/token-input';
 import usePromise from 'hooks/usePromise';
 import { Position, Token, Web3Service, AvailablePair } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { STRING_SWAP_INTERVALS } from 'utils/parsing';
-import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { sortTokens } from 'utils/parsing';
 import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
+import Cog from 'assets/svg/atom/cog';
+import PositionMenu from 'common/position-menu';
 
 const StyledCard = styled(Card)`
   margin: 10px;
   border-radius: 10px;
+  position: relative;
 `;
 
 const StyledCardContent = styled(CardContent)`
-  padding-bottom: 0px;
+  padding-bottom: 10px !important;
 `;
 
 const StyledCardActions = styled(CardActions)`
@@ -142,8 +137,8 @@ const ActivePosition = ({
 }: ActivePositionProps) => {
   const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, id, totalSwaps } = position;
   const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
+  const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [fromValue, setFromValue] = React.useState('');
-  const buttonContent = <MoreVertIcon />;
   const classNames = useDeletedStyles();
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const availablePairs = useAvailablePairs();
@@ -192,6 +187,7 @@ const ActivePosition = ({
 
   return (
     <StyledCard>
+      <PositionMenu onClose={() => setShouldShowSettings(false)} shouldShow={shouldShowSettings} position={position} />
       <StyledCardContent>
         <StyledCardHeader>
           <StyledCardTitleHeader>
@@ -201,40 +197,15 @@ const ActivePosition = ({
             <TokenIcon token={to} size="16px" />
             <Typography variant="body1">{to.symbol}</Typography>
           </StyledCardTitleHeader>
-          <FloatingMenu buttonContent={buttonContent} buttonStyles={{}} isIcon>
-            <MenuItem onClick={() => onWithdraw(position)}>
-              <StyledListItemIcon>
-                <CallSplitIcon fontSize="small" />
-              </StyledListItemIcon>
-              <ListItemText>
-                <FormattedMessage description="Withdraw" defaultMessage="Withdraw" />
-              </ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => onModifyRate(position)}>
-              <StyledListItemIcon>
-                <SettingsIcon fontSize="small" />
-              </StyledListItemIcon>
-              <ListItemText>
-                <FormattedMessage description="Modify frequency" defaultMessage="Modify Frequency" />
-              </ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => onRemoveFunds(position)}>
-              <StyledListItemIcon>
-                <CallSplitIcon fontSize="small" />
-              </StyledListItemIcon>
-              <ListItemText>
-                <FormattedMessage description="Remove funds" defaultMessage="Withdraw funds" />
-              </ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => onTerminate(position)} classes={classNames}>
-              <StyledListItemIcon>
-                <BlockIcon fontSize="small" />
-              </StyledListItemIcon>
-              <ListItemText>
-                <FormattedMessage description="Drop out" defaultMessage="Drop out" />
-              </ListItemText>
-            </MenuItem>
-          </FloatingMenu>
+          <IconButton
+            aria-label="more"
+            aria-controls="long-menu"
+            aria-haspopup="true"
+            onClick={() => setShouldShowSettings(true)}
+            size="small"
+          >
+            <Cog size="22px" />
+          </IconButton>
         </StyledCardHeader>
         <StyledDetailWrapper>
           <Typography variant="body2">
