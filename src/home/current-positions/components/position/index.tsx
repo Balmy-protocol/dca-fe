@@ -10,7 +10,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
+import Button from 'common/button';
 import Paper from '@material-ui/core/Paper';
 import Grow from '@material-ui/core/Grow';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -91,12 +91,6 @@ const StyledCardFooter = styled.div`
 `;
 
 const StyledCardFooterItem = styled.div``;
-
-const StyledAddButon = styled(Button)`
-  color: #239f33;
-  border-color: #239f33;
-  text-transform: none;
-`;
 
 const StyledFreqLeft = styled.div`
   padding: 8px 11px;
@@ -242,11 +236,11 @@ const ActivePosition = ({
             </Typography>
           </StyledFreqLeft>
           <StyledCardFooterItem>
-            <StyledAddButon variant="outlined" onClick={() => setShouldShowAddForm(true)}>
+            <Button variant="outlined" color="primary" onClick={() => setShouldShowAddForm(true)}>
               <Typography variant="body2">
                 <FormattedMessage description="add to position" defaultMessage="Add to position" />
               </Typography>
-            </StyledAddButon>
+            </Button>
           </StyledCardFooterItem>
         </StyledCardFooter>
       </StyledCardContent>
@@ -269,8 +263,8 @@ const ActivePosition = ({
               <Button
                 size="small"
                 variant="contained"
-                disabled={!shouldShowAddForm}
                 color="primary"
+                disabled={!shouldShowAddForm}
                 onClick={handleAddFunds}
               >
                 <Typography variant="button">

@@ -215,6 +215,8 @@ const ButtonTypes = {
 const CustomButton: React.FC<any> = ({ children, color, ...rest }) => {
   const ButtonToRender = ButtonTypes[color as keyof typeof ButtonTypes];
 
+  console.log(color, ButtonTypes);
+
   return <ButtonToRender {...rest}>{children}</ButtonToRender>;
 };
 
