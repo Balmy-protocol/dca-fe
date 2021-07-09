@@ -8,6 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Button from 'common/button';
 import Typography from '@material-ui/core/Typography';
 import ArrowLeft from 'assets/svg/atom/arrow-left';
+import { BigNumber } from 'ethers';
 
 const StyledHeader = styled.div`
   display: flex;
@@ -36,8 +37,9 @@ interface RemoveFundsSettingsProps {
 
 const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSettingsProps) => {
   const [fromValue, setFromValue] = React.useState('');
-  const hasError = fromValue && parseUnits(fromValue, position.from.decimals).gt(position.remainingLiquidity);
 
+  const hasError = fromValue && parseUnits(fromValue, position.from.decimals).gte(position.remainingLiquidity);
+  const shouldDisable = fromValue && parseUnits(fromValue, position.from.decimals).lte(BigNumber.from(0));
   return (
     <>
       <StyledHeader>
@@ -51,7 +53,7 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
       <StyledInputContainer>
         <TokenInput
           id="from-value"
-          error={!!hasError ? 'Ammount cannot exceed your current funds' : ''}
+          error={!!hasError ? 'Ammount cannot exceed or equal your current funds' : ''}
           value={fromValue}
           label={position.from.symbol}
           onChange={setFromValue}
@@ -71,7 +73,13 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
         </Typography>
       </StyledInputContainer>
       <StyledActionContainer>
-        <Button color="secondary" variant="contained" fullWidth onClick={() => onWithdraw(fromValue)}>
+        <Button
+          color="secondary"
+          variant="contained"
+          fullWidth
+          disabled={!fromValue || shouldDisable || hasError}
+          onClick={() => onWithdraw(fromValue)}
+        >
           <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
         </Button>
       </StyledActionContainer>

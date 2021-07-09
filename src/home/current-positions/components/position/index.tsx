@@ -15,13 +15,14 @@ import { Position, Token, Web3Service, AvailablePair } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { STRING_SWAP_INTERVALS } from 'utils/parsing';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { sortTokens } from 'utils/parsing';
+import { sortTokens, calculateStale } from 'utils/parsing';
 import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import Cog from 'assets/svg/atom/cog';
 import PositionMenu from 'common/position-menu';
 import AddToPosition from 'common/add-to-position-settings';
+import { BigNumber } from 'ethers';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -72,6 +73,26 @@ const StyledFreqLeft = styled.div`
   color: #0088cc;
 `;
 
+const StyledStale = styled.div`
+  padding: 8px 11px;
+  border-radius: 5px;
+  background-color: #f9f3dc;
+  color: #cc6d00;
+  * {
+    font-weight: 600 !important;
+  }
+`;
+
+const StyledNoFunds = styled.div`
+  padding: 8px 11px;
+  border-radius: 5px;
+  background-color: #f9dcdc;
+  color: #f50000;
+  * {
+    font-weight: 600 !important;
+  }
+`;
+
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
@@ -100,6 +121,10 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
 
   const [token0, token1] = sortTokens(from.address, to.address);
   const pair = find(availablePairs, { token0, token1 });
+
+  const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
+
+  const isStale = calculateStale(pair?.lastExecutedAt || 0, swapInterval, pair?.createdAt || 0);
 
   const handleAddFunds = async (ammountToAdd: string) => {
     try {
@@ -249,18 +274,32 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
           <LinearProgress variant="determinate" value={100 * (remainingSwaps.toNumber() / totalSwaps.toNumber())} />
         </StyledProgressWrapper>
         <StyledCardFooter>
-          <StyledFreqLeft>
-            <Typography variant="body2">
-              <FormattedMessage
-                description="days to finish"
-                defaultMessage="{remainingDays} {type} left"
-                values={{
-                  remainingDays: remainingSwaps.toString(),
-                  type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
-                }}
-              />
-            </Typography>
-          </StyledFreqLeft>
+          {hasNoFunds ? (
+            <StyledNoFunds>
+              <Typography variant="body2">
+                <FormattedMessage description="no funds" defaultMessage="No funds!" />
+              </Typography>
+            </StyledNoFunds>
+          ) : isStale ? (
+            <StyledStale>
+              <Typography variant="body2">
+                <FormattedMessage description="stale" defaultMessage="Stale" />
+              </Typography>
+            </StyledStale>
+          ) : (
+            <StyledFreqLeft>
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="days to finish"
+                  defaultMessage="{remainingDays} {type} left"
+                  values={{
+                    remainingDays: remainingSwaps.toString(),
+                    type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                  }}
+                />
+              </Typography>
+            </StyledFreqLeft>
+          )}
           <StyledCardFooterItem>
             <Button variant="outlined" color="primary" onClick={() => setShouldShowAddToPosition(true)}>
               <Typography variant="body2">

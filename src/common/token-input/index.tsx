@@ -20,17 +20,7 @@ interface TokenInputProps {
 
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`);
 
-const Swap = ({
-  id,
-  label,
-  onChange,
-  value,
-  disabled,
-  withBalance,
-  isLoadingBalance,
-  balance,
-  error,
-}: TokenInputProps) => {
+const TokenInput = ({ id, onChange, value, disabled, withBalance, balance, error }: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
@@ -74,20 +64,7 @@ const Swap = ({
           maxLength: 79,
         }}
       />
-      {/* {withBalance && (
-        <Typography variant="body2">
-          {isLoadingBalance ? (
-            <CircularProgress size={10} />
-          ) : (
-            <FormattedMessage
-              description="current balance"
-              defaultMessage="Balance: {balance} {token}"
-              values={{ balance: balance ? balance : '', token: label }}
-            />
-          )}
-        </Typography>
-      )} */}
     </>
   );
 };
-export default Swap;
+export default TokenInput;

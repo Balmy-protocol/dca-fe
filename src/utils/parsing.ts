@@ -35,3 +35,14 @@ export const sortTokens = (tokenA: string, tokenB: string) => {
 
   return [token0, token1];
 };
+
+export const calculateStale = (lastSwapped: number, frequencyType: BigNumber, createdAt: number) => {
+  const today = Math.floor(Date.now() / 1000);
+
+  if (lastSwapped === 0) {
+    return BigNumber.from(today).gt(BigNumber.from(createdAt).add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
+  }
+
+  const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(1).mul(frequencyType);
+  return BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
+};

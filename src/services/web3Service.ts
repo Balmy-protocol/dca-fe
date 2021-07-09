@@ -290,8 +290,9 @@ export default class Web3Service {
     this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
       token0: pair.token0.id,
       token1: pair.token1.id,
-      lastExecuted: (pair.swaps && pair.swaps[0].executedAtTimestamp) || 0,
+      lastExecuted: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
       id: pair.id,
+      createdAt: pair.createdAtTimestamp,
     }));
 
     const tokenListResponse = await gqlFetchAllById(this.uniClient, GET_TOKEN_LIST, {}, 'pools');
@@ -356,7 +357,7 @@ export default class Web3Service {
     const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
 
     return Promise.all([
-      factory.estimateGas.createPair(token0, token1),
+      factory.estimateGas.createPair(tokenA, tokenB),
       axios.get<GasNowResponse>('https://www.gasnow.org/api/v3/gas/price'),
       axios.get<CoinGeckoPriceResponse>(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=1&page=1&sparkline=false'
@@ -586,6 +587,7 @@ export default class Web3Service {
           token1,
           id: newPairTypeData.id as string,
           lastExecutedAt: 0,
+          createdAt: Math.floor(Date.now() / 1000),
         });
         break;
     }

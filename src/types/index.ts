@@ -46,6 +46,7 @@ export type AvailablePairResponse = {
   };
   id: string;
   swaps: AvailablePairSwap[];
+  createdAtTimestamp: number;
   status: string; // active, stale
 };
 
@@ -59,6 +60,7 @@ export type AvailablePair = {
   token0: string;
   token1: string;
   lastExecutedAt: number;
+  createdAt: number;
   id: string;
 };
 

@@ -10,6 +10,10 @@ const getAvailablePairs = gql`
       token1 {
         id
       }
+      swaps {
+        executedAtTimestamp
+      }
+      createdAtTimestamp
     }
   }
 `;

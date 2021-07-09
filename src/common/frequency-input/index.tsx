@@ -3,17 +3,18 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { SetStateCallback } from 'types';
 
-interface TokenInputProps {
+interface FrequencyInputProps {
   id: string;
   label: string;
   value: string;
   disabled?: boolean;
+  error?: string;
   onChange: (newValue: string) => void | SetStateCallback<string>;
 }
 
 const inputRegex = RegExp(/^[0-9]*$/);
 
-const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
+const FrequencyInput = ({ id, label, onChange, value, disabled, error }: FrequencyInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
@@ -25,6 +26,8 @@ const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
     <TextField
       id={id}
       value={value}
+      error={!!error}
+      helperText={error}
       placeholder="0"
       inputMode="decimal"
       autoComplete="off"
@@ -45,4 +48,4 @@ const Swap = ({ id, label, onChange, value, disabled }: TokenInputProps) => {
     />
   );
 };
-export default Swap;
+export default FrequencyInput;
