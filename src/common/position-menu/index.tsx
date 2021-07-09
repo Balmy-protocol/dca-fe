@@ -2,11 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
-import Button from 'common/button';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
+import PositionSettings from 'common/position-settings';
+import RemoveFundsSettings from 'common/remove-funds-settings';
+import ModifyRateSettings from 'common/modify-rate-settings';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -16,63 +14,70 @@ const StyledOverlay = styled.div`
   right: 0;
   z-index: 99;
   background-color: white;
-  padding: 10px;
+  padding: 10px 30px;
   display: flex;
   flex-direction: column;
-`;
-
-const StyledHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-grow: 0;
-`;
-
-const StyledActionsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  flex-grow: 1;
 `;
 
 interface PositionMenuProps {
   position: Position;
   onClose: () => void;
   shouldShow: boolean;
+  onWithdraw: (position: Position) => void;
+  onTerminate: (position: Position) => void;
+  onModifyRate: (ammountToRemove: string) => void;
+  onRemoveFunds: (ammountToRemove: string) => void;
 }
 
-const PositionMenu = ({ onClose, shouldShow }: PositionMenuProps) => {
+const PositionMenu = ({
+  onClose,
+  shouldShow,
+  onWithdraw,
+  onTerminate,
+  onModifyRate,
+  onRemoveFunds,
+  position,
+}: PositionMenuProps) => {
+  const [activeMenu, setActiveMenu] = React.useState('settings');
+
+  const onTerminatePosition = () => onTerminate(position);
+  const onWithdrawPosition = () => onWithdraw(position);
+  const onRemoveFundsPosition = (ammountToRemove: string) => {
+    onRemoveFunds(ammountToRemove);
+    onClose();
+    setActiveMenu('settings');
+  };
+  const onModifyRatePosition = (frequencyValue: string) => {
+    onModifyRate(frequencyValue);
+    onClose();
+    setActiveMenu('settings');
+  };
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
       <StyledOverlay>
-        <StyledHeader>
-          <IconButton
-            aria-label="close"
-            size="small"
-            onClick={onClose}
-            style={{ position: 'absolute', top: '10px', right: '10px' }}
-          >
-            <CloseIcon fontSize="inherit" />
-          </IconButton>
-          <Typography variant="h6">
-            <FormattedMessage description="position settings" defaultMessage="Position settings" />
-          </Typography>
-        </StyledHeader>
-        <StyledActionsContainer>
-          <Button variant="outlined" color="default" size="small" fullWidth>
-            <FormattedMessage description="withdraw swapped" defaultMessage="Withdraw swapped" />
-          </Button>
-          <Button variant="outlined" color="default" size="small" fullWidth>
-            <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
-          </Button>
-          <Button variant="outlined" color="default" size="small" fullWidth>
-            <FormattedMessage description="change duration" defaultMessage="Change duration" />
-          </Button>
-          <Button variant="contained" color="error" size="small" fullWidth>
-            <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
-          </Button>
-        </StyledActionsContainer>
+        {activeMenu === 'settings' && (
+          <PositionSettings
+            onClose={onClose}
+            onWithdraw={onWithdrawPosition}
+            onTerminate={onTerminatePosition}
+            onModifyRate={() => setActiveMenu('modifyRate')}
+            onRemoveFunds={() => setActiveMenu('removeFunds')}
+          />
+        )}
+        {activeMenu === 'removeFunds' && (
+          <RemoveFundsSettings
+            onClose={() => setActiveMenu('settings')}
+            position={position}
+            onWithdraw={onRemoveFundsPosition}
+          />
+        )}
+        {activeMenu === 'modifyRate' && (
+          <ModifyRateSettings
+            onClose={() => setActiveMenu('settings')}
+            position={position}
+            onModifyRate={onModifyRatePosition}
+          />
+        )}
       </StyledOverlay>
     </Slide>
   );

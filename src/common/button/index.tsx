@@ -14,12 +14,14 @@ const types = {
   secondary: 'secondary',
   warning: 'warning',
   error: 'error',
+  tertiary: 'tertiary',
 };
 
 const colors = {
   primary: '#239F33',
   default: '#333333',
   secondary: '#FAFAFA',
+  tertiary: '#0088CC',
   warning: '#FAFAFA',
   error: '#F50000',
 };
@@ -36,6 +38,10 @@ const backgroundColors = {
   secondary: {
     default: '#00A3F5',
     hover: '#0294de',
+  },
+  tertiary: {
+    default: '#DCEFF9',
+    hover: '#ccdee8',
   },
   warning: {
     default: '#F5B000',
@@ -59,6 +65,10 @@ const borderColors = {
   secondary: {
     default: '#00A3F5',
     hover: '#0294de',
+  },
+  tertiary: {
+    default: '#DCEFF9',
+    hover: '#ccdee8',
   },
   warning: {
     default: '#F5B000',
@@ -122,6 +132,32 @@ const SecondaryButton = withStyles({
     },
     '&:active': {
       backgroundColor: backgroundColors.secondary.hover,
+    },
+  },
+})(StyledDisabledFontButton);
+
+const TertiaryButton = withStyles({
+  text: {
+    color: colors.tertiary,
+  },
+  outlined: {
+    color: borderColors.tertiary.default,
+    borderColor: borderColors.tertiary.default,
+    '&:hover': {
+      borderColor: borderColors.tertiary.hover,
+    },
+    '&:active': {
+      borderColor: borderColors.tertiary.hover,
+    },
+  },
+  contained: {
+    color: colors.tertiary,
+    backgroundColor: backgroundColors.tertiary.default,
+    '&:hover': {
+      backgroundColor: backgroundColors.tertiary.hover,
+    },
+    '&:active': {
+      backgroundColor: backgroundColors.tertiary.hover,
     },
   },
 })(StyledDisabledFontButton);
@@ -210,12 +246,11 @@ const ButtonTypes = {
   default: DefaultButton,
   error: ErrorButton,
   warning: WarningButton,
+  tertiary: TertiaryButton,
 };
 
 const CustomButton: React.FC<any> = ({ children, color, ...rest }) => {
   const ButtonToRender = ButtonTypes[color as keyof typeof ButtonTypes];
-
-  console.log(color, ButtonTypes);
 
   return <ButtonToRender {...rest}>{children}</ButtonToRender>;
 };

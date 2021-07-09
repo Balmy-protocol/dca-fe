@@ -33,6 +33,10 @@ export type PoolResponse = {
 
 export type TokenList = Record<string, Token>;
 
+export interface AvailablePairSwap {
+  executedAtTimestamp: number;
+}
+
 export type AvailablePairResponse = {
   token0: {
     id: string;
@@ -41,6 +45,7 @@ export type AvailablePairResponse = {
     id: string;
   };
   id: string;
+  swaps: AvailablePairSwap[];
   status: string; // active, stale
 };
 
@@ -53,8 +58,8 @@ export type SwapInterval = {
 export type AvailablePair = {
   token0: string;
   token1: string;
+  lastExecutedAt: number;
   id: string;
-  status: string; // active, stale
 };
 
 export type AvailablePairs = AvailablePair[];

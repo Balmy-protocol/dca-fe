@@ -290,6 +290,7 @@ export default class Web3Service {
     this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
       token0: pair.token0.id,
       token1: pair.token1.id,
+      lastExecuted: (pair.swaps && pair.swaps[0].executedAtTimestamp) || 0,
       id: pair.id,
     }));
 
@@ -584,7 +585,7 @@ export default class Web3Service {
           token0,
           token1,
           id: newPairTypeData.id as string,
-          status: 'ACTIVE',
+          lastExecutedAt: 0,
         });
         break;
     }

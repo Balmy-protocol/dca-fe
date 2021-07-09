@@ -1,25 +1,15 @@
 import * as React from 'react';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { formatUnits, parseUnits } from '@ethersproject/units';
-import { BigNumber } from 'ethers';
+import { formatUnits } from '@ethersproject/units';
 import find from 'lodash/find';
 import Card from '@material-ui/core/Card';
-import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import IconButton from '@material-ui/core/IconButton';
 import Button from 'common/button';
-import Paper from '@material-ui/core/Paper';
-import Grow from '@material-ui/core/Grow';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
-import TokenInput from 'common/token-input';
 import usePromise from 'hooks/usePromise';
 import { Position, Token, Web3Service, AvailablePair } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
@@ -31,6 +21,7 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import Cog from 'assets/svg/atom/cog';
 import PositionMenu from 'common/position-menu';
+import AddToPosition from 'common/add-to-position-settings';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -40,16 +31,6 @@ const StyledCard = styled(Card)`
 
 const StyledCardContent = styled(CardContent)`
   padding-bottom: 10px !important;
-`;
-
-const StyledCardActions = styled(CardActions)`
-  padding-top: 0px;
-  justify-content: flex-end;
-`;
-
-const StyledIconButton = styled(IconButton)`
-  padding: 0px;
-  padding-right: 12px;
 `;
 
 const StyledCardHeader = styled.div`
@@ -65,14 +46,6 @@ const StyledCardTitleHeader = styled.div`
     margin-left: 4px;
     font-weight: 500;
   }
-`;
-
-const StyledListItemIcon = styled(ListItemIcon)`
-  min-width: 28px;
-`;
-
-const StyledAddCircleOutlineIcon = styled(AddCircleOutlineIcon)`
-  color: rgb(17 147 34);
 `;
 
 const StyledDetailWrapper = styled.div`
@@ -99,14 +72,6 @@ const StyledFreqLeft = styled.div`
   color: #0088cc;
 `;
 
-const useDeletedStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      backgroundColor: theme.palette.error.main,
-    },
-  })
-);
-
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
@@ -117,39 +82,26 @@ interface ActivePositionProps {
   web3Service: Web3Service;
   onWithdraw: (position: Position) => void;
   onTerminate: (position: Position) => void;
-  onModifyRate: (position: Position) => void;
-  onRemoveFunds: (position: Position) => void;
 }
 
-const ActivePosition = ({
-  position,
-  onWithdraw,
-  onTerminate,
-  onModifyRate,
-  onRemoveFunds,
-  web3Service,
-}: ActivePositionProps) => {
+const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: ActivePositionProps) => {
   const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, id, totalSwaps } = position;
-  const [shouldShowAddForm, setShouldShowAddForm] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
-  const [fromValue, setFromValue] = React.useState('');
-  const classNames = useDeletedStyles();
+  const [shouldShowAddToPosition, setShouldShowAddToPosition] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const availablePairs = useAvailablePairs();
   const addTransaction = useTransactionAdder();
-  const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
+  const [balance] = usePromise<string>(
     web3Service,
     'getBalance',
     [from.address, from.decimals],
-    !from || !web3Service.getAccount() || !shouldShowAddForm
+    !from || !web3Service.getAccount()
   );
-
-  const hasError = fromValue && balance && parseUnits(fromValue, from.decimals).gt(parseUnits(balance, from.decimals));
 
   const [token0, token1] = sortTokens(from.address, to.address);
   const pair = find(availablePairs, { token0, token1 });
 
-  const handleAddFunds = async () => {
+  const handleAddFunds = async (ammountToAdd: string) => {
     try {
       setModalLoading({
         content: (
@@ -162,16 +114,75 @@ const ActivePosition = ({
           </Typography>
         ),
       });
-      const result = await web3Service.addFunds(position, pair as AvailablePair, fromValue);
+      const result = await web3Service.addFunds(position, pair as AvailablePair, ammountToAdd);
       addTransaction(result, {
         type: TRANSACTION_TYPES.ADD_FUNDS_POSITION,
-        typeData: { id, newFunds: fromValue, decimals: from.decimals },
+        typeData: { id, newFunds: ammountToAdd, decimals: from.decimals },
       });
       setModalSuccess({
         hash: result.hash,
       });
-      setShouldShowAddForm(false);
-      setFromValue('');
+    } catch (e) {
+      setModalError({
+        error: e,
+      });
+    }
+  };
+
+  const handleWithdrawFunds = async (ammountToRemove: string) => {
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="subtitle2">
+            <FormattedMessage
+              description="Withdrawing funds from position"
+              defaultMessage="Returning {ammountToRemove} {from} to you"
+              values={{ from: position.from.symbol, ammountToRemove }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.removeFunds(position, pair as AvailablePair, ammountToRemove);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.REMOVE_FUNDS,
+        typeData: { id: position.id, ammountToRemove, decimals: position.from.decimals },
+      });
+      setModalSuccess({
+        hash: result.hash,
+      });
+    } catch (e) {
+      setModalError({
+        error: e,
+      });
+    }
+  };
+
+  const handleModifyRate = async (frequencyValue: string) => {
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="subtitle2">
+            <FormattedMessage
+              description="Modifying frequency for position"
+              defaultMessage="Changing your {from}:{to} position to finish in {frequencyValue} {frequencyType}"
+              values={{
+                from: position.from.symbol,
+                to: position.to.symbol,
+                frequencyValue,
+                frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()],
+              }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.modifyRate(position, pair as AvailablePair, frequencyValue);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.MODIFY_RATE_POSITION,
+        typeData: { id: position.id, newRate: frequencyValue },
+      });
+      setModalSuccess({
+        hash: result.hash,
+      });
     } catch (e) {
       setModalError({
         error: e,
@@ -181,7 +192,22 @@ const ActivePosition = ({
 
   return (
     <StyledCard>
-      <PositionMenu onClose={() => setShouldShowSettings(false)} shouldShow={shouldShowSettings} position={position} />
+      <PositionMenu
+        onClose={() => setShouldShowSettings(false)}
+        shouldShow={shouldShowSettings}
+        position={position}
+        onWithdraw={onWithdraw}
+        onTerminate={onTerminate}
+        onModifyRate={handleModifyRate}
+        onRemoveFunds={handleWithdrawFunds}
+      />
+      <AddToPosition
+        onClose={() => setShouldShowAddToPosition(false)}
+        shouldShow={shouldShowAddToPosition}
+        position={position}
+        balance={balance}
+        onAddFunds={handleAddFunds}
+      />
       <StyledCardContent>
         <StyledCardHeader>
           <StyledCardTitleHeader>
@@ -236,7 +262,7 @@ const ActivePosition = ({
             </Typography>
           </StyledFreqLeft>
           <StyledCardFooterItem>
-            <Button variant="outlined" color="primary" onClick={() => setShouldShowAddForm(true)}>
+            <Button variant="outlined" color="primary" onClick={() => setShouldShowAddToPosition(true)}>
               <Typography variant="body2">
                 <FormattedMessage description="add to position" defaultMessage="Add to position" />
               </Typography>
@@ -244,37 +270,6 @@ const ActivePosition = ({
           </StyledCardFooterItem>
         </StyledCardFooter>
       </StyledCardContent>
-      <Grow in={shouldShowAddForm} mountOnEnter unmountOnExit>
-        <Paper elevation={4}>
-          <Grid container alignItems="center" justify="space-around">
-            <Grid item xs={7}>
-              <TokenInput
-                id="add-from-value"
-                error={hasError ? 'Ammount cannot exceed balance' : ''}
-                value={fromValue}
-                label={from.symbol}
-                onChange={setFromValue}
-                withBalance={!isLoadingBalance}
-                isLoadingBalance={isLoadingBalance}
-                balance={balance}
-              />
-            </Grid>
-            <Grid item xs={3} style={{ marginTop: '8px' }}>
-              <Button
-                size="small"
-                variant="contained"
-                color="primary"
-                disabled={!shouldShowAddForm}
-                onClick={handleAddFunds}
-              >
-                <Typography variant="button">
-                  <FormattedMessage description="Add" defaultMessage="Add" />
-                </Typography>
-              </Button>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Grow>
     </StyledCard>
   );
 };

@@ -147,7 +147,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
           </Button>
         </StyledRecentTransactionsTitleContainer>
         {allOrderedTransactions.map((transaction) => (
-          <StyledTransactionDetail>
+          <StyledTransactionDetail key={transaction.hash}>
             <StyledTransactionDetailText>
               <Link href={buildEtherscanTransaction(transaction.hash)} target="_blank" rel="noreferrer">
                 <Typography variant="body2" component="span">
