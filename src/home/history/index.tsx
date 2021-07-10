@@ -18,17 +18,14 @@ const History = ({ web3Service }: HistoryProps) => {
 
   return (
     <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
-      <Grid item xs={12}>
-        <Typography variant="h3">
-          <FormattedMessage description="Previous positions" defaultMessage="Your previous positions" />
-        </Typography>
-      </Grid>
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">
           {pastPositions
             ? (pastPositions as PositionsRaw).map((position) => (
                 <Grid item xs={12} sm={6} md={3} key={position.id}>
-                  <PastPosition {...{ ...position, from: tokenList[position.from], to: tokenList[position.to] }} />
+                  <PastPosition
+                    position={{ ...position, from: tokenList[position.from], to: tokenList[position.to] }}
+                  />
                 </Grid>
               ))
             : null}

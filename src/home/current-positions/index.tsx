@@ -30,8 +30,6 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
   const [selectedPosition, setSelectedPosition] = React.useState<Position | null>(null);
   const currentBreakPoint = useCurrentBreakpoint();
 
-  console.log(currentBreakPoint);
-
   const positionsPerRow = POSITIONS_PER_ROW[currentBreakPoint];
   const positionsToFill =
     currentPositions.length % positionsPerRow !== 0 ? positionsPerRow - (currentPositions.length % positionsPerRow) : 0;
@@ -65,11 +63,6 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
           />
         </>
       )}
-      <Grid item xs={12}>
-        <Typography variant="h3">
-          <FormattedMessage description="Current positions" defaultMessage="Your current positions" />
-        </Typography>
-      </Grid>
       {/* dont know why I need the 100% width :shrug: */}
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">

@@ -1,67 +1,116 @@
 import * as React from 'react';
-import Card from '@material-ui/core/Card';
 import { formatUnits } from '@ethersproject/units';
+import find from 'lodash/find';
+import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
+import TokenIcon from 'common/token-icon';
+import { Position, Token } from 'types';
 import { STRING_SWAP_INTERVALS } from 'utils/parsing';
-import { Position } from 'types';
+import ArrowRight from 'assets/svg/atom/arrow-right';
 
 const StyledCard = styled(Card)`
   margin: 10px;
+  border-radius: 10px;
+  position: relative;
 `;
 
 const StyledCardContent = styled(CardContent)`
-  padding-bottom: 0px;
+  padding-bottom: 10px !important;
 `;
 
 const StyledCardHeader = styled.div`
   display: flex;
   justify-content: space-between;
+  margin-bottom: 15px;
 `;
 
 const StyledCardTitleHeader = styled.div`
   display: flex;
   align-items: center;
+  *:not(:first-child) {
+    margin-left: 4px;
+    font-weight: 500;
+  }
 `;
 
-const PastPosition = ({ from, to, swapInterval, swapped, totalDeposits, remainingSwaps, withdrawn, id }: Position) => (
-  <StyledCard>
-    <StyledCardContent>
-      <StyledCardHeader>
-        <StyledCardTitleHeader>
-          <Typography variant="h6">{from.symbol}</Typography>
-          <ArrowForwardIcon />
-          <Typography variant="h6">{to.symbol}</Typography>
-        </StyledCardTitleHeader>
-      </StyledCardHeader>
-      <Typography variant="subtitle1">
-        <FormattedMessage
-          description="current exercised"
-          defaultMessage="{exercised} {to} swapped"
-          values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
-        />
-      </Typography>
-      <Typography variant="subtitle2">
-        <FormattedMessage
-          description="current deposited"
-          defaultMessage="{totalDeposits} {from} deposited"
-          values={{ totalDeposits: formatUnits(totalDeposits, from.decimals), from: from.symbol }}
-        />
-      </Typography>
-      <Typography variant="body2" component="p">
-        <FormattedMessage
-          description="ran for"
-          defaultMessage="Ran for {remainingDays} {type}"
-          values={{
-            remainingDays: remainingSwaps.toString(),
-            type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
-          }}
-        />
-      </Typography>
-    </StyledCardContent>
-  </StyledCard>
-);
-export default PastPosition;
+const StyledDetailWrapper = styled.div`
+  margin-bottom: 5px;
+`;
+
+const StyledCardFooter = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+const StyledFreqLeft = styled.div`
+  padding: 8px 11px;
+  border-radius: 5px;
+  background-color: #dceff9;
+  color: #0088cc;
+`;
+
+interface PositionProp extends Omit<Position, 'from' | 'to'> {
+  from: Token;
+  to: Token;
+}
+
+interface ActivePositionProps {
+  position: PositionProp;
+}
+
+const ActivePosition = ({ position }: ActivePositionProps) => {
+  const { from, to, swapInterval, swapped, totalDeposits, totalSwaps } = position;
+
+  return (
+    <StyledCard>
+      <StyledCardContent>
+        <StyledCardHeader>
+          <StyledCardTitleHeader>
+            <TokenIcon token={from} size="16px" />
+            <Typography variant="body1">{from.symbol}</Typography>
+            <ArrowRight size="20px" />
+            <TokenIcon token={to} size="16px" />
+            <Typography variant="body1">{to.symbol}</Typography>
+          </StyledCardTitleHeader>
+        </StyledCardHeader>
+        <StyledDetailWrapper>
+          <Typography variant="body2">
+            <FormattedMessage
+              description="current exercised"
+              defaultMessage="{exercised} {to} swapped"
+              values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
+            />
+          </Typography>
+        </StyledDetailWrapper>
+        <StyledDetailWrapper>
+          <Typography variant="body2">
+            <FormattedMessage
+              description="current deposited"
+              defaultMessage="{remainingLiquidity} {from} deposited"
+              values={{ remainingLiquidity: formatUnits(totalDeposits, from.decimals), from: from.symbol }}
+            />
+          </Typography>
+        </StyledDetailWrapper>
+        <StyledCardFooter>
+          <StyledFreqLeft>
+            <Typography variant="body2">
+              <FormattedMessage
+                description="days to finish"
+                defaultMessage="Ran for {remainingDays} {type}"
+                values={{
+                  remainingDays: totalSwaps.toString(),
+                  type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                }}
+              />
+            </Typography>
+          </StyledFreqLeft>
+        </StyledCardFooter>
+      </StyledCardContent>
+    </StyledCard>
+  );
+};
+export default ActivePosition;

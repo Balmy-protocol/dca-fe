@@ -60,7 +60,7 @@ const StyledProgressWrapper = styled.div`
 
 const StyledCardFooter = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 `;
 

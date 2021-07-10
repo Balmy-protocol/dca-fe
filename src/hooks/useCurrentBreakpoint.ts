@@ -2,20 +2,21 @@ import { useTheme, useMediaQuery } from '@material-ui/core';
 
 function useCurrentBreakpoint() {
   const theme = useTheme();
-  let isBreakpoint = useMediaQuery(theme.breakpoints.only('xs'));
-  if (isBreakpoint) {
+  const isXsBreakpoint = useMediaQuery(theme.breakpoints.only('xs'));
+  const isSmBreakpoint = useMediaQuery(theme.breakpoints.only('sm'));
+  const isMdBreakpoint = useMediaQuery(theme.breakpoints.only('sm'));
+  const isLgBreakpoint = useMediaQuery(theme.breakpoints.only('sm'));
+
+  if (isXsBreakpoint) {
     return 'xs';
   }
-  isBreakpoint = useMediaQuery(theme.breakpoints.only('sm'));
-  if (isBreakpoint) {
+  if (isSmBreakpoint) {
     return 'sm';
   }
-  isBreakpoint = useMediaQuery(theme.breakpoints.only('md'));
-  if (isBreakpoint) {
+  if (isMdBreakpoint) {
     return 'md';
   }
-  isBreakpoint = useMediaQuery(theme.breakpoints.only('lg'));
-  if (isBreakpoint) {
+  if (isLgBreakpoint) {
     return 'lg';
   }
 
