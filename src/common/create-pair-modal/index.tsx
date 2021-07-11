@@ -1,29 +1,46 @@
 import React from 'react';
-import Paper from '@material-ui/core/Paper';
-import { ethers, Signer, BigNumber } from 'ethers';
 import styled from 'styled-components';
-import Button from '@material-ui/core/Button';
+import Button from 'common/button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import LoadingIndicator from 'common/centered-loading-indicator';
 import { Token, Web3Service, EstimatedPairResponse } from 'types';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import usePromise from 'hooks/usePromise';
 import useTransactionModal from 'hooks/useTransactionModal';
-import Link from '@material-ui/core/Link';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
+import { makeStyles } from '@material-ui/core/styles';
 
-const StyledPaper = styled(Paper)`
-  padding: 20px;
-  max-width: 500px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
+const useStyles = makeStyles({
+  paper: {
+    borderRadius: 20,
+  },
+});
+
+const StyledDialogContent = styled(DialogContent)`
+  display: flex;
+  flex-direction: column;
+  padding: 40px 72px !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  \ *:not(:last-child) {
+    margin-bottom: 10px;
+  }
+`;
+
+const StyledDialogActions = styled(DialogActions)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 32px 32px 32px;
+`;
+
+const StyledLoadingIndicatorWrapper = styled.div`
+  margin: 40px;
 `;
 
 interface CreatePairModalProps {
@@ -35,6 +52,7 @@ interface CreatePairModalProps {
 }
 
 const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairModalProps) => {
+  const classes = useStyles();
   const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise<EstimatedPairResponse>(
     web3Service,
     'getEstimatedPairCreation',
@@ -50,7 +68,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
       onCancel();
       setModalLoading({
         content: (
-          <Typography variant="subtitle2">
+          <Typography variant="body1">
             <FormattedMessage
               description="Creating pair"
               defaultMessage="Creating pair for {from} and {to}"
@@ -66,6 +84,13 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
       });
       setModalSuccess({
         hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="pair created"
+            defaultMessage="The pair {from}:{to} has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
+          />
+        ),
       });
     } catch (e) {
       setModalError({
@@ -75,39 +100,72 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
   };
 
   return (
-    <Dialog open={open} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">
-        <FormattedMessage
-          description="Create pair"
-          defaultMessage="Create pair with {from} and {to}"
-          values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
-        />
-      </DialogTitle>
-      <DialogContent>
+    <Dialog
+      open={open}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      fullWidth
+      maxWidth="xs"
+      classes={{ paper: classes.paper }}
+    >
+      <StyledDialogContent>
+        <Typography variant="h6">
+          <FormattedMessage
+            description="Create pair"
+            defaultMessage="Create pair for {from}:{to}"
+            values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
+          />
+        </Typography>
         {isLoadingEstimatedPrice || !estimatedPrice ? (
-          <LoadingIndicator />
+          <>
+            <StyledLoadingIndicatorWrapper>
+              <LoadingIndicator size={70} />
+            </StyledLoadingIndicatorWrapper>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="calculate pair cost"
+                defaultMessage="Calculating the cost of creating this pair"
+              />
+            </Typography>
+          </>
         ) : (
-          <DialogContentText id="alert-dialog-description">
-            <FormattedMessage
-              description="Create pair"
-              defaultMessage="The estimated cost of the operation is {cost} gwei (aprox. {costUsd} USD or {costEth} ETH)"
-              values={{
-                cost: estimatedPrice.gas,
-                costUsd: estimatedPrice.gasUsd.toFixed(2),
-                costEth: estimatedPrice.gasEth,
-              }}
-            />
-          </DialogContentText>
+          <>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="create pair question"
+                defaultMessage="Are you sure you want to create the {from}:{to} currency pair?"
+                values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
+              />
+            </Typography>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="Create pair"
+                defaultMessage="The estimated cost of the operation is {costEth} ETH or around {costUsd} dollars."
+                values={{
+                  cost: estimatedPrice.gas,
+                  costUsd: estimatedPrice.gasUsd.toFixed(2),
+                  costEth: estimatedPrice.gasEth,
+                }}
+              />
+            </Typography>
+          </>
         )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onCancel} color="primary">
-          <FormattedMessage description="Cancel" defaultMessage="Cancel" />
+      </StyledDialogContent>
+      <StyledDialogActions>
+        <Button onClick={onCancel} color="default" variant="outlined" fullWidth>
+          <FormattedMessage description="go back" defaultMessage="Go back" />
         </Button>
-        <Button color="primary" disabled={isLoadingEstimatedPrice} onClick={handleCreatePair} autoFocus>
+        <Button
+          color="secondary"
+          variant="contained"
+          disabled={isLoadingEstimatedPrice}
+          fullWidth
+          onClick={handleCreatePair}
+          autoFocus
+        >
           <FormattedMessage description="Create pair submit" defaultMessage="Create pair" />
         </Button>
-      </DialogActions>
+      </StyledDialogActions>
     </Dialog>
   );
 };

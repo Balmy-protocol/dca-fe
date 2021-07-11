@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@material-ui/core/Button';
+import Button from 'common/button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -8,29 +8,42 @@ import LoadingIndicator from 'common/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import CancelIcon from '@material-ui/icons/Cancel';
 import Link from '@material-ui/core/Link';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import { TRANSACTION_ERRORS } from 'utils/errors';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+  paper: {
+    borderRadius: 20,
+  },
+});
+
+const StyledDialogContent = styled(DialogContent)<{ withActions: boolean }>`
+  display: flex;
+  flex-direction: column;
+  padding: ${(props) => (props.withActions ? '40px 72px 20px 72px' : '40px 72px')} !important;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StyledDialogActions = styled(DialogActions)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 32px 32px 32px;
+`;
 
 const StyledDialog = styled(Dialog)`
   display: flex;
   flex-direction: column;
-  padding: 20px;
   align-items: center;
   justify-content: center;
 `;
 
-const StyledDialogContent = styled(DialogContent)`
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StyledLoadingIndicatorWrapper = styled.div`
-  margin: 40px;
+const StyledLoadingIndicatorWrapper = styled.div<{ withMargin?: boolean }>`
+  ${(props) => props.withMargin && 'margin: 40px;'}
 `;
 
 const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)`
@@ -99,17 +112,18 @@ export const TransactionModal = ({
   onClose,
 }: CreatePairModalProps) => {
   const open = selectedConfig !== 'closed';
+  const classes = useStyles();
 
   const LoadingContent = (
     <>
-      <StyledLoadingIndicatorWrapper>
-        <LoadingIndicator size={70} />
-      </StyledLoadingIndicatorWrapper>
       <Typography variant="h6">
         <FormattedMessage description="Waiting confirmation" defaultMessage="Waiting for confirmation" />
       </Typography>
+      <StyledLoadingIndicatorWrapper withMargin>
+        <LoadingIndicator size={70} />
+      </StyledLoadingIndicatorWrapper>
       {loadingConfig.content}
-      <Typography variant="body2">
+      <Typography variant="body1">
         <FormattedMessage description="Confirm in wallet" defaultMessage="Confirm this transaction in your wallet" />
       </Typography>
     </>
@@ -117,15 +131,15 @@ export const TransactionModal = ({
 
   const SuccessContent = (
     <>
+      <Typography variant="h6">
+        <FormattedMessage description="Operation successfull" defaultMessage="Confirmation success!" />
+      </Typography>
       <StyledLoadingIndicatorWrapper>
         <Typography variant="h1">
           <StyledCheckCircleOutlineIcon fontSize="inherit" />
         </Typography>
       </StyledLoadingIndicatorWrapper>
-      <Typography variant="h6">
-        <FormattedMessage description="Operation successfull" defaultMessage="The operation was successfull!" />
-      </Typography>
-      {successConfig.content}
+      <Typography variant="body1">{successConfig.content}</Typography>
       {successConfig.hash && (
         <Link href={buildEtherscanTransaction(successConfig.hash)} target="_blank" rel="noreferrer">
           <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
@@ -138,14 +152,16 @@ export const TransactionModal = ({
     <>
       <StyledLoadingIndicatorWrapper>
         <Typography variant="h1">
-          <ErrorOutlineIcon color="error" fontSize="inherit" />
+          <CancelIcon color="error" fontSize="inherit" />
         </Typography>
       </StyledLoadingIndicatorWrapper>
-      <Typography variant="h6">
-        <FormattedMessage description="Operation erro" defaultMessage="Error encountered" />
-      </Typography>
+      {!TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] && (
+        <Typography variant="h6">
+          <FormattedMessage description="Operation erro" defaultMessage="Error encountered" />
+        </Typography>
+      )}
       {errorConfig.content}
-      <Typography variant="subtitle2">
+      <Typography variant="body1">
         {TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] || (
           <FormattedMessage
             description="unkown_error"
@@ -157,18 +173,25 @@ export const TransactionModal = ({
     </>
   );
   return (
-    <StyledDialog open={open} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-      <StyledDialogContent>
+    <StyledDialog
+      open={open}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      fullWidth
+      maxWidth="xs"
+      classes={{ paper: classes.paper }}
+    >
+      <StyledDialogContent withActions={selectedConfig === 'success' || selectedConfig === 'error'}>
         {selectedConfig === 'loading' && LoadingContent}
         {selectedConfig === 'success' && SuccessContent}
         {selectedConfig === 'error' && ErrorContent}
       </StyledDialogContent>
       {selectedConfig === 'success' || selectedConfig === 'error' ? (
-        <DialogActions>
-          <Button onClick={onClose} variant="contained" color="primary" size="large" style={{ width: '100%' }}>
+        <StyledDialogActions>
+          <Button onClick={onClose} variant="outlined" color="default" size="large" style={{ width: '100%' }}>
             <FormattedMessage description="Close" defaultMessage="Close" />
           </Button>
-        </DialogActions>
+        </StyledDialogActions>
       ) : null}
     </StyledDialog>
   );

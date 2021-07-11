@@ -130,7 +130,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
     try {
       setModalLoading({
         content: (
-          <Typography variant="subtitle2">
+          <Typography variant="body1">
             <FormattedMessage
               description="Adding funds"
               defaultMessage="Adding funds to {from}:{to} position"
@@ -146,6 +146,16 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
       });
       setModalSuccess({
         hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="adding funds success"
+            defaultMessage="Adding funds to {from}:{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+            }}
+          />
+        ),
       });
     } catch (e) {
       setModalError({
@@ -158,7 +168,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
     try {
       setModalLoading({
         content: (
-          <Typography variant="subtitle2">
+          <Typography variant="body1">
             <FormattedMessage
               description="Withdrawing funds from position"
               defaultMessage="Returning {ammountToRemove} {from} to you"
@@ -174,6 +184,16 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
       });
       setModalSuccess({
         hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="Withdrawing funds from position success"
+            defaultMessage="Returning {ammountToRemove} {from} to you has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+            }}
+          />
+        ),
       });
     } catch (e) {
       setModalError({
@@ -186,7 +206,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
     try {
       setModalLoading({
         content: (
-          <Typography variant="subtitle2">
+          <Typography variant="body1">
             <FormattedMessage
               description="Modifying frequency for position"
               defaultMessage="Changing your {from}:{to} position to finish in {frequencyValue} {frequencyType}"
@@ -207,6 +227,18 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
       });
       setModalSuccess({
         hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="success modify frequency for position"
+            defaultMessage="Changing the frequency of your {from}:{to} position to finish in {frequencyValue} {frequencyType} has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+              frequencyValue,
+              frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()],
+            }}
+          />
+        ),
       });
     } catch (e) {
       setModalError({

@@ -168,7 +168,7 @@ SwapProps) => {
     try {
       setModalLoading({
         content: (
-          <Typography variant="subtitle2">
+          <Typography variant="body1">
             <FormattedMessage
               description="approving token"
               defaultMessage="Approving use of {from}"
@@ -181,6 +181,13 @@ SwapProps) => {
       addTransaction(result, { type: TRANSACTION_TYPES.APPROVE_TOKEN, typeData: { id: from, pair: existingPair?.id } });
       setModalSuccess({
         hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="success approving token"
+            defaultMessage="Approving use of {from} has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{ from: (from && tokenList[from].symbol) || '' }}
+          />
+        ),
       });
     } catch (e) {
       setModalError({
@@ -193,7 +200,7 @@ SwapProps) => {
     try {
       setModalLoading({
         content: (
-          <Typography variant="subtitle2">
+          <Typography variant="body1">
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"
@@ -224,6 +231,13 @@ SwapProps) => {
       });
       setModalSuccess({
         hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="success creating position"
+            defaultMessage="Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{ from: (from && tokenList[from].symbol) || '', to: (to && tokenList[to].symbol) || '' }}
+          />
+        ),
       });
 
       setFromValue('');

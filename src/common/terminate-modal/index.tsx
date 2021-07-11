@@ -2,31 +2,44 @@ import React from 'react';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import { formatUnits } from '@ethersproject/units';
-import Button from '@material-ui/core/Button';
+import Button from 'common/button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import { AvailablePair, Position } from 'types';
 import { FormattedMessage } from 'react-intl';
 import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { sortTokens } from 'utils/parsing';
-import ErrorIcon from '@material-ui/icons/Error';
 import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
+import { makeStyles } from '@material-ui/core/styles';
 
-const StyledIconWrapper = styled.div`
-  margin: 20px;
+const useStyles = makeStyles({
+  paper: {
+    borderRadius: 20,
+  },
+});
+
+const StyledDialogContent = styled(DialogContent)`
   display: flex;
+  flex-direction: column;
+  padding: 40px 72px !important;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  \ *:not(:last-child) {
+    margin-bottom: 10px;
+  }
 `;
 
-const StyledErrorIcon = styled(ErrorIcon)`
-  color: ${(props) => props.theme.palette.error.dark};
+const StyledDialogActions = styled(DialogActions)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 32px 32px 32px;
 `;
 
 interface WithdrawModalProps {
@@ -36,6 +49,7 @@ interface WithdrawModalProps {
 }
 
 const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
+  const classes = useStyles();
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
   const availablePairs = useAvailablePairs();
@@ -48,7 +62,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
       onCancel();
       setModalLoading({
         content: (
-          <Typography variant="subtitle2">
+          <Typography variant="body1">
             <FormattedMessage description="Terminating position" defaultMessage="Terminating your position" />
           </Typography>
         ),
@@ -57,6 +71,16 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
       addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="position termination success"
+            defaultMessage="Your {from}:{to} position termination has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+            }}
+          />
+        ),
       });
     } catch (e) {
       setModalError({
@@ -66,22 +90,16 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
   };
 
   return (
-    <Dialog open={open} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-      <DialogContent>
-        <StyledIconWrapper>
-          <Typography variant="h2">
-            <StyledErrorIcon fontSize="inherit" />
-          </Typography>
-        </StyledIconWrapper>
-        <DialogContentText id="alert-dialog-description">
-          <Typography variant="h4">
-            <FormattedMessage
-              description="Terminate warning"
-              defaultMessage="Are you sure you want to terminate this position?"
-            />
-          </Typography>
-        </DialogContentText>
-        <DialogContentText id="alert-dialog-description">
+    <Dialog open={open} fullWidth maxWidth="xs" classes={{ paper: classes.paper }}>
+      <StyledDialogContent>
+        <Typography variant="h6">
+          <FormattedMessage
+            description="terminate title"
+            defaultMessage="Terminate {from}:{to} position"
+            values={{ from: position.from.symbol, to: position.to.symbol }}
+          />
+        </Typography>
+        <Typography variant="body1">
           <FormattedMessage
             description="terminate description"
             defaultMessage="Swaps are no longer going to be executed. You will get back {from} {fromSymbol} and {to} {toSymbol}"
@@ -92,16 +110,16 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
               toSymbol: position.to.symbol,
             }}
           />
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onCancel} color="primary">
-          <FormattedMessage description="Cancel" defaultMessage="Cancel" />
+        </Typography>
+      </StyledDialogContent>
+      <StyledDialogActions>
+        <Button onClick={onCancel} color="default" variant="outlined" fullWidth>
+          <FormattedMessage description="go back" defaultMessage="Go back" />
         </Button>
-        <Button color="secondary" variant="contained" onClick={handleTerminate} autoFocus>
+        <Button color="warning" variant="contained" fullWidth onClick={handleTerminate} autoFocus>
           <FormattedMessage description="Terminate" defaultMessage="Terminate" />
         </Button>
-      </DialogActions>
+      </StyledDialogActions>
     </Dialog>
   );
 };
