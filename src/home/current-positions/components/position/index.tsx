@@ -271,7 +271,10 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
           </Typography>
         </StyledDetailWrapper>
         <StyledProgressWrapper>
-          <LinearProgress variant="determinate" value={100 * (remainingSwaps.toNumber() / totalSwaps.toNumber())} />
+          <LinearProgress
+            variant="determinate"
+            value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
+          />
         </StyledProgressWrapper>
         <StyledCardFooter>
           {hasNoFunds ? (
