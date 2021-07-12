@@ -11,6 +11,7 @@ import {
   NewPairTypeData,
   PositionRaw,
   ApproveTokenTypeData,
+  ResetPositionTypeData,
 } from 'types';
 import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -76,7 +77,21 @@ function useBuildTransactionDetail() {
             } position`;
           }
           break;
-
+        case TRANSACTION_TYPES.ADD_FUNDS_POSITION:
+          const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
+          const resettedPosition = find(positions, { id: resetPositionTypeData.id });
+          if (resettedPosition) {
+            message = `Add ${resetPositionTypeData.newFunds} ${
+              tokenList[(resettedPosition as PositionRaw).from].symbol
+            } to your ${tokenList[(resettedPosition as PositionRaw).from].symbol}:${
+              tokenList[(resettedPosition as PositionRaw).to].symbol
+            } position and set it to run for ${resetPositionTypeData.newSwaps} ${
+              STRING_SWAP_INTERVALS[
+                (resettedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
+              ]
+            }`;
+          }
+          break;
         case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
           const modifyRatePositionTypeData = tx.typeData as ModifyRatePositionTypeData;
           const modifiedPosition = find(positions, { id: modifyRatePositionTypeData.id });

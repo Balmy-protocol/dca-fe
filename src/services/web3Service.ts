@@ -32,6 +32,7 @@ import {
   NewPairTypeData,
   RemoveFundsTypeData,
   TokenList,
+  ResetPositionTypeData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
@@ -493,6 +494,16 @@ export default class Web3Service {
     return factory.modifyRateAndSwaps(position.dcaId, newRate, position.remainingSwaps);
   }
 
+  resetPosition(position: Position, pair: AvailablePair, newDeposit: string, newSwaps: string) {
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+
+    const newRate = parseUnits(newDeposit, position.from.decimals)
+      .add(position.remainingLiquidity)
+      .div(BigNumber.from(newSwaps));
+
+    return factory.modifyRateAndSwaps(position.dcaId, newRate, newSwaps);
+  }
+
   modifyRate(position: Position, pair: AvailablePair, newSwaps: string) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
@@ -566,6 +577,15 @@ export default class Web3Service {
         this.currentPositions[addFundsTypeData.id].remainingLiquidity = this.currentPositions[
           addFundsTypeData.id
         ].remainingLiquidity.add(parseUnits(addFundsTypeData.newFunds, addFundsTypeData.decimals));
+        break;
+      case TRANSACTION_TYPES.RESET_POSITION:
+        const resetPositionTypeData = transaction.typeData as ResetPositionTypeData;
+        this.currentPositions[resetPositionTypeData.id].remainingLiquidity = this.currentPositions[
+          resetPositionTypeData.id
+        ].remainingLiquidity.add(parseUnits(resetPositionTypeData.newFunds, resetPositionTypeData.decimals));
+        this.currentPositions[resetPositionTypeData.id].remainingSwaps = this.currentPositions[
+          resetPositionTypeData.id
+        ].remainingSwaps.add(BigNumber.from(resetPositionTypeData.newSwaps));
         break;
       case TRANSACTION_TYPES.REMOVE_FUNDS:
         const removeFundsTypeData = transaction.typeData as RemoveFundsTypeData;

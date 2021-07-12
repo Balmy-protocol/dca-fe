@@ -23,6 +23,7 @@ import Cog from 'assets/svg/atom/cog';
 import PositionMenu from 'common/position-menu';
 import AddToPosition from 'common/add-to-position-settings';
 import { BigNumber } from 'ethers';
+import ResetPosition from 'common/reset-position-settings';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -109,6 +110,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
   const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, id, totalSwaps } = position;
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [shouldShowAddToPosition, setShouldShowAddToPosition] = React.useState(false);
+  const [shouldShowReset, setShouldShowReset] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const availablePairs = useAvailablePairs();
   const addTransaction = useTransactionAdder();
@@ -125,6 +127,53 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
   const isStale = calculateStale(pair?.lastExecutedAt || 0, swapInterval, pair?.createdAt || 0);
+
+  const handleResetPosition = async (ammountToAdd: string, frequencyValue: string) => {
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="body1">
+            <FormattedMessage
+              description="setting swap"
+              defaultMessage="Adding {ammountToAdd} {from} to {from}:{to} position and setting it to run for {frequencyValue} {type}"
+              values={{
+                ammountToAdd,
+                frequencyValue,
+                from: from.symbol,
+                to: to.symbol,
+                type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+              }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.resetPosition(position, pair as AvailablePair, ammountToAdd, frequencyValue);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.RESET_POSITION,
+        typeData: { id, newFunds: ammountToAdd, decimals: from.decimals, newSwaps: frequencyValue },
+      });
+      setModalSuccess({
+        hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="resetting position success"
+            defaultMessage="Adding {ammountToAdd} {from} to {from}:{to} position and setting it to run for {frequencyValue} {type} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              ammountToAdd,
+              frequencyValue,
+              from: from.symbol,
+              to: to.symbol,
+              type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+            }}
+          />
+        ),
+      });
+    } catch (e) {
+      setModalError({
+        error: e,
+      });
+    }
+  };
 
   const handleAddFunds = async (ammountToAdd: string) => {
     try {
@@ -265,6 +314,13 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
         balance={balance}
         onAddFunds={handleAddFunds}
       />
+      <ResetPosition
+        onClose={() => setShouldShowReset(false)}
+        shouldShow={shouldShowReset}
+        position={position}
+        balance={balance}
+        onResetPosition={handleResetPosition}
+      />
       <StyledCardContent>
         <StyledCardHeader>
           <StyledCardTitleHeader>
@@ -336,7 +392,11 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
             </StyledFreqLeft>
           )}
           <StyledCardFooterItem>
-            <Button variant="outlined" color="primary" onClick={() => setShouldShowAddToPosition(true)}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => (hasNoFunds ? setShouldShowReset(true) : setShouldShowAddToPosition(true))}
+            >
               <Typography variant="body2">
                 <FormattedMessage description="add to position" defaultMessage="Add to position" />
               </Typography>

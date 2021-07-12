@@ -27,7 +27,7 @@ const StyledDialogContent = styled(DialogContent)`
   align-items: center;
   justify-content: center;
   text-align: center;
-  \ *:not(:last-child) {
+  *:not(:last-child) {
     margin-bottom: 10px;
   }
 `;
