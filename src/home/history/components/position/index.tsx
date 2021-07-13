@@ -10,6 +10,7 @@ import TokenIcon from 'common/token-icon';
 import { Position, Token } from 'types';
 import { STRING_SWAP_INTERVALS } from 'utils/parsing';
 import ArrowRight from 'assets/svg/atom/arrow-right';
+import { formatCurrencyAmount } from 'utils/currency';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -82,7 +83,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
             <FormattedMessage
               description="current exercised"
               defaultMessage="{exercised} {to} swapped"
-              values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
+              values={{ exercised: formatCurrencyAmount(swapped, to), to: to.symbol }}
             />
           </Typography>
         </StyledDetailWrapper>
@@ -91,7 +92,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
             <FormattedMessage
               description="current deposited"
               defaultMessage="{remainingLiquidity} {from} deposited"
-              values={{ remainingLiquidity: formatUnits(totalDeposits, from.decimals), from: from.symbol }}
+              values={{ remainingLiquidity: formatCurrencyAmount(totalDeposits, from), from: from.symbol }}
             />
           </Typography>
         </StyledDetailWrapper>

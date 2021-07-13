@@ -9,6 +9,8 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import TokenInput from 'common/token-input';
+import { formatCurrencyAmount } from 'utils/currency';
+import { BigNumber } from 'ethers';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -43,15 +45,12 @@ interface AddToPositionProps {
   onClose: () => void;
   shouldShow: boolean;
   onAddFunds: (ammountToAdd: string) => void;
-  balance: string;
+  balance: BigNumber;
 }
 
 const AddToPosition = ({ onClose, shouldShow, onAddFunds, position, balance }: AddToPositionProps) => {
   const [fromValue, setFromValue] = React.useState('');
-  const hasError =
-    fromValue &&
-    balance &&
-    parseUnits(fromValue, position.from.decimals).gt(parseUnits(balance, position.from.decimals));
+  const hasError = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
 
   const handleAddFunds = () => {
     onAddFunds(fromValue);
@@ -83,12 +82,13 @@ const AddToPosition = ({ onClose, shouldShow, onAddFunds, position, balance }: A
             withBalance={true}
             isLoadingBalance={false}
             balance={balance}
+            token={position.from}
           />
           <Typography variant="body2">
             <FormattedMessage
               description="in position"
               defaultMessage="In wallet: {balance} {symbol}"
-              values={{ balance: balance, symbol: position.from.symbol }}
+              values={{ balance: formatCurrencyAmount(balance, position.from, 6), symbol: position.from.symbol }}
             />
           </Typography>
         </StyledInputContainer>

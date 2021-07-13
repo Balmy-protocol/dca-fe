@@ -341,7 +341,7 @@ export default class Web3Service {
 
     const erc20 = new ethers.Contract(address, ERC20Interface, this.client);
 
-    return erc20.balanceOf(this.getAccount()).then((balance: string) => formatUnits(BigNumber.from(balance), decimals));
+    return erc20.balanceOf(this.getAccount());
   }
 
   getEstimatedPairCreation(token0?: string, token1?: string) {
@@ -375,7 +375,7 @@ export default class Web3Service {
       return {
         gas: formatUnits(gas, 'gwei'),
         gasUsd: parseFloat(formatEther(gas)) * ethPrice,
-        gasEth: formatEther(gas),
+        gasEth: gas,
       };
     });
   }

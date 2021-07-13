@@ -13,6 +13,8 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import { makeStyles } from '@material-ui/core/styles';
+import { formatCurrencyAmount } from 'utils/currency';
+import { ETH } from 'mocks/tokens';
 
 const useStyles = makeStyles({
   paper: {
@@ -144,7 +146,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
                 values={{
                   cost: estimatedPrice.gas,
                   costUsd: estimatedPrice.gasUsd.toFixed(2),
-                  costEth: estimatedPrice.gasEth,
+                  costEth: formatCurrencyAmount(estimatedPrice.gasEth, ETH, 4),
                 }}
               />
             </Typography>

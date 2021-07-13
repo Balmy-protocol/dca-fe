@@ -15,6 +15,7 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import FrequencyInput from 'common/frequency-input';
+import { formatCurrencyAmount } from 'utils/currency';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -56,7 +57,7 @@ interface ResetPositionProps {
   onClose: () => void;
   shouldShow: boolean;
   onResetPosition: (ammountToAdd: string, frequencyValue: string) => void;
-  balance: string;
+  balance: BigNumber;
 }
 
 const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance }: ResetPositionProps) => {
@@ -66,10 +67,7 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
   const frequencyType = STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS];
 
   const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
-  const hasErrorCurrency =
-    fromValue &&
-    balance &&
-    parseUnits(fromValue, position.from.decimals).gt(parseUnits(balance, position.from.decimals));
+  const hasErrorCurrency = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
 
   const hasError = activeStep === 0 ? hasErrorCurrency : hasErrorFrequency;
   const isEmpty = activeStep === 0 ? !fromValue : !frequencyValue;
@@ -122,13 +120,14 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
                   onChange={setFromValue}
                   withBalance={true}
                   isLoadingBalance={false}
+                  token={position.from}
                   balance={balance}
                 />
                 <Typography variant="body2">
                   <FormattedMessage
                     description="in position"
                     defaultMessage="In wallet: {balance} {symbol}"
-                    values={{ balance: balance, symbol: position.from.symbol }}
+                    values={{ balance: formatCurrencyAmount(balance, position.from, 6), symbol: position.from.symbol }}
                   />
                 </Typography>
               </>

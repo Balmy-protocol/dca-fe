@@ -24,6 +24,7 @@ import PositionMenu from 'common/position-menu';
 import AddToPosition from 'common/add-to-position-settings';
 import { BigNumber } from 'ethers';
 import ResetPosition from 'common/reset-position-settings';
+import { formatCurrencyAmount } from 'utils/currency';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -114,7 +115,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const availablePairs = useAvailablePairs();
   const addTransaction = useTransactionAdder();
-  const [balance] = usePromise<string>(
+  const [balance] = usePromise<BigNumber>(
     web3Service,
     'getBalance',
     [from.address, from.decimals],
@@ -345,7 +346,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
             <FormattedMessage
               description="current exercised"
               defaultMessage="{exercised} {to} swapped"
-              values={{ exercised: formatUnits(swapped, to.decimals), to: to.symbol }}
+              values={{ exercised: formatCurrencyAmount(swapped, to), to: to.symbol }}
             />
           </Typography>
         </StyledDetailWrapper>
@@ -354,7 +355,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
             <FormattedMessage
               description="current remaining"
               defaultMessage="{remainingLiquidity} {from} remain"
-              values={{ remainingLiquidity: formatUnits(remainingLiquidity, from.decimals), from: from.symbol }}
+              values={{ remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from), from: from.symbol }}
             />
           </Typography>
         </StyledDetailWrapper>

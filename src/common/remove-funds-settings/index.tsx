@@ -9,6 +9,7 @@ import Button from 'common/button';
 import Typography from '@material-ui/core/Typography';
 import ArrowLeft from 'assets/svg/atom/arrow-left';
 import { BigNumber } from 'ethers';
+import { formatCurrencyAmount } from 'utils/currency';
 
 const StyledHeader = styled.div`
   display: flex;
@@ -59,14 +60,15 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
           onChange={setFromValue}
           withBalance={true}
           isLoadingBalance={false}
-          balance={formatUnits(position.remainingLiquidity, position.from.decimals)}
+          balance={position.remainingLiquidity}
+          token={position.from}
         />
         <Typography variant="body2">
           <FormattedMessage
             description="in position"
             defaultMessage="In position: {balance} {symbol}"
             values={{
-              balance: formatUnits(position.remainingLiquidity, position.from.decimals),
+              balance: formatCurrencyAmount(position.remainingLiquidity, position.from, 4),
               symbol: position.from.symbol,
             }}
           />

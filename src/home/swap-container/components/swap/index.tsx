@@ -33,6 +33,7 @@ import CreatePairModal from 'common/create-pair-modal';
 import { NETWORKS, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
+import { formatCurrencyAmount } from 'utils/currency';
 import {
   useTransactionAdder,
   useHasPendingApproval,
@@ -126,7 +127,7 @@ SwapProps) => {
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
-  const [balance, isLoadingBalance, balanceErrors] = usePromise<string>(
+  const [balance, isLoadingBalance, balanceErrors] = usePromise<BigNumber>(
     web3Service,
     'getBalance',
     [from, (tokenList[from] && tokenList[from].decimals) || 18],
@@ -258,10 +259,7 @@ SwapProps) => {
     setTo(from);
   };
 
-  const hasError =
-    fromValue &&
-    balance &&
-    parseUnits(fromValue, tokenList[from].decimals).gt(parseUnits(balance, tokenList[from].decimals));
+  const hasError = fromValue && balance && parseUnits(fromValue, tokenList[from].decimals).gt(balance);
 
   const networkError =
     !isLoadingNetwork &&
@@ -322,13 +320,19 @@ SwapProps) => {
       />
       <Grid container>
         <Grid container alignItems="center" justify="space-between">
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <Typography variant="h6">
               <FormattedMessage description="You pay" defaultMessage="You pay" />
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={3}>
-            <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
+          <Grid item xs={12} md={6}>
+            <Typography variant="body2">
+              <FormattedMessage
+                description="in position"
+                defaultMessage="In wallet: {balance} {symbol}"
+                values={{ balance: formatCurrencyAmount(balance, tokenList[from], 2), symbol: tokenList[from].symbol }}
+              />
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
             <TokenInput
@@ -340,7 +344,11 @@ SwapProps) => {
               withBalance={!isLoadingBalance}
               isLoadingBalance={isLoadingBalance}
               balance={balance}
+              token={tokenList[from]}
             />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
           </Grid>
         </Grid>
         <Divider>
@@ -349,16 +357,13 @@ SwapProps) => {
           </IconButton>
         </Divider>
         <Grid container alignItems="center" justify="space-between">
-          <Grid item xs={12}>
-            <Typography variant="h6">
-              <FormattedMessage description="You get" defaultMessage="You get" />
+          <Grid item xs={12} sm={6}>
+            <Typography variant="body1">
+              <FormattedMessage description="will be swapped for" defaultMessage="Will be swapped for" />
             </Typography>
           </Grid>
           <Grid item xs={12} sm={3}>
             <TokenButton token={tokenList[to]} onClick={() => startSelectingCoin(to)} />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TokenInput id="to-value" value={toValue} disabled label={tokenList[to]?.symbol} onChange={setToValue} />
           </Grid>
         </Grid>
         <Grid container alignItems="center" justify="space-between">

@@ -186,7 +186,7 @@ export type GetAllowanceResponse = string;
 export interface EstimatedPairResponse {
   gas: string;
   gasUsd: number;
-  gasEth: string;
+  gasEth: BigNumber;
 }
 
 interface TransactionReceiptLog {
