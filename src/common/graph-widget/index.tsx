@@ -4,14 +4,17 @@ import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
 import { Chart } from 'react-charts';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import Grid from '@material-ui/core/Grid';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import { minimalAppleTabsStylesHook } from 'common/tabs';
 import getPool from 'graphql/getPool.graphql';
-import getTokenPrices from 'graphql/getTokenPrices.graphql';
 import { Token } from 'types';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
+import { toSignificantFromBigDecimal } from 'utils/currency';
 
 interface GraphWidgetProps {
   from: Token;
@@ -25,7 +28,65 @@ interface Price {
   token1Price: string;
 }
 
-type graphToken = Token | { address: string; symbol: string };
+interface PoolsResponseData {
+  pools: {
+    id: string;
+    poolDayData: Price[];
+  }[];
+}
+
+type graphToken = Token | { address: string; symbol: string; decimals: number };
+
+const StyledPaper = styled(Paper)`
+  padding: 8px;
+  position: relative;
+  border-radius: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const StyledTitleContainer = styled(Paper)`
+  padding: 25px;
+  border-radius: 10px;
+  flex-grow: 0;
+  background-color: #f6f6f6;
+  border: 1px solid #f5f5f5;
+  margin-bottom: 15px;
+`;
+
+const StyledGraphContainer = styled(Paper)`
+  padding: 17px;
+  flex-grow: 1;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+`;
+
+const StyledGraph = styled.div`
+  flex-grow: 1;
+`;
+
+const StyledGraphAxis = styled.div`
+  height: 0px;
+  border: 1px dotted #b8b8b8;
+  flex-grow: 0;
+  margin-top: 20px;
+`;
+
+const StyledGraphAxisLabels = styled.div`
+  flex-grow: 0;
+  margin-top: 7px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const StyledTabsContainer = styled(Paper)`
+  padding: 17px;
+  flex-grow: 0;
+  display: flex;
+`;
 
 const StyledCenteredWrapper = styled.div`
   display: flex;
@@ -34,11 +95,54 @@ const StyledCenteredWrapper = styled.div`
   justify-content: center;
 `;
 
+const mockedData = [
+  {
+    date: 1620604800,
+    id: '0x40fde2952a0674a3e77707af270af09800657293-18757',
+    token0Price: '46.39432408662232590979904512692854',
+    token1Price: '0.02155436079061979941377177773122095',
+  },
+  {
+    date: 1620518400,
+    id: '0x40fde2952a0674a3e77707af270af09800657293-18756',
+    token0Price: '2907.03864404869264090740198005893',
+    token1Price: '0.0003439926751738254801792666997970276',
+  },
+  {
+    date: 1620432000,
+    id: '0x40fde2952a0674a3e77707af270af09800657293-18755',
+    token0Price: '4.295170087228260817199609179566408',
+    token1Price: '0.2328196508383944694387373637776135',
+  },
+  {
+    date: 1620345600,
+    id: '0x40fde2952a0674a3e77707af270af09800657293-18754',
+    token0Price: '4.295170087228260817199609179566408',
+    token1Price: '0.2328196508383944694387373637776135',
+  },
+  {
+    date: 1620259200,
+    id: '0x40fde2952a0674a3e77707af270af09800657293-18753',
+    token0Price: '37.10419708975148470304056210791087',
+    token1Price: '0.02695112894051031917403075175128912',
+  },
+  {
+    date: 1620172800,
+    id: '0x40fde2952a0674a3e77707af270af09800657293-18752',
+    token0Price: '115.3018787973154413619826736887575',
+    token1Price: '0.008672885562930505082580673864334106',
+  },
+];
+
+const PERIODS = [14, 30];
+
 const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
-  let tokenA: graphToken = { address: '', symbol: '' };
-  let tokenB: graphToken = { address: '', symbol: '' };
-  let poolId = null;
+  let tokenA: graphToken = { address: '', symbol: '', decimals: 1 };
+  let tokenB: graphToken = { address: '', symbol: '', decimals: 1 };
   let prices: Price[] = [];
+  const [tabIndex, setTabIndex] = React.useState(0);
+  const tabsStyles = minimalAppleTabsStylesHook.useTabs();
+  const tabItemStyles = minimalAppleTabsStylesHook.useTabItem();
 
   if (to && from) {
     if (from.address < to.address) {
@@ -50,28 +154,21 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
     }
   }
 
-  const { loading: loadingPool, data } = useQuery<{ pools: { id: string }[] }>(getPool, {
-    variables: { tokenA: tokenA.address, tokenB: tokenB.address },
-    skip: true,
-    // skip: !(from && to),
+  const { loading: loadingPool, data } = useQuery<PoolsResponseData>(getPool, {
+    variables: {
+      tokenA: tokenA.address,
+      tokenB: tokenB.address,
+      from: parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),
+    },
+    skip: !(from && to),
     client,
   });
 
   const { pools } = data || {};
 
-  if (pools && pools.length) {
-    poolId = pools[0].id;
-  }
-
-  const { loading: loadingPrices, data: dataPrices } = useQuery<{ poolDayDatas: Price[] }>(getTokenPrices, {
-    variables: { pool: poolId, from: parseInt(DateTime.now().minus({ days: 14 }).toFormat('X'), 10) },
-    skip: true,
-    // skip: !poolId,
-    client,
-  });
-
-  if (dataPrices && dataPrices.poolDayDatas) {
-    prices = [...dataPrices.poolDayDatas];
+  if (pools && pools[0] && pools[0].poolDayData) {
+    prices = [...pools[0].poolDayData];
+    prices = mockedData;
     prices.reverse();
   }
 
@@ -79,7 +176,10 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
     () => [
       {
         label: 'Series 1',
-        data: prices.map(({ date, token1Price }) => [DateTime.fromSeconds(date).toFormat('MMM d t'), token1Price]),
+        data: prices.map(({ date, token1Price }) => [
+          DateTime.fromSeconds(date).toFormat('MMM d t'),
+          toSignificantFromBigDecimal(token1Price, 6),
+        ]),
       },
     ],
     [prices]
@@ -87,7 +187,7 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
 
   const axes = React.useMemo(
     () => [
-      { primary: true, type: 'ordinal', position: 'bottom' },
+      { primary: true, type: 'ordinal', position: 'bottom', show: false },
       { type: 'linear', position: 'left', show: false },
     ],
     []
@@ -104,11 +204,29 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
     [tokenA, tokenB]
   );
 
-  const isLoading = loadingPool || loadingPrices;
+  const isLoading = loadingPool;
   const noData = prices.length === 0;
 
   return (
-    <Grid container spacing={2} direction="column">
+    <StyledPaper elevation={3}>
+      <StyledTitleContainer elevation={0}>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="graph description"
+            defaultMessage="{from}/{to} Chart"
+            values={{
+              from: tokenA.symbol,
+              to: tokenB.symbol,
+            }}
+          />
+        </Typography>
+      </StyledTitleContainer>
+      <StyledTabsContainer elevation={0}>
+        <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
+          <Tab classes={tabItemStyles} disableRipple label={'1W'} />
+          <Tab classes={tabItemStyles} disableRipple label={'1M'} />
+        </Tabs>
+      </StyledTabsContainer>
       {isLoading ? (
         <CenteredLoadingIndicator />
       ) : (
@@ -123,9 +241,8 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
               </Typography>
             </StyledCenteredWrapper>
           ) : (
-            <>
-              <Typography variant="h4">{`${tokenA.symbol}/${tokenB.symbol}`}</Typography>
-              <div style={{ flex: 1 }}>
+            <StyledGraphContainer elevation={0}>
+              <StyledGraph>
                 <AutoSizer>
                   {({ height, width }) => (
                     <div style={{ height, width }}>
@@ -133,12 +250,29 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
                     </div>
                   )}
                 </AutoSizer>
-              </div>
-            </>
+              </StyledGraph>
+              <StyledGraphAxis />
+              <StyledGraphAxisLabels>
+                <Typography variant="caption">
+                  {DateTime.fromSeconds(prices[0].date).toLocaleString({
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </Typography>
+                <Typography variant="caption">
+                  {DateTime.fromSeconds(prices[prices.length - 1].date).toLocaleString({
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </Typography>
+              </StyledGraphAxisLabels>
+            </StyledGraphContainer>
           )}
         </>
       )}
-    </Grid>
+    </StyledPaper>
   );
 };
 

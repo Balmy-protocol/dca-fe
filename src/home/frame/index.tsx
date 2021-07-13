@@ -15,11 +15,6 @@ interface HomeFrameProps {
   isLoading: boolean;
 }
 
-const StyledContainer = styled(Container)<HomeFrameProps>`
-  height: ${(props) => (props.isLoading ? '100%' : 'auto')};
-  background-color: #e9e3ec;
-`;
-
 const StyledGridContainer = styled(Grid)<HomeFrameProps>`
   height: ${(props) => (props.isLoading ? `calc(100% + ${(props?.spacing || 0) * 4}px)` : 'auto')}; ;
 `;

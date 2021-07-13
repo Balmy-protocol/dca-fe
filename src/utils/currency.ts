@@ -16,15 +16,20 @@ const toSignificant = (
   const numerator = JSBI.BigInt(currency);
   const denominator = JSBI.BigInt(decimalScale);
 
-  // const decimalScale = JSBI.exponentiate(
-  //   JSBI.BigInt(10),
-  //   JSBI.BigInt(decimals)
-  // )
   Decimal.set({
     precision: significantDigits + 1,
     rounding: Decimal.ROUND_DOWN,
   });
   const quotient = new Decimal(numerator.toString()).div(denominator.toString()).toSignificantDigits(significantDigits);
+  return quotient.toFormat(quotient.decimalPlaces(), format);
+};
+
+export const toSignificantFromBigDecimal = (
+  currency: string,
+  significantDigits: number = 6,
+  format: object = { groupSeparator: '' }
+): string => {
+  const quotient = new Decimal(currency).toSignificantDigits(significantDigits);
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 

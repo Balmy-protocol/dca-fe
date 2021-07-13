@@ -33,7 +33,7 @@ const SwapContainer = () => {
       <WalletContext.Consumer>
         {({ graphPricesClient, web3Service }) => (
           <>
-            <Grid item xs={9} md={6}>
+            <Grid item xs={9} md={5}>
               <Swap
                 from={from}
                 to={to}
@@ -53,7 +53,7 @@ const SwapContainer = () => {
               />
             </Grid>
             <Hidden mdDown>
-              <Grid item xs={6} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
+              <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
                 <GraphWidget from={tokenList[from]} to={tokenList[to]} client={graphPricesClient} />
               </Grid>
             </Hidden>
