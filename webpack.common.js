@@ -14,6 +14,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Production',
       template: './public/index.html',
+      favicon: './public/favicon.ico',
       inject: false,
     }),
     new webpack.ProvidePlugin({

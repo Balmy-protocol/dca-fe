@@ -25,6 +25,18 @@ const StyledButtonContainer = styled.div`
   justify-content: center;
 `;
 
+const StyledButton = styled(Button)`
+  border-radius: 30px;
+  padding: 11px 16px;
+  color: #333333;
+  background-color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 1px 3px 1px rgba(60, 64, 67, 0.149);
+  :hover {
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.302), 0 4px 8px 3px rgba(60, 64, 67, 0.149);
+  }
+`;
+
 interface ConnectWalletButtonProps {
   web3Service: Web3Service;
   isLoading: boolean;
@@ -57,16 +69,15 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
             color="secondary"
             component="div"
           >
-            <Button
+            <StyledButton
               aria-controls="customized-menu"
               aria-haspopup="true"
-              variant="contained"
               color="primary"
               onClick={onOpen}
               style={{ maxWidth: '200px', textTransform: 'none' }}
             >
               <Typography noWrap>{web3Service.getAccount()}</Typography>
-            </Button>
+            </StyledButton>
           </Badge>
           <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />
         </>

@@ -30,44 +30,42 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const tabItemStyles = appleTabsStylesHook.useTabItem();
 
   return (
-    <StyledContainer isLoading={isLoading}>
-      <StyledGridContainer container spacing={8} isLoading={isLoading}>
-        {isLoading ? (
-          <Grid item xs={12} style={{ display: 'flex' }}>
-            <CenteredLoadingIndicator size={70} />
-          </Grid>
-        ) : (
-          <>
-            <WalletContext.Consumer>
-              {({ web3Service }) => (
-                <>
-                  <Grid item xs={12}>
-                    <SwapContainer />
-                  </Grid>
-                  {web3Service.getAccount() && (
-                    <>
-                      <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px' }}>
-                        <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
-                          <Tab classes={tabItemStyles} disableRipple label={'Open positions'} />
-                          <Tab classes={tabItemStyles} disableRipple label={'Past positions'} />
-                        </Tabs>
-                      </Grid>
-                      <Grid item xs={12} style={{ display: 'flex', paddingTop: '0px' }}>
-                        {tabIndex === 0 ? (
-                          <CurrentPositions web3Service={web3Service} />
-                        ) : (
-                          <History web3Service={web3Service} />
-                        )}
-                      </Grid>
-                    </>
-                  )}
-                </>
-              )}
-            </WalletContext.Consumer>
-          </>
-        )}
-      </StyledGridContainer>
-    </StyledContainer>
+    <StyledGridContainer container spacing={8} isLoading={isLoading}>
+      {isLoading ? (
+        <Grid item xs={12} style={{ display: 'flex' }}>
+          <CenteredLoadingIndicator size={70} />
+        </Grid>
+      ) : (
+        <>
+          <WalletContext.Consumer>
+            {({ web3Service }) => (
+              <>
+                <Grid item xs={12}>
+                  <SwapContainer />
+                </Grid>
+                {web3Service.getAccount() && (
+                  <>
+                    <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px' }}>
+                      <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
+                        <Tab classes={tabItemStyles} disableRipple label={'Open positions'} />
+                        <Tab classes={tabItemStyles} disableRipple label={'Past positions'} />
+                      </Tabs>
+                    </Grid>
+                    <Grid item xs={12} style={{ display: 'flex', paddingTop: '0px' }}>
+                      {tabIndex === 0 ? (
+                        <CurrentPositions web3Service={web3Service} />
+                      ) : (
+                        <History web3Service={web3Service} />
+                      )}
+                    </Grid>
+                  </>
+                )}
+              </>
+            )}
+          </WalletContext.Consumer>
+        </>
+      )}
+    </StyledGridContainer>
   );
 };
 export default HomeFrame;
