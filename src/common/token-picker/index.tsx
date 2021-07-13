@@ -8,18 +8,51 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import ListItem from '@material-ui/core/ListItem';
+import Divider from '@material-ui/core/Divider';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { useJupiterListItemStyles } from '@mui-treasury/styles/listItem/jupiter';
 import InputBase from '@material-ui/core/InputBase';
 import Search from '@material-ui/icons/Search';
-import { useSearchInputStyles } from '@mui-treasury/styles/input/search';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
+import { makeStyles } from '@material-ui/core/styles';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
+interface PartialTheme {
+  spacing: any;
+  palette: any;
+}
+const searchStyles = ({ spacing, palette }: PartialTheme) => {
+  // ATTENTION!
+  // you can customize some important variables here!!
+  const backgroundColor = palette.grey[100];
+  const space = spacing(1); // default = 8;
+  const borderRadius = 30;
+  const iconColor = palette.grey[500];
+  // end of variables
+  return {
+    root: {
+      backgroundColor,
+      borderRadius,
+      padding: `${space}px ${space * 2}px`,
+    },
+    input: {
+      fontSize: 16,
+    },
+    adornedStart: {
+      '& > *:first-child': {
+        // * is the icon at the beginning of input
+        fontSize: 20,
+        color: iconColor,
+        marginRight: space,
+      },
+    },
+  };
+};
+const useSearchInputStyles = makeStyles(searchStyles);
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -29,12 +62,43 @@ const StyledOverlay = styled.div`
   right: 0;
   z-index: 99;
   background-color: white;
-  padding: 20px;
+  padding: 32px;
   display: flex;
 `;
 
 const StyledChip = styled(Chip)`
   margin-right: 5px;
+`;
+
+const StyledListItemIcon = styled(ListItemIcon)`
+  min-width: 0px;
+  margin-right: 16px;
+`;
+
+const StyledListItem = styled(ListItem)`
+  padding-left: 0px;
+`;
+
+const StyledList = styled(List)`
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+  --scrollbarBG: #ffffff;
+  --thumbBG: #90a4ae;
+  ::-webkit-scrollbar {
+    width: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbarBG);
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--thumbBG);
+    border-radius: 6px;
+    border: 3px solid var(--scrollbarBG);
+  }
+`;
+
+const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
+  margin-top: ${(props) => props.customSpacing || 0}px;
 `;
 
 interface RowData {
@@ -65,10 +129,10 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps
   const classes = useJupiterListItemStyles();
 
   return (
-    <ListItem classes={classes} button onClick={() => onClick(tokenKeys[index])} style={style}>
-      <ListItemIcon>
-        <TokenIcon token={tokenList[tokenKeys[index]]} />
-      </ListItemIcon>
+    <StyledListItem classes={classes} button onClick={() => onClick(tokenKeys[index])} style={style}>
+      <StyledListItemIcon>
+        <TokenIcon size="32px" token={tokenList[tokenKeys[index]]} />
+      </StyledListItemIcon>
       <ListItemText disableTypography>
         <span>
           <Typography variant="body1" component="span">
@@ -82,7 +146,7 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps
           </Typography>
         </span>
       </ListItemText>
-    </ListItem>
+    </StyledListItem>
   );
 };
 
@@ -131,7 +195,7 @@ const TokenPicker = ({
           aria-label="close"
           size="small"
           onClick={onClose}
-          style={{ position: 'absolute', top: '20px', right: '20px' }}
+          style={{ position: 'absolute', top: '32px', right: '32px' }}
         >
           <CloseIcon fontSize="inherit" />
         </IconButton>
@@ -145,42 +209,52 @@ const TokenPicker = ({
               )}
             </Typography>
           </Grid>
-          <Grid item xs={12} style={{ flexBasis: 'auto' }}>
+          <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
             <InputBase
               classes={inputStyles}
-              placeholder={'Search...'}
+              placeholder={'Search by ETH, Ethereum or Ether'}
               startAdornment={<Search />}
               fullWidth
               onChange={(evt) => setSearch(evt.currentTarget.value)}
             />
-          </Grid>
+          </StyledGrid>
           {!!memoizedUsedTokens.length && (
-            <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-              {memoizedUsedTokens.map((token) => (
-                <StyledChip
-                  icon={<TokenIcon token={tokenList[token]} isInChip />}
-                  label={tokenList[token].symbol}
-                  onClick={() => handleItemSelected(token)}
-                  key={tokenList[token].address}
-                />
-              ))}
-            </Grid>
+            <>
+              <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
+                <Typography variant="caption">
+                  <FormattedMessage description="your tokens" defaultMessage="Tokens in your wallet" />
+                </Typography>
+              </StyledGrid>
+              <Grid item xs={12} style={{ flexBasis: 'auto' }}>
+                {memoizedUsedTokens.map((token) => (
+                  <StyledChip
+                    icon={<TokenIcon size="24px" token={tokenList[token]} isInChip />}
+                    label={tokenList[token].symbol}
+                    onClick={() => handleItemSelected(token)}
+                    key={tokenList[token].address}
+                  />
+                ))}
+              </Grid>
+              <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
+                <Divider />
+              </StyledGrid>
+            </>
           )}
-          <Grid item xs={12} style={{ flexGrow: 1 }}>
+          <StyledGrid item xs={12} customSpacing={12} style={{ flexGrow: 1 }}>
             <AutoSizer>
               {({ height, width }) => (
-                <List
+                <StyledList
                   height={height}
                   itemCount={memoizedTokenKeys.length}
-                  itemSize={35}
+                  itemSize={52}
                   width={width}
                   itemData={{ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }}
                 >
                   {Row}
-                </List>
+                </StyledList>
               )}
             </AutoSizer>
-          </Grid>
+          </StyledGrid>
         </Grid>
       </StyledOverlay>
     </Slide>

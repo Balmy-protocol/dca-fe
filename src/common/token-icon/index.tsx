@@ -3,6 +3,7 @@ import Avatar from '@material-ui/core/Avatar';
 import { Token } from 'types';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import CryptoIcons from 'assets/svg/color';
+import HelpIcon from '@material-ui/icons/Help';
 
 interface TokenButtonProps {
   token?: Token;
@@ -21,12 +22,7 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
       style={{ fontSize: realSize }}
     />
   ) : (
-    <Avatar
-      style={{ height: realSize, width: realSize }}
-      alt={token?.name}
-      src={token?.logoURI}
-      className={isInChip ? 'MuiChip-avatar' : ''}
-    />
+    <HelpIcon style={{ fontSize: realSize }} className={isInChip ? 'MuiChip-icon' : ''} />
   );
 };
 

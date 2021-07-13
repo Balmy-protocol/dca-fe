@@ -67,7 +67,7 @@ function useBuildTransactionMessages() {
             } position`;
           }
           break;
-        case TRANSACTION_TYPES.ADD_FUNDS_POSITION:
+        case TRANSACTION_TYPES.RESET_POSITION:
           const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
           const resettedPosition = find(positions, { id: resetPositionTypeData.id });
           if (resettedPosition) {
