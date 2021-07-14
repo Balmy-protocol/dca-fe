@@ -55,7 +55,7 @@ const TokenInput = ({ id, onChange, value, disabled, withBalance, balance, token
                 variant="contained"
                 size="small"
                 onClick={() => onChange(formatUnits(balance, token.decimals))}
-                style={{ marginBottom: '5px', minWidth: '41px' }}
+                style={{ marginBottom: '8px', minWidth: '41px' }}
               >
                 <FormattedMessage description="max" defaultMessage="MAX" />
               </Button>

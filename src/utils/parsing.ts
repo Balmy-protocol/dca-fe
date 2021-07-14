@@ -18,10 +18,22 @@ export const SWAP_INTERVALS = {
 };
 
 export const STRING_SWAP_INTERVALS = {
-  [FIVE_MINUTES_IN_SECONDS.toString()]: '5 minutes',
-  [DAY_IN_SECONDS.toString()]: 'days',
-  [WEEK_IN_SECONDS.toString()]: 'weeks',
-  [MONTH_IN_SECONDS.toString()]: 'months',
+  [FIVE_MINUTES_IN_SECONDS.toString()]: {
+    plural: '5 minutes',
+    adverb: '5 minutely',
+  },
+  [DAY_IN_SECONDS.toString()]: {
+    plural: 'days',
+    adverb: 'daily',
+  },
+  [WEEK_IN_SECONDS.toString()]: {
+    plural: 'weeks',
+    adverb: 'weekly',
+  },
+  [MONTH_IN_SECONDS.toString()]: {
+    plural: 'months',
+    adverb: 'monthly',
+  },
 };
 
 export const sortTokens = (tokenA: string, tokenB: string) => {

@@ -22,7 +22,7 @@ const StyledButtonContainer = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 `;
 
 const StyledButton = styled(Button)`
@@ -58,9 +58,7 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
 
   return (
     <StyledButtonContainer>
-      {isLoading ? (
-        <CircularProgress color="secondary" />
-      ) : (
+      {!isLoading && (
         <>
           <Badge
             badgeContent={

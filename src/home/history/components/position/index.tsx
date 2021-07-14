@@ -104,7 +104,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                 defaultMessage="Ran for {remainingDays} {type}"
                 values={{
                   remainingDays: totalSwaps.toString(),
-                  type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                  type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
                 }}
               />
             </Typography>

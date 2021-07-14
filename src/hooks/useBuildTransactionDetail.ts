@@ -88,7 +88,7 @@ function useBuildTransactionDetail() {
             } position and set it to run for ${resetPositionTypeData.newSwaps} ${
               STRING_SWAP_INTERVALS[
                 (resettedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ]
+              ].plural
             }`;
           }
           break;
@@ -101,7 +101,7 @@ function useBuildTransactionDetail() {
             } position to run for ${modifyRatePositionTypeData.newRate} ${
               STRING_SWAP_INTERVALS[
                 (modifiedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ]
+              ].plural
             }`;
           }
           break;

@@ -142,7 +142,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
                 frequencyValue,
                 from: from.symbol,
                 to: to.symbol,
-                type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
               }}
             />
           </Typography>
@@ -164,7 +164,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
               frequencyValue,
               from: from.symbol,
               to: to.symbol,
-              type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+              type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
             }}
           />
         ),
@@ -264,7 +264,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
                 from: position.from.symbol,
                 to: position.to.symbol,
                 frequencyValue,
-                frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()],
+                frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].plural,
               }}
             />
           </Typography>
@@ -285,7 +285,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
               from: position.from.symbol,
               to: position.to.symbol,
               frequencyValue,
-              frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()],
+              frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].plural,
             }}
           />
         ),
@@ -386,7 +386,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
                   defaultMessage="{remainingDays} {type} left"
                   values={{
                     remainingDays: remainingSwaps.toString(),
-                    type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                    type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
                   }}
                 />
               </Typography>

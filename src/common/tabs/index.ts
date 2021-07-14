@@ -2,23 +2,23 @@ import { createStyles, Theme } from '@material-ui/core/styles';
 import makeStyles from '@material-ui/styles/makeStyles';
 
 export const tabsStyles =
-  (isMinimal: boolean = false) =>
+  (isFullWidth: boolean = false) =>
   ({ palette, breakpoints }: Theme) =>
     createStyles({
       root: {
         backgroundColor: palette.type === 'light' ? '#eee' : palette.divider,
-        borderRadius: isMinimal ? 50 : 20,
+        borderRadius: 50,
         minHeight: 44,
         padding: 5,
       },
       flexContainer: {
-        display: 'inline-flex',
+        display: isFullWidth ? 'flex' : 'inline-flex',
         position: 'relative',
         zIndex: 1,
       },
       scroller: {
         [breakpoints.up('md')]: {
-          padding: isMinimal ? '0px' : '0 8px',
+          padding: '0px 5px',
         },
       },
       indicator: {
@@ -43,7 +43,7 @@ export const tabsStyles =
     });
 
 export const tabItemStyles =
-  (isMinimal: boolean = false) =>
+  (isFullWidth: boolean = false) =>
   ({ palette, breakpoints }: Theme) =>
     createStyles({
       root: {
@@ -51,11 +51,12 @@ export const tabItemStyles =
           opacity: 1,
         },
         minHeight: 44,
-        minWidth: isMinimal ? 50 : 96,
+        minWidth: 50,
         [breakpoints.up('md')]: {
-          minWidth: isMinimal ? 50 : 120,
+          minWidth: 50,
         },
-        padding: isMinimal ? '2px 8px' : '6px 12px',
+        padding: '2px 8px',
+        flexGrow: isFullWidth ? 1 : 0,
       },
       wrapper: {
         // zIndex: 2,
@@ -66,11 +67,11 @@ export const tabItemStyles =
     });
 
 export const appleTabsStylesHook = {
-  useTabs: makeStyles(createStyles(tabsStyles(false))),
-  useTabItem: makeStyles(createStyles(tabItemStyles(false))),
+  useTabs: makeStyles(createStyles(tabsStyles())),
+  useTabItem: makeStyles(createStyles(tabItemStyles())),
 };
 
-export const minimalAppleTabsStylesHook = {
+export const maximalAppleTabsStylesHook = {
   useTabs: makeStyles(createStyles(tabsStyles(true))),
   useTabItem: makeStyles(createStyles(tabItemStyles(true))),
 };

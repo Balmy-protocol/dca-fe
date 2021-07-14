@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { minimalAppleTabsStylesHook } from 'common/tabs';
+import { appleTabsStylesHook } from 'common/tabs';
 import getPool from 'graphql/getPool.graphql';
 import { Token } from 'types';
 import { DateTime } from 'luxon';
@@ -141,8 +141,8 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   let tokenB: graphToken = { address: '', symbol: '', decimals: 1 };
   let prices: Price[] = [];
   const [tabIndex, setTabIndex] = React.useState(0);
-  const tabsStyles = minimalAppleTabsStylesHook.useTabs();
-  const tabItemStyles = minimalAppleTabsStylesHook.useTabItem();
+  const tabsStyles = appleTabsStylesHook.useTabs();
+  const tabItemStyles = appleTabsStylesHook.useTabItem();
 
   if (to && from) {
     if (from.address < to.address) {

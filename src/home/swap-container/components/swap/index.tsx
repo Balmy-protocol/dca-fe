@@ -21,7 +21,7 @@ import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-input';
 import FrequencyTypeInput from 'common/frequency-type-input';
 import { SwapContextValue } from '../../SwapContext';
-import Button from '@material-ui/core/Button';
+import Button from 'common/button';
 import Tooltip from '@material-ui/core/Tooltip';
 import Divider from 'common/divider-wit-content';
 import IconButton from '@material-ui/core/IconButton';
@@ -51,29 +51,56 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 
 const StyledPaper = styled(Paper)`
-  padding: 20px;
-  max-width: 500px;
+  padding: 8px;
   position: relative;
   overflow: hidden;
   border-radius: 20px;
+  flex-grow: 1;
 `;
 
-const StyledWarningContainer = styled(Paper)<{ in: boolean }>`
-  border-radius: 3px;
-  background-color: ${(props) => props.theme.palette.warning.light};
-  display: ${(props) => (props.in ? 'flex' : 'none')};
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
+const StyledSwapContainer = styled.div`
+  display: flex;
+  background-color: #f6f6f6;
+  border-radius: 20px;
+  padding: 0px;
+`;
+
+const StyledFromContainer = styled(Grid)`
+  padding: 24px 24px 32px 24px;
+`;
+
+const StyledToContainer = styled(Grid)`
+  background-color: #e3e3e3;
+  padding: 24px;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  position: relative;
+`;
+
+const StyledSettingsContainer = styled.div`
+  padding: 24px;
 `;
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
 `;
 
-const StyledWarningIcon = styled(WarningIcon)`
-  color: ${(props) => props.theme.palette.warning.dark};
+const StyledSettingContainer = styled.div`
+  margin-top: 32px;
+`;
+
+const StyledButton = styled(Button)`
+  padding: 18px 22px;
+  border-radius: 12px;
+`;
+
+const StyledSwapTokenButton = styled(IconButton)`
+  position: absolute;
+  border: 3px solid #e3e3e3;
+  background-color: #ffffff;
+  left: 50%;
+  top: 24px;
+  transform: translateX(-50%) translateY(-100%);
 `;
 
 const frequencyTypeOptions = [
@@ -108,11 +135,9 @@ const Swap = ({
   from,
   to,
   fromValue,
-  toValue,
   setFrom,
   setTo,
   setFromValue,
-  setToValue,
   tokenList,
   setFrequencyType,
   setFrequencyValue,
@@ -298,6 +323,95 @@ SwapProps) => {
 
   const ignoreValues = [from, to];
 
+  const CreatePairButton = (
+    <StyledButton
+      size="large"
+      variant="contained"
+      fullWidth
+      color="warning"
+      disabled={!!pairExists || hasPendingPairCreation}
+      onClick={() => setShouldShowPairModal(true)}
+    >
+      <Typography variant="body1">
+        {hasPendingPairCreation ? (
+          <FormattedMessage description="pair being created" defaultMessage="This pair is being created" />
+        ) : (
+          <FormattedMessage
+            description="create pair button"
+            defaultMessage="Create {from}/{to} pair"
+            values={{
+              from: (tokenList[from] && tokenList[from].symbol) || '',
+              to: (tokenList[to] && tokenList[to].symbol) || '',
+            }}
+          />
+        )}
+      </Typography>
+    </StyledButton>
+  );
+  const NotConnectedButton = (
+    <StyledButton size="large" variant="contained" fullWidth color="error" disabled>
+      <Typography variant="body1">
+        <FormattedMessage description="wrong chainId" defaultMessage="You are not currently connected to the mainnet" />
+      </Typography>
+    </StyledButton>
+  );
+
+  const ApproveTokenButton = (
+    <StyledButton
+      size="large"
+      variant="contained"
+      fullWidth
+      color="primary"
+      disabled={!!isApproved || hasPendingApproval}
+      onClick={handleApproveToken}
+    >
+      <Typography variant="body1">
+        {hasPendingApproval ? (
+          <FormattedMessage
+            description="waiting for approval"
+            defaultMessage="Waiting for your {token} to be approved"
+            values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
+          />
+        ) : (
+          <FormattedMessage
+            description="Allow us to use your coin"
+            defaultMessage="Approve {token}"
+            values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
+          />
+        )}
+      </Typography>
+      <Tooltip title="You only have to do this once per token" arrow placement="top">
+        <StyledHelpOutlineIcon fontSize="small" />
+      </Tooltip>
+    </StyledButton>
+  );
+
+  const StartPositionButton = (
+    <StyledButton
+      size="large"
+      variant="contained"
+      disabled={shouldDisableButton}
+      color="secondary"
+      fullWidth
+      onClick={handleSwap}
+    >
+      <Typography variant="body1">
+        <FormattedMessage description="create position" defaultMessage="Create position" />
+      </Typography>
+    </StyledButton>
+  );
+
+  let ButtonToShow;
+  if (networkError) {
+    ButtonToShow = NotConnectedButton;
+  } else if (!pairExists) {
+    ButtonToShow = CreatePairButton;
+  } else if (!isApproved) {
+    ButtonToShow = ApproveTokenButton;
+  } else {
+    ButtonToShow = StartPositionButton;
+  }
+
   return (
     <StyledPaper elevation={3}>
       <CreatePairModal
@@ -318,175 +432,111 @@ SwapProps) => {
         ignoreValues={ignoreValues}
         availableFrom={tokenList[from].pairableTokens}
       />
-      <Grid container>
-        <Grid container alignItems="center" justify="space-between">
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6">
-              <FormattedMessage description="You pay" defaultMessage="You pay" />
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Typography variant="body2">
-              <FormattedMessage
-                description="in position"
-                defaultMessage="In wallet: {balance} {symbol}"
-                values={{ balance: formatCurrencyAmount(balance, tokenList[from], 2), symbol: tokenList[from].symbol }}
-              />
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TokenInput
-              id="from-value"
-              error={hasError ? 'Ammount cannot exceed balance' : ''}
-              value={fromValue}
-              label={tokenList[from]?.symbol}
-              onChange={setFromValue}
-              withBalance={!isLoadingBalance}
-              isLoadingBalance={isLoadingBalance}
-              balance={balance}
-              token={tokenList[from]}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
-          </Grid>
-        </Grid>
-        <Divider>
-          <IconButton onClick={toggleFromTo}>
-            <SwapVertIcon />
-          </IconButton>
-        </Divider>
-        <Grid container alignItems="center" justify="space-between">
-          <Grid item xs={12} sm={6}>
-            <Typography variant="body1">
-              <FormattedMessage description="will be swapped for" defaultMessage="Will be swapped for" />
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <TokenButton token={tokenList[to]} onClick={() => startSelectingCoin(to)} />
-          </Grid>
-        </Grid>
-        <Grid container alignItems="center" justify="space-between">
-          <Grid item xs={12}>
-            <Typography variant="h6">
-              <FormattedMessage description="Set for" defaultMessage="Set for" />
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <FrequencyInput id="frequency-value" value={frequencyValue} label="" onChange={setFrequencyValue} />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FrequencyTypeInput
-              id="frequency-type-value"
-              options={frequencyTypeOptions}
-              selected={frequencyType}
-              onChange={setFrequencyType}
-            />
-          </Grid>
-        </Grid>
-        <Grid container alignItems="stretch" spacing={2}>
-          {!pairExists ? (
-            <Grid item xs={12}>
-              <Grow in={!pairExists}>
-                <StyledWarningContainer elevation={0} in={!pairExists}>
-                  <StyledWarningIcon />
-                  <Typography variant="body1">
-                    <FormattedMessage
-                      description="This pair does not exist yet"
-                      defaultMessage="This pair does not exist yet"
-                    />
-                  </Typography>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    disabled={!!pairExists || hasPendingPairCreation}
-                    onClick={() => setShouldShowPairModal(true)}
-                    color="primary"
-                  >
-                    <Typography variant="button">
-                      {hasPendingPairCreation ? (
-                        <FormattedMessage
-                          description="pair being created"
-                          defaultMessage="This pair is being created"
-                        />
-                      ) : (
-                        <FormattedMessage
-                          description="Be the first to create it"
-                          defaultMessage="Be the first to create it"
-                        />
-                      )}
-                    </Typography>
-                  </Button>
-                </StyledWarningContainer>
-              </Grow>
-            </Grid>
-          ) : null}
-          {networkError ? (
-            <Grid item xs={12}>
-              <Grow in={networkError}>
-                <StyledWarningContainer elevation={0} in={networkError}>
-                  <StyledWarningIcon />
-                  <Typography variant="body1">
-                    <FormattedMessage
-                      description="wrong chainId"
-                      defaultMessage="You are not currently connected to the mainnet"
-                    />
-                  </Typography>
-                </StyledWarningContainer>
-              </Grow>
-            </Grid>
-          ) : null}
-          {!isApproved ? (
-            <Grid item xs={12}>
-              <Grow in={!isApproved}>
-                <StyledWarningContainer elevation={0} in={!isApproved}>
-                  <Button
-                    size="large"
-                    variant="contained"
-                    disabled={!!isApproved || hasPendingApproval}
-                    color="primary"
-                    style={{ width: '100%' }}
-                    onClick={handleApproveToken}
-                  >
-                    <Typography variant="button">
-                      {hasPendingApproval ? (
-                        <FormattedMessage
-                          description="waiting for approval"
-                          defaultMessage="Waiting for your {token} to be approved"
-                          values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
-                        />
-                      ) : (
-                        <FormattedMessage
-                          description="Allow us to use your coin"
-                          defaultMessage="Allow us to use your {token}"
-                          values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
-                        />
-                      )}
-                    </Typography>
-                    <Tooltip title="You only have to do this once per token" arrow placement="top">
-                      <StyledHelpOutlineIcon fontSize="small" />
-                    </Tooltip>
-                  </Button>
-                </StyledWarningContainer>
-              </Grow>
-            </Grid>
-          ) : null}
-          <Grid item xs={12}>
-            <Button
-              size="large"
-              variant="contained"
-              disabled={shouldDisableButton}
-              color="primary"
-              style={{ width: '100%' }}
-              onClick={handleSwap}
-            >
-              <Typography variant="button">
-                <FormattedMessage description="Start trading" defaultMessage="Start trading" />
+      <StyledSwapContainer>
+        <Grid container>
+          <StyledFromContainer container alignItems="center" justify="space-between">
+            <Grid item xs={12} md={6}>
+              <Typography variant="body1">
+                <FormattedMessage description="You pay" defaultMessage="You pay" />
               </Typography>
-            </Button>
+            </Grid>
+            <Grid item xs={12} md={6} style={{ textAlign: 'right' }}>
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="in position"
+                  defaultMessage="In wallet: {balance} {symbol}"
+                  values={{
+                    balance: formatCurrencyAmount(balance, tokenList[from], 4),
+                    symbol: tokenList[from].symbol,
+                  }}
+                />
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TokenInput
+                id="from-value"
+                error={hasError ? 'Ammount cannot exceed balance' : ''}
+                value={fromValue}
+                label={tokenList[from]?.symbol}
+                onChange={setFromValue}
+                withBalance={!isLoadingBalance}
+                isLoadingBalance={isLoadingBalance}
+                balance={balance}
+                token={tokenList[from]}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Grid container alignItems="center" justify="flex-end">
+                <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
+              </Grid>
+            </Grid>
+          </StyledFromContainer>
+          <StyledToContainer container alignItems="center" justify="space-between">
+            <StyledSwapTokenButton onClick={toggleFromTo}>
+              <SwapVertIcon />
+            </StyledSwapTokenButton>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="body1">
+                <FormattedMessage description="will be swapped for" defaultMessage="Will be swapped for" />
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Grid container alignItems="center" justify="flex-end">
+                <TokenButton token={tokenList[to]} onClick={() => startSelectingCoin(to)} />
+              </Grid>
+            </Grid>
+          </StyledToContainer>
+        </Grid>
+      </StyledSwapContainer>
+      <StyledSettingsContainer>
+        <Grid container>
+          <Grid item xs={12}>
+            <Grid container alignItems="center" justify="space-between">
+              <Grid item xs={12}>
+                <Typography variant="body1">
+                  <FormattedMessage description="executes once" defaultMessage="Executes once" />
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <FrequencyTypeInput
+                  id="frequency-type-value"
+                  options={frequencyTypeOptions}
+                  selected={frequencyType}
+                  onChange={setFrequencyType}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <StyledSettingContainer>
+              <Grid container alignItems="center" justify="space-between">
+                <Grid item xs={12}>
+                  <Typography variant="body1">
+                    <FormattedMessage description="completes in" defaultMessage="Completes in" />
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <FrequencyInput
+                    id="frequency-value"
+                    value={frequencyValue}
+                    label={frequencyType.toString()}
+                    onChange={setFrequencyValue}
+                  />
+                </Grid>
+              </Grid>
+            </StyledSettingContainer>
+          </Grid>
+          <Grid item xs={12}>
+            <StyledSettingContainer>
+              <Grid container alignItems="stretch" spacing={2}>
+                <Grid item xs={12}>
+                  {ButtonToShow}
+                </Grid>
+              </Grid>
+            </StyledSettingContainer>
           </Grid>
         </Grid>
-      </Grid>
+      </StyledSettingsContainer>
     </StyledPaper>
   );
 };

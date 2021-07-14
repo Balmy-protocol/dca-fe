@@ -38,7 +38,8 @@ interface ModifyRateSettingsProps {
 
 const ModifyRateSettings = ({ position, onModifyRate, onClose }: ModifyRateSettingsProps) => {
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
-  const frequencyType = STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS];
+  const frequencyType =
+    STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural;
 
   const hasError = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 

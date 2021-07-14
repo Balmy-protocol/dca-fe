@@ -78,7 +78,7 @@ function useBuildTransactionMessages() {
             } position and it has been set to run for ${resetPositionTypeData.newSwaps} ${
               STRING_SWAP_INTERVALS[
                 (resettedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ]
+              ].plural
             }`;
           }
           break;
@@ -103,7 +103,7 @@ function useBuildTransactionMessages() {
             } position has now been set to run for ${modifyRatePositionTypeData.newRate} ${
               STRING_SWAP_INTERVALS[
                 (modifiedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ]
+              ].plural
             }`;
           }
           break;

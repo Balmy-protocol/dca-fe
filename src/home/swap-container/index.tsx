@@ -16,7 +16,6 @@ const SwapContainer = () => {
   const [from, setFrom] = React.useState((routeParams && routeParams.from) || WETH.address);
   const [to, setTo] = React.useState((routeParams && routeParams.to) || DAI.address);
   const [fromValue, setFromValue] = React.useState('');
-  const [toValue, setToValue] = React.useState('');
   const [frequencyType, setFrequencyType] = React.useState(DAY_IN_SECONDS);
   const [frequencyValue, setFrequencyValue] = React.useState('1');
   const tokenList = useTokenList();
@@ -44,12 +43,9 @@ const SwapContainer = () => {
                 setFrequencyType={setFrequencyType}
                 setFrequencyValue={setFrequencyValue}
                 fromValue={fromValue}
-                toValue={toValue}
                 setFromValue={setFromValue}
-                setToValue={setToValue}
                 web3Service={web3Service}
                 tokenList={tokenList}
-                // availablePairs={availablePairs}
               />
             </Grid>
             <Hidden mdDown>

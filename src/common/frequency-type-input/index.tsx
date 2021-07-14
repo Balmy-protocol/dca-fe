@@ -1,16 +1,18 @@
 import React from 'react';
-import { useMinimalSelectStyles } from '@mui-treasury/styles/select/minimal';
-import Select from '@material-ui/core/Select';
-import { MenuProps } from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import capitalize from 'lodash/capitalize';
+import findIndex from 'lodash/findIndex';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import { maximalAppleTabsStylesHook } from 'common/tabs';
 import { BigNumber } from 'ethers';
 import { SetStateCallback } from 'types';
 
 interface selectOption {
   value: any;
-  label: string;
+  label: {
+    plural: string;
+    adverb: string;
+  };
 }
 
 type selectOptionsType = selectOption[];
@@ -23,51 +25,20 @@ interface minimalSelectProps {
 }
 
 const MinimalSelect = ({ options, selected, onChange, id }: minimalSelectProps) => {
-  const handleChange = (event: React.ChangeEvent<{ value: BigNumber }>) => {
-    onChange(event.target.value);
-  };
-
-  const minimalSelectClasses = useMinimalSelectStyles();
-
-  const iconComponent: React.FC<{ className: string }> = ({ className }: { className: string }) => {
-    return <ExpandMoreIcon className={className + ' ' + minimalSelectClasses.icon} />;
-  };
-
-  // moves the menu below the select input
-  const menuProps: Partial<MenuProps> = {
-    classes: {
-      paper: minimalSelectClasses.paper,
-      list: minimalSelectClasses.list,
-    },
-    anchorOrigin: {
-      vertical: 'bottom',
-      horizontal: 'left',
-    },
-    transformOrigin: {
-      vertical: 'top',
-      horizontal: 'left',
-    },
-    getContentAnchorEl: null,
+  const [tabIndex, setTabIndex] = React.useState(findIndex(options, { value: selected }));
+  const tabsStyles = maximalAppleTabsStylesHook.useTabs();
+  const tabItemStyles = maximalAppleTabsStylesHook.useTabItem();
+  const handleChange = (index: number) => {
+    setTabIndex(index);
+    onChange(options[index].value);
   };
 
   return (
-    <FormControl>
-      <Select
-        disableUnderline
-        classes={{ root: minimalSelectClasses.select }}
-        IconComponent={iconComponent}
-        value={selected}
-        MenuProps={menuProps}
-        onChange={handleChange}
-        id={id}
-      >
-        {options.map(({ value, label }: selectOption) => (
-          <MenuItem key={value} value={value}>
-            {label}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => handleChange(index)}>
+      {options.map((frequencyTypeOption: selectOption) => (
+        <Tab classes={tabItemStyles} disableRipple label={capitalize(frequencyTypeOption.label.adverb)} />
+      ))}
+    </Tabs>
   );
 };
 

@@ -169,9 +169,14 @@ const TokenPicker = ({
   );
   const inputStyles = useSearchInputStyles();
 
+  const handleOnClose = () => {
+    setSearch('');
+    onClose();
+  };
+
   const handleItemSelected = (item: string) => {
     onChange(item);
-    onClose();
+    handleOnClose();
   };
 
   tokenKeysToUse = isFrom ? tokenKeys : availableFrom;
@@ -194,7 +199,7 @@ const TokenPicker = ({
         <IconButton
           aria-label="close"
           size="small"
-          onClick={onClose}
+          onClick={handleOnClose}
           style={{ position: 'absolute', top: '32px', right: '32px' }}
         >
           <CloseIcon fontSize="inherit" />

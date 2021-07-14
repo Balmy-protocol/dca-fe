@@ -64,7 +64,8 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
   const [fromValue, setFromValue] = React.useState('');
   const [activeStep, setActiveStep] = React.useState(0);
   const [frequencyValue, setFrequencyValue] = React.useState('');
-  const frequencyType = STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS];
+  const frequencyType =
+    STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural;
 
   const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
   const hasErrorCurrency = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
