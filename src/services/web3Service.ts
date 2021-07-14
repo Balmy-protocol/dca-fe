@@ -145,8 +145,6 @@ export default class Web3Service {
 
     const account = await this.signer.getAddress();
 
-    this.setAccount(account);
-
     if (window.ethereum) {
       // handle metamask account change
       window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
@@ -224,6 +222,8 @@ export default class Web3Service {
       })),
       'id'
     );
+
+    this.setAccount(account);
   }
 
   getNetwork() {

@@ -7,7 +7,10 @@ function usePastPositions() {
   const { web3Service } = React.useContext(WalletContext);
   const transactions = useAllTransactions();
 
-  const pastPositions: PositionsRaw = React.useMemo(() => web3Service.getPastPositions(), [transactions]);
+  const pastPositions: PositionsRaw = React.useMemo(
+    () => web3Service.getPastPositions(),
+    [transactions, web3Service.getAccount()]
+  );
 
   return pastPositions;
 }

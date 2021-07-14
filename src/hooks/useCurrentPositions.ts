@@ -7,7 +7,11 @@ function useCurrentPositions() {
   const { web3Service } = React.useContext(WalletContext);
   const transactions = useAllTransactions();
 
-  const currentPositions: PositionsRaw = React.useMemo(() => web3Service.getCurrentPositions(), [transactions]);
+  const currentPositions: PositionsRaw = React.useMemo(
+    () => web3Service.getCurrentPositions(),
+    [transactions, web3Service.getAccount()]
+  );
+  console.log('goes through hook', currentPositions, web3Service.getAccount(), web3Service.getCurrentPositions());
 
   return currentPositions;
 }

@@ -4,6 +4,13 @@ import { FormattedMessage } from 'react-intl';
 import { Web3Service } from 'types';
 import styled from 'styled-components';
 
+const StyledButtonContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
 const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
@@ -22,9 +29,11 @@ interface ConnectWalletButtonProps {
 }
 
 const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => (
-  <StyledButton color="primary" onClick={() => web3Service.connect()}>
-    <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
-  </StyledButton>
+  <StyledButtonContainer>
+    <StyledButton color="primary" onClick={() => web3Service.connect()}>
+      <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
+    </StyledButton>
+  </StyledButtonContainer>
 );
 
 export default ConnectWalletButton;

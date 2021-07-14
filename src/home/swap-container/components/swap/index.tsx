@@ -348,10 +348,19 @@ SwapProps) => {
       </Typography>
     </StyledButton>
   );
+
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error" disabled>
       <Typography variant="body1">
         <FormattedMessage description="wrong chainId" defaultMessage="You are not currently connected to the mainnet" />
+      </Typography>
+    </StyledButton>
+  );
+
+  const NoWalletButton = (
+    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+      <Typography variant="body1">
+        <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
     </StyledButton>
   );
@@ -402,7 +411,9 @@ SwapProps) => {
   );
 
   let ButtonToShow;
-  if (networkError) {
+  if (!web3Service.getAccount()) {
+    ButtonToShow = NoWalletButton;
+  } else if (networkError) {
     ButtonToShow = NotConnectedButton;
   } else if (!pairExists) {
     ButtonToShow = CreatePairButton;
