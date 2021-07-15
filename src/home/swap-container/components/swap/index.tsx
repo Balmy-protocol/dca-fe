@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
@@ -30,7 +30,7 @@ import find from 'lodash/find';
 import WarningIcon from '@material-ui/icons/Warning';
 import usePromise from 'hooks/usePromise';
 import CreatePairModal from 'common/create-pair-modal';
-import { NETWORKS, TRANSACTION_TYPES } from 'config/constants';
+import { FULL_DEPOSIT_TYPE, MODE_TYPES, NETWORKS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { formatCurrencyAmount } from 'utils/currency';
@@ -49,6 +49,7 @@ import {
 } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
+import ModeTypeInput from 'common/mode-type-input';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -146,6 +147,7 @@ const Swap = ({
   web3Service,
 }: // availablePairs,
 SwapProps) => {
+  const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
@@ -241,7 +243,8 @@ SwapProps) => {
         fromValue,
         frequencyType,
         frequencyValue,
-        existingPair as AvailablePair
+        existingPair as AvailablePair,
+        modeType
       );
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
@@ -253,6 +256,7 @@ SwapProps) => {
           frequencyValue,
           existingPair: existingPair as AvailablePair,
           startedAt: Date.now(),
+          modeType,
         },
       });
       setModalSuccess({
@@ -286,6 +290,17 @@ SwapProps) => {
 
   const hasError = fromValue && balance && parseUnits(fromValue, tokenList[from].decimals).gt(balance);
 
+  const cantFund =
+    fromValue &&
+    balance &&
+    parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+    frequencyValue &&
+    BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+    from &&
+    ((modeType === RATE_TYPE &&
+      parseUnits(fromValue, tokenList[from].decimals).mul(BigNumber.from(frequencyValue)).gt(balance)) ||
+      (modeType === FULL_DEPOSIT_TYPE && parseUnits(fromValue, tokenList[from].decimals).gt(balance)));
+
   const networkError =
     !isLoadingNetwork &&
     currentNetwork &&
@@ -302,7 +317,9 @@ SwapProps) => {
   const shouldDisableButton =
     !pairExists ||
     !fromValue ||
+    !frequencyValue ||
     hasError ||
+    cantFund ||
     networkError ||
     isLoadingNetwork ||
     isLoadingBalance ||
@@ -322,6 +339,18 @@ SwapProps) => {
     [];
 
   const ignoreValues = [from, to];
+
+  const rate =
+    (fromValue &&
+      parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+      frequencyValue &&
+      BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+      from &&
+      formatUnits(
+        parseUnits(fromValue, tokenList[from].decimals).div(BigNumber.from(frequencyValue)),
+        tokenList[from].decimals
+      )) ||
+    0;
 
   const CreatePairButton = (
     <StyledButton
@@ -410,6 +439,14 @@ SwapProps) => {
     </StyledButton>
   );
 
+  const NoFundsButton = (
+    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+      <Typography variant="body1">
+        <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
+      </Typography>
+    </StyledButton>
+  );
+
   let ButtonToShow;
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
@@ -419,6 +456,8 @@ SwapProps) => {
     ButtonToShow = CreatePairButton;
   } else if (!isApproved) {
     ButtonToShow = ApproveTokenButton;
+  } else if (cantFund) {
+    ButtonToShow = NoFundsButton;
   } else {
     ButtonToShow = StartPositionButton;
   }
@@ -445,10 +484,17 @@ SwapProps) => {
       />
       <StyledSwapContainer>
         <Grid container>
+          <Grid item xs={12}>
+            <ModeTypeInput selected={modeType} onChange={setModeType} />
+          </Grid>
           <StyledFromContainer container alignItems="center" justify="space-between">
             <Grid item xs={12} md={6}>
               <Typography variant="body1">
-                <FormattedMessage description="You pay" defaultMessage="You pay" />
+                <FormattedMessage
+                  description="You {mode}"
+                  defaultMessage="You {mode}"
+                  values={{ mode: modeType === FULL_DEPOSIT_TYPE ? 'pay' : 'set' }}
+                />
               </Typography>
             </Grid>
             <Grid item xs={12} md={6} style={{ textAlign: 'right' }}>
@@ -535,6 +581,22 @@ SwapProps) => {
                   />
                 </Grid>
               </Grid>
+            </StyledSettingContainer>
+          </Grid>
+          <Grid item xs={12}>
+            <StyledSettingContainer>
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="rate detail"
+                  defaultMessage="We'll swap {amount} {from} every {frequency} for you"
+                  values={{
+                    amount: modeType === FULL_DEPOSIT_TYPE ? rate : fromValue,
+                    from: tokenList[from].symbol,
+                    frequency:
+                      STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singular,
+                  }}
+                />
+              </Typography>
             </StyledSettingContainer>
           </Grid>
           <Grid item xs={12}>

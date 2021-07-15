@@ -50,7 +50,7 @@ import DCAPair from 'abis/DCAPair.json';
 // MOCKS
 import usedTokensMocks from 'mocks/usedTokens';
 import { ETH } from 'mocks/tokens';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { FULL_DEPOSIT_TYPE, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 
 export const FACTORY_ADDRESS =
   process.env.ETH_NETWORK === 'mainnet'
@@ -453,7 +453,8 @@ export default class Web3Service {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
-    existingPair: AvailablePair
+    existingPair: AvailablePair,
+    modeType: string
   ) {
     let token = from;
 
@@ -463,7 +464,7 @@ export default class Web3Service {
 
     const weiValue = parseUnits(fromValue, token.decimals);
 
-    const rate = weiValue.div(BigNumber.from(frequencyValue));
+    const rate = modeType === RATE_TYPE ? weiValue : weiValue.div(BigNumber.from(frequencyValue));
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
 
@@ -548,7 +549,12 @@ export default class Web3Service {
           to: newPositionTypeData.to.address,
           swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
           swapped: BigNumber.from(0),
-          remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
+          remainingLiquidity:
+            newPositionTypeData.modeType === FULL_DEPOSIT_TYPE
+              ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
+              : parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).mul(
+                  BigNumber.from(newPositionTypeData.frequencyValue)
+                ),
           remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
           totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
           withdrawn: BigNumber.from(0),

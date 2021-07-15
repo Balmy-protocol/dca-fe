@@ -17,3 +17,17 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
   RESET_POSITION: 'RESET_POSITION',
   NO_OP: 'NO_OP',
 };
+
+export const FULL_DEPOSIT_TYPE = 'full_deposit';
+export const RATE_TYPE = 'by_rate';
+
+export const MODE_TYPES = {
+  FULL_DEPOSIT: {
+    label: 'Full deposit',
+    id: FULL_DEPOSIT_TYPE,
+  },
+  RATE: {
+    label: 'By rate',
+    id: RATE_TYPE,
+  },
+};

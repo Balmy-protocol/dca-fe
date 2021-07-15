@@ -262,6 +262,7 @@ export interface NewPositionTypeData {
   fromValue: string;
   frequencyType: string;
   frequencyValue: string;
+  modeType: string;
   existingPair: AvailablePair;
   id?: number | string;
   startedAt: number;

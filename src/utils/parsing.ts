@@ -19,18 +19,22 @@ export const SWAP_INTERVALS = {
 
 export const STRING_SWAP_INTERVALS = {
   [FIVE_MINUTES_IN_SECONDS.toString()]: {
+    singular: '5 minutes',
     plural: '5 minutes',
     adverb: '5 minutely',
   },
   [DAY_IN_SECONDS.toString()]: {
+    singular: 'day',
     plural: 'days',
     adverb: 'daily',
   },
   [WEEK_IN_SECONDS.toString()]: {
+    singular: 'week',
     plural: 'weeks',
     adverb: 'weekly',
   },
   [MONTH_IN_SECONDS.toString()]: {
+    singular: 'month',
     plural: 'months',
     adverb: 'monthly',
   },
