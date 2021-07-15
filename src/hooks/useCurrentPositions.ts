@@ -11,7 +11,6 @@ function useCurrentPositions() {
     () => web3Service.getCurrentPositions(),
     [transactions, web3Service.getAccount()]
   );
-  console.log('goes through hook', currentPositions, web3Service.getAccount(), web3Service.getCurrentPositions());
 
   return currentPositions;
 }

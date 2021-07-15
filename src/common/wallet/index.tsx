@@ -14,9 +14,9 @@ import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Web3Service } from 'types';
 import { FormattedMessage } from 'react-intl';
-import FloatingMenu from '../floating-menu';
 import Button from '@material-ui/core/Button';
 import WalletMenu from 'common/wallet-menu';
+import EtcButton from 'common/etc-button';
 
 const StyledButtonContainer = styled.div`
   position: relative;
@@ -77,6 +77,7 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
               <Typography noWrap>{web3Service.getAccount()}</Typography>
             </StyledButton>
           </Badge>
+          <EtcButton />
           <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />
         </>
       )}

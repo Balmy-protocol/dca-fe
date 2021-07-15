@@ -123,10 +123,6 @@ function useBuildTransactionDetail() {
           }
           break;
       }
-
-      if (message === 'Transaction confirmed!') {
-        console.log(tx.type);
-      }
       return message;
     },
     [availablePairs, tokenList, currentPositions, pastPositions]
