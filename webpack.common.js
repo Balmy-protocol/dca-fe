@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const tsTransformer = require('@formatjs/ts-transformer');
 const webpack = require('webpack');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
+const WebpackBar = require('webpackbar');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
 
@@ -24,7 +25,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.ETHPLORER_KEY': JSON.stringify('EK-7xNxe-HDazjQ3-smGdU'),
     }),
+    new WebpackBar(),
   ],
+  devtool: 'source-map',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
