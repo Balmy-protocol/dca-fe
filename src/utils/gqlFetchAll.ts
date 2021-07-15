@@ -1,10 +1,18 @@
-import { ApolloClient, NormalizedCacheObject, ObservableQuery, OperationVariables, DocumentNode } from '@apollo/client';
+import {
+  ApolloClient,
+  NormalizedCacheObject,
+  ObservableQuery,
+  OperationVariables,
+  DocumentNode,
+  WatchQueryFetchPolicy,
+} from '@apollo/client';
 
 export default async function gqlFetchAll(
   client: ApolloClient<NormalizedCacheObject>,
   queryToRun: DocumentNode,
   variables: any,
   dataToSearch: string,
+  fetchPolicy: WatchQueryFetchPolicy = 'cache-and-network',
   offset = 0,
   limit = 1000,
   query: ObservableQuery<any, OperationVariables> | null = null
@@ -27,7 +35,7 @@ export default async function gqlFetchAll(
     const newResults = await query.result();
 
     if (newResults.data[dataToSearch].length === limit + offset) {
-      return await gqlFetchAll(client, queryToRun, variables, dataToSearch, offset + limit, limit, query);
+      return await gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, query);
     }
 
     return query.result();
@@ -35,6 +43,7 @@ export default async function gqlFetchAll(
 
   const newQuery = client.watchQuery({
     query: queryToRun,
+    fetchPolicy,
     variables: {
       ...variables,
       first: limit,
@@ -45,7 +54,7 @@ export default async function gqlFetchAll(
   const results = await newQuery.result();
 
   if (results.data[dataToSearch].length === limit) {
-    return await gqlFetchAll(client, queryToRun, variables, dataToSearch, offset + limit, limit, newQuery);
+    return await gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, newQuery);
   }
 
   return results;

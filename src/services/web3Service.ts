@@ -18,7 +18,7 @@ import {
   AvailablePairs,
   AvailablePair,
   PositionResponse,
-  PositionsRaw,
+  TransactionPositionTypeDataOptions,
   PoolResponse,
   Position,
   PositionRaw,
@@ -173,7 +173,8 @@ export default class Web3Service {
         address: account.toLowerCase(),
         status: 'ACTIVE',
       },
-      'positions'
+      'positions',
+      'network-only'
     );
 
     this.currentPositions = keyBy(
@@ -192,6 +193,7 @@ export default class Web3Service {
         status: position.status,
         startedAt: position.createdAtTimestamp,
         totalDeposits: BigNumber.from(position.totalDeposits),
+        pendingTransaction: '',
       })),
       'id'
     );
@@ -203,7 +205,8 @@ export default class Web3Service {
         address: account.toLowerCase(),
         status: 'TERMINATED',
       },
-      'positions'
+      'positions',
+      'network-only'
     );
 
     this.pastPositions = keyBy(
@@ -222,6 +225,7 @@ export default class Web3Service {
         id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
+        pedingTransaction: '',
       })),
       'id'
     );
@@ -289,7 +293,13 @@ export default class Web3Service {
       await this.connect();
     }
 
-    const availablePairsResponse = await gqlFetchAll(this.apolloClient, GET_AVAILABLE_PAIRS, {}, 'pairs');
+    const availablePairsResponse = await gqlFetchAll(
+      this.apolloClient,
+      GET_AVAILABLE_PAIRS,
+      {},
+      'pairs',
+      'network-only'
+    );
 
     this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
       token0: pair.token0.id,
@@ -338,7 +348,7 @@ export default class Web3Service {
   getBalance(address?: string, decimals?: number) {
     if (!address) return Promise.resolve();
 
-    if (address === ETH.address) return this.signer.getBalance().then((balance: BigNumber) => formatEther(balance));
+    if (address === ETH.address) return this.signer.getBalance();
 
     const ERC20Interface = new Interface(ERC20ABI) as any;
 
@@ -558,53 +568,76 @@ export default class Web3Service {
     return this.client.off('block');
   }
 
+  setPendingTransaction(transaction: TransactionDetails) {
+    if (transaction.type === TRANSACTION_TYPES.NEW_PAIR || transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN) return;
+
+    const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
+    let id = typeData.id;
+    if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
+      const newPositionTypeData = typeData as NewPositionTypeData;
+      id = `pending-transaction-${transaction.hash}`;
+      this.currentPositions[id] = {
+        from: newPositionTypeData.from.address,
+        to: newPositionTypeData.to.address,
+        swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
+        swapped: BigNumber.from(0),
+        rate:
+          newPositionTypeData.modeType === RATE_TYPE
+            ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
+            : parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
+                BigNumber.from(newPositionTypeData.frequencyValue)
+              ),
+        remainingLiquidity:
+          newPositionTypeData.modeType === FULL_DEPOSIT_TYPE
+            ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
+            : parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).mul(
+                BigNumber.from(newPositionTypeData.frequencyValue)
+              ),
+        remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
+        totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
+        withdrawn: BigNumber.from(0),
+        dcaId: newPositionTypeData.id as number,
+        id: id,
+        startedAt: newPositionTypeData.startedAt,
+        totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
+        pendingTransaction: '',
+        status: 'ACTIVE',
+      };
+    }
+
+    this.currentPositions[id].pendingTransaction = transaction.hash;
+  }
+
   handleTransaction(transaction: TransactionDetails) {
     switch (transaction.type) {
       case TRANSACTION_TYPES.NEW_POSITION:
         const newPositionTypeData = transaction.typeData as NewPositionTypeData;
         const newId = `${newPositionTypeData.existingPair.id}-${newPositionTypeData.id}`;
         this.currentPositions[newId] = {
-          from: newPositionTypeData.from.address,
-          to: newPositionTypeData.to.address,
-          swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
-          swapped: BigNumber.from(0),
-          rate:
-            newPositionTypeData.modeType === RATE_TYPE
-              ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
-              : parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
-                  BigNumber.from(newPositionTypeData.frequencyValue)
-                ),
-          remainingLiquidity:
-            newPositionTypeData.modeType === FULL_DEPOSIT_TYPE
-              ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
-              : parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).mul(
-                  BigNumber.from(newPositionTypeData.frequencyValue)
-                ),
-          remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
-          totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
-          withdrawn: BigNumber.from(0),
-          dcaId: newPositionTypeData.id as number,
+          ...this.currentPositions[`pending-transaction-${transaction.hash}`],
+          pendingTransaction: '',
           id: newId,
-          startedAt: newPositionTypeData.startedAt,
-          totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
-          status: 'ACTIVE',
         };
+        delete this.currentPositions[`pending-transaction-${transaction.hash}`];
         break;
       case TRANSACTION_TYPES.TERMINATE_POSITION:
         const terminatePositionTypeData = transaction.typeData as TerminatePositionTypeData;
         this.pastPositions[terminatePositionTypeData.id] = {
           ...this.currentPositions[terminatePositionTypeData.id],
+          pendingTransaction: '',
         };
         delete this.currentPositions[terminatePositionTypeData.id];
         break;
       case TRANSACTION_TYPES.WITHDRAW_POSITION:
         const withdrawPositionTypeData = transaction.typeData as WithdrawTypeData;
+        this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[withdrawPositionTypeData.id].withdrawn = this.currentPositions[
           withdrawPositionTypeData.id
         ].withdrawn.add(this.currentPositions[withdrawPositionTypeData.id].swapped);
         break;
       case TRANSACTION_TYPES.ADD_FUNDS_POSITION:
         const addFundsTypeData = transaction.typeData as AddFundsTypeData;
+        this.currentPositions[addFundsTypeData.id].pendingTransaction = '';
         this.currentPositions[addFundsTypeData.id].remainingLiquidity = this.currentPositions[
           addFundsTypeData.id
         ].remainingLiquidity.add(parseUnits(addFundsTypeData.newFunds, addFundsTypeData.decimals));
@@ -614,6 +647,7 @@ export default class Web3Service {
         break;
       case TRANSACTION_TYPES.RESET_POSITION:
         const resetPositionTypeData = transaction.typeData as ResetPositionTypeData;
+        this.currentPositions[resetPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[resetPositionTypeData.id].remainingLiquidity = this.currentPositions[
           resetPositionTypeData.id
         ].remainingLiquidity.add(parseUnits(resetPositionTypeData.newFunds, resetPositionTypeData.decimals));
@@ -626,6 +660,7 @@ export default class Web3Service {
         break;
       case TRANSACTION_TYPES.REMOVE_FUNDS:
         const removeFundsTypeData = transaction.typeData as RemoveFundsTypeData;
+        this.currentPositions[removeFundsTypeData.id].pendingTransaction = '';
         this.currentPositions[removeFundsTypeData.id].remainingLiquidity = this.currentPositions[
           removeFundsTypeData.id
         ].remainingLiquidity.sub(parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals));
@@ -635,6 +670,7 @@ export default class Web3Service {
         break;
       case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION:
         const modifySwapsPositionTypeData = transaction.typeData as ModifySwapsPositionTypeData;
+        this.currentPositions[modifySwapsPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps = BigNumber.from(
           modifySwapsPositionTypeData.newSwaps
         );
@@ -644,6 +680,7 @@ export default class Web3Service {
         break;
       case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION:
         const modifyRateAndSwapsPositionTypeData = transaction.typeData as ModifyRateAndSwapsPositionTypeData;
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = parseUnits(
           modifyRateAndSwapsPositionTypeData.newRate,
           modifyRateAndSwapsPositionTypeData.decimals

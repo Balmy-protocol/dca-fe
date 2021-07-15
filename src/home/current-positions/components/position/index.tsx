@@ -25,6 +25,9 @@ import AddToPosition from 'common/add-to-position-settings';
 import { BigNumber } from 'ethers';
 import ResetPosition from 'common/reset-position-settings';
 import { formatCurrencyAmount } from 'utils/currency';
+import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/etherscan';
+import CallMadeIcon from '@material-ui/icons/CallMade';
+import Link from '@material-ui/core/Link';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -66,7 +69,9 @@ const StyledCardFooter = styled.div`
   align-items: center;
 `;
 
-const StyledCardFooterItem = styled.div``;
+const StyledCardFooterItem = styled.div<{ isPending: boolean }>`
+  ${(props) => props.isPending && 'flex-grow: 1;'}
+`;
 
 const StyledFreqLeft = styled.div`
   padding: 8px 11px;
@@ -108,7 +113,18 @@ interface ActivePositionProps {
 }
 
 const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: ActivePositionProps) => {
-  const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, rate, id, totalSwaps } = position;
+  const {
+    from,
+    to,
+    swapInterval,
+    swapped,
+    remainingLiquidity,
+    remainingSwaps,
+    rate,
+    id,
+    totalSwaps,
+    pendingTransaction,
+  } = position;
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [shouldShowAddToPosition, setShouldShowAddToPosition] = React.useState(false);
   const [shouldShowReset, setShouldShowReset] = React.useState(false);
@@ -122,6 +138,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
     !from || !web3Service.getAccount()
   );
 
+  const isPending = !!pendingTransaction;
   const [token0, token1] = sortTokens(from.address, to.address);
   const pair = find(availablePairs, { token0, token1 });
 
@@ -129,6 +146,14 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
 
   const isStale = calculateStale(pair?.lastExecutedAt || 0, swapInterval, pair?.createdAt || 0);
 
+  const handleOnWithdraw = (position: Position) => {
+    setShouldShowSettings(false);
+    onWithdraw(position);
+  };
+  const handleOnTerminate = (position: Position) => {
+    setShouldShowSettings(false);
+    onTerminate(position);
+  };
   const handleResetPosition = async (ammountToAdd: string, frequencyValue: string) => {
     try {
       setModalLoading({
@@ -352,8 +377,8 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
         onClose={() => setShouldShowSettings(false)}
         shouldShow={shouldShowSettings}
         position={position}
-        onWithdraw={onWithdraw}
-        onTerminate={onTerminate}
+        onWithdraw={handleOnWithdraw}
+        onTerminate={handleOnTerminate}
         onModifySwaps={handleModifySwaps}
         onModifyRateAndSwaps={handleModifyRateAndSwaps}
         onRemoveFunds={handleWithdrawFunds}
@@ -387,9 +412,10 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
             aria-controls="long-menu"
             aria-haspopup="true"
             onClick={() => setShouldShowSettings(true)}
+            disabled={isPending}
             size="small"
           >
-            <Cog size="22px" />
+            <Cog size="22px" isDisabled={isPending} />
           </IconButton>
         </StyledCardHeader>
         <StyledDetailWrapper>
@@ -430,41 +456,58 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
           />
         </StyledProgressWrapper>
         <StyledCardFooter>
-          {hasNoFunds ? (
-            <StyledNoFunds>
-              <Typography variant="body2">
-                <FormattedMessage description="no funds" defaultMessage="No funds!" />
-              </Typography>
-            </StyledNoFunds>
-          ) : isStale ? (
-            <StyledStale>
-              <Typography variant="body2">
-                <FormattedMessage description="stale" defaultMessage="Stale" />
-              </Typography>
-            </StyledStale>
-          ) : (
-            <StyledFreqLeft>
-              <Typography variant="body2">
-                <FormattedMessage
-                  description="days to finish"
-                  defaultMessage="{remainingDays} {type} left"
-                  values={{
-                    remainingDays: remainingSwaps.toString(),
-                    type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
-                  }}
-                />
-              </Typography>
-            </StyledFreqLeft>
-          )}
-          <StyledCardFooterItem>
+          {!isPending &&
+            (hasNoFunds ? (
+              <StyledNoFunds>
+                <Typography variant="body2">
+                  <FormattedMessage description="no funds" defaultMessage="No funds!" />
+                </Typography>
+              </StyledNoFunds>
+            ) : isStale ? (
+              <StyledStale>
+                <Typography variant="body2">
+                  <FormattedMessage description="stale" defaultMessage="Stale" />
+                </Typography>
+              </StyledStale>
+            ) : (
+              <StyledFreqLeft>
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="days to finish"
+                    defaultMessage="{remainingDays} {type} left"
+                    values={{
+                      remainingDays: remainingSwaps.toString(),
+                      type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
+                    }}
+                  />
+                </Typography>
+              </StyledFreqLeft>
+            ))}
+          <StyledCardFooterItem isPending={isPending}>
             <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => (hasNoFunds ? setShouldShowReset(true) : setShouldShowAddToPosition(true))}
+              variant={isPending ? 'contained' : 'outlined'}
+              color={isPending ? 'pending' : 'primary'}
+              onClick={() => !isPending && (hasNoFunds ? setShouldShowReset(true) : setShouldShowAddToPosition(true))}
+              fullWidth={isPending}
             >
-              <Typography variant="body2">
-                <FormattedMessage description="add to position" defaultMessage="Add to position" />
-              </Typography>
+              {isPending ? (
+                <Link
+                  href={buildEtherscanTransaction(pendingTransaction)}
+                  target="_blank"
+                  rel="noreferrer"
+                  underline="none"
+                  color="inherit"
+                >
+                  <Typography variant="body2" component="span">
+                    <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                  </Typography>
+                  <CallMadeIcon style={{ fontSize: '1rem' }} />
+                </Link>
+              ) : (
+                <Typography variant="body2">
+                  <FormattedMessage description="add to position" defaultMessage="Add to position" />
+                </Typography>
+              )}
             </Button>
           </StyledCardFooterItem>
         </StyledCardFooter>

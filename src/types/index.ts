@@ -129,6 +129,7 @@ export interface PositionRaw {
   id: string;
   status: string;
   startedAt: number;
+  pendingTransaction: string;
 }
 
 export interface PositionRawKeyBy {
@@ -274,7 +275,7 @@ export interface NewPositionTypeData {
   frequencyValue: string;
   modeType: string;
   existingPair: AvailablePair;
-  id?: number | string;
+  id: number | string;
   startedAt: number;
 }
 
@@ -283,6 +284,16 @@ export interface NewPairTypeData {
   token0: string;
   token1: string;
 }
+
+export type TransactionPositionTypeDataOptions =
+  | WithdrawTypeData
+  | AddFundsTypeData
+  | ModifySwapsPositionTypeData
+  | ModifyRateAndSwapsPositionTypeData
+  | TerminatePositionTypeData
+  | RemoveFundsTypeData
+  | NewPositionTypeData
+  | ResetPositionTypeData;
 
 export type TransactionTypeDataOptions =
   | WithdrawTypeData

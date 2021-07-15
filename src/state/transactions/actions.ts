@@ -18,6 +18,6 @@ export const finalizeTransaction = createAction<{
 }>('transactions/finalizeTransaction');
 export const checkedTransaction = createAction<{
   hash: string;
-  blockNumber: number;
+  blockNumber?: number;
 }>('transactions/checkedTransaction');
 export const clearAllTransactions = createAction('transactions/clearAllTransactions');

@@ -11,6 +11,8 @@ import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
 import EtherscanLink from 'common/view-on-etherscan';
 import { NewPositionTypeData } from 'types';
+import { usePendingTransactions } from './hooks';
+import { setInitialized } from 'state/initializer/actions';
 
 interface TxInterface {
   addedTime: number;
@@ -50,6 +52,8 @@ export default function Updater(): null {
 
   const buildTransactionMessage = useBuildTransactionMessage();
 
+  const pendingTransactions = usePendingTransactions();
+
   const getReceipt = useCallback(
     (hash: string) => {
       if (!web3Service.getAccount()) throw new Error('No library or chainId');
@@ -57,6 +61,13 @@ export default function Updater(): null {
     },
     [web3Service]
   );
+
+  useEffect(() => {
+    pendingTransactions.forEach((transaction) => {
+      web3Service.setPendingTransaction(transaction);
+    });
+    dispatch(setInitialized());
+  }, []);
 
   useEffect(() => {
     if (!web3Service.getAccount() || !lastBlockNumber) return;

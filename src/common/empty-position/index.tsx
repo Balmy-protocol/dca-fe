@@ -6,7 +6,7 @@ const StyledCard = styled(Card)`
   margin: 10px;
   border-radius: 10px;
   position: relative;
-  min-height: 189px;
+  min-height: 215px;
   background-color: transparent;
   border: 3px dashed rgba(0, 0, 0, 0.12);
 `;

@@ -10,6 +10,7 @@ import TerminateModal from 'common/terminate-modal';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import useTokenList from 'hooks/useTokenList';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+import EmptyPositions from 'common/empty-positions';
 
 interface CurrentPositionsProps {
   web3Service: Web3Service;
@@ -78,11 +79,18 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
                 </Grid>
               ))
             : null}
-          {emptyPositions.map((id) => (
-            <Grid item xs={12} sm={6} md={3} key={id}>
-              <EmptyPosition />
+          {currentPositions &&
+            !!currentPositions.length &&
+            emptyPositions.map((id) => (
+              <Grid item xs={12} sm={6} md={3} key={id}>
+                <EmptyPosition />
+              </Grid>
+            ))}
+          {currentPositions && !currentPositions.length && (
+            <Grid item xs={12}>
+              <EmptyPositions />
             </Grid>
-          ))}
+          )}
         </Grid>
       </Grid>
     </Grid>

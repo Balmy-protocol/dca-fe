@@ -1,5 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { useCallback, useMemo } from 'react';
+import reduce from 'lodash/reduce';
 import {
   TransactionDetails,
   TransactionTypes,
@@ -51,6 +52,16 @@ export function useTransactionAdder(): (
         throw Error('No transaction hash found.');
       }
       dispatch(addTransaction({ hash, from: web3Service.getAccount(), approval, summary, claim, type, typeData }));
+      web3Service.setPendingTransaction({
+        hash,
+        from: web3Service.getAccount(),
+        approval,
+        summary,
+        claim,
+        type,
+        typeData,
+        addedTime: new Date().getTime(),
+      });
     },
     [dispatch, web3Service.getAccount()]
   );
@@ -79,6 +90,26 @@ export function useHasPendingTransactions(): boolean {
   const transactions = useAllTransactions();
 
   return useMemo(() => Object.keys(transactions).some((hash) => !transactions[hash].receipt), [transactions]);
+}
+
+export function usePendingTransactions(): TransactionDetails[] {
+  const transactions = useAllTransactions();
+
+  return useMemo(
+    () =>
+      reduce(
+        Object.keys(transactions),
+        (acc: TransactionDetails[], hash) => {
+          if (!transactions[hash].receipt) {
+            acc.push(transactions[hash]);
+          }
+
+          return acc;
+        },
+        []
+      ),
+    [transactions]
+  );
 }
 
 /**

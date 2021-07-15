@@ -36,7 +36,12 @@ const MinimalSelect = ({ options, selected, onChange, id }: minimalSelectProps) 
   return (
     <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => handleChange(index)}>
       {options.map((frequencyTypeOption: selectOption) => (
-        <Tab classes={tabItemStyles} disableRipple label={capitalize(frequencyTypeOption.label.adverb)} />
+        <Tab
+          classes={tabItemStyles}
+          key={frequencyTypeOption.label.adverb}
+          disableRipple
+          label={capitalize(frequencyTypeOption.label.adverb)}
+        />
       ))}
     </Tabs>
   );

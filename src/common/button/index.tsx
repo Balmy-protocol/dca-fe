@@ -15,6 +15,7 @@ const types = {
   warning: 'warning',
   error: 'error',
   tertiary: 'tertiary',
+  pending: 'pending',
 };
 
 const colors = {
@@ -24,6 +25,7 @@ const colors = {
   tertiary: '#0088CC',
   warning: '#FAFAFA',
   error: '#F50000',
+  pending: '#CC00AB',
 };
 
 const backgroundColors = {
@@ -51,6 +53,10 @@ const backgroundColors = {
     default: '#F9DCDC',
     hover: '#e6caca',
   },
+  pending: {
+    default: '#F9DCF4',
+    hover: '#e0c5dc',
+  },
 };
 
 const borderColors = {
@@ -77,6 +83,10 @@ const borderColors = {
   error: {
     default: '#F9DCDC',
     hover: '#e6caca',
+  },
+  pending: {
+    default: '#F9DCF4',
+    hover: '#e0c5dc',
   },
 };
 
@@ -240,6 +250,32 @@ const WarningButton = withStyles({
   },
 })(StyledDisabledFontButton);
 
+const PendingButton = withStyles({
+  text: {
+    color: colors.pending,
+  },
+  outlined: {
+    color: colors.pending,
+    borderColor: borderColors.pending.default,
+    '&:hover': {
+      borderColor: borderColors.pending.hover,
+    },
+    '&:active': {
+      borderColor: borderColors.pending.hover,
+    },
+  },
+  contained: {
+    color: colors.pending,
+    backgroundColor: backgroundColors.pending.default,
+    '&:hover': {
+      backgroundColor: backgroundColors.pending.hover,
+    },
+    '&:active': {
+      backgroundColor: backgroundColors.pending.hover,
+    },
+  },
+})(StyledDisabledFontButton);
+
 const ButtonTypes = {
   primary: PrimaryButton,
   secondary: SecondaryButton,
@@ -247,6 +283,7 @@ const ButtonTypes = {
   error: ErrorButton,
   warning: WarningButton,
   tertiary: TertiaryButton,
+  pending: PendingButton,
 };
 
 const CustomButton: React.FC<any> = ({ children, color, ...rest }) => {

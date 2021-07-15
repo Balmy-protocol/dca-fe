@@ -257,6 +257,7 @@ SwapProps) => {
           existingPair: existingPair as AvailablePair,
           startedAt: Date.now(),
           modeType,
+          id: result.hash,
         },
       });
       setModalSuccess({

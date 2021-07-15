@@ -20,7 +20,7 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(checkedTransaction, (transactions, { payload: { hash, blockNumber } }) => {
       const tx = transactions[hash];
-      if (!tx) {
+      if (!tx || !blockNumber) {
         return;
       }
       if (!tx.lastCheckedBlockNumber) {

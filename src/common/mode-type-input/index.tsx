@@ -26,7 +26,12 @@ const ModeTypeInput = ({ selected, onChange }: modeTypeInputProps) => {
   return (
     <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => handleChange(index)}>
       {options.map((modeTypeOption) => (
-        <Tab classes={tabItemStyles} disableRipple label={capitalize(modeTypeOption.label)} />
+        <Tab
+          classes={tabItemStyles}
+          key={modeTypeOption.label}
+          disableRipple
+          label={capitalize(modeTypeOption.label)}
+        />
       ))}
     </Tabs>
   );
