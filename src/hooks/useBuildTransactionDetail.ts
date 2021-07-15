@@ -12,7 +12,7 @@ import {
   PositionRaw,
   ApproveTokenTypeData,
   ResetPositionTypeData,
-  ModifyRatePositionTypeData,
+  ModifyRateAndSwapsPositionTypeData,
 } from 'types';
 import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -106,18 +106,22 @@ function useBuildTransactionDetail() {
             }`;
           }
           break;
-        case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
-          const modifyRatePositionTypeData = tx.typeData as ModifyRatePositionTypeData;
-          const modifiedRatePosition = find(positions, { id: modifyRatePositionTypeData.id });
+        case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION:
+          const modifyRateAndSwapsPositionTypeData = tx.typeData as ModifyRateAndSwapsPositionTypeData;
+          const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
           if (modifiedRatePosition) {
             message = `Modify ${tokenList[(modifiedRatePosition as PositionRaw).from].symbol}:${
               tokenList[(modifiedRatePosition as PositionRaw).to].symbol
-            } position to swap ${modifyRatePositionTypeData.newRate} ${
+            } position to swap ${modifyRateAndSwapsPositionTypeData.newRate} ${
               tokenList[(modifiedRatePosition as PositionRaw).from].symbol
             } ${
               STRING_SWAP_INTERVALS[
                 (modifiedRatePosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
               ].adverb
+            } for ${modifyRateAndSwapsPositionTypeData.newSwaps} ${
+              STRING_SWAP_INTERVALS[
+                (modifiedRatePosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
+              ].plural
             }`;
           }
           break;

@@ -217,7 +217,7 @@ export type TransactionTypes =
   | 'NO_OP'
   | 'REMOVE_FUNDS'
   | 'MODIFY_SWAPS_POSITION'
-  | 'MODIFY_RATE_POSITION'
+  | 'MODIFY_RATE_AND_SWAPS_POSITION'
   | 'RESET_POSITION';
 
 export interface TransactionTypesConstant {
@@ -251,10 +251,11 @@ export interface ModifySwapsPositionTypeData {
   newSwaps: string;
 }
 
-export interface ModifyRatePositionTypeData {
+export interface ModifyRateAndSwapsPositionTypeData {
   id: number | string;
   newRate: string;
   decimals: number;
+  newSwaps: string;
 }
 export interface TerminatePositionTypeData {
   id: number | string;
@@ -287,7 +288,7 @@ export type TransactionTypeDataOptions =
   | WithdrawTypeData
   | AddFundsTypeData
   | ModifySwapsPositionTypeData
-  | ModifyRatePositionTypeData
+  | ModifyRateAndSwapsPositionTypeData
   | TerminatePositionTypeData
   | ApproveTokenTypeData
   | RemoveFundsTypeData

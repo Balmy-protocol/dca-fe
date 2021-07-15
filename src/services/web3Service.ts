@@ -33,7 +33,7 @@ import {
   RemoveFundsTypeData,
   TokenList,
   ResetPositionTypeData,
-  ModifyRatePositionTypeData,
+  ModifyRateAndSwapsPositionTypeData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
@@ -526,6 +526,12 @@ export default class Web3Service {
     );
   }
 
+  modifyRateAndSwaps(position: Position, pair: AvailablePair, newRate: string, newSwaps: string) {
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+
+    return factory.modifyRateAndSwaps(position.dcaId, parseUnits(newRate, position.from.decimals), newSwaps);
+  }
+
   removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
@@ -636,15 +642,18 @@ export default class Web3Service {
           modifySwapsPositionTypeData.id
         ].remainingLiquidity.div(this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps);
         break;
-      case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
-        const modifyRatePositionTypeData = transaction.typeData as ModifyRatePositionTypeData;
-        this.currentPositions[modifyRatePositionTypeData.id].rate = parseUnits(
-          modifyRatePositionTypeData.newRate,
-          modifyRatePositionTypeData.decimals
+      case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION:
+        const modifyRateAndSwapsPositionTypeData = transaction.typeData as ModifyRateAndSwapsPositionTypeData;
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = parseUnits(
+          modifyRateAndSwapsPositionTypeData.newRate,
+          modifyRateAndSwapsPositionTypeData.decimals
         );
-        this.currentPositions[modifyRatePositionTypeData.id].remainingLiquidity = this.currentPositions[
-          modifyRatePositionTypeData.id
-        ].remainingLiquidity.mul(this.currentPositions[modifyRatePositionTypeData.id].remainingSwaps);
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps = BigNumber.from(
+          modifyRateAndSwapsPositionTypeData.newSwaps
+        );
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity = this.currentPositions[
+          modifyRateAndSwapsPositionTypeData.id
+        ].rate.mul(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
         break;
       case TRANSACTION_TYPES.NEW_PAIR:
         const newPairTypeData = transaction.typeData as NewPairTypeData;

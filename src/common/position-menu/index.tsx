@@ -6,8 +6,9 @@ import PositionSettings from 'common/position-settings';
 import RemoveFundsSettings from 'common/remove-funds-settings';
 import ModifySwapsSettings from 'common/modify-swaps-settings';
 import ModifyRateSettings from 'common/modify-rate-settings';
+import { BigNumber } from 'ethers';
 
-const StyledOverlay = styled.div`
+const StyledOverlay = styled.div<{ withPadding: boolean }>`
   position: absolute;
   top: 0;
   bottom: 0;
@@ -15,7 +16,7 @@ const StyledOverlay = styled.div`
   right: 0;
   z-index: 99;
   background-color: white;
-  padding: 10px 30px;
+  padding: ${(props) => (props.withPadding ? '10px 30px' : '10px 0px')};
   display: flex;
   flex-direction: column;
 `;
@@ -24,10 +25,11 @@ interface PositionMenuProps {
   position: Position;
   onClose: () => void;
   shouldShow: boolean;
+  balance: BigNumber;
   onWithdraw: (position: Position) => void;
   onTerminate: (position: Position) => void;
   onModifySwaps: (newSwaps: string) => void;
-  onModifyRate: (newRate: string) => void;
+  onModifyRateAndSwaps: (newRate: string, newSwaps: string) => void;
   onRemoveFunds: (ammountToRemove: string) => void;
 }
 
@@ -37,9 +39,10 @@ const PositionMenu = ({
   onWithdraw,
   onTerminate,
   onModifySwaps,
-  onModifyRate,
+  onModifyRateAndSwaps,
   onRemoveFunds,
   position,
+  balance,
 }: PositionMenuProps) => {
   const [activeMenu, setActiveMenu] = React.useState('settings');
 
@@ -55,14 +58,14 @@ const PositionMenu = ({
     onClose();
     setActiveMenu('settings');
   };
-  const onModifyRatePosition = (rateValue: string) => {
-    onModifyRate(rateValue);
+  const onModifyRateAndSwapsPosition = (rateValue: string, frequencyValue: string) => {
+    onModifyRateAndSwaps(rateValue, frequencyValue);
     onClose();
     setActiveMenu('settings');
   };
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
-      <StyledOverlay>
+      <StyledOverlay withPadding={activeMenu !== 'modifyRate'}>
         {activeMenu === 'settings' && (
           <PositionSettings
             onClose={onClose}
@@ -80,18 +83,12 @@ const PositionMenu = ({
             onWithdraw={onRemoveFundsPosition}
           />
         )}
-        {activeMenu === 'modifySwaps' && (
-          <ModifySwapsSettings
-            onClose={() => setActiveMenu('settings')}
-            position={position}
-            onModifySwaps={onModifySwapsPosition}
-          />
-        )}
         {activeMenu === 'modifyRate' && (
           <ModifyRateSettings
             onClose={() => setActiveMenu('settings')}
             position={position}
-            onModifyRate={onModifyRatePosition}
+            onModifyRateAndSwaps={onModifyRateAndSwapsPosition}
+            balance={balance}
           />
         )}
       </StyledOverlay>

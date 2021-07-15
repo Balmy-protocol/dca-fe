@@ -297,40 +297,44 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
     }
   };
 
-  const handleModifyRate = async (newRate: string) => {
+  const handleModifyRateAndSwaps = async (newRate: string, newFrequency: string) => {
     try {
       setModalLoading({
         content: (
           <Typography variant="body1">
             <FormattedMessage
               description="Modifying rate for position"
-              defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType}"
+              defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural}"
               values={{
                 from: position.from.symbol,
                 to: position.to.symbol,
                 newRate,
+                frequency: newFrequency,
                 frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
+                frequencyTypePlural: STRING_SWAP_INTERVALS[position.swapInterval.toString()].plural,
               }}
             />
           </Typography>
         ),
       });
-      const result = await web3Service.modifyRate(position, pair as AvailablePair, newRate);
+      const result = await web3Service.modifyRateAndSwaps(position, pair as AvailablePair, newRate, newFrequency);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.MODIFY_RATE_POSITION,
-        typeData: { id: position.id, newSwaps: newRate, decimals: position.from.decimals },
+        type: TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION,
+        typeData: { id: position.id, newRate, newSwaps: newFrequency, decimals: position.from.decimals },
       });
       setModalSuccess({
         hash: result.hash,
         content: (
           <FormattedMessage
             description="success modify rate for position"
-            defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType} has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
               newRate,
+              frequency: newFrequency,
               frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
+              frequencyTypePlural: STRING_SWAP_INTERVALS[position.swapInterval.toString()].plural,
             }}
           />
         ),
@@ -351,8 +355,9 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
         onWithdraw={onWithdraw}
         onTerminate={onTerminate}
         onModifySwaps={handleModifySwaps}
-        onModifyRate={handleModifyRate}
+        onModifyRateAndSwaps={handleModifyRateAndSwaps}
         onRemoveFunds={handleWithdrawFunds}
+        balance={balance}
       />
       <AddToPosition
         onClose={() => setShouldShowAddToPosition(false)}
