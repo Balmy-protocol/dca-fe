@@ -108,7 +108,7 @@ interface ActivePositionProps {
 }
 
 const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: ActivePositionProps) => {
-  const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, id, totalSwaps } = position;
+  const { from, to, swapInterval, swapped, remainingLiquidity, remainingSwaps, rate, id, totalSwaps } = position;
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [shouldShowAddToPosition, setShouldShowAddToPosition] = React.useState(false);
   const [shouldShowReset, setShouldShowReset] = React.useState(false);
@@ -252,7 +252,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
     }
   };
 
-  const handleModifyRate = async (frequencyValue: string) => {
+  const handleModifySwaps = async (frequencyValue: string) => {
     try {
       setModalLoading({
         content: (
@@ -270,10 +270,10 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
           </Typography>
         ),
       });
-      const result = await web3Service.modifyRate(position, pair as AvailablePair, frequencyValue);
+      const result = await web3Service.modifySwaps(position, pair as AvailablePair, frequencyValue);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.MODIFY_RATE_POSITION,
-        typeData: { id: position.id, newRate: frequencyValue },
+        type: TRANSACTION_TYPES.MODIFY_SWAPS_POSITION,
+        typeData: { id: position.id, newSwaps: frequencyValue },
       });
       setModalSuccess({
         hash: result.hash,
@@ -297,6 +297,51 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
     }
   };
 
+  const handleModifyRate = async (newRate: string) => {
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="body1">
+            <FormattedMessage
+              description="Modifying rate for position"
+              defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType}"
+              values={{
+                from: position.from.symbol,
+                to: position.to.symbol,
+                newRate,
+                frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
+              }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.modifyRate(position, pair as AvailablePair, newRate);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.MODIFY_RATE_POSITION,
+        typeData: { id: position.id, newSwaps: newRate, decimals: position.from.decimals },
+      });
+      setModalSuccess({
+        hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="success modify rate for position"
+            defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType} has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+              newRate,
+              frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
+            }}
+          />
+        ),
+      });
+    } catch (e) {
+      setModalError({
+        error: e,
+      });
+    }
+  };
+
   return (
     <StyledCard>
       <PositionMenu
@@ -305,6 +350,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
         position={position}
         onWithdraw={onWithdraw}
         onTerminate={onTerminate}
+        onModifySwaps={handleModifySwaps}
         onModifyRate={handleModifyRate}
         onRemoveFunds={handleWithdrawFunds}
       />
@@ -356,6 +402,19 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
               description="current remaining"
               defaultMessage="{remainingLiquidity} {from} remain"
               values={{ remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from), from: from.symbol }}
+            />
+          </Typography>
+        </StyledDetailWrapper>
+        <StyledDetailWrapper>
+          <Typography variant="caption">
+            <FormattedMessage
+              description="current rate"
+              defaultMessage="Swapping {rate} {from} {frequency}"
+              values={{
+                rate: formatCurrencyAmount(rate, from),
+                from: from.symbol,
+                frequency: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+              }}
             />
           </Typography>
         </StyledDetailWrapper>

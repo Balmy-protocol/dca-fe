@@ -24,12 +24,20 @@ const StyledHeader = styled.div`
 interface PositionSettingsProps {
   onWithdraw: () => void;
   onTerminate: () => void;
+  onModifySwaps: () => void;
   onModifyRate: () => void;
   onRemoveFunds: () => void;
   onClose: () => void;
 }
 
-const PositionSettings = ({ onWithdraw, onTerminate, onModifyRate, onRemoveFunds, onClose }: PositionSettingsProps) => {
+const PositionSettings = ({
+  onWithdraw,
+  onTerminate,
+  onModifySwaps,
+  onModifyRate,
+  onRemoveFunds,
+  onClose,
+}: PositionSettingsProps) => {
   return (
     <>
       <StyledHeader>
@@ -52,8 +60,11 @@ const PositionSettings = ({ onWithdraw, onTerminate, onModifyRate, onRemoveFunds
         <Button variant="outlined" color="default" size="small" fullWidth onClick={onRemoveFunds}>
           <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
         </Button>
-        <Button variant="outlined" color="default" size="small" fullWidth onClick={onModifyRate}>
+        <Button variant="outlined" color="default" size="small" fullWidth onClick={onModifySwaps}>
           <FormattedMessage description="change duration" defaultMessage="Change duration" />
+        </Button>
+        <Button variant="outlined" color="default" size="small" fullWidth onClick={onModifyRate}>
+          <FormattedMessage description="change rate" defaultMessage="Change rate" />
         </Button>
         <Button variant="contained" color="error" size="small" fullWidth onClick={onTerminate}>
           <FormattedMessage description="terminate position" defaultMessage="Terminate position" />

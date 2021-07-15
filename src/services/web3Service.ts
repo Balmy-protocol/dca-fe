@@ -28,11 +28,12 @@ import {
   TerminatePositionTypeData,
   WithdrawTypeData,
   AddFundsTypeData,
-  ModifyRatePositionTypeData,
+  ModifySwapsPositionTypeData,
   NewPairTypeData,
   RemoveFundsTypeData,
   TokenList,
   ResetPositionTypeData,
+  ModifyRatePositionTypeData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
@@ -181,6 +182,7 @@ export default class Web3Service {
         to: position.to.id,
         swapInterval: BigNumber.from(position.swapInterval.interval),
         swapped: BigNumber.from(position.totalSwapped),
+        rate: BigNumber.from(position.current.rate),
         remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         withdrawn: BigNumber.from(position.totalWithdrawn),
@@ -211,6 +213,7 @@ export default class Web3Service {
         totalDeposits: BigNumber.from(position.totalDeposits),
         swapInterval: BigNumber.from(position.swapInterval.interval),
         swapped: BigNumber.from(position.totalSwapped),
+        rate: BigNumber.from(position.current.rate),
         remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         totalSwaps: BigNumber.from(position.totalSwaps),
@@ -505,12 +508,22 @@ export default class Web3Service {
     return factory.modifyRateAndSwaps(position.dcaId, newRate, newSwaps);
   }
 
-  modifyRate(position: Position, pair: AvailablePair, newSwaps: string) {
+  modifySwaps(position: Position, pair: AvailablePair, newSwaps: string) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     const newRate = position.remainingLiquidity.div(BigNumber.from(newSwaps));
 
     return factory.modifyRateAndSwaps(position.dcaId, newRate, newSwaps);
+  }
+
+  modifyRate(position: Position, pair: AvailablePair, newRate: string) {
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+
+    return factory.modifyRateAndSwaps(
+      position.dcaId,
+      parseUnits(newRate, position.from.decimals),
+      position.remainingSwaps
+    );
   }
 
   removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string) {
@@ -549,6 +562,12 @@ export default class Web3Service {
           to: newPositionTypeData.to.address,
           swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
           swapped: BigNumber.from(0),
+          rate:
+            newPositionTypeData.modeType === RATE_TYPE
+              ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
+              : parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
+                  BigNumber.from(newPositionTypeData.frequencyValue)
+                ),
           remainingLiquidity:
             newPositionTypeData.modeType === FULL_DEPOSIT_TYPE
               ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
@@ -583,6 +602,9 @@ export default class Web3Service {
         this.currentPositions[addFundsTypeData.id].remainingLiquidity = this.currentPositions[
           addFundsTypeData.id
         ].remainingLiquidity.add(parseUnits(addFundsTypeData.newFunds, addFundsTypeData.decimals));
+        this.currentPositions[addFundsTypeData.id].rate = this.currentPositions[
+          addFundsTypeData.id
+        ].remainingLiquidity.div(this.currentPositions[addFundsTypeData.id].remainingSwaps);
         break;
       case TRANSACTION_TYPES.RESET_POSITION:
         const resetPositionTypeData = transaction.typeData as ResetPositionTypeData;
@@ -592,18 +614,37 @@ export default class Web3Service {
         this.currentPositions[resetPositionTypeData.id].remainingSwaps = this.currentPositions[
           resetPositionTypeData.id
         ].remainingSwaps.add(BigNumber.from(resetPositionTypeData.newSwaps));
+        this.currentPositions[resetPositionTypeData.id].rate = this.currentPositions[
+          resetPositionTypeData.id
+        ].remainingLiquidity.div(this.currentPositions[resetPositionTypeData.id].remainingSwaps);
         break;
       case TRANSACTION_TYPES.REMOVE_FUNDS:
         const removeFundsTypeData = transaction.typeData as RemoveFundsTypeData;
         this.currentPositions[removeFundsTypeData.id].remainingLiquidity = this.currentPositions[
           removeFundsTypeData.id
         ].remainingLiquidity.sub(parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals));
+        this.currentPositions[removeFundsTypeData.id].rate = this.currentPositions[
+          removeFundsTypeData.id
+        ].remainingLiquidity.div(this.currentPositions[removeFundsTypeData.id].remainingSwaps);
+        break;
+      case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION:
+        const modifySwapsPositionTypeData = transaction.typeData as ModifySwapsPositionTypeData;
+        this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps = BigNumber.from(
+          modifySwapsPositionTypeData.newSwaps
+        );
+        this.currentPositions[modifySwapsPositionTypeData.id].rate = this.currentPositions[
+          modifySwapsPositionTypeData.id
+        ].remainingLiquidity.div(this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps);
         break;
       case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
         const modifyRatePositionTypeData = transaction.typeData as ModifyRatePositionTypeData;
-        this.currentPositions[modifyRatePositionTypeData.id].remainingSwaps = BigNumber.from(
-          modifyRatePositionTypeData.newRate
+        this.currentPositions[modifyRatePositionTypeData.id].rate = parseUnits(
+          modifyRatePositionTypeData.newRate,
+          modifyRatePositionTypeData.decimals
         );
+        this.currentPositions[modifyRatePositionTypeData.id].remainingLiquidity = this.currentPositions[
+          modifyRatePositionTypeData.id
+        ].remainingLiquidity.mul(this.currentPositions[modifyRatePositionTypeData.id].remainingSwaps);
         break;
       case TRANSACTION_TYPES.NEW_PAIR:
         const newPairTypeData = transaction.typeData as NewPairTypeData;

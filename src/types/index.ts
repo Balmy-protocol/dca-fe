@@ -106,6 +106,7 @@ export type PositionResponse = {
     withdrawn: BigNumber;
     remainingLiquidity: BigNumber;
   };
+  rate: BigNumber;
   totalDeposits: BigNumber;
   totalSwaps: BigNumber;
   totalSwapped: BigNumber;
@@ -123,6 +124,7 @@ export interface PositionRaw {
   totalDeposits: BigNumber;
   withdrawn: BigNumber; // cuanto saque
   totalSwaps: BigNumber; // cuanto puse originalmente
+  rate: BigNumber;
   dcaId: number;
   id: string;
   status: string;
@@ -214,6 +216,7 @@ export type TransactionTypes =
   | 'ADD_FUNDS_POSITION'
   | 'NO_OP'
   | 'REMOVE_FUNDS'
+  | 'MODIFY_SWAPS_POSITION'
   | 'MODIFY_RATE_POSITION'
   | 'RESET_POSITION';
 
@@ -243,9 +246,15 @@ export interface RemoveFundsTypeData {
   ammountToRemove: string;
   decimals: number;
 }
+export interface ModifySwapsPositionTypeData {
+  id: number | string;
+  newSwaps: string;
+}
+
 export interface ModifyRatePositionTypeData {
   id: number | string;
   newRate: string;
+  decimals: number;
 }
 export interface TerminatePositionTypeData {
   id: number | string;
@@ -277,6 +286,7 @@ export interface NewPairTypeData {
 export type TransactionTypeDataOptions =
   | WithdrawTypeData
   | AddFundsTypeData
+  | ModifySwapsPositionTypeData
   | ModifyRatePositionTypeData
   | TerminatePositionTypeData
   | ApproveTokenTypeData

@@ -7,11 +7,12 @@ import {
   WithdrawTypeData,
   AddFundsTypeData,
   RemoveFundsTypeData,
-  ModifyRatePositionTypeData,
+  ModifySwapsPositionTypeData,
   NewPairTypeData,
   PositionRaw,
   ApproveTokenTypeData,
   ResetPositionTypeData,
+  ModifyRatePositionTypeData,
 } from 'types';
 import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -92,16 +93,31 @@ function useBuildTransactionDetail() {
             }`;
           }
           break;
-        case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
-          const modifyRatePositionTypeData = tx.typeData as ModifyRatePositionTypeData;
-          const modifiedPosition = find(positions, { id: modifyRatePositionTypeData.id });
+        case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION:
+          const modifySwapsPositionTypeData = tx.typeData as ModifySwapsPositionTypeData;
+          const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
           if (modifiedPosition) {
             message = `Modify ${tokenList[(modifiedPosition as PositionRaw).from].symbol}:${
               tokenList[(modifiedPosition as PositionRaw).to].symbol
-            } position to run for ${modifyRatePositionTypeData.newRate} ${
+            } position to run for ${modifySwapsPositionTypeData.newSwaps} ${
               STRING_SWAP_INTERVALS[
                 (modifiedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
               ].plural
+            }`;
+          }
+          break;
+        case TRANSACTION_TYPES.MODIFY_RATE_POSITION:
+          const modifyRatePositionTypeData = tx.typeData as ModifyRatePositionTypeData;
+          const modifiedRatePosition = find(positions, { id: modifyRatePositionTypeData.id });
+          if (modifiedRatePosition) {
+            message = `Modify ${tokenList[(modifiedRatePosition as PositionRaw).from].symbol}:${
+              tokenList[(modifiedRatePosition as PositionRaw).to].symbol
+            } position to swap ${modifyRatePositionTypeData.newRate} ${
+              tokenList[(modifiedRatePosition as PositionRaw).from].symbol
+            } ${
+              STRING_SWAP_INTERVALS[
+                (modifiedRatePosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
+              ].adverb
             }`;
           }
           break;

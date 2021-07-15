@@ -4,6 +4,7 @@ import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
 import PositionSettings from 'common/position-settings';
 import RemoveFundsSettings from 'common/remove-funds-settings';
+import ModifySwapsSettings from 'common/modify-swaps-settings';
 import ModifyRateSettings from 'common/modify-rate-settings';
 
 const StyledOverlay = styled.div`
@@ -25,7 +26,8 @@ interface PositionMenuProps {
   shouldShow: boolean;
   onWithdraw: (position: Position) => void;
   onTerminate: (position: Position) => void;
-  onModifyRate: (ammountToRemove: string) => void;
+  onModifySwaps: (newSwaps: string) => void;
+  onModifyRate: (newRate: string) => void;
   onRemoveFunds: (ammountToRemove: string) => void;
 }
 
@@ -34,6 +36,7 @@ const PositionMenu = ({
   shouldShow,
   onWithdraw,
   onTerminate,
+  onModifySwaps,
   onModifyRate,
   onRemoveFunds,
   position,
@@ -47,8 +50,13 @@ const PositionMenu = ({
     onClose();
     setActiveMenu('settings');
   };
-  const onModifyRatePosition = (frequencyValue: string) => {
-    onModifyRate(frequencyValue);
+  const onModifySwapsPosition = (frequencyValue: string) => {
+    onModifySwaps(frequencyValue);
+    onClose();
+    setActiveMenu('settings');
+  };
+  const onModifyRatePosition = (rateValue: string) => {
+    onModifyRate(rateValue);
     onClose();
     setActiveMenu('settings');
   };
@@ -60,6 +68,7 @@ const PositionMenu = ({
             onClose={onClose}
             onWithdraw={onWithdrawPosition}
             onTerminate={onTerminatePosition}
+            onModifySwaps={() => setActiveMenu('modifySwaps')}
             onModifyRate={() => setActiveMenu('modifyRate')}
             onRemoveFunds={() => setActiveMenu('removeFunds')}
           />
@@ -69,6 +78,13 @@ const PositionMenu = ({
             onClose={() => setActiveMenu('settings')}
             position={position}
             onWithdraw={onRemoveFundsPosition}
+          />
+        )}
+        {activeMenu === 'modifySwaps' && (
+          <ModifySwapsSettings
+            onClose={() => setActiveMenu('settings')}
+            position={position}
+            onModifySwaps={onModifySwapsPosition}
           />
         )}
         {activeMenu === 'modifyRate' && (

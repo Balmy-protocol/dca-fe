@@ -2,15 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import { Position } from 'types';
-import TokenInput from 'common/token-input';
+import FrequencyInput from 'common/frequency-input';
 import { FormattedMessage } from 'react-intl';
 import IconButton from '@material-ui/core/IconButton';
 import Button from 'common/button';
 import Typography from '@material-ui/core/Typography';
 import ArrowLeft from 'assets/svg/atom/arrow-left';
-import { BigNumber } from 'ethers';
-import { formatCurrencyAmount } from 'utils/currency';
 import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { BigNumber } from 'ethers';
 
 const StyledHeader = styled.div`
   display: flex;
@@ -31,19 +30,18 @@ const StyledActionContainer = styled.div`
   flex-grow: 0;
 `;
 
-interface ModifyRateSettingsProps {
+interface modifySwapsSettingsProps {
   position: Position;
-  onModifyRate: (newRate: string) => void;
+  onModifySwaps: (frequencyValue: string) => void;
   onClose: () => void;
-  // balance: BigNumber;
 }
 
-const ModifyRateSettings = ({ position, onModifyRate, onClose }: ModifyRateSettingsProps) => {
-  const [fromValue, setFromValue] = React.useState('');
+const modifySwapsSettings = ({ position, onModifySwaps, onClose }: modifySwapsSettingsProps) => {
+  const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
   const frequencyType =
     STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural;
-  const hasError = fromValue && parseUnits(fromValue, position.from.decimals).gte(position.remainingLiquidity);
-  const shouldDisable = fromValue && parseUnits(fromValue, position.from.decimals).lte(BigNumber.from(0));
+
+  const hasError = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 
   return (
     <>
@@ -52,31 +50,17 @@ const ModifyRateSettings = ({ position, onModifyRate, onClose }: ModifyRateSetti
           <ArrowLeft size="20px" />
         </StyledIconButton>
         <Typography variant="h6">
-          <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
+          <FormattedMessage description="change duration" defaultMessage="Change duration" />
         </Typography>
       </StyledHeader>
       <StyledInputContainer>
-        <TokenInput
-          id="from-value"
-          error={!!hasError ? 'Ammount cannot exceed or equal your current funds' : ''}
-          value={fromValue}
-          label={position.from.symbol}
-          onChange={setFromValue}
-          withBalance={true}
-          isLoadingBalance={false}
-          balance={position.remainingLiquidity}
-          token={position.from}
+        <FrequencyInput
+          id="frequency-value"
+          error={!!hasError ? 'Value must be greater than 0' : ''}
+          value={frequencyValue}
+          label={position.swapInterval.toString()}
+          onChange={setFrequencyValue}
         />
-        <Typography variant="body2">
-          <FormattedMessage
-            description="in position"
-            defaultMessage="In position: {balance} {symbol}"
-            values={{
-              balance: formatCurrencyAmount(position.remainingLiquidity, position.from, 4),
-              symbol: position.from.symbol,
-            }}
-          />
-        </Typography>
         <Typography variant="body2">
           <FormattedMessage
             description="current days to finish"
@@ -93,13 +77,13 @@ const ModifyRateSettings = ({ position, onModifyRate, onClose }: ModifyRateSetti
           color="secondary"
           variant="contained"
           fullWidth
-          disabled={!fromValue || shouldDisable || hasError}
-          onClick={() => onModifyRate(fromValue)}
+          disabled={!frequencyValue || hasError}
+          onClick={() => onModifySwaps(frequencyValue)}
         >
-          <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
+          <FormattedMessage description="change duration" defaultMessage="Change duration" />
         </Button>
       </StyledActionContainer>
     </>
   );
 };
-export default ModifyRateSettings;
+export default modifySwapsSettings;
