@@ -18,7 +18,7 @@ import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
-import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
 import useTokenList from './useTokenList';
 
 function useBuildTransactionDetail() {
@@ -86,11 +86,10 @@ function useBuildTransactionDetail() {
               tokenList[(resettedPosition as PositionRaw).from].symbol
             } to your ${tokenList[(resettedPosition as PositionRaw).from].symbol}:${
               tokenList[(resettedPosition as PositionRaw).to].symbol
-            } position and set it to run for ${resetPositionTypeData.newSwaps} ${
-              STRING_SWAP_INTERVALS[
-                (resettedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ].plural
-            }`;
+            } position and set it to run for ${resetPositionTypeData.newSwaps} ${getFrequencyLabel(
+              (resettedPosition as PositionRaw).swapInterval.toString(),
+              resetPositionTypeData.newSwaps
+            )}`;
           }
           break;
         case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION:
@@ -99,11 +98,10 @@ function useBuildTransactionDetail() {
           if (modifiedPosition) {
             message = `Modify ${tokenList[(modifiedPosition as PositionRaw).from].symbol}:${
               tokenList[(modifiedPosition as PositionRaw).to].symbol
-            } position to run for ${modifySwapsPositionTypeData.newSwaps} ${
-              STRING_SWAP_INTERVALS[
-                (modifiedPosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ].plural
-            }`;
+            } position to run for ${modifySwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
+              (modifiedPosition as PositionRaw).swapInterval.toString(),
+              modifySwapsPositionTypeData.newSwaps
+            )}`;
           }
           break;
         case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION:
@@ -118,11 +116,10 @@ function useBuildTransactionDetail() {
               STRING_SWAP_INTERVALS[
                 (modifiedRatePosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
               ].adverb
-            } for ${modifyRateAndSwapsPositionTypeData.newSwaps} ${
-              STRING_SWAP_INTERVALS[
-                (modifiedRatePosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ].plural
-            }`;
+            } for ${modifyRateAndSwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
+              (modifiedRatePosition as PositionRaw).swapInterval.toString(),
+              modifyRateAndSwapsPositionTypeData.newSwaps
+            )}`;
           }
           break;
         case TRANSACTION_TYPES.NEW_PAIR:

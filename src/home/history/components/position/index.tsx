@@ -8,9 +8,10 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { Position, Token } from 'types';
-import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import { formatCurrencyAmount } from 'utils/currency';
+import { BigNumber } from 'ethers';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -104,7 +105,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                 defaultMessage="Ran for {remainingDays} {type}"
                 values={{
                   remainingDays: totalSwaps.toString(),
-                  type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
+                  type: getFrequencyLabel(swapInterval.toString(), totalSwaps.toString()),
                 }}
               />
             </Typography>

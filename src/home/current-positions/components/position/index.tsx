@@ -13,7 +13,7 @@ import TokenIcon from 'common/token-icon';
 import usePromise from 'hooks/usePromise';
 import { Position, Token, Web3Service, AvailablePair } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { STRING_SWAP_INTERVALS, getFrequencyLabel } from 'utils/parsing';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { sortTokens, calculateStale } from 'utils/parsing';
 import { TRANSACTION_TYPES } from 'config/constants';
@@ -167,7 +167,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
                 frequencyValue,
                 from: from.symbol,
                 to: to.symbol,
-                type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
+                type: getFrequencyLabel(swapInterval.toString(), frequencyValue),
               }}
             />
           </Typography>
@@ -189,7 +189,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
               frequencyValue,
               from: from.symbol,
               to: to.symbol,
-              type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
+              type: getFrequencyLabel(swapInterval.toString(), frequencyValue),
             }}
           />
         ),
@@ -289,7 +289,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
                 from: position.from.symbol,
                 to: position.to.symbol,
                 frequencyValue,
-                frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].plural,
+                type: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
               }}
             />
           </Typography>
@@ -310,7 +310,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
               from: position.from.symbol,
               to: position.to.symbol,
               frequencyValue,
-              frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].plural,
+              type: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
             }}
           />
         ),
@@ -336,7 +336,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
                 newRate,
                 frequency: newFrequency,
                 frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
-                frequencyTypePlural: STRING_SWAP_INTERVALS[position.swapInterval.toString()].plural,
+                frequencyTypePlural: getFrequencyLabel(position.swapInterval.toString(), newFrequency),
               }}
             />
           </Typography>
@@ -359,7 +359,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
               newRate,
               frequency: newFrequency,
               frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
-              frequencyTypePlural: STRING_SWAP_INTERVALS[position.swapInterval.toString()].plural,
+              frequencyTypePlural: getFrequencyLabel(position.swapInterval.toString(), newFrequency),
             }}
           />
         ),
@@ -477,7 +477,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
                     defaultMessage="{remainingDays} {type} left"
                     values={{
                       remainingDays: remainingSwaps.toString(),
-                      type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural,
+                      type: getFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
                     }}
                   />
                 </Typography>

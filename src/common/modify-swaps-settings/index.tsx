@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Button from 'common/button';
 import Typography from '@material-ui/core/Typography';
 import ArrowLeft from 'assets/svg/atom/arrow-left';
-import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 
 const StyledHeader = styled.div`
@@ -38,9 +38,7 @@ interface modifySwapsSettingsProps {
 
 const modifySwapsSettings = ({ position, onModifySwaps, onClose }: modifySwapsSettingsProps) => {
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
-  const frequencyType =
-    STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural;
-
+  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), frequencyValue);
   const hasError = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 
   return (

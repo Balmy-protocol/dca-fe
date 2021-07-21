@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
-import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
@@ -63,8 +63,7 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
   const [fromValue, setFromValue] = React.useState(formatUnits(position.rate, position.from.decimals));
   const [activeStep, setActiveStep] = React.useState(0);
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
-  const frequencyType =
-    STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].plural;
+  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), frequencyValue);
   const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
   const hasErrorCurrency = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
 
