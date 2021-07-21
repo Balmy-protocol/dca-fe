@@ -46,6 +46,7 @@ import {
   MONTH_IN_SECONDS,
   STRING_SWAP_INTERVALS,
   FIVE_MINUTES_IN_SECONDS,
+  getFrequencyLabel,
 } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
@@ -570,7 +571,11 @@ SwapProps) => {
               <Grid container alignItems="center" justify="space-between" spacing={2}>
                 <Grid item xs={12}>
                   <Typography variant="body1">
-                    <FormattedMessage description="completes in" defaultMessage="Completes in" />
+                    <FormattedMessage
+                      description="completes in"
+                      defaultMessage="Ammount of {type}"
+                      values={{ type: getFrequencyLabel(frequencyType.toString(), frequencyValue) }}
+                    />
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
