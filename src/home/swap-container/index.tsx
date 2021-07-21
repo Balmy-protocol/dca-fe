@@ -17,7 +17,7 @@ const SwapContainer = () => {
   const [to, setTo] = React.useState((routeParams && routeParams.to) || DAI.address);
   const [fromValue, setFromValue] = React.useState('');
   const [frequencyType, setFrequencyType] = React.useState(DAY_IN_SECONDS);
-  const [frequencyValue, setFrequencyValue] = React.useState('1');
+  const [frequencyValue, setFrequencyValue] = React.useState('5');
   const tokenList = useTokenList();
 
   const onSetFrom = (from: string) => {

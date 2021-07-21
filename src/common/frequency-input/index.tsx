@@ -2,13 +2,12 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { SetStateCallback } from 'types';
-import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { STRING_SWAP_INTERVALS } from 'utils/parsing';
 
 interface FrequencyInputProps {
   id: string;
   label: string;
   value: string;
-  isMaximal?: boolean;
   disabled?: boolean;
   error?: string;
   onChange: (newValue: string) => void | SetStateCallback<string>;
@@ -16,8 +15,8 @@ interface FrequencyInputProps {
 
 const inputRegex = RegExp(/^[0-9]*$/);
 
-const FrequencyInput = ({ id, label, onChange, value, disabled, error, isMaximal }: FrequencyInputProps) => {
-  const frequencyType = getFrequencyLabel(label, value);
+const FrequencyInput = ({ id, label, onChange, value, disabled, error }: FrequencyInputProps) => {
+  const frequencyType = STRING_SWAP_INTERVALS[label as keyof typeof STRING_SWAP_INTERVALS].plural;
 
   const validator = (nextValue: string) => {
     // sanitize value
@@ -36,7 +35,7 @@ const FrequencyInput = ({ id, label, onChange, value, disabled, error, isMaximal
       inputMode="decimal"
       autoComplete="off"
       autoCorrect="off"
-      fullWidth={!isMaximal}
+      fullWidth
       type="text"
       margin={'normal'}
       disabled={disabled}

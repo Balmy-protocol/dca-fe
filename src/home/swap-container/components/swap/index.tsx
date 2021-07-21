@@ -18,7 +18,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
 import TokenButton from 'common/token-button';
 import TokenInput from 'common/token-input';
-import FrequencyInput from 'common/frequency-input';
+import FrequencyInput from 'common/frequency-easy-input';
 import FrequencyTypeInput from 'common/frequency-type-input';
 import { SwapContextValue } from '../../SwapContext';
 import Button from 'common/button';
@@ -549,7 +549,7 @@ SwapProps) => {
       <StyledSettingsContainer>
         <Grid container>
           <Grid item xs={12}>
-            <Grid container alignItems="center" justify="space-between">
+            <Grid container alignItems="center" justify="space-between" spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="body1">
                   <FormattedMessage description="executes once" defaultMessage="Executes once" />
@@ -567,7 +567,7 @@ SwapProps) => {
           </Grid>
           <Grid item xs={12}>
             <StyledSettingContainer>
-              <Grid container alignItems="center" justify="space-between">
+              <Grid container alignItems="center" justify="space-between" spacing={2}>
                 <Grid item xs={12}>
                   <Typography variant="body1">
                     <FormattedMessage description="completes in" defaultMessage="Completes in" />
