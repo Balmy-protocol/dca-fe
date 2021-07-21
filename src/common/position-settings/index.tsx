@@ -58,7 +58,7 @@ const PositionSettings = ({
           <FormattedMessage description="withdraw swapped" defaultMessage="Withdraw swapped" />
         </Button>
         <Button variant="outlined" color="default" size="small" fullWidth onClick={onRemoveFunds}>
-          <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
+          <FormattedMessage description="withdraw funds" defaultMessage="Withdraw deposited" />
         </Button>
         <Button variant="outlined" color="default" size="small" fullWidth onClick={onModifyRate}>
           <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
