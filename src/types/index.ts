@@ -38,10 +38,10 @@ export interface AvailablePairSwap {
 }
 
 export type AvailablePairResponse = {
-  token0: {
+  tokenA: {
     id: string;
   };
-  token1: {
+  tokenB: {
     id: string;
   };
   id: string;

@@ -4,10 +4,10 @@ const getAvailablePairs = gql`
   query getAvailablePairs($first: Int, $skip: Int) {
     pairs(first: $first, skip: $skip) {
       id
-      token0 {
+      tokenA {
         id
       }
-      token1 {
+      tokenB {
         id
       }
       swaps {

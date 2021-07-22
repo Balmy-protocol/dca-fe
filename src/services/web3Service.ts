@@ -53,10 +53,7 @@ import usedTokensMocks from 'mocks/usedTokens';
 import { ETH } from 'mocks/tokens';
 import { FULL_DEPOSIT_TYPE, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 
-export const FACTORY_ADDRESS =
-  process.env.ETH_NETWORK === 'mainnet'
-    ? '0xa55E3d0E2Ad549D4De687B57b8598e108D65EbA9'
-    : '0xBCb011FB225aFe1a0B9Ac56c9231C772DeF6805A';
+export const FACTORY_ADDRESS = process.env.FACTORY_ADDRESS as string;
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
@@ -302,8 +299,8 @@ export default class Web3Service {
     );
 
     this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
-      token0: pair.token0.id,
-      token1: pair.token1.id,
+      token0: pair.tokenA.id,
+      token1: pair.tokenB.id,
       lastExecuted: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
       id: pair.id,
       createdAt: pair.createdAtTimestamp,

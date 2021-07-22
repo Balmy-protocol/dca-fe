@@ -108,7 +108,7 @@ const StyledSwapTokenButton = styled(IconButton)`
 `;
 
 const frequencyTypeOptions = [
-  ...(process.env.ETH_NETWORK === 'ropsten'
+  ...(process.env.ETH_NETWORK !== 'mainnet'
     ? [
         {
           label: STRING_SWAP_INTERVALS[FIVE_MINUTES_IN_SECONDS.toString()],

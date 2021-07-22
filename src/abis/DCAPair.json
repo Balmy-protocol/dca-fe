@@ -8,11 +8,6 @@
           "type": "address"
         },
         {
-          "internalType": "contract ISlidingOracle",
-          "name": "_oracle",
-          "type": "address"
-        },
-        {
           "internalType": "contract IERC20Detailed",
           "name": "_tokenA",
           "type": "address"
@@ -227,6 +222,12 @@
           "type": "uint256"
         },
         {
+          "indexed": false,
+          "internalType": "uint32",
+          "name": "_fee",
+          "type": "uint32"
+        },
+        {
           "components": [
             {
               "components": [
@@ -439,19 +440,6 @@
       "type": "event"
     },
     {
-      "inputs": [],
-      "name": "activeSwapIntervals",
-      "outputs": [
-        {
-          "internalType": "uint32[]",
-          "name": "__activeSwapIntervals",
-          "type": "uint32[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -490,6 +478,24 @@
       "name": "approve",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "availableToBorrow",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountToBorrowTokenA",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amountToBorrowTokenB",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -701,6 +707,25 @@
     {
       "inputs": [
         {
+          "internalType": "uint32",
+          "name": "_activeSwapInterval",
+          "type": "uint32"
+        }
+      ],
+      "name": "isSwapIntervalActive",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "_isIntervalActive",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "uint256",
           "name": "_amountToBorrowTokenA",
           "type": "uint256"
@@ -812,19 +837,6 @@
           "internalType": "uint32",
           "name": "",
           "type": "uint32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "oracle",
-      "outputs": [
-        {
-          "internalType": "contract ISlidingOracle",
-          "name": "",
-          "type": "address"
         }
       ],
       "stateMutability": "view",
