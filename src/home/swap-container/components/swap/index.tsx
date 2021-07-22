@@ -102,6 +102,9 @@ const StyledSwapTokenButton = styled(IconButton)`
   left: 50%;
   top: 24px;
   transform: translateX(-50%) translateY(-100%);
+  :hover {
+    background-color: #f0f0f0;
+  }
 `;
 
 const frequencyTypeOptions = [

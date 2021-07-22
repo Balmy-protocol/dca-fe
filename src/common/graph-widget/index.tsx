@@ -31,7 +31,7 @@ interface UniPrice {
 
 interface Price {
   name: string;
-  uni: string;
+  uni: number;
 }
 
 interface PoolsResponseData {
@@ -41,7 +41,11 @@ interface PoolsResponseData {
   }[];
 }
 
-type graphToken = Token | { address: string; symbol: string; decimals: number };
+interface TokenWithBase extends Token {
+  isBaseToken: boolean;
+}
+
+type graphToken = TokenWithBase | { address: string; symbol: string; decimals: number; isBaseToken: boolean };
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -142,23 +146,36 @@ const mockedData = [
 
 const PERIODS = [14, 30];
 
+const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST'];
+
 const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
-  let tokenA: graphToken = { address: '', symbol: '', decimals: 1 };
-  let tokenB: graphToken = { address: '', symbol: '', decimals: 1 };
+  let tokenA: graphToken = { address: '', symbol: '', decimals: 1, isBaseToken: false };
+  let tokenB: graphToken = { address: '', symbol: '', decimals: 1, isBaseToken: true };
   let uniData: UniPrice[] = [];
   let prices: Price[] = [];
-  let prices2: Price[] = [];
   const [tabIndex, setTabIndex] = React.useState(0);
   const tabsStyles = appleTabsStylesHook.useTabs();
   const tabItemStyles = appleTabsStylesHook.useTabItem();
 
   if (to && from) {
     if (from.address < to.address) {
-      tokenA = from;
-      tokenB = to;
+      tokenA = {
+        ...from,
+        isBaseToken: STABLE_COINS.includes(from.symbol),
+      };
+      tokenB = {
+        ...to,
+        isBaseToken: STABLE_COINS.includes(to.symbol),
+      };
     } else {
-      tokenA = to;
-      tokenB = from;
+      tokenA = {
+        ...to,
+        isBaseToken: STABLE_COINS.includes(to.symbol),
+      };
+      tokenB = {
+        ...from,
+        isBaseToken: STABLE_COINS.includes(from.symbol),
+      };
     }
   }
 
@@ -175,21 +192,24 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   const { pools } = data || {};
 
   if (pools && pools[0] && pools[0].poolDayData) {
-    // uniData = [...pools[0].poolDayData]
-    uniData = [...mockedData];
+    uniData = [...pools[0].poolDayData];
+    // uniData = [...mockedData];
     uniData.reverse();
   }
 
   prices = React.useMemo(
     () =>
-      map(uniData, ({ date, token1Price }) => ({
+      map(uniData, ({ date, token1Price, token0Price }) => ({
         name: DateTime.fromSeconds(date).toFormat('MMM d t'),
-        uni: toSignificantFromBigDecimal(token1Price, 6),
+        uni: parseFloat(toSignificantFromBigDecimal(tokenA.isBaseToken ? token0Price : token1Price, 6)),
       })),
     [uniData]
   );
 
-  const tooltipFormatter = (value: string, name: string) => `1 ${tokenA.symbol} = ${value} ${tokenB.symbol}`;
+  const tooltipFormatter = (value: string, name: string) =>
+    `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
+      tokenA.isBaseToken ? '' : tokenB.symbol
+    }`;
   const isLoading = loadingPool;
   const noData = prices.length === 0;
 
