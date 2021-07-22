@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { TransactionDetails } from 'types';
+import keys from 'lodash/keys';
 import { addTransaction, checkedTransaction, finalizeTransaction, clearAllTransactions } from './actions';
 
 const now = () => new Date().getTime();
@@ -16,7 +17,7 @@ export default createReducer(initialState, (builder) =>
       if (transactions[hash]) {
         throw Error('Attempted to add existing transaction.');
       }
-      transactions[hash] = { hash, approval, summary, claim, from, addedTime: now(), type, typeData };
+      transactions[hash] = { hash, approval, summary, claim, from, addedTime: now(), type, typeData, isCleared: false };
     })
     .addCase(checkedTransaction, (transactions, { payload: { hash, blockNumber } }) => {
       const tx = transactions[hash];
@@ -41,7 +42,8 @@ export default createReducer(initialState, (builder) =>
         ...extendedTypeData,
       };
     })
-    .addCase(clearAllTransactions, () => {
-      return initialState;
+    .addCase(clearAllTransactions, (transactions) => {
+      const transactionKeys = keys(transactions);
+      transactionKeys.forEach((txHash: string) => (transactions[txHash].isCleared = true));
     })
 );

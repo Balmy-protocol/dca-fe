@@ -12,7 +12,11 @@ import styled from 'styled-components';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import { useAllTransactions, useHasPendingTransactions, useIsTransactionPending } from 'state/transactions/hooks';
+import {
+  useAllNotClearedTransactions,
+  useHasPendingTransactions,
+  useIsTransactionPending,
+} from 'state/transactions/hooks';
 import Paper from '@material-ui/core/Paper';
 import Card from '@material-ui/core/Card';
 import { TransactionDetails } from 'types';
@@ -80,7 +84,7 @@ interface WalletMenuProps {
 }
 
 const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
-  const allTransactions = useAllTransactions();
+  const allTransactions = useAllNotClearedTransactions();
   const hasPendingTransactions = useHasPendingTransactions();
   const isPendingTransaction = useIsTransactionPending();
   const buildTransactionDetail = useBuildTransactionDetail();

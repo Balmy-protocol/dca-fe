@@ -308,6 +308,7 @@ export type TransactionTypeDataOptions =
 
 export interface TransactionDetails {
   hash: string;
+  isCleared?: boolean;
   approval?: { tokenAddress: string; spender: string };
   summary?: string;
   claim?: { recipient: string };
