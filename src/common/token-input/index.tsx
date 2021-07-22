@@ -12,6 +12,14 @@ const StyledInput = styled(Input)`
   text-align: center;
 `;
 
+const StyledInputContainer = styled.div`
+  background-color: #e3e3e3;
+  padding: 5px 10px;
+  border-radius: 10px;
+  display: inline-flex;
+  margin: 0px 6px;
+`;
+
 interface TokenInputProps {
   id: string;
   label: string;
@@ -49,16 +57,18 @@ const TokenInput = ({
   return (
     <>
       {isMinimal ? (
-        <StyledInput
-          id={id}
-          value={value}
-          onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-          style={{ width: `${value.length + 1}ch` }}
-          type="text"
-          inputProps={{
-            style: { textAlign: 'center' },
-          }}
-        />
+        <StyledInputContainer>
+          <StyledInput
+            id={id}
+            value={value}
+            onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+            style={{ width: `${value.length + 1}ch` }}
+            type="text"
+            inputProps={{
+              style: { textAlign: 'center' },
+            }}
+          />
+        </StyledInputContainer>
       ) : (
         <TextField
           id={id}
