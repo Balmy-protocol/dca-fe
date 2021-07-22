@@ -50,7 +50,6 @@ import {
 } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
-import ModeTypeInput from 'common/mode-type-input';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -146,9 +145,9 @@ const Swap = ({
   frequencyType,
   frequencyValue,
   web3Service,
-}: // availablePairs,
-SwapProps) => {
+}: SwapProps) => {
   const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
+  const [rate, setRate] = React.useState('0');
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
@@ -244,8 +243,7 @@ SwapProps) => {
         fromValue,
         frequencyType,
         frequencyValue,
-        existingPair as AvailablePair,
-        modeType
+        existingPair as AvailablePair
       );
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
@@ -257,7 +255,6 @@ SwapProps) => {
           frequencyValue,
           existingPair: existingPair as AvailablePair,
           startedAt: Date.now(),
-          modeType,
           id: result.hash,
         },
       });
@@ -273,6 +270,7 @@ SwapProps) => {
       });
 
       setFromValue('');
+      setRate('0');
     } catch (e) {
       setModalError({
         error: e,
@@ -290,18 +288,72 @@ SwapProps) => {
     setTo(from);
   };
 
-  const hasError = fromValue && balance && parseUnits(fromValue, tokenList[from].decimals).gt(balance);
+  const handleFromValueChange = (fromValue: string) => {
+    setModeType(FULL_DEPOSIT_TYPE);
+    setFromValue(fromValue);
+    setRate(
+      (fromValue &&
+        parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+        frequencyValue &&
+        BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+        from &&
+        formatUnits(
+          parseUnits(fromValue, tokenList[from].decimals).div(BigNumber.from(frequencyValue)),
+          tokenList[from].decimals
+        )) ||
+        '0'
+    );
+  };
 
-  const cantFund =
-    fromValue &&
-    balance &&
-    parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
-    frequencyValue &&
-    BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-    from &&
-    ((modeType === RATE_TYPE &&
-      parseUnits(fromValue, tokenList[from].decimals).mul(BigNumber.from(frequencyValue)).gt(balance)) ||
-      (modeType === FULL_DEPOSIT_TYPE && parseUnits(fromValue, tokenList[from].decimals).gt(balance)));
+  const handleRateValueChange = (rate: string) => {
+    setModeType(RATE_TYPE);
+    setRate(rate);
+    setFromValue(
+      (rate &&
+        parseUnits(rate, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+        frequencyValue &&
+        BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+        from &&
+        formatUnits(
+          parseUnits(rate, tokenList[from].decimals).mul(BigNumber.from(frequencyValue)),
+          tokenList[from].decimals
+        )) ||
+        ''
+    );
+  };
+
+  const handleFrequencyChange = (frequencyValue: string) => {
+    setFrequencyValue(frequencyValue);
+    if (modeType === RATE_TYPE) {
+      setFromValue(
+        (rate &&
+          parseUnits(rate, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+          frequencyValue &&
+          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          from &&
+          formatUnits(
+            parseUnits(rate, tokenList[from].decimals).mul(BigNumber.from(frequencyValue)),
+            tokenList[from].decimals
+          )) ||
+          ''
+      );
+    } else {
+      setRate(
+        (fromValue &&
+          parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+          frequencyValue &&
+          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          from &&
+          formatUnits(
+            parseUnits(fromValue, tokenList[from].decimals).div(BigNumber.from(frequencyValue)),
+            tokenList[from].decimals
+          )) ||
+          '0'
+      );
+    }
+  };
+
+  const cantFund = fromValue && balance && parseUnits(fromValue, tokenList[from].decimals).gt(balance);
 
   const networkError =
     !isLoadingNetwork &&
@@ -320,7 +372,6 @@ SwapProps) => {
     !pairExists ||
     !fromValue ||
     !frequencyValue ||
-    hasError ||
     cantFund ||
     networkError ||
     isLoadingNetwork ||
@@ -341,18 +392,6 @@ SwapProps) => {
     [];
 
   const ignoreValues = [from, to];
-
-  const rate =
-    (fromValue &&
-      parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
-      frequencyValue &&
-      BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-      from &&
-      formatUnits(
-        parseUnits(fromValue, tokenList[from].decimals).div(BigNumber.from(frequencyValue)),
-        tokenList[from].decimals
-      )) ||
-    0;
 
   const CreatePairButton = (
     <StyledButton
@@ -486,17 +525,10 @@ SwapProps) => {
       />
       <StyledSwapContainer>
         <Grid container>
-          <Grid item xs={12}>
-            <ModeTypeInput selected={modeType} onChange={setModeType} />
-          </Grid>
           <StyledFromContainer container alignItems="center" justify="space-between">
             <Grid item xs={12} md={6}>
               <Typography variant="body1">
-                <FormattedMessage
-                  description="You {mode}"
-                  defaultMessage="You {mode}"
-                  values={{ mode: modeType === FULL_DEPOSIT_TYPE ? 'pay' : 'set' }}
-                />
+                <FormattedMessage description="You pay" defaultMessage="You pay" />
               </Typography>
             </Grid>
             <Grid item xs={12} md={6} style={{ textAlign: 'right' }}>
@@ -514,10 +546,10 @@ SwapProps) => {
             <Grid item xs={12} sm={6}>
               <TokenInput
                 id="from-value"
-                error={hasError ? 'Ammount cannot exceed balance' : ''}
+                error={cantFund ? 'Ammount cannot exceed balance' : ''}
                 value={fromValue}
                 label={tokenList[from]?.symbol}
-                onChange={setFromValue}
+                onChange={handleFromValueChange}
                 withBalance={!isLoadingBalance}
                 isLoadingBalance={isLoadingBalance}
                 balance={balance}
@@ -528,6 +560,33 @@ SwapProps) => {
               <Grid container alignItems="center" justify="flex-end">
                 <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
               </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <StyledSettingContainer>
+                <Typography variant="body1" component="span">
+                  <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
+                </Typography>
+                <TokenInput
+                  id="rate-value"
+                  value={rate}
+                  label={tokenList[from]?.symbol}
+                  onChange={handleRateValueChange}
+                  withBalance={false}
+                  token={tokenList[from]}
+                  isMinimal
+                />
+                <Typography variant="body1" component="span">
+                  <FormattedMessage
+                    description="rate detail"
+                    defaultMessage="{from} every {frequency} for you"
+                    values={{
+                      from: tokenList[from].symbol,
+                      frequency:
+                        STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singular,
+                    }}
+                  />
+                </Typography>
+              </StyledSettingContainer>
             </Grid>
           </StyledFromContainer>
           <StyledToContainer container alignItems="center" justify="space-between">
@@ -583,26 +642,10 @@ SwapProps) => {
                     id="frequency-value"
                     value={frequencyValue}
                     label={frequencyType.toString()}
-                    onChange={setFrequencyValue}
+                    onChange={handleFrequencyChange}
                   />
                 </Grid>
               </Grid>
-            </StyledSettingContainer>
-          </Grid>
-          <Grid item xs={12}>
-            <StyledSettingContainer>
-              <Typography variant="body1">
-                <FormattedMessage
-                  description="rate detail"
-                  defaultMessage="We'll swap {amount} {from} every {frequency} for you"
-                  values={{
-                    amount: modeType === FULL_DEPOSIT_TYPE ? rate : fromValue,
-                    from: tokenList[from].symbol,
-                    frequency:
-                      STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singular,
-                  }}
-                />
-              </Typography>
             </StyledSettingContainer>
           </Grid>
           <Grid item xs={12}>

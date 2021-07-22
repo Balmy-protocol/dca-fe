@@ -466,8 +466,7 @@ export default class Web3Service {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
-    existingPair: AvailablePair,
-    modeType: string
+    existingPair: AvailablePair
   ) {
     let token = from;
 
@@ -477,7 +476,7 @@ export default class Web3Service {
 
     const weiValue = parseUnits(fromValue, token.decimals);
 
-    const rate = modeType === RATE_TYPE ? weiValue : weiValue.div(BigNumber.from(frequencyValue));
+    const rate = weiValue.div(BigNumber.from(frequencyValue));
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
 
@@ -581,18 +580,10 @@ export default class Web3Service {
         to: newPositionTypeData.to.address,
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
         swapped: BigNumber.from(0),
-        rate:
-          newPositionTypeData.modeType === RATE_TYPE
-            ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
-            : parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
-                BigNumber.from(newPositionTypeData.frequencyValue)
-              ),
-        remainingLiquidity:
-          newPositionTypeData.modeType === FULL_DEPOSIT_TYPE
-            ? parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)
-            : parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).mul(
-                BigNumber.from(newPositionTypeData.frequencyValue)
-              ),
+        rate: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
+          BigNumber.from(newPositionTypeData.frequencyValue)
+        ),
+        remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         withdrawn: BigNumber.from(0),
