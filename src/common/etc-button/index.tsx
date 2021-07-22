@@ -25,19 +25,19 @@ function ListItemLink(props: ListItemProps<'a', { button?: true }>) {
 const EtcButton = () => (
   <FloatingMenu buttonContent={<MoreVertIcon />}>
     <List>
-      <ListItemLink>
+      <ListItemLink href="https://twitter.com/mean_fi" target="_blank">
         <ListItemIcon>
           <TwitterIcon />
         </ListItemIcon>
         <ListItemText primary="Twitter" />
       </ListItemLink>
-      <ListItemLink>
+      <ListItemLink href="https://docs.mean.finance" target="_blank">
         <ListItemIcon>
           <DescriptionIcon />
         </ListItemIcon>
         <ListItemText primary="Docs" />
       </ListItemLink>
-      <ListItemLink>
+      <ListItemLink href="https://github.com/Mean-Finance/dca" target="_blank">
         <ListItemIcon>
           <GitHubIcon />
         </ListItemIcon>
