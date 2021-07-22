@@ -2,11 +2,12 @@ import React from 'react';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
-import { Chart } from 'react-charts';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import map from 'lodash/map';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { appleTabsStylesHook } from 'common/tabs';
@@ -22,16 +23,21 @@ interface GraphWidgetProps {
   client: ApolloClient<NormalizedCacheObject>;
 }
 
-interface Price {
+interface UniPrice {
   date: number;
   token0Price: string;
   token1Price: string;
 }
 
+interface Price {
+  name: string;
+  uni: string;
+}
+
 interface PoolsResponseData {
   pools: {
     id: string;
-    poolDayData: Price[];
+    poolDayData: UniPrice[];
   }[];
 }
 
@@ -139,7 +145,9 @@ const PERIODS = [14, 30];
 const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   let tokenA: graphToken = { address: '', symbol: '', decimals: 1 };
   let tokenB: graphToken = { address: '', symbol: '', decimals: 1 };
+  let uniData: UniPrice[] = [];
   let prices: Price[] = [];
+  let prices2: Price[] = [];
   const [tabIndex, setTabIndex] = React.useState(0);
   const tabsStyles = appleTabsStylesHook.useTabs();
   const tabItemStyles = appleTabsStylesHook.useTabItem();
@@ -167,43 +175,21 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   const { pools } = data || {};
 
   if (pools && pools[0] && pools[0].poolDayData) {
-    prices = [...pools[0].poolDayData];
-    prices = mockedData;
-    prices.reverse();
+    // uniData = [...pools[0].poolDayData]
+    uniData = [...mockedData];
+    uniData.reverse();
   }
 
-  const graphData = React.useMemo(
-    () => [
-      {
-        label: 'Series 1',
-        data: prices.map(({ date, token1Price }) => [
-          DateTime.fromSeconds(date).toFormat('MMM d t'),
-          toSignificantFromBigDecimal(token1Price, 6),
-        ]),
-      },
-    ],
-    [prices]
+  prices = React.useMemo(
+    () =>
+      map(uniData, ({ date, token1Price }) => ({
+        name: DateTime.fromSeconds(date).toFormat('MMM d t'),
+        uni: toSignificantFromBigDecimal(token1Price, 6),
+      })),
+    [uniData]
   );
 
-  const axes = React.useMemo(
-    () => [
-      { primary: true, type: 'ordinal', position: 'bottom', show: false },
-      { type: 'linear', position: 'left', show: false },
-    ],
-    []
-  );
-
-  const tooltip = React.useMemo(
-    () => ({
-      render: ({ datum }: { datum: { yValue: string } }) => {
-        return (
-          <Typography variant="body2">{`${((datum && datum.yValue) || '').toString()} ${tokenB.symbol}`}</Typography>
-        );
-      },
-    }),
-    [tokenA, tokenB]
-  );
-
+  const tooltipFormatter = (value: string, name: string) => `1 ${tokenA.symbol} = ${value} ${tokenB.symbol}`;
   const isLoading = loadingPool;
   const noData = prices.length === 0;
 
@@ -242,26 +228,25 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
             </StyledCenteredWrapper>
           ) : (
             <StyledGraphContainer elevation={0}>
-              <StyledGraph>
-                <AutoSizer>
-                  {({ height, width }) => (
-                    <div style={{ height, width }}>
-                      <Chart data={graphData} axes={axes} primaryCursor tooltip={tooltip} />
-                    </div>
-                  )}
-                </AutoSizer>
-              </StyledGraph>
+              <ResponsiveContainer width="100%">
+                <LineChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <Line type="monotone" dataKey="uni" stroke="#8884d8" />
+                  <XAxis dataKey="name" hide />
+                  <YAxis hide />
+                  <Tooltip formatter={tooltipFormatter} />
+                </LineChart>
+              </ResponsiveContainer>
               <StyledGraphAxis />
               <StyledGraphAxisLabels>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(prices[0].date).toLocaleString({
+                  {DateTime.fromSeconds(uniData[0].date).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
                   })}
                 </Typography>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(prices[prices.length - 1].date).toLocaleString({
+                  {DateTime.fromSeconds(uniData[uniData.length - 1].date).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
