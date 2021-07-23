@@ -635,7 +635,7 @@ const Swap = ({
                   <Typography variant="body1">
                     <FormattedMessage
                       description="completes in"
-                      defaultMessage="Ammount of {type}"
+                      defaultMessage="Amount of {type}"
                       values={{ type: getFrequencyLabel(frequencyType.toString(), frequencyValue) }}
                     />
                   </Typography>
