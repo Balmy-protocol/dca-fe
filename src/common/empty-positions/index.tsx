@@ -19,10 +19,18 @@ const StyledCard = styled(Card)`
   flex-direction: column;
 `;
 
-const EmptyPositions = () => (
+interface EmptyPositionsProps {
+  isClosed?: boolean;
+}
+
+const EmptyPositions = ({ isClosed }: EmptyPositionsProps) => (
   <StyledCard variant="outlined">
     <Typography variant="h4">
-      <FormattedMessage description="empty positions" defaultMessage="No open positions yet." />
+      <FormattedMessage
+        description="empty positions"
+        defaultMessage="No {status} positions yet."
+        values={{ status: isClosed ? 'past' : 'open' }}
+      />
     </Typography>
   </StyledCard>
 );

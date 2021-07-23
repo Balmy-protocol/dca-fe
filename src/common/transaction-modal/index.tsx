@@ -40,6 +40,7 @@ const StyledDialog = styled(Dialog)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
 `;
 
 const StyledLoadingIndicatorWrapper = styled.div<{ withMargin?: boolean }>`

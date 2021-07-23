@@ -7,14 +7,34 @@ import { TokenList, Web3Service, PositionsRaw } from 'types';
 import usePromise from 'hooks/usePromise';
 import usePastPositions from 'hooks/usePastPositions';
 import useTokenList from 'hooks/useTokenList';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+import EmptyPositions from 'common/empty-positions';
+import EmptyPosition from 'common/empty-position';
 
 interface HistoryProps {
   web3Service: Web3Service;
 }
 
+const POSITIONS_PER_ROW = {
+  xs: 1,
+  sm: 2,
+  md: 4,
+  lg: 4,
+  xl: 4,
+};
 const History = ({ web3Service }: HistoryProps) => {
   const pastPositions = usePastPositions();
   const tokenList = useTokenList();
+  const currentBreakPoint = useCurrentBreakpoint();
+
+  const positionsPerRow = POSITIONS_PER_ROW[currentBreakPoint];
+  const positionsToFill =
+    pastPositions.length % positionsPerRow !== 0 ? positionsPerRow - (pastPositions.length % positionsPerRow) : 0;
+  const emptyPositions = [];
+
+  for (let i = 0; i < positionsToFill; i++) {
+    emptyPositions.push(i);
+  }
 
   return (
     <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
@@ -29,6 +49,18 @@ const History = ({ web3Service }: HistoryProps) => {
                 </Grid>
               ))
             : null}
+          {pastPositions &&
+            !!pastPositions.length &&
+            emptyPositions.map((id) => (
+              <Grid item xs={12} sm={6} md={3} key={id}>
+                <EmptyPosition />
+              </Grid>
+            ))}
+          {pastPositions && !pastPositions.length && (
+            <Grid item xs={12}>
+              <EmptyPositions isClosed />
+            </Grid>
+          )}
         </Grid>
       </Grid>
     </Grid>
