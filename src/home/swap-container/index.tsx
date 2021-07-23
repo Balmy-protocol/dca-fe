@@ -32,7 +32,7 @@ const SwapContainer = () => {
       <WalletContext.Consumer>
         {({ graphPricesClient, web3Service }) => (
           <>
-            <Grid item xs={9} md={5}>
+            <Grid item xs={12} md={5}>
               <Swap
                 from={from}
                 to={to}

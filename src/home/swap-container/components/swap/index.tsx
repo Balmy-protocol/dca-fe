@@ -549,7 +549,7 @@ const Swap = ({
             <Grid item xs={12} sm={6}>
               <TokenInput
                 id="from-value"
-                error={cantFund ? 'Ammount cannot exceed balance' : ''}
+                error={cantFund ? 'Amount cannot exceed balance' : ''}
                 value={fromValue}
                 label={tokenList[from]?.symbol}
                 onChange={handleFromValueChange}

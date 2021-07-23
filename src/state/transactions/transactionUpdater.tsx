@@ -83,7 +83,7 @@ export default function Updater(): null {
 
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_PAIR) {
                 extendedTypeData = {
-                  id: ethers.utils.hexValue(receipt.logs[0].data),
+                  id: ethers.utils.hexValue(receipt.logs[receipt.logs.length - 1].data),
                 };
               }
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {

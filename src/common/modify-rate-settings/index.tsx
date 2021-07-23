@@ -120,7 +120,7 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
             <>
               <TokenInput
                 id="from-value"
-                error={!!hasError ? 'Ammount cannot exceed your current balance' : ''}
+                error={!!hasError ? 'Amount cannot exceed your current balance' : ''}
                 value={fromValue}
                 label={position.from.symbol}
                 onChange={setFromValue}
