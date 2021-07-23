@@ -538,11 +538,17 @@ export default class Web3Service {
   removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
-    const newRate = position.remainingLiquidity
-      .sub(parseUnits(ammountToRemove, position.from.decimals))
-      .div(BigNumber.from(position.remainingSwaps));
+    const newRate = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
+      ? position.rate
+      : position.remainingLiquidity
+          .sub(parseUnits(ammountToRemove, position.from.decimals))
+          .div(BigNumber.from(position.remainingSwaps));
 
-    return factory.modifyRateAndSwaps(position.dcaId, newRate, position.remainingSwaps);
+    return factory.modifyRateAndSwaps(
+      position.dcaId,
+      newRate,
+      parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity) ? 0 : position.remainingSwaps
+    );
   }
 
   getTransactionReceipt(txHash: string) {

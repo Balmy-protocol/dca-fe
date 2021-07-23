@@ -61,10 +61,17 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
     [from.address, to.address],
     !from || !to || !web3Service.getAccount() || !open
   );
+
   const addTransaction = useTransactionAdder();
 
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
 
+  if (estimatedPriceErrors && open) {
+    setModalError({
+      error: estimatedPriceErrors,
+    });
+    onCancel();
+  }
   const handleCreatePair = async () => {
     try {
       onCancel();

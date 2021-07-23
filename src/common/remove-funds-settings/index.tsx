@@ -39,7 +39,7 @@ interface RemoveFundsSettingsProps {
 const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSettingsProps) => {
   const [fromValue, setFromValue] = React.useState('');
 
-  const hasError = fromValue && parseUnits(fromValue, position.from.decimals).gte(position.remainingLiquidity);
+  const hasError = fromValue && parseUnits(fromValue, position.from.decimals).gt(position.remainingLiquidity);
   const shouldDisable = fromValue && parseUnits(fromValue, position.from.decimals).lte(BigNumber.from(0));
   return (
     <>

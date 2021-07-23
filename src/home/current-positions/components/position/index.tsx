@@ -263,10 +263,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
           <FormattedMessage
             description="Withdrawing funds from position success"
             defaultMessage="Returning {ammountToRemove} {from} to you has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{
-              from: position.from.symbol,
-              to: position.to.symbol,
-            }}
+            values={{ from: position.from.symbol, ammountToRemove }}
           />
         ),
       });
