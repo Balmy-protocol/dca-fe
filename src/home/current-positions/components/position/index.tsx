@@ -28,6 +28,7 @@ import { formatCurrencyAmount } from 'utils/currency';
 import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/etherscan';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import Link from '@material-ui/core/Link';
+import useBalance from 'hooks/useBalance';
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -131,12 +132,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const availablePairs = useAvailablePairs();
   const addTransaction = useTransactionAdder();
-  const [balance] = usePromise<BigNumber>(
-    web3Service,
-    'getBalance',
-    [from.address, from.decimals],
-    !from || !web3Service.getAccount()
-  );
+  const [balance] = useBalance(from);
 
   const isPending = !!pendingTransaction;
   const [token0, token1] = sortTokens(from.address, to.address);

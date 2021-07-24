@@ -93,7 +93,13 @@ const AddToPosition = ({ onClose, shouldShow, onAddFunds, position, balance }: A
           </Typography>
         </StyledInputContainer>
         <StyledActionContainer>
-          <Button color="primary" variant="contained" fullWidth onClick={handleAddFunds}>
+          <Button
+            color="primary"
+            variant="contained"
+            fullWidth
+            onClick={handleAddFunds}
+            disabled={hasError || !fromValue || parseUnits(fromValue, position.from.decimals).lte(BigNumber.from(0))}
+          >
             <FormattedMessage description="add to position" defaultMessage="Add to position" />
           </Button>
         </StyledActionContainer>

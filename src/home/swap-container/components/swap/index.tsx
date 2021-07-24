@@ -29,6 +29,7 @@ import SwapVertIcon from '@material-ui/icons/SwapVert';
 import find from 'lodash/find';
 import WarningIcon from '@material-ui/icons/Warning';
 import usePromise from 'hooks/usePromise';
+import useBalance from 'hooks/useBalance';
 import CreatePairModal from 'common/create-pair-modal';
 import { FULL_DEPOSIT_TYPE, MODE_TYPES, NETWORKS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -157,12 +158,7 @@ const Swap = ({
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
-  const [balance, isLoadingBalance, balanceErrors] = usePromise<BigNumber>(
-    web3Service,
-    'getBalance',
-    [from, (tokenList[from] && tokenList[from].decimals) || 18],
-    !from || !web3Service.getAccount()
-  );
+  const [balance, isLoadingBalance, balanceErrors] = useBalance(tokenList[from]);
 
   const [currentNetwork, isLoadingNetwork, networkErrors] = usePromise<Network>(
     web3Service,
