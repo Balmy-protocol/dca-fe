@@ -186,7 +186,8 @@ const TokenPicker = ({
       tokenKeysToUse.filter(
         (el) =>
           (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
-            tokenList[el].symbol.toLowerCase().includes(search.toLowerCase())) &&
+            tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
+            tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
           !usedTokens.includes(el) &&
           !ignoreValues.includes(el)
       ),
