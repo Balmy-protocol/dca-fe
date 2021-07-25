@@ -18,7 +18,6 @@ function useBalance(from: Token) {
   React.useEffect(() => {
     async function callPromise() {
       if (from) {
-        console.log('will get balance');
         try {
           const promiseResult = await web3Service.getBalance(from.address, from.decimals);
           setResult(promiseResult);

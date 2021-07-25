@@ -329,15 +329,25 @@ export default class Web3Service {
         };
       }
 
+      const availableTokensToken0 = [...acc[pool.token0.id].pairableTokens];
+      const availableTokensToken1 = [...acc[pool.token1.id].pairableTokens];
+
+      if (availableTokensToken0.indexOf(pool.token1.id) === -1) {
+        availableTokensToken0.push(pool.token1.id);
+      }
+      if (availableTokensToken1.indexOf(pool.token0.id) === -1) {
+        availableTokensToken1.push(pool.token0.id);
+      }
+
       return {
         ...acc,
         [pool.token0.id]: {
           ...acc[pool.token0.id],
-          pairableTokens: [...acc[pool.token0.id].pairableTokens, pool.token1.id],
+          pairableTokens: [...availableTokensToken0],
         },
         [pool.token1.id]: {
           ...acc[pool.token1.id],
-          pairableTokens: [...acc[pool.token1.id].pairableTokens, pool.token0.id],
+          pairableTokens: [...availableTokensToken1],
         },
       };
     }, {});
