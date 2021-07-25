@@ -8,6 +8,7 @@ import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
+import find from 'lodash/find';
 import keyBy from 'lodash/keyBy';
 import axios, { AxiosResponse } from 'axios';
 import {
