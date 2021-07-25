@@ -17,12 +17,13 @@ import { FormattedMessage } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import WalletMenu from 'common/wallet-menu';
 import EtcButton from 'common/etc-button';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
-const StyledButtonContainer = styled.div`
+const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: ${(props) => (props.breakpoint === 'xs' ? 'center' : 'flex-end')};
 `;
 
 const StyledButton = styled(Button)`
@@ -48,6 +49,7 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
   const hasPendingTransactions = useHasPendingTransactions();
   const dispatch = useAppDispatch();
   const badge = useBadgeNumber();
+  const currentBreakPoint = useCurrentBreakpoint();
 
   const onOpen = () => {
     dispatch(
@@ -57,7 +59,7 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
   };
 
   return (
-    <StyledButtonContainer>
+    <StyledButtonContainer breakpoint={currentBreakPoint}>
       {!isLoading && (
         <>
           <Badge

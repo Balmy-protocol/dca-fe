@@ -3,12 +3,13 @@ import Button from '@material-ui/core/Button';
 import { FormattedMessage } from 'react-intl';
 import { Web3Service } from 'types';
 import styled from 'styled-components';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
-const StyledButtonContainer = styled.div`
+const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: ${(props) => (props.breakpoint === 'xs' ? 'center' : 'flex-end')};
 `;
 
 const StyledButton = styled(Button)`
@@ -28,12 +29,15 @@ interface ConnectWalletButtonProps {
   web3Service: Web3Service;
 }
 
-const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => (
-  <StyledButtonContainer>
-    <StyledButton color="primary" onClick={() => web3Service.connect()}>
-      <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
-    </StyledButton>
-  </StyledButtonContainer>
-);
+const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => {
+  const currentBreakPoint = useCurrentBreakpoint();
+  return (
+    <StyledButtonContainer breakpoint={currentBreakPoint}>
+      <StyledButton color="primary" onClick={() => web3Service.connect()}>
+        <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
+      </StyledButton>
+    </StyledButtonContainer>
+  );
+};
 
 export default ConnectWalletButton;

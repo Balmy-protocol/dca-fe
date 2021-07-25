@@ -525,12 +525,12 @@ const Swap = ({
       <StyledSwapContainer>
         <Grid container>
           <StyledFromContainer container alignItems="center" justify="space-between">
-            <Grid item xs={12} md={6}>
+            <Grid item xs={6}>
               <Typography variant="body1">
                 <FormattedMessage description="You pay" defaultMessage="You pay" />
               </Typography>
             </Grid>
-            <Grid item xs={12} md={6} style={{ textAlign: 'right' }}>
+            <Grid item xs={6} style={{ textAlign: 'right' }}>
               <Typography variant="body2">
                 <FormattedMessage
                   description="in position"
@@ -542,7 +542,7 @@ const Swap = ({
                 />
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={6}>
               <TokenInput
                 id="from-value"
                 error={cantFund ? 'Amount cannot exceed balance' : ''}
@@ -555,7 +555,7 @@ const Swap = ({
                 token={tokenList[from]}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={6}>
               <Grid container alignItems="center" justify="flex-end">
                 <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
               </Grid>
@@ -592,12 +592,12 @@ const Swap = ({
             <StyledSwapTokenButton onClick={toggleFromTo}>
               <SwapVertIcon />
             </StyledSwapTokenButton>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={6}>
               <Typography variant="body1">
                 <FormattedMessage description="will be swapped for" defaultMessage="Will be swapped for" />
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={6}>
               <Grid container alignItems="center" justify="flex-end">
                 <TokenButton token={tokenList[to]} onClick={() => startSelectingCoin(to)} />
               </Grid>

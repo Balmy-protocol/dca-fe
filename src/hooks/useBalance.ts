@@ -13,6 +13,7 @@ function useBalance(from: Token) {
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
+  const account = usePrevious(web3Service.getAccount());
 
   React.useEffect(() => {
     async function callPromise() {
@@ -32,6 +33,7 @@ function useBalance(from: Token) {
     if (
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
+      !isEqual(account, web3Service.getAccount()) ||
       !isEqual(prevPendingTrans, hasPendingTransactions)
     ) {
       setIsLoading(true);
@@ -39,7 +41,7 @@ function useBalance(from: Token) {
       setError(undefined);
       callPromise();
     }
-  }, [from, isLoading, result, error, hasPendingTransactions]);
+  }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount()]);
 
   return [result, isLoading, error];
 }
