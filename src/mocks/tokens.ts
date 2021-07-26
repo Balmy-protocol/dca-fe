@@ -50,7 +50,7 @@ export const UNI = {
 export const YFI = {
   chainId: 1,
   decimals: 18,
-  address: '0x99fda92878c1d2f1e0971d1937c50cc578a33e3d',
+  address: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
   name: 'Yearn Finance',
   symbol: 'YFI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',

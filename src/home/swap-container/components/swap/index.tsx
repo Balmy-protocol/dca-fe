@@ -387,7 +387,7 @@ const Swap = ({
       !usedTokensErrors &&
       usedTokensData &&
       usedTokensData.data.tokens &&
-      usedTokensData.data.tokens.map((token) => token.tokenInfo.address)) ||
+      usedTokensData.data.tokens.map((token) => token.tokenInfo.address.toLowerCase())) ||
     [];
 
   const ignoreValues = [from, to];

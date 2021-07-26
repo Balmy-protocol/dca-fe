@@ -163,10 +163,6 @@ const TokenPicker = ({
   const [search, setSearch] = React.useState('');
   let tokenKeysToUse: string[] = [];
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
-  const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !ignoreValues.includes(el)),
-    [usedTokens, ignoreValues]
-  );
   const inputStyles = useSearchInputStyles();
 
   const handleOnClose = () => {
@@ -180,6 +176,11 @@ const TokenPicker = ({
   };
 
   tokenKeysToUse = isFrom ? tokenKeys : availableFrom;
+
+  const memoizedUsedTokens = React.useMemo(
+    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
+    [usedTokens, ignoreValues, tokenKeysToUse]
+  );
 
   const memoizedTokenKeys = React.useMemo(
     () =>

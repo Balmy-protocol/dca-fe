@@ -438,9 +438,10 @@ export default class Web3Service {
   }
 
   getUsedTokens() {
-    return axios.get(
-      `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
-    );
+    // return axios.get(
+    //   `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
+    // );
+    return Promise.resolve(usedTokensMocks);
   }
 
   getAllowance(token: Token, pairContract: AvailablePair) {
