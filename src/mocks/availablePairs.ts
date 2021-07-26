@@ -1,4 +1,4 @@
-import { WETH, DAI, UNI, USDC, YFI } from './tokens';
+import { WETH, DAI, UNI, YFI } from './tokens';
 
 const mockedPairs = [
   {
@@ -15,11 +15,6 @@ const mockedPairs = [
     tokenA: UNI.address,
     tokenB: WETH.address,
     id: '0x360b79e59504c98f66c6eae105d11ffae352c673',
-  },
-  {
-    tokenA: USDC.address,
-    tokenB: YFI.address,
-    id: '0x3edbadb0e6f7d54f73b7ff163111979b65dd7102',
   },
 ];
 

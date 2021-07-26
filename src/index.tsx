@@ -9,7 +9,6 @@ import MainApp from './frame';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from 'styled-components';
 import Web3Service from 'services/web3Service';
-import { WETH, DAI, USDC, YFI, UNI, T0 } from 'mocks/tokens';
 import TransactionModalProvider from 'common/transaction-modal';
 import { ApolloProvider } from '@apollo/client';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';

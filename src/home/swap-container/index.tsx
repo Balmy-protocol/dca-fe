@@ -13,7 +13,7 @@ import Hidden from '@material-ui/core/Hidden';
 
 const SwapContainer = () => {
   const routeParams = useParams<{ from: string; to: string }>();
-  const [from, setFrom] = React.useState((routeParams && routeParams.from) || UNI.address);
+  const [from, setFrom] = React.useState((routeParams && routeParams.from) || WETH.address);
   const [to, setTo] = React.useState((routeParams && routeParams.to) || DAI.address);
   const [fromValue, setFromValue] = React.useState('');
   const [frequencyType, setFrequencyType] = React.useState(DAY_IN_SECONDS);

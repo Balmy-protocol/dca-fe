@@ -4,6 +4,7 @@ export const NETWORKS = {
   mainnet: 1,
   ropsten: 3,
   rinkeby: 4,
+  meanfinance: 31337,
 };
 
 export const TRANSACTION_TYPES: TransactionTypesConstant = {
