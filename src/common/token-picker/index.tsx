@@ -19,6 +19,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles } from '@material-ui/core/styles';
+import { ContactSupportOutlined } from '@material-ui/icons';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
 interface PartialTheme {

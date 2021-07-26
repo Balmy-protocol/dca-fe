@@ -30,6 +30,7 @@ import find from 'lodash/find';
 import WarningIcon from '@material-ui/icons/Warning';
 import usePromise from 'hooks/usePromise';
 import useBalance from 'hooks/useBalance';
+import useUsedTokens from 'hooks/useUsedTokens';
 import CreatePairModal from 'common/create-pair-modal';
 import { FULL_DEPOSIT_TYPE, MODE_TYPES, NETWORKS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -167,12 +168,7 @@ const Swap = ({
     !web3Service.getAccount()
   );
 
-  const [usedTokensData, isLoadingUsedTokens, usedTokensErrors] = usePromise<GetUsedTokensDataResponse>(
-    web3Service,
-    'getUsedTokens',
-    [],
-    !web3Service.getAccount()
-  );
+  const [usedTokens] = useUsedTokens();
 
   const existingPair = React.useMemo(() => {
     let token0 = from < to ? from : to;
@@ -381,14 +377,6 @@ const Swap = ({
     networkErrors ||
     parseUnits(fromValue, tokenList[from].decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0));
-
-  const usedTokens =
-    (!isLoadingUsedTokens &&
-      !usedTokensErrors &&
-      usedTokensData &&
-      usedTokensData.data.tokens &&
-      usedTokensData.data.tokens.map((token) => token.tokenInfo.address.toLowerCase())) ||
-    [];
 
   const ignoreValues = [from, to];
 
