@@ -26,6 +26,12 @@ const SwapContainer = () => {
       setTo(tokenList[from].pairableTokens[0]);
     }
   };
+  const onSetTo = (to: string) => {
+    setTo(to);
+    if (!tokenList[to].pairableTokens.includes(from)) {
+      setFrom(tokenList[to].pairableTokens[0]);
+    }
+  };
 
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">
@@ -37,7 +43,7 @@ const SwapContainer = () => {
                 from={from}
                 to={to}
                 setFrom={onSetFrom}
-                setTo={setTo}
+                setTo={onSetTo}
                 frequencyType={frequencyType}
                 frequencyValue={frequencyValue}
                 setFrequencyType={setFrequencyType}

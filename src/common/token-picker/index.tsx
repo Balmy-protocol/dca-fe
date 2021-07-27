@@ -179,13 +179,13 @@ const TokenPicker = ({
   tokenKeysToUse = isFrom ? tokenKeys : availableFrom;
 
   const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
-    [usedTokens, ignoreValues, tokenKeysToUse]
+    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeys.includes(el)),
+    [usedTokens, ignoreValues, tokenKeys]
   );
 
   const memoizedTokenKeys = React.useMemo(
     () =>
-      tokenKeysToUse.filter(
+      tokenKeys.filter(
         (el) =>
           (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
@@ -193,7 +193,7 @@ const TokenPicker = ({
           !usedTokens.includes(el) &&
           !ignoreValues.includes(el)
       ),
-    [tokenKeys, search, usedTokens, ignoreValues, tokenKeysToUse, availableFrom]
+    [tokenKeys, search, usedTokens, ignoreValues, tokenKeys, availableFrom]
   );
 
   return (
