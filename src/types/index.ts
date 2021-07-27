@@ -274,7 +274,7 @@ export interface NewPositionTypeData {
   frequencyType: string;
   frequencyValue: string;
   existingPair: AvailablePair;
-  id: number | string;
+  id: string;
   startedAt: number;
 }
 
