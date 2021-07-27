@@ -598,7 +598,7 @@ export default class Web3Service {
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         withdrawn: BigNumber.from(0),
-        dcaId: newPositionTypeData.id as number,
+        dcaId: newPositionTypeData.id,
         id: id,
         startedAt: newPositionTypeData.startedAt,
         totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
@@ -608,6 +608,7 @@ export default class Web3Service {
     }
 
     this.currentPositions[id].pendingTransaction = transaction.hash;
+    console.log('created pending position with id', id);
   }
 
   handleTransaction(transaction: TransactionDetails) {
@@ -618,6 +619,7 @@ export default class Web3Service {
         this.currentPositions[newId] = {
           ...this.currentPositions[`pending-transaction-${transaction.hash}`],
           pendingTransaction: '',
+          dcaId: newPositionTypeData.id,
           id: newId,
         };
         delete this.currentPositions[`pending-transaction-${transaction.hash}`];

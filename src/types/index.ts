@@ -125,7 +125,7 @@ export interface PositionRaw {
   withdrawn: BigNumber; // cuanto saque
   totalSwaps: BigNumber; // cuanto puse originalmente
   rate: BigNumber;
-  dcaId: number;
+  dcaId: string;
   id: string;
   status: string;
   startedAt: number;
