@@ -36,7 +36,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
     <StyledNavbarContainer container>
       <Grid item xs={12} sm={6}>
         <StyledBox breakpoint={currentBreakPoint}>
-          <Link href="http://mean.finance" target="_blank">
+          <Link href="http://mean.finance">
             <img
               alt="mean finance"
               style={{ width: '200px' }}
