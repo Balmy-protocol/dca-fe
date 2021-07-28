@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 const getTokenList = gql`
   query getTokenList($first: Int, $id: String) {
-    pools(first: $first, where: { id_gt: $id }, orderBy: id, orderDirection: asc) {
+    pools(first: $first, where: { id_gt: $id, liquidity_gt: 0 }, orderBy: id, orderDirection: asc) {
       id
       token0 {
         id
