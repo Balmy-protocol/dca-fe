@@ -20,6 +20,7 @@ import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles } from '@material-ui/core/styles';
 import { ContactSupportOutlined } from '@material-ui/icons';
+import { ETH } from 'mocks/tokens';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
 interface PartialTheme {
@@ -165,6 +166,7 @@ const TokenPicker = ({
   let tokenKeysToUse: string[] = [];
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const inputStyles = useSearchInputStyles();
+  const extendedIgnoredValues = isFrom ? ignoreValues : [...ignoreValues, ETH.address];
 
   const handleOnClose = () => {
     setSearch('');
@@ -179,8 +181,8 @@ const TokenPicker = ({
   tokenKeysToUse = isFrom ? tokenKeys : availableFrom;
 
   const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeys.includes(el)),
-    [usedTokens, ignoreValues, tokenKeys]
+    () => usedTokens.filter((el) => !extendedIgnoredValues.includes(el) && tokenKeys.includes(el)),
+    [usedTokens, extendedIgnoredValues, tokenKeys]
   );
 
   const memoizedTokenKeys = React.useMemo(
@@ -191,9 +193,9 @@ const TokenPicker = ({
             tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
           !usedTokens.includes(el) &&
-          !ignoreValues.includes(el)
+          !extendedIgnoredValues.includes(el)
       ),
-    [tokenKeys, search, usedTokens, ignoreValues, tokenKeys, availableFrom]
+    [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeys, availableFrom]
   );
 
   return (

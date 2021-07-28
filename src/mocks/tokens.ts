@@ -35,8 +35,8 @@ export const WETH = {
 export const ETH = {
   chainId: 1,
   decimals: 18,
-  address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-  name: 'Ether',
+  address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+  name: 'Ethereum',
   symbol: 'ETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
   pairableTokens: [],

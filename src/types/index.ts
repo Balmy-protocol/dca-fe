@@ -212,6 +212,7 @@ export type TransactionTypes =
   | 'NEW_POSITION'
   | 'NEW_PAIR'
   | 'APPROVE_TOKEN'
+  | 'WRAP_ETHER'
   | 'TERMINATE_POSITION'
   | 'WITHDRAW_POSITION'
   | 'ADD_FUNDS_POSITION'
@@ -267,6 +268,10 @@ export interface ApproveTokenTypeData {
   pair: string;
 }
 
+export interface WrapEtherTypeData {
+  amount: string;
+}
+
 export interface NewPositionTypeData {
   from: Token;
   to: Token;
@@ -301,6 +306,7 @@ export type TransactionTypeDataOptions =
   | ModifyRateAndSwapsPositionTypeData
   | TerminatePositionTypeData
   | ApproveTokenTypeData
+  | WrapEtherTypeData
   | RemoveFundsTypeData
   | NewPositionTypeData
   | ResetPositionTypeData

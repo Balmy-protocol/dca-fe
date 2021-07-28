@@ -1062,7 +1062,7 @@ const manifest = {
   EQLI: EQLI,
   EQUA: EQUA,
   ETC: ETC,
-  ETH: ETH,
+  '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   ETHOS: ETHOS,
   ETN: ETN,
   ETP: ETP,

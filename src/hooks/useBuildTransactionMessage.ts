@@ -13,6 +13,7 @@ import {
   NewPairTypeData,
   PositionRaw,
   ApproveTokenTypeData,
+  WrapEtherTypeData,
   ResetPositionTypeData,
 } from 'types';
 import { TRANSACTION_TYPES } from 'config/constants';
@@ -34,6 +35,11 @@ function useBuildTransactionMessages() {
     (tx: TransactionDetails) => {
       let message = 'Transaction confirmed!';
       switch (tx.type) {
+        case TRANSACTION_TYPES.WRAP_ETHER:
+          const wrapEtherTypeData = tx.typeData as WrapEtherTypeData;
+
+          message = `${wrapEtherTypeData.amount} wrapped to WETH`;
+          break;
         case TRANSACTION_TYPES.NEW_POSITION:
           const newPositionTypeData = tx.typeData as NewPositionTypeData;
 

@@ -41,6 +41,7 @@ import {
   useHasPendingApproval,
   useHasConfirmedApproval,
   useHasPendingPairCreation,
+  useHasPendingWrap,
 } from 'state/transactions/hooks';
 import {
   DAY_IN_SECONDS,
@@ -52,6 +53,7 @@ import {
 } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
+import { ETH, WETH } from 'mocks/tokens';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -143,6 +145,7 @@ const Swap = ({
   fromValue,
   setFrom,
   setTo,
+  toggleFromTo,
   setFromValue,
   tokenList,
   setFrequencyType,
@@ -177,6 +180,7 @@ const Swap = ({
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
 
   const hasPendingApproval = useHasPendingApproval(from, existingPair?.id);
+  const hasPendingWrap = useHasPendingWrap();
   const hasConfirmedApproval = useHasConfirmedApproval(from, existingPair?.id);
   const hasPendingPairCreation = useHasPendingPairCreation(from, to);
 
@@ -188,6 +192,8 @@ const Swap = ({
   );
 
   const handleApproveToken = async () => {
+    const fromSymbol = from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol;
+
     try {
       setModalLoading({
         content: (
@@ -195,7 +201,7 @@ const Swap = ({
             <FormattedMessage
               description="approving token"
               defaultMessage="Approving use of {from}"
-              values={{ from: (from && tokenList[from].symbol) || '' }}
+              values={{ from: fromSymbol || '' }}
             />
           </Typography>
         ),
@@ -208,7 +214,7 @@ const Swap = ({
           <FormattedMessage
             description="success approving token"
             defaultMessage="Approving use of {from} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: (from && tokenList[from].symbol) || '' }}
+            values={{ from: fromSymbol || '' }}
           />
         ),
       });
@@ -219,7 +225,41 @@ const Swap = ({
     }
   };
 
+  const handleWrapToken = async () => {
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="body1">
+            <FormattedMessage
+              description="wrapping eth"
+              defaultMessage="Wrapping {value} ETH for you"
+              values={{ value: fromValue }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.wrapETH(fromValue);
+      addTransaction(result, { type: TRANSACTION_TYPES.WRAP_ETHER, typeData: { amount: fromValue } });
+      setModalSuccess({
+        hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="success wrapping eth"
+            defaultMessage="Wrapping ETH has been succesfully submitted to the blockchain and will be confirmed soon"
+          />
+        ),
+      });
+      setFrom(WETH.address);
+    } catch (e) {
+      setModalError({
+        error: e,
+      });
+    }
+  };
+
   const handleSwap = async () => {
+    const fromSymbol = from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol;
+
     try {
       setModalLoading({
         content: (
@@ -227,7 +267,7 @@ const Swap = ({
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"
-              values={{ from: (from && tokenList[from].symbol) || '', to: (to && tokenList[to].symbol) || '' }}
+              values={{ from: fromSymbol || '', to: (to && tokenList[to].symbol) || '' }}
             />
           </Typography>
         ),
@@ -243,7 +283,7 @@ const Swap = ({
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
         typeData: {
-          from: tokenList[from],
+          from: tokenList[from === ETH.address ? WETH.address : from],
           to: tokenList[to],
           fromValue,
           frequencyType: frequencyType.toString(),
@@ -259,7 +299,7 @@ const Swap = ({
           <FormattedMessage
             description="success creating position"
             defaultMessage="Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: (from && tokenList[from].symbol) || '', to: (to && tokenList[to].symbol) || '' }}
+            values={{ from: fromSymbol || '', to: (to && tokenList[to].symbol) || '' }}
           />
         ),
       });
@@ -276,11 +316,6 @@ const Swap = ({
   const startSelectingCoin = (token: string) => {
     setSelecting(token);
     setShouldShowPicker(true);
-  };
-
-  const toggleFromTo = () => {
-    setFrom(to);
-    setTo(from);
   };
 
   const handleFromValueChange = (fromValue: string) => {
@@ -378,6 +413,8 @@ const Swap = ({
     parseUnits(fromValue, tokenList[from].decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 
+  const isETH = from === ETH.address;
+
   const ignoreValues = [from, to];
 
   const CreatePairButton = (
@@ -397,7 +434,7 @@ const Swap = ({
             description="create pair button"
             defaultMessage="Create {from}/{to} pair"
             values={{
-              from: (tokenList[from] && tokenList[from].symbol) || '',
+              from: (from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol) || '',
               to: (tokenList[to] && tokenList[to].symbol) || '',
             }}
           />
@@ -436,17 +473,42 @@ const Swap = ({
           <FormattedMessage
             description="waiting for approval"
             defaultMessage="Waiting for your {token} to be approved"
-            values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
+            values={{ token: (from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol) || '' }}
           />
         ) : (
           <FormattedMessage
             description="Allow us to use your coin"
             defaultMessage="Approve {token}"
-            values={{ token: (tokenList[from] && tokenList[from].symbol) || '' }}
+            values={{ token: (from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol) || '' }}
           />
         )}
       </Typography>
       <Tooltip title="You only have to do this once per token" arrow placement="top">
+        <StyledHelpOutlineIcon fontSize="small" />
+      </Tooltip>
+    </StyledButton>
+  );
+
+  const WrapButton = (
+    <StyledButton
+      size="large"
+      variant="contained"
+      fullWidth
+      color="primary"
+      disabled={!isETH || cantFund || !fromValue || hasPendingWrap}
+      onClick={handleWrapToken}
+    >
+      <Typography variant="body1">
+        {hasPendingWrap ? (
+          <FormattedMessage
+            description="waiting for eth to wrap"
+            defaultMessage="Waiting for your ETH to be wrapped to WETH"
+          />
+        ) : (
+          <FormattedMessage description="wrap eth" defaultMessage="Wrap ETH" />
+        )}
+      </Typography>
+      <Tooltip title="You can only operate with WETH. But we can wrap your ETH for you" arrow placement="top">
         <StyledHelpOutlineIcon fontSize="small" />
       </Tooltip>
     </StyledButton>
@@ -480,6 +542,8 @@ const Swap = ({
     ButtonToShow = NoWalletButton;
   } else if (networkError) {
     ButtonToShow = NotConnectedButton;
+  } else if (isETH) {
+    ButtonToShow = WrapButton;
   } else if (!pairExists) {
     ButtonToShow = CreatePairButton;
   } else if (!isApproved) {
@@ -577,7 +641,7 @@ const Swap = ({
             </Grid>
           </StyledFromContainer>
           <StyledToContainer container alignItems="center" justify="space-between">
-            <StyledSwapTokenButton onClick={toggleFromTo}>
+            <StyledSwapTokenButton onClick={() => toggleFromTo()}>
               <SwapVertIcon />
             </StyledSwapTokenButton>
             <Grid item xs={6}>

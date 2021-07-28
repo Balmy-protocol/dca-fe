@@ -8,7 +8,7 @@ import { useQuery } from '@apollo/client';
 import useTokenList from 'hooks/useTokenList';
 import Swap from './components/swap';
 import { DAY_IN_SECONDS } from 'utils/parsing';
-import { WETH, DAI, UNI } from 'mocks/tokens';
+import { WETH, DAI, UNI, ETH } from 'mocks/tokens';
 import Hidden from '@material-ui/core/Hidden';
 
 const SwapContainer = () => {
@@ -33,6 +33,15 @@ const SwapContainer = () => {
     }
   };
 
+  const toggleFromTo = () => {
+    if (from === ETH.address) {
+      setTo(WETH.address);
+    } else {
+      setTo(from);
+    }
+    setFrom(to);
+  };
+
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">
       <WalletContext.Consumer>
@@ -52,6 +61,7 @@ const SwapContainer = () => {
                 setFromValue={setFromValue}
                 web3Service={web3Service}
                 tokenList={tokenList}
+                toggleFromTo={toggleFromTo}
               />
             </Grid>
             <Hidden mdDown>

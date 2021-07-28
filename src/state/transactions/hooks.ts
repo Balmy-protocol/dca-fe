@@ -166,6 +166,21 @@ export function useHasPendingApproval(tokenAddress: string | undefined, spender:
   );
 }
 
+// returns whether a ETH has a pending WRAP transaction
+export function useHasPendingWrap(): boolean {
+  const allTransactions = useAllTransactions();
+  return useMemo(
+    () =>
+      Object.keys(allTransactions).some((hash) => {
+        if (!allTransactions[hash]) return false;
+        if (allTransactions[hash].type !== TRANSACTION_TYPES.WRAP_ETHER) return false;
+        const tx = allTransactions[hash];
+        return !tx.receipt;
+      }),
+    [allTransactions]
+  );
+}
+
 // returns whether a token has a pending approval transaction
 export function useHasPendingPairCreation(from: string | undefined, to: string | undefined): boolean {
   const allTransactions = useAllTransactions();

@@ -46,12 +46,13 @@ import { sortTokens } from 'utils/parsing';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
+import WETHABI from 'abis/weth.json';
 import Factory from 'abis/factory.json';
 import DCAPair from 'abis/DCAPair.json';
 
 // MOCKS
 import usedTokensMocks from 'mocks/usedTokens';
-import { ETH } from 'mocks/tokens';
+import { ETH, WETH } from 'mocks/tokens';
 import { FULL_DEPOSIT_TYPE, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 
 export const FACTORY_ADDRESS = process.env.FACTORY_ADDRESS as string;
@@ -309,48 +310,78 @@ export default class Web3Service {
 
     const tokenListResponse = await gqlFetchAllById(this.uniClient, GET_TOKEN_LIST, {}, 'pools');
 
-    this.tokenList = tokenListResponse.data.pools.reduce((acc: TokenList, pool: PoolResponse) => {
-      if (!acc[pool.token0.id]) {
-        acc[pool.token0.id] = {
-          decimals: BigNumber.from(pool.token0.decimals).toNumber(),
-          address: pool.token0.id,
-          name: pool.token0.name,
-          symbol: pool.token0.symbol,
-          pairableTokens: [],
+    this.tokenList = tokenListResponse.data.pools.reduce(
+      (acc: TokenList, pool: PoolResponse) => {
+        if (!acc[pool.token0.id]) {
+          acc[pool.token0.id] = {
+            decimals: BigNumber.from(pool.token0.decimals).toNumber(),
+            address: pool.token0.id,
+            name: pool.token0.name,
+            symbol: pool.token0.symbol,
+            pairableTokens: [],
+          };
+        }
+        if (!acc[pool.token1.id]) {
+          acc[pool.token1.id] = {
+            decimals: BigNumber.from(pool.token1.decimals).toNumber(),
+            address: pool.token1.id,
+            name: pool.token1.name,
+            symbol: pool.token1.symbol,
+            pairableTokens: [],
+          };
+        }
+
+        const availableTokensToken0 = [...acc[pool.token0.id].pairableTokens];
+        const availableTokensToken1 = [...acc[pool.token1.id].pairableTokens];
+
+        if (availableTokensToken0.indexOf(pool.token1.id) === -1) {
+          availableTokensToken0.push(pool.token1.id);
+
+          // allow ETH for WETH
+          if (pool.token1.id === WETH.address) {
+            availableTokensToken0.push(ETH.address);
+          }
+        }
+        if (availableTokensToken1.indexOf(pool.token0.id) === -1) {
+          availableTokensToken1.push(pool.token0.id);
+          // allow ETH for WETH
+          if (pool.token0.id === WETH.address) {
+            availableTokensToken1.push(ETH.address);
+          }
+        }
+
+        if (pool.token0.id === WETH.address) {
+          acc = {
+            ...acc,
+            [ETH.address]: {
+              ...acc[ETH.address],
+              pairableTokens: [...availableTokensToken0],
+            },
+          };
+        } else if (pool.token1.id === WETH.address) {
+          acc = {
+            ...acc,
+            [ETH.address]: {
+              ...acc[ETH.address],
+              pairableTokens: [...availableTokensToken1],
+            },
+          };
+        }
+
+        return {
+          ...acc,
+          [pool.token0.id]: {
+            ...acc[pool.token0.id],
+            pairableTokens: [...availableTokensToken0],
+          },
+          [pool.token1.id]: {
+            ...acc[pool.token1.id],
+            pairableTokens: [...availableTokensToken1],
+          },
         };
-      }
-      if (!acc[pool.token1.id]) {
-        acc[pool.token1.id] = {
-          decimals: BigNumber.from(pool.token1.decimals).toNumber(),
-          address: pool.token1.id,
-          name: pool.token1.name,
-          symbol: pool.token1.symbol,
-          pairableTokens: [],
-        };
-      }
-
-      const availableTokensToken0 = [...acc[pool.token0.id].pairableTokens];
-      const availableTokensToken1 = [...acc[pool.token1.id].pairableTokens];
-
-      if (availableTokensToken0.indexOf(pool.token1.id) === -1) {
-        availableTokensToken0.push(pool.token1.id);
-      }
-      if (availableTokensToken1.indexOf(pool.token0.id) === -1) {
-        availableTokensToken1.push(pool.token0.id);
-      }
-
-      return {
-        ...acc,
-        [pool.token0.id]: {
-          ...acc[pool.token0.id],
-          pairableTokens: [...availableTokensToken0],
-        },
-        [pool.token1.id]: {
-          ...acc[pool.token1.id],
-          pairableTokens: [...availableTokensToken1],
-        },
-      };
-    }, {});
+      },
+      { [ETH.address]: ETH, [WETH.address]: WETH }
+    );
   }
 
   getBalance(address?: string, decimals?: number) {
@@ -375,6 +406,10 @@ export default class Web3Service {
       tokenA = token1;
       tokenB = token0;
     }
+
+    // check for ETH
+    tokenA = tokenA === ETH.address ? WETH.address : tokenA;
+    tokenB = tokenB === ETH.address ? WETH.address : tokenB;
 
     const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
 
@@ -412,6 +447,10 @@ export default class Web3Service {
       tokenB = token0;
     }
 
+    // check for ETH
+    tokenA = tokenA === ETH.address ? WETH.address : tokenA;
+    tokenB = tokenB === ETH.address ? WETH.address : tokenB;
+
     const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
 
     return factory.createPair(tokenA, tokenB);
@@ -443,12 +482,22 @@ export default class Web3Service {
     );
   }
 
-  getAllowance(token: Token, pairContract: AvailablePair) {
-    if (token.address === ETH.address) return formatEther(MaxUint256);
+  wrapETH(amount: string) {
+    const ERC20Interface = new Interface(WETHABI) as any;
 
+    const erc20 = new ethers.Contract(WETH.address, ERC20Interface, this.getSigner());
+
+    return erc20.deposit({ value: parseUnits(amount, ETH.decimals).toHexString() });
+  }
+
+  getAllowance(token: Token, pairContract: AvailablePair) {
     const ERC20Interface = new Interface(ERC20ABI) as any;
 
-    const erc20 = new ethers.Contract(token.address, ERC20Interface, this.client);
+    const erc20 = new ethers.Contract(
+      token.address === ETH.address ? WETH.address : token.address,
+      ERC20Interface,
+      this.client
+    );
 
     return erc20
       .allowance(this.getAccount(), pairContract.id)
@@ -456,11 +505,13 @@ export default class Web3Service {
   }
 
   approveToken(token: Token, pairContract: AvailablePair) {
-    if (token.address === ETH.address) return Promise.resolve();
-
     const ERC20Interface = new Interface(ERC20ABI) as any;
 
-    const erc20 = new ethers.Contract(token.address, ERC20Interface, this.getSigner());
+    const erc20 = new ethers.Contract(
+      token.address === ETH.address ? WETH.address : token.address,
+      ERC20Interface,
+      this.getSigner()
+    );
 
     return erc20.approve(pairContract.id, MaxUint256);
   }
@@ -475,10 +526,6 @@ export default class Web3Service {
   ) {
     let token = from;
 
-    if (from > to) {
-      token = to;
-    }
-
     const weiValue = parseUnits(fromValue, token.decimals);
 
     const rate = weiValue.div(BigNumber.from(frequencyValue));
@@ -487,7 +534,12 @@ export default class Web3Service {
 
     const factory = new ethers.Contract(existingPair.id, DCAPair.abi, this.getSigner());
 
-    return factory.deposit(token.address, rate, amountOfSwaps, swapInterval);
+    return factory.deposit(
+      token.address === ETH.address ? WETH.address : token.address,
+      rate,
+      amountOfSwaps,
+      swapInterval
+    );
   }
 
   withdraw(position: Position, pair: AvailablePair) {
@@ -579,7 +631,12 @@ export default class Web3Service {
   }
 
   setPendingTransaction(transaction: TransactionDetails) {
-    if (transaction.type === TRANSACTION_TYPES.NEW_PAIR || transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN) return;
+    if (
+      transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
+      transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+      transaction.type === TRANSACTION_TYPES.WRAP_ETHER
+    )
+      return;
 
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
     let id = typeData.id;

@@ -13,6 +13,7 @@ export type SwapContextValue = {
   frequencyValue: string;
   setFrom: SetStateCallback<string>;
   setTo: SetStateCallback<string>;
+  toggleFromTo: () => void;
   setFromValue: SetStateCallback<string>;
   setFrequencyType: SetStateCallback<BigNumber>;
   setFrequencyValue: SetStateCallback<string>;
@@ -26,6 +27,7 @@ const SwapContextDefaultValue: SwapContextValue = {
   frequencyValue: '1',
   setFrequencyType: () => {},
   setFrequencyValue: () => {},
+  toggleFromTo: () => {},
   setFrom: () => {},
   setTo: () => {},
   setFromValue: () => {},
