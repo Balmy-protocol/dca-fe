@@ -78,7 +78,7 @@ export default function Updater(): null {
         const promise = getReceipt(hash);
         promise
           .then((receipt: any) => {
-            if (receipt) {
+            if (receipt && !transactions[hash].receipt) {
               let extendedTypeData = {};
 
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_PAIR) {
