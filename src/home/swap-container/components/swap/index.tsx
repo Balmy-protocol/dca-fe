@@ -191,6 +191,12 @@ const Swap = ({
     !tokenList[from] || !web3Service.getAccount() || !existingPair || hasPendingApproval
   );
 
+  React.useEffect(() => {
+    if (!hasPendingWrap && from === ETH.address) {
+      setFrom(WETH.address);
+    }
+  }, [hasPendingWrap]);
+
   const handleApproveToken = async () => {
     const fromSymbol = from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol;
 
@@ -249,7 +255,6 @@ const Swap = ({
           />
         ),
       });
-      setFrom(WETH.address);
     } catch (e) {
       setModalError({
         error: e,
