@@ -63,21 +63,21 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
   const [fromValue, setFromValue] = React.useState(formatUnits(position.rate, position.from.decimals));
   const [activeStep, setActiveStep] = React.useState(0);
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
+  const realBalance = balance && balance.add(position.remainingLiquidity);
   const frequencyType = getFrequencyLabel(position.swapInterval.toString(), position.remainingSwaps.toString());
   const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
-  const hasErrorCurrency = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
-
+  const hasErrorCurrency = fromValue && realBalance && parseUnits(fromValue, position.from.decimals).gt(realBalance);
   const hasError = activeStep === 0 ? hasErrorCurrency : hasErrorFrequency;
   const isEmpty = activeStep === 0 ? !fromValue : !frequencyValue;
 
   const cantFund =
     activeStep !== 0 &&
     fromValue &&
-    balance &&
+    realBalance &&
     parseUnits(fromValue, position.from.decimals).gt(BigNumber.from(0)) &&
     frequencyValue &&
     BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-    parseUnits(fromValue, position.from.decimals).mul(BigNumber.from(frequencyValue)).gt(balance);
+    parseUnits(fromValue, position.from.decimals).mul(BigNumber.from(frequencyValue)).gt(realBalance);
 
   const handleNext = () => {
     if (activeStep === 1) {
@@ -127,13 +127,16 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
                 withBalance={true}
                 isLoadingBalance={false}
                 token={position.from}
-                balance={balance}
+                balance={realBalance}
               />
               <Typography variant="body2">
                 <FormattedMessage
                   description="in position"
-                  defaultMessage="In wallet: {balance} {symbol}"
-                  values={{ balance: formatCurrencyAmount(balance, position.from, 6), symbol: position.from.symbol }}
+                  defaultMessage="Available: {balance} {symbol}"
+                  values={{
+                    balance: formatCurrencyAmount(realBalance, position.from, 6),
+                    symbol: position.from.symbol,
+                  }}
                 />
               </Typography>
             </>

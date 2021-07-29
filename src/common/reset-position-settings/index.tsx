@@ -64,9 +64,10 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
   const [fromValue, setFromValue] = React.useState('');
   const [activeStep, setActiveStep] = React.useState(0);
   const [frequencyValue, setFrequencyValue] = React.useState('');
+  const realBalance = balance && balance.add(position.remainingLiquidity);
 
   const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
-  const hasErrorCurrency = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
+  const hasErrorCurrency = fromValue && realBalance && parseUnits(fromValue, position.from.decimals).gt(realBalance);
   const frequencyType = getFrequencyLabel(position.swapInterval.toString(), frequencyValue);
 
   const hasError = activeStep === 0 ? hasErrorCurrency : hasErrorFrequency;
@@ -121,13 +122,16 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
                   withBalance={true}
                   isLoadingBalance={false}
                   token={position.from}
-                  balance={balance}
+                  balance={realBalance}
                 />
                 <Typography variant="body2">
                   <FormattedMessage
                     description="in position"
                     defaultMessage="In wallet: {balance} {symbol}"
-                    values={{ balance: formatCurrencyAmount(balance, position.from, 6), symbol: position.from.symbol }}
+                    values={{
+                      balance: formatCurrencyAmount(realBalance, position.from, 6),
+                      symbol: position.from.symbol,
+                    }}
                   />
                 </Typography>
               </>
