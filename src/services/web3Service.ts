@@ -734,13 +734,31 @@ export default class Web3Service {
         break;
       case TRANSACTION_TYPES.REMOVE_FUNDS:
         const removeFundsTypeData = transaction.typeData as RemoveFundsTypeData;
+        const removeFundsDifference = parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals).eq(
+          this.currentPositions[removeFundsTypeData.id].remainingLiquidity
+        )
+          ? this.currentPositions[removeFundsTypeData.id].remainingSwaps
+          : BigNumber.from(0);
+        const originalRemainingLiquidity = this.currentPositions[removeFundsTypeData.id].remainingLiquidity.toString();
         this.currentPositions[removeFundsTypeData.id].pendingTransaction = '';
+        this.currentPositions[removeFundsTypeData.id].totalSwaps = parseUnits(
+          removeFundsTypeData.ammountToRemove,
+          removeFundsTypeData.decimals
+        ).eq(this.currentPositions[removeFundsTypeData.id].remainingLiquidity)
+          ? this.currentPositions[removeFundsTypeData.id].totalSwaps.sub(removeFundsDifference)
+          : this.currentPositions[removeFundsTypeData.id].totalSwaps;
         this.currentPositions[removeFundsTypeData.id].remainingLiquidity = this.currentPositions[
           removeFundsTypeData.id
         ].remainingLiquidity.sub(parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals));
         this.currentPositions[removeFundsTypeData.id].rate = this.currentPositions[
           removeFundsTypeData.id
         ].remainingLiquidity.div(this.currentPositions[removeFundsTypeData.id].remainingSwaps);
+        this.currentPositions[removeFundsTypeData.id].remainingSwaps = parseUnits(
+          removeFundsTypeData.ammountToRemove,
+          removeFundsTypeData.decimals
+        ).eq(BigNumber.from(originalRemainingLiquidity))
+          ? BigNumber.from(0)
+          : this.currentPositions[removeFundsTypeData.id].remainingSwaps;
         break;
       case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION:
         const modifySwapsPositionTypeData = transaction.typeData as ModifySwapsPositionTypeData;
