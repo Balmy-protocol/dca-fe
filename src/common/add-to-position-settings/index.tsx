@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import TokenInput from 'common/token-input';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
+import { STRING_SWAP_INTERVALS, getFrequencyLabel } from 'utils/parsing';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -51,7 +52,11 @@ interface AddToPositionProps {
 const AddToPosition = ({ onClose, shouldShow, onAddFunds, position, balance }: AddToPositionProps) => {
   const [fromValue, setFromValue] = React.useState('');
   const hasError = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
+  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), position.remainingSwaps.toString());
 
+  const newRate = parseUnits(fromValue || '0', position.from.decimals)
+    .add(position.remainingLiquidity)
+    .div(BigNumber.from(position.remainingSwaps));
   const handleAddFunds = () => {
     onAddFunds(fromValue);
     onClose();
@@ -89,6 +94,23 @@ const AddToPosition = ({ onClose, shouldShow, onAddFunds, position, balance }: A
               description="in position"
               defaultMessage="In wallet: {balance} {symbol}"
               values={{ balance: formatCurrencyAmount(balance, position.from, 6), symbol: position.from.symbol }}
+            />
+          </Typography>
+        </StyledInputContainer>
+        <StyledInputContainer>
+          <Typography variant="caption" component="span">
+            <FormattedMessage
+              description="rate detail"
+              defaultMessage="We'll swap {rate} {from} every {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
+              values={{
+                from: position.from.symbol,
+                rate: formatUnits(newRate, position.from.decimals),
+                frequency:
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                    .singular,
+                frequencyPlural: frequencyType,
+                ammountOfSwaps: position.remainingSwaps.toString(),
+              }}
             />
           </Typography>
         </StyledInputContainer>

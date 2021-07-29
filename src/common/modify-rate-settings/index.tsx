@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
-import { getFrequencyLabel } from 'utils/parsing';
+import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
@@ -63,7 +63,7 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
   const [fromValue, setFromValue] = React.useState(formatUnits(position.rate, position.from.decimals));
   const [activeStep, setActiveStep] = React.useState(0);
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
-  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), frequencyValue);
+  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), position.remainingSwaps.toString());
   const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
   const hasErrorCurrency = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
 
@@ -153,6 +153,21 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
                   values={{
                     remainingDays: position.remainingSwaps.toString(),
                     type: frequencyType,
+                  }}
+                />
+              </Typography>
+              <Typography variant="caption">
+                <FormattedMessage
+                  description="rate detail"
+                  defaultMessage="We'll swap {rate} {from} every {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
+                  values={{
+                    from: position.from.symbol,
+                    rate: fromValue,
+                    frequency:
+                      STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                        .singular,
+                    frequencyPlural: frequencyType,
+                    ammountOfSwaps: frequencyValue || '0',
                   }}
                 />
               </Typography>

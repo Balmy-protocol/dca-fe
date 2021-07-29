@@ -65,7 +65,7 @@ interface ActivePositionProps {
 }
 
 const ActivePosition = ({ position }: ActivePositionProps) => {
-  const { from, to, swapInterval, swapped, totalDeposits, totalSwaps } = position;
+  const { from, to, swapInterval, swapped, totalDeposits, totalSwaps, remainingSwaps } = position;
 
   return (
     <StyledCard>
@@ -104,7 +104,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                 description="days to finish"
                 defaultMessage="Ran for {remainingDays} {type}"
                 values={{
-                  remainingDays: totalSwaps.toString(),
+                  remainingDays: totalSwaps.sub(remainingSwaps).toString(),
                   type: getFrequencyLabel(swapInterval.toString(), totalSwaps.toString()),
                 }}
               />

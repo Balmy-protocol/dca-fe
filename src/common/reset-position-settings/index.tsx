@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
-import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { STRING_SWAP_INTERVALS, getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
@@ -67,6 +67,7 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
 
   const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
   const hasErrorCurrency = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
+  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), frequencyValue);
 
   const hasError = activeStep === 0 ? hasErrorCurrency : hasErrorFrequency;
   const isEmpty = activeStep === 0 ? !fromValue : !frequencyValue;
@@ -131,13 +132,30 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
                 </Typography>
               </>
             ) : (
-              <FrequencyInput
-                id="frequency-value"
-                error={!!hasError ? 'Value must be greater than 0' : ''}
-                value={frequencyValue}
-                label={position.swapInterval.toString()}
-                onChange={setFrequencyValue}
-              />
+              <>
+                <FrequencyInput
+                  id="frequency-value"
+                  error={!!hasError ? 'Value must be greater than 0' : ''}
+                  value={frequencyValue}
+                  label={position.swapInterval.toString()}
+                  onChange={setFrequencyValue}
+                />
+                <Typography variant="caption">
+                  <FormattedMessage
+                    description="rate detail"
+                    defaultMessage="We'll swap {rate} {from} every {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
+                    values={{
+                      from: position.from.symbol,
+                      rate: fromValue,
+                      frequency:
+                        STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                          .singular,
+                      frequencyPlural: frequencyType,
+                      ammountOfSwaps: frequencyValue || '0',
+                    }}
+                  />
+                </Typography>
+              </>
             )}
           </StyledInputContainer>
           <StyledActionContainer>
