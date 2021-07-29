@@ -103,7 +103,7 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
           </Step>
           <Step key="set new frequency">
             <StepLabel>
-              <FormattedMessage description="set new frequency" defaultMessage="Set frequency" />
+              <FormattedMessage description="set new duration" defaultMessage="Set duration" />
             </StepLabel>
           </Step>
         </StyledStepper>
