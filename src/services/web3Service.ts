@@ -303,7 +303,7 @@ export default class Web3Service {
     this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
       token0: pair.tokenA.id,
       token1: pair.tokenB.id,
-      lastExecuted: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
+      lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
       id: pair.id,
       createdAt: pair.createdAtTimestamp,
     }));

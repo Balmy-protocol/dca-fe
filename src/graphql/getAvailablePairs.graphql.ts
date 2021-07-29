@@ -10,7 +10,7 @@ const getAvailablePairs = gql`
       tokenB {
         id
       }
-      swaps {
+      swaps(first: 1, orderBy: executedAtTimestamp, orderDirection: desc) {
         executedAtTimestamp
       }
       createdAtTimestamp
