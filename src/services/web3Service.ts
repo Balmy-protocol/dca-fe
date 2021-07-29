@@ -665,7 +665,6 @@ export default class Web3Service {
     }
 
     this.currentPositions[id].pendingTransaction = transaction.hash;
-    console.log('created pending position with id', id);
   }
 
   handleTransaction(transaction: TransactionDetails) {
@@ -708,10 +707,24 @@ export default class Web3Service {
         break;
       case TRANSACTION_TYPES.RESET_POSITION:
         const resetPositionTypeData = transaction.typeData as ResetPositionTypeData;
+        const resetPositionSwapDifference = BigNumber.from(resetPositionTypeData.newSwaps).lt(
+          this.currentPositions[resetPositionTypeData.id].remainingSwaps
+        )
+          ? this.currentPositions[resetPositionTypeData.id].remainingSwaps.sub(
+              BigNumber.from(resetPositionTypeData.newSwaps)
+            )
+          : BigNumber.from(resetPositionTypeData.newSwaps).sub(
+              this.currentPositions[resetPositionTypeData.id].remainingSwaps
+            );
         this.currentPositions[resetPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[resetPositionTypeData.id].remainingLiquidity = this.currentPositions[
           resetPositionTypeData.id
         ].remainingLiquidity.add(parseUnits(resetPositionTypeData.newFunds, resetPositionTypeData.decimals));
+        this.currentPositions[resetPositionTypeData.id].totalSwaps = BigNumber.from(resetPositionTypeData.newSwaps).lt(
+          this.currentPositions[resetPositionTypeData.id].remainingSwaps
+        )
+          ? this.currentPositions[resetPositionTypeData.id].totalSwaps.sub(resetPositionSwapDifference)
+          : this.currentPositions[resetPositionTypeData.id].totalSwaps.add(resetPositionSwapDifference);
         this.currentPositions[resetPositionTypeData.id].remainingSwaps = this.currentPositions[
           resetPositionTypeData.id
         ].remainingSwaps.add(BigNumber.from(resetPositionTypeData.newSwaps));
@@ -741,11 +754,29 @@ export default class Web3Service {
         break;
       case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION:
         const modifyRateAndSwapsPositionTypeData = transaction.typeData as ModifyRateAndSwapsPositionTypeData;
+        const modifiedRateAndSwapsSwapDifference = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
+          this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps
+        )
+          ? this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps.sub(
+              BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps)
+            )
+          : BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).sub(
+              this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps
+            );
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = parseUnits(
           modifyRateAndSwapsPositionTypeData.newRate,
           modifyRateAndSwapsPositionTypeData.decimals
         );
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps = BigNumber.from(
+          modifyRateAndSwapsPositionTypeData.newSwaps
+        ).lt(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps)
+          ? this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps.sub(
+              modifiedRateAndSwapsSwapDifference
+            )
+          : this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps.add(
+              modifiedRateAndSwapsSwapDifference
+            );
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps = BigNumber.from(
           modifyRateAndSwapsPositionTypeData.newSwaps
         );

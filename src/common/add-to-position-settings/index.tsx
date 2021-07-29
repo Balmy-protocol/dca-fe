@@ -54,9 +54,11 @@ const AddToPosition = ({ onClose, shouldShow, onAddFunds, position, balance }: A
   const hasError = fromValue && balance && parseUnits(fromValue, position.from.decimals).gt(balance);
   const frequencyType = getFrequencyLabel(position.swapInterval.toString(), position.remainingSwaps.toString());
 
-  const newRate = parseUnits(fromValue || '0', position.from.decimals)
-    .add(position.remainingLiquidity)
-    .div(BigNumber.from(position.remainingSwaps));
+  const newRate = position.remainingSwaps.eq(BigNumber.from(0))
+    ? BigNumber.from(0)
+    : parseUnits(fromValue || '0', position.from.decimals)
+        .add(position.remainingLiquidity)
+        .div(BigNumber.from(position.remainingSwaps));
   const handleAddFunds = () => {
     onAddFunds(fromValue);
     onClose();

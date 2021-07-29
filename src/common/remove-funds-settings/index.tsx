@@ -40,9 +40,11 @@ interface RemoveFundsSettingsProps {
 const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSettingsProps) => {
   const [fromValue, setFromValue] = React.useState('');
 
-  const newRate = position.remainingLiquidity
-    .sub(parseUnits(fromValue || '0', position.from.decimals))
-    .div(BigNumber.from(position.remainingSwaps));
+  const newRate = position.remainingSwaps.eq(BigNumber.from(0))
+    ? BigNumber.from(0)
+    : position.remainingLiquidity
+        .sub(parseUnits(fromValue || '0', position.from.decimals))
+        .div(BigNumber.from(position.remainingSwaps));
   const hasError = fromValue && parseUnits(fromValue, position.from.decimals).gt(position.remainingLiquidity);
   const shouldDisable = fromValue && parseUnits(fromValue, position.from.decimals).lte(BigNumber.from(0));
   const frequencyType = getFrequencyLabel(position.swapInterval.toString(), position.remainingSwaps.toString());
