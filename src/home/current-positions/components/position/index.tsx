@@ -119,6 +119,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
     to,
     swapInterval,
     swapped,
+    withdrawn,
     remainingLiquidity,
     remainingSwaps,
     rate,
@@ -417,6 +418,15 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
               description="current exercised"
               defaultMessage="{exercised} {to} swapped"
               values={{ exercised: formatCurrencyAmount(swapped, to), to: to.symbol }}
+            />
+          </Typography>
+        </StyledDetailWrapper>
+        <StyledDetailWrapper>
+          <Typography variant="caption">
+            <FormattedMessage
+              description="current swapped in position"
+              defaultMessage="{exercised} {to} in position"
+              values={{ exercised: formatCurrencyAmount(swapped.sub(withdrawn), to), to: to.symbol }}
             />
           </Typography>
         </StyledDetailWrapper>

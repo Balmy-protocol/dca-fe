@@ -691,9 +691,8 @@ export default class Web3Service {
       case TRANSACTION_TYPES.WITHDRAW_POSITION:
         const withdrawPositionTypeData = transaction.typeData as WithdrawTypeData;
         this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
-        this.currentPositions[withdrawPositionTypeData.id].withdrawn = this.currentPositions[
-          withdrawPositionTypeData.id
-        ].withdrawn.add(this.currentPositions[withdrawPositionTypeData.id].swapped);
+        this.currentPositions[withdrawPositionTypeData.id].withdrawn =
+          this.currentPositions[withdrawPositionTypeData.id].swapped;
         break;
       case TRANSACTION_TYPES.ADD_FUNDS_POSITION:
         const addFundsTypeData = transaction.typeData as AddFundsTypeData;

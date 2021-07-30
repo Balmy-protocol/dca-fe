@@ -12,6 +12,7 @@ const StyledActionsContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-grow: 1;
+  padding: 10px 0px;
 `;
 
 const StyledHeader = styled.div`
