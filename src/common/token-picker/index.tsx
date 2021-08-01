@@ -1,6 +1,9 @@
 import React, { CSSProperties } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
+import reverse from 'lodash/reverse';
+import remove from 'lodash/remove';
+import sortBy from 'lodash/sortBy';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@material-ui/core/Slide';
 import { TokenList } from 'types';
@@ -20,7 +23,7 @@ import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles } from '@material-ui/core/styles';
 import { ContactSupportOutlined } from '@material-ui/icons';
-import { ETH } from 'mocks/tokens';
+import { ETH, WETH } from 'mocks/tokens';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
 interface PartialTheme {
@@ -185,8 +188,8 @@ const TokenPicker = ({
     [usedTokens, extendedIgnoredValues, tokenKeys]
   );
 
-  const memoizedTokenKeys = React.useMemo(
-    () =>
+  const memoizedTokenKeys = React.useMemo(() => {
+    let orderedTokenKeys = sortBy(
       tokenKeys.filter(
         (el) =>
           (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
@@ -195,8 +198,27 @@ const TokenPicker = ({
           !usedTokens.includes(el) &&
           !extendedIgnoredValues.includes(el)
       ),
-    [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeys, availableFrom]
-  );
+      [(el) => tokenList[el].totalValueLockedUSD]
+    );
+
+    reverse(orderedTokenKeys);
+
+    if (orderedTokenKeys.findIndex((el) => el === WETH.address) !== -1) {
+      remove(orderedTokenKeys, (token) => token === WETH.address);
+      console.log('will unshift WETH', orderedTokenKeys[0]);
+      orderedTokenKeys.unshift(WETH.address);
+      console.log(orderedTokenKeys[0]);
+    }
+
+    if (orderedTokenKeys.findIndex((el) => el === ETH.address) !== -1) {
+      remove(orderedTokenKeys, (token) => token === ETH.address);
+      console.log('will unshift ETH');
+      orderedTokenKeys.unshift(ETH.address);
+      console.log(orderedTokenKeys[0]);
+    }
+
+    return orderedTokenKeys;
+  }, [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeys, availableFrom]);
 
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>

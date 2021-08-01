@@ -9,12 +9,14 @@ const getTokenList = gql`
         decimals
         symbol
         name
+        totalValueLockedUSD
       }
       token1 {
         id
         decimals
         symbol
         name
+        totalValueLockedUSD
       }
     }
   }

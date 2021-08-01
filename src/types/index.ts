@@ -13,6 +13,7 @@ export type Token = {
   symbol: string;
   logoURI?: string;
   pairableTokens: string[];
+  totalValueLockedUSD: number;
 };
 
 export type PoolResponse = {
@@ -21,12 +22,14 @@ export type PoolResponse = {
     id: string;
     name: string;
     symbol: string;
+    totalValueLockedUSD: string;
   };
   token1: {
     decimals: string;
     id: string;
     name: string;
     symbol: string;
+    totalValueLockedUSD: string;
   };
   id: string;
 };

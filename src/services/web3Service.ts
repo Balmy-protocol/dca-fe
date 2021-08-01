@@ -319,6 +319,7 @@ export default class Web3Service {
             name: pool.token0.name,
             symbol: pool.token0.symbol,
             pairableTokens: [],
+            totalValueLockedUSD: parseFloat(pool.token0.totalValueLockedUSD),
           };
         }
         if (!acc[pool.token1.id]) {
@@ -328,6 +329,7 @@ export default class Web3Service {
             name: pool.token1.name,
             symbol: pool.token1.symbol,
             pairableTokens: [],
+            totalValueLockedUSD: parseFloat(pool.token1.totalValueLockedUSD),
           };
         }
 

@@ -13,6 +13,7 @@ export const DAI = {
   symbol: 'DAI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
   pairableTokens: [],
+  totalValueLockedUSD: 0,
 };
 
 const WETH_ADDRESSES = {
@@ -30,6 +31,7 @@ export const WETH = {
   symbol: 'WETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
   pairableTokens: [],
+  totalValueLockedUSD: 0,
 };
 
 export const ETH = {
@@ -40,6 +42,7 @@ export const ETH = {
   symbol: 'ETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
   pairableTokens: [],
+  totalValueLockedUSD: 0,
 };
 
 const UNI_ADDRESSES = {
@@ -57,6 +60,7 @@ export const UNI = {
   symbol: 'UNI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
   pairableTokens: [],
+  totalValueLockedUSD: 0,
 };
 
 const YFI_ADDRESSES = {
@@ -74,4 +78,5 @@ export const YFI = {
   symbol: 'YFI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
   pairableTokens: [],
+  totalValueLockedUSD: 0,
 };
