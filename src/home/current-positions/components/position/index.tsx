@@ -29,15 +29,27 @@ import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/ethersca
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import Link from '@material-ui/core/Link';
 import useBalance from 'hooks/useBalance';
+import Tooltip from '@material-ui/core/Tooltip';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+
+const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
+  margin-left: 10px;
+`;
 
 const StyledCard = styled(Card)`
   margin: 10px;
   border-radius: 10px;
   position: relative;
+  display: flex;
+  flex-grow: 1;
 `;
 
 const StyledCardContent = styled(CardContent)`
   padding-bottom: 10px !important;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 const StyledCardHeader = styled.div`
@@ -57,6 +69,9 @@ const StyledCardTitleHeader = styled.div`
 
 const StyledDetailWrapper = styled.div`
   margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 `;
 
 const StyledProgressWrapper = styled.div`
@@ -79,6 +94,7 @@ const StyledFreqLeft = styled.div`
   border-radius: 5px;
   background-color: #dceff9;
   color: #0088cc;
+  margin-right: 15px;
 `;
 
 const StyledStale = styled.div`
@@ -413,22 +429,20 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
           </IconButton>
         </StyledCardHeader>
         <StyledDetailWrapper>
-          <Typography variant="body2">
-            <FormattedMessage
-              description="current exercised"
-              defaultMessage="{exercised} {to} swapped"
-              values={{ exercised: formatCurrencyAmount(swapped, to), to: to.symbol }}
-            />
-          </Typography>
-        </StyledDetailWrapper>
-        <StyledDetailWrapper>
-          <Typography variant="caption">
+          <Typography variant="body2" component="span">
             <FormattedMessage
               description="current swapped in position"
-              defaultMessage="{exercised} {to} in position"
+              defaultMessage="{exercised} {to} to withdraw"
               values={{ exercised: formatCurrencyAmount(swapped.sub(withdrawn), to), to: to.symbol }}
             />
           </Typography>
+          <Tooltip
+            title={`Total ammount swapped: ${formatCurrencyAmount(swapped, to)} ${to.symbol}`}
+            arrow
+            placement="top"
+          >
+            <StyledHelpOutlineIcon fontSize="small" />
+          </Tooltip>
         </StyledDetailWrapper>
         <StyledDetailWrapper>
           <Typography variant="body2">

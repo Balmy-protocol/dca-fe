@@ -1,6 +1,6 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
+import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import ActivePosition from './components/position';
 import { Web3Service, TokenList, Positions, PositionsRaw, Position } from 'types';
@@ -11,6 +11,10 @@ import useCurrentPositions from 'hooks/useCurrentPositions';
 import useTokenList from 'hooks/useTokenList';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
+
+const StyledGridItem = styled(Grid)`
+  display: flex;
+`;
 
 interface CurrentPositionsProps {
   web3Service: Web3Service;
@@ -66,25 +70,25 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
       )}
       {/* dont know why I need the 100% width :shrug: */}
       <Grid item xs={12} style={{ width: '100%' }}>
-        <Grid container spacing={2} alignItems="flex-start">
+        <Grid container spacing={2} alignItems="stretch">
           {currentPositions
             ? (currentPositions as PositionsRaw).map((position) => (
-                <Grid item xs={12} sm={6} md={3} key={position.id}>
+                <StyledGridItem item xs={12} sm={6} md={3} key={position.id}>
                   <ActivePosition
                     position={{ ...position, from: tokenList[position.from], to: tokenList[position.to] }}
                     web3Service={web3Service}
                     onWithdraw={onWithdraw}
                     onTerminate={onTerminate}
                   />
-                </Grid>
+                </StyledGridItem>
               ))
             : null}
           {currentPositions &&
             !!currentPositions.length &&
             emptyPositions.map((id) => (
-              <Grid item xs={12} sm={6} md={3} key={id}>
+              <StyledGridItem item xs={12} sm={6} md={3} key={id}>
                 <EmptyPosition />
-              </Grid>
+              </StyledGridItem>
             ))}
           {currentPositions && !currentPositions.length && (
             <Grid item xs={12}>

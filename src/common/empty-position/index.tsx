@@ -9,6 +9,7 @@ const StyledCard = styled(Card)`
   min-height: 215px;
   background-color: transparent;
   border: 3px dashed rgba(0, 0, 0, 0.12);
+  flex-grow: 1;
 `;
 
 const EmptyPosition = () => <StyledCard variant="outlined" />;
