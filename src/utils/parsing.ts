@@ -63,6 +63,17 @@ export const calculateStale = (lastSwapped: number, frequencyType: BigNumber, cr
   return BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
 };
 
+export const calculateStaleSwaps = (lastSwapped: number, frequencyType: BigNumber, createdAt: number) => {
+  const today = BigNumber.from(Math.floor(Date.now() / 1000)).div(frequencyType);
+
+  if (lastSwapped === 0) {
+    return today.sub(BigNumber.from(createdAt).div(frequencyType).add(3));
+  }
+
+  const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(3);
+  return today.sub(nextSwapAvailable);
+};
+
 export const getFrequencyLabel = (frenquencyType: string, frequencyValue?: string) =>
   frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
     ? STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singular

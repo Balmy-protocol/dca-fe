@@ -32,6 +32,7 @@ import usePromise from 'hooks/usePromise';
 import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
 import CreatePairModal from 'common/create-pair-modal';
+import StalePairModal from 'common/stale-pair-modal';
 import { FULL_DEPOSIT_TYPE, MODE_TYPES, NETWORKS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -50,6 +51,7 @@ import {
   STRING_SWAP_INTERVALS,
   FIVE_MINUTES_IN_SECONDS,
   getFrequencyLabel,
+  calculateStale,
 } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
@@ -159,6 +161,7 @@ const Swap = ({
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
+  const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
@@ -315,6 +318,16 @@ const Swap = ({
       setModalError({
         error: e,
       });
+    }
+  };
+
+  const preHandleSwap = () => {
+    const isStale = calculateStale(existingPair?.lastExecutedAt || 0, frequencyType, existingPair?.createdAt || 0);
+
+    if (isStale) {
+      setShouldShowStalePairModal(true);
+    } else {
+      handleSwap();
     }
   };
 
@@ -526,7 +539,7 @@ const Swap = ({
       disabled={shouldDisableButton}
       color="secondary"
       fullWidth
-      onClick={handleSwap}
+      onClick={preHandleSwap}
     >
       <Typography variant="body1">
         <FormattedMessage description="create position" defaultMessage="Create position" />
@@ -567,6 +580,13 @@ const Swap = ({
         web3Service={web3Service}
         from={tokenList[from]}
         to={tokenList[to]}
+      />
+      <StalePairModal
+        open={shouldShowStalePairModal}
+        onConfirm={handleSwap}
+        onCancel={() => setShouldShowStalePairModal(false)}
+        pair={existingPair}
+        freqType={frequencyType}
       />
       <TokenPicker
         shouldShow={shouldShowPicker}
