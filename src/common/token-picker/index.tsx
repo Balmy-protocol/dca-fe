@@ -205,16 +205,12 @@ const TokenPicker = ({
 
     if (orderedTokenKeys.findIndex((el) => el === WETH.address) !== -1) {
       remove(orderedTokenKeys, (token) => token === WETH.address);
-      console.log('will unshift WETH', orderedTokenKeys[0]);
       orderedTokenKeys.unshift(WETH.address);
-      console.log(orderedTokenKeys[0]);
     }
 
     if (orderedTokenKeys.findIndex((el) => el === ETH.address) !== -1) {
       remove(orderedTokenKeys, (token) => token === ETH.address);
-      console.log('will unshift ETH');
       orderedTokenKeys.unshift(ETH.address);
-      console.log(orderedTokenKeys[0]);
     }
 
     return orderedTokenKeys;

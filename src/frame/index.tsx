@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Container from '@material-ui/core/Container';
 import NavBar from 'common/navbar';
+import AppFooter from 'common/footer';
 import Home from 'home';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
@@ -69,6 +70,9 @@ const AppFrame = ({ isLoading }: AppFrameProps) => (
             </Route>
           </Switch>
         </StyledAppGridContainer>
+        <StyledNavBarGridContainer item xs={12}>
+          <AppFooter />
+        </StyledNavBarGridContainer>
       </StyledGridContainer>
     </StyledContainer>
   </Router>
