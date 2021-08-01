@@ -43,7 +43,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
                     <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px' }}>
                       <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
                         <Tab classes={tabItemStyles} disableRipple label={'Open positions'} />
-                        <Tab classes={tabItemStyles} disableRipple label={'Past positions'} />
+                        <Tab classes={tabItemStyles} disableRipple label={'Terminated positions'} />
                       </Tabs>
                     </Grid>
                     <Grid item xs={12} style={{ display: 'flex', paddingTop: '0px' }}>
