@@ -4,12 +4,12 @@ import Button from 'common/button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import { calculateStaleSwaps } from 'utils/parsing';
 import { AvailablePair } from 'types';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { BigNumber } from 'ethers';
+import Link from '@material-ui/core/Link';
 
 const useStyles = makeStyles({
   paper: {
@@ -18,14 +18,12 @@ const useStyles = makeStyles({
 });
 
 const StyledDialogContent = styled(DialogContent)`
-  display: flex;
-  flex-direction: column;
   padding: 40px 72px !important;
   align-items: center;
   justify-content: center;
   text-align: center;
-  *:not(:last-child) {
-    margin-bottom: 10px;
+  *:not(:first-child) {
+    margin-left: 5px;
   }
 `;
 
@@ -46,7 +44,6 @@ interface StalePairModalProps {
 
 const StalePairModal = ({ pair, freqType, onConfirm, open, onCancel }: StalePairModalProps) => {
   const classes = useStyles();
-  const staleSwaps = calculateStaleSwaps(pair?.lastExecutedAt || 0, freqType, pair?.createdAt || 0);
 
   return (
     <Dialog
@@ -58,13 +55,18 @@ const StalePairModal = ({ pair, freqType, onConfirm, open, onCancel }: StalePair
       classes={{ paper: classes.paper }}
     >
       <StyledDialogContent>
-        <Typography variant="body1">
+        <Typography variant="body1" component="span">
+          <FormattedMessage description="stale pair message" defaultMessage="This pair is " />
+        </Typography>
+        <Typography variant="body1" component="span">
+          <Link href="https://docs.mean.finance/concepts/positions#stale-positions" target="_blank">
+            <FormattedMessage description="stale" defaultMessage="stale" />
+          </Link>
+        </Typography>
+        <Typography variant="body1" component="span">
           <FormattedMessage
             description="stale pair message"
-            defaultMessage="This pair has been stale for the last {staleSwaps} swaps for that frequency. Are you sure you want to create a position?"
-            values={{
-              staleSwaps: staleSwaps.toString(),
-            }}
+            defaultMessage=" for that frequency. Are you sure you want to create a position?"
           />
         </Typography>
       </StyledDialogContent>
