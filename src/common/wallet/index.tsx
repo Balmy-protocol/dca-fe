@@ -16,7 +16,6 @@ import { Web3Service } from 'types';
 import { FormattedMessage } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import WalletMenu from 'common/wallet-menu';
-import EtcButton from 'common/etc-button';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
 const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
@@ -79,7 +78,6 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
               <Typography noWrap>{web3Service.getAccount()}</Typography>
             </StyledButton>
           </Badge>
-          <EtcButton />
           <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />
         </>
       )}

@@ -196,7 +196,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
         content: (
           <FormattedMessage
             description="resetting position success"
-            defaultMessage="Adding {ammountToAdd} {from} to {from}:{to} position and setting it to run for {frequencyValue} {type} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Adding {ammountToAdd} {from} to {from}:{to} position and setting it to run for {frequencyValue} {type} has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               ammountToAdd,
               frequencyValue,
@@ -237,7 +237,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
         content: (
           <FormattedMessage
             description="adding funds success"
-            defaultMessage="Adding funds to {from}:{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Adding funds to your {from}:{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
