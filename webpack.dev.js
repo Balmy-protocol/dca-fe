@@ -55,7 +55,7 @@ module.exports = merge(common, {
       'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
     }),
     new webpack.DefinePlugin({
-      'process.env.FACTORY_ADDRESS': JSON.stringify('0x5f6AD3A83088188e81ff80295F7686e868400C29'),
+      'process.env.FACTORY_ADDRESS': JSON.stringify('0xCbb75279D84eB2ae32a750cb88bcaeb8e5de6002'),
     }),
   ],
   // -------------ropsten--------------
