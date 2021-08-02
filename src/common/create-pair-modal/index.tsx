@@ -142,7 +142,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
             <Typography variant="body1">
               <FormattedMessage
                 description="create pair question"
-                defaultMessage="Are you sure you want to create the {from}:{to} currency pair?"
+                defaultMessage="Are you sure you want to create the {from}:{to} pair?"
                 values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
               />
             </Typography>
