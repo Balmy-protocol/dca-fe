@@ -11,6 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import TwitterIcon from '@material-ui/icons/Twitter';
 import DescriptionIcon from '@material-ui/icons/Description';
 import GitHubIcon from '@material-ui/icons/GitHub';
+import DiscordIcon from 'assets/svg/atom/discord';
 
 const StyledCategoryTitle = styled(CategoryTitle)`
   margin: 0px;
@@ -62,6 +63,14 @@ export default React.memo(function OceanAppFooter() {
                         <TwitterIcon fontSize="inherit" />
                       </StyledIconContainer>
                       <FormattedMessage description="twitter" defaultMessage="Twitter" />
+                    </Link>
+                  </CategoryItem>
+                  <CategoryItem>
+                    <Link href="https://discord.gg/ThfzDdn4pn" target="_blank" color="inherit">
+                      <StyledIconContainer>
+                        <DiscordIcon isDisabled={false} size="inherit" />
+                      </StyledIconContainer>
+                      <FormattedMessage description="discord" defaultMessage="Discord" />
                     </Link>
                   </CategoryItem>
                 </CategoryProvider>
