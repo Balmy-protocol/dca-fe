@@ -13,7 +13,7 @@ module.exports = merge(common, {
   //     'process.env.UNI_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3'),
   //   }),
   //   new webpack.DefinePlugin({
-  //     'process.env.DCA_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/alejoamiras/dca-rinkeby-stable'),
+  //     'process.env.DCA_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1'),
   //   }),
   //   new webpack.DefinePlugin({
   //     'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
@@ -49,7 +49,7 @@ module.exports = merge(common, {
       'process.env.UNI_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/alejoamiras/uniswap-v3-rinkeby'),
     }),
     new webpack.DefinePlugin({
-      'process.env.DCA_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/alejoamiras/dca-rinkeby-stable'),
+      'process.env.DCA_GRAPH': JSON.stringify('https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-rinkeby'),
     }),
     new webpack.DefinePlugin({
       'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
