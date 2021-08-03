@@ -4,9 +4,10 @@ import TextField from '@material-ui/core/TextField';
 import Button from 'common/button';
 import { SetStateCallback, Token } from 'types';
 import { FormattedMessage } from 'react-intl';
-import { formatUnits } from 'ethers/lib/utils';
+import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import Input from '@material-ui/core/Input';
+import { ETH } from 'mocks/tokens';
 
 const StyledInput = styled(Input)`
   text-align: center;
@@ -54,6 +55,16 @@ const TokenInput = ({
     }
   };
 
+  const handleMaxValue = () => {
+    if (balance && token) {
+      if (token.address === ETH.address) {
+        onChange(formatUnits(balance.sub(parseUnits('0.1', token.decimals)), token.decimals));
+      } else {
+        onChange(formatUnits(balance, token.decimals));
+      }
+    }
+  };
+
   return (
     <>
       {isMinimal ? (
@@ -91,7 +102,7 @@ const TokenInput = ({
                   color="tertiary"
                   variant="contained"
                   size="small"
-                  onClick={() => onChange(formatUnits(balance, token.decimals))}
+                  onClick={handleMaxValue}
                   style={{ marginBottom: '8px', minWidth: '41px' }}
                 >
                   <FormattedMessage description="max" defaultMessage="MAX" />
