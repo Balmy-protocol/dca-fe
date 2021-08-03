@@ -144,7 +144,7 @@ const mockedData = [
   },
 ];
 
-const PERIODS = [14, 30];
+const PERIODS = [7, 30];
 
 const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST'];
 
@@ -252,7 +252,7 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
                 <LineChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                   <Line type="monotone" dataKey="uni" stroke="#8884d8" />
                   <XAxis dataKey="name" hide />
-                  <YAxis hide />
+                  <YAxis hide domain={['auto', 'auto']} />
                   <Tooltip formatter={tooltipFormatter} />
                 </LineChart>
               </ResponsiveContainer>

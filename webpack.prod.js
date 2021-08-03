@@ -19,7 +19,7 @@ module.exports = merge(common, {
   //     'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
   //   }),
   //   new webpack.DefinePlugin({
-  //     'process.env.FACTORY_ADDRESS': JSON.stringify('0xCbb75279D84eB2ae32a750cb88bcaeb8e5de6002'),
+  //     'process.env.FACTORY_ADDRESS': JSON.stringify('0xaC4a40a995f236E081424D966F1dFE014Fe0e98A'),
   //   }),
   // ],
   // // -------------meanfinance--------------
@@ -37,7 +37,7 @@ module.exports = merge(common, {
   //     'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
   //   }),
   //   new webpack.DefinePlugin({
-  //     'process.env.FACTORY_ADDRESS': JSON.stringify('0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00'),
+  //     'process.env.FACTORY_ADDRESS': JSON.stringify('0xaC4a40a995f236E081424D966F1dFE014Fe0e98A'),
   //   }),
   // ],
   // -------------mainnet--------------
