@@ -321,6 +321,7 @@ export interface TransactionDetails {
   approval?: { tokenAddress: string; spender: string };
   summary?: string;
   claim?: { recipient: string };
+  retries: number;
   receipt?: TransactionReceipt;
   lastCheckedBlockNumber?: number;
   addedTime: number;

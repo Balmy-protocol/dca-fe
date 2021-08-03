@@ -244,10 +244,6 @@ export default class Web3Service {
     return this.signer;
   }
 
-  waitForTransaction(hash: string) {
-    return this.client.waitForTransaction(hash);
-  }
-
   async disconnect() {
     if (this.client && (this.client as any).disconnect) {
       await (this.client as any).disconnect();
@@ -620,6 +616,14 @@ export default class Web3Service {
     return this.client.getTransactionReceipt(txHash);
   }
 
+  getTransaction(txHash: string) {
+    return this.client.getTransaction(txHash);
+  }
+
+  waitForTransaction(txHash: string) {
+    return this.client.waitForTransaction(txHash);
+  }
+
   getBlockNumber() {
     return this.client.getBlockNumber();
   }
@@ -667,6 +671,22 @@ export default class Web3Service {
     }
 
     this.currentPositions[id].pendingTransaction = transaction.hash;
+  }
+
+  handleTransactionRejection(transaction: TransactionDetails) {
+    if (
+      transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
+      transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+      transaction.type === TRANSACTION_TYPES.WRAP_ETHER
+    )
+      return;
+    const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
+    const id = typeData.id;
+    if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
+      delete this.currentPositions[`pending-transaction-${transaction.hash}`];
+    } else {
+      this.currentPositions[id].pendingTransaction = '';
+    }
   }
 
   handleTransaction(transaction: TransactionDetails) {

@@ -4,8 +4,9 @@ import { useSnackbar } from 'notistack';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useBuildTransactionMessage from 'hooks/useBuildTransactionMessage';
+import useBuildRejectedTransactionMessage from 'hooks/useBuildRejectedTransactionMessage';
 import Zoom from '@material-ui/core/Zoom';
-import { checkedTransaction, finalizeTransaction } from './actions';
+import { checkedTransaction, finalizeTransaction, removeTransaction, transactionFailed } from './actions';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
@@ -51,6 +52,7 @@ export default function Updater(): null {
   const { enqueueSnackbar } = useSnackbar();
 
   const buildTransactionMessage = useBuildTransactionMessage();
+  const buildRejectedTransactionMessage = useBuildRejectedTransactionMessage();
 
   const pendingTransactions = usePendingTransactions();
 
@@ -60,6 +62,45 @@ export default function Updater(): null {
       return web3Service.getTransactionReceipt(hash).then((receipt: any) => receipt);
     },
     [web3Service]
+  );
+  const checkIfTransactionExists = useCallback(
+    (hash: string) => {
+      if (!web3Service.getAccount()) throw new Error('No library or chainId');
+      return web3Service.getTransaction(hash).then(async (tx: ethers.providers.TransactionResponse) => {
+        if (!tx) {
+          if (transactions[hash].retries > 2) {
+            web3Service.handleTransactionRejection({
+              ...transactions[hash],
+              typeData: {
+                ...transactions[hash].typeData,
+              },
+            });
+            dispatch(removeTransaction({ hash }));
+            enqueueSnackbar(
+              buildRejectedTransactionMessage({
+                ...transactions[hash],
+                typeData: {
+                  ...transactions[hash].typeData,
+                },
+              }),
+              {
+                variant: 'error',
+                anchorOrigin: {
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                },
+                TransitionComponent: Zoom,
+              }
+            );
+          } else {
+            dispatch(transactionFailed({ hash, blockNumber: lastBlockNumber }));
+          }
+        } else {
+          dispatch(checkedTransaction({ hash, blockNumber: lastBlockNumber }));
+        }
+      });
+    },
+    [web3Service, web3Service.getAccount(), transactions, lastBlockNumber, dispatch]
   );
 
   useEffect(() => {
@@ -147,7 +188,7 @@ export default function Updater(): null {
                 dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber }));
               }
             } else {
-              dispatch(checkedTransaction({ hash, blockNumber: lastBlockNumber }));
+              checkIfTransactionExists(hash);
             }
           })
           .catch((error: any) => {
@@ -156,7 +197,7 @@ export default function Updater(): null {
             }
           });
       });
-  }, [web3Service.getAccount(), transactions, lastBlockNumber, dispatch, getReceipt]);
+  }, [web3Service.getAccount(), transactions, lastBlockNumber, dispatch, getReceipt, checkIfTransactionExists]);
 
   return null;
 }

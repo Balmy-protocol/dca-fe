@@ -62,6 +62,7 @@ export function useTransactionAdder(): (
         type,
         typeData,
         addedTime: new Date().getTime(),
+        retries: 0,
       });
     },
     [dispatch, web3Service.getAccount()]
