@@ -34,6 +34,24 @@ export const WETH = {
   totalValueLockedUSD: 0,
 };
 
+const USDC_ADDRESSES = {
+  mainnet: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+  ropsten: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+  rinkeby: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
+  meanfinance: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+};
+
+export const USDC = {
+  chainId: 1,
+  decimals: 6,
+  address: USDC_ADDRESSES[process.env.ETH_NETWORK as keyof typeof USDC_ADDRESSES],
+  name: 'USD Coin',
+  symbol: 'USDC',
+  logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/usdc.png?1547036627',
+  pairableTokens: [],
+  totalValueLockedUSD: 0,
+};
+
 export const ETH = {
   chainId: 1,
   decimals: 18,

@@ -8,13 +8,13 @@ import { useQuery } from '@apollo/client';
 import useTokenList from 'hooks/useTokenList';
 import Swap from './components/swap';
 import { DAY_IN_SECONDS } from 'utils/parsing';
-import { WETH, DAI, UNI, ETH } from 'mocks/tokens';
+import { WETH, DAI, UNI, ETH, USDC } from 'mocks/tokens';
 import Hidden from '@material-ui/core/Hidden';
 
 const SwapContainer = () => {
   const routeParams = useParams<{ from: string; to: string }>();
-  const [from, setFrom] = React.useState((routeParams && routeParams.from) || WETH.address);
-  const [to, setTo] = React.useState((routeParams && routeParams.to) || DAI.address);
+  const [from, setFrom] = React.useState((routeParams && routeParams.from) || USDC.address);
+  const [to, setTo] = React.useState((routeParams && routeParams.to) || WETH.address);
   const [fromValue, setFromValue] = React.useState('');
   const [frequencyType, setFrequencyType] = React.useState(DAY_IN_SECONDS);
   const [frequencyValue, setFrequencyValue] = React.useState('5');
