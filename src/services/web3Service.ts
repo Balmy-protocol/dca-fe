@@ -49,6 +49,7 @@ import ERC20ABI from 'abis/erc20.json';
 import WETHABI from 'abis/weth.json';
 import Factory from 'abis/factory.json';
 import DCAPair from 'abis/DCAPair.json';
+import TokenDescriptor from 'abis/TokenDescriptor.json';
 
 // MOCKS
 import usedTokensMocks from 'mocks/usedTokens';
@@ -56,6 +57,7 @@ import { ETH, WETH } from 'mocks/tokens';
 import { FULL_DEPOSIT_TYPE, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 
 export const FACTORY_ADDRESS = process.env.FACTORY_ADDRESS as string;
+export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as string;
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
@@ -193,6 +195,7 @@ export default class Web3Service {
         startedAt: position.createdAtTimestamp,
         totalDeposits: BigNumber.from(position.totalDeposits),
         pendingTransaction: '',
+        pairId: position.pair.id,
       })),
       'id'
     );
@@ -225,6 +228,7 @@ export default class Web3Service {
         status: position.status,
         startedAt: position.createdAtTimestamp,
         pedingTransaction: '',
+        pairId: position.pair.id,
       })),
       'id'
     );
@@ -454,6 +458,16 @@ export default class Web3Service {
     return factory.createPair(tokenA, tokenB);
   }
 
+  async getTokenNFT(position: Position) {
+    const pairAddress = position.pairId;
+    const dcaId = position.dcaId;
+
+    const pairAddressContract = new ethers.Contract(pairAddress, DCAPair.abi, this.client);
+
+    const tokenData = await pairAddressContract.tokenURI(dcaId);
+    return JSON.parse(atob(tokenData.substring(29)));
+  }
+
   getCurrentPositions() {
     return orderBy(values(this.currentPositions), 'startedAt', 'desc');
   }
@@ -652,6 +666,7 @@ export default class Web3Service {
       this.currentPositions[id] = {
         from: newPositionTypeData.from.address,
         to: newPositionTypeData.to.address,
+        pairId: newPositionTypeData.existingPair.id,
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
         swapped: BigNumber.from(0),
         rate: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(

@@ -31,6 +31,7 @@ import Link from '@material-ui/core/Link';
 import useBalance from 'hooks/useBalance';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -127,9 +128,10 @@ interface ActivePositionProps {
   web3Service: Web3Service;
   onWithdraw: (position: Position) => void;
   onTerminate: (position: Position) => void;
+  onViewNFT: (position: Position) => void;
 }
 
-const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: ActivePositionProps) => {
+const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onViewNFT }: ActivePositionProps) => {
   const {
     from,
     to,
@@ -417,16 +419,30 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service }: Acti
             <TokenIcon token={to} size="16px" />
             <Typography variant="body1">{to.symbol}</Typography>
           </StyledCardTitleHeader>
-          <IconButton
-            aria-label="more"
-            aria-controls="long-menu"
-            aria-haspopup="true"
-            onClick={() => setShouldShowSettings(true)}
-            disabled={isPending}
-            size="small"
-          >
-            <Cog size="22px" isDisabled={isPending} />
-          </IconButton>
+          <div>
+            <Tooltip title="View NFT" arrow placement="top">
+              <IconButton
+                aria-label="more"
+                aria-controls="long-menu"
+                aria-haspopup="true"
+                onClick={() => onViewNFT(position)}
+                disabled={isPending}
+                size="small"
+              >
+                <VisibilityIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <IconButton
+              aria-label="more"
+              aria-controls="long-menu"
+              aria-haspopup="true"
+              onClick={() => setShouldShowSettings(true)}
+              disabled={isPending}
+              size="small"
+            >
+              <Cog size="22px" isDisabled={isPending} />
+            </IconButton>
+          </div>
         </StyledCardHeader>
         <StyledDetailWrapper>
           <Typography variant="body2" component="span">

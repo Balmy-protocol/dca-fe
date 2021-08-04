@@ -133,6 +133,7 @@ export interface PositionRaw {
   status: string;
   startedAt: number;
   pendingTransaction: string;
+  pairId: string;
 }
 
 export interface PositionRawKeyBy {
@@ -329,4 +330,10 @@ export interface TransactionDetails {
   from: string;
   type: TransactionTypes;
   typeData: TransactionTypeDataOptions;
+}
+
+export interface NFTData {
+  description: string;
+  image: string;
+  name: string;
 }
