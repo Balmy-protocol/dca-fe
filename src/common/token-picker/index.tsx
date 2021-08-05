@@ -3,6 +3,7 @@ import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
 import reverse from 'lodash/reverse';
 import remove from 'lodash/remove';
+import uniq from 'lodash/uniq';
 import sortBy from 'lodash/sortBy';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@material-ui/core/Slide';
@@ -24,6 +25,10 @@ import TokenIcon from 'common/token-icon';
 import { makeStyles } from '@material-ui/core/styles';
 import { ContactSupportOutlined } from '@material-ui/icons';
 import { ETH, WETH } from 'mocks/tokens';
+import useAvailablePairs from 'hooks/useAvailablePairs';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
 interface PartialTheme {
@@ -166,10 +171,12 @@ const TokenPicker = ({
   usedTokens,
 }: TokenPickerProps) => {
   const [search, setSearch] = React.useState('');
+  const [isOnlyPairs, setIsOnlyPairs] = React.useState(false);
   let tokenKeysToUse: string[] = [];
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const inputStyles = useSearchInputStyles();
   const extendedIgnoredValues = isFrom ? ignoreValues : [...ignoreValues, ETH.address];
+  const availablePairs = useAvailablePairs();
 
   const handleOnClose = () => {
     setSearch('');
@@ -181,16 +188,27 @@ const TokenPicker = ({
     handleOnClose();
   };
 
-  tokenKeysToUse = isFrom ? tokenKeys : availableFrom;
+  const uniqTokensFromPairs = React.useMemo(
+    () =>
+      uniq(
+        availablePairs.reduce(
+          (accum, current) => [...accum, current.token0, current.token1],
+          [...(isFrom ? [ETH.address] : [])]
+        )
+      ),
+    [availablePairs]
+  );
+
+  tokenKeysToUse = !isOnlyPairs ? tokenKeys : uniqTokensFromPairs;
 
   const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !extendedIgnoredValues.includes(el) && tokenKeys.includes(el)),
-    [usedTokens, extendedIgnoredValues, tokenKeys]
+    () => usedTokens.filter((el) => !extendedIgnoredValues.includes(el) && tokenKeysToUse.includes(el)),
+    [usedTokens, extendedIgnoredValues, tokenKeysToUse]
   );
 
   const memoizedTokenKeys = React.useMemo(() => {
     let orderedTokenKeys = sortBy(
-      tokenKeys.filter(
+      tokenKeysToUse.filter(
         (el) =>
           (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
@@ -214,7 +232,7 @@ const TokenPicker = ({
     }
 
     return orderedTokenKeys;
-  }, [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeys, availableFrom]);
+  }, [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeysToUse, availableFrom]);
 
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
@@ -236,6 +254,19 @@ const TokenPicker = ({
                 <FormattedMessage description="You get" defaultMessage="You get" />
               )}
             </Typography>
+            <FormGroup row>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isOnlyPairs}
+                    onChange={() => setIsOnlyPairs(!isOnlyPairs)}
+                    name="isOnlyPairs"
+                    color="primary"
+                  />
+                }
+                label="Only tokens in available pairs"
+              />
+            </FormGroup>
           </Grid>
           <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
             <InputBase
