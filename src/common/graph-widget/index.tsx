@@ -16,6 +16,7 @@ import { Token } from 'types';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 import { toSignificantFromBigDecimal } from 'utils/currency';
+import { ETH, WETH } from 'mocks/tokens';
 
 interface GraphWidgetProps {
   from: Token;
@@ -160,20 +161,24 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
   if (to && from) {
     if (from.address < to.address) {
       tokenA = {
-        ...from,
+        ...(from.address === ETH.address ? WETH : from),
+        symbol: from.symbol,
         isBaseToken: STABLE_COINS.includes(from.symbol),
       };
       tokenB = {
-        ...to,
+        ...(to.address === ETH.address ? WETH : to),
+        symbol: to.symbol,
         isBaseToken: STABLE_COINS.includes(to.symbol),
       };
     } else {
       tokenA = {
-        ...to,
+        ...(to.address === ETH.address ? WETH : to),
+        symbol: to.symbol,
         isBaseToken: STABLE_COINS.includes(to.symbol),
       };
       tokenB = {
-        ...from,
+        ...(from.address === ETH.address ? WETH : from),
+        symbol: from.symbol,
         isBaseToken: STABLE_COINS.includes(from.symbol),
       };
     }
