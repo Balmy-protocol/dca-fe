@@ -20,15 +20,34 @@ const SwapContainer = () => {
   const [frequencyValue, setFrequencyValue] = React.useState('5');
   const tokenList = useTokenList();
 
-  const onSetFrom = (from: string) => {
-    setFrom(from);
-    if (!tokenList[from].pairableTokens.includes(to)) {
-      setTo(tokenList[from].pairableTokens[0]);
+  const onSetFrom = (newFrom: string) => {
+    // check for decimals
+    if (tokenList[newFrom].decimals < tokenList[from].decimals) {
+      const splitValue = fromValue.match(/^(\d*)\.?(\d*)$/);
+      let newFromValue = fromValue;
+      if (splitValue && splitValue[2] !== '') {
+        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, tokenList[newFrom].decimals)}`;
+      }
+
+      setFromValue(newFromValue);
+    }
+
+    setFrom(newFrom);
+    if (!tokenList[newFrom].pairableTokens.includes(to)) {
+      setTo(tokenList[newFrom].pairableTokens[0]);
     }
   };
   const onSetTo = (to: string) => {
     setTo(to);
     if (!tokenList[to].pairableTokens.includes(from)) {
+      const splitValue = fromValue.match(/^(\d*)\.?(\d*)$/);
+      let newFromValue = fromValue;
+      if (splitValue && splitValue[2] !== '') {
+        newFromValue = `${splitValue[1]}.${splitValue[2].substring(
+          0,
+          tokenList[tokenList[to].pairableTokens[0]].decimals
+        )}`;
+      }
       setFrom(tokenList[to].pairableTokens[0]);
     }
   };
@@ -38,6 +57,17 @@ const SwapContainer = () => {
       setTo(WETH.address);
     } else {
       setTo(from);
+    }
+
+    // check for decimals
+    if (tokenList[to].decimals < tokenList[from].decimals) {
+      const splitValue = fromValue.match(/^(\d*)\.?(\d*)$/);
+      let newFromValue = fromValue;
+      if (splitValue && splitValue[2] !== '') {
+        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, tokenList[to].decimals)}`;
+      }
+
+      setFromValue(newFromValue);
     }
     setFrom(to);
   };

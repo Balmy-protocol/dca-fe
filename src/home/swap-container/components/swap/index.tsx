@@ -52,6 +52,7 @@ import {
   FIVE_MINUTES_IN_SECONDS,
   getFrequencyLabel,
   calculateStale,
+  HOURS_IN_SECONDS,
 } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
@@ -122,6 +123,10 @@ const frequencyTypeOptions = [
         },
       ]
     : []),
+  // {
+  //   label: STRING_SWAP_INTERVALS[HOURS_IN_SECONDS.toString()],
+  //   value: HOURS_IN_SECONDS,
+  // },
   {
     label: STRING_SWAP_INTERVALS[DAY_IN_SECONDS.toString()],
     value: DAY_IN_SECONDS,
@@ -195,6 +200,21 @@ const Swap = ({
   );
 
   React.useEffect(() => {
+    setRate(
+      (fromValue &&
+        parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+        frequencyValue &&
+        BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+        from &&
+        formatUnits(
+          parseUnits(fromValue, tokenList[from].decimals).div(BigNumber.from(frequencyValue)),
+          tokenList[from].decimals
+        )) ||
+        '0'
+    );
+  }, [from]);
+
+  React.useEffect(() => {
     if (!hasPendingWrap && from === ETH.address) {
       setFrom(WETH.address);
     }
@@ -266,6 +286,7 @@ const Swap = ({
   };
 
   const handleSwap = async () => {
+    setShouldShowStalePairModal(false);
     const fromSymbol = from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol;
 
     try {

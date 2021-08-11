@@ -30,7 +30,7 @@ interface TokenInputProps {
   withBalance?: boolean;
   isLoadingBalance?: boolean;
   balance?: BigNumber;
-  token?: Token;
+  token: Token;
   error?: string;
   isMinimal?: boolean;
 }
@@ -50,6 +50,8 @@ const TokenInput = ({
 }: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
+    const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${token.decimals}}$`);
+
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
       onChange(nextValue);
     }

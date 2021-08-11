@@ -264,7 +264,7 @@ const TokenPicker = ({
                     color="primary"
                   />
                 }
-                label="Only tokens in available pairs"
+                label="Only tokens with created pairs"
               />
             </FormGroup>
           </Grid>

@@ -7,6 +7,7 @@ const MINUTES_IN_HOURS = BigNumber.from(60);
 const SECONDS_IN_MINUTES = BigNumber.from(60);
 
 export const FIVE_MINUTES_IN_SECONDS = SECONDS_IN_MINUTES.mul(BigNumber.from(5));
+export const HOURS_IN_SECONDS = SECONDS_IN_MINUTES.mul(MINUTES_IN_HOURS);
 export const DAY_IN_SECONDS = HOURS_IN_DAYS.mul(MINUTES_IN_HOURS).mul(SECONDS_IN_MINUTES);
 export const WEEK_IN_SECONDS = DAYS_IN_WEEK.mul(HOURS_IN_DAYS).mul(MINUTES_IN_HOURS).mul(SECONDS_IN_MINUTES);
 export const MONTH_IN_SECONDS = HOURS_IN_MONTH.mul(MINUTES_IN_HOURS).mul(SECONDS_IN_MINUTES);
@@ -22,6 +23,11 @@ export const STRING_SWAP_INTERVALS = {
     singular: '5 minutes',
     plural: '5 minutes',
     adverb: '5 minutely',
+  },
+  [HOURS_IN_SECONDS.toString()]: {
+    singular: 'hour',
+    plural: 'hours',
+    adverb: 'hourly',
   },
   [DAY_IN_SECONDS.toString()]: {
     singular: 'day',
