@@ -33,7 +33,16 @@ import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
 import CreatePairModal from 'common/create-pair-modal';
 import StalePairModal from 'common/stale-pair-modal';
-import { FULL_DEPOSIT_TYPE, MODE_TYPES, NETWORKS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import LowLiquidityModal from 'common/low-liquidity-modal';
+import {
+  FULL_DEPOSIT_TYPE,
+  MINIMUM_LIQUIDITY_USD,
+  MODE_TYPES,
+  NETWORKS,
+  POSSIBLE_ACTIONS,
+  RATE_TYPE,
+  TRANSACTION_TYPES,
+} from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { formatCurrencyAmount } from 'utils/currency';
@@ -57,6 +66,7 @@ import {
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { ETH, WETH } from 'mocks/tokens';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -167,6 +177,9 @@ const Swap = ({
   const [selecting, setSelecting] = React.useState(from);
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
+  const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
+  const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
+  const [isLoading, setIsLoading] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
@@ -422,6 +435,40 @@ const Swap = ({
     }
   };
 
+  const POSSIBLE_ACTIONS_FUNCTIONS = {
+    createPair: () => setShouldShowPairModal(true),
+    createPosition: preHandleSwap,
+    approveToken: handleApproveToken,
+  };
+
+  const onLowLiquidityModalClose = () => {
+    setShouldShowLowLiquidityModal(false);
+  };
+
+  const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
+    let hasLowLiquidity = true;
+
+    setIsLoading(true);
+
+    const liquidity = await web3Service.getPairLiquidity(from, to);
+
+    setIsLoading(false);
+
+    hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
+
+    setCurrentAction(actionToDo);
+    if (hasLowLiquidity) {
+      setShouldShowLowLiquidityModal(true);
+    } else {
+      POSSIBLE_ACTIONS_FUNCTIONS[actionToDo] && POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
+    }
+  };
+
+  const closeLowLiquidityModal = () => {
+    POSSIBLE_ACTIONS_FUNCTIONS[currentAction] && POSSIBLE_ACTIONS_FUNCTIONS[currentAction]();
+    onLowLiquidityModalClose();
+  };
+
   const cantFund = fromValue && balance && parseUnits(fromValue, tokenList[from].decimals).gt(balance);
 
   const networkError =
@@ -432,8 +479,11 @@ const Swap = ({
   const isApproved = !fromValue
     ? true
     : (!isLoadingAllowance &&
-        allowance &&
-        parseUnits(allowance, tokenList[from].decimals).gte(parseUnits(fromValue, tokenList[from].decimals))) ||
+        allowance.allowance &&
+        allowance.token.address === from &&
+        parseUnits(allowance.allowance, tokenList[from].decimals).gte(
+          parseUnits(fromValue, tokenList[from].decimals)
+        )) ||
       hasConfirmedApproval;
 
   const pairExists = existingPair;
@@ -462,23 +512,26 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="warning"
-      disabled={!!pairExists || hasPendingPairCreation}
-      onClick={() => setShouldShowPairModal(true)}
+      disabled={!!pairExists || hasPendingPairCreation || isLoading}
+      onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPair as keyof typeof POSSIBLE_ACTIONS)}
     >
-      <Typography variant="body1">
-        {hasPendingPairCreation ? (
-          <FormattedMessage description="pair being created" defaultMessage="This pair is being created" />
-        ) : (
-          <FormattedMessage
-            description="create pair button"
-            defaultMessage="Create {from}/{to} pair"
-            values={{
-              from: (from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol) || '',
-              to: (tokenList[to] && tokenList[to].symbol) || '',
-            }}
-          />
-        )}
-      </Typography>
+      {!isLoading && (
+        <Typography variant="body1">
+          {hasPendingPairCreation ? (
+            <FormattedMessage description="pair being created" defaultMessage="This pair is being created" />
+          ) : (
+            <FormattedMessage
+              description="create pair button"
+              defaultMessage="Create {from}/{to} pair"
+              values={{
+                from: (from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol) || '',
+                to: (tokenList[to] && tokenList[to].symbol) || '',
+              }}
+            />
+          )}
+        </Typography>
+      )}
+      {isLoading && <CenteredLoadingIndicator />}
     </StyledButton>
   );
 
@@ -504,8 +557,8 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="primary"
-      disabled={!!isApproved || hasPendingApproval}
-      onClick={handleApproveToken}
+      disabled={!!isApproved || hasPendingApproval || isLoading}
+      onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
     >
       <Typography variant="body1">
         {hasPendingApproval ? (
@@ -557,14 +610,17 @@ const Swap = ({
     <StyledButton
       size="large"
       variant="contained"
-      disabled={shouldDisableButton}
+      disabled={shouldDisableButton || isLoading}
       color="secondary"
       fullWidth
-      onClick={preHandleSwap}
+      onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
-      <Typography variant="body1">
-        <FormattedMessage description="create position" defaultMessage="Create position" />
-      </Typography>
+      {!isLoading && (
+        <Typography variant="body1">
+          <FormattedMessage description="create position" defaultMessage="Create position" />
+        </Typography>
+      )}
+      {isLoading && <CenteredLoadingIndicator />}
     </StyledButton>
   );
 
@@ -606,8 +662,12 @@ const Swap = ({
         open={shouldShowStalePairModal}
         onConfirm={handleSwap}
         onCancel={() => setShouldShowStalePairModal(false)}
-        pair={existingPair}
-        freqType={frequencyType}
+      />
+      <LowLiquidityModal
+        open={shouldShowLowLiquidityModal}
+        onConfirm={closeLowLiquidityModal}
+        onCancel={onLowLiquidityModalClose}
+        actionToTake={currentAction}
       />
       <TokenPicker
         shouldShow={shouldShowPicker}

@@ -188,7 +188,10 @@ export interface GetUsedTokensDataResponse {
   data: GetUsedTokensData;
 }
 
-export type GetAllowanceResponse = string;
+export type GetAllowanceResponse = {
+  allowance: string;
+  token: Token;
+};
 
 export interface EstimatedPairResponse {
   gas: string;
@@ -337,3 +340,12 @@ export interface NFTData {
   image: string;
   name: string;
 }
+
+export interface PoolLiquidityData {
+  id: string;
+  poolDayData: {
+    id: string;
+    volumeUSD: string;
+  }[];
+}
+export type PoolsLiquidityData = PoolLiquidityData[];

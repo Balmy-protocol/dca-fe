@@ -9,6 +9,7 @@ import Torus from '@toruslabs/torus-embed';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import find from 'lodash/find';
+import { DateTime } from 'luxon';
 import keyBy from 'lodash/keyBy';
 import axios, { AxiosResponse } from 'axios';
 import {
@@ -35,14 +36,19 @@ import {
   TokenList,
   ResetPositionTypeData,
   ModifyRateAndSwapsPositionTypeData,
+  PoolLiquidityData,
+  PoolsLiquidityData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
+import { sortTokens } from 'utils/parsing';
+
+// GQL queries
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
 import GET_TOKEN_LIST from 'graphql/getTokenList.graphql';
 import GET_POSITIONS from 'graphql/getPositions.graphql';
+import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
 import gqlFetchAll from 'utils/gqlFetchAll';
 import gqlFetchAllById from 'utils/gqlFetchAllById';
-import { sortTokens } from 'utils/parsing';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
@@ -513,7 +519,7 @@ export default class Web3Service {
 
     return erc20
       .allowance(this.getAccount(), pairContract.id)
-      .then((allowance: string) => formatUnits(allowance, token.decimals));
+      .then((allowance: string) => ({ token, allowance: formatUnits(allowance, token.decimals) }));
   }
 
   approveToken(token: Token, pairContract: AvailablePair) {
@@ -856,5 +862,34 @@ export default class Web3Service {
     const factory = new ethers.Contract(pairContract.id, DCAPair.abi, this.getSigner());
 
     return factory.interface.parseLog(log);
+  }
+
+  async getPairLiquidity(token0: string, token1: string) {
+    let tokenA;
+    let tokenB;
+    if (token0 < token1) {
+      tokenA = token0;
+      tokenB = token1;
+    } else {
+      tokenA = token1;
+      tokenB = token0;
+    }
+    const poolsWithLiquidityResponse = await gqlFetchAll(
+      this.uniClient,
+      GET_PAIR_LIQUIDITY,
+      {
+        tokenA,
+        tokenB,
+      },
+      'pools'
+    );
+
+    const liquidity: number = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
+      pool.poolDayData.forEach((dayData) => (acc += parseFloat(dayData.volumeUSD)));
+
+      return acc;
+    }, 0);
+
+    return liquidity;
   }
 }

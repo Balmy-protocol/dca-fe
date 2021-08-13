@@ -4,12 +4,11 @@ import Button from 'common/button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import { AvailablePair } from 'types';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { BigNumber } from 'ethers';
 import Link from '@material-ui/core/Link';
+import { POSSIBLE_ACTIONS } from 'config/constants';
 
 const useStyles = makeStyles({
   paper: {
@@ -34,14 +33,28 @@ const StyledDialogActions = styled(DialogActions)`
   padding: 0px 32px 32px 32px;
 `;
 
-interface StalePairModalProps {
+interface LowLiquidityModalProps {
   onCancel: () => void;
   onConfirm: () => void;
   open: boolean;
+  actionToTake: keyof typeof POSSIBLE_ACTIONS;
 }
 
-const StalePairModal = ({ onConfirm, open, onCancel }: StalePairModalProps) => {
+const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiquidityModalProps) => {
   const classes = useStyles();
+
+  const actionMessages = React.useMemo(
+    () => ({
+      [POSSIBLE_ACTIONS.createPair]: <FormattedMessage description="lowLiqCreatePair" defaultMessage="Create pair" />,
+      [POSSIBLE_ACTIONS.createPosition]: (
+        <FormattedMessage description="lowLiqCreatePosition" defaultMessage="Create position" />
+      ),
+      [POSSIBLE_ACTIONS.approveToken]: (
+        <FormattedMessage description="lowLiqApproveToken" defaultMessage="Approve token" />
+      ),
+    }),
+    []
+  );
 
   return (
     <Dialog
@@ -53,19 +66,16 @@ const StalePairModal = ({ onConfirm, open, onCancel }: StalePairModalProps) => {
       classes={{ paper: classes.paper }}
     >
       <StyledDialogContent>
-        <Typography variant="body1" component="span">
-          <FormattedMessage description="stale pair message" defaultMessage="This pair is " />
-        </Typography>
-        <Typography variant="body1" component="span">
-          <Link href="https://docs.mean.finance/concepts/positions#stale-positions" target="_blank">
-            <FormattedMessage description="stale" defaultMessage="stale" />
-          </Link>
-        </Typography>
-        <Typography variant="body1" component="span">
+        <Typography variant="body1" component="p">
           <FormattedMessage
-            description="stale pair message"
-            defaultMessage=" for that frequency. Are you sure you want to create a position?"
+            description="low liquidity message"
+            defaultMessage="Due to low volume, the price oracle for this pair of tokens might not be reliable right now. Proceed with caution or try another pair"
           />
+        </Typography>
+        <Typography variant="body1" component="p">
+          <Link href="https://docs.mean.finance/concepts/price-oracle" target="_blank">
+            <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
+          </Link>
         </Typography>
       </StyledDialogContent>
       <StyledDialogActions>
@@ -73,10 +83,10 @@ const StalePairModal = ({ onConfirm, open, onCancel }: StalePairModalProps) => {
           <FormattedMessage description="cancel" defaultMessage="Cancel" />
         </Button>
         <Button color="secondary" variant="contained" fullWidth onClick={onConfirm} autoFocus>
-          <FormattedMessage description="Create position submit" defaultMessage="Create position" />
+          {actionMessages[actionToTake]}
         </Button>
       </StyledDialogActions>
     </Dialog>
   );
 };
-export default StalePairModal;
+export default LowLiquidityModal;
