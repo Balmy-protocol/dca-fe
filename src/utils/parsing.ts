@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 
-const HOURS_IN_MONTH = BigNumber.from(732);
+const HOURS_IN_MONTH = BigNumber.from(720);
 const DAYS_IN_WEEK = BigNumber.from(7);
 const HOURS_IN_DAYS = BigNumber.from(24);
 const MINUTES_IN_HOURS = BigNumber.from(60);
