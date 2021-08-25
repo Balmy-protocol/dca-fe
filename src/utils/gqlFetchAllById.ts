@@ -7,7 +7,8 @@ export default async function gqlFetchAllById(
   dataToSearch: string,
   offset = '',
   limit = 1000,
-  query: ObservableQuery<any, OperationVariables> | null = null
+  query: ObservableQuery<any, OperationVariables> | null = null,
+  timesCalled = 1
 ): Promise<any> {
   if (query) {
     const fetchMoreResult = await query.fetchMore({
@@ -27,7 +28,7 @@ export default async function gqlFetchAllById(
 
     const newResults = await query.result();
 
-    if (newResults.data[dataToSearch].length === limit + offset) {
+    if (newResults.data[dataToSearch].length === limit * timesCalled) {
       return await gqlFetchAllById(
         client,
         queryToRun,
@@ -35,7 +36,8 @@ export default async function gqlFetchAllById(
         dataToSearch,
         newResults.data[dataToSearch][newResults.data[dataToSearch].length - 1].id,
         limit,
-        query
+        query,
+        timesCalled + 1
       );
     }
 
@@ -61,7 +63,8 @@ export default async function gqlFetchAllById(
       dataToSearch,
       results.data[dataToSearch][results.data[dataToSearch].length - 1].id,
       limit,
-      newQuery
+      newQuery,
+      timesCalled + 1
     );
   }
 
