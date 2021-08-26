@@ -161,6 +161,8 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
 
   const isStale = calculateStale(pair?.lastExecutedAt || 0, swapInterval, pair?.createdAt || 0);
 
+  const shouldBlockModifications = remainingSwaps.eq(BigNumber.from(0)) && withdrawn.gte(swapped);
+
   const handleOnWithdraw = (position: Position) => {
     setShouldShowSettings(false);
     onWithdraw(position);
@@ -419,30 +421,32 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
             <TokenIcon token={to} size="16px" />
             <Typography variant="body1">{to.symbol}</Typography>
           </StyledCardTitleHeader>
-          <div>
-            <Tooltip title="View NFT" arrow placement="top">
+          {!shouldBlockModifications && (
+            <div>
+              <Tooltip title="View NFT" arrow placement="top">
+                <IconButton
+                  aria-label="more"
+                  aria-controls="long-menu"
+                  aria-haspopup="true"
+                  onClick={() => onViewNFT(position)}
+                  disabled={isPending}
+                  size="small"
+                >
+                  <VisibilityIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
               <IconButton
                 aria-label="more"
                 aria-controls="long-menu"
                 aria-haspopup="true"
-                onClick={() => onViewNFT(position)}
+                onClick={() => setShouldShowSettings(true)}
                 disabled={isPending}
                 size="small"
               >
-                <VisibilityIcon fontSize="small" />
+                <Cog size="22px" isDisabled={isPending} />
               </IconButton>
-            </Tooltip>
-            <IconButton
-              aria-label="more"
-              aria-controls="long-menu"
-              aria-haspopup="true"
-              onClick={() => setShouldShowSettings(true)}
-              disabled={isPending}
-              size="small"
-            >
-              <Cog size="22px" isDisabled={isPending} />
-            </IconButton>
-          </div>
+            </div>
+          )}
         </StyledCardHeader>
         <StyledDetailWrapper>
           <Typography variant="body2" component="span">
@@ -516,33 +520,35 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
                 </Typography>
               </StyledFreqLeft>
             ))}
-          <StyledCardFooterItem isPending={isPending}>
-            <Button
-              variant={isPending ? 'contained' : 'outlined'}
-              color={isPending ? 'pending' : 'primary'}
-              onClick={() => !isPending && (hasNoFunds ? setShouldShowReset(true) : setShouldShowAddToPosition(true))}
-              fullWidth={isPending}
-            >
-              {isPending ? (
-                <Link
-                  href={buildEtherscanTransaction(pendingTransaction)}
-                  target="_blank"
-                  rel="noreferrer"
-                  underline="none"
-                  color="inherit"
-                >
-                  <Typography variant="body2" component="span">
-                    <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+          {!shouldBlockModifications && (
+            <StyledCardFooterItem isPending={isPending}>
+              <Button
+                variant={isPending ? 'contained' : 'outlined'}
+                color={isPending ? 'pending' : 'primary'}
+                onClick={() => !isPending && (hasNoFunds ? setShouldShowReset(true) : setShouldShowAddToPosition(true))}
+                fullWidth={isPending}
+              >
+                {isPending ? (
+                  <Link
+                    href={buildEtherscanTransaction(pendingTransaction)}
+                    target="_blank"
+                    rel="noreferrer"
+                    underline="none"
+                    color="inherit"
+                  >
+                    <Typography variant="body2" component="span">
+                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                    </Typography>
+                    <CallMadeIcon style={{ fontSize: '1rem' }} />
+                  </Link>
+                ) : (
+                  <Typography variant="body2">
+                    <FormattedMessage description="add to position" defaultMessage="Add to position" />
                   </Typography>
-                  <CallMadeIcon style={{ fontSize: '1rem' }} />
-                </Link>
-              ) : (
-                <Typography variant="body2">
-                  <FormattedMessage description="add to position" defaultMessage="Add to position" />
-                </Typography>
-              )}
-            </Button>
-          </StyledCardFooterItem>
+                )}
+              </Button>
+            </StyledCardFooterItem>
+          )}
         </StyledCardFooter>
       </StyledCardContent>
     </StyledCard>
