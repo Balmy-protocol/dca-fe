@@ -60,7 +60,7 @@ module.exports = merge(common, {
   //   new webpack.DefinePlugin({
   //     'process.env.FACTORY_ADDRESS': JSON.stringify('0xaC4a40a995f236E081424D966F1dFE014Fe0e98A'),
   //   }),
-  // new webpack.DefinePlugin({
+  //   new webpack.DefinePlugin({
   //     'process.env.TOKEN_DESCRIPTOR_ADDRESS': JSON.stringify('0x51B2f9a89cB8033262CE0F7BA8618cafE11cA679'),
   //   }),
   // ],

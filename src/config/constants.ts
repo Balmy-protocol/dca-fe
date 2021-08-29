@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { TransactionTypesConstant } from 'types';
 
 export const NETWORKS = {
@@ -34,4 +35,12 @@ export const MODE_TYPES = {
     label: 'By rate',
     id: RATE_TYPE,
   },
+};
+
+export const MINIMUM_LIQUIDITY_USD = parseFloat('350000');
+
+export const POSSIBLE_ACTIONS = {
+  createPair: 'createPair',
+  createPosition: 'createPosition',
+  approveToken: 'approveToken',
 };
