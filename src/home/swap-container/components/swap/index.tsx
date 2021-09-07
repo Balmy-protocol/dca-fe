@@ -479,6 +479,7 @@ const Swap = ({
   const isApproved = !fromValue
     ? true
     : (!isLoadingAllowance &&
+        allowance &&
         allowance.allowance &&
         allowance.token.address === from &&
         parseUnits(allowance.allowance, tokenList[from].decimals).gte(
