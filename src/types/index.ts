@@ -349,3 +349,17 @@ export interface PoolLiquidityData {
   }[];
 }
 export type PoolsLiquidityData = PoolLiquidityData[];
+
+export interface GetPairResponseSwapData {
+  id: string;
+  executedAtTimestamp: string;
+  ratePerUnitAToB: string;
+  ratePerUnitBToA: string;
+}
+
+export interface GetPairPriceResponseData {
+  pair: {
+    id: string;
+    swaps: GetPairResponseSwapData[];
+  };
+}
