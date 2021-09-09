@@ -2,28 +2,37 @@ import React from 'react';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import map from 'lodash/map';
+import find from 'lodash/find';
+import orderBy from 'lodash/orderBy';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { appleTabsStylesHook } from 'common/tabs';
 import getPool from 'graphql/getPool.graphql';
-import { Token } from 'types';
+import { AvailablePair, GetPairPriceResponseData, GetPairResponseSwapData, Token } from 'types';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
-import { toSignificantFromBigDecimal } from 'utils/currency';
+import { formatCurrencyAmount, toSignificantFromBigDecimal } from 'utils/currency';
 import { ETH, WETH } from 'mocks/tokens';
+import { BigNumber } from 'ethers';
+import useDCAGraphql from 'hooks/useDCAGraphql';
+import useUNIGraphql from 'hooks/useUNIGraphql';
+import useAvailablePairs from 'hooks/useAvailablePairs';
+import getPairPrices from 'graphql/getPairPrices.graphql';
 
 interface GraphWidgetProps {
   from: Token;
   to: Token;
-  client: ApolloClient<NormalizedCacheObject>;
 }
 
+interface UniMappedPrice {
+  date: string;
+  tokenPrice: string;
+}
 interface UniPrice {
   date: number;
   token0Price: string;
@@ -32,13 +41,14 @@ interface UniPrice {
 
 interface Price {
   name: string;
-  uni: number;
+  Uniswap: number;
+  'Mean Finance': number | null;
 }
 
 interface PoolsResponseData {
   pools: {
     id: string;
-    poolDayData: UniPrice[];
+    poolHourData: UniPrice[];
   }[];
 }
 
@@ -46,7 +56,7 @@ interface TokenWithBase extends Token {
   isBaseToken: boolean;
 }
 
-type graphToken = TokenWithBase | { address: string; symbol: string; decimals: number; isBaseToken: boolean };
+type graphToken = TokenWithBase;
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -149,14 +159,38 @@ const PERIODS = [7, 30];
 
 const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST'];
 
-const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
-  let tokenA: graphToken = { address: '', symbol: '', decimals: 1, isBaseToken: false };
-  let tokenB: graphToken = { address: '', symbol: '', decimals: 1, isBaseToken: true };
-  let uniData: UniPrice[] = [];
-  let prices: Price[] = [];
+const averagePoolPrice = (prices: string[], token: Token) => {
+  let result = 0;
+  prices.forEach((price) => (result += parseFloat(toSignificantFromBigDecimal(price, 6))));
+
+  return toSignificantFromBigDecimal((result / prices.length).toString(), 6);
+};
+
+const EMPTY_GRAPH_TOKEN: TokenWithBase = {
+  address: '',
+  symbol: '',
+  decimals: 1,
+  isBaseToken: false,
+  name: '',
+  totalValueLockedUSD: 0,
+  pairableTokens: [],
+};
+const GraphWidget = ({ from, to }: GraphWidgetProps) => {
+  const client = useDCAGraphql();
+  const uniClient = useUNIGraphql();
+  let tokenA: graphToken = EMPTY_GRAPH_TOKEN;
+  let tokenB: graphToken = EMPTY_GRAPH_TOKEN;
+  let uniData: UniMappedPrice[] = [];
+  let swapData: GetPairResponseSwapData[] = [];
+  let prices: any = [];
   const [tabIndex, setTabIndex] = React.useState(0);
   const tabsStyles = appleTabsStylesHook.useTabs();
+  const availablePairs = useAvailablePairs();
   const tabItemStyles = appleTabsStylesHook.useTabItem();
+  const dateFilter = React.useMemo(
+    () => parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),
+    [tabIndex]
+  );
 
   if (to && from) {
     if (from.address < to.address) {
@@ -184,38 +218,93 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
     }
   }
 
+  const existingPair = React.useMemo(
+    () => find(availablePairs, { token0: tokenA.address, token1: tokenB.address }) as AvailablePair | null,
+    [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]
+  );
+
+  const { loading: loadingMeanData, data: pairData } = useQuery<GetPairPriceResponseData>(getPairPrices, {
+    variables: {
+      id: existingPair?.id,
+    },
+    skip: !existingPair,
+    client,
+  });
+
   const { loading: loadingPool, data } = useQuery<PoolsResponseData>(getPool, {
     variables: {
       tokenA: tokenA.address,
       tokenB: tokenB.address,
-      from: parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),
+      from: dateFilter,
     },
     skip: !(from && to),
-    client,
+    client: uniClient,
   });
 
   const { pools } = data || {};
+  const { pair } = pairData || {};
+  let aggregatedPoolData: any = {};
+  uniData = React.useMemo(() => {
+    if (pools && pools[0] && pools[0].poolHourData) {
+      pools.forEach((pool) => {
+        pool.poolHourData.forEach(({ date, token1Price, token0Price }) => {
+          if (!aggregatedPoolData[date]) {
+            aggregatedPoolData[date] = {
+              values: [tokenA.isBaseToken ? token0Price : token1Price],
+            };
+          } else {
+            aggregatedPoolData[date] = {
+              values: [...aggregatedPoolData[date], tokenA.isBaseToken ? token0Price : token1Price],
+            };
+          }
+        });
+      });
 
-  if (pools && pools[0] && pools[0].poolDayData) {
-    uniData = [...pools[0].poolDayData];
-    // uniData = [...mockedData];
-    uniData.reverse();
-  }
+      return Object.keys(aggregatedPoolData).map((singleAggregatedPoolData) => ({
+        date: singleAggregatedPoolData,
+        tokenPrice: averagePoolPrice(
+          aggregatedPoolData[singleAggregatedPoolData].values,
+          tokenA.isBaseToken ? tokenB : tokenA
+        ),
+      }));
+    }
 
-  prices = React.useMemo(
-    () =>
-      map(uniData, ({ date, token1Price, token0Price }) => ({
-        name: DateTime.fromSeconds(date).toFormat('MMM d t'),
-        uni: parseFloat(toSignificantFromBigDecimal(tokenA.isBaseToken ? token0Price : token1Price, 6)),
-      })),
-    [uniData]
-  );
+    return [];
+  }, [pools, loadingPool]);
+  swapData = React.useMemo(() => {
+    if (pair && pair.swaps) {
+      return pair.swaps.filter((swap) => parseInt(swap.executedAtTimestamp, 10) >= dateFilter);
+    }
+
+    return [];
+  }, [pair, loadingMeanData, dateFilter]);
+
+  prices = React.useMemo(() => {
+    const mappedUniData = map(uniData, ({ date, tokenPrice }) => ({
+      name: DateTime.fromSeconds(parseInt(date, 10)).toFormat('MMM d t'),
+      Uniswap: parseFloat(tokenPrice),
+      date,
+    }));
+    const mappedSwapData = map(swapData, ({ executedAtTimestamp, ratePerUnitAToB, ratePerUnitBToA }) => ({
+      name: DateTime.fromSeconds(parseInt(executedAtTimestamp, 10)).toFormat('MMM d t'),
+      'Mean Finance':
+        parseFloat(
+          formatCurrencyAmount(
+            BigNumber.from(tokenA.isBaseToken ? ratePerUnitBToA : ratePerUnitAToB),
+            tokenA.isBaseToken ? tokenA : tokenB
+          )
+        ) || null,
+      date: executedAtTimestamp,
+    }));
+
+    return orderBy([...mappedUniData, ...mappedSwapData], ['date'], ['desc']).reverse();
+  }, [uniData, swapData]);
 
   const tooltipFormatter = (value: string, name: string) =>
     `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
       tokenA.isBaseToken ? '' : tokenB.symbol
     }`;
-  const isLoading = loadingPool;
+  const isLoading = loadingPool || loadingMeanData;
   const noData = prices.length === 0;
 
   return (
@@ -255,23 +344,25 @@ const GraphWidget = ({ from, to, client }: GraphWidgetProps) => {
             <StyledGraphContainer elevation={0}>
               <ResponsiveContainer width="100%">
                 <LineChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                  <Line type="monotone" dataKey="uni" stroke="#8884d8" />
-                  <XAxis dataKey="name" hide />
+                  <Line connectNulls type="monotone" dataKey="Uniswap" stroke="#BD00FF" dot={false} />
+                  {swapData.length && <Line connectNulls type="monotone" dataKey="Mean Finance" stroke="#36a3f5" />}
+                  <XAxis hide dataKey="name" />
                   <YAxis hide domain={['auto', 'auto']} />
                   <Tooltip formatter={tooltipFormatter} />
+                  <Legend />
                 </LineChart>
               </ResponsiveContainer>
               <StyledGraphAxis />
               <StyledGraphAxisLabels>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(uniData[0].date).toLocaleString({
+                  {DateTime.fromSeconds(parseInt(uniData[0].date, 10)).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
                   })}
                 </Typography>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(uniData[uniData.length - 1].date).toLocaleString({
+                  {DateTime.fromSeconds(parseInt(uniData[uniData.length - 1].date, 10)).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
