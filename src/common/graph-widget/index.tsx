@@ -344,7 +344,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
             <StyledGraphContainer elevation={0}>
               <ResponsiveContainer width="100%">
                 <LineChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                  <Line connectNulls type="monotone" dataKey="Uniswap" stroke="#BD00FF" />
+                  <Line connectNulls type="monotone" dataKey="Uniswap" stroke="#BD00FF" dot={false} />
                   {swapData.length && <Line connectNulls type="monotone" dataKey="Mean Finance" stroke="#36a3f5" />}
                   <XAxis hide dataKey="name" />
                   <YAxis hide domain={['auto', 'auto']} />
