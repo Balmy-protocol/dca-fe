@@ -29,6 +29,7 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
 interface PartialTheme {
@@ -177,6 +178,7 @@ const TokenPicker = ({
   const inputStyles = useSearchInputStyles();
   const extendedIgnoredValues = isFrom ? ignoreValues : [...ignoreValues, ETH.address];
   const availablePairs = useAvailablePairs();
+  const currentNetwork = useCurrentNetwork();
 
   const handleOnClose = () => {
     setSearch('');
@@ -221,9 +223,9 @@ const TokenPicker = ({
 
     reverse(orderedTokenKeys);
 
-    if (orderedTokenKeys.findIndex((el) => el === WETH.address) !== -1) {
-      remove(orderedTokenKeys, (token) => token === WETH.address);
-      orderedTokenKeys.unshift(WETH.address);
+    if (orderedTokenKeys.findIndex((el) => el === WETH(currentNetwork).address) !== -1) {
+      remove(orderedTokenKeys, (token) => token === WETH(currentNetwork).address);
+      orderedTokenKeys.unshift(WETH(currentNetwork).address);
     }
 
     if (orderedTokenKeys.findIndex((el) => el === ETH.address) !== -1) {

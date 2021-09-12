@@ -2,10 +2,51 @@ import { BigNumber } from 'ethers';
 import { TransactionTypesConstant } from 'types';
 
 export const NETWORKS = {
-  mainnet: 1,
-  ropsten: 3,
-  rinkeby: 4,
-  meanfinance: 31337,
+  mainnet: {
+    chainId: 1,
+    name: 'Mainnet',
+  },
+  ropsten: {
+    chainId: 3,
+    name: 'Ropsten',
+  },
+  rinkeby: {
+    chainId: 4,
+    name: 'Rinkeby',
+  },
+  goerli: {
+    chainId: 5,
+    name: 'Goerli',
+  },
+  kovan: {
+    chainId: 42,
+    name: 'Kovan',
+  },
+  meanfinance: {
+    chainId: 31337,
+    name: 'Mean Finance',
+  },
+};
+
+export const FACTORY_ADDRESS = '0xaC4a40a995f236E081424D966F1dFE014Fe0e98A';
+export const TOKEN_DESCRIPTOR_ADDRESS = '0x51B2f9a89cB8033262CE0F7BA8618cafE11cA679';
+
+export const MEAN_GRAPHQL_URL = {
+  [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1',
+  [NETWORKS.ropsten.chainId]: 'https://api.thegraph.com/subgraphs/name/alejoamiras/dca-ropsten-stable',
+  [NETWORKS.rinkeby.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-rinkeby',
+  [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1',
+  [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1',
+  [NETWORKS.meanfinance.chainId]: 'http://3.235.77.84:8000/subgraphs/name/alejoamiras/dca-subgraph',
+};
+
+export const UNI_GRAPHQL_URL = {
+  [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+  [NETWORKS.ropsten.chainId]: 'https://api.thegraph.com/subgraphs/name/alejoamiras/uniswap-v3-ropsten',
+  [NETWORKS.rinkeby.chainId]: 'https://api.thegraph.com/subgraphs/name/alejoamiras/uniswap-v3-rinkeby',
+  [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+  [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+  [NETWORKS.meanfinance.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
 };
 
 export const TRANSACTION_TYPES: TransactionTypesConstant = {

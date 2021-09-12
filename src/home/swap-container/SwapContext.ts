@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers';
 import { DAY_IN_SECONDS } from 'utils/parsing';
 import { WETH, DAI } from 'mocks/tokens';
 import { SetStateCallback } from 'types';
+import { NETWORKS } from 'config/constants';
 
 export type SwapContextValue = {
   from: string;
@@ -20,8 +21,8 @@ export type SwapContextValue = {
 };
 
 const SwapContextDefaultValue: SwapContextValue = {
-  from: WETH.address,
-  to: DAI.address,
+  from: WETH(NETWORKS.mainnet.chainId).address,
+  to: DAI(NETWORKS.mainnet.chainId).address,
   fromValue: '',
   frequencyType: DAY_IN_SECONDS,
   frequencyValue: '1',

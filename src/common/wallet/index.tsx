@@ -57,31 +57,29 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
     setShouldOpenMenu(!shouldOpenMenu);
   };
 
+  if (isLoading) return null;
+
   return (
-    <StyledButtonContainer breakpoint={currentBreakPoint}>
-      {!isLoading && (
-        <>
-          <Badge
-            badgeContent={
-              hasPendingTransactions ? <CircularProgress size={10} /> : Object.keys(transactions).length - badge
-            }
-            color="secondary"
-            component="div"
-          >
-            <StyledButton
-              aria-controls="customized-menu"
-              aria-haspopup="true"
-              color="primary"
-              onClick={onOpen}
-              style={{ maxWidth: '200px', textTransform: 'none' }}
-            >
-              <Typography noWrap>{web3Service.getAccount()}</Typography>
-            </StyledButton>
-          </Badge>
-          <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />
-        </>
-      )}
-    </StyledButtonContainer>
+    <>
+      <Badge
+        badgeContent={
+          hasPendingTransactions ? <CircularProgress size={10} /> : Object.keys(transactions).length - badge
+        }
+        color="secondary"
+        component="div"
+      >
+        <StyledButton
+          aria-controls="customized-menu"
+          aria-haspopup="true"
+          color="primary"
+          onClick={onOpen}
+          style={{ maxWidth: '200px', textTransform: 'none' }}
+        >
+          <Typography noWrap>{web3Service.getAccount()}</Typography>
+        </StyledButton>
+      </Badge>
+      <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />
+    </>
   );
 };
 

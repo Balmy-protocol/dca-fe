@@ -23,6 +23,7 @@ import useDCAGraphql from 'hooks/useDCAGraphql';
 import useUNIGraphql from 'hooks/useUNIGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 interface GraphWidgetProps {
   from: Token;
@@ -191,27 +192,28 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     () => parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),
     [tabIndex]
   );
+  const currentNetwork = useCurrentNetwork();
 
   if (to && from) {
     if (from.address < to.address) {
       tokenA = {
-        ...(from.address === ETH.address ? WETH : from),
+        ...(from.address === ETH.address ? WETH(currentNetwork) : from),
         symbol: from.symbol,
         isBaseToken: STABLE_COINS.includes(from.symbol),
       };
       tokenB = {
-        ...(to.address === ETH.address ? WETH : to),
+        ...(to.address === ETH.address ? WETH(currentNetwork) : to),
         symbol: to.symbol,
         isBaseToken: STABLE_COINS.includes(to.symbol),
       };
     } else {
       tokenA = {
-        ...(to.address === ETH.address ? WETH : to),
+        ...(to.address === ETH.address ? WETH(currentNetwork) : to),
         symbol: to.symbol,
         isBaseToken: STABLE_COINS.includes(to.symbol),
       };
       tokenB = {
-        ...(from.address === ETH.address ? WETH : from),
+        ...(from.address === ETH.address ? WETH(currentNetwork) : from),
         symbol: from.symbol,
         isBaseToken: STABLE_COINS.includes(from.symbol),
       };

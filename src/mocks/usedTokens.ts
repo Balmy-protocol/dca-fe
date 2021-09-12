@@ -5,12 +5,12 @@ const mockedUsedTokens = {
     tokens: [
       {
         tokenInfo: {
-          address: UNI.address,
+          address: UNI(1).address,
         },
       },
       {
         tokenInfo: {
-          address: YFI.address,
+          address: YFI(1).address,
         },
       },
     ],

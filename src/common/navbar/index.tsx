@@ -7,6 +7,10 @@ import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
 import Link from '@material-ui/core/Link';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import find from 'lodash/find';
+import { NETWORKS } from 'config/constants';
+import NetworkLabel from 'common/network-label';
 
 const StyledBox = styled(Box)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   flex: 1;
@@ -26,12 +30,22 @@ const StyledNavbarContainer = styled(Grid)`
   align-items: center;
 `;
 
+const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: ${(props) => (props.breakpoint === 'xs' ? 'center' : 'flex-end')};
+`;
+
 interface NavBarProps {
   isLoading: boolean;
 }
 
 const NavBar = ({ isLoading }: NavBarProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
+  const currentNetwork = useCurrentNetwork();
+
+  const network = React.useMemo(() => find(NETWORKS, { chainId: currentNetwork }) || null, [currentNetwork]);
   return (
     <StyledNavbarContainer container>
       <Grid item xs={12} sm={6}>
@@ -46,15 +60,18 @@ const NavBar = ({ isLoading }: NavBarProps) => {
         </StyledBox>
       </Grid>
       <Grid item xs={12} sm={6}>
-        <WalletContext.Consumer>
-          {({ web3Service }) =>
-            !web3Service.getAccount() && !isLoading ? (
-              <ConnectWalletButtom web3Service={web3Service} />
-            ) : (
-              <WalletButtom isLoading={isLoading} web3Service={web3Service} />
-            )
-          }
-        </WalletContext.Consumer>
+        <StyledButtonContainer breakpoint={currentBreakPoint}>
+          <NetworkLabel network={network} />
+          <WalletContext.Consumer>
+            {({ web3Service }) =>
+              !web3Service.getAccount() && !isLoading ? (
+                <ConnectWalletButtom web3Service={web3Service} />
+              ) : (
+                <WalletButtom isLoading={isLoading} web3Service={web3Service} />
+              )
+            }
+          </WalletContext.Consumer>
+        </StyledButtonContainer>
       </Grid>
     </StyledNavbarContainer>
   );
