@@ -4,7 +4,7 @@ import { TransactionTypesConstant } from 'types';
 export const NETWORKS = {
   mainnet: {
     chainId: 1,
-    name: 'Mainnet',
+    name: 'Ethereum mainnet',
   },
   ropsten: {
     chainId: 3,
@@ -67,6 +67,14 @@ export const NETWORKS = {
     name: 'xDAI',
   },
 };
+
+export const SUPPORTED_NETWORKS = [
+  NETWORKS.mainnet.chainId,
+  NETWORKS.ropsten.chainId,
+  NETWORKS.rinkeby.chainId,
+  NETWORKS.goerli.chainId,
+  NETWORKS.kovan.chainId,
+];
 
 export const FACTORY_ADDRESS = '0xaC4a40a995f236E081424D966F1dFE014Fe0e98A';
 export const TOKEN_DESCRIPTOR_ADDRESS = '0x51B2f9a89cB8033262CE0F7BA8618cafE11cA679';

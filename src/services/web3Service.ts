@@ -497,6 +497,17 @@ export default class Web3Service {
     console.log(mockedTokens);
   }
 
+  changeNetwork(newChainId: number) {
+    if (!window.ethereum) {
+      return;
+    }
+
+    return window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: `0x${newChainId.toString(16)}` }],
+    });
+  }
+
   getBalance(address?: string, decimals?: number) {
     if (!address) return Promise.resolve();
 

@@ -84,3 +84,5 @@ export const getFrequencyLabel = (frenquencyType: string, frequencyValue?: strin
   frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
     ? STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singular
     : STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].plural;
+
+export const capitalizeFirstLetter = (toCap: string) => toCap.charAt(0).toUpperCase() + toCap.slice(1);
