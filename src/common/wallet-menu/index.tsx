@@ -27,6 +27,7 @@ import Link from '@material-ui/core/Link';
 import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/etherscan';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { makeStyles } from '@material-ui/core/styles';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const useStyles = makeStyles({
   paper: {
@@ -92,6 +93,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
   const classes = useStyles();
+  const currentNetwork = useCurrentNetwork();
 
   const allOrderedTransactions = React.useMemo(
     () =>
@@ -103,11 +105,11 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
         'addedTime',
         'desc'
       ),
-    [allTransactions, hasPendingTransactions]
+    [allTransactions, hasPendingTransactions, currentNetwork]
   );
 
   const onClearAll = () => {
-    dispatch(clearAllTransactions());
+    dispatch(clearAllTransactions({ chainId: currentNetwork.chainId }));
   };
   const onDisconnect = () => {
     web3Service.disconnect();
@@ -135,7 +137,11 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
             </Button>
           </StyledRecentTransactionsTitleContainer>
           <Typography variant="subtitle1">{`${account.substring(0, 6)}...${account.substring(38)}`}</Typography>
-          <Link href={buildEtherscanAddress(web3Service.getAccount())} target="_blank" rel="noreferrer">
+          <Link
+            href={buildEtherscanAddress(web3Service.getAccount(), currentNetwork.chainId)}
+            target="_blank"
+            rel="noreferrer"
+          >
             <Typography variant="body2" component="span">
               <FormattedMessage description="view on etherscan" defaultMessage="View on explorer" />
             </Typography>
@@ -153,7 +159,11 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
         {allOrderedTransactions.map((transaction) => (
           <StyledTransactionDetail key={transaction.hash}>
             <StyledTransactionDetailText>
-              <Link href={buildEtherscanTransaction(transaction.hash)} target="_blank" rel="noreferrer">
+              <Link
+                href={buildEtherscanTransaction(transaction.hash, currentNetwork.chainId)}
+                target="_blank"
+                rel="noreferrer"
+              >
                 <Typography variant="body2" component="span">
                   {buildTransactionDetail(transaction)}
                 </Typography>

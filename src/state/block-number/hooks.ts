@@ -1,6 +1,8 @@
 import { useAppSelector } from 'state/hooks';
 import { RootState } from '../index';
 
-export function useBlockNumber(): number | undefined {
-  return useAppSelector((state: RootState) => state.blockNumber.blockNumber || -1);
+export function useBlockNumber(chainId: number): number | undefined {
+  return useAppSelector(
+    (state: RootState) => (state.blockNumber[chainId] && state.blockNumber[chainId].blockNumber) || -1
+  );
 }

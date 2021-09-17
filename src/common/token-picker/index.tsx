@@ -223,9 +223,9 @@ const TokenPicker = ({
 
     reverse(orderedTokenKeys);
 
-    if (orderedTokenKeys.findIndex((el) => el === WETH(currentNetwork).address) !== -1) {
-      remove(orderedTokenKeys, (token) => token === WETH(currentNetwork).address);
-      orderedTokenKeys.unshift(WETH(currentNetwork).address);
+    if (orderedTokenKeys.findIndex((el) => el === WETH(currentNetwork.chainId).address) !== -1) {
+      remove(orderedTokenKeys, (token) => token === WETH(currentNetwork.chainId).address);
+      orderedTokenKeys.unshift(WETH(currentNetwork.chainId).address);
     }
 
     if (orderedTokenKeys.findIndex((el) => el === ETH.address) !== -1) {

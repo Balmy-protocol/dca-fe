@@ -45,7 +45,6 @@ const NavBar = ({ isLoading }: NavBarProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
   const currentNetwork = useCurrentNetwork();
 
-  const network = React.useMemo(() => find(NETWORKS, { chainId: currentNetwork }) || null, [currentNetwork]);
   return (
     <StyledNavbarContainer container>
       <Grid item xs={12} sm={6}>
@@ -61,7 +60,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       </Grid>
       <Grid item xs={12} sm={6}>
         <StyledButtonContainer breakpoint={currentBreakPoint}>
-          <NetworkLabel network={network} />
+          <NetworkLabel network={currentNetwork} />
           <WalletContext.Consumer>
             {({ web3Service }) =>
               !web3Service.getAccount() && !isLoading ? (

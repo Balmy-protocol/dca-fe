@@ -14,6 +14,7 @@ import EtherscanLink from 'common/view-on-etherscan';
 import { NewPositionTypeData } from 'types';
 import { usePendingTransactions } from './hooks';
 import { setInitialized } from 'state/initializer/actions';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 interface TxInterface {
   addedTime: number;
@@ -42,12 +43,14 @@ export function shouldCheck(lastBlockNumber: number, tx: TxInterface): boolean {
 export default function Updater(): null {
   const web3Service = useWeb3Service();
 
-  const lastBlockNumber = useBlockNumber();
+  const currentNetwork = useCurrentNetwork();
+
+  const lastBlockNumber = useBlockNumber(currentNetwork.chainId);
 
   const dispatch = useAppDispatch();
   const state = useAppSelector((state: any) => state.transactions);
 
-  const transactions = useMemo(() => state || {}, [state]);
+  const transactions = useMemo(() => state[currentNetwork.chainId] || {}, [state, currentNetwork]);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -75,7 +78,7 @@ export default function Updater(): null {
                 ...transactions[hash].typeData,
               },
             });
-            dispatch(removeTransaction({ hash }));
+            dispatch(removeTransaction({ hash, chainId: currentNetwork.chainId }));
             enqueueSnackbar(
               buildRejectedTransactionMessage({
                 ...transactions[hash],
@@ -93,14 +96,14 @@ export default function Updater(): null {
               }
             );
           } else {
-            dispatch(transactionFailed({ hash, blockNumber: lastBlockNumber }));
+            dispatch(transactionFailed({ hash, blockNumber: lastBlockNumber, chainId: currentNetwork.chainId }));
           }
         } else {
-          dispatch(checkedTransaction({ hash, blockNumber: lastBlockNumber }));
+          dispatch(checkedTransaction({ hash, blockNumber: lastBlockNumber, chainId: currentNetwork.chainId }));
         }
       });
     },
-    [web3Service, web3Service.getAccount(), transactions, lastBlockNumber, dispatch]
+    [web3Service, web3Service.getAccount(), transactions, lastBlockNumber, dispatch, currentNetwork]
   );
 
   useEffect(() => {
@@ -159,8 +162,10 @@ export default function Updater(): null {
                     transactionHash: receipt.transactionHash,
                     transactionIndex: receipt.transactionIndex,
                     logs: receipt.logs,
+                    chainId: currentNetwork.chainId,
                   },
                   extendedTypeData,
+                  chainId: currentNetwork.chainId,
                 })
               );
 
@@ -185,7 +190,7 @@ export default function Updater(): null {
 
               // the receipt was fetched before the block, fast forward to that block to trigger balance updates
               if (receipt.blockNumber > lastBlockNumber) {
-                dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber }));
+                dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber, chainId: currentNetwork.chainId }));
               }
             } else {
               checkIfTransactionExists(hash);

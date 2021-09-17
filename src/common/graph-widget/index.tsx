@@ -197,23 +197,23 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   if (to && from) {
     if (from.address < to.address) {
       tokenA = {
-        ...(from.address === ETH.address ? WETH(currentNetwork) : from),
+        ...(from.address === ETH.address ? WETH(currentNetwork.chainId) : from),
         symbol: from.symbol,
         isBaseToken: STABLE_COINS.includes(from.symbol),
       };
       tokenB = {
-        ...(to.address === ETH.address ? WETH(currentNetwork) : to),
+        ...(to.address === ETH.address ? WETH(currentNetwork.chainId) : to),
         symbol: to.symbol,
         isBaseToken: STABLE_COINS.includes(to.symbol),
       };
     } else {
       tokenA = {
-        ...(to.address === ETH.address ? WETH(currentNetwork) : to),
+        ...(to.address === ETH.address ? WETH(currentNetwork.chainId) : to),
         symbol: to.symbol,
         isBaseToken: STABLE_COINS.includes(to.symbol),
       };
       tokenB = {
-        ...(from.address === ETH.address ? WETH(currentNetwork) : from),
+        ...(from.address === ETH.address ? WETH(currentNetwork.chainId) : from),
         symbol: from.symbol,
         isBaseToken: STABLE_COINS.includes(from.symbol),
       };

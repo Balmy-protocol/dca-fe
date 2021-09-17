@@ -67,7 +67,6 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { ETH, WETH } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -155,7 +154,7 @@ const getFrequencyTypeOptions = (chainId: number) => [
 interface SwapProps extends SwapContextValue {
   tokenList: TokenList;
   web3Service: Web3Service;
-  currentNetwork: number;
+  currentNetwork: { chainId: number; name: string };
 }
 
 const Swap = ({
@@ -225,12 +224,13 @@ const Swap = ({
 
   React.useEffect(() => {
     if (!hasPendingWrap && from === ETH.address) {
-      setFrom(WETH(currentNetwork).address);
+      setFrom(WETH(currentNetwork.chainId).address);
     }
   }, [hasPendingWrap]);
 
   const handleApproveToken = async () => {
-    const fromSymbol = from === ETH.address ? tokenList[WETH(currentNetwork).address].symbol : tokenList[from].symbol;
+    const fromSymbol =
+      from === ETH.address ? tokenList[WETH(currentNetwork.chainId).address].symbol : tokenList[from].symbol;
 
     try {
       setModalLoading({
@@ -296,7 +296,8 @@ const Swap = ({
 
   const handleSwap = async () => {
     setShouldShowStalePairModal(false);
-    const fromSymbol = from === ETH.address ? tokenList[WETH(currentNetwork).address].symbol : tokenList[from].symbol;
+    const fromSymbol =
+      from === ETH.address ? tokenList[WETH(currentNetwork.chainId).address].symbol : tokenList[from].symbol;
 
     try {
       setModalLoading({
@@ -321,7 +322,7 @@ const Swap = ({
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
         typeData: {
-          from: tokenList[from === ETH.address ? WETH(currentNetwork).address : from],
+          from: tokenList[from === ETH.address ? WETH(currentNetwork.chainId).address : from],
           to: tokenList[to],
           fromValue,
           frequencyType: frequencyType.toString(),
@@ -514,8 +515,9 @@ const Swap = ({
               defaultMessage="Create {from}/{to} pair"
               values={{
                 from:
-                  (from === ETH.address ? tokenList[WETH(currentNetwork).address].symbol : tokenList[from].symbol) ||
-                  '',
+                  (from === ETH.address
+                    ? tokenList[WETH(currentNetwork.chainId).address].symbol
+                    : tokenList[from].symbol) || '',
                 to: (tokenList[to] && tokenList[to].symbol) || '',
               }}
             />
@@ -558,7 +560,9 @@ const Swap = ({
             defaultMessage="Waiting for your {token} to be approved"
             values={{
               token:
-                (from === ETH.address ? tokenList[WETH(currentNetwork).address].symbol : tokenList[from].symbol) || '',
+                (from === ETH.address
+                  ? tokenList[WETH(currentNetwork.chainId).address].symbol
+                  : tokenList[from].symbol) || '',
             }}
           />
         ) : (
@@ -567,7 +571,9 @@ const Swap = ({
             defaultMessage="Approve {token}"
             values={{
               token:
-                (from === ETH.address ? tokenList[WETH(currentNetwork).address].symbol : tokenList[from].symbol) || '',
+                (from === ETH.address
+                  ? tokenList[WETH(currentNetwork.chainId).address].symbol
+                  : tokenList[from].symbol) || '',
             }}
           />
         )}
@@ -772,7 +778,7 @@ const Swap = ({
               <Grid item xs={12}>
                 <FrequencyTypeInput
                   id="frequency-type-value"
-                  options={getFrequencyTypeOptions(currentNetwork)}
+                  options={getFrequencyTypeOptions(currentNetwork.chainId)}
                   selected={frequencyType}
                   onChange={setFrequencyType}
                 />

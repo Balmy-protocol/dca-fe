@@ -157,8 +157,8 @@ export default class Web3Service {
 
     const chain = await ethersProvider.getNetwork();
 
-    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId]);
-    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId]);
+    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[1]);
+    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[1]);
     this.setClient(ethersProvider);
     this.setSigner(signer);
 
@@ -296,7 +296,6 @@ export default class Web3Service {
     };
 
     const web3Modal = new Web3Modal({
-      network: process.env.ETH_NETWORK, // optional
       cacheProvider: true, // optional
       providerOptions, // required
     });
@@ -320,8 +319,8 @@ export default class Web3Service {
     let chain = await this.getNetwork();
 
     if (!this.apolloClient.getClient() || !this.uniClient.getClient()) {
-      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId]);
-      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId]);
+      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[1]);
+      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[1]);
     }
 
     const availablePairsResponse = await gqlFetchAll(
@@ -342,8 +341,86 @@ export default class Web3Service {
 
     const tokenListResponse = await gqlFetchAllById(this.uniClient.getClient(), GET_TOKEN_LIST, {}, 'pools');
 
+    const mockedTokens: Record<string, Record<string, number>> = {
+      USDC: {},
+      WETH: {},
+      UNI: {},
+      DAI: {},
+      YFI: {},
+    };
     this.tokenList = tokenListResponse.data.pools.reduce(
       (acc: TokenList, pool: PoolResponse) => {
+        if (pool.token0.symbol === 'USDC') {
+          if (!mockedTokens.USDC[pool.token0.id]) {
+            mockedTokens.USDC[pool.token0.id] = 1;
+          } else {
+            mockedTokens.USDC[pool.token0.id] = mockedTokens.USDC[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token0.symbol === 'WETH') {
+          if (!mockedTokens.WETH[pool.token0.id]) {
+            mockedTokens.WETH[pool.token0.id] = 1;
+          } else {
+            mockedTokens.WETH[pool.token0.id] = mockedTokens.WETH[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token0.symbol === 'UNI') {
+          if (!mockedTokens.UNI[pool.token0.id]) {
+            mockedTokens.UNI[pool.token0.id] = 1;
+          } else {
+            mockedTokens.UNI[pool.token0.id] = mockedTokens.UNI[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token0.symbol === 'DAI') {
+          if (!mockedTokens.DAI[pool.token0.id]) {
+            mockedTokens.DAI[pool.token0.id] = 1;
+          } else {
+            mockedTokens.DAI[pool.token0.id] = mockedTokens.DAI[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token0.symbol === 'YFI') {
+          if (!mockedTokens.YFI[pool.token0.id]) {
+            mockedTokens.YFI[pool.token0.id] = 1;
+          } else {
+            mockedTokens.YFI[pool.token0.id] = mockedTokens.YFI[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'USDC') {
+          if (!mockedTokens.USDC[pool.token1.id]) {
+            mockedTokens.USDC[pool.token1.id] = 1;
+          } else {
+            mockedTokens.USDC[pool.token1.id] = mockedTokens.USDC[pool.token1.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'WETH') {
+          if (!mockedTokens.WETH[pool.token1.id]) {
+            mockedTokens.WETH[pool.token1.id] = 1;
+          } else {
+            mockedTokens.WETH[pool.token1.id] = mockedTokens.WETH[pool.token1.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'UNI') {
+          if (!mockedTokens.UNI[pool.token1.id]) {
+            mockedTokens.UNI[pool.token1.id] = 1;
+          } else {
+            mockedTokens.UNI[pool.token1.id] = mockedTokens.UNI[pool.token1.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'DAI') {
+          if (!mockedTokens.DAI[pool.token1.id]) {
+            mockedTokens.DAI[pool.token1.id] = 1;
+          } else {
+            mockedTokens.DAI[pool.token1.id] = mockedTokens.DAI[pool.token1.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'YFI') {
+          if (!mockedTokens.YFI[pool.token1.id]) {
+            mockedTokens.YFI[pool.token1.id] = 1;
+          } else {
+            mockedTokens.YFI[pool.token1.id] = mockedTokens.YFI[pool.token1.id] + 1;
+          }
+        }
+
         if (!acc[pool.token0.id]) {
           acc[pool.token0.id] = {
             decimals: BigNumber.from(pool.token0.decimals).toNumber(),
@@ -416,6 +493,8 @@ export default class Web3Service {
       },
       { [ETH.address]: ETH, [WETH(chain.chainId).address]: WETH(chain.chainId) }
     );
+
+    console.log(mockedTokens);
   }
 
   getBalance(address?: string, decimals?: number) {
@@ -753,12 +832,14 @@ export default class Web3Service {
       case TRANSACTION_TYPES.NEW_POSITION:
         const newPositionTypeData = transaction.typeData as NewPositionTypeData;
         const newId = `${newPositionTypeData.existingPair.id}-${newPositionTypeData.id}`;
-        this.currentPositions[newId] = {
-          ...this.currentPositions[`pending-transaction-${transaction.hash}`],
-          pendingTransaction: '',
-          dcaId: newPositionTypeData.id,
-          id: newId,
-        };
+        if (!this.currentPositions[newId]) {
+          this.currentPositions[newId] = {
+            ...this.currentPositions[`pending-transaction-${transaction.hash}`],
+            pendingTransaction: '',
+            dcaId: newPositionTypeData.id,
+            id: newId,
+          };
+        }
         delete this.currentPositions[`pending-transaction-${transaction.hash}`];
         break;
       case TRANSACTION_TYPES.TERMINATE_POSITION:

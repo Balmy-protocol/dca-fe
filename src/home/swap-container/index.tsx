@@ -25,9 +25,9 @@ const SwapContainer = () => {
   const currentNetwork = useCurrentNetwork();
 
   React.useEffect(() => {
-    if (currentNetwork && find(NETWORKS, { chainId: currentNetwork })) {
-      setFrom(USDC(currentNetwork).address);
-      setTo(WETH(currentNetwork).address);
+    if (currentNetwork.chainId) {
+      setFrom(USDC(currentNetwork.chainId).address);
+      setTo(WETH(currentNetwork.chainId).address);
     }
   }, [currentNetwork]);
 
@@ -65,7 +65,7 @@ const SwapContainer = () => {
 
   const toggleFromTo = () => {
     if (from === ETH.address) {
-      setTo(WETH(currentNetwork).address);
+      setTo(WETH(currentNetwork.chainId).address);
     } else {
       setTo(from);
     }
@@ -83,7 +83,7 @@ const SwapContainer = () => {
     setFrom(to);
   };
 
-  const isLoading = !currentNetwork || from === '' || to === '';
+  const isLoading = !currentNetwork.chainId || from === '' || to === '';
 
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">

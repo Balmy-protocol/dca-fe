@@ -3,11 +3,11 @@ import WalletContext from 'common/wallet-context';
 
 function useCurrentNetwork() {
   const { web3Service } = React.useContext(WalletContext);
-  const [network, setCurrentNetwork] = React.useState(0);
+  const [network, setCurrentNetwork] = React.useState({ chainId: 0, name: '' });
   React.useEffect(() => {
     async function getNetwork() {
       const currentNetwork = await web3Service.getNetwork();
-      setCurrentNetwork(currentNetwork.chainId);
+      setCurrentNetwork(currentNetwork);
     }
 
     getNetwork();

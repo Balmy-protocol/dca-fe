@@ -9,6 +9,7 @@ import {
   NewPairTypeData,
 } from 'types';
 import { useAppDispatch, useAppSelector } from 'hooks/state';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 import useWeb3Service from 'hooks/useWeb3Service';
 import { addTransaction } from './actions';
@@ -28,6 +29,7 @@ export function useTransactionAdder(): (
 ) => void {
   const web3Service = useWeb3Service();
   const dispatch = useAppDispatch();
+  const currentNetwork = useCurrentNetwork();
 
   return useCallback(
     (
@@ -52,7 +54,18 @@ export function useTransactionAdder(): (
       if (!hash) {
         throw Error('No transaction hash found.');
       }
-      dispatch(addTransaction({ hash, from: web3Service.getAccount(), approval, summary, claim, type, typeData }));
+      dispatch(
+        addTransaction({
+          hash,
+          from: web3Service.getAccount(),
+          approval,
+          summary,
+          claim,
+          type,
+          typeData,
+          chainId: currentNetwork.chainId,
+        })
+      );
       web3Service.setPendingTransaction({
         hash,
         from: web3Service.getAccount(),
@@ -65,7 +78,7 @@ export function useTransactionAdder(): (
         retries: 0,
       });
     },
-    [dispatch, web3Service.getAccount()]
+    [dispatch, web3Service.getAccount(), currentNetwork]
   );
 }
 
@@ -73,10 +86,11 @@ export function useTransactionAdder(): (
 export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((state) => state.transactions);
   const web3Service = useWeb3Service();
+  const currentNetwork = useCurrentNetwork();
 
   const returnValue = useMemo(
-    () => pickBy(state, (tx: TransactionDetails) => tx.from === web3Service.getAccount()),
-    [Object.keys(state), web3Service.getAccount()]
+    () => pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) => tx.from === web3Service.getAccount()),
+    [Object.keys(state[currentNetwork.chainId] || {}), web3Service.getAccount(), currentNetwork]
   );
   return returnValue || {};
 }
@@ -85,10 +99,15 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
 export function useAllNotClearedTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((state) => state.transactions);
   const web3Service = useWeb3Service();
+  const currentNetwork = useCurrentNetwork();
 
   const returnValue = useMemo(
-    () => pickBy(state, (tx: TransactionDetails) => tx.from === web3Service.getAccount() && tx.isCleared === false),
-    [Object.keys(state), web3Service.getAccount()]
+    () =>
+      pickBy(
+        state[currentNetwork.chainId],
+        (tx: TransactionDetails) => tx.from === web3Service.getAccount() && tx.isCleared === false
+      ),
+    [Object.keys(state[currentNetwork.chainId] || {}), web3Service.getAccount(), currentNetwork]
   );
   return returnValue || {};
 }

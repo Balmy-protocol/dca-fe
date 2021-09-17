@@ -3,10 +3,12 @@ import { useAppDispatch } from 'state/hooks';
 import useDebounce from 'hooks/useDebounce';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { updateBlockNumber } from './actions';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 export default function Updater(): null {
   const web3Service = useWeb3Service();
   const dispatch = useAppDispatch();
+  const currentNetwork = useCurrentNetwork();
 
   const [state, setState] = useState<{ blockNumber: number | null }>({
     blockNumber: null,
@@ -43,7 +45,7 @@ export default function Updater(): null {
 
   useEffect(() => {
     if (!debouncedState.blockNumber) return;
-    dispatch(updateBlockNumber({ blockNumber: debouncedState.blockNumber }));
+    dispatch(updateBlockNumber({ blockNumber: debouncedState.blockNumber, chainId: currentNetwork.chainId }));
   }, [dispatch, debouncedState.blockNumber]);
 
   return null;
