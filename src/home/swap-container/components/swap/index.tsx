@@ -41,6 +41,7 @@ import {
   NETWORKS,
   POSSIBLE_ACTIONS,
   RATE_TYPE,
+  SUPPORTED_NETWORKS,
   TRANSACTION_TYPES,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -67,6 +68,7 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { ETH, WETH } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import NetworkMenu from 'common/network-menu';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -180,6 +182,7 @@ const Swap = ({
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
+  const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
   const [isLoading, setIsLoading] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
@@ -529,9 +532,15 @@ const Swap = ({
   );
 
   const NotConnectedButton = (
-    <StyledButton size="large" variant="contained" fullWidth color="error" disabled>
+    <StyledButton
+      size="large"
+      variant="contained"
+      fullWidth
+      color="error"
+      onClick={() => setShouldOpenNetworkMenu(true)}
+    >
       <Typography variant="body1">
-        <FormattedMessage description="wrong chainId" defaultMessage="You are not currently connected to the mainnet" />
+        <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
       </Typography>
     </StyledButton>
   );
@@ -638,7 +647,7 @@ const Swap = ({
   let ButtonToShow;
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
-  } else if (false) {
+  } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
   } else if (isETH) {
     ButtonToShow = WrapButton;
@@ -683,6 +692,7 @@ const Swap = ({
         ignoreValues={ignoreValues}
         availableFrom={tokenList[from].pairableTokens}
       />
+      <NetworkMenu open={shouldOpenNetworkMenu} onClose={() => setShouldOpenNetworkMenu(false)} />
       <StyledSwapContainer>
         <Grid container>
           <StyledFromContainer container alignItems="center" justify="space-between">
