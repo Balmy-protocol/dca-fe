@@ -493,8 +493,6 @@ export default class Web3Service {
       },
       { [ETH.address]: ETH, [WETH(chain.chainId).address]: WETH(chain.chainId) }
     );
-
-    console.log(mockedTokens);
   }
 
   changeNetwork(newChainId: number) {
