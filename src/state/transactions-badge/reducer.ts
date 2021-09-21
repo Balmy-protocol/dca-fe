@@ -2,16 +2,23 @@ import { createReducer } from '@reduxjs/toolkit';
 import { updateBadgeNumber } from './actions';
 
 export interface BadgeState {
-  readonly viewedTransactions: number;
+  [chainId: number]: {
+    readonly viewedTransactions: number;
+  };
 }
 
 const initialState: BadgeState = {
-  viewedTransactions: 0,
+  1: {
+    viewedTransactions: 0,
+  },
 };
 
 export default createReducer(initialState, (builder) =>
   builder.addCase(updateBadgeNumber, (state, action) => {
-    const { viewedTransactions } = action.payload;
-    state.viewedTransactions = viewedTransactions;
+    const { viewedTransactions, chainId } = action.payload;
+    if (!state[chainId]) {
+      state[chainId] = { viewedTransactions: 0 };
+    }
+    state[chainId].viewedTransactions = viewedTransactions;
   })
 );
