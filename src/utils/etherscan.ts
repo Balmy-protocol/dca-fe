@@ -1,5 +1,5 @@
-export const buildEtherscanTransaction = (tx: string) =>
-  `https://${process.env.ETH_NETWORK === 'mainnet' ? '' : `${process.env.ETH_NETWORK}.`}etherscan.io/tx/${tx}`;
+import { EXPLORER_URL } from 'config/constants';
 
-export const buildEtherscanAddress = (tx: string) =>
-  `https://${process.env.ETH_NETWORK === 'mainnet' ? '' : `${process.env.ETH_NETWORK}.`}etherscan.io/address/${tx}`;
+export const buildEtherscanTransaction = (tx: string, network: number) => `${EXPLORER_URL[network]}tx/${tx}`;
+
+export const buildEtherscanAddress = (tx: string, network: number) => `${EXPLORER_URL[network]}address/${tx}`;

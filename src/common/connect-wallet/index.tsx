@@ -32,11 +32,9 @@ interface ConnectWalletButtonProps {
 const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
   return (
-    <StyledButtonContainer breakpoint={currentBreakPoint}>
-      <StyledButton color="primary" onClick={() => web3Service.connect()}>
-        <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
-      </StyledButton>
-    </StyledButtonContainer>
+    <StyledButton color="primary" onClick={() => web3Service.connect()}>
+      <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
+    </StyledButton>
   );
 };
 

@@ -41,6 +41,7 @@ import {
   NETWORKS,
   POSSIBLE_ACTIONS,
   RATE_TYPE,
+  SUPPORTED_NETWORKS,
   TRANSACTION_TYPES,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -67,6 +68,7 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { ETH, WETH } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import NetworkMenu from 'common/network-menu';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -124,8 +126,8 @@ const StyledSwapTokenButton = styled(IconButton)`
   }
 `;
 
-const frequencyTypeOptions = [
-  ...(process.env.ETH_NETWORK !== 'mainnet'
+const getFrequencyTypeOptions = (chainId: number) => [
+  ...(chainId !== NETWORKS.mainnet.chainId
     ? [
         {
           label: STRING_SWAP_INTERVALS[FIVE_MINUTES_IN_SECONDS.toString()],
@@ -154,6 +156,7 @@ const frequencyTypeOptions = [
 interface SwapProps extends SwapContextValue {
   tokenList: TokenList;
   web3Service: Web3Service;
+  currentNetwork: { chainId: number; name: string };
 }
 
 const Swap = ({
@@ -169,6 +172,7 @@ const Swap = ({
   setFrequencyValue,
   frequencyType,
   frequencyValue,
+  currentNetwork,
   web3Service,
 }: SwapProps) => {
   const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
@@ -178,19 +182,13 @@ const Swap = ({
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
+  const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
   const [isLoading, setIsLoading] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(tokenList[from]);
-
-  const [currentNetwork, isLoadingNetwork, networkErrors] = usePromise<Network>(
-    web3Service,
-    'getNetwork',
-    [],
-    !web3Service.getAccount()
-  );
 
   const [usedTokens] = useUsedTokens();
 
@@ -229,12 +227,13 @@ const Swap = ({
 
   React.useEffect(() => {
     if (!hasPendingWrap && from === ETH.address) {
-      setFrom(WETH.address);
+      setFrom(WETH(currentNetwork.chainId).address);
     }
   }, [hasPendingWrap]);
 
   const handleApproveToken = async () => {
-    const fromSymbol = from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol;
+    const fromSymbol =
+      from === ETH.address ? tokenList[WETH(currentNetwork.chainId).address].symbol : tokenList[from].symbol;
 
     try {
       setModalLoading({
@@ -300,7 +299,8 @@ const Swap = ({
 
   const handleSwap = async () => {
     setShouldShowStalePairModal(false);
-    const fromSymbol = from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol;
+    const fromSymbol =
+      from === ETH.address ? tokenList[WETH(currentNetwork.chainId).address].symbol : tokenList[from].symbol;
 
     try {
       setModalLoading({
@@ -325,7 +325,7 @@ const Swap = ({
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
         typeData: {
-          from: tokenList[from === ETH.address ? WETH.address : from],
+          from: tokenList[from === ETH.address ? WETH(currentNetwork.chainId).address : from],
           to: tokenList[to],
           fromValue,
           frequencyType: frequencyType.toString(),
@@ -471,11 +471,6 @@ const Swap = ({
 
   const cantFund = fromValue && balance && parseUnits(fromValue, tokenList[from].decimals).gt(balance);
 
-  const networkError =
-    !isLoadingNetwork &&
-    currentNetwork &&
-    currentNetwork.chainId !== NETWORKS[process.env.ETH_NETWORK as keyof typeof NETWORKS];
-
   const isApproved = !fromValue
     ? true
     : (!isLoadingAllowance &&
@@ -493,13 +488,10 @@ const Swap = ({
     !fromValue ||
     !frequencyValue ||
     cantFund ||
-    networkError ||
-    isLoadingNetwork ||
     isLoadingBalance ||
     balanceErrors ||
     allowanceErrors ||
     !isApproved ||
-    networkErrors ||
     parseUnits(fromValue, tokenList[from].decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 
@@ -525,7 +517,10 @@ const Swap = ({
               description="create pair button"
               defaultMessage="Create {from}/{to} pair"
               values={{
-                from: (from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol) || '',
+                from:
+                  (from === ETH.address
+                    ? tokenList[WETH(currentNetwork.chainId).address].symbol
+                    : tokenList[from].symbol) || '',
                 to: (tokenList[to] && tokenList[to].symbol) || '',
               }}
             />
@@ -537,9 +532,15 @@ const Swap = ({
   );
 
   const NotConnectedButton = (
-    <StyledButton size="large" variant="contained" fullWidth color="error" disabled>
+    <StyledButton
+      size="large"
+      variant="contained"
+      fullWidth
+      color="error"
+      onClick={() => setShouldOpenNetworkMenu(true)}
+    >
       <Typography variant="body1">
-        <FormattedMessage description="wrong chainId" defaultMessage="You are not currently connected to the mainnet" />
+        <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
       </Typography>
     </StyledButton>
   );
@@ -566,13 +567,23 @@ const Swap = ({
           <FormattedMessage
             description="waiting for approval"
             defaultMessage="Waiting for your {token} to be approved"
-            values={{ token: (from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol) || '' }}
+            values={{
+              token:
+                (from === ETH.address
+                  ? tokenList[WETH(currentNetwork.chainId).address].symbol
+                  : tokenList[from].symbol) || '',
+            }}
           />
         ) : (
           <FormattedMessage
             description="Allow us to use your coin"
             defaultMessage="Approve {token}"
-            values={{ token: (from === ETH.address ? tokenList[WETH.address].symbol : tokenList[from].symbol) || '' }}
+            values={{
+              token:
+                (from === ETH.address
+                  ? tokenList[WETH(currentNetwork.chainId).address].symbol
+                  : tokenList[from].symbol) || '',
+            }}
           />
         )}
       </Typography>
@@ -636,7 +647,7 @@ const Swap = ({
   let ButtonToShow;
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
-  } else if (networkError) {
+  } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
   } else if (isETH) {
     ButtonToShow = WrapButton;
@@ -681,6 +692,7 @@ const Swap = ({
         ignoreValues={ignoreValues}
         availableFrom={tokenList[from].pairableTokens}
       />
+      <NetworkMenu open={shouldOpenNetworkMenu} onClose={() => setShouldOpenNetworkMenu(false)} />
       <StyledSwapContainer>
         <Grid container>
           <StyledFromContainer container alignItems="center" justify="space-between">
@@ -776,7 +788,7 @@ const Swap = ({
               <Grid item xs={12}>
                 <FrequencyTypeInput
                   id="frequency-type-value"
-                  options={frequencyTypeOptions}
+                  options={getFrequencyTypeOptions(currentNetwork.chainId)}
                   selected={frequencyType}
                   onChange={setFrequencyType}
                 />

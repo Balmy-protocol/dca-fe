@@ -2,7 +2,7 @@ import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
-import Web3Modal, { getProviderInfo } from 'web3modal';
+import Web3Modal, { getProviderInfo, getInjectedProvider } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
@@ -23,7 +23,6 @@ import {
   TransactionPositionTypeDataOptions,
   PoolResponse,
   Position,
-  PositionRaw,
   PositionRawKeyBy,
   TransactionDetails,
   NewPositionTypeData,
@@ -37,7 +36,6 @@ import {
   ResetPositionTypeData,
   ModifyRateAndSwapsPositionTypeData,
   PoolLiquidityData,
-  PoolsLiquidityData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { sortTokens } from 'utils/parsing';
@@ -60,9 +58,17 @@ import TokenDescriptor from 'abis/TokenDescriptor.json';
 // MOCKS
 import usedTokensMocks from 'mocks/usedTokens';
 import { ETH, WETH } from 'mocks/tokens';
-import { FULL_DEPOSIT_TYPE, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import {
+  FACTORY_ADDRESS,
+  FULL_DEPOSIT_TYPE,
+  MEAN_GRAPHQL_URL,
+  NETWORKS,
+  RATE_TYPE,
+  TRANSACTION_TYPES,
+  UNI_GRAPHQL_URL,
+} from 'config/constants';
+import GraphqlService from './graphql';
 
-export const FACTORY_ADDRESS = process.env.FACTORY_ADDRESS as string;
 export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as string;
 
 export default class Web3Service {
@@ -70,8 +76,8 @@ export default class Web3Service {
   modal: Web3Modal;
   signer: Signer;
   availablePairs: AvailablePairs;
-  apolloClient: ApolloClient<NormalizedCacheObject>;
-  uniClient: ApolloClient<NormalizedCacheObject>;
+  apolloClient: GraphqlService;
+  uniClient: GraphqlService;
   account: string;
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
   currentPositions: PositionRawKeyBy;
@@ -81,19 +87,9 @@ export default class Web3Service {
 
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
-    apolloClient?: ApolloClient<NormalizedCacheObject>,
-    uniClient?: ApolloClient<NormalizedCacheObject>,
     client?: ethers.providers.Web3Provider,
     modal?: Web3Modal
   ) {
-    if (apolloClient) {
-      this.apolloClient = apolloClient;
-    }
-
-    if (uniClient) {
-      this.uniClient = uniClient;
-    }
-
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
     }
@@ -104,6 +100,9 @@ export default class Web3Service {
     if (modal) {
       this.modal = modal;
     }
+
+    this.apolloClient = new GraphqlService();
+    this.uniClient = new GraphqlService();
   }
 
   setClient(client: ethers.providers.Web3Provider) {
@@ -116,6 +115,14 @@ export default class Web3Service {
 
   getClient() {
     return this.client;
+  }
+
+  getDCAGraphqlClient() {
+    return this.apolloClient;
+  }
+
+  getUNIGraphqlClient() {
+    return this.uniClient;
   }
 
   getProviderInfo() {
@@ -148,20 +155,14 @@ export default class Web3Service {
     // For this, you need the account signer...
     const signer = ethersProvider.getSigner();
 
+    const chain = await ethersProvider.getNetwork();
+
+    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[1]);
+    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[1]);
     this.setClient(ethersProvider);
     this.setSigner(signer);
 
     const account = await this.signer.getAddress();
-
-    if (window.ethereum) {
-      // handle metamask account change
-      window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
-        window.location.reload();
-      });
-
-      // extremely recommended by metamask
-      window.ethereum.on('chainChanged', () => window.location.reload());
-    }
 
     provider.on('network', (newNetwork: any, oldNetwork: any) => {
       // When a Provider makes its initial connection, it emits a "network"
@@ -174,7 +175,7 @@ export default class Web3Service {
     });
 
     const currentPositionsResponse = await gqlFetchAll(
-      this.apolloClient,
+      this.apolloClient.getClient(),
       GET_POSITIONS,
       {
         address: account.toLowerCase(),
@@ -207,7 +208,7 @@ export default class Web3Service {
     );
 
     const pastPositionsResponse = await gqlFetchAll(
-      this.apolloClient,
+      this.apolloClient.getClient(),
       GET_POSITIONS,
       {
         address: account.toLowerCase(),
@@ -242,8 +243,16 @@ export default class Web3Service {
     this.setAccount(account);
   }
 
-  getNetwork() {
-    return this.client.getNetwork();
+  async getNetwork() {
+    if (this.client) {
+      return this.client.getNetwork();
+    }
+
+    if (window.ethereum) {
+      return new ethers.providers.Web3Provider(window.ethereum).getNetwork();
+    }
+
+    return Promise.resolve(NETWORKS.mainnet);
   }
 
   getAccount() {
@@ -287,7 +296,6 @@ export default class Web3Service {
     };
 
     const web3Modal = new Web3Modal({
-      network: process.env.ETH_NETWORK, // optional
       cacheProvider: true, // optional
       providerOptions, // required
     });
@@ -298,8 +306,25 @@ export default class Web3Service {
       await this.connect();
     }
 
+    if (window.ethereum) {
+      // handle metamask account change
+      window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
+        window.location.reload();
+      });
+
+      // extremely recommended by metamask
+      window.ethereum.on('chainChanged', () => window.location.reload());
+    }
+
+    let chain = await this.getNetwork();
+
+    if (!this.apolloClient.getClient() || !this.uniClient.getClient()) {
+      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[1]);
+      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[1]);
+    }
+
     const availablePairsResponse = await gqlFetchAll(
-      this.apolloClient,
+      this.apolloClient.getClient(),
       GET_AVAILABLE_PAIRS,
       {},
       'pairs',
@@ -314,10 +339,88 @@ export default class Web3Service {
       createdAt: pair.createdAtTimestamp,
     }));
 
-    const tokenListResponse = await gqlFetchAllById(this.uniClient, GET_TOKEN_LIST, {}, 'pools');
+    const tokenListResponse = await gqlFetchAllById(this.uniClient.getClient(), GET_TOKEN_LIST, {}, 'pools');
 
+    const mockedTokens: Record<string, Record<string, number>> = {
+      USDC: {},
+      WETH: {},
+      UNI: {},
+      DAI: {},
+      YFI: {},
+    };
     this.tokenList = tokenListResponse.data.pools.reduce(
       (acc: TokenList, pool: PoolResponse) => {
+        if (pool.token0.symbol === 'USDC') {
+          if (!mockedTokens.USDC[pool.token0.id]) {
+            mockedTokens.USDC[pool.token0.id] = 1;
+          } else {
+            mockedTokens.USDC[pool.token0.id] = mockedTokens.USDC[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token0.symbol === 'WETH') {
+          if (!mockedTokens.WETH[pool.token0.id]) {
+            mockedTokens.WETH[pool.token0.id] = 1;
+          } else {
+            mockedTokens.WETH[pool.token0.id] = mockedTokens.WETH[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token0.symbol === 'UNI') {
+          if (!mockedTokens.UNI[pool.token0.id]) {
+            mockedTokens.UNI[pool.token0.id] = 1;
+          } else {
+            mockedTokens.UNI[pool.token0.id] = mockedTokens.UNI[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token0.symbol === 'DAI') {
+          if (!mockedTokens.DAI[pool.token0.id]) {
+            mockedTokens.DAI[pool.token0.id] = 1;
+          } else {
+            mockedTokens.DAI[pool.token0.id] = mockedTokens.DAI[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token0.symbol === 'YFI') {
+          if (!mockedTokens.YFI[pool.token0.id]) {
+            mockedTokens.YFI[pool.token0.id] = 1;
+          } else {
+            mockedTokens.YFI[pool.token0.id] = mockedTokens.YFI[pool.token0.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'USDC') {
+          if (!mockedTokens.USDC[pool.token1.id]) {
+            mockedTokens.USDC[pool.token1.id] = 1;
+          } else {
+            mockedTokens.USDC[pool.token1.id] = mockedTokens.USDC[pool.token1.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'WETH') {
+          if (!mockedTokens.WETH[pool.token1.id]) {
+            mockedTokens.WETH[pool.token1.id] = 1;
+          } else {
+            mockedTokens.WETH[pool.token1.id] = mockedTokens.WETH[pool.token1.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'UNI') {
+          if (!mockedTokens.UNI[pool.token1.id]) {
+            mockedTokens.UNI[pool.token1.id] = 1;
+          } else {
+            mockedTokens.UNI[pool.token1.id] = mockedTokens.UNI[pool.token1.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'DAI') {
+          if (!mockedTokens.DAI[pool.token1.id]) {
+            mockedTokens.DAI[pool.token1.id] = 1;
+          } else {
+            mockedTokens.DAI[pool.token1.id] = mockedTokens.DAI[pool.token1.id] + 1;
+          }
+        }
+        if (pool.token1.symbol === 'YFI') {
+          if (!mockedTokens.YFI[pool.token1.id]) {
+            mockedTokens.YFI[pool.token1.id] = 1;
+          } else {
+            mockedTokens.YFI[pool.token1.id] = mockedTokens.YFI[pool.token1.id] + 1;
+          }
+        }
+
         if (!acc[pool.token0.id]) {
           acc[pool.token0.id] = {
             decimals: BigNumber.from(pool.token0.decimals).toNumber(),
@@ -346,19 +449,19 @@ export default class Web3Service {
           availableTokensToken0.push(pool.token1.id);
 
           // allow ETH for WETH
-          if (pool.token1.id === WETH.address) {
+          if (pool.token1.id === WETH(chain.chainId).address) {
             availableTokensToken0.push(ETH.address);
           }
         }
         if (availableTokensToken1.indexOf(pool.token0.id) === -1) {
           availableTokensToken1.push(pool.token0.id);
           // allow ETH for WETH
-          if (pool.token0.id === WETH.address) {
+          if (pool.token0.id === WETH(chain.chainId).address) {
             availableTokensToken1.push(ETH.address);
           }
         }
 
-        if (pool.token0.id === WETH.address) {
+        if (pool.token0.id === WETH(chain.chainId).address) {
           acc = {
             ...acc,
             [ETH.address]: {
@@ -366,7 +469,7 @@ export default class Web3Service {
               pairableTokens: [...availableTokensToken0],
             },
           };
-        } else if (pool.token1.id === WETH.address) {
+        } else if (pool.token1.id === WETH(chain.chainId).address) {
           acc = {
             ...acc,
             [ETH.address]: {
@@ -388,8 +491,19 @@ export default class Web3Service {
           },
         };
       },
-      { [ETH.address]: ETH, [WETH.address]: WETH }
+      { [ETH.address]: ETH, [WETH(chain.chainId).address]: WETH(chain.chainId) }
     );
+  }
+
+  changeNetwork(newChainId: number) {
+    if (!window.ethereum) {
+      return;
+    }
+
+    return window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: `0x${newChainId.toString(16)}` }],
+    });
   }
 
   getBalance(address?: string, decimals?: number) {
@@ -404,8 +518,10 @@ export default class Web3Service {
     return erc20.balanceOf(this.getAccount());
   }
 
-  getEstimatedPairCreation(token0?: string, token1?: string) {
+  async getEstimatedPairCreation(token0?: string, token1?: string) {
     if (!token0 || !token1) return Promise.resolve();
+
+    const chain = await this.getNetwork();
 
     let tokenA = token0;
     let tokenB = token1;
@@ -416,8 +532,8 @@ export default class Web3Service {
     }
 
     // check for ETH
-    tokenA = tokenA === ETH.address ? WETH.address : tokenA;
-    tokenB = tokenB === ETH.address ? WETH.address : tokenB;
+    tokenA = tokenA === ETH.address ? WETH(chain.chainId).address : tokenA;
+    tokenB = tokenB === ETH.address ? WETH(chain.chainId).address : tokenB;
 
     const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
 
@@ -444,8 +560,10 @@ export default class Web3Service {
     });
   }
 
-  createPair(token0: string, token1: string) {
+  async createPair(token0: string, token1: string) {
     if (!token0 || !token1) return Promise.resolve();
+
+    const chain = await this.getNetwork();
 
     let tokenA = token0;
     let tokenB = token1;
@@ -456,8 +574,8 @@ export default class Web3Service {
     }
 
     // check for ETH
-    tokenA = tokenA === ETH.address ? WETH.address : tokenA;
-    tokenB = tokenB === ETH.address ? WETH.address : tokenB;
+    tokenA = tokenA === ETH.address ? WETH(chain.chainId).address : tokenA;
+    tokenB = tokenB === ETH.address ? WETH(chain.chainId).address : tokenB;
 
     const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
 
@@ -500,19 +618,23 @@ export default class Web3Service {
     );
   }
 
-  wrapETH(amount: string) {
+  async wrapETH(amount: string) {
     const ERC20Interface = new Interface(WETHABI) as any;
 
-    const erc20 = new ethers.Contract(WETH.address, ERC20Interface, this.getSigner());
+    const chain = await this.getNetwork();
+
+    const erc20 = new ethers.Contract(WETH(chain.chainId).address, ERC20Interface, this.getSigner());
 
     return erc20.deposit({ value: parseUnits(amount, ETH.decimals).toHexString() });
   }
 
-  getAllowance(token: Token, pairContract: AvailablePair) {
+  async getAllowance(token: Token, pairContract: AvailablePair) {
     const ERC20Interface = new Interface(ERC20ABI) as any;
 
+    const chain = await this.getNetwork();
+
     const erc20 = new ethers.Contract(
-      token.address === ETH.address ? WETH.address : token.address,
+      token.address === ETH.address ? WETH(chain.chainId).address : token.address,
       ERC20Interface,
       this.client
     );
@@ -522,11 +644,13 @@ export default class Web3Service {
       .then((allowance: string) => ({ token, allowance: formatUnits(allowance, token.decimals) }));
   }
 
-  approveToken(token: Token, pairContract: AvailablePair) {
+  async approveToken(token: Token, pairContract: AvailablePair) {
     const ERC20Interface = new Interface(ERC20ABI) as any;
 
+    const chain = await this.getNetwork();
+
     const erc20 = new ethers.Contract(
-      token.address === ETH.address ? WETH.address : token.address,
+      token.address === ETH.address ? WETH(chain.chainId).address : token.address,
       ERC20Interface,
       this.getSigner()
     );
@@ -534,7 +658,7 @@ export default class Web3Service {
     return erc20.approve(pairContract.id, MaxUint256);
   }
 
-  deposit(
+  async deposit(
     from: Token,
     to: Token,
     fromValue: string,
@@ -543,6 +667,8 @@ export default class Web3Service {
     existingPair: AvailablePair
   ) {
     let token = from;
+
+    const chain = await this.getNetwork();
 
     const weiValue = parseUnits(fromValue, token.decimals);
 
@@ -553,7 +679,7 @@ export default class Web3Service {
     const factory = new ethers.Contract(existingPair.id, DCAPair.abi, this.getSigner());
 
     return factory.deposit(
-      token.address === ETH.address ? WETH.address : token.address,
+      token.address === ETH.address ? WETH(chain.chainId).address : token.address,
       rate,
       amountOfSwaps,
       swapInterval
@@ -715,12 +841,14 @@ export default class Web3Service {
       case TRANSACTION_TYPES.NEW_POSITION:
         const newPositionTypeData = transaction.typeData as NewPositionTypeData;
         const newId = `${newPositionTypeData.existingPair.id}-${newPositionTypeData.id}`;
-        this.currentPositions[newId] = {
-          ...this.currentPositions[`pending-transaction-${transaction.hash}`],
-          pendingTransaction: '',
-          dcaId: newPositionTypeData.id,
-          id: newId,
-        };
+        if (!this.currentPositions[newId]) {
+          this.currentPositions[newId] = {
+            ...this.currentPositions[`pending-transaction-${transaction.hash}`],
+            pendingTransaction: '',
+            dcaId: newPositionTypeData.id,
+            id: newId,
+          };
+        }
         delete this.currentPositions[`pending-transaction-${transaction.hash}`];
         break;
       case TRANSACTION_TYPES.TERMINATE_POSITION:
@@ -875,7 +1003,7 @@ export default class Web3Service {
       tokenB = token0;
     }
     const poolsWithLiquidityResponse = await gqlFetchAll(
-      this.uniClient,
+      this.uniClient.getClient(),
       GET_PAIR_LIQUIDITY,
       {
         tokenA,

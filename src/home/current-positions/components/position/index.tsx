@@ -32,6 +32,7 @@ import useBalance from 'hooks/useBalance';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -152,6 +153,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
   const availablePairs = useAvailablePairs();
   const addTransaction = useTransactionAdder();
   const [balance] = useBalance(from);
+  const currentNetwork = useCurrentNetwork();
 
   const isPending = !!pendingTransaction;
   const [token0, token1] = sortTokens(from.address, to.address);
@@ -530,7 +532,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
               >
                 {isPending ? (
                   <Link
-                    href={buildEtherscanTransaction(pendingTransaction)}
+                    href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
                     target="_blank"
                     rel="noreferrer"
                     underline="none"

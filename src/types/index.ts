@@ -213,6 +213,7 @@ export interface TransactionReceipt {
   blockNumber: number;
   status?: number;
   logs: TransactionReceiptLog[];
+  chainId: number;
 }
 
 export type TransactionTypes =

@@ -25,6 +25,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.ETHPLORER_KEY': JSON.stringify('EK-7xNxe-HDazjQ3-smGdU'),
     }),
+    new webpack.DefinePlugin({
+      'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
+    }),
     new WebpackBar(),
   ],
   devtool: 'source-map',

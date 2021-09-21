@@ -13,6 +13,7 @@ import Link from '@material-ui/core/Link';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import { TRANSACTION_ERRORS } from 'utils/errors';
 import { makeStyles } from '@material-ui/core/styles';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const useStyles = makeStyles({
   paper: {
@@ -114,6 +115,7 @@ export const TransactionModal = ({
 }: CreatePairModalProps) => {
   const open = selectedConfig !== 'closed';
   const classes = useStyles();
+  const currentNetwork = useCurrentNetwork();
 
   const LoadingContent = (
     <>
@@ -142,7 +144,11 @@ export const TransactionModal = ({
       </StyledLoadingIndicatorWrapper>
       <Typography variant="body1">{successConfig.content}</Typography>
       {successConfig.hash && (
-        <Link href={buildEtherscanTransaction(successConfig.hash)} target="_blank" rel="noreferrer">
+        <Link
+          href={buildEtherscanTransaction(successConfig.hash, currentNetwork.chainId)}
+          target="_blank"
+          rel="noreferrer"
+        >
           <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
         </Link>
       )}

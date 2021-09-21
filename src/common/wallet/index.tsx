@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import MenuItem from '@material-ui/core/MenuItem';
 import { useAppSelector } from 'state/hooks';
-import { useHasPendingTransactions } from 'state/transactions/hooks';
+import { useAllTransactions, useHasPendingTransactions } from 'state/transactions/hooks';
 import { useBadgeNumber } from 'state/transactions-badge/hooks';
 import { updateBadgeNumber } from 'state/transactions-badge/actions';
 import { useAppDispatch } from 'state/hooks';
@@ -17,6 +17,7 @@ import { FormattedMessage } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import WalletMenu from 'common/wallet-menu';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   position: relative;
@@ -43,45 +44,47 @@ interface ConnectWalletButtonProps {
 }
 
 const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
-  const transactions = useAppSelector((state: any) => state.transactions);
+  const transactions = useAllTransactions();
   const [shouldOpenMenu, setShouldOpenMenu] = React.useState(false);
   const hasPendingTransactions = useHasPendingTransactions();
   const dispatch = useAppDispatch();
-  const badge = useBadgeNumber();
+  const currentNetwork = useCurrentNetwork();
+  const badge = useBadgeNumber(currentNetwork.chainId);
   const currentBreakPoint = useCurrentBreakpoint();
 
   const onOpen = () => {
     dispatch(
-      updateBadgeNumber({ viewedTransactions: Object.keys(transactions).length - (hasPendingTransactions ? 1 : 0) })
+      updateBadgeNumber({
+        viewedTransactions: Object.keys(transactions).length - (hasPendingTransactions ? 1 : 0),
+        chainId: currentNetwork.chainId,
+      })
     );
     setShouldOpenMenu(!shouldOpenMenu);
   };
 
+  if (isLoading) return null;
+
   return (
-    <StyledButtonContainer breakpoint={currentBreakPoint}>
-      {!isLoading && (
-        <>
-          <Badge
-            badgeContent={
-              hasPendingTransactions ? <CircularProgress size={10} /> : Object.keys(transactions).length - badge
-            }
-            color="secondary"
-            component="div"
-          >
-            <StyledButton
-              aria-controls="customized-menu"
-              aria-haspopup="true"
-              color="primary"
-              onClick={onOpen}
-              style={{ maxWidth: '200px', textTransform: 'none' }}
-            >
-              <Typography noWrap>{web3Service.getAccount()}</Typography>
-            </StyledButton>
-          </Badge>
-          <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />
-        </>
-      )}
-    </StyledButtonContainer>
+    <>
+      <Badge
+        badgeContent={
+          hasPendingTransactions ? <CircularProgress size={10} /> : Object.keys(transactions).length - badge
+        }
+        color="secondary"
+        component="div"
+      >
+        <StyledButton
+          aria-controls="customized-menu"
+          aria-haspopup="true"
+          color="primary"
+          onClick={onOpen}
+          style={{ maxWidth: '200px', textTransform: 'none' }}
+        >
+          <Typography noWrap>{web3Service.getAccount()}</Typography>
+        </StyledButton>
+      </Badge>
+      <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />
+    </>
   );
 };
 
