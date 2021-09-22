@@ -9,7 +9,7 @@ import {
   RemoveFundsTypeData,
   ModifySwapsPositionTypeData,
   NewPairTypeData,
-  PositionRaw,
+  Position,
   ApproveTokenTypeData,
   ResetPositionTypeData,
   WrapEtherTypeData,
@@ -48,8 +48,8 @@ function useBuildTransactionDetail() {
           const terminatePositionTypeData = tx.typeData as TerminatePositionTypeData;
           const terminatedPosition = find(positions, { id: terminatePositionTypeData.id });
           if (terminatedPosition) {
-            message = `Terminate ${tokenList[(terminatedPosition as PositionRaw).from].symbol}:${
-              tokenList[(terminatedPosition as PositionRaw).to].symbol
+            message = `Terminate ${(terminatedPosition as Position).from.symbol}:${
+              (terminatedPosition as Position).to.symbol
             } position`;
           }
           break;
@@ -57,8 +57,8 @@ function useBuildTransactionDetail() {
           const withdrawPositionTypeData = tx.typeData as WithdrawTypeData;
           const withdrawnPosition = find(positions, { id: withdrawPositionTypeData.id });
           if (withdrawnPosition) {
-            message = `Withdraw from ${tokenList[(withdrawnPosition as PositionRaw).from].symbol}:${
-              tokenList[(withdrawnPosition as PositionRaw).to].symbol
+            message = `Withdraw from ${(withdrawnPosition as Position).from.symbol}:${
+              (withdrawnPosition as Position).to.symbol
             } position`;
           }
           break;
@@ -66,11 +66,9 @@ function useBuildTransactionDetail() {
           const addFundsTypeData = tx.typeData as AddFundsTypeData;
           const fundedPosition = find(positions, { id: addFundsTypeData.id });
           if (fundedPosition) {
-            message = `Add ${addFundsTypeData.newFunds} ${
-              tokenList[(fundedPosition as PositionRaw).from].symbol
-            } to the ${tokenList[(fundedPosition as PositionRaw).from].symbol}:${
-              tokenList[(fundedPosition as PositionRaw).to].symbol
-            } position`;
+            message = `Add ${addFundsTypeData.newFunds} ${(fundedPosition as Position).from.symbol} to the ${
+              (fundedPosition as Position).from.symbol
+            }:${(fundedPosition as Position).to.symbol} position`;
           }
           break;
         case TRANSACTION_TYPES.REMOVE_FUNDS:
@@ -78,9 +76,9 @@ function useBuildTransactionDetail() {
           const removeFundedPosition = find(positions, { id: removeFundsTypeData.id });
           if (removeFundedPosition) {
             message = `Remove ${removeFundsTypeData.ammountToRemove} ${
-              tokenList[(removeFundedPosition as PositionRaw).from].symbol
-            } from the ${tokenList[(removeFundedPosition as PositionRaw).from].symbol}:${
-              tokenList[(removeFundedPosition as PositionRaw).to].symbol
+              (removeFundedPosition as Position).from.symbol
+            } from the ${(removeFundedPosition as Position).from.symbol}:${
+              (removeFundedPosition as Position).to.symbol
             } position`;
           }
           break;
@@ -88,12 +86,12 @@ function useBuildTransactionDetail() {
           const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
           const resettedPosition = find(positions, { id: resetPositionTypeData.id });
           if (resettedPosition) {
-            message = `Add ${resetPositionTypeData.newFunds} ${
-              tokenList[(resettedPosition as PositionRaw).from].symbol
-            } to your ${tokenList[(resettedPosition as PositionRaw).from].symbol}:${
-              tokenList[(resettedPosition as PositionRaw).to].symbol
-            } position and set it to run for ${resetPositionTypeData.newSwaps} ${getFrequencyLabel(
-              (resettedPosition as PositionRaw).swapInterval.toString(),
+            message = `Add ${resetPositionTypeData.newFunds} ${(resettedPosition as Position).from.symbol} to your ${
+              (resettedPosition as Position).from.symbol
+            }:${(resettedPosition as Position).to.symbol} position and set it to run for ${
+              resetPositionTypeData.newSwaps
+            } ${getFrequencyLabel(
+              (resettedPosition as Position).swapInterval.toString(),
               resetPositionTypeData.newSwaps
             )}`;
           }
@@ -102,10 +100,10 @@ function useBuildTransactionDetail() {
           const modifySwapsPositionTypeData = tx.typeData as ModifySwapsPositionTypeData;
           const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
           if (modifiedPosition) {
-            message = `Modify ${tokenList[(modifiedPosition as PositionRaw).from].symbol}:${
-              tokenList[(modifiedPosition as PositionRaw).to].symbol
+            message = `Modify ${(modifiedPosition as Position).from.symbol}:${
+              (modifiedPosition as Position).to.symbol
             } position to run for ${modifySwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
-              (modifiedPosition as PositionRaw).swapInterval.toString(),
+              (modifiedPosition as Position).swapInterval.toString(),
               modifySwapsPositionTypeData.newSwaps
             )}`;
           }
@@ -114,16 +112,16 @@ function useBuildTransactionDetail() {
           const modifyRateAndSwapsPositionTypeData = tx.typeData as ModifyRateAndSwapsPositionTypeData;
           const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
           if (modifiedRatePosition) {
-            message = `Modify ${tokenList[(modifiedRatePosition as PositionRaw).from].symbol}:${
-              tokenList[(modifiedRatePosition as PositionRaw).to].symbol
+            message = `Modify ${(modifiedRatePosition as Position).from.symbol}:${
+              (modifiedRatePosition as Position).to.symbol
             } position to swap ${modifyRateAndSwapsPositionTypeData.newRate} ${
-              tokenList[(modifiedRatePosition as PositionRaw).from].symbol
+              (modifiedRatePosition as Position).from.symbol
             } ${
               STRING_SWAP_INTERVALS[
-                (modifiedRatePosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
+                (modifiedRatePosition as Position).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
               ].adverb
             } for ${modifyRateAndSwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
-              (modifiedRatePosition as PositionRaw).swapInterval.toString(),
+              (modifiedRatePosition as Position).swapInterval.toString(),
               modifyRateAndSwapsPositionTypeData.newSwaps
             )}`;
           }

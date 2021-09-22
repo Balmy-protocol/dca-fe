@@ -173,8 +173,6 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   decimals: 1,
   isBaseToken: false,
   name: '',
-  totalValueLockedUSD: 0,
-  pairableTokens: [],
 };
 const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const client = useDCAGraphql();

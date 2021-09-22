@@ -12,9 +12,12 @@ export type Token = {
   name: string;
   symbol: string;
   logoURI?: string;
-  pairableTokens: string[];
-  totalValueLockedUSD: number;
 };
+
+export interface ExtendedToken extends Token {
+  pairableTokens: string[];
+  totalValueLockedUSD?: number;
+}
 
 export type PoolResponse = {
   token0: {
@@ -34,7 +37,7 @@ export type PoolResponse = {
   id: string;
 };
 
-export type TokenList = Record<string, Token>;
+export type TokenList = Record<string, ExtendedToken>;
 
 export interface AvailablePairSwap {
   executedAtTimestamp: number;
@@ -86,12 +89,8 @@ export type Web3ServicePromisableMethods =
 export type PositionResponse = {
   id: string;
   dcaId: string;
-  from: {
-    id: string;
-  };
-  to: {
-    id: string;
-  };
+  from: Token;
+  to: Token;
   pair: {
     id: string;
   };
@@ -117,9 +116,9 @@ export type PositionResponse = {
   createdAtTimestamp: number;
 };
 
-export interface PositionRaw {
-  from: string;
-  to: string;
+export interface Position {
+  from: Token;
+  to: Token;
   swapInterval: BigNumber; // daily/weekly/etc
   swapped: BigNumber; // total de swappeado
   remainingLiquidity: BigNumber;
@@ -136,20 +135,14 @@ export interface PositionRaw {
   pairId: string;
 }
 
-export interface PositionRawKeyBy {
-  [key: string]: PositionRaw;
-}
-
-export interface Position extends Omit<PositionRaw, 'to' | 'from'> {
-  from: Token;
-  to: Token;
+export interface PositionKeyBy {
+  [key: string]: Position;
 }
 
 export interface Network {
   chainId: number;
 }
 
-export type PositionsRaw = PositionRaw[];
 export type Positions = Position[];
 
 export interface GasNowResponseData {

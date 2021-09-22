@@ -3,13 +3,12 @@ import Grid from '@material-ui/core/Grid';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import ActivePosition from './components/position';
-import { Web3Service, TokenList, Positions, PositionsRaw, Position, NFTData } from 'types';
+import { Web3Service, Positions, Position, NFTData } from 'types';
 import WithdrawModal from 'common/withdraw-modal';
 import NFTModal from 'common/view-nft-modal';
 import EmptyPosition from 'common/empty-position';
 import TerminateModal from 'common/terminate-modal';
 import useCurrentPositions from 'hooks/useCurrentPositions';
-import useTokenList from 'hooks/useTokenList';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
 
@@ -29,7 +28,6 @@ const POSITIONS_PER_ROW = {
   xl: 4,
 };
 const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
-  const tokenList = useTokenList();
   const currentPositions = useCurrentPositions();
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
@@ -83,10 +81,10 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="stretch">
           {currentPositions
-            ? (currentPositions as PositionsRaw).map((position) => (
+            ? (currentPositions as Positions).map((position) => (
                 <StyledGridItem item xs={12} sm={6} md={3} key={position.id}>
                   <ActivePosition
-                    position={{ ...position, from: tokenList[position.from], to: tokenList[position.to] }}
+                    position={position}
                     web3Service={web3Service}
                     onWithdraw={onWithdraw}
                     onTerminate={onTerminate}

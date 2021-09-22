@@ -1,6 +1,6 @@
 import React from 'react';
 import WalletContext from 'common/wallet-context';
-import { PositionsRaw } from 'types';
+import { Positions } from 'types';
 import { useAllTransactions } from 'state/transactions/hooks';
 import { useHasInitialized } from 'state/initializer/hooks';
 
@@ -9,7 +9,7 @@ function useCurrentPositions() {
   const transactions = useAllTransactions();
   const hasInitialized = useHasInitialized();
 
-  const currentPositions: PositionsRaw = React.useMemo(
+  const currentPositions: Positions = React.useMemo(
     () => web3Service.getCurrentPositions(),
     [transactions, web3Service.getAccount(), hasInitialized]
   );
