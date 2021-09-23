@@ -7,7 +7,7 @@ import uniq from 'lodash/uniq';
 import sortBy from 'lodash/sortBy';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@material-ui/core/Slide';
-import { TokenList } from 'types';
+import { Token, TokenList } from 'types';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -30,8 +30,10 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { useTokenLists } from 'state/token-lists/hooks';
+import useTokenList from 'hooks/useTokenList';
 
-type SetFromToState = React.Dispatch<React.SetStateAction<string>>;
+type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 interface PartialTheme {
   spacing: any;
   palette: any;
@@ -115,7 +117,7 @@ const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
 interface RowData {
   tokenList: TokenList;
   tokenKeys: string[];
-  onClick: SetFromToState;
+  onClick: (token: string) => void;
 }
 
 interface RowProps {
@@ -126,14 +128,13 @@ interface RowProps {
 
 interface TokenPickerProps {
   shouldShow: boolean;
-  tokenList: TokenList;
   availableFrom?: string[];
-  selected: string;
+  selected: Token;
   onChange: SetFromToState;
   onClose: () => void;
   isFrom: boolean;
   usedTokens: string[];
-  ignoreValues: string[];
+  ignoreValues: Token[];
 }
 
 const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps) => {
@@ -163,7 +164,6 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps
 
 const TokenPicker = ({
   shouldShow,
-  tokenList,
   isFrom,
   availableFrom = [],
   onClose,
@@ -171,6 +171,7 @@ const TokenPicker = ({
   ignoreValues,
   usedTokens,
 }: TokenPickerProps) => {
+  const tokenList = useTokenList();
   const [search, setSearch] = React.useState('');
   const [isOnlyPairs, setIsOnlyPairs] = React.useState(false);
   let tokenKeysToUse: string[] = [];
@@ -186,7 +187,7 @@ const TokenPicker = ({
   };
 
   const handleItemSelected = (item: string) => {
-    onChange(item);
+    onChange(tokenList[item]);
     handleOnClose();
   };
 
@@ -194,7 +195,7 @@ const TokenPicker = ({
     () =>
       uniq(
         availablePairs.reduce(
-          (accum, current) => [...accum, current.token0, current.token1],
+          (accum, current) => [...accum, current.token0.address, current.token1.address],
           [...(isFrom ? [ETH.address] : [])]
         )
       ),
@@ -209,32 +210,42 @@ const TokenPicker = ({
   );
 
   const memoizedTokenKeys = React.useMemo(() => {
-    let orderedTokenKeys = sortBy(
-      tokenKeysToUse.filter(
-        (el) =>
-          (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
-            tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
-            tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
-          !usedTokens.includes(el) &&
-          !extendedIgnoredValues.includes(el) &&
-          tokenList[el].chainId === currentNetwork.chainId
-      ),
-      [(el) => tokenList[el].totalValueLockedUSD]
+    // let orderedTokenKeys = sortBy(
+    //   tokenKeysToUse.filter(
+    //     (el) =>
+    //       (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
+    //         tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
+    //         tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
+    //       !usedTokens.includes(el) &&
+    //       !extendedIgnoredValues.includes(el) &&
+    //       tokenList[el].chainId === currentNetwork.chainId
+    //   ),
+    //   [(el) => tokenList[el].totalValueLockedUSD]
+    // );
+
+    let filteredTokenKeys = tokenKeysToUse.filter(
+      (el) =>
+        (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
+          tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
+          tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
+        !usedTokens.includes(el) &&
+        !extendedIgnoredValues.includes(el) &&
+        tokenList[el].chainId === currentNetwork.chainId
     );
 
-    reverse(orderedTokenKeys);
+    // reverse(filteredTokenKeys);
 
-    if (orderedTokenKeys.findIndex((el) => el === WETH(currentNetwork.chainId).address) !== -1) {
-      remove(orderedTokenKeys, (token) => token === WETH(currentNetwork.chainId).address);
-      orderedTokenKeys.unshift(WETH(currentNetwork.chainId).address);
+    if (filteredTokenKeys.findIndex((el) => el === WETH(currentNetwork.chainId).address) !== -1) {
+      remove(filteredTokenKeys, (token) => token === WETH(currentNetwork.chainId).address);
+      filteredTokenKeys.unshift(WETH(currentNetwork.chainId).address);
     }
 
-    if (orderedTokenKeys.findIndex((el) => el === ETH.address) !== -1) {
-      remove(orderedTokenKeys, (token) => token === ETH.address);
-      orderedTokenKeys.unshift(ETH.address);
+    if (filteredTokenKeys.findIndex((el) => el === ETH.address) !== -1) {
+      remove(filteredTokenKeys, (token) => token === ETH.address);
+      filteredTokenKeys.unshift(ETH.address);
     }
 
-    return orderedTokenKeys;
+    return filteredTokenKeys;
   }, [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeysToUse, availableFrom, currentNetwork.chainId]);
 
   return (

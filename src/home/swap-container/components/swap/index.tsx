@@ -11,6 +11,8 @@ import {
   AvailablePairs,
   GetAllowanceResponse,
   AvailablePair,
+  SetStateCallback,
+  Token,
 } from 'types';
 import Typography from '@material-ui/core/Typography';
 import Grow from '@material-ui/core/Grow';
@@ -20,7 +22,6 @@ import TokenButton from 'common/token-button';
 import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-easy-input';
 import FrequencyTypeInput from 'common/frequency-type-input';
-import { SwapContextValue } from '../../SwapContext';
 import Button from 'common/button';
 import Tooltip from '@material-ui/core/Tooltip';
 import Divider from 'common/divider-wit-content';
@@ -153,8 +154,18 @@ const getFrequencyTypeOptions = (chainId: number) => [
   },
 ];
 
-interface SwapProps extends SwapContextValue {
-  tokenList: TokenList;
+interface SwapProps {
+  from: Token;
+  fromValue: string;
+  to: Token;
+  frequencyType: BigNumber;
+  frequencyValue: string;
+  setFrom: SetStateCallback<Token>;
+  setTo: SetStateCallback<Token>;
+  toggleFromTo: () => void;
+  setFromValue: SetStateCallback<string>;
+  setFrequencyType: SetStateCallback<BigNumber>;
+  setFrequencyValue: SetStateCallback<string>;
   web3Service: Web3Service;
   currentNetwork: { chainId: number; name: string };
 }
@@ -167,7 +178,6 @@ const Swap = ({
   setTo,
   toggleFromTo,
   setFromValue,
-  tokenList,
   setFrequencyType,
   setFrequencyValue,
   frequencyType,
@@ -188,14 +198,14 @@ const Swap = ({
   const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
-  const [balance, isLoadingBalance, balanceErrors] = useBalance(tokenList[from]);
+  const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
 
   const [usedTokens] = useUsedTokens();
 
   const existingPair = React.useMemo(() => {
-    let token0 = from < to ? from : to;
-    let token1 = from < to ? to : from;
-    return find(availablePairs, { token0, token1 });
+    let token0 = from.address < to.address ? from.address : to.address;
+    let token1 = from.address < to.address ? to.address : from.address;
+    return find(availablePairs, (pair) => pair.token0.address === token0 && pair.token1.address === token1);
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
 
   const hasPendingApproval = useHasPendingApproval(from, existingPair?.id);
@@ -206,34 +216,30 @@ const Swap = ({
   const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
     web3Service,
     'getAllowance',
-    [tokenList[from], existingPair],
-    !tokenList[from] || !web3Service.getAccount() || !existingPair || hasPendingApproval
+    [from, existingPair],
+    !from || !web3Service.getAccount() || !existingPair || hasPendingApproval
   );
 
   React.useEffect(() => {
     setRate(
       (fromValue &&
-        parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+        parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
         frequencyValue &&
         BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
         from &&
-        formatUnits(
-          parseUnits(fromValue, tokenList[from].decimals).div(BigNumber.from(frequencyValue)),
-          tokenList[from].decimals
-        )) ||
+        formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
         '0'
     );
   }, [from]);
 
   React.useEffect(() => {
-    if (!hasPendingWrap && from === ETH.address) {
-      setFrom(WETH(currentNetwork.chainId).address);
+    if (!hasPendingWrap && from.address === ETH.address) {
+      setFrom(WETH(currentNetwork.chainId));
     }
   }, [hasPendingWrap]);
 
   const handleApproveToken = async () => {
-    const fromSymbol =
-      from === ETH.address ? tokenList[WETH(currentNetwork.chainId).address].symbol : tokenList[from].symbol;
+    const fromSymbol = from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol;
 
     try {
       setModalLoading({
@@ -247,8 +253,11 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await web3Service.approveToken(tokenList[from], existingPair as AvailablePair);
-      addTransaction(result, { type: TRANSACTION_TYPES.APPROVE_TOKEN, typeData: { id: from, pair: existingPair?.id } });
+      const result = await web3Service.approveToken(from, existingPair as AvailablePair);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        typeData: { token: from, pair: (existingPair as AvailablePair).id },
+      });
       setModalSuccess({
         hash: result.hash,
         content: (
@@ -299,8 +308,7 @@ const Swap = ({
 
   const handleSwap = async () => {
     setShouldShowStalePairModal(false);
-    const fromSymbol =
-      from === ETH.address ? tokenList[WETH(currentNetwork.chainId).address].symbol : tokenList[from].symbol;
+    const fromSymbol = from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol;
 
     try {
       setModalLoading({
@@ -309,14 +317,14 @@ const Swap = ({
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"
-              values={{ from: fromSymbol || '', to: (to && tokenList[to].symbol) || '' }}
+              values={{ from: fromSymbol || '', to: (to && to.symbol) || '' }}
             />
           </Typography>
         ),
       });
       const result = await web3Service.deposit(
-        tokenList[from],
-        tokenList[to],
+        from,
+        to,
         fromValue,
         frequencyType,
         frequencyValue,
@@ -325,8 +333,8 @@ const Swap = ({
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
         typeData: {
-          from: tokenList[from === ETH.address ? WETH(currentNetwork.chainId).address : from],
-          to: tokenList[to],
+          from: from.address === ETH.address ? WETH(currentNetwork.chainId) : from,
+          to: to,
           fromValue,
           frequencyType: frequencyType.toString(),
           frequencyValue,
@@ -341,7 +349,7 @@ const Swap = ({
           <FormattedMessage
             description="success creating position"
             defaultMessage="Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: fromSymbol || '', to: (to && tokenList[to].symbol) || '' }}
+            values={{ from: fromSymbol || '', to: (to && to.symbol) || '' }}
           />
         ),
       });
@@ -365,7 +373,7 @@ const Swap = ({
     }
   };
 
-  const startSelectingCoin = (token: string) => {
+  const startSelectingCoin = (token: Token) => {
     setSelecting(token);
     setShouldShowPicker(true);
   };
@@ -375,14 +383,11 @@ const Swap = ({
     setFromValue(fromValue);
     setRate(
       (fromValue &&
-        parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+        parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
         frequencyValue &&
         BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
         from &&
-        formatUnits(
-          parseUnits(fromValue, tokenList[from].decimals).div(BigNumber.from(frequencyValue)),
-          tokenList[from].decimals
-        )) ||
+        formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
         '0'
     );
   };
@@ -392,14 +397,11 @@ const Swap = ({
     setRate(rate);
     setFromValue(
       (rate &&
-        parseUnits(rate, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+        parseUnits(rate, from.decimals).gt(BigNumber.from(0)) &&
         frequencyValue &&
         BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
         from &&
-        formatUnits(
-          parseUnits(rate, tokenList[from].decimals).mul(BigNumber.from(frequencyValue)),
-          tokenList[from].decimals
-        )) ||
+        formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
         ''
     );
   };
@@ -409,27 +411,21 @@ const Swap = ({
     if (modeType === RATE_TYPE) {
       setFromValue(
         (rate &&
-          parseUnits(rate, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+          parseUnits(rate, from.decimals).gt(BigNumber.from(0)) &&
           frequencyValue &&
           BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
           from &&
-          formatUnits(
-            parseUnits(rate, tokenList[from].decimals).mul(BigNumber.from(frequencyValue)),
-            tokenList[from].decimals
-          )) ||
+          formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
           ''
       );
     } else {
       setRate(
         (fromValue &&
-          parseUnits(fromValue, tokenList[from].decimals).gt(BigNumber.from(0)) &&
+          parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
           frequencyValue &&
           BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
           from &&
-          formatUnits(
-            parseUnits(fromValue, tokenList[from].decimals).div(BigNumber.from(frequencyValue)),
-            tokenList[from].decimals
-          )) ||
+          formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
           '0'
       );
     }
@@ -469,17 +465,15 @@ const Swap = ({
     onLowLiquidityModalClose();
   };
 
-  const cantFund = fromValue && balance && parseUnits(fromValue, tokenList[from].decimals).gt(balance);
+  const cantFund = fromValue && balance && parseUnits(fromValue, from.decimals).gt(balance);
 
   const isApproved = !fromValue
     ? true
     : (!isLoadingAllowance &&
         allowance &&
         allowance.allowance &&
-        allowance.token.address === from &&
-        parseUnits(allowance.allowance, tokenList[from].decimals).gte(
-          parseUnits(fromValue, tokenList[from].decimals)
-        )) ||
+        allowance.token.address === from.address &&
+        parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
       hasConfirmedApproval;
 
   const pairExists = existingPair;
@@ -492,10 +486,10 @@ const Swap = ({
     balanceErrors ||
     allowanceErrors ||
     !isApproved ||
-    parseUnits(fromValue, tokenList[from].decimals).lte(BigNumber.from(0)) ||
+    parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 
-  const isETH = from === ETH.address;
+  const isETH = from.address === ETH.address;
 
   const ignoreValues = [from, to];
 
@@ -517,11 +511,8 @@ const Swap = ({
               description="create pair button"
               defaultMessage="Create {from}/{to} pair"
               values={{
-                from:
-                  (from === ETH.address
-                    ? tokenList[WETH(currentNetwork.chainId).address].symbol
-                    : tokenList[from].symbol) || '',
-                to: (tokenList[to] && tokenList[to].symbol) || '',
+                from: (from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol) || '',
+                to: (to && to.symbol) || '',
               }}
             />
           )}
@@ -568,10 +559,7 @@ const Swap = ({
             description="waiting for approval"
             defaultMessage="Waiting for your {token} to be approved"
             values={{
-              token:
-                (from === ETH.address
-                  ? tokenList[WETH(currentNetwork.chainId).address].symbol
-                  : tokenList[from].symbol) || '',
+              token: (from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol) || '',
             }}
           />
         ) : (
@@ -579,10 +567,7 @@ const Swap = ({
             description="Allow us to use your coin"
             defaultMessage="Approve {token}"
             values={{
-              token:
-                (from === ETH.address
-                  ? tokenList[WETH(currentNetwork.chainId).address].symbol
-                  : tokenList[from].symbol) || '',
+              token: (from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol) || '',
             }}
           />
         )}
@@ -667,8 +652,8 @@ const Swap = ({
         open={shouldShowPairModal}
         onCancel={() => setShouldShowPairModal(false)}
         web3Service={web3Service}
-        from={tokenList[from]}
-        to={tokenList[to]}
+        from={from}
+        to={to}
       />
       <StalePairModal
         open={shouldShowStalePairModal}
@@ -686,11 +671,9 @@ const Swap = ({
         onClose={() => setShouldShowPicker(false)}
         isFrom={selecting === from}
         selected={selecting}
-        onChange={selecting === from ? setFrom : setTo}
-        tokenList={tokenList}
+        onChange={selecting.address === from.address ? setFrom : setTo}
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
-        availableFrom={tokenList[from].pairableTokens}
       />
       <NetworkMenu open={shouldOpenNetworkMenu} onClose={() => setShouldOpenNetworkMenu(false)} />
       <StyledSwapContainer>
@@ -707,8 +690,8 @@ const Swap = ({
                   description="in position"
                   defaultMessage="In wallet: {balance} {symbol}"
                   values={{
-                    balance: formatCurrencyAmount(balance, tokenList[from], 4),
-                    symbol: tokenList[from].symbol,
+                    balance: formatCurrencyAmount(balance, from, 4),
+                    symbol: from.symbol,
                   }}
                 />
               </Typography>
@@ -718,17 +701,17 @@ const Swap = ({
                 id="from-value"
                 error={cantFund ? 'Amount cannot exceed balance' : ''}
                 value={fromValue}
-                label={tokenList[from]?.symbol}
+                label={from.symbol}
                 onChange={handleFromValueChange}
                 withBalance={!isLoadingBalance}
                 isLoadingBalance={isLoadingBalance}
                 balance={balance}
-                token={tokenList[from]}
+                token={from}
               />
             </Grid>
             <Grid item xs={6}>
               <Grid container alignItems="center" justify="flex-end">
-                <TokenButton token={tokenList[from]} onClick={() => startSelectingCoin(from)} />
+                <TokenButton token={from} onClick={() => startSelectingCoin(from)} />
               </Grid>
             </Grid>
             <Grid item xs={12}>
@@ -739,10 +722,10 @@ const Swap = ({
                 <TokenInput
                   id="rate-value"
                   value={rate}
-                  label={tokenList[from]?.symbol}
+                  label={from.symbol}
                   onChange={handleRateValueChange}
                   withBalance={false}
-                  token={tokenList[from]}
+                  token={from}
                   isMinimal
                 />
                 <Typography variant="body1" component="span">
@@ -750,7 +733,7 @@ const Swap = ({
                     description="rate detail"
                     defaultMessage="{from} every {frequency} for you"
                     values={{
-                      from: tokenList[from].symbol,
+                      from: from.symbol,
                       frequency:
                         STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singular,
                     }}
@@ -770,7 +753,7 @@ const Swap = ({
             </Grid>
             <Grid item xs={6}>
               <Grid container alignItems="center" justify="flex-end">
-                <TokenButton token={tokenList[to]} onClick={() => startSelectingCoin(to)} />
+                <TokenButton token={to} onClick={() => startSelectingCoin(to)} />
               </Grid>
             </Grid>
           </StyledToContainer>

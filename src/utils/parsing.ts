@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import { Token } from 'types';
 
 const HOURS_IN_MONTH = BigNumber.from(720);
 const DAYS_IN_WEEK = BigNumber.from(7);
@@ -46,11 +47,23 @@ export const STRING_SWAP_INTERVALS = {
   },
 };
 
-export const sortTokens = (tokenA: string, tokenB: string) => {
+export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
   let token1 = tokenB;
 
   if (tokenA > tokenB) {
+    token0 = tokenB;
+    token1 = tokenA;
+  }
+
+  return [token0, token1];
+};
+
+export const sortTokens = (tokenA: Token, tokenB: Token) => {
+  let token0 = tokenA;
+  let token1 = tokenB;
+
+  if (tokenA.address > tokenB.address) {
     token0 = tokenB;
     token1 = tokenA;
   }

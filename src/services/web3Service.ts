@@ -431,8 +431,6 @@ export default class Web3Service {
               name: pool.token0.name,
               symbol: pool.token0.symbol,
               chainId: pool.token0.chainId,
-              pairableTokens: [],
-              totalValueLockedUSD: parseFloat(pool.token0.totalValueLockedUSD),
             };
           }
           if (!acc[pool.token1.id]) {
@@ -442,28 +440,7 @@ export default class Web3Service {
               name: pool.token1.name,
               symbol: pool.token1.symbol,
               chainId: pool.token1.chainId,
-              pairableTokens: [],
-              totalValueLockedUSD: parseFloat(pool.token1.totalValueLockedUSD),
             };
-          }
-
-          const availableTokensToken0 = [...(acc[pool.token0.id].pairableTokens || [])];
-          const availableTokensToken1 = [...(acc[pool.token1.id].pairableTokens || [])];
-
-          if (availableTokensToken0.indexOf(pool.token1.id) === -1) {
-            availableTokensToken0.push(pool.token1.id);
-
-            // allow ETH for WETH
-            if (pool.token1.id === WETH(chain.chainId).address) {
-              availableTokensToken0.push(ETH.address);
-            }
-          }
-          if (availableTokensToken1.indexOf(pool.token0.id) === -1) {
-            availableTokensToken1.push(pool.token0.id);
-            // allow ETH for WETH
-            if (pool.token0.id === WETH(chain.chainId).address) {
-              availableTokensToken1.push(ETH.address);
-            }
           }
 
           if (pool.token0.id === WETH(chain.chainId).address) {
@@ -471,7 +448,6 @@ export default class Web3Service {
               ...acc,
               [ETH.address]: {
                 ...acc[ETH.address],
-                pairableTokens: [...availableTokensToken0],
               },
             };
           } else if (pool.token1.id === WETH(chain.chainId).address) {
@@ -479,7 +455,6 @@ export default class Web3Service {
               ...acc,
               [ETH.address]: {
                 ...acc[ETH.address],
-                pairableTokens: [...availableTokensToken1],
               },
             };
           }
@@ -488,11 +463,9 @@ export default class Web3Service {
             ...acc,
             [pool.token0.id]: {
               ...acc[pool.token0.id],
-              pairableTokens: [...availableTokensToken0],
             },
             [pool.token1.id]: {
               ...acc[pool.token1.id],
-              pairableTokens: [...availableTokensToken1],
             },
           };
         },
@@ -512,7 +485,6 @@ export default class Web3Service {
             (this.tokenList[token.address.toLowerCase()] = {
               ...token,
               address: token.address.toLowerCase(),
-              pairableTokens: [],
             })
         );
       });
@@ -1016,15 +988,15 @@ export default class Web3Service {
     return factory.interface.parseLog(log);
   }
 
-  async getPairLiquidity(token0: string, token1: string) {
+  async getPairLiquidity(token0: Token, token1: Token) {
     let tokenA;
     let tokenB;
-    if (token0 < token1) {
-      tokenA = token0;
-      tokenB = token1;
+    if (token0.address < token1.address) {
+      tokenA = token0.address;
+      tokenB = token1.address;
     } else {
-      tokenA = token1;
-      tokenB = token0;
+      tokenA = token1.address;
+      tokenB = token0.address;
     }
     const poolsWithLiquidityResponse = await gqlFetchAll(
       this.uniClient.getClient(),

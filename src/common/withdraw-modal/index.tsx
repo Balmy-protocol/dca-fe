@@ -54,7 +54,7 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
   const { web3Service } = React.useContext(WalletContext);
 
   const availablePairs = useAvailablePairs();
-  const [token0, token1] = sortTokens(position.from.address, position.to.address);
+  const [token0, token1] = sortTokens(position.from, position.to);
   const pair = find(availablePairs, { token0, token1 });
   const addTransaction = useTransactionAdder();
 

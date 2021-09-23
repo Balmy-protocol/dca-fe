@@ -1,4 +1,5 @@
 import { NETWORKS } from 'config/constants';
+import { Token } from 'types';
 
 const DAI_ADDRESSES = {
   [NETWORKS.mainnet.chainId]: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -9,15 +10,13 @@ const DAI_ADDRESSES = {
   [NETWORKS.kovan.chainId]: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
 };
 
-export const DAI = (chainId: number) => ({
+export const DAI = (chainId: number): Token => ({
   chainId: chainId,
   decimals: 18,
   address: DAI_ADDRESSES[chainId] || DAI_ADDRESSES[1],
   name: 'Dai stable coin',
   symbol: 'DAI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
-  pairableTokens: [],
-  totalValueLockedUSD: 0,
 });
 
 const WETH_ADDRESSES = {
@@ -29,15 +28,13 @@ const WETH_ADDRESSES = {
   [NETWORKS.kovan.chainId]: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
 };
 
-export const WETH = (chainId: number) => ({
+export const WETH = (chainId: number): Token => ({
   chainId: chainId,
   decimals: 18,
   address: WETH_ADDRESSES[chainId] || WETH_ADDRESSES[1],
   name: 'Wrapped Ether',
   symbol: 'WETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
-  pairableTokens: [],
-  totalValueLockedUSD: 0,
 });
 
 const USDC_ADDRESSES = {
@@ -49,15 +46,13 @@ const USDC_ADDRESSES = {
   [NETWORKS.kovan.chainId]: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
 };
 
-export const USDC = (chainId: number) => ({
+export const USDC = (chainId: number): Token => ({
   chainId: chainId,
   decimals: 6,
   address: USDC_ADDRESSES[chainId] || USDC_ADDRESSES[1],
   name: 'USD Coin',
   symbol: 'USDC',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/usdc.png?1547036627',
-  pairableTokens: [],
-  totalValueLockedUSD: 0,
 });
 
 export const ETH = {
@@ -67,8 +62,6 @@ export const ETH = {
   name: 'Ethereum',
   symbol: 'ETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
-  pairableTokens: [],
-  totalValueLockedUSD: 0,
 };
 
 const UNI_ADDRESSES = {
@@ -80,15 +73,13 @@ const UNI_ADDRESSES = {
   [NETWORKS.kovan.chainId]: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
 };
 
-export const UNI = (chainId: number) => ({
+export const UNI = (chainId: number): Token => ({
   chainId: chainId,
   decimals: 18,
   address: UNI_ADDRESSES[chainId] || UNI_ADDRESSES[1],
   name: 'Uniswap',
   symbol: 'UNI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
-  pairableTokens: [],
-  totalValueLockedUSD: 0,
 });
 
 const YFI_ADDRESSES = {
@@ -100,13 +91,11 @@ const YFI_ADDRESSES = {
   [NETWORKS.kovan.chainId]: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
 };
 
-export const YFI = (chainId: number) => ({
+export const YFI = (chainId: number): Token => ({
   chainId: chainId,
   decimals: 18,
   address: YFI_ADDRESSES[chainId] || YFI_ADDRESSES[1],
   name: 'Yearn Finance',
   symbol: 'YFI',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
-  pairableTokens: [],
-  totalValueLockedUSD: 0,
 });

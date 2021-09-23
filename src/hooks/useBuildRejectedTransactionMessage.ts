@@ -24,7 +24,6 @@ import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
 import useTokenList from './useTokenList';
 
 function useBuildTransactionMessages() {
-  const tokenList = useTokenList();
   const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
@@ -130,26 +129,22 @@ function useBuildTransactionMessages() {
           break;
         case TRANSACTION_TYPES.NEW_PAIR:
           const newPairTypeData = tx.typeData as NewPairTypeData;
-          message = `Creating the pair ${tokenList[newPairTypeData.token0].symbol}:${
-            tokenList[newPairTypeData.token1].symbol
-          }`;
+          message = `Creating the pair ${newPairTypeData.token0.symbol}:${newPairTypeData.token1.symbol}`;
           break;
         case TRANSACTION_TYPES.APPROVE_TOKEN:
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
           const pair = find(availablePairs, { id: tokenApprovalTypeData.pair });
           if (pair) {
-            message = `Approving your ${tokenList[tokenApprovalTypeData.id].symbol} to be used in the pair ${
-              tokenList[pair.token0].symbol
-            }:${tokenList[pair.token1].symbol}`;
+            message = `Approving your ${tokenApprovalTypeData.token.symbol} to be used in the pair ${pair.token0.symbol}:${pair.token1.symbol}`;
           } else {
-            message = `Approving your ${tokenList[tokenApprovalTypeData.id].symbol}`;
+            message = `Approving your ${tokenApprovalTypeData.token.symbol}`;
           }
           break;
       }
 
       return `${message} has been canceled or gas price has changed. If you have changed the gas price, once the transaction finishes you can reload the app and see your changes reflected.`;
     },
-    [availablePairs, tokenList, currentPositions, pastPositions]
+    [availablePairs, currentPositions, pastPositions]
   );
 }
 

@@ -21,10 +21,8 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
-import useTokenList from './useTokenList';
 
 function useBuildTransactionMessages() {
-  const tokenList = useTokenList();
   const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
@@ -132,26 +130,22 @@ function useBuildTransactionMessages() {
           break;
         case TRANSACTION_TYPES.NEW_PAIR:
           const newPairTypeData = tx.typeData as NewPairTypeData;
-          message = `The pair ${tokenList[newPairTypeData.token0].symbol}:${
-            tokenList[newPairTypeData.token1].symbol
-          } has been created`;
+          message = `The pair ${newPairTypeData.token0.symbol}:${newPairTypeData.token1.symbol} has been created`;
           break;
         case TRANSACTION_TYPES.APPROVE_TOKEN:
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
           const pair = find(availablePairs, { id: tokenApprovalTypeData.pair });
           if (pair) {
-            message = `${tokenList[tokenApprovalTypeData.id].symbol} is now ready to be used in the pair ${
-              tokenList[pair.token0].symbol
-            }:${tokenList[pair.token1].symbol}`;
+            message = `${tokenApprovalTypeData.token.symbol} is now ready to be used in the pair ${pair.token0.symbol}:${pair.token1.symbol}`;
           } else {
-            message = `${tokenList[tokenApprovalTypeData.id].symbol} is now ready to be used`;
+            message = `${tokenApprovalTypeData.token.symbol} is now ready to be used`;
           }
           break;
       }
 
       return message;
     },
-    [availablePairs, tokenList, currentPositions, pastPositions]
+    [availablePairs, currentPositions, pastPositions]
   );
 }
 

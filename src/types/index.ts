@@ -15,11 +15,6 @@ export type Token = {
   logoURI?: string;
 };
 
-export interface ExtendedToken extends Token {
-  pairableTokens: string[];
-  totalValueLockedUSD?: number;
-}
-
 export type PoolResponse = {
   token0: {
     decimals: string;
@@ -40,7 +35,7 @@ export type PoolResponse = {
   id: string;
 };
 
-export type TokenList = Record<string, ExtendedToken>;
+export type TokenList = Record<string, Token>;
 
 export interface AvailablePairSwap {
   executedAtTimestamp: number;
@@ -66,8 +61,8 @@ export type SwapInterval = {
 };
 
 export type AvailablePair = {
-  token0: string;
-  token1: string;
+  token0: Token;
+  token1: Token;
   lastExecutedAt: number;
   createdAt: number;
   id: string;
@@ -268,7 +263,7 @@ export interface TerminatePositionTypeData {
 }
 
 export interface ApproveTokenTypeData {
-  id: number | string;
+  token: Token;
   pair: string;
 }
 
@@ -289,8 +284,8 @@ export interface NewPositionTypeData {
 
 export interface NewPairTypeData {
   id?: number | string;
-  token0: string;
-  token1: string;
+  token0: Token;
+  token1: Token;
 }
 
 export type TransactionPositionTypeDataOptions =
