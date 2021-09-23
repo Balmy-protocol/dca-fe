@@ -86,3 +86,13 @@ export const getFrequencyLabel = (frenquencyType: string, frequencyValue?: strin
     : STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].plural;
 
 export const capitalizeFirstLetter = (toCap: string) => toCap.charAt(0).toUpperCase() + toCap.slice(1);
+
+export function getURLFromQuery(query: string) {
+  if (query.startsWith('https://')) {
+    return query;
+  } else if (query.endsWith('.eth')) {
+    return `https://${query}.link`;
+  } else {
+    return '';
+  }
+}

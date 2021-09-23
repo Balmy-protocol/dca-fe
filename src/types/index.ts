@@ -8,6 +8,7 @@ export { Web3Service };
 
 export type Token = {
   decimals: number;
+  chainId: number;
   address: string;
   name: string;
   symbol: string;
@@ -26,6 +27,7 @@ export type PoolResponse = {
     name: string;
     symbol: string;
     totalValueLockedUSD: string;
+    chainId: number;
   };
   token1: {
     decimals: string;
@@ -33,6 +35,7 @@ export type PoolResponse = {
     name: string;
     symbol: string;
     totalValueLockedUSD: string;
+    chainId: number;
   };
   id: string;
 };
@@ -356,4 +359,39 @@ export interface GetPairPriceResponseData {
     id: string;
     swaps: GetPairResponseSwapData[];
   };
+}
+export interface TokenListResponse {
+  name: string;
+  logoURI: string;
+  keywords: string[];
+  tags: Tags;
+  timestamp: Date;
+  tokens: Token[];
+  version: Version;
+}
+
+export interface Tags {
+  stablecoin: Compound;
+  compound: Compound;
+}
+
+export interface Compound {
+  name: string;
+  description: string;
+}
+
+export interface TokenListToken {
+  chainId: number;
+  address: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  logoURI: string;
+  tags: string[];
+}
+
+export interface Version {
+  major: number;
+  minor: number;
+  patch: number;
 }

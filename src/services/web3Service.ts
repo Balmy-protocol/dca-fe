@@ -36,9 +36,10 @@ import {
   ResetPositionTypeData,
   ModifyRateAndSwapsPositionTypeData,
   PoolLiquidityData,
+  TokenListResponse,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
-import { sortTokens } from 'utils/parsing';
+import { getURLFromQuery, sortTokens } from 'utils/parsing';
 
 // GQL queries
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
@@ -64,6 +65,7 @@ import {
   MEAN_GRAPHQL_URL,
   NETWORKS,
   RATE_TYPE,
+  TOKEN_LISTS,
   TRANSACTION_TYPES,
   UNI_GRAPHQL_URL,
 } from 'config/constants';
@@ -428,6 +430,7 @@ export default class Web3Service {
               address: pool.token0.id,
               name: pool.token0.name,
               symbol: pool.token0.symbol,
+              chainId: pool.token0.chainId,
               pairableTokens: [],
               totalValueLockedUSD: parseFloat(pool.token0.totalValueLockedUSD),
             };
@@ -438,6 +441,7 @@ export default class Web3Service {
               address: pool.token1.id,
               name: pool.token1.name,
               symbol: pool.token1.symbol,
+              chainId: pool.token1.chainId,
               pairableTokens: [],
               totalValueLockedUSD: parseFloat(pool.token1.totalValueLockedUSD),
             };
@@ -494,6 +498,24 @@ export default class Web3Service {
         },
         { [ETH.address]: ETH, [WETH(chain.chainId).address]: WETH(chain.chainId) }
       );
+    } else {
+      const tokensPromises: Promise<AxiosResponse<TokenListResponse>>[] = [];
+      Object.keys(TOKEN_LISTS).forEach((tokenListUrl) => tokensPromises.push(axios.get(getURLFromQuery(tokenListUrl))));
+
+      const values = await Promise.all(tokensPromises);
+
+      this.tokenList = {};
+
+      values.forEach((tokenListResponse) => {
+        tokenListResponse.data.tokens.forEach(
+          (token) =>
+            (this.tokenList[token.address.toLowerCase()] = {
+              ...token,
+              address: token.address.toLowerCase(),
+              pairableTokens: [],
+            })
+        );
+      });
     }
   }
 

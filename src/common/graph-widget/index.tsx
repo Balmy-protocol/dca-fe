@@ -173,6 +173,7 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   decimals: 1,
   isBaseToken: false,
   name: '',
+  chainId: 0,
 };
 const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const client = useDCAGraphql();

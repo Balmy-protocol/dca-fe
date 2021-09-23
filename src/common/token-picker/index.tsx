@@ -216,7 +216,8 @@ const TokenPicker = ({
             tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
           !usedTokens.includes(el) &&
-          !extendedIgnoredValues.includes(el)
+          !extendedIgnoredValues.includes(el) &&
+          tokenList[el].chainId === currentNetwork.chainId
       ),
       [(el) => tokenList[el].totalValueLockedUSD]
     );
@@ -234,7 +235,7 @@ const TokenPicker = ({
     }
 
     return orderedTokenKeys;
-  }, [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeysToUse, availableFrom]);
+  }, [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeysToUse, availableFrom, currentNetwork.chainId]);
 
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>

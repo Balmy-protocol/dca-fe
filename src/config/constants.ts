@@ -152,3 +152,18 @@ export const POSSIBLE_ACTIONS = {
   createPosition: 'createPosition',
   approveToken: 'approveToken',
 };
+
+export const TOKEN_LISTS = {
+  'tokens.1inch.eth': {
+    name: '1inch',
+    homepage: '',
+  },
+  'https://www.gemini.com/uniswap/manifest.json': {
+    name: 'Gemini Token List',
+    homepage: 'https://www.gemini.com/',
+  },
+  'https://gateway.ipfs.io/ipns/tokens.uniswap.org': {
+    name: 'Uniswap Default List',
+    homepage: '',
+  },
+};

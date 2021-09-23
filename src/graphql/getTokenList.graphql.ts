@@ -10,6 +10,7 @@ const getTokenList = gql`
         symbol
         name
         totalValueLockedUSD
+        chainId
       }
       token1 {
         id
@@ -17,6 +18,7 @@ const getTokenList = gql`
         symbol
         name
         totalValueLockedUSD
+        chainId
       }
     }
   }
