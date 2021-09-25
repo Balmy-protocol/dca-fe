@@ -14,7 +14,10 @@ interface AppFrameProps {
   isLoading: boolean;
 }
 
-const StyledGridContainer = styled(Grid)<{ isLoading: boolean }>`
+const StyledGridContainer = styled(Grid).withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
+})<{ isLoading: boolean }>`
   ${(props) => (props.isLoading ? 'height: 100%;' : '')}
   background-color: #E5E5E5;
 `;
@@ -24,13 +27,19 @@ const StyledNavBarGridContainer = styled(Grid)`
   margin-top: 40px !important;
 `;
 
-const StyledAppGridContainer = styled(Grid)<{ isLoading: boolean }>`
+const StyledAppGridContainer = styled(Grid).withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
+})<{ isLoading: boolean }>`
   ${(props) => (props.isLoading ? 'height: 100%;' : '')}
   flex: 1;
   margin-top: 40px !important;
 `;
 
-const StyledContainer = styled(Container)<{ isLoading: boolean }>`
+const StyledContainer = styled(Container).withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
+})<{ isLoading: boolean }>`
   height: ${(props) => (props.isLoading ? '100%' : 'auto')};
   background-color: #e5e5e5;
 `;

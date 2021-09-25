@@ -220,6 +220,13 @@ const Swap = ({
     !from || !web3Service.getAccount() || !existingPair || hasPendingApproval
   );
 
+  const [hasPool, isLoadingHasPool, hasPoolErrors] = usePromise<boolean>(
+    web3Service,
+    'hasPool',
+    [from, to],
+    !from || !to
+  );
+
   React.useEffect(() => {
     setRate(
       (fromValue &&
@@ -491,7 +498,7 @@ const Swap = ({
 
   const isETH = from.address === ETH.address;
 
-  const ignoreValues = [from, to];
+  const ignoreValues = [from.address, to.address];
 
   const CreatePairButton = (
     <StyledButton
@@ -499,10 +506,10 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="warning"
-      disabled={!!pairExists || hasPendingPairCreation || isLoading}
+      disabled={!!pairExists || hasPendingPairCreation || isLoading || isLoadingHasPool}
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPair as keyof typeof POSSIBLE_ACTIONS)}
     >
-      {!isLoading && (
+      {!isLoading && !isLoadingHasPool && (
         <Typography variant="body1">
           {hasPendingPairCreation ? (
             <FormattedMessage description="pair being created" defaultMessage="This pair is being created" />
@@ -518,7 +525,7 @@ const Swap = ({
           )}
         </Typography>
       )}
-      {isLoading && <CenteredLoadingIndicator />}
+      {(isLoading || isLoadingHasPool) && <CenteredLoadingIndicator />}
     </StyledButton>
   );
 
@@ -552,6 +559,7 @@ const Swap = ({
       color="primary"
       disabled={!!isApproved || hasPendingApproval || isLoading}
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
+      style={{ pointerEvents: 'all' }}
     >
       <Typography variant="body1">
         {hasPendingApproval ? (
@@ -586,6 +594,7 @@ const Swap = ({
       color="primary"
       disabled={!isETH || cantFund || !fromValue || hasPendingWrap}
       onClick={handleWrapToken}
+      style={{ pointerEvents: 'all' }}
     >
       <Typography variant="body1">
         {hasPendingWrap ? (
@@ -607,17 +616,17 @@ const Swap = ({
     <StyledButton
       size="large"
       variant="contained"
-      disabled={shouldDisableButton || isLoading}
+      disabled={shouldDisableButton || isLoading || isLoadingHasPool}
       color="secondary"
       fullWidth
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
-      {!isLoading && (
+      {!isLoading && !isLoadingHasPool && (
         <Typography variant="body1">
           <FormattedMessage description="create position" defaultMessage="Create position" />
         </Typography>
       )}
-      {isLoading && <CenteredLoadingIndicator />}
+      {(isLoading || isLoadingHasPool) && <CenteredLoadingIndicator />}
     </StyledButton>
   );
 
@@ -629,11 +638,38 @@ const Swap = ({
     </StyledButton>
   );
 
+  const PairNotSupportedButton = (
+    <StyledButton size="large" color="error" variant="contained" fullWidth disabled style={{ pointerEvents: 'all' }}>
+      <Typography variant="body1">
+        <FormattedMessage description="pairNotOnUniswap" defaultMessage="We do not support this pair" />
+      </Typography>
+      <Tooltip
+        title="If you want to use this pair of tokens you must first create a pool for it on UniswapV3"
+        arrow
+        placement="top"
+      >
+        <StyledHelpOutlineIcon fontSize="small" />
+      </Tooltip>
+    </StyledButton>
+  );
+
+  const LoadingButton = (
+    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+      <CenteredLoadingIndicator />
+    </StyledButton>
+  );
+
   let ButtonToShow;
+
+  console.log(hasPool, isLoadingHasPool);
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
+  } else if (isLoading || isLoadingHasPool) {
+    ButtonToShow = LoadingButton;
+  } else if (!hasPool && !isLoadingHasPool) {
+    ButtonToShow = PairNotSupportedButton;
   } else if (isETH) {
     ButtonToShow = WrapButton;
   } else if (!pairExists) {

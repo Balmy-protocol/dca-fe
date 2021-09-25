@@ -15,6 +15,12 @@ export type Token = {
   logoURI?: string;
 };
 
+export type GetPoolResponse = {
+  pools: {
+    id: string;
+  }[];
+};
+
 export type PoolResponse = {
   token0: {
     decimals: string;
@@ -82,6 +88,7 @@ export type Web3ServicePromisableMethods =
   | 'createPair'
   | 'getAvailablePairs'
   | 'getAllowance'
+  | 'hasPool'
   | 'getPastPositions';
 
 export type PositionResponse = {
@@ -355,6 +362,16 @@ export interface GetPairPriceResponseData {
     swaps: GetPairResponseSwapData[];
   };
 }
+export interface TokensLists {
+  name: string;
+  logoURI: string;
+  keywords: string[];
+  tags: Tags;
+  timestamp: Date;
+  tokens: TokenList;
+  version: Version;
+}
+
 export interface TokenListResponse {
   name: string;
   logoURI: string;

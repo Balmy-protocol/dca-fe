@@ -166,4 +166,8 @@ export const TOKEN_LISTS = {
     name: 'Uniswap Default List',
     homepage: '',
   },
+  'https://tokens.coingecko.com/uniswap/all.json': {
+    name: 'CoinGecko',
+    homepage: '',
+  },
 };

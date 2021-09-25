@@ -17,6 +17,7 @@ import store from 'state';
 import TransactionUpdater from 'state/transactions/transactionUpdater';
 import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
 import { SnackbarProvider } from 'notistack';
+import { setupCache } from 'axios-cache-adapter';
 
 const theme = createMuiTheme();
 
@@ -31,6 +32,16 @@ function loadLocaleData(locale: string) {
       return EnMessages;
   }
 }
+
+// Create `axios-cache-adapter` instance
+const cache = setupCache({
+  maxAge: 15 * 60 * 1000,
+});
+
+// Create `axios` instance passing the newly created `cache.adapter`
+const axiosClient = axios.create({
+  adapter: cache.adapter,
+});
 
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
   const [account, setAccount] = React.useState('');
@@ -58,6 +69,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
         account,
         graphPricesClient: web3Service.getUNIGraphqlClient().getClient(),
         DCASubgraph: web3Service.getDCAGraphqlClient().getClient(),
+        axiosClient,
       }}
     >
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}

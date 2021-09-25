@@ -21,7 +21,6 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
-import useTokenList from './useTokenList';
 
 function useBuildTransactionMessages() {
   const availablePairs = useAvailablePairs();

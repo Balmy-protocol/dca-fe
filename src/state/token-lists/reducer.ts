@@ -5,7 +5,9 @@ export interface TokenListsState {
   [tokenListName: string]: boolean;
 }
 
-export const initialState: TokenListsState = {};
+export const initialState: TokenListsState = {
+  'https://gateway.ipfs.io/ipns/tokens.uniswap.org': true,
+};
 
 export default createReducer(initialState, (builder) =>
   builder.addCase(enableTokenList, (tokenLists, { payload: { tokenList, enabled } }) => {

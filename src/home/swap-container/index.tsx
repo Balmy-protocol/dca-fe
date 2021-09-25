@@ -5,7 +5,6 @@ import GraphWidget from 'common/graph-widget';
 import find from 'lodash/find';
 import WalletContext from 'common/wallet-context';
 import { useQuery } from '@apollo/client';
-import useTokenList from 'hooks/useTokenList';
 import Swap from './components/swap';
 import { DAY_IN_SECONDS } from 'utils/parsing';
 import { WETH, DAI, UNI, ETH, USDC } from 'mocks/tokens';
@@ -22,6 +21,11 @@ const SwapContainer = () => {
   const currentNetwork = useCurrentNetwork();
   const [from, setFrom] = React.useState(USDC(currentNetwork.chainId));
   const [to, setTo] = React.useState(WETH(currentNetwork.chainId));
+
+  React.useEffect(() => {
+    setFrom(USDC(currentNetwork.chainId));
+    setTo(WETH(currentNetwork.chainId));
+  }, [currentNetwork.chainId]);
 
   const onSetFrom = (newFrom: Token) => {
     // check for decimals

@@ -68,7 +68,7 @@ const NetworkMenu = ({ open, onClose }: NetworkMenuProps) => {
         </Typography>
         <StyledSupportedNetworksContainer>
           {SUPPORTED_NETWORKS.map((chainId) => (
-            <StyledWalletInformationContainer variant="outlined">
+            <StyledWalletInformationContainer variant="outlined" key={chainId}>
               <StyledNetworkItemContainer>
                 <Typography variant="body1">{(find(NETWORKS, { chainId }) || { name: '' }).name}</Typography>
                 {currentNetwork.chainId !== chainId && (

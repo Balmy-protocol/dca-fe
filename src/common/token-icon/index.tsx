@@ -16,9 +16,6 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
   const [hasError, setHasError] = React.useState(false);
   let componentToRender = null;
 
-  if (token?.symbol === 'WETH') {
-    console.log(token);
-  }
   if (CryptoIcons[token?.address as keyof typeof CryptoIcons]) {
     componentToRender = (
       <SvgIcon
@@ -29,7 +26,9 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
       />
     );
   } else if (token?.logoURI && !hasError) {
-    componentToRender = <img src={token.logoURI} onError={() => setHasError(true)} height="32" width="32" />;
+    componentToRender = (
+      <img src={token.logoURI} onError={() => setHasError(true)} height={realSize} width={realSize} />
+    );
   } else {
     componentToRender = <HelpIcon style={{ fontSize: realSize }} className={isInChip ? 'MuiChip-icon' : ''} />;
   }

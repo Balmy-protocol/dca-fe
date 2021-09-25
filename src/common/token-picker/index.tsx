@@ -1,13 +1,14 @@
 import React, { CSSProperties } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
+import axios, { AxiosResponse } from 'axios';
 import reverse from 'lodash/reverse';
 import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
 import sortBy from 'lodash/sortBy';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@material-ui/core/Slide';
-import { Token, TokenList } from 'types';
+import { Token, TokenList, TokenListResponse } from 'types';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -30,8 +31,11 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { useTokenLists } from 'state/token-lists/hooks';
 import useTokenList from 'hooks/useTokenList';
+import Button from 'common/button';
+import { TOKEN_LISTS } from 'config/constants';
+import Card from '@material-ui/core/Card';
+import TokenLists from 'common/token-lists';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 interface PartialTheme {
@@ -92,6 +96,11 @@ const StyledListItem = styled(ListItem)`
   padding-left: 0px;
 `;
 
+const StyledButton = styled(Button)`
+  padding: 18px 22px;
+  border-radius: 12px;
+`;
+
 const StyledList = styled(List)`
   scrollbar-width: thin;
   scrollbar-color: var(--thumbBG) var(--scrollbarBG);
@@ -134,7 +143,7 @@ interface TokenPickerProps {
   onClose: () => void;
   isFrom: boolean;
   usedTokens: string[];
-  ignoreValues: Token[];
+  ignoreValues: string[];
 }
 
 const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps) => {
@@ -170,20 +179,34 @@ const TokenPicker = ({
   onChange,
   ignoreValues,
   usedTokens,
+  selected,
 }: TokenPickerProps) => {
   const tokenList = useTokenList();
   const [search, setSearch] = React.useState('');
   const [isOnlyPairs, setIsOnlyPairs] = React.useState(false);
+  const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
   let tokenKeysToUse: string[] = [];
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const inputStyles = useSearchInputStyles();
-  const extendedIgnoredValues = isFrom ? ignoreValues : [...ignoreValues, ETH.address];
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
+  const extendedIgnoredValues = isFrom
+    ? [
+        ...ignoreValues,
+        ...(ignoreValues.includes(WETH(currentNetwork.chainId).address) &&
+        selected.address !== WETH(currentNetwork.chainId).address
+          ? [ETH.address]
+          : []),
+      ]
+    : [...ignoreValues, ETH.address];
 
   const handleOnClose = () => {
-    setSearch('');
-    onClose();
+    if (shouldShowTokenLists) {
+      setShouldShowTokenLists(false);
+    } else {
+      setSearch('');
+      onClose();
+    }
   };
 
   const handleItemSelected = (item: string) => {
@@ -210,21 +233,9 @@ const TokenPicker = ({
   );
 
   const memoizedTokenKeys = React.useMemo(() => {
-    // let orderedTokenKeys = sortBy(
-    //   tokenKeysToUse.filter(
-    //     (el) =>
-    //       (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
-    //         tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
-    //         tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
-    //       !usedTokens.includes(el) &&
-    //       !extendedIgnoredValues.includes(el) &&
-    //       tokenList[el].chainId === currentNetwork.chainId
-    //   ),
-    //   [(el) => tokenList[el].totalValueLockedUSD]
-    // );
-
     let filteredTokenKeys = tokenKeysToUse.filter(
       (el) =>
+        tokenList[el] &&
         (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
           tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
           tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
@@ -232,8 +243,6 @@ const TokenPicker = ({
         !extendedIgnoredValues.includes(el) &&
         tokenList[el].chainId === currentNetwork.chainId
     );
-
-    // reverse(filteredTokenKeys);
 
     if (filteredTokenKeys.findIndex((el) => el === WETH(currentNetwork.chainId).address) !== -1) {
       remove(filteredTokenKeys, (token) => token === WETH(currentNetwork.chainId).address);
@@ -260,73 +269,96 @@ const TokenPicker = ({
           <CloseIcon fontSize="inherit" />
         </IconButton>
         <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
-          <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-            <Typography variant="h6">
-              {isFrom ? (
-                <FormattedMessage description="You pay" defaultMessage="You pay" />
-              ) : (
-                <FormattedMessage description="You get" defaultMessage="You get" />
-              )}
-            </Typography>
-            <FormGroup row>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={isOnlyPairs}
-                    onChange={() => setIsOnlyPairs(!isOnlyPairs)}
-                    name="isOnlyPairs"
-                    color="primary"
-                  />
-                }
-                label="Only tokens with created pairs"
-              />
-            </FormGroup>
-          </Grid>
-          <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
-            <InputBase
-              classes={inputStyles}
-              placeholder={'Search by ETH, Ethereum or Ether'}
-              startAdornment={<Search />}
-              fullWidth
-              onChange={(evt) => setSearch(evt.currentTarget.value)}
-            />
-          </StyledGrid>
-          {!!memoizedUsedTokens.length && (
+          {shouldShowTokenLists ? (
+            <TokenLists />
+          ) : (
             <>
-              <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
-                <Typography variant="caption">
-                  <FormattedMessage description="your tokens" defaultMessage="Tokens in your wallet" />
-                </Typography>
-              </StyledGrid>
               <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-                {memoizedUsedTokens.map((token) => (
-                  <StyledChip
-                    icon={<TokenIcon size="24px" token={tokenList[token]} isInChip />}
-                    label={tokenList[token].symbol}
-                    onClick={() => handleItemSelected(token)}
-                    key={tokenList[token].address}
+                <Typography variant="h6">
+                  {isFrom ? (
+                    <FormattedMessage description="You pay" defaultMessage="You pay" />
+                  ) : (
+                    <FormattedMessage description="You get" defaultMessage="You get" />
+                  )}
+                </Typography>
+                <FormGroup row>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={isOnlyPairs}
+                        onChange={() => setIsOnlyPairs(!isOnlyPairs)}
+                        name="isOnlyPairs"
+                        color="primary"
+                      />
+                    }
+                    label="Only tokens with created pairs"
                   />
-                ))}
+                </FormGroup>
               </Grid>
               <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
-                <Divider />
+                <InputBase
+                  classes={inputStyles}
+                  placeholder={'Search by ETH, Ethereum or Ether'}
+                  startAdornment={<Search />}
+                  fullWidth
+                  onChange={(evt) => setSearch(evt.currentTarget.value)}
+                />
+              </StyledGrid>
+              {!!memoizedUsedTokens.length && (
+                <>
+                  <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
+                    <Typography variant="caption">
+                      <FormattedMessage description="your tokens" defaultMessage="Tokens in your wallet" />
+                    </Typography>
+                  </StyledGrid>
+                  <Grid item xs={12} style={{ flexBasis: 'auto' }}>
+                    {memoizedUsedTokens.map((token) => (
+                      <StyledChip
+                        icon={<TokenIcon size="24px" token={tokenList[token]} isInChip />}
+                        label={tokenList[token].symbol}
+                        onClick={() => handleItemSelected(token)}
+                        key={tokenList[token].address}
+                      />
+                    ))}
+                  </Grid>
+                  <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
+                    <Divider />
+                  </StyledGrid>
+                </>
+              )}
+              <StyledGrid item xs={12} customSpacing={12} style={{ flexGrow: 1 }}>
+                <AutoSizer>
+                  {({ height, width }) => (
+                    <StyledList
+                      height={height}
+                      itemCount={memoizedTokenKeys.length}
+                      itemSize={52}
+                      width={width}
+                      itemData={{ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }}
+                    >
+                      {Row}
+                    </StyledList>
+                  )}
+                </AutoSizer>
               </StyledGrid>
             </>
           )}
-          <StyledGrid item xs={12} customSpacing={12} style={{ flexGrow: 1 }}>
-            <AutoSizer>
-              {({ height, width }) => (
-                <StyledList
-                  height={height}
-                  itemCount={memoizedTokenKeys.length}
-                  itemSize={52}
-                  width={width}
-                  itemData={{ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }}
-                >
-                  {Row}
-                </StyledList>
-              )}
-            </AutoSizer>
+          <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
+            <StyledButton
+              size="large"
+              variant="contained"
+              color="default"
+              fullWidth
+              onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}
+            >
+              <Typography variant="body1">
+                {!shouldShowTokenLists ? (
+                  <FormattedMessage description="manage token list" defaultMessage="Manage Token Lists" />
+                ) : (
+                  <FormattedMessage description="doneManagingTokenLists" defaultMessage="Done" />
+                )}
+              </Typography>
+            </StyledButton>
           </StyledGrid>
         </Grid>
       </StyledOverlay>

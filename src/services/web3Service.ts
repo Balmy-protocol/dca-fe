@@ -37,6 +37,7 @@ import {
   ModifyRateAndSwapsPositionTypeData,
   PoolLiquidityData,
   TokenListResponse,
+  GetPoolResponse,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { getURLFromQuery, sortTokens } from 'utils/parsing';
@@ -44,6 +45,7 @@ import { getURLFromQuery, sortTokens } from 'utils/parsing';
 // GQL queries
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
 import GET_TOKEN_LIST from 'graphql/getTokenList.graphql';
+import GET_POOLS from 'graphql/getPool.graphql';
 import GET_POSITIONS from 'graphql/getPositions.graphql';
 import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
 import gqlFetchAll from 'utils/gqlFetchAll';
@@ -65,6 +67,7 @@ import {
   MEAN_GRAPHQL_URL,
   NETWORKS,
   RATE_TYPE,
+  SUPPORTED_NETWORKS,
   TOKEN_LISTS,
   TRANSACTION_TYPES,
   UNI_GRAPHQL_URL,
@@ -341,6 +344,8 @@ export default class Web3Service {
       createdAt: pair.createdAtTimestamp,
     }));
 
+    this.tokenList = {};
+
     if (chain.chainId !== NETWORKS.mainnet.chainId) {
       const tokenListResponse = await gqlFetchAllById(this.uniClient.getClient(), GET_TOKEN_LIST, {}, 'pools');
 
@@ -430,7 +435,7 @@ export default class Web3Service {
               address: pool.token0.id,
               name: pool.token0.name,
               symbol: pool.token0.symbol,
-              chainId: pool.token0.chainId,
+              chainId: (SUPPORTED_NETWORKS[chain.chainId] && chain.chainId) || NETWORKS.mainnet.chainId,
             };
           }
           if (!acc[pool.token1.id]) {
@@ -439,7 +444,7 @@ export default class Web3Service {
               address: pool.token1.id,
               name: pool.token1.name,
               symbol: pool.token1.symbol,
-              chainId: pool.token1.chainId,
+              chainId: (SUPPORTED_NETWORKS[chain.chainId] && chain.chainId) || NETWORKS.mainnet.chainId,
             };
           }
 
@@ -471,23 +476,6 @@ export default class Web3Service {
         },
         { [ETH.address]: ETH, [WETH(chain.chainId).address]: WETH(chain.chainId) }
       );
-    } else {
-      const tokensPromises: Promise<AxiosResponse<TokenListResponse>>[] = [];
-      Object.keys(TOKEN_LISTS).forEach((tokenListUrl) => tokensPromises.push(axios.get(getURLFromQuery(tokenListUrl))));
-
-      const values = await Promise.all(tokensPromises);
-
-      this.tokenList = {};
-
-      values.forEach((tokenListResponse) => {
-        tokenListResponse.data.tokens.forEach(
-          (token) =>
-            (this.tokenList[token.address.toLowerCase()] = {
-              ...token,
-              address: token.address.toLowerCase(),
-            })
-        );
-      });
     }
   }
 
@@ -1015,5 +1003,28 @@ export default class Web3Service {
     }, 0);
 
     return liquidity;
+  }
+
+  async hasPool(token0: Token, token1: Token) {
+    const [tokenA, tokenB] = sortTokens(token0, token1);
+
+    // if they are not connected we show everything as available
+    if (!this.client) return true;
+
+    const chain = await this.client.getNetwork();
+
+    const poolsData = await this.uniClient.getClient().query<GetPoolResponse>({
+      query: GET_POOLS,
+      variables: {
+        tokenA: tokenA.address === ETH.address ? WETH(chain.chainId).address : tokenA.address,
+        tokenB: tokenB.address === ETH.address ? WETH(chain.chainId).address : tokenB.address,
+      },
+    });
+
+    const {
+      data: { pools },
+    } = poolsData;
+
+    return !!pools.length;
   }
 }
