@@ -10,16 +10,32 @@ const StyledPaper = styled(Paper)`
   border-radius: 10px;
 
   p {
-    margin: 10px 0px;
+    margin: 0px;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    margin: 0px;
+    margin-bottom: 12px;
+    font-weight: 500 !important;
+  }
+  ul {
+    margin: 0px;
+    margin-bottom: 24px;
+    li {
+      p {
+        margin: 0px;
+      }
+    }
   }
 `;
 
 const FAQFrame = () => (
   <Grid container>
     <StyledPaper>
-      <Grid container spacing={2}>
+      <Grid container spacing={0}>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage description="faqWhatIsMeanFinance" defaultMessage="What is Mean Finance?" />
           </Typography>
           <Typography variant="body1">
@@ -30,7 +46,7 @@ const FAQFrame = () => (
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage description="faqHowDoesMeanFinanceWork" defaultMessage="How does Mean Finance work?" />
           </Typography>
           <Typography variant="body1">
@@ -41,7 +57,7 @@ const FAQFrame = () => (
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage
               description="faqWhyShouldIUseMeanFinance"
               defaultMessage="Why should I use Mean Finance?"
@@ -87,7 +103,7 @@ const FAQFrame = () => (
           </ul>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage
               description="faqHowIsThePriceCalculatedForEachSwap"
               defaultMessage="How is the price calculated for each swap?"
@@ -101,7 +117,7 @@ const FAQFrame = () => (
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage description="faqIsMeanFinanceAudited" defaultMessage="Is Mean Finance audited?" />
           </Typography>
           <Typography variant="body1">
@@ -112,7 +128,7 @@ const FAQFrame = () => (
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage
               description="faqWhenDoINeedToPayGasFees"
               defaultMessage="When do I need to pay gas fees?"
@@ -172,7 +188,7 @@ const FAQFrame = () => (
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage description="faqDoINeedToPayAnyFees" defaultMessage="Do I need to pay any fees?" />
           </Typography>
           <Typography variant="body1">
@@ -195,7 +211,7 @@ const FAQFrame = () => (
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage
               description="faqWhatDoesItMeanForAPairToBeStale"
               defaultMessage="What does it mean for a pair to be stale?"
@@ -241,7 +257,7 @@ const FAQFrame = () => (
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage description="faqWhyIsMyPositionStale" defaultMessage="Why is my position stale?" />
           </Typography>
           <Typography variant="body1">
@@ -284,7 +300,7 @@ const FAQFrame = () => (
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5" component="h2">
             <FormattedMessage
               description="faqWhenWillMyPositionBeSwapped"
               defaultMessage="When will my position be swapped?"
