@@ -5,10 +5,16 @@ const getAvailablePairs = gql`
     pairs(first: $first, skip: $skip) {
       id
       tokenA {
-        id
+        address: id
+        decimals
+        name
+        symbol
       }
       tokenB {
-        id
+        address: id
+        decimals
+        name
+        symbol
       }
       swaps(first: 1, orderBy: executedAtTimestamp, orderDirection: desc) {
         executedAtTimestamp

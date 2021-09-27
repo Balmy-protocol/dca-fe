@@ -17,10 +17,16 @@ const getCurrentPositions = gql`
       totalSwapped
       totalWithdrawn
       from {
-        id
+        address: id
+        decimals
+        name
+        symbol
       }
       to {
-        id
+        address: id
+        decimals
+        name
+        symbol
       }
       pair {
         id

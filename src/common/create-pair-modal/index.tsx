@@ -89,7 +89,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
       const result = await web3Service.createPair(from.address, to.address);
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_PAIR,
-        typeData: { token0: from.address, token1: to.address },
+        typeData: { token0: from, token1: to },
       });
       setModalSuccess({
         hash: result.hash,

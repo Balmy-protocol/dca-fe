@@ -3,10 +3,9 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import PastPosition from './components/position';
-import { TokenList, Web3Service, PositionsRaw } from 'types';
+import { TokenList, Web3Service, Positions } from 'types';
 import usePromise from 'hooks/usePromise';
 import usePastPositions from 'hooks/usePastPositions';
-import useTokenList from 'hooks/useTokenList';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
 import EmptyPosition from 'common/empty-position';
@@ -24,7 +23,6 @@ const POSITIONS_PER_ROW = {
 };
 const History = ({ web3Service }: HistoryProps) => {
   const pastPositions = usePastPositions();
-  const tokenList = useTokenList();
   const currentBreakPoint = useCurrentBreakpoint();
 
   const positionsPerRow = POSITIONS_PER_ROW[currentBreakPoint];
@@ -41,11 +39,9 @@ const History = ({ web3Service }: HistoryProps) => {
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container spacing={2} alignItems="flex-start">
           {pastPositions
-            ? (pastPositions as PositionsRaw).map((position) => (
+            ? (pastPositions as Positions).map((position) => (
                 <Grid item xs={12} sm={6} md={3} key={position.id}>
-                  <PastPosition
-                    position={{ ...position, from: tokenList[position.from], to: tokenList[position.to] }}
-                  />
+                  <PastPosition position={position} />
                 </Grid>
               ))
             : null}

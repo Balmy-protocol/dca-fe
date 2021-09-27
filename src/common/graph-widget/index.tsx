@@ -12,7 +12,7 @@ import orderBy from 'lodash/orderBy';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { appleTabsStylesHook } from 'common/tabs';
-import getPool from 'graphql/getPool.graphql';
+import getPoolPrices from 'graphql/getPoolPrices.graphql';
 import { AvailablePair, GetPairPriceResponseData, GetPairResponseSwapData, Token } from 'types';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
@@ -173,8 +173,7 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   decimals: 1,
   isBaseToken: false,
   name: '',
-  totalValueLockedUSD: 0,
-  pairableTokens: [],
+  chainId: 0,
 };
 const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const client = useDCAGraphql();
@@ -221,7 +220,11 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   }
 
   const existingPair = React.useMemo(
-    () => find(availablePairs, { token0: tokenA.address, token1: tokenB.address }) as AvailablePair | null,
+    () =>
+      find(
+        availablePairs,
+        (pair) => pair.token0.address === tokenA.address && pair.token1.address === tokenB.address
+      ) as AvailablePair | null,
     [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]
   );
 
@@ -233,7 +236,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     client,
   });
 
-  const { loading: loadingPool, data } = useQuery<PoolsResponseData>(getPool, {
+  const { loading: loadingPool, data } = useQuery<PoolsResponseData>(getPoolPrices, {
     variables: {
       tokenA: tokenA.address,
       tokenB: tokenB.address,

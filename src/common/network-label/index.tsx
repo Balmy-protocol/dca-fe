@@ -14,7 +14,10 @@ const StyledConnectedCircle = styled.div<{ isMainnet: boolean }>`
   background-color: ${(props) => (props.isMainnet ? 'green' : 'rgb(245 183 24)')};
 `;
 
-const StyledButton = styled(Button)<{ isMainnet: boolean }>`
+const StyledButton = styled(Button).withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    (!['isMainnet'].includes(prop) && defaultValidatorFn(prop)) || ['startIcon'].includes(prop),
+})<{ isMainnet: boolean }>`
   border-radius: 30px;
   padding: 11px 16px;
   color: #333333;

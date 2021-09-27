@@ -156,8 +156,11 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
   const currentNetwork = useCurrentNetwork();
 
   const isPending = !!pendingTransaction;
-  const [token0, token1] = sortTokens(from.address, to.address);
-  const pair = find(availablePairs, { token0, token1 });
+  const [token0, token1] = sortTokens(from, to);
+  const pair = find(
+    availablePairs,
+    (pair) => pair.token0.address === token0.address && pair.token1.address === token1.address
+  );
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 

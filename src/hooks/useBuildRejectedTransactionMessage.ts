@@ -11,7 +11,7 @@ import {
   ModifySwapsPositionTypeData,
   ModifyRateAndSwapsPositionTypeData,
   NewPairTypeData,
-  PositionRaw,
+  Position,
   ApproveTokenTypeData,
   WrapEtherTypeData,
   ResetPositionTypeData,
@@ -21,10 +21,8 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
-import useTokenList from './useTokenList';
 
 function useBuildTransactionMessages() {
-  const tokenList = useTokenList();
   const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
@@ -49,8 +47,8 @@ function useBuildTransactionMessages() {
           const terminatePositionTypeData = tx.typeData as TerminatePositionTypeData;
           const terminatedPosition = find(positions, { id: terminatePositionTypeData.id });
           if (terminatedPosition) {
-            message = `Terminating your ${tokenList[(terminatedPosition as PositionRaw).from].symbol}:${
-              tokenList[(terminatedPosition as PositionRaw).to].symbol
+            message = `Terminating your ${(terminatedPosition as Position).from.symbol}:${
+              (terminatedPosition as Position).to.symbol
             } position`;
           }
           break;
@@ -58,8 +56,8 @@ function useBuildTransactionMessages() {
           const withdrawPositionTypeData = tx.typeData as WithdrawTypeData;
           const withdrawnPosition = find(positions, { id: withdrawPositionTypeData.id });
           if (withdrawnPosition) {
-            message = `Withdrawing from your ${tokenList[(withdrawnPosition as PositionRaw).from].symbol}:${
-              tokenList[(withdrawnPosition as PositionRaw).to].symbol
+            message = `Withdrawing from your ${(withdrawnPosition as Position).from.symbol}:${
+              (withdrawnPosition as Position).to.symbol
             } position`;
           }
           break;
@@ -67,23 +65,21 @@ function useBuildTransactionMessages() {
           const addFundsTypeData = tx.typeData as AddFundsTypeData;
           const fundedPosition = find(positions, { id: addFundsTypeData.id });
           if (fundedPosition) {
-            message = `Adding ${addFundsTypeData.newFunds} ${
-              tokenList[(fundedPosition as PositionRaw).from].symbol
-            } to your ${tokenList[(fundedPosition as PositionRaw).from].symbol}:${
-              tokenList[(fundedPosition as PositionRaw).to].symbol
-            } position`;
+            message = `Adding ${addFundsTypeData.newFunds} ${(fundedPosition as Position).from.symbol} to your ${
+              (fundedPosition as Position).from.symbol
+            }:${(fundedPosition as Position).to.symbol} position`;
           }
           break;
         case TRANSACTION_TYPES.RESET_POSITION:
           const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
           const resettedPosition = find(positions, { id: resetPositionTypeData.id });
           if (resettedPosition) {
-            message = `Adding ${resetPositionTypeData.newFunds} ${
-              tokenList[(resettedPosition as PositionRaw).from].symbol
-            } to your ${tokenList[(resettedPosition as PositionRaw).from].symbol}:${
-              tokenList[(resettedPosition as PositionRaw).to].symbol
-            } position and setting it to run for ${resetPositionTypeData.newSwaps} ${getFrequencyLabel(
-              (resettedPosition as PositionRaw).swapInterval.toString(),
+            message = `Adding ${resetPositionTypeData.newFunds} ${(resettedPosition as Position).from.symbol} to your ${
+              (resettedPosition as Position).from.symbol
+            }:${(resettedPosition as Position).to.symbol} position and setting it to run for ${
+              resetPositionTypeData.newSwaps
+            } ${getFrequencyLabel(
+              (resettedPosition as Position).swapInterval.toString(),
               resetPositionTypeData.newSwaps
             )}`;
           }
@@ -93,9 +89,9 @@ function useBuildTransactionMessages() {
           const removeFundedPosition = find(positions, { id: removeFundsTypeData.id });
           if (removeFundedPosition) {
             message = `Removing ${removeFundsTypeData.ammountToRemove} ${
-              tokenList[(removeFundedPosition as PositionRaw).from].symbol
-            } from your ${tokenList[(removeFundedPosition as PositionRaw).from].symbol}:${
-              tokenList[(removeFundedPosition as PositionRaw).to].symbol
+              (removeFundedPosition as Position).from.symbol
+            } from your ${(removeFundedPosition as Position).from.symbol}:${
+              (removeFundedPosition as Position).to.symbol
             } position`;
           }
           break;
@@ -104,10 +100,10 @@ function useBuildTransactionMessages() {
           const modifySwapsPositionTypeData = tx.typeData as ModifySwapsPositionTypeData;
           const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
           if (modifiedPosition) {
-            message = `Setting your ${tokenList[(modifiedPosition as PositionRaw).from].symbol}:${
-              tokenList[(modifiedPosition as PositionRaw).to].symbol
+            message = `Setting your ${(modifiedPosition as Position).from.symbol}:${
+              (modifiedPosition as Position).to.symbol
             } position to run for ${modifySwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
-              (modifiedPosition as PositionRaw).swapInterval.toString(),
+              (modifiedPosition as Position).swapInterval.toString(),
               modifySwapsPositionTypeData.newSwaps
             )}`;
           }
@@ -116,42 +112,38 @@ function useBuildTransactionMessages() {
           const modifyRateAndSwapsPositionTypeData = tx.typeData as ModifyRateAndSwapsPositionTypeData;
           const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
           if (modifiedRatePosition) {
-            message = `Setting your ${tokenList[(modifiedRatePosition as PositionRaw).from].symbol}:${
-              tokenList[(modifiedRatePosition as PositionRaw).to].symbol
+            message = `Setting your ${(modifiedRatePosition as Position).from.symbol}:${
+              (modifiedRatePosition as Position).to.symbol
             } position to swap ${modifyRateAndSwapsPositionTypeData.newRate} ${
-              tokenList[(modifiedRatePosition as PositionRaw).from].symbol
+              (modifiedRatePosition as Position).from.symbol
             } ${
               STRING_SWAP_INTERVALS[
-                (modifiedRatePosition as PositionRaw).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
+                (modifiedRatePosition as Position).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
               ].adverb
             } for ${modifyRateAndSwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
-              (modifiedRatePosition as PositionRaw).swapInterval.toString(),
+              (modifiedRatePosition as Position).swapInterval.toString(),
               modifyRateAndSwapsPositionTypeData.newSwaps
             )}`;
           }
           break;
         case TRANSACTION_TYPES.NEW_PAIR:
           const newPairTypeData = tx.typeData as NewPairTypeData;
-          message = `Creating the pair ${tokenList[newPairTypeData.token0].symbol}:${
-            tokenList[newPairTypeData.token1].symbol
-          }`;
+          message = `Creating the pair ${newPairTypeData.token0.symbol}:${newPairTypeData.token1.symbol}`;
           break;
         case TRANSACTION_TYPES.APPROVE_TOKEN:
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
           const pair = find(availablePairs, { id: tokenApprovalTypeData.pair });
           if (pair) {
-            message = `Approving your ${tokenList[tokenApprovalTypeData.id].symbol} to be used in the pair ${
-              tokenList[pair.token0].symbol
-            }:${tokenList[pair.token1].symbol}`;
+            message = `Approving your ${tokenApprovalTypeData.token.symbol} to be used in the pair ${pair.token0.symbol}:${pair.token1.symbol}`;
           } else {
-            message = `Approving your ${tokenList[tokenApprovalTypeData.id].symbol}`;
+            message = `Approving your ${tokenApprovalTypeData.token.symbol}`;
           }
           break;
       }
 
       return `${message} has been canceled or gas price has changed. If you have changed the gas price, once the transaction finishes you can reload the app and see your changes reflected.`;
     },
-    [availablePairs, tokenList, currentPositions, pastPositions]
+    [availablePairs, currentPositions, pastPositions]
   );
 }
 

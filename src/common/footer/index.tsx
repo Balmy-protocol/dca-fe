@@ -48,21 +48,27 @@ export default React.memo(function OceanAppFooter() {
                   <StyledCategoryTitle>
                     <FormattedMessage description="community" defaultMessage="Community" />
                   </StyledCategoryTitle>
-                  <CategoryItem>
-                    <Link href="https://github.com/Mean-Finance/dca" target="_blank" color="inherit">
-                      <StyledIconContainer>
-                        <GitHubIcon fontSize="inherit" />
-                      </StyledIconContainer>
-                      <FormattedMessage description="github" defaultMessage="Github" />
-                    </Link>
+                  <CategoryItem
+                    href="https://github.com/Mean-Finance/dca"
+                    target="_blank"
+                    color="inherit"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <StyledIconContainer>
+                      <GitHubIcon fontSize="inherit" />
+                    </StyledIconContainer>
+                    <FormattedMessage description="github" defaultMessage="Github" />
                   </CategoryItem>
-                  <CategoryItem>
-                    <Link href="https://twitter.com/mean_fi" target="_blank" color="inherit">
-                      <StyledIconContainer>
-                        <TwitterIcon fontSize="inherit" />
-                      </StyledIconContainer>
-                      <FormattedMessage description="twitter" defaultMessage="Twitter" />
-                    </Link>
+                  <CategoryItem
+                    href="https://twitter.com/mean_fi"
+                    target="_blank"
+                    color="inherit"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <StyledIconContainer>
+                      <TwitterIcon fontSize="inherit" />
+                    </StyledIconContainer>
+                    <FormattedMessage description="twitter" defaultMessage="Twitter" />
                   </CategoryItem>
                 </CategoryProvider>
               </Grid>
@@ -75,13 +81,16 @@ export default React.memo(function OceanAppFooter() {
                   <StyledCategoryTitle>
                     <FormattedMessage description="resources" defaultMessage="Resources" />
                   </StyledCategoryTitle>
-                  <CategoryItem>
-                    <Link href="https://docs.mean.finance" target="_blank" color="inherit">
-                      <StyledIconContainer>
-                        <DescriptionIcon fontSize="inherit" />
-                      </StyledIconContainer>
-                      <FormattedMessage description="docs" defaultMessage="Docs" />
-                    </Link>
+                  <CategoryItem
+                    href="https://docs.mean.finance"
+                    target="_blank"
+                    color="inherit"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <StyledIconContainer>
+                      <DescriptionIcon fontSize="inherit" />
+                    </StyledIconContainer>
+                    <FormattedMessage description="docs" defaultMessage="Docs" />
                   </CategoryItem>
                 </CategoryProvider>
               </Grid>

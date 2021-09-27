@@ -7,6 +7,7 @@ import {
   TransactionTypeDataOptions,
   ApproveTokenTypeData,
   NewPairTypeData,
+  Token,
 } from 'types';
 import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -163,8 +164,9 @@ export function isTransactionPending(tx: TransactionDetails): boolean {
 }
 
 // returns whether a token has a pending approval transaction
-export function useHasPendingApproval(tokenAddress: string | undefined, spender: string | undefined): boolean {
+export function useHasPendingApproval(token: Token, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
+  const tokenAddress = token.address;
   return useMemo(
     () =>
       typeof tokenAddress === 'string' &&
@@ -178,7 +180,7 @@ export function useHasPendingApproval(tokenAddress: string | undefined, spender:
         } else {
           return (
             (<ApproveTokenTypeData>tx.typeData).pair === spender &&
-            (<ApproveTokenTypeData>tx.typeData).id === tokenAddress
+            (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress
           );
         }
       }),
@@ -202,12 +204,13 @@ export function useHasPendingWrap(): boolean {
 }
 
 // returns whether a token has a pending approval transaction
-export function useHasPendingPairCreation(from: string | undefined, to: string | undefined): boolean {
+export function useHasPendingPairCreation(from: Token, to: Token): boolean {
   const allTransactions = useAllTransactions();
+  const fromAddress = from.address;
+  const toAddress = to.address;
+
   return useMemo(
     () =>
-      typeof from === 'string' &&
-      typeof to === 'string' &&
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
         if (allTransactions[hash].type !== TRANSACTION_TYPES.NEW_PAIR) return false;
@@ -215,16 +218,20 @@ export function useHasPendingPairCreation(from: string | undefined, to: string |
         if (tx.receipt) {
           return false;
         } else {
-          return (<NewPairTypeData>tx.typeData).token0 === from && (<NewPairTypeData>tx.typeData).token1 === to;
+          return (
+            (<NewPairTypeData>tx.typeData).token0.address === fromAddress &&
+            (<NewPairTypeData>tx.typeData).token1.address === toAddress
+          );
         }
       }),
-    [allTransactions, from, to]
+    [allTransactions, fromAddress, toAddress]
   );
 }
 
 // returns whether a token has been approved transaction
-export function useHasConfirmedApproval(tokenAddress: string | undefined, spender: string | undefined): boolean {
+export function useHasConfirmedApproval(token: Token, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
+  const tokenAddress = token.address;
   return useMemo(
     () =>
       typeof tokenAddress === 'string' &&
@@ -236,7 +243,7 @@ export function useHasConfirmedApproval(tokenAddress: string | undefined, spende
         return (
           tx.receipt &&
           (<ApproveTokenTypeData>tx.typeData).pair === spender &&
-          (<ApproveTokenTypeData>tx.typeData).id === tokenAddress
+          (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress
         );
       }),
     [allTransactions, spender, tokenAddress]

@@ -15,7 +15,10 @@ interface HomeFrameProps {
   isLoading: boolean;
 }
 
-const StyledGridContainer = styled(Grid)<HomeFrameProps>`
+const StyledGridContainer = styled(Grid).withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
+})<HomeFrameProps>`
   height: ${(props) => (props.isLoading ? `calc(100% + ${(props?.spacing || 0) * 4}px)` : 'auto')}; ;
 `;
 

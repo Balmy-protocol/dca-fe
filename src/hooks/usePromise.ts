@@ -2,6 +2,7 @@ import React from 'react';
 import { Web3Service, Web3ServicePromisableMethods } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
+import isUndefined from 'lodash/isUndefined';
 
 function usePromise<T>(
   promise: Web3Service,
@@ -26,7 +27,7 @@ function usePromise<T>(
       setIsLoading(false);
     }
 
-    if (!skip && ((!isLoading && !result && !error) || !isEqual(prevParameters, parameters))) {
+    if (!skip && ((!isLoading && isUndefined(result) && isUndefined(error)) || !isEqual(prevParameters, parameters))) {
       setIsLoading(true);
       setResult(undefined);
       setError(undefined);

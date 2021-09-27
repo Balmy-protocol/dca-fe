@@ -23,7 +23,7 @@ import {
   TransactionPositionTypeDataOptions,
   PoolResponse,
   Position,
-  PositionRawKeyBy,
+  PositionKeyBy,
   TransactionDetails,
   NewPositionTypeData,
   TerminatePositionTypeData,
@@ -36,13 +36,16 @@ import {
   ResetPositionTypeData,
   ModifyRateAndSwapsPositionTypeData,
   PoolLiquidityData,
+  TokenListResponse,
+  GetPoolResponse,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
-import { sortTokens } from 'utils/parsing';
+import { getURLFromQuery, sortTokens } from 'utils/parsing';
 
 // GQL queries
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
 import GET_TOKEN_LIST from 'graphql/getTokenList.graphql';
+import GET_POOLS from 'graphql/getPool.graphql';
 import GET_POSITIONS from 'graphql/getPositions.graphql';
 import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
 import gqlFetchAll from 'utils/gqlFetchAll';
@@ -64,6 +67,8 @@ import {
   MEAN_GRAPHQL_URL,
   NETWORKS,
   RATE_TYPE,
+  SUPPORTED_NETWORKS,
+  TOKEN_LISTS,
   TRANSACTION_TYPES,
   UNI_GRAPHQL_URL,
 } from 'config/constants';
@@ -80,8 +85,8 @@ export default class Web3Service {
   uniClient: GraphqlService;
   account: string;
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
-  currentPositions: PositionRawKeyBy;
-  pastPositions: PositionRawKeyBy;
+  currentPositions: PositionKeyBy;
+  pastPositions: PositionKeyBy;
   tokenList: TokenList;
   providerInfo: { id: string; logo: string; name: string };
 
@@ -187,8 +192,8 @@ export default class Web3Service {
 
     this.currentPositions = keyBy(
       currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
-        from: position.from.id,
-        to: position.to.id,
+        from: position.from,
+        to: position.to,
         swapInterval: BigNumber.from(position.swapInterval.interval),
         swapped: BigNumber.from(position.totalSwapped),
         rate: BigNumber.from(position.current.rate),
@@ -220,8 +225,8 @@ export default class Web3Service {
 
     this.pastPositions = keyBy(
       pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
-        from: position.from.id,
-        to: position.to.id,
+        from: position.from,
+        to: position.to,
         totalDeposits: BigNumber.from(position.totalDeposits),
         swapInterval: BigNumber.from(position.swapInterval.interval),
         swapped: BigNumber.from(position.totalSwapped),
@@ -332,167 +337,146 @@ export default class Web3Service {
     );
 
     this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
-      token0: pair.tokenA.id,
-      token1: pair.tokenB.id,
+      token0: pair.tokenA,
+      token1: pair.tokenB,
       lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
       id: pair.id,
       createdAt: pair.createdAtTimestamp,
     }));
 
-    const tokenListResponse = await gqlFetchAllById(this.uniClient.getClient(), GET_TOKEN_LIST, {}, 'pools');
+    this.tokenList = {};
 
-    const mockedTokens: Record<string, Record<string, number>> = {
-      USDC: {},
-      WETH: {},
-      UNI: {},
-      DAI: {},
-      YFI: {},
-    };
-    this.tokenList = tokenListResponse.data.pools.reduce(
-      (acc: TokenList, pool: PoolResponse) => {
-        if (pool.token0.symbol === 'USDC') {
-          if (!mockedTokens.USDC[pool.token0.id]) {
-            mockedTokens.USDC[pool.token0.id] = 1;
-          } else {
-            mockedTokens.USDC[pool.token0.id] = mockedTokens.USDC[pool.token0.id] + 1;
-          }
-        }
-        if (pool.token0.symbol === 'WETH') {
-          if (!mockedTokens.WETH[pool.token0.id]) {
-            mockedTokens.WETH[pool.token0.id] = 1;
-          } else {
-            mockedTokens.WETH[pool.token0.id] = mockedTokens.WETH[pool.token0.id] + 1;
-          }
-        }
-        if (pool.token0.symbol === 'UNI') {
-          if (!mockedTokens.UNI[pool.token0.id]) {
-            mockedTokens.UNI[pool.token0.id] = 1;
-          } else {
-            mockedTokens.UNI[pool.token0.id] = mockedTokens.UNI[pool.token0.id] + 1;
-          }
-        }
-        if (pool.token0.symbol === 'DAI') {
-          if (!mockedTokens.DAI[pool.token0.id]) {
-            mockedTokens.DAI[pool.token0.id] = 1;
-          } else {
-            mockedTokens.DAI[pool.token0.id] = mockedTokens.DAI[pool.token0.id] + 1;
-          }
-        }
-        if (pool.token0.symbol === 'YFI') {
-          if (!mockedTokens.YFI[pool.token0.id]) {
-            mockedTokens.YFI[pool.token0.id] = 1;
-          } else {
-            mockedTokens.YFI[pool.token0.id] = mockedTokens.YFI[pool.token0.id] + 1;
-          }
-        }
-        if (pool.token1.symbol === 'USDC') {
-          if (!mockedTokens.USDC[pool.token1.id]) {
-            mockedTokens.USDC[pool.token1.id] = 1;
-          } else {
-            mockedTokens.USDC[pool.token1.id] = mockedTokens.USDC[pool.token1.id] + 1;
-          }
-        }
-        if (pool.token1.symbol === 'WETH') {
-          if (!mockedTokens.WETH[pool.token1.id]) {
-            mockedTokens.WETH[pool.token1.id] = 1;
-          } else {
-            mockedTokens.WETH[pool.token1.id] = mockedTokens.WETH[pool.token1.id] + 1;
-          }
-        }
-        if (pool.token1.symbol === 'UNI') {
-          if (!mockedTokens.UNI[pool.token1.id]) {
-            mockedTokens.UNI[pool.token1.id] = 1;
-          } else {
-            mockedTokens.UNI[pool.token1.id] = mockedTokens.UNI[pool.token1.id] + 1;
-          }
-        }
-        if (pool.token1.symbol === 'DAI') {
-          if (!mockedTokens.DAI[pool.token1.id]) {
-            mockedTokens.DAI[pool.token1.id] = 1;
-          } else {
-            mockedTokens.DAI[pool.token1.id] = mockedTokens.DAI[pool.token1.id] + 1;
-          }
-        }
-        if (pool.token1.symbol === 'YFI') {
-          if (!mockedTokens.YFI[pool.token1.id]) {
-            mockedTokens.YFI[pool.token1.id] = 1;
-          } else {
-            mockedTokens.YFI[pool.token1.id] = mockedTokens.YFI[pool.token1.id] + 1;
-          }
-        }
+    if (chain.chainId !== NETWORKS.mainnet.chainId) {
+      const tokenListResponse = await gqlFetchAllById(this.uniClient.getClient(), GET_TOKEN_LIST, {}, 'pools');
 
-        if (!acc[pool.token0.id]) {
-          acc[pool.token0.id] = {
-            decimals: BigNumber.from(pool.token0.decimals).toNumber(),
-            address: pool.token0.id,
-            name: pool.token0.name,
-            symbol: pool.token0.symbol,
-            pairableTokens: [],
-            totalValueLockedUSD: parseFloat(pool.token0.totalValueLockedUSD),
-          };
-        }
-        if (!acc[pool.token1.id]) {
-          acc[pool.token1.id] = {
-            decimals: BigNumber.from(pool.token1.decimals).toNumber(),
-            address: pool.token1.id,
-            name: pool.token1.name,
-            symbol: pool.token1.symbol,
-            pairableTokens: [],
-            totalValueLockedUSD: parseFloat(pool.token1.totalValueLockedUSD),
-          };
-        }
-
-        const availableTokensToken0 = [...acc[pool.token0.id].pairableTokens];
-        const availableTokensToken1 = [...acc[pool.token1.id].pairableTokens];
-
-        if (availableTokensToken0.indexOf(pool.token1.id) === -1) {
-          availableTokensToken0.push(pool.token1.id);
-
-          // allow ETH for WETH
-          if (pool.token1.id === WETH(chain.chainId).address) {
-            availableTokensToken0.push(ETH.address);
+      const mockedTokens: Record<string, Record<string, number>> = {
+        USDC: {},
+        WETH: {},
+        UNI: {},
+        DAI: {},
+        YFI: {},
+      };
+      this.tokenList = tokenListResponse.data.pools.reduce(
+        (acc: TokenList, pool: PoolResponse) => {
+          if (pool.token0.symbol === 'USDC') {
+            if (!mockedTokens.USDC[pool.token0.id]) {
+              mockedTokens.USDC[pool.token0.id] = 1;
+            } else {
+              mockedTokens.USDC[pool.token0.id] = mockedTokens.USDC[pool.token0.id] + 1;
+            }
           }
-        }
-        if (availableTokensToken1.indexOf(pool.token0.id) === -1) {
-          availableTokensToken1.push(pool.token0.id);
-          // allow ETH for WETH
+          if (pool.token0.symbol === 'WETH') {
+            if (!mockedTokens.WETH[pool.token0.id]) {
+              mockedTokens.WETH[pool.token0.id] = 1;
+            } else {
+              mockedTokens.WETH[pool.token0.id] = mockedTokens.WETH[pool.token0.id] + 1;
+            }
+          }
+          if (pool.token0.symbol === 'UNI') {
+            if (!mockedTokens.UNI[pool.token0.id]) {
+              mockedTokens.UNI[pool.token0.id] = 1;
+            } else {
+              mockedTokens.UNI[pool.token0.id] = mockedTokens.UNI[pool.token0.id] + 1;
+            }
+          }
+          if (pool.token0.symbol === 'DAI') {
+            if (!mockedTokens.DAI[pool.token0.id]) {
+              mockedTokens.DAI[pool.token0.id] = 1;
+            } else {
+              mockedTokens.DAI[pool.token0.id] = mockedTokens.DAI[pool.token0.id] + 1;
+            }
+          }
+          if (pool.token0.symbol === 'YFI') {
+            if (!mockedTokens.YFI[pool.token0.id]) {
+              mockedTokens.YFI[pool.token0.id] = 1;
+            } else {
+              mockedTokens.YFI[pool.token0.id] = mockedTokens.YFI[pool.token0.id] + 1;
+            }
+          }
+          if (pool.token1.symbol === 'USDC') {
+            if (!mockedTokens.USDC[pool.token1.id]) {
+              mockedTokens.USDC[pool.token1.id] = 1;
+            } else {
+              mockedTokens.USDC[pool.token1.id] = mockedTokens.USDC[pool.token1.id] + 1;
+            }
+          }
+          if (pool.token1.symbol === 'WETH') {
+            if (!mockedTokens.WETH[pool.token1.id]) {
+              mockedTokens.WETH[pool.token1.id] = 1;
+            } else {
+              mockedTokens.WETH[pool.token1.id] = mockedTokens.WETH[pool.token1.id] + 1;
+            }
+          }
+          if (pool.token1.symbol === 'UNI') {
+            if (!mockedTokens.UNI[pool.token1.id]) {
+              mockedTokens.UNI[pool.token1.id] = 1;
+            } else {
+              mockedTokens.UNI[pool.token1.id] = mockedTokens.UNI[pool.token1.id] + 1;
+            }
+          }
+          if (pool.token1.symbol === 'DAI') {
+            if (!mockedTokens.DAI[pool.token1.id]) {
+              mockedTokens.DAI[pool.token1.id] = 1;
+            } else {
+              mockedTokens.DAI[pool.token1.id] = mockedTokens.DAI[pool.token1.id] + 1;
+            }
+          }
+          if (pool.token1.symbol === 'YFI') {
+            if (!mockedTokens.YFI[pool.token1.id]) {
+              mockedTokens.YFI[pool.token1.id] = 1;
+            } else {
+              mockedTokens.YFI[pool.token1.id] = mockedTokens.YFI[pool.token1.id] + 1;
+            }
+          }
+
+          if (!acc[pool.token0.id]) {
+            acc[pool.token0.id] = {
+              decimals: BigNumber.from(pool.token0.decimals).toNumber(),
+              address: pool.token0.id,
+              name: pool.token0.name,
+              symbol: pool.token0.symbol,
+              chainId: (SUPPORTED_NETWORKS[chain.chainId] && chain.chainId) || NETWORKS.mainnet.chainId,
+            };
+          }
+          if (!acc[pool.token1.id]) {
+            acc[pool.token1.id] = {
+              decimals: BigNumber.from(pool.token1.decimals).toNumber(),
+              address: pool.token1.id,
+              name: pool.token1.name,
+              symbol: pool.token1.symbol,
+              chainId: (SUPPORTED_NETWORKS[chain.chainId] && chain.chainId) || NETWORKS.mainnet.chainId,
+            };
+          }
+
           if (pool.token0.id === WETH(chain.chainId).address) {
-            availableTokensToken1.push(ETH.address);
+            acc = {
+              ...acc,
+              [ETH.address]: {
+                ...acc[ETH.address],
+              },
+            };
+          } else if (pool.token1.id === WETH(chain.chainId).address) {
+            acc = {
+              ...acc,
+              [ETH.address]: {
+                ...acc[ETH.address],
+              },
+            };
           }
-        }
 
-        if (pool.token0.id === WETH(chain.chainId).address) {
-          acc = {
+          return {
             ...acc,
-            [ETH.address]: {
-              ...acc[ETH.address],
-              pairableTokens: [...availableTokensToken0],
+            [pool.token0.id]: {
+              ...acc[pool.token0.id],
+            },
+            [pool.token1.id]: {
+              ...acc[pool.token1.id],
             },
           };
-        } else if (pool.token1.id === WETH(chain.chainId).address) {
-          acc = {
-            ...acc,
-            [ETH.address]: {
-              ...acc[ETH.address],
-              pairableTokens: [...availableTokensToken1],
-            },
-          };
-        }
-
-        return {
-          ...acc,
-          [pool.token0.id]: {
-            ...acc[pool.token0.id],
-            pairableTokens: [...availableTokensToken0],
-          },
-          [pool.token1.id]: {
-            ...acc[pool.token1.id],
-            pairableTokens: [...availableTokensToken1],
-          },
-        };
-      },
-      { [ETH.address]: ETH, [WETH(chain.chainId).address]: WETH(chain.chainId) }
-    );
+        },
+        { [ETH.address]: ETH, [WETH(chain.chainId).address]: WETH(chain.chainId) }
+      );
+    }
   }
 
   changeNetwork(newChainId: number) {
@@ -796,8 +780,8 @@ export default class Web3Service {
       const newPositionTypeData = typeData as NewPositionTypeData;
       id = `pending-transaction-${transaction.hash}`;
       this.currentPositions[id] = {
-        from: newPositionTypeData.from.address,
-        to: newPositionTypeData.to.address,
+        from: newPositionTypeData.from,
+        to: newPositionTypeData.to,
         pairId: newPositionTypeData.existingPair.id,
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
         swapped: BigNumber.from(0),
@@ -992,15 +976,15 @@ export default class Web3Service {
     return factory.interface.parseLog(log);
   }
 
-  async getPairLiquidity(token0: string, token1: string) {
+  async getPairLiquidity(token0: Token, token1: Token) {
     let tokenA;
     let tokenB;
-    if (token0 < token1) {
-      tokenA = token0;
-      tokenB = token1;
+    if (token0.address < token1.address) {
+      tokenA = token0.address;
+      tokenB = token1.address;
     } else {
-      tokenA = token1;
-      tokenB = token0;
+      tokenA = token1.address;
+      tokenB = token0.address;
     }
     const poolsWithLiquidityResponse = await gqlFetchAll(
       this.uniClient.getClient(),
@@ -1019,5 +1003,28 @@ export default class Web3Service {
     }, 0);
 
     return liquidity;
+  }
+
+  async hasPool(token0: Token, token1: Token) {
+    const [tokenA, tokenB] = sortTokens(token0, token1);
+
+    // if they are not connected we show everything as available
+    if (!this.client) return true;
+
+    const chain = await this.client.getNetwork();
+
+    const poolsData = await this.uniClient.getClient().query<GetPoolResponse>({
+      query: GET_POOLS,
+      variables: {
+        tokenA: tokenA.address === ETH.address ? WETH(chain.chainId).address : tokenA.address,
+        tokenB: tokenB.address === ETH.address ? WETH(chain.chainId).address : tokenB.address,
+      },
+    });
+
+    const {
+      data: { pools },
+    } = poolsData;
+
+    return !!pools.length;
   }
 }

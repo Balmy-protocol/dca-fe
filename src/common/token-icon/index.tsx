@@ -13,17 +13,27 @@ interface TokenButtonProps {
 
 const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
   const realSize = size || '28px';
+  const [hasError, setHasError] = React.useState(false);
+  let componentToRender = null;
 
-  return CryptoIcons[token?.address as keyof typeof CryptoIcons] ? (
-    <SvgIcon
-      component={CryptoIcons[token?.address as keyof typeof CryptoIcons]}
-      viewBox="0 0 32 32"
-      className={isInChip ? 'MuiChip-icon' : ''}
-      style={{ fontSize: realSize }}
-    />
-  ) : (
-    <HelpIcon style={{ fontSize: realSize }} className={isInChip ? 'MuiChip-icon' : ''} />
-  );
+  if (CryptoIcons[token?.address as keyof typeof CryptoIcons]) {
+    componentToRender = (
+      <SvgIcon
+        component={CryptoIcons[token?.address as keyof typeof CryptoIcons]}
+        viewBox="0 0 32 32"
+        className={isInChip ? 'MuiChip-icon' : ''}
+        style={{ fontSize: realSize }}
+      />
+    );
+  } else if (token?.logoURI && !hasError) {
+    componentToRender = (
+      <img src={token.logoURI} onError={() => setHasError(true)} height={realSize} width={realSize} />
+    );
+  } else {
+    componentToRender = <HelpIcon style={{ fontSize: realSize }} className={isInChip ? 'MuiChip-icon' : ''} />;
+  }
+
+  return componentToRender;
 };
 
 export default TokenIcon;

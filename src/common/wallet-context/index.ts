@@ -4,12 +4,14 @@ import graphPricesClient from 'utils/graphPricesApolloClient';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';
 import Web3Service from 'services/web3Service';
 import { TokenList, AvailablePairs } from 'types';
+import axios, { AxiosInstance } from 'axios';
 
 export type WalletContextValue = {
   web3Service: Web3Service;
   graphPricesClient: ApolloClient<NormalizedCacheObject>;
   DCASubgraph: ApolloClient<NormalizedCacheObject>;
   account: string;
+  axiosClient: AxiosInstance;
 };
 
 export const WalletContextDefaultValue: WalletContextValue = {
@@ -17,6 +19,7 @@ export const WalletContextDefaultValue: WalletContextValue = {
   graphPricesClient,
   DCASubgraph,
   account: '',
+  axiosClient: axios.create(),
 };
 
 const WalletContext = React.createContext(WalletContextDefaultValue);

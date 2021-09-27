@@ -8,12 +8,17 @@ export { Web3Service };
 
 export type Token = {
   decimals: number;
+  chainId: number;
   address: string;
   name: string;
   symbol: string;
   logoURI?: string;
-  pairableTokens: string[];
-  totalValueLockedUSD: number;
+};
+
+export type GetPoolResponse = {
+  pools: {
+    id: string;
+  }[];
 };
 
 export type PoolResponse = {
@@ -23,6 +28,7 @@ export type PoolResponse = {
     name: string;
     symbol: string;
     totalValueLockedUSD: string;
+    chainId: number;
   };
   token1: {
     decimals: string;
@@ -30,6 +36,7 @@ export type PoolResponse = {
     name: string;
     symbol: string;
     totalValueLockedUSD: string;
+    chainId: number;
   };
   id: string;
 };
@@ -60,8 +67,8 @@ export type SwapInterval = {
 };
 
 export type AvailablePair = {
-  token0: string;
-  token1: string;
+  token0: Token;
+  token1: Token;
   lastExecutedAt: number;
   createdAt: number;
   id: string;
@@ -81,17 +88,14 @@ export type Web3ServicePromisableMethods =
   | 'createPair'
   | 'getAvailablePairs'
   | 'getAllowance'
+  | 'hasPool'
   | 'getPastPositions';
 
 export type PositionResponse = {
   id: string;
   dcaId: string;
-  from: {
-    id: string;
-  };
-  to: {
-    id: string;
-  };
+  from: Token;
+  to: Token;
   pair: {
     id: string;
   };
@@ -117,9 +121,9 @@ export type PositionResponse = {
   createdAtTimestamp: number;
 };
 
-export interface PositionRaw {
-  from: string;
-  to: string;
+export interface Position {
+  from: Token;
+  to: Token;
   swapInterval: BigNumber; // daily/weekly/etc
   swapped: BigNumber; // total de swappeado
   remainingLiquidity: BigNumber;
@@ -136,20 +140,14 @@ export interface PositionRaw {
   pairId: string;
 }
 
-export interface PositionRawKeyBy {
-  [key: string]: PositionRaw;
-}
-
-export interface Position extends Omit<PositionRaw, 'to' | 'from'> {
-  from: Token;
-  to: Token;
+export interface PositionKeyBy {
+  [key: string]: Position;
 }
 
 export interface Network {
   chainId: number;
 }
 
-export type PositionsRaw = PositionRaw[];
 export type Positions = Position[];
 
 export interface GasNowResponseData {
@@ -272,7 +270,7 @@ export interface TerminatePositionTypeData {
 }
 
 export interface ApproveTokenTypeData {
-  id: number | string;
+  token: Token;
   pair: string;
 }
 
@@ -293,8 +291,8 @@ export interface NewPositionTypeData {
 
 export interface NewPairTypeData {
   id?: number | string;
-  token0: string;
-  token1: string;
+  token0: Token;
+  token1: Token;
 }
 
 export type TransactionPositionTypeDataOptions =
@@ -363,4 +361,49 @@ export interface GetPairPriceResponseData {
     id: string;
     swaps: GetPairResponseSwapData[];
   };
+}
+export interface TokensLists {
+  name: string;
+  logoURI: string;
+  keywords: string[];
+  tags: Tags;
+  timestamp: Date;
+  tokens: TokenList;
+  version: Version;
+}
+
+export interface TokenListResponse {
+  name: string;
+  logoURI: string;
+  keywords: string[];
+  tags: Tags;
+  timestamp: Date;
+  tokens: Token[];
+  version: Version;
+}
+
+export interface Tags {
+  stablecoin: Compound;
+  compound: Compound;
+}
+
+export interface Compound {
+  name: string;
+  description: string;
+}
+
+export interface TokenListToken {
+  chainId: number;
+  address: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  logoURI: string;
+  tags: string[];
+}
+
+export interface Version {
+  major: number;
+  minor: number;
+  patch: number;
 }
