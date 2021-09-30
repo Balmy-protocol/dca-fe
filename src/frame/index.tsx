@@ -6,6 +6,7 @@ import Container from '@material-ui/core/Container';
 import NavBar from 'common/navbar';
 import AppFooter from 'common/footer';
 import Home from 'home';
+import FAQ from 'faq';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
@@ -71,6 +72,9 @@ const AppFrame = ({ isLoading }: AppFrameProps) => (
         </StyledNavBarGridContainer>
         <StyledAppGridContainer item xs={12} isLoading={isLoading}>
           <Switch>
+            <Route path="/faq">
+              <FAQ />
+            </Route>
             <Route path="/:from?/:to?">
               <Home isLoading={isLoading} />
             </Route>

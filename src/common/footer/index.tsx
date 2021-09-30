@@ -1,5 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { CategoryProvider, CategoryTitle, CategoryItem } from '@mui-treasury/components/menu/category';
 import Link from '@material-ui/core/Link';
@@ -92,6 +93,17 @@ export default React.memo(function OceanAppFooter() {
                     </StyledIconContainer>
                     <FormattedMessage description="docs" defaultMessage="Docs" />
                   </CategoryItem>
+                  <RouterLink
+                    to="/faq"
+                    className="NikiCategoryMenu-item-12"
+                    color="inherit"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <StyledIconContainer>
+                      <DescriptionIcon fontSize="inherit" />
+                    </StyledIconContainer>
+                    <FormattedMessage description="faq" defaultMessage="FAQ" />
+                  </RouterLink>
                 </CategoryProvider>
               </Grid>
             </Grid>
