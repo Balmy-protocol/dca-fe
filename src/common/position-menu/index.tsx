@@ -74,6 +74,7 @@ const PositionMenu = ({
             onModifySwaps={() => setActiveMenu('modifySwaps')}
             onModifyRate={() => setActiveMenu('modifyRate')}
             onRemoveFunds={() => setActiveMenu('removeFunds')}
+            positionId={position.id}
           />
         )}
         {activeMenu === 'removeFunds' && (
@@ -89,6 +90,7 @@ const PositionMenu = ({
             position={position}
             onModifyRateAndSwaps={onModifyRateAndSwapsPosition}
             balance={balance}
+            isMinimal
           />
         )}
       </StyledOverlay>

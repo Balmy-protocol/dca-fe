@@ -24,6 +24,7 @@ import useUNIGraphql from 'hooks/useUNIGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { STABLE_COINS } from 'config/constants';
 
 interface GraphWidgetProps {
   from: Token;
@@ -157,8 +158,6 @@ const mockedData = [
 ];
 
 const PERIODS = [7, 30];
-
-const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST'];
 
 const averagePoolPrice = (prices: string[], token: Token) => {
   let result = 0;

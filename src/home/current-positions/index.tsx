@@ -55,7 +55,7 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
   };
 
   const handleViewNFT = async (position: Position) => {
-    const tokenNFT = await web3Service.getTokenNFT(position);
+    const tokenNFT = await web3Service.getTokenNFT(position.dcaId, position.pairId);
     setNFTData(tokenNFT);
     setShowNFTModal(true);
   };

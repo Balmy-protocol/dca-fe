@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { Token } from 'types';
+import { FullPosition, Position, Token } from 'types';
 
 const HOURS_IN_MONTH = BigNumber.from(720);
 const DAYS_IN_WEEK = BigNumber.from(7);
@@ -108,4 +108,25 @@ export function getURLFromQuery(query: string) {
   } else {
     return '';
   }
+}
+
+export function fullPositionToMappedPosition(position: FullPosition): Position {
+  return {
+    from: position.from,
+    to: position.to,
+    swapInterval: BigNumber.from(position.swapInterval.interval),
+    swapped: BigNumber.from(position.totalSwapped),
+    rate: BigNumber.from(position.current.rate),
+    remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+    remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+    withdrawn: BigNumber.from(position.totalWithdrawn),
+    totalSwaps: BigNumber.from(position.totalSwaps),
+    dcaId: position.dcaId,
+    id: position.id,
+    status: position.status,
+    startedAt: parseInt(position.createdAtTimestamp, 10),
+    totalDeposits: BigNumber.from(position.totalDeposits),
+    pendingTransaction: '',
+    pairId: position.pair.id,
+  };
 }

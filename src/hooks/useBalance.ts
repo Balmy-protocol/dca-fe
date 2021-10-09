@@ -5,7 +5,7 @@ import usePrevious from 'hooks/usePrevious';
 import WalletContext from 'common/wallet-context';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 
-function useBalance(from: Token) {
+function useBalance(from: Token | undefined) {
   const [isLoading, setIsLoading] = React.useState(false);
   const { web3Service } = React.useContext(WalletContext);
   const [result, setResult] = React.useState<any>(undefined);
@@ -41,6 +41,10 @@ function useBalance(from: Token) {
       callPromise();
     }
   }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount()]);
+
+  if (!from) {
+    return ['0', false, undefined];
+  }
 
   return [result, isLoading, error];
 }

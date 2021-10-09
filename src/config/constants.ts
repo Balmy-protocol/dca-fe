@@ -171,3 +171,5 @@ export const TOKEN_LISTS = {
     homepage: '',
   },
 };
+
+export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST'];

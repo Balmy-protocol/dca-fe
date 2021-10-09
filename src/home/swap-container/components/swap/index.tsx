@@ -661,7 +661,6 @@ const Swap = ({
 
   let ButtonToShow;
 
-  console.log(hasPool, isLoadingHasPool);
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {

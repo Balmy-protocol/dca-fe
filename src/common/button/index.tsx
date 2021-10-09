@@ -11,6 +11,7 @@ const variants = {
 const types = {
   primary: 'primary',
   default: 'default',
+  white: 'white',
   secondary: 'secondary',
   warning: 'warning',
   error: 'error',
@@ -21,6 +22,7 @@ const types = {
 const colors = {
   primary: '#239F33',
   default: '#333333',
+  white: '#333333',
   secondary: '#FAFAFA',
   tertiary: '#0088CC',
   warning: '#FAFAFA',
@@ -36,6 +38,10 @@ const backgroundColors = {
   default: {
     default: '#D9D9D9',
     hover: '#c9c9c9',
+  },
+  white: {
+    default: '#FFFFFF',
+    hover: '#efefef',
   },
   secondary: {
     default: '#00A3F5',
@@ -67,6 +73,10 @@ const borderColors = {
   default: {
     default: '#D9D9D9',
     hover: '#c9c9c9',
+  },
+  white: {
+    default: '#FFFFFF',
+    hover: '#efefef',
   },
   secondary: {
     default: '#00A3F5',
@@ -198,6 +208,32 @@ const DefaultButton = withStyles({
   },
 })(StyledDisabledFontButton);
 
+const WhiteButton = withStyles({
+  text: {
+    color: colors.white,
+  },
+  outlined: {
+    color: colors.white,
+    borderColor: borderColors.white.default,
+    '&:hover': {
+      borderColor: borderColors.white.hover,
+    },
+    '&:active': {
+      borderColor: borderColors.white.hover,
+    },
+  },
+  contained: {
+    color: colors.white,
+    backgroundColor: backgroundColors.white.default,
+    '&:hover': {
+      backgroundColor: backgroundColors.white.hover,
+    },
+    '&:active': {
+      backgroundColor: backgroundColors.white.hover,
+    },
+  },
+})(StyledDisabledFontButton);
+
 const ErrorButton = withStyles({
   text: {
     color: colors.error,
@@ -280,6 +316,7 @@ const ButtonTypes = {
   primary: PrimaryButton,
   secondary: SecondaryButton,
   default: DefaultButton,
+  white: WhiteButton,
   error: ErrorButton,
   warning: WarningButton,
   tertiary: TertiaryButton,

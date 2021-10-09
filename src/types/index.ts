@@ -140,6 +140,86 @@ export interface Position {
   pairId: string;
 }
 
+export interface FullPosition {
+  from: Token;
+  to: Token;
+  totalDeposits: string;
+  totalSwaps: string; // cuanto puse originalmente
+  dcaId: string;
+  id: string;
+  status: string;
+  startedAt: number;
+  pendingTransaction: string;
+  pair: {
+    id: string;
+    tokenA: Token;
+    tokenB: Token;
+  };
+  createdAtTimestamp: string;
+  totalSwapped: string;
+  totalWithdrawn: string;
+  startedAtSwap: string;
+  terminatedAtTimestamp: string;
+  swapInterval: {
+    id: string;
+    interval: string;
+    description: string;
+  };
+  current: PositionState;
+  history: PositionState[];
+}
+
+export interface PositionState {
+  id: string;
+  startingSwap: string;
+  rate: string;
+  lastSwap: string;
+  remainingSwaps: string;
+  swapped: string;
+  withdrawn: string;
+  remainingLiquidity: string;
+  createdAtBlock: string;
+  createdAtTimestamp: string;
+  transaction: {
+    id: string;
+    hash: string;
+    timestamp: string;
+  };
+}
+
+export interface PairSwapsIntervals {
+  id: string;
+  swapInterval: {
+    id: string;
+    interval: string;
+    description: string;
+  };
+  swapPerformed: string;
+}
+export interface PairSwaps {
+  id: string;
+  executedAtTimestamp: string;
+  executedAtBlock: string;
+  ratePerUnitBToAWithFee: string;
+  ratePerUnitAToBWithFee: string;
+  transaction: {
+    id: string;
+    hash: string;
+    index: string;
+    gasSent: string;
+    gasPrice: string;
+    from: string;
+    timestamp: string;
+  };
+  pairSwapsIntervals: PairSwapsIntervals[];
+}
+
+export interface GetPairSwapsData {
+  id: string;
+  createdAtTimestamp: string;
+  swaps: PairSwaps[];
+}
+
 export interface PositionKeyBy {
   [key: string]: Position;
 }

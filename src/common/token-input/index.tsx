@@ -33,6 +33,7 @@ interface TokenInputProps {
   token: Token;
   error?: string;
   isMinimal?: boolean;
+  fullWidth?: boolean;
 }
 
 const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`);
@@ -47,6 +48,7 @@ const TokenInput = ({
   token,
   error,
   isMinimal,
+  fullWidth,
 }: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
@@ -96,6 +98,7 @@ const TokenInput = ({
           margin={'normal'}
           disabled={disabled}
           spellCheck="false"
+          fullWidth={fullWidth}
           onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
           InputProps={{
             endAdornment:

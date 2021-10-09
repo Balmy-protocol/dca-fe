@@ -1,6 +1,7 @@
 import { TransactionResponse } from '@ethersproject/providers';
 import { useCallback, useMemo } from 'react';
 import reduce from 'lodash/reduce';
+import find from 'lodash/find';
 import {
   TransactionDetails,
   TransactionTypes,
@@ -8,6 +9,7 @@ import {
   ApproveTokenTypeData,
   NewPairTypeData,
   Token,
+  TransactionPositionTypeDataOptions,
 } from 'types';
 import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -226,6 +228,30 @@ export function useHasPendingPairCreation(from: Token, to: Token): boolean {
       }),
     [allTransactions, fromAddress, toAddress]
   );
+}
+
+// returns whether a token has a pending approval transaction
+export function usePositionHasPendingTransaction(position: string): string | null {
+  const allTransactions = useAllTransactions();
+
+  return useMemo(() => {
+    const foundTransaction = find(allTransactions, (transaction) => {
+      if (!transaction) return false;
+      if (
+        transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
+        transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+        transaction.type === TRANSACTION_TYPES.WRAP_ETHER
+      )
+        return false;
+      if (transaction.receipt) {
+        return false;
+      } else {
+        return (<TransactionPositionTypeDataOptions>transaction.typeData).id === position;
+      }
+    });
+
+    return foundTransaction?.hash || null;
+  }, [allTransactions, position]);
 }
 
 // returns whether a token has been approved transaction
