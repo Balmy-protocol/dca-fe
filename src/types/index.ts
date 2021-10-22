@@ -152,19 +152,16 @@ export interface Network {
 export type PositionsRaw = PositionRaw[];
 export type Positions = Position[];
 
-export interface GasNowResponseData {
-  rapid: number;
-  fast: number;
-  standard: number;
-  slow: number;
-  timestamp: number;
+export interface TxPriceResponse {
+  unit: string;
+  blockPrices: {
+    estimatedPrices: {
+      price: number;
+      maxPriorityFeePerGas: number;
+      maxFeePerGas: number;
+    }[];
+  }[];
 }
-
-export interface GasNowResponse {
-  code: number;
-  data: GasNowResponseData;
-}
-
 export interface CoinGeckoTokenPriceResponse {
   id: string;
   current_price: number;

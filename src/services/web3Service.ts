@@ -13,7 +13,6 @@ import { DateTime } from 'luxon';
 import keyBy from 'lodash/keyBy';
 import axios, { AxiosResponse } from 'axios';
 import {
-  GasNowResponse,
   CoinGeckoPriceResponse,
   Token,
   AvailablePairResponse,
@@ -36,6 +35,7 @@ import {
   ResetPositionTypeData,
   ModifyRateAndSwapsPositionTypeData,
   PoolLiquidityData,
+  TxPriceResponse,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { sortTokens } from 'utils/parsing';
@@ -539,15 +539,18 @@ export default class Web3Service {
 
     return Promise.all([
       factory.estimateGas.createPair(tokenA, tokenB),
-      axios.get<GasNowResponse>('https://www.gasnow.org/api/v3/gas/price'),
+      axios.get<TxPriceResponse>('https://api.txprice.com/'),
       axios.get<CoinGeckoPriceResponse>(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=1&page=1&sparkline=false'
       ),
-    ]).then((values: [BigNumber, AxiosResponse<GasNowResponse>, AxiosResponse<CoinGeckoPriceResponse>]) => {
+    ]).then((values: [BigNumber, AxiosResponse<TxPriceResponse>, AxiosResponse<CoinGeckoPriceResponse>]) => {
       const [gasLimitRaw, gasPriceResponse, ethPriceResponse] = values;
 
       const gasLimit = BigNumber.from(gasLimitRaw);
-      const gasPrice = BigNumber.from(gasPriceResponse.data.data.standard);
+      const gasPrice = parseUnits(
+        gasPriceResponse.data.blockPrices[0].estimatedPrices[2].price.toString(),
+        gasPriceResponse.data.unit
+      );
       const ethPrice = ethPriceResponse.data[0].current_price;
 
       const gas = gasLimit.mul(gasPrice);
@@ -606,10 +609,6 @@ export default class Web3Service {
 
   getTokenList() {
     return this.tokenList;
-  }
-
-  getGasPrice() {
-    return axios.get<GasNowResponse>('https://www.gasnow.org/api/v3/gas/price');
   }
 
   getUsedTokens() {
