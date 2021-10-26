@@ -7,6 +7,7 @@ import NavBar from 'common/navbar';
 import AppFooter from 'common/footer';
 import Home from 'home';
 import FAQ from 'faq';
+import PositionDetail from 'position-detail';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
@@ -15,12 +16,8 @@ interface AppFrameProps {
   isLoading: boolean;
 }
 
-const StyledGridContainer = styled(Grid).withConfig({
-  shouldForwardProp: (prop, defaultValidatorFn) =>
-    (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
-})<{ isLoading: boolean }>`
-  ${(props) => (props.isLoading ? 'height: 100%;' : '')}
-  background-color: #E5E5E5;
+const StyledGridContainer = styled(Grid)`
+  background-color: #e5e5e5;
 `;
 
 const StyledNavBarGridContainer = styled(Grid)`
@@ -28,30 +25,24 @@ const StyledNavBarGridContainer = styled(Grid)`
   margin-top: 40px !important;
 `;
 
-const StyledAppGridContainer = styled(Grid).withConfig({
-  shouldForwardProp: (prop, defaultValidatorFn) =>
-    (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
-})<{ isLoading: boolean }>`
-  ${(props) => (props.isLoading ? 'height: 100%;' : '')}
+const StyledAppGridContainer = styled(Grid)`
   flex: 1;
   margin-top: 40px !important;
 `;
 
-const StyledContainer = styled(Container).withConfig({
-  shouldForwardProp: (prop, defaultValidatorFn) =>
-    (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
-})<{ isLoading: boolean }>`
-  height: ${(props) => (props.isLoading ? '100%' : 'auto')};
+const StyledContainer = styled(Container)`
   background-color: #e5e5e5;
+  flex: 1;
+  display: flex;
 `;
 
 const StyledWarningContainer = styled.div`
   display: flex;
   width: 100%;
-  flex-grow: 1;
   background-color: #f5b000;
   justify-content: center;
   align-items: center;
+  flex: 0;
 `;
 
 const AppFrame = ({ isLoading }: AppFrameProps) => (
@@ -65,15 +56,18 @@ const AppFrame = ({ isLoading }: AppFrameProps) => (
         />
       </Typography>
     </StyledWarningContainer>
-    <StyledContainer isLoading={isLoading}>
-      <StyledGridContainer container direction="column" isLoading={isLoading}>
+    <StyledContainer>
+      <StyledGridContainer container direction="column">
         <StyledNavBarGridContainer item xs={12}>
           <NavBar isLoading={isLoading} />
         </StyledNavBarGridContainer>
-        <StyledAppGridContainer item xs={12} isLoading={isLoading}>
+        <StyledAppGridContainer item xs={12}>
           <Switch>
             <Route path="/faq">
               <FAQ />
+            </Route>
+            <Route path="/positions/:positionId">
+              <PositionDetail />
             </Route>
             <Route path="/:from?/:to?">
               <Home isLoading={isLoading} />

@@ -38,6 +38,7 @@ import {
   TokenListResponse,
   GetPoolResponse,
   TxPriceResponse,
+  FullPosition,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { getURLFromQuery, sortTokens } from 'utils/parsing';
@@ -569,10 +570,7 @@ export default class Web3Service {
     return factory.createPair(tokenA, tokenB);
   }
 
-  async getTokenNFT(position: Position) {
-    const pairAddress = position.pairId;
-    const dcaId = position.dcaId;
-
+  async getTokenNFT(dcaId: string, pairAddress: string) {
     const pairAddressContract = new ethers.Contract(pairAddress, DCAPair.abi, this.client);
 
     const tokenData = await pairAddressContract.tokenURI(dcaId);
@@ -719,7 +717,7 @@ export default class Web3Service {
     );
   }
 
-  modifyRateAndSwaps(position: Position, pair: AvailablePair, newRate: string, newSwaps: string) {
+  modifyRateAndSwaps(position: Position, pair: Pick<AvailablePair, 'id'>, newRate: string, newSwaps: string) {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     return factory.modifyRateAndSwaps(position.dcaId, parseUnits(newRate, position.from.decimals), newSwaps);

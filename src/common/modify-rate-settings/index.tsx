@@ -41,15 +41,17 @@ const StyledInputContainer = styled.div`
   flex-grow: 1;
 `;
 
-const StyledActionContainer = styled.div`
+const StyledActionContainer = styled.div<{ isMinimal?: boolean }>`
   flex-grow: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: ${(props) => (props.isMinimal ? '0px' : '20px')};
 `;
 
-const StyledStepper = styled(Stepper)`
-  padding: 0px;
+const StyledStepper = styled(Stepper)<{ isMinimal?: boolean }>`
+  padding: ${(props) => (props.isMinimal ? '0px' : '24px')};
+  padding-bottom: ${(props) => (props.isMinimal ? '0px' : '10px')};
 `;
 
 interface ModifyRateAndSwapsProps {
@@ -57,9 +59,18 @@ interface ModifyRateAndSwapsProps {
   onClose: () => void;
   onModifyRateAndSwaps: (ammountToAdd: string, frequencyValue: string) => void;
   balance: BigNumber;
+  isMinimal?: boolean;
+  showAddCaption?: boolean;
 }
 
-const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }: ModifyRateAndSwapsProps) => {
+const ModifyRateAndSwaps = ({
+  onClose,
+  onModifyRateAndSwaps,
+  position,
+  balance,
+  isMinimal,
+  showAddCaption,
+}: ModifyRateAndSwapsProps) => {
   const [fromValue, setFromValue] = React.useState(formatUnits(position.rate, position.from.decimals));
   const [activeStep, setActiveStep] = React.useState(0);
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
@@ -102,7 +113,7 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
 
   return (
     <>
-      <StyledStepper activeStep={activeStep}>
+      <StyledStepper activeStep={activeStep} isMinimal={isMinimal}>
         <Step key="set new funds">
           <StepLabel>
             <FormattedMessage description="set new rate" defaultMessage="Set rate" />
@@ -128,8 +139,9 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
                 isLoadingBalance={false}
                 token={position.from}
                 balance={realBalance}
+                fullWidth
               />
-              <Typography variant="body2">
+              <Typography variant={isMinimal ? 'body2' : 'body1'}>
                 <FormattedMessage
                   description="in position"
                   defaultMessage="Available: {balance} {symbol}"
@@ -149,7 +161,7 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
                 label={position.swapInterval.toString()}
                 onChange={setFrequencyValue}
               />
-              <Typography variant="body2">
+              <Typography variant={isMinimal ? 'body2' : 'body1'}>
                 <FormattedMessage
                   description="current days to finish"
                   defaultMessage="Current: {remainingDays} {type} left"
@@ -159,7 +171,7 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
                   }}
                 />
               </Typography>
-              <Typography variant="caption">
+              <Typography variant={isMinimal ? 'caption' : 'body2'}>
                 <FormattedMessage
                   description="rate detail"
                   defaultMessage="We'll swap {rate} {from} every {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
@@ -174,10 +186,49 @@ const ModifyRateAndSwaps = ({ onClose, onModifyRateAndSwaps, position, balance }
                   }}
                 />
               </Typography>
+              {showAddCaption && (
+                <Typography variant={isMinimal ? 'caption' : 'body2'}>
+                  {position.remainingLiquidity
+                    .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals)))
+                    .lte(BigNumber.from(0)) ? (
+                    <FormattedMessage
+                      description="rate add detail"
+                      defaultMessage="You will need to provide an aditional {addAmmount} {from}"
+                      values={{
+                        from: position.from.symbol,
+                        addAmmount: formatUnits(
+                          position.remainingLiquidity
+                            .sub(
+                              BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals))
+                            )
+                            .abs(),
+                          position.from.decimals
+                        ),
+                      }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      description="rate withdraw detail"
+                      defaultMessage="We will return {returnAmmount} {from} to you"
+                      values={{
+                        from: position.from.symbol,
+                        returnAmmount: formatUnits(
+                          position.remainingLiquidity
+                            .sub(
+                              BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals))
+                            )
+                            .abs(),
+                          position.from.decimals
+                        ),
+                      }}
+                    />
+                  )}
+                </Typography>
+              )}
             </>
           )}
         </StyledInputContainer>
-        <StyledActionContainer>
+        <StyledActionContainer isMinimal={isMinimal}>
           <Button color="default" variant="outlined" onClick={handleBack}>
             {activeStep === 0 && <FormattedMessage description="cancel" defaultMessage="Cancel" />}
             {activeStep !== 0 && <FormattedMessage description="go back" defaultMessage="Back" />}

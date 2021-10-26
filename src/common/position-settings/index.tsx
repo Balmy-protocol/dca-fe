@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-
+import { useHistory } from 'react-router';
 const StyledActionsContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -29,6 +29,7 @@ interface PositionSettingsProps {
   onModifyRate: () => void;
   onRemoveFunds: () => void;
   onClose: () => void;
+  positionId: string;
 }
 
 const PositionSettings = ({
@@ -38,7 +39,14 @@ const PositionSettings = ({
   onModifyRate,
   onRemoveFunds,
   onClose,
+  positionId,
 }: PositionSettingsProps) => {
+  const history = useHistory();
+
+  const onViewDetails = () => {
+    history.push(`/positions/${positionId}`);
+  };
+
   return (
     <>
       <StyledHeader>
@@ -64,8 +72,8 @@ const PositionSettings = ({
         <Button variant="outlined" color="default" size="small" fullWidth onClick={onModifyRate}>
           <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
         </Button>
-        <Button variant="contained" color="error" size="small" fullWidth onClick={onTerminate}>
-          <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
+        <Button variant="contained" color="secondary" size="small" fullWidth onClick={onViewDetails}>
+          <FormattedMessage description="view details" defaultMessage="View details" />
         </Button>
       </StyledActionsContainer>
     </>
