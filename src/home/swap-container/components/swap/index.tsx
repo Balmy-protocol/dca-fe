@@ -70,6 +70,7 @@ import { BigNumber } from 'ethers';
 import { ETH, WETH } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import NetworkMenu from 'common/network-menu';
+import { STALE } from 'hooks/useIsStale';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -371,12 +372,13 @@ const Swap = ({
   };
 
   const preHandleSwap = () => {
-    const isStale = calculateStale(
-      existingPair?.lastExecutedAt || 0,
-      frequencyType,
-      existingPair?.createdAt || 0,
-      existingPair?.swapInfo || null
-    );
+    const isStale =
+      calculateStale(
+        existingPair?.lastExecutedAt || 0,
+        frequencyType,
+        existingPair?.createdAt || 0,
+        existingPair?.swapInfo || null
+      ) === STALE;
 
     if (isStale) {
       setShouldShowStalePairModal(true);
