@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
-import { FullPosition, Position, Token } from 'types';
+import find from 'lodash/find';
+import { FullPosition, GetNextSwapInfo, Position, Token } from 'types';
 
 const HOURS_IN_MONTH = BigNumber.from(720);
 const DAYS_IN_WEEK = BigNumber.from(7);
@@ -71,15 +72,42 @@ export const sortTokens = (tokenA: Token, tokenB: Token) => {
   return [token0, token1];
 };
 
-export const calculateStale = (lastSwapped: number, frequencyType: BigNumber, createdAt: number) => {
+export const calculateStale: (
+  lastSwapped: number | undefined,
+  frequencyType: BigNumber,
+  createdAt: number,
+  nextSwapInformation: GetNextSwapInfo | null
+) => -1 | 0 | 1 | 2 = (
+  lastSwapped: number = 0,
+  frequencyType: BigNumber,
+  createdAt: number,
+  nextSwapInformation: GetNextSwapInfo | null
+) => {
+  let isStale = false;
+  if (!nextSwapInformation) {
+    return -1;
+  }
+
+  const hasToExecute = find(nextSwapInformation.swapsToPerform, { interval: frequencyType.toNumber() });
+
   const today = Math.floor(Date.now() / 1000);
 
   if (lastSwapped === 0) {
-    return BigNumber.from(today).gt(BigNumber.from(createdAt).add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
+    isStale = BigNumber.from(today).gt(BigNumber.from(createdAt).add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
   }
 
   const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(1).mul(frequencyType);
-  return BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
+  isStale = BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
+
+  if (isStale) {
+    if (!hasToExecute) {
+      return 0;
+    }
+
+    return 2;
+  } else {
+    return 1;
+  }
 };
 
 export const calculateStaleSwaps = (lastSwapped: number, frequencyType: BigNumber, createdAt: number) => {

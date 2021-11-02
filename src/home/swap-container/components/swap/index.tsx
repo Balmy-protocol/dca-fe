@@ -371,7 +371,12 @@ const Swap = ({
   };
 
   const preHandleSwap = () => {
-    const isStale = calculateStale(existingPair?.lastExecutedAt || 0, frequencyType, existingPair?.createdAt || 0);
+    const isStale = calculateStale(
+      existingPair?.lastExecutedAt || 0,
+      frequencyType,
+      existingPair?.createdAt || 0,
+      existingPair?.swapInfo || null
+    );
 
     if (isStale) {
       setShouldShowStalePairModal(true);

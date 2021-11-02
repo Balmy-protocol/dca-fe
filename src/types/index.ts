@@ -66,12 +66,19 @@ export type SwapInterval = {
   description: string;
 };
 
+export interface GetNextSwapInfo {
+  swapsToPerform: {
+    interval: number;
+  }[];
+}
+
 export type AvailablePair = {
   token0: Token;
   token1: Token;
   lastExecutedAt: number;
   createdAt: number;
   id: string;
+  swapInfo: GetNextSwapInfo;
 };
 
 export type AvailablePairs = AvailablePair[];

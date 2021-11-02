@@ -47,12 +47,13 @@ interface PositionStatusProps {
 const PositionStatus = ({ position, pair }: PositionStatusProps) => {
   if (!pair) return null;
   const lastExecutedAt = (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || '0';
-  const isStale = calculateStale(
-    parseInt(lastExecutedAt, 10) || 0,
-    BigNumber.from(position.swapInterval.interval),
-    parseInt(pair.createdAtTimestamp, 10) || 0
-  );
+  // const isStale = calculateStale(
+  //   parseInt(lastExecutedAt, 10) || 0,
+  //   BigNumber.from(position.swapInterval.interval),
+  //   parseInt(pair.createdAtTimestamp, 10) || 0
+  // );
 
+  const isStale = false;
   const hasNoFunds = BigNumber.from(position.current.remainingLiquidity).lte(BigNumber.from(0));
 
   const isTerminated = position.status === 'TERMINATED';

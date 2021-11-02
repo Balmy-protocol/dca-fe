@@ -33,6 +33,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useIsStale, { STALE } from 'hooks/useIsStale';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -164,7 +165,13 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
-  const isStale = calculateStale(pair?.lastExecutedAt || 0, swapInterval, pair?.createdAt || 0);
+  const isStale =
+    calculateStale(
+      pair?.lastExecutedAt || 0,
+      swapInterval,
+      pair?.createdAt || 0,
+      pair?.swapInfo || { swapsToPerform: [] }
+    ) === STALE;
 
   const shouldBlockModifications = remainingSwaps.eq(BigNumber.from(0)) && withdrawn.gte(swapped);
 

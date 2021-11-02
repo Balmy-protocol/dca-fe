@@ -39,6 +39,7 @@ import {
   GetPoolResponse,
   TxPriceResponse,
   FullPosition,
+  GetNextSwapInfo,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { getURLFromQuery, sortTokens } from 'utils/parsing';
@@ -337,13 +338,16 @@ export default class Web3Service {
       'network-only'
     );
 
-    this.availablePairs = availablePairsResponse.data.pairs.map((pair: AvailablePairResponse) => ({
-      token0: pair.tokenA,
-      token1: pair.tokenB,
-      lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
-      id: pair.id,
-      createdAt: pair.createdAtTimestamp,
-    }));
+    this.availablePairs = await Promise.all(
+      availablePairsResponse.data.pairs.map(async (pair: AvailablePairResponse) => ({
+        token0: pair.tokenA,
+        token1: pair.tokenB,
+        lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
+        id: pair.id,
+        createdAt: pair.createdAtTimestamp,
+        swapInformation: this.getNextSwapInfo(pair.id),
+      }))
+    );
 
     this.tokenList = {};
 
@@ -962,6 +966,9 @@ export default class Web3Service {
           id: newPairTypeData.id as string,
           lastExecutedAt: 0,
           createdAt: Math.floor(Date.now() / 1000),
+          swapInfo: {
+            swapsToPerform: [],
+          },
         });
         break;
     }
@@ -971,6 +978,12 @@ export default class Web3Service {
     const factory = new ethers.Contract(pairContract.id, DCAPair.abi, this.getSigner());
 
     return factory.interface.parseLog(log);
+  }
+
+  async getNextSwapInfo(pair: string): Promise<GetNextSwapInfo> {
+    const pairAddressContract = new ethers.Contract(pair, DCAPair.abi, this.client);
+
+    return pairAddressContract.getNextSwapInfo();
   }
 
   async getPairLiquidity(token0: Token, token1: Token) {
