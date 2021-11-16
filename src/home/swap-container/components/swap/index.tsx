@@ -36,10 +36,15 @@ import CreatePairModal from 'common/create-pair-modal';
 import StalePairModal from 'common/stale-pair-modal';
 import LowLiquidityModal from 'common/low-liquidity-modal';
 import {
+  FIVE_MINUTES,
   FULL_DEPOSIT_TYPE,
   MINIMUM_LIQUIDITY_USD,
   MODE_TYPES,
   NETWORKS,
+  ONE_HOUR,
+  ONE_WEEK,
+  ONE_DAY,
+  STRING_SWAP_INTERVALS,
   POSSIBLE_ACTIONS,
   RATE_TYPE,
   SUPPORTED_NETWORKS,
@@ -55,16 +60,7 @@ import {
   useHasPendingPairCreation,
   useHasPendingWrap,
 } from 'state/transactions/hooks';
-import {
-  DAY_IN_SECONDS,
-  WEEK_IN_SECONDS,
-  MONTH_IN_SECONDS,
-  STRING_SWAP_INTERVALS,
-  FIVE_MINUTES_IN_SECONDS,
-  getFrequencyLabel,
-  calculateStale,
-  HOURS_IN_SECONDS,
-} from 'utils/parsing';
+import { getFrequencyLabel, calculateStale } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { ETH, WETH } from 'mocks/tokens';
@@ -132,26 +128,22 @@ const getFrequencyTypeOptions = (chainId: number) => [
   ...(chainId !== NETWORKS.mainnet.chainId
     ? [
         {
-          label: STRING_SWAP_INTERVALS[FIVE_MINUTES_IN_SECONDS.toString()],
-          value: FIVE_MINUTES_IN_SECONDS,
+          label: STRING_SWAP_INTERVALS[FIVE_MINUTES.toString()],
+          value: FIVE_MINUTES,
         },
       ]
     : []),
-  // {
-  //   label: STRING_SWAP_INTERVALS[HOURS_IN_SECONDS.toString()],
-  //   value: HOURS_IN_SECONDS,
-  // },
   {
-    label: STRING_SWAP_INTERVALS[DAY_IN_SECONDS.toString()],
-    value: DAY_IN_SECONDS,
+    label: STRING_SWAP_INTERVALS[ONE_HOUR.toString()],
+    value: ONE_HOUR,
   },
   {
-    label: STRING_SWAP_INTERVALS[WEEK_IN_SECONDS.toString()],
-    value: WEEK_IN_SECONDS,
+    label: STRING_SWAP_INTERVALS[ONE_DAY.toString()],
+    value: ONE_DAY,
   },
   {
-    label: STRING_SWAP_INTERVALS[MONTH_IN_SECONDS.toString()],
-    value: MONTH_IN_SECONDS,
+    label: STRING_SWAP_INTERVALS[ONE_WEEK.toString()],
+    value: ONE_WEEK,
   },
 ];
 

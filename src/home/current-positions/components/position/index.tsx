@@ -13,10 +13,10 @@ import TokenIcon from 'common/token-icon';
 import usePromise from 'hooks/usePromise';
 import { Position, Token, Web3Service, AvailablePair } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { STRING_SWAP_INTERVALS, getFrequencyLabel } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { sortTokens, calculateStale } from 'utils/parsing';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import Cog from 'assets/svg/atom/cog';
@@ -33,7 +33,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import useIsStale, { STALE } from 'hooks/useIsStale';
+import { STALE } from 'hooks/useIsStale';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;

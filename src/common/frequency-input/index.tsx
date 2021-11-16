@@ -2,7 +2,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { SetStateCallback } from 'types';
-import { STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { STRING_SWAP_INTERVALS } from 'config/constants';
 
 interface FrequencyInputProps {
   id: string;

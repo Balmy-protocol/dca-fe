@@ -48,7 +48,7 @@ interface PositionStatusProps {
 const PositionStatus = ({ position, pair }: PositionStatusProps) => {
   if (!pair) return null;
   const lastExecutedAt = (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || '0';
-  const [calculateStale, isLoadingStale] = useIsStale(pair.id);
+  const [calculateStale, isLoadingStale] = useIsStale(pair);
 
   const isStale =
     isLoadingStale &&

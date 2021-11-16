@@ -224,6 +224,12 @@ export interface PairSwaps {
 export interface GetPairSwapsData {
   id: string;
   createdAtTimestamp: string;
+  tokenA: {
+    id: string;
+  };
+  tokenB: {
+    id: string;
+  };
   swaps: PairSwaps[];
 }
 

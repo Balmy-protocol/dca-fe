@@ -15,11 +15,11 @@ import {
   WrapEtherTypeData,
   ModifyRateAndSwapsPositionTypeData,
 } from 'types';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
-import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
 
 function useBuildTransactionDetail() {
   const availablePairs = useAvailablePairs();

@@ -12,8 +12,8 @@ import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
 import Divider from '@material-ui/core/Divider';
 
-import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
-
+import { getFrequencyLabel } from 'utils/parsing';
+import { STRING_SWAP_INTERVALS } from 'config/constants';
 interface DetailsProps {
   position: FullPosition;
 }

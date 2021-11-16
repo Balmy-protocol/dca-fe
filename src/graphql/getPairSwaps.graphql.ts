@@ -4,6 +4,18 @@ const getPairSwaps = gql`
   query getPairSwaps($id: ID) {
     pair(id: $id) {
       id
+      tokenA {
+        address: id
+        decimals
+        name
+        symbol
+      }
+      tokenB {
+        address: id
+        decimals
+        name
+        symbol
+      }
       createdAtTimestamp
       swaps(orderBy: executedAtTimestamp, orderDirection: desc) {
         id

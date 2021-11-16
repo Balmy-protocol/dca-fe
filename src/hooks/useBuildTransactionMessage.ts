@@ -20,7 +20,8 @@ import { TRANSACTION_TYPES } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
-import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
+import { STRING_SWAP_INTERVALS } from 'config/constants';
 
 function useBuildTransactionMessages() {
   const availablePairs = useAvailablePairs();
