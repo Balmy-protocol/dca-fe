@@ -8,10 +8,11 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { Position, Token } from 'types';
-import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
+import { STRING_SWAP_INTERVALS } from 'config/constants';
 
 const StyledCard = styled(Card)`
   margin: 10px;

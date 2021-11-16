@@ -11,7 +11,8 @@ import Typography from '@material-ui/core/Typography';
 import TokenInput from 'common/token-input';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
-import { STRING_SWAP_INTERVALS, getFrequencyLabel } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
+import { STRING_SWAP_INTERVALS } from 'config/constants';
 
 const StyledOverlay = styled.div`
   position: absolute;

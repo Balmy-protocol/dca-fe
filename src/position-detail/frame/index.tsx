@@ -19,14 +19,14 @@ import NftViewer from 'position-detail/nft-viewer';
 import Details from 'position-detail/position-data';
 import PositionControls from 'position-detail/position-controls';
 import WithdrawModal from 'common/withdraw-modal';
-import { fullPositionToMappedPosition, getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { fullPositionToMappedPosition, getFrequencyLabel } from 'utils/parsing';
 import TerminateModal from 'common/terminate-modal';
 import useBalance from 'hooks/useBalance';
 import Collapse from '@material-ui/core/Collapse';
 import ModifyRateSettings from 'common/modify-rate-settings';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { usePositionHasPendingTransaction, useTransactionAdder } from 'state/transactions/hooks';
 import PositionStatus from 'position-detail/position-status';
 

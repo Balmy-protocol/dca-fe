@@ -57,6 +57,7 @@ import gqlFetchAllById from 'utils/gqlFetchAllById';
 import ERC20ABI from 'abis/erc20.json';
 import WETHABI from 'abis/weth.json';
 import Factory from 'abis/factory.json';
+import HUB from 'abis/Hub.json';
 import DCAPair from 'abis/DCAPair.json';
 import TokenDescriptor from 'abis/TokenDescriptor.json';
 
@@ -64,7 +65,7 @@ import TokenDescriptor from 'abis/TokenDescriptor.json';
 import usedTokensMocks from 'mocks/usedTokens';
 import { ETH, WETH } from 'mocks/tokens';
 import {
-  FACTORY_ADDRESS,
+  HUB_ADDRESS,
   FULL_DEPOSIT_TYPE,
   MEAN_GRAPHQL_URL,
   NETWORKS,
@@ -112,6 +113,7 @@ export default class Web3Service {
     this.uniClient = new GraphqlService();
   }
 
+  // GETTERS AND SETTERS
   setClient(client: ethers.providers.Web3Provider) {
     this.client = client;
   }
@@ -149,6 +151,49 @@ export default class Web3Service {
     this.setAccountCallback(account);
   }
 
+  async getNetwork() {
+    if (this.client) {
+      return this.client.getNetwork();
+    }
+
+    if (window.ethereum) {
+      return new ethers.providers.Web3Provider(window.ethereum).getNetwork();
+    }
+
+    return Promise.resolve(NETWORKS.mainnet);
+  }
+
+  getAccount() {
+    return this.account;
+  }
+
+  getSigner() {
+    return this.signer;
+  }
+
+  getCurrentPositions() {
+    return orderBy(values(this.currentPositions), 'startedAt', 'desc');
+  }
+
+  getPastPositions() {
+    return orderBy(values(this.pastPositions), 'startedAt', 'desc');
+  }
+
+  getAvailablePairs() {
+    return this.availablePairs;
+  }
+
+  getTokenList() {
+    return this.tokenList;
+  }
+
+  getUsedTokens() {
+    return axios.get(
+      `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
+    );
+  }
+
+  // BOOTSTRAP
   async connect() {
     const provider = await this.modal?.connect();
 
@@ -250,26 +295,6 @@ export default class Web3Service {
     this.setAccount(account);
   }
 
-  async getNetwork() {
-    if (this.client) {
-      return this.client.getNetwork();
-    }
-
-    if (window.ethereum) {
-      return new ethers.providers.Web3Provider(window.ethereum).getNetwork();
-    }
-
-    return Promise.resolve(NETWORKS.mainnet);
-  }
-
-  getAccount() {
-    return this.account;
-  }
-
-  getSigner() {
-    return this.signer;
-  }
-
   async disconnect() {
     if (this.client && (this.client as any).disconnect) {
       await (this.client as any).disconnect();
@@ -345,7 +370,7 @@ export default class Web3Service {
         lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
         id: pair.id,
         createdAt: pair.createdAtTimestamp,
-        swapInformation: this.getNextSwapInfo(pair.id),
+        swapInfo: this.getNextSwapInfo({ tokenA: pair.tokenA.id, tokenB: pair.tokenB.id }),
       }))
     );
 
@@ -484,6 +509,7 @@ export default class Web3Service {
     }
   }
 
+  // ADDRESS METHODS
   changeNetwork(newChainId: number) {
     if (!window.ethereum) {
       return;
@@ -507,6 +533,109 @@ export default class Web3Service {
     return erc20.balanceOf(this.getAccount());
   }
 
+  async wrapETH(amount: string) {
+    const ERC20Interface = new Interface(WETHABI) as any;
+
+    const chain = await this.getNetwork();
+
+    const erc20 = new ethers.Contract(WETH(chain.chainId).address, ERC20Interface, this.getSigner());
+
+    return erc20.deposit({ value: parseUnits(amount, ETH.decimals).toHexString() });
+  }
+
+  async getAllowance(token: Token, pairContract: AvailablePair) {
+    const ERC20Interface = new Interface(ERC20ABI) as any;
+
+    const chain = await this.getNetwork();
+
+    const erc20 = new ethers.Contract(
+      token.address === ETH.address ? WETH(chain.chainId).address : token.address,
+      ERC20Interface,
+      this.client
+    );
+
+    return erc20
+      .allowance(this.getAccount(), pairContract.id)
+      .then((allowance: string) => ({ token, allowance: formatUnits(allowance, token.decimals) }));
+  }
+
+  async approveToken(token: Token, pairContract: AvailablePair) {
+    const ERC20Interface = new Interface(ERC20ABI) as any;
+
+    const chain = await this.getNetwork();
+
+    const erc20 = new ethers.Contract(
+      token.address === ETH.address ? WETH(chain.chainId).address : token.address,
+      ERC20Interface,
+      this.getSigner()
+    );
+
+    return erc20.approve(pairContract.id, MaxUint256);
+  }
+
+  // PAIR METHODS
+  async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
+    const hubContract = new ethers.Contract(HUB_ADDRESS, HUB.abi, this.client);
+
+    const nextSwapInfo = await hubContract.getNextSwapInfo();
+
+    return {
+      swapsToPerform: [],
+    };
+  }
+
+  async getPairLiquidity(token0: Token, token1: Token) {
+    let tokenA;
+    let tokenB;
+    if (token0.address < token1.address) {
+      tokenA = token0.address;
+      tokenB = token1.address;
+    } else {
+      tokenA = token1.address;
+      tokenB = token0.address;
+    }
+    const poolsWithLiquidityResponse = await gqlFetchAll(
+      this.uniClient.getClient(),
+      GET_PAIR_LIQUIDITY,
+      {
+        tokenA,
+        tokenB,
+      },
+      'pools'
+    );
+
+    const liquidity: number = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
+      pool.poolDayData.forEach((dayData) => (acc += parseFloat(dayData.volumeUSD)));
+
+      return acc;
+    }, 0);
+
+    return liquidity;
+  }
+
+  async hasPool(token0: Token, token1: Token) {
+    const [tokenA, tokenB] = sortTokens(token0, token1);
+
+    // if they are not connected we show everything as available
+    if (!this.client) return true;
+
+    const chain = await this.client.getNetwork();
+
+    const poolsData = await this.uniClient.getClient().query<GetPoolResponse>({
+      query: GET_POOLS,
+      variables: {
+        tokenA: tokenA.address === ETH.address ? WETH(chain.chainId).address : tokenA.address,
+        tokenB: tokenB.address === ETH.address ? WETH(chain.chainId).address : tokenB.address,
+      },
+    });
+
+    const {
+      data: { pools },
+    } = poolsData;
+
+    return !!pools.length;
+  }
+
   async getEstimatedPairCreation(token0?: string, token1?: string) {
     if (!token0 || !token1) return Promise.resolve();
 
@@ -524,7 +653,7 @@ export default class Web3Service {
     tokenA = tokenA === ETH.address ? WETH(chain.chainId).address : tokenA;
     tokenB = tokenB === ETH.address ? WETH(chain.chainId).address : tokenB;
 
-    const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
+    const factory = new ethers.Contract(HUB_ADDRESS, Factory.abi, this.getSigner());
 
     return Promise.all([
       factory.estimateGas.createPair(tokenA, tokenB),
@@ -569,78 +698,17 @@ export default class Web3Service {
     tokenA = tokenA === ETH.address ? WETH(chain.chainId).address : tokenA;
     tokenB = tokenB === ETH.address ? WETH(chain.chainId).address : tokenB;
 
-    const factory = new ethers.Contract(FACTORY_ADDRESS, Factory.abi, this.getSigner());
+    const factory = new ethers.Contract(HUB_ADDRESS, Factory.abi, this.getSigner());
 
     return factory.createPair(tokenA, tokenB);
   }
 
+  // POSITION EMTHODS
   async getTokenNFT(dcaId: string, pairAddress: string) {
     const pairAddressContract = new ethers.Contract(pairAddress, DCAPair.abi, this.client);
 
     const tokenData = await pairAddressContract.tokenURI(dcaId);
     return JSON.parse(atob(tokenData.substring(29)));
-  }
-
-  getCurrentPositions() {
-    return orderBy(values(this.currentPositions), 'startedAt', 'desc');
-  }
-
-  getPastPositions() {
-    return orderBy(values(this.pastPositions), 'startedAt', 'desc');
-  }
-
-  getAvailablePairs() {
-    return this.availablePairs;
-  }
-
-  getTokenList() {
-    return this.tokenList;
-  }
-
-  getUsedTokens() {
-    return axios.get(
-      `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
-    );
-  }
-
-  async wrapETH(amount: string) {
-    const ERC20Interface = new Interface(WETHABI) as any;
-
-    const chain = await this.getNetwork();
-
-    const erc20 = new ethers.Contract(WETH(chain.chainId).address, ERC20Interface, this.getSigner());
-
-    return erc20.deposit({ value: parseUnits(amount, ETH.decimals).toHexString() });
-  }
-
-  async getAllowance(token: Token, pairContract: AvailablePair) {
-    const ERC20Interface = new Interface(ERC20ABI) as any;
-
-    const chain = await this.getNetwork();
-
-    const erc20 = new ethers.Contract(
-      token.address === ETH.address ? WETH(chain.chainId).address : token.address,
-      ERC20Interface,
-      this.client
-    );
-
-    return erc20
-      .allowance(this.getAccount(), pairContract.id)
-      .then((allowance: string) => ({ token, allowance: formatUnits(allowance, token.decimals) }));
-  }
-
-  async approveToken(token: Token, pairContract: AvailablePair) {
-    const ERC20Interface = new Interface(ERC20ABI) as any;
-
-    const chain = await this.getNetwork();
-
-    const erc20 = new ethers.Contract(
-      token.address === ETH.address ? WETH(chain.chainId).address : token.address,
-      ERC20Interface,
-      this.getSigner()
-    );
-
-    return erc20.approve(pairContract.id, MaxUint256);
   }
 
   async deposit(
@@ -743,6 +811,7 @@ export default class Web3Service {
     );
   }
 
+  // TRANSACTION HANDLING
   getTransactionReceipt(txHash: string) {
     return this.client.getTransactionReceipt(txHash);
   }
@@ -765,6 +834,12 @@ export default class Web3Service {
 
   removeOnBlock() {
     return this.client.off('block');
+  }
+
+  parseLog(log: any, pairContract: AvailablePair) {
+    const factory = new ethers.Contract(pairContract.id, DCAPair.abi, this.getSigner());
+
+    return factory.interface.parseLog(log);
   }
 
   setPendingTransaction(transaction: TransactionDetails) {
@@ -972,69 +1047,5 @@ export default class Web3Service {
         });
         break;
     }
-  }
-
-  parseLog(log: any, pairContract: AvailablePair) {
-    const factory = new ethers.Contract(pairContract.id, DCAPair.abi, this.getSigner());
-
-    return factory.interface.parseLog(log);
-  }
-
-  async getNextSwapInfo(pair: string): Promise<GetNextSwapInfo> {
-    const pairAddressContract = new ethers.Contract(pair, DCAPair.abi, this.client);
-
-    return pairAddressContract.getNextSwapInfo();
-  }
-
-  async getPairLiquidity(token0: Token, token1: Token) {
-    let tokenA;
-    let tokenB;
-    if (token0.address < token1.address) {
-      tokenA = token0.address;
-      tokenB = token1.address;
-    } else {
-      tokenA = token1.address;
-      tokenB = token0.address;
-    }
-    const poolsWithLiquidityResponse = await gqlFetchAll(
-      this.uniClient.getClient(),
-      GET_PAIR_LIQUIDITY,
-      {
-        tokenA,
-        tokenB,
-      },
-      'pools'
-    );
-
-    const liquidity: number = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
-      pool.poolDayData.forEach((dayData) => (acc += parseFloat(dayData.volumeUSD)));
-
-      return acc;
-    }, 0);
-
-    return liquidity;
-  }
-
-  async hasPool(token0: Token, token1: Token) {
-    const [tokenA, tokenB] = sortTokens(token0, token1);
-
-    // if they are not connected we show everything as available
-    if (!this.client) return true;
-
-    const chain = await this.client.getNetwork();
-
-    const poolsData = await this.uniClient.getClient().query<GetPoolResponse>({
-      query: GET_POOLS,
-      variables: {
-        tokenA: tokenA.address === ETH.address ? WETH(chain.chainId).address : tokenA.address,
-        tokenB: tokenB.address === ETH.address ? WETH(chain.chainId).address : tokenB.address,
-      },
-    });
-
-    const {
-      data: { pools },
-    } = poolsData;
-
-    return !!pools.length;
   }
 }

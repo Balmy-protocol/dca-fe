@@ -76,15 +76,15 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.kovan.chainId,
 ];
 
-export const FACTORY_ADDRESS = '0xaC4a40a995f236E081424D966F1dFE014Fe0e98A';
-export const TOKEN_DESCRIPTOR_ADDRESS = '0x51B2f9a89cB8033262CE0F7BA8618cafE11cA679';
+export const HUB_ADDRESS = '0x4384f6e940C9bF5e56df63064e38CB9c5Af4A8Bc';
+export const TOKEN_DESCRIPTOR_ADDRESS = '0x2B5384Ba9CE1cF889Ef758E14B6E9B7abb6e4bbF';
 
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1',
   [NETWORKS.ropsten.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-ropsten',
   [NETWORKS.rinkeby.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-rinkeby',
   [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-goerli',
-  [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-kovan',
+  [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1dot1-kovan',
   [NETWORKS.meanfinance.chainId]: 'http://3.235.77.84:8000/subgraphs/name/alejoamiras/dca-subgraph',
 };
 
@@ -173,3 +173,61 @@ export const TOKEN_LISTS = {
 };
 
 export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST'];
+
+export const ONE_MINUTE = BigNumber.from(60);
+export const FIVE_MINUTES = ONE_MINUTE.mul(BigNumber.from(5));
+export const FIFTEEN_MINUTES = FIVE_MINUTES.mul(BigNumber.from(3));
+export const THIRTY_MINUTES = FIFTEEN_MINUTES.mul(BigNumber.from(2));
+export const ONE_HOUR = THIRTY_MINUTES.mul(BigNumber.from(2));
+export const FOUR_HOURS = ONE_HOUR.mul(BigNumber.from(4));
+export const ONE_DAY = FOUR_HOURS.mul(BigNumber.from(6));
+export const ONE_WEEK = ONE_DAY.mul(BigNumber.from(7));
+
+export const SWAP_INTERVALS = {
+  hour: ONE_HOUR,
+  day: ONE_DAY,
+  week: ONE_WEEK,
+};
+
+export const STRING_SWAP_INTERVALS = {
+  [ONE_MINUTE.toString()]: {
+    singular: '1 minute',
+    plural: '1 minute',
+    adverb: '1 minutely',
+  },
+  [FIVE_MINUTES.toString()]: {
+    singular: '5 minutes',
+    plural: '5 minutes',
+    adverb: '5 minutely',
+  },
+  [FIFTEEN_MINUTES.toString()]: {
+    singular: '15 minutes',
+    plural: '15 minutes',
+    adverb: '15 minutely',
+  },
+  [THIRTY_MINUTES.toString()]: {
+    singular: '30 minutes',
+    plural: '30 minutes',
+    adverb: '30 minutely',
+  },
+  [ONE_HOUR.toString()]: {
+    singular: 'hour',
+    plural: 'hours',
+    adverb: 'hourly',
+  },
+  [FOUR_HOURS.toString()]: {
+    singular: '4 hours',
+    plural: '4 hours',
+    adverb: '4 hourly',
+  },
+  [ONE_DAY.toString()]: {
+    singular: 'day',
+    plural: 'days',
+    adverb: 'daily',
+  },
+  [ONE_WEEK.toString()]: {
+    singular: 'week',
+    plural: 'weeks',
+    adverb: 'weekly',
+  },
+};

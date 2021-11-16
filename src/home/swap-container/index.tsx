@@ -6,17 +6,16 @@ import find from 'lodash/find';
 import WalletContext from 'common/wallet-context';
 import { useQuery } from '@apollo/client';
 import Swap from './components/swap';
-import { DAY_IN_SECONDS } from 'utils/parsing';
 import { WETH, DAI, UNI, ETH, USDC } from 'mocks/tokens';
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { NETWORKS } from 'config/constants';
+import { NETWORKS, ONE_DAY } from 'config/constants';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { Token } from 'types';
 
 const SwapContainer = () => {
   const [fromValue, setFromValue] = React.useState('');
-  const [frequencyType, setFrequencyType] = React.useState(DAY_IN_SECONDS);
+  const [frequencyType, setFrequencyType] = React.useState(ONE_DAY);
   const [frequencyValue, setFrequencyValue] = React.useState('5');
   const currentNetwork = useCurrentNetwork();
   const [from, setFrom] = React.useState(USDC(currentNetwork.chainId));

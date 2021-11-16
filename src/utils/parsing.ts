@@ -1,53 +1,7 @@
 import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import { FullPosition, GetNextSwapInfo, Position, Token } from 'types';
-
-const HOURS_IN_MONTH = BigNumber.from(720);
-const DAYS_IN_WEEK = BigNumber.from(7);
-const HOURS_IN_DAYS = BigNumber.from(24);
-const MINUTES_IN_HOURS = BigNumber.from(60);
-const SECONDS_IN_MINUTES = BigNumber.from(60);
-
-export const FIVE_MINUTES_IN_SECONDS = SECONDS_IN_MINUTES.mul(BigNumber.from(5));
-export const HOURS_IN_SECONDS = SECONDS_IN_MINUTES.mul(MINUTES_IN_HOURS);
-export const DAY_IN_SECONDS = HOURS_IN_DAYS.mul(MINUTES_IN_HOURS).mul(SECONDS_IN_MINUTES);
-export const WEEK_IN_SECONDS = DAYS_IN_WEEK.mul(HOURS_IN_DAYS).mul(MINUTES_IN_HOURS).mul(SECONDS_IN_MINUTES);
-export const MONTH_IN_SECONDS = HOURS_IN_MONTH.mul(MINUTES_IN_HOURS).mul(SECONDS_IN_MINUTES);
-
-export const SWAP_INTERVALS = {
-  day: DAY_IN_SECONDS,
-  week: WEEK_IN_SECONDS,
-  month: MONTH_IN_SECONDS,
-};
-
-export const STRING_SWAP_INTERVALS = {
-  [FIVE_MINUTES_IN_SECONDS.toString()]: {
-    singular: '5 minutes',
-    plural: '5 minutes',
-    adverb: '5 minutely',
-  },
-  [HOURS_IN_SECONDS.toString()]: {
-    singular: 'hour',
-    plural: 'hours',
-    adverb: 'hourly',
-  },
-  [DAY_IN_SECONDS.toString()]: {
-    singular: 'day',
-    plural: 'days',
-    adverb: 'daily',
-  },
-  [WEEK_IN_SECONDS.toString()]: {
-    singular: 'week',
-    plural: 'weeks',
-    adverb: 'weekly',
-  },
-  [MONTH_IN_SECONDS.toString()]: {
-    singular: 'month',
-    plural: 'months',
-    adverb: 'monthly',
-  },
-};
-
+import { STRING_SWAP_INTERVALS, ONE_DAY } from 'config/constants';
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
   let token1 = tokenB;
@@ -93,11 +47,11 @@ export const calculateStale: (
   const today = Math.floor(Date.now() / 1000);
 
   if (lastSwapped === 0) {
-    isStale = BigNumber.from(today).gt(BigNumber.from(createdAt).add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
+    isStale = BigNumber.from(today).gt(BigNumber.from(createdAt).add(frequencyType).add(ONE_DAY.mul(3)));
   }
 
   const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(1).mul(frequencyType);
-  isStale = BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(DAY_IN_SECONDS.mul(3)));
+  isStale = BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(ONE_DAY.mul(3)));
 
   if (isStale) {
     if (!hasToExecute) {

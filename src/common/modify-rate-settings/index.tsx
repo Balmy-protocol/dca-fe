@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
-import { getFrequencyLabel, STRING_SWAP_INTERVALS } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
@@ -16,6 +16,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import FrequencyInput from 'common/frequency-input';
 import { formatCurrencyAmount } from 'utils/currency';
+import { STRING_SWAP_INTERVALS } from 'config/constants';
 
 const StyledOverlay = styled.div`
   position: absolute;
