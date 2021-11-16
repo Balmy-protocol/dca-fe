@@ -5,6 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import { FullPosition, GetPairSwapsData } from 'types';
 import { calculateStale, getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
+import useIsStale, { STALE } from 'hooks/useIsStale';
 
 const PositionStatusContainer = styled.div`
   display: flex;
@@ -47,13 +48,16 @@ interface PositionStatusProps {
 const PositionStatus = ({ position, pair }: PositionStatusProps) => {
   if (!pair) return null;
   const lastExecutedAt = (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || '0';
-  // const isStale = calculateStale(
-  //   parseInt(lastExecutedAt, 10) || 0,
-  //   BigNumber.from(position.swapInterval.interval),
-  //   parseInt(pair.createdAtTimestamp, 10) || 0
-  // );
+  const [calculateStale, isLoadingStale] = useIsStale(pair.id);
 
-  const isStale = false;
+  const isStale =
+    isLoadingStale &&
+    calculateStale(
+      parseInt(lastExecutedAt, 10) || 0,
+      BigNumber.from(position.swapInterval.interval),
+      parseInt(pair.createdAtTimestamp, 10) || 0
+    ) === STALE;
+
   const hasNoFunds = BigNumber.from(position.current.remainingLiquidity).lte(BigNumber.from(0));
 
   const isTerminated = position.status === 'TERMINATED';
