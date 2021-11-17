@@ -3,11 +3,11 @@ import WalletContext from 'common/wallet-context';
 import { TokenList } from 'types';
 import reduce from 'lodash/reduce';
 import { useAllTransactions } from 'state/transactions/hooks';
-import useCurrentNetwork from './useCurrentNetwork';
-import useTokensLists from './useTokensLists';
 import { NETWORKS } from 'config/constants';
 import { ETH } from 'mocks/tokens';
 import { useSavedTokenLists } from 'state/token-lists/hooks';
+import useTokensLists from './useTokensLists';
+import useCurrentNetwork from './useCurrentNetwork';
 
 function useTokenList() {
   const { web3Service } = React.useContext(WalletContext);

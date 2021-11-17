@@ -11,7 +11,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import CreatedIcon from '@material-ui/icons/NewReleases';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import { FullPosition, GetPairSwapsData, PairSwaps } from 'types';
+import { FullPosition, PairSwaps } from 'types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
 import { STABLE_COINS } from 'config/constants';
@@ -22,12 +22,6 @@ const StyledCard = styled(Card)``;
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 3px;
   font-size: 15px;
-`;
-
-const StyledTrailingTypography = styled.span`
-  &:before {
-    content: '\\00a0';
-  }
 `;
 
 const StyledTimeline = styled(Grid)`

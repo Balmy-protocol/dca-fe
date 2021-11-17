@@ -2,10 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
-import WalletContext, { WalletContextDefaultValue } from 'common/wallet-context';
-import { Token, TokenList, AvailablePairs } from 'types';
-import axios, { AxiosResponse } from 'axios';
-import MainApp from './frame';
+import WalletContext from 'common/wallet-context';
+import axios from 'axios';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from 'styled-components';
 import Web3Service from 'services/web3Service';
@@ -18,11 +16,12 @@ import TransactionUpdater from 'state/transactions/transactionUpdater';
 import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
 import { SnackbarProvider } from 'notistack';
 import { setupCache } from 'axios-cache-adapter';
+import MainApp from './frame';
 
 const theme = createMuiTheme();
 
 type AppProps = {
-  messages: any;
+  messages: Record<string, string>;
   locale: string;
 };
 
@@ -45,7 +44,7 @@ const axiosClient = axios.create({
 
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
   const [account, setAccount] = React.useState('');
-  const [web3Service, setWeb3Service] = React.useState(new Web3Service(setAccount));
+  const [web3Service] = React.useState(new Web3Service(setAccount));
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
 
   React.useEffect(() => {

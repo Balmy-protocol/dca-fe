@@ -1,10 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import { SetStateCallback } from 'types';
-import { getFrequencyLabel } from 'utils/parsing';
-import { STRING_SWAP_INTERVALS } from 'config/constants';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { maximalAppleTabsStylesHook } from 'common/tabs';
@@ -12,14 +8,11 @@ import findIndex from 'lodash/findIndex';
 
 interface FrequencyEasyInputProps {
   id: string;
-  label: string;
   value: string;
-  disabled?: boolean;
-  error?: string;
   onChange: (newValue: string) => void | SetStateCallback<string>;
 }
 
-interface selectOption {
+interface SelectOption {
   value: string;
 }
 
@@ -75,9 +68,8 @@ const StyledInput = styled.input`
   color: rgba(0, 0, 0, 0.87);
 `;
 
-const FrequencyEasyInput = ({ id, label, onChange, value }: FrequencyEasyInputProps) => {
-  const frequencyType = getFrequencyLabel(label, value);
-
+const FrequencyEasyInput = ({ id, onChange, value }: FrequencyEasyInputProps) => {
+  const [tabIndex, setTabIndex] = React.useState(findIndex(PREDEFINED_RANGES, { value }));
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
@@ -86,7 +78,6 @@ const FrequencyEasyInput = ({ id, label, onChange, value }: FrequencyEasyInputPr
     }
   };
 
-  const [tabIndex, setTabIndex] = React.useState(findIndex(PREDEFINED_RANGES, { value }));
   const tabsStyles = maximalAppleTabsStylesHook.useTabs();
   const tabItemStyles = maximalAppleTabsStylesHook.useTabItem();
   const handleChange = (index: number) => {
@@ -98,7 +89,7 @@ const FrequencyEasyInput = ({ id, label, onChange, value }: FrequencyEasyInputPr
     <StyledFrequencyInputContainer>
       <StyledTabContainer>
         <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => handleChange(index)}>
-          {PREDEFINED_RANGES.map((predefinedRangeOption: selectOption) => (
+          {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption) => (
             <Tab
               classes={tabItemStyles}
               key={predefinedRangeOption.value}

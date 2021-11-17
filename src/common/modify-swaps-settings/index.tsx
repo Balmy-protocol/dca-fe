@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { parseUnits, formatUnits } from '@ethersproject/units';
 import { Position } from 'types';
 import FrequencyInput from 'common/frequency-input';
 import { FormattedMessage } from 'react-intl';
@@ -54,7 +53,7 @@ const modifySwapsSettings = ({ position, onModifySwaps, onClose }: modifySwapsSe
       <StyledInputContainer>
         <FrequencyInput
           id="frequency-value"
-          error={!!hasError ? 'Value must be greater than 0' : ''}
+          error={hasError ? 'Value must be greater than 0' : ''}
           value={frequencyValue}
           label={position.swapInterval.toString()}
           onChange={setFrequencyValue}

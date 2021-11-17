@@ -63,11 +63,11 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
       <StyledInputContainer>
         <TokenInput
           id="from-value"
-          error={!!hasError ? 'Amount cannot exceed or equal your current funds' : ''}
+          error={hasError ? 'Amount cannot exceed or equal your current funds' : ''}
           value={fromValue}
           label={position.from.symbol}
           onChange={setFromValue}
-          withBalance={true}
+          withBalance
           isLoadingBalance={false}
           balance={position.remainingLiquidity}
           token={position.from}

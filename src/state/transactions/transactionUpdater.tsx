@@ -1,20 +1,20 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
-import { useAppDispatch, useAppSelector } from '../hooks';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useBuildTransactionMessage from 'hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from 'hooks/useBuildRejectedTransactionMessage';
 import Zoom from '@material-ui/core/Zoom';
-import { checkedTransaction, finalizeTransaction, removeTransaction, transactionFailed } from './actions';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
 import EtherscanLink from 'common/view-on-etherscan';
 import { NewPositionTypeData } from 'types';
-import { usePendingTransactions } from './hooks';
 import { setInitialized } from 'state/initializer/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { usePendingTransactions } from './hooks';
+import { checkedTransaction, finalizeTransaction, removeTransaction, transactionFailed } from './actions';
+import { useAppDispatch, useAppSelector } from '../hooks';
 
 interface TxInterface {
   addedTime: number;
@@ -31,13 +31,13 @@ export function shouldCheck(lastBlockNumber: number, tx: TxInterface): boolean {
   if (minutesPending > 60) {
     // every 10 blocks if pending for longer than an hour
     return blocksSinceCheck > 9;
-  } else if (minutesPending > 5) {
+  }
+  if (minutesPending > 5) {
     // every 3 blocks if pending more than 5 minutes
     return blocksSinceCheck > 2;
-  } else {
-    // otherwise every block
-    return true;
   }
+  // otherwise every block
+  return true;
 }
 
 export default function Updater(): null {

@@ -1,23 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@material-ui/core/Button';
+import Button, { ButtonProps } from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
-const variants = {
-  outlined: 'outlined',
-  contained: 'outlined',
-  text: 'text',
-};
-
-const types = {
-  primary: 'primary',
-  default: 'default',
-  white: 'white',
-  secondary: 'secondary',
-  warning: 'warning',
-  error: 'error',
-  tertiary: 'tertiary',
-  pending: 'pending',
-};
 
 const colors = {
   primary: '#239F33',
@@ -323,8 +307,12 @@ const ButtonTypes = {
   pending: PendingButton,
 };
 
-const CustomButton: React.FC<any> = ({ children, color, ...rest }) => {
-  const ButtonToRender = ButtonTypes[color as keyof typeof ButtonTypes];
+interface CustomButtonProps extends Omit<ButtonProps, 'color'> {
+  color: keyof typeof ButtonTypes;
+}
+
+const CustomButton: React.FC<CustomButtonProps> = ({ children, color, ...rest }: CustomButtonProps) => {
+  const ButtonToRender = ButtonTypes[color];
 
   return <ButtonToRender {...rest}>{children}</ButtonToRender>;
 };

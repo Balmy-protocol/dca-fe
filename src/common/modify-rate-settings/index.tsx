@@ -3,12 +3,9 @@ import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import { getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
-import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import TokenInput from 'common/token-input';
 import Stepper from '@material-ui/core/Stepper';
@@ -17,19 +14,6 @@ import StepLabel from '@material-ui/core/StepLabel';
 import FrequencyInput from 'common/frequency-input';
 import { formatCurrencyAmount } from 'utils/currency';
 import { STRING_SWAP_INTERVALS } from 'config/constants';
-
-const StyledOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  background-color: white;
-  padding: 10px 0px;
-  display: flex;
-  flex-direction: column;
-`;
 
 const StyledStepContents = styled.div`
   display: flex;
@@ -132,12 +116,10 @@ const ModifyRateAndSwaps = ({
             <>
               <TokenInput
                 id="from-value"
-                error={!!hasError ? 'Amount cannot exceed your current balance' : ''}
+                error={hasError ? 'Amount cannot exceed your current balance' : ''}
                 value={fromValue}
-                label={position.from.symbol}
                 onChange={setFromValue}
-                withBalance={true}
-                isLoadingBalance={false}
+                withBalance
                 token={position.from}
                 balance={realBalance}
                 fullWidth
@@ -157,7 +139,7 @@ const ModifyRateAndSwaps = ({
             <>
               <FrequencyInput
                 id="frequency-value"
-                error={!!hasError ? 'Value must be greater than 0' : ''}
+                error={hasError ? 'Value must be greater than 0' : ''}
                 value={frequencyValue}
                 label={position.swapInterval.toString()}
                 onChange={setFrequencyValue}

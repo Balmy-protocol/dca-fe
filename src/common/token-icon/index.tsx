@@ -1,5 +1,4 @@
 import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
 import { Token } from 'types';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import CryptoIcons from 'assets/svg/color';
@@ -27,7 +26,13 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
     );
   } else if (token?.logoURI && !hasError) {
     componentToRender = (
-      <img src={token.logoURI} onError={() => setHasError(true)} height={realSize} width={realSize} />
+      <img
+        src={token.logoURI}
+        onError={() => setHasError(true)}
+        height={realSize}
+        width={realSize}
+        alt={token.symbol}
+      />
     );
   } else {
     componentToRender = <HelpIcon style={{ fontSize: realSize }} className={isInChip ? 'MuiChip-icon' : ''} />;

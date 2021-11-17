@@ -1,17 +1,14 @@
 import * as React from 'react';
 import Grid from '@material-ui/core/Grid';
-import { useParams } from 'react-router-dom';
 import GraphWidget from 'common/graph-widget';
-import find from 'lodash/find';
 import WalletContext from 'common/wallet-context';
-import { useQuery } from '@apollo/client';
-import Swap from './components/swap';
-import { WETH, DAI, UNI, ETH, USDC } from 'mocks/tokens';
+import { WETH, ETH, USDC } from 'mocks/tokens';
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { NETWORKS, ONE_DAY } from 'config/constants';
+import { ONE_DAY } from 'config/constants';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { Token } from 'types';
+import Swap from './components/swap';
 
 const SwapContainer = () => {
   const [fromValue, setFromValue] = React.useState('');
@@ -29,7 +26,7 @@ const SwapContainer = () => {
   const onSetFrom = (newFrom: Token) => {
     // check for decimals
     if (newFrom.decimals < from.decimals) {
-      const splitValue = fromValue.match(/^(\d*)\.?(\d*)$/);
+      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
       let newFromValue = fromValue;
       if (splitValue && splitValue[2] !== '') {
         newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, newFrom.decimals)}`;
@@ -43,8 +40,8 @@ const SwapContainer = () => {
     //   setTo(newFrom.pairableTokens[0]);
     // }
   };
-  const onSetTo = (to: Token) => {
-    setTo(to);
+  const onSetTo = (newTo: Token) => {
+    setTo(newTo);
     // if (!to.pairableTokens.includes(from)) {
     //   const splitValue = fromValue.match(/^(\d*)\.?(\d*)$/);
     //   let newFromValue = fromValue;
@@ -67,7 +64,7 @@ const SwapContainer = () => {
 
     // check for decimals
     if (to.decimals < from.decimals) {
-      const splitValue = fromValue.match(/^(\d*)\.?(\d*)$/);
+      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
       let newFromValue = fromValue;
       if (splitValue && splitValue[2] !== '') {
         newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, to.decimals)}`;

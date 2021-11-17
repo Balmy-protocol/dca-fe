@@ -1,14 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { parseUnits, formatUnits } from '@ethersproject/units';
+import { parseUnits } from '@ethersproject/units';
 import { getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
 import TokenInput from 'common/token-input';
 import Stepper from '@material-ui/core/Stepper';
@@ -116,11 +114,11 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
               <>
                 <TokenInput
                   id="from-value"
-                  error={!!hasError ? 'Amount cannot exceed your current balance' : ''}
+                  error={hasError ? 'Amount cannot exceed your current balance' : ''}
                   value={fromValue}
                   label={position.from.symbol}
                   onChange={setFromValue}
-                  withBalance={true}
+                  withBalance
                   isLoadingBalance={false}
                   token={position.from}
                   balance={realBalance}
@@ -140,7 +138,7 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
               <>
                 <FrequencyInput
                   id="frequency-value"
-                  error={!!hasError ? 'Value must be greater than 0' : ''}
+                  error={hasError ? 'Value must be greater than 0' : ''}
                   value={frequencyValue}
                   label={position.swapInterval.toString()}
                   onChange={setFrequencyValue}

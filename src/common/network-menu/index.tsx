@@ -13,7 +13,6 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import { makeStyles } from '@material-ui/core/styles';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
-import { capitalizeFirstLetter } from 'utils/parsing';
 
 const useStyles = makeStyles({
   paper: {

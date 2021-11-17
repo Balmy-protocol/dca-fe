@@ -50,7 +50,7 @@ interface WithdrawModalProps {
 
 const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
   const classes = useStyles();
-  const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
+  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
   const availablePairs = useAvailablePairs();
   const [token0, token1] = sortTokens(position.from, position.to);

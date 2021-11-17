@@ -1,5 +1,4 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import find from 'lodash/find';
 import React from 'react';
 import { GetNextSwapInfo, GetPairSwapsData } from 'types';
 import { calculateStale as rawCalculateStale } from 'utils/parsing';
@@ -31,7 +30,7 @@ function useIsStale(
   }, []);
 
   const calculateStale = React.useCallback(
-    (lastSwapped: number = 0, frequencyType: BigNumber, createdAt: number) =>
+    (lastSwapped = 0, frequencyType: BigNumber, createdAt: number) =>
       rawCalculateStale(lastSwapped, frequencyType, createdAt, nextSwapInformation),
     [nextSwapInformation, isLoading, pair]
   );

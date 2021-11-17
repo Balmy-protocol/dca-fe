@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { formatUnits } from '@ethersproject/units';
 import find from 'lodash/find';
 import Card from '@material-ui/core/Card';
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -10,12 +9,11 @@ import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
-import usePromise from 'hooks/usePromise';
 import { Position, Token, Web3Service, AvailablePair } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { getFrequencyLabel } from 'utils/parsing';
+import { getFrequencyLabel, sortTokens, calculateStale } from 'utils/parsing';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { sortTokens, calculateStale } from 'utils/parsing';
+
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
@@ -25,7 +23,7 @@ import AddToPosition from 'common/add-to-position-settings';
 import { BigNumber } from 'ethers';
 import ResetPosition from 'common/reset-position-settings';
 import { formatCurrencyAmount } from 'utils/currency';
-import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/etherscan';
+import { buildEtherscanTransaction } from 'utils/etherscan';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import Link from '@material-ui/core/Link';
 import useBalance from 'hooks/useBalance';
@@ -150,7 +148,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [shouldShowAddToPosition, setShouldShowAddToPosition] = React.useState(false);
   const [shouldShowReset, setShouldShowReset] = React.useState(false);
-  const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
+  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const availablePairs = useAvailablePairs();
   const addTransaction = useTransactionAdder();
   const [balance] = useBalance(from);

@@ -1,15 +1,13 @@
 import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
+import { TransactionResponse } from '@ethersproject/providers';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
-import Web3Modal, { getProviderInfo, getInjectedProvider } from 'web3modal';
+import Web3Modal, { getProviderInfo } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
-import find from 'lodash/find';
-import { DateTime } from 'luxon';
 import keyBy from 'lodash/keyBy';
 import axios, { AxiosResponse } from 'axios';
 import {
@@ -35,14 +33,12 @@ import {
   ResetPositionTypeData,
   ModifyRateAndSwapsPositionTypeData,
   PoolLiquidityData,
-  TokenListResponse,
   GetPoolResponse,
   TxPriceResponse,
-  FullPosition,
   GetNextSwapInfo,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
-import { getURLFromQuery, sortTokens } from 'utils/parsing';
+import { sortTokens } from 'utils/parsing';
 
 // GQL queries
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
@@ -59,19 +55,14 @@ import WETHABI from 'abis/weth.json';
 import Factory from 'abis/factory.json';
 import HUB from 'abis/Hub.json';
 import DCAPair from 'abis/DCAPair.json';
-import TokenDescriptor from 'abis/TokenDescriptor.json';
 
 // MOCKS
-import usedTokensMocks from 'mocks/usedTokens';
 import { ETH, WETH } from 'mocks/tokens';
 import {
   HUB_ADDRESS,
-  FULL_DEPOSIT_TYPE,
   MEAN_GRAPHQL_URL,
   NETWORKS,
-  RATE_TYPE,
   SUPPORTED_NETWORKS,
-  TOKEN_LISTS,
   TRANSACTION_TYPES,
   UNI_GRAPHQL_URL,
 } from 'config/constants';
@@ -81,16 +72,27 @@ export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as 
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
+
   modal: Web3Modal;
+
   signer: Signer;
+
   availablePairs: AvailablePairs;
+
   apolloClient: GraphqlService;
+
   uniClient: GraphqlService;
+
   account: string;
+
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
+
   currentPositions: PositionKeyBy;
+
   pastPositions: PositionKeyBy;
+
   tokenList: TokenList;
+
   providerInfo: { id: string; logo: string; name: string };
 
   constructor(
@@ -348,7 +350,7 @@ export default class Web3Service {
       window.ethereum.on('chainChanged', () => window.location.reload());
     }
 
-    let chain = await this.getNetwork();
+    const chain = await this.getNetwork();
 
     if (!this.apolloClient.getClient() || !this.uniClient.getClient()) {
       this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[1]);
@@ -681,8 +683,8 @@ export default class Web3Service {
     });
   }
 
-  async createPair(token0: string, token1: string) {
-    if (!token0 || !token1) return Promise.resolve();
+  async createPair(token0: string, token1: string): Promise<TransactionResponse> {
+    if (!token0 || !token1) return Promise.reject();
 
     const chain = await this.getNetwork();
 
@@ -719,7 +721,7 @@ export default class Web3Service {
     frequencyValue: string,
     existingPair: AvailablePair
   ) {
-    let token = from;
+    const token = from;
 
     const chain = await this.getNetwork();
 
@@ -739,19 +741,19 @@ export default class Web3Service {
     );
   }
 
-  withdraw(position: Position, pair: AvailablePair) {
+  withdraw(position: Position, pair: AvailablePair): Promise<TransactionResponse> {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     return factory.withdrawSwapped(position.dcaId);
   }
 
-  terminate(position: Position, pair: AvailablePair) {
+  terminate(position: Position, pair: AvailablePair): Promise<TransactionResponse> {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     return factory.terminate(position.dcaId);
   }
 
-  addFunds(position: Position, pair: AvailablePair, newDeposit: string) {
+  addFunds(position: Position, pair: AvailablePair, newDeposit: string): Promise<TransactionResponse> {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     const newRate = parseUnits(newDeposit, position.from.decimals)
@@ -761,7 +763,12 @@ export default class Web3Service {
     return factory.modifyRateAndSwaps(position.dcaId, newRate, position.remainingSwaps);
   }
 
-  resetPosition(position: Position, pair: AvailablePair, newDeposit: string, newSwaps: string) {
+  resetPosition(
+    position: Position,
+    pair: AvailablePair,
+    newDeposit: string,
+    newSwaps: string
+  ): Promise<TransactionResponse> {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     const newRate = parseUnits(newDeposit, position.from.decimals)
@@ -771,7 +778,7 @@ export default class Web3Service {
     return factory.modifyRateAndSwaps(position.dcaId, newRate, newSwaps);
   }
 
-  modifySwaps(position: Position, pair: AvailablePair, newSwaps: string) {
+  modifySwaps(position: Position, pair: AvailablePair, newSwaps: string): Promise<TransactionResponse> {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     const newRate = position.remainingLiquidity.div(BigNumber.from(newSwaps));
@@ -779,7 +786,7 @@ export default class Web3Service {
     return factory.modifyRateAndSwaps(position.dcaId, newRate, newSwaps);
   }
 
-  modifyRate(position: Position, pair: AvailablePair, newRate: string) {
+  modifyRate(position: Position, pair: AvailablePair, newRate: string): Promise<TransactionResponse> {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     return factory.modifyRateAndSwaps(
@@ -789,13 +796,18 @@ export default class Web3Service {
     );
   }
 
-  modifyRateAndSwaps(position: Position, pair: Pick<AvailablePair, 'id'>, newRate: string, newSwaps: string) {
+  modifyRateAndSwaps(
+    position: Position,
+    pair: Pick<AvailablePair, 'id'>,
+    newRate: string,
+    newSwaps: string
+  ): Promise<TransactionResponse> {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     return factory.modifyRateAndSwaps(position.dcaId, parseUnits(newRate, position.from.decimals), newSwaps);
   }
 
-  removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string) {
+  removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string): Promise<TransactionResponse> {
     const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
 
     const newRate = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
@@ -851,7 +863,7 @@ export default class Web3Service {
       return;
 
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
-    let id = typeData.id;
+    let { id } = typeData;
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
       const newPositionTypeData = typeData as NewPositionTypeData;
       id = `pending-transaction-${transaction.hash}`;
@@ -869,7 +881,7 @@ export default class Web3Service {
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         withdrawn: BigNumber.from(0),
         dcaId: newPositionTypeData.id,
-        id: id,
+        id,
         startedAt: newPositionTypeData.startedAt,
         totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         pendingTransaction: '',
@@ -888,7 +900,7 @@ export default class Web3Service {
     )
       return;
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
-    const id = typeData.id;
+    const { id } = typeData;
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
       delete this.currentPositions[`pending-transaction-${transaction.hash}`];
     } else {

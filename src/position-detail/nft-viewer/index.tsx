@@ -1,7 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { FullPosition, NFTData } from 'types';
 

@@ -10,7 +10,7 @@ export default function DottedPosition({ size }: IconProps) {
   return (
     <SvgIcon viewBox="0 0 260 204" style={{ fontSize: realSize }}>
       <g filter="url(#filter0_d)">
-        <rect x="4.5" y="2.5" width="251" height="195" rx="15.5" stroke="#D9D9D9" stroke-dasharray="16 16" />
+        <rect x="4.5" y="2.5" width="251" height="195" rx="15.5" stroke="#D9D9D9" strokeDasharray="16 16" />
       </g>
       <defs>
         <filter
@@ -20,9 +20,9 @@ export default function DottedPosition({ size }: IconProps) {
           width="260"
           height="204"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
           <feOffset dy="2" />
           <feGaussianBlur stdDeviation="2" />

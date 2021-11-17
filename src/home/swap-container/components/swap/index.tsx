@@ -3,17 +3,7 @@ import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import {
-  TokenList,
-  Web3Service,
-  Network,
-  GetUsedTokensDataResponse,
-  AvailablePairs,
-  GetAllowanceResponse,
-  AvailablePair,
-  SetStateCallback,
-  Token,
-} from 'types';
+import { Web3Service, GetAllowanceResponse, AvailablePair, SetStateCallback, Token } from 'types';
 import Typography from '@material-ui/core/Typography';
 import Grow from '@material-ui/core/Grow';
 import { FormattedMessage } from 'react-intl';
@@ -24,11 +14,9 @@ import FrequencyInput from 'common/frequency-easy-input';
 import FrequencyTypeInput from 'common/frequency-type-input';
 import Button from 'common/button';
 import Tooltip from '@material-ui/core/Tooltip';
-import Divider from 'common/divider-wit-content';
 import IconButton from '@material-ui/core/IconButton';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 import find from 'lodash/find';
-import WarningIcon from '@material-ui/icons/Warning';
 import usePromise from 'hooks/usePromise';
 import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
@@ -188,7 +176,7 @@ const Swap = ({
   const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
   const [isLoading, setIsLoading] = React.useState(false);
-  const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
+  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
@@ -196,8 +184,8 @@ const Swap = ({
   const [usedTokens] = useUsedTokens();
 
   const existingPair = React.useMemo(() => {
-    let token0 = from.address < to.address ? from.address : to.address;
-    let token1 = from.address < to.address ? to.address : from.address;
+    const token0 = from.address < to.address ? from.address : to.address;
+    const token1 = from.address < to.address ? to.address : from.address;
     return find(availablePairs, (pair) => pair.token0.address === token0 && pair.token1.address === token1);
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
 
@@ -213,12 +201,7 @@ const Swap = ({
     !from || !web3Service.getAccount() || !existingPair || hasPendingApproval
   );
 
-  const [hasPool, isLoadingHasPool, hasPoolErrors] = usePromise<boolean>(
-    web3Service,
-    'hasPool',
-    [from, to],
-    !from || !to
-  );
+  const [hasPool, isLoadingHasPool] = usePromise<boolean>(web3Service, 'hasPool', [from, to], !from || !to);
 
   React.useEffect(() => {
     setRate(
@@ -334,7 +317,7 @@ const Swap = ({
         type: TRANSACTION_TYPES.NEW_POSITION,
         typeData: {
           from: from.address === ETH.address ? WETH(currentNetwork.chainId) : from,
-          to: to,
+          to,
           fromValue,
           frequencyType: frequencyType.toString(),
           frequencyValue,

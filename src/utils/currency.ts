@@ -9,7 +9,7 @@ const Decimal = toFormat(_Decimal);
 const toSignificant = (
   currency: string,
   decimals: number,
-  significantDigits: number = 6,
+  significantDigits = 6,
   format: object = { groupSeparator: '' }
 ): string => {
   const decimalScale = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(decimals));
@@ -26,14 +26,14 @@ const toSignificant = (
 
 export const toSignificantFromBigDecimal = (
   currency: string,
-  significantDigits: number = 6,
+  significantDigits = 6,
   format: object = { groupSeparator: '' }
 ): string => {
   const quotient = new Decimal(currency).toSignificantDigits(significantDigits);
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 
-export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token, sigFigs: number = 6) {
+export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token, sigFigs = 6) {
   if (!amount) {
     return '-';
   }

@@ -6,7 +6,7 @@ interface IconProps {
   isDisabled: boolean;
 }
 
-export default function Discord({ size, isDisabled }: IconProps) {
+export default function Discord({ size }: IconProps) {
   const realSize = size || '28px';
   return (
     <SvgIcon viewBox="0 0 24 24" style={{ fontSize: realSize }}>

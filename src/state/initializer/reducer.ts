@@ -1,4 +1,4 @@
-import { createReducer, nanoid } from '@reduxjs/toolkit';
+import { createReducer } from '@reduxjs/toolkit';
 import { setInitialized } from './actions';
 
 export interface ApplicationState {

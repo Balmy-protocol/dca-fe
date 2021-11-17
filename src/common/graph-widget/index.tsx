@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
@@ -40,13 +39,6 @@ interface UniPrice {
   token0Price: string;
   token1Price: string;
 }
-
-interface Price {
-  name: string;
-  Uniswap: number;
-  'Mean Finance': number | null;
-}
-
 interface PoolsResponseData {
   pools: {
     id: string;
@@ -58,7 +50,20 @@ interface TokenWithBase extends Token {
   isBaseToken: boolean;
 }
 
-type graphToken = TokenWithBase;
+type GraphToken = TokenWithBase;
+
+interface PriceMeanData {
+  name: string;
+  'Mean Finance': number | null;
+  date: string;
+}
+interface PriceUniData {
+  name: string;
+  Uniswap: number;
+  date: string;
+}
+
+type Prices = (PriceMeanData | PriceUniData)[];
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -84,10 +89,6 @@ const StyledGraphContainer = styled(Paper)`
   display: flex;
   width: 100%;
   flex-direction: column;
-`;
-
-const StyledGraph = styled.div`
-  flex-grow: 1;
 `;
 
 const StyledGraphAxis = styled.div`
@@ -118,48 +119,9 @@ const StyledCenteredWrapper = styled.div`
   justify-content: center;
 `;
 
-const mockedData = [
-  {
-    date: 1620604800,
-    id: '0x40fde2952a0674a3e77707af270af09800657293-18757',
-    token0Price: '46.39432408662232590979904512692854',
-    token1Price: '0.02155436079061979941377177773122095',
-  },
-  {
-    date: 1620518400,
-    id: '0x40fde2952a0674a3e77707af270af09800657293-18756',
-    token0Price: '2907.03864404869264090740198005893',
-    token1Price: '0.0003439926751738254801792666997970276',
-  },
-  {
-    date: 1620432000,
-    id: '0x40fde2952a0674a3e77707af270af09800657293-18755',
-    token0Price: '4.295170087228260817199609179566408',
-    token1Price: '0.2328196508383944694387373637776135',
-  },
-  {
-    date: 1620345600,
-    id: '0x40fde2952a0674a3e77707af270af09800657293-18754',
-    token0Price: '4.295170087228260817199609179566408',
-    token1Price: '0.2328196508383944694387373637776135',
-  },
-  {
-    date: 1620259200,
-    id: '0x40fde2952a0674a3e77707af270af09800657293-18753',
-    token0Price: '37.10419708975148470304056210791087',
-    token1Price: '0.02695112894051031917403075175128912',
-  },
-  {
-    date: 1620172800,
-    id: '0x40fde2952a0674a3e77707af270af09800657293-18752',
-    token0Price: '115.3018787973154413619826736887575',
-    token1Price: '0.008672885562930505082580673864334106',
-  },
-];
-
 const PERIODS = [7, 30];
 
-const averagePoolPrice = (prices: string[], token: Token) => {
+const averagePoolPrice = (prices: string[]) => {
   let result = 0;
   prices.forEach((price) => (result += parseFloat(toSignificantFromBigDecimal(price, 6))));
 
@@ -177,11 +139,11 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
 const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const client = useDCAGraphql();
   const uniClient = useUNIGraphql();
-  let tokenA: graphToken = EMPTY_GRAPH_TOKEN;
-  let tokenB: graphToken = EMPTY_GRAPH_TOKEN;
+  let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
+  let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
   let uniData: UniMappedPrice[] = [];
   let swapData: GetPairResponseSwapData[] = [];
-  let prices: any = [];
+  let prices: Prices = [];
   const [tabIndex, setTabIndex] = React.useState(0);
   const tabsStyles = appleTabsStylesHook.useTabs();
   const availablePairs = useAvailablePairs();
@@ -247,7 +209,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
 
   const { pools } = data || {};
   const { pair } = pairData || {};
-  let aggregatedPoolData: any = {};
+  const aggregatedPoolData: Record<string, { values: string[] }> = {};
   uniData = React.useMemo(() => {
     if (pools && pools[0] && pools[0].poolHourData) {
       pools.forEach((pool) => {
@@ -258,7 +220,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
             };
           } else {
             aggregatedPoolData[date] = {
-              values: [...aggregatedPoolData[date], tokenA.isBaseToken ? token0Price : token1Price],
+              values: [...aggregatedPoolData[date].values, tokenA.isBaseToken ? token0Price : token1Price],
             };
           }
         });
@@ -266,10 +228,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
 
       return Object.keys(aggregatedPoolData).map((singleAggregatedPoolData) => ({
         date: singleAggregatedPoolData,
-        tokenPrice: averagePoolPrice(
-          aggregatedPoolData[singleAggregatedPoolData].values,
-          tokenA.isBaseToken ? tokenB : tokenA
-        ),
+        tokenPrice: averagePoolPrice(aggregatedPoolData[singleAggregatedPoolData].values),
       }));
     }
 
@@ -304,7 +263,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     return orderBy([...mappedUniData, ...mappedSwapData], ['date'], ['desc']).reverse();
   }, [uniData, swapData]);
 
-  const tooltipFormatter = (value: string, name: string) =>
+  const tooltipFormatter = (value: string) =>
     `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
       tokenA.isBaseToken ? '' : tokenB.symbol
     }`;
@@ -327,8 +286,8 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
       </StyledTitleContainer>
       <StyledTabsContainer elevation={0}>
         <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
-          <Tab classes={tabItemStyles} disableRipple label={'1W'} />
-          <Tab classes={tabItemStyles} disableRipple label={'1M'} />
+          <Tab classes={tabItemStyles} disableRipple label="1W" />
+          <Tab classes={tabItemStyles} disableRipple label="1M" />
         </Tabs>
       </StyledTabsContainer>
       {isLoading ? (

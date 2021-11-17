@@ -11,25 +11,10 @@ export default async function gqlFetchAllById(
   timesCalled = 1
 ): Promise<any> {
   if (query) {
-    const fetchMoreResult = await query.fetchMore({
-      variables: {
-        ...variables,
-        first: limit,
-        id: offset,
-      },
-
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        const newEntries = fetchMoreResult[dataToSearch];
-        return {
-          [dataToSearch]: [...previousResult[dataToSearch], ...newEntries],
-        };
-      },
-    });
-
     const newResults = await query.result();
 
     if (newResults.data[dataToSearch].length === limit * timesCalled) {
-      return await gqlFetchAllById(
+      return gqlFetchAllById(
         client,
         queryToRun,
         variables,
@@ -56,7 +41,7 @@ export default async function gqlFetchAllById(
   const results = await newQuery.result();
 
   if (results.data[dataToSearch].length === limit) {
-    return await gqlFetchAllById(
+    return gqlFetchAllById(
       client,
       queryToRun,
       variables,

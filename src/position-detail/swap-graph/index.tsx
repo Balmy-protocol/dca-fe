@@ -6,12 +6,10 @@ import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } f
 import Paper from '@material-ui/core/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
-import { FullPosition, GetPairSwapsData, PairSwaps } from 'types';
-import getPairSwaps from 'graphql/getPairSwaps.graphql';
+import { FullPosition, PairSwaps } from 'types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
-import { parseUnits } from '@ethersproject/units';
 
 const StyledGraphAxis = styled.div`
   height: 0px;
@@ -90,7 +88,7 @@ const SwapsGraph = ({ position, swaps }: SwapsGraphProps) => {
     return orderBy(mappedSwapData, ['date'], ['desc']).reverse();
   }, [swaps]);
 
-  const tooltipFormatter = (value: string, name: string) => `${value} ${position.to.symbol}`;
+  const tooltipFormatter = (value: string) => `${value} ${position.to.symbol}`;
 
   const noData = swaps.length === 0;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Token, Web3Service, Web3ServicePromisableMethods } from 'types';
+import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import WalletContext from 'common/wallet-context';

@@ -23,20 +23,16 @@ const StyledInputContainer = styled.div`
 
 interface TokenInputProps {
   id: string;
-  label: string;
   value: string;
   disabled?: boolean;
   onChange: (newValue: string) => void | SetStateCallback<string>;
   withBalance?: boolean;
-  isLoadingBalance?: boolean;
   balance?: BigNumber;
   token: Token;
   error?: string;
   isMinimal?: boolean;
   fullWidth?: boolean;
 }
-
-const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`);
 
 const TokenInput = ({
   id,
@@ -95,7 +91,7 @@ const TokenInput = ({
           autoComplete="off"
           autoCorrect="off"
           type="text"
-          margin={'normal'}
+          margin="normal"
           disabled={disabled}
           spellCheck="false"
           fullWidth={fullWidth}
@@ -114,6 +110,7 @@ const TokenInput = ({
                 </Button>
               ) : null,
           }}
+          // eslint-disable-next-line react/jsx-no-duplicate-props
           inputProps={{
             pattern: '^[0-9]*[.,]?[0-9]*$',
             minLength: 1,

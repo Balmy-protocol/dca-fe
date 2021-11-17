@@ -2,7 +2,7 @@ import { createStyles, Theme } from '@material-ui/core/styles';
 import makeStyles from '@material-ui/styles/makeStyles';
 
 export const tabsStyles =
-  (isFullWidth: boolean = false) =>
+  (isFullWidth = false) =>
   ({ palette, breakpoints }: Theme) =>
     createStyles({
       root: {
@@ -43,7 +43,7 @@ export const tabsStyles =
     });
 
 export const tabItemStyles =
-  (isFullWidth: boolean = false) =>
+  (isFullWidth = false) =>
   ({ palette, breakpoints }: Theme) =>
     createStyles({
       root: {

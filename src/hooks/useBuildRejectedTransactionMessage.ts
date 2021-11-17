@@ -1,5 +1,4 @@
 import React from 'react';
-import WalletContext from 'common/wallet-context';
 import find from 'lodash/find';
 import {
   TransactionDetails,
@@ -16,12 +15,11 @@ import {
   WrapEtherTypeData,
   ResetPositionTypeData,
 } from 'types';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
+import { getFrequencyLabel } from 'utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
-import { getFrequencyLabel } from 'utils/parsing';
-import { STRING_SWAP_INTERVALS } from 'config/constants';
 
 function useBuildTransactionMessages() {
   const availablePairs = useAvailablePairs();

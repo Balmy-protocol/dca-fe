@@ -2,6 +2,7 @@ import { ApolloClient, NormalizedCacheObject, InMemoryCache } from '@apollo/clie
 
 export default class GraphqlService {
   client: ApolloClient<NormalizedCacheObject>;
+
   url: string;
 
   constructor(url?: string) {

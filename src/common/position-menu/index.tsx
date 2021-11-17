@@ -4,7 +4,6 @@ import Slide from '@material-ui/core/Slide';
 import { Position } from 'types';
 import PositionSettings from 'common/position-settings';
 import RemoveFundsSettings from 'common/remove-funds-settings';
-import ModifySwapsSettings from 'common/modify-swaps-settings';
 import ModifyRateSettings from 'common/modify-rate-settings';
 import { BigNumber } from 'ethers';
 
@@ -38,7 +37,6 @@ const PositionMenu = ({
   shouldShow,
   onWithdraw,
   onTerminate,
-  onModifySwaps,
   onModifyRateAndSwaps,
   onRemoveFunds,
   position,
@@ -50,11 +48,6 @@ const PositionMenu = ({
   const onWithdrawPosition = () => onWithdraw(position);
   const onRemoveFundsPosition = (ammountToRemove: string) => {
     onRemoveFunds(ammountToRemove);
-    onClose();
-    setActiveMenu('settings');
-  };
-  const onModifySwapsPosition = (frequencyValue: string) => {
-    onModifySwaps(frequencyValue);
     onClose();
     setActiveMenu('settings');
   };

@@ -2,7 +2,6 @@ import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import Button from '@material-ui/core/Button';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';

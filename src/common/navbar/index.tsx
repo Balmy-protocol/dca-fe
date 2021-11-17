@@ -3,14 +3,12 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import styled from 'styled-components';
 import WalletContext from 'common/wallet-context';
-import ConnectWalletButtom from '../connect-wallet';
-import WalletButtom from '../wallet';
 import Link from '@material-ui/core/Link';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import find from 'lodash/find';
-import { NETWORKS } from 'config/constants';
 import NetworkLabel from 'common/network-label';
+import WalletButtom from '../wallet';
+import ConnectWalletButtom from '../connect-wallet';
 
 const StyledBox = styled(Box)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   flex: 1;

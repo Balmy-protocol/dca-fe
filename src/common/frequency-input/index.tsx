@@ -37,7 +37,7 @@ const FrequencyInput = ({ id, label, onChange, value, disabled, error }: Frequen
       autoCorrect="off"
       fullWidth
       type="text"
-      margin={'normal'}
+      margin="normal"
       disabled={disabled}
       spellCheck="false"
       onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
