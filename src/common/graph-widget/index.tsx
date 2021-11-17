@@ -123,7 +123,9 @@ const PERIODS = [7, 30];
 
 const averagePoolPrice = (prices: string[]) => {
   let result = 0;
-  prices.forEach((price) => (result += parseFloat(toSignificantFromBigDecimal(price, 6))));
+  prices.forEach((price) => {
+    result += parseFloat(toSignificantFromBigDecimal(price, 6));
+  });
 
   return toSignificantFromBigDecimal((result / prices.length).toString(), 6);
 };

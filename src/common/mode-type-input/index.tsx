@@ -8,12 +8,12 @@ import { maximalAppleTabsStylesHook } from 'common/tabs';
 import { SetStateCallback } from 'types';
 import { MODE_TYPES } from 'config/constants';
 
-interface modeTypeInputProps {
+interface ModeTypeInputProps {
   onChange: SetStateCallback<string>;
   selected: string;
 }
 
-const ModeTypeInput = ({ selected, onChange }: modeTypeInputProps) => {
+const ModeTypeInput = ({ selected, onChange }: ModeTypeInputProps) => {
   const options = React.useMemo(() => values(MODE_TYPES), [MODE_TYPES]);
   const [tabIndex, setTabIndex] = React.useState(findIndex(options, { id: selected }));
   const tabsStyles = maximalAppleTabsStylesHook.useTabs();
