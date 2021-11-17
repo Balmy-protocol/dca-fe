@@ -11,7 +11,7 @@ const DAI_ADDRESSES = {
 };
 
 export const DAI = (chainId: number): Token => ({
-  chainId: chainId,
+  chainId,
   decimals: 18,
   address: DAI_ADDRESSES[chainId] || DAI_ADDRESSES[1],
   name: 'Dai stable coin',
@@ -29,7 +29,7 @@ const WETH_ADDRESSES = {
 };
 
 export const WETH = (chainId: number): Token => ({
-  chainId: chainId,
+  chainId,
   decimals: 18,
   address: WETH_ADDRESSES[chainId] || WETH_ADDRESSES[1],
   name: 'Wrapped Ether',
@@ -47,7 +47,7 @@ const USDC_ADDRESSES = {
 };
 
 export const USDC = (chainId: number): Token => ({
-  chainId: chainId,
+  chainId,
   decimals: 6,
   address: USDC_ADDRESSES[chainId] || USDC_ADDRESSES[1],
   name: 'USD Coin',
@@ -74,7 +74,7 @@ const UNI_ADDRESSES = {
 };
 
 export const UNI = (chainId: number): Token => ({
-  chainId: chainId,
+  chainId,
   decimals: 18,
   address: UNI_ADDRESSES[chainId] || UNI_ADDRESSES[1],
   name: 'Uniswap',
@@ -92,7 +92,7 @@ const YFI_ADDRESSES = {
 };
 
 export const YFI = (chainId: number): Token => ({
-  chainId: chainId,
+  chainId,
   decimals: 18,
   address: YFI_ADDRESSES[chainId] || YFI_ADDRESSES[1],
   name: 'Yearn Finance',

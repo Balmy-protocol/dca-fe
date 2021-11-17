@@ -8,8 +8,8 @@ function usePromise<T>(
   promise: Web3Service,
   functionName: Web3ServicePromisableMethods,
   parameters: any[] = [],
-  skip: boolean = false
-): [T, boolean, any] {
+  skip = false
+): [T, boolean, { code: number; message: string }] {
   const [isLoading, setIsLoading] = React.useState(false);
   const [result, setResult] = React.useState<any>(undefined);
   const [error, setError] = React.useState<any>(undefined);

@@ -18,24 +18,10 @@ export default async function gqlFetchAll(
   query: ObservableQuery<any, OperationVariables> | null = null
 ): Promise<any> {
   if (query) {
-    const fetchMoreResult = await query.fetchMore({
-      variables: {
-        first: limit,
-        skip: offset,
-      },
-
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        const newEntries = fetchMoreResult[dataToSearch];
-        return {
-          [dataToSearch]: [...previousResult[dataToSearch], ...newEntries],
-        };
-      },
-    });
-
     const newResults = await query.result();
 
     if (newResults.data[dataToSearch].length === limit + offset) {
-      return await gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, query);
+      return gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, query);
     }
 
     return query.result();
@@ -54,7 +40,7 @@ export default async function gqlFetchAll(
   const results = await newQuery.result();
 
   if (results.data[dataToSearch].length === limit) {
-    return await gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, newQuery);
+    return gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, newQuery);
   }
 
   return results;

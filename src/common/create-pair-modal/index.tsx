@@ -64,7 +64,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
 
   const addTransaction = useTransactionAdder();
 
-  const [setModalSuccess, setModalLoading, setModalError, setClosedConfig] = useTransactionModal();
+  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
 
   if (estimatedPriceErrors && open) {
     setModalError({
@@ -103,7 +103,10 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
       });
     } catch (e) {
       setModalError({
-        error: e,
+        error: {
+          code: e.code,
+          message: e.message,
+        },
       });
     }
   };

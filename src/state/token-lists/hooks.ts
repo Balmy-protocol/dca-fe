@@ -1,5 +1,3 @@
-import { useCallback, useMemo } from 'react';
-
 import { useAppSelector } from 'hooks/state';
 
 // returns all the transactions for the current chain

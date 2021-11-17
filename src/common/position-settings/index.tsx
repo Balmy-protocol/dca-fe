@@ -5,7 +5,8 @@ import { FormattedMessage } from 'react-intl';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import { useHistory } from 'react-router';
+import { useHistory } from 'react-router-dom';
+
 const StyledActionsContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -24,23 +25,13 @@ const StyledHeader = styled.div`
 
 interface PositionSettingsProps {
   onWithdraw: () => void;
-  onTerminate: () => void;
-  onModifySwaps: () => void;
   onModifyRate: () => void;
   onRemoveFunds: () => void;
   onClose: () => void;
   positionId: string;
 }
 
-const PositionSettings = ({
-  onWithdraw,
-  onTerminate,
-  onModifySwaps,
-  onModifyRate,
-  onRemoveFunds,
-  onClose,
-  positionId,
-}: PositionSettingsProps) => {
+const PositionSettings = ({ onWithdraw, onModifyRate, onRemoveFunds, onClose, positionId }: PositionSettingsProps) => {
   const history = useHistory();
 
   const onViewDetails = () => {

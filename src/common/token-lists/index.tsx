@@ -6,11 +6,9 @@ import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import Link from '@material-ui/core/Link';
 import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
-import { getURLFromQuery } from 'utils/parsing';
 import { useSavedTokenLists } from 'state/token-lists/hooks';
 import { useAppDispatch } from 'hooks/state';
 import { enableTokenList } from 'state/token-lists/actions';
@@ -31,11 +29,11 @@ const StyledCard = styled(Card)`
 function getLogoURL(logoURI: string) {
   if (logoURI?.startsWith('ipfs://')) {
     return `https://ipfs.io/ipfs/${logoURI.split('//')[1]}`;
-  } else if (typeof logoURI === 'string') {
-    return logoURI;
-  } else {
-    return '';
   }
+  if (typeof logoURI === 'string') {
+    return logoURI;
+  }
+  return '';
 }
 
 const buildTokenListUrl = (tokenListUrl: string) => `https://tokenlists.org/token-list?url=${tokenListUrl}`;

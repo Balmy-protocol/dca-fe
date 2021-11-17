@@ -7,24 +7,23 @@ import { maximalAppleTabsStylesHook } from 'common/tabs';
 import { BigNumber } from 'ethers';
 import { SetStateCallback } from 'types';
 
-interface selectOption {
-  value: any;
+interface SelectOption {
+  value: BigNumber;
   label: {
     plural: string;
     adverb: string;
   };
 }
 
-type selectOptionsType = selectOption[];
+type SelectOptionsType = SelectOption[];
 
-interface minimalSelectProps {
-  options: selectOptionsType;
+interface MinimalSelectProps {
+  options: SelectOptionsType;
   onChange: SetStateCallback<BigNumber>;
   selected: BigNumber;
-  id: string;
 }
 
-const MinimalSelect = ({ options, selected, onChange, id }: minimalSelectProps) => {
+const MinimalSelect = ({ options, selected, onChange }: MinimalSelectProps) => {
   const [tabIndex, setTabIndex] = React.useState(findIndex(options, { value: selected }));
   const tabsStyles = maximalAppleTabsStylesHook.useTabs();
   const tabItemStyles = maximalAppleTabsStylesHook.useTabItem();
@@ -35,7 +34,7 @@ const MinimalSelect = ({ options, selected, onChange, id }: minimalSelectProps) 
 
   return (
     <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => handleChange(index)}>
-      {options.map((frequencyTypeOption: selectOption) => (
+      {options.map((frequencyTypeOption: SelectOption) => (
         <Tab
           classes={tabItemStyles}
           key={frequencyTypeOption.label.adverb}

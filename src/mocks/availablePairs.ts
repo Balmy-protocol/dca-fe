@@ -1,5 +1,5 @@
 import { NETWORKS } from 'config/constants';
-import { WETH, DAI, UNI, YFI } from './tokens';
+import { WETH, DAI, UNI } from './tokens';
 
 const mockedPairs = [
   {

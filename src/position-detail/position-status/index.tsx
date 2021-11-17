@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import { FullPosition, GetPairSwapsData } from 'types';
-import { calculateStale, getFrequencyLabel } from 'utils/parsing';
+import { getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 import useIsStale, { STALE } from 'hooks/useIsStale';
 

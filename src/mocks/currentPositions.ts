@@ -1,6 +1,6 @@
-import { WETH, DAI, UNI } from './tokens';
 import { NETWORKS, ONE_DAY } from 'config/constants';
 import { parseUnits } from '@ethersproject/units';
+import { WETH, DAI, UNI } from './tokens';
 
 const mockedCurrentPositions = [
   {

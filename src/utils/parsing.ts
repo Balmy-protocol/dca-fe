@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import { FullPosition, GetNextSwapInfo, Position, Token } from 'types';
 import { STRING_SWAP_INTERVALS, ONE_DAY } from 'config/constants';
+
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
   let token1 = tokenB;
@@ -32,7 +33,7 @@ export const calculateStale: (
   createdAt: number,
   nextSwapInformation: GetNextSwapInfo | null
 ) => -1 | 0 | 1 | 2 = (
-  lastSwapped: number = 0,
+  lastSwapped = 0,
   frequencyType: BigNumber,
   createdAt: number,
   nextSwapInformation: GetNextSwapInfo | null
@@ -59,9 +60,8 @@ export const calculateStale: (
     }
 
     return 2;
-  } else {
-    return 1;
   }
+  return 1;
 };
 
 export const calculateStaleSwaps = (lastSwapped: number, frequencyType: BigNumber, createdAt: number) => {
@@ -85,11 +85,11 @@ export const capitalizeFirstLetter = (toCap: string) => toCap.charAt(0).toUpperC
 export function getURLFromQuery(query: string) {
   if (query.startsWith('https://')) {
     return query;
-  } else if (query.endsWith('.eth')) {
-    return `https://${query}.link`;
-  } else {
-    return '';
   }
+  if (query.endsWith('.eth')) {
+    return `https://${query}.link`;
+  }
+  return '';
 }
 
 export function fullPositionToMappedPosition(position: FullPosition): Position {

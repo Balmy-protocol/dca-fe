@@ -15,14 +15,12 @@ const StyledContent = styled.div`
   padding: 0 10px 0 10px;
 `;
 
-const Divider: React.FC = ({ children }) => {
-  return (
-    <StyledContainer>
-      <StyledBorder />
-      <StyledContent>{children}</StyledContent>
-      <StyledBorder />
-    </StyledContainer>
-  );
-};
+const Divider: React.FC = ({ children }) => (
+  <StyledContainer>
+    <StyledBorder />
+    <StyledContent>{children}</StyledContent>
+    <StyledBorder />
+  </StyledContainer>
+);
 
 export default Divider;

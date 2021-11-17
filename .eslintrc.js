@@ -36,6 +36,7 @@ module.exports = {
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['error'],
     'formatjs/no-offset': 'error',
+    'react/require-default-props': 'off',
   },
   overrides: [
     {

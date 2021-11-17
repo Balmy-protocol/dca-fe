@@ -1,15 +1,14 @@
 import React from 'react';
-import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { appleTabsStylesHook } from 'common/tabs';
 import styled from 'styled-components';
+import WalletContext from 'common/wallet-context';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import SwapContainer from '../swap-container';
 import History from '../history';
 import CurrentPositions from '../current-positions';
-import WalletContext from 'common/wallet-context';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -45,8 +44,8 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
                   <>
                     <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px' }}>
                       <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
-                        <Tab classes={tabItemStyles} disableRipple label={'Open positions'} />
-                        <Tab classes={tabItemStyles} disableRipple label={'Terminated positions'} />
+                        <Tab classes={tabItemStyles} disableRipple label="Open positions" />
+                        <Tab classes={tabItemStyles} disableRipple label="Terminated positions" />
                       </Tabs>
                     </Grid>
                     <Grid item xs={12} style={{ display: 'flex', paddingTop: '0px' }}>

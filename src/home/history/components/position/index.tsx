@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { formatUnits } from '@ethersproject/units';
-import find from 'lodash/find';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
@@ -11,8 +9,6 @@ import { Position, Token } from 'types';
 import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import { formatCurrencyAmount } from 'utils/currency';
-import { BigNumber } from 'ethers';
-import { STRING_SWAP_INTERVALS } from 'config/constants';
 
 const StyledCard = styled(Card)`
   margin: 10px;

@@ -1,14 +1,11 @@
 import React, { CSSProperties } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
-import axios, { AxiosResponse } from 'axios';
-import reverse from 'lodash/reverse';
 import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
-import sortBy from 'lodash/sortBy';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@material-ui/core/Slide';
-import { Token, TokenList, TokenListResponse } from 'types';
+import { Token, TokenList } from 'types';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -24,7 +21,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles } from '@material-ui/core/styles';
-import { ContactSupportOutlined } from '@material-ui/icons';
 import { ETH, WETH } from 'mocks/tokens';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import FormGroup from '@material-ui/core/FormGroup';
@@ -33,15 +29,14 @@ import Switch from '@material-ui/core/Switch';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useTokenList from 'hooks/useTokenList';
 import Button from 'common/button';
-import { TOKEN_LISTS } from 'config/constants';
-import Card from '@material-ui/core/Card';
 import TokenLists from 'common/token-lists';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 interface PartialTheme {
-  spacing: any;
-  palette: any;
+  spacing: (space: number) => number;
+  palette: { grey: string[] };
 }
+
 const searchStyles = ({ spacing, palette }: PartialTheme) => {
   // ATTENTION!
   // you can customize some important variables here!!
@@ -233,7 +228,7 @@ const TokenPicker = ({
   );
 
   const memoizedTokenKeys = React.useMemo(() => {
-    let filteredTokenKeys = tokenKeysToUse.filter(
+    const filteredTokenKeys = tokenKeysToUse.filter(
       (el) =>
         tokenList[el] &&
         (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
@@ -298,7 +293,7 @@ const TokenPicker = ({
               <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
                 <InputBase
                   classes={inputStyles}
-                  placeholder={'Search by ETH, Ethereum or Ether'}
+                  placeholder="Search by ETH, Ethereum or Ether"
                   startAdornment={<Search />}
                   fullWidth
                   onChange={(evt) => setSearch(evt.currentTarget.value)}

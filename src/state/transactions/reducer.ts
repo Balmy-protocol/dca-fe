@@ -67,7 +67,7 @@ export default createReducer(initialState, (builder) =>
       } else {
         tx.lastCheckedBlockNumber = Math.max(blockNumber, tx.lastCheckedBlockNumber);
       }
-      tx.retries = tx.retries + 1;
+      tx.retries += 1;
     })
     .addCase(finalizeTransaction, (transactions, { payload: { hash, receipt, extendedTypeData, chainId } }) => {
       const tx = transactions[chainId][hash];

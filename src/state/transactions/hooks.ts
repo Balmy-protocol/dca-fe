@@ -15,9 +15,9 @@ import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 import useWeb3Service from 'hooks/useWeb3Service';
-import { addTransaction } from './actions';
 import { TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
+import { addTransaction } from './actions';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -179,12 +179,11 @@ export function useHasPendingApproval(token: Token, spender: string | undefined)
         const tx = allTransactions[hash];
         if (tx.receipt) {
           return false;
-        } else {
-          return (
-            (<ApproveTokenTypeData>tx.typeData).pair === spender &&
-            (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress
-          );
         }
+        return (
+          (<ApproveTokenTypeData>tx.typeData).pair === spender &&
+          (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress
+        );
       }),
     [allTransactions, spender, tokenAddress]
   );
@@ -219,12 +218,11 @@ export function useHasPendingPairCreation(from: Token, to: Token): boolean {
         const tx = allTransactions[hash];
         if (tx.receipt) {
           return false;
-        } else {
-          return (
-            (<NewPairTypeData>tx.typeData).token0.address === fromAddress &&
-            (<NewPairTypeData>tx.typeData).token1.address === toAddress
-          );
         }
+        return (
+          (<NewPairTypeData>tx.typeData).token0.address === fromAddress &&
+          (<NewPairTypeData>tx.typeData).token1.address === toAddress
+        );
       }),
     [allTransactions, fromAddress, toAddress]
   );
@@ -245,9 +243,8 @@ export function usePositionHasPendingTransaction(position: string): string | nul
         return false;
       if (transaction.receipt) {
         return false;
-      } else {
-        return (<TransactionPositionTypeDataOptions>transaction.typeData).id === position;
       }
+      return (<TransactionPositionTypeDataOptions>transaction.typeData).id === position;
     });
 
     return foundTransaction?.hash || null;

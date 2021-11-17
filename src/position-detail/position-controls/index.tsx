@@ -23,13 +23,7 @@ interface PositionControlsProps {
   pendingTransaction: string | null;
 }
 
-const PositionControls = ({
-  position,
-  onWithdraw,
-  onTerminate,
-  onModifyRate,
-  pendingTransaction,
-}: PositionControlsProps) => {
+const PositionControls = ({ onWithdraw, onTerminate, onModifyRate, pendingTransaction }: PositionControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
 

@@ -77,9 +77,9 @@ export interface TransactionModalContextValue {
 }
 
 export const TransactionModalContextDefaultValue: TransactionModalContextValue = {
-  setLoadingConfig: (config: LoadingConfig) => {},
-  setSuccessConfig: (config: SuccessConfig) => {},
-  setErrorConfig: (config: ErrorConfig) => {},
+  setLoadingConfig: () => {},
+  setSuccessConfig: () => {},
+  setErrorConfig: () => {},
   setClosedConfig: () => {},
 };
 
@@ -204,7 +204,7 @@ export const TransactionModal = ({
   );
 };
 
-const TransactionModalProvider: React.FC<{}> = ({ children }) => {
+const TransactionModalProvider: React.FC = ({ children }) => {
   const [loadingConfig, setLoadingConfig] = React.useState<LoadingConfig>({ content: null });
   const [successConfig, setSuccessConfig] = React.useState<SuccessConfig>({ content: null });
   const [errorConfig, setErrorConfig] = React.useState<ErrorConfig>({ content: null });

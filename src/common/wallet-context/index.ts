@@ -3,7 +3,6 @@ import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import graphPricesClient from 'utils/graphPricesApolloClient';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';
 import Web3Service from 'services/web3Service';
-import { TokenList, AvailablePairs } from 'types';
 import axios, { AxiosInstance } from 'axios';
 
 export type WalletContextValue = {

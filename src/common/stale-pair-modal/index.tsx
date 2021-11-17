@@ -4,11 +4,9 @@ import Button from 'common/button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import { AvailablePair } from 'types';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { BigNumber } from 'ethers';
 import Link from '@material-ui/core/Link';
 
 const useStyles = makeStyles({

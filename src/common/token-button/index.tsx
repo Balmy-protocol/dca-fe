@@ -16,18 +16,16 @@ const StyledButton = styled(Button)`
   padding: 7px 10px;
 `;
 
-const Swap = ({ token, onClick }: TokenButtonProps) => {
-  return (
-    <StyledButton
-      size="large"
-      color="default"
-      variant="outlined"
-      startIcon={<TokenIcon size="24px" token={token} />}
-      endIcon={<CaretDown size="10px" />}
-      onClick={onClick}
-    >
-      {token?.symbol}
-    </StyledButton>
-  );
-};
+const Swap = ({ token, onClick }: TokenButtonProps) => (
+  <StyledButton
+    size="large"
+    color="default"
+    variant="outlined"
+    startIcon={<TokenIcon size="24px" token={token} />}
+    endIcon={<CaretDown size="10px" />}
+    onClick={onClick}
+  >
+    {token?.symbol}
+  </StyledButton>
+);
 export default Swap;
