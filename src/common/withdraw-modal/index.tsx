@@ -88,9 +88,7 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'Error while withdrawing' });
     }
   };
 

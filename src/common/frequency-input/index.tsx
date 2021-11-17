@@ -44,6 +44,7 @@ const FrequencyInput = ({ id, label, onChange, value, disabled, error }: Frequen
       InputProps={{
         endAdornment: <InputAdornment position="end">{frequencyType || ''}</InputAdornment>,
       }}
+      // eslint-disable-next-line react/jsx-no-duplicate-props
       inputProps={{
         pattern: '^[0-9]*$',
         minLength: 1,

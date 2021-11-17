@@ -111,6 +111,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
     dispatch(clearAllTransactions({ chainId: currentNetwork.chainId }));
   };
   const onDisconnect = () => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     web3Service.disconnect();
     onClearAll();
     onClose();

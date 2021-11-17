@@ -83,9 +83,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'Error while terminating position' });
     }
   };
 

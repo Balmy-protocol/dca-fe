@@ -101,13 +101,8 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
           />
         ),
       });
-    } catch (e) {
-      setModalError({
-        error: {
-          code: e.code,
-          message: e.message,
-        },
-      });
+    } catch {
+      setModalError({ content: 'Failed while trying to create pair' });
     }
   };
 

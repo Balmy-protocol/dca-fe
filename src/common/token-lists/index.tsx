@@ -53,7 +53,12 @@ const TokenLists = () => {
         tokenList[tokenListUrl] ? (
           <Grid item xs={12} md={6} key={tokenListUrl}>
             <StyledCard raised elevation={5}>
-              <img src={getLogoURL(tokenList[tokenListUrl].logoURI)} width="50px" height="50px" />
+              <img
+                src={getLogoURL(tokenList[tokenListUrl].logoURI)}
+                width="50px"
+                height="50px"
+                alt={tokenList[tokenListUrl].name}
+              />
               <Typography variant="body1">{tokenList[tokenListUrl].name}</Typography>
               <Typography variant="body1">
                 <FormattedMessage

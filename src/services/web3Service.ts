@@ -512,7 +512,7 @@ export default class Web3Service {
   }
 
   // ADDRESS METHODS
-  changeNetwork(newChainId: number) {
+  changeNetwork(newChainId: number): void {
     if (!window.ethereum) {
       return;
     }

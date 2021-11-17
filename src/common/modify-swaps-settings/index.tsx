@@ -29,13 +29,13 @@ const StyledActionContainer = styled.div`
   flex-grow: 0;
 `;
 
-interface modifySwapsSettingsProps {
+interface ModifySwapsSettingsProps {
   position: Position;
   onModifySwaps: (frequencyValue: string) => void;
   onClose: () => void;
 }
 
-const modifySwapsSettings = ({ position, onModifySwaps, onClose }: modifySwapsSettingsProps) => {
+const modifySwapsSettings = ({ position, onModifySwaps, onClose }: ModifySwapsSettingsProps) => {
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
   const frequencyType = getFrequencyLabel(position.swapInterval.toString(), frequencyValue);
   const hasError = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
@@ -74,7 +74,7 @@ const modifySwapsSettings = ({ position, onModifySwaps, onClose }: modifySwapsSe
           color="secondary"
           variant="contained"
           fullWidth
-          disabled={!frequencyValue || hasError}
+          disabled={!frequencyValue || !!hasError}
           onClick={() => onModifySwaps(frequencyValue)}
         >
           <FormattedMessage description="change duration" defaultMessage="Change duration" />

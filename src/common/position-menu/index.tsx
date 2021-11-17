@@ -26,8 +26,6 @@ interface PositionMenuProps {
   shouldShow: boolean;
   balance: BigNumber;
   onWithdraw: (position: Position) => void;
-  onTerminate: (position: Position) => void;
-  onModifySwaps: (newSwaps: string) => void;
   onModifyRateAndSwaps: (newRate: string, newSwaps: string) => void;
   onRemoveFunds: (ammountToRemove: string) => void;
 }
@@ -36,7 +34,6 @@ const PositionMenu = ({
   onClose,
   shouldShow,
   onWithdraw,
-  onTerminate,
   onModifyRateAndSwaps,
   onRemoveFunds,
   position,
@@ -44,7 +41,6 @@ const PositionMenu = ({
 }: PositionMenuProps) => {
   const [activeMenu, setActiveMenu] = React.useState('settings');
 
-  const onTerminatePosition = () => onTerminate(position);
   const onWithdrawPosition = () => onWithdraw(position);
   const onRemoveFundsPosition = (ammountToRemove: string) => {
     onRemoveFunds(ammountToRemove);
@@ -63,8 +59,6 @@ const PositionMenu = ({
           <PositionSettings
             onClose={onClose}
             onWithdraw={onWithdrawPosition}
-            onTerminate={onTerminatePosition}
-            onModifySwaps={() => setActiveMenu('modifySwaps')}
             onModifyRate={() => setActiveMenu('modifyRate')}
             onRemoveFunds={() => setActiveMenu('removeFunds')}
             positionId={position.id}
