@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   ApolloClient,
   NormalizedCacheObject,
@@ -7,7 +8,11 @@ import {
   WatchQueryFetchPolicy,
 } from '@apollo/client';
 
-export default async function gqlFetchAll(
+interface GraphqlResults<T> {
+  data: T;
+}
+
+export default async function gqlFetchAll<T>(
   client: ApolloClient<NormalizedCacheObject>,
   queryToRun: DocumentNode,
   variables: any,
@@ -16,7 +21,7 @@ export default async function gqlFetchAll(
   offset = 0,
   limit = 1000,
   query: ObservableQuery<any, OperationVariables> | null = null
-): Promise<any> {
+): Promise<GraphqlResults<T>> {
   if (query) {
     const newResults = await query.result();
 
@@ -45,3 +50,5 @@ export default async function gqlFetchAll(
 
   return results;
 }
+
+/* eslint-enable */

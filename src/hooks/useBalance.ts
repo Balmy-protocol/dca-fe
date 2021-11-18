@@ -4,12 +4,13 @@ import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import WalletContext from 'common/wallet-context';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
+import { BigNumber } from 'ethers';
 
-function useBalance(from: Token | undefined) {
+function useBalance(from: Token | undefined): [BigNumber | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const { web3Service } = React.useContext(WalletContext);
-  const [result, setResult] = React.useState<any>(undefined);
-  const [error, setError] = React.useState<any>(undefined);
+  const [result, setResult] = React.useState<BigNumber | undefined>(undefined);
+  const [error, setError] = React.useState<string | undefined>(undefined);
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
@@ -38,12 +39,14 @@ function useBalance(from: Token | undefined) {
       setIsLoading(true);
       setResult(undefined);
       setError(undefined);
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
   }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount()]);
 
   if (!from) {
-    return ['0', false, undefined];
+    return [BigNumber.from('0'), false, undefined];
   }
 
   return [result, isLoading, error];

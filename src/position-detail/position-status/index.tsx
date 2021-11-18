@@ -63,13 +63,15 @@ const PositionStatus = ({ position, pair }: PositionStatusProps) => {
   const isTerminated = position.status === 'TERMINATED';
   return (
     <PositionStatusContainer>
+      {/* eslint-disable-next-line no-nested-ternary */}
       {isTerminated ? (
         <StyledNoFunds>
           <Typography variant="body1">
             <FormattedMessage description="terminated" defaultMessage="Terminated" />
           </Typography>
         </StyledNoFunds>
-      ) : hasNoFunds ? (
+      ) : // eslint-disable-next-line no-nested-ternary
+      hasNoFunds ? (
         <StyledNoFunds>
           <Typography variant="body1">
             <FormattedMessage description="no funds" defaultMessage="No funds!" />

@@ -10,6 +10,7 @@ function useCurrentNetwork() {
       setCurrentNetwork(currentNetwork);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getNetwork();
   }, [web3Service]);
 

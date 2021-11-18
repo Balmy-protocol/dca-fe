@@ -10,7 +10,7 @@ export const initialState: TokenListsState = {
 };
 
 export default createReducer(initialState, (builder) =>
-  builder.addCase(enableTokenList, (tokenLists, { payload: { tokenList, enabled } }) => {
-    tokenLists[tokenList] = enabled;
+  builder.addCase(enableTokenList, (state, { payload: { tokenList, enabled } }) => {
+    state[tokenList] = enabled;
   })
 );

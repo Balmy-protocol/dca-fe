@@ -9,7 +9,7 @@ import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
 import EtherscanLink from 'common/view-on-etherscan';
-import { NewPositionTypeData } from 'types';
+import { NewPositionTypeData, TransactionReceipt } from 'types';
 import { setInitialized } from 'state/initializer/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { usePendingTransactions } from './hooks';
@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from '../hooks';
 
 interface TxInterface {
   addedTime: number;
-  receipt?: Record<string, any>;
+  receipt?: TransactionReceipt;
   lastCheckedBlockNumber?: number;
 }
 
@@ -48,7 +48,7 @@ export default function Updater(): null {
   const lastBlockNumber = useBlockNumber(currentNetwork.chainId);
 
   const dispatch = useAppDispatch();
-  const state = useAppSelector((state: any) => state.transactions);
+  const state = useAppSelector((appState) => appState.transactions);
 
   const transactions = useMemo(() => state[currentNetwork.chainId] || {}, [state, currentNetwork]);
 
@@ -62,14 +62,14 @@ export default function Updater(): null {
   const getReceipt = useCallback(
     (hash: string) => {
       if (!web3Service.getAccount()) throw new Error('No library or chainId');
-      return web3Service.getTransactionReceipt(hash).then((receipt: any) => receipt);
+      return web3Service.getTransactionReceipt(hash).then((receipt: TransactionReceipt) => receipt);
     },
     [web3Service]
   );
   const checkIfTransactionExists = useCallback(
     (hash: string) => {
       if (!web3Service.getAccount()) throw new Error('No library or chainId');
-      return web3Service.getTransaction(hash).then(async (tx: ethers.providers.TransactionResponse) => {
+      return web3Service.getTransaction(hash).then((tx: ethers.providers.TransactionResponse) => {
         if (!tx) {
           if (transactions[hash].retries > 2) {
             web3Service.handleTransactionRejection({
@@ -101,6 +101,8 @@ export default function Updater(): null {
         } else {
           dispatch(checkedTransaction({ hash, blockNumber: lastBlockNumber, chainId: currentNetwork.chainId }));
         }
+
+        return true;
       });
     },
     [web3Service, web3Service.getAccount(), transactions, lastBlockNumber, dispatch, currentNetwork]
@@ -118,10 +120,10 @@ export default function Updater(): null {
 
     Object.keys(transactions)
       .filter((hash) => shouldCheck(lastBlockNumber, transactions[hash]))
-      .map((hash) => {
+      .forEach((hash) => {
         const promise = getReceipt(hash);
         promise
-          .then((receipt: any) => {
+          .then((receipt) => {
             if (receipt && !transactions[hash].receipt) {
               let extendedTypeData = {};
 
@@ -132,6 +134,7 @@ export default function Updater(): null {
               }
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
                 extendedTypeData = {
+                  // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                   id: web3Service
                     .parseLog(
                       receipt.logs[receipt.logs.length - 1],
@@ -153,15 +156,7 @@ export default function Updater(): null {
                 finalizeTransaction({
                   hash,
                   receipt: {
-                    blockHash: receipt.blockHash,
-                    blockNumber: receipt.blockNumber,
-                    contractAddress: receipt.contractAddress,
-                    from: receipt.from,
-                    status: receipt.status,
-                    to: receipt.to,
-                    transactionHash: receipt.transactionHash,
-                    transactionIndex: receipt.transactionIndex,
-                    logs: receipt.logs,
+                    ...receipt,
                     chainId: currentNetwork.chainId,
                   },
                   extendedTypeData,
@@ -193,13 +188,13 @@ export default function Updater(): null {
                 dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber, chainId: currentNetwork.chainId }));
               }
             } else {
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
               checkIfTransactionExists(hash);
             }
+            return true;
           })
-          .catch((error: any) => {
-            if (!error.isCancelledError) {
-              console.error(`Failed to check transaction hash: ${hash}`, error);
-            }
+          .catch((error) => {
+            console.error(`Failed to check transaction hash: ${hash}`, error);
           });
       });
   }, [web3Service.getAccount(), transactions, lastBlockNumber, dispatch, getReceipt, checkIfTransactionExists]);

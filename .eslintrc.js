@@ -39,6 +39,10 @@ module.exports = {
     'react/require-default-props': 'off',
     // doesnt make sense to keep this active while we have ts
     'react/prop-types': 'off',
+    'class-methods-use-this': 'off',
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+    'eslint-comments/no-unlimited-disable': 'off',
+    'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state'] }],
   },
   overrides: [
     {

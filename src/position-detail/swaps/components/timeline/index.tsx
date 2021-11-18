@@ -1,5 +1,5 @@
 import React from 'react';
-import { BigNumber } from '@ethersproject/bignumber';
+import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
 import Grid from '@material-ui/core/Grid';
@@ -125,9 +125,10 @@ const PositionTimeline = ({ swaps, position }: PositionTimelineProps) => {
         description="pairSwapDetails"
         defaultMessage="1 {from} = {swapRate} {to}"
         values={{
-          b: (chunks: any) => <b>{chunks}</b>,
+          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
           from: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
           to: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
+          // eslint-disable-next-line no-nested-ternary
           swapRate: STABLE_COINS.includes(position.to.symbol)
             ? formatCurrencyAmount(BigNumber.from(pairSwap.ratePerUnitAToBWithFee), position.pair.tokenB)
             : position.pair.tokenA.address === position.from.address
@@ -147,8 +148,9 @@ const PositionTimeline = ({ swaps, position }: PositionTimelineProps) => {
                 description="pairSwapDetails"
                 defaultMessage="Swapped <b>{rate} {from}</b> to <b>{result} {to}</b>"
                 values={{
-                  b: (chunks: any) => <b>{chunks}</b>,
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                   result:
+                    // eslint-disable-next-line no-nested-ternary
                     position.pair.tokenA.address === position.from.address
                       ? formatCurrencyAmount(
                           BigNumber.from(pairSwap.ratePerUnitAToBWithFee)
@@ -202,7 +204,7 @@ const PositionTimeline = ({ swaps, position }: PositionTimelineProps) => {
               description="positionModifiedRate"
               defaultMessage="Rate: <b>{rate} {from}</b>"
               values={{
-                b: (chunks: any) => <b>{chunks}</b>,
+                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                 rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
                 from: position.from.symbol,
               }}
@@ -215,7 +217,7 @@ const PositionTimeline = ({ swaps, position }: PositionTimelineProps) => {
               description="positionModifiedSwaps"
               defaultMessage="Set to run for <b>{swaps} {frequency}</b>"
               values={{
-                b: (chunks: any) => <b>{chunks}</b>,
+                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                 swaps: parseInt(positionState.lastSwap, 10) - parseInt(positionState.startingSwap, 10) + 1,
                 frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
               }}

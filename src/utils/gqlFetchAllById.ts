@@ -1,6 +1,11 @@
+/* eslint-disable */
 import { ApolloClient, NormalizedCacheObject, ObservableQuery, OperationVariables, DocumentNode } from '@apollo/client';
 
-export default async function gqlFetchAllById(
+interface GraphqlResults<T> {
+  data: T;
+}
+
+export default async function gqlFetchAllById<T>(
   client: ApolloClient<NormalizedCacheObject>,
   queryToRun: DocumentNode,
   variables: any,
@@ -9,7 +14,7 @@ export default async function gqlFetchAllById(
   limit = 1000,
   query: ObservableQuery<any, OperationVariables> | null = null,
   timesCalled = 1
-): Promise<any> {
+): Promise<GraphqlResults<T>> {
   if (query) {
     const newResults = await query.result();
 
@@ -55,3 +60,5 @@ export default async function gqlFetchAllById(
 
   return results;
 }
+
+/* eslint-enable */
