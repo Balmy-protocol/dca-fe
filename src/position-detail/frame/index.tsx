@@ -27,6 +27,7 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { usePositionHasPendingTransaction, useTransactionAdder } from 'state/transactions/hooks';
 import PositionStatus from 'position-detail/position-status';
+import { BigNumber } from 'ethers';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -92,9 +93,9 @@ const PositionDetailFrame = () => {
         swapsData.pair.swaps
           .filter((swap) => {
             if (
-              parseInt(swap.executedAtTimestamp) > parseInt(position.createdAtTimestamp) &&
+              parseInt(swap.executedAtTimestamp, 10) > parseInt(position.createdAtTimestamp, 10) &&
               (position.terminatedAtTimestamp === null ||
-                parseInt(swap.executedAtTimestamp) < parseInt(position.terminatedAtTimestamp)) &&
+                parseInt(swap.executedAtTimestamp, 10) < parseInt(position.terminatedAtTimestamp, 10)) &&
               some(
                 swap.pairSwapsIntervals,
                 (swapInterval) => swapInterval.swapInterval.interval === position.swapInterval.interval
@@ -103,10 +104,10 @@ const PositionDetailFrame = () => {
               swapsExecuted += 1;
             }
             return (
-              swapsExecuted <= parseInt(position.totalSwaps) &&
-              parseInt(swap.executedAtTimestamp) > parseInt(position.createdAtTimestamp) &&
+              swapsExecuted <= parseInt(position.totalSwaps, 10) &&
+              parseInt(swap.executedAtTimestamp, 10) > parseInt(position.createdAtTimestamp, 10) &&
               (position.terminatedAtTimestamp === null ||
-                parseInt(swap.executedAtTimestamp) < parseInt(position.terminatedAtTimestamp)) &&
+                parseInt(swap.executedAtTimestamp, 10) < parseInt(position.terminatedAtTimestamp, 10)) &&
               some(
                 swap.pairSwapsIntervals,
                 (swapInterval) => swapInterval.swapInterval.interval === position.swapInterval.interval
@@ -171,14 +172,13 @@ const PositionDetailFrame = () => {
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'Error changing rate and swaps' });
     }
   };
 
   React.useEffect(() => {
     if (position && !isPending) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       refetch();
     }
   }, [isPending]);
@@ -207,7 +207,6 @@ const PositionDetailFrame = () => {
         <StyledControlsWrapper item xs={12}>
           <PositionStatus position={position} pair={swapsData?.pair} />
           <PositionControls
-            position={position}
             onWithdraw={() => setShowWithdrawModal(true)}
             onTerminate={() => setShowTerminateModal(true)}
             onModifyRate={() => setActionToShow('modifyRate')}
@@ -227,7 +226,7 @@ const PositionDetailFrame = () => {
               onClose={() => setActionToShow(null)}
               position={fullPositionToMappedPosition(position)}
               onModifyRateAndSwaps={handleModifyRateAndSwaps}
-              balance={balance}
+              balance={balance || BigNumber.from(0)}
               showAddCaption
             />
           </StyledPaper>

@@ -11,6 +11,9 @@ export interface PoolLiquidityData {
 
 export type PoolsLiquidityData = PoolLiquidityData[];
 
+export interface PoolsLiquidityDataGraphqlResponse {
+  pools: PoolsLiquidityData;
+}
 export interface GetPairResponseSwapData {
   id: string;
   executedAtTimestamp: string;
@@ -23,6 +26,10 @@ export interface GetPairPriceResponseData {
     id: string;
     swaps: GetPairResponseSwapData[];
   };
+}
+
+export interface PositionsGraphqlResponse {
+  positions: PositionResponse[];
 }
 
 export type PositionResponse = {
@@ -124,3 +131,23 @@ export type PoolResponse = {
   };
   id: string;
 };
+
+export interface PoolsGraphqlResponse {
+  pools: PoolResponse[];
+}
+export interface AvailablePairSwap {
+  executedAtTimestamp: number;
+}
+
+export type AvailablePairResponse = {
+  tokenA: Token;
+  tokenB: Token;
+  id: string;
+  swaps: AvailablePairSwap[];
+  createdAtTimestamp: number;
+  status: string; // active, stale
+};
+
+export interface AvailablePairsGraphqlResponse {
+  pairs: AvailablePairResponse[];
+}

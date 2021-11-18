@@ -7,7 +7,6 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Link from '@material-ui/core/Link';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import { buildEtherscanTransaction } from 'utils/etherscan';
-import { FullPosition } from 'types';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const PositionControlsContainer = styled.div`
@@ -16,7 +15,6 @@ const PositionControlsContainer = styled.div`
 `;
 
 interface PositionControlsProps {
-  position: FullPosition;
   onWithdraw: () => void;
   onTerminate: () => void;
   onModifyRate: () => void;

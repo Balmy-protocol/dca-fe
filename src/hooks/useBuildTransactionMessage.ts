@@ -32,17 +32,19 @@ function useBuildTransactionMessages() {
     (tx: TransactionDetails) => {
       let message = 'Transaction confirmed!';
       switch (tx.type) {
-        case TRANSACTION_TYPES.WRAP_ETHER:
+        case TRANSACTION_TYPES.WRAP_ETHER: {
           const wrapEtherTypeData = tx.typeData as WrapEtherTypeData;
 
           message = `${wrapEtherTypeData.amount} wrapped to WETH`;
           break;
-        case TRANSACTION_TYPES.NEW_POSITION:
+        }
+        case TRANSACTION_TYPES.NEW_POSITION: {
           const newPositionTypeData = tx.typeData as NewPositionTypeData;
 
           message = `Your new ${newPositionTypeData.from.symbol}:${newPositionTypeData.to.symbol} position has been created`;
           break;
-        case TRANSACTION_TYPES.TERMINATE_POSITION:
+        }
+        case TRANSACTION_TYPES.TERMINATE_POSITION: {
           const terminatePositionTypeData = tx.typeData as TerminatePositionTypeData;
           const terminatedPosition = find(positions, { id: terminatePositionTypeData.id });
           if (terminatedPosition) {
@@ -51,7 +53,8 @@ function useBuildTransactionMessages() {
             } position has been terminated`;
           }
           break;
-        case TRANSACTION_TYPES.WITHDRAW_POSITION:
+        }
+        case TRANSACTION_TYPES.WITHDRAW_POSITION: {
           const withdrawPositionTypeData = tx.typeData as WithdrawTypeData;
           const withdrawnPosition = find(positions, { id: withdrawPositionTypeData.id });
           if (withdrawnPosition) {
@@ -60,7 +63,8 @@ function useBuildTransactionMessages() {
             } position`;
           }
           break;
-        case TRANSACTION_TYPES.ADD_FUNDS_POSITION:
+        }
+        case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
           const addFundsTypeData = tx.typeData as AddFundsTypeData;
           const fundedPosition = find(positions, { id: addFundsTypeData.id });
           if (fundedPosition) {
@@ -71,7 +75,8 @@ function useBuildTransactionMessages() {
             } position`;
           }
           break;
-        case TRANSACTION_TYPES.RESET_POSITION:
+        }
+        case TRANSACTION_TYPES.RESET_POSITION: {
           const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
           const resettedPosition = find(positions, { id: resetPositionTypeData.id });
           if (resettedPosition) {
@@ -85,7 +90,8 @@ function useBuildTransactionMessages() {
             )}`;
           }
           break;
-        case TRANSACTION_TYPES.REMOVE_FUNDS:
+        }
+        case TRANSACTION_TYPES.REMOVE_FUNDS: {
           const removeFundsTypeData = tx.typeData as RemoveFundsTypeData;
           const removeFundedPosition = find(positions, { id: removeFundsTypeData.id });
           if (removeFundedPosition) {
@@ -96,8 +102,9 @@ function useBuildTransactionMessages() {
             } position`;
           }
           break;
+        }
 
-        case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION:
+        case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION: {
           const modifySwapsPositionTypeData = tx.typeData as ModifySwapsPositionTypeData;
           const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
           if (modifiedPosition) {
@@ -109,7 +116,8 @@ function useBuildTransactionMessages() {
             )}`;
           }
           break;
-        case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION:
+        }
+        case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
           const modifyRateAndSwapsPositionTypeData = tx.typeData as ModifyRateAndSwapsPositionTypeData;
           const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
           if (modifiedRatePosition) {
@@ -127,11 +135,13 @@ function useBuildTransactionMessages() {
             )}`;
           }
           break;
-        case TRANSACTION_TYPES.NEW_PAIR:
+        }
+        case TRANSACTION_TYPES.NEW_PAIR: {
           const newPairTypeData = tx.typeData as NewPairTypeData;
           message = `The pair ${newPairTypeData.token0.symbol}:${newPairTypeData.token1.symbol} has been created`;
           break;
-        case TRANSACTION_TYPES.APPROVE_TOKEN:
+        }
+        case TRANSACTION_TYPES.APPROVE_TOKEN: {
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
           const pair = find(availablePairs, { id: tokenApprovalTypeData.pair });
           if (pair) {
@@ -139,6 +149,9 @@ function useBuildTransactionMessages() {
           } else {
             message = `${tokenApprovalTypeData.token.symbol} is now ready to be used`;
           }
+          break;
+        }
+        default:
           break;
       }
 

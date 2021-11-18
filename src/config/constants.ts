@@ -189,6 +189,49 @@ export const SWAP_INTERVALS = {
   week: ONE_WEEK,
 };
 
+export const SWAP_INTERVALS_MAP = [
+  {
+    description: 'One minute',
+    key: 1,
+    value: ONE_MINUTE,
+  },
+  {
+    description: 'Five minutes',
+    key: 2,
+    value: FIVE_MINUTES,
+  },
+  {
+    description: 'Fifteen minutes',
+    key: 4,
+    value: FIFTEEN_MINUTES,
+  },
+  {
+    description: 'Thirty minutes',
+    key: 8,
+    value: THIRTY_MINUTES,
+  },
+  {
+    description: 'One hour',
+    key: 16,
+    value: ONE_HOUR,
+  },
+  {
+    description: 'Four hours',
+    key: 32,
+    value: FOUR_HOURS,
+  },
+  {
+    description: 'One day',
+    key: 64,
+    value: ONE_DAY,
+  },
+  {
+    description: 'One week',
+    key: 128,
+    value: ONE_WEEK,
+  },
+];
+
 export const STRING_SWAP_INTERVALS = {
   [ONE_MINUTE.toString()]: {
     singular: '1 minute',

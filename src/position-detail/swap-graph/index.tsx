@@ -1,5 +1,5 @@
 import React from 'react';
-import { BigNumber } from '@ethersproject/bignumber';
+import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
@@ -45,8 +45,15 @@ interface SwapsGraphProps {
   swaps: PairSwaps[];
 }
 
+interface PriceData {
+  name: string;
+  date: string;
+}
+
+type Prices = PriceData[];
+
 const SwapsGraph = ({ position, swaps }: SwapsGraphProps) => {
-  let prices: any = [];
+  let prices: Prices = [];
 
   prices = React.useMemo(() => {
     const orderedSwaps = orderBy(swaps, ['executedAtTimestamp'], ['asc']);
@@ -70,14 +77,12 @@ const SwapsGraph = ({ position, swaps }: SwapsGraphProps) => {
                       .div(BigNumber.from('10').pow(position.from.decimals)),
                     position.to
                   )
-            ) + ((acc[acc.length - 1] && acc[acc.length - 1][position.to.symbol]) || 0),
+            ) + (((acc[acc.length - 1] && acc[acc.length - 1][position.to.symbol]) as number) || 0),
           date: executedAtTimestamp,
         },
       ],
       []
     );
-
-    position.createdAtTimestamp;
 
     mappedSwapData.push({
       name: DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toFormat('MMM d t'),

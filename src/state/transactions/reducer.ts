@@ -24,14 +24,14 @@ export default createReducer(initialState, (builder) =>
   builder
     .addCase(
       addTransaction,
-      (transactions, { payload: { from, hash, approval, summary, claim, type, typeData, chainId } }) => {
-        if (transactions[chainId] && transactions[chainId][hash]) {
+      (state, { payload: { from, hash, approval, summary, claim, type, typeData, chainId } }) => {
+        if (state[chainId] && state[chainId][hash]) {
           throw Error('Attempted to add existing transaction.');
         }
-        if (!transactions[chainId]) {
-          transactions[chainId] = {};
+        if (!state[chainId]) {
+          state[chainId] = {};
         }
-        transactions[chainId][hash] = {
+        state[chainId][hash] = {
           hash,
           approval,
           summary,
@@ -45,8 +45,8 @@ export default createReducer(initialState, (builder) =>
         };
       }
     )
-    .addCase(checkedTransaction, (transactions, { payload: { hash, blockNumber, chainId } }) => {
-      const tx = transactions[chainId][hash];
+    .addCase(checkedTransaction, (state, { payload: { hash, blockNumber, chainId } }) => {
+      const tx = state[chainId][hash];
       if (!tx || !blockNumber) {
         return;
       }
@@ -57,8 +57,8 @@ export default createReducer(initialState, (builder) =>
       }
       tx.retries = 0;
     })
-    .addCase(transactionFailed, (transactions, { payload: { hash, blockNumber, chainId } }) => {
-      const tx = transactions[chainId][hash];
+    .addCase(transactionFailed, (state, { payload: { hash, blockNumber, chainId } }) => {
+      const tx = state[chainId][hash];
       if (!tx || !blockNumber) {
         return;
       }
@@ -69,8 +69,8 @@ export default createReducer(initialState, (builder) =>
       }
       tx.retries += 1;
     })
-    .addCase(finalizeTransaction, (transactions, { payload: { hash, receipt, extendedTypeData, chainId } }) => {
-      const tx = transactions[chainId][hash];
+    .addCase(finalizeTransaction, (state, { payload: { hash, receipt, extendedTypeData, chainId } }) => {
+      const tx = state[chainId][hash];
       if (!tx) {
         return;
       }
@@ -81,15 +81,17 @@ export default createReducer(initialState, (builder) =>
         ...extendedTypeData,
       };
     })
-    .addCase(removeTransaction, (transactions, { payload: { hash, chainId } }) => {
-      const tx = transactions[chainId][hash];
+    .addCase(removeTransaction, (state, { payload: { hash, chainId } }) => {
+      const tx = state[chainId][hash];
       if (!tx) {
         return;
       }
-      delete transactions[chainId][hash];
+      delete state[chainId][hash];
     })
-    .addCase(clearAllTransactions, (transactions, { payload: { chainId } }) => {
-      const transactionKeys = keys(transactions[chainId]);
-      transactionKeys.forEach((txHash: string) => (transactions[chainId][txHash].isCleared = true));
+    .addCase(clearAllTransactions, (state, { payload: { chainId } }) => {
+      const transactionKeys = keys(state[chainId]);
+      transactionKeys.forEach((txHash: string) => {
+        state[chainId][txHash].isCleared = true;
+      });
     })
 );

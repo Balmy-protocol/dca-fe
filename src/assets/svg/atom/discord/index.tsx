@@ -3,7 +3,6 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 
 interface IconProps {
   size?: string;
-  isDisabled: boolean;
 }
 
 export default function Discord({ size }: IconProps) {

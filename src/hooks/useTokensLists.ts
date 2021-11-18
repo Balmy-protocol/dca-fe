@@ -21,13 +21,12 @@ function useTokensLists() {
       const mappedTokensLists = values.map((tokensListsResponse) => {
         const tokens: TokenList = {};
 
-        tokensListsResponse.data.tokens.forEach(
-          (token) =>
-            (tokens[token.address.toLowerCase()] = {
-              ...token,
-              address: token.address.toLowerCase(),
-            })
-        );
+        tokensListsResponse.data.tokens.forEach((token) => {
+          tokens[token.address.toLowerCase()] = {
+            ...token,
+            address: token.address.toLowerCase(),
+          };
+        });
 
         return {
           ...tokensListsResponse.data,
@@ -37,13 +36,14 @@ function useTokensLists() {
 
       const newTokensLists: Record<string, TokensLists> = {};
 
-      Object.keys(TOKEN_LISTS).forEach(
-        (tokenListUrl, index) => (newTokensLists[tokenListUrl] = mappedTokensLists[index])
-      );
+      Object.keys(TOKEN_LISTS).forEach((tokenListUrl, index) => {
+        newTokensLists[tokenListUrl] = mappedTokensLists[index];
+      });
 
       setTokensLists(newTokensLists);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getTokensLists();
   }, [axiosClient]);
 

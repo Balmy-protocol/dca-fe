@@ -127,11 +127,10 @@ interface ActivePositionProps {
   position: PositionProp;
   web3Service: Web3Service;
   onWithdraw: (position: Position) => void;
-  onTerminate: (position: Position) => void;
   onViewNFT: (position: Position) => void;
 }
 
-const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onViewNFT }: ActivePositionProps) => {
+const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: ActivePositionProps) => {
   const {
     from,
     to,
@@ -158,7 +157,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
   const [token0, token1] = sortTokens(from, to);
   const pair = find(
     availablePairs,
-    (pair) => pair.token0.address === token0.address && pair.token1.address === token1.address
+    (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
   );
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
@@ -173,13 +172,9 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
 
   const shouldBlockModifications = remainingSwaps.eq(BigNumber.from(0)) && withdrawn.gte(swapped);
 
-  const handleOnWithdraw = (position: Position) => {
+  const handleOnWithdraw = (positionToWithdraw: Position) => {
     setShouldShowSettings(false);
-    onWithdraw(position);
-  };
-  const handleOnTerminate = (position: Position) => {
-    setShouldShowSettings(false);
-    onTerminate(position);
+    onWithdraw(positionToWithdraw);
   };
   const handleResetPosition = async (ammountToAdd: string, frequencyValue: string) => {
     try {
@@ -222,9 +217,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'error while adding funds' });
     }
   };
 
@@ -260,9 +253,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'error while adding funds' });
     }
   };
 
@@ -295,54 +286,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
-    }
-  };
-
-  const handleModifySwaps = async (frequencyValue: string) => {
-    try {
-      setModalLoading({
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="Modifying frequency for position"
-              defaultMessage="Changing your {from}:{to} position to finish in {frequencyValue} {frequencyType}"
-              values={{
-                from: position.from.symbol,
-                to: position.to.symbol,
-                frequencyValue,
-                type: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
-              }}
-            />
-          </Typography>
-        ),
-      });
-      const result = await web3Service.modifySwaps(position, pair as AvailablePair, frequencyValue);
-      addTransaction(result, {
-        type: TRANSACTION_TYPES.MODIFY_SWAPS_POSITION,
-        typeData: { id: position.id, newSwaps: frequencyValue },
-      });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="success modify frequency for position"
-            defaultMessage="Changing the frequency of your {from}:{to} position to finish in {frequencyValue} {frequencyType} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{
-              from: position.from.symbol,
-              to: position.to.symbol,
-              frequencyValue,
-              type: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
-            }}
-          />
-        ),
-      });
-    } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'error while withdrawing funds' });
     }
   };
 
@@ -389,9 +333,7 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'error while modifying rate' });
     }
   };
 
@@ -402,8 +344,6 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
         shouldShow={shouldShowSettings}
         position={position}
         onWithdraw={handleOnWithdraw}
-        onTerminate={handleOnTerminate}
-        onModifySwaps={handleModifySwaps}
         onModifyRateAndSwaps={handleModifyRateAndSwaps}
         onRemoveFunds={handleWithdrawFunds}
         balance={balance}
@@ -503,33 +443,34 @@ const ActivePosition = ({ position, onWithdraw, onTerminate, web3Service, onView
           />
         </StyledProgressWrapper>
         <StyledCardFooter>
-          {!isPending &&
-            (hasNoFunds ? (
-              <StyledNoFunds>
-                <Typography variant="body2">
-                  <FormattedMessage description="no funds" defaultMessage="No funds!" />
-                </Typography>
-              </StyledNoFunds>
-            ) : isStale ? (
-              <StyledStale>
-                <Typography variant="body2">
-                  <FormattedMessage description="stale" defaultMessage="Stale" />
-                </Typography>
-              </StyledStale>
-            ) : (
-              <StyledFreqLeft>
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="days to finish"
-                    defaultMessage="{remainingDays} {type} left"
-                    values={{
-                      remainingDays: remainingSwaps.toString(),
-                      type: getFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
-                    }}
-                  />
-                </Typography>
-              </StyledFreqLeft>
-            ))}
+          {!isPending && hasNoFunds && (
+            <StyledNoFunds>
+              <Typography variant="body2">
+                <FormattedMessage description="no funds" defaultMessage="No funds!" />
+              </Typography>
+            </StyledNoFunds>
+          )}
+          {!isPending && !hasNoFunds && isStale && (
+            <StyledStale>
+              <Typography variant="body2">
+                <FormattedMessage description="stale" defaultMessage="Stale" />
+              </Typography>
+            </StyledStale>
+          )}
+          {!isPending && !hasNoFunds && !isStale && (
+            <StyledFreqLeft>
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="days to finish"
+                  defaultMessage="{remainingDays} {type} left"
+                  values={{
+                    remainingDays: remainingSwaps.toString(),
+                    type: getFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
+                  }}
+                />
+              </Typography>
+            </StyledFreqLeft>
+          )}
           {!shouldBlockModifications && (
             <StyledCardFooterItem isPending={isPending}>
               <Button

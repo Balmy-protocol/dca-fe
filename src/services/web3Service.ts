@@ -1,6 +1,6 @@
 import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
-import { TransactionResponse } from '@ethersproject/providers';
+import { ExternalProvider, Log, Provider, TransactionResponse } from '@ethersproject/providers';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import Web3Modal, { getProviderInfo } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -36,9 +36,16 @@ import {
   GetPoolResponse,
   TxPriceResponse,
   GetNextSwapInfo,
+  NFTData,
+  GetUsedTokensData,
+  PositionsGraphqlResponse,
+  AvailablePairsGraphqlResponse,
+  PoolsLiquidityDataGraphqlResponse,
+  PoolsGraphqlResponse,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { sortTokens } from 'utils/parsing';
+import { buildSwapInput } from 'utils/swap';
 
 // GQL queries
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
@@ -63,9 +70,11 @@ import {
   MEAN_GRAPHQL_URL,
   NETWORKS,
   SUPPORTED_NETWORKS,
+  SWAP_INTERVALS_MAP,
   TRANSACTION_TYPES,
   UNI_GRAPHQL_URL,
 } from 'config/constants';
+import { ERC20Contract, HubContract, PairContract } from 'types/contracts';
 import GraphqlService from './graphql';
 
 export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as string;
@@ -190,19 +199,19 @@ export default class Web3Service {
   }
 
   getUsedTokens() {
-    return axios.get(
-      `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${[process.env.ETHPLORER_KEY]}`
+    return axios.get<GetUsedTokensData>(
+      `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${process.env.ETHPLORER_KEY || ''}`
     );
   }
 
   // BOOTSTRAP
   async connect() {
-    const provider = await this.modal?.connect();
+    const provider: Provider = (await this.modal?.connect()) as Provider;
 
     this.providerInfo = getProviderInfo(provider);
     // A Web3Provider wraps a standard Web3 provider, which is
     // what Metamask injects as window.ethereum into each page
-    const ethersProvider = new ethers.providers.Web3Provider(provider);
+    const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider);
 
     // The Metamask plugin also allows signing transactions to
     // send ether and pay to change state within the blockchain.
@@ -218,7 +227,7 @@ export default class Web3Service {
 
     const account = await this.signer.getAddress();
 
-    provider.on('network', (newNetwork: any, oldNetwork: any) => {
+    provider.on('network', (newNetwork: number, oldNetwork: null | number) => {
       // When a Provider makes its initial connection, it emits a "network"
       // event with a null oldNetwork along with the newNetwork. So, if the
       // oldNetwork exists, it represents a changing network
@@ -228,7 +237,7 @@ export default class Web3Service {
       }
     });
 
-    const currentPositionsResponse = await gqlFetchAll(
+    const currentPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
       this.apolloClient.getClient(),
       GET_POSITIONS,
       {
@@ -261,7 +270,7 @@ export default class Web3Service {
       'id'
     );
 
-    const pastPositionsResponse = await gqlFetchAll(
+    const pastPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
       this.apolloClient.getClient(),
       GET_POSITIONS,
       {
@@ -288,7 +297,7 @@ export default class Web3Service {
         id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
-        pedingTransaction: '',
+        pendingTransaction: '',
         pairId: position.pair.id,
       })),
       'id'
@@ -298,11 +307,15 @@ export default class Web3Service {
   }
 
   async disconnect() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     if (this.client && (this.client as any).disconnect) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await (this.client as any).disconnect();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     if (this.client && (this.client as any).close) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       await (this.client as any).close();
     }
 
@@ -322,7 +335,7 @@ export default class Web3Service {
         },
       },
       authereum: {
-        package: Authereum, // required
+        package: Authereum as WalletConnectProvider, // required
       },
       torus: {
         package: Torus, // required
@@ -342,11 +355,13 @@ export default class Web3Service {
 
     if (window.ethereum) {
       // handle metamask account change
-      window.ethereum.on('accountsChanged', (newAccounts: string[]) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      window.ethereum.on('accountsChanged', () => {
         window.location.reload();
       });
 
       // extremely recommended by metamask
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       window.ethereum.on('chainChanged', () => window.location.reload());
     }
 
@@ -357,7 +372,7 @@ export default class Web3Service {
       this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[1]);
     }
 
-    const availablePairsResponse = await gqlFetchAll(
+    const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(
       this.apolloClient.getClient(),
       GET_AVAILABLE_PAIRS,
       {},
@@ -372,14 +387,19 @@ export default class Web3Service {
         lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
         id: pair.id,
         createdAt: pair.createdAtTimestamp,
-        swapInfo: this.getNextSwapInfo({ tokenA: pair.tokenA.id, tokenB: pair.tokenB.id }),
+        swapInfo: await this.getNextSwapInfo({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }),
       }))
     );
 
     this.tokenList = {};
 
     if (chain.chainId !== NETWORKS.mainnet.chainId) {
-      const tokenListResponse = await gqlFetchAllById(this.uniClient.getClient(), GET_TOKEN_LIST, {}, 'pools');
+      const tokenListResponse = await gqlFetchAllById<PoolsGraphqlResponse>(
+        this.uniClient.getClient(),
+        GET_TOKEN_LIST,
+        {},
+        'pools'
+      );
 
       const mockedTokens: Record<string, Record<string, number>> = {
         USDC: {},
@@ -394,74 +414,75 @@ export default class Web3Service {
             if (!mockedTokens.USDC[pool.token0.id]) {
               mockedTokens.USDC[pool.token0.id] = 1;
             } else {
-              mockedTokens.USDC[pool.token0.id] = mockedTokens.USDC[pool.token0.id] + 1;
+              mockedTokens.USDC[pool.token0.id] += 1;
             }
           }
           if (pool.token0.symbol === 'WETH') {
             if (!mockedTokens.WETH[pool.token0.id]) {
               mockedTokens.WETH[pool.token0.id] = 1;
             } else {
-              mockedTokens.WETH[pool.token0.id] = mockedTokens.WETH[pool.token0.id] + 1;
+              mockedTokens.WETH[pool.token0.id] += 1;
             }
           }
           if (pool.token0.symbol === 'UNI') {
             if (!mockedTokens.UNI[pool.token0.id]) {
               mockedTokens.UNI[pool.token0.id] = 1;
             } else {
-              mockedTokens.UNI[pool.token0.id] = mockedTokens.UNI[pool.token0.id] + 1;
+              mockedTokens.UNI[pool.token0.id] += 1;
             }
           }
           if (pool.token0.symbol === 'DAI') {
             if (!mockedTokens.DAI[pool.token0.id]) {
               mockedTokens.DAI[pool.token0.id] = 1;
             } else {
-              mockedTokens.DAI[pool.token0.id] = mockedTokens.DAI[pool.token0.id] + 1;
+              mockedTokens.DAI[pool.token0.id] += 1;
             }
           }
           if (pool.token0.symbol === 'YFI') {
             if (!mockedTokens.YFI[pool.token0.id]) {
               mockedTokens.YFI[pool.token0.id] = 1;
             } else {
-              mockedTokens.YFI[pool.token0.id] = mockedTokens.YFI[pool.token0.id] + 1;
+              mockedTokens.YFI[pool.token0.id] += 1;
             }
           }
           if (pool.token1.symbol === 'USDC') {
             if (!mockedTokens.USDC[pool.token1.id]) {
               mockedTokens.USDC[pool.token1.id] = 1;
             } else {
-              mockedTokens.USDC[pool.token1.id] = mockedTokens.USDC[pool.token1.id] + 1;
+              mockedTokens.USDC[pool.token1.id] += 1;
             }
           }
           if (pool.token1.symbol === 'WETH') {
             if (!mockedTokens.WETH[pool.token1.id]) {
               mockedTokens.WETH[pool.token1.id] = 1;
             } else {
-              mockedTokens.WETH[pool.token1.id] = mockedTokens.WETH[pool.token1.id] + 1;
+              mockedTokens.WETH[pool.token1.id] += 1;
             }
           }
           if (pool.token1.symbol === 'UNI') {
             if (!mockedTokens.UNI[pool.token1.id]) {
               mockedTokens.UNI[pool.token1.id] = 1;
             } else {
-              mockedTokens.UNI[pool.token1.id] = mockedTokens.UNI[pool.token1.id] + 1;
+              mockedTokens.UNI[pool.token1.id] += 1;
             }
           }
           if (pool.token1.symbol === 'DAI') {
             if (!mockedTokens.DAI[pool.token1.id]) {
               mockedTokens.DAI[pool.token1.id] = 1;
             } else {
-              mockedTokens.DAI[pool.token1.id] = mockedTokens.DAI[pool.token1.id] + 1;
+              mockedTokens.DAI[pool.token1.id] += 1;
             }
           }
           if (pool.token1.symbol === 'YFI') {
             if (!mockedTokens.YFI[pool.token1.id]) {
               mockedTokens.YFI[pool.token1.id] = 1;
             } else {
-              mockedTokens.YFI[pool.token1.id] = mockedTokens.YFI[pool.token1.id] + 1;
+              mockedTokens.YFI[pool.token1.id] += 1;
             }
           }
 
           if (!acc[pool.token0.id]) {
+            // eslint-disable-next-line no-param-reassign
             acc[pool.token0.id] = {
               decimals: BigNumber.from(pool.token0.decimals).toNumber(),
               address: pool.token0.id,
@@ -471,6 +492,7 @@ export default class Web3Service {
             };
           }
           if (!acc[pool.token1.id]) {
+            // eslint-disable-next-line no-param-reassign
             acc[pool.token1.id] = {
               decimals: BigNumber.from(pool.token1.decimals).toNumber(),
               address: pool.token1.id,
@@ -481,6 +503,7 @@ export default class Web3Service {
           }
 
           if (pool.token0.id === WETH(chain.chainId).address) {
+            // eslint-disable-next-line no-param-reassign
             acc = {
               ...acc,
               [ETH.address]: {
@@ -488,6 +511,7 @@ export default class Web3Service {
               },
             };
           } else if (pool.token1.id === WETH(chain.chainId).address) {
+            // eslint-disable-next-line no-param-reassign
             acc = {
               ...acc,
               [ETH.address]: {
@@ -517,36 +541,37 @@ export default class Web3Service {
       return;
     }
 
-    return window.ethereum.request({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    window.ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: `0x${newChainId.toString(16)}` }],
     });
   }
 
-  getBalance(address?: string, decimals?: number) {
-    if (!address) return Promise.resolve();
+  getBalance(address?: string): Promise<BigNumber> {
+    if (!address) return Promise.resolve(BigNumber.from(0));
 
     if (address === ETH.address) return this.signer.getBalance();
 
-    const ERC20Interface = new Interface(ERC20ABI) as any;
+    const ERC20Interface = new Interface(ERC20ABI);
 
-    const erc20 = new ethers.Contract(address, ERC20Interface, this.client);
+    const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as ERC20Contract;
 
     return erc20.balanceOf(this.getAccount());
   }
 
-  async wrapETH(amount: string) {
-    const ERC20Interface = new Interface(WETHABI) as any;
+  async wrapETH(amount: string): Promise<TransactionResponse> {
+    const ERC20Interface = new Interface(WETHABI);
 
     const chain = await this.getNetwork();
 
-    const erc20 = new ethers.Contract(WETH(chain.chainId).address, ERC20Interface, this.getSigner());
+    const erc20 = new ethers.Contract(WETH(chain.chainId).address, ERC20Interface, this.getSigner()) as ERC20Contract;
 
     return erc20.deposit({ value: parseUnits(amount, ETH.decimals).toHexString() });
   }
 
   async getAllowance(token: Token, pairContract: AvailablePair) {
-    const ERC20Interface = new Interface(ERC20ABI) as any;
+    const ERC20Interface = new Interface(ERC20ABI);
 
     const chain = await this.getNetwork();
 
@@ -554,15 +579,15 @@ export default class Web3Service {
       token.address === ETH.address ? WETH(chain.chainId).address : token.address,
       ERC20Interface,
       this.client
-    );
+    ) as ERC20Contract;
 
     return erc20
       .allowance(this.getAccount(), pairContract.id)
       .then((allowance: string) => ({ token, allowance: formatUnits(allowance, token.decimals) }));
   }
 
-  async approveToken(token: Token, pairContract: AvailablePair) {
-    const ERC20Interface = new Interface(ERC20ABI) as any;
+  async approveToken(token: Token, pairContract: AvailablePair): Promise<TransactionResponse> {
+    const ERC20Interface = new Interface(ERC20ABI);
 
     const chain = await this.getNetwork();
 
@@ -570,19 +595,30 @@ export default class Web3Service {
       token.address === ETH.address ? WETH(chain.chainId).address : token.address,
       ERC20Interface,
       this.getSigner()
-    );
+    ) as ERC20Contract;
 
     return erc20.approve(pairContract.id, MaxUint256);
   }
 
   // PAIR METHODS
   async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
-    const hubContract = new ethers.Contract(HUB_ADDRESS, HUB.abi, this.client);
+    const hubContract = new ethers.Contract(HUB_ADDRESS, HUB.abi, this.client) as HubContract;
 
-    const nextSwapInfo = await hubContract.getNextSwapInfo();
+    const { tokens, pairIndexes } = buildSwapInput([pair], []);
+
+    const nextSwapInfo = await hubContract.getNextSwapInfo(tokens, pairIndexes);
+
+    const { pairs } = nextSwapInfo;
+
+    const [{ intervalsInSwap }] = pairs;
+
+    // eslint-disable-next-line no-bitwise
+    const swapsToPerform = SWAP_INTERVALS_MAP.filter(
+      (swapInterval) => swapInterval.key & parseInt(intervalsInSwap, 16)
+    ).map((swapInterval) => ({ interval: swapInterval.value.toNumber() }));
 
     return {
-      swapsToPerform: [],
+      swapsToPerform,
     };
   }
 
@@ -596,7 +632,7 @@ export default class Web3Service {
       tokenA = token1.address;
       tokenB = token0.address;
     }
-    const poolsWithLiquidityResponse = await gqlFetchAll(
+    const poolsWithLiquidityResponse = await gqlFetchAll<PoolsLiquidityDataGraphqlResponse>(
       this.uniClient.getClient(),
       GET_PAIR_LIQUIDITY,
       {
@@ -607,7 +643,10 @@ export default class Web3Service {
     );
 
     const liquidity: number = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
-      pool.poolDayData.forEach((dayData) => (acc += parseFloat(dayData.volumeUSD)));
+      // eslint-disable-next-line no-param-reassign
+      pool.poolDayData.forEach((dayData) => {
+        acc += parseFloat(dayData.volumeUSD);
+      });
 
       return acc;
     }, 0);
@@ -663,8 +702,8 @@ export default class Web3Service {
       axios.get<CoinGeckoPriceResponse>(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=1&page=1&sparkline=false'
       ),
-    ]).then((values: [BigNumber, AxiosResponse<TxPriceResponse>, AxiosResponse<CoinGeckoPriceResponse>]) => {
-      const [gasLimitRaw, gasPriceResponse, ethPriceResponse] = values;
+    ]).then((promiseValues: [BigNumber, AxiosResponse<TxPriceResponse>, AxiosResponse<CoinGeckoPriceResponse>]) => {
+      const [gasLimitRaw, gasPriceResponse, ethPriceResponse] = promiseValues;
 
       const gasLimit = BigNumber.from(gasLimitRaw);
       const gasPrice = parseUnits(
@@ -700,17 +739,17 @@ export default class Web3Service {
     tokenA = tokenA === ETH.address ? WETH(chain.chainId).address : tokenA;
     tokenB = tokenB === ETH.address ? WETH(chain.chainId).address : tokenB;
 
-    const factory = new ethers.Contract(HUB_ADDRESS, Factory.abi, this.getSigner());
+    const factory = new ethers.Contract(HUB_ADDRESS, Factory.abi, this.getSigner()) as HubContract;
 
     return factory.createPair(tokenA, tokenB);
   }
 
   // POSITION EMTHODS
-  async getTokenNFT(dcaId: string, pairAddress: string) {
-    const pairAddressContract = new ethers.Contract(pairAddress, DCAPair.abi, this.client);
+  async getTokenNFT(dcaId: string, pairAddress: string): Promise<NFTData> {
+    const pairAddressContract = new ethers.Contract(pairAddress, DCAPair.abi, this.client) as PairContract;
 
     const tokenData = await pairAddressContract.tokenURI(dcaId);
-    return JSON.parse(atob(tokenData.substring(29)));
+    return JSON.parse(atob(tokenData.substring(29))) as NFTData;
   }
 
   async deposit(
@@ -720,7 +759,7 @@ export default class Web3Service {
     frequencyType: BigNumber,
     frequencyValue: string,
     existingPair: AvailablePair
-  ) {
+  ): Promise<TransactionResponse> {
     const token = from;
 
     const chain = await this.getNetwork();
@@ -731,7 +770,7 @@ export default class Web3Service {
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
 
-    const factory = new ethers.Contract(existingPair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(existingPair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
     return factory.deposit(
       token.address === ETH.address ? WETH(chain.chainId).address : token.address,
@@ -742,19 +781,19 @@ export default class Web3Service {
   }
 
   withdraw(position: Position, pair: AvailablePair): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
     return factory.withdrawSwapped(position.dcaId);
   }
 
   terminate(position: Position, pair: AvailablePair): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
     return factory.terminate(position.dcaId);
   }
 
   addFunds(position: Position, pair: AvailablePair, newDeposit: string): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
     const newRate = parseUnits(newDeposit, position.from.decimals)
       .add(position.remainingLiquidity)
@@ -769,25 +808,25 @@ export default class Web3Service {
     newDeposit: string,
     newSwaps: string
   ): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
     const newRate = parseUnits(newDeposit, position.from.decimals)
       .add(position.remainingLiquidity)
       .div(BigNumber.from(newSwaps));
 
-    return factory.modifyRateAndSwaps(position.dcaId, newRate, newSwaps);
+    return factory.modifyRateAndSwaps(position.dcaId, newRate, BigNumber.from(newSwaps));
   }
 
   modifySwaps(position: Position, pair: AvailablePair, newSwaps: string): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
     const newRate = position.remainingLiquidity.div(BigNumber.from(newSwaps));
 
-    return factory.modifyRateAndSwaps(position.dcaId, newRate, newSwaps);
+    return factory.modifyRateAndSwaps(position.dcaId, newRate, BigNumber.from(newSwaps));
   }
 
   modifyRate(position: Position, pair: AvailablePair, newRate: string): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
     return factory.modifyRateAndSwaps(
       position.dcaId,
@@ -802,13 +841,17 @@ export default class Web3Service {
     newRate: string,
     newSwaps: string
   ): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
-    return factory.modifyRateAndSwaps(position.dcaId, parseUnits(newRate, position.from.decimals), newSwaps);
+    return factory.modifyRateAndSwaps(
+      position.dcaId,
+      parseUnits(newRate, position.from.decimals),
+      BigNumber.from(newSwaps)
+    );
   }
 
   removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner());
+    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
 
     const newRate = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
       ? position.rate
@@ -819,7 +862,9 @@ export default class Web3Service {
     return factory.modifyRateAndSwaps(
       position.dcaId,
       newRate,
-      parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity) ? 0 : position.remainingSwaps
+      parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
+        ? BigNumber.from(0)
+        : position.remainingSwaps
     );
   }
 
@@ -848,7 +893,7 @@ export default class Web3Service {
     return this.client.off('block');
   }
 
-  parseLog(log: any, pairContract: AvailablePair) {
+  parseLog(log: Log, pairContract: AvailablePair) {
     const factory = new ethers.Contract(pairContract.id, DCAPair.abi, this.getSigner());
 
     return factory.interface.parseLog(log);
@@ -910,7 +955,7 @@ export default class Web3Service {
 
   handleTransaction(transaction: TransactionDetails) {
     switch (transaction.type) {
-      case TRANSACTION_TYPES.NEW_POSITION:
+      case TRANSACTION_TYPES.NEW_POSITION: {
         const newPositionTypeData = transaction.typeData as NewPositionTypeData;
         const newId = `${newPositionTypeData.existingPair.id}-${newPositionTypeData.id}`;
         if (!this.currentPositions[newId]) {
@@ -923,7 +968,8 @@ export default class Web3Service {
         }
         delete this.currentPositions[`pending-transaction-${transaction.hash}`];
         break;
-      case TRANSACTION_TYPES.TERMINATE_POSITION:
+      }
+      case TRANSACTION_TYPES.TERMINATE_POSITION: {
         const terminatePositionTypeData = transaction.typeData as TerminatePositionTypeData;
         this.pastPositions[terminatePositionTypeData.id] = {
           ...this.currentPositions[terminatePositionTypeData.id],
@@ -931,13 +977,15 @@ export default class Web3Service {
         };
         delete this.currentPositions[terminatePositionTypeData.id];
         break;
-      case TRANSACTION_TYPES.WITHDRAW_POSITION:
+      }
+      case TRANSACTION_TYPES.WITHDRAW_POSITION: {
         const withdrawPositionTypeData = transaction.typeData as WithdrawTypeData;
         this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[withdrawPositionTypeData.id].withdrawn =
           this.currentPositions[withdrawPositionTypeData.id].swapped;
         break;
-      case TRANSACTION_TYPES.ADD_FUNDS_POSITION:
+      }
+      case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
         const addFundsTypeData = transaction.typeData as AddFundsTypeData;
         this.currentPositions[addFundsTypeData.id].pendingTransaction = '';
         this.currentPositions[addFundsTypeData.id].remainingLiquidity = this.currentPositions[
@@ -947,7 +995,8 @@ export default class Web3Service {
           addFundsTypeData.id
         ].remainingLiquidity.div(this.currentPositions[addFundsTypeData.id].remainingSwaps);
         break;
-      case TRANSACTION_TYPES.RESET_POSITION:
+      }
+      case TRANSACTION_TYPES.RESET_POSITION: {
         const resetPositionTypeData = transaction.typeData as ResetPositionTypeData;
         const resetPositionSwapDifference = BigNumber.from(resetPositionTypeData.newSwaps).lt(
           this.currentPositions[resetPositionTypeData.id].remainingSwaps
@@ -974,7 +1023,8 @@ export default class Web3Service {
           resetPositionTypeData.id
         ].remainingLiquidity.div(this.currentPositions[resetPositionTypeData.id].remainingSwaps);
         break;
-      case TRANSACTION_TYPES.REMOVE_FUNDS:
+      }
+      case TRANSACTION_TYPES.REMOVE_FUNDS: {
         const removeFundsTypeData = transaction.typeData as RemoveFundsTypeData;
         const removeFundsDifference = parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals).eq(
           this.currentPositions[removeFundsTypeData.id].remainingLiquidity
@@ -1002,7 +1052,8 @@ export default class Web3Service {
           ? BigNumber.from(0)
           : this.currentPositions[removeFundsTypeData.id].remainingSwaps;
         break;
-      case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION:
+      }
+      case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION: {
         const modifySwapsPositionTypeData = transaction.typeData as ModifySwapsPositionTypeData;
         this.currentPositions[modifySwapsPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps = BigNumber.from(
@@ -1012,7 +1063,8 @@ export default class Web3Service {
           modifySwapsPositionTypeData.id
         ].remainingLiquidity.div(this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps);
         break;
-      case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION:
+      }
+      case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
         const modifyRateAndSwapsPositionTypeData = transaction.typeData as ModifyRateAndSwapsPositionTypeData;
         const modifiedRateAndSwapsSwapDifference = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
           this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps
@@ -1044,7 +1096,8 @@ export default class Web3Service {
           modifyRateAndSwapsPositionTypeData.id
         ].rate.mul(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
         break;
-      case TRANSACTION_TYPES.NEW_PAIR:
+      }
+      case TRANSACTION_TYPES.NEW_PAIR: {
         const newPairTypeData = transaction.typeData as NewPairTypeData;
         const [token0, token1] = sortTokens(newPairTypeData.token0, newPairTypeData.token1);
         this.availablePairs.push({
@@ -1057,6 +1110,9 @@ export default class Web3Service {
             swapsToPerform: [],
           },
         });
+        break;
+      }
+      default:
         break;
     }
   }

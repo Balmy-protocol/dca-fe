@@ -4,11 +4,11 @@ import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import WalletContext from 'common/wallet-context';
 
-function useUsedTokens() {
+function useUsedTokens(): [string[], boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const { web3Service } = React.useContext(WalletContext);
-  const [result, setResult] = React.useState<any>([]);
-  const [error, setError] = React.useState<any>(undefined);
+  const [result, setResult] = React.useState<string[]>([]);
+  const [error, setError] = React.useState<string | undefined>(undefined);
   const account = usePrevious(web3Service.getAccount());
 
   React.useEffect(() => {
@@ -23,7 +23,7 @@ function useUsedTokens() {
         setResult(mappedTokens);
         setError(undefined);
       } catch (e) {
-        setError(e);
+        setError(e as string);
       }
       setIsLoading(false);
     }
@@ -32,6 +32,7 @@ function useUsedTokens() {
       setIsLoading(true);
       setResult([]);
       setError(undefined);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
   }, [isLoading, result, error, web3Service.getAccount()]);

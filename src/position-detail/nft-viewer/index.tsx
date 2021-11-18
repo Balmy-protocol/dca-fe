@@ -16,12 +16,13 @@ const NftViewer = ({ position }: NftViewerProps) => {
       const tokenNFT = await web3Service.getTokenNFT(position.dcaId, position.pair.id);
       setNFTData(tokenNFT);
     };
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchNFTData();
   }, [position]);
 
   return (
     <Grid container justify="center">
-      {nftData && <img src={nftData.image} />}
+      {nftData && <img src={nftData.image} alt="nft" />}
     </Grid>
   );
 };

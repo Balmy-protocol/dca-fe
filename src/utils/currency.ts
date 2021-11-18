@@ -1,3 +1,4 @@
+/* eslint-disable */
 import _Decimal from 'decimal.js-light';
 import { BigNumber } from 'ethers';
 import JSBI from 'jsbi';
@@ -10,7 +11,7 @@ const toSignificant = (
   currency: string,
   decimals: number,
   significantDigits = 6,
-  format: object = { groupSeparator: '' }
+  format: { groupSeparator: string } = { groupSeparator: '' }
 ): string => {
   const decimalScale = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(decimals));
   const numerator = JSBI.BigInt(currency);
@@ -49,3 +50,4 @@ export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token
 
   return toSignificant(amount.toString(), token.decimals, sigFigs);
 }
+/* eslint-enable */

@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
 import { Web3Service, GetAllowanceResponse, AvailablePair, SetStateCallback, Token } from 'types';
 import Typography from '@material-ui/core/Typography';
-import Grow from '@material-ui/core/Grow';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
 import TokenButton from 'common/token-button';
@@ -252,9 +251,7 @@ const Swap = ({
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'Error approving token' });
     }
   };
 
@@ -283,9 +280,7 @@ const Swap = ({
         ),
       });
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'error wrapping eth' });
     }
   };
 
@@ -340,9 +335,7 @@ const Swap = ({
       setFromValue('');
       setRate('0');
     } catch (e) {
-      setModalError({
-        error: e,
-      });
+      setModalError({ content: 'Error creating position' });
     }
   };
 
@@ -358,6 +351,7 @@ const Swap = ({
     if (isStale) {
       setShouldShowStalePairModal(true);
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       handleSwap();
     }
   };
@@ -367,54 +361,54 @@ const Swap = ({
     setShouldShowPicker(true);
   };
 
-  const handleFromValueChange = (fromValue: string) => {
+  const handleFromValueChange = (newFromValue: string) => {
     setModeType(FULL_DEPOSIT_TYPE);
-    setFromValue(fromValue);
+    setFromValue(newFromValue);
     setRate(
-      (fromValue &&
-        parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
+      (newFromValue &&
+        parseUnits(newFromValue, from.decimals).gt(BigNumber.from(0)) &&
         frequencyValue &&
         BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
         from &&
-        formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
+        formatUnits(parseUnits(newFromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
         '0'
     );
   };
 
-  const handleRateValueChange = (rate: string) => {
+  const handleRateValueChange = (newRate: string) => {
     setModeType(RATE_TYPE);
-    setRate(rate);
+    setRate(newRate);
     setFromValue(
-      (rate &&
-        parseUnits(rate, from.decimals).gt(BigNumber.from(0)) &&
+      (newRate &&
+        parseUnits(newRate, from.decimals).gt(BigNumber.from(0)) &&
         frequencyValue &&
         BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
         from &&
-        formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
+        formatUnits(parseUnits(newRate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
         ''
     );
   };
 
-  const handleFrequencyChange = (frequencyValue: string) => {
-    setFrequencyValue(frequencyValue);
+  const handleFrequencyChange = (newFrequencyValue: string) => {
+    setFrequencyValue(newFrequencyValue);
     if (modeType === RATE_TYPE) {
       setFromValue(
         (rate &&
           parseUnits(rate, from.decimals).gt(BigNumber.from(0)) &&
-          frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          newFrequencyValue &&
+          BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
           from &&
-          formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
+          formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(newFrequencyValue)), from.decimals)) ||
           ''
       );
     } else {
       setRate(
         (fromValue &&
           parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
-          frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          newFrequencyValue &&
+          BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
           from &&
-          formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
+          formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(newFrequencyValue)), from.decimals)) ||
           '0'
       );
     }
@@ -444,13 +438,17 @@ const Swap = ({
     setCurrentAction(actionToDo);
     if (hasLowLiquidity) {
       setShouldShowLowLiquidityModal(true);
-    } else {
-      POSSIBLE_ACTIONS_FUNCTIONS[actionToDo] && POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
+    } else if (POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
     }
   };
 
   const closeLowLiquidityModal = () => {
-    POSSIBLE_ACTIONS_FUNCTIONS[currentAction] && POSSIBLE_ACTIONS_FUNCTIONS[currentAction]();
+    if (POSSIBLE_ACTIONS_FUNCTIONS[currentAction]) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      POSSIBLE_ACTIONS_FUNCTIONS[currentAction]();
+    }
     onLowLiquidityModalClose();
   };
 
@@ -598,7 +596,7 @@ const Swap = ({
     <StyledButton
       size="large"
       variant="contained"
-      disabled={shouldDisableButton || isLoading || isLoadingHasPool}
+      disabled={!!shouldDisableButton || isLoading || isLoadingHasPool}
       color="secondary"
       fullWidth
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
@@ -718,10 +716,8 @@ const Swap = ({
                 id="from-value"
                 error={cantFund ? 'Amount cannot exceed balance' : ''}
                 value={fromValue}
-                label={from.symbol}
                 onChange={handleFromValueChange}
                 withBalance={!isLoadingBalance}
-                isLoadingBalance={isLoadingBalance}
                 balance={balance}
                 token={from}
               />
@@ -739,7 +735,6 @@ const Swap = ({
                 <TokenInput
                   id="rate-value"
                   value={rate}
-                  label={from.symbol}
                   onChange={handleRateValueChange}
                   withBalance={false}
                   token={from}
@@ -787,7 +782,6 @@ const Swap = ({
               </Grid>
               <Grid item xs={12}>
                 <FrequencyTypeInput
-                  id="frequency-type-value"
                   options={getFrequencyTypeOptions(currentNetwork.chainId)}
                   selected={frequencyType}
                   onChange={setFrequencyType}
@@ -808,12 +802,7 @@ const Swap = ({
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <FrequencyInput
-                    id="frequency-value"
-                    value={frequencyValue}
-                    label={frequencyType.toString()}
-                    onChange={handleFrequencyChange}
-                  />
+                  <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} />
                 </Grid>
               </Grid>
             </StyledSettingContainer>

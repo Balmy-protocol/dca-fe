@@ -1,22 +1,5 @@
 import { Token } from './tokens';
 
-export interface AvailablePairSwap {
-  executedAtTimestamp: number;
-}
-
-export type AvailablePairResponse = {
-  tokenA: {
-    id: string;
-  };
-  tokenB: {
-    id: string;
-  };
-  id: string;
-  swaps: AvailablePairSwap[];
-  createdAtTimestamp: number;
-  status: string; // active, stale
-};
-
 export interface GetNextSwapInfo {
   swapsToPerform: {
     interval: number;

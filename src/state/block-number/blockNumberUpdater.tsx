@@ -16,9 +16,9 @@ export default function Updater(): null {
 
   const blockNumberCallback = useCallback(
     (blockNumber: number) => {
-      setState((state) => {
-        if (typeof state.blockNumber !== 'number') return { blockNumber };
-        return { blockNumber: Math.max(blockNumber, state.blockNumber) };
+      setState((oldState) => {
+        if (typeof oldState.blockNumber !== 'number') return { blockNumber };
+        return { blockNumber: Math.max(blockNumber, oldState.blockNumber) };
       });
     },
     [setState]
@@ -33,7 +33,7 @@ export default function Updater(): null {
     web3Service
       .getBlockNumber()
       .then(blockNumberCallback)
-      .catch((error: any) => console.error('Failed to get block number for chainId', error));
+      .catch((error) => console.error('Failed to get block number for chainId', error));
 
     web3Service.onBlock(blockNumberCallback);
     return () => {

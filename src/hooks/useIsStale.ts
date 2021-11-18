@@ -1,4 +1,4 @@
-import { BigNumber } from '@ethersproject/bignumber';
+import { BigNumber } from 'ethers';
 import React from 'react';
 import { GetNextSwapInfo, GetPairSwapsData } from 'types';
 import { calculateStale as rawCalculateStale } from 'utils/parsing';
@@ -26,6 +26,7 @@ function useIsStale(
       setIsLoading(false);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getNextSwapInformation();
   }, []);
 

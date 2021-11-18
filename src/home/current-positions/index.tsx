@@ -40,7 +40,7 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
     currentPositions.length % positionsPerRow !== 0 ? positionsPerRow - (currentPositions.length % positionsPerRow) : 0;
   const emptyPositions = [];
 
-  for (let i = 0; i < positionsToFill; i++) {
+  for (let i = 0; i < positionsToFill; i += 1) {
     emptyPositions.push(i);
   }
 

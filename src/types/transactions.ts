@@ -1,20 +1,8 @@
+import { TransactionReceipt as RawTransactionReceipt } from '@ethersproject/providers';
 import { AvailablePair } from './pairs';
 import { Token } from './tokens';
 
-interface TransactionReceiptLog {
-  data: string;
-}
-
-export interface TransactionReceipt {
-  to: string;
-  from: string;
-  contractAddress: string;
-  transactionIndex: number;
-  blockHash: string;
-  transactionHash: string;
-  blockNumber: number;
-  status?: number;
-  logs: TransactionReceiptLog[];
+export interface TransactionReceipt extends RawTransactionReceipt {
   chainId: number;
 }
 

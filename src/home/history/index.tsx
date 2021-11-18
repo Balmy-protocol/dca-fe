@@ -1,15 +1,10 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import { Web3Service } from 'types';
 import usePastPositions from 'hooks/usePastPositions';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
 import EmptyPosition from 'common/empty-position';
 import PastPosition from './components/position';
-
-interface HistoryProps {
-  web3Service: Web3Service;
-}
 
 const POSITIONS_PER_ROW = {
   xs: 1,
@@ -27,7 +22,7 @@ const History = () => {
     pastPositions.length % positionsPerRow !== 0 ? positionsPerRow - (pastPositions.length % positionsPerRow) : 0;
   const emptyPositions = [];
 
-  for (let i = 0; i < positionsToFill; i++) {
+  for (let i = 0; i < positionsToFill; i += 1) {
     emptyPositions.push(i);
   }
 

@@ -87,7 +87,7 @@ export function useTransactionAdder(): (
 
 // returns all the transactions for the current chain
 export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
-  const state = useAppSelector((state) => state.transactions);
+  const state = useAppSelector((appState) => appState.transactions);
   const web3Service = useWeb3Service();
   const currentNetwork = useCurrentNetwork();
 
@@ -100,7 +100,7 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
 
 // returns all the transactions for the current chain that are not cleared
 export function useAllNotClearedTransactions(): { [txHash: string]: TransactionDetails } {
-  const state = useAppSelector((state) => state.transactions);
+  const state = useAppSelector((appState) => appState.transactions);
   const web3Service = useWeb3Service();
   const currentNetwork = useCurrentNetwork();
 
