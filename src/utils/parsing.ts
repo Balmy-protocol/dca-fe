@@ -49,10 +49,10 @@ export const calculateStale: (
 
   if (lastSwapped === 0) {
     isStale = BigNumber.from(today).gt(BigNumber.from(createdAt).add(frequencyType).add(ONE_DAY.mul(3)));
+  } else {
+    const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(1).mul(frequencyType);
+    isStale = BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(ONE_DAY.mul(3)));
   }
-
-  const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(1).mul(frequencyType);
-  isStale = BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(ONE_DAY.mul(3)));
 
   if (isStale) {
     if (!hasToExecute) {
