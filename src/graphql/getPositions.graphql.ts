@@ -10,7 +10,6 @@ const getCurrentPositions = gql`
       skip: $skip
     ) {
       id
-      dcaId
       createdAtTimestamp
       totalDeposits
       totalSwaps
@@ -35,7 +34,6 @@ const getCurrentPositions = gql`
       swapInterval {
         id
         interval
-        description
       }
       current {
         id

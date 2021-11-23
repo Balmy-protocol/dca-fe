@@ -23,14 +23,9 @@ import CreatePairModal from 'common/create-pair-modal';
 import StalePairModal from 'common/stale-pair-modal';
 import LowLiquidityModal from 'common/low-liquidity-modal';
 import {
-  FIVE_MINUTES,
   FULL_DEPOSIT_TYPE,
   MINIMUM_LIQUIDITY_USD,
   MODE_TYPES,
-  NETWORKS,
-  ONE_HOUR,
-  ONE_WEEK,
-  ONE_DAY,
   STRING_SWAP_INTERVALS,
   POSSIBLE_ACTIONS,
   RATE_TYPE,
@@ -111,28 +106,14 @@ const StyledSwapTokenButton = styled(IconButton)`
   }
 `;
 
-const getFrequencyTypeOptions = (chainId: number) => [
-  ...(chainId !== NETWORKS.mainnet.chainId
-    ? [
-        {
-          label: STRING_SWAP_INTERVALS[FIVE_MINUTES.toString()],
-          value: FIVE_MINUTES,
-        },
-      ]
-    : []),
-  {
-    label: STRING_SWAP_INTERVALS[ONE_HOUR.toString()],
-    value: ONE_HOUR,
-  },
-  {
-    label: STRING_SWAP_INTERVALS[ONE_DAY.toString()],
-    value: ONE_DAY,
-  },
-  {
-    label: STRING_SWAP_INTERVALS[ONE_WEEK.toString()],
-    value: ONE_WEEK,
-  },
-];
+interface AVAILABLE_SWAP_INTERVAL {
+  label: {
+    singular: string;
+    plural: string;
+    adverb: string;
+  };
+  value: BigNumber;
+}
 
 interface SwapProps {
   from: Token;
@@ -148,6 +129,7 @@ interface SwapProps {
   setFrequencyValue: SetStateCallback<string>;
   web3Service: Web3Service;
   currentNetwork: { chainId: number; name: string };
+  availableFrequencies: AVAILABLE_SWAP_INTERVAL[];
 }
 
 const Swap = ({
@@ -164,6 +146,7 @@ const Swap = ({
   frequencyValue,
   currentNetwork,
   web3Service,
+  availableFrequencies,
 }: SwapProps) => {
   const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
   const [rate, setRate] = React.useState('0');
@@ -196,11 +179,16 @@ const Swap = ({
   const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
     web3Service,
     'getAllowance',
-    [from, existingPair],
+    [from],
     !from || !web3Service.getAccount() || !existingPair || hasPendingApproval
   );
 
-  const [hasPool, isLoadingHasPool] = usePromise<boolean>(web3Service, 'hasPool', [from, to], !from || !to);
+  const [pairIsSupported, isLoadingPairIsSupported] = usePromise<boolean>(
+    web3Service,
+    'canSupportPair',
+    [from, to],
+    !from || !to
+  );
 
   React.useEffect(() => {
     setRate(
@@ -235,7 +223,7 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await web3Service.approveToken(from, existingPair as AvailablePair);
+      const result = await web3Service.approveToken(from);
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: { token: from, pair: (existingPair as AvailablePair).id },
@@ -300,14 +288,7 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await web3Service.deposit(
-        from,
-        to,
-        fromValue,
-        frequencyType,
-        frequencyValue,
-        existingPair as AvailablePair
-      );
+      const result = await web3Service.deposit(from, to, fromValue, frequencyType, frequencyValue);
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
         typeData: {
@@ -452,7 +433,7 @@ const Swap = ({
     onLowLiquidityModalClose();
   };
 
-  const cantFund = fromValue && balance && parseUnits(fromValue, from.decimals).gt(balance);
+  const cantFund = !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
 
   const isApproved = !fromValue
     ? true
@@ -486,10 +467,10 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="warning"
-      disabled={!!pairExists || hasPendingPairCreation || isLoading || isLoadingHasPool}
+      disabled={!!pairExists || hasPendingPairCreation || isLoading || isLoadingPairIsSupported}
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPair as keyof typeof POSSIBLE_ACTIONS)}
     >
-      {!isLoading && !isLoadingHasPool && (
+      {!isLoading && !isLoadingPairIsSupported && (
         <Typography variant="body1">
           {hasPendingPairCreation ? (
             <FormattedMessage description="pair being created" defaultMessage="This pair is being created" />
@@ -505,7 +486,7 @@ const Swap = ({
           )}
         </Typography>
       )}
-      {(isLoading || isLoadingHasPool) && <CenteredLoadingIndicator />}
+      {(isLoading || isLoadingPairIsSupported) && <CenteredLoadingIndicator />}
     </StyledButton>
   );
 
@@ -596,17 +577,17 @@ const Swap = ({
     <StyledButton
       size="large"
       variant="contained"
-      disabled={!!shouldDisableButton || isLoading || isLoadingHasPool}
+      disabled={!!shouldDisableButton || isLoading || isLoadingPairIsSupported}
       color="secondary"
       fullWidth
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
-      {!isLoading && !isLoadingHasPool && (
+      {!isLoading && !isLoadingPairIsSupported && (
         <Typography variant="body1">
           <FormattedMessage description="create position" defaultMessage="Create position" />
         </Typography>
       )}
-      {(isLoading || isLoadingHasPool) && <CenteredLoadingIndicator />}
+      {(isLoading || isLoadingPairIsSupported) && <CenteredLoadingIndicator />}
     </StyledButton>
   );
 
@@ -641,13 +622,23 @@ const Swap = ({
 
   let ButtonToShow;
 
+  // console.log('-----------------------------------------------------')
+  // console.log('!web3Service.getAccount()', !web3Service.getAccount())
+  // console.log('!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)', !SUPPORTED_NETWORKS.includes(currentNetwork.chainId))
+  // console.log('isLoading || isLoadingPairIsSupported', isLoading || isLoadingPairIsSupported, isLoading, isLoadingPairIsSupported)
+  // console.log('!pairIsSupported && !isLoadingPairIsSupported', !pairIsSupported && !isLoadingPairIsSupported, !pairIsSupported, !isLoadingPairIsSupported)
+  // console.log('isETH', isETH)
+  // console.log('!pairExists', !pairExists)
+  // console.log('!isApproved', !isApproved)
+  // console.log('cantFund', cantFund)
+
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
-  } else if (isLoading || isLoadingHasPool) {
+  } else if (isLoading || isLoadingPairIsSupported) {
     ButtonToShow = LoadingButton;
-  } else if (!hasPool && !isLoadingHasPool) {
+  } else if (!pairIsSupported && !isLoadingPairIsSupported) {
     ButtonToShow = PairNotSupportedButton;
   } else if (isETH) {
     ButtonToShow = WrapButton;
@@ -782,7 +773,7 @@ const Swap = ({
               </Grid>
               <Grid item xs={12}>
                 <FrequencyTypeInput
-                  options={getFrequencyTypeOptions(currentNetwork.chainId)}
+                  options={availableFrequencies}
                   selected={frequencyType}
                   onChange={setFrequencyType}
                 />

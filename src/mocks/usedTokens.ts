@@ -1,4 +1,4 @@
-import { UNI, YFI } from './tokens';
+import { UNI } from './tokens';
 
 const mockedUsedTokens = {
   data: {
@@ -6,11 +6,6 @@ const mockedUsedTokens = {
       {
         tokenInfo: {
           address: UNI(1).address,
-        },
-      },
-      {
-        tokenInfo: {
-          address: YFI(1).address,
         },
       },
     ],

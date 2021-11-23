@@ -72,7 +72,7 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
           </Typography>
         ),
       });
-      const result = await web3Service.withdraw(position, pair as AvailablePair);
+      const result = await web3Service.withdraw(position);
       addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,

@@ -1,26 +1,38 @@
 import * as React from 'react';
 import Grid from '@material-ui/core/Grid';
+import orderBy from 'lodash/orderBy';
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
-import { WETH, ETH, USDC } from 'mocks/tokens';
+import { WETH, ETH, USDC, LINK, DAI } from 'mocks/tokens';
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { ONE_DAY } from 'config/constants';
+import { ONE_DAY, STRING_SWAP_INTERVALS } from 'config/constants';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import { Token } from 'types';
+import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
+import { useQuery } from '@apollo/client';
+import useDCAGraphql from 'hooks/useDCAGraphql';
+import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
 import Swap from './components/swap';
+import { BigNumber } from 'ethers';
 
 const SwapContainer = () => {
   const [fromValue, setFromValue] = React.useState('');
   const [frequencyType, setFrequencyType] = React.useState(ONE_DAY);
   const [frequencyValue, setFrequencyValue] = React.useState('5');
   const currentNetwork = useCurrentNetwork();
-  const [from, setFrom] = React.useState(USDC(currentNetwork.chainId));
-  const [to, setTo] = React.useState(WETH(currentNetwork.chainId));
+  const [from, setFrom] = React.useState(WETH(currentNetwork.chainId));
+  const [to, setTo] = React.useState(USDC(currentNetwork.chainId));
+  const client = useDCAGraphql();
+  const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
+    getAvailableIntervals,
+    {
+      client,
+    }
+  );
 
   React.useEffect(() => {
-    setFrom(USDC(currentNetwork.chainId));
-    setTo(WETH(currentNetwork.chainId));
+    setFrom(WETH(currentNetwork.chainId));
+    setTo(USDC(currentNetwork.chainId));
   }, [currentNetwork.chainId]);
 
   const onSetFrom = (newFrom: Token) => {
@@ -75,7 +87,9 @@ const SwapContainer = () => {
     setFrom(to);
   };
 
-  const isLoading = !currentNetwork.chainId;
+  console.log(swapIntervalsData);
+
+  const isLoading = !currentNetwork.chainId || isLoadingSwapIntervals || !swapIntervalsData;
 
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">
@@ -104,6 +118,21 @@ const SwapContainer = () => {
                     web3Service={web3Service}
                     currentNetwork={currentNetwork}
                     toggleFromTo={toggleFromTo}
+                    availableFrequencies={
+                      (swapIntervalsData &&
+                        orderBy(
+                          swapIntervalsData.swapIntervals,
+                          [(swapInterval) => parseInt(swapInterval.interval, 10)],
+                          ['asc']
+                        ).map((swapInterval) => ({
+                          label:
+                            STRING_SWAP_INTERVALS[
+                              swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS
+                            ],
+                          value: BigNumber.from(swapInterval.interval),
+                        }))) ||
+                      []
+                    }
                   />
                 </Grid>
                 <Hidden mdDown>

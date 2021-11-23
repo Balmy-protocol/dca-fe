@@ -15,7 +15,6 @@ import {
   Token,
   AvailablePairResponse,
   AvailablePairs,
-  AvailablePair,
   PositionResponse,
   TransactionPositionTypeDataOptions,
   PoolResponse,
@@ -33,7 +32,6 @@ import {
   ResetPositionTypeData,
   ModifyRateAndSwapsPositionTypeData,
   PoolLiquidityData,
-  GetPoolResponse,
   TxPriceResponse,
   GetNextSwapInfo,
   NFTData,
@@ -50,7 +48,6 @@ import { buildSwapInput } from 'utils/swap';
 // GQL queries
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
 import GET_TOKEN_LIST from 'graphql/getTokenList.graphql';
-import GET_POOLS from 'graphql/getPool.graphql';
 import GET_POSITIONS from 'graphql/getPositions.graphql';
 import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
 import gqlFetchAll from 'utils/gqlFetchAll';
@@ -59,9 +56,8 @@ import gqlFetchAllById from 'utils/gqlFetchAllById';
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
 import WETHABI from 'abis/weth.json';
-import Factory from 'abis/factory.json';
-import HUB from 'abis/Hub.json';
-import DCAPair from 'abis/DCAPair.json';
+import ORACLE_AGGREGATOR_ABI from 'abis/OracleAggregator.json';
+import HUB_ABI from 'abis/Hub.json';
 
 // MOCKS
 import { ETH, WETH } from 'mocks/tokens';
@@ -69,12 +65,13 @@ import {
   HUB_ADDRESS,
   MEAN_GRAPHQL_URL,
   NETWORKS,
+  ORACLE_ADDRESS,
   SUPPORTED_NETWORKS,
   SWAP_INTERVALS_MAP,
   TRANSACTION_TYPES,
   UNI_GRAPHQL_URL,
 } from 'config/constants';
-import { ERC20Contract, HubContract, PairContract } from 'types/contracts';
+import { ERC20Contract, HubContract, OracleContract } from 'types/contracts';
 import GraphqlService from './graphql';
 
 export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as string;
@@ -259,7 +256,6 @@ export default class Web3Service {
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         withdrawn: BigNumber.from(position.totalWithdrawn),
         totalSwaps: BigNumber.from(position.totalSwaps),
-        dcaId: position.dcaId,
         id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
@@ -293,7 +289,6 @@ export default class Web3Service {
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         totalSwaps: BigNumber.from(position.totalSwaps),
         withdrawn: BigNumber.from(position.totalWithdrawn),
-        dcaId: position.dcaId,
         id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
@@ -390,149 +385,6 @@ export default class Web3Service {
         swapInfo: await this.getNextSwapInfo({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }),
       }))
     );
-
-    this.tokenList = {};
-
-    if (chain.chainId !== NETWORKS.mainnet.chainId) {
-      const tokenListResponse = await gqlFetchAllById<PoolsGraphqlResponse>(
-        this.uniClient.getClient(),
-        GET_TOKEN_LIST,
-        {},
-        'pools'
-      );
-
-      const mockedTokens: Record<string, Record<string, number>> = {
-        USDC: {},
-        WETH: {},
-        UNI: {},
-        DAI: {},
-        YFI: {},
-      };
-      this.tokenList = tokenListResponse.data.pools.reduce(
-        (acc: TokenList, pool: PoolResponse) => {
-          if (pool.token0.symbol === 'USDC') {
-            if (!mockedTokens.USDC[pool.token0.id]) {
-              mockedTokens.USDC[pool.token0.id] = 1;
-            } else {
-              mockedTokens.USDC[pool.token0.id] += 1;
-            }
-          }
-          if (pool.token0.symbol === 'WETH') {
-            if (!mockedTokens.WETH[pool.token0.id]) {
-              mockedTokens.WETH[pool.token0.id] = 1;
-            } else {
-              mockedTokens.WETH[pool.token0.id] += 1;
-            }
-          }
-          if (pool.token0.symbol === 'UNI') {
-            if (!mockedTokens.UNI[pool.token0.id]) {
-              mockedTokens.UNI[pool.token0.id] = 1;
-            } else {
-              mockedTokens.UNI[pool.token0.id] += 1;
-            }
-          }
-          if (pool.token0.symbol === 'DAI') {
-            if (!mockedTokens.DAI[pool.token0.id]) {
-              mockedTokens.DAI[pool.token0.id] = 1;
-            } else {
-              mockedTokens.DAI[pool.token0.id] += 1;
-            }
-          }
-          if (pool.token0.symbol === 'YFI') {
-            if (!mockedTokens.YFI[pool.token0.id]) {
-              mockedTokens.YFI[pool.token0.id] = 1;
-            } else {
-              mockedTokens.YFI[pool.token0.id] += 1;
-            }
-          }
-          if (pool.token1.symbol === 'USDC') {
-            if (!mockedTokens.USDC[pool.token1.id]) {
-              mockedTokens.USDC[pool.token1.id] = 1;
-            } else {
-              mockedTokens.USDC[pool.token1.id] += 1;
-            }
-          }
-          if (pool.token1.symbol === 'WETH') {
-            if (!mockedTokens.WETH[pool.token1.id]) {
-              mockedTokens.WETH[pool.token1.id] = 1;
-            } else {
-              mockedTokens.WETH[pool.token1.id] += 1;
-            }
-          }
-          if (pool.token1.symbol === 'UNI') {
-            if (!mockedTokens.UNI[pool.token1.id]) {
-              mockedTokens.UNI[pool.token1.id] = 1;
-            } else {
-              mockedTokens.UNI[pool.token1.id] += 1;
-            }
-          }
-          if (pool.token1.symbol === 'DAI') {
-            if (!mockedTokens.DAI[pool.token1.id]) {
-              mockedTokens.DAI[pool.token1.id] = 1;
-            } else {
-              mockedTokens.DAI[pool.token1.id] += 1;
-            }
-          }
-          if (pool.token1.symbol === 'YFI') {
-            if (!mockedTokens.YFI[pool.token1.id]) {
-              mockedTokens.YFI[pool.token1.id] = 1;
-            } else {
-              mockedTokens.YFI[pool.token1.id] += 1;
-            }
-          }
-
-          if (!acc[pool.token0.id]) {
-            // eslint-disable-next-line no-param-reassign
-            acc[pool.token0.id] = {
-              decimals: BigNumber.from(pool.token0.decimals).toNumber(),
-              address: pool.token0.id,
-              name: pool.token0.name,
-              symbol: pool.token0.symbol,
-              chainId: (SUPPORTED_NETWORKS[chain.chainId] && chain.chainId) || NETWORKS.mainnet.chainId,
-            };
-          }
-          if (!acc[pool.token1.id]) {
-            // eslint-disable-next-line no-param-reassign
-            acc[pool.token1.id] = {
-              decimals: BigNumber.from(pool.token1.decimals).toNumber(),
-              address: pool.token1.id,
-              name: pool.token1.name,
-              symbol: pool.token1.symbol,
-              chainId: (SUPPORTED_NETWORKS[chain.chainId] && chain.chainId) || NETWORKS.mainnet.chainId,
-            };
-          }
-
-          if (pool.token0.id === WETH(chain.chainId).address) {
-            // eslint-disable-next-line no-param-reassign
-            acc = {
-              ...acc,
-              [ETH.address]: {
-                ...acc[ETH.address],
-              },
-            };
-          } else if (pool.token1.id === WETH(chain.chainId).address) {
-            // eslint-disable-next-line no-param-reassign
-            acc = {
-              ...acc,
-              [ETH.address]: {
-                ...acc[ETH.address],
-              },
-            };
-          }
-
-          return {
-            ...acc,
-            [pool.token0.id]: {
-              ...acc[pool.token0.id],
-            },
-            [pool.token1.id]: {
-              ...acc[pool.token1.id],
-            },
-          };
-        },
-        { [ETH.address]: ETH, [WETH(chain.chainId).address]: WETH(chain.chainId) }
-      );
-    }
   }
 
   // ADDRESS METHODS
@@ -555,7 +407,7 @@ export default class Web3Service {
 
     const ERC20Interface = new Interface(ERC20ABI);
 
-    const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as ERC20Contract;
+    const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as unknown as ERC20Contract;
 
     return erc20.balanceOf(this.getAccount());
   }
@@ -565,12 +417,16 @@ export default class Web3Service {
 
     const chain = await this.getNetwork();
 
-    const erc20 = new ethers.Contract(WETH(chain.chainId).address, ERC20Interface, this.getSigner()) as ERC20Contract;
+    const erc20 = new ethers.Contract(
+      WETH(chain.chainId).address,
+      ERC20Interface,
+      this.getSigner()
+    ) as unknown as ERC20Contract;
 
     return erc20.deposit({ value: parseUnits(amount, ETH.decimals).toHexString() });
   }
 
-  async getAllowance(token: Token, pairContract: AvailablePair) {
+  async getAllowance(token: Token) {
     const ERC20Interface = new Interface(ERC20ABI);
 
     const chain = await this.getNetwork();
@@ -579,14 +435,14 @@ export default class Web3Service {
       token.address === ETH.address ? WETH(chain.chainId).address : token.address,
       ERC20Interface,
       this.client
-    ) as ERC20Contract;
+    ) as unknown as ERC20Contract;
 
     return erc20
-      .allowance(this.getAccount(), pairContract.id)
+      .allowance(this.getAccount(), HUB_ADDRESS)
       .then((allowance: string) => ({ token, allowance: formatUnits(allowance, token.decimals) }));
   }
 
-  async approveToken(token: Token, pairContract: AvailablePair): Promise<TransactionResponse> {
+  async approveToken(token: Token): Promise<TransactionResponse> {
     const ERC20Interface = new Interface(ERC20ABI);
 
     const chain = await this.getNetwork();
@@ -595,14 +451,18 @@ export default class Web3Service {
       token.address === ETH.address ? WETH(chain.chainId).address : token.address,
       ERC20Interface,
       this.getSigner()
-    ) as ERC20Contract;
+    ) as unknown as ERC20Contract;
 
-    return erc20.approve(pairContract.id, MaxUint256);
+    return erc20.approve(HUB_ADDRESS, MaxUint256);
   }
 
   // PAIR METHODS
   async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
-    const hubContract = new ethers.Contract(HUB_ADDRESS, HUB.abi, this.client) as HubContract;
+    const hubContract = new ethers.Contract(
+      HUB_ADDRESS,
+      HUB_ABI.abi,
+      this.client || ethers.getDefaultProvider((await this.getNetwork()).name)
+    ) as unknown as HubContract;
 
     const { tokens, pairIndexes } = buildSwapInput([pair], []);
 
@@ -654,27 +514,19 @@ export default class Web3Service {
     return liquidity;
   }
 
-  async hasPool(token0: Token, token1: Token) {
+  async canSupportPair(token0: Token, token1: Token) {
     const [tokenA, tokenB] = sortTokens(token0, token1);
 
     // if they are not connected we show everything as available
     if (!this.client) return true;
 
-    const chain = await this.client.getNetwork();
+    const oracleInstance = new ethers.Contract(
+      ORACLE_ADDRESS,
+      ORACLE_AGGREGATOR_ABI.abi,
+      this.client
+    ) as unknown as OracleContract;
 
-    const poolsData = await this.uniClient.getClient().query<GetPoolResponse>({
-      query: GET_POOLS,
-      variables: {
-        tokenA: tokenA.address === ETH.address ? WETH(chain.chainId).address : tokenA.address,
-        tokenB: tokenB.address === ETH.address ? WETH(chain.chainId).address : tokenB.address,
-      },
-    });
-
-    const {
-      data: { pools },
-    } = poolsData;
-
-    return !!pools.length;
+    return oracleInstance.canSupportPair(tokenA.address, tokenB.address);
   }
 
   async getEstimatedPairCreation(token0?: string, token1?: string) {
@@ -694,10 +546,10 @@ export default class Web3Service {
     tokenA = tokenA === ETH.address ? WETH(chain.chainId).address : tokenA;
     tokenB = tokenB === ETH.address ? WETH(chain.chainId).address : tokenB;
 
-    const factory = new ethers.Contract(HUB_ADDRESS, Factory.abi, this.getSigner());
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner());
 
     return Promise.all([
-      factory.estimateGas.createPair(tokenA, tokenB),
+      hubInstance.estimateGas.deposit(tokenA, tokenB),
       axios.get<TxPriceResponse>('https://api.txprice.com/'),
       axios.get<CoinGeckoPriceResponse>(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=1&page=1&sparkline=false'
@@ -722,33 +574,11 @@ export default class Web3Service {
     });
   }
 
-  async createPair(token0: string, token1: string): Promise<TransactionResponse> {
-    if (!token0 || !token1) return Promise.reject();
-
-    const chain = await this.getNetwork();
-
-    let tokenA = token0;
-    let tokenB = token1;
-
-    if (token0 > token1) {
-      tokenA = token1;
-      tokenB = token0;
-    }
-
-    // check for ETH
-    tokenA = tokenA === ETH.address ? WETH(chain.chainId).address : tokenA;
-    tokenB = tokenB === ETH.address ? WETH(chain.chainId).address : tokenB;
-
-    const factory = new ethers.Contract(HUB_ADDRESS, Factory.abi, this.getSigner()) as HubContract;
-
-    return factory.createPair(tokenA, tokenB);
-  }
-
   // POSITION EMTHODS
-  async getTokenNFT(dcaId: string, pairAddress: string): Promise<NFTData> {
-    const pairAddressContract = new ethers.Contract(pairAddress, DCAPair.abi, this.client) as PairContract;
+  async getTokenNFT(id: string): Promise<NFTData> {
+    const pairAddressContract = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.client) as unknown as HubContract;
 
-    const tokenData = await pairAddressContract.tokenURI(dcaId);
+    const tokenData = await pairAddressContract.tokenURI(id);
     return JSON.parse(atob(tokenData.substring(29))) as NFTData;
   }
 
@@ -757,8 +587,7 @@ export default class Web3Service {
     to: Token,
     fromValue: string,
     frequencyType: BigNumber,
-    frequencyValue: string,
-    existingPair: AvailablePair
+    frequencyValue: string
   ): Promise<TransactionResponse> {
     const token = from;
 
@@ -766,106 +595,126 @@ export default class Web3Service {
 
     const weiValue = parseUnits(fromValue, token.decimals);
 
-    const rate = weiValue.div(BigNumber.from(frequencyValue));
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
 
-    const factory = new ethers.Contract(existingPair.id, DCAPair.abi, this.getSigner()) as PairContract;
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
-    return factory.deposit(
-      token.address === ETH.address ? WETH(chain.chainId).address : token.address,
-      rate,
+    return hubInstance.deposit(
+      from.address === ETH.address ? WETH(chain.chainId).address : from.address,
+      from.address === ETH.address ? WETH(chain.chainId).address : to.address,
+      weiValue,
       amountOfSwaps,
-      swapInterval
+      swapInterval,
+      this.account,
+      []
     );
   }
 
-  withdraw(position: Position, pair: AvailablePair): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
+  withdraw(position: Position): Promise<TransactionResponse> {
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
-    return factory.withdrawSwapped(position.dcaId);
+    return hubInstance.withdrawSwapped(position.id, this.account);
   }
 
-  terminate(position: Position, pair: AvailablePair): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
+  terminate(position: Position): Promise<TransactionResponse> {
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
-    return factory.terminate(position.dcaId);
+    return hubInstance.terminate(position.id, this.account, this.account);
   }
 
-  addFunds(position: Position, pair: AvailablePair, newDeposit: string): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
+  addFunds(position: Position, newDeposit: string): Promise<TransactionResponse> {
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
     const newRate = parseUnits(newDeposit, position.from.decimals)
       .add(position.remainingLiquidity)
       .div(BigNumber.from(position.remainingSwaps));
 
-    return factory.modifyRateAndSwaps(position.dcaId, newRate, position.remainingSwaps);
+    const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
+    if (newAmount.gte(position.remainingLiquidity)) {
+      return hubInstance.increasePosition(
+        position.id,
+        newAmount.sub(position.remainingLiquidity),
+        position.remainingSwaps
+      );
+    } else {
+      return hubInstance.reducePosition(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        position.remainingSwaps,
+        this.account
+      );
+    }
   }
 
-  resetPosition(
-    position: Position,
-    pair: AvailablePair,
-    newDeposit: string,
-    newSwaps: string
-  ): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
+  resetPosition(position: Position, newDeposit: string, newSwaps: string): Promise<TransactionResponse> {
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
     const newRate = parseUnits(newDeposit, position.from.decimals)
       .add(position.remainingLiquidity)
       .div(BigNumber.from(newSwaps));
 
-    return factory.modifyRateAndSwaps(position.dcaId, newRate, BigNumber.from(newSwaps));
+    const newAmount = newRate.mul(BigNumber.from(newSwaps));
+    if (newAmount.gte(position.remainingLiquidity)) {
+      return hubInstance.increasePosition(
+        position.id,
+        newAmount.sub(position.remainingLiquidity),
+        BigNumber.from(newSwaps)
+      );
+    } else {
+      return hubInstance.reducePosition(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.account
+      );
+    }
   }
 
-  modifySwaps(position: Position, pair: AvailablePair, newSwaps: string): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
+  modifyRateAndSwaps(position: Position, newRate: string, newSwaps: string): Promise<TransactionResponse> {
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
-    const newRate = position.remainingLiquidity.div(BigNumber.from(newSwaps));
-
-    return factory.modifyRateAndSwaps(position.dcaId, newRate, BigNumber.from(newSwaps));
+    const newAmount = BigNumber.from(newRate).mul(BigNumber.from(newSwaps));
+    if (newAmount.gte(position.remainingLiquidity)) {
+      return hubInstance.increasePosition(
+        position.id,
+        newAmount.sub(position.remainingLiquidity),
+        BigNumber.from(newSwaps)
+      );
+    } else {
+      return hubInstance.reducePosition(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.account
+      );
+    }
   }
 
-  modifyRate(position: Position, pair: AvailablePair, newRate: string): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
+  removeFunds(position: Position, ammountToRemove: string): Promise<TransactionResponse> {
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
-    return factory.modifyRateAndSwaps(
-      position.dcaId,
-      parseUnits(newRate, position.from.decimals),
-      position.remainingSwaps
-    );
-  }
-
-  modifyRateAndSwaps(
-    position: Position,
-    pair: Pick<AvailablePair, 'id'>,
-    newRate: string,
-    newSwaps: string
-  ): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
-
-    return factory.modifyRateAndSwaps(
-      position.dcaId,
-      parseUnits(newRate, position.from.decimals),
-      BigNumber.from(newSwaps)
-    );
-  }
-
-  removeFunds(position: Position, pair: AvailablePair, ammountToRemove: string): Promise<TransactionResponse> {
-    const factory = new ethers.Contract(pair.id, DCAPair.abi, this.getSigner()) as PairContract;
+    const newSwaps = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
+      ? BigNumber.from(0)
+      : position.remainingSwaps;
 
     const newRate = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
-      ? position.rate
+      ? BigNumber.from(0)
       : position.remainingLiquidity
           .sub(parseUnits(ammountToRemove, position.from.decimals))
           .div(BigNumber.from(position.remainingSwaps));
 
-    return factory.modifyRateAndSwaps(
-      position.dcaId,
-      newRate,
-      parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
-        ? BigNumber.from(0)
-        : position.remainingSwaps
-    );
+    const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
+    if (newAmount.gte(position.remainingLiquidity)) {
+      return hubInstance.increasePosition(position.id, newAmount.sub(position.remainingLiquidity), newSwaps);
+    } else {
+      return hubInstance.reducePosition(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.account
+      );
+    }
   }
 
   // TRANSACTION HANDLING
@@ -893,10 +742,10 @@ export default class Web3Service {
     return this.client.off('block');
   }
 
-  parseLog(log: Log, pairContract: AvailablePair) {
-    const factory = new ethers.Contract(pairContract.id, DCAPair.abi, this.getSigner());
+  parseLog(log: Log) {
+    const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner());
 
-    return factory.interface.parseLog(log);
+    return hubInstance.interface.parseLog(log);
   }
 
   setPendingTransaction(transaction: TransactionDetails) {
@@ -925,7 +774,6 @@ export default class Web3Service {
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         withdrawn: BigNumber.from(0),
-        dcaId: newPositionTypeData.id,
         id,
         startedAt: newPositionTypeData.startedAt,
         totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
@@ -962,7 +810,6 @@ export default class Web3Service {
           this.currentPositions[newId] = {
             ...this.currentPositions[`pending-transaction-${transaction.hash}`],
             pendingTransaction: '',
-            dcaId: newPositionTypeData.id,
             id: newId,
           };
         }

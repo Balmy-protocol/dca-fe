@@ -145,7 +145,6 @@ const PositionDetailFrame = () => {
       });
       const result = await web3Service.modifyRateAndSwaps(
         fullPositionToMappedPosition(position),
-        position.pair,
         newRate,
         newFrequency
       );

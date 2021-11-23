@@ -24,7 +24,6 @@ export interface Position {
   withdrawn: BigNumber; // cuanto saque
   totalSwaps: BigNumber; // cuanto puse originalmente
   rate: BigNumber;
-  dcaId: string;
   id: string;
   status: string;
   startedAt: number;
@@ -37,7 +36,6 @@ export interface FullPosition {
   to: Token;
   totalDeposits: string;
   totalSwaps: string; // cuanto puse originalmente
-  dcaId: string;
   id: string;
   status: string;
   startedAt: number;

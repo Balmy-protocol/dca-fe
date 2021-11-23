@@ -116,10 +116,8 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
                   id="from-value"
                   error={hasError ? 'Amount cannot exceed your current balance' : ''}
                   value={fromValue}
-                  label={position.from.symbol}
                   onChange={setFromValue}
                   withBalance
-                  isLoadingBalance={false}
                   token={position.from}
                   balance={realBalance}
                 />

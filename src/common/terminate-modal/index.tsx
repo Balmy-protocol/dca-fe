@@ -67,7 +67,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
           </Typography>
         ),
       });
-      const result = await web3Service.terminate(position, pair as AvailablePair);
+      const result = await web3Service.terminate(position);
       addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,

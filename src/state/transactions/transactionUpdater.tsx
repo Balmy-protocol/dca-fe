@@ -135,12 +135,7 @@ export default function Updater(): null {
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
                 extendedTypeData = {
                   // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                  id: web3Service
-                    .parseLog(
-                      receipt.logs[receipt.logs.length - 1],
-                      (transactions[hash].typeData as NewPositionTypeData).existingPair
-                    )
-                    .args._dcaId.toString(),
+                  id: web3Service.parseLog(receipt.logs[receipt.logs.length - 1]).args.positionId.toString(),
                 };
               }
 

@@ -77,6 +77,7 @@ export const SUPPORTED_NETWORKS = [
 ];
 
 export const HUB_ADDRESS = '0x4384f6e940C9bF5e56df63064e38CB9c5Af4A8Bc';
+export const ORACLE_ADDRESS = '0x22e626374CF1BdCfBE88684A6C87A743b7700A56';
 export const TOKEN_DESCRIPTOR_ADDRESS = '0x2B5384Ba9CE1cF889Ef758E14B6E9B7abb6e4bbF';
 
 export const MEAN_GRAPHQL_URL = {
@@ -93,7 +94,7 @@ export const UNI_GRAPHQL_URL = {
   [NETWORKS.ropsten.chainId]: 'https://api.thegraph.com/subgraphs/name/alejoamiras/uniswap-v3-ropsten',
   [NETWORKS.rinkeby.chainId]: 'https://api.thegraph.com/subgraphs/name/alejoamiras/uniswap-v3-rinkeby',
   [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-goerli',
-  [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/renpu-mcarlo/uniswap-v3-kovan',
+  [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/fibofinance/uniswap-v3-kovan',
   [NETWORKS.meanfinance.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
 };
 
@@ -236,22 +237,22 @@ export const STRING_SWAP_INTERVALS = {
   [ONE_MINUTE.toString()]: {
     singular: '1 minute',
     plural: '1 minute',
-    adverb: '1 minutely',
+    adverb: 'every 1 minute',
   },
   [FIVE_MINUTES.toString()]: {
     singular: '5 minutes',
     plural: '5 minutes',
-    adverb: '5 minutely',
+    adverb: 'every 5 minutes',
   },
   [FIFTEEN_MINUTES.toString()]: {
     singular: '15 minutes',
     plural: '15 minutes',
-    adverb: '15 minutely',
+    adverb: 'every 15 minutes',
   },
   [THIRTY_MINUTES.toString()]: {
     singular: '30 minutes',
     plural: '30 minutes',
-    adverb: '30 minutely',
+    adverb: 'every 30 minutes',
   },
   [ONE_HOUR.toString()]: {
     singular: 'hour',
@@ -261,7 +262,7 @@ export const STRING_SWAP_INTERVALS = {
   [FOUR_HOURS.toString()]: {
     singular: '4 hours',
     plural: '4 hours',
-    adverb: '4 hourly',
+    adverb: 'every 4 hours',
   },
   [ONE_DAY.toString()]: {
     singular: 'day',

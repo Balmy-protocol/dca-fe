@@ -37,7 +37,6 @@ const getPairSwaps = gql`
           swapInterval {
             interval
             id
-            description
           }
           swapPerformed
         }

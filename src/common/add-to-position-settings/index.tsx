@@ -85,10 +85,8 @@ const AddToPosition = ({ onClose, shouldShow, onAddFunds, position, balance }: A
             id="from-value"
             error={hasError ? 'Amount cannot exceed your current balance' : ''}
             value={fromValue}
-            label={position.from.symbol}
             onChange={setFromValue}
             withBalance
-            isLoadingBalance={false}
             balance={balance}
             token={position.from}
           />

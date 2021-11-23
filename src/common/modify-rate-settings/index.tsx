@@ -220,7 +220,7 @@ const ModifyRateAndSwaps = ({
             color={activeStep === 0 ? 'secondary' : 'primary'}
             variant="contained"
             onClick={handleNext}
-            disabled={!!hasError || isEmpty || cantFund}
+            disabled={!!hasError || isEmpty || !!cantFund}
           >
             {activeStep === 0 && <FormattedMessage description="next" defaultMessage="Next" />}
             {activeStep !== 0 && !cantFund && (

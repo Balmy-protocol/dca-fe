@@ -4,7 +4,7 @@ import { TokenList } from 'types';
 import reduce from 'lodash/reduce';
 import { useAllTransactions } from 'state/transactions/hooks';
 import { NETWORKS } from 'config/constants';
-import { ETH } from 'mocks/tokens';
+import { DEFAULT_TOKEN_LIST, ETH } from 'mocks/tokens';
 import { useSavedTokenLists } from 'state/token-lists/hooks';
 import useTokensLists from './useTokensLists';
 import useCurrentNetwork from './useCurrentNetwork';
@@ -18,7 +18,11 @@ function useTokenList() {
 
   const tokenList: TokenList = React.useMemo(() => {
     if (currentNetwork.chainId !== NETWORKS.mainnet.chainId) {
-      return web3Service.getTokenList();
+      if (DEFAULT_TOKEN_LIST[currentNetwork.chainId]) {
+        return DEFAULT_TOKEN_LIST[currentNetwork.chainId] || {};
+      }
+
+      // return web3Service.getTokenList();
     }
 
     return reduce(
