@@ -13,7 +13,7 @@ import { Position, Token, Web3Service } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { getFrequencyLabel, sortTokens, calculateStale } from 'utils/parsing';
 import useTransactionModal from 'hooks/useTransactionModal';
-
+import { useHistory } from 'react-router-dom';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
@@ -152,6 +152,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
   const addTransaction = useTransactionAdder();
   const [balance] = useBalance(from);
   const currentNetwork = useCurrentNetwork();
+  const history = useHistory();
 
   const isPending = !!pendingTransaction;
   const [token0, token1] = sortTokens(from, to);
@@ -176,6 +177,11 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
     setShouldShowSettings(false);
     onWithdraw(positionToWithdraw);
   };
+
+  const onViewDetails = () => {
+    history.push(`/positions/${position.id}`);
+  };
+
   const handleResetPosition = async (ammountToAdd: string, frequencyValue: string) => {
     try {
       setModalLoading({
@@ -474,9 +480,9 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           {!shouldBlockModifications && (
             <StyledCardFooterItem isPending={isPending}>
               <Button
-                variant={isPending ? 'contained' : 'outlined'}
-                color={isPending ? 'pending' : 'primary'}
-                onClick={() => !isPending && (hasNoFunds ? setShouldShowReset(true) : setShouldShowAddToPosition(true))}
+                variant="contained"
+                color={isPending ? 'pending' : 'secondary'}
+                onClick={() => !isPending && onViewDetails()}
                 fullWidth={isPending}
               >
                 {isPending ? (
@@ -494,7 +500,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
                   </Link>
                 ) : (
                   <Typography variant="body2">
-                    <FormattedMessage description="add to position" defaultMessage="Add to position" />
+                    <FormattedMessage description="View details" defaultMessage="View details" />
                   </Typography>
                 )}
               </Button>
