@@ -1,5 +1,4 @@
 import { TransactionReceipt as RawTransactionReceipt } from '@ethersproject/providers';
-import { AvailablePair } from './pairs';
 import { Token } from './tokens';
 
 export interface TransactionReceipt extends RawTransactionReceipt {
@@ -77,6 +76,7 @@ export interface NewPositionTypeData {
   frequencyValue: string;
   id: string;
   startedAt: number;
+  isCreatingPair: boolean;
 }
 
 export interface NewPairTypeData {

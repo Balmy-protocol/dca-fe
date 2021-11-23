@@ -75,6 +75,7 @@ const CreatePairModal = ({
     !from || !to || !toDeposit || !amountOfSwaps || !swapInterval || !web3Service.getAccount() || !open
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
 
   if (estimatedPriceErrors && open) {
