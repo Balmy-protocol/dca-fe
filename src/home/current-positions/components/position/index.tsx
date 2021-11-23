@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
-import { Position, Token, Web3Service, AvailablePair } from 'types';
+import { Position, Token, Web3Service } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { getFrequencyLabel, sortTokens, calculateStale } from 'utils/parsing';
 import useTransactionModal from 'hooks/useTransactionModal';

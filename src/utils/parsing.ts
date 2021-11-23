@@ -108,6 +108,5 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
     startedAt: parseInt(position.createdAtTimestamp, 10),
     totalDeposits: BigNumber.from(position.totalDeposits),
     pendingTransaction: '',
-    pairId: position.pair.id,
   };
 }

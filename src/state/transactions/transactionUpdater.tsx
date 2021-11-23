@@ -9,7 +9,7 @@ import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
 import EtherscanLink from 'common/view-on-etherscan';
-import { NewPositionTypeData, TransactionReceipt } from 'types';
+import { TransactionReceipt } from 'types';
 import { setInitialized } from 'state/initializer/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { usePendingTransactions } from './hooks';

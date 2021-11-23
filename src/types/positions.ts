@@ -28,7 +28,6 @@ export interface Position {
   status: string;
   startedAt: number;
   pendingTransaction: string;
-  pairId: string;
 }
 
 export interface FullPosition {

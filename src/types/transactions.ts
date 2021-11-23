@@ -63,7 +63,6 @@ export interface TerminatePositionTypeData {
 
 export interface ApproveTokenTypeData {
   token: Token;
-  pair: string;
 }
 
 export interface WrapEtherTypeData {
@@ -76,7 +75,6 @@ export interface NewPositionTypeData {
   fromValue: string;
   frequencyType: string;
   frequencyValue: string;
-  existingPair: AvailablePair;
   id: string;
   startedAt: number;
 }

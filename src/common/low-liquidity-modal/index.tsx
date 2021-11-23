@@ -45,7 +45,6 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
 
   const actionMessages = React.useMemo(
     () => ({
-      [POSSIBLE_ACTIONS.createPair]: <FormattedMessage description="lowLiqCreatePair" defaultMessage="Create pair" />,
       [POSSIBLE_ACTIONS.createPosition]: (
         <FormattedMessage description="lowLiqCreatePosition" defaultMessage="Create position" />
       ),

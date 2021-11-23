@@ -149,7 +149,6 @@ export const MODE_TYPES = {
 export const MINIMUM_LIQUIDITY_USD = parseFloat('350000');
 
 export const POSSIBLE_ACTIONS = {
-  createPair: 'createPair',
   createPosition: 'createPosition',
   approveToken: 'approveToken',
 };
