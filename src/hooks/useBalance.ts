@@ -20,7 +20,7 @@ function useBalance(from: Token | undefined): [BigNumber | undefined, boolean, s
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await web3Service.getBalance(from.address, from.decimals);
+          const promiseResult = await web3Service.getBalance(from.address);
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {

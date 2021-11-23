@@ -48,13 +48,9 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
     setSelectedPosition(position);
     setShowWithdrawModal(true);
   };
-  const onTerminate = (position: Position) => {
-    setSelectedPosition(position);
-    setShowTerminateModal(true);
-  };
 
   const handleViewNFT = async (position: Position) => {
-    const tokenNFT = await web3Service.getTokenNFT(position.dcaId, position.pairId);
+    const tokenNFT = await web3Service.getTokenNFT(position.id);
     setNFTData(tokenNFT);
     setShowNFTModal(true);
   };
@@ -86,7 +82,6 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
                     position={position}
                     web3Service={web3Service}
                     onWithdraw={onWithdraw}
-                    onTerminate={onTerminate}
                     onViewNFT={handleViewNFT}
                   />
                 </StyledGridItem>

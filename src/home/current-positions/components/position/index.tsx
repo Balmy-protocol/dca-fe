@@ -195,7 +195,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           </Typography>
         ),
       });
-      const result = await web3Service.resetPosition(position, pair as AvailablePair, ammountToAdd, frequencyValue);
+      const result = await web3Service.resetPosition(position, ammountToAdd, frequencyValue);
       addTransaction(result, {
         type: TRANSACTION_TYPES.RESET_POSITION,
         typeData: { id, newFunds: ammountToAdd, decimals: from.decimals, newSwaps: frequencyValue },
@@ -234,7 +234,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           </Typography>
         ),
       });
-      const result = await web3Service.addFunds(position, pair as AvailablePair, ammountToAdd);
+      const result = await web3Service.addFunds(position, ammountToAdd);
       addTransaction(result, {
         type: TRANSACTION_TYPES.ADD_FUNDS_POSITION,
         typeData: { id, newFunds: ammountToAdd, decimals: from.decimals },
@@ -270,7 +270,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           </Typography>
         ),
       });
-      const result = await web3Service.removeFunds(position, pair as AvailablePair, ammountToRemove);
+      const result = await web3Service.removeFunds(position, ammountToRemove);
       addTransaction(result, {
         type: TRANSACTION_TYPES.REMOVE_FUNDS,
         typeData: { id: position.id, ammountToRemove, decimals: position.from.decimals },
@@ -310,7 +310,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           </Typography>
         ),
       });
-      const result = await web3Service.modifyRateAndSwaps(position, pair as AvailablePair, newRate, newFrequency);
+      const result = await web3Service.modifyRateAndSwaps(position, newRate, newFrequency);
       addTransaction(result, {
         type: TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION,
         typeData: { id: position.id, newRate, newSwaps: newFrequency, decimals: position.from.decimals },
@@ -346,20 +346,20 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         onWithdraw={handleOnWithdraw}
         onModifyRateAndSwaps={handleModifyRateAndSwaps}
         onRemoveFunds={handleWithdrawFunds}
-        balance={balance}
+        balance={balance || BigNumber.from(0)}
       />
       <AddToPosition
         onClose={() => setShouldShowAddToPosition(false)}
         shouldShow={shouldShowAddToPosition}
         position={position}
-        balance={balance}
+        balance={balance || BigNumber.from(0)}
         onAddFunds={handleAddFunds}
       />
       <ResetPosition
         onClose={() => setShouldShowReset(false)}
         shouldShow={shouldShowReset}
         position={position}
-        balance={balance}
+        balance={balance || BigNumber.from(0)}
         onResetPosition={handleResetPosition}
       />
       <StyledCardContent>

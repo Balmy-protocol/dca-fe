@@ -49,11 +49,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
                       </Tabs>
                     </Grid>
                     <Grid item xs={12} style={{ display: 'flex', paddingTop: '0px' }}>
-                      {tabIndex === 0 ? (
-                        <CurrentPositions web3Service={web3Service} />
-                      ) : (
-                        <History web3Service={web3Service} />
-                      )}
+                      {tabIndex === 0 ? <CurrentPositions web3Service={web3Service} /> : <History />}
                     </Grid>
                   </>
                 )}

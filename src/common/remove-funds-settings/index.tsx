@@ -65,10 +65,8 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
           id="from-value"
           error={hasError ? 'Amount cannot exceed or equal your current funds' : ''}
           value={fromValue}
-          label={position.from.symbol}
           onChange={setFromValue}
           withBalance
-          isLoadingBalance={false}
           balance={position.remainingLiquidity}
           token={position.from}
         />
@@ -115,7 +113,7 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
           color="secondary"
           variant="contained"
           fullWidth
-          disabled={!fromValue || shouldDisable || hasError}
+          disabled={!fromValue || !!shouldDisable || !!hasError}
           onClick={() => onWithdraw(fromValue)}
         >
           <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />

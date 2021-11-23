@@ -32,9 +32,16 @@ export interface PositionsGraphqlResponse {
   positions: PositionResponse[];
 }
 
+export interface SwapIntervalGraphqlResponse {
+  id: string;
+  interval: string;
+  active: boolean;
+}
+export interface GetSwapIntervalsGraphqlResponse {
+  swapIntervals: SwapIntervalGraphqlResponse[];
+}
 export type PositionResponse = {
   id: string;
-  dcaId: string;
   from: Token;
   to: Token;
   pair: {

@@ -72,39 +72,39 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
     });
     onCancel();
   }
-  const handleCreatePair = async () => {
-    try {
-      onCancel();
-      setModalLoading({
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="Creating pair"
-              defaultMessage="Creating pair for {from} and {to}"
-              values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
-            />
-          </Typography>
-        ),
-      });
-      const result = await web3Service.createPair(from.address, to.address);
-      addTransaction(result, {
-        type: TRANSACTION_TYPES.NEW_PAIR,
-        typeData: { token0: from, token1: to },
-      });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="pair created"
-            defaultMessage="The pair {from}:{to} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
-          />
-        ),
-      });
-    } catch {
-      setModalError({ content: 'Failed while trying to create pair' });
-    }
-  };
+  // const handleCreatePair = async () => {
+  //   try {
+  //     onCancel();
+  //     setModalLoading({
+  //       content: (
+  //         <Typography variant="body1">
+  //           <FormattedMessage
+  //             description="Creating pair"
+  //             defaultMessage="Creating pair for {from} and {to}"
+  //             values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
+  //           />
+  //         </Typography>
+  //       ),
+  //     });
+  //     const result = await web3Service.createPair(from.address, to.address);
+  //     addTransaction(result, {
+  //       type: TRANSACTION_TYPES.NEW_PAIR,
+  //       typeData: { token0: from, token1: to },
+  //     });
+  //     setModalSuccess({
+  //       hash: result.hash,
+  //       content: (
+  //         <FormattedMessage
+  //           description="pair created"
+  //           defaultMessage="The pair {from}:{to} has been succesfully submitted to the blockchain and will be confirmed soon"
+  //           values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
+  //         />
+  //       ),
+  //     });
+  //   } catch {
+  //     setModalError({ content: 'Failed while trying to create pair' });
+  //   }
+  // };
 
   return (
     <Dialog
@@ -167,7 +167,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
           variant="contained"
           disabled={isLoadingEstimatedPrice}
           fullWidth
-          onClick={handleCreatePair}
+          // onClick={handleCreatePair}
           autoFocus
         >
           <FormattedMessage description="Create pair submit" defaultMessage="Create pair" />

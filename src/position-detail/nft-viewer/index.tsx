@@ -13,7 +13,7 @@ const NftViewer = ({ position }: NftViewerProps) => {
 
   React.useEffect(() => {
     const fetchNFTData = async () => {
-      const tokenNFT = await web3Service.getTokenNFT(position.dcaId, position.pair.id);
+      const tokenNFT = await web3Service.getTokenNFT(position.id);
       setNFTData(tokenNFT);
     };
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

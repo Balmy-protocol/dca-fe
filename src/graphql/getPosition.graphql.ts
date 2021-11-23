@@ -4,7 +4,6 @@ const getPosition = gql`
   query getPosition($id: String!) {
     position(id: $id) {
       id
-      dcaId
       createdAtTimestamp
       totalDeposits
       totalSwaps
@@ -43,7 +42,6 @@ const getPosition = gql`
       swapInterval {
         id
         interval
-        description
       }
       current {
         id

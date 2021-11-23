@@ -103,7 +103,6 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
     remainingSwaps: BigNumber.from(position.current.remainingSwaps),
     withdrawn: BigNumber.from(position.totalWithdrawn),
     totalSwaps: BigNumber.from(position.totalSwaps),
-    dcaId: position.dcaId,
     id: position.id,
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),

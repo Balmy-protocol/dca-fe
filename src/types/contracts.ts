@@ -29,6 +29,10 @@ interface SwapInforTokenData {
   token: string;
 }
 
+export class OracleContract extends Contract {
+  canSupportPair: (tokenA: string, tokenB: string) => Promise<boolean>;
+}
+
 export class HubContract extends Contract {
   getNextSwapInfo: (
     tokens: string[],
@@ -36,22 +40,30 @@ export class HubContract extends Contract {
   ) => Promise<{ pairs: SwapInfoPairData[]; tokens: SwapInforTokenData[] }>;
 
   createPair: (tokenA: string, tokenB: string) => Promise<TransactionResponse>;
-}
-
-export class PairContract extends Contract {
-  tokenURI: (dcaId: string) => Promise<string>;
-
-  withdrawSwapped: (dcaId: string) => Promise<TransactionResponse>;
-
-  terminate: (dcaId: string) => Promise<TransactionResponse>;
-
-  modifyRateAndSwaps: (dcaId: string, newRate: BigNumber, newSwaps: BigNumber) => Promise<TransactionResponse>;
 
   deposit: (
     from: string,
-    rate: BigNumber,
-    amountOfSwaps: BigNumber,
-    swapInterval: BigNumber
+    to: string,
+    totalAmmount: BigNumber,
+    swaps: BigNumber,
+    interval: BigNumber,
+    account: string,
+    permissions: { operator: string; permissions: string[] }[]
+  ) => Promise<TransactionResponse>;
+
+  tokenURI: (id: string) => Promise<string>;
+
+  withdrawSwapped: (id: string, recipient: string) => Promise<TransactionResponse>;
+
+  terminate: (id: string, recipientUnswapped: string, recipientSwapped: string) => Promise<TransactionResponse>;
+
+  increasePosition: (id: string, newAmount: BigNumber, newSwaps: BigNumber) => Promise<TransactionResponse>;
+
+  reducePosition: (
+    id: string,
+    newAmount: BigNumber,
+    newSwaps: BigNumber,
+    recipient: string
   ) => Promise<TransactionResponse>;
 }
 /* eslint-enable */

@@ -20,10 +20,9 @@ export type Web3ServicePromisableMethods =
   | 'getCurrentPositions'
   | 'getNetwork'
   | 'getUsedTokens'
-  | 'createPair'
   | 'getAvailablePairs'
   | 'getAllowance'
-  | 'hasPool'
+  | 'canSupportPair'
   | 'getPastPositions';
 
 export interface Network {
