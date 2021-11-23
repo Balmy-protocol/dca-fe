@@ -9,6 +9,7 @@ import Torus from '@toruslabs/torus-embed';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import keyBy from 'lodash/keyBy';
+import find from 'lodash/find';
 import axios, { AxiosResponse } from 'axios';
 import {
   CoinGeckoPriceResponse,
@@ -820,6 +821,19 @@ export default class Web3Service {
           };
         }
         delete this.currentPositions[`pending-transaction-${transaction.hash}`];
+        const [token0, token1] = sortTokens(newPositionTypeData.from, newPositionTypeData.to);
+        if (!find(this.availablePairs, { id: `${token0.address}-${token1.address}` })) {
+          this.availablePairs.push({
+            token0,
+            token1,
+            id: `${token0.address}-${token1.address}`,
+            lastExecutedAt: 0,
+            createdAt: Math.floor(Date.now() / 1000),
+            swapInfo: {
+              swapsToPerform: [],
+            },
+          });
+        }
         break;
       }
       case TRANSACTION_TYPES.TERMINATE_POSITION: {

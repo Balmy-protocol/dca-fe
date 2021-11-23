@@ -1,5 +1,4 @@
 import React from 'react';
-import WalletContext from 'common/wallet-context';
 import { TokenList } from 'types';
 import reduce from 'lodash/reduce';
 import { useAllTransactions } from 'state/transactions/hooks';
@@ -10,7 +9,6 @@ import useTokensLists from './useTokensLists';
 import useCurrentNetwork from './useCurrentNetwork';
 
 function useTokenList() {
-  const { web3Service } = React.useContext(WalletContext);
   const currentNetwork = useCurrentNetwork();
   const transactions = useAllTransactions();
   const tokensLists = useTokensLists();

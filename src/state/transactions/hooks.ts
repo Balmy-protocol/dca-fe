@@ -7,9 +7,9 @@ import {
   TransactionTypes,
   TransactionTypeDataOptions,
   ApproveTokenTypeData,
-  NewPairTypeData,
   Token,
   TransactionPositionTypeDataOptions,
+  NewPositionTypeData,
 } from 'types';
 import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -211,14 +211,17 @@ export function useHasPendingPairCreation(from: Token, to: Token): boolean {
     () =>
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
-        if (allTransactions[hash].type !== TRANSACTION_TYPES.NEW_PAIR) return false;
+        if (allTransactions[hash].type !== TRANSACTION_TYPES.NEW_POSITION) return false;
         const tx = allTransactions[hash];
         if (tx.receipt) {
           return false;
         }
         return (
-          (<NewPairTypeData>tx.typeData).token0.address === fromAddress &&
-          (<NewPairTypeData>tx.typeData).token1.address === toAddress
+          ((<NewPositionTypeData>tx.typeData).from.address === fromAddress ||
+            (<NewPositionTypeData>tx.typeData).to.address === fromAddress) &&
+          ((<NewPositionTypeData>tx.typeData).from.address === toAddress ||
+            (<NewPositionTypeData>tx.typeData).to.address === toAddress) &&
+          (<NewPositionTypeData>tx.typeData).isCreatingPair
         );
       }),
     [allTransactions, fromAddress, toAddress]

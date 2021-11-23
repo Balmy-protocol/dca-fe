@@ -3,7 +3,7 @@ import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import { Web3Service, GetAllowanceResponse, AvailablePair, SetStateCallback, Token } from 'types';
+import { Web3Service, GetAllowanceResponse, SetStateCallback, Token } from 'types';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
@@ -40,6 +40,7 @@ import {
   useHasPendingApproval,
   useHasConfirmedApproval,
   useHasPendingWrap,
+  useHasPendingPairCreation,
 } from 'state/transactions/hooks';
 import { getFrequencyLabel, calculateStale } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -169,6 +170,7 @@ const Swap = ({
     const token1 = from.address < to.address ? to.address : from.address;
     return find(availablePairs, (pair) => pair.token0.address === token0 && pair.token1.address === token1);
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
+  const isCreatingPair = useHasPendingPairCreation(from, to);
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount());
   const hasPendingWrap = useHasPendingWrap();
@@ -237,7 +239,6 @@ const Swap = ({
         ),
       });
     } catch (e) {
-      console.log(e);
       setModalError({ content: 'Error approving token' });
     }
   };
@@ -299,6 +300,7 @@ const Swap = ({
           frequencyValue,
           startedAt: Date.now(),
           id: result.hash,
+          isCreatingPair: !existingPair,
         },
       });
       setModalSuccess({
@@ -326,10 +328,10 @@ const Swap = ({
     }
     const isStale =
       calculateStale(
-        existingPair.lastExecutedAt || 0,
+        existingPair?.lastExecutedAt || 0,
         frequencyType,
-        existingPair.createdAt || 0,
-        existingPair.swapInfo || null
+        existingPair?.createdAt || 0,
+        existingPair?.swapInfo || null
       ) === STALE;
 
     if (isStale) {
@@ -562,6 +564,14 @@ const Swap = ({
     </StyledButton>
   );
 
+  const CreatingPairButton = (
+    <StyledButton size="large" variant="contained" disabled color="secondary" fullWidth>
+      <Typography variant="body1">
+        <FormattedMessage description="creating pair" defaultMessage="Creating this pair" />
+      </Typography>
+    </StyledButton>
+  );
+
   const NoFundsButton = (
     <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
       <Typography variant="body1">
@@ -617,6 +627,8 @@ const Swap = ({
     ButtonToShow = ApproveTokenButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
+  } else if (isCreatingPair) {
+    ButtonToShow = CreatingPairButton;
   } else {
     ButtonToShow = StartPositionButton;
   }

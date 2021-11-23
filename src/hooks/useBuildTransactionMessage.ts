@@ -143,7 +143,7 @@ function useBuildTransactionMessages() {
         }
         case TRANSACTION_TYPES.APPROVE_TOKEN: {
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
-          `${tokenApprovalTypeData.token.symbol} is now ready to be used`;
+          message = `${tokenApprovalTypeData.token.symbol} is now ready to be used`;
           break;
         }
         default:
