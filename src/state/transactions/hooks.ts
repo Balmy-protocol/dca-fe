@@ -180,10 +180,7 @@ export function useHasPendingApproval(token: Token, spender: string | undefined)
         if (tx.receipt) {
           return false;
         }
-        return (
-          (<ApproveTokenTypeData>tx.typeData).pair === spender &&
-          (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress
-        );
+        return (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress && tx.from === spender;
       }),
     [allTransactions, spender, tokenAddress]
   );
@@ -263,11 +260,7 @@ export function useHasConfirmedApproval(token: Token, spender: string | undefine
         if (!allTransactions[hash]) return false;
         if (allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN) return false;
         const tx = allTransactions[hash];
-        return (
-          tx.receipt &&
-          (<ApproveTokenTypeData>tx.typeData).pair === spender &&
-          (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress
-        );
+        return tx.receipt && (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress && tx.from === spender;
       }),
     [allTransactions, spender, tokenAddress]
   );

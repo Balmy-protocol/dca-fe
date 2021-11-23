@@ -10,10 +10,9 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import usePromise from 'hooks/usePromise';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { useTransactionAdder } from 'state/transactions/hooks';
-import { TRANSACTION_TYPES } from 'config/constants';
 import { makeStyles } from '@material-ui/core/styles';
 import { formatCurrencyAmount } from 'utils/currency';
+import { BigNumber } from 'ethers';
 import { ETH } from 'mocks/tokens';
 
 const useStyles = makeStyles({
@@ -51,18 +50,30 @@ interface CreatePairModalProps {
   to: Token;
   onCancel: () => void;
   open: boolean;
+  amountOfSwaps: string;
+  toDeposit: string;
+  swapInterval: BigNumber;
+  onCreatePair: () => void;
 }
 
-const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairModalProps) => {
+const CreatePairModal = ({
+  from,
+  to,
+  toDeposit,
+  amountOfSwaps,
+  swapInterval,
+  web3Service,
+  open,
+  onCancel,
+  onCreatePair,
+}: CreatePairModalProps) => {
   const classes = useStyles();
   const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise<EstimatedPairResponse>(
     web3Service,
     'getEstimatedPairCreation',
-    [from.address, to.address],
-    !from || !to || !web3Service.getAccount() || !open
+    [from, to, toDeposit, amountOfSwaps, swapInterval],
+    !from || !to || !toDeposit || !amountOfSwaps || !swapInterval || !web3Service.getAccount() || !open
   );
-
-  const addTransaction = useTransactionAdder();
 
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
 
@@ -72,39 +83,6 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
     });
     onCancel();
   }
-  // const handleCreatePair = async () => {
-  //   try {
-  //     onCancel();
-  //     setModalLoading({
-  //       content: (
-  //         <Typography variant="body1">
-  //           <FormattedMessage
-  //             description="Creating pair"
-  //             defaultMessage="Creating pair for {from} and {to}"
-  //             values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
-  //           />
-  //         </Typography>
-  //       ),
-  //     });
-  //     const result = await web3Service.createPair(from.address, to.address);
-  //     addTransaction(result, {
-  //       type: TRANSACTION_TYPES.NEW_PAIR,
-  //       typeData: { token0: from, token1: to },
-  //     });
-  //     setModalSuccess({
-  //       hash: result.hash,
-  //       content: (
-  //         <FormattedMessage
-  //           description="pair created"
-  //           defaultMessage="The pair {from}:{to} has been succesfully submitted to the blockchain and will be confirmed soon"
-  //           values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
-  //         />
-  //       ),
-  //     });
-  //   } catch {
-  //     setModalError({ content: 'Failed while trying to create pair' });
-  //   }
-  // };
 
   return (
     <Dialog
@@ -118,8 +96,8 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
       <StyledDialogContent>
         <Typography variant="h6">
           <FormattedMessage
-            description="Create pair"
-            defaultMessage="Create pair for {from}:{to}"
+            description="First deposit"
+            defaultMessage="Create position for {from}:{to}"
             values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
           />
         </Typography>
@@ -131,7 +109,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
             <Typography variant="body1">
               <FormattedMessage
                 description="calculate pair cost"
-                defaultMessage="Calculating the cost of creating this pair"
+                defaultMessage="Calculating the cost of creating this position"
               />
             </Typography>
           </>
@@ -140,7 +118,7 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
             <Typography variant="body1">
               <FormattedMessage
                 description="create pair question"
-                defaultMessage="Are you sure you want to create the {from}:{to} pair?"
+                defaultMessage="You are the first person to create a position for this pair of tokens. Due to that the gas cost is going to be higher than creating a position for a pair we already operate with. This will be a one time operation. Are you sure you want to create the {from}:{to} position?"
                 values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
               />
             </Typography>
@@ -167,10 +145,10 @@ const CreatePairModal = ({ from, to, web3Service, open, onCancel }: CreatePairMo
           variant="contained"
           disabled={isLoadingEstimatedPrice}
           fullWidth
-          // onClick={handleCreatePair}
+          onClick={onCreatePair}
           autoFocus
         >
-          <FormattedMessage description="Create pair submit" defaultMessage="Create pair" />
+          <FormattedMessage description="Create pair submit" defaultMessage="Create position" />
         </Button>
       </StyledDialogActions>
     </Dialog>

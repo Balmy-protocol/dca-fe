@@ -148,6 +148,11 @@
     "web3-utils": "^1.3.6",
     "web3modal": "^1.9.3"
   },
+  "lint": {
+    "*.{js,jsx,ts,tsx,css,md}": [
+      "eslint --ext .js,.jsx,.ts,.tsx --format=pretty ./src"
+    ]
+  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md}": [
       "prettier --write"

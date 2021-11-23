@@ -1,10 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import capitalize from 'lodash/capitalize';
-import findIndex from 'lodash/findIndex';
 import styled from 'styled-components';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import { maximalAppleTabsStylesHook } from 'common/tabs';
 import { BigNumber } from 'ethers';
 import { SetStateCallback } from 'types';
 import Button from '@material-ui/core/Button';
@@ -91,7 +87,6 @@ interface CustomCurrent {
 const MinimalSelect = ({ options, selected, onChange }: MinimalSelectProps) => {
   const [selectedRef, setSelectedRef] = useState<CustomCurrent | null>(null);
 
-  console.log(selectedRef, selectedRef && selectedRef.offsetWidth);
   return (
     <StyledTabsContainer>
       <StyledTabItemsContainer>

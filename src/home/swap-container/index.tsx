@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import orderBy from 'lodash/orderBy';
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
-import { WETH, ETH, USDC, LINK, DAI } from 'mocks/tokens';
+import { WETH, ETH, USDC } from 'mocks/tokens';
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { ONE_DAY, STRING_SWAP_INTERVALS } from 'config/constants';
@@ -11,9 +11,9 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
 import { useQuery } from '@apollo/client';
 import useDCAGraphql from 'hooks/useDCAGraphql';
+import { BigNumber } from 'ethers';
 import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
 import Swap from './components/swap';
-import { BigNumber } from 'ethers';
 
 const SwapContainer = () => {
   const [fromValue, setFromValue] = React.useState('');
@@ -86,8 +86,6 @@ const SwapContainer = () => {
     }
     setFrom(to);
   };
-
-  console.log(swapIntervalsData);
 
   const isLoading = !currentNetwork.chainId || isLoadingSwapIntervals || !swapIntervalsData;
 

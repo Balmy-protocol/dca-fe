@@ -1,20 +1,17 @@
 import React from 'react';
-import find from 'lodash/find';
 import styled from 'styled-components';
 import { formatUnits } from '@ethersproject/units';
 import Button from 'common/button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import { AvailablePair, Position } from 'types';
+import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
 import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { sortTokens } from 'utils/parsing';
 import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
-import useAvailablePairs from 'hooks/useAvailablePairs';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -53,9 +50,6 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
 
-  const availablePairs = useAvailablePairs();
-  const [token0, token1] = sortTokens(position.from, position.to);
-  const pair = find(availablePairs, { token0, token1 });
   const addTransaction = useTransactionAdder();
 
   const handleWithdraw = async () => {

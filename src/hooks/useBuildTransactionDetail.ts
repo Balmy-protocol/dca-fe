@@ -140,12 +140,7 @@ function useBuildTransactionDetail() {
         }
         case TRANSACTION_TYPES.APPROVE_TOKEN: {
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
-          const pair = find(availablePairs, { id: tokenApprovalTypeData.pair });
-          if (pair) {
-            message = `Approve ${tokenApprovalTypeData.token.symbol} to be used in the pair ${pair.token0.symbol}:${pair.token1.symbol}`;
-          } else {
-            message = `Approve ${tokenApprovalTypeData.token.symbol}`;
-          }
+          message = `Approve ${tokenApprovalTypeData.token.symbol}`;
           break;
         }
         default:

@@ -17,7 +17,6 @@ import {
   AvailablePairs,
   PositionResponse,
   TransactionPositionTypeDataOptions,
-  PoolResponse,
   Position,
   PositionKeyBy,
   TransactionDetails,
@@ -39,7 +38,6 @@ import {
   PositionsGraphqlResponse,
   AvailablePairsGraphqlResponse,
   PoolsLiquidityDataGraphqlResponse,
-  PoolsGraphqlResponse,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { sortTokens } from 'utils/parsing';
@@ -47,11 +45,9 @@ import { buildSwapInput } from 'utils/swap';
 
 // GQL queries
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
-import GET_TOKEN_LIST from 'graphql/getTokenList.graphql';
 import GET_POSITIONS from 'graphql/getPositions.graphql';
 import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
 import gqlFetchAll from 'utils/gqlFetchAll';
-import gqlFetchAllById from 'utils/gqlFetchAllById';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
@@ -66,7 +62,6 @@ import {
   MEAN_GRAPHQL_URL,
   NETWORKS,
   ORACLE_ADDRESS,
-  SUPPORTED_NETWORKS,
   SWAP_INTERVALS_MAP,
   TRANSACTION_TYPES,
   UNI_GRAPHQL_URL,
@@ -472,8 +467,8 @@ export default class Web3Service {
 
     const [{ intervalsInSwap }] = pairs;
 
-    // eslint-disable-next-line no-bitwise
     const swapsToPerform = SWAP_INTERVALS_MAP.filter(
+      // eslint-disable-next-line no-bitwise
       (swapInterval) => swapInterval.key & parseInt(intervalsInSwap, 16)
     ).map((swapInterval) => ({ interval: swapInterval.value.toNumber() }));
 
@@ -503,8 +498,8 @@ export default class Web3Service {
     );
 
     const liquidity: number = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
-      // eslint-disable-next-line no-param-reassign
       pool.poolDayData.forEach((dayData) => {
+        // eslint-disable-next-line no-param-reassign
         acc += parseFloat(dayData.volumeUSD);
       });
 
@@ -529,7 +524,13 @@ export default class Web3Service {
     return oracleInstance.canSupportPair(tokenA.address, tokenB.address);
   }
 
-  async getEstimatedPairCreation(token0?: string, token1?: string) {
+  async getEstimatedPairCreation(
+    token0: Token,
+    token1: Token,
+    amountToDeposit: string,
+    amountOfSwaps: string,
+    swapInterval: BigNumber
+  ) {
     if (!token0 || !token1) return Promise.resolve();
 
     const chain = await this.getNetwork();
@@ -537,19 +538,29 @@ export default class Web3Service {
     let tokenA = token0;
     let tokenB = token1;
 
-    if (token0 > token1) {
+    if (token0.address > token1.address) {
       tokenA = token1;
       tokenB = token0;
     }
 
     // check for ETH
-    tokenA = tokenA === ETH.address ? WETH(chain.chainId).address : tokenA;
-    tokenB = tokenB === ETH.address ? WETH(chain.chainId).address : tokenB;
+    tokenA = tokenA.address === ETH.address ? WETH(chain.chainId) : tokenA;
+    tokenB = tokenB.address === ETH.address ? WETH(chain.chainId) : tokenB;
 
     const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner());
 
+    const weiValue = parseUnits(amountToDeposit, token0.decimals);
+
     return Promise.all([
-      hubInstance.estimateGas.deposit(tokenA, tokenB),
+      hubInstance.estimateGas.deposit(
+        tokenA.address,
+        tokenB.address,
+        weiValue,
+        BigNumber.from(amountOfSwaps),
+        swapInterval,
+        this.account,
+        []
+      ),
       axios.get<TxPriceResponse>('https://api.txprice.com/'),
       axios.get<CoinGeckoPriceResponse>(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=1&page=1&sparkline=false'
@@ -637,14 +648,13 @@ export default class Web3Service {
         newAmount.sub(position.remainingLiquidity),
         position.remainingSwaps
       );
-    } else {
-      return hubInstance.reducePosition(
-        position.id,
-        position.remainingLiquidity.sub(newAmount),
-        position.remainingSwaps,
-        this.account
-      );
     }
+    return hubInstance.reducePosition(
+      position.id,
+      position.remainingLiquidity.sub(newAmount),
+      position.remainingSwaps,
+      this.account
+    );
   }
 
   resetPosition(position: Position, newDeposit: string, newSwaps: string): Promise<TransactionResponse> {
@@ -661,14 +671,13 @@ export default class Web3Service {
         newAmount.sub(position.remainingLiquidity),
         BigNumber.from(newSwaps)
       );
-    } else {
-      return hubInstance.reducePosition(
-        position.id,
-        position.remainingLiquidity.sub(newAmount),
-        BigNumber.from(newSwaps),
-        this.account
-      );
     }
+    return hubInstance.reducePosition(
+      position.id,
+      position.remainingLiquidity.sub(newAmount),
+      BigNumber.from(newSwaps),
+      this.account
+    );
   }
 
   modifyRateAndSwaps(position: Position, newRate: string, newSwaps: string): Promise<TransactionResponse> {
@@ -681,14 +690,13 @@ export default class Web3Service {
         newAmount.sub(position.remainingLiquidity),
         BigNumber.from(newSwaps)
       );
-    } else {
-      return hubInstance.reducePosition(
-        position.id,
-        position.remainingLiquidity.sub(newAmount),
-        BigNumber.from(newSwaps),
-        this.account
-      );
     }
+    return hubInstance.reducePosition(
+      position.id,
+      position.remainingLiquidity.sub(newAmount),
+      BigNumber.from(newSwaps),
+      this.account
+    );
   }
 
   removeFunds(position: Position, ammountToRemove: string): Promise<TransactionResponse> {
@@ -707,14 +715,13 @@ export default class Web3Service {
     const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
       return hubInstance.increasePosition(position.id, newAmount.sub(position.remainingLiquidity), newSwaps);
-    } else {
-      return hubInstance.reducePosition(
-        position.id,
-        position.remainingLiquidity.sub(newAmount),
-        BigNumber.from(newSwaps),
-        this.account
-      );
     }
+    return hubInstance.reducePosition(
+      position.id,
+      position.remainingLiquidity.sub(newAmount),
+      BigNumber.from(newSwaps),
+      this.account
+    );
   }
 
   // TRANSACTION HANDLING
@@ -764,7 +771,6 @@ export default class Web3Service {
       this.currentPositions[id] = {
         from: newPositionTypeData.from,
         to: newPositionTypeData.to,
-        pairId: newPositionTypeData.existingPair.id,
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
         swapped: BigNumber.from(0),
         rate: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
@@ -805,7 +811,7 @@ export default class Web3Service {
     switch (transaction.type) {
       case TRANSACTION_TYPES.NEW_POSITION: {
         const newPositionTypeData = transaction.typeData as NewPositionTypeData;
-        const newId = `${newPositionTypeData.existingPair.id}-${newPositionTypeData.id}`;
+        const newId = newPositionTypeData.id;
         if (!this.currentPositions[newId]) {
           this.currentPositions[newId] = {
             ...this.currentPositions[`pending-transaction-${transaction.hash}`],

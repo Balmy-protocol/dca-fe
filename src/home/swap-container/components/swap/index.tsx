@@ -39,7 +39,6 @@ import {
   useTransactionAdder,
   useHasPendingApproval,
   useHasConfirmedApproval,
-  useHasPendingPairCreation,
   useHasPendingWrap,
 } from 'state/transactions/hooks';
 import { getFrequencyLabel, calculateStale } from 'utils/parsing';
@@ -106,7 +105,7 @@ const StyledSwapTokenButton = styled(IconButton)`
   }
 `;
 
-interface AVAILABLE_SWAP_INTERVAL {
+interface AvailableSwapInterval {
   label: {
     singular: string;
     plural: string;
@@ -129,7 +128,7 @@ interface SwapProps {
   setFrequencyValue: SetStateCallback<string>;
   web3Service: Web3Service;
   currentNetwork: { chainId: number; name: string };
-  availableFrequencies: AVAILABLE_SWAP_INTERVAL[];
+  availableFrequencies: AvailableSwapInterval[];
 }
 
 const Swap = ({
@@ -171,16 +170,15 @@ const Swap = ({
     return find(availablePairs, (pair) => pair.token0.address === token0 && pair.token1.address === token1);
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
 
-  const hasPendingApproval = useHasPendingApproval(from, existingPair?.id);
+  const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount());
   const hasPendingWrap = useHasPendingWrap();
-  const hasConfirmedApproval = useHasConfirmedApproval(from, existingPair?.id);
-  const hasPendingPairCreation = useHasPendingPairCreation(from, to);
+  const hasConfirmedApproval = useHasConfirmedApproval(from, web3Service.getAccount());
 
   const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
     web3Service,
     'getAllowance',
     [from],
-    !from || !web3Service.getAccount() || !existingPair || hasPendingApproval
+    !from || !web3Service.getAccount() || hasPendingApproval
   );
 
   const [pairIsSupported, isLoadingPairIsSupported] = usePromise<boolean>(
@@ -226,7 +224,7 @@ const Swap = ({
       const result = await web3Service.approveToken(from);
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
-        typeData: { token: from, pair: (existingPair as AvailablePair).id },
+        typeData: { token: from },
       });
       setModalSuccess({
         hash: result.hash,
@@ -239,6 +237,7 @@ const Swap = ({
         ),
       });
     } catch (e) {
+      console.log(e);
       setModalError({ content: 'Error approving token' });
     }
   };
@@ -273,6 +272,7 @@ const Swap = ({
   };
 
   const handleSwap = async () => {
+    setShouldShowPairModal(false);
     setShouldShowStalePairModal(false);
     const fromSymbol = from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol;
 
@@ -297,7 +297,6 @@ const Swap = ({
           fromValue,
           frequencyType: frequencyType.toString(),
           frequencyValue,
-          existingPair: existingPair as AvailablePair,
           startedAt: Date.now(),
           id: result.hash,
         },
@@ -321,12 +320,16 @@ const Swap = ({
   };
 
   const preHandleSwap = () => {
+    if (!existingPair) {
+      setShouldShowPairModal(true);
+      return;
+    }
     const isStale =
       calculateStale(
-        existingPair?.lastExecutedAt || 0,
+        existingPair.lastExecutedAt || 0,
         frequencyType,
-        existingPair?.createdAt || 0,
-        existingPair?.swapInfo || null
+        existingPair.createdAt || 0,
+        existingPair.swapInfo || null
       ) === STALE;
 
     if (isStale) {
@@ -396,7 +399,6 @@ const Swap = ({
   };
 
   const POSSIBLE_ACTIONS_FUNCTIONS = {
-    createPair: () => setShouldShowPairModal(true),
     createPosition: preHandleSwap,
     approveToken: handleApproveToken,
   };
@@ -444,9 +446,7 @@ const Swap = ({
         parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
       hasConfirmedApproval;
 
-  const pairExists = existingPair;
   const shouldDisableButton =
-    !pairExists ||
     !fromValue ||
     !frequencyValue ||
     cantFund ||
@@ -460,35 +460,6 @@ const Swap = ({
   const isETH = from.address === ETH.address;
 
   const ignoreValues = [from.address, to.address];
-
-  const CreatePairButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      fullWidth
-      color="warning"
-      disabled={!!pairExists || hasPendingPairCreation || isLoading || isLoadingPairIsSupported}
-      onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPair as keyof typeof POSSIBLE_ACTIONS)}
-    >
-      {!isLoading && !isLoadingPairIsSupported && (
-        <Typography variant="body1">
-          {hasPendingPairCreation ? (
-            <FormattedMessage description="pair being created" defaultMessage="This pair is being created" />
-          ) : (
-            <FormattedMessage
-              description="create pair button"
-              defaultMessage="Create {from}/{to} pair"
-              values={{
-                from: (from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol) || '',
-                to: (to && to.symbol) || '',
-              }}
-            />
-          )}
-        </Typography>
-      )}
-      {(isLoading || isLoadingPairIsSupported) && <CenteredLoadingIndicator />}
-    </StyledButton>
-  );
 
   const NotConnectedButton = (
     <StyledButton
@@ -642,8 +613,6 @@ const Swap = ({
     ButtonToShow = PairNotSupportedButton;
   } else if (isETH) {
     ButtonToShow = WrapButton;
-  } else if (!pairExists) {
-    ButtonToShow = CreatePairButton;
   } else if (!isApproved) {
     ButtonToShow = ApproveTokenButton;
   } else if (cantFund) {
@@ -660,6 +629,10 @@ const Swap = ({
         web3Service={web3Service}
         from={from}
         to={to}
+        amountOfSwaps={frequencyValue}
+        swapInterval={frequencyType}
+        toDeposit={fromValue}
+        onCreatePair={handleSwap}
       />
       <StalePairModal
         open={shouldShowStalePairModal}
