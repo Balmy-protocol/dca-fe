@@ -320,14 +320,14 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
               <StyledGraphAxis />
               <StyledGraphAxisLabels>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(parseInt(uniData[0].date, 10)).toLocaleString({
+                  {DateTime.fromSeconds(parseInt(prices[0].date, 10)).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
                   })}
                 </Typography>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(parseInt(uniData[uniData.length - 1].date, 10)).toLocaleString({
+                  {DateTime.fromSeconds(parseInt(prices[prices.length - 1].date, 10)).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
