@@ -10,6 +10,7 @@ import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import find from 'lodash/find';
 import { DateTime } from 'luxon';
+import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import keyBy from 'lodash/keyBy';
 import axios, { AxiosResponse } from 'axios';
 import {
@@ -73,7 +74,7 @@ export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as 
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
-  modal: Web3Modal;
+  modal: SafeAppWeb3Modal;
   signer: Signer;
   availablePairs: AvailablePairs;
   apolloClient: GraphqlService;
@@ -88,7 +89,7 @@ export default class Web3Service {
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
     client?: ethers.providers.Web3Provider,
-    modal?: Web3Modal
+    modal?: SafeAppWeb3Modal
   ) {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
@@ -129,7 +130,7 @@ export default class Web3Service {
     return this.providerInfo;
   }
 
-  setModal(modal: Web3Modal) {
+  setModal(modal: SafeAppWeb3Modal) {
     this.modal = modal;
   }
 
@@ -143,7 +144,7 @@ export default class Web3Service {
   }
 
   async connect() {
-    const provider = await this.modal?.connect();
+    const provider = await this.modal?.requestProvider();
 
     this.providerInfo = getProviderInfo(provider);
     // A Web3Provider wraps a standard Web3 provider, which is
@@ -295,14 +296,16 @@ export default class Web3Service {
       },
     };
 
-    const web3Modal = new Web3Modal({
+    const web3Modal = new SafeAppWeb3Modal({
       cacheProvider: true, // optional
       providerOptions, // required
     });
 
     this.setModal(web3Modal);
 
-    if (web3Modal.cachedProvider) {
+    const loadedAsSafeApp = await web3Modal.isSafeApp();
+
+    if (web3Modal.cachedProvider || loadedAsSafeApp) {
       await this.connect();
     }
 
