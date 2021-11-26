@@ -76,16 +76,16 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.kovan.chainId,
 ];
 
-export const HUB_ADDRESS = '0x4384f6e940C9bF5e56df63064e38CB9c5Af4A8Bc';
-export const ORACLE_ADDRESS = '0x22e626374CF1BdCfBE88684A6C87A743b7700A56';
-export const TOKEN_DESCRIPTOR_ADDRESS = '0x2B5384Ba9CE1cF889Ef758E14B6E9B7abb6e4bbF';
+export const HUB_ADDRESS = '0x00A882bD48377309d1DfA59bf49E60729f04c9DF';
+export const ORACLE_ADDRESS = '0xC864bB0627097DE9889eB416090F917b3C2212dB';
+export const TOKEN_DESCRIPTOR_ADDRESS = '0xcBE662FF67df0E84eb4120e405047c779c26e82F';
 
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1',
   [NETWORKS.ropsten.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-ropsten',
   [NETWORKS.rinkeby.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-rinkeby',
   [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-goerli',
-  [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1dot1-kovan',
+  [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-kovan',
   [NETWORKS.meanfinance.chainId]: 'http://3.235.77.84:8000/subgraphs/name/alejoamiras/dca-subgraph',
 };
 
@@ -273,4 +273,14 @@ export const STRING_SWAP_INTERVALS = {
     plural: 'weeks',
     adverb: 'weekly',
   },
+};
+
+export const POSITION_ACTIONS = {
+  MODIFIED_RATE: 'MODIFIED_RATE',
+  MODIFIED_DURATION: 'MODIFIED_DURATION',
+  MODIFIED_RATE_AND_DURATION: 'MODIFIED_RATE_AND_DURATION',
+  WITHDREW: 'WITHDREW',
+  SWAPPED: 'SWAPPED',
+  CREATED: 'CREATED',
+  TERMINATED: 'TERMINATED',
 };

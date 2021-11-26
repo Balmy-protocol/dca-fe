@@ -143,6 +143,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
     id,
     totalSwaps,
     pendingTransaction,
+    toWithdraw,
   } = position;
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [shouldShowAddToPosition, setShouldShowAddToPosition] = React.useState(false);
@@ -409,7 +410,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
             <FormattedMessage
               description="current swapped in position"
               defaultMessage="{exercised} {to} to withdraw"
-              values={{ exercised: formatCurrencyAmount(swapped.sub(withdrawn), to), to: to.symbol }}
+              values={{ exercised: formatCurrencyAmount(swapped.sub(toWithdraw), to), to: to.symbol }}
             />
           </Typography>
           <Tooltip

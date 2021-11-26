@@ -5,7 +5,6 @@ import Paper from '@material-ui/core/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import { useQuery } from '@apollo/client';
-import some from 'lodash/some';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import getPosition from 'graphql/getPosition.graphql';
 import useDCAGraphql from 'hooks/useDCAGraphql';
@@ -47,6 +46,8 @@ const CollapsableGrid = styled(Grid)<{ in: boolean }>`
   ${(props) => (!props.in ? 'padding: 0px !important;' : '')}
 `;
 
+const WAIT_FOR_SUBGRAPH = 5000;
+
 const PositionDetailFrame = () => {
   const { positionId } = useParams<{ positionId: string }>();
   const client = useDCAGraphql();
@@ -83,41 +84,6 @@ const PositionDetailFrame = () => {
     skip: !position,
     client,
   });
-
-  let swapsExecuted = 0;
-  const mappedSwaps = React.useMemo(
-    () =>
-      (swapsData &&
-        position &&
-        swapsData.pair &&
-        swapsData.pair.swaps
-          .filter((swap) => {
-            if (
-              parseInt(swap.executedAtTimestamp, 10) > parseInt(position.createdAtTimestamp, 10) &&
-              (position.terminatedAtTimestamp === null ||
-                parseInt(swap.executedAtTimestamp, 10) < parseInt(position.terminatedAtTimestamp, 10)) &&
-              some(
-                swap.pairSwapsIntervals,
-                (swapInterval) => swapInterval.swapInterval.interval === position.swapInterval.interval
-              )
-            ) {
-              swapsExecuted += 1;
-            }
-            return (
-              swapsExecuted <= parseInt(position.totalSwaps, 10) &&
-              parseInt(swap.executedAtTimestamp, 10) > parseInt(position.createdAtTimestamp, 10) &&
-              (position.terminatedAtTimestamp === null ||
-                parseInt(swap.executedAtTimestamp, 10) < parseInt(position.terminatedAtTimestamp, 10)) &&
-              some(
-                swap.pairSwapsIntervals,
-                (swapInterval) => swapInterval.swapInterval.interval === position.swapInterval.interval
-              )
-            );
-          })
-          .reverse()) ||
-      [],
-    [isLoadingSwaps, swapsData]
-  );
 
   const handleModifyRateAndSwaps = async (newRate: string, newFrequency: string) => {
     if (!position) {
@@ -171,18 +137,19 @@ const PositionDetailFrame = () => {
         ),
       });
     } catch (e) {
+      console.error('Error changing rate and swaps', e);
       setModalError({ content: 'Error changing rate and swaps' });
     }
   };
 
   React.useEffect(() => {
     if (position && !isPending) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      refetch();
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
+      setTimeout(refetch, WAIT_FOR_SUBGRAPH);
     }
   }, [isPending]);
 
-  if (isLoading || !data || !position) {
+  if (isLoading || !data || !position || isLoadingSwaps) {
     return (
       <Grid container>
         <CenteredLoadingIndicator size={70} />
@@ -205,12 +172,15 @@ const PositionDetailFrame = () => {
       <Grid container spacing={4}>
         <StyledControlsWrapper item xs={12}>
           <PositionStatus position={position} pair={swapsData?.pair} />
-          <PositionControls
-            onWithdraw={() => setShowWithdrawModal(true)}
-            onTerminate={() => setShowTerminateModal(true)}
-            onModifyRate={() => setActionToShow('modifyRate')}
-            pendingTransaction={pendingTransaction}
-          />
+          {position.status !== 'TERMINATED' && (
+            <PositionControls
+              onWithdraw={() => setShowWithdrawModal(true)}
+              onTerminate={() => setShowTerminateModal(true)}
+              onModifyRate={() => setActionToShow('modifyRate')}
+              position={position}
+              pendingTransaction={pendingTransaction}
+            />
+          )}
         </StyledControlsWrapper>
         <Collapse
           in={actionToShow === 'modifyRate'}
@@ -236,7 +206,7 @@ const PositionDetailFrame = () => {
               <Details position={position} />
             </StyledFlexGridItem>
             <StyledFlexGridItem item xs={12} md={8}>
-              <SwapsGraph position={position} swaps={mappedSwaps} />
+              <SwapsGraph position={position} />
             </StyledFlexGridItem>
             <Grid item xs={12}>
               <Typography variant="h4">
@@ -244,7 +214,7 @@ const PositionDetailFrame = () => {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <PositionSwaps position={position} swaps={mappedSwaps} />
+              <PositionSwaps position={position} />
             </Grid>
           </Grid>
         </Grid>

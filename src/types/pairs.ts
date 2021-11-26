@@ -1,9 +1,10 @@
 import { Token } from './tokens';
 
+export interface SwapsToPerform {
+  interval: number;
+}
 export interface GetNextSwapInfo {
-  swapsToPerform: {
-    interval: number;
-  }[];
+  swapsToPerform: SwapsToPerform[];
 }
 
 export type AvailablePair = {
@@ -48,10 +49,10 @@ export interface GetPairSwapsData {
   id: string;
   createdAtTimestamp: string;
   tokenA: {
-    id: string;
+    address: string;
   };
   tokenB: {
-    id: string;
+    address: string;
   };
   swaps: PairSwaps[];
 }

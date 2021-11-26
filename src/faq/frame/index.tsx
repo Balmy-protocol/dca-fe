@@ -123,7 +123,7 @@ const FAQFrame = () => (
           <Typography variant="body1">
             <FormattedMessage
               description="faqIsMeanFinanceAuditedResponse"
-              defaultMessage="Mean Finance contracts have not been audited yet. However, since the code is public, you can take a look if you’d like to."
+              defaultMessage="Mean Finance contracts are now audited!"
             />
           </Typography>
         </Grid>

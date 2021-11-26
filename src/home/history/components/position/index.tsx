@@ -2,12 +2,14 @@ import * as React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
+import Button from 'common/button';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { Position, Token } from 'types';
 import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRight from 'assets/svg/atom/arrow-right';
+import { useHistory } from 'react-router-dom';
 import { formatCurrencyAmount } from 'utils/currency';
 
 const StyledCard = styled(Card)`
@@ -63,7 +65,11 @@ interface ActivePositionProps {
 
 const ActivePosition = ({ position }: ActivePositionProps) => {
   const { from, to, swapInterval, swapped, totalDeposits, totalSwaps, remainingSwaps } = position;
+  const history = useHistory();
 
+  const onViewDetails = () => {
+    history.push(`/positions/${position.id}`);
+  };
   return (
     <StyledCard>
       <StyledCardContent>
@@ -107,6 +113,13 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
               />
             </Typography>
           </StyledFreqLeft>
+          <div>
+            <Button variant="contained" color="secondary" onClick={onViewDetails}>
+              <Typography variant="body2">
+                <FormattedMessage description="View details" defaultMessage="View details" />
+              </Typography>
+            </Button>
+          </div>
         </StyledCardFooter>
       </StyledCardContent>
     </StyledCard>

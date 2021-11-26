@@ -1,17 +1,16 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import { FullPosition, PairSwaps } from 'types';
+import { FullPosition } from 'types';
 import PositionTimeline from './components/timeline';
 
 interface PositionSwapsProps {
   position: FullPosition;
-  swaps: PairSwaps[];
 }
 
-const PositionSwaps = ({ position, swaps }: PositionSwapsProps) => (
+const PositionSwaps = ({ position }: PositionSwapsProps) => (
   <Grid container>
     <Grid item xs={12}>
-      <PositionTimeline position={position} swaps={swaps} />
+      <PositionTimeline position={position} />
     </Grid>
   </Grid>
 );

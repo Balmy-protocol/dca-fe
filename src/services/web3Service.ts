@@ -39,9 +39,10 @@ import {
   PositionsGraphqlResponse,
   AvailablePairsGraphqlResponse,
   PoolsLiquidityDataGraphqlResponse,
+  SwapsToPerform,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
-import { sortTokens } from 'utils/parsing';
+import { sortTokens, sortTokensByAddress } from 'utils/parsing';
 import { buildSwapInput } from 'utils/swap';
 
 // GQL queries
@@ -251,6 +252,7 @@ export default class Web3Service {
         remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         withdrawn: BigNumber.from(position.totalWithdrawn),
+        toWithdraw: BigNumber.from(position.current.idleSwapped),
         totalSwaps: BigNumber.from(position.totalSwaps),
         id: position.id,
         status: position.status,
@@ -285,6 +287,7 @@ export default class Web3Service {
         remainingSwaps: BigNumber.from(position.current.remainingSwaps),
         totalSwaps: BigNumber.from(position.totalSwaps),
         withdrawn: BigNumber.from(position.totalWithdrawn),
+        toWithdraw: BigNumber.from(position.current.idleSwapped),
         id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
@@ -454,24 +457,30 @@ export default class Web3Service {
 
   // PAIR METHODS
   async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
+    const [tokenA, tokenB] = sortTokensByAddress(pair.tokenA, pair.tokenB);
     const hubContract = new ethers.Contract(
       HUB_ADDRESS,
       HUB_ABI.abi,
       this.client || ethers.getDefaultProvider((await this.getNetwork()).name)
     ) as unknown as HubContract;
 
-    const { tokens, pairIndexes } = buildSwapInput([pair], []);
+    const { tokens, pairIndexes } = buildSwapInput([{ tokenA, tokenB }], []);
 
-    const nextSwapInfo = await hubContract.getNextSwapInfo(tokens, pairIndexes);
+    let swapsToPerform: SwapsToPerform[] = [];
+    try {
+      const nextSwapInfo = await hubContract.getNextSwapInfo(tokens, pairIndexes);
 
-    const { pairs } = nextSwapInfo;
+      const { pairs } = nextSwapInfo;
 
-    const [{ intervalsInSwap }] = pairs;
+      const [{ intervalsInSwap }] = pairs;
 
-    const swapsToPerform = SWAP_INTERVALS_MAP.filter(
-      // eslint-disable-next-line no-bitwise
-      (swapInterval) => swapInterval.key & parseInt(intervalsInSwap, 16)
-    ).map((swapInterval) => ({ interval: swapInterval.value.toNumber() }));
+      swapsToPerform = SWAP_INTERVALS_MAP.filter(
+        // eslint-disable-next-line no-bitwise
+        (swapInterval) => swapInterval.key & parseInt(intervalsInSwap, 16)
+      ).map((swapInterval) => ({ interval: swapInterval.value.toNumber() }));
+    } catch {
+      console.error('Error fetching pair', pair);
+    }
 
     return {
       swapsToPerform,
@@ -684,7 +693,7 @@ export default class Web3Service {
   modifyRateAndSwaps(position: Position, newRate: string, newSwaps: string): Promise<TransactionResponse> {
     const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
-    const newAmount = BigNumber.from(newRate).mul(BigNumber.from(newSwaps));
+    const newAmount = BigNumber.from(parseUnits(newRate, position.from.decimals)).mul(BigNumber.from(newSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
       return hubInstance.increasePosition(
         position.id,
@@ -772,6 +781,7 @@ export default class Web3Service {
       this.currentPositions[id] = {
         from: newPositionTypeData.from,
         to: newPositionTypeData.to,
+        toWithdraw: BigNumber.from(0),
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
         swapped: BigNumber.from(0),
         rate: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(

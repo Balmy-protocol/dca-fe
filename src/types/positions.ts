@@ -13,6 +13,14 @@ export interface NFTData {
   name: string;
 }
 
+type PositionActions =
+  | 'MODIFIED_RATE'
+  | 'MODIFIED_DURATION'
+  | 'MODIFIED_RATE_AND_DURATION'
+  | 'WITHDREW'
+  | 'SWAPPED'
+  | 'CREATED'
+  | 'TERMINATED';
 export interface Position {
   from: Token;
   to: Token;
@@ -24,6 +32,7 @@ export interface Position {
   withdrawn: BigNumber; // cuanto saque
   totalSwaps: BigNumber; // cuanto puse originalmente
   rate: BigNumber;
+  toWithdraw: BigNumber;
   id: string;
   status: string;
   startedAt: number;
@@ -55,7 +64,27 @@ export interface FullPosition {
     description: string;
   };
   current: PositionState;
-  history: PositionState[];
+  history: ActionState[];
+}
+
+export interface ActionState {
+  id: string;
+  action: PositionActions;
+  rate: string;
+  oldRate: string;
+  remainingSwaps: string;
+  oldRemainingSwaps: string;
+  swapped: string;
+  withdrawn: string;
+  ratePerUnitBToAWithFee: string;
+  ratePerUnitAToBWithFee: string;
+  createdAtBlock: string;
+  createdAtTimestamp: string;
+  transaction: {
+    id: string;
+    hash: string;
+    timestamp: string;
+  };
 }
 
 export interface PositionState {
@@ -69,6 +98,7 @@ export interface PositionState {
   remainingLiquidity: string;
   createdAtBlock: string;
   createdAtTimestamp: string;
+  idleSwapped: string;
   transaction: {
     id: string;
     hash: string;

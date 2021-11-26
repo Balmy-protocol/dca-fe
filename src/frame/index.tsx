@@ -9,8 +9,6 @@ import Home from 'home';
 import FAQ from 'faq';
 import PositionDetail from 'position-detail';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
 
 interface AppFrameProps {
   isLoading: boolean;
@@ -36,26 +34,9 @@ const StyledContainer = styled(Container)`
   display: flex;
 `;
 
-const StyledWarningContainer = styled.div`
-  display: flex;
-  width: 100%;
-  background-color: #f5b000;
-  justify-content: center;
-  align-items: center;
-  flex: 0;
-`;
-
 const AppFrame = ({ isLoading }: AppFrameProps) => (
   <Router>
     <CssBaseline />
-    <StyledWarningContainer>
-      <Typography variant="caption">
-        <FormattedMessage
-          description="not audited"
-          defaultMessage="These contracts have not been audited yet, use at your own risk"
-        />
-      </Typography>
-    </StyledWarningContainer>
     <StyledContainer>
       <StyledGridContainer container direction="column">
         <StyledNavBarGridContainer item xs={12}>

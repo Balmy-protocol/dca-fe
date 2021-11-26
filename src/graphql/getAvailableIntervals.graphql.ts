@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 const getAvailableIntervals = gql`
   query getAvailableIntervals {
-    swapIntervals {
+    swapIntervals(where: { active: true }) {
       id
       interval
       active

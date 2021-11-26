@@ -61,7 +61,6 @@ const PositionMenu = ({
             onWithdraw={onWithdrawPosition}
             onModifyRate={() => setActiveMenu('modifyRate')}
             onRemoveFunds={() => setActiveMenu('removeFunds')}
-            positionId={position.id}
           />
         )}
         {activeMenu === 'removeFunds' && (

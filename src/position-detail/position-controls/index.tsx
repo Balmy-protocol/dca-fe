@@ -8,6 +8,8 @@ import Link from '@material-ui/core/Link';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { FullPosition } from 'types';
+import { BigNumber } from 'ethers';
 
 const PositionControlsContainer = styled.div`
   display: flex;
@@ -19,9 +21,16 @@ interface PositionControlsProps {
   onTerminate: () => void;
   onModifyRate: () => void;
   pendingTransaction: string | null;
+  position: FullPosition;
 }
 
-const PositionControls = ({ onWithdraw, onTerminate, onModifyRate, pendingTransaction }: PositionControlsProps) => {
+const PositionControls = ({
+  onWithdraw,
+  onTerminate,
+  onModifyRate,
+  pendingTransaction,
+  position,
+}: PositionControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
 
@@ -45,7 +54,12 @@ const PositionControls = ({ onWithdraw, onTerminate, onModifyRate, pendingTransa
           </Button>
         ) : (
           [
-            <Button variant="contained" color="white" onClick={onWithdraw}>
+            <Button
+              variant="contained"
+              color="white"
+              onClick={onWithdraw}
+              disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0))}
+            >
               <FormattedMessage description="withdraw swapped" defaultMessage="Withdraw swapped" />
             </Button>,
             <Button variant="contained" color="white" onClick={onModifyRate}>

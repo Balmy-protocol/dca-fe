@@ -99,6 +99,7 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
     swapInterval: BigNumber.from(position.swapInterval.interval),
     swapped: BigNumber.from(position.totalSwapped),
     rate: BigNumber.from(position.current.rate),
+    toWithdraw: BigNumber.from(position.current.idleSwapped),
     remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
     remainingSwaps: BigNumber.from(position.current.remainingSwaps),
     withdrawn: BigNumber.from(position.totalWithdrawn),

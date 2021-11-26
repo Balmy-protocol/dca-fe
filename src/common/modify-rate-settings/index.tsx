@@ -169,45 +169,48 @@ const ModifyRateAndSwaps = ({
                   }}
                 />
               </Typography>
-              {showAddCaption && (
-                <Typography variant={isMinimal ? 'caption' : 'body2'}>
-                  {position.remainingLiquidity
-                    .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals)))
-                    .lte(BigNumber.from(0)) ? (
-                    <FormattedMessage
-                      description="rate add detail"
-                      defaultMessage="You will need to provide an aditional {addAmmount} {from}"
-                      values={{
-                        from: position.from.symbol,
-                        addAmmount: formatUnits(
-                          position.remainingLiquidity
-                            .sub(
-                              BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals))
-                            )
-                            .abs(),
-                          position.from.decimals
-                        ),
-                      }}
-                    />
-                  ) : (
-                    <FormattedMessage
-                      description="rate withdraw detail"
-                      defaultMessage="We will return {returnAmmount} {from} to you"
-                      values={{
-                        from: position.from.symbol,
-                        returnAmmount: formatUnits(
-                          position.remainingLiquidity
-                            .sub(
-                              BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals))
-                            )
-                            .abs(),
-                          position.from.decimals
-                        ),
-                      }}
-                    />
-                  )}
-                </Typography>
-              )}
+              {showAddCaption &&
+                !position.remainingLiquidity
+                  .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals)))
+                  .eq(BigNumber.from(0)) && (
+                  <Typography variant={isMinimal ? 'caption' : 'body2'}>
+                    {position.remainingLiquidity
+                      .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals)))
+                      .lte(BigNumber.from(0)) ? (
+                      <FormattedMessage
+                        description="rate add detail"
+                        defaultMessage="You will need to provide an aditional {addAmmount} {from}"
+                        values={{
+                          from: position.from.symbol,
+                          addAmmount: formatUnits(
+                            position.remainingLiquidity
+                              .sub(
+                                BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals))
+                              )
+                              .abs(),
+                            position.from.decimals
+                          ),
+                        }}
+                      />
+                    ) : (
+                      <FormattedMessage
+                        description="rate withdraw detail"
+                        defaultMessage="We will return {returnAmmount} {from} to you"
+                        values={{
+                          from: position.from.symbol,
+                          returnAmmount: formatUnits(
+                            position.remainingLiquidity
+                              .sub(
+                                BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals))
+                              )
+                              .abs(),
+                            position.from.decimals
+                          ),
+                        }}
+                      />
+                    )}
+                  </Typography>
+                )}
             </>
           )}
         </StyledInputContainer>
