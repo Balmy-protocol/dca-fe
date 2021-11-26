@@ -27,10 +27,9 @@ interface PositionSettingsProps {
   onModifyRate: () => void;
   onRemoveFunds: () => void;
   onClose: () => void;
-  positionId: string;
 }
 
-const PositionSettings = ({ onWithdraw, onModifyRate, onRemoveFunds, onClose, positionId }: PositionSettingsProps) => (
+const PositionSettings = ({ onWithdraw, onModifyRate, onRemoveFunds, onClose }: PositionSettingsProps) => (
   <>
     <StyledHeader>
       <IconButton

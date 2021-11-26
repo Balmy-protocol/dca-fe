@@ -102,7 +102,7 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
             defaultMessage="Are you sure you want to withdraw {ammount} {from}?"
             values={{
               from: position.to.symbol,
-              ammount: formatUnits(position.swapped.sub(position.withdrawn), position.to.decimals),
+              ammount: formatUnits(position.toWithdraw, position.to.decimals),
             }}
           />
         </Typography>

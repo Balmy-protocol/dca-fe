@@ -98,7 +98,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
             values={{
               from: formatUnits(position.remainingLiquidity, position.from.decimals),
               fromSymbol: position.from.symbol,
-              to: formatUnits(position.swapped.sub(position.withdrawn), position.to.decimals),
+              to: formatUnits(position.toWithdraw, position.to.decimals),
               toSymbol: position.to.symbol,
             }}
           />

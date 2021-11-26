@@ -2,14 +2,15 @@ import React from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import Paper from '@material-ui/core/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
-import { FullPosition, PairSwaps } from 'types';
+import { ActionState, FullPosition } from 'types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { formatCurrencyAmount } from 'utils/currency';
+import { POSITION_ACTIONS } from 'config/constants';
+import { formatUnits } from '@ethersproject/units';
 
 const StyledGraphAxis = styled.div`
   height: 0px;
@@ -42,7 +43,6 @@ const StyledCenteredWrapper = styled.div`
 `;
 interface SwapsGraphProps {
   position: FullPosition;
-  swaps: PairSwaps[];
 }
 
 interface PriceData {
@@ -50,59 +50,118 @@ interface PriceData {
   date: string;
 }
 
+interface PriceDataAccum extends PriceData {
+  [x: string]: string | number;
+}
+
+type PricesAccum = PriceDataAccum[];
+
 type Prices = PriceData[];
 
-const SwapsGraph = ({ position, swaps }: SwapsGraphProps) => {
+const buildSwapItemForGraph = (
+  position: FullPosition,
+  { createdAtTimestamp, swapped, rate }: ActionState,
+  acc: PricesAccum
+) => ({
+  name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
+  [position.to.symbol]:
+    parseFloat(formatUnits(BigNumber.from(swapped), position.to.decimals)) +
+    (((acc[acc.length - 1] && acc[acc.length - 1][position.to.symbol]) as number) || 0),
+  [position.from.symbol]:
+    (((acc[acc.length - 1] && acc[acc.length - 1][position.from.symbol]) as number) || 0) -
+    parseFloat(formatUnits(BigNumber.from(rate), position.from.decimals)),
+  date: createdAtTimestamp,
+});
+
+const buildWithdrewItemForGraph = (position: FullPosition, { createdAtTimestamp }: ActionState, acc: PricesAccum) => ({
+  name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
+  [position.to.symbol]: 0,
+  [position.from.symbol]: (acc[acc.length - 1] && acc[acc.length - 1][position.from.symbol]) || 0,
+  date: createdAtTimestamp,
+});
+
+const buildCreatedItemForGraph = (
+  position: FullPosition,
+  { createdAtTimestamp, remainingSwaps, rate }: ActionState
+) => ({
+  name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
+  [position.to.symbol]: 0,
+  [position.from.symbol]: parseFloat(
+    formatUnits(BigNumber.from(rate).mul(BigNumber.from(remainingSwaps)), position.from.decimals)
+  ),
+  date: createdAtTimestamp,
+});
+
+const buildModifiedRateAndDurationItemForGraph = (
+  position: FullPosition,
+  { createdAtTimestamp, oldRemainingSwaps, oldRate, remainingSwaps, rate }: ActionState,
+  acc: PricesAccum
+) => ({
+  name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
+  [position.to.symbol]: (acc[acc.length - 1] && acc[acc.length - 1][position.to.symbol]) || 0,
+  [position.from.symbol]:
+    parseFloat(
+      formatUnits(
+        BigNumber.from(rate)
+          .mul(BigNumber.from(remainingSwaps))
+          .sub(BigNumber.from(oldRate).mul(BigNumber.from(oldRemainingSwaps))),
+        position.from.decimals
+      )
+    ) + (((acc[acc.length - 1] && acc[acc.length - 1][position.from.symbol]) as number) || 0),
+  date: createdAtTimestamp,
+});
+
+const buildEmptyItemForGraph = (position: FullPosition, { createdAtTimestamp }: ActionState, acc: PricesAccum) => ({
+  name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
+  [position.to.symbol]: (acc[acc.length - 1] && acc[acc.length - 1][position.to.symbol]) || 0,
+  [position.from.symbol]: (acc[acc.length - 1] && acc[acc.length - 1][position.from.symbol]) || 0,
+  date: createdAtTimestamp,
+});
+
+const buildTerminatedItemForGraph = (position: FullPosition, { createdAtTimestamp }: ActionState) => ({
+  name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
+  [position.to.symbol]: 0,
+  [position.from.symbol]: 0,
+  date: createdAtTimestamp,
+});
+
+const ITEM_MAP = {
+  [POSITION_ACTIONS.CREATED]: buildCreatedItemForGraph,
+  [POSITION_ACTIONS.SWAPPED]: buildSwapItemForGraph,
+  [POSITION_ACTIONS.WITHDREW]: buildWithdrewItemForGraph,
+  [POSITION_ACTIONS.MODIFIED_DURATION]: buildModifiedRateAndDurationItemForGraph,
+  [POSITION_ACTIONS.MODIFIED_RATE]: buildModifiedRateAndDurationItemForGraph,
+  [POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION]: buildModifiedRateAndDurationItemForGraph,
+  [POSITION_ACTIONS.TERMINATED]: buildTerminatedItemForGraph,
+};
+
+const SwapsGraph = ({ position }: SwapsGraphProps) => {
   let prices: Prices = [];
 
   prices = React.useMemo(() => {
-    const orderedSwaps = orderBy(swaps, ['executedAtTimestamp'], ['asc']);
+    const orderedSwaps = orderBy(position.history, ['createdAtTimestamp'], ['asc']);
     const mappedSwapData = orderedSwaps.reduce(
-      (acc, { executedAtTimestamp, ratePerUnitAToBWithFee, ratePerUnitBToAWithFee }) => [
+      (acc, positionState) => [
         ...acc,
-        {
-          name: DateTime.fromSeconds(parseInt(executedAtTimestamp, 10)).toFormat('MMM d t'),
-          [position.to.symbol]:
-            parseFloat(
-              position.pair.tokenA.address === position.from.address
-                ? formatCurrencyAmount(
-                    BigNumber.from(ratePerUnitAToBWithFee)
-                      .mul(BigNumber.from(position.current.rate))
-                      .div(BigNumber.from('10').pow(position.from.decimals)),
-                    position.to
-                  )
-                : formatCurrencyAmount(
-                    BigNumber.from(ratePerUnitBToAWithFee)
-                      .mul(BigNumber.from(position.current.rate))
-                      .div(BigNumber.from('10').pow(position.from.decimals)),
-                    position.to
-                  )
-            ) + (((acc[acc.length - 1] && acc[acc.length - 1][position.to.symbol]) as number) || 0),
-          date: executedAtTimestamp,
-        },
+        (ITEM_MAP[positionState.action] && ITEM_MAP[positionState.action](position, positionState, acc)) ||
+          buildEmptyItemForGraph(position, positionState, acc),
       ],
       []
     );
 
-    mappedSwapData.push({
-      name: DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toFormat('MMM d t'),
-      [position.to.symbol]: parseFloat('0'),
-      date: position.createdAtTimestamp,
-    });
-
     return orderBy(mappedSwapData, ['date'], ['desc']).reverse();
-  }, [swaps]);
+  }, [position]);
 
-  const tooltipFormatter = (value: string) => `${value} ${position.to.symbol}`;
+  const tooltipFormatter = (value: string, name: string) => `${value} ${name}`;
 
-  const noData = swaps.length === 0;
+  const noData = position.history.length === 0;
 
   return (
     <StyledGraphContainer>
       <Grid container>
         <Grid item xs={12}>
           <Typography variant="h4">
-            <FormattedMessage description="PositionGraph" defaultMessage="Swapped through time" />
+            <FormattedMessage description="PositionGraph" defaultMessage="Your position through time" />
           </Typography>
         </Grid>
         <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -118,25 +177,54 @@ const SwapsGraph = ({ position, swaps }: SwapsGraphProps) => {
           ) : (
             <>
               <ResponsiveContainer width="100%">
-                <LineChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                  <Line connectNulls type="monotone" dataKey={position.to.symbol} stroke="#36a3f5" />
+                <AreaChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <defs>
+                    <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#36a3f5" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#36a3f5" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#BD00FF" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#BD00FF" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Area
+                    connectNulls
+                    type="monotone"
+                    dataKey={position.from.symbol}
+                    stroke="#BD00FF"
+                    fillOpacity={1}
+                    yAxisId={1}
+                    fill="url(#colorPv)"
+                  />
+                  <Area
+                    connectNulls
+                    type="monotone"
+                    dataKey={position.to.symbol}
+                    stroke="#36a3f5"
+                    fillOpacity={1}
+                    fill="url(#colorUv)"
+                  />
                   <XAxis hide dataKey="name" />
-                  <YAxis hide domain={['auto', 'auto']} />
+                  <YAxis hide domain={['auto', 'auto']} dataKey={position.to.symbol} />
+                  <YAxis hide domain={['auto', 'auto']} dataKey={position.from.symbol} yAxisId={1} />
                   <Tooltip formatter={tooltipFormatter} />
                   <Legend />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
               <StyledGraphAxis />
               <StyledGraphAxisLabels>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(parseInt(swaps[swaps.length - 1].executedAtTimestamp, 10)).toLocaleString({
+                  {DateTime.fromSeconds(
+                    parseInt(position.history[position.history.length - 1].createdAtTimestamp, 10)
+                  ).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
                   })}
                 </Typography>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(parseInt(swaps[0].executedAtTimestamp, 10)).toLocaleString({
+                  {DateTime.fromSeconds(parseInt(position.history[0].createdAtTimestamp, 10)).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',

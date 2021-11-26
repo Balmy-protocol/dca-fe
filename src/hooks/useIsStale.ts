@@ -18,7 +18,10 @@ function useIsStale(
   React.useEffect(() => {
     async function getNextSwapInformation() {
       try {
-        const nextSwap = await web3service.getNextSwapInfo({ tokenA: pair.tokenA.id, tokenB: pair.tokenB.id });
+        const nextSwap = await web3service.getNextSwapInfo({
+          tokenA: pair.tokenA.address,
+          tokenB: pair.tokenB.address,
+        });
         setNextSwapInformation(nextSwap);
       } catch (e) {
         console.error(e);

@@ -40,6 +40,7 @@ const getCurrentPositions = gql`
         rate
         remainingSwaps
         remainingLiquidity
+        idleSwapped
       }
     }
   }

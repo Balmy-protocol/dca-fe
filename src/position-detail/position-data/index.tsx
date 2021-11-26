@@ -90,10 +90,7 @@ const Details = ({ position }: DetailsProps) => (
                 defaultMessage="{toWithdraw} {to}"
                 values={{
                   b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  toWithdraw: formatCurrencyAmount(
-                    BigNumber.from(position.totalSwapped).sub(position.current.withdrawn),
-                    position.to
-                  ),
+                  toWithdraw: formatCurrencyAmount(BigNumber.from(position.current.idleSwapped), position.to),
                   to: position.to.symbol,
                 }}
               />

@@ -49,18 +49,21 @@ const getPosition = gql`
         remainingSwaps
         remainingLiquidity
         withdrawn
+        idleSwapped
       }
-      history(orderBy: createdAtTimestamp, orderDirection: asc) {
+      history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc) {
         id
+        action
         rate
-        startingSwap
-        lastSwap
+        oldRate
         remainingSwaps
+        oldRemainingSwaps
         swapped
         withdrawn
-        remainingLiquidity
         createdAtBlock
         createdAtTimestamp
+        ratePerUnitAToBWithFee
+        ratePerUnitBToAWithFee
         transaction {
           id
           hash

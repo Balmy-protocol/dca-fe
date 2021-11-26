@@ -17,7 +17,7 @@ const getPairSwaps = gql`
         symbol
       }
       createdAtTimestamp
-      swaps(orderBy: executedAtTimestamp, orderDirection: desc) {
+      swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1) {
         id
         executedAtTimestamp
         executedAtBlock
@@ -27,8 +27,6 @@ const getPairSwaps = gql`
           id
           hash
           index
-          gasSent
-          gasPrice
           from
           timestamp
         }
@@ -38,7 +36,6 @@ const getPairSwaps = gql`
             interval
             id
           }
-          swapPerformed
         }
       }
     }
