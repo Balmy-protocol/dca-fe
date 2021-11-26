@@ -1,9 +1,16 @@
 import { ethers, Signer, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
-import { ExternalProvider, Log, Provider, TransactionResponse } from '@ethersproject/providers';
+import {
+  ExternalProvider,
+  Log,
+  Provider,
+  TransactionResponse,
+  getNetwork as getStringNetwork,
+} from '@ethersproject/providers';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
-import Web3Modal, { getProviderInfo } from 'web3modal';
+import Web3Modal, { getProviderInfo, getInjectedProvider } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
+import detectEthereumProvider from '@metamask/detect-provider';
 import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
 import values from 'lodash/values';
@@ -11,6 +18,7 @@ import orderBy from 'lodash/orderBy';
 import keyBy from 'lodash/keyBy';
 import find from 'lodash/find';
 import axios, { AxiosResponse } from 'axios';
+import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import {
   CoinGeckoPriceResponse,
   Token,
@@ -76,7 +84,7 @@ export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
 
-  modal: Web3Modal;
+  modal: SafeAppWeb3Modal;
 
   signer: Signer;
 
@@ -101,7 +109,7 @@ export default class Web3Service {
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
     client?: ethers.providers.Web3Provider,
-    modal?: Web3Modal
+    modal?: SafeAppWeb3Modal
   ) {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
@@ -143,7 +151,7 @@ export default class Web3Service {
     return this.providerInfo;
   }
 
-  setModal(modal: Web3Modal) {
+  setModal(modal: SafeAppWeb3Modal) {
     this.modal = modal;
   }
 
@@ -200,7 +208,7 @@ export default class Web3Service {
 
   // BOOTSTRAP
   async connect() {
-    const provider: Provider = (await this.modal?.connect()) as Provider;
+    const provider: Provider = (await this.modal?.requestProvider()) as Provider;
 
     this.providerInfo = getProviderInfo(provider);
     // A Web3Provider wraps a standard Web3 provider, which is
@@ -336,14 +344,16 @@ export default class Web3Service {
       },
     };
 
-    const web3Modal = new Web3Modal({
+    const web3Modal = new SafeAppWeb3Modal({
       cacheProvider: true, // optional
       providerOptions, // required
     });
 
     this.setModal(web3Modal);
 
-    if (web3Modal.cachedProvider) {
+    const loadedAsSafeApp = await web3Modal.isSafeApp();
+
+    if (web3Modal.cachedProvider || loadedAsSafeApp) {
       await this.connect();
     }
 
@@ -458,11 +468,17 @@ export default class Web3Service {
   // PAIR METHODS
   async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
     const [tokenA, tokenB] = sortTokensByAddress(pair.tokenA, pair.tokenB);
-    const hubContract = new ethers.Contract(
-      HUB_ADDRESS,
-      HUB_ABI.abi,
-      this.client || ethers.getDefaultProvider((await this.getNetwork()).name)
-    ) as unknown as HubContract;
+    const currentNetwork = await this.getNetwork();
+    let provider: any = this.client;
+    if (!this.client) {
+      try {
+        provider = ethers.getDefaultProvider(getStringNetwork(currentNetwork.name));
+      } catch {
+        provider = await detectEthereumProvider();
+      }
+    }
+
+    const hubContract = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, provider) as unknown as HubContract;
 
     const { tokens, pairIndexes } = buildSwapInput([{ tokenA, tokenB }], []);
 
