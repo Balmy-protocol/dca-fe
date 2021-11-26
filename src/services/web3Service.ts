@@ -8,7 +8,7 @@ import {
   getNetwork as getStringNetwork,
 } from '@ethersproject/providers';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
-import Web3Modal, { getProviderInfo, getInjectedProvider } from 'web3modal';
+import { getProviderInfo } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import detectEthereumProvider from '@metamask/detect-provider';
 import Authereum from 'authereum';
@@ -469,6 +469,7 @@ export default class Web3Service {
   async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
     const [tokenA, tokenB] = sortTokensByAddress(pair.tokenA, pair.tokenB);
     const currentNetwork = await this.getNetwork();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let provider: any = this.client;
     if (!this.client) {
       try {
