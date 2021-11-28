@@ -1,3 +1,4 @@
+import { Oracles } from './contracts';
 import { Token } from './tokens';
 
 export interface SwapsToPerform {
@@ -14,6 +15,7 @@ export type AvailablePair = {
   createdAt: number;
   id: string;
   swapInfo: GetNextSwapInfo;
+  oracle: Oracles;
 };
 
 export type AvailablePairs = AvailablePair[];

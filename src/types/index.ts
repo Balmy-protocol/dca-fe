@@ -23,7 +23,8 @@ export type Web3ServicePromisableMethods =
   | 'getAvailablePairs'
   | 'getAllowance'
   | 'canSupportPair'
-  | 'getPastPositions';
+  | 'getPastPositions'
+  | 'getPairOracle';
 
 export interface Network {
   chainId: number;

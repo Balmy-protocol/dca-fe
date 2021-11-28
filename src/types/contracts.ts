@@ -4,6 +4,7 @@ import { Contract } from '@ethersproject/contracts';
 import { TransactionResponse } from '@ethersproject/providers';
 import { PairIndex } from 'utils/swap';
 
+export type Oracles = 0 | 1 | 2;
 export class ERC20Contract extends Contract {
   balanceOf: (address: string) => Promise<BigNumber>;
 
@@ -31,6 +32,8 @@ interface SwapInforTokenData {
 
 export class OracleContract extends Contract {
   canSupportPair: (tokenA: string, tokenB: string) => Promise<boolean>;
+
+  oracleInUse: (tokenA: string, tokenB: string) => Promise<0 | 1 | 2>;
 }
 
 export class HubContract extends Contract {

@@ -1,4 +1,5 @@
 import { TransactionReceipt as RawTransactionReceipt } from '@ethersproject/providers';
+import { Oracles } from './contracts';
 import { Token } from './tokens';
 
 export interface TransactionReceipt extends RawTransactionReceipt {
@@ -77,6 +78,7 @@ export interface NewPositionTypeData {
   id: string;
   startedAt: number;
   isCreatingPair: boolean;
+  oracle: Oracles;
 }
 
 export interface NewPairTypeData {
