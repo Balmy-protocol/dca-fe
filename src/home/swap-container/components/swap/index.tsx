@@ -31,6 +31,7 @@ import {
   RATE_TYPE,
   SUPPORTED_NETWORKS,
   TRANSACTION_TYPES,
+  ORACLES,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -410,15 +411,19 @@ const Swap = ({
   };
 
   const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
-    let hasLowLiquidity = true;
-
     setIsLoading(true);
 
-    const liquidity = await web3Service.getPairLiquidity(from, to);
+    const oracleInUse = await web3Service.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
+
+    let hasLowLiquidity = oracleInUse === ORACLES.UNISWAP;
+
+    if (oracleInUse === ORACLES.UNISWAP) {
+      const liquidity = await web3Service.getPairLiquidity(from, to);
+
+      hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
+    }
 
     setIsLoading(false);
-
-    hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
 
     setCurrentAction(actionToDo);
     if (hasLowLiquidity) {

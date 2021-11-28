@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
 import { TransactionTypesConstant } from 'types';
+import { Oracles } from 'types/contracts';
 
 export const NETWORKS = {
   mainnet: {
@@ -283,4 +284,10 @@ export const POSITION_ACTIONS = {
   SWAPPED: 'SWAPPED',
   CREATED: 'CREATED',
   TERMINATED: 'TERMINATED',
+};
+
+export const ORACLES: Record<'NONE' | 'CHAINLINK' | 'UNISWAP', Oracles> = {
+  NONE: 0,
+  CHAINLINK: 1,
+  UNISWAP: 2,
 };

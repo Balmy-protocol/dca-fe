@@ -23,7 +23,10 @@ import useUNIGraphql from 'hooks/useUNIGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { STABLE_COINS } from 'config/constants';
+import { ORACLES, STABLE_COINS } from 'config/constants';
+import usePromise from 'hooks/usePromise';
+import { Oracles } from 'types/contracts';
+import useWeb3Service from 'hooks/useWeb3Service';
 
 interface GraphWidgetProps {
   from: Token;
@@ -141,6 +144,7 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
 const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const client = useDCAGraphql();
   const uniClient = useUNIGraphql();
+  const web3Service = useWeb3Service();
   let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
   let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
   let uniData: UniMappedPrice[] = [];
@@ -191,6 +195,13 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]
   );
 
+  const [oracleInUse, isLoadingOracle] = usePromise<Oracles>(
+    web3Service,
+    'getPairOracle',
+    [{ tokenA: from.address, tokenB: to.address }, !!existingPair],
+    !from || !to
+  );
+
   const { loading: loadingMeanData, data: pairData } = useQuery<GetPairPriceResponseData>(getPairPrices, {
     variables: {
       id: existingPair?.id,
@@ -205,7 +216,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
       tokenB: tokenB.address,
       from: dateFilter,
     },
-    skip: !(from && to),
+    skip: !(from && to) || oracleInUse !== ORACLES.UNISWAP,
     client: uniClient,
   });
 
@@ -269,7 +280,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
       tokenA.isBaseToken ? '' : tokenB.symbol
     }`;
-  const isLoading = loadingPool || loadingMeanData;
+  const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
   const noData = prices.length === 0;
 
   return (
@@ -309,7 +320,9 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
             <StyledGraphContainer elevation={0}>
               <ResponsiveContainer width="100%">
                 <LineChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                  <Line connectNulls type="monotone" dataKey="Uniswap" stroke="#BD00FF" dot={false} />
+                  {uniData.length && (
+                    <Line connectNulls type="monotone" dataKey="Uniswap" stroke="#BD00FF" dot={false} />
+                  )}
                   {swapData.length && <Line connectNulls type="monotone" dataKey="Mean Finance" stroke="#36a3f5" />}
                   <XAxis hide dataKey="name" />
                   <YAxis hide domain={['auto', 'auto']} />

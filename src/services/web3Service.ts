@@ -34,7 +34,6 @@ import {
   WithdrawTypeData,
   AddFundsTypeData,
   ModifySwapsPositionTypeData,
-  NewPairTypeData,
   RemoveFundsTypeData,
   TokenList,
   ResetPositionTypeData,
@@ -64,6 +63,8 @@ import ERC20ABI from 'abis/erc20.json';
 import WETHABI from 'abis/weth.json';
 import ORACLE_AGGREGATOR_ABI from 'abis/OracleAggregator.json';
 import HUB_ABI from 'abis/Hub.json';
+import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
+import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
 
 // MOCKS
 import { ETH, WETH } from 'mocks/tokens';
@@ -71,12 +72,13 @@ import {
   HUB_ADDRESS,
   MEAN_GRAPHQL_URL,
   NETWORKS,
+  ORACLES,
   ORACLE_ADDRESS,
   SWAP_INTERVALS_MAP,
   TRANSACTION_TYPES,
   UNI_GRAPHQL_URL,
 } from 'config/constants';
-import { ERC20Contract, HubContract, OracleContract } from 'types/contracts';
+import { ERC20Contract, HubContract, OracleContract, Oracles } from 'types/contracts';
 import GraphqlService from './graphql';
 
 export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as string;
@@ -392,6 +394,7 @@ export default class Web3Service {
         id: pair.id,
         createdAt: pair.createdAtTimestamp,
         swapInfo: await this.getNextSwapInfo({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }),
+        oracle: await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true),
       }))
     );
   }
@@ -466,6 +469,63 @@ export default class Web3Service {
   }
 
   // PAIR METHODS
+  async getPairOracle(pair: { tokenA: string; tokenB: string }, isExistingPair: boolean): Promise<Oracles> {
+    const [tokenA, tokenB] = sortTokensByAddress(pair.tokenA, pair.tokenB);
+    const currentNetwork = await this.getNetwork();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let provider: any = this.client;
+    if (!this.client) {
+      try {
+        provider = ethers.getDefaultProvider(getStringNetwork(currentNetwork.name));
+      } catch {
+        provider = await detectEthereumProvider();
+      }
+    }
+
+    if (isExistingPair) {
+      const oracleInstance = new ethers.Contract(
+        ORACLE_ADDRESS,
+        ORACLE_AGGREGATOR_ABI.abi,
+        provider
+      ) as unknown as OracleContract;
+      let oracleInUse: Oracles = ORACLES.NONE;
+      try {
+        oracleInUse = await oracleInstance.oracleInUse(tokenA, tokenB);
+      } catch (e) {
+        console.error('Error fetching oracle in use for pair', pair, e);
+      }
+
+      return oracleInUse;
+    }
+
+    const chainLinkOracle = new ethers.Contract(
+      ORACLE_ADDRESS,
+      CHAINLINK_ORACLE_ABI.abi,
+      provider
+    ) as unknown as OracleContract;
+    const uniswapOracle = new ethers.Contract(
+      ORACLE_ADDRESS,
+      UNISWAP_ORACLE_ABI.abi,
+      provider
+    ) as unknown as OracleContract;
+    let oracleInUse: Oracles = ORACLES.NONE;
+    try {
+      const chainlinkSupportsPair = await chainLinkOracle.canSupportPair(tokenA, tokenB);
+      if (chainlinkSupportsPair) {
+        oracleInUse = ORACLES.CHAINLINK;
+      } else {
+        const uniswapSupportsPair = await uniswapOracle.canSupportPair(tokenA, tokenB);
+        if (uniswapSupportsPair) {
+          oracleInUse = ORACLES.UNISWAP;
+        }
+      }
+    } catch (e) {
+      console.error('Error fetching support for oracle for', pair, e);
+    }
+
+    return oracleInUse;
+  }
+
   async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
     const [tokenA, tokenB] = sortTokensByAddress(pair.tokenA, pair.tokenB);
     const currentNetwork = await this.getNetwork();
@@ -859,6 +919,7 @@ export default class Web3Service {
             swapInfo: {
               swapsToPerform: [],
             },
+            oracle: newPositionTypeData.oracle,
           });
         }
         break;
@@ -989,21 +1050,6 @@ export default class Web3Service {
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity = this.currentPositions[
           modifyRateAndSwapsPositionTypeData.id
         ].rate.mul(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
-        break;
-      }
-      case TRANSACTION_TYPES.NEW_PAIR: {
-        const newPairTypeData = transaction.typeData as NewPairTypeData;
-        const [token0, token1] = sortTokens(newPairTypeData.token0, newPairTypeData.token1);
-        this.availablePairs.push({
-          token0,
-          token1,
-          id: newPairTypeData.id as string,
-          lastExecutedAt: 0,
-          createdAt: Math.floor(Date.now() / 1000),
-          swapInfo: {
-            swapsToPerform: [],
-          },
-        });
         break;
       }
       default:
