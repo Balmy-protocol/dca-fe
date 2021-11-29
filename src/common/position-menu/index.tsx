@@ -8,16 +8,18 @@ import ModifyRateSettings from 'common/modify-rate-settings';
 import { BigNumber } from 'ethers';
 
 const StyledOverlay = styled.div<{ withPadding: boolean }>`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  background-color: white;
-  padding: ${(props) => (props.withPadding ? '10px 30px' : '10px 0px')};
-  display: flex;
-  flex-direction: column;
+  ${({ theme, withPadding }) => `
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    background-color: ${theme.palette.type === 'light' ? 'white' : '#424242'};
+    padding: ${withPadding ? '10px 30px' : '10px 0px'};
+    display: flex;
+    flex-direction: column;
+  `}
 `;
 
 interface PositionMenuProps {

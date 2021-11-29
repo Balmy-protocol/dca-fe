@@ -16,6 +16,12 @@ const useStyles = makeStyles({
   },
 });
 
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
+
 const StyledDialogContent = styled(DialogContent)`
   padding: 40px 72px !important;
   align-items: center;
@@ -72,9 +78,9 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
           />
         </Typography>
         <Typography variant="body1" component="p">
-          <Link href="https://docs.mean.finance/concepts/price-oracle" target="_blank">
+          <StyledLink href="https://docs.mean.finance/concepts/price-oracle" target="_blank">
             <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
-          </Link>
+          </StyledLink>
         </Typography>
       </StyledDialogContent>
       <StyledDialogActions>

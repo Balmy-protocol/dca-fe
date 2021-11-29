@@ -9,15 +9,13 @@ import Badge from '@material-ui/core/Badge';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Web3Service } from 'types';
-import Button from '@material-ui/core/Button';
+import Button from 'common/button';
 import WalletMenu from 'common/wallet-menu';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
-  color: #333333;
-  background-color: #ffffff;
   cursor: pointer;
   box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 1px 3px 1px rgba(60, 64, 67, 0.149);
   :hover {
@@ -62,7 +60,8 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
         <StyledButton
           aria-controls="customized-menu"
           aria-haspopup="true"
-          color="primary"
+          color="default"
+          variant="outlined"
           onClick={onOpen}
           style={{ maxWidth: '200px', textTransform: 'none' }}
         >

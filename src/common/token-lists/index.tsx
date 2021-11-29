@@ -13,6 +13,12 @@ import { useSavedTokenLists } from 'state/token-lists/hooks';
 import { useAppDispatch } from 'hooks/state';
 import { enableTokenList } from 'state/token-lists/actions';
 
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
+
 const StyledTokenListContainer = styled(Grid)`
   padding: 32px;
 `;
@@ -73,9 +79,9 @@ const TokenLists = () => {
                   {tokenList[tokenListUrl].version.patch}
                 </Typography>
               )}
-              <Link target="_blank" href={buildTokenListUrl(tokenListUrl)}>
+              <StyledLink target="_blank" href={buildTokenListUrl(tokenListUrl)}>
                 <FormattedMessage description="view list" defaultMessage="View list" />
-              </Link>
+              </StyledLink>
               <FormGroup row>
                 <Switch
                   checked={savedTokenList[tokenListUrl]}

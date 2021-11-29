@@ -11,7 +11,6 @@ interface TokenButtonProps {
 }
 
 const StyledButton = styled(Button)`
-  background-color: #ffffff;
   border-radius: 50px;
   padding: 7px 10px;
 `;

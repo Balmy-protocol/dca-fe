@@ -78,12 +78,14 @@ const StyledPaper = styled(Paper)`
 `;
 
 const StyledTitleContainer = styled(Paper)`
-  padding: 25px;
-  border-radius: 10px;
-  flex-grow: 0;
-  background-color: #f6f6f6;
-  border: 1px solid #f5f5f5;
-  margin-bottom: 15px;
+  ${({ theme }) => `
+    padding: 25px;
+    border-radius: 10px;
+    flex-grow: 0;
+    background-color: ${theme.palette.type === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
+    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+    margin-bottom: 15px;
+  `}
 `;
 
 const StyledGraphContainer = styled(Paper)`

@@ -34,6 +34,12 @@ const useStyles = makeStyles({
   },
 });
 
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
+
 const StyledPaper = styled(Paper)`
   padding: 30px;
 `;
@@ -137,7 +143,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
             </Button>
           </StyledRecentTransactionsTitleContainer>
           <Typography variant="subtitle1">{`${account.substring(0, 6)}...${account.substring(38)}`}</Typography>
-          <Link
+          <StyledLink
             href={buildEtherscanAddress(web3Service.getAccount(), currentNetwork.chainId)}
             target="_blank"
             rel="noreferrer"
@@ -146,7 +152,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
               <FormattedMessage description="view on etherscan" defaultMessage="View on explorer" />
             </Typography>
             <CallMadeIcon style={{ fontSize: '1rem' }} />
-          </Link>
+          </StyledLink>
         </StyledWalletInformationContainer>
         <StyledRecentTransactionsTitleContainer withMargin>
           <Typography variant="h6">
@@ -159,7 +165,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
         {allOrderedTransactions.map((transaction) => (
           <StyledTransactionDetail key={transaction.hash}>
             <StyledTransactionDetailText>
-              <Link
+              <StyledLink
                 href={buildEtherscanTransaction(transaction.hash, currentNetwork.chainId)}
                 target="_blank"
                 rel="noreferrer"
@@ -168,7 +174,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
                   {buildTransactionDetail(transaction)}
                 </Typography>
                 <CallMadeIcon style={{ fontSize: '1rem' }} />
-              </Link>
+              </StyledLink>
             </StyledTransactionDetailText>
             {transaction.isPending ? <StyledCircularProgress size={24} /> : <StyledCheck />}
           </StyledTransactionDetail>

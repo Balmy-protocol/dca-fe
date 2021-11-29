@@ -11,8 +11,10 @@ import Typography from '@material-ui/core/Typography';
 import usePromise from 'hooks/usePromise';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { makeStyles } from '@material-ui/core/styles';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ETH } from 'mocks/tokens';
 
 const useStyles = makeStyles({
@@ -68,6 +70,7 @@ const CreatePairModal = ({
   onCreatePair,
 }: CreatePairModalProps) => {
   const classes = useStyles();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise<EstimatedPairResponse>(
     web3Service,
     'getEstimatedPairCreation',
@@ -78,12 +81,16 @@ const CreatePairModal = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
 
-  if (estimatedPriceErrors && open) {
-    setModalError({
-      error: estimatedPriceErrors,
-    });
-    onCancel();
-  }
+  // TODO: Uncomment when estimateGasWorks
+  // if (estimatedPriceErrors && open) {
+  //   setModalError({
+  //     error: estimatedPriceErrors,
+  //   });
+  //   onCancel();
+  // }
+  // const isLoading = isLoadingEstimatedPrice || !estimatedPrice;
+
+  const isLoading = false;
 
   return (
     <Dialog
@@ -102,7 +109,7 @@ const CreatePairModal = ({
             values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
           />
         </Typography>
-        {isLoadingEstimatedPrice || !estimatedPrice ? (
+        {isLoading ? (
           <>
             <StyledLoadingIndicatorWrapper>
               <LoadingIndicator size={70} />
@@ -123,7 +130,8 @@ const CreatePairModal = ({
                 values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
               />
             </Typography>
-            <Typography variant="body1">
+            {/* TODO: uncomment when estimateGas works */}
+            {/* <Typography variant="body1">
               <FormattedMessage
                 description="Create pair"
                 defaultMessage="The estimated cost of the operation is {costEth} ETH or around {costUsd} dollars."
@@ -133,7 +141,7 @@ const CreatePairModal = ({
                   costEth: formatCurrencyAmount(estimatedPrice.gasEth, ETH, 4),
                 }}
               />
-            </Typography>
+            </Typography> */}
           </>
         )}
       </StyledDialogContent>

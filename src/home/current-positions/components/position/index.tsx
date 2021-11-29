@@ -91,11 +91,13 @@ const StyledCardFooterItem = styled.div<{ isPending: boolean }>`
 `;
 
 const StyledFreqLeft = styled.div`
-  padding: 8px 11px;
-  border-radius: 5px;
-  background-color: #dceff9;
-  color: #0088cc;
-  margin-right: 15px;
+  ${({ theme }) => `
+    padding: 8px 11px;
+    border-radius: 5px;
+    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
+    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+    margin-right: 15px;
+  `}
 `;
 
 const StyledStale = styled.div`

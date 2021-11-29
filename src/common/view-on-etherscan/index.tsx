@@ -9,6 +9,12 @@ interface EtherscanLinkProps {
   hash: string;
 }
 
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
+
 const StyledLinkWrapper = styled.div`
   margin-right: 20px;
 `;
@@ -17,9 +23,9 @@ const EtherscanLink = ({ hash }: EtherscanLinkProps) => {
   const currentNetwork = useCurrentNetwork();
   return (
     <StyledLinkWrapper>
-      <Link href={buildEtherscanTransaction(hash, currentNetwork.chainId)} target="_blank" rel="noreferrer">
+      <StyledLink href={buildEtherscanTransaction(hash, currentNetwork.chainId)} target="_blank" rel="noreferrer">
         <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
-      </Link>
+      </StyledLink>
     </StyledLinkWrapper>
   );
 };

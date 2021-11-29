@@ -14,11 +14,13 @@ const StyledInput = styled(Input)`
 `;
 
 const StyledInputContainer = styled.div`
-  background-color: #e3e3e3;
-  padding: 5px 10px;
-  border-radius: 10px;
-  display: inline-flex;
-  margin: 0px 6px;
+  ${({ theme }) => `
+    background-color: ${theme.palette.type === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.12)'};
+    padding: 5px 10px;
+    border-radius: 10px;
+    display: inline-flex;
+    margin: 0px 6px;
+  `}
 `;
 
 interface TokenInputProps {

@@ -5,18 +5,20 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 
 const StyledCard = styled(Card)`
-  margin: 10px;
-  border-radius: 10px;
-  position: relative;
-  min-height: 215px;
-  background-color: transparent;
-  color: rgba(0, 0, 0, 0.4);
-  border: 3px dashed rgba(0, 0, 0, 0.12);
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  ${({ theme }) => `
+    margin: 10px;
+    border-radius: 10px;
+    position: relative;
+    min-height: 215px;
+    background-color: transparent;
+    color: ${theme.palette.type === 'light' ? 'rgba(0, 0, 0, 0.4)' : '#FFF'};
+    border: 3px dashed ${theme.palette.type === 'light' ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.8)'};
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  `}
 `;
 
 interface EmptyPositionsProps {
