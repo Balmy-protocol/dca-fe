@@ -15,6 +15,12 @@ const useStyles = makeStyles({
   },
 });
 
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
+
 const StyledDialogContent = styled(DialogContent)`
   padding: 40px 72px !important;
   align-items: center;
@@ -55,9 +61,9 @@ const StalePairModal = ({ onConfirm, open, onCancel }: StalePairModalProps) => {
           <FormattedMessage description="stale pair message" defaultMessage="This pair is " />
         </Typography>
         <Typography variant="body1" component="span">
-          <Link href="https://docs.mean.finance/concepts/positions#stale-positions" target="_blank">
+          <StyledLink href="https://docs.mean.finance/concepts/positions#stale-positions" target="_blank">
             <FormattedMessage description="stale" defaultMessage="stale" />
-          </Link>
+          </StyledLink>
         </Typography>
         <Typography variant="body1" component="span">
           <FormattedMessage

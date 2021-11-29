@@ -16,14 +16,16 @@ interface SelectOption {
 type SelectOptionsType = SelectOption[];
 
 const StyledTabsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  background: #eee;
-  align-items: center;
-  padding: 5px;
-  border-radius: 30px;
-  position: relative;
+  ${({ theme }) => `
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background: ${theme.palette.type === 'light' ? '#eee' : 'rgba(255, 255, 255, 0.12)'};
+    align-items: center;
+    padding: 5px;
+    border-radius: 30px;
+    position: relative;
+  `}
 `;
 
 const StyledTabItemsContainer = styled.div`
@@ -52,24 +54,26 @@ const StyledTabItem = styled(Button)<{ isSelected: boolean }>`
 `;
 
 const StyledTabIndicator = styled.div<{ width: number; left: number; height: number; top: number }>`
-  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  left: ${(props) => props.left + 3}px;
-  top: ${(props) => props.top + 3}px;
-  width: ${(props) => props.width}px;
-  height: ${(props) => props.height}px;
-  position: absolute;
-  &:after {
-    content: '';
+  ${({ theme, left, top, width, height }) => `
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    left: ${left + 3}px;
+    top: ${top + 3}px;
+    width: ${width}px;
+    height: ${height}px;
     position: absolute;
-    background-color: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 12px 0 rgb(0 0 0 / 16%);
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: ${(props) => props.width}px;
-  }
+    &:after {
+      content: '';
+      position: absolute;
+      background-color: ${theme.palette.type === 'light' ? '#fff' : 'rgba(255, 255, 255, 0.12)'};
+      border-radius: 20px;
+      box-shadow: 0 4px 12px 0 rgb(0 0 0 / 16%);
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: ${width}px;
+    }
+  `}
 `;
 interface MinimalSelectProps {
   options: SelectOptionsType;

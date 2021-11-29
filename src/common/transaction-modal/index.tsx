@@ -15,6 +15,12 @@ import { TRANSACTION_ERRORS } from 'utils/errors';
 import { makeStyles } from '@material-ui/core/styles';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
+
 const useStyles = makeStyles({
   paper: {
     borderRadius: 20,
@@ -144,13 +150,13 @@ export const TransactionModal = ({
       </StyledLoadingIndicatorWrapper>
       <Typography variant="body1">{successConfig.content}</Typography>
       {successConfig.hash && (
-        <Link
+        <StyledLink
           href={buildEtherscanTransaction(successConfig.hash, currentNetwork.chainId)}
           target="_blank"
           rel="noreferrer"
         >
           <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
-        </Link>
+        </StyledLink>
       )}
     </>
   );

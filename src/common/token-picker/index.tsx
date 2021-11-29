@@ -13,7 +13,6 @@ import ListItem from '@material-ui/core/ListItem';
 import Divider from '@material-ui/core/Divider';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { useJupiterListItemStyles } from '@mui-treasury/styles/listItem/jupiter';
 import InputBase from '@material-ui/core/InputBase';
 import Search from '@material-ui/icons/Search';
 import IconButton from '@material-ui/core/IconButton';
@@ -34,16 +33,16 @@ import TokenLists from 'common/token-lists';
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 interface PartialTheme {
   spacing: (space: number) => number;
-  palette: { grey: string[] };
+  palette: { grey: string[]; type: 'light' | 'dark' };
 }
 
 const searchStyles = ({ spacing, palette }: PartialTheme) => {
   // ATTENTION!
   // you can customize some important variables here!!
-  const backgroundColor = palette.grey[100];
+  const backgroundColor = palette.type === 'light' ? palette.grey[100] : 'rgba(255, 255, 255, 0.12)';
   const space = spacing(1); // default = 8;
   const borderRadius = 30;
-  const iconColor = palette.grey[500];
+  const iconColor = palette.type === 'light' ? palette.grey[500] : '#ffffff';
   // end of variables
   return {
     root: {
@@ -67,15 +66,17 @@ const searchStyles = ({ spacing, palette }: PartialTheme) => {
 const useSearchInputStyles = makeStyles(searchStyles);
 
 const StyledOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  background-color: white;
-  padding: 32px;
-  display: flex;
+  ${({ theme }) => `
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    background-color: ${theme.palette.type === 'light' ? '#ffffff' : '#424242'};
+    padding: 32px;
+    display: flex;
+  `}
 `;
 
 const StyledChip = styled(Chip)`
@@ -97,21 +98,24 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledList = styled(List)`
-  scrollbar-width: thin;
-  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-  --scrollbarBG: #ffffff;
-  --thumbBG: #90a4ae;
-  ::-webkit-scrollbar {
-    width: 11px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--scrollbarBG);
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: var(--thumbBG);
-    border-radius: 6px;
-    border: 3px solid var(--scrollbarBG);
-  }
+  ${({ theme }) => `
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+    --scrollbarBG: ${theme.palette.type === 'light' ? '#ffffff' : '#424242'};
+    --thumbBG: ${theme.palette.type === 'light' ? '#90a4ae' : '#ffffff'};
+    ::-webkit-scrollbar {
+      width: 11px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbarBG);
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--thumbBG);
+      border-radius: 6px;
+      border: 3px solid var(--scrollbarBG);
+    }
+  `}
 `;
 
 const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
@@ -141,8 +145,30 @@ interface TokenPickerProps {
   ignoreValues: string[];
 }
 
+const useListItemStyles = makeStyles(({ palette }) => ({
+  root: {
+    borderRadius: 6,
+    color: palette.text.secondary,
+    padding: '0.5rem 1rem',
+    '&:hover': {
+      color: palette.text.primary,
+      backgroundColor: palette.type === 'light' ? palette.grey[100] : palette.grey[700],
+    },
+  },
+  selected: {
+    '&.Mui-selected': {
+      fontWeight: 500,
+      // backgroundColor: palette.primary.mainaccentColor,
+      color: palette.primary.main,
+      '&:hover': {
+        color: palette.primary.main,
+        // backgroundColor: accentColor
+      },
+    },
+  },
+}));
 const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps) => {
-  const classes = useJupiterListItemStyles();
+  const classes = useListItemStyles();
 
   return (
     <StyledListItem classes={classes} button onClick={() => onClick(tokenKeys[index])} style={style}>

@@ -65,23 +65,25 @@ import ORACLE_AGGREGATOR_ABI from 'abis/OracleAggregator.json';
 import HUB_ABI from 'abis/Hub.json';
 import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
+import TOKEN_DESCRIPTOR_ABI from 'abis/TokenDescriptor.json';
 
 // MOCKS
 import { ETH, WETH } from 'mocks/tokens';
 import {
+  CHAINLINK_ORACLE_ADDRESS,
   HUB_ADDRESS,
   MEAN_GRAPHQL_URL,
   NETWORKS,
   ORACLES,
   ORACLE_ADDRESS,
   SWAP_INTERVALS_MAP,
+  TOKEN_DESCRIPTOR_ADDRESS,
   TRANSACTION_TYPES,
+  UNISWAP_ORACLE_ADDRESS,
   UNI_GRAPHQL_URL,
 } from 'config/constants';
-import { ERC20Contract, HubContract, OracleContract, Oracles } from 'types/contracts';
+import { ERC20Contract, HubContract, OracleContract, Oracles, TokenDescriptorContract } from 'types/contracts';
 import GraphqlService from './graphql';
-
-export const TOKEN_DESCRIPTOR_ADDRESS = process.env.TOKEN_DESCRIPTOR_ADDRESS as string;
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
@@ -499,12 +501,12 @@ export default class Web3Service {
     }
 
     const chainLinkOracle = new ethers.Contract(
-      ORACLE_ADDRESS,
+      CHAINLINK_ORACLE_ADDRESS,
       CHAINLINK_ORACLE_ABI.abi,
       provider
     ) as unknown as OracleContract;
     const uniswapOracle = new ethers.Contract(
-      ORACLE_ADDRESS,
+      UNISWAP_ORACLE_ADDRESS,
       UNISWAP_ORACLE_ABI.abi,
       provider
     ) as unknown as OracleContract;
@@ -674,9 +676,13 @@ export default class Web3Service {
 
   // POSITION EMTHODS
   async getTokenNFT(id: string): Promise<NFTData> {
-    const pairAddressContract = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.client) as unknown as HubContract;
+    const tokenDescriptorContract = new ethers.Contract(
+      TOKEN_DESCRIPTOR_ADDRESS,
+      TOKEN_DESCRIPTOR_ABI.abi,
+      this.client
+    ) as unknown as TokenDescriptorContract;
 
-    const tokenData = await pairAddressContract.tokenURI(id);
+    const tokenData = await tokenDescriptorContract.tokenURI(HUB_ADDRESS, id);
     return JSON.parse(atob(tokenData.substring(29))) as NFTData;
   }
 

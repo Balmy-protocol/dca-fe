@@ -4,21 +4,14 @@ import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
 import WalletContext from 'common/wallet-context';
 import axios from 'axios';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import { ThemeProvider } from 'styled-components';
 import Web3Service from 'services/web3Service';
-import TransactionModalProvider from 'common/transaction-modal';
 import { ApolloProvider } from '@apollo/client';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
 import store from 'state';
-import TransactionUpdater from 'state/transactions/transactionUpdater';
-import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
 import { SnackbarProvider } from 'notistack';
 import { setupCache } from 'axios-cache-adapter';
 import MainApp from './frame';
-
-const theme = createMuiTheme();
 
 type AppProps = {
   messages: Record<string, string>;
@@ -73,25 +66,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
     >
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
-        <MuiThemeProvider theme={theme}>
-          <ThemeProvider theme={theme}>
-            <ApolloProvider client={DCASubgraph}>
-              <Provider store={store}>
-                <SnackbarProvider>
-                  <TransactionModalProvider>
-                    {!isLoading && (
-                      <>
-                        <TransactionUpdater />
-                        <BlockNumberUpdater />
-                      </>
-                    )}
-                    <MainApp isLoading={isLoading} />
-                  </TransactionModalProvider>
-                </SnackbarProvider>
-              </Provider>
-            </ApolloProvider>
-          </ThemeProvider>
-        </MuiThemeProvider>
+        <ApolloProvider client={DCASubgraph}>
+          <Provider store={store}>
+            <SnackbarProvider>
+              <MainApp isLoading={isLoading} />
+            </SnackbarProvider>
+          </Provider>
+        </ApolloProvider>
       </IntlProvider>
     </WalletContext.Provider>
   );

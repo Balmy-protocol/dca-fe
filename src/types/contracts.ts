@@ -36,6 +36,10 @@ export class OracleContract extends Contract {
   oracleInUse: (tokenA: string, tokenB: string) => Promise<0 | 1 | 2>;
 }
 
+export class TokenDescriptorContract extends Contract {
+  tokenURI: (hubAddress: string, positionId: string) => Promise<string>;
+}
+
 export class HubContract extends Contract {
   getNextSwapInfo: (
     tokens: string[],
@@ -53,8 +57,6 @@ export class HubContract extends Contract {
     account: string,
     permissions: { operator: string; permissions: string[] }[]
   ) => Promise<TransactionResponse>;
-
-  tokenURI: (id: string) => Promise<string>;
 
   withdrawSwapped: (id: string, recipient: string) => Promise<TransactionResponse>;
 

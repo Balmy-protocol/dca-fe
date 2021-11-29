@@ -60,10 +60,12 @@ const StyledPaper = styled(Paper)`
 `;
 
 const StyledSwapContainer = styled.div`
-  display: flex;
-  background-color: #f6f6f6;
-  border-radius: 20px;
-  padding: 0px;
+  ${({ theme }) => `
+    display: flex;
+    background-color: ${theme.palette.type === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
+    border-radius: 20px;
+    padding: 0px;
+  `}
 `;
 
 const StyledFromContainer = styled(Grid)`
@@ -71,11 +73,13 @@ const StyledFromContainer = styled(Grid)`
 `;
 
 const StyledToContainer = styled(Grid)`
-  background-color: #e3e3e3;
-  padding: 24px;
-  border-bottom-right-radius: 20px;
-  border-bottom-left-radius: 20px;
-  position: relative;
+  ${({ theme }) => `
+    background-color: ${theme.palette.type === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.1)'};
+    padding: 24px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    position: relative;
+  `}
 `;
 
 const StyledSettingsContainer = styled.div`
@@ -96,15 +100,17 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledSwapTokenButton = styled(IconButton)`
-  position: absolute;
-  border: 3px solid #e3e3e3;
-  background-color: #ffffff;
-  left: 50%;
-  top: 24px;
-  transform: translateX(-50%) translateY(-100%);
-  :hover {
-    background-color: #f0f0f0;
-  }
+  ${({ theme }) => `
+    position: absolute;
+    border: 3px solid ${theme.palette.type === 'light' ? '#e3e3e3' : '#6a6a6a'};
+    background-color: ${theme.palette.type === 'light' ? '#ffffff' : '#595959'};
+    left: 50%;
+    top: 24px;
+    transform: translateX(-50%) translateY(-100%);
+    :hover {
+      background-color: ${theme.palette.type === 'light' ? '#f0f0f0' : '#484848'};
+    }
+  `}
 `;
 
 interface AvailableSwapInterval {

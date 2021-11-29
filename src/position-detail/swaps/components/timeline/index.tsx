@@ -29,6 +29,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 const StyledTimeline = styled(Grid)`
   position: relative;
   padding: 0px 0px 0px 10px;
+  margin-top: 10px;
   &:before {
     content: '';
     position: absolute;
@@ -41,7 +42,19 @@ const StyledTimeline = styled(Grid)`
 `;
 
 const StyledTimelineContainer = styled(Grid)`
-  position: relative;
+  ${({ theme }) => `
+    position: relative;
+    &:last-child {
+      :before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        width: 4px;
+        bottom: 0;
+        background: ${theme.palette.type === 'light' ? '#ffffff' : '#303030'};
+      }
+    }
+  `}
 `;
 
 const StyledCenteredGrid = styled(Grid)`
@@ -56,52 +69,56 @@ const StyledRightGrid = styled(Grid)`
 `;
 
 const StyledTimelineIcon = styled.div`
-  position: absolute;
-  left: -24px;
-  top: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  text-align: center;
-  font-size: 2rem;
-  background: white;
-
-  i {
+  ${({ theme }) => `
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  svg {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
+    left: -24px;
+    top: 20px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-  }
+    text-align: center;
+    font-size: 2rem;
+    background: ${theme.palette.type === 'light' ? '#eee' : '#424242'};
+
+    i {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    svg {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  `}
 `;
 
 const StyledTimelineContent = styled.div`
-  padding: 20px 0px 15px 45px;
-  position: relative;
-  &:before {
-    content: '';
-    background: #d4d4d4;
-    width: 20px;
-    height: 20px;
-    left: 35px;
-    top: 35px;
-    display: block;
-    position: absolute;
-    transform: rotate(45deg);
-    border-radius: 0 0 0 2px;
-  }
+  ${({ theme }) => `
+    padding: 20px 0px 15px 45px;
+    position: relative;
+    &:before {
+      content: '';
+      background: ${theme.palette.type === 'light' ? '#eee' : '#595959'};
+      width: 20px;
+      height: 20px;
+      left: 35px;
+      top: 35px;
+      display: block;
+      position: absolute;
+      transform: rotate(45deg);
+      border-radius: 0 0 0 2px;
+    }
+  `}
 `;
 
 const StyledTimelineContentText = styled(Grid)`
@@ -109,12 +126,15 @@ const StyledTimelineContentText = styled(Grid)`
 `;
 
 const StyledTimelineContentTitle = styled(Grid)`
-  padding: 10px 20px;
-  background-color: #d4d4d4;
+  ${({ theme }) => `
+    padding: 10px 20px;
+    background-color: ${theme.palette.type === 'light' ? '#eee' : '#595959'};
+  `}
 `;
 
 interface PositionTimelineProps {
   position: FullPosition;
+  filter: 0 | 1 | 2; // 0 - all; 1 - swaps; 2 - modifications;
 }
 
 const buildSwappedItem = (positionState: ActionState, position: FullPosition) => {
@@ -124,11 +144,11 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
       defaultMessage="1 {from} = {swapRate} {to}"
       values={{
         b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-        from: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
-        to: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
+        from: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
+        to: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
         // eslint-disable-next-line no-nested-ternary
         swapRate: STABLE_COINS.includes(position.to.symbol)
-          ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitAToBWithFee), position.pair.tokenB)
+          ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA)
           : position.pair.tokenA.address === position.from.address
           ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitAToBWithFee), position.pair.tokenB)
           : formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA),
@@ -144,7 +164,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
           <Typography variant="body1" component="span">
             <FormattedMessage
               description="pairSwapDetails"
-              defaultMessage="Swapped <b>{rate} {from}</b> to <b>{result} {to}</b>"
+              defaultMessage="Swapped <b>{rate} {from}</b> for <b>{result} {to}</b>"
               values={{
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                 result:
@@ -451,12 +471,33 @@ const MESSAGE_MAP = {
   [POSITION_ACTIONS.TERMINATED]: buildTerminatedItem,
 };
 
-const PositionTimeline = ({ position }: PositionTimelineProps) => {
+const FILTERS = {
+  0: [
+    POSITION_ACTIONS.CREATED,
+    POSITION_ACTIONS.MODIFIED_DURATION,
+    POSITION_ACTIONS.MODIFIED_RATE,
+    POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
+    POSITION_ACTIONS.SWAPPED,
+    POSITION_ACTIONS.WITHDREW,
+    POSITION_ACTIONS.TERMINATED,
+  ],
+  1: [POSITION_ACTIONS.SWAPPED],
+  2: [
+    POSITION_ACTIONS.CREATED,
+    POSITION_ACTIONS.MODIFIED_DURATION,
+    POSITION_ACTIONS.MODIFIED_RATE,
+    POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
+    POSITION_ACTIONS.WITHDREW,
+    POSITION_ACTIONS.TERMINATED,
+  ],
+};
+
+const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
   let history = [];
 
-  const mappedPositionHistory = position.history.map((positionState) =>
-    MESSAGE_MAP[positionState.action](positionState, position)
-  );
+  const mappedPositionHistory = position.history
+    .filter((positionState) => FILTERS[filter].includes(positionState.action))
+    .map((positionState) => MESSAGE_MAP[positionState.action](positionState, position));
 
   history = orderBy(mappedPositionHistory, ['toOrder'], ['desc']);
 
