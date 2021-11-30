@@ -1,14 +1,27 @@
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
+import { setupCache } from 'axios-cache-adapter';
+import axios from 'axios';
 
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
 import initializer from './initializer/reducer';
-import tokenLists from './token-lists/reducer';
+import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 
-const PERSISTED_STATES: string[] = ['transactions', 'badge', 'tokenLists', 'config'];
+// this should not be here
+// Create `axios-cache-adapter` instance
+const cache = setupCache({
+  maxAge: 15 * 60 * 1000,
+});
+
+// Create `axios` instance passing the newly created `cache.adapter`
+export const axiosClient = axios.create({
+  adapter: cache.adapter,
+});
+
+const PERSISTED_STATES: string[] = ['transactions', 'badge', 'tokenLists.activeLists', 'config'];
 
 const store = configureStore({
   reducer: {
@@ -19,8 +32,11 @@ const store = configureStore({
     tokenLists,
     config,
   },
-  middleware: [...getDefaultMiddleware({ thunk: false }), save({ states: PERSISTED_STATES, debounce: 1000 })],
-  preloadedState: load({ states: PERSISTED_STATES }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ thunk: { extraArgument: axiosClient } }).concat([
+      save({ states: PERSISTED_STATES, debounce: 1000 }),
+    ]),
+  preloadedState: load({ states: PERSISTED_STATES, preloadedState: { tokenLists: { byUrl: getDefaultByUrl() } } }),
 });
 
 export default store;

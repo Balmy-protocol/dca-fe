@@ -4,8 +4,7 @@ import reduce from 'lodash/reduce';
 import { useAllTransactions } from 'state/transactions/hooks';
 import { NETWORKS } from 'config/constants';
 import { DEFAULT_TOKEN_LIST, ETH } from 'mocks/tokens';
-import { useSavedTokenLists } from 'state/token-lists/hooks';
-import useTokensLists from './useTokensLists';
+import { useSavedTokenLists, useTokensLists } from 'state/token-lists/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 
 function useTokenList() {
@@ -25,7 +24,7 @@ function useTokenList() {
 
     return reduce(
       tokensLists,
-      (acc, tokensList, key) => (savedTokenLists[key] ? { ...acc, ...tokensList.tokens } : acc),
+      (acc, tokensList, key) => (savedTokenLists.includes(key) ? { ...acc, ...tokensList.tokens } : acc),
       { [ETH.address]: ETH }
     );
   }, [transactions, currentNetwork.chainId]);

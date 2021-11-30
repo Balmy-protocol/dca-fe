@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import useTokensLists from 'hooks/useTokensLists';
 import { TOKEN_LISTS } from 'config/constants';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
@@ -9,7 +8,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import Switch from '@material-ui/core/Switch';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
-import { useSavedTokenLists } from 'state/token-lists/hooks';
+import { useSavedTokenLists, useTokensLists } from 'state/token-lists/hooks';
 import { useAppDispatch } from 'hooks/state';
 import { enableTokenList } from 'state/token-lists/actions';
 
@@ -50,7 +49,7 @@ const TokenLists = () => {
   const dispatch = useAppDispatch();
 
   const onEnableDisableList = (list: string) => {
-    dispatch(enableTokenList({ tokenList: list, enabled: !savedTokenList[list] }));
+    dispatch(enableTokenList({ tokenList: list, enabled: !savedTokenList.includes(list) }));
   };
 
   return (
@@ -84,7 +83,7 @@ const TokenLists = () => {
               </StyledLink>
               <FormGroup row>
                 <Switch
-                  checked={savedTokenList[tokenListUrl]}
+                  checked={savedTokenList.includes(tokenListUrl)}
                   onChange={() => onEnableDisableList(tokenListUrl)}
                   name={`enableDisable${tokenListUrl}`}
                   color="primary"
