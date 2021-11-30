@@ -5,67 +5,83 @@ import { Oracles } from 'types/contracts';
 export const NETWORKS = {
   mainnet: {
     chainId: 1,
-    name: 'Ethereum mainnet',
+    name: 'Ethereum',
+    mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   },
   ropsten: {
     chainId: 3,
     name: 'Ropsten',
+    mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   },
   rinkeby: {
     chainId: 4,
     name: 'Rinkeby',
+    mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   },
   goerli: {
     chainId: 5,
     name: 'Goerli',
+    mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   },
   kovan: {
     chainId: 42,
     name: 'Kovan',
+    mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   },
   meanfinance: {
     chainId: 31337,
     name: 'Mean Finance',
+    mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   },
   bsc: {
     chainId: 56,
     name: 'BSC',
+    mainCurrency: 'BNB',
   },
   polygon: {
     chainId: 137,
     name: 'Polygon',
+    mainCurrency: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
   },
   fantom: {
     chainId: 250,
     name: 'Fantom',
+    mainCurrency: '',
   },
   avalanche: {
     chainId: 43114,
     name: 'Avalanche',
+    mainCurrency: '',
   },
   arbitrum: {
     chainId: 42161,
     name: 'Arbitrum',
+    mainCurrency: '',
   },
   heco: {
     chainId: 128,
     name: 'Heco',
+    mainCurrency: '',
   },
   optimism: {
     chainId: 10,
     name: 'Optimism',
+    mainCurrency: '',
   },
   okex: {
     chainId: 66,
     name: 'OKEx',
+    mainCurrency: '',
   },
   harmony: {
     chainId: 1666600000,
     name: 'Harmony',
+    mainCurrency: '',
   },
   xdai: {
     chainId: 100,
     name: 'xDAI',
+    mainCurrency: '',
   },
 };
 
@@ -76,6 +92,8 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.goerli.chainId,
   NETWORKS.kovan.chainId,
 ];
+
+export const NETWORKS_FOR_MENU = [NETWORKS.mainnet.chainId, NETWORKS.polygon.chainId];
 
 export const HUB_ADDRESS = '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567';
 export const ORACLE_ADDRESS = '0xF8736BB2a48bB5D9dF88b393eC3053a52a440edE';

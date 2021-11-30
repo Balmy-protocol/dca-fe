@@ -51,3 +51,11 @@ export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token
   return toSignificant(amount.toString(), token.decimals, sigFigs);
 }
 /* eslint-enable */
+
+export const emptyTokenWithAddress: (address: string) => Token = (address: string) => ({
+  decimals: 18,
+  chainId: 1,
+  address,
+  name: '',
+  symbol: '',
+});
