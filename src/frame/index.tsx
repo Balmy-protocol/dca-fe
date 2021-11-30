@@ -14,6 +14,8 @@ import PositionDetail from 'position-detail';
 import styled, { DefaultTheme, ThemeProvider } from 'styled-components';
 import { useThemeMode } from 'state/config/hooks';
 import TransactionModalProvider from 'common/transaction-modal';
+import { useAppDispatch } from 'hooks/state';
+import { startFetchingTokenLists } from 'state/token-lists/actions';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -52,6 +54,13 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
       type,
     },
   });
+
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispatch(startFetchingTokenLists());
+  }, []);
 
   return (
     <MuiThemeProvider theme={theme}>

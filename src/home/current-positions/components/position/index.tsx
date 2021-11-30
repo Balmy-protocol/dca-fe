@@ -412,7 +412,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
             <FormattedMessage
               description="current swapped in position"
               defaultMessage="{exercised} {to} to withdraw"
-              values={{ exercised: formatCurrencyAmount(swapped.sub(toWithdraw), to), to: to.symbol }}
+              values={{ exercised: formatCurrencyAmount(toWithdraw, to), to: to.symbol }}
             />
           </Typography>
           <Tooltip

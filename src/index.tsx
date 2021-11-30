@@ -3,14 +3,12 @@ import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
 import WalletContext from 'common/wallet-context';
-import axios from 'axios';
 import Web3Service from 'services/web3Service';
 import { ApolloProvider } from '@apollo/client';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
-import store from 'state';
+import store, { axiosClient } from 'state';
 import { SnackbarProvider } from 'notistack';
-import { setupCache } from 'axios-cache-adapter';
 import MainApp from './frame';
 
 type AppProps = {
@@ -24,16 +22,6 @@ function loadLocaleData(locale: string) {
       return EnMessages;
   }
 }
-
-// Create `axios-cache-adapter` instance
-const cache = setupCache({
-  maxAge: 15 * 60 * 1000,
-});
-
-// Create `axios` instance passing the newly created `cache.adapter`
-const axiosClient = axios.create({
-  adapter: cache.adapter,
-});
 
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
   const [account, setAccount] = React.useState('');

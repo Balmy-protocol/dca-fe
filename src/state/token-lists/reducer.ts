@@ -1,16 +1,81 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { enableTokenList } from './actions';
+import { TokensLists, Token } from 'types';
+import keyBy from 'lodash/keyBy';
+import { enableTokenList, fetchTokenList } from './actions';
 
 export interface TokenListsState {
-  [tokenListName: string]: boolean;
+  byUrl: { [tokenListUrl: string]: TokensLists };
+  activeLists: string[];
 }
 
+export const getDefaultByUrl = () => ({
+  'tokens.1inch.eth': {
+    name: '1inch',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: {},
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+  },
+  'https://www.gemini.com/uniswap/manifest.json': {
+    name: 'Gemini Token List',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: {},
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+  },
+  'https://gateway.ipfs.io/ipns/tokens.uniswap.org': {
+    name: 'Uniswap Default List',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: {},
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+  },
+  'https://tokens.coingecko.com/uniswap/all.json': {
+    name: 'CoinGecko',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: {},
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+  },
+});
 export const initialState: TokenListsState = {
-  'https://gateway.ipfs.io/ipns/tokens.uniswap.org': true,
+  activeLists: ['https://gateway.ipfs.io/ipns/tokens.uniswap.org'],
+  byUrl: getDefaultByUrl(),
 };
 
 export default createReducer(initialState, (builder) =>
-  builder.addCase(enableTokenList, (state, { payload: { tokenList, enabled } }) => {
-    state[tokenList] = enabled;
-  })
+  builder
+    .addCase(enableTokenList, (state, { payload: { tokenList, enabled } }) => {
+      if (enabled && !state.activeLists.includes(tokenList)) {
+        state.activeLists.push(tokenList);
+      }
+      if (!enabled && state.activeLists.includes(tokenList)) {
+        state.activeLists = state.activeLists.filter((item) => item !== tokenList);
+      }
+    })
+    .addCase(fetchTokenList.pending, (state, { meta: { requestId, arg } }) => {
+      state.byUrl[arg].requestId = requestId;
+    })
+    .addCase(fetchTokenList.fulfilled, (state, { payload, meta: { arg } }) => {
+      const mappedTokens: Token[] = payload.tokens.map<Token>((token) => ({
+        ...token,
+        address: token.address.toLowerCase(),
+      }));
+      const tokens: Record<string, Token> = keyBy(mappedTokens, 'address');
+
+      state.byUrl[arg] = {
+        ...state.byUrl[arg],
+        ...payload,
+        tokens,
+        hasLoaded: true,
+      };
+    })
 );

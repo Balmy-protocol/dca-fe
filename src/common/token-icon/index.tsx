@@ -3,6 +3,7 @@ import { Token } from 'types';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import CryptoIcons from 'assets/svg/color';
 import HelpIcon from '@material-ui/icons/Help';
+import useTokenList from 'hooks/useTokenList';
 
 interface TokenButtonProps {
   token?: Token;
@@ -14,6 +15,8 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
   const realSize = size || '28px';
   const [hasError, setHasError] = React.useState(false);
   let componentToRender = null;
+  const tokenList = useTokenList();
+  const tokenLogoUri = token?.logoURI || (token && tokenList[token.address] && tokenList[token.address].logoURI);
 
   if (CryptoIcons[token?.address as keyof typeof CryptoIcons]) {
     componentToRender = (
@@ -24,14 +27,14 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
         style={{ fontSize: realSize }}
       />
     );
-  } else if (token?.logoURI && !hasError) {
+  } else if (tokenLogoUri && !hasError) {
     componentToRender = (
       <img
-        src={token.logoURI}
+        src={tokenLogoUri}
         onError={() => setHasError(true)}
         height={realSize}
         width={realSize}
-        alt={token.symbol}
+        alt={token?.symbol}
       />
     );
   } else {

@@ -12,11 +12,11 @@ export type TokenList = Record<string, Token>;
 export interface TokensLists {
   name: string;
   logoURI: string;
-  keywords: string[];
-  tags: Tags;
-  timestamp: Date;
+  timestamp: number;
   tokens: TokenList;
   version: Version;
+  hasLoaded: boolean;
+  requestId: string;
 }
 
 export interface TokenListToken {
@@ -50,7 +50,7 @@ export interface TokenListResponse {
   logoURI: string;
   keywords: string[];
   tags: Tags;
-  timestamp: Date;
+  timestamp: number;
   tokens: Token[];
   version: Version;
 }
