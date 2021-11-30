@@ -226,7 +226,8 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         ),
       });
     } catch (e) {
-      setModalError({ content: 'error while adding funds' });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      setModalError({ content: 'error while adding funds', error: { code: e.code, message: e.message } });
     }
   };
 
@@ -262,7 +263,8 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         ),
       });
     } catch (e) {
-      setModalError({ content: 'error while adding funds' });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      setModalError({ content: 'error while adding funds', error: { code: e.code, message: e.message } });
     }
   };
 
@@ -295,7 +297,8 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         ),
       });
     } catch (e) {
-      setModalError({ content: 'error while withdrawing funds' });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      setModalError({ content: 'error while withdrawing funds', error: { code: e.code, message: e.message } });
     }
   };
 
@@ -342,7 +345,8 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         ),
       });
     } catch (e) {
-      setModalError({ content: 'error while modifying rate' });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      setModalError({ content: 'error while modifying rate', error: { code: e.code, message: e.message } });
     }
   };
 
