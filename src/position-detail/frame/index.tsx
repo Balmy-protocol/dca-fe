@@ -137,8 +137,8 @@ const PositionDetailFrame = () => {
         ),
       });
     } catch (e) {
-      console.error('Error changing rate and swaps', e);
-      setModalError({ content: 'Error changing rate and swaps' });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      setModalError({ content: 'Error changing rate and swaps', error: { code: e.code, message: e.message } });
     }
   };
 

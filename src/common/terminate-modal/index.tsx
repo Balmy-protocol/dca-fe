@@ -77,7 +77,8 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         ),
       });
     } catch (e) {
-      setModalError({ content: 'Error while terminating position' });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      setModalError({ content: 'Error while terminating position', error: { code: e.code, message: e.message } });
     }
   };
 
