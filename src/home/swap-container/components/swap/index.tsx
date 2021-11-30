@@ -48,7 +48,6 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { ETH, WETH } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import NetworkMenu from 'common/network-menu';
 import { STALE } from 'hooks/useIsStale';
 
 const StyledPaper = styled(Paper)`
@@ -162,7 +161,6 @@ const Swap = ({
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
-  const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
   const [isLoading, setIsLoading] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -475,13 +473,7 @@ const Swap = ({
   const ignoreValues = [from.address, to.address];
 
   const NotConnectedButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      fullWidth
-      color="error"
-      onClick={() => setShouldOpenNetworkMenu(true)}
-    >
+    <StyledButton size="large" variant="contained" fullWidth color="error">
       <Typography variant="body1">
         <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
       </Typography>
@@ -614,16 +606,6 @@ const Swap = ({
 
   let ButtonToShow;
 
-  // console.log('-----------------------------------------------------')
-  // console.log('!web3Service.getAccount()', !web3Service.getAccount())
-  // console.log('!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)', !SUPPORTED_NETWORKS.includes(currentNetwork.chainId))
-  // console.log('isLoading || isLoadingPairIsSupported', isLoading || isLoadingPairIsSupported, isLoading, isLoadingPairIsSupported)
-  // console.log('!pairIsSupported && !isLoadingPairIsSupported', !pairIsSupported && !isLoadingPairIsSupported, !pairIsSupported, !isLoadingPairIsSupported)
-  // console.log('isETH', isETH)
-  // console.log('!pairExists', !pairExists)
-  // console.log('!isApproved', !isApproved)
-  // console.log('cantFund', cantFund)
-
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
@@ -677,7 +659,6 @@ const Swap = ({
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
       />
-      <NetworkMenu open={shouldOpenNetworkMenu} onClose={() => setShouldOpenNetworkMenu(false)} />
       <StyledSwapContainer>
         <Grid container>
           <StyledFromContainer container alignItems="center" justify="space-between">
