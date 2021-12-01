@@ -8,7 +8,6 @@ import { ApolloProvider } from '@apollo/client';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
 import store, { axiosClient } from 'state';
-import { SnackbarProvider } from 'notistack';
 import MainApp from './frame';
 
 type AppProps = {
@@ -56,9 +55,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
         <ApolloProvider client={DCASubgraph}>
           <Provider store={store}>
-            <SnackbarProvider>
-              <MainApp isLoading={isLoading} />
-            </SnackbarProvider>
+            <MainApp isLoading={isLoading} />
           </Provider>
         </ApolloProvider>
       </IntlProvider>

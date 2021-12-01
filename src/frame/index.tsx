@@ -16,6 +16,7 @@ import { useThemeMode } from 'state/config/hooks';
 import TransactionModalProvider from 'common/transaction-modal';
 import { useAppDispatch } from 'hooks/state';
 import { startFetchingTokenLists } from 'state/token-lists/actions';
+import { SnackbarProvider } from 'notistack';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -66,39 +67,41 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
     <MuiThemeProvider theme={theme}>
       <ThemeProvider theme={theme as DefaultTheme}>
         <CssBaseline />
-        <TransactionModalProvider>
-          {!isLoading && (
-            <>
-              <TransactionUpdater />
-              <BlockNumberUpdater />
-            </>
-          )}
-          <Router>
-            <StyledContainer>
-              <StyledGridContainer container direction="column">
-                <StyledNavBarGridContainer item xs={12}>
-                  <NavBar isLoading={isLoading} />
-                </StyledNavBarGridContainer>
-                <StyledAppGridContainer item xs={12}>
-                  <Switch>
-                    <Route path="/faq">
-                      <FAQ />
-                    </Route>
-                    <Route path="/positions/:positionId">
-                      <PositionDetail />
-                    </Route>
-                    <Route path="/:from?/:to?">
-                      <Home isLoading={isLoading} />
-                    </Route>
-                  </Switch>
-                </StyledAppGridContainer>
-                <StyledNavBarGridContainer item xs={12}>
-                  <AppFooter />
-                </StyledNavBarGridContainer>
-              </StyledGridContainer>
-            </StyledContainer>
-          </Router>
-        </TransactionModalProvider>
+        <SnackbarProvider>
+          <TransactionModalProvider>
+            {!isLoading && (
+              <>
+                <TransactionUpdater />
+                <BlockNumberUpdater />
+              </>
+            )}
+            <Router>
+              <StyledContainer>
+                <StyledGridContainer container direction="column">
+                  <StyledNavBarGridContainer item xs={12}>
+                    <NavBar isLoading={isLoading} />
+                  </StyledNavBarGridContainer>
+                  <StyledAppGridContainer item xs={12}>
+                    <Switch>
+                      <Route path="/faq">
+                        <FAQ />
+                      </Route>
+                      <Route path="/positions/:positionId">
+                        <PositionDetail />
+                      </Route>
+                      <Route path="/:from?/:to?">
+                        <Home isLoading={isLoading} />
+                      </Route>
+                    </Switch>
+                  </StyledAppGridContainer>
+                  <StyledNavBarGridContainer item xs={12}>
+                    <AppFooter />
+                  </StyledNavBarGridContainer>
+                </StyledGridContainer>
+              </StyledContainer>
+            </Router>
+          </TransactionModalProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     </MuiThemeProvider>
   );
