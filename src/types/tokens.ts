@@ -13,7 +13,7 @@ export interface TokensLists {
   name: string;
   logoURI: string;
   timestamp: number;
-  tokens: TokenList;
+  tokens: Token[];
   version: Version;
   hasLoaded: boolean;
   requestId: string;

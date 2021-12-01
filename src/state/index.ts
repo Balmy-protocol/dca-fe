@@ -36,7 +36,18 @@ const store = configureStore({
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient } }).concat([
       save({ states: PERSISTED_STATES, debounce: 1000 }),
     ]),
-  preloadedState: load({ states: PERSISTED_STATES, preloadedState: { tokenLists: { byUrl: getDefaultByUrl() } } }),
+  preloadedState: load({
+    states: PERSISTED_STATES,
+    preloadedState: {
+      tokenLists: {
+        byUrl: getDefaultByUrl(),
+        activeLists: [
+          'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
+          'https://gateway.pinata.cloud/ipfs/QmRhveZ2UB68XUhMjT7eNjgnku4AkyhKSKAJZ3i2KReHuL',
+        ],
+      },
+    },
+  }),
 });
 
 export default store;

@@ -1,13 +1,14 @@
 import React from 'react';
 import { TokenList } from 'types';
 import reduce from 'lodash/reduce';
+import keyBy from 'lodash/keyBy';
 import { useAllTransactions } from 'state/transactions/hooks';
 import { NETWORKS } from 'config/constants';
 import { DEFAULT_TOKEN_LIST, PROTOCOL_TOKEN, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { useSavedTokenLists, useTokensLists } from 'state/token-lists/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 
-function useTokenList() {
+function useTokenList(filter = true) {
   const currentNetwork = useCurrentNetwork();
   const transactions = useAllTransactions();
   const tokensLists = useTokensLists();
@@ -24,7 +25,18 @@ function useTokenList() {
 
     return reduce(
       tokensLists,
-      (acc, tokensList, key) => (savedTokenLists.includes(key) ? { ...acc, ...tokensList.tokens } : acc),
+      (acc, tokensList, key) =>
+        !filter || savedTokenLists.includes(key)
+          ? {
+              ...acc,
+              ...keyBy(
+                tokensList.tokens.filter(
+                  (token) => token.chainId === currentNetwork.chainId && !Object.keys(acc).includes(token.address)
+                ),
+                'address'
+              ),
+            }
+          : acc,
       { [PROTOCOL_TOKEN_ADDRESS]: PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId) }
     );
   }, [transactions, currentNetwork.chainId]);

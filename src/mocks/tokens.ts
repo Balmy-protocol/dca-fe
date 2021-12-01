@@ -263,5 +263,5 @@ export const KOVAN_TOKENS = {
 };
 
 export const DEFAULT_TOKEN_LIST = {
-  [NETWORKS.kovan.chainId]: KOVAN_TOKENS,
+  [NETWORKS.ropsten.chainId]: KOVAN_TOKENS,
 };
