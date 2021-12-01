@@ -280,7 +280,7 @@ const TokenPicker = ({
         >
           <CloseIcon fontSize="inherit" />
         </IconButton>
-        <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
+        <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap', overflow: 'scroll' }}>
           {shouldShowTokenLists ? (
             <TokenLists />
           ) : (

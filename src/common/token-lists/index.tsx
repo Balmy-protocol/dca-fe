@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { TOKEN_LISTS } from 'config/constants';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import Link from '@material-ui/core/Link';
@@ -54,7 +53,7 @@ const TokenLists = () => {
 
   return (
     <StyledTokenListContainer container spacing={4} style={{ flexGrow: 1 }}>
-      {Object.keys(TOKEN_LISTS).map((tokenListUrl) =>
+      {Object.keys(tokenList).map((tokenListUrl) =>
         tokenList[tokenListUrl] ? (
           <Grid item xs={12} md={6} key={tokenListUrl}>
             <StyledCard raised elevation={5}>

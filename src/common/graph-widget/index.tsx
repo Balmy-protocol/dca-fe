@@ -16,7 +16,7 @@ import { AvailablePair, GetPairPriceResponseData, GetPairResponseSwapData, Token
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from 'utils/currency';
-import { PROTOCOL_TOKEN, PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
 import { BigNumber } from 'ethers';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import useUNIGraphql from 'hooks/useUNIGraphql';

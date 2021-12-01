@@ -11,11 +11,21 @@ interface TokenButtonProps {
   size?: string;
 }
 
+function getLogoURL(logoURI: string) {
+  if (logoURI?.startsWith('ipfs://')) {
+    return `https://ipfs.io/ipfs/${logoURI.split('//')[1]}`;
+  }
+  if (typeof logoURI === 'string') {
+    return logoURI;
+  }
+  return '';
+}
+
 const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
   const realSize = size || '28px';
   const [hasError, setHasError] = React.useState(false);
   let componentToRender = null;
-  const tokenList = useTokenList();
+  const tokenList = useTokenList(false);
   const tokenLogoUri = token?.logoURI || (token && tokenList[token.address] && tokenList[token.address].logoURI);
 
   if (CryptoIcons[token?.address as keyof typeof CryptoIcons]) {
@@ -30,7 +40,7 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
   } else if (tokenLogoUri && !hasError) {
     componentToRender = (
       <img
-        src={tokenLogoUri}
+        src={getLogoURL(tokenLogoUri)}
         onError={() => setHasError(true)}
         height={realSize}
         width={realSize}

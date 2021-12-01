@@ -1,6 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { TokensLists, Token } from 'types';
-import keyBy from 'lodash/keyBy';
 import { enableTokenList, fetchTokenList } from './actions';
 
 export interface TokenListsState {
@@ -9,11 +8,20 @@ export interface TokenListsState {
 }
 
 export const getDefaultByUrl = () => ({
+  'https://gateway.pinata.cloud/ipfs/QmRhveZ2UB68XUhMjT7eNjgnku4AkyhKSKAJZ3i2KReHuL': {
+    name: 'Mean Finance',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+  },
   'tokens.1inch.eth': {
     name: '1inch',
     logoURI: '',
     timestamp: new Date().getTime(),
-    tokens: {},
+    tokens: [],
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
@@ -22,7 +30,7 @@ export const getDefaultByUrl = () => ({
     name: 'Gemini Token List',
     logoURI: '',
     timestamp: new Date().getTime(),
-    tokens: {},
+    tokens: [],
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
@@ -31,7 +39,7 @@ export const getDefaultByUrl = () => ({
     name: 'Uniswap Default List',
     logoURI: '',
     timestamp: new Date().getTime(),
-    tokens: {},
+    tokens: [],
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
@@ -40,7 +48,7 @@ export const getDefaultByUrl = () => ({
     name: 'CoinGecko',
     logoURI: '',
     timestamp: new Date().getTime(),
-    tokens: {},
+    tokens: [],
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
@@ -69,12 +77,11 @@ export default createReducer(initialState, (builder) =>
         ...token,
         address: token.address.toLowerCase(),
       }));
-      const tokens: Record<string, Token> = keyBy(mappedTokens, 'address');
 
       state.byUrl[arg] = {
         ...state.byUrl[arg],
         ...payload,
-        tokens,
+        tokens: mappedTokens,
         hasLoaded: true,
       };
     })
