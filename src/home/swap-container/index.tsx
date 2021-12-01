@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import orderBy from 'lodash/orderBy';
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
-import { WETH, ETH, USDC } from 'mocks/tokens';
+import { WETH, USDC } from 'mocks/tokens';
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { ONE_DAY, STRING_SWAP_INTERVALS } from 'config/constants';
@@ -68,11 +68,7 @@ const SwapContainer = () => {
   };
 
   const toggleFromTo = () => {
-    if (from.address === ETH.address) {
-      setTo(WETH(currentNetwork.chainId));
-    } else {
-      setTo(from);
-    }
+    setTo(from);
 
     // check for decimals
     if (to.decimals < from.decimals) {

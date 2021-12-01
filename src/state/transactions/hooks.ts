@@ -15,8 +15,9 @@ import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 import useWeb3Service from 'hooks/useWeb3Service';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { COMPANION_ADDRESS, HUB_ADDRESS, TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
+import { ETH_ADDRESS, WETH } from 'mocks/tokens';
 import { addTransaction } from './actions';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
@@ -166,9 +167,11 @@ export function isTransactionPending(tx: TransactionDetails): boolean {
 }
 
 // returns whether a token has a pending approval transaction
-export function useHasPendingApproval(token: Token, spender: string | undefined): boolean {
+export function useHasPendingApproval(token: Token, tokenTo: Token, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = token.address;
+  const addressToCheck = tokenTo.address === ETH_ADDRESS ? HUB_ADDRESS : COMPANION_ADDRESS;
+
   return useMemo(
     () =>
       typeof tokenAddress === 'string' &&
@@ -180,7 +183,11 @@ export function useHasPendingApproval(token: Token, spender: string | undefined)
         if (tx.receipt) {
           return false;
         }
-        return (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress && tx.from === spender;
+        return (
+          (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress &&
+          (<ApproveTokenTypeData>tx.typeData).addressFor === addressToCheck &&
+          tx.from === spender
+        );
       }),
     [allTransactions, spender, tokenAddress]
   );
@@ -204,8 +211,9 @@ export function useHasPendingWrap(): boolean {
 // returns whether a token has a pending approval transaction
 export function useHasPendingPairCreation(from: Token, to: Token): boolean {
   const allTransactions = useAllTransactions();
-  const fromAddress = from.address;
-  const toAddress = to.address;
+  const network = useCurrentNetwork();
+  const fromAddress = from.address === ETH_ADDRESS ? WETH(network.chainId).address : from.address;
+  const toAddress = to.address === ETH_ADDRESS ? WETH(network.chainId).address : to.address;
 
   return useMemo(
     () =>
@@ -216,11 +224,13 @@ export function useHasPendingPairCreation(from: Token, to: Token): boolean {
         if (tx.receipt) {
           return false;
         }
+        let txFrom = (<NewPositionTypeData>tx.typeData).from.address;
+        txFrom = txFrom === ETH_ADDRESS ? WETH(network.chainId).address : txFrom;
+        let txTo = (<NewPositionTypeData>tx.typeData).to.address;
+        txTo = txTo === ETH_ADDRESS ? WETH(network.chainId).address : txTo;
         return (
-          ((<NewPositionTypeData>tx.typeData).from.address === fromAddress ||
-            (<NewPositionTypeData>tx.typeData).to.address === fromAddress) &&
-          ((<NewPositionTypeData>tx.typeData).from.address === toAddress ||
-            (<NewPositionTypeData>tx.typeData).to.address === toAddress) &&
+          (txFrom === fromAddress || txTo === fromAddress) &&
+          (txFrom === toAddress || txTo === toAddress) &&
           (<NewPositionTypeData>tx.typeData).isCreatingPair
         );
       }),
@@ -252,9 +262,10 @@ export function usePositionHasPendingTransaction(position: string): string | nul
 }
 
 // returns whether a token has been approved transaction
-export function useHasConfirmedApproval(token: Token, spender: string | undefined): boolean {
+export function useHasConfirmedApproval(token: Token, tokenTo: Token, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = token.address;
+  const addressToCheck = tokenTo.address === ETH_ADDRESS ? COMPANION_ADDRESS : HUB_ADDRESS;
   return useMemo(
     () =>
       typeof tokenAddress === 'string' &&
@@ -263,7 +274,12 @@ export function useHasConfirmedApproval(token: Token, spender: string | undefine
         if (!allTransactions[hash]) return false;
         if (allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN) return false;
         const tx = allTransactions[hash];
-        return tx.receipt && (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress && tx.from === spender;
+        return (
+          tx.receipt &&
+          (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress &&
+          (<ApproveTokenTypeData>tx.typeData).addressFor === addressToCheck &&
+          tx.from === spender
+        );
       }),
     [allTransactions, spender, tokenAddress]
   );

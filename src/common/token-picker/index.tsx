@@ -20,7 +20,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles } from '@material-ui/core/styles';
-import { ETH, WETH } from 'mocks/tokens';
+import { ETH_ADDRESS, WETH } from 'mocks/tokens';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -137,7 +137,6 @@ interface RowProps {
 interface TokenPickerProps {
   shouldShow: boolean;
   availableFrom?: string[];
-  selected: Token;
   onChange: SetFromToState;
   onClose: () => void;
   isFrom: boolean;
@@ -200,7 +199,6 @@ const TokenPicker = ({
   onChange,
   ignoreValues,
   usedTokens,
-  selected,
 }: TokenPickerProps) => {
   const tokenList = useTokenList();
   const [search, setSearch] = React.useState('');
@@ -211,15 +209,6 @@ const TokenPicker = ({
   const inputStyles = useSearchInputStyles();
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
-  const extendedIgnoredValues = isFrom
-    ? [
-        ...ignoreValues,
-        ...(ignoreValues.includes(WETH(currentNetwork.chainId).address) &&
-        selected.address !== WETH(currentNetwork.chainId).address
-          ? [ETH.address]
-          : []),
-      ]
-    : [...ignoreValues, ETH.address];
 
   const handleOnClose = () => {
     if (shouldShowTokenLists) {
@@ -237,20 +226,15 @@ const TokenPicker = ({
 
   const uniqTokensFromPairs = React.useMemo(
     () =>
-      uniq(
-        availablePairs.reduce(
-          (accum, current) => [...accum, current.token0.address, current.token1.address],
-          [...(isFrom ? [ETH.address] : [])]
-        )
-      ),
+      uniq(availablePairs.reduce((accum, current) => [...accum, current.token0.address, current.token1.address], [])),
     [availablePairs]
   );
 
   tokenKeysToUse = !isOnlyPairs ? tokenKeys : uniqTokensFromPairs;
 
   const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !extendedIgnoredValues.includes(el) && tokenKeysToUse.includes(el)),
-    [usedTokens, extendedIgnoredValues, tokenKeysToUse]
+    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
+    [usedTokens, ignoreValues, tokenKeysToUse]
   );
 
   const memoizedTokenKeys = React.useMemo(() => {
@@ -261,7 +245,7 @@ const TokenPicker = ({
           tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
           tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
         !usedTokens.includes(el) &&
-        !extendedIgnoredValues.includes(el) &&
+        !ignoreValues.includes(el) &&
         tokenList[el].chainId === currentNetwork.chainId
     );
 
@@ -270,13 +254,13 @@ const TokenPicker = ({
       filteredTokenKeys.unshift(WETH(currentNetwork.chainId).address);
     }
 
-    if (filteredTokenKeys.findIndex((el) => el === ETH.address) !== -1) {
-      remove(filteredTokenKeys, (token) => token === ETH.address);
-      filteredTokenKeys.unshift(ETH.address);
+    if (filteredTokenKeys.findIndex((el) => el === ETH_ADDRESS) !== -1) {
+      remove(filteredTokenKeys, (token) => token === ETH_ADDRESS);
+      filteredTokenKeys.unshift(ETH_ADDRESS);
     }
 
     return filteredTokenKeys;
-  }, [tokenKeys, search, usedTokens, extendedIgnoredValues, tokenKeysToUse, availableFrom, currentNetwork.chainId]);
+  }, [tokenKeys, search, usedTokens, ignoreValues, tokenKeysToUse, availableFrom, currentNetwork.chainId]);
 
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>

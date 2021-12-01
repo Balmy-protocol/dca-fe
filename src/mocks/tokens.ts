@@ -58,14 +58,17 @@ export const USDC = (chainId: number): Token => ({
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
 });
 
-export const ETH = {
-  chainId: 1,
+export const ETH_COMPANION_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+
+export const ETH = (chainId: number): Token => ({
+  chainId,
   decimals: 18,
-  address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+  address: ETH_ADDRESS,
   name: 'Ethereum',
   symbol: 'ETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
-};
+});
 
 const UNI_ADDRESSES = {
   [NETWORKS.mainnet.chainId]: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
@@ -206,6 +209,7 @@ export const SNX = (chainId: number): Token => ({
 });
 
 export const KOVAN_TOKENS = {
+  [ETH_ADDRESS]: ETH(NETWORKS.kovan.chainId),
   [DAI_ADDRESSES[NETWORKS.kovan.chainId]]: DAI(NETWORKS.kovan.chainId),
   [WETH_ADDRESSES[NETWORKS.kovan.chainId]]: WETH(NETWORKS.kovan.chainId),
   [USDC_ADDRESSES[NETWORKS.kovan.chainId]]: USDC(NETWORKS.kovan.chainId),

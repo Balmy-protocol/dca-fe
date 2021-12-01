@@ -431,7 +431,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           <Typography variant="body2">
             <FormattedMessage
               description="current remaining"
-              defaultMessage="{remainingLiquidity} {from} remain"
+              defaultMessage="{remainingLiquidity} {from} remaining"
               values={{ remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from), from: from.symbol }}
             />
           </Typography>

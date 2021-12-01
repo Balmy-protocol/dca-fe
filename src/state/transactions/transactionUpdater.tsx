@@ -9,7 +9,7 @@ import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
 import EtherscanLink from 'common/view-on-etherscan';
-import { TransactionReceipt } from 'types';
+import { NewPositionTypeData, TransactionReceipt } from 'types';
 import { setInitialized } from 'state/initializer/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { usePendingTransactions } from './hooks';
@@ -135,7 +135,12 @@ export default function Updater(): null {
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
                 extendedTypeData = {
                   // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                  id: web3Service.parseLog(receipt.logs[receipt.logs.length - 1]).args.positionId.toString(),
+                  id: web3Service
+                    .parseLog(
+                      receipt.logs[receipt.logs.length - 1],
+                      (transactions[hash].typeData as NewPositionTypeData).addressFor
+                    )
+                    .args.positionId.toString(),
                 };
               }
 

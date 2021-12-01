@@ -40,13 +40,44 @@ export class TokenDescriptorContract extends Contract {
   tokenURI: (hubAddress: string, positionId: string) => Promise<string>;
 }
 
+export class HubCompanionContract extends Contract {
+  depositUsingProtocolToken: (
+    from: string,
+    to: string,
+    totalAmmount: BigNumber,
+    swaps: BigNumber,
+    interval: BigNumber,
+    account: string,
+    permissions: { operator: string; permissions: string[] }[],
+    overrides: { value?: BigNumber }
+  ) => Promise<TransactionResponse>;
+
+  withdrawSwappedUsingProtocolToken: (id: string, recipient: string) => Promise<TransactionResponse>;
+
+  terminateUsingProtocolTokenAsFrom: (
+    id: string,
+    recipientUnswapped: string,
+    recipientSwapped: string
+  ) => Promise<TransactionResponse>;
+
+  increasePositionUsingProtocolToken: (
+    id: string,
+    newAmount: BigNumber,
+    newSwaps: BigNumber
+  ) => Promise<TransactionResponse>;
+
+  reducePositionUsingProtocolToken: (
+    id: string,
+    newAmount: BigNumber,
+    newSwaps: BigNumber,
+    recipient: string
+  ) => Promise<TransactionResponse>;
+}
 export class HubContract extends Contract {
   getNextSwapInfo: (
     tokens: string[],
     pairIndexes: PairIndex[]
   ) => Promise<{ pairs: SwapInfoPairData[]; tokens: SwapInforTokenData[] }>;
-
-  createPair: (tokenA: string, tokenB: string) => Promise<TransactionResponse>;
 
   deposit: (
     from: string,

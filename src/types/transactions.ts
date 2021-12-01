@@ -63,6 +63,7 @@ export interface TerminatePositionTypeData {
 
 export interface ApproveTokenTypeData {
   token: Token;
+  addressFor: string;
 }
 
 export interface WrapEtherTypeData {
@@ -79,6 +80,7 @@ export interface NewPositionTypeData {
   startedAt: number;
   isCreatingPair: boolean;
   oracle: Oracles;
+  addressFor: string;
 }
 
 export interface NewPairTypeData {

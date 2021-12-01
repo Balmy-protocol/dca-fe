@@ -32,6 +32,8 @@ import {
   SUPPORTED_NETWORKS,
   TRANSACTION_TYPES,
   ORACLES,
+  COMPANION_ADDRESS,
+  HUB_ADDRESS,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -40,13 +42,12 @@ import {
   useTransactionAdder,
   useHasPendingApproval,
   useHasConfirmedApproval,
-  useHasPendingWrap,
   useHasPendingPairCreation,
 } from 'state/transactions/hooks';
 import { getFrequencyLabel, calculateStale } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
-import { ETH, WETH } from 'mocks/tokens';
+import { ETH_ADDRESS, WETH } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { STALE } from 'hooks/useIsStale';
 
@@ -171,21 +172,27 @@ const Swap = ({
   const [usedTokens] = useUsedTokens();
 
   const existingPair = React.useMemo(() => {
-    const token0 = from.address < to.address ? from.address : to.address;
-    const token1 = from.address < to.address ? to.address : from.address;
+    let token0 = from.address < to.address ? from.address : to.address;
+    let token1 = from.address < to.address ? to.address : from.address;
+
+    if (token0 === ETH_ADDRESS) {
+      token0 = WETH(currentNetwork.chainId).address;
+    }
+    if (token1 === ETH_ADDRESS) {
+      token1 = WETH(currentNetwork.chainId).address;
+    }
     return find(availablePairs, (pair) => pair.token0.address === token0 && pair.token1.address === token1);
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
   const isCreatingPair = useHasPendingPairCreation(from, to);
 
-  const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount());
-  const hasPendingWrap = useHasPendingWrap();
-  const hasConfirmedApproval = useHasConfirmedApproval(from, web3Service.getAccount());
+  const hasPendingApproval = useHasPendingApproval(from, to, web3Service.getAccount());
+  const hasConfirmedApproval = useHasConfirmedApproval(from, to, web3Service.getAccount());
 
   const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
     web3Service,
     'getAllowance',
-    [from],
-    !from || !web3Service.getAccount() || hasPendingApproval
+    [from, to],
+    !from || !to || !web3Service.getAccount() || hasPendingApproval
   );
 
   const [pairIsSupported, isLoadingPairIsSupported] = usePromise<boolean>(
@@ -207,14 +214,8 @@ const Swap = ({
     );
   }, [from]);
 
-  React.useEffect(() => {
-    if (!hasPendingWrap && from.address === ETH.address) {
-      setFrom(WETH(currentNetwork.chainId));
-    }
-  }, [hasPendingWrap]);
-
   const handleApproveToken = async () => {
-    const fromSymbol = from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol;
+    const fromSymbol = from.symbol;
 
     try {
       setModalLoading({
@@ -228,10 +229,10 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await web3Service.approveToken(from);
+      const result = await web3Service.approveToken(from, to);
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
-        typeData: { token: from },
+        typeData: { token: from, addressFor: to.address === ETH_ADDRESS ? COMPANION_ADDRESS : HUB_ADDRESS },
       });
       setModalSuccess({
         hash: result.hash,
@@ -249,40 +250,10 @@ const Swap = ({
     }
   };
 
-  const handleWrapToken = async () => {
-    try {
-      setModalLoading({
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="wrapping eth"
-              defaultMessage="Wrapping {value} ETH for you"
-              values={{ value: fromValue }}
-            />
-          </Typography>
-        ),
-      });
-      const result = await web3Service.wrapETH(fromValue);
-      addTransaction(result, { type: TRANSACTION_TYPES.WRAP_ETHER, typeData: { amount: fromValue } });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="success wrapping eth"
-            defaultMessage="Wrapping ETH has been succesfully submitted to the blockchain and will be confirmed soon"
-          />
-        ),
-      });
-    } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'error wrapping eth', error: { code: e.code, message: e.message } });
-    }
-  };
-
   const handleSwap = async () => {
     setShouldShowPairModal(false);
     setShouldShowStalePairModal(false);
-    const fromSymbol = from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol;
+    const fromSymbol = from.symbol;
 
     try {
       setModalLoading({
@@ -300,7 +271,7 @@ const Swap = ({
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
         typeData: {
-          from: from.address === ETH.address ? WETH(currentNetwork.chainId) : from,
+          from,
           to,
           fromValue,
           frequencyType: frequencyType.toString(),
@@ -308,6 +279,7 @@ const Swap = ({
           startedAt: Date.now(),
           id: result.hash,
           isCreatingPair: !existingPair,
+          addressFor: to.address === ETH_ADDRESS || from.address === ETH_ADDRESS ? COMPANION_ADDRESS : HUB_ADDRESS,
         },
       });
       setModalSuccess({
@@ -458,7 +430,8 @@ const Swap = ({
         allowance.allowance &&
         allowance.token.address === from.address &&
         parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
-      hasConfirmedApproval;
+      hasConfirmedApproval ||
+      from.address === ETH_ADDRESS;
 
   const shouldDisableButton =
     !fromValue ||
@@ -470,8 +443,6 @@ const Swap = ({
     !isApproved ||
     parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0));
-
-  const isETH = from.address === ETH.address;
 
   const ignoreValues = [from.address, to.address];
 
@@ -507,7 +478,7 @@ const Swap = ({
             description="waiting for approval"
             defaultMessage="Waiting for your {token} to be approved"
             values={{
-              token: (from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol) || '',
+              token: from.symbol || '',
             }}
           />
         ) : (
@@ -515,38 +486,12 @@ const Swap = ({
             description="Allow us to use your coin"
             defaultMessage="Approve {token}"
             values={{
-              token: (from.address === ETH.address ? WETH(currentNetwork.chainId).symbol : from.symbol) || '',
+              token: from.symbol || '',
             }}
           />
         )}
       </Typography>
       <Tooltip title="You only have to do this once per token" arrow placement="top">
-        <StyledHelpOutlineIcon fontSize="small" />
-      </Tooltip>
-    </StyledButton>
-  );
-
-  const WrapButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      fullWidth
-      color="primary"
-      disabled={!isETH || cantFund || !fromValue || hasPendingWrap}
-      onClick={handleWrapToken}
-      style={{ pointerEvents: 'all' }}
-    >
-      <Typography variant="body1">
-        {hasPendingWrap ? (
-          <FormattedMessage
-            description="waiting for eth to wrap"
-            defaultMessage="Waiting for your ETH to be wrapped to WETH"
-          />
-        ) : (
-          <FormattedMessage description="wrap eth" defaultMessage="Wrap ETH" />
-        )}
-      </Typography>
-      <Tooltip title="You can only operate with WETH. But we can wrap your ETH for you" arrow placement="top">
         <StyledHelpOutlineIcon fontSize="small" />
       </Tooltip>
     </StyledButton>
@@ -617,8 +562,6 @@ const Swap = ({
     ButtonToShow = LoadingButton;
   } else if (!pairIsSupported && !isLoadingPairIsSupported) {
     ButtonToShow = PairNotSupportedButton;
-  } else if (isETH) {
-    ButtonToShow = WrapButton;
   } else if (!isApproved) {
     ButtonToShow = ApproveTokenButton;
   } else if (cantFund) {
@@ -657,7 +600,6 @@ const Swap = ({
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
         isFrom={selecting === from}
-        selected={selecting}
         onChange={selecting.address === from.address ? setFrom : setTo}
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
