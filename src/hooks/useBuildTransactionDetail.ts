@@ -35,7 +35,7 @@ function useBuildTransactionDetail() {
         case TRANSACTION_TYPES.WRAP_ETHER: {
           const wrapEtherTypeData = tx.typeData as WrapEtherTypeData;
 
-          message = `${wrapEtherTypeData.amount} wrapped to WETH`;
+          message = `${wrapEtherTypeData.amount} wrapped to WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId]`;
           break;
         }
         case TRANSACTION_TYPES.NEW_POSITION: {

@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import orderBy from 'lodash/orderBy';
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
-import { WETH, USDC } from 'mocks/tokens';
+import { WRAPPED_PROTOCOL_TOKEN, USDC } from 'mocks/tokens';
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { ONE_DAY, STRING_SWAP_INTERVALS } from 'config/constants';
@@ -20,7 +20,7 @@ const SwapContainer = () => {
   const [frequencyType, setFrequencyType] = React.useState(ONE_DAY);
   const [frequencyValue, setFrequencyValue] = React.useState('5');
   const currentNetwork = useCurrentNetwork();
-  const [from, setFrom] = React.useState(WETH(currentNetwork.chainId));
+  const [from, setFrom] = React.useState(WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId));
   const [to, setTo] = React.useState(USDC(currentNetwork.chainId));
   const client = useDCAGraphql();
   const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
@@ -31,7 +31,7 @@ const SwapContainer = () => {
   );
 
   React.useEffect(() => {
-    setFrom(WETH(currentNetwork.chainId));
+    setFrom(WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId));
     setTo(USDC(currentNetwork.chainId));
   }, [currentNetwork.chainId]);
 

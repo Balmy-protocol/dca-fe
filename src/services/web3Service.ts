@@ -68,7 +68,7 @@ import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
 import TOKEN_DESCRIPTOR_ABI from 'abis/TokenDescriptor.json';
 
 // MOCKS
-import { ETH_ADDRESS, ETH_COMPANION_ADDRESS, WETH } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
 import {
   CHAINLINK_ORACLE_ADDRESS,
   COINGECKO_IDS,
@@ -439,7 +439,7 @@ export default class Web3Service {
   getBalance(address?: string): Promise<BigNumber> {
     if (!address) return Promise.resolve(BigNumber.from(0));
 
-    if (address === ETH_ADDRESS) return this.signer.getBalance();
+    if (address === PROTOCOL_TOKEN_ADDRESS) return this.signer.getBalance();
 
     const ERC20Interface = new Interface(ERC20ABI);
 
@@ -449,13 +449,13 @@ export default class Web3Service {
   }
 
   async getAllowance(token: Token, tokenTo: Token) {
-    if (token.address === ETH_ADDRESS) {
+    if (token.address === PROTOCOL_TOKEN_ADDRESS) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, 18) });
     }
 
     let addressToCheck;
 
-    if (tokenTo.address === ETH_ADDRESS) {
+    if (tokenTo.address === PROTOCOL_TOKEN_ADDRESS) {
       addressToCheck = COMPANION_ADDRESS;
     } else {
       addressToCheck = HUB_ADDRESS;
@@ -476,7 +476,7 @@ export default class Web3Service {
   async approveToken(token: Token, tokenTo: Token): Promise<TransactionResponse> {
     let addressToApprove;
 
-    if (tokenTo.address === ETH_ADDRESS) {
+    if (tokenTo.address === PROTOCOL_TOKEN_ADDRESS) {
       addressToApprove = COMPANION_ADDRESS;
     } else {
       addressToApprove = HUB_ADDRESS;
@@ -632,8 +632,12 @@ export default class Web3Service {
     ) as unknown as OracleContract;
 
     return oracleInstance.canSupportPair(
-      tokenA.address === ETH_ADDRESS ? WETH(network.chainId).address : tokenA.address,
-      tokenB.address === ETH_ADDRESS ? WETH(network.chainId).address : tokenB.address
+      tokenA.address === PROTOCOL_TOKEN_ADDRESS
+        ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address
+        : tokenA.address,
+      tokenB.address === PROTOCOL_TOKEN_ADDRESS
+        ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address
+        : tokenB.address
     );
   }
 
@@ -657,8 +661,8 @@ export default class Web3Service {
     }
 
     // check for ETH
-    tokenA = tokenA.address === ETH_ADDRESS ? WETH(chain.chainId) : tokenA;
-    tokenB = tokenB.address === ETH_ADDRESS ? WETH(chain.chainId) : tokenB;
+    tokenA = tokenA.address === PROTOCOL_TOKEN_ADDRESS ? WRAPPED_PROTOCOL_TOKEN[chain.chainId](chain.chainId) : tokenA;
+    tokenB = tokenB.address === PROTOCOL_TOKEN_ADDRESS ? WRAPPED_PROTOCOL_TOKEN[chain.chainId](chain.chainId) : tokenB;
 
     const hubInstance = new ethers.Contract(HUB_ADDRESS, HUB_ABI.abi, this.getSigner());
 
@@ -724,7 +728,7 @@ export default class Web3Service {
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
 
-    if (from.address === ETH_ADDRESS || to.address === ETH_ADDRESS) {
+    if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
       const hubCompanionInstance = new ethers.Contract(
         COMPANION_ADDRESS,
         HUB_COMPANION_ABI.abi,
@@ -732,14 +736,14 @@ export default class Web3Service {
       ) as unknown as HubCompanionContract;
 
       return hubCompanionInstance.depositUsingProtocolToken(
-        from.address === ETH_ADDRESS ? ETH_COMPANION_ADDRESS : from.address,
-        to.address === ETH_ADDRESS ? ETH_COMPANION_ADDRESS : to.address,
+        from.address === PROTOCOL_TOKEN_ADDRESS ? ETH_COMPANION_ADDRESS : from.address,
+        to.address === PROTOCOL_TOKEN_ADDRESS ? ETH_COMPANION_ADDRESS : to.address,
         weiValue,
         amountOfSwaps,
         swapInterval,
         this.account,
         [],
-        from.address === ETH_ADDRESS ? { value: weiValue } : {}
+        from.address === PROTOCOL_TOKEN_ADDRESS ? { value: weiValue } : {}
       );
     }
 
@@ -749,7 +753,7 @@ export default class Web3Service {
   }
 
   withdraw(position: Position): Promise<TransactionResponse> {
-    if (position.to.address === ETH_ADDRESS) {
+    if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
       const hubCompanionInstance = new ethers.Contract(
         COMPANION_ADDRESS,
         HUB_COMPANION_ABI.abi,
@@ -765,7 +769,7 @@ export default class Web3Service {
   }
 
   terminate(position: Position): Promise<TransactionResponse> {
-    if (position.to.address === ETH_ADDRESS) {
+    if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
       const hubCompanionInstance = new ethers.Contract(
         COMPANION_ADDRESS,
         HUB_COMPANION_ABI.abi,
@@ -794,7 +798,7 @@ export default class Web3Service {
 
     const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === ETH_ADDRESS) {
+      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
         return hubCompanionInstance.increasePositionUsingProtocolToken(
           position.id,
           newAmount.sub(position.remainingLiquidity),
@@ -808,7 +812,7 @@ export default class Web3Service {
       );
     }
 
-    if (position.from.address === ETH_ADDRESS || position.to.address === ETH_ADDRESS) {
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),
@@ -839,7 +843,7 @@ export default class Web3Service {
 
     const newAmount = newRate.mul(BigNumber.from(newSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === ETH_ADDRESS) {
+      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
         return hubCompanionInstance.increasePositionUsingProtocolToken(
           position.id,
           newAmount.sub(position.remainingLiquidity),
@@ -853,7 +857,7 @@ export default class Web3Service {
       );
     }
 
-    if (position.from.address === ETH_ADDRESS || position.to.address === ETH_ADDRESS) {
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),
@@ -880,7 +884,7 @@ export default class Web3Service {
 
     const newAmount = BigNumber.from(parseUnits(newRate, position.from.decimals)).mul(BigNumber.from(newSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === ETH_ADDRESS) {
+      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
         return hubCompanionInstance.increasePositionUsingProtocolToken(
           position.id,
           newAmount.sub(position.remainingLiquidity),
@@ -895,7 +899,7 @@ export default class Web3Service {
       );
     }
 
-    if (position.from.address === ETH_ADDRESS || position.to.address === ETH_ADDRESS) {
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),
@@ -932,7 +936,7 @@ export default class Web3Service {
 
     const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === ETH_ADDRESS) {
+      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
         return hubCompanionInstance.increasePositionUsingProtocolToken(
           position.id,
           newAmount.sub(position.remainingLiquidity),
@@ -943,7 +947,7 @@ export default class Web3Service {
       return hubInstance.increasePosition(position.id, newAmount.sub(position.remainingLiquidity), newSwaps);
     }
 
-    if (position.from.address === ETH_ADDRESS || position.to.address === ETH_ADDRESS) {
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),

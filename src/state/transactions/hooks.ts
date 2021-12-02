@@ -17,7 +17,7 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { COMPANION_ADDRESS, HUB_ADDRESS, TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
-import { ETH_ADDRESS, WETH } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
 import { addTransaction } from './actions';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
@@ -170,7 +170,7 @@ export function isTransactionPending(tx: TransactionDetails): boolean {
 export function useHasPendingApproval(token: Token, tokenTo: Token, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = token.address;
-  const addressToCheck = tokenTo.address === ETH_ADDRESS ? HUB_ADDRESS : COMPANION_ADDRESS;
+  const addressToCheck = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? HUB_ADDRESS : COMPANION_ADDRESS;
 
   return useMemo(
     () =>
@@ -212,8 +212,14 @@ export function useHasPendingWrap(): boolean {
 export function useHasPendingPairCreation(from: Token, to: Token): boolean {
   const allTransactions = useAllTransactions();
   const network = useCurrentNetwork();
-  const fromAddress = from.address === ETH_ADDRESS ? WETH(network.chainId).address : from.address;
-  const toAddress = to.address === ETH_ADDRESS ? WETH(network.chainId).address : to.address;
+  const fromAddress =
+    from.address === PROTOCOL_TOKEN_ADDRESS
+      ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address
+      : from.address;
+  const toAddress =
+    to.address === PROTOCOL_TOKEN_ADDRESS
+      ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address
+      : to.address;
 
   return useMemo(
     () =>
@@ -225,9 +231,11 @@ export function useHasPendingPairCreation(from: Token, to: Token): boolean {
           return false;
         }
         let txFrom = (<NewPositionTypeData>tx.typeData).from.address;
-        txFrom = txFrom === ETH_ADDRESS ? WETH(network.chainId).address : txFrom;
+        txFrom =
+          txFrom === PROTOCOL_TOKEN_ADDRESS ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address : txFrom;
         let txTo = (<NewPositionTypeData>tx.typeData).to.address;
-        txTo = txTo === ETH_ADDRESS ? WETH(network.chainId).address : txTo;
+        txTo =
+          txTo === PROTOCOL_TOKEN_ADDRESS ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address : txTo;
         return (
           (txFrom === fromAddress || txTo === fromAddress) &&
           (txFrom === toAddress || txTo === toAddress) &&
@@ -265,7 +273,7 @@ export function usePositionHasPendingTransaction(position: string): string | nul
 export function useHasConfirmedApproval(token: Token, tokenTo: Token, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = token.address;
-  const addressToCheck = tokenTo.address === ETH_ADDRESS ? COMPANION_ADDRESS : HUB_ADDRESS;
+  const addressToCheck = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? COMPANION_ADDRESS : HUB_ADDRESS;
   return useMemo(
     () =>
       typeof tokenAddress === 'string' &&

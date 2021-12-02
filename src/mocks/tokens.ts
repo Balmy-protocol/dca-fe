@@ -59,16 +59,54 @@ export const USDC = (chainId: number): Token => ({
 });
 
 export const ETH_COMPANION_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-export const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+export const PROTOCOL_TOKEN_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
 export const ETH = (chainId: number): Token => ({
   chainId,
   decimals: 18,
-  address: ETH_ADDRESS,
+  address: PROTOCOL_TOKEN_ADDRESS,
   name: 'Ethereum',
   symbol: 'ETH',
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
 });
+
+export const MATIC = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Matic',
+  symbol: 'MATIC',
+  logoURI:
+    'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270/logo.png',
+});
+
+export const WMATIC = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Wrapped Matic',
+  symbol: 'WMATIC',
+  logoURI:
+    'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270/logo.png',
+});
+
+export const PROTOCOL_TOKEN = {
+  [NETWORKS.mainnet.chainId]: ETH,
+  [NETWORKS.ropsten.chainId]: ETH,
+  [NETWORKS.rinkeby.chainId]: ETH,
+  [NETWORKS.goerli.chainId]: ETH,
+  [NETWORKS.kovan.chainId]: ETH,
+  [NETWORKS.polygon.chainId]: MATIC,
+};
+
+export const WRAPPED_PROTOCOL_TOKEN = {
+  [NETWORKS.mainnet.chainId]: WETH,
+  [NETWORKS.ropsten.chainId]: WETH,
+  [NETWORKS.rinkeby.chainId]: WETH,
+  [NETWORKS.goerli.chainId]: WETH,
+  [NETWORKS.kovan.chainId]: WETH,
+  [NETWORKS.polygon.chainId]: WMATIC,
+};
 
 const UNI_ADDRESSES = {
   [NETWORKS.mainnet.chainId]: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
@@ -209,7 +247,7 @@ export const SNX = (chainId: number): Token => ({
 });
 
 export const KOVAN_TOKENS = {
-  [ETH_ADDRESS]: ETH(NETWORKS.kovan.chainId),
+  [PROTOCOL_TOKEN_ADDRESS]: ETH(NETWORKS.kovan.chainId),
   [DAI_ADDRESSES[NETWORKS.kovan.chainId]]: DAI(NETWORKS.kovan.chainId),
   [WETH_ADDRESSES[NETWORKS.kovan.chainId]]: WETH(NETWORKS.kovan.chainId),
   [USDC_ADDRESSES[NETWORKS.kovan.chainId]]: USDC(NETWORKS.kovan.chainId),
