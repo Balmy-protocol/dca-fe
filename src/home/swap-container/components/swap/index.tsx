@@ -34,6 +34,9 @@ import {
   ORACLES,
   COMPANION_ADDRESS,
   HUB_ADDRESS,
+  WHALE_MODE_FREQUENCIES,
+  WHALE_MINIMUM_VALUES,
+  TESTNETS,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -50,6 +53,8 @@ import { BigNumber } from 'ethers';
 import { ETH_ADDRESS, WETH } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { STALE } from 'hooks/useIsStale';
+import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -99,6 +104,10 @@ const StyledButton = styled(Button)`
   border-radius: 12px;
 `;
 
+const StyledWhaleModeContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
 const StyledSwapTokenButton = styled(IconButton)`
   ${({ theme }) => `
     position: absolute;
@@ -164,6 +173,7 @@ const Swap = ({
   const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
   const [isLoading, setIsLoading] = React.useState(false);
+  const [whaleMode, setWhaleMode] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
@@ -202,6 +212,13 @@ const Swap = ({
     !from || !to
   );
 
+  const [usdPrice, isLoadingUsdPrice] = usePromise<number>(
+    web3Service,
+    'getUsdPrice',
+    [from.address === ETH_ADDRESS ? WETH(currentNetwork.chainId) : from],
+    !from
+  );
+
   React.useEffect(() => {
     setRate(
       (fromValue &&
@@ -213,6 +230,20 @@ const Swap = ({
         '0'
     );
   }, [from]);
+
+  const toggleWhaleMode = () => {
+    if (whaleMode) {
+      if (WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequencyType.toString())) {
+        const firstNonFilteredResult = availableFrequencies.filter(
+          (frequency) => !WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequency.value.toString())
+        )[0];
+
+        setFrequencyType(firstNonFilteredResult.value);
+      }
+    }
+
+    setWhaleMode(!whaleMode);
+  };
 
   const handleApproveToken = async () => {
     const fromSymbol = from.symbol;
@@ -446,6 +477,25 @@ const Swap = ({
 
   const ignoreValues = [from.address, to.address];
 
+  const isTestnet = TESTNETS.includes(currentNetwork.chainId);
+
+  let shouldShowNotEnoughForWhale =
+    whaleMode &&
+    WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequencyType.toString()) &&
+    fromValue &&
+    frequencyValue &&
+    !isLoadingUsdPrice &&
+    usdPrice &&
+    parseFloat(formatUnits(parseUnits(fromValue, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) *
+      usdPrice <
+      (WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] || Infinity);
+
+  shouldShowNotEnoughForWhale =
+    shouldShowNotEnoughForWhale ||
+    (whaleMode &&
+      !usdPrice &&
+      !isTestnet &&
+      WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequencyType.toString()));
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error">
       <Typography variant="body1">
@@ -501,17 +551,26 @@ const Swap = ({
     <StyledButton
       size="large"
       variant="contained"
-      disabled={!!shouldDisableButton || isLoading || isLoadingPairIsSupported}
+      disabled={!!shouldDisableButton || isLoading || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale}
       color="secondary"
       fullWidth
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
-      {!isLoading && !isLoadingPairIsSupported && (
+      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && (
         <Typography variant="body1">
           <FormattedMessage description="create position" defaultMessage="Create position" />
         </Typography>
       )}
-      {(isLoading || isLoadingPairIsSupported) && <CenteredLoadingIndicator />}
+      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="notenoughwhale"
+            defaultMessage="You can only deposit with a minimum value of {value} USD"
+            values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
+          />
+        </Typography>
+      )}
+      {(isLoading || isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
     </StyledButton>
   );
 
@@ -572,6 +631,12 @@ const Swap = ({
     ButtonToShow = StartPositionButton;
   }
 
+  const filteredFrequencies = whaleMode
+    ? availableFrequencies
+    : availableFrequencies.filter(
+        (frequency) => !WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequency.value.toString())
+      );
+
   return (
     <StyledPaper elevation={3}>
       <CreatePairModal
@@ -607,6 +672,22 @@ const Swap = ({
       <StyledSwapContainer>
         <Grid container>
           <StyledFromContainer container alignItems="center" justify="space-between">
+            <Grid item xs={12}>
+              <StyledWhaleModeContainer>
+                <FormControlLabel
+                  style={{ margin: 0 }}
+                  control={<Switch checked={whaleMode} color="primary" onChange={toggleWhaleMode} />}
+                  label="Whale mode"
+                />
+                <Tooltip
+                  title="This will enable you to create positions with shorter frequencies, but you will need to provide more liquidity for them"
+                  arrow
+                  placement="top"
+                >
+                  <StyledHelpOutlineIcon fontSize="small" />
+                </Tooltip>
+              </StyledWhaleModeContainer>
+            </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">
                 <FormattedMessage description="You pay" defaultMessage="You pay" />
@@ -695,7 +776,7 @@ const Swap = ({
               </Grid>
               <Grid item xs={12}>
                 <FrequencyTypeInput
-                  options={availableFrequencies}
+                  options={filteredFrequencies}
                   selected={frequencyType}
                   onChange={setFrequencyType}
                 />

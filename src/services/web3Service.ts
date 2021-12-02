@@ -71,6 +71,7 @@ import TOKEN_DESCRIPTOR_ABI from 'abis/TokenDescriptor.json';
 import { ETH_ADDRESS, ETH_COMPANION_ADDRESS, WETH } from 'mocks/tokens';
 import {
   CHAINLINK_ORACLE_ADDRESS,
+  COINGECKO_IDS,
   COMPANION_ADDRESS,
   HUB_ADDRESS,
   MEAN_GRAPHQL_URL,
@@ -91,6 +92,7 @@ import {
   Oracles,
   TokenDescriptorContract,
 } from 'types/contracts';
+import { axiosClient } from 'state';
 import GraphqlService from './graphql';
 
 export default class Web3Service {
@@ -407,6 +409,18 @@ export default class Web3Service {
         oracle: await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true),
       }))
     );
+  }
+
+  // TOKEN METHODS
+  async getUsdPrice(token: Token) {
+    const network = await this.getNetwork();
+    const price = await axiosClient.get<Record<string, { usd: number }>>(
+      `https://api.coingecko.com/api/v3/simple/token_price/${
+        COINGECKO_IDS[network.chainId] || COINGECKO_IDS[NETWORKS.mainnet.chainId]
+      }?contract_addresses=${token.address}&vs_currencies=usd`
+    );
+
+    return price.data[token.address].usd;
   }
 
   // ADDRESS METHODS

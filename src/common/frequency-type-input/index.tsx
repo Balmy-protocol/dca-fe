@@ -35,6 +35,7 @@ const StyledTabItemsContainer = styled.div`
   align-items: center;
   position: relative;
   z-index: 1;
+  flex: 1;
 `;
 
 const StyledTabItem = styled(Button)<{ isSelected: boolean }>`
