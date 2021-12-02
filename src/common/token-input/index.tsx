@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import Input from '@material-ui/core/Input';
-import { ETH_ADDRESS } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 const StyledInput = styled(Input)`
   text-align: center;
@@ -59,7 +59,7 @@ const TokenInput = ({
 
   const handleMaxValue = () => {
     if (balance && token) {
-      if (token.address === ETH_ADDRESS) {
+      if (token.address === PROTOCOL_TOKEN_ADDRESS) {
         onChange(formatUnits(balance.sub(parseUnits('0.1', token.decimals)), token.decimals));
       } else {
         onChange(formatUnits(balance, token.decimals));

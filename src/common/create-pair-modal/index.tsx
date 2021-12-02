@@ -15,7 +15,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ETH } from 'mocks/tokens';
 
 const useStyles = makeStyles({
   paper: {

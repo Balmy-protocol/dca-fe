@@ -20,7 +20,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles } from '@material-ui/core/styles';
-import { ETH_ADDRESS, WETH } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -249,14 +249,21 @@ const TokenPicker = ({
         tokenList[el].chainId === currentNetwork.chainId
     );
 
-    if (filteredTokenKeys.findIndex((el) => el === WETH(currentNetwork.chainId).address) !== -1) {
-      remove(filteredTokenKeys, (token) => token === WETH(currentNetwork.chainId).address);
-      filteredTokenKeys.unshift(WETH(currentNetwork.chainId).address);
+    if (
+      filteredTokenKeys.findIndex(
+        (el) => el === WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).address
+      ) !== -1
+    ) {
+      remove(
+        filteredTokenKeys,
+        (token) => token === WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).address
+      );
+      filteredTokenKeys.unshift(WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).address);
     }
 
-    if (filteredTokenKeys.findIndex((el) => el === ETH_ADDRESS) !== -1) {
-      remove(filteredTokenKeys, (token) => token === ETH_ADDRESS);
-      filteredTokenKeys.unshift(ETH_ADDRESS);
+    if (filteredTokenKeys.findIndex((el) => el === PROTOCOL_TOKEN_ADDRESS) !== -1) {
+      remove(filteredTokenKeys, (token) => token === PROTOCOL_TOKEN_ADDRESS);
+      filteredTokenKeys.unshift(PROTOCOL_TOKEN_ADDRESS);
     }
 
     return filteredTokenKeys;
