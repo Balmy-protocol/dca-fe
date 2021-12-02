@@ -85,6 +85,12 @@ export const NETWORKS = {
   },
 };
 
+export const TESTNETS = [
+  NETWORKS.ropsten.chainId,
+  NETWORKS.rinkeby.chainId,
+  NETWORKS.goerli.chainId,
+  NETWORKS.kovan.chainId,
+];
 export const SUPPORTED_NETWORKS = [
   NETWORKS.mainnet.chainId,
   NETWORKS.ropsten.chainId,
@@ -92,6 +98,15 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.goerli.chainId,
   NETWORKS.kovan.chainId,
 ];
+
+export const COINGECKO_IDS = {
+  [NETWORKS.mainnet.chainId]: 'ethereum',
+  [NETWORKS.ropsten.chainId]: 'ethereum',
+  [NETWORKS.rinkeby.chainId]: 'ethereum',
+  [NETWORKS.goerli.chainId]: 'ethereum',
+  [NETWORKS.kovan.chainId]: 'ethereum',
+  [NETWORKS.polygon.chainId]: 'polygon-pos',
+};
 
 export const NETWORKS_FOR_MENU = [NETWORKS.mainnet.chainId, NETWORKS.polygon.chainId];
 
@@ -297,6 +312,59 @@ export const STRING_SWAP_INTERVALS = {
   },
 };
 
+export const WHALE_MODE_FREQUENCIES = {
+  [NETWORKS.mainnet.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+    ONE_HOUR.toString(),
+    FOUR_HOURS.toString(),
+  ],
+  [NETWORKS.polygon.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+    ONE_HOUR.toString(),
+    FOUR_HOURS.toString(),
+  ],
+  [NETWORKS.kovan.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+    ONE_HOUR.toString(),
+    FOUR_HOURS.toString(),
+  ],
+};
+
+export const WHALE_MINIMUM_VALUES = {
+  [NETWORKS.mainnet.chainId]: {
+    [ONE_MINUTE.toString()]: 10000,
+    [FIVE_MINUTES.toString()]: 10000,
+    [FIFTEEN_MINUTES.toString()]: 10000,
+    [THIRTY_MINUTES.toString()]: 10000,
+    [ONE_HOUR.toString()]: 10000,
+    [FOUR_HOURS.toString()]: 10000,
+  },
+  [NETWORKS.kovan.chainId]: {
+    [ONE_MINUTE.toString()]: 10000,
+    [FIVE_MINUTES.toString()]: 10000,
+    [FIFTEEN_MINUTES.toString()]: 10000,
+    [THIRTY_MINUTES.toString()]: 10000,
+    [ONE_HOUR.toString()]: 10000,
+    [FOUR_HOURS.toString()]: 10000,
+  },
+  [NETWORKS.polygon.chainId]: {
+    [ONE_MINUTE.toString()]: 10000,
+    [FIVE_MINUTES.toString()]: 10000,
+    [FIFTEEN_MINUTES.toString()]: 10000,
+    [THIRTY_MINUTES.toString()]: 10000,
+    [ONE_HOUR.toString()]: 10000,
+    [FOUR_HOURS.toString()]: 10000,
+  },
+};
 export const POSITION_ACTIONS = {
   MODIFIED_RATE: 'MODIFIED_RATE',
   MODIFIED_DURATION: 'MODIFIED_DURATION',
