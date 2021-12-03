@@ -94,13 +94,12 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
           ) : (
             <FormattedMessage
               description="rate detail"
-              defaultMessage="We'll swap {rate} {from} every {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
+              defaultMessage="We'll swap {rate} {from} {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
               values={{
                 from: position.from.symbol,
                 rate: formatUnits(newRate, position.from.decimals),
                 frequency:
-                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                    .singular,
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
                 frequencyPlural: frequencyType,
                 ammountOfSwaps: position.remainingSwaps.toString(),
               }}

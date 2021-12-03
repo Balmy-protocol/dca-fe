@@ -27,6 +27,7 @@ import { ORACLES, STABLE_COINS } from 'config/constants';
 import usePromise from 'hooks/usePromise';
 import { Oracles } from 'types/contracts';
 import useWeb3Service from 'hooks/useWeb3Service';
+import { useThemeMode } from 'state/config/hooks';
 
 interface GraphWidgetProps {
   from: Token;
@@ -144,6 +145,7 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   chainId: 0,
 };
 const GraphWidget = ({ from, to }: GraphWidgetProps) => {
+  const mode = useThemeMode();
   const client = useDCAGraphql();
   const uniClient = useUNIGraphql();
   const web3Service = useWeb3Service();
@@ -336,7 +338,10 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
                   {swapData.length && <Line connectNulls type="monotone" dataKey="Mean Finance" stroke="#36a3f5" />}
                   <XAxis hide dataKey="name" />
                   <YAxis hide domain={['auto', 'auto']} />
-                  <Tooltip formatter={tooltipFormatter} />
+                  <Tooltip
+                    formatter={tooltipFormatter}
+                    contentStyle={{ backgroundColor: mode === 'light' ? '#ffffff' : '#424242' }}
+                  />
                   <Legend />
                 </LineChart>
               </ResponsiveContainer>

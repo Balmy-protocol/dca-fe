@@ -48,23 +48,9 @@ const SwapContainer = () => {
     }
 
     setFrom(newFrom);
-    // if (!newFrom.pairableTokens.includes(to)) {
-    //   setTo(newFrom.pairableTokens[0]);
-    // }
   };
   const onSetTo = (newTo: Token) => {
     setTo(newTo);
-    // if (!to.pairableTokens.includes(from)) {
-    //   const splitValue = fromValue.match(/^(\d*)\.?(\d*)$/);
-    //   let newFromValue = fromValue;
-    //   if (splitValue && splitValue[2] !== '') {
-    //     newFromValue = `${splitValue[1]}.${splitValue[2].substring(
-    //       0,
-    //       tokenList[tokenList[to].pairableTokens[0]].decimals
-    //     )}`;
-    //   }
-    //   setFrom(tokenList[to].pairableTokens[0]);
-    // }
   };
 
   const toggleFromTo = () => {

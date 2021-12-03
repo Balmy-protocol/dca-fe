@@ -84,7 +84,7 @@ function useBuildTransactionMessages() {
               (resettedPosition as Position).from.symbol
             } have been added to your ${(resettedPosition as Position).from.symbol}:${
               (resettedPosition as Position).to.symbol
-            } position and it has been set to run for ${resetPositionTypeData.newSwaps} ${getFrequencyLabel(
+            } position and it has been set to run for ${getFrequencyLabel(
               (resettedPosition as Position).swapInterval.toString(),
               resetPositionTypeData.newSwaps
             )}`;
@@ -110,7 +110,7 @@ function useBuildTransactionMessages() {
           if (modifiedPosition) {
             message = `Your ${(modifiedPosition as Position).from.symbol}:${
               (modifiedPosition as Position).to.symbol
-            } position has now been set to run for ${modifySwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
+            } position has now been set to run for ${getFrequencyLabel(
               (modifiedPosition as Position).swapInterval.toString(),
               modifySwapsPositionTypeData.newSwaps
             )}`;
@@ -128,7 +128,7 @@ function useBuildTransactionMessages() {
             } ${
               STRING_SWAP_INTERVALS[
                 (modifiedRatePosition as Position).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ].adverb
+              ].every
             } for ${modifyRateAndSwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
               (modifiedRatePosition as Position).swapInterval.toString(),
               modifyRateAndSwapsPositionTypeData.newSwaps

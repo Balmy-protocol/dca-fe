@@ -8,7 +8,6 @@ import Button from '@material-ui/core/Button';
 interface SelectOption {
   value: BigNumber;
   label: {
-    plural: string;
     adverb: string;
   };
 }

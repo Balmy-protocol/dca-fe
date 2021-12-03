@@ -144,13 +144,13 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
                 <Typography variant="caption">
                   <FormattedMessage
                     description="rate detail"
-                    defaultMessage="We'll swap {rate} {from} every {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
+                    defaultMessage="We'll swap {rate} {from} {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
                     values={{
                       from: position.from.symbol,
                       rate: fromValue,
                       frequency:
                         STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                          .singular,
+                          .every,
                       frequencyPlural: frequencyType,
                       ammountOfSwaps: frequencyValue || '0',
                     }}

@@ -88,9 +88,8 @@ const PositionStatus = ({ position, pair }: PositionStatusProps) => {
           <Typography variant="body1">
             <FormattedMessage
               description="days to finish"
-              defaultMessage="{remainingDays} {type} left"
+              defaultMessage="{type} left"
               values={{
-                remainingDays: position.current.remainingSwaps,
                 type: getFrequencyLabel(position.swapInterval.interval, position.current.remainingSwaps),
               }}
             />

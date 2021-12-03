@@ -233,7 +233,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
         <Typography variant="body1">
           <FormattedMessage
             description="positionCreatedSwaps"
-            defaultMessage="Set to run for <b>{swaps} {frequency}</b>"
+            defaultMessage="Set to run for <b>{frequency}</b>"
             values={{
               b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               swaps: positionState.remainingSwaps,
