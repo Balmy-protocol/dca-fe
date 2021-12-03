@@ -80,23 +80,17 @@ const StyledProgressWrapper = styled.div`
   margin-bottom: 21px;
 `;
 
-const StyledCardFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const StyledCardFooterItem = styled.div<{ isPending: boolean }>`
-  ${(props) => props.isPending && 'flex-grow: 1;'}
+const StyledCardFooterButton = styled(Button)`
+  margin-top: 8px;
 `;
 
 const StyledFreqLeft = styled.div`
   ${({ theme }) => `
-    padding: 8px 11px;
+    padding: 12px 15px;
     border-radius: 5px;
+    text-align: center;
     background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
     color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
-    margin-right: 15px;
   `}
 `;
 
@@ -138,7 +132,6 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
     to,
     swapInterval,
     swapped,
-    withdrawn,
     remainingLiquidity,
     remainingSwaps,
     rate,
@@ -173,8 +166,6 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
       pair?.createdAt || 0,
       pair?.swapInfo || { swapsToPerform: [] }
     ) === STALE;
-
-  const shouldBlockModifications = remainingSwaps.eq(BigNumber.from(0)) && withdrawn.gte(swapped);
 
   const handleOnWithdraw = (positionToWithdraw: Position) => {
     setShouldShowSettings(false);
@@ -384,32 +375,30 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
             <TokenIcon token={to} size="16px" />
             <Typography variant="body1">{to.symbol}</Typography>
           </StyledCardTitleHeader>
-          {!shouldBlockModifications && (
-            <div>
-              <Tooltip title="View NFT" arrow placement="top">
-                <IconButton
-                  aria-label="more"
-                  aria-controls="long-menu"
-                  aria-haspopup="true"
-                  onClick={() => onViewNFT(position)}
-                  disabled={isPending}
-                  size="small"
-                >
-                  <VisibilityIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
+          <div>
+            <Tooltip title="View NFT" arrow placement="top">
               <IconButton
                 aria-label="more"
                 aria-controls="long-menu"
                 aria-haspopup="true"
-                onClick={() => setShouldShowSettings(true)}
+                onClick={() => onViewNFT(position)}
                 disabled={isPending}
                 size="small"
               >
-                <Cog size="22px" isDisabled={isPending} />
+                <VisibilityIcon fontSize="small" />
               </IconButton>
-            </div>
-          )}
+            </Tooltip>
+            <IconButton
+              aria-label="more"
+              aria-controls="long-menu"
+              aria-haspopup="true"
+              onClick={() => setShouldShowSettings(true)}
+              disabled={isPending}
+              size="small"
+            >
+              <Cog size="22px" isDisabled={isPending} />
+            </IconButton>
+          </div>
         </StyledCardHeader>
         <StyledDetailWrapper>
           <Typography variant="body2" component="span">
@@ -455,65 +444,58 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
             value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
           />
         </StyledProgressWrapper>
-        <StyledCardFooter>
-          {!isPending && hasNoFunds && (
-            <StyledNoFunds>
-              <Typography variant="body2">
-                <FormattedMessage description="no funds" defaultMessage="No funds!" />
+        {!isPending && hasNoFunds && (
+          <StyledNoFunds>
+            <Typography variant="body2">
+              <FormattedMessage description="no funds" defaultMessage="No funds!" />
+            </Typography>
+          </StyledNoFunds>
+        )}
+        {!isPending && !hasNoFunds && isStale && (
+          <StyledStale>
+            <Typography variant="body2">
+              <FormattedMessage description="stale" defaultMessage="Stale" />
+            </Typography>
+          </StyledStale>
+        )}
+        {!isPending && !hasNoFunds && !isStale && (
+          <StyledFreqLeft>
+            <Typography variant="body2">
+              <FormattedMessage
+                description="days to finish"
+                defaultMessage="{type} left"
+                values={{
+                  type: getFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
+                }}
+              />
+            </Typography>
+          </StyledFreqLeft>
+        )}
+        <StyledCardFooterButton
+          variant="contained"
+          color={isPending ? 'pending' : 'secondary'}
+          onClick={() => !isPending && onViewDetails()}
+          fullWidth
+        >
+          {isPending ? (
+            <Link
+              href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
+              target="_blank"
+              rel="noreferrer"
+              underline="none"
+              color="inherit"
+            >
+              <Typography variant="body2" component="span">
+                <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
               </Typography>
-            </StyledNoFunds>
+              <CallMadeIcon style={{ fontSize: '1rem' }} />
+            </Link>
+          ) : (
+            <Typography variant="body2">
+              <FormattedMessage description="View details" defaultMessage="View details" />
+            </Typography>
           )}
-          {!isPending && !hasNoFunds && isStale && (
-            <StyledStale>
-              <Typography variant="body2">
-                <FormattedMessage description="stale" defaultMessage="Stale" />
-              </Typography>
-            </StyledStale>
-          )}
-          {!isPending && !hasNoFunds && !isStale && (
-            <StyledFreqLeft>
-              <Typography variant="body2">
-                <FormattedMessage
-                  description="days to finish"
-                  defaultMessage="{remainingDays} {type} left"
-                  values={{
-                    remainingDays: remainingSwaps.toString(),
-                    type: getFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
-                  }}
-                />
-              </Typography>
-            </StyledFreqLeft>
-          )}
-          {!shouldBlockModifications && (
-            <StyledCardFooterItem isPending={isPending}>
-              <Button
-                variant="contained"
-                color={isPending ? 'pending' : 'secondary'}
-                onClick={() => !isPending && onViewDetails()}
-                fullWidth={isPending}
-              >
-                {isPending ? (
-                  <Link
-                    href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    underline="none"
-                    color="inherit"
-                  >
-                    <Typography variant="body2" component="span">
-                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                    </Typography>
-                    <CallMadeIcon style={{ fontSize: '1rem' }} />
-                  </Link>
-                ) : (
-                  <Typography variant="body2">
-                    <FormattedMessage description="View details" defaultMessage="View details" />
-                  </Typography>
-                )}
-              </Button>
-            </StyledCardFooterItem>
-          )}
-        </StyledCardFooter>
+        </StyledCardFooterButton>
       </StyledCardContent>
     </StyledCard>
   );

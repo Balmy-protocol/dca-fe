@@ -47,7 +47,7 @@ import {
   useHasConfirmedApproval,
   useHasPendingPairCreation,
 } from 'state/transactions/hooks';
-import { getFrequencyLabel, calculateStale } from 'utils/parsing';
+import { calculateStale } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
@@ -125,7 +125,6 @@ const StyledSwapTokenButton = styled(IconButton)`
 interface AvailableSwapInterval {
   label: {
     singular: string;
-    plural: string;
     adverb: string;
   };
   value: BigNumber;
@@ -744,11 +743,11 @@ const Swap = ({
                 <Typography variant="body1" component="span">
                   <FormattedMessage
                     description="rate detail"
-                    defaultMessage="{from} every {frequency} for you"
+                    defaultMessage="{from} {frequency} for you"
                     values={{
                       from: from.symbol,
                       frequency:
-                        STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singular,
+                        STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
                     }}
                   />
                 </Typography>
@@ -798,7 +797,7 @@ const Swap = ({
                     <FormattedMessage
                       description="completes in"
                       defaultMessage="Amount of {type}"
-                      values={{ type: getFrequencyLabel(frequencyType.toString(), frequencyValue) }}
+                      values={{ type: STRING_SWAP_INTERVALS[frequencyType.toString()].subject }}
                     />
                   </Typography>
                 </Grid>

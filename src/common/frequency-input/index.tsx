@@ -16,7 +16,7 @@ interface FrequencyInputProps {
 const inputRegex = RegExp(/^[0-9]*$/);
 
 const FrequencyInput = ({ id, label, onChange, value, disabled, error }: FrequencyInputProps) => {
-  const frequencyType = STRING_SWAP_INTERVALS[label as keyof typeof STRING_SWAP_INTERVALS].plural;
+  const frequencyType = STRING_SWAP_INTERVALS[label as keyof typeof STRING_SWAP_INTERVALS].subject;
 
   const validator = (nextValue: string) => {
     // sanitize value

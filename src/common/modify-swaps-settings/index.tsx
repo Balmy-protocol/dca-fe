@@ -61,9 +61,8 @@ const modifySwapsSettings = ({ position, onModifySwaps, onClose }: ModifySwapsSe
         <Typography variant="body2">
           <FormattedMessage
             description="current days to finish"
-            defaultMessage="Current: {remainingDays} {type} left"
+            defaultMessage="Current: {type} left"
             values={{
-              remainingDays: position.remainingSwaps.toString(),
               type: frequencyType,
             }}
           />

@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers';
 import { TransactionTypesConstant } from 'types';
 import { Oracles } from 'types/contracts';
+import { Duration } from 'luxon';
 
 export const NETWORKS = {
   mainnet: {
@@ -269,46 +270,78 @@ export const SWAP_INTERVALS_MAP = [
   },
 ];
 
+const toReadable = (left: number, frequency: number) => {
+  const customDuration = Duration.fromMillis(frequency * 1000 * left);
+  const asDays = customDuration.as('days');
+  const asHours = customDuration.as('hours');
+  const asMinutes = customDuration.as('minutes');
+
+  if (asDays >= 1) {
+    return `${asDays} days`;
+  }
+
+  if (asHours >= 1) {
+    return `${asHours} hours`;
+  }
+
+  return `${asMinutes} minutes`;
+};
 export const STRING_SWAP_INTERVALS = {
   [ONE_MINUTE.toString()]: {
-    singular: '1 minute',
-    plural: '1 minute',
+    singular: '1 minute (1 swap)',
+    plural: (left: number) => `${toReadable(left, ONE_MINUTE.toNumber())} (${left} swaps)`,
     adverb: 'every 1 minute',
+    every: 'every 1 minute',
+    subject: 'swaps',
   },
   [FIVE_MINUTES.toString()]: {
-    singular: '5 minutes',
-    plural: '5 minutes',
+    singular: '5 minutes (1 swap)',
+    plural: (left: number) => `${toReadable(left, FIVE_MINUTES.toNumber())} (${left} swaps)`,
     adverb: 'every 5 minutes',
+    every: 'every 5 minutes',
+    subject: 'swaps',
   },
   [FIFTEEN_MINUTES.toString()]: {
-    singular: '15 minutes',
-    plural: '15 minutes',
+    singular: '15 minutes (1 swap)',
+    plural: (left: number) => `${toReadable(left, FIFTEEN_MINUTES.toNumber())} (${left} swaps)`,
     adverb: 'every 15 minutes',
+    every: 'every 15 minutes',
+    subject: 'swaps',
   },
   [THIRTY_MINUTES.toString()]: {
-    singular: '30 minutes',
-    plural: '30 minutes',
+    singular: '30 minutes (1 swap)',
+    plural: (left: number) => `${toReadable(left, THIRTY_MINUTES.toNumber())} (${left} swaps)`,
     adverb: 'every 30 minutes',
+    every: 'every 30 minutes',
+    subject: 'swaps',
   },
   [ONE_HOUR.toString()]: {
-    singular: 'hour',
-    plural: 'hours',
+    singular: 'hour (1 swap)',
+    plural: (left: number) => `${toReadable(left, ONE_HOUR.toNumber())} (${left} swaps)`,
     adverb: 'hourly',
+    every: 'every hour',
+    subject: 'swaps',
   },
   [FOUR_HOURS.toString()]: {
-    singular: '4 hours',
-    plural: '4 hours',
+    singular: '4 hours (1 swap)',
+    plural: (left: number) => `${toReadable(left, FOUR_HOURS.toNumber())} (${left} swaps)`,
     adverb: 'every 4 hours',
+    every: 'every 4 hours',
+    subject: 'swaps',
   },
   [ONE_DAY.toString()]: {
-    singular: 'day',
-    plural: 'days',
+    singular: 'day (1 swap)',
+    plural: (left: number) => `${toReadable(left, ONE_DAY.toNumber())} (${left} swaps)`,
+    every: 'every day',
     adverb: 'daily',
+    subject: 'days',
   },
   [ONE_WEEK.toString()]: {
-    singular: 'week',
-    plural: 'weeks',
+    singular: 'week (1 swap)',
+    plural: (left: number) => `${toReadable(left, ONE_WEEK.toNumber())} (${left} swaps)`,
+    every: 'every week',
     adverb: 'weekly',
+    subject: 'weeks',
   },
 };
 

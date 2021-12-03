@@ -125,7 +125,7 @@ function useBuildTransactionDetail() {
             } ${
               STRING_SWAP_INTERVALS[
                 (modifiedRatePosition as Position).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ].adverb
+              ].every
             } for ${modifyRateAndSwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
               (modifiedRatePosition as Position).swapInterval.toString(),
               modifyRateAndSwapsPositionTypeData.newSwaps

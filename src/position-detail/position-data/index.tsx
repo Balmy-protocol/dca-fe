@@ -118,7 +118,7 @@ const Details = ({ position }: DetailsProps) => (
                   rate: formatCurrencyAmount(BigNumber.from(position.current.rate), position.from),
                   from: position.from.symbol,
                   frequency:
-                    STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].adverb,
+                    STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every,
                 }}
               />
             </Typography>
@@ -162,15 +162,7 @@ const Details = ({ position }: DetailsProps) => (
           </Grid>
           <Grid item xs={12}>
             <Typography variant="caption">
-              <FormattedMessage
-                description="positionDetailsRemainingFunds"
-                defaultMessage="{swaps} {frequency}"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  swaps: position.current.remainingSwaps,
-                  frequency: getFrequencyLabel(position.swapInterval.interval, position.totalSwaps),
-                }}
-              />
+              {getFrequencyLabel(position.swapInterval.interval, position.totalSwaps)}
             </Typography>
           </Grid>
         </Grid>
