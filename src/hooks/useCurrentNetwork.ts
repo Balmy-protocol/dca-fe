@@ -1,13 +1,18 @@
 import React from 'react';
 import WalletContext from 'common/wallet-context';
+import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
 
-function useCurrentNetwork() {
+function useCurrentNetwork(showOriginal = false) {
   const { web3Service } = React.useContext(WalletContext);
-  const [network, setCurrentNetwork] = React.useState({ chainId: 42, name: '' });
+  const [network, setCurrentNetwork] = React.useState({ chainId: 10, name: '' });
   React.useEffect(() => {
     async function getNetwork() {
       const currentNetwork = await web3Service.getNetwork();
-      setCurrentNetwork(currentNetwork);
+      if (SUPPORTED_NETWORKS.includes(currentNetwork.chainId) || showOriginal) {
+        setCurrentNetwork(currentNetwork);
+      } else {
+        setCurrentNetwork(NETWORKS.optimism);
+      }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

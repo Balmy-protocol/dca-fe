@@ -188,7 +188,7 @@ export default class Web3Service {
       return new ethers.providers.Web3Provider(window.ethereum).getNetwork();
     }
 
-    return Promise.resolve(NETWORKS.mainnet);
+    return Promise.resolve(NETWORKS.optimism);
   }
 
   getAccount() {
@@ -280,8 +280,8 @@ export default class Web3Service {
 
     const chain = await ethersProvider.getNetwork();
 
-    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[1]);
-    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[1]);
+    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
+    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
     this.setClient(ethersProvider);
     this.setSigner(signer);
 
@@ -430,8 +430,8 @@ export default class Web3Service {
     const chain = await this.getNetwork();
 
     if (!this.apolloClient.getClient() || !this.uniClient.getClient()) {
-      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[1]);
-      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[1]);
+      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
+      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
     }
 
     const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(
@@ -468,16 +468,42 @@ export default class Web3Service {
   }
 
   // ADDRESS METHODS
-  changeNetwork(newChainId: number): void {
+  async changeNetwork(newChainId: number): Promise<void> {
     if (!window.ethereum) {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: `0x${newChainId.toString(16)}` }],
-    });
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${newChainId.toString(16)}` }],
+      });
+    } catch (switchError) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (switchError.code === 4902) {
+        try {
+          const network = find(NETWORKS, { chainId: newChainId });
+
+          if (network) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: `0x${newChainId.toString(16)}`,
+                  chainName: network.name,
+                  nativeCurrency: network.nativeCurrency,
+                  rpcUrls: network.rpc,
+                },
+              ],
+            });
+          }
+        } catch (addError) {
+          console.error('Error adding new chain to metamask');
+        }
+      }
+    }
   }
 
   getBalance(address?: string): Promise<BigNumber> {
@@ -541,7 +567,10 @@ export default class Web3Service {
     let provider: any = this.client;
     if (!this.client) {
       try {
-        provider = ethers.getDefaultProvider(getStringNetwork(currentNetwork.name));
+        provider = ethers.getDefaultProvider(getStringNetwork(currentNetwork.name), {
+          infura: '5744aff1d49f4eee923c5f3e5af4cc1c',
+          etherscan: '4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF',
+        });
       } catch {
         provider = await detectEthereumProvider();
       }
@@ -601,7 +630,10 @@ export default class Web3Service {
     let provider: any = this.client;
     if (!this.client) {
       try {
-        provider = ethers.getDefaultProvider(getStringNetwork(currentNetwork.name));
+        provider = ethers.getDefaultProvider(getStringNetwork(currentNetwork.name), {
+          infura: '5744aff1d49f4eee923c5f3e5af4cc1c',
+          etherscan: '4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF',
+        });
       } catch {
         provider = await detectEthereumProvider();
       }

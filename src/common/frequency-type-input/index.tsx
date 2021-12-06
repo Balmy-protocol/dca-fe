@@ -98,6 +98,7 @@ const MinimalSelect = ({ options, selected, onChange }: MinimalSelectProps) => {
           <StyledTabItem
             ref={(newRef) => (selected.eq(frequencyTypeOption.value) && setSelectedRef(newRef)) || null}
             disableRipple
+            key={frequencyTypeOption.value.toString()}
             color="inherit"
             isSelected={selected.eq(frequencyTypeOption.value)}
             onClick={() => onChange(frequencyTypeOption.value)}

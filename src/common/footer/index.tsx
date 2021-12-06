@@ -57,7 +57,7 @@ const Footer = () => {
                     <FormattedMessage description="community" defaultMessage="Community" />
                   </StyledCategoryTitle>
                   <CategoryItem
-                    href="https://github.com/Mean-Finance/dca"
+                    href="https://github.com/Mean-Finance/dca-v2-core-beta"
                     target="_blank"
                     color="inherit"
                     style={{ textDecoration: 'none' }}

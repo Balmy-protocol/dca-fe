@@ -8,6 +8,7 @@ const DAI_ADDRESSES = {
   [NETWORKS.meanfinance.chainId]: '0x6b175474e89094c44da98b954eedeac495271d0f',
   [NETWORKS.goerli.chainId]: '0x9d233a907e065855d2a9c7d4b552ea27fb2e5a36',
   [NETWORKS.kovan.chainId]: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
+  [NETWORKS.optimism.chainId]: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1',
 };
 
 export const DAI = (chainId: number): Token => ({
@@ -28,6 +29,7 @@ const WETH_ADDRESSES = {
   [NETWORKS.goerli.chainId]: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
   [NETWORKS.kovan.chainId]: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
   [NETWORKS.optimismKovan.chainId]: '0x4200000000000000000000000000000000000006',
+  [NETWORKS.optimism.chainId]: '0x4200000000000000000000000000000000000006',
 };
 
 export const WETH = (chainId: number): Token => ({
@@ -48,6 +50,7 @@ const USDC_ADDRESSES = {
   [NETWORKS.goerli.chainId]: '0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c',
   [NETWORKS.kovan.chainId]: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
   [NETWORKS.optimismKovan.chainId]: '0x4e62882864fB8CE54AFfcAf8D899A286762B011B',
+  [NETWORKS.optimism.chainId]: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
 };
 
 export const USDC = (chainId: number): Token => ({
@@ -275,8 +278,4 @@ export const KOVAN_TOKENS = {
   [COMP_ADDRESSES[NETWORKS.kovan.chainId]]: COMP(NETWORKS.kovan.chainId),
   [LINK_ADDRESSES[NETWORKS.kovan.chainId]]: LINK(NETWORKS.kovan.chainId),
   [SNX_ADDRESSES[NETWORKS.kovan.chainId]]: SNX(NETWORKS.kovan.chainId),
-};
-
-export const DEFAULT_TOKEN_LIST = {
-  [NETWORKS.ropsten.chainId]: KOVAN_TOKENS,
 };
