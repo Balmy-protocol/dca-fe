@@ -92,7 +92,6 @@ import {
   OracleContract,
   Oracles,
   PermissionManagerContract,
-  TokenDescriptorContract,
 } from 'types/contracts';
 import { axiosClient } from 'state';
 import GraphqlService from './graphql';
@@ -549,7 +548,7 @@ export default class Web3Service {
     }
 
     if (isExistingPair) {
-      const oracleAddress = await this.getHUBAddress();
+      const oracleAddress = await this.getOracleAddress();
       const oracleInstance = new ethers.Contract(
         oracleAddress,
         ORACLE_AGGREGATOR_ABI.abi,
