@@ -60,7 +60,10 @@ const TokenInput = ({
   const handleMaxValue = () => {
     if (balance && token) {
       if (token.address === PROTOCOL_TOKEN_ADDRESS) {
-        onChange(formatUnits(balance.sub(parseUnits('0.1', token.decimals)), token.decimals));
+        const maxValue = balance.gte(parseUnits('1', token.decimals))
+          ? balance.sub(parseUnits('0.1', token.decimals))
+          : balance;
+        onChange(formatUnits(maxValue, token.decimals));
       } else {
         onChange(formatUnits(balance, token.decimals));
       }
