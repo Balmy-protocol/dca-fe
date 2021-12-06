@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '@material-ui/core/Button';
+import Tooltip from '@material-ui/core/Tooltip';
 import find from 'lodash/find';
-import { NETWORKS, NETWORKS_FOR_MENU } from 'config/constants';
+import { NETWORKS, NETWORKS_FOR_MENU, SUPPORTED_NETWORKS } from 'config/constants';
 import Typography from '@material-ui/core/Typography';
 import Popover from '@material-ui/core/Popover';
 import useWeb3Service from 'hooks/useWeb3Service';
@@ -10,6 +11,7 @@ import { createStyles, makeStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core';
 import TokenIcon from 'common/token-icon';
 import { emptyTokenWithAddress } from 'utils/currency';
+import WarningIcon from '@material-ui/icons/Warning';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -18,14 +20,6 @@ const usePopoverStyles = makeStyles((theme: Theme) =>
     },
   })
 );
-
-const StyledConnectedCircle = styled.div<{ isMainnet: boolean }>`
-  width: 10px;
-  height: 10px;
-  border-radius: 30px;
-  background-color: rgb(245 183 24);
-  background-color: ${(props) => (props.isMainnet ? 'green' : 'rgb(245 183 24)')};
-`;
 
 const StyledMenu = styled.div`
   padding: 0px 10px 10px 10px;
@@ -85,6 +79,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const handleClose = (chainId: number) => {
     setAnchorEl(null);
     setShouldOpenNetworkMenu(false);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     web3Service.changeNetwork(chainId);
   };
 
@@ -93,25 +88,39 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
     return (supportedNetwork && supportedNetwork.name) || capitalizeFirstLetter(network.name);
   }, [network]);
 
-  return (
-    <>
-      <StyledButton
-        aria-controls="customized-menu"
-        aria-haspopup="true"
-        color="primary"
-        onClick={handleClick}
-        style={{ maxWidth: '220px', textTransform: 'none' }}
-        isMainnet={NETWORKS_FOR_MENU.includes(network.chainId)}
-        endIcon={<StyledConnectedCircle isMainnet={NETWORKS_FOR_MENU.includes(network.chainId)} />}
-      >
+  const buttonToRender = (
+    <StyledButton
+      aria-controls="customized-menu"
+      aria-haspopup="true"
+      color="primary"
+      onClick={handleClick}
+      style={{ maxWidth: '220px', textTransform: 'none' }}
+      isMainnet={NETWORKS_FOR_MENU.includes(network.chainId)}
+      startIcon={SUPPORTED_NETWORKS.includes(network.chainId) ? null : <WarningIcon />}
+    >
+      {NETWORKS_FOR_MENU.includes(network.chainId) && (
         <StyledTokenIconContainer>
           <TokenIcon
             size="20px"
             token={emptyTokenWithAddress(find(NETWORKS, { chainId: network.chainId })?.mainCurrency || '')}
           />
         </StyledTokenIconContainer>
-        <Typography variant="body1">{networkName}</Typography>
-      </StyledButton>
+      )}
+      <Typography variant="body1">{networkName}</Typography>
+    </StyledButton>
+  );
+
+  const componentToRender = SUPPORTED_NETWORKS.includes(network.chainId) ? (
+    buttonToRender
+  ) : (
+    <Tooltip title="We do not support this network. You are seeing data from Optimistic Ethereum" arrow placement="top">
+      {buttonToRender}
+    </Tooltip>
+  );
+
+  return (
+    <>
+      {componentToRender}
       <Popover
         anchorOrigin={{
           vertical: 'bottom',
@@ -127,7 +136,13 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
       >
         <StyledMenu>
           {NETWORKS_FOR_MENU.map((chainId) => (
-            <StyledMenuItem variant="outlined" color="default" size="small" onClick={() => handleClose(chainId)}>
+            <StyledMenuItem
+              key={chainId}
+              variant="outlined"
+              color="default"
+              size="small"
+              onClick={() => handleClose(chainId)}
+            >
               <StyledTokenIconContainer>
                 <TokenIcon
                   size="20px"

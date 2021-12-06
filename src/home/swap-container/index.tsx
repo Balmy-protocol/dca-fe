@@ -1,12 +1,14 @@
 import * as React from 'react';
 import Grid from '@material-ui/core/Grid';
 import orderBy from 'lodash/orderBy';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
 import { getWrappedProtocolToken, USDC } from 'mocks/tokens';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { ONE_DAY, STRING_SWAP_INTERVALS } from 'config/constants';
+import { NETWORKS, ONE_DAY, STRING_SWAP_INTERVALS } from 'config/constants';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
 import { useQuery } from '@apollo/client';
@@ -69,7 +71,7 @@ const SwapContainer = () => {
     setFrom(to);
   };
 
-  const isLoading = !currentNetwork.chainId || isLoadingSwapIntervals || !swapIntervalsData;
+  const isLoading = isLoadingSwapIntervals || !swapIntervalsData;
 
   return (
     <Grid container spacing={2} alignItems="center" justify="space-around">
@@ -96,7 +98,7 @@ const SwapContainer = () => {
                     fromValue={fromValue}
                     setFromValue={setFromValue}
                     web3Service={web3Service}
-                    currentNetwork={currentNetwork}
+                    currentNetwork={currentNetwork || NETWORKS.optimism}
                     toggleFromTo={toggleFromTo}
                     availableFrequencies={
                       (swapIntervalsData &&
@@ -115,11 +117,11 @@ const SwapContainer = () => {
                     }
                   />
                 </Grid>
-                <Hidden mdDown>
+                {/* <Hidden mdDown>
                   <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
                     <GraphWidget from={from} to={to} />
                   </Grid>
-                </Hidden>
+                </Hidden> */}
               </>
             )}
           </>

@@ -48,7 +48,7 @@ interface NavBarProps {
 
 const NavBar = ({ isLoading }: NavBarProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useCurrentNetwork(true);
   const theme = useThemeMode();
   const dispatch = useAppDispatch();
 

@@ -16,10 +16,16 @@ const StyledCard = styled(Card)`
   margin: 10px;
   border-radius: 10px;
   position: relative;
+  display: flex;
+  flex-grow: 1;
 `;
 
 const StyledCardContent = styled(CardContent)`
   padding-bottom: 10px !important;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 const StyledCardHeader = styled.div`
@@ -39,19 +45,23 @@ const StyledCardTitleHeader = styled.div`
 
 const StyledDetailWrapper = styled.div`
   margin-bottom: 5px;
-`;
-
-const StyledCardFooter = styled.div`
   display: flex;
-  justify-content: flex-start;
   align-items: center;
+  justify-content: flex-start;
 `;
 
 const StyledFreqLeft = styled.div`
-  padding: 8px 11px;
-  border-radius: 5px;
-  background-color: #dceff9;
-  color: #0088cc;
+  ${({ theme }) => `
+    padding: 12px 15px;
+    border-radius: 5px;
+    text-align: center;
+    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
+    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+  `}
+`;
+
+const StyledCardFooterButton = styled(Button)`
+  margin-top: 8px;
 `;
 
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
@@ -100,27 +110,23 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
             />
           </Typography>
         </StyledDetailWrapper>
-        <StyledCardFooter>
-          <StyledFreqLeft>
-            <Typography variant="body2">
-              <FormattedMessage
-                description="days to finish"
-                defaultMessage="Ran for {type}"
-                values={{
-                  remainingDays: totalSwaps.sub(remainingSwaps).toString(),
-                  type: getFrequencyLabel(swapInterval.toString(), totalSwaps.toString()),
-                }}
-              />
-            </Typography>
-          </StyledFreqLeft>
-          <div>
-            <Button variant="contained" color="secondary" onClick={onViewDetails}>
-              <Typography variant="body2">
-                <FormattedMessage description="View details" defaultMessage="View details" />
-              </Typography>
-            </Button>
-          </div>
-        </StyledCardFooter>
+        <StyledFreqLeft>
+          <Typography variant="body2">
+            <FormattedMessage
+              description="days to finish"
+              defaultMessage="Ran for {type}"
+              values={{
+                remainingDays: totalSwaps.sub(remainingSwaps).toString(),
+                type: getFrequencyLabel(swapInterval.toString(), totalSwaps.toString()),
+              }}
+            />
+          </Typography>
+        </StyledFreqLeft>
+        <StyledCardFooterButton variant="contained" color="secondary" onClick={onViewDetails}>
+          <Typography variant="body2">
+            <FormattedMessage description="View details" defaultMessage="View details" />
+          </Typography>
+        </StyledCardFooterButton>
       </StyledCardContent>
     </StyledCard>
   );

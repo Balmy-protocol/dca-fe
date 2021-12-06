@@ -39,6 +39,7 @@ import {
   WHALE_MODE_FREQUENCIES,
   WHALE_MINIMUM_VALUES,
   TESTNETS,
+  NETWORKS,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -55,7 +56,9 @@ import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { STALE } from 'hooks/useIsStale';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Switch from '@material-ui/core/Switch';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import useIsWhitelisted from 'hooks/useIsWhitelisted';
 
@@ -107,6 +110,7 @@ const StyledButton = styled(Button)`
   border-radius: 12px;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledWhaleModeContainer = styled.div`
   display: flex;
   align-items: center;
@@ -242,11 +246,19 @@ const Swap = ({
     );
   }, [from]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const toggleWhaleMode = () => {
     if (whaleMode) {
-      if (WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequencyType.toString())) {
+      if (
+        (WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
+          frequencyType.toString()
+        )
+      ) {
         const firstNonFilteredResult = availableFrequencies.filter(
-          (frequency) => !WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequency.value.toString())
+          (frequency) =>
+            !(
+              WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]
+            ).includes(frequency.value.toString())
         )[0];
 
         setFrequencyType(firstNonFilteredResult.value);
@@ -510,7 +522,9 @@ const Swap = ({
 
   let shouldShowNotEnoughForWhale =
     whaleMode &&
-    WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequencyType.toString()) &&
+    (WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
+      frequencyType.toString()
+    ) &&
     fromValue &&
     frequencyValue &&
     !isLoadingUsdPrice &&
@@ -522,7 +536,11 @@ const Swap = ({
   shouldShowNotEnoughForWhale =
     !isTestnet &&
     (shouldShowNotEnoughForWhale ||
-      (whaleMode && !usdPrice && WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequencyType.toString())));
+      (whaleMode &&
+        !usdPrice &&
+        (WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
+          frequencyType.toString()
+        )));
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error">
       <Typography variant="body1">
@@ -661,7 +679,10 @@ const Swap = ({
   const filteredFrequencies = whaleMode
     ? availableFrequencies
     : availableFrequencies.filter(
-        (frequency) => !WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequency.value.toString())
+        (frequency) =>
+          !(
+            WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]
+          ).includes(frequency.value.toString())
       );
 
   return (
@@ -699,7 +720,7 @@ const Swap = ({
       <StyledSwapContainer>
         <Grid container>
           <StyledFromContainer container alignItems="center" justify="space-between">
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <StyledWhaleModeContainer>
                 <FormControlLabel
                   style={{ margin: 0 }}
@@ -714,7 +735,7 @@ const Swap = ({
                   <StyledHelpOutlineIcon fontSize="small" />
                 </Tooltip>
               </StyledWhaleModeContainer>
-            </Grid>
+            </Grid> */}
             <Grid item xs={6}>
               <Typography variant="body1">
                 <FormattedMessage description="You pay" defaultMessage="You pay" />

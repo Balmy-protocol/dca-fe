@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 import { BigNumber } from 'ethers';
 import { TransactionTypesConstant } from 'types';
 import { Oracles } from 'types/contracts';
@@ -8,91 +9,225 @@ export const NETWORKS = {
     chainId: 1,
     name: 'Ethereum',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: [
+      'https://mainnet.infura.io/v3/${INFURA_API_KEY}',
+      'wss://mainnet.infura.io/ws/v3/${INFURA_API_KEY}',
+      'https://api.mycryptoapi.com/eth',
+      'https://cloudflare-eth.com',
+    ],
   },
   ropsten: {
     chainId: 3,
     name: 'Ropsten',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: ['https://ropsten.infura.io/v3/${INFURA_API_KEY}', 'wss://ropsten.infura.io/ws/v3/${INFURA_API_KEY}'],
   },
   rinkeby: {
     chainId: 4,
     name: 'Rinkeby',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: ['https://rinkeby.infura.io/v3/${INFURA_API_KEY}', 'wss://rinkeby.infura.io/ws/v3/${INFURA_API_KEY}'],
   },
   goerli: {
     chainId: 5,
     name: 'Goerli',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: ['https://goerli.infura.io/v3/${INFURA_API_KEY}', 'wss://goerli.infura.io/ws/v3/${INFURA_API_KEY}'],
   },
   kovan: {
     chainId: 42,
     name: 'Kovan',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: ['https://kovan.infura.io/v3/${INFURA_API_KEY}', 'wss://kovan.infura.io/ws/v3/${INFURA_API_KEY}'],
   },
   meanfinance: {
     chainId: 31337,
     name: 'Mean Finance',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: ['https://kovan.infura.io/v3/${INFURA_API_KEY}', 'wss://kovan.infura.io/ws/v3/${INFURA_API_KEY}'],
   },
   bsc: {
     chainId: 56,
     name: 'BSC',
     mainCurrency: 'BNB',
+    nativeCurrency: {
+      name: 'BNB',
+      symbol: 'BNB',
+      decimals: 18,
+    },
+    rpc: [
+      'https://bsc-dataseed1.binance.org',
+      'https://bsc-dataseed2.binance.org',
+      'https://bsc-dataseed3.binance.org',
+      'https://bsc-dataseed4.binance.org',
+      'https://bsc-dataseed1.defibit.io',
+      'https://bsc-dataseed2.defibit.io',
+      'https://bsc-dataseed3.defibit.io',
+      'https://bsc-dataseed4.defibit.io',
+      'https://bsc-dataseed1.ninicoin.io',
+      'https://bsc-dataseed2.ninicoin.io',
+      'https://bsc-dataseed3.ninicoin.io',
+      'https://bsc-dataseed4.ninicoin.io',
+      'wss://bsc-ws-node.nariox.org',
+    ],
   },
   polygon: {
     chainId: 137,
     name: 'Polygon',
     mainCurrency: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
+    nativeCurrency: {
+      name: 'Matic',
+      symbol: 'MATIC',
+      decimals: 18,
+    },
+    rpc: [
+      'https://polygon-rpc.com/',
+      'https://rpc-mainnet.matic.network',
+      'https://matic-mainnet.chainstacklabs.com',
+      'https://rpc-mainnet.maticvigil.com',
+      'https://rpc-mainnet.matic.quiknode.pro',
+      'https://matic-mainnet-full-rpc.bwarelabs.com',
+    ],
   },
   fantom: {
     chainId: 250,
     name: 'Fantom',
     mainCurrency: '',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: [],
   },
   avalanche: {
     chainId: 43114,
     name: 'Avalanche',
     mainCurrency: '',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: [],
   },
   arbitrum: {
     chainId: 42161,
     name: 'Arbitrum',
     mainCurrency: '',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: [],
   },
   heco: {
     chainId: 128,
     name: 'Heco',
     mainCurrency: '',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: [],
   },
   optimism: {
     chainId: 10,
     name: 'Optimistic Ethereum',
     mainCurrency: 'OPTIMISM',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'OETH',
+      decimals: 18,
+    },
+    rpc: ['https://mainnet.optimism.io/'],
   },
   optimismKovan: {
     chainId: 69,
     name: 'Optimistic Ethereum Kovan',
     mainCurrency: 'OPTIMISM',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'OETH',
+      decimals: 18,
+    },
+    rpc: ['https://kovan.optimism.io/'],
   },
   optimismGoerli: {
     chainId: 420,
     name: 'Optimistic Ethereum Goerli',
     mainCurrency: 'OPTIMISM',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'OETH',
+      decimals: 18,
+    },
+    rpc: ['https://goerli.optimism.io/'],
   },
   okex: {
     chainId: 66,
     name: 'OKEx',
     mainCurrency: '',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: [],
   },
   harmony: {
     chainId: 1666600000,
     name: 'Harmony',
     mainCurrency: '',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: [],
   },
   xdai: {
     chainId: 100,
     name: 'xDAI',
     mainCurrency: '',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: [],
   },
 };
 
@@ -121,60 +256,52 @@ export const COINGECKO_IDS = {
 export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId];
 
 export const HUB_ADDRESS = {
-  [NETWORKS.mainnet.chainId]: '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567',
   [NETWORKS.kovan.chainId]: '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567',
   [NETWORKS.optimismKovan.chainId]: '0x19BB8c1130649BD2a114c2f2d4C3a6AFa3Bd4944',
+  [NETWORKS.optimism.chainId]: '0x24F85583FAa9F8BD0B8Aa7B1D1f4f53F0F450038',
 };
 export const ORACLE_ADDRESS = {
-  [NETWORKS.mainnet.chainId]: '0xF8736BB2a48bB5D9dF88b393eC3053a52a440edE',
   [NETWORKS.kovan.chainId]: '0xF8736BB2a48bB5D9dF88b393eC3053a52a440edE',
   [NETWORKS.optimismKovan.chainId]: '0x4aFd06674E0701F3bfd6f026e4Ec785f5eC3E29f',
+  [NETWORKS.optimism.chainId]: '0x579280AcF998A031922421a2f6C62Ba609Be44F7',
 };
 export const COMPANION_ADDRESS = {
-  [NETWORKS.mainnet.chainId]: '0x50ed158bfed47ee565f31404c98a9f9ac0fa0cac',
   [NETWORKS.kovan.chainId]: '0x50ed158bfed47ee565f31404c98a9f9ac0fa0cac',
   [NETWORKS.optimismKovan.chainId]: '0x2e2e175406109c2E5Df16a59f615Ee6E7CA87b5c',
+  [NETWORKS.optimism.chainId]: '0x1eD2957bA1F14c17E01424DD93a258dd2E04cAAC',
 };
 export const TOKEN_DESCRIPTOR_ADDRESS = {
-  [NETWORKS.mainnet.chainId]: '0x0aB7CF8A552Fa296632e280213c392473D6d0933',
   [NETWORKS.kovan.chainId]: '0x0aB7CF8A552Fa296632e280213c392473D6d0933',
   [NETWORKS.optimismKovan.chainId]: '0x579280AcF998A031922421a2f6C62Ba609Be44F7',
+  [NETWORKS.optimism.chainId]: '0x0100a1c3020fE97051cBB18636C0f91abCc603cE',
 };
 export const CHAINLINK_ORACLE_ADDRESS = {
-  [NETWORKS.mainnet.chainId]: '0x5aB88a77f609B47AD752dca6d8537746861A5839',
   [NETWORKS.kovan.chainId]: '0x5aB88a77f609B47AD752dca6d8537746861A5839',
   [NETWORKS.optimismKovan.chainId]: '0xC9A965C884c43e849a46A3df4Bb28e036f6C0dB5',
+  [NETWORKS.optimism.chainId]: '0x8847480C34C7DceEf73647c57766f28c3A07596B',
 };
 export const UNISWAP_ORACLE_ADDRESS = {
-  [NETWORKS.mainnet.chainId]: '0xF929d119a2c108928b20346dAd609751ddc0ad18',
   [NETWORKS.kovan.chainId]: '0xF929d119a2c108928b20346dAd609751ddc0ad18',
   [NETWORKS.optimismKovan.chainId]: '0x8847480C34C7DceEf73647c57766f28c3A07596B',
+  [NETWORKS.optimism.chainId]: '0x4aFd06674E0701F3bfd6f026e4Ec785f5eC3E29f',
 };
 
 export const PERMISSION_MANAGER_ADDRESS = {
-  [NETWORKS.mainnet.chainId]: '0xbB3E83D7C2fD7c1D07bb2dCCe435728Da2e42463',
   [NETWORKS.kovan.chainId]: '0xbB3E83D7C2fD7c1D07bb2dCCe435728Da2e42463',
   [NETWORKS.optimismKovan.chainId]: '0x0100a1c3020fE97051cBB18636C0f91abCc603cE',
+  [NETWORKS.optimism.chainId]: '0x09AdE44D2E60fCa2270fF32Af5a189f40D29837b',
 };
 
 export const MEAN_GRAPHQL_URL = {
-  [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1',
-  [NETWORKS.ropsten.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-ropsten',
-  [NETWORKS.rinkeby.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-rinkeby',
-  [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-goerli',
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-kovan',
-  [NETWORKS.meanfinance.chainId]: 'http://3.235.77.84:8000/subgraphs/name/alejoamiras/dca-subgraph',
   [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-optimism-kovan',
+  [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism',
 };
 
 export const UNI_GRAPHQL_URL = {
-  [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
-  [NETWORKS.ropsten.chainId]: 'https://api.thegraph.com/subgraphs/name/alejoamiras/uniswap-v3-ropsten',
-  [NETWORKS.rinkeby.chainId]: 'https://api.thegraph.com/subgraphs/name/alejoamiras/uniswap-v3-rinkeby',
-  [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-goerli',
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/fibofinance/uniswap-v3-kovan',
-  [NETWORKS.meanfinance.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-optimism-kovan',
+  [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-optimism',
 };
 
 export const EXPLORER_URL = {
@@ -389,14 +516,6 @@ export const STRING_SWAP_INTERVALS = {
 };
 
 export const WHALE_MODE_FREQUENCIES = {
-  [NETWORKS.mainnet.chainId]: [
-    ONE_MINUTE.toString(),
-    FIVE_MINUTES.toString(),
-    FIFTEEN_MINUTES.toString(),
-    THIRTY_MINUTES.toString(),
-    ONE_HOUR.toString(),
-    FOUR_HOURS.toString(),
-  ],
   [NETWORKS.polygon.chainId]: [
     ONE_MINUTE.toString(),
     FIVE_MINUTES.toString(),
@@ -421,17 +540,17 @@ export const WHALE_MODE_FREQUENCIES = {
     ONE_HOUR.toString(),
     FOUR_HOURS.toString(),
   ],
+  [NETWORKS.optimism.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+    ONE_HOUR.toString(),
+    FOUR_HOURS.toString(),
+  ],
 };
 
 export const WHALE_MINIMUM_VALUES = {
-  [NETWORKS.mainnet.chainId]: {
-    [ONE_MINUTE.toString()]: 10000,
-    [FIVE_MINUTES.toString()]: 10000,
-    [FIFTEEN_MINUTES.toString()]: 10000,
-    [THIRTY_MINUTES.toString()]: 10000,
-    [ONE_HOUR.toString()]: 10000,
-    [FOUR_HOURS.toString()]: 10000,
-  },
   [NETWORKS.kovan.chainId]: {
     [ONE_MINUTE.toString()]: 10000,
     [FIVE_MINUTES.toString()]: 10000,
@@ -456,6 +575,14 @@ export const WHALE_MINIMUM_VALUES = {
     [ONE_HOUR.toString()]: 10000,
     [FOUR_HOURS.toString()]: 10000,
   },
+  [NETWORKS.optimism.chainId]: {
+    [ONE_MINUTE.toString()]: 10000,
+    [FIVE_MINUTES.toString()]: 10000,
+    [FIFTEEN_MINUTES.toString()]: 10000,
+    [THIRTY_MINUTES.toString()]: 10000,
+    [ONE_HOUR.toString()]: 10000,
+    [FOUR_HOURS.toString()]: 10000,
+  },
 };
 export const POSITION_ACTIONS = {
   MODIFIED_RATE: 'MODIFIED_RATE',
@@ -472,3 +599,4 @@ export const ORACLES: Record<'NONE' | 'CHAINLINK' | 'UNISWAP', Oracles> = {
   CHAINLINK: 1,
   UNISWAP: 2,
 };
+/* eslint-enable */
