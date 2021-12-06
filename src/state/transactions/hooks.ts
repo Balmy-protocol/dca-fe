@@ -17,7 +17,7 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { COMPANION_ADDRESS, HUB_ADDRESS, TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
-import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import { addTransaction } from './actions';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
@@ -213,13 +213,9 @@ export function useHasPendingPairCreation(from: Token, to: Token): boolean {
   const allTransactions = useAllTransactions();
   const network = useCurrentNetwork();
   const fromAddress =
-    from.address === PROTOCOL_TOKEN_ADDRESS
-      ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address
-      : from.address;
+    from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : from.address;
   const toAddress =
-    to.address === PROTOCOL_TOKEN_ADDRESS
-      ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address
-      : to.address;
+    to.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : to.address;
 
   return useMemo(
     () =>
@@ -231,11 +227,9 @@ export function useHasPendingPairCreation(from: Token, to: Token): boolean {
           return false;
         }
         let txFrom = (<NewPositionTypeData>tx.typeData).from.address;
-        txFrom =
-          txFrom === PROTOCOL_TOKEN_ADDRESS ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address : txFrom;
+        txFrom = txFrom === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : txFrom;
         let txTo = (<NewPositionTypeData>tx.typeData).to.address;
-        txTo =
-          txTo === PROTOCOL_TOKEN_ADDRESS ? WRAPPED_PROTOCOL_TOKEN[network.chainId](network.chainId).address : txTo;
+        txTo = txTo === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : txTo;
         return (
           (txFrom === fromAddress || txTo === fromAddress) &&
           (txFrom === toAddress || txTo === toAddress) &&

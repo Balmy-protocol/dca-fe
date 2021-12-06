@@ -16,7 +16,7 @@ import { AvailablePair, GetPairPriceResponseData, GetPairResponseSwapData, Token
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from 'utils/currency';
-import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import { BigNumber } from 'ethers';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import useUNIGraphql from 'hooks/useUNIGraphql';
@@ -167,31 +167,23 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   if (to && from) {
     if (from.address < to.address) {
       tokenA = {
-        ...(from.address === PROTOCOL_TOKEN_ADDRESS
-          ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId)
-          : from),
+        ...(from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : from),
         symbol: from.symbol,
         isBaseToken: STABLE_COINS.includes(from.symbol),
       };
       tokenB = {
-        ...(to.address === PROTOCOL_TOKEN_ADDRESS
-          ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId)
-          : to),
+        ...(to.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : to),
         symbol: to.symbol,
         isBaseToken: STABLE_COINS.includes(to.symbol),
       };
     } else {
       tokenA = {
-        ...(to.address === PROTOCOL_TOKEN_ADDRESS
-          ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId)
-          : to),
+        ...(to.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : to),
         symbol: to.symbol,
         isBaseToken: STABLE_COINS.includes(to.symbol),
       };
       tokenB = {
-        ...(from.address === PROTOCOL_TOKEN_ADDRESS
-          ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId)
-          : from),
+        ...(from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : from),
         symbol: from.symbol,
         isBaseToken: STABLE_COINS.includes(from.symbol),
       };

@@ -102,7 +102,7 @@ const AddToPosition = ({ onClose, shouldShow, onAddFunds, position, balance }: A
           <Typography variant="caption" component="span">
             <FormattedMessage
               description="rate detail"
-              defaultMessage="We'll swap {rate} {from} {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
+              defaultMessage="We'll swap {rate} {from} {frequency} for {frequencyPlural} for you"
               values={{
                 from: position.from.symbol,
                 rate: formatUnits(newRate, position.from.decimals),

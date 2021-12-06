@@ -138,7 +138,8 @@ export default function Updater(): null {
                   id: web3Service
                     .parseLog(
                       receipt.logs[receipt.logs.length - 1],
-                      (transactions[hash].typeData as NewPositionTypeData).addressFor
+                      (transactions[hash].typeData as NewPositionTypeData).addressFor,
+                      currentNetwork.chainId
                     )
                     .args.positionId.toString(),
                 };

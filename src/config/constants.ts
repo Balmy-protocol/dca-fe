@@ -67,7 +67,17 @@ export const NETWORKS = {
   optimism: {
     chainId: 10,
     name: 'Optimism',
-    mainCurrency: '',
+    mainCurrency: '0x4200000000000000000000000000000000000006',
+  },
+  optimismKovan: {
+    chainId: 69,
+    name: 'Optimism Kovan',
+    mainCurrency: '0x4200000000000000000000000000000000000006',
+  },
+  optimismGoerli: {
+    chainId: 420,
+    name: 'Optimism Goerli',
+    mainCurrency: '0x4200000000000000000000000000000000000006',
   },
   okex: {
     chainId: 66,
@@ -91,6 +101,8 @@ export const TESTNETS = [
   NETWORKS.rinkeby.chainId,
   NETWORKS.goerli.chainId,
   NETWORKS.kovan.chainId,
+  NETWORKS.optimismKovan.chainId,
+  NETWORKS.optimismGoerli.chainId,
 ];
 export const SUPPORTED_NETWORKS = [
   NETWORKS.mainnet.chainId,
@@ -98,6 +110,7 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.rinkeby.chainId,
   NETWORKS.goerli.chainId,
   NETWORKS.kovan.chainId,
+  NETWORKS.optimismKovan.chainId,
 ];
 
 export const COINGECKO_IDS = {
@@ -107,16 +120,43 @@ export const COINGECKO_IDS = {
   [NETWORKS.goerli.chainId]: 'ethereum',
   [NETWORKS.kovan.chainId]: 'ethereum',
   [NETWORKS.polygon.chainId]: 'polygon-pos',
+  [NETWORKS.optimism.chainId]: 'optimistic-ethereum',
+  [NETWORKS.optimismGoerli.chainId]: 'optimistic-ethereum',
+  [NETWORKS.optimismKovan.chainId]: 'optimistic-ethereum',
 };
 
 export const NETWORKS_FOR_MENU = [NETWORKS.mainnet.chainId, NETWORKS.polygon.chainId];
 
-export const HUB_ADDRESS = '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567';
-export const ORACLE_ADDRESS = '0xF8736BB2a48bB5D9dF88b393eC3053a52a440edE';
-export const COMPANION_ADDRESS = '0x50ed158bfed47ee565f31404c98a9f9ac0fa0cac';
-export const TOKEN_DESCRIPTOR_ADDRESS = '0x0aB7CF8A552Fa296632e280213c392473D6d0933';
-export const CHAINLINK_ORACLE_ADDRESS = '0x5aB88a77f609B47AD752dca6d8537746861A5839';
-export const UNISWAP_ORACLE_ADDRESS = '0xF929d119a2c108928b20346dAd609751ddc0ad18';
+export const HUB_ADDRESS = {
+  [NETWORKS.mainnet.chainId]: '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567',
+  [NETWORKS.kovan.chainId]: '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567',
+  [NETWORKS.optimismKovan.chainId]: '0x19BB8c1130649BD2a114c2f2d4C3a6AFa3Bd4944',
+};
+export const ORACLE_ADDRESS = {
+  [NETWORKS.mainnet.chainId]: '0xF8736BB2a48bB5D9dF88b393eC3053a52a440edE',
+  [NETWORKS.kovan.chainId]: '0xF8736BB2a48bB5D9dF88b393eC3053a52a440edE',
+  [NETWORKS.optimismKovan.chainId]: '0x4aFd06674E0701F3bfd6f026e4Ec785f5eC3E29f',
+};
+export const COMPANION_ADDRESS = {
+  [NETWORKS.mainnet.chainId]: '0x50ed158bfed47ee565f31404c98a9f9ac0fa0cac',
+  [NETWORKS.kovan.chainId]: '0x50ed158bfed47ee565f31404c98a9f9ac0fa0cac',
+  [NETWORKS.optimismKovan.chainId]: '0x2e2e175406109c2E5Df16a59f615Ee6E7CA87b5c',
+};
+export const TOKEN_DESCRIPTOR_ADDRESS = {
+  [NETWORKS.mainnet.chainId]: '0x0aB7CF8A552Fa296632e280213c392473D6d0933',
+  [NETWORKS.kovan.chainId]: '0x0aB7CF8A552Fa296632e280213c392473D6d0933',
+  [NETWORKS.optimismKovan.chainId]: '0x579280AcF998A031922421a2f6C62Ba609Be44F7',
+};
+export const CHAINLINK_ORACLE_ADDRESS = {
+  [NETWORKS.mainnet.chainId]: '0x5aB88a77f609B47AD752dca6d8537746861A5839',
+  [NETWORKS.kovan.chainId]: '0x5aB88a77f609B47AD752dca6d8537746861A5839',
+  [NETWORKS.optimismKovan.chainId]: '0xC9A965C884c43e849a46A3df4Bb28e036f6C0dB5',
+};
+export const UNISWAP_ORACLE_ADDRESS = {
+  [NETWORKS.mainnet.chainId]: '0xF929d119a2c108928b20346dAd609751ddc0ad18',
+  [NETWORKS.kovan.chainId]: '0xF929d119a2c108928b20346dAd609751ddc0ad18',
+  [NETWORKS.optimismKovan.chainId]: '0x8847480C34C7DceEf73647c57766f28c3A07596B',
+};
 
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1',
@@ -125,6 +165,7 @@ export const MEAN_GRAPHQL_URL = {
   [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-goerli',
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-kovan',
   [NETWORKS.meanfinance.chainId]: 'http://3.235.77.84:8000/subgraphs/name/alejoamiras/dca-subgraph',
+  [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-optimism-kovan',
 };
 
 export const UNI_GRAPHQL_URL = {
@@ -134,6 +175,7 @@ export const UNI_GRAPHQL_URL = {
   [NETWORKS.goerli.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-goerli',
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/fibofinance/uniswap-v3-kovan',
   [NETWORKS.meanfinance.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+  [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-optimism-kovan',
 };
 
 export const EXPLORER_URL = {
@@ -150,6 +192,9 @@ export const EXPLORER_URL = {
   [NETWORKS.arbitrum.chainId]: 'https://arbiscan.io/',
   [NETWORKS.heco.chainId]: 'https://scan.hecochain.com/',
   [NETWORKS.optimism.chainId]: 'https://optimistic.etherscan.io/',
+  [NETWORKS.optimismKovan.chainId]: 'https://optimistic.etherscan.io/',
+  [NETWORKS.optimismGoerli.chainId]: 'https://kovan-optimistic.etherscan.io/',
+  [NETWORKS.optimismGoerli.chainId]: 'https://kovan-optimistic.etherscan.io/',
   [NETWORKS.okex.chainId]: 'https://www.oklink.com/okexchain/',
   [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
   [NETWORKS.xdai.chainId]: 'https://blockscout.com/xdai/mainnet/',
@@ -370,6 +415,14 @@ export const WHALE_MODE_FREQUENCIES = {
     ONE_HOUR.toString(),
     FOUR_HOURS.toString(),
   ],
+  [NETWORKS.optimismKovan.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+    ONE_HOUR.toString(),
+    FOUR_HOURS.toString(),
+  ],
 };
 
 export const WHALE_MINIMUM_VALUES = {
@@ -390,6 +443,14 @@ export const WHALE_MINIMUM_VALUES = {
     [FOUR_HOURS.toString()]: 10000,
   },
   [NETWORKS.polygon.chainId]: {
+    [ONE_MINUTE.toString()]: 10000,
+    [FIVE_MINUTES.toString()]: 10000,
+    [FIFTEEN_MINUTES.toString()]: 10000,
+    [THIRTY_MINUTES.toString()]: 10000,
+    [ONE_HOUR.toString()]: 10000,
+    [FOUR_HOURS.toString()]: 10000,
+  },
+  [NETWORKS.optimismKovan.chainId]: {
     [ONE_MINUTE.toString()]: 10000,
     [FIVE_MINUTES.toString()]: 10000,
     [FIFTEEN_MINUTES.toString()]: 10000,
