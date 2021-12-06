@@ -8,8 +8,8 @@ import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import NetworkLabel from 'common/network-label';
 import MeanLogo from 'common/mean-logo';
-import Brightness4Icon from '@material-ui/icons/Brightness4';
-import Brightness7Icon from '@material-ui/icons/Brightness7';
+import Brightness3Icon from '@material-ui/icons/Brightness3';
+import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import { useThemeMode } from 'state/config/hooks';
 import IconButton from '@material-ui/core/IconButton';
 import { toggleTheme } from 'state/config/actions';
@@ -74,7 +74,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             }
           </WalletContext.Consumer>
           <IconButton onClick={() => dispatch(toggleTheme())} color="inherit">
-            {theme === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+            {theme === 'dark' ? <WbSunnyIcon /> : <Brightness3Icon />}
           </IconButton>
         </StyledButtonContainer>
       </Grid>
