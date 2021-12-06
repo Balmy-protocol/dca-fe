@@ -10,6 +10,7 @@ import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import TwitterIcon from '@material-ui/icons/Twitter';
+import DiscordIcon from 'assets/svg/atom/discord';
 import DescriptionIcon from '@material-ui/icons/Description';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import MeanLogo from 'common/mean-logo';
@@ -76,6 +77,17 @@ const Footer = () => {
                       <TwitterIcon fontSize="inherit" />
                     </StyledIconContainer>
                     <FormattedMessage description="twitter" defaultMessage="Twitter" />
+                  </CategoryItem>
+                  <CategoryItem
+                    href="https://discord.com/invite/ThfzDdn4pn"
+                    target="_blank"
+                    color="inherit"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <StyledIconContainer>
+                      <DiscordIcon size="inherit" />
+                    </StyledIconContainer>
+                    <FormattedMessage description="discord" defaultMessage="Discord" />
                   </CategoryItem>
                 </CategoryProvider>
               </Grid>
