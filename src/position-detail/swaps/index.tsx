@@ -11,7 +11,7 @@ interface PositionSwapsProps {
 }
 
 const PositionSwaps = ({ position }: PositionSwapsProps) => {
-  const [tabIndex, setTabIndex] = React.useState<0 | 1 | 2>(0);
+  const [tabIndex, setTabIndex] = React.useState<0 | 1 | 2 | 3>(0);
   const tabsStyles = appleTabsStylesHook.useTabs();
   const tabItemStyles = appleTabsStylesHook.useTabItem();
   return (
@@ -21,6 +21,7 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
           <Tab classes={tabItemStyles} disableRipple label="All" />
           <Tab classes={tabItemStyles} disableRipple label="Swaps" />
           <Tab classes={tabItemStyles} disableRipple label="Modifications" />
+          <Tab classes={tabItemStyles} disableRipple label="Withdraws" />
         </Tabs>
       </Grid>
       <Grid item xs={12}>
