@@ -65,7 +65,7 @@ import HUB_COMPANION_ABI from 'abis/HubCompanion.json';
 import HUB_ABI from 'abis/Hub.json';
 import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
-import TOKEN_DESCRIPTOR_ABI from 'abis/TokenDescriptor.json';
+import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
@@ -78,6 +78,7 @@ import {
   NETWORKS,
   ORACLES,
   ORACLE_ADDRESS,
+  PERMISSION_MANAGER_ADDRESS,
   SWAP_INTERVALS_MAP,
   TOKEN_DESCRIPTOR_ADDRESS,
   TRANSACTION_TYPES,
@@ -90,6 +91,7 @@ import {
   HubContract,
   OracleContract,
   Oracles,
+  PermissionManagerContract,
   TokenDescriptorContract,
 } from 'types/contracts';
 import { axiosClient } from 'state';
@@ -225,6 +227,12 @@ export default class Web3Service {
     const network = await this.getNetwork();
 
     return HUB_ADDRESS[network.chainId] || HUB_ADDRESS[NETWORKS.mainnet.chainId];
+  }
+
+  async getPermissionManagerAddress() {
+    const network = await this.getNetwork();
+
+    return PERMISSION_MANAGER_ADDRESS[network.chainId] || PERMISSION_MANAGER_ADDRESS[NETWORKS.mainnet.chainId];
   }
 
   async getHUBCompanionAddress() {
@@ -743,15 +751,14 @@ export default class Web3Service {
 
   // POSITION EMTHODS
   async getTokenNFT(id: string): Promise<NFTData> {
-    const tokenDescriptorAddress = await this.getTokenDescriptorAddress();
-    const hubAddress = await this.getHUBAddress();
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
     const tokenDescriptorContract = new ethers.Contract(
-      tokenDescriptorAddress,
-      TOKEN_DESCRIPTOR_ABI.abi,
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
       this.client
-    ) as unknown as TokenDescriptorContract;
+    ) as unknown as PermissionManagerContract;
 
-    const tokenData = await tokenDescriptorContract.tokenURI(hubAddress, id);
+    const tokenData = await tokenDescriptorContract.tokenURI(id);
     return JSON.parse(atob(tokenData.substring(29))) as NFTData;
   }
 
