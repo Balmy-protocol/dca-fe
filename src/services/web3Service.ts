@@ -225,43 +225,43 @@ export default class Web3Service {
   async getHUBAddress() {
     const network = await this.getNetwork();
 
-    return HUB_ADDRESS[network.chainId] || HUB_ADDRESS[NETWORKS.mainnet.chainId];
+    return HUB_ADDRESS[network.chainId] || HUB_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getPermissionManagerAddress() {
     const network = await this.getNetwork();
 
-    return PERMISSION_MANAGER_ADDRESS[network.chainId] || PERMISSION_MANAGER_ADDRESS[NETWORKS.mainnet.chainId];
+    return PERMISSION_MANAGER_ADDRESS[network.chainId] || PERMISSION_MANAGER_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getHUBCompanionAddress() {
     const network = await this.getNetwork();
 
-    return COMPANION_ADDRESS[network.chainId] || COMPANION_ADDRESS[NETWORKS.mainnet.chainId];
+    return COMPANION_ADDRESS[network.chainId] || COMPANION_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getOracleAddress() {
     const network = await this.getNetwork();
 
-    return ORACLE_ADDRESS[network.chainId] || ORACLE_ADDRESS[NETWORKS.mainnet.chainId];
+    return ORACLE_ADDRESS[network.chainId] || ORACLE_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getChainlinkOracleAddress() {
     const network = await this.getNetwork();
 
-    return CHAINLINK_ORACLE_ADDRESS[network.chainId] || CHAINLINK_ORACLE_ADDRESS[NETWORKS.mainnet.chainId];
+    return CHAINLINK_ORACLE_ADDRESS[network.chainId] || CHAINLINK_ORACLE_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getUniswapOracleAddress() {
     const network = await this.getNetwork();
 
-    return UNISWAP_ORACLE_ADDRESS[network.chainId] || UNISWAP_ORACLE_ADDRESS[NETWORKS.mainnet.chainId];
+    return UNISWAP_ORACLE_ADDRESS[network.chainId] || UNISWAP_ORACLE_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getTokenDescriptorAddress() {
     const network = await this.getNetwork();
 
-    return TOKEN_DESCRIPTOR_ADDRESS[network.chainId] || TOKEN_DESCRIPTOR_ADDRESS[NETWORKS.mainnet.chainId];
+    return TOKEN_DESCRIPTOR_ADDRESS[network.chainId] || TOKEN_DESCRIPTOR_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   // BOOTSTRAP
@@ -460,7 +460,7 @@ export default class Web3Service {
     const network = await this.getNetwork();
     const price = await axiosClient.get<Record<string, { usd: number }>>(
       `https://api.coingecko.com/api/v3/simple/token_price/${
-        COINGECKO_IDS[network.chainId] || COINGECKO_IDS[NETWORKS.mainnet.chainId]
+        COINGECKO_IDS[network.chainId] || COINGECKO_IDS[NETWORKS.optimism.chainId]
       }?contract_addresses=${token.address}&vs_currencies=usd`
     );
 

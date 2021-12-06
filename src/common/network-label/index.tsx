@@ -100,7 +100,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
         aria-haspopup="true"
         color="primary"
         onClick={handleClick}
-        style={{ maxWidth: '200px', textTransform: 'none' }}
+        style={{ maxWidth: '220px', textTransform: 'none' }}
         isMainnet={NETWORKS_FOR_MENU.includes(network.chainId)}
         endIcon={<StyledConnectedCircle isMainnet={NETWORKS_FOR_MENU.includes(network.chainId)} />}
       >

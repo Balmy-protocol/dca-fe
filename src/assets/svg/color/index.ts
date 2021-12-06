@@ -282,6 +282,7 @@ import OMNI from './omni.svg';
 import ONG from './ong.svg';
 import ONT from './ont.svg';
 import OOT from './oot.svg';
+import OPTIMISM from './optimism.svg';
 import OST from './ost.svg';
 import OX from './ox.svg';
 import OXT from './oxt.svg';
@@ -1196,6 +1197,7 @@ const manifest = {
   '0xd341d1680eeee3255b8c4c75bcce7eb57f144dae': ONG,
   ONT,
   OOT,
+  OPTIMISM,
   '0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca': OST,
   OX,
   '0x4575f41308ec1483f3d399aa9a2826d74da13deb': OXT,
