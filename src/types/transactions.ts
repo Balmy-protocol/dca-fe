@@ -1,8 +1,22 @@
-import { TransactionReceipt as RawTransactionReceipt } from '@ethersproject/providers';
+import { Log } from '@ethersproject/providers';
 import { Oracles } from './contracts';
 import { Token } from './tokens';
 
-export interface TransactionReceipt extends RawTransactionReceipt {
+export interface TransactionReceipt {
+  to: string;
+  from: string;
+  contractAddress: string;
+  transactionIndex: number;
+  root?: string;
+  logsBloom: string;
+  blockHash: string;
+  transactionHash: string;
+  logs: Array<Log>;
+  blockNumber: number;
+  confirmations: number;
+  byzantium: boolean;
+  type: number;
+  status?: number;
   chainId: number;
 }
 

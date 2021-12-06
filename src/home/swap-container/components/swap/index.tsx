@@ -24,6 +24,7 @@ import StalePairModal from 'common/stale-pair-modal';
 import LowLiquidityModal from 'common/low-liquidity-modal';
 import {
   FULL_DEPOSIT_TYPE,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   MINIMUM_LIQUIDITY_USD,
   MODE_TYPES,
   STRING_SWAP_INTERVALS,
@@ -31,6 +32,7 @@ import {
   RATE_TYPE,
   SUPPORTED_NETWORKS,
   TRANSACTION_TYPES,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ORACLES,
   COMPANION_ADDRESS,
   HUB_ADDRESS,
@@ -171,6 +173,7 @@ const Swap = ({
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = React.useState(false);
   const [whaleMode, setWhaleMode] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -181,16 +184,23 @@ const Swap = ({
   const [usedTokens] = useUsedTokens();
 
   const existingPair = React.useMemo(() => {
-    let token0 = from.address < to.address ? from.address : to.address;
-    let token1 = from.address < to.address ? to.address : from.address;
+    let tokenA = from.address;
+    let tokenB = to.address;
 
-    if (token0 === PROTOCOL_TOKEN_ADDRESS) {
-      token0 = getWrappedProtocolToken(currentNetwork.chainId).address;
+    if (tokenA === PROTOCOL_TOKEN_ADDRESS) {
+      tokenA = getWrappedProtocolToken(currentNetwork.chainId).address;
     }
-    if (token1 === PROTOCOL_TOKEN_ADDRESS) {
-      token1 = getWrappedProtocolToken(currentNetwork.chainId).address;
+    if (tokenB === PROTOCOL_TOKEN_ADDRESS) {
+      tokenB = getWrappedProtocolToken(currentNetwork.chainId).address;
     }
-    return find(availablePairs, (pair) => pair.token0.address === token0 && pair.token1.address === token1);
+
+    const token0 = tokenA < tokenB ? tokenA : tokenB;
+    const token1 = tokenA < tokenB ? tokenB : tokenA;
+
+    return find(
+      availablePairs,
+      (pair) => pair.token0.address === token0.toLocaleLowerCase() && pair.token1.address === token1.toLocaleLowerCase()
+    );
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
   const isCreatingPair = useHasPendingPairCreation(from, to);
 
@@ -428,10 +438,11 @@ const Swap = ({
     setShouldShowLowLiquidityModal(false);
   };
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
     // setIsLoading(true);
 
-    const oracleInUse = await web3Service.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
+    // const oracleInUse = await web3Service.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
 
     // let hasLowLiquidity = oracleInUse === ORACLES.UNISWAP;
 

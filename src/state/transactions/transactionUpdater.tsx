@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import useWeb3Service from 'hooks/useWeb3Service';
+import omit from 'lodash/omit';
 import useBuildTransactionMessage from 'hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from 'hooks/useBuildRejectedTransactionMessage';
 import Zoom from '@material-ui/core/Zoom';
@@ -62,7 +63,7 @@ export default function Updater(): null {
   const getReceipt = useCallback(
     (hash: string) => {
       if (!web3Service.getAccount()) throw new Error('No library or chainId');
-      return web3Service.getTransactionReceipt(hash).then((receipt: TransactionReceipt) => receipt);
+      return web3Service.getTransactionReceipt(hash);
     },
     [web3Service]
   );
@@ -157,7 +158,7 @@ export default function Updater(): null {
                 finalizeTransaction({
                   hash,
                   receipt: {
-                    ...receipt,
+                    ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
                     chainId: currentNetwork.chainId,
                   },
                   extendedTypeData,
