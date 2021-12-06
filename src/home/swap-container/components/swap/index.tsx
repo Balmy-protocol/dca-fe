@@ -429,27 +429,31 @@ const Swap = ({
   };
 
   const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
-    setIsLoading(true);
+    // setIsLoading(true);
 
     const oracleInUse = await web3Service.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
 
-    let hasLowLiquidity = oracleInUse === ORACLES.UNISWAP;
+    // let hasLowLiquidity = oracleInUse === ORACLES.UNISWAP;
 
-    if (oracleInUse === ORACLES.UNISWAP) {
-      const liquidity = await web3Service.getPairLiquidity(from, to);
+    // if (oracleInUse === ORACLES.UNISWAP) {
+    //   const liquidity = await web3Service.getPairLiquidity(from, to);
 
-      hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
-    }
+    //   hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
+    // }
 
-    setIsLoading(false);
+    // setIsLoading(false);
 
     setCurrentAction(actionToDo);
-    if (hasLowLiquidity) {
-      setShouldShowLowLiquidityModal(true);
-    } else if (POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
+    if (POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
     }
+    // if (hasLowLiquidity) {
+    //   setShouldShowLowLiquidityModal(true);
+    // } else if (POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
+    //   // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    //   POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
+    // }
   };
 
   const closeLowLiquidityModal = () => {
