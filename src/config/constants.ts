@@ -158,6 +158,12 @@ export const UNISWAP_ORACLE_ADDRESS = {
   [NETWORKS.optimismKovan.chainId]: '0x8847480C34C7DceEf73647c57766f28c3A07596B',
 };
 
+export const PERMISSION_MANAGER_ADDRESS = {
+  [NETWORKS.mainnet.chainId]: '0xbB3E83D7C2fD7c1D07bb2dCCe435728Da2e42463',
+  [NETWORKS.kovan.chainId]: '0xbB3E83D7C2fD7c1D07bb2dCCe435728Da2e42463',
+  [NETWORKS.optimismKovan.chainId]: '0x0100a1c3020fE97051cBB18636C0f91abCc603cE',
+};
+
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1',
   [NETWORKS.ropsten.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v1-ropsten',

@@ -74,6 +74,10 @@ export class HubCompanionContract extends Contract {
     recipient: string
   ) => Promise<TransactionResponse>;
 }
+
+export class PermissionManagerContract extends Contract {
+  tokenURI: (positionId: string) => Promise<string>;
+}
 export class HubContract extends Contract {
   getNextSwapInfo: (
     tokens: string[],
