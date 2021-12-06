@@ -68,7 +68,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         content: (
           <FormattedMessage
             description="position termination success"
-            defaultMessage="Your {from}:{to} position termination has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Your {from}/{to} position termination has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
@@ -88,7 +88,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         <Typography variant="h6">
           <FormattedMessage
             description="terminate title"
-            defaultMessage="Terminate {from}:{to} position"
+            defaultMessage="Terminate {from}/{to} position"
             values={{ from: position.from.symbol, to: position.to.symbol }}
           />
         </Typography>

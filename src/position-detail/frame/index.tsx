@@ -96,7 +96,7 @@ const PositionDetailFrame = () => {
           <Typography variant="body1">
             <FormattedMessage
               description="Modifying rate for position"
-              defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural}"
+              defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural}"
               values={{
                 from: position.from.symbol,
                 to: position.to.symbol,
@@ -124,7 +124,7 @@ const PositionDetailFrame = () => {
         content: (
           <FormattedMessage
             description="success modify rate for position"
-            defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,

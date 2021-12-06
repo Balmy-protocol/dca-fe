@@ -183,7 +183,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           <Typography variant="body1">
             <FormattedMessage
               description="setting swap"
-              defaultMessage="Adding {ammountToAdd} {from} to {from}:{to} position and setting it to run for {frequencyValue} {type}"
+              defaultMessage="Adding {ammountToAdd} {from} to {from}/{to} position and setting it to run for {frequencyValue} {type}"
               values={{
                 ammountToAdd,
                 frequencyValue,
@@ -205,7 +205,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         content: (
           <FormattedMessage
             description="resetting position success"
-            defaultMessage="Adding {ammountToAdd} {from} to {from}:{to} position and setting it to run for {frequencyValue} {type} has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Adding {ammountToAdd} {from} to {from}/{to} position and setting it to run for {frequencyValue} {type} has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               ammountToAdd,
               frequencyValue,
@@ -229,7 +229,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           <Typography variant="body1">
             <FormattedMessage
               description="Adding funds"
-              defaultMessage="Adding funds to {from}:{to} position"
+              defaultMessage="Adding funds to {from}/{to} position"
               values={{ from: from.symbol, to: to.symbol }}
             />
           </Typography>
@@ -245,7 +245,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         content: (
           <FormattedMessage
             description="adding funds success"
-            defaultMessage="Adding funds to your {from}:{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Adding funds to your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
@@ -300,7 +300,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
           <Typography variant="body1">
             <FormattedMessage
               description="Modifying rate for position"
-              defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural}"
+              defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural}"
               values={{
                 from: position.from.symbol,
                 to: position.to.symbol,
@@ -323,7 +323,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         content: (
           <FormattedMessage
             description="success modify rate for position"
-            defaultMessage="Changing your {from}:{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
