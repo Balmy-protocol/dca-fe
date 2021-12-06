@@ -170,7 +170,11 @@ export function isTransactionPending(tx: TransactionDetails): boolean {
 export function useHasPendingApproval(token: Token, tokenTo: Token, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = token.address;
-  const addressToCheck = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? HUB_ADDRESS : COMPANION_ADDRESS;
+  const currentNetwork = useCurrentNetwork();
+  const addressToCheck =
+    tokenTo.address === PROTOCOL_TOKEN_ADDRESS
+      ? HUB_ADDRESS[currentNetwork.chainId]
+      : COMPANION_ADDRESS[currentNetwork.chainId];
 
   return useMemo(
     () =>
@@ -267,7 +271,11 @@ export function usePositionHasPendingTransaction(position: string): string | nul
 export function useHasConfirmedApproval(token: Token, tokenTo: Token, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = token.address;
-  const addressToCheck = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? COMPANION_ADDRESS : HUB_ADDRESS;
+  const currentNetwork = useCurrentNetwork();
+  const addressToCheck =
+    tokenTo.address === PROTOCOL_TOKEN_ADDRESS
+      ? COMPANION_ADDRESS[currentNetwork.chainId]
+      : HUB_ADDRESS[currentNetwork.chainId];
   return useMemo(
     () =>
       typeof tokenAddress === 'string' &&
