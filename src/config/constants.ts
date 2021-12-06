@@ -366,7 +366,7 @@ export const STRING_SWAP_INTERVALS = {
     subject: 'swaps',
   },
   [ONE_HOUR.toString()]: {
-    singular: 'hour (1 swap)',
+    singular: '1 hour (1 swap)',
     plural: (left: number) => `${toReadable(left, ONE_HOUR.toNumber())} (${left} swaps)`,
     adverb: 'hourly',
     every: 'every hour',
@@ -380,14 +380,14 @@ export const STRING_SWAP_INTERVALS = {
     subject: 'swaps',
   },
   [ONE_DAY.toString()]: {
-    singular: 'day (1 swap)',
+    singular: '1 day (1 swap)',
     plural: (left: number) => `${toReadable(left, ONE_DAY.toNumber())} (${left} swaps)`,
     every: 'every day',
     adverb: 'daily',
     subject: 'days',
   },
   [ONE_WEEK.toString()]: {
-    singular: 'week (1 swap)',
+    singular: '1 week (1 swap)',
     plural: (left: number) => `${toReadable(left, ONE_WEEK.toNumber())} (${left} swaps)`,
     every: 'every week',
     adverb: 'weekly',

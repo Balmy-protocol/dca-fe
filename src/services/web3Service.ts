@@ -1062,7 +1062,7 @@ export default class Web3Service {
   }
 
   parseLog(log: Log, addressFor: string, chainId: number) {
-    if (addressFor === COMPANION_ADDRESS) {
+    if (addressFor === COMPANION_ADDRESS[chainId]) {
       const hubCompanionInstance = new ethers.Contract(
         COMPANION_ADDRESS[chainId],
         HUB_COMPANION_ABI.abi,
