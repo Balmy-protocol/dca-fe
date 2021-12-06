@@ -559,7 +559,7 @@ export default class Web3Service {
       try {
         oracleInUse = await oracleInstance.oracleInUse(tokenA, tokenB);
       } catch (e) {
-        console.error('Error fetching oracle in use for pair', pair, e);
+        console.error('Error fetching oracle in use for existing pair', pair, e);
       }
 
       return oracleInUse;
@@ -589,7 +589,7 @@ export default class Web3Service {
         }
       }
     } catch (e) {
-      console.error('Error fetching support for oracle for', pair, e);
+      console.error('Error fetching oracle support for pair', pair, e);
     }
 
     return oracleInUse;
