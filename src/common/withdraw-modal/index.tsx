@@ -73,7 +73,7 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         content: (
           <FormattedMessage
             description="withdraw from success"
-            defaultMessage="Your withdrawal of {to} from your {from}:{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Your withdrawal of {to} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
@@ -93,7 +93,7 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         <Typography variant="h6">
           <FormattedMessage
             description="withdraw title"
-            defaultMessage="Withdraw {to} from {from}:{to} position"
+            defaultMessage="Withdraw {to} from {from}/{to} position"
             values={{ from: position.from.symbol, to: position.to.symbol }}
           />
         </Typography>

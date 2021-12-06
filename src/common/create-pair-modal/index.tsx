@@ -104,7 +104,7 @@ const CreatePairModal = ({
         <Typography variant="h6">
           <FormattedMessage
             description="First deposit"
-            defaultMessage="Create position for {from}:{to}"
+            defaultMessage="Create position for {from}/{to}"
             values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
           />
         </Typography>
@@ -125,7 +125,7 @@ const CreatePairModal = ({
             <Typography variant="body1">
               <FormattedMessage
                 description="create pair question"
-                defaultMessage="You are the first person to create a position for this pair of tokens. Due to that the gas cost is going to be higher than creating a position for a pair we already operate with. This will be a one time operation. Are you sure you want to create the {from}:{to} position?"
+                defaultMessage="You are the first person to create a position for this pair of tokens. Due to that the gas cost is going to be higher than creating a position for a pair we already operate with. This will be a one time operation. Are you sure you want to create the {from}/{to} position?"
                 values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
               />
             </Typography>
