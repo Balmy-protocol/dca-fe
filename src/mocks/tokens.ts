@@ -27,6 +27,7 @@ const WETH_ADDRESSES = {
   [NETWORKS.meanfinance.chainId]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   [NETWORKS.goerli.chainId]: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
   [NETWORKS.kovan.chainId]: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
+  [NETWORKS.optimismKovan.chainId]: '0x4200000000000000000000000000000000000006',
 };
 
 export const WETH = (chainId: number): Token => ({
@@ -46,6 +47,7 @@ const USDC_ADDRESSES = {
   [NETWORKS.meanfinance.chainId]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   [NETWORKS.goerli.chainId]: '0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c',
   [NETWORKS.kovan.chainId]: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
+  [NETWORKS.optimismKovan.chainId]: '0x4e62882864fB8CE54AFfcAf8D899A286762B011B',
 };
 
 export const USDC = (chainId: number): Token => ({
@@ -97,6 +99,9 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.goerli.chainId]: ETH,
   [NETWORKS.kovan.chainId]: ETH,
   [NETWORKS.polygon.chainId]: MATIC,
+  [NETWORKS.optimismKovan.chainId]: ETH,
+  [NETWORKS.optimism.chainId]: ETH,
+  [NETWORKS.optimismGoerli.chainId]: ETH,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
@@ -106,7 +111,17 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.goerli.chainId]: WETH,
   [NETWORKS.kovan.chainId]: WETH,
   [NETWORKS.polygon.chainId]: WMATIC,
+  [NETWORKS.optimismKovan.chainId]: WETH,
+  [NETWORKS.optimismGoerli.chainId]: WETH,
+  [NETWORKS.optimism.chainId]: WETH,
 };
+
+export const getProtocolToken = (chainId: number) =>
+  (PROTOCOL_TOKEN[chainId] && PROTOCOL_TOKEN[chainId](chainId)) ||
+  PROTOCOL_TOKEN[NETWORKS.mainnet.chainId](NETWORKS.mainnet.chainId);
+export const getWrappedProtocolToken = (chainId: number) =>
+  (WRAPPED_PROTOCOL_TOKEN[chainId] && WRAPPED_PROTOCOL_TOKEN[chainId](chainId)) ||
+  WRAPPED_PROTOCOL_TOKEN[NETWORKS.mainnet.chainId](NETWORKS.mainnet.chainId);
 
 const UNI_ADDRESSES = {
   [NETWORKS.mainnet.chainId]: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',

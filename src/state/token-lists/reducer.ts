@@ -53,9 +53,22 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
   },
+  'https://static.optimism.io/optimism.tokenlist.json': {
+    name: 'Optimism',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+  },
 });
 export const initialState: TokenListsState = {
-  activeLists: ['https://gateway.ipfs.io/ipns/tokens.uniswap.org'],
+  activeLists: [
+    'https://gateway.pinata.cloud/ipfs/QmRhveZ2UB68XUhMjT7eNjgnku4AkyhKSKAJZ3i2KReHuL',
+    'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
+    'https://static.optimism.io/optimism.tokenlist.json',
+  ],
   byUrl: getDefaultByUrl(),
 };
 

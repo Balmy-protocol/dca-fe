@@ -50,7 +50,7 @@ import {
 import { calculateStale } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
-import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { STALE } from 'hooks/useIsStale';
 import Switch from '@material-ui/core/Switch';
@@ -185,10 +185,10 @@ const Swap = ({
     let token1 = from.address < to.address ? to.address : from.address;
 
     if (token0 === PROTOCOL_TOKEN_ADDRESS) {
-      token0 = WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).address;
+      token0 = getWrappedProtocolToken(currentNetwork.chainId).address;
     }
     if (token1 === PROTOCOL_TOKEN_ADDRESS) {
-      token1 = WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).address;
+      token1 = getWrappedProtocolToken(currentNetwork.chainId).address;
     }
     return find(availablePairs, (pair) => pair.token0.address === token0 && pair.token1.address === token1);
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
@@ -214,11 +214,7 @@ const Swap = ({
   const [usdPrice, isLoadingUsdPrice] = usePromise<number>(
     web3Service,
     'getUsdPrice',
-    [
-      from.address === PROTOCOL_TOKEN_ADDRESS
-        ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId)
-        : from,
-    ],
+    [from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : from],
     !from
   );
 
@@ -266,7 +262,13 @@ const Swap = ({
       const result = await web3Service.approveToken(from, to);
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
-        typeData: { token: from, addressFor: to.address === PROTOCOL_TOKEN_ADDRESS ? COMPANION_ADDRESS : HUB_ADDRESS },
+        typeData: {
+          token: from,
+          addressFor:
+            to.address === PROTOCOL_TOKEN_ADDRESS
+              ? COMPANION_ADDRESS[currentNetwork.chainId]
+              : HUB_ADDRESS[currentNetwork.chainId],
+        },
       });
       setModalSuccess({
         hash: result.hash,
@@ -315,8 +317,8 @@ const Swap = ({
           isCreatingPair: !existingPair,
           addressFor:
             to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
-              ? COMPANION_ADDRESS
-              : HUB_ADDRESS,
+              ? COMPANION_ADDRESS[currentNetwork.chainId]
+              : HUB_ADDRESS[currentNetwork.chainId],
         },
       });
       setModalSuccess({

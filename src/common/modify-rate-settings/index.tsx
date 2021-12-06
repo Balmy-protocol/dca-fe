@@ -156,7 +156,7 @@ const ModifyRateAndSwaps = ({
               <Typography variant={isMinimal ? 'caption' : 'body2'}>
                 <FormattedMessage
                   description="rate detail"
-                  defaultMessage="We'll swap {rate} {from} {frequency} for {ammountOfSwaps} {frequencyPlural} for you"
+                  defaultMessage="We'll swap {rate} {from} {frequency} for {frequencyPlural} for you"
                   values={{
                     from: position.from.symbol,
                     rate: fromValue,

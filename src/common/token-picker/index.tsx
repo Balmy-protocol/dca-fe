@@ -20,7 +20,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Chip from '@material-ui/core/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles } from '@material-ui/core/styles';
-import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -249,16 +249,9 @@ const TokenPicker = ({
         tokenList[el].chainId === currentNetwork.chainId
     );
 
-    if (
-      filteredTokenKeys.findIndex(
-        (el) => el === WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).address
-      ) !== -1
-    ) {
-      remove(
-        filteredTokenKeys,
-        (token) => token === WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).address
-      );
-      filteredTokenKeys.unshift(WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).address);
+    if (filteredTokenKeys.findIndex((el) => el === getWrappedProtocolToken(currentNetwork.chainId).address) !== -1) {
+      remove(filteredTokenKeys, (token) => token === getWrappedProtocolToken(currentNetwork.chainId).address);
+      filteredTokenKeys.unshift(getWrappedProtocolToken(currentNetwork.chainId).address);
     }
 
     if (filteredTokenKeys.findIndex((el) => el === PROTOCOL_TOKEN_ADDRESS) !== -1) {

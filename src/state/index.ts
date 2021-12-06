@@ -42,8 +42,9 @@ const store = configureStore({
       tokenLists: {
         byUrl: getDefaultByUrl(),
         activeLists: [
-          'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
           'https://gateway.pinata.cloud/ipfs/QmRhveZ2UB68XUhMjT7eNjgnku4AkyhKSKAJZ3i2KReHuL',
+          'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
+          'https://static.optimism.io/optimism.tokenlist.json',
         ],
       },
     },

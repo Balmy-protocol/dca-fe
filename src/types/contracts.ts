@@ -63,7 +63,8 @@ export class HubCompanionContract extends Contract {
   increasePositionUsingProtocolToken: (
     id: string,
     newAmount: BigNumber,
-    newSwaps: BigNumber
+    newSwaps: BigNumber,
+    overrides: { value?: BigNumber }
   ) => Promise<TransactionResponse>;
 
   reducePositionUsingProtocolToken: (

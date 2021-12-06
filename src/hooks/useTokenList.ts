@@ -4,7 +4,7 @@ import reduce from 'lodash/reduce';
 import keyBy from 'lodash/keyBy';
 import { useAllTransactions } from 'state/transactions/hooks';
 import { NETWORKS } from 'config/constants';
-import { DEFAULT_TOKEN_LIST, PROTOCOL_TOKEN, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { DEFAULT_TOKEN_LIST, getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { useSavedTokenLists, useTokensLists } from 'state/token-lists/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 
@@ -37,7 +37,7 @@ function useTokenList(filter = true) {
               ),
             }
           : acc,
-      { [PROTOCOL_TOKEN_ADDRESS]: PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId) }
+      { [PROTOCOL_TOKEN_ADDRESS]: getProtocolToken(currentNetwork.chainId) }
     );
   }, [transactions, currentNetwork.chainId]);
 

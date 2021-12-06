@@ -105,7 +105,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
             <Typography variant="body2">
               <FormattedMessage
                 description="days to finish"
-                defaultMessage="Ran for {remainingDays} {type}"
+                defaultMessage="Ran for {type}"
                 values={{
                   remainingDays: totalSwaps.sub(remainingSwaps).toString(),
                   type: getFrequencyLabel(swapInterval.toString(), totalSwaps.toString()),
