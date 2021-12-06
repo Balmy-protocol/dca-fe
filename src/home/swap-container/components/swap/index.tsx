@@ -514,11 +514,9 @@ const Swap = ({
       (WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] || Infinity);
 
   shouldShowNotEnoughForWhale =
-    shouldShowNotEnoughForWhale ||
-    (whaleMode &&
-      !usdPrice &&
-      !isTestnet &&
-      WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequencyType.toString()));
+    !isTestnet &&
+    (shouldShowNotEnoughForWhale ||
+      (whaleMode && !usdPrice && WHALE_MODE_FREQUENCIES[currentNetwork.chainId].includes(frequencyType.toString())));
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error">
       <Typography variant="body1">
