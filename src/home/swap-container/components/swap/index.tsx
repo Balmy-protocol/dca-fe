@@ -688,7 +688,7 @@ const Swap = ({
                   label="Whale mode"
                 />
                 <Tooltip
-                  title="This will enable you to create positions with shorter frequencies, but you will need to provide more liquidity for them"
+                  title="This mode will allow you to create positions with shorter frequencies, but you will have to deposit more funds"
                   arrow
                   placement="top"
                 >
