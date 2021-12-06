@@ -63,7 +63,7 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
           color="default"
           variant="outlined"
           onClick={onOpen}
-          style={{ maxWidth: '200px', textTransform: 'none' }}
+          style={{ maxWidth: '220px', textTransform: 'none' }}
         >
           <Typography noWrap>{web3Service.getAccount()}</Typography>
         </StyledButton>

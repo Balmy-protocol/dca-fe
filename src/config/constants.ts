@@ -66,18 +66,18 @@ export const NETWORKS = {
   },
   optimism: {
     chainId: 10,
-    name: 'Optimism',
-    mainCurrency: '0x4200000000000000000000000000000000000006',
+    name: 'Optimistic Ethereum',
+    mainCurrency: 'OPTIMISM',
   },
   optimismKovan: {
     chainId: 69,
-    name: 'Optimism Kovan',
-    mainCurrency: '0x4200000000000000000000000000000000000006',
+    name: 'Optimistic Ethereum Kovan',
+    mainCurrency: 'OPTIMISM',
   },
   optimismGoerli: {
     chainId: 420,
-    name: 'Optimism Goerli',
-    mainCurrency: '0x4200000000000000000000000000000000000006',
+    name: 'Optimistic Ethereum Goerli',
+    mainCurrency: 'OPTIMISM',
   },
   okex: {
     chainId: 66,
@@ -104,14 +104,7 @@ export const TESTNETS = [
   NETWORKS.optimismKovan.chainId,
   NETWORKS.optimismGoerli.chainId,
 ];
-export const SUPPORTED_NETWORKS = [
-  NETWORKS.mainnet.chainId,
-  NETWORKS.ropsten.chainId,
-  NETWORKS.rinkeby.chainId,
-  NETWORKS.goerli.chainId,
-  NETWORKS.kovan.chainId,
-  NETWORKS.optimismKovan.chainId,
-];
+export const SUPPORTED_NETWORKS = [NETWORKS.kovan.chainId, NETWORKS.optimismKovan.chainId, NETWORKS.optimism.chainId];
 
 export const COINGECKO_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',
@@ -125,7 +118,7 @@ export const COINGECKO_IDS = {
   [NETWORKS.optimismKovan.chainId]: 'optimistic-ethereum',
 };
 
-export const NETWORKS_FOR_MENU = [NETWORKS.mainnet.chainId, NETWORKS.polygon.chainId];
+export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId];
 
 export const HUB_ADDRESS = {
   [NETWORKS.mainnet.chainId]: '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567',
