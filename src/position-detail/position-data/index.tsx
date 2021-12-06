@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { FullPosition } from 'types';
 import Typography from '@material-ui/core/Typography';
+import Tooltip from '@material-ui/core/Tooltip';
 import TokenIcon from 'common/token-icon';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import { FormattedMessage } from 'react-intl';
@@ -171,17 +172,21 @@ const Details = ({ position }: DetailsProps) => (
         <Divider variant="middle" />
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="body2">
-          <FormattedMessage
-            description="positionDetailsCreatedAt"
-            defaultMessage="Created at {created}"
-            values={{
-              created: DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toLocaleString(
-                DateTime.DATETIME_FULL
-              ),
-            }}
-          />
-        </Typography>
+        <Tooltip
+          title={DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toLocaleString(DateTime.DATETIME_FULL)}
+          arrow
+          placement="top"
+        >
+          <Typography variant="body2" component="span">
+            <FormattedMessage
+              description="positionDetailsCreatedAt"
+              defaultMessage="Created at {created}"
+              values={{
+                created: DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toRelative(),
+              }}
+            />
+          </Typography>
+        </Tooltip>
       </Grid>
     </Grid>
   </StyledPaper>
