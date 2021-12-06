@@ -163,8 +163,7 @@ const ModifyRateAndSwaps = ({
                     frequency:
                       STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
                         .every,
-                    frequencyPlural: frequencyType,
-                    ammountOfSwaps: frequencyValue || '0',
+                    frequencyPlural: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
                   }}
                 />
               </Typography>
