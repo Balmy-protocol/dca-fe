@@ -67,7 +67,6 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
 
   const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
   const hasErrorCurrency = fromValue && realBalance && parseUnits(fromValue, position.from.decimals).gt(realBalance);
-  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), frequencyValue);
 
   const hasError = activeStep === 0 ? hasErrorCurrency : hasErrorFrequency;
   const isEmpty = activeStep === 0 ? !fromValue : !frequencyValue;

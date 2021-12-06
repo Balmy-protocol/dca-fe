@@ -29,6 +29,8 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useTokenList from 'hooks/useTokenList';
 import Button from 'common/button';
 import TokenLists from 'common/token-lists';
+import useTokenBalance from 'hooks/useTokenBalance';
+import { formatCurrencyAmount } from 'utils/currency';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 interface PartialTheme {
@@ -169,6 +171,7 @@ const useListItemStyles = makeStyles(({ palette }) => ({
 const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps) => {
   const classes = useListItemStyles();
 
+  const tokenBalance = useTokenBalance(tokenList[tokenKeys[index]]);
   return (
     <StyledListItem classes={classes} button onClick={() => onClick(tokenKeys[index])} style={style}>
       <StyledListItemIcon>
@@ -187,6 +190,7 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps
           </Typography>
         </span>
       </ListItemText>
+      {tokenBalance && <div>{formatCurrencyAmount(tokenBalance, tokenList[tokenKeys[index]], 6)}</div>}
     </StyledListItem>
   );
 };
