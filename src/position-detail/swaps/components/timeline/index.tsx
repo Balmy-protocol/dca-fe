@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import SettingsIcon from '@material-ui/icons/Settings';
-import BlockIcon from '@material-ui/icons/Block';
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import CreatedIcon from '@material-ui/icons/NewReleases';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -134,7 +134,7 @@ const StyledTimelineContentTitle = styled(Grid)`
 
 interface PositionTimelineProps {
   position: FullPosition;
-  filter: 0 | 1 | 2; // 0 - all; 1 - swaps; 2 - modifications;
+  filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
 }
 
 const buildSwappedItem = (positionState: ActionState, position: FullPosition) => {
@@ -208,7 +208,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
       </>
     ),
     title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
-    toOrder: positionState.createdAtTimestamp,
+    toOrder: positionState.createdAtBlock,
   };
 };
 
@@ -258,7 +258,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
     </>
   ),
   title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
-  toOrder: positionState.createdAtTimestamp,
+  toOrder: positionState.createdAtBlock,
 });
 
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
@@ -298,7 +298,7 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Rate Modified" />,
-  toOrder: positionState.createdAtTimestamp,
+  toOrder: positionState.createdAtBlock,
 });
 
 const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -340,7 +340,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Changed duration" />,
-  toOrder: positionState.createdAtTimestamp,
+  toOrder: positionState.createdAtBlock,
 });
 
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -399,7 +399,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
-  toOrder: positionState.createdAtTimestamp,
+  toOrder: positionState.createdAtBlock,
 });
 
 const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
@@ -435,11 +435,11 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
     </>
   ),
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
-  toOrder: positionState.createdAtTimestamp,
+  toOrder: positionState.createdAtBlock,
 });
 
 const buildTerminatedItem = (positionState: ActionState) => ({
-  icon: <BlockIcon />,
+  icon: <DeleteSweepIcon />,
   content: (
     <>
       <StyledRightGrid item xs={12}>
@@ -458,7 +458,7 @@ const buildTerminatedItem = (positionState: ActionState) => ({
     </>
   ),
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Terminated" />,
-  toOrder: positionState.createdAtTimestamp,
+  toOrder: positionState.createdAtBlock,
 });
 
 const MESSAGE_MAP = {
@@ -487,9 +487,9 @@ const FILTERS = {
     POSITION_ACTIONS.MODIFIED_DURATION,
     POSITION_ACTIONS.MODIFIED_RATE,
     POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-    POSITION_ACTIONS.WITHDREW,
     POSITION_ACTIONS.TERMINATED,
   ],
+  3: [POSITION_ACTIONS.WITHDREW],
 };
 
 const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
