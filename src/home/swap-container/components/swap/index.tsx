@@ -57,6 +57,7 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { STALE } from 'hooks/useIsStale';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import useIsWhitelisted from 'hooks/useIsWhitelisted';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -180,6 +181,7 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
+  const isWhitelisted = useIsWhitelisted();
 
   const [usedTokens] = useUsedTokens();
 
@@ -351,6 +353,9 @@ const Swap = ({
   };
 
   const preHandleSwap = () => {
+    if (!isWhitelisted) {
+      return;
+    }
     if (!existingPair) {
       setShouldShowPairModal(true);
       return;
@@ -488,6 +493,7 @@ const Swap = ({
       from.address === PROTOCOL_TOKEN_ADDRESS;
 
   const shouldDisableButton =
+    !isWhitelisted ||
     !fromValue ||
     !frequencyValue ||
     cantFund ||
