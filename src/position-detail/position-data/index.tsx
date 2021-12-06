@@ -163,7 +163,11 @@ const Details = ({ position }: DetailsProps) => (
           </Grid>
           <Grid item xs={12}>
             <Typography variant="caption">
-              {getFrequencyLabel(position.swapInterval.interval, position.totalSwaps)}
+              {parseInt(position.current.remainingSwaps, 10) > 0 ? (
+                getFrequencyLabel(position.swapInterval.interval, position.current.remainingSwaps)
+              ) : (
+                <FormattedMessage description="positionDetailsRemainingSwapsNone" defaultMessage="Position finished" />
+              )}
             </Typography>
           </Grid>
         </Grid>
