@@ -151,7 +151,7 @@ const ResetPosition = ({ onClose, shouldShow, onResetPosition, position, balance
                       frequency:
                         STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
                           .every,
-                      frequencyPlural: frequencyType,
+                      frequencyPlural: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
                       ammountOfSwaps: frequencyValue || '0',
                     }}
                   />
