@@ -15,13 +15,14 @@ function useAvailablePairs() {
   const currentNetwork = useCurrentNetwork();
   return React.useMemo(() => {
     if (!web3Service.getAccount()) {
-      return true;
+      return false;
     }
     const account = web3Service.getAccount().toLowerCase();
     return (
-      TESTNETS.includes(currentNetwork.chainId) || DcaV1Owners.includes(account)
-      // DefiLatamOwners.includes(account) ||
-      // DefyBuildersOwners.includes(account)
+      TESTNETS.includes(currentNetwork.chainId) ||
+      DcaV1Owners.includes(account) ||
+      DefiLatamOwners.includes(account) ||
+      DefyBuildersOwners.includes(account)
       // LobsterOwners.includes(account)
     );
   }, [web3Service.getAccount(), currentNetwork]);
