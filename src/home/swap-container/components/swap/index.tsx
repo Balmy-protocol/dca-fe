@@ -563,7 +563,7 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="primary"
-      disabled={!!isApproved || hasPendingApproval || isLoading}
+      disabled={!!isApproved || hasPendingApproval || isLoading || !isWhitelisted}
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
       style={{ pointerEvents: 'all' }}
     >
