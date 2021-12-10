@@ -208,7 +208,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
       </>
     ),
     title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
-    toOrder: positionState.createdAtBlock,
+    toOrder: parseInt(positionState.createdAtBlock, 10),
   };
 };
 
@@ -258,7 +258,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
     </>
   ),
   title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
-  toOrder: positionState.createdAtBlock,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
@@ -298,7 +298,7 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Rate Modified" />,
-  toOrder: positionState.createdAtBlock,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
 const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -340,7 +340,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Changed duration" />,
-  toOrder: positionState.createdAtBlock,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -399,7 +399,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
-  toOrder: positionState.createdAtBlock,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
 const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
@@ -435,7 +435,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
     </>
   ),
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
-  toOrder: positionState.createdAtBlock,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
 const buildTerminatedItem = (positionState: ActionState) => ({
@@ -458,7 +458,7 @@ const buildTerminatedItem = (positionState: ActionState) => ({
     </>
   ),
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Terminated" />,
-  toOrder: positionState.createdAtBlock,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
 const MESSAGE_MAP = {

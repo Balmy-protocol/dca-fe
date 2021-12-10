@@ -11,6 +11,7 @@ import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
 import { POSITION_ACTIONS } from 'config/constants';
 import { formatUnits } from '@ethersproject/units';
+import { useThemeMode } from 'state/config/hooks';
 
 const StyledGraphAxis = styled.div`
   height: 0px;
@@ -138,6 +139,8 @@ const ITEM_MAP = {
 const SwapsGraph = ({ position }: SwapsGraphProps) => {
   let prices: Prices = [];
 
+  const mode = useThemeMode();
+
   prices = React.useMemo(() => {
     const orderedSwaps = orderBy(position.history, ['createdAtTimestamp'], ['asc']);
     const mappedSwapData = orderedSwaps.reduce(
@@ -208,23 +211,26 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
                   <XAxis hide dataKey="name" />
                   <YAxis hide domain={['auto', 'auto']} dataKey={position.to.symbol} />
                   <YAxis hide domain={['auto', 'auto']} dataKey={position.from.symbol} yAxisId={1} />
-                  <Tooltip formatter={tooltipFormatter} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: mode === 'light' ? '#ffffff' : '#424242' }}
+                    formatter={tooltipFormatter}
+                  />
                   <Legend />
                 </AreaChart>
               </ResponsiveContainer>
               <StyledGraphAxis />
               <StyledGraphAxisLabels>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(
-                    parseInt(position.history[position.history.length - 1].createdAtTimestamp, 10)
-                  ).toLocaleString({
+                  {DateTime.fromSeconds(parseInt(position.history[0].createdAtTimestamp, 10)).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
                   })}
                 </Typography>
                 <Typography variant="caption">
-                  {DateTime.fromSeconds(parseInt(position.history[0].createdAtTimestamp, 10)).toLocaleString({
+                  {DateTime.fromSeconds(
+                    parseInt(position.history[position.history.length - 1].createdAtTimestamp, 10)
+                  ).toLocaleString({
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
