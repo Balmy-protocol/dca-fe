@@ -167,21 +167,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
               defaultMessage="Swapped <b>{rate} {from}</b> for <b>{result} {to}</b>"
               values={{
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                result:
-                  // eslint-disable-next-line no-nested-ternary
-                  position.pair.tokenA.address === position.from.address
-                    ? formatCurrencyAmount(
-                        BigNumber.from(positionState.ratePerUnitAToBWithFee)
-                          .mul(BigNumber.from(positionState.rate))
-                          .div(BigNumber.from('10').pow(position.from.decimals)),
-                        position.to
-                      )
-                    : formatCurrencyAmount(
-                        BigNumber.from(positionState.ratePerUnitBToAWithFee)
-                          .mul(BigNumber.from(positionState.rate))
-                          .div(BigNumber.from('10').pow(position.from.decimals)),
-                        position.to
-                      ),
+                result: formatCurrencyAmount(BigNumber.from(positionState.swapped), position.to),
                 from: position.from.symbol,
                 to: position.to.symbol,
                 rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
