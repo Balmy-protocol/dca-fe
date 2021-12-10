@@ -312,6 +312,7 @@ export default class Web3Service {
       currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
         from: position.from,
         to: position.to,
+        user: position.user,
         swapInterval: BigNumber.from(position.swapInterval.interval),
         swapped: BigNumber.from(position.totalSwapped),
         rate: BigNumber.from(position.current.rate),
@@ -345,6 +346,7 @@ export default class Web3Service {
       pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
         from: position.from,
         to: position.to,
+        user: position.user,
         totalDeposits: BigNumber.from(position.totalDeposits),
         swapInterval: BigNumber.from(position.swapInterval.interval),
         swapped: BigNumber.from(position.totalSwapped),
@@ -1125,6 +1127,7 @@ export default class Web3Service {
       this.currentPositions[id] = {
         from: newPositionTypeData.from,
         to: newPositionTypeData.to,
+        user: this.getAccount(),
         toWithdraw: BigNumber.from(0),
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
         swapped: BigNumber.from(0),

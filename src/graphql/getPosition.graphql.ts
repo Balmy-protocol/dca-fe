@@ -10,6 +10,7 @@ const getPosition = gql`
       totalSwapped
       totalWithdrawn
       startedAtSwap
+      user
       terminatedAtTimestamp
       from {
         address: id

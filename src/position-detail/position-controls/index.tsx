@@ -10,6 +10,7 @@ import { buildEtherscanTransaction } from 'utils/etherscan';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { FullPosition } from 'types';
 import { BigNumber } from 'ethers';
+import useWeb3Service from 'hooks/useWeb3Service';
 
 const PositionControlsContainer = styled.div`
   display: flex;
@@ -33,6 +34,10 @@ const PositionControls = ({
 }: PositionControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
+  const web3Service = useWeb3Service();
+  const account = web3Service.getAccount();
+
+  if (account !== position.user) return null;
 
   return (
     <PositionControlsContainer>
