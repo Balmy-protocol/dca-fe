@@ -24,6 +24,7 @@ type PositionActions =
 export interface Position {
   from: Token;
   to: Token;
+  user: string;
   swapInterval: BigNumber; // daily/weekly/etc
   swapped: BigNumber; // total de swappeado
   remainingLiquidity: BigNumber;
@@ -42,6 +43,7 @@ export interface Position {
 export interface FullPosition {
   from: Token;
   to: Token;
+  user: string;
   totalDeposits: string;
   totalSwaps: string; // cuanto puse originalmente
   id: string;

@@ -98,6 +98,7 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
   return {
     from: position.from,
     to: position.to,
+    user: position.user,
     swapInterval: BigNumber.from(position.swapInterval.interval),
     swapped: BigNumber.from(position.totalSwapped),
     rate: BigNumber.from(position.current.rate),

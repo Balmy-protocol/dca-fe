@@ -44,6 +44,7 @@ export type PositionResponse = {
   id: string;
   from: Token;
   to: Token;
+  user: string;
   pair: {
     id: string;
   };
