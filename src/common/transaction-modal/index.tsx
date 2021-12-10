@@ -141,7 +141,7 @@ export const TransactionModal = ({
   const SuccessContent = (
     <>
       <Typography variant="h6">
-        <FormattedMessage description="Operation successfull" defaultMessage="Confirmation success!" />
+        <FormattedMessage description="Operation successfull" defaultMessage="Transaction sent!" />
       </Typography>
       <StyledLoadingIndicatorWrapper>
         <Typography variant="h1">
