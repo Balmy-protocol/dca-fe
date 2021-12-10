@@ -172,19 +172,19 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                   position.pair.tokenA.address === position.from.address
                     ? formatCurrencyAmount(
                         BigNumber.from(positionState.ratePerUnitAToBWithFee)
-                          .mul(BigNumber.from(position.current.rate))
+                          .mul(BigNumber.from(positionState.rate))
                           .div(BigNumber.from('10').pow(position.from.decimals)),
                         position.to
                       )
                     : formatCurrencyAmount(
                         BigNumber.from(positionState.ratePerUnitBToAWithFee)
-                          .mul(BigNumber.from(position.current.rate))
+                          .mul(BigNumber.from(positionState.rate))
                           .div(BigNumber.from('10').pow(position.from.decimals)),
                         position.to
                       ),
                 from: position.from.symbol,
                 to: position.to.symbol,
-                rate: formatCurrencyAmount(BigNumber.from(position.current.rate), position.from),
+                rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
               }}
             />
           </Typography>
