@@ -48,7 +48,7 @@ interface SwapsGraphProps {
 
 interface PriceData {
   name: string;
-  date: string;
+  date: number;
 }
 
 interface PriceDataAccum extends PriceData {
@@ -71,14 +71,14 @@ const buildSwapItemForGraph = (
   [position.from.symbol]:
     (((acc[acc.length - 1] && acc[acc.length - 1][position.from.symbol]) as number) || 0) -
     parseFloat(formatUnits(BigNumber.from(rate), position.from.decimals)),
-  date: createdAtTimestamp,
+  date: parseInt(createdAtTimestamp, 10),
 });
 
 const buildWithdrewItemForGraph = (position: FullPosition, { createdAtTimestamp }: ActionState, acc: PricesAccum) => ({
   name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
   [position.to.symbol]: 0,
   [position.from.symbol]: (acc[acc.length - 1] && acc[acc.length - 1][position.from.symbol]) || 0,
-  date: createdAtTimestamp,
+  date: parseInt(createdAtTimestamp, 10),
 });
 
 const buildCreatedItemForGraph = (
@@ -90,7 +90,7 @@ const buildCreatedItemForGraph = (
   [position.from.symbol]: parseFloat(
     formatUnits(BigNumber.from(rate).mul(BigNumber.from(remainingSwaps)), position.from.decimals)
   ),
-  date: createdAtTimestamp,
+  date: parseInt(createdAtTimestamp, 10),
 });
 
 const buildModifiedRateAndDurationItemForGraph = (
@@ -109,21 +109,21 @@ const buildModifiedRateAndDurationItemForGraph = (
         position.from.decimals
       )
     ) + (((acc[acc.length - 1] && acc[acc.length - 1][position.from.symbol]) as number) || 0),
-  date: createdAtTimestamp,
+  date: parseInt(createdAtTimestamp, 10),
 });
 
 const buildEmptyItemForGraph = (position: FullPosition, { createdAtTimestamp }: ActionState, acc: PricesAccum) => ({
   name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
   [position.to.symbol]: (acc[acc.length - 1] && acc[acc.length - 1][position.to.symbol]) || 0,
   [position.from.symbol]: (acc[acc.length - 1] && acc[acc.length - 1][position.from.symbol]) || 0,
-  date: createdAtTimestamp,
+  date: parseInt(createdAtTimestamp, 10),
 });
 
 const buildTerminatedItemForGraph = (position: FullPosition, { createdAtTimestamp }: ActionState) => ({
   name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
   [position.to.symbol]: 0,
   [position.from.symbol]: 0,
-  date: createdAtTimestamp,
+  date: parseInt(createdAtTimestamp, 10),
 });
 
 const ITEM_MAP = {
