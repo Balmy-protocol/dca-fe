@@ -37,7 +37,7 @@ const PositionControls = ({
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
 
-  if (account !== position.user) return null;
+  if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
 
   return (
     <PositionControlsContainer>
