@@ -53,7 +53,7 @@ const TokenInput = ({
     const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${token.decimals}}$`);
 
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
-      onChange(nextValue);
+      onChange(nextValue.startsWith('.') ? `0${nextValue}` : nextValue);
     }
   };
 
