@@ -9,6 +9,7 @@ import Home from 'home';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 
 interface AppFrameProps {
   isLoading: boolean;
@@ -43,10 +44,28 @@ const StyledWarningContainer = styled.div`
   justify-content: center;
   align-items: center;
 `;
+const StyledBetaContainer = styled.div`
+  display: flex;
+  width: 100%;
+  flex-grow: 1;
+  background-color: #2cc941;
+  color: #ffffff;
+  justify-content: center;
+  align-items: center;
+`;
 
 const AppFrame = ({ isLoading }: AppFrameProps) => (
   <Router>
     <CssBaseline />
+    <StyledBetaContainer>
+      <Typography variant="caption">
+        <FormattedMessage
+          description="betaMessage"
+          defaultMessage="Our new Mean Finance v2 version is now on beta! Visit it at "
+        />
+        <Link href="https://beta.mean.finance">{` beta.mean.finance`}</Link>
+      </Typography>
+    </StyledBetaContainer>
     <StyledWarningContainer>
       <Typography variant="caption">
         <FormattedMessage
