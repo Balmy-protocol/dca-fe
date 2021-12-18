@@ -557,6 +557,14 @@ const Swap = ({
     </StyledButton>
   );
 
+  const NotWhitelistedButton = (
+    <StyledButton size="large" variant="contained" fullWidth color="error">
+      <Typography variant="body1">
+        <FormattedMessage description="not whitelisted" defaultMessage="We are sorry, but you are not whitelisted" />
+      </Typography>
+    </StyledButton>
+  );
+
   const ApproveTokenButton = (
     <StyledButton
       size="large"
@@ -662,6 +670,8 @@ const Swap = ({
     ButtonToShow = NoWalletButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
+  } else if (!isWhitelisted) {
+    ButtonToShow = NotWhitelistedButton;
   } else if (isLoading || isLoadingPairIsSupported) {
     ButtonToShow = LoadingButton;
   } else if (!pairIsSupported && !isLoadingPairIsSupported) {
