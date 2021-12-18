@@ -601,12 +601,17 @@ const Swap = ({
       fullWidth
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
-      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && (
+      {isWhitelisted && !isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && (
         <Typography variant="body1">
           <FormattedMessage description="create position" defaultMessage="Create position" />
         </Typography>
       )}
-      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && (
+      {!isWhitelisted && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && (
+        <Typography variant="body1">
+          <FormattedMessage description="not whitelisted" defaultMessage="We are sorry, but you are not whitelisted" />
+        </Typography>
+      )}
+      {isWhitelisted && !isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && (
         <Typography variant="body1">
           <FormattedMessage
             description="notenoughwhale"
