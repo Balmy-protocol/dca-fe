@@ -558,7 +558,7 @@ const Swap = ({
   );
 
   const NotWhitelistedButton = (
-    <StyledButton size="large" variant="contained" fullWidth color="error">
+    <StyledButton size="large" variant="contained" fullWidth color="primary" disabled>
       <Typography variant="body1">
         <FormattedMessage description="not whitelisted" defaultMessage="We are sorry, but you are not whitelisted" />
       </Typography>
