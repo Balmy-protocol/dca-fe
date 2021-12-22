@@ -295,7 +295,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
         <Typography variant="body1">
           <FormattedMessage
             description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for <b>{swaps} {frequency}</b> from <b>{oldSwaps} {frequency}</b>"
+            defaultMessage="{increaseDecrease} duration to run for <b>{frequency}</b> from <b>{frequency}</b>"
             values={{
               b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
@@ -303,8 +303,6 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
               )
                 ? 'Increased'
                 : 'Decreased',
-              swaps: positionState.remainingSwaps,
-              oldSwaps: positionState.oldRemainingSwaps,
               frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
             }}
           />
@@ -354,7 +352,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
         <Typography variant="body1">
           <FormattedMessage
             description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for <b>{swaps} {frequency}</b> from <b>{oldSwaps} {frequency}</b>"
+            defaultMessage="{increaseDecrease} duration to run for <b>{frequency}</b> from <b>{frequency}</b>"
             values={{
               b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
@@ -362,8 +360,6 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
               )
                 ? 'Increased'
                 : 'Decreased',
-              swaps: positionState.remainingSwaps,
-              oldSwaps: positionState.oldRemainingSwaps,
               frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
             }}
           />
