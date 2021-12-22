@@ -8,7 +8,7 @@ export interface TokenListsState {
 }
 
 export const getDefaultByUrl = () => ({
-  'https://gateway.pinata.cloud/ipfs/bafkreifkj5w4a65en4zffe5ot6h6ucp2vv45hdxapsed4m4um2ykcnlpg4': {
+  'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json': {
     name: 'Mean Finance',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -65,7 +65,7 @@ export const getDefaultByUrl = () => ({
 });
 export const initialState: TokenListsState = {
   activeLists: [
-    'https://gateway.pinata.cloud/ipfs/QmRhveZ2UB68XUhMjT7eNjgnku4AkyhKSKAJZ3i2KReHuL',
+    'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
     'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
     'https://static.optimism.io/optimism.tokenlist.json',
   ],
