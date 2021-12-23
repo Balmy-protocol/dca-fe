@@ -61,9 +61,9 @@ const ModifyRateAndSwaps = ({
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
   const realBalance = balance && balance.add(position.remainingLiquidity);
   const frequencyType = getFrequencyLabel(position.swapInterval.toString(), position.remainingSwaps.toString());
-  const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
+  // const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
   const hasErrorCurrency = fromValue && realBalance && parseUnits(fromValue, position.from.decimals).gt(realBalance);
-  const hasError = activeStep === 0 ? hasErrorCurrency : hasErrorFrequency;
+  const hasError = activeStep === 0 ? hasErrorCurrency : false;
   const isEmpty = activeStep === 0 ? !fromValue : !frequencyValue;
 
   const cantFund =

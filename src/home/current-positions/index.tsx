@@ -1,10 +1,8 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import styled from 'styled-components';
-import { Web3Service, Position, NFTData } from 'types';
+import { Web3Service, Position } from 'types';
 import WithdrawModal from 'common/withdraw-modal';
-import NFTModal from 'common/view-nft-modal';
-import EmptyPosition from 'common/empty-position';
 import TerminateModal from 'common/terminate-modal';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
@@ -30,8 +28,6 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
   const currentPositions = useCurrentPositions();
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
-  const [showNFTModal, setShowNFTModal] = React.useState(false);
-  const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const [selectedPosition, setSelectedPosition] = React.useState<Position | null>(null);
   const currentBreakPoint = useCurrentBreakpoint();
 
@@ -47,12 +43,6 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
   const onWithdraw = (position: Position) => {
     setSelectedPosition(position);
     setShowWithdrawModal(true);
-  };
-
-  const handleViewNFT = async (position: Position) => {
-    const tokenNFT = await web3Service.getTokenNFT(position.id);
-    setNFTData(tokenNFT);
-    setShowNFTModal(true);
   };
 
   return (
@@ -71,29 +61,16 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
           />
         </>
       )}
-      <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       {/* dont know why I need the 100% width :shrug: */}
       <Grid item xs={12} style={{ width: '100%' }}>
-        <Grid container spacing={2} alignItems="stretch">
+        <Grid container alignItems="stretch">
           {currentPositions
             ? currentPositions.map((position) => (
-                <StyledGridItem item xs={12} sm={6} md={3} key={position.id}>
-                  <ActivePosition
-                    position={position}
-                    web3Service={web3Service}
-                    onWithdraw={onWithdraw}
-                    onViewNFT={handleViewNFT}
-                  />
+                <StyledGridItem item xs={12} key={position.id}>
+                  <ActivePosition position={position} web3Service={web3Service} onWithdraw={onWithdraw} />
                 </StyledGridItem>
               ))
             : null}
-          {currentPositions &&
-            !!currentPositions.length &&
-            emptyPositions.map((id) => (
-              <StyledGridItem item xs={12} sm={6} md={3} key={id}>
-                <EmptyPosition />
-              </StyledGridItem>
-            ))}
           {currentPositions && !currentPositions.length && (
             <Grid item xs={12}>
               <EmptyPositions />
