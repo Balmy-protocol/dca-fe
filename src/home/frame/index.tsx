@@ -4,11 +4,9 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { appleTabsStylesHook } from 'common/tabs';
 import styled from 'styled-components';
-import WalletContext from 'common/wallet-context';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import SwapContainer from '../swap-container';
-import History from '../history';
-import CurrentPositions from '../current-positions';
+import Positions from '../positions';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -34,28 +32,19 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
         </Grid>
       ) : (
         <>
-          <WalletContext.Consumer>
-            {({ web3Service }) => (
-              <>
-                <Grid item xs={12}>
-                  <SwapContainer />
-                </Grid>
-                {web3Service.getAccount() && (
-                  <>
-                    <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px' }}>
-                      <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
-                        <Tab classes={tabItemStyles} disableRipple label="Open positions" />
-                        <Tab classes={tabItemStyles} disableRipple label="Terminated positions" />
-                      </Tabs>
-                    </Grid>
-                    <Grid item xs={12} style={{ display: 'flex', paddingTop: '0px' }}>
-                      {tabIndex === 0 ? <CurrentPositions web3Service={web3Service} /> : <History />}
-                    </Grid>
-                  </>
-                )}
-              </>
-            )}
-          </WalletContext.Consumer>
+          <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px', justifyContent: 'center' }}>
+            <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
+              <Tab classes={tabItemStyles} disableRipple label="Create" />
+              <Tab classes={tabItemStyles} disableRipple label="Positions" />
+            </Tabs>
+          </Grid>
+          {tabIndex === 0 ? (
+            <Grid item xs={12}>
+              <SwapContainer />
+            </Grid>
+          ) : (
+            <Positions />
+          )}
         </>
       )}
     </StyledGridContainer>

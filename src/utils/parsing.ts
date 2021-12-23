@@ -82,6 +82,13 @@ export const getFrequencyLabel = (frenquencyType: string, frequencyValue?: strin
         parseInt(frequencyValue || '0', 10)
       );
 
+export const getTimeFrequencyLabel = (frenquencyType: string, frequencyValue?: string) =>
+  frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
+    ? STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singularTime
+    : STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].pluralTime(
+        parseInt(frequencyValue || '0', 10)
+      );
+
 export const capitalizeFirstLetter = (toCap: string) => toCap.charAt(0).toUpperCase() + toCap.slice(1);
 
 export function getURLFromQuery(query: string) {

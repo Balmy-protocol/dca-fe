@@ -3,22 +3,22 @@ import find from 'lodash/find';
 import Card from '@material-ui/core/Card';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import CardContent from '@material-ui/core/CardContent';
-import IconButton from '@material-ui/core/IconButton';
 import Button from 'common/button';
+import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { Position, Token, Web3Service } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { getFrequencyLabel, sortTokens, calculateStale } from 'utils/parsing';
+import { getFrequencyLabel, getTimeFrequencyLabel, sortTokens, calculateStale } from 'utils/parsing';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useHistory } from 'react-router-dom';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
-import Cog from 'assets/svg/atom/cog';
 import PositionMenu from 'common/position-menu';
+import { createStyles, withStyles, Theme } from '@material-ui/core/styles';
 import AddToPosition from 'common/add-to-position-settings';
 import { BigNumber } from 'ethers';
 import ResetPosition from 'common/reset-position-settings';
@@ -27,15 +27,34 @@ import { buildEtherscanTransaction } from 'utils/etherscan';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import Link from '@material-ui/core/Link';
 import useBalance from 'hooks/useBalance';
-import Tooltip from '@material-ui/core/Tooltip';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import VisibilityIcon from '@material-ui/icons/Visibility';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { STALE } from 'hooks/useIsStale';
 
-const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
-  margin-left: 10px;
-`;
+const BorderLinearProgress = withStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      height: 22,
+      borderRadius: 5,
+      '&::after': {
+        content: (props: { swaps: number }) =>
+          `"${props.swaps !== 0 ? `${props.swaps} swap${props.swaps > 1 ? 's' : ''} left` : ''}"`,
+        position: 'absolute',
+        top: '0',
+        bottom: '0',
+        right: '0',
+        left: '0',
+        textAlign: 'center',
+      },
+    },
+    colorPrimary: {
+      backgroundColor: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
+    },
+    bar: {
+      borderRadius: 5,
+      backgroundColor: '#1a90ff',
+    },
+  })
+)(LinearProgress);
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -49,19 +68,18 @@ const StyledCardContent = styled(CardContent)`
   padding-bottom: 10px !important;
   flex-grow: 1;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 `;
 
 const StyledCardHeader = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
 `;
 
 const StyledCardTitleHeader = styled.div`
   display: flex;
   align-items: center;
+  margin-right: 10px;
   *:not(:first-child) {
     margin-left: 4px;
     font-weight: 500;
@@ -86,11 +104,10 @@ const StyledCardFooterButton = styled(Button)`
 
 const StyledFreqLeft = styled.div`
   ${({ theme }) => `
-    padding: 12px 15px;
-    border-radius: 5px;
+    padding: 10px 13px;
+    border-radius: 15px;
     text-align: center;
-    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
-    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
   `}
 `;
 
@@ -99,6 +116,7 @@ const StyledStale = styled.div`
   border-radius: 5px;
   background-color: #f9f3dc;
   color: #cc6d00;
+  text-align: center;
   * {
     font-weight: 600 !important;
   }
@@ -114,6 +132,18 @@ const StyledNoFunds = styled.div`
   `}
 `;
 
+const StyledContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+`;
+
+const StyledCallToActionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
@@ -123,15 +153,13 @@ interface ActivePositionProps {
   position: PositionProp;
   web3Service: Web3Service;
   onWithdraw: (position: Position) => void;
-  onViewNFT: (position: Position) => void;
 }
 
-const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: ActivePositionProps) => {
+const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionProps) => {
   const {
     from,
     to,
     swapInterval,
-    swapped,
     remainingLiquidity,
     remainingSwaps,
     rate,
@@ -342,7 +370,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
   };
 
   return (
-    <StyledCard>
+    <StyledCard variant="outlined">
       <PositionMenu
         onClose={() => setShouldShowSettings(false)}
         shouldShow={shouldShowSettings}
@@ -367,135 +395,122 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         onResetPosition={handleResetPosition}
       />
       <StyledCardContent>
-        <StyledCardHeader>
-          <StyledCardTitleHeader>
-            <TokenIcon token={from} size="16px" />
-            <Typography variant="body1">{from.symbol}</Typography>
-            <ArrowRight size="20px" />
-            <TokenIcon token={to} size="16px" />
-            <Typography variant="body1">{to.symbol}</Typography>
-          </StyledCardTitleHeader>
-          <div>
-            <Tooltip title="View NFT" arrow placement="top">
-              <IconButton
-                aria-label="more"
-                aria-controls="long-menu"
-                aria-haspopup="true"
-                onClick={() => onViewNFT(position)}
-                disabled={isPending}
-                size="small"
+        <Grid container>
+          <Grid xs={12} sm={9} md={10}>
+            <StyledContentContainer>
+              <StyledCardHeader>
+                <StyledCardTitleHeader>
+                  <TokenIcon token={from} size="20px" />
+                  <Typography variant="body1">{from.symbol}</Typography>
+                  <ArrowRight size="20px" />
+                  <TokenIcon token={to} size="20px" />
+                  <Typography variant="body1">{to.symbol}</Typography>
+                </StyledCardTitleHeader>
+                {!isPending && !hasNoFunds && (
+                  <StyledFreqLeft>
+                    <Typography variant="body2">
+                      <FormattedMessage
+                        description="days to finish"
+                        defaultMessage="{type} left"
+                        values={{
+                          type: getTimeFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
+                        }}
+                      />
+                    </Typography>
+                  </StyledFreqLeft>
+                )}
+              </StyledCardHeader>
+              <StyledDetailWrapper>
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="current remaining"
+                    defaultMessage="Remaining: <b>{remainingLiquidity} {from} ({rate} {from} {frequency})</b>"
+                    values={{
+                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                      rate: formatCurrencyAmount(rate, from),
+                      frequency:
+                        STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+                      remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from),
+                      from: from.symbol,
+                    }}
+                  />
+                </Typography>
+              </StyledDetailWrapper>
+              <StyledDetailWrapper>
+                <Typography variant="body2" component="span">
+                  <FormattedMessage
+                    description="current swapped in position"
+                    defaultMessage="To withdraw: <b>{exercised} {to}</b>"
+                    values={{
+                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                      exercised: formatCurrencyAmount(toWithdraw, to),
+                      to: to.symbol,
+                    }}
+                  />
+                </Typography>
+              </StyledDetailWrapper>
+            </StyledContentContainer>
+          </Grid>
+          <Grid xs={12} sm={3} md={2}>
+            <StyledCallToActionContainer>
+              {!isPending && !hasNoFunds && !isStale && (
+                <StyledFreqLeft>
+                  <Typography variant="body2">
+                    <FormattedMessage description="in progress" defaultMessage="In progress" />
+                  </Typography>
+                </StyledFreqLeft>
+              )}
+              {!isPending && hasNoFunds && (
+                <StyledNoFunds>
+                  <Typography variant="body2">
+                    <FormattedMessage description="no funds" defaultMessage="Position finished" />
+                  </Typography>
+                </StyledNoFunds>
+              )}
+              {!isPending && !hasNoFunds && isStale && (
+                <StyledStale>
+                  <Typography variant="body2">
+                    <FormattedMessage description="stale" defaultMessage="Stale" />
+                  </Typography>
+                </StyledStale>
+              )}
+              <StyledCardFooterButton
+                variant="contained"
+                color={isPending ? 'pending' : 'secondary'}
+                onClick={() => !isPending && onViewDetails()}
+                fullWidth
               >
-                <VisibilityIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <IconButton
-              aria-label="more"
-              aria-controls="long-menu"
-              aria-haspopup="true"
-              onClick={() => setShouldShowSettings(true)}
-              disabled={isPending}
-              size="small"
-            >
-              <Cog size="22px" isDisabled={isPending} />
-            </IconButton>
-          </div>
-        </StyledCardHeader>
-        <StyledDetailWrapper>
-          <Typography variant="body2" component="span">
-            <FormattedMessage
-              description="current swapped in position"
-              defaultMessage="{exercised} {to} to withdraw"
-              values={{ exercised: formatCurrencyAmount(toWithdraw, to), to: to.symbol }}
-            />
-          </Typography>
-          <Tooltip
-            title={`Total ammount swapped: ${formatCurrencyAmount(swapped, to)} ${to.symbol}`}
-            arrow
-            placement="top"
-          >
-            <StyledHelpOutlineIcon fontSize="small" />
-          </Tooltip>
-        </StyledDetailWrapper>
-        <StyledDetailWrapper>
-          <Typography variant="body2">
-            <FormattedMessage
-              description="current remaining"
-              defaultMessage="{remainingLiquidity} {from} remaining"
-              values={{ remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from), from: from.symbol }}
-            />
-          </Typography>
-        </StyledDetailWrapper>
-        <StyledDetailWrapper>
-          <Typography variant="caption">
-            <FormattedMessage
-              description="current rate"
-              defaultMessage="Swapping {rate} {from} {frequency}"
-              values={{
-                rate: formatCurrencyAmount(rate, from),
-                from: from.symbol,
-                frequency: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
-              }}
-            />
-          </Typography>
-        </StyledDetailWrapper>
-        <StyledProgressWrapper>
-          <LinearProgress
-            variant="determinate"
-            value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
-          />
-        </StyledProgressWrapper>
-        {!isPending && hasNoFunds && (
-          <StyledNoFunds>
-            <Typography variant="body2">
-              <FormattedMessage description="no funds" defaultMessage="Position finished" />
-            </Typography>
-          </StyledNoFunds>
-        )}
-        {!isPending && !hasNoFunds && isStale && (
-          <StyledStale>
-            <Typography variant="body2">
-              <FormattedMessage description="stale" defaultMessage="Stale" />
-            </Typography>
-          </StyledStale>
-        )}
-        {!isPending && !hasNoFunds && !isStale && (
-          <StyledFreqLeft>
-            <Typography variant="body2">
-              <FormattedMessage
-                description="days to finish"
-                defaultMessage="{type} left"
-                values={{
-                  type: getFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
-                }}
+                {isPending ? (
+                  <Link
+                    href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
+                    target="_blank"
+                    rel="noreferrer"
+                    underline="none"
+                    color="inherit"
+                  >
+                    <Typography variant="body2" component="span">
+                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                    </Typography>
+                    <CallMadeIcon style={{ fontSize: '1rem' }} />
+                  </Link>
+                ) : (
+                  <Typography variant="body2">
+                    <FormattedMessage description="View details" defaultMessage="View details" />
+                  </Typography>
+                )}
+              </StyledCardFooterButton>
+            </StyledCallToActionContainer>
+          </Grid>
+          <Grid xs={12}>
+            <StyledProgressWrapper>
+              <BorderLinearProgress
+                swaps={remainingSwaps.toNumber()}
+                variant="determinate"
+                value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
               />
-            </Typography>
-          </StyledFreqLeft>
-        )}
-        <StyledCardFooterButton
-          variant="contained"
-          color={isPending ? 'pending' : 'secondary'}
-          onClick={() => !isPending && onViewDetails()}
-          fullWidth
-        >
-          {isPending ? (
-            <Link
-              href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
-              target="_blank"
-              rel="noreferrer"
-              underline="none"
-              color="inherit"
-            >
-              <Typography variant="body2" component="span">
-                <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-              </Typography>
-              <CallMadeIcon style={{ fontSize: '1rem' }} />
-            </Link>
-          ) : (
-            <Typography variant="body2">
-              <FormattedMessage description="View details" defaultMessage="View details" />
-            </Typography>
-          )}
-        </StyledCardFooterButton>
+            </StyledProgressWrapper>
+          </Grid>
+        </Grid>
       </StyledCardContent>
     </StyledCard>
   );

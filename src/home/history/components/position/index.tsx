@@ -2,6 +2,7 @@ import * as React from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
 import Button from 'common/button';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
@@ -24,19 +25,18 @@ const StyledCardContent = styled(CardContent)`
   padding-bottom: 10px !important;
   flex-grow: 1;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 `;
 
 const StyledCardHeader = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
 `;
 
 const StyledCardTitleHeader = styled.div`
   display: flex;
   align-items: center;
+  margin-right: 10px;
   *:not(:first-child) {
     margin-left: 4px;
     font-weight: 500;
@@ -52,12 +52,23 @@ const StyledDetailWrapper = styled.div`
 
 const StyledFreqLeft = styled.div`
   ${({ theme }) => `
-    padding: 12px 15px;
-    border-radius: 5px;
+    padding: 10px 13px;
+    border-radius: 15px;
     text-align: center;
-    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
-    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
   `}
+`;
+
+const StyledContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+`;
+
+const StyledCallToActionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 `;
 
 const StyledCardFooterButton = styled(Button)`
@@ -81,52 +92,70 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
     history.push(`/positions/${position.id}`);
   };
   return (
-    <StyledCard>
+    <StyledCard variant="outlined">
       <StyledCardContent>
-        <StyledCardHeader>
-          <StyledCardTitleHeader>
-            <TokenIcon token={from} size="16px" />
-            <Typography variant="body1">{from.symbol}</Typography>
-            <ArrowRight size="20px" />
-            <TokenIcon token={to} size="16px" />
-            <Typography variant="body1">{to.symbol}</Typography>
-          </StyledCardTitleHeader>
-        </StyledCardHeader>
-        <StyledDetailWrapper>
-          <Typography variant="body2">
-            <FormattedMessage
-              description="current exercised"
-              defaultMessage="{exercised} {to} swapped"
-              values={{ exercised: formatCurrencyAmount(swapped, to), to: to.symbol }}
-            />
-          </Typography>
-        </StyledDetailWrapper>
-        <StyledDetailWrapper>
-          <Typography variant="body2">
-            <FormattedMessage
-              description="current deposited"
-              defaultMessage="{remainingLiquidity} {from} deposited"
-              values={{ remainingLiquidity: formatCurrencyAmount(totalDeposits, from), from: from.symbol }}
-            />
-          </Typography>
-        </StyledDetailWrapper>
-        <StyledFreqLeft>
-          <Typography variant="body2">
-            <FormattedMessage
-              description="days to finish"
-              defaultMessage="Ran for {type}"
-              values={{
-                remainingDays: totalSwaps.sub(remainingSwaps).toString(),
-                type: getFrequencyLabel(swapInterval.toString(), totalSwaps.toString()),
-              }}
-            />
-          </Typography>
-        </StyledFreqLeft>
-        <StyledCardFooterButton variant="contained" color="secondary" onClick={onViewDetails}>
-          <Typography variant="body2">
-            <FormattedMessage description="View details" defaultMessage="View details" />
-          </Typography>
-        </StyledCardFooterButton>
+        <Grid container>
+          <Grid xs={12} sm={9} md={10}>
+            <StyledContentContainer>
+              <StyledCardHeader>
+                <StyledCardTitleHeader>
+                  <TokenIcon token={from} size="16px" />
+                  <Typography variant="body1">{from.symbol}</Typography>
+                  <ArrowRight size="20px" />
+                  <TokenIcon token={to} size="16px" />
+                  <Typography variant="body1">{to.symbol}</Typography>
+                </StyledCardTitleHeader>
+                <StyledFreqLeft>
+                  <Typography variant="body2">
+                    <FormattedMessage
+                      description="days to finish"
+                      defaultMessage="Ran for {type}"
+                      values={{
+                        remainingDays: totalSwaps.sub(remainingSwaps).toString(),
+                        type: getFrequencyLabel(swapInterval.toString(), totalSwaps.toString()),
+                      }}
+                    />
+                  </Typography>
+                </StyledFreqLeft>
+              </StyledCardHeader>
+              <StyledDetailWrapper>
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="current exercised"
+                    defaultMessage="<b>{exercised}</b> {to} swapped"
+                    values={{
+                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                      exercised: formatCurrencyAmount(swapped, to),
+                      to: to.symbol,
+                    }}
+                  />
+                </Typography>
+              </StyledDetailWrapper>
+              <StyledDetailWrapper>
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="current deposited"
+                    defaultMessage="<b>{remainingLiquidity} {from}</b> deposited"
+                    values={{
+                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                      remainingLiquidity: formatCurrencyAmount(totalDeposits, from),
+                      from: from.symbol,
+                    }}
+                  />
+                </Typography>
+              </StyledDetailWrapper>
+            </StyledContentContainer>
+          </Grid>
+          <Grid xs={12} sm={3} md={2}>
+            <StyledCallToActionContainer>
+              <StyledCardFooterButton variant="contained" color="secondary" onClick={onViewDetails} fullWidth>
+                <Typography variant="body2">
+                  <FormattedMessage description="View details" defaultMessage="View details" />
+                </Typography>
+              </StyledCardFooterButton>
+            </StyledCallToActionContainer>
+          </Grid>
+        </Grid>
       </StyledCardContent>
     </StyledCard>
   );
