@@ -74,6 +74,7 @@ import {
   COINGECKO_IDS,
   COMPANION_ADDRESS,
   HUB_ADDRESS,
+  MAX_UINT_32,
   MEAN_GRAPHQL_URL,
   NETWORKS,
   ORACLES,
@@ -809,6 +810,10 @@ export default class Web3Service {
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
 
+    if (amountOfSwaps.gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
+
     if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
       const companionAddress = await this.getHUBCompanionAddress();
 
@@ -936,6 +941,10 @@ export default class Web3Service {
       this.getSigner()
     ) as unknown as HubCompanionContract;
 
+    if (BigNumber.from(newSwaps).gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
+
     const newRate = parseUnits(newDeposit, position.from.decimals)
       .add(position.remainingLiquidity)
       .div(BigNumber.from(newSwaps));
@@ -983,6 +992,10 @@ export default class Web3Service {
       HUB_COMPANION_ABI.abi,
       this.getSigner()
     ) as unknown as HubCompanionContract;
+
+    if (BigNumber.from(newSwaps).gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
 
     const newAmount = BigNumber.from(parseUnits(newRate, position.from.decimals)).mul(BigNumber.from(newSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
@@ -1038,6 +1051,10 @@ export default class Web3Service {
       : position.remainingLiquidity
           .sub(parseUnits(ammountToRemove, position.from.decimals))
           .div(BigNumber.from(position.remainingSwaps));
+
+    if (newSwaps.gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
 
     const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {

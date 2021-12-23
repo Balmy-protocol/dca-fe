@@ -615,4 +615,6 @@ export const ORACLES: Record<'NONE' | 'CHAINLINK' | 'UNISWAP', Oracles> = {
   CHAINLINK: 1,
   UNISWAP: 2,
 };
+
+export const MAX_UINT_32 = 4294967295;
 /* eslint-enable */
