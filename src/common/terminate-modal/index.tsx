@@ -95,7 +95,13 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         <Typography variant="body1">
           <FormattedMessage
             description="terminate description"
-            defaultMessage="Swaps are no longer going to be executed. You will get back {from} {fromSymbol} and {to} {toSymbol}"
+            defaultMessage="Swaps are no longer going to be executed, you won't be able to make any new modifications to this position."
+          />
+        </Typography>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="terminate returns"
+            defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
             values={{
               from: formatUnits(position.remainingLiquidity, position.from.decimals),
               fromSymbol: position.from.symbol,
@@ -104,12 +110,15 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
             }}
           />
         </Typography>
+        <Typography variant="body1">
+          <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
+        </Typography>
       </StyledDialogContent>
       <StyledDialogActions>
         <Button onClick={onCancel} color="default" variant="outlined" fullWidth>
           <FormattedMessage description="go back" defaultMessage="Go back" />
         </Button>
-        <Button color="warning" variant="contained" fullWidth onClick={handleTerminate} autoFocus>
+        <Button color="error" variant="contained" fullWidth onClick={handleTerminate} autoFocus>
           <FormattedMessage description="Terminate" defaultMessage="Terminate" />
         </Button>
       </StyledDialogActions>

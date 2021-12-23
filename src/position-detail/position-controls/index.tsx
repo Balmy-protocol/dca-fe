@@ -70,7 +70,7 @@ const PositionControls = ({
             <Button variant="contained" color="white" onClick={onModifyRate}>
               <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
             </Button>,
-            <Button variant="contained" color="error" onClick={onTerminate}>
+            <Button variant="outlined" color="error" onClick={onTerminate}>
               <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
             </Button>,
           ]
