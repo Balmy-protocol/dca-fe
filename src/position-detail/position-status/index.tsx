@@ -13,11 +13,13 @@ const PositionStatusContainer = styled.div`
 `;
 
 const StyledFreqLeft = styled.div`
-  padding: 8px 11px;
-  border-radius: 5px;
-  background-color: #2cc941;
-  color: #fafafa;
-  margin-right: 15px;
+  ${({ theme }) => `
+    padding: 8px 11px;
+    border-radius: 5px;
+    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
+    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+    margin-right: 15px;
+  `}
 `;
 
 const StyledStale = styled.div`
@@ -31,13 +33,12 @@ const StyledStale = styled.div`
 `;
 
 const StyledNoFunds = styled.div`
-  padding: 8px 11px;
-  border-radius: 5px;
-  background-color: #f9dcdc;
-  color: #f50000;
-  * {
-    font-weight: 600 !important;
-  }
+  ${({ theme }) => `
+    padding: 8px 11px;
+    border-radius: 5px;
+    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
+    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+  `}
 `;
 
 interface PositionStatusProps {
@@ -74,7 +75,7 @@ const PositionStatus = ({ position, pair }: PositionStatusProps) => {
       hasNoFunds ? (
         <StyledNoFunds>
           <Typography variant="body1">
-            <FormattedMessage description="no funds" defaultMessage="No funds!" />
+            <FormattedMessage description="no funds" defaultMessage="Position finished" />
           </Typography>
         </StyledNoFunds>
       ) : isStale ? (

@@ -105,13 +105,13 @@ const StyledStale = styled.div`
 `;
 
 const StyledNoFunds = styled.div`
-  padding: 8px 11px;
-  border-radius: 5px;
-  background-color: #f9dcdc;
-  color: #f50000;
-  * {
-    font-weight: 600 !important;
-  }
+  ${({ theme }) => `
+    padding: 8px 11px;
+    border-radius: 5px;
+    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
+    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+    text-align: center;
+  `}
 `;
 
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
@@ -447,7 +447,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service, onViewNFT }: Active
         {!isPending && hasNoFunds && (
           <StyledNoFunds>
             <Typography variant="body2">
-              <FormattedMessage description="no funds" defaultMessage="No funds!" />
+              <FormattedMessage description="no funds" defaultMessage="Position finished" />
             </Typography>
           </StyledNoFunds>
         )}
