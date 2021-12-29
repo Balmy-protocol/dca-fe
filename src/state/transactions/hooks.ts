@@ -167,17 +167,25 @@ export function isTransactionPending(tx: TransactionDetails): boolean {
 }
 
 // returns whether a token has a pending approval transaction
-export function useHasPendingApproval(token: Token, tokenTo: Token, spender: string | undefined): boolean {
+export function useHasPendingApproval(
+  token: Token | null,
+  tokenTo: Token | null,
+  spender: string | undefined
+): boolean {
   const allTransactions = useAllTransactions();
-  const tokenAddress = token.address;
+  const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
   const addressToCheck =
-    tokenTo.address === PROTOCOL_TOKEN_ADDRESS
-      ? HUB_ADDRESS[currentNetwork.chainId]
-      : COMPANION_ADDRESS[currentNetwork.chainId];
+    (tokenTo &&
+      (tokenTo.address === PROTOCOL_TOKEN_ADDRESS
+        ? HUB_ADDRESS[currentNetwork.chainId]
+        : COMPANION_ADDRESS[currentNetwork.chainId])) ||
+    '';
 
   return useMemo(
     () =>
+      !!token &&
+      !!tokenTo &&
       typeof tokenAddress === 'string' &&
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {
@@ -213,16 +221,21 @@ export function useHasPendingWrap(): boolean {
 }
 
 // returns whether a token has a pending approval transaction
-export function useHasPendingPairCreation(from: Token, to: Token): boolean {
+export function useHasPendingPairCreation(from: Token | null, to: Token | null): boolean {
   const allTransactions = useAllTransactions();
   const network = useCurrentNetwork();
   const fromAddress =
-    from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : from.address;
+    (from &&
+      (from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : from.address)) ||
+    '';
   const toAddress =
-    to.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : to.address;
+    (to && (to.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : to.address)) ||
+    '';
 
   return useMemo(
     () =>
+      !!from &&
+      !!to &&
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
         if (allTransactions[hash].type !== TRANSACTION_TYPES.NEW_POSITION) return false;
@@ -240,7 +253,7 @@ export function useHasPendingPairCreation(from: Token, to: Token): boolean {
           (<NewPositionTypeData>tx.typeData).isCreatingPair
         );
       }),
-    [allTransactions, fromAddress, toAddress]
+    [allTransactions, fromAddress, toAddress, from, to]
   );
 }
 
@@ -268,16 +281,24 @@ export function usePositionHasPendingTransaction(position: string): string | nul
 }
 
 // returns whether a token has been approved transaction
-export function useHasConfirmedApproval(token: Token, tokenTo: Token, spender: string | undefined): boolean {
+export function useHasConfirmedApproval(
+  token: Token | null,
+  tokenTo: Token | null,
+  spender: string | undefined
+): boolean {
   const allTransactions = useAllTransactions();
-  const tokenAddress = token.address;
+  const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
   const addressToCheck =
-    tokenTo.address === PROTOCOL_TOKEN_ADDRESS
-      ? COMPANION_ADDRESS[currentNetwork.chainId]
-      : HUB_ADDRESS[currentNetwork.chainId];
+    (tokenTo &&
+      (tokenTo.address === PROTOCOL_TOKEN_ADDRESS
+        ? COMPANION_ADDRESS[currentNetwork.chainId]
+        : HUB_ADDRESS[currentNetwork.chainId])) ||
+    '';
   return useMemo(
     () =>
+      !!token &&
+      !!tokenTo &&
       typeof tokenAddress === 'string' &&
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {

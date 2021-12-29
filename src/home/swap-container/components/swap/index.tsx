@@ -43,7 +43,7 @@ import {
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { formatCurrencyAmount } from 'utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import {
   useTransactionAdder,
   useHasPendingApproval,
@@ -138,17 +138,17 @@ interface AvailableSwapInterval {
 }
 
 interface SwapProps {
-  from: Token;
+  from: Token | null;
   fromValue: string;
-  to: Token;
+  to: Token | null;
   frequencyType: BigNumber;
   frequencyValue: string;
-  setFrom: SetStateCallback<Token>;
-  setTo: SetStateCallback<Token>;
+  setFrom: (from: Token) => void;
+  setTo: (to: Token) => void;
   toggleFromTo: () => void;
-  setFromValue: SetStateCallback<string>;
-  setFrequencyType: SetStateCallback<BigNumber>;
-  setFrequencyValue: SetStateCallback<string>;
+  setFromValue: (newFromValue: string) => void;
+  setFrequencyType: (newFrequencyType: BigNumber) => void;
+  setFrequencyValue: (newFrequencyValue: string) => void;
   web3Service: Web3Service;
   currentNetwork: { chainId: number; name: string };
   availableFrequencies: AvailableSwapInterval[];
@@ -173,7 +173,7 @@ const Swap = ({
   const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
   const [rate, setRate] = React.useState('0');
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
-  const [selecting, setSelecting] = React.useState(from);
+  const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
@@ -190,6 +190,7 @@ const Swap = ({
   const [usedTokens] = useUsedTokens();
 
   const existingPair = React.useMemo(() => {
+    if (!from || !to) return undefined;
     let tokenA = from.address;
     let tokenB = to.address;
 
@@ -230,11 +231,12 @@ const Swap = ({
   const [usdPrice, isLoadingUsdPrice] = usePromise<number>(
     web3Service,
     'getUsdPrice',
-    [from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : from],
+    [from && from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : from || null],
     !from
   );
 
   React.useEffect(() => {
+    if (!from) return;
     setRate(
       (fromValue &&
         parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
@@ -269,6 +271,7 @@ const Swap = ({
   };
 
   const handleApproveToken = async () => {
+    if (!from || !to) return;
     const fromSymbol = from.symbol;
 
     try {
@@ -311,6 +314,7 @@ const Swap = ({
   };
 
   const handleSwap = async () => {
+    if (!from || !to) return;
     setShouldShowPairModal(false);
     setShouldShowStalePairModal(false);
     const fromSymbol = from.symbol;
@@ -394,6 +398,7 @@ const Swap = ({
   };
 
   const handleFromValueChange = (newFromValue: string) => {
+    if (!from) return;
     setModeType(FULL_DEPOSIT_TYPE);
     setFromValue(newFromValue);
     setRate(
@@ -408,6 +413,7 @@ const Swap = ({
   };
 
   const handleRateValueChange = (newRate: string) => {
+    if (!from) return;
     setModeType(RATE_TYPE);
     setRate(newRate);
     setFromValue(
@@ -422,6 +428,7 @@ const Swap = ({
   };
 
   const handleFrequencyChange = (newFrequencyValue: string) => {
+    if (!from) return;
     setFrequencyValue(newFrequencyValue);
     if (modeType === RATE_TYPE) {
       setFromValue(
@@ -492,19 +499,22 @@ const Swap = ({
     onLowLiquidityModalClose();
   };
 
-  const cantFund = !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
+  const cantFund = from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
 
-  const isApproved = !fromValue
-    ? true
-    : (!isLoadingAllowance &&
-        allowance &&
-        allowance.allowance &&
-        allowance.token.address === from.address &&
-        parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
-      hasConfirmedApproval ||
-      from.address === PROTOCOL_TOKEN_ADDRESS;
+  const isApproved =
+    from &&
+    (!fromValue
+      ? true
+      : (!isLoadingAllowance &&
+          allowance &&
+          allowance.allowance &&
+          allowance.token.address === from.address &&
+          parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
+        hasConfirmedApproval ||
+        from.address === PROTOCOL_TOKEN_ADDRESS);
 
   const shouldDisableButton =
+    !from ||
     !isWhitelisted ||
     !fromValue ||
     !frequencyValue ||
@@ -516,11 +526,12 @@ const Swap = ({
     parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 
-  const ignoreValues = [from.address, to.address];
+  const ignoreValues = [...(from ? [from.address] : []), ...(to ? [to.address] : [])];
 
   const isTestnet = TESTNETS.includes(currentNetwork.chainId);
 
   let shouldShowNotEnoughForWhale =
+    from &&
     whaleMode &&
     (WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
       frequencyType.toString()
@@ -581,7 +592,7 @@ const Swap = ({
             description="waiting for approval"
             defaultMessage="Waiting for your {token} to be approved"
             values={{
-              token: from.symbol || '',
+              token: (from && from.symbol) || '',
             }}
           />
         ) : (
@@ -589,7 +600,7 @@ const Swap = ({
             description="Allow us to use your coin"
             defaultMessage="Approve {token}"
             values={{
-              token: from.symbol || '',
+              token: (from && from.symbol) || '',
             }}
           />
         )}
@@ -674,7 +685,7 @@ const Swap = ({
     ButtonToShow = NotWhitelistedButton;
   } else if (isLoading || isLoadingPairIsSupported) {
     ButtonToShow = LoadingButton;
-  } else if (!pairIsSupported && !isLoadingPairIsSupported) {
+  } else if (!pairIsSupported && !isLoadingPairIsSupported && from && to) {
     ButtonToShow = PairNotSupportedButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0))) {
     ButtonToShow = ApproveTokenButton;
@@ -719,11 +730,12 @@ const Swap = ({
         onCancel={onLowLiquidityModalClose}
         actionToTake={currentAction}
       />
+
       <TokenPicker
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
         isFrom={selecting === from}
-        onChange={selecting.address === from.address ? setFrom : setTo}
+        onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
       />
@@ -752,16 +764,18 @@ const Swap = ({
               </Typography>
             </Grid>
             <Grid item xs={6} style={{ textAlign: 'right' }}>
-              <Typography variant="body2">
-                <FormattedMessage
-                  description="in position"
-                  defaultMessage="In wallet: {balance} {symbol}"
-                  values={{
-                    balance: formatCurrencyAmount(balance, from, 4),
-                    symbol: from.symbol,
-                  }}
-                />
-              </Typography>
+              {from && (
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="in position"
+                    defaultMessage="In wallet: {balance} {symbol}"
+                    values={{
+                      balance: formatCurrencyAmount(balance, from, 4),
+                      symbol: from.symbol,
+                    }}
+                  />
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={6}>
               <TokenInput
@@ -776,7 +790,7 @@ const Swap = ({
             </Grid>
             <Grid item xs={6}>
               <Grid container alignItems="center" justify="flex-end">
-                <TokenButton token={from} onClick={() => startSelectingCoin(from)} />
+                <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
               </Grid>
             </Grid>
             <Grid item xs={12}>
@@ -797,7 +811,7 @@ const Swap = ({
                     description="rate detail"
                     defaultMessage="{from} {frequency} for you"
                     values={{
-                      from: from.symbol,
+                      from: (from && from.symbol) || '',
                       frequency:
                         STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
                     }}
@@ -817,7 +831,7 @@ const Swap = ({
             </Grid>
             <Grid item xs={6}>
               <Grid container alignItems="center" justify="flex-end">
-                <TokenButton token={to} onClick={() => startSelectingCoin(to)} />
+                <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
               </Grid>
             </Grid>
           </StyledToContainer>

@@ -56,10 +56,10 @@ const StyledTabItem = styled(Button)<{ isSelected: boolean }>`
 const StyledTabIndicator = styled.div<{ width: number; left: number; height: number; top: number }>`
   ${({ theme, left, top, width, height }) => `
     transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    left: ${left + 3}px;
-    top: ${top + 3}px;
-    width: ${width}px;
-    height: ${height}px;
+    left: ${left + 7}px;
+    top: ${top + 7}px;
+    width: ${width - 5}px;
+    height: ${height - 5}px;
     position: absolute;
     &:after {
       content: '';
