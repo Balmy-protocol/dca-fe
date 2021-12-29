@@ -95,7 +95,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
     <StyledCard variant="outlined">
       <StyledCardContent>
         <Grid container>
-          <Grid xs={12} sm={9} md={10}>
+          <Grid item xs={12} sm={9} md={10}>
             <StyledContentContainer>
               <StyledCardHeader>
                 <StyledCardTitleHeader>
@@ -146,7 +146,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
               </StyledDetailWrapper>
             </StyledContentContainer>
           </Grid>
-          <Grid xs={12} sm={3} md={2}>
+          <Grid item xs={12} sm={3} md={2}>
             <StyledCallToActionContainer>
               <StyledCardFooterButton variant="contained" color="secondary" onClick={onViewDetails} fullWidth>
                 <Typography variant="body2">

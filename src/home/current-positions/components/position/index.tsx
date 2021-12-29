@@ -396,7 +396,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
       />
       <StyledCardContent>
         <Grid container>
-          <Grid xs={12} sm={9} md={10}>
+          <Grid item xs={12} sm={9} md={10}>
             <StyledContentContainer>
               <StyledCardHeader>
                 <StyledCardTitleHeader>
@@ -451,7 +451,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
               </StyledDetailWrapper>
             </StyledContentContainer>
           </Grid>
-          <Grid xs={12} sm={3} md={2}>
+          <Grid item xs={12} sm={3} md={2}>
             <StyledCallToActionContainer>
               {!isPending && !hasNoFunds && !isStale && (
                 <StyledFreqLeft>
@@ -501,7 +501,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
               </StyledCardFooterButton>
             </StyledCallToActionContainer>
           </Grid>
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <StyledProgressWrapper>
               <BorderLinearProgress
                 swaps={remainingSwaps.toNumber()}
