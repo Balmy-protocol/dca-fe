@@ -21,6 +21,7 @@ interface PositionControlsProps {
   onWithdraw: () => void;
   onTerminate: () => void;
   onModifyRate: () => void;
+  onViewNFT: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
 }
@@ -31,6 +32,7 @@ const PositionControls = ({
   onModifyRate,
   pendingTransaction,
   position,
+  onViewNFT,
 }: PositionControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
@@ -59,6 +61,9 @@ const PositionControls = ({
           </Button>
         ) : (
           [
+            <Button variant="contained" color="white" onClick={onViewNFT}>
+              <FormattedMessage description="view nft" defaultMessage="View NFT" />
+            </Button>,
             <Button
               variant="contained"
               color="white"

@@ -10,7 +10,7 @@ import getPosition from 'graphql/getPosition.graphql';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import { useHistory, useParams } from 'react-router-dom';
 import PositionSwaps from 'position-detail/swaps';
-import { FullPosition, GetPairSwapsData } from 'types';
+import { FullPosition, GetPairSwapsData, NFTData } from 'types';
 import getPairSwaps from 'graphql/getPairSwaps.graphql';
 import SwapsGraph from 'position-detail/swap-graph';
 import Details from 'position-detail/position-data';
@@ -26,6 +26,7 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { usePositionHasPendingTransaction, useTransactionAdder } from 'state/transactions/hooks';
 import PositionStatus from 'position-detail/position-status';
+import NFTModal from 'common/view-nft-modal';
 import { BigNumber } from 'ethers';
 import Button from 'common/button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -57,6 +58,8 @@ const PositionDetailFrame = () => {
   const history = useHistory();
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
+  const [showNFTModal, setShowNFTModal] = React.useState(false);
+  const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const addTransaction = useTransactionAdder();
   const [actionToShow, setActionToShow] = React.useState<null | 'modifyRate' | 'removeFunds'>(null);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -87,6 +90,13 @@ const PositionDetailFrame = () => {
     skip: !position,
     client,
   });
+
+  const handleViewNFT = async () => {
+    if (!position) return;
+    const tokenNFT = await web3Service.getTokenNFT(position.id);
+    setNFTData(tokenNFT);
+    setShowNFTModal(true);
+  };
 
   const handleModifyRateAndSwaps = async (newRate: string, newFrequency: string) => {
     if (!position) {
@@ -150,7 +160,7 @@ const PositionDetailFrame = () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
       setTimeout(refetch, WAIT_FOR_SUBGRAPH);
     }
-  }, [isPending]);
+  }, [position, isPending]);
 
   if (isLoading || !data || !position || isLoadingSwaps) {
     return (
@@ -172,6 +182,7 @@ const PositionDetailFrame = () => {
         position={fullPositionToMappedPosition(position)}
         onCancel={() => setShowTerminateModal(false)}
       />
+      <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <Grid container spacing={4}>
         <Grid item xs={12} style={{ paddingBottom: '0px', paddingTop: '0px' }}>
           <Button variant="text" color="default" onClick={() => history.push('/')}>
@@ -187,6 +198,7 @@ const PositionDetailFrame = () => {
               onWithdraw={() => setShowWithdrawModal(true)}
               onTerminate={() => setShowTerminateModal(true)}
               onModifyRate={() => setActionToShow('modifyRate')}
+              onViewNFT={handleViewNFT}
               position={position}
               pendingTransaction={pendingTransaction}
             />
