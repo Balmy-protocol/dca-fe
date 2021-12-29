@@ -8,7 +8,7 @@ import { useQuery } from '@apollo/client';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import getPosition from 'graphql/getPosition.graphql';
 import useDCAGraphql from 'hooks/useDCAGraphql';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import PositionSwaps from 'position-detail/swaps';
 import { FullPosition, GetPairSwapsData } from 'types';
 import getPairSwaps from 'graphql/getPairSwaps.graphql';
@@ -27,6 +27,8 @@ import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { usePositionHasPendingTransaction, useTransactionAdder } from 'state/transactions/hooks';
 import PositionStatus from 'position-detail/position-status';
 import { BigNumber } from 'ethers';
+import Button from 'common/button';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -52,6 +54,7 @@ const PositionDetailFrame = () => {
   const { positionId } = useParams<{ positionId: string }>();
   const client = useDCAGraphql();
   const web3Service = useWeb3Service();
+  const history = useHistory();
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const addTransaction = useTransactionAdder();
@@ -170,6 +173,13 @@ const PositionDetailFrame = () => {
         onCancel={() => setShowTerminateModal(false)}
       />
       <Grid container spacing={4}>
+        <Grid item xs={12} style={{ paddingBottom: '0px', paddingTop: '0px' }}>
+          <Button variant="text" color="default" onClick={() => history.push('/')}>
+            <Typography variant="body2" component="div" style={{ display: 'flex', alignItems: 'center' }}>
+              <ArrowBackIcon fontSize="inherit" /> Back to positions
+            </Typography>
+          </Button>
+        </Grid>
         <StyledControlsWrapper item xs={12}>
           <PositionStatus position={position} pair={swapsData?.pair} />
           {position.status !== 'TERMINATED' && (

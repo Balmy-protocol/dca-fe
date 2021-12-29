@@ -8,6 +8,9 @@ import { appleTabsStylesHook } from 'common/tabs';
 import useWeb3Service from 'hooks/useWeb3Service';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
+import { useOpenClosePositionTab } from 'state/tabs/hooks';
+import { useAppDispatch } from 'state/hooks';
+import { changeOpenClosePositionTab } from 'state/tabs/actions';
 import History from '../history';
 import CurrentPositions from '../current-positions';
 
@@ -35,7 +38,8 @@ const StyledPaper = styled(Paper)`
 `;
 const Positions = () => {
   const web3Service = useWeb3Service();
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const tabIndex = useOpenClosePositionTab();
+  const dispatch = useAppDispatch();
   const tabsStyles = appleTabsStylesHook.useTabs();
   const tabItemStyles = appleTabsStylesHook.useTabItem();
 
@@ -58,7 +62,11 @@ const Positions = () => {
         <StyledPaper elevation={3}>
           <Grid container>
             <Grid item xs={12} style={{ display: 'flex', paddingBottom: '15px' }}>
-              <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
+              <Tabs
+                classes={tabsStyles}
+                value={tabIndex}
+                onChange={(e, index) => dispatch(changeOpenClosePositionTab(index))}
+              >
                 <Tab classes={tabItemStyles} disableRipple label="Open positions" />
                 <Tab classes={tabItemStyles} disableRipple label="Terminated positions" />
               </Tabs>

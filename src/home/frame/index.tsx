@@ -5,6 +5,9 @@ import Tab from '@material-ui/core/Tab';
 import { appleTabsStylesHook } from 'common/tabs';
 import styled from 'styled-components';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import { useMainTab } from 'state/tabs/hooks';
+import { useAppDispatch } from 'state/hooks';
+import { changeMainTab } from 'state/tabs/actions';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 
@@ -20,7 +23,8 @@ const StyledGridContainer = styled(Grid).withConfig({
 `;
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const tabIndex = useMainTab();
+  const dispatch = useAppDispatch();
   const tabsStyles = appleTabsStylesHook.useTabs();
   const tabItemStyles = appleTabsStylesHook.useTabItem();
 
@@ -33,7 +37,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       ) : (
         <>
           <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px', justifyContent: 'center' }}>
-            <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
+            <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => dispatch(changeMainTab(index))}>
               <Tab classes={tabItemStyles} disableRipple label="Create" />
               <Tab classes={tabItemStyles} disableRipple label="Positions" />
             </Tabs>
