@@ -40,6 +40,7 @@ import {
   WHALE_MINIMUM_VALUES,
   TESTNETS,
   NETWORKS,
+  MAX_UINT_32,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -611,21 +612,33 @@ const Swap = ({
     </StyledButton>
   );
 
+  const swapsIsMax = BigNumber.from(frequencyValue || '0').gt(BigNumber.from(MAX_UINT_32));
   const StartPositionButton = (
     <StyledButton
       size="large"
       variant="contained"
-      disabled={!!shouldDisableButton || isLoading || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale}
+      disabled={
+        !!shouldDisableButton || isLoading || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax
+      }
       color="secondary"
       fullWidth
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
-      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && (
+      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="swapsCannotBeMax"
+            defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
+            values={{ MAX_UINT_32 }}
+          />
+        </Typography>
+      )}
+      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
         <Typography variant="body1">
           <FormattedMessage description="create position" defaultMessage="Create position" />
         </Typography>
       )}
-      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && (
+      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
         <Typography variant="body1">
           <FormattedMessage
             description="notenoughwhale"
