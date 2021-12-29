@@ -99,9 +99,30 @@ const StyledButton = styled(Button)`
   border-radius: 12px;
 `;
 
+const StyledGridWithScrollbar = styled(Grid)<{ hasScrollbar: boolean }>`
+  ${({ theme, hasScrollbar }) => `
+    overflow-y: ${hasScrollbar ? 'scroll' : 'hidden'};
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+    --scrollbarBG: ${theme.palette.type === 'light' ? '#ffffff' : '#424242'};
+    --thumbBG: ${theme.palette.type === 'light' ? '#90a4ae' : '#ffffff'};
+    ::-webkit-scrollbar {
+      width: 11px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbarBG);
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--thumbBG);
+      border-radius: 6px;
+      border: 3px solid var(--scrollbarBG);
+    }
+  `}
+`;
+
 const StyledList = styled(List)`
   ${({ theme }) => `
-
     scrollbar-width: thin;
     scrollbar-color: var(--thumbBG) var(--scrollbarBG);
     --scrollbarBG: ${theme.palette.type === 'light' ? '#ffffff' : '#424242'};
@@ -277,7 +298,13 @@ const TokenPicker = ({
         >
           <CloseIcon fontSize="inherit" />
         </IconButton>
-        <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap', overflow: 'scroll' }}>
+        <StyledGridWithScrollbar
+          container
+          spacing={1}
+          direction="column"
+          hasScrollbar={shouldShowTokenLists}
+          style={{ flexWrap: 'nowrap' }}
+        >
           {shouldShowTokenLists ? (
             <TokenLists />
           ) : (
@@ -369,7 +396,7 @@ const TokenPicker = ({
               </Typography>
             </StyledButton>
           </StyledGrid>
-        </Grid>
+        </StyledGridWithScrollbar>
       </StyledOverlay>
     </Slide>
   );
