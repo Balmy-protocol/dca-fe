@@ -516,6 +516,7 @@ const Swap = ({
 
   const shouldDisableButton =
     !from ||
+    !to ||
     !isWhitelisted ||
     !fromValue ||
     !frequencyValue ||
