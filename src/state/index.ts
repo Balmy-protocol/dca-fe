@@ -7,6 +7,7 @@ import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
 import initializer from './initializer/reducer';
+import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 
@@ -31,6 +32,7 @@ const store = configureStore({
     badge,
     tokenLists,
     config,
+    tabs,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient } }).concat([
