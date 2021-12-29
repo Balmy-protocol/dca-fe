@@ -30,6 +30,7 @@ import NFTModal from 'common/view-nft-modal';
 import { BigNumber } from 'ethers';
 import Button from 'common/button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import PositionNotFound from 'position-detail/position-not-found';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -77,7 +78,7 @@ const PositionDetailFrame = () => {
 
   const position = data && data.position;
 
-  const pendingTransaction = usePositionHasPendingTransaction((data && data.position.id) || '');
+  const pendingTransaction = usePositionHasPendingTransaction((position && position.id) || '');
 
   const isPending = pendingTransaction !== null;
 
@@ -162,12 +163,18 @@ const PositionDetailFrame = () => {
     }
   }, [position, isPending]);
 
-  if (isLoading || !data || !position || isLoadingSwaps) {
+  const positionNotFound = !position && data && !isLoading;
+
+  if (isLoading || !data || (!position && !positionNotFound) || isLoadingSwaps) {
     return (
       <Grid container>
         <CenteredLoadingIndicator size={70} />
       </Grid>
     );
+  }
+
+  if (positionNotFound || !position) {
+    return <PositionNotFound />;
   }
 
   return (
