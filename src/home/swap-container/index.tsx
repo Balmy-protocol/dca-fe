@@ -4,7 +4,7 @@ import orderBy from 'lodash/orderBy';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
-import { getWrappedProtocolToken, USDC } from 'mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken, USDC } from 'mocks/tokens';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -15,15 +15,15 @@ import { useQuery } from '@apollo/client';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import { BigNumber } from 'ethers';
 import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
+import { useCreatePositionState } from 'state/create-position/hooks';
+import { useAppDispatch } from 'state/hooks';
+import { setFrequencyType, setFrequencyValue, setFrom, setFromValue, setTo } from 'state/create-position/actions';
 import Swap from './components/swap';
 
 const SwapContainer = () => {
-  const [fromValue, setFromValue] = React.useState('');
-  const [frequencyType, setFrequencyType] = React.useState(ONE_DAY);
-  const [frequencyValue, setFrequencyValue] = React.useState('5');
+  const { fromValue, frequencyType, frequencyValue, from, to } = useCreatePositionState();
+  const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
-  const [from, setFrom] = React.useState(getWrappedProtocolToken(currentNetwork.chainId));
-  const [to, setTo] = React.useState(USDC(currentNetwork.chainId));
   const client = useDCAGraphql();
   const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
     getAvailableIntervals,
@@ -33,42 +33,42 @@ const SwapContainer = () => {
   );
 
   React.useEffect(() => {
-    setFrom(getWrappedProtocolToken(currentNetwork.chainId));
-    setTo(USDC(currentNetwork.chainId));
+    dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
+    // setTo(USDC(currentNetwork.chainId));
   }, [currentNetwork.chainId]);
 
   const onSetFrom = (newFrom: Token) => {
     // check for decimals
-    if (newFrom.decimals < from.decimals) {
+    if (from && newFrom.decimals < from.decimals) {
       const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
       let newFromValue = fromValue;
       if (splitValue && splitValue[2] !== '') {
         newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, newFrom.decimals)}`;
       }
 
-      setFromValue(newFromValue);
+      dispatch(setFromValue(newFromValue));
     }
 
-    setFrom(newFrom);
+    dispatch(setFrom(newFrom));
   };
   const onSetTo = (newTo: Token) => {
-    setTo(newTo);
+    dispatch(setTo(newTo));
   };
 
   const toggleFromTo = () => {
-    setTo(from);
+    dispatch(setTo(from));
 
     // check for decimals
-    if (to.decimals < from.decimals) {
+    if (to && from && to.decimals < from.decimals) {
       const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
       let newFromValue = fromValue;
       if (splitValue && splitValue[2] !== '') {
         newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, to.decimals)}`;
       }
 
-      setFromValue(newFromValue);
+      dispatch(setFromValue(newFromValue));
     }
-    setFrom(to);
+    dispatch(setFrom(to));
   };
 
   const isLoading = isLoadingSwapIntervals || !swapIntervalsData;
@@ -93,10 +93,10 @@ const SwapContainer = () => {
                     setTo={onSetTo}
                     frequencyType={frequencyType}
                     frequencyValue={frequencyValue}
-                    setFrequencyType={setFrequencyType}
-                    setFrequencyValue={setFrequencyValue}
+                    setFrequencyType={(newFrequencyType) => dispatch(setFrequencyType(newFrequencyType))}
+                    setFrequencyValue={(newFrequencyValue) => dispatch(setFrequencyValue(newFrequencyValue))}
                     fromValue={fromValue}
-                    setFromValue={setFromValue}
+                    setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
                     web3Service={web3Service}
                     currentNetwork={currentNetwork || NETWORKS.optimism}
                     toggleFromTo={toggleFromTo}

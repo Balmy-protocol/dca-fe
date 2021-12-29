@@ -6,7 +6,7 @@ import TokenIcon from 'common/token-icon';
 import CaretDown from 'assets/svg/atom/caret-down';
 
 interface TokenButtonProps {
-  token?: Token;
+  token?: Token | null;
   onClick: React.MouseEventHandler<HTMLButtonElement>;
 }
 
@@ -18,13 +18,13 @@ const StyledButton = styled(Button)`
 const Swap = ({ token, onClick }: TokenButtonProps) => (
   <StyledButton
     size="large"
-    color="default"
-    variant="outlined"
-    startIcon={<TokenIcon size="24px" token={token} />}
+    color={token ? 'default' : 'secondary'}
+    variant={token ? 'outlined' : 'contained'}
+    startIcon={token && <TokenIcon size="24px" token={token} />}
     endIcon={<CaretDown size="10px" />}
     onClick={onClick}
   >
-    {token?.symbol}
+    {token ? token.symbol : 'Select a token'}
   </StyledButton>
 );
 export default Swap;

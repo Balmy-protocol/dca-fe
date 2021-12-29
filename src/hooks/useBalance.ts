@@ -6,7 +6,7 @@ import WalletContext from 'common/wallet-context';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 
-function useBalance(from: Token | undefined): [BigNumber | undefined, boolean, string?] {
+function useBalance(from: Token | undefined | null): [BigNumber | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const { web3Service } = React.useContext(WalletContext);
   const [result, setResult] = React.useState<BigNumber | undefined>(undefined);

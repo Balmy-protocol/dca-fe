@@ -47,8 +47,8 @@ const StyledLoadingIndicatorWrapper = styled.div`
 
 interface CreatePairModalProps {
   web3Service: Web3Service;
-  from: Token;
-  to: Token;
+  from: Token | null;
+  to: Token | null;
   onCancel: () => void;
   open: boolean;
   amountOfSwaps: string;

@@ -30,7 +30,7 @@ interface TokenInputProps {
   onChange: (newValue: string) => void | SetStateCallback<string>;
   withBalance?: boolean;
   balance?: BigNumber;
-  token: Token;
+  token: Token | null;
   error?: string;
   isMinimal?: boolean;
   fullWidth?: boolean;
@@ -50,7 +50,7 @@ const TokenInput = ({
 }: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
-    const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${token.decimals}}$`);
+    const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${(token && token.decimals) || 18}}$`);
 
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
       onChange(nextValue.startsWith('.') ? `0${nextValue}` : nextValue);

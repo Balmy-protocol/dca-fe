@@ -6,6 +6,7 @@ import axios from 'axios';
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
+import createPosition from './create-position/reducer';
 import initializer from './initializer/reducer';
 import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
@@ -31,11 +32,12 @@ const store = configureStore({
     initializer,
     badge,
     tokenLists,
+    createPosition,
     config,
     tabs,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ thunk: { extraArgument: axiosClient } }).concat([
+    getDefaultMiddleware({ thunk: { extraArgument: axiosClient }, serializableCheck: false }).concat([
       save({ states: PERSISTED_STATES, debounce: 1000 }),
     ]),
   preloadedState: load({
