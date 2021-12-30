@@ -48,6 +48,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
         account,
         graphPricesClient: web3Service.getUNIGraphqlClient().getClient(),
         DCASubgraph: web3Service.getDCAGraphqlClient().getClient(),
+        graphChainlinkClient: web3Service.getChainlinkGraphqlClient().getClient(),
         axiosClient,
       }}
     >

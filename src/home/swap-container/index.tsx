@@ -117,11 +117,11 @@ const SwapContainer = () => {
                     }
                   />
                 </Grid>
-                {/* <Hidden mdDown>
+                <Hidden mdDown>
                   <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
                     <GraphWidget from={from} to={to} />
                   </Grid>
-                </Hidden> */}
+                </Hidden>
               </>
             )}
           </>

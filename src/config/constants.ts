@@ -301,7 +301,11 @@ export const MEAN_GRAPHQL_URL = {
 export const UNI_GRAPHQL_URL = {
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/fibofinance/uniswap-v3-kovan',
   [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-optimism-kovan',
-  [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-optimism',
+  [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
+};
+
+export const CHAINLINK_GRAPHQL_URL = {
+  [NETWORKS.mainnet.chainId]: 'https://gql.graph.chain.link/subgraphs/name/ethereum-mainnet',
 };
 
 export const EXPLORER_URL = {

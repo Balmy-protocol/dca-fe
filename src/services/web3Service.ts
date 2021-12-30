@@ -70,6 +70,7 @@ import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import {
+  CHAINLINK_GRAPHQL_URL,
   CHAINLINK_ORACLE_ADDRESS,
   COINGECKO_IDS,
   COMPANION_ADDRESS,
@@ -110,6 +111,8 @@ export default class Web3Service {
 
   uniClient: GraphqlService;
 
+  chainlinkClient: GraphqlService;
+
   account: string;
 
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
@@ -140,6 +143,7 @@ export default class Web3Service {
 
     this.apolloClient = new GraphqlService();
     this.uniClient = new GraphqlService();
+    this.chainlinkClient = new GraphqlService();
   }
 
   // GETTERS AND SETTERS
@@ -161,6 +165,10 @@ export default class Web3Service {
 
   getUNIGraphqlClient() {
     return this.uniClient;
+  }
+
+  getChainlinkGraphqlClient() {
+    return this.chainlinkClient;
   }
 
   getProviderInfo() {
@@ -283,6 +291,7 @@ export default class Web3Service {
 
     this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
     this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
+    this.chainlinkClient = new GraphqlService(CHAINLINK_GRAPHQL_URL[chain.chainId] || CHAINLINK_GRAPHQL_URL[1]);
     this.setClient(ethersProvider);
     this.setSigner(signer);
 
