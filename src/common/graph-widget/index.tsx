@@ -28,10 +28,12 @@ import usePromise from 'hooks/usePromise';
 import { Oracles } from 'types/contracts';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { useThemeMode } from 'state/config/hooks';
+import useChainlinkGraphql from 'hooks/useChainlinkGraphql';
+import getChainlinkPrices from 'graphql/getChainlinkPrices.graphql';
 
 interface GraphWidgetProps {
-  from: Token;
-  to: Token;
+  from: Token | null;
+  to: Token | null;
 }
 
 interface UniMappedPrice {
@@ -165,7 +167,12 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const currentNetwork = useCurrentNetwork();
 
   if (to && from) {
-    if (from.address < to.address) {
+    const toAddress =
+      to.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId).address : to.address;
+    const fromAddress =
+      from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId).address : from.address;
+
+    if (fromAddress < toAddress) {
       tokenA = {
         ...(from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : from),
         symbol: from.symbol,
@@ -199,12 +206,12 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]
   );
 
-  const [oracleInUse, isLoadingOracle] = usePromise<Oracles>(
-    web3Service,
-    'getPairOracle',
-    [{ tokenA: from.address, tokenB: to.address }, !!existingPair],
-    !from || !to
-  );
+  // const [oracleInUse, isLoadingOracle] = usePromise<Oracles>(
+  //   web3Service,
+  //   'getPairOracle',
+  //   [{...(to && from ? { tokenA: from.address, tokenB: to.address } : {})}, !!existingPair],
+  //   !from || !to
+  // );
 
   const { loading: loadingMeanData, data: pairData } = useQuery<GetPairPriceResponseData>(getPairPrices, {
     variables: {
@@ -220,7 +227,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
       tokenB: tokenB.address,
       from: dateFilter,
     },
-    skip: !(from && to) || oracleInUse !== ORACLES.UNISWAP,
+    skip: !(from && to),
     client: uniClient,
   });
 
@@ -284,7 +291,8 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
       tokenA.isBaseToken ? '' : tokenB.symbol
     }`;
-  const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
+  const isLoading = loadingPool || loadingMeanData;
+  // const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
   const noData = prices.length === 0;
 
   return (
@@ -312,14 +320,29 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
       ) : (
         <>
           {noData ? (
-            <StyledCenteredWrapper>
-              <Typography variant="h6">
-                <FormattedMessage
-                  description="No data available"
-                  defaultMessage="There is no data available about this pair"
-                />
-              </Typography>
-            </StyledCenteredWrapper>
+            <>
+              {from && to && (
+                <StyledCenteredWrapper>
+                  <Typography variant="h6">
+                    <FormattedMessage
+                      description="No data available"
+                      defaultMessage="There is no data available about this pair"
+                    />
+                  </Typography>
+                </StyledCenteredWrapper>
+              )}
+              {!from ||
+                (!to && (
+                  <StyledCenteredWrapper>
+                    <Typography variant="h6">
+                      <FormattedMessage
+                        description="No pair selected"
+                        defaultMessage="Select a pair to view its price history"
+                      />
+                    </Typography>
+                  </StyledCenteredWrapper>
+                ))}
+            </>
           ) : (
             <StyledGraphContainer elevation={0}>
               <ResponsiveContainer width="100%">
