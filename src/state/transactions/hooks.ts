@@ -18,6 +18,7 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import { COMPANION_ADDRESS, HUB_ADDRESS, TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
+import { useBlockNumber } from 'state/block-number/hooks';
 import { addTransaction } from './actions';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
@@ -257,7 +258,7 @@ export function useHasPendingPairCreation(from: Token | null, to: Token | null):
   );
 }
 
-// returns whether a token has a pending approval transaction
+// returns whether a token has a pending transaction
 export function usePositionHasPendingTransaction(position: string): string | null {
   const allTransactions = useAllTransactions();
 
@@ -278,6 +279,26 @@ export function usePositionHasPendingTransaction(position: string): string | nul
 
     return foundTransaction?.hash || null;
   }, [allTransactions, position]);
+}
+
+// returns whether a token has been transfered
+export function usePositionHasTransfered(position: string): string | null {
+  const allTransactions = useAllTransactions();
+  const currentNetwork = useCurrentNetwork();
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+
+  return useMemo(() => {
+    const foundTransaction = find(allTransactions, (transaction) => {
+      if (!transaction) return false;
+      if (transaction.type !== TRANSACTION_TYPES.TRANSFER_POSITION) return false;
+      // cache this for 3 blocks
+      if (transaction.receipt && (blockNumber || 0) - transaction.receipt.blockNumber > 3) return false;
+
+      return !!transaction.receipt && (<TransactionPositionTypeDataOptions>transaction.typeData).id === position;
+    });
+
+    return foundTransaction?.hash || null;
+  }, [allTransactions, position, blockNumber]);
 }
 
 // returns whether a token has been approved transaction

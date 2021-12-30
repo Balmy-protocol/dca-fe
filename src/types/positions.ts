@@ -74,6 +74,8 @@ export interface ActionState {
   action: PositionActions;
   rate: string;
   oldRate: string;
+  from: string;
+  to: string;
   remainingSwaps: string;
   oldRemainingSwaps: string;
   swapped: string;

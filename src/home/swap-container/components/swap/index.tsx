@@ -3,7 +3,7 @@ import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import { Web3Service, GetAllowanceResponse, SetStateCallback, Token } from 'types';
+import { Web3Service, GetAllowanceResponse, Token } from 'types';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
