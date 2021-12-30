@@ -24,13 +24,18 @@ import ModifyRateSettings from 'common/modify-rate-settings';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
-import { usePositionHasPendingTransaction, useTransactionAdder } from 'state/transactions/hooks';
+import {
+  usePositionHasPendingTransaction,
+  usePositionHasTransfered,
+  useTransactionAdder,
+} from 'state/transactions/hooks';
 import PositionStatus from 'position-detail/position-status';
 import NFTModal from 'common/view-nft-modal';
 import { BigNumber } from 'ethers';
 import Button from 'common/button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import PositionNotFound from 'position-detail/position-not-found';
+import TransferPositionModal from 'common/transfer-position-modal';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -59,6 +64,7 @@ const PositionDetailFrame = () => {
   const history = useHistory();
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
+  const [showTransferModal, setShowTransferModal] = React.useState(false);
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const addTransaction = useTransactionAdder();
@@ -79,6 +85,7 @@ const PositionDetailFrame = () => {
   const position = data && data.position;
 
   const pendingTransaction = usePositionHasPendingTransaction((position && position.id) || '');
+  const positionTransfered = usePositionHasTransfered((position && position.id) || '');
 
   const isPending = pendingTransaction !== null;
 
@@ -189,6 +196,11 @@ const PositionDetailFrame = () => {
         position={fullPositionToMappedPosition(position)}
         onCancel={() => setShowTerminateModal(false)}
       />
+      <TransferPositionModal
+        open={showTransferModal}
+        position={position}
+        onCancel={() => setShowTransferModal(false)}
+      />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <Grid container spacing={4}>
         <Grid item xs={12} style={{ paddingBottom: '0px', paddingTop: '0px' }}>
@@ -200,11 +212,12 @@ const PositionDetailFrame = () => {
         </Grid>
         <StyledControlsWrapper item xs={12}>
           <PositionStatus position={position} pair={swapsData?.pair} />
-          {position.status !== 'TERMINATED' && (
+          {position.status !== 'TERMINATED' && !positionTransfered && (
             <PositionControls
               onWithdraw={() => setShowWithdrawModal(true)}
               onTerminate={() => setShowTerminateModal(true)}
               onModifyRate={() => setActionToShow('modifyRate')}
+              onTransfer={() => setShowTransferModal(true)}
               onViewNFT={handleViewNFT}
               position={position}
               pendingTransaction={pendingTransaction}

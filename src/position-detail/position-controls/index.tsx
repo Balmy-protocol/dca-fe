@@ -21,6 +21,7 @@ interface PositionControlsProps {
   onWithdraw: () => void;
   onTerminate: () => void;
   onModifyRate: () => void;
+  onTransfer: () => void;
   onViewNFT: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
@@ -30,6 +31,7 @@ const PositionControls = ({
   onWithdraw,
   onTerminate,
   onModifyRate,
+  onTransfer,
   pendingTransaction,
   position,
   onViewNFT,
@@ -61,9 +63,6 @@ const PositionControls = ({
           </Button>
         ) : (
           [
-            <Button variant="contained" color="white" onClick={onViewNFT}>
-              <FormattedMessage description="view nft" defaultMessage="View NFT" />
-            </Button>,
             <Button
               variant="contained"
               color="white"
@@ -72,8 +71,14 @@ const PositionControls = ({
             >
               <FormattedMessage description="withdraw swapped" defaultMessage="Withdraw swapped" />
             </Button>,
+            <Button variant="contained" color="white" onClick={onViewNFT}>
+              <FormattedMessage description="view nft" defaultMessage="View NFT" />
+            </Button>,
             <Button variant="contained" color="white" onClick={onModifyRate}>
               <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
+            </Button>,
+            <Button variant="contained" color="white" onClick={onTransfer}>
+              <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
             </Button>,
             <Button variant="outlined" color="error" onClick={onTerminate}>
               <FormattedMessage description="terminate position" defaultMessage="Terminate position" />

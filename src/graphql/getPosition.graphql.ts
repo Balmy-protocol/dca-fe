@@ -57,6 +57,8 @@ const getPosition = gql`
         action
         rate
         oldRate
+        from
+        to
         remainingSwaps
         oldRemainingSwaps
         swapped

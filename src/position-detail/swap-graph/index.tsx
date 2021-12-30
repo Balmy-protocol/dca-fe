@@ -143,14 +143,16 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
 
   prices = React.useMemo(() => {
     const orderedSwaps = orderBy(position.history, ['createdAtTimestamp'], ['asc']);
-    const mappedSwapData = orderedSwaps.reduce(
-      (acc, positionState) => [
-        ...acc,
-        (ITEM_MAP[positionState.action] && ITEM_MAP[positionState.action](position, positionState, acc)) ||
-          buildEmptyItemForGraph(position, positionState, acc),
-      ],
-      []
-    );
+    const mappedSwapData = orderedSwaps
+      .filter((positionState) => positionState.action !== POSITION_ACTIONS.TRANSFERED)
+      .reduce(
+        (acc, positionState) => [
+          ...acc,
+          (ITEM_MAP[positionState.action] && ITEM_MAP[positionState.action](position, positionState, acc)) ||
+            buildEmptyItemForGraph(position, positionState, acc),
+        ],
+        []
+      );
 
     return orderBy(mappedSwapData, ['date'], ['desc']).reverse();
   }, [position]);

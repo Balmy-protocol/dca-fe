@@ -14,6 +14,7 @@ import {
   ResetPositionTypeData,
   WrapEtherTypeData,
   ModifyRateAndSwapsPositionTypeData,
+  TransferTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -112,6 +113,11 @@ function useBuildTransactionDetail() {
               modifySwapsPositionTypeData.newSwaps
             )}`;
           }
+          break;
+        }
+        case TRANSACTION_TYPES.TRANSFER_POSITION: {
+          const transferedTypeData = tx.typeData as TransferTypeData;
+          message = `Transfer ${transferedTypeData.from}:${transferedTypeData.to} position to ${transferedTypeData.toAddress}`;
           break;
         }
         case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {

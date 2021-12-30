@@ -4,11 +4,11 @@ import orderBy from 'lodash/orderBy';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
-import { getProtocolToken, getWrappedProtocolToken, USDC } from 'mocks/tokens';
+import { getProtocolToken } from 'mocks/tokens';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Hidden from '@material-ui/core/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { NETWORKS, ONE_DAY, STRING_SWAP_INTERVALS } from 'config/constants';
+import { NETWORKS, STRING_SWAP_INTERVALS } from 'config/constants';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
 import { useQuery } from '@apollo/client';

@@ -47,6 +47,8 @@ import {
   AvailablePairsGraphqlResponse,
   PoolsLiquidityDataGraphqlResponse,
   SwapsToPerform,
+  FullPosition,
+  TransferTypeData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { sortTokens, sortTokensByAddress } from 'utils/parsing';
@@ -784,6 +786,18 @@ export default class Web3Service {
   }
 
   // POSITION EMTHODS
+  async transfer(position: FullPosition, toAddress: string): Promise<TransactionResponse> {
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      this.getSigner()
+    ) as unknown as PermissionManagerContract;
+
+    return permissionManagerInstance.transferFrom(position.user, toAddress, position.id);
+  }
+
   async getTokenNFT(id: string): Promise<NFTData> {
     const permissionManagerAddress = await this.getPermissionManagerAddress();
     const tokenDescriptorContract = new ethers.Contract(
@@ -1337,6 +1351,11 @@ export default class Web3Service {
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity = this.currentPositions[
           modifyRateAndSwapsPositionTypeData.id
         ].rate.mul(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
+        break;
+      }
+      case TRANSACTION_TYPES.TRANSFER_POSITION: {
+        const transferPositionTypeData = transaction.typeData as TransferTypeData;
+        delete this.currentPositions[transferPositionTypeData.id];
         break;
       }
       default:
