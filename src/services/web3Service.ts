@@ -886,7 +886,7 @@ export default class Web3Service {
   }
 
   async terminate(position: Position): Promise<TransactionResponse> {
-    if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.from.address === PROTOCOL_TOKEN_ADDRESS) {
       const companionAddress = await this.getHUBCompanionAddress();
 
       const hubCompanionInstance = new ethers.Contract(
@@ -895,6 +895,9 @@ export default class Web3Service {
         this.getSigner()
       ) as unknown as HubCompanionContract;
 
+      if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
+        return hubCompanionInstance.terminateUsingProtocolTokenAsTo(position.id, this.account, this.account);
+      }
       return hubCompanionInstance.terminateUsingProtocolTokenAsFrom(position.id, this.account, this.account);
     }
 

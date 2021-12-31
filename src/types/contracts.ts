@@ -60,6 +60,12 @@ export class HubCompanionContract extends Contract {
     recipientSwapped: string
   ) => Promise<TransactionResponse>;
 
+  terminateUsingProtocolTokenAsTo: (
+    id: string,
+    recipientUnswapped: string,
+    recipientSwapped: string
+  ) => Promise<TransactionResponse>;
+
   increasePositionUsingProtocolToken: (
     id: string,
     newAmount: BigNumber,
