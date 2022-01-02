@@ -865,8 +865,8 @@ export default class Web3Service {
     return hubInstance.deposit(from.address, to.address, weiValue, amountOfSwaps, swapInterval, this.account, []);
   }
 
-  async withdraw(position: Position, hasBeenTransfered = false): Promise<TransactionResponse> {
-    if (position.to.address === PROTOCOL_TOKEN_ADDRESS && !hasBeenTransfered) {
+  async withdraw(position: Position): Promise<TransactionResponse> {
+    if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
       const companionAddress = await this.getHUBCompanionAddress();
 
       const hubCompanionInstance = new ethers.Contract(
@@ -885,11 +885,8 @@ export default class Web3Service {
     return hubInstance.withdrawSwapped(position.id, this.account);
   }
 
-  async terminate(position: Position, hasBeenTransfered = false): Promise<TransactionResponse> {
-    if (
-      (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.from.address === PROTOCOL_TOKEN_ADDRESS) &&
-      !hasBeenTransfered
-    ) {
+  async terminate(position: Position): Promise<TransactionResponse> {
+    if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.from.address === PROTOCOL_TOKEN_ADDRESS) {
       const companionAddress = await this.getHUBCompanionAddress();
 
       const hubCompanionInstance = new ethers.Contract(
