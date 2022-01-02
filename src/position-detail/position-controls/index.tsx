@@ -25,6 +25,7 @@ interface PositionControlsProps {
   onViewNFT: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
+  shouldDisable: boolean;
 }
 
 const PositionControls = ({
@@ -35,6 +36,7 @@ const PositionControls = ({
   pendingTransaction,
   position,
   onViewNFT,
+  shouldDisable,
 }: PositionControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
@@ -67,20 +69,20 @@ const PositionControls = ({
               variant="contained"
               color="white"
               onClick={onWithdraw}
-              disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0))}
+              disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || shouldDisable}
             >
               <FormattedMessage description="withdraw swapped" defaultMessage="Withdraw swapped" />
             </Button>,
-            <Button variant="contained" color="white" onClick={onViewNFT}>
+            <Button variant="contained" color="white" onClick={onViewNFT} disabled={shouldDisable}>
               <FormattedMessage description="view nft" defaultMessage="View NFT" />
             </Button>,
-            <Button variant="contained" color="white" onClick={onModifyRate}>
+            <Button variant="contained" color="white" onClick={onModifyRate} disabled={shouldDisable}>
               <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
             </Button>,
-            <Button variant="contained" color="white" onClick={onTransfer}>
-              <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-            </Button>,
-            <Button variant="outlined" color="error" onClick={onTerminate}>
+            // <Button variant="contained" color="white" onClick={onTransfer}>
+            //   <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
+            // </Button>,
+            <Button variant="outlined" color="error" onClick={onTerminate} disabled={shouldDisable}>
               <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
             </Button>,
           ]

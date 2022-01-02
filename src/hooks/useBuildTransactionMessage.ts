@@ -15,6 +15,7 @@ import {
   WrapEtherTypeData,
   ResetPositionTypeData,
   TransferTypeData,
+  ApproveCompanionTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -140,6 +141,11 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.TRANSFER_POSITION: {
           const transferedTypeData = tx.typeData as TransferTypeData;
           message = `Your ${transferedTypeData.from}:${transferedTypeData.to} position has now been transfered to ${transferedTypeData.toAddress}`;
+          break;
+        }
+        case TRANSACTION_TYPES.APPROVE_COMPANION: {
+          const approveCompanionTypeData = tx.typeData as ApproveCompanionTypeData;
+          message = `Our Hub Companion has been approved to modify your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position`;
           break;
         }
         case TRANSACTION_TYPES.NEW_PAIR: {

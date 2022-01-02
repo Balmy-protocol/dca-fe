@@ -85,6 +85,15 @@ export class PermissionManagerContract extends Contract {
   tokenURI: (positionId: string) => Promise<string>;
 
   transferFrom: (owner: string, toAddress: string, positionId: string) => Promise<TransactionResponse>;
+
+  hasPermission: (positionId: string, address: string, permit: number) => Promise<boolean>;
+
+  modify: (
+    positionId: string,
+    permissions: { operator: string; permissions: number[] }[]
+  ) => Promise<TransactionResponse>;
+
+  ownerOf: (positionId: string) => Promise<string>;
 }
 export class HubContract extends Contract {
   getNextSwapInfo: (
