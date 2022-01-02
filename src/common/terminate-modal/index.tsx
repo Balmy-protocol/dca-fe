@@ -13,6 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import { makeStyles } from '@material-ui/core/styles';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
 
 const useStyles = makeStyles({
   paper: {
@@ -43,13 +45,15 @@ interface WithdrawModalProps {
   position: Position;
   onCancel: () => void;
   open: boolean;
+  hasBeenTransfered?: boolean;
 }
 
-const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
+const TerminateModal = ({ position, open, onCancel, hasBeenTransfered }: WithdrawModalProps) => {
   const classes = useStyles();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
   const addTransaction = useTransactionAdder();
+  const currentNetwork = useCurrentNetwork();
 
   const handleTerminate = async () => {
     try {
@@ -61,7 +65,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
           </Typography>
         ),
       });
-      const result = await web3Service.terminate(position);
+      const result = await web3Service.terminate(position, hasBeenTransfered);
       addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,
@@ -104,9 +108,15 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
             defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
             values={{
               from: formatUnits(position.remainingLiquidity, position.from.decimals),
-              fromSymbol: position.from.symbol,
+              fromSymbol:
+                position.from.address === PROTOCOL_TOKEN_ADDRESS && hasBeenTransfered
+                  ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).symbol
+                  : position.from.symbol,
               to: formatUnits(position.toWithdraw, position.to.decimals),
-              toSymbol: position.to.symbol,
+              toSymbol:
+                position.to.address === PROTOCOL_TOKEN_ADDRESS && hasBeenTransfered
+                  ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).symbol
+                  : position.to.symbol,
             }}
           />
         </Typography>

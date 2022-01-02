@@ -13,6 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import { makeStyles } from '@material-ui/core/styles';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
 
 const useStyles = makeStyles({
   paper: {
@@ -42,11 +44,13 @@ const StyledDialogActions = styled(DialogActions)`
 interface WithdrawModalProps {
   position: Position;
   onCancel: () => void;
+  hasBeenTransfered?: boolean;
   open: boolean;
 }
 
-const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
+const WithdrawModal = ({ position, open, onCancel, hasBeenTransfered }: WithdrawModalProps) => {
   const classes = useStyles();
+  const currentNetwork = useCurrentNetwork();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
 
@@ -59,14 +63,19 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         content: (
           <Typography variant="body1">
             <FormattedMessage
-              description="Withdrawing from"
-              defaultMessage="Withdrawing {from}"
-              values={{ from: position.to.symbol }}
+              description="Withdrawing to"
+              defaultMessage="Withdrawing {to}"
+              values={{
+                to:
+                  position.to.address === PROTOCOL_TOKEN_ADDRESS && hasBeenTransfered
+                    ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).symbol
+                    : position.to.symbol,
+              }}
             />
           </Typography>
         ),
       });
-      const result = await web3Service.withdraw(position);
+      const result = await web3Service.withdraw(position, hasBeenTransfered);
       addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,
@@ -93,16 +102,26 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         <Typography variant="h6">
           <FormattedMessage
             description="withdraw title"
-            defaultMessage="Withdraw {to} from {from}/{to} position"
-            values={{ from: position.from.symbol, to: position.to.symbol }}
+            defaultMessage="Withdraw {newTo} from {from}/{to} position"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+              newTo:
+                position.to.address === PROTOCOL_TOKEN_ADDRESS && hasBeenTransfered
+                  ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).symbol
+                  : position.to.symbol,
+            }}
           />
         </Typography>
         <Typography variant="body1">
           <FormattedMessage
             description="Withdraw warning"
-            defaultMessage="Are you sure you want to withdraw {ammount} {from}?"
+            defaultMessage="Are you sure you want to withdraw {ammount} {to}?"
             values={{
-              from: position.to.symbol,
+              to:
+                position.to.address === PROTOCOL_TOKEN_ADDRESS && hasBeenTransfered
+                  ? WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId).symbol
+                  : position.to.symbol,
               ammount: formatUnits(position.toWithdraw, position.to.decimals),
             }}
           />
