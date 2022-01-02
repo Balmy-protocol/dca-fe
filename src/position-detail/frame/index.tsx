@@ -36,7 +36,6 @@ import Button from 'common/button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import PositionNotFound from 'position-detail/position-not-found';
 import TransferPositionModal from 'common/transfer-position-modal';
-import useHasBeenTransfered from 'hooks/useHasBeenTransfered';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -84,8 +83,6 @@ const PositionDetailFrame = () => {
   });
 
   const position = data && data.position;
-
-  const hasBeenTransfered = useHasBeenTransfered(position);
 
   const pendingTransaction = usePositionHasPendingTransaction((position && position.id) || '');
   const positionTransfered = usePositionHasTransfered((position && position.id) || '');
@@ -193,13 +190,11 @@ const PositionDetailFrame = () => {
         open={showWithdrawModal}
         position={fullPositionToMappedPosition(position)}
         onCancel={() => setShowWithdrawModal(false)}
-        hasBeenTransfered={hasBeenTransfered}
       />
       <TerminateModal
         open={showTerminateModal}
         position={fullPositionToMappedPosition(position)}
         onCancel={() => setShowTerminateModal(false)}
-        hasBeenTransfered={hasBeenTransfered}
       />
       <TransferPositionModal
         open={showTransferModal}
