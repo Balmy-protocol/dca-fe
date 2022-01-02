@@ -246,7 +246,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
       });
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'error while adding funds', error: { code: e.code, message: e.message } });
+      setModalError({ content: 'error while adding funds', error: { code: e.code, message: e.message, data: e.data } });
     }
   };
 
@@ -283,7 +283,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
       });
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'error while adding funds', error: { code: e.code, message: e.message } });
+      setModalError({ content: 'error while adding funds', error: { code: e.code, message: e.message, data: e.data } });
     }
   };
 
@@ -316,8 +316,12 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
         ),
       });
     } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'error while withdrawing funds', error: { code: e.code, message: e.message } });
+      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setModalError({
+        content: 'error while withdrawing funds',
+        error: { code: e.code, message: e.message, data: e.data },
+      });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   };
 
@@ -364,8 +368,12 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
         ),
       });
     } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'error while modifying rate', error: { code: e.code, message: e.message } });
+      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setModalError({
+        content: 'error while modifying rate',
+        error: { code: e.code, message: e.message, data: e.data },
+      });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   };
 
