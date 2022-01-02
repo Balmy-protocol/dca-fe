@@ -943,7 +943,7 @@ export default class Web3Service {
       );
     }
 
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),
@@ -995,7 +995,7 @@ export default class Web3Service {
       );
     }
 
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),
@@ -1044,7 +1044,7 @@ export default class Web3Service {
       );
     }
 
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),
@@ -1099,7 +1099,7 @@ export default class Web3Service {
       return hubInstance.increasePosition(position.id, newAmount.sub(position.remainingLiquidity), newSwaps);
     }
 
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),
