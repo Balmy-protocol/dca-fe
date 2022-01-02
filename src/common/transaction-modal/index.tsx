@@ -72,6 +72,7 @@ interface ErrorConfig {
   error?: {
     code: number;
     message: string;
+    data: any;
   };
 }
 
@@ -99,7 +100,7 @@ const defaultSuccessConfig: SuccessConfig = {
 
 const defaultErrorConfig: ErrorConfig = {
   content: null,
-  error: { message: 'something went wrong', code: -9999999 },
+  error: { message: 'something went wrong', code: -9999999, data: null },
 };
 
 export const TransactionModalContext = React.createContext(TransactionModalContextDefaultValue);
@@ -176,15 +177,38 @@ export const TransactionModal = ({
       {errorConfig.content}
       <Typography variant="body1">
         {TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] || (
-          <FormattedMessage
-            description="unkown_error"
-            defaultMessage="Unknown error: {message}"
-            values={{ message: errorConfig.error?.message }}
-          />
+          <>
+            <FormattedMessage
+              description="unkown_error"
+              defaultMessage="Unknown error: {message}"
+              values={{ message: errorConfig.error?.message }}
+            />
+            {Array.isArray(errorConfig.error?.data) ? (
+              <Typography variant="body1" component="p">
+                <FormattedMessage description="additional_infromation" defaultMessage="Additional information:" />
+                {errorConfig.error?.data.map((msg) => (
+                  <Typography variant="body1" component="p">
+                    {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
+                    {msg.message}
+                  </Typography>
+                ))}
+              </Typography>
+            ) : null}
+            {!Array.isArray(errorConfig.error?.data) && errorConfig.error?.data instanceof Object ? (
+              <Typography variant="body1" component="p">
+                <FormattedMessage description="additional_infromation" defaultMessage="Additional information:" />
+                <Typography variant="body1" component="p">
+                  {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
+                  {errorConfig.error?.data.message}
+                </Typography>
+              </Typography>
+            ) : null}
+          </>
         )}
       </Typography>
     </>
   );
+
   return (
     <StyledDialog
       open={open}

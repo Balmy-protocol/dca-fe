@@ -81,8 +81,12 @@ const TerminateModal = ({ position, open, onCancel, hasBeenTransfered }: Withdra
         ),
       });
     } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'Error while terminating position', error: { code: e.code, message: e.message } });
+      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setModalError({
+        content: 'Error while terminating position',
+        error: { code: e.code, message: e.message, data: e.data },
+      });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   };
 
