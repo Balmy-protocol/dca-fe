@@ -82,6 +82,7 @@ import {
   NETWORKS,
   ORACLES,
   ORACLE_ADDRESS,
+  PERMISSIONS,
   PERMISSION_MANAGER_ADDRESS,
   SWAP_INTERVALS_MAP,
   TOKEN_DESCRIPTOR_ADDRESS,
@@ -794,7 +795,59 @@ export default class Web3Service {
     });
   }
 
-  // POSITION EMTHODS
+  // POSITION METHODS
+  async companionIsApproved(position: FullPosition): Promise<boolean> {
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+    const companionAddress = await this.getHUBCompanionAddress();
+
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      this.getSigner()
+    ) as unknown as PermissionManagerContract;
+
+    try {
+      await permissionManagerInstance.ownerOf(position.id);
+    } catch (e) {
+      // hack for when the subgraph has not updated yet but the position has been terminated
+      const error = e as { data?: { message?: string } };
+      if (
+        error &&
+        error.data &&
+        error.data.message &&
+        error.data.message === 'execution reverted: ERC721: owner query for nonexistent token'
+      )
+        return true;
+    }
+
+    const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
+      permissionManagerInstance.hasPermission(position.id, companionAddress, PERMISSIONS.INCREASE),
+      permissionManagerInstance.hasPermission(position.id, companionAddress, PERMISSIONS.REDUCE),
+      permissionManagerInstance.hasPermission(position.id, companionAddress, PERMISSIONS.WITHDRAW),
+      permissionManagerInstance.hasPermission(position.id, companionAddress, PERMISSIONS.TERMINATE),
+    ]);
+
+    return hasIncrease && hasReduce && hasWithdraw && hasTerminate;
+  }
+
+  async approveCompanionForPosition(position: FullPosition): Promise<TransactionResponse> {
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+    const companionAddress = await this.getHUBCompanionAddress();
+
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      this.getSigner()
+    ) as unknown as PermissionManagerContract;
+
+    return permissionManagerInstance.modify(position.id, [
+      {
+        operator: companionAddress,
+        permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE, PERMISSIONS.WITHDRAW],
+      },
+    ]);
+  }
+
   async transfer(position: FullPosition, toAddress: string): Promise<TransactionResponse> {
     const permissionManagerAddress = await this.getPermissionManagerAddress();
 
