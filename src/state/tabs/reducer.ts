@@ -1,14 +1,16 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { changeMainTab, changeOpenClosePositionTab } from './actions';
+import { changeMainTab, changeOpenClosePositionTab, changePositionDetailsTab } from './actions';
 
 export interface HomeTabsState {
   mainSelector: number;
   openClosedPositions: number;
+  positionDetailsSelector: number;
 }
 
 const initialState: HomeTabsState = {
   mainSelector: 0,
   openClosedPositions: 0,
+  positionDetailsSelector: 0,
 };
 
 export default createReducer(initialState, (builder) =>
@@ -18,5 +20,8 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(changeOpenClosePositionTab, (state, { payload }) => {
       state.openClosedPositions = payload;
+    })
+    .addCase(changePositionDetailsTab, (state, { payload }) => {
+      state.positionDetailsSelector = payload;
     })
 );

@@ -17,7 +17,7 @@ const PositionControlsContainer = styled.div`
   align-self: flex-end;
 `;
 
-interface PositionControlsProps {
+interface PositionSummaryControlsProps {
   onWithdraw: () => void;
   onTerminate: () => void;
   onModifyRate: () => void;
@@ -28,7 +28,7 @@ interface PositionControlsProps {
   shouldDisable: boolean;
 }
 
-const PositionControls = ({
+const PositionSummaryControls = ({
   onWithdraw,
   onTerminate,
   onModifyRate,
@@ -37,7 +37,7 @@ const PositionControls = ({
   position,
   onViewNFT,
   shouldDisable,
-}: PositionControlsProps) => {
+}: PositionSummaryControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
   const web3Service = useWeb3Service();
@@ -92,4 +92,4 @@ const PositionControls = ({
   );
 };
 
-export default PositionControls;
+export default PositionSummaryControls;
