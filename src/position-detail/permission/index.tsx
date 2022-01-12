@@ -16,9 +16,13 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'hooks/state';
 import { addPermission, removePermission } from 'state/position-permissions/actions';
 import { STRING_PERMISSIONS } from 'config/constants';
+import { FormattedMessage } from 'react-intl';
+import Tooltip from '@material-ui/core/Tooltip';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 interface PositionPermissionProps {
   positionPermission: PositionPermission;
+  shouldDisable: boolean;
 }
 
 const hasPermission = (permissions: Permission[], permission: Permission) => permissions.indexOf(permission) !== -1;
@@ -35,6 +39,10 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
+`;
+
+const StyledLabel = styled.div`
+  display: flex;
 `;
 
 const StyledCardContent = styled(CardContent)`
@@ -65,7 +73,38 @@ const StyledContentContainer = styled.div`
   flex-grow: 1;
 `;
 
-const PositionPermissionItem = ({ positionPermission }: PositionPermissionProps) => {
+const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
+  margin-left: 10px;
+`;
+
+const HelpTexts = {
+  INCREASE: (
+    <FormattedMessage
+      description="increase permission helptext"
+      defaultMessage="This allows the address to increase the funds and modify the duration of your position"
+    />
+  ),
+  REDUCE: (
+    <FormattedMessage
+      description="reduce permission helptext"
+      defaultMessage="This allows the address to decrease the funds and modify the duration of your position"
+    />
+  ),
+  WITHDRAW: (
+    <FormattedMessage
+      description="withdraw permission helptext"
+      defaultMessage="This allows the address to withdraw your swapped liquidity from your position"
+    />
+  ),
+  TERMINATE: (
+    <FormattedMessage
+      description="terminate permission helptext"
+      defaultMessage="This allows the address to terminate your position"
+    />
+  ),
+};
+
+const PositionPermissionItem = ({ positionPermission, shouldDisable }: PositionPermissionProps) => {
   const currentNetwork = useCurrentNetwork();
   const dispatch = useAppDispatch();
 
@@ -78,7 +117,7 @@ const PositionPermissionItem = ({ positionPermission }: PositionPermissionProps)
   };
 
   return (
-    <StyledCard variant="outlined">
+    <StyledCard elevation={2}>
       <StyledCardContent>
         <StyledContentContainer>
           <StyledCardHeader>
@@ -108,9 +147,20 @@ const PositionPermissionItem = ({ positionPermission }: PositionPermissionProps)
                       checked={hasPermission(positionPermission.permissions, stringPermissionKey)}
                       color="primary"
                       name={stringPermissionKey}
+                      disabled={shouldDisable}
                     />
                   }
-                  label={<Typography variant="body2">{STRING_PERMISSIONS[stringPermissionKey]}</Typography>}
+                  disabled={shouldDisable}
+                  label={
+                    <>
+                      <Typography variant="body2" component={StyledLabel}>
+                        {STRING_PERMISSIONS[stringPermissionKey]}
+                        <Tooltip title={HelpTexts[stringPermissionKey]} arrow placement="top">
+                          <StyledHelpOutlineIcon fontSize="small" />
+                        </Tooltip>
+                      </Typography>
+                    </>
+                  }
                 />
               ))}
             </FormGroup>

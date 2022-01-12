@@ -18,6 +18,7 @@ import { TRANSACTION_TYPES } from 'config/constants';
 import { discardChanges } from 'state/position-permissions/actions';
 import { useAppDispatch } from 'state/hooks';
 import AddAddressPermissionModal from 'common/add-address-permission-modal';
+import Card from '@material-ui/core/Card';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;
@@ -28,6 +29,9 @@ const StyledFlexGridItem = styled(Grid)`
   display: flex;
 `;
 
+const StyledCard = styled(Card)`
+  padding: 20px 40px;
+`;
 interface PositionPermissionsContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
@@ -38,6 +42,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
   const hasModifiedPermissions = useHasModifiedPermissions();
   const modifiedPermissions = useModifiedPermissions();
   const web3Service = useWeb3Service();
+  const account = web3Service.getAccount();
   const [shouldShowAddAddressModal, setShouldShowAddAddressModal] = React.useState(false);
   const dispatch = useAppDispatch();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -95,6 +100,12 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
     dispatch(discardChanges());
   };
 
+  const shouldDisable =
+    position.status === 'TERMINATED' ||
+    !account ||
+    account.toLowerCase() !== position.user.toLowerCase() ||
+    !!pendingTransaction;
+
   return (
     <>
       <AddAddressPermissionModal
@@ -102,6 +113,19 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
         onCancel={() => setShouldShowAddAddressModal(false)}
       />
       <Grid container spacing={2} alignItems="stretch">
+        <Grid item xs={12}>
+          <StyledCard variant="outlined">
+            <Typography variant="h6">
+              <FormattedMessage description="Permissions title" defaultMessage="View permissions" />
+            </Typography>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="AddressessPermissions"
+                defaultMessage="This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones"
+              />
+            </Typography>
+          </StyledCard>
+        </Grid>
         <Grid item xs={12}>
           <Typography variant="h4">
             <FormattedMessage description="AddressessPermissions" defaultMessage="Permissions on your position:" />
@@ -123,7 +147,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
           <Grid container>
             {Object.values(permissions).map((permission) => (
               <Grid item xs={4}>
-                <PositionPermission positionPermission={permission} />
+                <PositionPermission positionPermission={permission} shouldDisable={shouldDisable} />
               </Grid>
             ))}
           </Grid>
