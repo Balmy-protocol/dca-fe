@@ -8,6 +8,7 @@ import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
 import createPosition from './create-position/reducer';
 import initializer from './initializer/reducer';
+import positionPermissions from './position-permissions/reducer';
 import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
@@ -35,6 +36,7 @@ const store = configureStore({
     createPosition,
     config,
     tabs,
+    positionPermissions,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient }, serializableCheck: false }).concat([

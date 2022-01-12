@@ -13,6 +13,13 @@ export interface NFTData {
   name: string;
 }
 
+export type Permission = 'INCREASE' | 'REDUCE' | 'WITHDRAW' | 'TERMINATE';
+export interface PositionPermission {
+  id: string;
+  operator: string;
+  permissions: Permission[];
+}
+
 type PositionActions =
   | 'MODIFIED_RATE'
   | 'MODIFIED_DURATION'
@@ -103,6 +110,7 @@ export interface PositionState {
   createdAtBlock: string;
   createdAtTimestamp: string;
   idleSwapped: string;
+  permissions: PositionPermission[];
   transaction: {
     id: string;
     hash: string;

@@ -51,6 +51,11 @@ const getPosition = gql`
         remainingLiquidity
         withdrawn
         idleSwapped
+        permissions {
+          id
+          operator
+          permissions
+        }
       }
       history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc) {
         id

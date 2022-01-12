@@ -49,6 +49,7 @@ import {
   SwapsToPerform,
   FullPosition,
   TransferTypeData,
+  PositionPermission,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { sortTokens, sortTokensByAddress } from 'utils/parsing';
@@ -846,6 +847,24 @@ export default class Web3Service {
         permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE, PERMISSIONS.WITHDRAW],
       },
     ]);
+  }
+
+  async modifyPermissions(position: FullPosition, newPermissions: PositionPermission[]): Promise<TransactionResponse> {
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      this.getSigner()
+    ) as unknown as PermissionManagerContract;
+
+    return permissionManagerInstance.modify(
+      position.id,
+      newPermissions.map(({ permissions, operator }) => ({
+        operator,
+        permissions: permissions.map((permission) => PERMISSIONS[permission]),
+      }))
+    );
   }
 
   async transfer(position: FullPosition, toAddress: string): Promise<TransactionResponse> {

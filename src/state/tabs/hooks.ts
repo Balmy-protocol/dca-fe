@@ -8,3 +8,7 @@ export function useMainTab() {
 export function useOpenClosePositionTab() {
   return useAppSelector((state: RootState) => state.tabs.openClosedPositions);
 }
+
+export function usePositionDetailsTab() {
+  return useAppSelector((state: RootState) => state.tabs.positionDetailsSelector);
+}

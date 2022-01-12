@@ -1,6 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 import { BigNumber } from 'ethers';
-import { TransactionTypesConstant } from 'types';
+import { Permission, TransactionTypesConstant } from 'types';
 import { Oracles } from 'types/contracts';
 import { Duration } from 'luxon';
 
@@ -343,6 +343,7 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
   REMOVE_FUNDS: 'REMOVE_FUNDS',
   RESET_POSITION: 'RESET_POSITION',
   WRAP_ETHER: 'WRAP_ETHER',
+  MODIFY_PERMISSIONS: 'MODIFY_PERMISSIONS',
   NO_OP: 'NO_OP',
 };
 
@@ -628,6 +629,13 @@ export const PERMISSIONS = {
   REDUCE: 1,
   WITHDRAW: 2,
   TERMINATE: 3,
+};
+
+export const STRING_PERMISSIONS: Record<Permission, string> = {
+  INCREASE: 'Increase',
+  REDUCE: 'Reduce',
+  WITHDRAW: 'Withdraw',
+  TERMINATE: 'Terminate',
 };
 
 export const MAX_UINT_32 = 4294967295;

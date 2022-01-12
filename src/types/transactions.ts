@@ -34,12 +34,10 @@ export type TransactionTypes =
   | 'MODIFY_RATE_AND_SWAPS_POSITION'
   | 'TRANSFER_POSITION'
   | 'APPROVE_COMPANION'
+  | 'MODIFY_PERMISSIONS'
   | 'RESET_POSITION';
 
-export interface TransactionTypesConstant {
-  [key: string]: TransactionTypes;
-}
-
+export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
 export interface WithdrawTypeData {
   id: number | string;
 }
@@ -49,6 +47,12 @@ export interface TransferTypeData {
   from: string;
   to: string;
   toAddress: string;
+}
+
+export interface ModifyPermissionsTypeData {
+  id: number | string;
+  from: string;
+  to: string;
 }
 
 export interface ApproveCompanionTypeData {
@@ -128,6 +132,7 @@ export type TransactionPositionTypeDataOptions =
   | NewPositionTypeData
   | ResetPositionTypeData
   | ApproveCompanionTypeData
+  | ModifyPermissionsTypeData
   | TransferTypeData;
 
 export type TransactionTypeDataOptions =
@@ -143,6 +148,7 @@ export type TransactionTypeDataOptions =
   | ResetPositionTypeData
   | NewPairTypeData
   | ApproveCompanionTypeData
+  | ModifyPermissionsTypeData
   | TransferTypeData;
 
 export interface TransactionDetails {
