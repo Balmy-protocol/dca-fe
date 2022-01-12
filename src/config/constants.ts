@@ -292,6 +292,10 @@ export const PERMISSION_MANAGER_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0x09AdE44D2E60fCa2270fF32Af5a189f40D29837b',
 };
 
+export const BETA_MIGRATOR_ADDRESS = {
+  [NETWORKS.optimismKovan.chainId]: '0x2c99528d9628430D791e8e5cF548583a1A6C235b',
+};
+
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-kovan',
   [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-optimism-kovan',
@@ -345,6 +349,7 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
   WRAP_ETHER: 'WRAP_ETHER',
   MODIFY_PERMISSIONS: 'MODIFY_PERMISSIONS',
   NO_OP: 'NO_OP',
+  MIGRATE_POSITION: 'MIGRATE_POSITION',
 };
 
 export const FULL_DEPOSIT_TYPE = 'full_deposit';

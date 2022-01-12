@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish, BytesLike } from 'ethers';
 import { Contract } from '@ethersproject/contracts';
 import { TransactionResponse } from '@ethersproject/providers';
 import { PairIndex } from 'utils/swap';
@@ -38,6 +38,19 @@ export class OracleContract extends Contract {
 
 export class TokenDescriptorContract extends Contract {
   tokenURI: (hubAddress: string, positionId: string) => Promise<string>;
+}
+
+export class BetaMigratorContract extends Contract {
+  migrate: (
+    _positionId: string,
+    _signature: {
+      permissions: { operator: string; permissions: number[] }[];
+      deadline: BigNumber;
+      v: BigNumberish;
+      r: BytesLike;
+      s: BytesLike;
+    }
+  ) => Promise<TransactionResponse>;
 }
 
 export class HubCompanionContract extends Contract {
@@ -94,6 +107,8 @@ export class PermissionManagerContract extends Contract {
   ) => Promise<TransactionResponse>;
 
   ownerOf: (positionId: string) => Promise<string>;
+
+  nonces: (address: string) => Promise<number>;
 }
 export class HubContract extends Contract {
   getNextSwapInfo: (

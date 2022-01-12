@@ -1,4 +1,4 @@
-import { ethers, Signer, BigNumber } from 'ethers';
+import { ethers, Signer, BigNumber, VoidSigner } from 'ethers';
 import { Interface } from '@ethersproject/abi';
 import {
   ExternalProvider,
@@ -7,6 +7,7 @@ import {
   TransactionResponse,
   getNetwork as getStringNetwork,
 } from '@ethersproject/providers';
+import { fromRpcSig } from 'ethereumjs-util';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import { getProviderInfo } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -50,6 +51,7 @@ import {
   FullPosition,
   TransferTypeData,
   PositionPermission,
+  MigratePositionTypeData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { sortTokens, sortTokensByAddress } from 'utils/parsing';
@@ -69,10 +71,12 @@ import HUB_ABI from 'abis/Hub.json';
 import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
 import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
+import BETA_MIGRATOR_ABI from 'abis/BetaMigrator.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import {
+  BETA_MIGRATOR_ADDRESS,
   CHAINLINK_GRAPHQL_URL,
   CHAINLINK_ORACLE_ADDRESS,
   COINGECKO_IDS,
@@ -92,6 +96,7 @@ import {
   UNI_GRAPHQL_URL,
 } from 'config/constants';
 import {
+  BetaMigratorContract,
   ERC20Contract,
   HubCompanionContract,
   HubContract,
@@ -245,6 +250,12 @@ export default class Web3Service {
     const network = await this.getNetwork();
 
     return PERMISSION_MANAGER_ADDRESS[network.chainId] || PERMISSION_MANAGER_ADDRESS[NETWORKS.optimism.chainId];
+  }
+
+  async getBetaMigratorAddress() {
+    const network = await this.getNetwork();
+
+    return BETA_MIGRATOR_ADDRESS[network.chainId] || BETA_MIGRATOR_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getHUBCompanionAddress() {
@@ -797,6 +808,67 @@ export default class Web3Service {
   }
 
   // POSITION METHODS
+  async migratePosition(positionId: string): Promise<TransactionResponse> {
+    const signer = this.getSigner();
+    const currentNetwork = await this.getNetwork();
+    const betaMigratorAddress = await this.getBetaMigratorAddress();
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+
+    const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
+
+    const betaMigratorInstance = new ethers.Contract(
+      betaMigratorAddress,
+      BETA_MIGRATOR_ABI.abi,
+      signer
+    ) as unknown as BetaMigratorContract;
+
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      signer
+    ) as unknown as PermissionManagerContract;
+
+    const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
+
+    const PermissionSet = [
+      { name: 'operator', type: 'address' },
+      { name: 'permissions', type: 'uint8[]' },
+    ];
+
+    const PermissionPermit = [
+      { name: 'permissions', type: 'PermissionSet[]' },
+      { name: 'tokenId', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ];
+
+    const permissions = [{ operator: betaMigratorAddress, permissions: [PERMISSIONS.TERMINATE] }];
+
+    // eslint-disable-next-line no-underscore-dangle
+    const rawSignature = await (signer as VoidSigner)._signTypedData(
+      {
+        name: 'Mean Finance DCA',
+        version: '1',
+        chainId: currentNetwork.chainId,
+        verifyingContract: permissionManagerAddress,
+      },
+      { PermissionSet, PermissionPermit },
+      { tokenId: positionId, permissions, nonce: nextNonce, deadline: MAX_UINT_256 }
+    );
+
+    const { v, r, s } = fromRpcSig(rawSignature);
+
+    const generatedSignature = {
+      permissions,
+      deadline: MAX_UINT_256,
+      v,
+      r,
+      s,
+    };
+
+    return betaMigratorInstance.migrate(positionId, generatedSignature);
+  }
+
   async companionIsApproved(position: FullPosition): Promise<boolean> {
     const permissionManagerAddress = await this.getPermissionManagerAddress();
     const companionAddress = await this.getHUBCompanionAddress();
@@ -1311,6 +1383,15 @@ export default class Web3Service {
       }
       case TRANSACTION_TYPES.TERMINATE_POSITION: {
         const terminatePositionTypeData = transaction.typeData as TerminatePositionTypeData;
+        this.pastPositions[terminatePositionTypeData.id] = {
+          ...this.currentPositions[terminatePositionTypeData.id],
+          pendingTransaction: '',
+        };
+        delete this.currentPositions[terminatePositionTypeData.id];
+        break;
+      }
+      case TRANSACTION_TYPES.MIGRATE_POSITION: {
+        const terminatePositionTypeData = transaction.typeData as MigratePositionTypeData;
         this.pastPositions[terminatePositionTypeData.id] = {
           ...this.currentPositions[terminatePositionTypeData.id],
           pendingTransaction: '',

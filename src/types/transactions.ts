@@ -35,9 +35,11 @@ export type TransactionTypes =
   | 'TRANSFER_POSITION'
   | 'APPROVE_COMPANION'
   | 'MODIFY_PERMISSIONS'
+  | 'MIGRATE_POSITION'
   | 'RESET_POSITION';
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
+
 export interface WithdrawTypeData {
   id: number | string;
 }
@@ -50,6 +52,11 @@ export interface TransferTypeData {
 }
 
 export interface ModifyPermissionsTypeData {
+  id: number | string;
+  from: string;
+  to: string;
+}
+export interface MigratePositionTypeData {
   id: number | string;
   from: string;
   to: string;
@@ -133,6 +140,7 @@ export type TransactionPositionTypeDataOptions =
   | ResetPositionTypeData
   | ApproveCompanionTypeData
   | ModifyPermissionsTypeData
+  | MigratePositionTypeData
   | TransferTypeData;
 
 export type TransactionTypeDataOptions =
@@ -149,6 +157,7 @@ export type TransactionTypeDataOptions =
   | NewPairTypeData
   | ApproveCompanionTypeData
   | ModifyPermissionsTypeData
+  | MigratePositionTypeData
   | TransferTypeData;
 
 export interface TransactionDetails {

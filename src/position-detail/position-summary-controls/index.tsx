@@ -11,18 +11,24 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { FullPosition } from 'types';
 import { BigNumber } from 'ethers';
 import useWeb3Service from 'hooks/useWeb3Service';
+import Grid from '@material-ui/core/Grid';
 
 const PositionControlsContainer = styled.div`
   display: flex;
   align-self: flex-end;
 `;
 
+const StyledGrid = styled(Grid)`
+  display: flex;
+  justify-content: flex-end;
+`;
 interface PositionSummaryControlsProps {
   onWithdraw: () => void;
   onTerminate: () => void;
   onModifyRate: () => void;
   onTransfer: () => void;
   onViewNFT: () => void;
+  onMigratePosition: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
   shouldDisable: boolean;
@@ -37,6 +43,7 @@ const PositionSummaryControls = ({
   position,
   onViewNFT,
   shouldDisable,
+  onMigratePosition,
 }: PositionSummaryControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
@@ -47,47 +54,58 @@ const PositionSummaryControls = ({
 
   return (
     <PositionControlsContainer>
-      <ButtonGroup>
-        {isPending ? (
-          <Button variant="contained" color="pending" size="large">
-            <Link
-              href={buildEtherscanTransaction(pendingTransaction as string, currentNetwork.chainId)}
-              target="_blank"
-              rel="noreferrer"
-              underline="none"
-              color="inherit"
-            >
-              <Typography variant="body2" component="span">
-                <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-              </Typography>
-              <CallMadeIcon style={{ fontSize: '1rem' }} />
-            </Link>
-          </Button>
-        ) : (
-          [
-            <Button
-              variant="contained"
-              color="white"
-              onClick={onWithdraw}
-              disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || shouldDisable}
-            >
-              <FormattedMessage description="withdraw swapped" defaultMessage="Withdraw swapped" />
-            </Button>,
-            <Button variant="contained" color="white" onClick={onViewNFT} disabled={shouldDisable}>
-              <FormattedMessage description="view nft" defaultMessage="View NFT" />
-            </Button>,
-            <Button variant="contained" color="white" onClick={onModifyRate} disabled={shouldDisable}>
-              <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
-            </Button>,
-            // <Button variant="contained" color="white" onClick={onTransfer}>
-            //   <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-            // </Button>,
-            <Button variant="outlined" color="error" onClick={onTerminate} disabled={shouldDisable}>
-              <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
-            </Button>,
-          ]
+      <Grid container spacing={2}>
+        {BigNumber.from(position.current.remainingSwaps).gt(BigNumber.from(0)) && (
+          <StyledGrid item xs={12}>
+            <Button variant="contained" color="primary" onClick={onMigratePosition}>
+              <FormattedMessage description="migrate position" defaultMessage="Migrate position" />
+            </Button>
+          </StyledGrid>
         )}
-      </ButtonGroup>
+        <StyledGrid item xs={12}>
+          <ButtonGroup>
+            {isPending ? (
+              <Button variant="contained" color="pending" size="large">
+                <Link
+                  href={buildEtherscanTransaction(pendingTransaction as string, currentNetwork.chainId)}
+                  target="_blank"
+                  rel="noreferrer"
+                  underline="none"
+                  color="inherit"
+                >
+                  <Typography variant="body2" component="span">
+                    <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                  </Typography>
+                  <CallMadeIcon style={{ fontSize: '1rem' }} />
+                </Link>
+              </Button>
+            ) : (
+              [
+                <Button
+                  variant="contained"
+                  color="white"
+                  onClick={onWithdraw}
+                  disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || shouldDisable}
+                >
+                  <FormattedMessage description="withdraw swapped" defaultMessage="Withdraw swapped" />
+                </Button>,
+                <Button variant="contained" color="white" onClick={onViewNFT} disabled={shouldDisable}>
+                  <FormattedMessage description="view nft" defaultMessage="View NFT" />
+                </Button>,
+                <Button variant="contained" color="white" onClick={onModifyRate} disabled={shouldDisable}>
+                  <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
+                </Button>,
+                // <Button variant="contained" color="white" onClick={onTransfer}>
+                //   <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
+                // </Button>,
+                <Button variant="outlined" color="error" onClick={onTerminate} disabled={shouldDisable}>
+                  <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
+                </Button>,
+              ]
+            )}
+          </ButtonGroup>
+        </StyledGrid>
+      </Grid>
     </PositionControlsContainer>
   );
 };
