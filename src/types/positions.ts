@@ -87,6 +87,7 @@ export interface ActionState {
   oldRemainingSwaps: string;
   swapped: string;
   withdrawn: string;
+  permissions: PositionPermission[];
   ratePerUnitBToAWithFee: string;
   ratePerUnitAToBWithFee: string;
   createdAtBlock: string;

@@ -16,7 +16,7 @@ import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import { ActionState, FullPosition } from 'types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
-import { POSITION_ACTIONS, STABLE_COINS } from 'config/constants';
+import { POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS } from 'config/constants';
 import { getFrequencyLabel } from 'utils/parsing';
 import { buildEtherscanAddress } from 'utils/etherscan';
 import Link from '@material-ui/core/Link';
@@ -312,20 +312,29 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
   toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
-const buildPermissionsModifiedItem = (positionState: ActionState) => ({
+const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
   icon: <FingerprintIcon />,
   content: (
     <>
       <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionPermissionsModified"
-            defaultMessage="Added new permissions to position"
-            values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-            }}
-          />
-        </Typography>
+        {positionState.permissions.map((permission) => (
+          <Typography variant="body1">
+            <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
+              {permission.operator}
+              <CallMadeIcon style={{ fontSize: '1rem' }} />
+            </StyledLink>
+            <FormattedMessage description="positionPermissionsModified only" defaultMessage="will only be able to" />
+            {permission.permissions.map(
+              (permissionString, index) =>
+                ` ${
+                  index === permission.permissions.length - 1 && permission.permissions.length > 1 ? 'and ' : ''
+                }${STRING_PERMISSIONS[permissionString].toLowerCase()}${
+                  index !== permission.permissions.length - 1 && index !== permission.permissions.length - 2 ? ',' : ''
+                } `
+            )}
+            <FormattedMessage description="positionPermissionsModified your position" defaultMessage="your position" />
+          </Typography>
+        ))}
       </Grid>
       <StyledRightGrid item xs={12}>
         <Tooltip
