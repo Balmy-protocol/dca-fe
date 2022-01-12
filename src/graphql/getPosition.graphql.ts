@@ -72,6 +72,11 @@ const getPosition = gql`
         createdAtTimestamp
         ratePerUnitAToBWithFee
         ratePerUnitBToAWithFee
+        permissions {
+          operator
+          id
+          permissions
+        }
         transaction {
           id
           hash

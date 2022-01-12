@@ -312,7 +312,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
   toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
-const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
+const buildPermissionsModifiedItem = (positionState: ActionState) => ({
   icon: <FingerprintIcon />,
   content: (
     <>
