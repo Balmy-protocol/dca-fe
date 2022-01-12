@@ -17,6 +17,7 @@ import {
   TransferTypeData,
   ApproveCompanionTypeData,
   ModifyPermissionsTypeData,
+  MigratePositionTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -130,6 +131,11 @@ function useBuildTransactionDetail() {
         case TRANSACTION_TYPES.APPROVE_COMPANION: {
           const approveCompanionTypeData = tx.typeData as ApproveCompanionTypeData;
           message = `Approving Hub Companion to modify your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position`;
+          break;
+        }
+        case TRANSACTION_TYPES.MIGRATE_POSITION: {
+          const approveCompanionTypeData = tx.typeData as MigratePositionTypeData;
+          message = `Migrate your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position`;
           break;
         }
         case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {

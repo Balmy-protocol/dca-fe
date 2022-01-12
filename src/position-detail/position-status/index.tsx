@@ -7,9 +7,9 @@ import { getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 import useIsStale, { STALE } from 'hooks/useIsStale';
 
-const PositionStatusContainer = styled.div`
+const PositionStatusContainer = styled.div<{ alignedEnd?: boolean }>`
   display: flex;
-  align-self: flex-start;
+  align-self: ${(props) => (props.alignedEnd ? 'flex-end' : 'flex-start')};
 `;
 
 const StyledFreqLeft = styled.div`
@@ -44,9 +44,10 @@ const StyledNoFunds = styled.div`
 interface PositionStatusProps {
   position: FullPosition;
   pair?: GetPairSwapsData;
+  alignedEnd?: boolean;
 }
 
-const PositionStatus = ({ position, pair }: PositionStatusProps) => {
+const PositionStatus = ({ position, pair, alignedEnd }: PositionStatusProps) => {
   if (!pair) return null;
   const lastExecutedAt = (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || '0';
   const [calculateStale, isLoadingStale] = useIsStale(pair);
@@ -63,7 +64,7 @@ const PositionStatus = ({ position, pair }: PositionStatusProps) => {
 
   const isTerminated = position.status === 'TERMINATED';
   return (
-    <PositionStatusContainer>
+    <PositionStatusContainer alignedEnd={alignedEnd}>
       {/* eslint-disable-next-line no-nested-ternary */}
       {isTerminated ? (
         <StyledNoFunds>

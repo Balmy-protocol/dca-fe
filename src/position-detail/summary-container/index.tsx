@@ -23,6 +23,7 @@ import { useTransactionAdder } from 'state/transactions/hooks';
 import WithdrawModal from 'common/withdraw-modal';
 import TerminateModal from 'common/terminate-modal';
 import TransferPositionModal from 'common/transfer-position-modal';
+import MigratePositionModal from 'common/migrate-position-modal';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -64,6 +65,7 @@ const PositionSummaryContainer = ({
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
+  const [showMigrateModal, setShowMigrateModal] = React.useState(false);
   const [showTransferModal, setShowTransferModal] = React.useState(false);
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const web3Service = useWeb3Service();
@@ -155,16 +157,22 @@ const PositionSummaryContainer = ({
         position={position}
         onCancel={() => setShowTransferModal(false)}
       />
+      <MigratePositionModal
+        open={showMigrateModal}
+        position={fullPositionToMappedPosition(position)}
+        onCancel={() => setShowMigrateModal(false)}
+      />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <Grid container spacing={2} alignItems="stretch">
         <StyledControlsWrapper item xs={12}>
-          <PositionStatus position={position} pair={swapsData} />
+          <PositionStatus position={position} pair={swapsData} alignedEnd />
           {position.status !== 'TERMINATED' && !positionTransfered && (
             <PositionControls
               onWithdraw={() => setShowWithdrawModal(true)}
               onTerminate={() => setShowTerminateModal(true)}
               onModifyRate={() => setActionToShow('modifyRate')}
               onTransfer={() => setShowTransferModal(true)}
+              onMigratePosition={() => setShowMigrateModal(true)}
               onViewNFT={handleViewNFT}
               position={position}
               pendingTransaction={pendingTransaction}

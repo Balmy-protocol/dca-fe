@@ -17,6 +17,7 @@ import {
   TransferTypeData,
   ApproveCompanionTypeData,
   ModifyPermissionsTypeData,
+  MigratePositionTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -140,6 +141,11 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.TRANSFER_POSITION: {
           const transferedTypeData = tx.typeData as TransferTypeData;
           message = `Transfering your ${transferedTypeData.from}:${transferedTypeData.to} position has to ${transferedTypeData.toAddress}`;
+          break;
+        }
+        case TRANSACTION_TYPES.MIGRATE_POSITION: {
+          const transferedTypeData = tx.typeData as MigratePositionTypeData;
+          message = `Migrating your ${transferedTypeData.from}:${transferedTypeData.to} position`;
           break;
         }
         case TRANSACTION_TYPES.APPROVE_COMPANION: {

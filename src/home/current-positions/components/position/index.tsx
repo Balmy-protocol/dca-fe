@@ -29,6 +29,7 @@ import Link from '@material-ui/core/Link';
 import useBalance from 'hooks/useBalance';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { STALE } from 'hooks/useIsStale';
+import MigratePositionModal from 'common/migrate-position-modal';
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -170,6 +171,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
   } = position;
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [shouldShowAddToPosition, setShouldShowAddToPosition] = React.useState(false);
+  const [shouldShowMigrate, setShouldShowMigrate] = React.useState(false);
   const [shouldShowReset, setShouldShowReset] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const availablePairs = useAvailablePairs();
@@ -332,7 +334,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
           <Typography variant="body1">
             <FormattedMessage
               description="Modifying rate for position"
-              defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural}"
+              defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequencyTypePlural}"
               values={{
                 from: position.from.symbol,
                 to: position.to.symbol,
@@ -355,7 +357,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
         content: (
           <FormattedMessage
             description="success modify rate for position"
-            defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
@@ -402,6 +404,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
         balance={balance || BigNumber.from(0)}
         onResetPosition={handleResetPosition}
       />
+      <MigratePositionModal onCancel={() => setShouldShowMigrate(false)} open={shouldShowMigrate} position={position} />
       <StyledCardContent>
         <Grid container>
           <Grid item xs={12} sm={9} md={10}>
@@ -507,6 +510,18 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
                   </Typography>
                 )}
               </StyledCardFooterButton>
+              {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
+                <StyledCardFooterButton
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => setShouldShowMigrate(true)}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
             </StyledCallToActionContainer>
           </Grid>
           <Grid item xs={12}>
