@@ -144,7 +144,11 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
   prices = React.useMemo(() => {
     const orderedSwaps = orderBy(position.history, ['createdAtTimestamp'], ['asc']);
     const mappedSwapData = orderedSwaps
-      .filter((positionState) => positionState.action !== POSITION_ACTIONS.TRANSFERED)
+      .filter(
+        (positionState) =>
+          positionState.action !== POSITION_ACTIONS.TRANSFERED &&
+          positionState.action !== POSITION_ACTIONS.PERMISSIONS_MODIFIED
+      )
       .reduce(
         (acc, positionState) => [
           ...acc,

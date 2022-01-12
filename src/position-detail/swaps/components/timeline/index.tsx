@@ -22,6 +22,7 @@ import { buildEtherscanAddress } from 'utils/etherscan';
 import Link from '@material-ui/core/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
+import FingerprintIcon from '@material-ui/icons/Fingerprint';
 
 const StyledCard = styled(Card)``;
 
@@ -311,6 +312,40 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
   toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
+const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
+  icon: <FingerprintIcon />,
+  content: (
+    <>
+      <Grid item xs={12}>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="positionPermissionsModified"
+            defaultMessage="Added new permissions to position"
+            values={{
+              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+            }}
+          />
+        </Typography>
+      </Grid>
+      <StyledRightGrid item xs={12}>
+        <Tooltip
+          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
+            DateTime.DATETIME_FULL
+          )}
+          arrow
+          placement="top"
+        >
+          <Typography variant="body2" component="span">
+            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
+          </Typography>
+        </Tooltip>
+      </StyledRightGrid>
+    </>
+  ),
+  title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position permissions modified" />,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
+});
+
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
   content: (
@@ -516,6 +551,7 @@ const MESSAGE_MAP = {
   [POSITION_ACTIONS.WITHDREW]: buildWithdrawnItem,
   [POSITION_ACTIONS.TERMINATED]: buildTerminatedItem,
   [POSITION_ACTIONS.TRANSFERED]: buildTransferedItem,
+  [POSITION_ACTIONS.PERMISSIONS_MODIFIED]: buildPermissionsModifiedItem,
 };
 
 const FILTERS = {
@@ -528,6 +564,7 @@ const FILTERS = {
     POSITION_ACTIONS.WITHDREW,
     POSITION_ACTIONS.TRANSFERED,
     POSITION_ACTIONS.TERMINATED,
+    POSITION_ACTIONS.PERMISSIONS_MODIFIED,
   ],
   1: [POSITION_ACTIONS.SWAPPED],
   2: [
@@ -537,6 +574,7 @@ const FILTERS = {
     POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
     POSITION_ACTIONS.TRANSFERED,
     POSITION_ACTIONS.TERMINATED,
+    POSITION_ACTIONS.PERMISSIONS_MODIFIED,
   ],
   3: [POSITION_ACTIONS.WITHDREW],
 };
