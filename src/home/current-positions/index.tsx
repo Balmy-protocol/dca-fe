@@ -53,6 +53,7 @@ const CurrentPositions = ({ web3Service }: CurrentPositionsProps) => {
             open={showWithdrawModal}
             position={selectedPosition}
             onCancel={() => setShowWithdrawModal(false)}
+            useProtocolToken={false}
           />
           <TerminateModal
             open={showTerminateModal}

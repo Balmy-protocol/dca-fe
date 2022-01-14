@@ -7,7 +7,6 @@ import {
   TransactionResponse,
   getNetwork as getStringNetwork,
 } from '@ethersproject/providers';
-import { fromRpcSig } from 'ethereumjs-util';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import { getProviderInfo } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -105,6 +104,7 @@ import {
   PermissionManagerContract,
 } from 'types/contracts';
 import { axiosClient } from 'state';
+import { fromRpcSig } from 'ethereumjs-util';
 import GraphqlService from './graphql';
 
 export default class Web3Service {
@@ -875,6 +875,60 @@ export default class Web3Service {
     return betaMigratorInstance.migrate(positionId, generatedSignature);
   }
 
+  async companionHasWithdraw(positionId: string): Promise<boolean> {
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+    const companionAddress = await this.getHUBCompanionAddress();
+
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      this.getSigner()
+    ) as unknown as PermissionManagerContract;
+
+    try {
+      await permissionManagerInstance.ownerOf(positionId);
+    } catch (e) {
+      // hack for when the subgraph has not updated yet but the position has been terminated
+      const error = e as { data?: { message?: string } };
+      if (
+        error &&
+        error.data &&
+        error.data.message &&
+        error.data.message === 'execution reverted: ERC721: owner query for nonexistent token'
+      )
+        return true;
+    }
+
+    return permissionManagerInstance.hasPermission(positionId, companionAddress, PERMISSIONS.WITHDRAW);
+  }
+
+  async companionHasTerminate(positionId: string): Promise<boolean> {
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+    const companionAddress = await this.getHUBCompanionAddress();
+
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      this.getSigner()
+    ) as unknown as PermissionManagerContract;
+
+    try {
+      await permissionManagerInstance.ownerOf(positionId);
+    } catch (e) {
+      // hack for when the subgraph has not updated yet but the position has been terminated
+      const error = e as { data?: { message?: string } };
+      if (
+        error &&
+        error.data &&
+        error.data.message &&
+        error.data.message === 'execution reverted: ERC721: owner query for nonexistent token'
+      )
+        return true;
+    }
+
+    return permissionManagerInstance.hasPermission(positionId, companionAddress, PERMISSIONS.TERMINATE);
+  }
+
   async companionIsApproved(position: FullPosition): Promise<boolean> {
     const permissionManagerAddress = await this.getPermissionManagerAddress();
     const companionAddress = await this.getHUBCompanionAddress();
@@ -1015,47 +1069,207 @@ export default class Web3Service {
     return hubInstance.deposit(from.address, to.address, weiValue, amountOfSwaps, swapInterval, this.account, []);
   }
 
-  async withdraw(position: Position): Promise<TransactionResponse> {
-    if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
-      const companionAddress = await this.getHUBCompanionAddress();
+  async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
+    const currentNetwork = await this.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const signer = this.getSigner();
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+    const companionAddress = await this.getHUBCompanionAddress();
 
-      const hubCompanionInstance = new ethers.Contract(
-        companionAddress,
-        HUB_COMPANION_ABI.abi,
-        this.getSigner()
-      ) as unknown as HubCompanionContract;
+    if (
+      position.to.address !== PROTOCOL_TOKEN_ADDRESS &&
+      position.to.address !== wrappedProtocolToken.address &&
+      useProtocolToken
+    ) {
+      throw new Error('Should not call withdraw without it being protocol token');
+    }
 
+    if (!useProtocolToken) {
+      const hubAddress = await this.getHUBAddress();
+
+      const hubInstance = new ethers.Contract(hubAddress, HUB_ABI.abi, signer) as unknown as HubContract;
+
+      return hubInstance.withdrawSwapped(position.id, this.account);
+    }
+
+    const hubCompanionInstance = new ethers.Contract(
+      companionAddress,
+      HUB_COMPANION_ABI.abi,
+      this.getSigner()
+    ) as unknown as HubCompanionContract;
+
+    const companionHasPermission = await this.companionHasWithdraw(position.id);
+
+    if (companionHasPermission) {
       return hubCompanionInstance.withdrawSwappedUsingProtocolToken(position.id, this.account);
     }
 
-    const hubAddress = await this.getHUBAddress();
+    const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
 
-    const hubInstance = new ethers.Contract(hubAddress, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      signer
+    ) as unknown as PermissionManagerContract;
 
-    return hubInstance.withdrawSwapped(position.id, this.account);
+    const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
+
+    const PermissionSet = [
+      { name: 'operator', type: 'address' },
+      { name: 'permissions', type: 'uint8[]' },
+    ];
+
+    const PermissionPermit = [
+      { name: 'permissions', type: 'PermissionSet[]' },
+      { name: 'tokenId', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ];
+
+    const permissions = [{ operator: companionAddress, permissions: [PERMISSIONS.WITHDRAW] }];
+
+    // eslint-disable-next-line no-underscore-dangle
+    const rawSignature = await (signer as VoidSigner)._signTypedData(
+      {
+        name: 'Mean Finance DCA',
+        version: '1',
+        chainId: currentNetwork.chainId,
+        verifyingContract: permissionManagerAddress,
+      },
+      { PermissionSet, PermissionPermit },
+      { tokenId: position.id, permissions, nonce: nextNonce, deadline: MAX_UINT_256 }
+    );
+
+    const { v, r, s } = fromRpcSig(rawSignature);
+
+    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
+      permissions,
+      position.id,
+      MAX_UINT_256,
+      v,
+      r,
+      s
+    );
+
+    const { data: withdrawData } = await hubCompanionInstance.populateTransaction.withdrawSwappedUsingProtocolToken(
+      position.id,
+      this.account
+    );
+
+    if (!permissionData || !withdrawData) {
+      throw new Error('Permission or withdraw data cannot be undefined');
+    }
+
+    return hubCompanionInstance.multicall([permissionData, withdrawData]);
   }
 
-  async terminate(position: Position): Promise<TransactionResponse> {
-    if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      const companionAddress = await this.getHUBCompanionAddress();
+  async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
+    const currentNetwork = await this.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const signer = this.getSigner();
+    const permissionManagerAddress = await this.getPermissionManagerAddress();
+    const companionAddress = await this.getHUBCompanionAddress();
 
-      const hubCompanionInstance = new ethers.Contract(
-        companionAddress,
-        HUB_COMPANION_ABI.abi,
-        this.getSigner()
-      ) as unknown as HubCompanionContract;
+    if (
+      position.from.address !== wrappedProtocolToken.address &&
+      position.from.address !== PROTOCOL_TOKEN_ADDRESS &&
+      position.to.address !== PROTOCOL_TOKEN_ADDRESS &&
+      position.to.address !== wrappedProtocolToken.address &&
+      useProtocolToken
+    ) {
+      throw new Error('Should not call terminate without it being protocol token');
+    }
 
+    if (!useProtocolToken) {
+      const hubAddress = await this.getHUBAddress();
+
+      const hubInstance = new ethers.Contract(hubAddress, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
+
+      return hubInstance.terminate(position.id, this.account, this.account);
+    }
+
+    const hubCompanionInstance = new ethers.Contract(
+      companionAddress,
+      HUB_COMPANION_ABI.abi,
+      this.getSigner()
+    ) as unknown as HubCompanionContract;
+
+    const companionHasPermission = await this.companionHasTerminate(position.id);
+
+    if (companionHasPermission) {
       if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
         return hubCompanionInstance.terminateUsingProtocolTokenAsTo(position.id, this.account, this.account);
       }
       return hubCompanionInstance.terminateUsingProtocolTokenAsFrom(position.id, this.account, this.account);
     }
 
-    const hubAddress = await this.getHUBAddress();
+    const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
 
-    const hubInstance = new ethers.Contract(hubAddress, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      signer
+    ) as unknown as PermissionManagerContract;
 
-    return hubInstance.terminate(position.id, this.account, this.account);
+    const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
+
+    const PermissionSet = [
+      { name: 'operator', type: 'address' },
+      { name: 'permissions', type: 'uint8[]' },
+    ];
+
+    const PermissionPermit = [
+      { name: 'permissions', type: 'PermissionSet[]' },
+      { name: 'tokenId', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ];
+
+    const permissions = [{ operator: companionAddress, permissions: [PERMISSIONS.TERMINATE] }];
+
+    // eslint-disable-next-line no-underscore-dangle
+    const rawSignature = await (signer as VoidSigner)._signTypedData(
+      {
+        name: 'Mean Finance DCA',
+        version: '1',
+        chainId: currentNetwork.chainId,
+        verifyingContract: permissionManagerAddress,
+      },
+      { PermissionSet, PermissionPermit },
+      { tokenId: position.id, permissions, nonce: nextNonce, deadline: MAX_UINT_256 }
+    );
+
+    const { v, r, s } = fromRpcSig(rawSignature);
+
+    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
+      permissions,
+      position.id,
+      MAX_UINT_256,
+      v,
+      r,
+      s
+    );
+
+    let terminateData;
+    if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
+      ({ data: terminateData } = await hubCompanionInstance.populateTransaction.terminateUsingProtocolTokenAsTo(
+        position.id,
+        this.account,
+        this.account
+      ));
+    } else {
+      ({ data: terminateData } = await hubCompanionInstance.populateTransaction.terminateUsingProtocolTokenAsFrom(
+        position.id,
+        this.account,
+        this.account
+      ));
+    }
+
+    if (!permissionData || !terminateData) {
+      throw new Error('Permission or withdraw data cannot be undefined');
+    }
+
+    return hubCompanionInstance.multicall([permissionData, terminateData]);
   }
 
   async addFunds(position: Position, newDeposit: string): Promise<TransactionResponse> {

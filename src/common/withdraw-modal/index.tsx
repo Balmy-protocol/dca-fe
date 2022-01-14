@@ -13,6 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import { makeStyles } from '@material-ui/core/styles';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 const useStyles = makeStyles({
   paper: {
@@ -43,14 +45,22 @@ interface WithdrawModalProps {
   position: Position;
   onCancel: () => void;
   open: boolean;
+  useProtocolToken: boolean;
 }
 
-const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
+const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawModalProps) => {
   const classes = useStyles();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
+  const currentNetwork = useCurrentNetwork();
   const { web3Service } = React.useContext(WalletContext);
-
+  const protocolToken = getProtocolToken(currentNetwork.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const addTransaction = useTransactionAdder();
+  const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
+  const toSymbol =
+    position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address
+      ? protocolOrWrappedToken
+      : position.to.symbol;
 
   const handleWithdraw = async () => {
     try {
@@ -66,17 +76,18 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
           </Typography>
         ),
       });
-      const result = await web3Service.withdraw(position);
+      const result = await web3Service.withdraw(position, useProtocolToken);
       addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,
         content: (
           <FormattedMessage
             description="withdraw from success"
-            defaultMessage="Your withdrawal of {to} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Your withdrawal of {toSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
+              toSymbol,
             }}
           />
         ),
@@ -94,16 +105,16 @@ const WithdrawModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         <Typography variant="h6">
           <FormattedMessage
             description="withdraw title"
-            defaultMessage="Withdraw {to} from {from}/{to} position"
-            values={{ from: position.from.symbol, to: position.to.symbol }}
+            defaultMessage="Withdraw {toSymbol} from {from}/{to} position"
+            values={{ from: position.from.symbol, to: position.to.symbol, toSymbol }}
           />
         </Typography>
         <Typography variant="body1">
           <FormattedMessage
             description="Withdraw warning"
-            defaultMessage="Are you sure you want to withdraw {ammount} {from}?"
+            defaultMessage="Are you sure you want to withdraw {ammount} {to}?"
             values={{
-              from: position.to.symbol,
+              to: toSymbol,
               ammount: formatUnits(position.toWithdraw, position.to.decimals),
             }}
           />
