@@ -24,6 +24,7 @@ import WithdrawModal from 'common/withdraw-modal';
 import TerminateModal from 'common/terminate-modal';
 import TransferPositionModal from 'common/transfer-position-modal';
 import MigratePositionModal from 'common/migrate-position-modal';
+import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -71,6 +72,10 @@ const PositionSummaryContainer = ({
   const web3Service = useWeb3Service();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
+
+  const [withdrawWithProtocolToken, setWithdrawWithProtocolToken] = React.useState(
+    !!position && position.to.address === PROTOCOL_TOKEN_ADDRESS
+  );
 
   const handleViewNFT = async () => {
     if (!position) return;
@@ -146,6 +151,7 @@ const PositionSummaryContainer = ({
         open={showWithdrawModal}
         position={fullPositionToMappedPosition(position)}
         onCancel={() => setShowWithdrawModal(false)}
+        useProtocolToken={withdrawWithProtocolToken}
       />
       <TerminateModal
         open={showTerminateModal}
@@ -168,7 +174,10 @@ const PositionSummaryContainer = ({
           <PositionStatus position={position} pair={swapsData} alignedEnd />
           {position.status !== 'TERMINATED' && !positionTransfered && (
             <PositionControls
-              onWithdraw={() => setShowWithdrawModal(true)}
+              onWithdraw={(useProtocolToken: boolean) => {
+                setShowWithdrawModal(true);
+                setWithdrawWithProtocolToken(useProtocolToken);
+              }}
               onTerminate={() => setShowTerminateModal(true)}
               onModifyRate={() => setActionToShow('modifyRate')}
               onTransfer={() => setShowTransferModal(true)}

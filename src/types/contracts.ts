@@ -92,6 +92,8 @@ export class HubCompanionContract extends Contract {
     newSwaps: BigNumber,
     recipient: string
   ) => Promise<TransactionResponse>;
+
+  multicall: (data: string[]) => Promise<TransactionResponse>;
 }
 
 export class PermissionManagerContract extends Contract {
