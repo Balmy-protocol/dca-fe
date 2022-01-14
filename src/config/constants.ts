@@ -257,38 +257,38 @@ export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId];
 
 export const HUB_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567',
-  [NETWORKS.optimismKovan.chainId]: '0x19BB8c1130649BD2a114c2f2d4C3a6AFa3Bd4944',
+  [NETWORKS.optimismKovan.chainId]: '0x2aCb69a8f2Ab6b496D482073eB70573A345a3272',
   [NETWORKS.optimism.chainId]: '0x24F85583FAa9F8BD0B8Aa7B1D1f4f53F0F450038',
 };
 export const ORACLE_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0xF8736BB2a48bB5D9dF88b393eC3053a52a440edE',
-  [NETWORKS.optimismKovan.chainId]: '0x4aFd06674E0701F3bfd6f026e4Ec785f5eC3E29f',
+  [NETWORKS.optimismKovan.chainId]: '0xbd216FC42aD3B937278665f3659Dce318f3F3f70',
   [NETWORKS.optimism.chainId]: '0x579280AcF998A031922421a2f6C62Ba609Be44F7',
 };
 export const COMPANION_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0x50ed158bfed47ee565f31404c98a9f9ac0fa0cac',
-  [NETWORKS.optimismKovan.chainId]: '0x2e2e175406109c2E5Df16a59f615Ee6E7CA87b5c',
+  [NETWORKS.optimismKovan.chainId]: '0xC3D6c3395F0C9432E875e50d07B07dA81A636192',
   [NETWORKS.optimism.chainId]: '0x1eD2957bA1F14c17E01424DD93a258dd2E04cAAC',
 };
 export const TOKEN_DESCRIPTOR_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0x0aB7CF8A552Fa296632e280213c392473D6d0933',
-  [NETWORKS.optimismKovan.chainId]: '0x579280AcF998A031922421a2f6C62Ba609Be44F7',
+  [NETWORKS.optimismKovan.chainId]: '0x4f8cc084436Eb5de497DD812871b316ca04ADC57',
   [NETWORKS.optimism.chainId]: '0x0100a1c3020fE97051cBB18636C0f91abCc603cE',
 };
 export const CHAINLINK_ORACLE_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0x5aB88a77f609B47AD752dca6d8537746861A5839',
-  [NETWORKS.optimismKovan.chainId]: '0xC9A965C884c43e849a46A3df4Bb28e036f6C0dB5',
+  [NETWORKS.optimismKovan.chainId]: '0x4384f6e940C9bF5e56df63064e38CB9c5Af4A8Bc',
   [NETWORKS.optimism.chainId]: '0x8847480C34C7DceEf73647c57766f28c3A07596B',
 };
 export const UNISWAP_ORACLE_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0xF929d119a2c108928b20346dAd609751ddc0ad18',
-  [NETWORKS.optimismKovan.chainId]: '0x8847480C34C7DceEf73647c57766f28c3A07596B',
+  [NETWORKS.optimismKovan.chainId]: '0x3325AE99D0A492521Ef5671181C0c30a352D61A3',
   [NETWORKS.optimism.chainId]: '0x4aFd06674E0701F3bfd6f026e4Ec785f5eC3E29f',
 };
 
 export const PERMISSION_MANAGER_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0xbB3E83D7C2fD7c1D07bb2dCCe435728Da2e42463',
-  [NETWORKS.optimismKovan.chainId]: '0x0100a1c3020fE97051cBB18636C0f91abCc603cE',
+  [NETWORKS.optimismKovan.chainId]: '0x3dbC70b2c825329d13A33991028426cfF582f9B3',
   [NETWORKS.optimism.chainId]: '0x09AdE44D2E60fCa2270fF32Af5a189f40D29837b',
 };
 
@@ -298,7 +298,7 @@ export const BETA_MIGRATOR_ADDRESS = {
 
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-kovan',
-  [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-optimism-kovan',
+  [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-optimism-kovan-beta',
   [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism',
 };
 

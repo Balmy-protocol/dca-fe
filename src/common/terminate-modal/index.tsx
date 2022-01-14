@@ -13,6 +13,11 @@ import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import { makeStyles } from '@material-ui/core/styles';
+import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 
 const useStyles = makeStyles({
   paper: {
@@ -27,7 +32,7 @@ const StyledDialogContent = styled(DialogContent)`
   align-items: center;
   justify-content: center;
   text-align: center;
-  *:not(:last-child) {
+  & > *:not(:last-child) {
     margin-bottom: 10px;
   }
 `;
@@ -50,10 +55,25 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
   const addTransaction = useTransactionAdder();
+  const currentNetwork = useCurrentNetwork();
+  const protocolToken = getProtocolToken(currentNetwork.chainId);
+  const [useProtocolToken, setUseProtocolToken] = React.useState(false);
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const hasProtocolToken =
+    position.from.address === protocolToken.address || position.to.address === protocolToken.address;
+  const hasWrappedOrProtocol =
+    hasProtocolToken ||
+    position.from.address === wrappedProtocolToken.address ||
+    position.to.address === wrappedProtocolToken.address;
+
+  const handleCancel = () => {
+    onCancel();
+    setUseProtocolToken(false);
+  };
 
   const handleTerminate = async () => {
     try {
-      onCancel();
+      handleCancel();
       setModalLoading({
         content: (
           <Typography variant="body1">
@@ -61,7 +81,17 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
           </Typography>
         ),
       });
-      const result = await web3Service.terminate(position);
+      let terminateWithUnwrap = false;
+
+      if (hasWrappedOrProtocol) {
+        if (hasProtocolToken) {
+          terminateWithUnwrap = !useProtocolToken;
+        } else {
+          terminateWithUnwrap = useProtocolToken;
+        }
+      }
+
+      const result = await web3Service.terminate(position, terminateWithUnwrap);
       addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,
@@ -117,9 +147,30 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         <Typography variant="body1">
           <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
         </Typography>
+        {hasWrappedOrProtocol && (
+          <FormGroup row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  color="primary"
+                  checked={useProtocolToken}
+                  onChange={(evt) => setUseProtocolToken(evt.target.checked)}
+                  name="useProtocolToken"
+                />
+              }
+              label={
+                hasWrappedOrProtocol && hasProtocolToken ? (
+                  <FormattedMessage description="Terminate get weth" defaultMessage="Get ETH as WETH instead" />
+                ) : (
+                  <FormattedMessage description="Terminate get eth" defaultMessage="Get WETH as ETH instead" />
+                )
+              }
+            />
+          </FormGroup>
+        )}
       </StyledDialogContent>
       <StyledDialogActions>
-        <Button onClick={onCancel} color="default" variant="outlined" fullWidth>
+        <Button onClick={handleCancel} color="default" variant="outlined" fullWidth>
           <FormattedMessage description="go back" defaultMessage="Go back" />
         </Button>
         <Button color="error" variant="contained" fullWidth onClick={handleTerminate} autoFocus>
