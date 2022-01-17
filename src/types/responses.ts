@@ -3,7 +3,7 @@ import { Token } from './tokens';
 
 export interface PoolLiquidityData {
   id: string;
-  poolDayData: {
+  poolHourData: {
     id: string;
     volumeUSD: string;
   }[];

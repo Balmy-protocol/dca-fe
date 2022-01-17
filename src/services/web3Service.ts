@@ -719,9 +719,9 @@ export default class Web3Service {
     );
 
     const liquidity: number = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
-      pool.poolDayData.forEach((dayData) => {
+      pool.poolHourData.forEach((hourData) => {
         // eslint-disable-next-line no-param-reassign
-        acc += parseFloat(dayData.volumeUSD);
+        acc += parseFloat(hourData.volumeUSD);
       });
 
       return acc;
