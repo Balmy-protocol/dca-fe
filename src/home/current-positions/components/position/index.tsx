@@ -11,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { Position, Token, Web3Service } from 'types';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { getFrequencyLabel, getTimeFrequencyLabel, sortTokens, calculateStale } from 'utils/parsing';
+import { getFrequencyLabel, getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useHistory } from 'react-router-dom';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
@@ -28,7 +28,6 @@ import CallMadeIcon from '@material-ui/icons/CallMade';
 import Link from '@material-ui/core/Link';
 import useBalance from 'hooks/useBalance';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { STALE } from 'hooks/useIsStale';
 import MigratePositionModal from 'common/migrate-position-modal';
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
@@ -190,12 +189,7 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
   const isStale =
-    calculateStale(
-      pair?.lastExecutedAt || 0,
-      swapInterval,
-      pair?.createdAt || 0,
-      pair?.swapInfo || { swapsToPerform: [] }
-    ) === STALE;
+    calculateStale(pair?.lastExecutedAt || 0, swapInterval, position.startedAt, pair?.swapInfo || '1') === STALE;
 
   const handleOnWithdraw = (positionToWithdraw: Position) => {
     setShouldShowSettings(false);

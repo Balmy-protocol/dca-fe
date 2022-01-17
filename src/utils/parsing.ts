@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import { FullPosition, GetNextSwapInfo, Position, Token } from 'types';
-import { STRING_SWAP_INTERVALS, ONE_DAY } from 'config/constants';
+import { MAX_BI, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -27,41 +27,50 @@ export const sortTokens = (tokenA: Token, tokenB: Token) => {
   return [token0, token1];
 };
 
+export const NO_SWAP_INFORMATION = -1;
+export const NOTHING_TO_EXECUTE = 0;
+export const HEALTHY = 1;
+export const STALE = 2;
+
 export const calculateStale: (
   lastSwapped: number | undefined,
   frequencyType: BigNumber,
   createdAt: number,
-  nextSwapInformation: GetNextSwapInfo | null
+  nextSwapInformation: string | null
 ) => -1 | 0 | 1 | 2 = (
   lastSwapped = 0,
   frequencyType: BigNumber,
   createdAt: number,
-  nextSwapInformation: GetNextSwapInfo | null
+  nextSwapInformation: string | null
 ) => {
   let isStale = false;
   if (!nextSwapInformation) {
-    return -1;
+    return NO_SWAP_INFORMATION;
   }
 
-  const hasToExecute = find(nextSwapInformation.swapsToPerform, { interval: frequencyType.toNumber() });
+  const hasToExecute = BigNumber.from(nextSwapInformation).lt(MAX_BI);
+
+  if (!hasToExecute) {
+    return NOTHING_TO_EXECUTE;
+  }
 
   const today = Math.floor(Date.now() / 1000);
 
-  if (lastSwapped === 0) {
-    isStale = BigNumber.from(today).gt(BigNumber.from(createdAt).add(frequencyType).add(ONE_DAY.mul(3)));
-  } else {
-    const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(1).mul(frequencyType);
-    isStale = BigNumber.from(today).gt(nextSwapAvailable.add(frequencyType).add(ONE_DAY.mul(3)));
+  const foundFrequency = find(SWAP_INTERVALS_MAP, { value: frequencyType });
+
+  if (!foundFrequency) {
+    throw new Error('Frequency not found');
   }
+
+  const timeframeToUse = BigNumber.from(lastSwapped).gte(BigNumber.from(createdAt)) ? lastSwapped : createdAt;
+
+  const nextSwapAvailable = BigNumber.from(timeframeToUse).div(frequencyType).add(1).mul(frequencyType);
+  isStale = BigNumber.from(today).gt(nextSwapAvailable.add(foundFrequency.staleValue));
 
   if (isStale) {
-    if (!hasToExecute) {
-      return 0;
-    }
-
-    return 2;
+    return STALE;
   }
-  return 1;
+  return HEALTHY;
 };
 
 export const calculateStaleSwaps = (lastSwapped: number, frequencyType: BigNumber, createdAt: number) => {

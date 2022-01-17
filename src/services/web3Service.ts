@@ -327,7 +327,7 @@ export default class Web3Service {
       GET_POSITIONS,
       {
         address: account.toLowerCase(),
-        status: 'ACTIVE',
+        status: ['ACTIVE', 'COMPLETED'],
       },
       'positions',
       'network-only'
@@ -361,7 +361,7 @@ export default class Web3Service {
       GET_POSITIONS,
       {
         address: account.toLowerCase(),
-        status: 'TERMINATED',
+        status: ['TERMINATED'],
       },
       'positions',
       'network-only'
@@ -470,15 +470,21 @@ export default class Web3Service {
     );
 
     this.availablePairs = await Promise.all(
-      availablePairsResponse.data.pairs.map(async (pair: AvailablePairResponse) => ({
-        token0: pair.tokenA,
-        token1: pair.tokenB,
-        lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
-        id: pair.id,
-        createdAt: pair.createdAtTimestamp,
-        swapInfo: await this.getNextSwapInfo({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }),
-        oracle: await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true),
-      }))
+      availablePairsResponse.data.pairs.map(async (pair: AvailablePairResponse) => {
+        const oldestCreatedPosition =
+          (pair.positions && pair.positions[0] && pair.positions[0].createdAtTimestamp) || 0;
+        const lastCreatedAt =
+          oldestCreatedPosition > pair.createdAtTimestamp ? oldestCreatedPosition : pair.createdAtTimestamp;
+        return {
+          token0: pair.tokenA,
+          token1: pair.tokenB,
+          lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
+          id: pair.id,
+          lastCreatedAt,
+          swapInfo: pair.nextSwapAvailableAt,
+          oracle: await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true),
+        };
+      })
     );
   }
 
@@ -1372,10 +1378,8 @@ export default class Web3Service {
             token1,
             id: `${token0.address}-${token1.address}`,
             lastExecutedAt: 0,
-            createdAt: Math.floor(Date.now() / 1000),
-            swapInfo: {
-              swapsToPerform: [],
-            },
+            lastCreatedAt: Math.floor(Date.now() / 1000),
+            swapInfo: '1',
             oracle: newPositionTypeData.oracle,
           });
         }
