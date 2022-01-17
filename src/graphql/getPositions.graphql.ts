@@ -1,11 +1,11 @@
 import gql from 'graphql-tag';
 
 const getCurrentPositions = gql`
-  query getCurrentPositions($address: String!, $first: Int, $skip: Int, $status: String) {
+  query getCurrentPositions($address: String!, $first: Int, $skip: Int, $status: [String]) {
     positions(
       orderDirection: desc
       orderBy: createdAtTimestamp
-      where: { user: $address, status: $status }
+      where: { user: $address, status_in: $status }
       first: $first
       skip: $skip
     ) {

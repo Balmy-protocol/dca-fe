@@ -1,5 +1,6 @@
 module.exports = {
   plugins: ['@typescript-eslint', 'eslint-comments', 'jest', 'promise', 'formatjs'],
+  ignorePatterns: ['jest.config.ts', '.eslintrc.js'],
   extends: [
     'airbnb-typescript',
     'plugin:@typescript-eslint/recommended',

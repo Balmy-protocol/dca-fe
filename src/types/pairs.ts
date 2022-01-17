@@ -12,9 +12,9 @@ export type AvailablePair = {
   token0: Token;
   token1: Token;
   lastExecutedAt: number;
-  createdAt: number;
+  lastCreatedAt: number;
   id: string;
-  swapInfo: GetNextSwapInfo;
+  swapInfo: string;
   oracle: Oracles;
 };
 
@@ -57,4 +57,5 @@ export interface GetPairSwapsData {
     address: string;
   };
   swaps: PairSwaps[];
+  nextSwapAvailableAt: string;
 }

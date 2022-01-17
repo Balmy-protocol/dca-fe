@@ -414,41 +414,49 @@ export const SWAP_INTERVALS_MAP = [
     description: 'One minute',
     key: 1,
     value: ONE_MINUTE,
+    staleValue: THIRTY_MINUTES,
   },
   {
     description: 'Five minutes',
     key: 2,
     value: FIVE_MINUTES,
+    staleValue: ONE_HOUR,
   },
   {
     description: 'Fifteen minutes',
     key: 4,
     value: FIFTEEN_MINUTES,
+    staleValue: ONE_HOUR,
   },
   {
     description: 'Thirty minutes',
     key: 8,
     value: THIRTY_MINUTES,
+    staleValue: ONE_HOUR.mul(2),
   },
   {
     description: 'One hour',
     key: 16,
     value: ONE_HOUR,
+    staleValue: ONE_HOUR.mul(12),
   },
   {
     description: 'Four hours',
     key: 32,
     value: FOUR_HOURS,
+    staleValue: ONE_DAY,
   },
   {
     description: 'One day',
     key: 64,
     value: ONE_DAY,
+    staleValue: ONE_DAY.mul(3),
   },
   {
     description: 'One week',
     key: 128,
     value: ONE_WEEK,
+    staleValue: ONE_DAY.mul(3).add(ONE_WEEK),
   },
 ];
 
@@ -645,4 +653,6 @@ export const STRING_PERMISSIONS: Record<Permission, string> = {
 };
 
 export const MAX_UINT_32 = 4294967295;
+
+export const MAX_BI = BigNumber.from('115792089237316195423570985008687907853269984665640564039457584007913129639935');
 /* eslint-enable */

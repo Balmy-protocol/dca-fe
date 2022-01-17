@@ -155,6 +155,8 @@ export type AvailablePairResponse = {
   swaps: AvailablePairSwap[];
   createdAtTimestamp: number;
   status: string; // active, stale
+  positions: PositionResponse[];
+  nextSwapAvailableAt: string;
 };
 
 export interface AvailablePairsGraphqlResponse {

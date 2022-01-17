@@ -51,12 +51,11 @@ import {
   useHasConfirmedApproval,
   useHasPendingPairCreation,
 } from 'state/transactions/hooks';
-import { calculateStale } from 'utils/parsing';
+import { calculateStale, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import { STALE } from 'hooks/useIsStale';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Switch from '@material-ui/core/Switch';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -382,7 +381,7 @@ const Swap = ({
       calculateStale(
         existingPair?.lastExecutedAt || 0,
         frequencyType,
-        existingPair?.createdAt || 0,
+        existingPair?.lastCreatedAt || 0,
         existingPair?.swapInfo || null
       ) === STALE;
 
