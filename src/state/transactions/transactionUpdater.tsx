@@ -111,6 +111,7 @@ export default function Updater(): null {
 
   useEffect(() => {
     pendingTransactions.forEach((transaction) => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       web3Service.setPendingTransaction(transaction);
     });
     dispatch(setInitialized());

@@ -25,7 +25,7 @@ import Button from 'common/button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import PositionNotFound from 'position-detail/position-not-found';
 import useIsCompanionApproved from 'hooks/useIsCompanionApproved';
-import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import Alert from '@material-ui/lab/Alert';
 import AlertTitle from '@material-ui/lab/AlertTitle';
 import { buildEtherscanAddress } from 'utils/etherscan';
@@ -78,7 +78,7 @@ const PositionDetailFrame = () => {
     skip: positionId === '' || positionId === null,
   });
 
-  const position = data && data.position;
+  let position = data && data.position;
 
   const [isCompanionApproved, isCompanionApprovedLoading, isCompanionApprovedErrors] = useIsCompanionApproved(position);
 
@@ -175,6 +175,14 @@ const PositionDetailFrame = () => {
 
   const usesCompanion =
     position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS;
+
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const protocolToken = getProtocolToken(currentNetwork.chainId);
+  position = {
+    ...position,
+    from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+    to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+  };
 
   return (
     <>
