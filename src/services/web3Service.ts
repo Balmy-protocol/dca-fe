@@ -6,6 +6,9 @@ import {
   Provider,
   TransactionResponse,
   getNetwork as getStringNetwork,
+  getDefaultProvider,
+  getNetwork,
+  InfuraProvider,
 } from '@ethersproject/providers';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import { getProviderInfo } from 'web3modal';
@@ -73,7 +76,7 @@ import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 import BETA_MIGRATOR_ABI from 'abis/BetaMigrator.json';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
 import {
   BETA_MIGRATOR_ADDRESS,
   CHAINLINK_GRAPHQL_URL,
@@ -322,6 +325,10 @@ export default class Web3Service {
       }
     });
 
+    const network = await this.getNetwork();
+    const protocolToken = getProtocolToken(network.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
+
     const currentPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
       this.apolloClient.getClient(),
       GET_POSITIONS,
@@ -335,8 +342,8 @@ export default class Web3Service {
 
     this.currentPositions = keyBy(
       currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
-        from: position.from,
-        to: position.to,
+        from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+        to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
         user: position.user,
         swapInterval: BigNumber.from(position.swapInterval.interval),
         swapped: BigNumber.from(position.totalSwapped),
@@ -369,8 +376,8 @@ export default class Web3Service {
 
     this.pastPositions = keyBy(
       pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
-        from: position.from,
-        to: position.to,
+        from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+        to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
         user: position.user,
         totalDeposits: BigNumber.from(position.totalDeposits),
         swapInterval: BigNumber.from(position.swapInterval.interval),
@@ -475,6 +482,13 @@ export default class Web3Service {
           (pair.positions && pair.positions[0] && pair.positions[0].createdAtTimestamp) || 0;
         const lastCreatedAt =
           oldestCreatedPosition > pair.createdAtTimestamp ? oldestCreatedPosition : pair.createdAtTimestamp;
+        let pairOracle;
+        try {
+          pairOracle = await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true);
+        } catch {
+          pairOracle = ORACLES.CHAINLINK;
+        }
+
         return {
           token0: pair.tokenA,
           token1: pair.tokenB,
@@ -482,7 +496,7 @@ export default class Web3Service {
           id: pair.id,
           lastCreatedAt,
           swapInfo: pair.nextSwapAvailableAt,
-          oracle: await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true),
+          oracle: pairOracle,
         };
       })
     );
@@ -1518,7 +1532,7 @@ export default class Web3Service {
     return hubInstance.interface.parseLog(log);
   }
 
-  setPendingTransaction(transaction: TransactionDetails) {
+  async setPendingTransaction(transaction: TransactionDetails) {
     if (
       transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
       transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
@@ -1528,12 +1542,16 @@ export default class Web3Service {
 
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
     let { id } = typeData;
+    const network = await this.getNetwork();
+    const protocolToken = getProtocolToken(network.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
       const newPositionTypeData = typeData as NewPositionTypeData;
       id = `pending-transaction-${transaction.hash}`;
       this.currentPositions[id] = {
-        from: newPositionTypeData.from,
-        to: newPositionTypeData.to,
+        from:
+          newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from,
+        to: newPositionTypeData.to.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to,
         user: this.getAccount(),
         toWithdraw: BigNumber.from(0),
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
