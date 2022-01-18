@@ -71,6 +71,7 @@ export function useTransactionAdder(): (
           chainId: currentNetwork.chainId,
         })
       );
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       web3Service.setPendingTransaction({
         hash,
         from: web3Service.getAccount(),
