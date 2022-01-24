@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import { getFrequencyLabel } from 'utils/parsing';
 import { BigNumber } from 'ethers';
-import { Position } from 'types';
+import { Position, Token } from 'types';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
@@ -14,6 +14,28 @@ import StepLabel from '@material-ui/core/StepLabel';
 import FrequencyInput from 'common/frequency-input';
 import { formatCurrencyAmount } from 'utils/currency';
 import { STRING_SWAP_INTERVALS } from 'config/constants';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import Switch from '@material-ui/core/Switch';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import useBalance from 'hooks/useBalance';
+import useAllowance from 'hooks/useAllowance';
+import { useHasPendingApproval } from 'state/transactions/hooks';
+import useWeb3Service from 'hooks/useWeb3Service';
+import {
+  useModifyRateSettingsActiveStep,
+  useModifyRateSettingsFrequencyValue,
+  useModifyRateSettingsFromValue,
+  useModifyRateSettingsUseWrappedProtocolToken,
+} from 'state/modify-rate-settings/hooks';
+import { useAppDispatch } from 'state/hooks';
+import {
+  setActiveStep,
+  setFrequencyValue,
+  setFromValue,
+  setUseWrappedProtocolToken,
+} from 'state/modify-rate-settings/actions';
 
 const StyledStepContents = styled.div`
   display: flex;
@@ -34,6 +56,10 @@ const StyledActionContainer = styled.div<{ isMinimal?: boolean }>`
   margin-top: ${(props) => (props.isMinimal ? '0px' : '20px')};
 `;
 
+const StyledApproveButton = styled(Button)`
+  margin-right: 10px;
+`;
+
 const StyledStepper = styled(Stepper)<{ isMinimal?: boolean }>`
   padding: ${(props) => (props.isMinimal ? '0px' : '24px')};
   padding-bottom: ${(props) => (props.isMinimal ? '0px' : '10px')};
@@ -42,8 +68,8 @@ const StyledStepper = styled(Stepper)<{ isMinimal?: boolean }>`
 interface ModifyRateAndSwapsProps {
   position: Position;
   onClose: () => void;
-  onModifyRateAndSwaps: (ammountToAdd: string, frequencyValue: string) => void;
-  balance: BigNumber;
+  onModifyRateAndSwaps: (ammountToAdd: string, frequencyValue: string, useWrappedProtocol: boolean) => void;
+  onApprove: (from: Token, to: Token) => void;
   isMinimal?: boolean;
   showAddCaption?: boolean;
 }
@@ -52,16 +78,27 @@ const ModifyRateAndSwaps = ({
   onClose,
   onModifyRateAndSwaps,
   position,
-  balance,
   isMinimal,
   showAddCaption,
+  onApprove,
 }: ModifyRateAndSwapsProps) => {
-  const [fromValue, setFromValue] = React.useState(formatUnits(position.rate, position.from.decimals));
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
+  // const fromValue = React.useState(formatUnits(position.rate, position.from.decimals));
+  const fromValue = useModifyRateSettingsFromValue();
+  const activeStep = useModifyRateSettingsActiveStep();
+  // const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
+  const frequencyValue = useModifyRateSettingsFrequencyValue();
+  const useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
+  const dispatch = useAppDispatch();
+  const currentNetwork = useCurrentNetwork();
+  const web3Service = useWeb3Service();
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS;
+  const fromToUse = shouldShowWrappedProtocolSwitch && useWrappedProtocolToken ? wrappedProtocolToken : position.from;
+  const hasPendingApproval = useHasPendingApproval(fromToUse, web3Service.getAccount());
+  const [balance] = useBalance(useWrappedProtocolToken ? wrappedProtocolToken : position.from);
+  const [allowance] = useAllowance(useWrappedProtocolToken ? wrappedProtocolToken : position.from);
   const realBalance = balance && balance.add(position.remainingLiquidity);
   const frequencyType = getFrequencyLabel(position.swapInterval.toString(), position.remainingSwaps.toString());
-  // const hasErrorFrequency = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
   const hasErrorCurrency = fromValue && realBalance && parseUnits(fromValue, position.from.decimals).gt(realBalance);
   const hasError = activeStep === 0 ? hasErrorCurrency : false;
   const isEmpty = activeStep === 0 ? !fromValue : !frequencyValue;
@@ -77,24 +114,38 @@ const ModifyRateAndSwaps = ({
 
   const handleNext = () => {
     if (activeStep === 1) {
-      onModifyRateAndSwaps(fromValue, frequencyValue);
+      onModifyRateAndSwaps(fromValue, frequencyValue, shouldShowWrappedProtocolSwitch && useWrappedProtocolToken);
       onClose();
-      setFromValue(formatUnits(position.rate, position.from.decimals));
-      setFrequencyValue(position.remainingSwaps.toString());
+      dispatch(setFromValue(formatUnits(position.rate, position.from.decimals)));
+      dispatch(setFrequencyValue(position.remainingSwaps.toString()));
     } else {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      dispatch(setActiveStep(activeStep + 1));
     }
   };
 
   const handleBack = () => {
     if (activeStep === 0) {
       onClose();
-      setFromValue(formatUnits(position.rate, position.from.decimals));
-      setFrequencyValue('');
+      dispatch(setFromValue(formatUnits(position.rate, position.from.decimals)));
+      dispatch(setFrequencyValue(''));
     } else {
-      setActiveStep((prevActiveStep) => prevActiveStep - 1);
+      dispatch(setActiveStep(activeStep - 1));
     }
   };
+
+  const isIncreasingPosition = position.remainingLiquidity
+    .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
+    .lte(BigNumber.from(0));
+
+  const needsToApprove =
+    useWrappedProtocolToken &&
+    allowance &&
+    isIncreasingPosition &&
+    parseUnits(allowance.allowance, position.from.decimals).lt(
+      position.remainingLiquidity
+        .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
+        .abs()
+    );
 
   return (
     <>
@@ -114,13 +165,28 @@ const ModifyRateAndSwaps = ({
         <StyledInputContainer>
           {activeStep === 0 ? (
             <>
+              {shouldShowWrappedProtocolSwitch && (
+                <FormGroup row>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={useWrappedProtocolToken}
+                        onChange={() => dispatch(setUseWrappedProtocolToken(!useWrappedProtocolToken))}
+                        name="enableDisableWrappedProtocolToken"
+                        color="primary"
+                      />
+                    }
+                    label={`Use ${wrappedProtocolToken.symbol}`}
+                  />
+                </FormGroup>
+              )}
               <TokenInput
                 id="from-value"
                 error={hasError ? 'Amount cannot exceed your current balance' : ''}
                 value={fromValue}
-                onChange={setFromValue}
+                onChange={(newFromValue: string) => dispatch(setFromValue(newFromValue))}
                 withBalance
-                token={position.from}
+                token={fromToUse}
                 balance={realBalance}
                 fullWidth
               />
@@ -129,8 +195,8 @@ const ModifyRateAndSwaps = ({
                   description="in position"
                   defaultMessage="Available: {balance} {symbol}"
                   values={{
-                    balance: formatCurrencyAmount(realBalance, position.from, 6),
-                    symbol: position.from.symbol,
+                    balance: formatCurrencyAmount(realBalance, fromToUse, 6),
+                    symbol: fromToUse.symbol,
                   }}
                 />
               </Typography>
@@ -142,7 +208,7 @@ const ModifyRateAndSwaps = ({
                 error={hasError ? 'Value must be greater than 0' : ''}
                 value={frequencyValue}
                 label={position.swapInterval.toString()}
-                onChange={setFrequencyValue}
+                onChange={(newFrequencyValue: string) => dispatch(setFrequencyValue(newFrequencyValue))}
               />
               <Typography variant={isMinimal ? 'body2' : 'body1'}>
                 <FormattedMessage
@@ -158,7 +224,7 @@ const ModifyRateAndSwaps = ({
                   description="rate detail"
                   defaultMessage="We'll swap {rate} {from} {frequency} for {frequencyPlural} for you"
                   values={{
-                    from: position.from.symbol,
+                    from: fromToUse.symbol,
                     rate: fromValue,
                     frequency:
                       STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
@@ -169,24 +235,20 @@ const ModifyRateAndSwaps = ({
               </Typography>
               {showAddCaption &&
                 !position.remainingLiquidity
-                  .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals)))
+                  .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
                   .eq(BigNumber.from(0)) && (
                   <Typography variant={isMinimal ? 'caption' : 'body2'}>
-                    {position.remainingLiquidity
-                      .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals)))
-                      .lte(BigNumber.from(0)) ? (
+                    {isIncreasingPosition ? (
                       <FormattedMessage
                         description="rate add detail"
                         defaultMessage="You will need to provide an aditional {addAmmount} {from}"
                         values={{
-                          from: position.from.symbol,
+                          from: fromToUse.symbol,
                           addAmmount: formatUnits(
                             position.remainingLiquidity
-                              .sub(
-                                BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals))
-                              )
+                              .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
                               .abs(),
-                            position.from.decimals
+                            fromToUse.decimals
                           ),
                         }}
                       />
@@ -195,14 +257,12 @@ const ModifyRateAndSwaps = ({
                         description="rate withdraw detail"
                         defaultMessage="We will return {returnAmmount} {from} to you"
                         values={{
-                          from: position.from.symbol,
+                          from: fromToUse.symbol,
                           returnAmmount: formatUnits(
                             position.remainingLiquidity
-                              .sub(
-                                BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, position.from.decimals))
-                              )
+                              .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
                               .abs(),
-                            position.from.decimals
+                            fromToUse.decimals
                           ),
                         }}
                       />
@@ -217,20 +277,50 @@ const ModifyRateAndSwaps = ({
             {activeStep === 0 && <FormattedMessage description="cancel" defaultMessage="Cancel" />}
             {activeStep !== 0 && <FormattedMessage description="go back" defaultMessage="Back" />}
           </Button>
-          <Button
-            color={activeStep === 0 ? 'secondary' : 'primary'}
-            variant="contained"
-            onClick={handleNext}
-            disabled={!!hasError || isEmpty || !!cantFund}
-          >
-            {activeStep === 0 && <FormattedMessage description="next" defaultMessage="Next" />}
-            {activeStep !== 0 && !cantFund && (
-              <FormattedMessage description="modify rate frequency" defaultMessage="Modify position" />
+          <div>
+            {activeStep === 1 && (needsToApprove || hasPendingApproval) && (
+              <StyledApproveButton
+                color="primary"
+                variant="contained"
+                onClick={() => onApprove(fromToUse, position.to)}
+                disabled={hasPendingApproval}
+              >
+                {hasPendingApproval ? (
+                  <FormattedMessage
+                    description="waiting for approval"
+                    defaultMessage="Waiting for your {token} to be approved"
+                    values={{
+                      token: fromToUse.symbol,
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    description="Allow us to use your coin"
+                    defaultMessage="Approve {token}"
+                    values={{
+                      token: fromToUse.symbol,
+                    }}
+                  />
+                )}
+              </StyledApproveButton>
             )}
-            {activeStep !== 0 && cantFund && (
-              <FormattedMessage description="no balance" defaultMessage="Insufficient balance" />
-            )}
-          </Button>
+            <Button
+              color={activeStep === 0 ? 'secondary' : 'primary'}
+              variant="contained"
+              onClick={handleNext}
+              disabled={
+                !!hasError || isEmpty || !!cantFund || (activeStep === 1 && needsToApprove) || hasPendingApproval
+              }
+            >
+              {activeStep === 0 && <FormattedMessage description="next" defaultMessage="Next" />}
+              {activeStep !== 0 && !cantFund && (
+                <FormattedMessage description="modify rate frequency" defaultMessage="Modify position" />
+              )}
+              {activeStep !== 0 && cantFund && (
+                <FormattedMessage description="no balance" defaultMessage="Insufficient balance" />
+              )}
+            </Button>
+          </div>
         </StyledActionContainer>
       </StyledStepContents>
     </>

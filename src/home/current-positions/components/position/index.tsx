@@ -9,24 +9,18 @@ import Typography from '@material-ui/core/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
-import { Position, Token, Web3Service } from 'types';
-import { useTransactionAdder } from 'state/transactions/hooks';
-import { getFrequencyLabel, getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
-import useTransactionModal from 'hooks/useTransactionModal';
+import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
+import { Position, Token } from 'types';
 import { useHistory } from 'react-router-dom';
-import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
+import { STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
-import PositionMenu from 'common/position-menu';
 import { createStyles, withStyles, Theme } from '@material-ui/core/styles';
-import AddToPosition from 'common/add-to-position-settings';
 import { BigNumber } from 'ethers';
-import ResetPosition from 'common/reset-position-settings';
 import { formatCurrencyAmount } from 'utils/currency';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import Link from '@material-ui/core/Link';
-import useBalance from 'hooks/useBalance';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import MigratePositionModal from 'common/migrate-position-modal';
 
@@ -151,11 +145,9 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
 
 interface ActivePositionProps {
   position: PositionProp;
-  web3Service: Web3Service;
-  onWithdraw: (position: Position) => void;
 }
 
-const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionProps) => {
+const ActivePosition = ({ position }: ActivePositionProps) => {
   const {
     from,
     to,
@@ -163,19 +155,12 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
     remainingLiquidity,
     remainingSwaps,
     rate,
-    id,
     totalSwaps,
     pendingTransaction,
     toWithdraw,
   } = position;
-  const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
-  const [shouldShowAddToPosition, setShouldShowAddToPosition] = React.useState(false);
   const [shouldShowMigrate, setShouldShowMigrate] = React.useState(false);
-  const [shouldShowReset, setShouldShowReset] = React.useState(false);
-  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const availablePairs = useAvailablePairs();
-  const addTransaction = useTransactionAdder();
-  const [balance] = useBalance(from);
   const currentNetwork = useCurrentNetwork();
   const history = useHistory();
 
@@ -191,213 +176,12 @@ const ActivePosition = ({ position, onWithdraw, web3Service }: ActivePositionPro
   const isStale =
     calculateStale(pair?.lastExecutedAt || 0, swapInterval, position.startedAt, pair?.swapInfo || '1') === STALE;
 
-  const handleOnWithdraw = (positionToWithdraw: Position) => {
-    setShouldShowSettings(false);
-    onWithdraw(positionToWithdraw);
-  };
-
   const onViewDetails = () => {
     history.push(`/positions/${position.id}`);
   };
 
-  const handleResetPosition = async (ammountToAdd: string, frequencyValue: string) => {
-    try {
-      setModalLoading({
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="setting swap"
-              defaultMessage="Adding {ammountToAdd} {from} to {from}/{to} position and setting it to run for {frequencyValue} {type}"
-              values={{
-                ammountToAdd,
-                frequencyValue,
-                from: from.symbol,
-                to: to.symbol,
-                type: getFrequencyLabel(swapInterval.toString(), frequencyValue),
-              }}
-            />
-          </Typography>
-        ),
-      });
-      const result = await web3Service.resetPosition(position, ammountToAdd, frequencyValue);
-      addTransaction(result, {
-        type: TRANSACTION_TYPES.RESET_POSITION,
-        typeData: { id, newFunds: ammountToAdd, decimals: from.decimals, newSwaps: frequencyValue },
-      });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="resetting position success"
-            defaultMessage="Adding {ammountToAdd} {from} to {from}/{to} position and setting it to run for {frequencyValue} {type} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{
-              ammountToAdd,
-              frequencyValue,
-              from: from.symbol,
-              to: to.symbol,
-              type: getFrequencyLabel(swapInterval.toString(), frequencyValue),
-            }}
-          />
-        ),
-      });
-    } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'error while adding funds', error: { code: e.code, message: e.message, data: e.data } });
-    }
-  };
-
-  const handleAddFunds = async (ammountToAdd: string) => {
-    try {
-      setModalLoading({
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="Adding funds"
-              defaultMessage="Adding funds to {from}/{to} position"
-              values={{ from: from.symbol, to: to.symbol }}
-            />
-          </Typography>
-        ),
-      });
-      const result = await web3Service.addFunds(position, ammountToAdd);
-      addTransaction(result, {
-        type: TRANSACTION_TYPES.ADD_FUNDS_POSITION,
-        typeData: { id, newFunds: ammountToAdd, decimals: from.decimals },
-      });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="adding funds success"
-            defaultMessage="Adding funds to your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{
-              from: position.from.symbol,
-              to: position.to.symbol,
-            }}
-          />
-        ),
-      });
-    } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'error while adding funds', error: { code: e.code, message: e.message, data: e.data } });
-    }
-  };
-
-  const handleWithdrawFunds = async (ammountToRemove: string) => {
-    try {
-      setModalLoading({
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="Withdrawing funds from position"
-              defaultMessage="Returning {ammountToRemove} {from} to you"
-              values={{ from: position.from.symbol, ammountToRemove }}
-            />
-          </Typography>
-        ),
-      });
-      const result = await web3Service.removeFunds(position, ammountToRemove);
-      addTransaction(result, {
-        type: TRANSACTION_TYPES.REMOVE_FUNDS,
-        typeData: { id: position.id, ammountToRemove, decimals: position.from.decimals },
-      });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="Withdrawing funds from position success"
-            defaultMessage="Returning {ammountToRemove} {from} to you has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: position.from.symbol, ammountToRemove }}
-          />
-        ),
-      });
-    } catch (e) {
-      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({
-        content: 'error while withdrawing funds',
-        error: { code: e.code, message: e.message, data: e.data },
-      });
-      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    }
-  };
-
-  const handleModifyRateAndSwaps = async (newRate: string, newFrequency: string) => {
-    try {
-      setModalLoading({
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="Modifying rate for position"
-              defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequencyTypePlural}"
-              values={{
-                from: position.from.symbol,
-                to: position.to.symbol,
-                newRate,
-                frequency: newFrequency,
-                frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
-                frequencyTypePlural: getFrequencyLabel(position.swapInterval.toString(), newFrequency),
-              }}
-            />
-          </Typography>
-        ),
-      });
-      const result = await web3Service.modifyRateAndSwaps(position, newRate, newFrequency);
-      addTransaction(result, {
-        type: TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION,
-        typeData: { id: position.id, newRate, newSwaps: newFrequency, decimals: position.from.decimals },
-      });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="success modify rate for position"
-            defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{
-              from: position.from.symbol,
-              to: position.to.symbol,
-              newRate,
-              frequency: newFrequency,
-              frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
-              frequencyTypePlural: getFrequencyLabel(position.swapInterval.toString(), newFrequency),
-            }}
-          />
-        ),
-      });
-    } catch (e) {
-      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({
-        content: 'error while modifying rate',
-        error: { code: e.code, message: e.message, data: e.data },
-      });
-      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    }
-  };
-
   return (
     <StyledCard variant="outlined">
-      <PositionMenu
-        onClose={() => setShouldShowSettings(false)}
-        shouldShow={shouldShowSettings}
-        position={position}
-        onWithdraw={handleOnWithdraw}
-        onModifyRateAndSwaps={handleModifyRateAndSwaps}
-        onRemoveFunds={handleWithdrawFunds}
-        balance={balance || BigNumber.from(0)}
-      />
-      <AddToPosition
-        onClose={() => setShouldShowAddToPosition(false)}
-        shouldShow={shouldShowAddToPosition}
-        position={position}
-        balance={balance || BigNumber.from(0)}
-        onAddFunds={handleAddFunds}
-      />
-      <ResetPosition
-        onClose={() => setShouldShowReset(false)}
-        shouldShow={shouldShowReset}
-        position={position}
-        balance={balance || BigNumber.from(0)}
-        onResetPosition={handleResetPosition}
-      />
       <MigratePositionModal onCancel={() => setShouldShowMigrate(false)} open={shouldShowMigrate} position={position} />
       <StyledCardContent>
         <Grid container>

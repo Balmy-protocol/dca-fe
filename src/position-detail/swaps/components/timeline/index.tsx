@@ -403,7 +403,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
         <Typography variant="body1">
           <FormattedMessage
             description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for <b>{frequency}</b> from <b>{frequency}</b>"
+            defaultMessage="{increaseDecrease} duration to run for <b>{frequency}</b> from <b>{oldFrequency}</b>"
             values={{
               b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
@@ -412,6 +412,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
                 ? 'Increased'
                 : 'Decreased',
               frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
+              oldFrequency: getFrequencyLabel(position.swapInterval.interval, positionState.oldRemainingSwaps),
             }}
           />
         </Typography>
@@ -460,7 +461,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
         <Typography variant="body1">
           <FormattedMessage
             description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for <b>{frequency}</b> from <b>{frequency}</b>"
+            defaultMessage="{increaseDecrease} duration to run for <b>{frequency}</b> from <b>{oldFrequency}</b>"
             values={{
               b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
@@ -469,6 +470,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
                 ? 'Increased'
                 : 'Decreased',
               frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
+              oldFrequency: getFrequencyLabel(position.swapInterval.interval, positionState.oldRemainingSwaps),
             }}
           />
         </Typography>
