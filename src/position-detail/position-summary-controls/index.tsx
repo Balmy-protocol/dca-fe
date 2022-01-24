@@ -37,7 +37,7 @@ interface PositionSummaryControlsProps {
   onMigratePosition: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
-  shouldDisable: boolean;
+  shouldDisable?: boolean;
 }
 
 const PositionSummaryControls = ({
@@ -88,11 +88,12 @@ const PositionSummaryControls = ({
           )}
           {!isPending && (
             <>
-              {(position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) && (
+              {(position.to.address === PROTOCOL_TOKEN_ADDRESS ||
+                position.to.address === wrappedProtocolToken.address) && (
                 <WithdrawButton
                   position={position}
                   onClick={onWithdraw}
-                  disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || shouldDisable}
+                  disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || !!shouldDisable}
                 />
               )}
 
@@ -101,7 +102,7 @@ const PositionSummaryControls = ({
                   variant="contained"
                   color="white"
                   onClick={() => onWithdraw(false)}
-                  disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || shouldDisable}
+                  disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || !!shouldDisable}
                 >
                   <FormattedMessage
                     description="withdraw swapped"
@@ -113,9 +114,10 @@ const PositionSummaryControls = ({
                 </Button>
               )}
               <StyledButtonGroup>
-              <Button variant="contained" color="white" onClick={onViewNFT} disabled={shouldDisable}>
+                <Button variant="contained" color="white" onClick={onViewNFT} disabled={shouldDisable}>
                   <FormattedMessage description="view nft" defaultMessage="View NFT" />
-                </Button>,
+                </Button>
+                ,
                 <Button variant="contained" color="white" onClick={onModifyRate} disabled={shouldDisable}>
                   <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
                 </Button>

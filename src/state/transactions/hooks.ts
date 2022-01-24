@@ -169,25 +169,15 @@ export function isTransactionPending(tx: TransactionDetails): boolean {
 }
 
 // returns whether a token has a pending approval transaction
-export function useHasPendingApproval(
-  token: Token | null,
-  tokenTo: Token | null,
-  spender: string | undefined
-): boolean {
+export function useHasPendingApproval(token: Token | null, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
-  const addressToCheck =
-    (tokenTo &&
-      (tokenTo.address === PROTOCOL_TOKEN_ADDRESS
-        ? HUB_ADDRESS[currentNetwork.chainId]
-        : COMPANION_ADDRESS[currentNetwork.chainId])) ||
-    '';
+  const addressToCheck = HUB_ADDRESS[currentNetwork.chainId];
 
   return useMemo(
     () =>
       !!token &&
-      !!tokenTo &&
       typeof tokenAddress === 'string' &&
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {

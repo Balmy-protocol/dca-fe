@@ -9,15 +9,13 @@ import ModifyRateSettings from 'common/modify-rate-settings';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import PositionSwaps from 'position-detail/swaps';
-import { FullPosition, GetPairSwapsData, NFTData } from 'types';
+import { FullPosition, GetPairSwapsData, NFTData, Token } from 'types';
 import SwapsGraph from 'position-detail/swap-graph';
 import Details from 'position-detail/position-data';
 import PositionStatus from 'position-detail/position-status';
-import { BigNumber } from 'ethers';
 import useWeb3Service from 'hooks/useWeb3Service';
-import useBalance from 'hooks/useBalance';
 import NFTModal from 'common/view-nft-modal';
-import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
+import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS, COMPANION_ADDRESS, HUB_ADDRESS } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import WithdrawModal from 'common/withdraw-modal';
@@ -25,6 +23,10 @@ import TerminateModal from 'common/terminate-modal';
 import TransferPositionModal from 'common/transfer-position-modal';
 import MigratePositionModal from 'common/migrate-position-modal';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { useAppDispatch } from 'state/hooks';
+import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
+import { formatUnits } from '@ethersproject/units';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -47,21 +49,10 @@ const StyledFlexGridItem = styled(Grid)`
 interface PositionSummaryContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
-  usesCompanion: boolean;
-  isCompanionApproved: boolean;
-  positionTransfered: string | null;
   swapsData: GetPairSwapsData | undefined;
 }
 
-const PositionSummaryContainer = ({
-  position,
-  pendingTransaction,
-  usesCompanion,
-  isCompanionApproved,
-  positionTransfered,
-  swapsData,
-}: PositionSummaryContainerProps) => {
-  const [balance] = useBalance(position && position.from);
+const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: PositionSummaryContainerProps) => {
   const [actionToShow, setActionToShow] = React.useState<null | 'modifyRate' | 'removeFunds'>(null);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
@@ -72,6 +63,8 @@ const PositionSummaryContainer = ({
   const web3Service = useWeb3Service();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
+  const currentNetwork = useCurrentNetwork();
+  const dispatch = useAppDispatch();
 
   const [withdrawWithProtocolToken, setWithdrawWithProtocolToken] = React.useState(
     !!position && position.to.address === PROTOCOL_TOKEN_ADDRESS
@@ -84,7 +77,7 @@ const PositionSummaryContainer = ({
     setShowNFTModal(true);
   };
 
-  const handleModifyRateAndSwaps = async (newRate: string, newFrequency: string) => {
+  const handleModifyRateAndSwaps = async (newRate: string, newFrequency: string, useWrappedProtocolToken: boolean) => {
     if (!position) {
       return;
     }
@@ -95,7 +88,7 @@ const PositionSummaryContainer = ({
           <Typography variant="body1">
             <FormattedMessage
               description="Modifying rate for position"
-              defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural}"
+              defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequencyTypePlural}"
               values={{
                 from: position.from.symbol,
                 to: position.to.symbol,
@@ -111,7 +104,8 @@ const PositionSummaryContainer = ({
       const result = await web3Service.modifyRateAndSwaps(
         fullPositionToMappedPosition(position),
         newRate,
-        newFrequency
+        newFrequency,
+        useWrappedProtocolToken
       );
       setActionToShow(null);
       addTransaction(result, {
@@ -123,7 +117,7 @@ const PositionSummaryContainer = ({
         content: (
           <FormattedMessage
             description="success modify rate for position"
-            defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequency} {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: position.from.symbol,
               to: position.to.symbol,
@@ -145,6 +139,58 @@ const PositionSummaryContainer = ({
     }
   };
 
+  const handleApproveToken = async (from: Token, to: Token) => {
+    if (!from) return;
+    const fromSymbol = from.symbol;
+
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="body1">
+            <FormattedMessage
+              description="approving token"
+              defaultMessage="Approving use of {from}"
+              values={{ from: fromSymbol || '' }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await web3Service.approveToken(from, to);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        typeData: {
+          token: from,
+          addressFor:
+            to.address === PROTOCOL_TOKEN_ADDRESS
+              ? COMPANION_ADDRESS[currentNetwork.chainId]
+              : HUB_ADDRESS[currentNetwork.chainId],
+        },
+      });
+      setModalSuccess({
+        hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="success approving token"
+            defaultMessage="Approving use of {from} has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{ from: fromSymbol || '' }}
+          />
+        ),
+      });
+    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
+    }
+  };
+
+  const onShowModifyRateSettings = () => {
+    setActionToShow('modifyRate');
+    dispatch(
+      initializeModifyRateSettings({
+        fromValue: formatUnits(position.current.rate, position.from.decimals),
+        frequencyValue: position.current.remainingSwaps.toString(),
+      })
+    );
+  };
   return (
     <>
       <WithdrawModal
@@ -172,20 +218,19 @@ const PositionSummaryContainer = ({
       <Grid container spacing={2} alignItems="stretch">
         <StyledControlsWrapper item xs={12}>
           <PositionStatus position={position} pair={swapsData} alignedEnd />
-          {position.status !== 'TERMINATED' && !positionTransfered && (
+          {position.status !== 'TERMINATED' && (
             <PositionControls
               onWithdraw={(useProtocolToken: boolean) => {
                 setShowWithdrawModal(true);
                 setWithdrawWithProtocolToken(useProtocolToken);
               }}
               onTerminate={() => setShowTerminateModal(true)}
-              onModifyRate={() => setActionToShow('modifyRate')}
+              onModifyRate={onShowModifyRateSettings}
               onTransfer={() => setShowTransferModal(true)}
               onMigratePosition={() => setShowMigrateModal(true)}
               onViewNFT={handleViewNFT}
               position={position}
               pendingTransaction={pendingTransaction}
-              shouldDisable={usesCompanion && !isCompanionApproved}
             />
           )}
         </StyledControlsWrapper>
@@ -202,7 +247,7 @@ const PositionSummaryContainer = ({
               onClose={() => setActionToShow(null)}
               position={fullPositionToMappedPosition(position)}
               onModifyRateAndSwaps={handleModifyRateAndSwaps}
-              balance={balance || BigNumber.from(0)}
+              onApprove={handleApproveToken}
               showAddCaption
             />
           </StyledPaper>
