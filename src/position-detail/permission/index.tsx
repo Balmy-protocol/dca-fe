@@ -15,7 +15,7 @@ import { buildEtherscanAddress } from 'utils/etherscan';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'hooks/state';
 import { addPermission, removePermission } from 'state/position-permissions/actions';
-import { STRING_PERMISSIONS } from 'config/constants';
+import { COMPANION_ADDRESS, STRING_PERMISSIONS } from 'config/constants';
 import { FormattedMessage } from 'react-intl';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
@@ -107,6 +107,7 @@ const HelpTexts = {
 const PositionPermissionItem = ({ positionPermission, shouldDisable }: PositionPermissionProps) => {
   const currentNetwork = useCurrentNetwork();
   const dispatch = useAppDispatch();
+  const companionAddress = COMPANION_ADDRESS[currentNetwork.chainId];
 
   const handlePermissionChange = (permission: Permission, newValue: boolean) => {
     if (newValue) {
@@ -129,7 +130,9 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable }: PositionP
                   rel="noreferrer"
                 >
                   <Typography variant="body2" component="span">
-                    {positionPermission.operator}
+                    {positionPermission.operator.toLowerCase() === companionAddress.toLowerCase()
+                      ? 'Mean Finance Companion'
+                      : positionPermission.operator}
                   </Typography>
                   <CallMadeIcon style={{ fontSize: '1rem' }} />
                 </StyledLink>
