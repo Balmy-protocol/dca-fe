@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import TextField from '@material-ui/core/TextField';
 import Button from 'common/button';
-import { SetStateCallback, Token } from 'types';
+import { Token } from 'types';
 import { FormattedMessage } from 'react-intl';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
@@ -27,7 +27,7 @@ interface TokenInputProps {
   id: string;
   value: string;
   disabled?: boolean;
-  onChange: (newValue: string) => void | SetStateCallback<string>;
+  onChange: (newValue: string) => any;
   withBalance?: boolean;
   balance?: BigNumber;
   token: Token | null;

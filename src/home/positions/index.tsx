@@ -5,7 +5,6 @@ import Tab from '@material-ui/core/Tab';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import { appleTabsStylesHook } from 'common/tabs';
-import useWeb3Service from 'hooks/useWeb3Service';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from 'state/tabs/hooks';
@@ -37,7 +36,6 @@ const StyledPaper = styled(Paper)`
   `}
 `;
 const Positions = () => {
-  const web3Service = useWeb3Service();
   const tabIndex = useOpenClosePositionTab();
   const dispatch = useAppDispatch();
   const tabsStyles = appleTabsStylesHook.useTabs();
@@ -72,7 +70,7 @@ const Positions = () => {
               </Tabs>
             </Grid>
             <Grid item xs={12}>
-              {tabIndex === 0 ? <CurrentPositions web3Service={web3Service} /> : <History />}
+              {tabIndex === 0 ? <CurrentPositions /> : <History />}
             </Grid>
           </Grid>
         </StyledPaper>

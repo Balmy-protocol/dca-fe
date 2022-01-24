@@ -6,9 +6,6 @@ import {
   Provider,
   TransactionResponse,
   getNetwork as getStringNetwork,
-  getDefaultProvider,
-  getNetwork,
-  InfuraProvider,
 } from '@ethersproject/providers';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import { getProviderInfo } from 'web3modal';
@@ -565,18 +562,12 @@ export default class Web3Service {
     return erc20.balanceOf(this.getAccount());
   }
 
-  async getAllowance(token: Token, tokenTo: Token) {
+  async getAllowance(token: Token) {
     if (token.address === PROTOCOL_TOKEN_ADDRESS) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, 18) });
     }
 
-    let addressToCheck;
-
-    if (tokenTo.address === PROTOCOL_TOKEN_ADDRESS) {
-      addressToCheck = await this.getHUBCompanionAddress();
-    } else {
-      addressToCheck = await this.getHUBAddress();
-    }
+    const addressToCheck = await this.getHUBAddress();
 
     const ERC20Interface = new Interface(ERC20ABI);
 
@@ -828,19 +819,11 @@ export default class Web3Service {
   }
 
   // POSITION METHODS
-  async migratePosition(positionId: string): Promise<TransactionResponse> {
+  async getSignatureForPermission(positionId: string, contractAddress: string, permission: number) {
     const signer = this.getSigner();
-    const currentNetwork = await this.getNetwork();
-    const betaMigratorAddress = await this.getBetaMigratorAddress();
     const permissionManagerAddress = await this.getPermissionManagerAddress();
-
+    const currentNetwork = await this.getNetwork();
     const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
-
-    const betaMigratorInstance = new ethers.Contract(
-      betaMigratorAddress,
-      BETA_MIGRATOR_ABI.abi,
-      signer
-    ) as unknown as BetaMigratorContract;
 
     const permissionManagerInstance = new ethers.Contract(
       permissionManagerAddress,
@@ -862,7 +845,7 @@ export default class Web3Service {
       { name: 'deadline', type: 'uint256' },
     ];
 
-    const permissions = [{ operator: betaMigratorAddress, permissions: [PERMISSIONS.TERMINATE] }];
+    const permissions = [{ operator: contractAddress, permissions: [permission] }];
 
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await (signer as VoidSigner)._signTypedData(
@@ -878,18 +861,35 @@ export default class Web3Service {
 
     const { v, r, s } = fromRpcSig(rawSignature);
 
-    const generatedSignature = {
+    return {
       permissions,
       deadline: MAX_UINT_256,
       v,
       r,
       s,
     };
+  }
+
+  async migratePosition(positionId: string): Promise<TransactionResponse> {
+    const signer = this.getSigner();
+    const betaMigratorAddress = await this.getBetaMigratorAddress();
+
+    const betaMigratorInstance = new ethers.Contract(
+      betaMigratorAddress,
+      BETA_MIGRATOR_ABI.abi,
+      signer
+    ) as unknown as BetaMigratorContract;
+
+    const generatedSignature = await this.getSignatureForPermission(
+      positionId,
+      betaMigratorAddress,
+      PERMISSIONS.TERMINATE
+    );
 
     return betaMigratorInstance.migrate(positionId, generatedSignature);
   }
 
-  async companionHasWithdraw(positionId: string): Promise<boolean> {
+  async companionHasPermission(positionId: string, permission: number) {
     const permissionManagerAddress = await this.getPermissionManagerAddress();
     const companionAddress = await this.getHUBCompanionAddress();
 
@@ -899,48 +899,7 @@ export default class Web3Service {
       this.getSigner()
     ) as unknown as PermissionManagerContract;
 
-    try {
-      await permissionManagerInstance.ownerOf(positionId);
-    } catch (e) {
-      // hack for when the subgraph has not updated yet but the position has been terminated
-      const error = e as { data?: { message?: string } };
-      if (
-        error &&
-        error.data &&
-        error.data.message &&
-        error.data.message === 'execution reverted: ERC721: owner query for nonexistent token'
-      )
-        return true;
-    }
-
-    return permissionManagerInstance.hasPermission(positionId, companionAddress, PERMISSIONS.WITHDRAW);
-  }
-
-  async companionHasTerminate(positionId: string): Promise<boolean> {
-    const permissionManagerAddress = await this.getPermissionManagerAddress();
-    const companionAddress = await this.getHUBCompanionAddress();
-
-    const permissionManagerInstance = new ethers.Contract(
-      permissionManagerAddress,
-      PERMISSION_MANAGER_ABI.abi,
-      this.getSigner()
-    ) as unknown as PermissionManagerContract;
-
-    try {
-      await permissionManagerInstance.ownerOf(positionId);
-    } catch (e) {
-      // hack for when the subgraph has not updated yet but the position has been terminated
-      const error = e as { data?: { message?: string } };
-      if (
-        error &&
-        error.data &&
-        error.data.message &&
-        error.data.message === 'execution reverted: ERC721: owner query for nonexistent token'
-      )
-        return true;
-    }
-
-    return permissionManagerInstance.hasPermission(positionId, companionAddress, PERMISSIONS.TERMINATE);
+    return permissionManagerInstance.hasPermission(positionId, companionAddress, permission);
   }
 
   async companionIsApproved(position: FullPosition): Promise<boolean> {
@@ -1055,7 +1014,7 @@ export default class Web3Service {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
-    if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (from.address === PROTOCOL_TOKEN_ADDRESS) {
       const companionAddress = await this.getHUBCompanionAddress();
 
       const hubCompanionInstance = new ethers.Contract(
@@ -1087,7 +1046,6 @@ export default class Web3Service {
     const currentNetwork = await this.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const signer = this.getSigner();
-    const permissionManagerAddress = await this.getPermissionManagerAddress();
     const companionAddress = await this.getHUBCompanionAddress();
 
     if (
@@ -1112,54 +1070,22 @@ export default class Web3Service {
       this.getSigner()
     ) as unknown as HubCompanionContract;
 
-    const companionHasPermission = await this.companionHasWithdraw(position.id);
+    const companionHasPermission = await this.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
 
     if (companionHasPermission) {
       return hubCompanionInstance.withdrawSwappedUsingProtocolToken(position.id, this.account);
     }
 
-    const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
-
-    const permissionManagerInstance = new ethers.Contract(
-      permissionManagerAddress,
-      PERMISSION_MANAGER_ABI.abi,
-      signer
-    ) as unknown as PermissionManagerContract;
-
-    const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
-
-    const PermissionSet = [
-      { name: 'operator', type: 'address' },
-      { name: 'permissions', type: 'uint8[]' },
-    ];
-
-    const PermissionPermit = [
-      { name: 'permissions', type: 'PermissionSet[]' },
-      { name: 'tokenId', type: 'uint256' },
-      { name: 'nonce', type: 'uint256' },
-      { name: 'deadline', type: 'uint256' },
-    ];
-
-    const permissions = [{ operator: companionAddress, permissions: [PERMISSIONS.WITHDRAW] }];
-
-    // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await (signer as VoidSigner)._signTypedData(
-      {
-        name: 'Mean Finance DCA',
-        version: '1',
-        chainId: currentNetwork.chainId,
-        verifyingContract: permissionManagerAddress,
-      },
-      { PermissionSet, PermissionPermit },
-      { tokenId: position.id, permissions, nonce: nextNonce, deadline: MAX_UINT_256 }
+    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+      position.id,
+      companionAddress,
+      PERMISSIONS.WITHDRAW
     );
-
-    const { v, r, s } = fromRpcSig(rawSignature);
 
     const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
       permissions,
       position.id,
-      MAX_UINT_256,
+      deadline,
       v,
       r,
       s
@@ -1180,8 +1106,6 @@ export default class Web3Service {
   async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
     const currentNetwork = await this.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const signer = this.getSigner();
-    const permissionManagerAddress = await this.getPermissionManagerAddress();
     const companionAddress = await this.getHUBCompanionAddress();
 
     if (
@@ -1208,7 +1132,7 @@ export default class Web3Service {
       this.getSigner()
     ) as unknown as HubCompanionContract;
 
-    const companionHasPermission = await this.companionHasTerminate(position.id);
+    const companionHasPermission = await this.companionHasPermission(position.id, PERMISSIONS.TERMINATE);
 
     if (companionHasPermission) {
       if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
@@ -1217,48 +1141,16 @@ export default class Web3Service {
       return hubCompanionInstance.terminateUsingProtocolTokenAsFrom(position.id, this.account, this.account);
     }
 
-    const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
-
-    const permissionManagerInstance = new ethers.Contract(
-      permissionManagerAddress,
-      PERMISSION_MANAGER_ABI.abi,
-      signer
-    ) as unknown as PermissionManagerContract;
-
-    const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
-
-    const PermissionSet = [
-      { name: 'operator', type: 'address' },
-      { name: 'permissions', type: 'uint8[]' },
-    ];
-
-    const PermissionPermit = [
-      { name: 'permissions', type: 'PermissionSet[]' },
-      { name: 'tokenId', type: 'uint256' },
-      { name: 'nonce', type: 'uint256' },
-      { name: 'deadline', type: 'uint256' },
-    ];
-
-    const permissions = [{ operator: companionAddress, permissions: [PERMISSIONS.TERMINATE] }];
-
-    // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await (signer as VoidSigner)._signTypedData(
-      {
-        name: 'Mean Finance DCA',
-        version: '1',
-        chainId: currentNetwork.chainId,
-        verifyingContract: permissionManagerAddress,
-      },
-      { PermissionSet, PermissionPermit },
-      { tokenId: position.id, permissions, nonce: nextNonce, deadline: MAX_UINT_256 }
+    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+      position.id,
+      companionAddress,
+      PERMISSIONS.WITHDRAW
     );
-
-    const { v, r, s } = fromRpcSig(rawSignature);
 
     const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
       permissions,
       position.id,
-      MAX_UINT_256,
+      deadline,
       v,
       r,
       s
@@ -1387,23 +1279,58 @@ export default class Web3Service {
     );
   }
 
-  async modifyRateAndSwaps(position: Position, newRate: string, newSwaps: string): Promise<TransactionResponse> {
+  async modifyRateAndSwaps(
+    position: Position,
+    newRate: string,
+    newSwaps: string,
+    useWrappedProtocolToken: boolean
+  ): Promise<TransactionResponse> {
     const hubAddress = await this.getHUBAddress();
     const companionAddress = await this.getHUBCompanionAddress();
     const hubInstance = new ethers.Contract(hubAddress, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
+    const currentNetwork = await this.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const hubCompanionInstance = new ethers.Contract(
       companionAddress,
       HUB_COMPANION_ABI.abi,
       this.getSigner()
     ) as unknown as HubCompanionContract;
 
+    if (
+      position.from.address !== wrappedProtocolToken.address &&
+      position.from.address !== PROTOCOL_TOKEN_ADDRESS &&
+      useWrappedProtocolToken
+    ) {
+      throw new Error('Should not call modify rate and swaps without it being protocol token');
+    }
+
     if (BigNumber.from(newSwaps).gt(BigNumber.from(MAX_UINT_32))) {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
     const newAmount = BigNumber.from(parseUnits(newRate, position.from.decimals)).mul(BigNumber.from(newSwaps));
+
+    if (position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) {
+      if (newAmount.gte(position.remainingLiquidity)) {
+        return hubInstance.increasePosition(
+          position.id,
+          newAmount.sub(position.remainingLiquidity),
+          BigNumber.from(newSwaps)
+        );
+      }
+
+      return hubInstance.reducePosition(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.account
+      );
+    }
+
     if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
+      const companionHasIncrease = await this.companionHasPermission(position.id, PERMISSIONS.INCREASE);
+
+      if (companionHasIncrease) {
         return hubCompanionInstance.increasePositionUsingProtocolToken(
           position.id,
           newAmount.sub(position.remainingLiquidity),
@@ -1412,14 +1339,38 @@ export default class Web3Service {
         );
       }
 
-      return hubInstance.increasePosition(
+      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+        position.id,
+        companionAddress,
+        PERMISSIONS.INCREASE
+      );
+
+      const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
+        permissions,
+        position.id,
+        deadline,
+        v,
+        r,
+        s
+      );
+
+      const { data: withdrawData } = await hubCompanionInstance.populateTransaction.increasePositionUsingProtocolToken(
         position.id,
         newAmount.sub(position.remainingLiquidity),
-        BigNumber.from(newSwaps)
+        BigNumber.from(newSwaps),
+        { value: newAmount.sub(position.remainingLiquidity) }
       );
+
+      if (!permissionData || !withdrawData) {
+        throw new Error('Permission or withdraw data cannot be undefined');
+      }
+
+      return hubCompanionInstance.multicall([permissionData, withdrawData]);
     }
 
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
+    const companionHasReduce = await this.companionHasPermission(position.id, PERMISSIONS.REDUCE);
+
+    if (companionHasReduce) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(
         position.id,
         position.remainingLiquidity.sub(newAmount),
@@ -1428,12 +1379,33 @@ export default class Web3Service {
       );
     }
 
-    return hubInstance.reducePosition(
+    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+      position.id,
+      companionAddress,
+      PERMISSIONS.REDUCE
+    );
+
+    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
+      permissions,
+      position.id,
+      deadline,
+      v,
+      r,
+      s
+    );
+
+    const { data: withdrawData } = await hubCompanionInstance.populateTransaction.reducePositionUsingProtocolToken(
       position.id,
       position.remainingLiquidity.sub(newAmount),
       BigNumber.from(newSwaps),
       this.account
     );
+
+    if (!permissionData || !withdrawData) {
+      throw new Error('Permission or withdraw data cannot be undefined');
+    }
+
+    return hubCompanionInstance.multicall([permissionData, withdrawData]);
   }
 
   async removeFunds(position: Position, ammountToRemove: string): Promise<TransactionResponse> {

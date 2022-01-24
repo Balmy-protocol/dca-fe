@@ -79,6 +79,7 @@ const PositionMenu = ({
             onModifyRateAndSwaps={onModifyRateAndSwapsPosition}
             balance={balance}
             isMinimal
+            onApprove={() => {}}
           />
         )}
       </StyledOverlay>

@@ -264,6 +264,15 @@ export const SNX = (chainId: number): Token => ({
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
 });
 
+export const EMPTY_TOKEN = {
+  chainId: -1,
+  decimals: 18,
+  address: 'none',
+  name: 'EMPTY',
+  symbol: 'EMTPY',
+  logoURI: '',
+};
+
 export const KOVAN_TOKENS = {
   [PROTOCOL_TOKEN_ADDRESS]: ETH(NETWORKS.kovan.chainId),
   [DAI_ADDRESSES[NETWORKS.kovan.chainId]]: DAI(NETWORKS.kovan.chainId),
