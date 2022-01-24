@@ -16,7 +16,7 @@ import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import { ActionState, FullPosition } from 'types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
-import { POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS } from 'config/constants';
+import { COMPANION_ADDRESS, POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS } from 'config/constants';
 import { getFrequencyLabel } from 'utils/parsing';
 import { buildEtherscanAddress } from 'utils/etherscan';
 import Link from '@material-ui/core/Link';
@@ -320,7 +320,9 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
         {positionState.permissions.map((permission) => (
           <Typography variant="body1">
             <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
-              {permission.operator}
+              {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase()
+                ? 'Mean Finance Companion'
+                : permission.operator}
               <CallMadeIcon style={{ fontSize: '1rem' }} />
             </StyledLink>
             <FormattedMessage description="positionPermissionsModified only" defaultMessage="will only be able to" />
