@@ -831,6 +831,20 @@ export default class Web3Service {
       signer
     ) as unknown as PermissionManagerContract;
 
+    const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.INCREASE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.REDUCE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.WITHDRAW),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.TERMINATE),
+    ]);
+
+    const defaultPermissions = [
+      ...(hasIncrease ? [PERMISSIONS.INCREASE] : []),
+      ...(hasReduce ? [PERMISSIONS.REDUCE] : []),
+      ...(hasWithdraw ? [PERMISSIONS.WITHDRAW] : []),
+      ...(hasTerminate ? [PERMISSIONS.TERMINATE] : []),
+    ];
+
     const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
 
     const PermissionSet = [
@@ -845,7 +859,7 @@ export default class Web3Service {
       { name: 'deadline', type: 'uint256' },
     ];
 
-    const permissions = [{ operator: contractAddress, permissions: [permission] }];
+    const permissions = [{ operator: contractAddress, permissions: [...defaultPermissions, permission] }];
 
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await (signer as VoidSigner)._signTypedData(
@@ -1335,7 +1349,7 @@ export default class Web3Service {
           position.id,
           newAmount.sub(position.remainingLiquidity),
           BigNumber.from(newSwaps),
-          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
+          { value: newAmount.sub(position.remainingLiquidity) }
         );
       }
 
@@ -1354,18 +1368,18 @@ export default class Web3Service {
         s
       );
 
-      const { data: withdrawData } = await hubCompanionInstance.populateTransaction.increasePositionUsingProtocolToken(
+      const { data: increaseData } = await hubCompanionInstance.populateTransaction.increasePositionUsingProtocolToken(
         position.id,
         newAmount.sub(position.remainingLiquidity),
         BigNumber.from(newSwaps),
         { value: newAmount.sub(position.remainingLiquidity) }
       );
 
-      if (!permissionData || !withdrawData) {
-        throw new Error('Permission or withdraw data cannot be undefined');
+      if (!permissionData || !increaseData) {
+        throw new Error('Permission or increase data cannot be undefined');
       }
 
-      return hubCompanionInstance.multicall([permissionData, withdrawData]);
+      return hubCompanionInstance.multicall([permissionData, increaseData]);
     }
 
     const companionHasReduce = await this.companionHasPermission(position.id, PERMISSIONS.REDUCE);
@@ -1394,18 +1408,18 @@ export default class Web3Service {
       s
     );
 
-    const { data: withdrawData } = await hubCompanionInstance.populateTransaction.reducePositionUsingProtocolToken(
+    const { data: reduceData } = await hubCompanionInstance.populateTransaction.reducePositionUsingProtocolToken(
       position.id,
       position.remainingLiquidity.sub(newAmount),
       BigNumber.from(newSwaps),
       this.account
     );
 
-    if (!permissionData || !withdrawData) {
-      throw new Error('Permission or withdraw data cannot be undefined');
+    if (!permissionData || !reduceData) {
+      throw new Error('Permission or reduce data cannot be undefined');
     }
 
-    return hubCompanionInstance.multicall([permissionData, withdrawData]);
+    return hubCompanionInstance.multicall([permissionData, reduceData]);
   }
 
   async removeFunds(position: Position, ammountToRemove: string): Promise<TransactionResponse> {
