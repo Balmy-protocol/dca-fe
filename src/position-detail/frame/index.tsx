@@ -11,16 +11,15 @@ import { FullPosition, GetPairSwapsData } from 'types';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import getPairSwaps from 'graphql/getPairSwaps.graphql';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { usePositionHasPendingTransaction } from 'state/transactions/hooks';
 import Button from 'common/button';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import PositionNotFound from 'position-detail/position-not-found';
-import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'state/hooks';
 import { appleTabsStylesHook } from 'common/tabs';
-import { changePositionDetailsTab } from 'state/tabs/actions';
+import { changeMainTab, changePositionDetailsTab } from 'state/tabs/actions';
 import { usePositionDetailsTab } from 'state/tabs/hooks';
 import PositionPermissionsContainer from 'position-detail/permissions-container';
 import { setPermissions } from 'state/position-permissions/actions';
@@ -31,7 +30,6 @@ const WAIT_FOR_SUBGRAPH = 5000;
 const PositionDetailFrame = () => {
   const { positionId } = useParams<{ positionId: string }>();
   const client = useDCAGraphql();
-  const web3Service = useWeb3Service();
   const history = useHistory();
   const tabIndex = usePositionDetailsTab();
   const dispatch = useAppDispatch();
@@ -102,9 +100,6 @@ const PositionDetailFrame = () => {
     return <PositionNotFound />;
   }
 
-  const usesCompanion =
-    position.from.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === PROTOCOL_TOKEN_ADDRESS;
-
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   position = {
@@ -113,11 +108,15 @@ const PositionDetailFrame = () => {
     to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
   };
 
+  const onBackToPositions = () => {
+    dispatch(changeMainTab(1));
+    history.push('/');
+  };
   return (
     <>
       <Grid container spacing={4}>
         <Grid item xs={12} style={{ paddingBottom: '0px', paddingTop: '0px' }}>
-          <Button variant="text" color="default" onClick={() => history.push('/')}>
+          <Button variant="text" color="default" onClick={onBackToPositions}>
             <Typography variant="body2" component="div" style={{ display: 'flex', alignItems: 'center' }}>
               <ArrowBackIcon fontSize="inherit" /> Back to positions
             </Typography>

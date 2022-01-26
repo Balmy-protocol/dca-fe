@@ -15,7 +15,7 @@ import PositionPermission from 'position-detail/permission';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import { TRANSACTION_TYPES } from 'config/constants';
-import { discardChanges } from 'state/position-permissions/actions';
+import { discardChanges, submitPermissionChanges } from 'state/position-permissions/actions';
 import { useAppDispatch } from 'state/hooks';
 import AddAddressPermissionModal from 'common/add-address-permission-modal';
 import Card from '@material-ui/core/Card';
@@ -86,6 +86,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
           />
         ),
       });
+      dispatch(submitPermissionChanges());
     } catch (e) {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({

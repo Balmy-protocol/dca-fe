@@ -288,7 +288,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                   </Typography>
                 )}
               </StyledCardFooterButton>
-              {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
+              {/* {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
                 <StyledCardFooterButton
                   variant="contained"
                   color="secondary"
@@ -299,7 +299,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                     <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
                   </Typography>
                 </StyledCardFooterButton>
-              )}
+              )} */}
             </StyledCallToActionContainer>
           </Grid>
           <Grid item xs={12}>

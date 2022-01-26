@@ -22,7 +22,10 @@ const PositionNotFound = () => {
       </Typography>
 
       <Typography variant="h4">
-        <FormattedMessage description="positionNotFoundTitle" defaultMessage="This position does not exist yet" />
+        <FormattedMessage
+          description="positionNotFoundTitle"
+          defaultMessage="This position does not appear to be indexed yet"
+        />
       </Typography>
 
       <Typography variant="h5">

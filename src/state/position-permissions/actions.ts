@@ -14,3 +14,4 @@ export const addOperator = createAction<{ operator: string; permissions: Permiss
   'positionPermissions/addOperator'
 );
 export const discardChanges = createAction('positionPermissions/discardChanges');
+export const submitPermissionChanges = createAction('positionPermissions/submitChanges');

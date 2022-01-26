@@ -33,7 +33,9 @@ const SwapContainer = () => {
   );
 
   React.useEffect(() => {
-    dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
+    if (!from) {
+      dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
+    }
     // setTo(USDC(currentNetwork.chainId));
   }, [currentNetwork.chainId]);
 

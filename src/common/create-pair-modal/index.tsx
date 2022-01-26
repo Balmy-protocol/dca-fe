@@ -5,16 +5,11 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import LoadingIndicator from 'common/centered-loading-indicator';
-import { Token, Web3Service, EstimatedPairResponse } from 'types';
+import { Token, Web3Service } from 'types';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
-import usePromise from 'hooks/usePromise';
-import useTransactionModal from 'hooks/useTransactionModal';
 import { makeStyles } from '@material-ui/core/styles';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 const useStyles = makeStyles({
   paper: {
@@ -46,48 +41,15 @@ const StyledLoadingIndicatorWrapper = styled.div`
 `;
 
 interface CreatePairModalProps {
-  web3Service: Web3Service;
   from: Token | null;
   to: Token | null;
   onCancel: () => void;
   open: boolean;
-  amountOfSwaps: string;
-  toDeposit: string;
-  swapInterval: BigNumber;
   onCreatePair: () => void;
 }
 
-const CreatePairModal = ({
-  from,
-  to,
-  toDeposit,
-  amountOfSwaps,
-  swapInterval,
-  web3Service,
-  open,
-  onCancel,
-  onCreatePair,
-}: CreatePairModalProps) => {
+const CreatePairModal = ({ from, to, open, onCancel, onCreatePair }: CreatePairModalProps) => {
   const classes = useStyles();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [estimatedPrice, isLoadingEstimatedPrice, estimatedPriceErrors] = usePromise<EstimatedPairResponse>(
-    web3Service,
-    'getEstimatedPairCreation',
-    [from, to, toDeposit, amountOfSwaps, swapInterval],
-    !from || !to || !toDeposit || !amountOfSwaps || !swapInterval || !web3Service.getAccount() || !open
-  );
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
-
-  // TODO: Uncomment when estimateGasWorks
-  // if (estimatedPriceErrors && open) {
-  //   setModalError({
-  //     error: estimatedPriceErrors,
-  //   });
-  //   onCancel();
-  // }
-  // const isLoading = isLoadingEstimatedPrice || !estimatedPrice;
 
   const isLoading = false;
 
@@ -129,18 +91,6 @@ const CreatePairModal = ({
                 values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
               />
             </Typography>
-            {/* TODO: uncomment when estimateGas works */}
-            {/* <Typography variant="body1">
-              <FormattedMessage
-                description="Create pair"
-                defaultMessage="The estimated cost of the operation is {costEth} ETH or around {costUsd} dollars."
-                values={{
-                  cost: estimatedPrice.gas,
-                  costUsd: estimatedPrice.gasUsd.toFixed(2),
-                  costEth: formatCurrencyAmount(estimatedPrice.gasEth, ETH, 4),
-                }}
-              />
-            </Typography> */}
           </>
         )}
       </StyledDialogContent>
@@ -148,14 +98,7 @@ const CreatePairModal = ({
         <Button onClick={onCancel} color="default" variant="outlined" fullWidth>
           <FormattedMessage description="go back" defaultMessage="Go back" />
         </Button>
-        <Button
-          color="secondary"
-          variant="contained"
-          disabled={isLoadingEstimatedPrice}
-          fullWidth
-          onClick={onCreatePair}
-          autoFocus
-        >
+        <Button color="secondary" variant="contained" fullWidth onClick={onCreatePair} autoFocus>
           <FormattedMessage description="Create pair submit" defaultMessage="Create position" />
         </Button>
       </StyledDialogActions>
