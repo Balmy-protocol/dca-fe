@@ -5,6 +5,8 @@ import usePrevious from 'hooks/usePrevious';
 import WalletContext from 'common/wallet-context';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
+import { useBlockNumber } from 'state/block-number/hooks';
+import useCurrentNetwork from './useCurrentNetwork';
 
 function useBalance(from: Token | undefined | null): [BigNumber | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -15,6 +17,9 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = usePrevious(web3Service.getAccount());
+  const currentNetwork = useCurrentNetwork();
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const prevBlockNumber = usePrevious(blockNumber);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -34,7 +39,12 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
       !isEqual(account, web3Service.getAccount()) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions)
+      !isEqual(prevPendingTrans, hasPendingTransactions) ||
+      (blockNumber &&
+        prevBlockNumber &&
+        blockNumber !== -1 &&
+        prevBlockNumber !== -1 &&
+        !isEqual(prevBlockNumber, blockNumber))
     ) {
       setIsLoading(true);
       setResult(undefined);
@@ -43,7 +53,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount()]);
+  }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount(), prevBlockNumber, blockNumber]);
 
   if (!from) {
     return [BigNumber.from('0'), false, undefined];

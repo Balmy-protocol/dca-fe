@@ -3,7 +3,7 @@ import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@material-ui/core/Paper';
 import styled from 'styled-components';
 import Grid from '@material-ui/core/Grid';
-import { Web3Service, GetAllowanceResponse, Token } from 'types';
+import { Web3Service, Token } from 'types';
 import Typography from '@material-ui/core/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
@@ -45,12 +45,7 @@ import {
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
-import {
-  useTransactionAdder,
-  useHasPendingApproval,
-  useHasConfirmedApproval,
-  useHasPendingPairCreation,
-} from 'state/transactions/hooks';
+import { useTransactionAdder, useHasPendingApproval, useHasPendingPairCreation } from 'state/transactions/hooks';
 import { calculateStale, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
@@ -61,6 +56,7 @@ import Switch from '@material-ui/core/Switch';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import useIsWhitelisted from 'hooks/useIsWhitelisted';
+import useAllowance from 'hooks/useAllowance';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -212,14 +208,8 @@ const Swap = ({
   const isCreatingPair = useHasPendingPairCreation(from, to);
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount());
-  const hasConfirmedApproval = useHasConfirmedApproval(from, to, web3Service.getAccount());
 
-  const [allowance, isLoadingAllowance, allowanceErrors] = usePromise<GetAllowanceResponse>(
-    web3Service,
-    'getAllowance',
-    [from, to],
-    !from || !to || !web3Service.getAccount() || hasPendingApproval
-  );
+  const [allowance, isLoadingAllowance, allowanceErrors] = useAllowance(from);
 
   const [pairIsSupported, isLoadingPairIsSupported] = usePromise<boolean>(
     web3Service,
@@ -286,15 +276,12 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await web3Service.approveToken(from, to);
+      const result = await web3Service.approveToken(from);
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: from,
-          addressFor:
-            to.address === PROTOCOL_TOKEN_ADDRESS
-              ? COMPANION_ADDRESS[currentNetwork.chainId]
-              : HUB_ADDRESS[currentNetwork.chainId],
+          addressFor: HUB_ADDRESS[currentNetwork.chainId],
         },
       });
       setModalSuccess({
@@ -366,6 +353,29 @@ const Swap = ({
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error creating position', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    }
+  };
+
+  const preHandleApprove = () => {
+    if (!existingPair) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      handleApproveToken();
+      return;
+    }
+
+    const isStale =
+      calculateStale(
+        existingPair?.lastExecutedAt || 0,
+        frequencyType,
+        existingPair?.lastCreatedAt || 0,
+        existingPair?.swapInfo || null
+      ) === STALE;
+
+    if (isStale) {
+      setShouldShowStalePairModal(true);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      handleApproveToken();
     }
   };
 
@@ -454,13 +464,18 @@ const Swap = ({
     }
   };
 
+  const onLowLiquidityModalClose = () => {
+    setShouldShowLowLiquidityModal(false);
+  };
+
   const POSSIBLE_ACTIONS_FUNCTIONS = {
-    createPosition: preHandleSwap,
+    createPosition: handleSwap,
     approveToken: handleApproveToken,
   };
 
-  const onLowLiquidityModalClose = () => {
-    setShouldShowLowLiquidityModal(false);
+  const PRE_POSSIBLE_ACTIONS_FUNCTIONS = {
+    createPosition: preHandleSwap,
+    approveToken: preHandleApprove,
   };
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -473,9 +488,12 @@ const Swap = ({
     let hasLowLiquidity = oracleInUse === ORACLES.UNISWAP;
 
     if (oracleInUse === ORACLES.UNISWAP) {
-      const liquidity = await web3Service.getPairLiquidity(from, to);
-
-      hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
+      try {
+        const liquidity = await web3Service.getPairLiquidity(from, to);
+        hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
+      } catch {
+        hasLowLiquidity = false;
+      }
     }
 
     setIsLoading(false);
@@ -483,16 +501,16 @@ const Swap = ({
     setCurrentAction(actionToDo);
     if (hasLowLiquidity) {
       setShouldShowLowLiquidityModal(true);
-    } else if (POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
+    } else if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
+      PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
     }
   };
 
   const closeLowLiquidityModal = () => {
-    if (POSSIBLE_ACTIONS_FUNCTIONS[currentAction]) {
+    if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[currentAction]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      POSSIBLE_ACTIONS_FUNCTIONS[currentAction]();
+      PRE_POSSIBLE_ACTIONS_FUNCTIONS[currentAction]();
     }
     onLowLiquidityModalClose();
   };
@@ -508,7 +526,6 @@ const Swap = ({
           allowance.allowance &&
           allowance.token.address === from.address &&
           parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
-        hasConfirmedApproval ||
         from.address === PROTOCOL_TOKEN_ADDRESS);
 
   const shouldDisableButton =
@@ -698,7 +715,7 @@ const Swap = ({
     ButtonToShow = LoadingButton;
   } else if (!pairIsSupported && !isLoadingPairIsSupported && from && to) {
     ButtonToShow = PairNotSupportedButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0))) {
+  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
     ButtonToShow = ApproveTokenButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
@@ -722,17 +739,13 @@ const Swap = ({
       <CreatePairModal
         open={shouldShowPairModal}
         onCancel={() => setShouldShowPairModal(false)}
-        web3Service={web3Service}
         from={from}
         to={to}
-        amountOfSwaps={frequencyValue}
-        swapInterval={frequencyType}
-        toDeposit={fromValue}
         onCreatePair={handleSwap}
       />
       <StalePairModal
         open={shouldShowStalePairModal}
-        onConfirm={handleSwap}
+        onConfirm={() => POSSIBLE_ACTIONS_FUNCTIONS[currentAction]()}
         onCancel={() => setShouldShowStalePairModal(false)}
       />
       <LowLiquidityModal

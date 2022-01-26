@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 import useWeb3Service from 'hooks/useWeb3Service';
-import { COMPANION_ADDRESS, HUB_ADDRESS, TRANSACTION_TYPES } from 'config/constants';
+import { HUB_ADDRESS, TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import { useBlockNumber } from 'state/block-number/hooks';
@@ -293,24 +293,16 @@ export function usePositionHasTransfered(position: string): string | null {
 }
 
 // returns whether a token has been approved transaction
-export function useHasConfirmedApproval(
-  token: Token | null,
-  tokenTo: Token | null,
-  spender: string | undefined
-): boolean {
+export function useHasConfirmedApproval(token: Token | null, spender: string | undefined): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
-  const addressToCheck =
-    (tokenTo &&
-      (tokenTo.address === PROTOCOL_TOKEN_ADDRESS
-        ? COMPANION_ADDRESS[currentNetwork.chainId]
-        : HUB_ADDRESS[currentNetwork.chainId])) ||
-    '';
+  const addressToCheck = HUB_ADDRESS[currentNetwork.chainId];
+  // const blockNumber = useBlockNumber(currentNetwork.chainId);
+
   return useMemo(
     () =>
       !!token &&
-      !!tokenTo &&
       typeof tokenAddress === 'string' &&
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {
@@ -321,6 +313,7 @@ export function useHasConfirmedApproval(
           tx.receipt &&
           (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress &&
           (<ApproveTokenTypeData>tx.typeData).addressFor === addressToCheck &&
+          // (blockNumber || 0) - (tx.receipt.blockNumber || 0) <= 3 &&
           tx.from === spender
         );
       }),

@@ -34,7 +34,6 @@ interface PositionSummaryControlsProps {
   onModifyRate: () => void;
   onTransfer: () => void;
   onViewNFT: () => void;
-  onMigratePosition: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
   shouldDisable?: boolean;
@@ -49,7 +48,6 @@ const PositionSummaryControls = ({
   position,
   onViewNFT,
   shouldDisable,
-  onMigratePosition,
 }: PositionSummaryControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
@@ -62,13 +60,6 @@ const PositionSummaryControls = ({
   return (
     <PositionControlsContainer>
       <Grid container spacing={2}>
-        {BigNumber.from(position.current.remainingSwaps).gt(BigNumber.from(0)) && (
-          <StyledGrid item xs={12}>
-            <Button variant="contained" color="primary" onClick={onMigratePosition}>
-              <FormattedMessage description="migrate position" defaultMessage="Migrate position" />
-            </Button>
-          </StyledGrid>
-        )}
         <StyledGrid item xs={12}>
           {isPending && (
             <Button variant="contained" color="pending" size="large">
@@ -121,9 +112,9 @@ const PositionSummaryControls = ({
                 <Button variant="contained" color="white" onClick={onModifyRate} disabled={shouldDisable}>
                   <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
                 </Button>
-                {/* <Button variant="contained" color="white" onClick={onTransfer}>
+                <Button variant="contained" color="white" onClick={onTransfer}>
                   <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-                </Button> */}
+                </Button>
                 <Button variant="outlined" color="error" onClick={onTerminate} disabled={shouldDisable}>
                   <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
                 </Button>

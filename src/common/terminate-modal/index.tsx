@@ -11,7 +11,7 @@ import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
 import { makeStyles } from '@material-ui/core/styles';
 import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -74,15 +74,9 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
   const handleTerminate = async () => {
     try {
       handleCancel();
-      setModalLoading({
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage description="Terminating position" defaultMessage="Terminating your position" />
-          </Typography>
-        ),
-      });
       let terminateWithUnwrap = false;
 
+      const hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.TERMINATE);
       if (hasWrappedOrProtocol) {
         if (hasProtocolToken) {
           terminateWithUnwrap = !useProtocolToken;
@@ -90,6 +84,24 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
           terminateWithUnwrap = useProtocolToken;
         }
       }
+
+      setModalLoading({
+        content: (
+          <>
+            <Typography variant="body1">
+              <FormattedMessage description="Terminating position" defaultMessage="Terminating your position" />
+            </Typography>
+            {hasWrappedOrProtocol && terminateWithUnwrap && !hasPermission && (
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="Approve signature companion text"
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                />
+              </Typography>
+            )}
+          </>
+        ),
+      });
 
       const result = await web3Service.terminate(position, terminateWithUnwrap);
       addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id } });

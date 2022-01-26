@@ -11,7 +11,7 @@ import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@material-ui/core/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
 import { makeStyles } from '@material-ui/core/styles';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
@@ -65,15 +65,27 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
   const handleWithdraw = async () => {
     try {
       onCancel();
+      const hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
+
       setModalLoading({
         content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="Withdrawing from"
-              defaultMessage="Withdrawing {from}"
-              values={{ from: position.to.symbol }}
-            />
-          </Typography>
+          <>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="Withdrawing from"
+                defaultMessage="Withdrawing {from}"
+                values={{ from: position.to.symbol }}
+              />
+            </Typography>
+            {useProtocolToken && !hasPermission && (
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="Approve signature companion text"
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                />
+              </Typography>
+            )}
+          </>
         ),
       });
       const result = await web3Service.withdraw(position, useProtocolToken);

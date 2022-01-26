@@ -134,7 +134,7 @@ const ModifyRateAndSwaps = ({
   };
 
   const isIncreasingPosition = position.remainingLiquidity
-    .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
+    .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue || '0', fromToUse.decimals)))
     .lte(BigNumber.from(0));
 
   const needsToApprove =
@@ -143,7 +143,7 @@ const ModifyRateAndSwaps = ({
     isIncreasingPosition &&
     parseUnits(allowance.allowance, position.from.decimals).lt(
       position.remainingLiquidity
-        .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
+        .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue || '0', fromToUse.decimals)))
         .abs()
     );
 
@@ -219,23 +219,25 @@ const ModifyRateAndSwaps = ({
                   }}
                 />
               </Typography>
-              <Typography variant={isMinimal ? 'caption' : 'body2'}>
-                <FormattedMessage
-                  description="rate detail"
-                  defaultMessage="We'll swap {rate} {from} {frequency} for {frequencyPlural} for you"
-                  values={{
-                    from: fromToUse.symbol,
-                    rate: fromValue,
-                    frequency:
-                      STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                        .every,
-                    frequencyPlural: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
-                  }}
-                />
-              </Typography>
+              {frequencyValue && frequencyValue !== '0' && fromValue && fromValue !== '0' && (
+                <Typography variant={isMinimal ? 'caption' : 'body2'}>
+                  <FormattedMessage
+                    description="rate detail"
+                    defaultMessage="We'll swap {rate} {from} {frequency} for {frequencyPlural} for you"
+                    values={{
+                      from: fromToUse.symbol,
+                      rate: fromValue,
+                      frequency:
+                        STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                          .every,
+                      frequencyPlural: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
+                    }}
+                  />
+                </Typography>
+              )}
               {showAddCaption &&
                 !position.remainingLiquidity
-                  .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
+                  .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue || '0', fromToUse.decimals)))
                   .eq(BigNumber.from(0)) && (
                   <Typography variant={isMinimal ? 'caption' : 'body2'}>
                     {isIncreasingPosition ? (
@@ -246,7 +248,11 @@ const ModifyRateAndSwaps = ({
                           from: fromToUse.symbol,
                           addAmmount: formatUnits(
                             position.remainingLiquidity
-                              .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
+                              .sub(
+                                BigNumber.from(frequencyValue || '0').mul(
+                                  parseUnits(fromValue || '0', fromToUse.decimals)
+                                )
+                              )
                               .abs(),
                             fromToUse.decimals
                           ),
@@ -260,7 +266,11 @@ const ModifyRateAndSwaps = ({
                           from: fromToUse.symbol,
                           returnAmmount: formatUnits(
                             position.remainingLiquidity
-                              .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue, fromToUse.decimals)))
+                              .sub(
+                                BigNumber.from(frequencyValue || '0').mul(
+                                  parseUnits(fromValue || '0', fromToUse.decimals)
+                                )
+                              )
                               .abs(),
                             fromToUse.decimals
                           ),

@@ -319,22 +319,47 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
       <Grid item xs={12}>
         {positionState.permissions.map((permission) => (
           <Typography variant="body1">
-            <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
-              {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase()
-                ? 'Mean Finance Companion'
-                : permission.operator}
-              <CallMadeIcon style={{ fontSize: '1rem' }} />
-            </StyledLink>
-            <FormattedMessage description="positionPermissionsModified only" defaultMessage="will only be able to" />
-            {permission.permissions.map(
-              (permissionString, index) =>
-                ` ${
-                  index === permission.permissions.length - 1 && permission.permissions.length > 1 ? 'and ' : ''
-                }${STRING_PERMISSIONS[permissionString].toLowerCase()}${
-                  index !== permission.permissions.length - 1 && index !== permission.permissions.length - 2 ? ',' : ''
-                } `
+            {permission.permissions.length ? (
+              <>
+                <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
+                  {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase()
+                    ? 'Mean Finance Companion'
+                    : permission.operator}
+                  <CallMadeIcon style={{ fontSize: '1rem' }} />
+                </StyledLink>
+                <FormattedMessage
+                  description="positionPermissionsModified only"
+                  defaultMessage="will only be able to"
+                />
+                {permission.permissions.map(
+                  (permissionString, index) =>
+                    ` ${
+                      index === permission.permissions.length - 1 && permission.permissions.length > 1 ? 'and ' : ''
+                    }${STRING_PERMISSIONS[permissionString].toLowerCase()}${
+                      index !== permission.permissions.length - 1 && index !== permission.permissions.length - 2
+                        ? ','
+                        : ''
+                    } `
+                )}
+                <FormattedMessage
+                  description="positionPermissionsModified your position"
+                  defaultMessage="your position"
+                />
+              </>
+            ) : (
+              <>
+                <FormattedMessage
+                  description="positionPermissionsModified all"
+                  defaultMessage="Removed all permissions for"
+                />
+                <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
+                  {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase()
+                    ? 'Mean Finance Companion'
+                    : permission.operator}
+                  <CallMadeIcon style={{ fontSize: '1rem' }} />
+                </StyledLink>
+              </>
             )}
-            <FormattedMessage description="positionPermissionsModified your position" defaultMessage="your position" />
           </Typography>
         ))}
       </Grid>

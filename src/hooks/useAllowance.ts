@@ -5,6 +5,8 @@ import usePrevious from 'hooks/usePrevious';
 import WalletContext from 'common/wallet-context';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { EMPTY_TOKEN } from 'mocks/tokens';
+import { useBlockNumber } from 'state/block-number/hooks';
+import useCurrentNetwork from './useCurrentNetwork';
 
 function useAllowance(
   from: Token | undefined | null
@@ -17,6 +19,9 @@ function useAllowance(
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = usePrevious(web3Service.getAccount());
+  const currentNetwork = useCurrentNetwork();
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const prevBlockNumber = usePrevious(blockNumber);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -36,7 +41,12 @@ function useAllowance(
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
       !isEqual(account, web3Service.getAccount()) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions)
+      !isEqual(prevPendingTrans, hasPendingTransactions) ||
+      (blockNumber &&
+        prevBlockNumber &&
+        blockNumber !== -1 &&
+        prevBlockNumber !== -1 &&
+        !isEqual(prevBlockNumber, blockNumber))
     ) {
       setIsLoading(true);
       setResult(undefined);
@@ -45,7 +55,7 @@ function useAllowance(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount()]);
+  }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount(), prevBlockNumber, blockNumber]);
 
   if (!from) {
     return [{ token: from || EMPTY_TOKEN, allowance: '0' }, false, undefined];

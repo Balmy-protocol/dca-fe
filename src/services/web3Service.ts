@@ -51,6 +51,7 @@ import {
   TransferTypeData,
   PositionPermission,
   MigratePositionTypeData,
+  ModifyPermissionsTypeData,
 } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { sortTokens, sortTokensByAddress } from 'utils/parsing';
@@ -581,14 +582,8 @@ export default class Web3Service {
     };
   }
 
-  async approveToken(token: Token, tokenTo: Token): Promise<TransactionResponse> {
-    let addressToApprove;
-
-    if (tokenTo.address === PROTOCOL_TOKEN_ADDRESS) {
-      addressToApprove = await this.getHUBCompanionAddress();
-    } else {
-      addressToApprove = await this.getHUBAddress();
-    }
+  async approveToken(token: Token): Promise<TransactionResponse> {
+    const addressToApprove = await this.getHUBAddress();
 
     const ERC20Interface = new Interface(ERC20ABI);
 
@@ -1023,12 +1018,14 @@ export default class Web3Service {
 
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
+    const currentNetwork = await this.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
     if (amountOfSwaps.gt(BigNumber.from(MAX_UINT_32))) {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
-    if (from.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (from.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase()) {
       const companionAddress = await this.getHUBCompanionAddress();
 
       const hubCompanionInstance = new ethers.Contract(
@@ -1045,6 +1042,7 @@ export default class Web3Service {
         swapInterval,
         this.account,
         [],
+        [],
         from.address === PROTOCOL_TOKEN_ADDRESS ? { value: weiValue } : {}
       );
     }
@@ -1053,7 +1051,16 @@ export default class Web3Service {
 
     const hubInstance = new ethers.Contract(hubAddress, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
-    return hubInstance.deposit(from.address, to.address, weiValue, amountOfSwaps, swapInterval, this.account, []);
+    const toToUse = to.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken : to;
+    return hubInstance['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'](
+      from.address,
+      toToUse.address,
+      weiValue,
+      amountOfSwaps,
+      swapInterval,
+      this.account,
+      []
+    );
   }
 
   async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
@@ -1149,7 +1156,7 @@ export default class Web3Service {
     const companionHasPermission = await this.companionHasPermission(position.id, PERMISSIONS.TERMINATE);
 
     if (companionHasPermission) {
-      if (position.to.address === PROTOCOL_TOKEN_ADDRESS) {
+      if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
         return hubCompanionInstance.terminateUsingProtocolTokenAsTo(position.id, this.account, this.account);
       }
       return hubCompanionInstance.terminateUsingProtocolTokenAsFrom(position.id, this.account, this.account);
@@ -1158,7 +1165,7 @@ export default class Web3Service {
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position.id,
       companionAddress,
-      PERMISSIONS.WITHDRAW
+      PERMISSIONS.TERMINATE
     );
 
     const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
@@ -1371,15 +1378,16 @@ export default class Web3Service {
       const { data: increaseData } = await hubCompanionInstance.populateTransaction.increasePositionUsingProtocolToken(
         position.id,
         newAmount.sub(position.remainingLiquidity),
-        BigNumber.from(newSwaps),
-        { value: newAmount.sub(position.remainingLiquidity) }
+        BigNumber.from(newSwaps)
       );
 
       if (!permissionData || !increaseData) {
         throw new Error('Permission or increase data cannot be undefined');
       }
 
-      return hubCompanionInstance.multicall([permissionData, increaseData]);
+      return hubCompanionInstance.multicall([permissionData, increaseData], {
+        value: newAmount.sub(position.remainingLiquidity),
+      });
     }
 
     const companionHasReduce = await this.companionHasPermission(position.id, PERMISSIONS.REDUCE);
@@ -1502,8 +1510,8 @@ export default class Web3Service {
     return this.client.off('block');
   }
 
-  parseLog(log: Log, addressFor: string, chainId: number) {
-    if (addressFor === COMPANION_ADDRESS[chainId]) {
+  parseLog(log: Log, chainId: number) {
+    if (log.address === COMPANION_ADDRESS[chainId]) {
       const hubCompanionInstance = new ethers.Contract(
         COMPANION_ADDRESS[chainId],
         HUB_COMPANION_ABI.abi,
@@ -1743,6 +1751,11 @@ export default class Web3Service {
       case TRANSACTION_TYPES.TRANSFER_POSITION: {
         const transferPositionTypeData = transaction.typeData as TransferTypeData;
         delete this.currentPositions[transferPositionTypeData.id];
+        break;
+      }
+      case TRANSACTION_TYPES.MODIFY_PERMISSIONS: {
+        const modifyPermissionsTypeData = transaction.typeData as ModifyPermissionsTypeData;
+        this.currentPositions[modifyPermissionsTypeData.id].pendingTransaction = '';
         break;
       }
       default:

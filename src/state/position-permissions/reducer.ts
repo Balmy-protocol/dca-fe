@@ -1,6 +1,13 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { PositionPermission } from 'types';
-import { setPermissions, removePermission, addOperator, addPermission, discardChanges } from './actions';
+import {
+  setPermissions,
+  removePermission,
+  addOperator,
+  addPermission,
+  discardChanges,
+  submitPermissionChanges,
+} from './actions';
 
 export interface PositionPermissionsState {
   // used for safe checking
@@ -54,6 +61,13 @@ export default createReducer(initialState, (builder) =>
       };
     })
     .addCase(discardChanges, (state) => {
+      state.modifiedPermissions = {};
+    })
+    .addCase(submitPermissionChanges, (state) => {
+      state.permissions = {
+        ...state.permissions,
+        ...state.modifiedPermissions,
+      };
       state.modifiedPermissions = {};
     })
 );

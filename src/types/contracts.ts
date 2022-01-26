@@ -62,7 +62,8 @@ export class HubCompanionContract extends Contract {
     interval: BigNumber,
     account: string,
     permissions: { operator: string; permissions: string[] }[],
-    overrides: { value?: BigNumber }
+    bytes: string[],
+    overrides?: { value?: BigNumber }
   ) => Promise<TransactionResponse>;
 
   withdrawSwappedUsingProtocolToken: (id: string, recipient: string) => Promise<TransactionResponse>;
@@ -83,7 +84,7 @@ export class HubCompanionContract extends Contract {
     id: string,
     newAmount: BigNumber,
     newSwaps: BigNumber,
-    overrides: { value?: BigNumber }
+    overrides?: { value?: BigNumber }
   ) => Promise<TransactionResponse>;
 
   reducePositionUsingProtocolToken: (
@@ -93,7 +94,7 @@ export class HubCompanionContract extends Contract {
     recipient: string
   ) => Promise<TransactionResponse>;
 
-  multicall: (data: string[]) => Promise<TransactionResponse>;
+  multicall: (data: string[], overrides?: { value?: BigNumber }) => Promise<TransactionResponse>;
 }
 
 export class PermissionManagerContract extends Contract {
@@ -133,6 +134,16 @@ export class HubContract extends Contract {
   terminate: (id: string, recipientUnswapped: string, recipientSwapped: string) => Promise<TransactionResponse>;
 
   increasePosition: (id: string, newAmount: BigNumber, newSwaps: BigNumber) => Promise<TransactionResponse>;
+
+  'deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])': (
+    from: string,
+    to: string,
+    totalAmmount: BigNumber,
+    swaps: BigNumber,
+    interval: BigNumber,
+    account: string,
+    permissions: { operator: string; permissions: string[] }[]
+  ) => Promise<TransactionResponse>;
 
   reducePosition: (
     id: string,

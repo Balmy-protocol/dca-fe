@@ -15,18 +15,24 @@ import Details from 'position-detail/position-data';
 import PositionStatus from 'position-detail/position-status';
 import useWeb3Service from 'hooks/useWeb3Service';
 import NFTModal from 'common/view-nft-modal';
-import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS, COMPANION_ADDRESS, HUB_ADDRESS } from 'config/constants';
+import {
+  TRANSACTION_TYPES,
+  STRING_SWAP_INTERVALS,
+  COMPANION_ADDRESS,
+  HUB_ADDRESS,
+  PERMISSIONS,
+} from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import WithdrawModal from 'common/withdraw-modal';
 import TerminateModal from 'common/terminate-modal';
 import TransferPositionModal from 'common/transfer-position-modal';
-import MigratePositionModal from 'common/migrate-position-modal';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'state/hooks';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits } from '@ethersproject/units';
+import { BigNumber } from 'ethers';
 
 const StyledControlsWrapper = styled(Grid)`
   display: flex;
@@ -57,7 +63,6 @@ const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: P
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
-  const [showMigrateModal, setShowMigrateModal] = React.useState(false);
   const [showTransferModal, setShowTransferModal] = React.useState(false);
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const web3Service = useWeb3Service();
@@ -83,22 +88,49 @@ const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: P
     }
 
     try {
+      const isIncreasingPosition = BigNumber.from(position.current.remainingLiquidity)
+        .sub(BigNumber.from(newFrequency || '0').mul(parseUnits(newRate, position.from.decimals)))
+        .lte(BigNumber.from(0));
+
+      const hasPermission = await web3Service.companionHasPermission(
+        position.id,
+        isIncreasingPosition ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
+      );
+
       setModalLoading({
         content: (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="Modifying rate for position"
-              defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequencyTypePlural}"
-              values={{
-                from: position.from.symbol,
-                to: position.to.symbol,
-                newRate,
-                frequency: newFrequency,
-                frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.interval.toString()].adverb,
-                frequencyTypePlural: getFrequencyLabel(position.swapInterval.interval.toString(), newFrequency),
-              }}
-            />
-          </Typography>
+          <>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="Modifying rate for position"
+                defaultMessage="Changing your {from}/{to} position rate to swap {newRate} {from} {frequencyType} for {frequencyTypePlural}"
+                values={{
+                  from: position.from.symbol,
+                  to: position.to.symbol,
+                  newRate,
+                  frequency: newFrequency,
+                  frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.interval.toString()].adverb,
+                  frequencyTypePlural: getFrequencyLabel(position.swapInterval.interval.toString(), newFrequency),
+                }}
+              />
+            </Typography>
+            {position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken && !hasPermission && (
+              <Typography variant="body1">
+                {!isIncreasingPosition && (
+                  <FormattedMessage
+                    description="Approve signature companion text decrease"
+                    defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                  />
+                )}
+                {isIncreasingPosition && (
+                  <FormattedMessage
+                    description="Approve signature companion text increase"
+                    defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary ETH."
+                  />
+                )}
+              </Typography>
+            )}
+          </>
         ),
       });
       const result = await web3Service.modifyRateAndSwaps(
@@ -155,7 +187,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: P
           </Typography>
         ),
       });
-      const result = await web3Service.approveToken(from, to);
+      const result = await web3Service.approveToken(from);
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
@@ -183,13 +215,17 @@ const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: P
   };
 
   const onShowModifyRateSettings = () => {
-    setActionToShow('modifyRate');
-    dispatch(
-      initializeModifyRateSettings({
-        fromValue: formatUnits(position.current.rate, position.from.decimals),
-        frequencyValue: position.current.remainingSwaps.toString(),
-      })
-    );
+    if (actionToShow === 'modifyRate') {
+      setActionToShow(null);
+    } else {
+      setActionToShow('modifyRate');
+      dispatch(
+        initializeModifyRateSettings({
+          fromValue: formatUnits(position.current.rate, position.from.decimals),
+          frequencyValue: position.current.remainingSwaps.toString(),
+        })
+      );
+    }
   };
   return (
     <>
@@ -209,11 +245,6 @@ const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: P
         position={position}
         onCancel={() => setShowTransferModal(false)}
       />
-      <MigratePositionModal
-        open={showMigrateModal}
-        position={fullPositionToMappedPosition(position)}
-        onCancel={() => setShowMigrateModal(false)}
-      />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <Grid container spacing={2} alignItems="stretch">
         <StyledControlsWrapper item xs={12}>
@@ -227,7 +258,6 @@ const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: P
               onTerminate={() => setShowTerminateModal(true)}
               onModifyRate={onShowModifyRateSettings}
               onTransfer={() => setShowTransferModal(true)}
-              onMigratePosition={() => setShowMigrateModal(true)}
               onViewNFT={handleViewNFT}
               position={position}
               pendingTransaction={pendingTransaction}
