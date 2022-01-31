@@ -298,7 +298,7 @@ export const BETA_MIGRATOR_ADDRESS = {
 
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-kovan',
-  [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/dca-v2-optimism-beta',
+  [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism-beta',
   [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism-beta',
 };
 
