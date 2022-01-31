@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 
 const StyledPaper = styled(Paper)`
   padding: 30px;
@@ -28,6 +29,13 @@ const StyledPaper = styled(Paper)`
       }
     }
   }
+`;
+
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'};
+  `}
+  margin: 0px 5px;
 `;
 
 const FAQFrame = () => (
@@ -111,8 +119,23 @@ const FAQFrame = () => (
           </Typography>
           <Typography variant="body1">
             <FormattedMessage
-              description="faqHowIsThePriceCalculatedForEachSwapResponse"
-              defaultMessage="Mean Finance relies on on-chain oracles to determine the price at the moment of the swap. Right now Mean Finance uses Uniswap V3’s TWAP oracles, but in the future we will support more on-chain oracles."
+              description="faqHowIsThePriceCalculatedForEachSwapResponseFirst"
+              defaultMessage="Mean Finance relies on on-chain oracles to determine the price at the moment of the swap. Right now Mean Finance uses"
+            />
+            <StyledLink href="https://chain.link/data-feeds" target="_blank" rel="noreferrer">
+              Chainlink price feeds
+            </StyledLink>
+            <FormattedMessage description="faqHowIsThePriceCalculatedForEachSwapResponseAnd" defaultMessage="and" />
+            <StyledLink
+              href="https://docs.uniswap.org/protocol/concepts/V3-overview/oracle"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Uniswap V3’s TWAP oracles,
+            </StyledLink>
+            <FormattedMessage
+              description="faqHowIsThePriceCalculatedForEachSwapResponseSecond"
+              defaultMessage="but in the future we will support more on-chain oracles."
             />
           </Typography>
         </Grid>
@@ -123,8 +146,15 @@ const FAQFrame = () => (
           <Typography variant="body1">
             <FormattedMessage
               description="faqIsMeanFinanceAuditedResponse"
-              defaultMessage="Mean Finance contracts are now audited!"
+              defaultMessage="Mean Finance contracts have been audited by Pessimistic and PeckShield. You can read the reports"
             />
+            <StyledLink
+              href="https://github.com/Mean-Finance/dca-v2-core/tree/main/audits"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <FormattedMessage description="faqIsMeanFinanceAuditedHere" defaultMessage="here" />
+            </StyledLink>
           </Typography>
         </Grid>
         <Grid item xs={12}>
@@ -168,6 +198,14 @@ const FAQFrame = () => (
             <li>
               <Typography variant="body1">
                 <FormattedMessage
+                  description="faqWhenDoINeedToPayGasFeesResponsePart6"
+                  defaultMessage="Setting or revoking permissions"
+                />
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body1">
+                <FormattedMessage
                   description="faqWhenDoINeedToPayGasFeesResponsePart5"
                   defaultMessage="Terminating their position"
                 />
@@ -183,8 +221,11 @@ const FAQFrame = () => (
           <Typography variant="body1">
             <FormattedMessage
               description="faqWhenDoINeedToPayGasFeesResponsePart7"
-              defaultMessage="For more information, feel free to check our fees section."
+              defaultMessage="For more information, feel free to check our"
             />
+            <StyledLink href="https://docs.mean.finance/concepts/fees" target="_blank" rel="noreferrer">
+              <FormattedMessage description="faqWhenDoINeedToPayGasFeesResponsePart8" defaultMessage="fees section." />
+            </StyledLink>
           </Typography>
         </Grid>
         <Grid item xs={12}>
@@ -206,8 +247,11 @@ const FAQFrame = () => (
           <Typography variant="body1">
             <FormattedMessage
               description="faqDoINeedToPayAnyFeesResponsePart3"
-              defaultMessage=" For more information, feel free to check our fees section."
+              defaultMessage=" For more information, feel free to check our"
             />
+            <StyledLink href="https://docs.mean.finance/concepts/fees" target="_blank" rel="noreferrer">
+              <FormattedMessage description="faqWhenDoINeedToPayGasFeesResponsePart8" defaultMessage="fees section." />
+            </StyledLink>
           </Typography>
         </Grid>
         <Grid item xs={12}>
