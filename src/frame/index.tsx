@@ -17,6 +17,9 @@ import TransactionModalProvider from 'common/transaction-modal';
 import { useAppDispatch } from 'hooks/state';
 import { startFetchingTokenLists } from 'state/token-lists/actions';
 import { SnackbarProvider } from 'notistack';
+import { FormattedMessage } from 'react-intl';
+import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -47,6 +50,23 @@ const StyledContainer = styled(Container)`
   display: flex;
 `;
 
+const StyledBetaContainer = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: #2cc941;
+  color: #ffffff;
+  justify-content: center;
+  align-items: center;
+`;
+
+const StyledWarningContainer = styled.div`
+  display: flex;
+  width: 100%;
+  background-color: #f5b000;
+  justify-content: center;
+  align-items: center;
+`;
+
 const AppFrame = ({ isLoading }: AppFrameProps) => {
   const type = useThemeMode();
 
@@ -67,6 +87,15 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
     <MuiThemeProvider theme={theme}>
       <ThemeProvider theme={theme as DefaultTheme}>
         <CssBaseline />
+        <StyledBetaContainer>
+          <Typography variant="caption">
+            <FormattedMessage
+              description="betaMessage"
+              defaultMessage="Mean Finance v2 is finally launched! If you want to look at your v1 positions visit"
+            />
+            <Link href="https://v1.mean.finance">{` v1.mean.finance`}</Link>
+          </Typography>
+        </StyledBetaContainer>
         <SnackbarProvider>
           <TransactionModalProvider>
             {!isLoading && (
