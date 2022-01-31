@@ -293,13 +293,13 @@ export const PERMISSION_MANAGER_ADDRESS = {
 };
 
 export const BETA_MIGRATOR_ADDRESS = {
-  [NETWORKS.optimismKovan.chainId]: '0x2c99528d9628430D791e8e5cF548583a1A6C235b',
+  [NETWORKS.optimismKovan.chainId]: '0x90892f95b0E93E82B414A9aC0717A325170ED211',
 };
 
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-kovan',
-  [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-optimism-kovan',
-  [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism',
+  [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/dca-v2-optimism-beta',
+  [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism-beta',
 };
 
 export const UNI_GRAPHQL_URL = {
