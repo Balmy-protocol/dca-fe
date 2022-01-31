@@ -55,7 +55,6 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Switch from '@material-ui/core/Switch';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import useIsWhitelisted from 'hooks/useIsWhitelisted';
 import useAllowance from 'hooks/useAllowance';
 
 const StyledPaper = styled(Paper)`
@@ -181,7 +180,6 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
-  const isWhitelisted = useIsWhitelisted();
 
   const [usedTokens] = useUsedTokens();
 
@@ -380,9 +378,6 @@ const Swap = ({
   };
 
   const preHandleSwap = () => {
-    if (!isWhitelisted) {
-      return;
-    }
     if (!existingPair) {
       setShouldShowPairModal(true);
       return;
@@ -531,7 +526,6 @@ const Swap = ({
   const shouldDisableButton =
     !from ||
     !to ||
-    !isWhitelisted ||
     !fromValue ||
     !frequencyValue ||
     cantFund ||
@@ -598,7 +592,7 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="primary"
-      disabled={!!isApproved || hasPendingApproval || isLoading || !isWhitelisted}
+      disabled={!!isApproved || hasPendingApproval || isLoading}
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
       style={{ pointerEvents: 'all' }}
     >
@@ -709,8 +703,6 @@ const Swap = ({
     ButtonToShow = NoWalletButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
-  } else if (!isWhitelisted) {
-    ButtonToShow = NotWhitelistedButton;
   } else if (isLoading || isLoadingPairIsSupported) {
     ButtonToShow = LoadingButton;
   } else if (!pairIsSupported && !isLoadingPairIsSupported && from && to) {
