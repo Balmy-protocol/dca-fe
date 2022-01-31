@@ -33,7 +33,7 @@ export default React.memo(function OceanAppFooter() {
       <Box pt={6} pb={{ md: 6 }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={12} lg={4}>
-            <Link href="http://mean.finance">
+            <Link href="http://v1.mean.finance">
               <img
                 alt="mean finance"
                 style={{ width: '200px' }}

@@ -61,9 +61,9 @@ const AppFrame = ({ isLoading }: AppFrameProps) => (
       <Typography variant="caption">
         <FormattedMessage
           description="betaMessage"
-          defaultMessage="Our new Mean Finance v2 version is now on beta! Visit it at "
+          defaultMessage="Our new Mean Finance v2 version is now on live! Visit it at "
         />
-        <Link href="https://beta.mean.finance">{` beta.mean.finance`}</Link>
+        <Link href="https://mean.finance">{` mean.finance`}</Link>
       </Typography>
     </StyledBetaContainer>
     <StyledWarningContainer>
