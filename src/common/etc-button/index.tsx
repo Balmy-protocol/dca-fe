@@ -28,7 +28,7 @@ const EtcButton = () => (
         </ListItemIcon>
         <ListItemText primary="Docs" />
       </ListItemLink>
-      <ListItemLink href="https://github.com/Mean-Finance/dca-v2-core-beta" target="_blank">
+      <ListItemLink href="https://github.com/Mean-Finance/dca-v2-core" target="_blank">
         <ListItemIcon>
           <GitHubIcon />
         </ListItemIcon>

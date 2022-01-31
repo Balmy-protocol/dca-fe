@@ -45,7 +45,7 @@ const Footer = () => {
       <Box pt={6} pb={{ md: 6 }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={12} lg={4}>
-            <Link href="https://beta.mean.finance">
+            <Link href="https://mean.finance">
               <MeanLogo theme={mode} />
             </Link>
           </Grid>
@@ -57,7 +57,7 @@ const Footer = () => {
                     <FormattedMessage description="community" defaultMessage="Community" />
                   </StyledCategoryTitle>
                   <CategoryItem
-                    href="https://github.com/Mean-Finance/dca-v2-core-beta"
+                    href="https://github.com/Mean-Finance/dca-v2-core"
                     target="_blank"
                     color="inherit"
                     style={{ textDecoration: 'none' }}
