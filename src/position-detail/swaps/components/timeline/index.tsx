@@ -156,8 +156,8 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
       defaultMessage="1 {from} = {swapRate} {to}"
       values={{
         b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-        from: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
-        to: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
+        from: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
+        to: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
         // eslint-disable-next-line no-nested-ternary
         swapRate: STABLE_COINS.includes(position.to.symbol)
           ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA)
