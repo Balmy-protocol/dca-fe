@@ -56,6 +56,7 @@ import Switch from '@material-ui/core/Switch';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import useAllowance from 'hooks/useAllowance';
+import useGasEstimate from 'hooks/useGasEstimate';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -180,6 +181,7 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
+  const [gasEstimation, isLoadingGasEstimation, gasEstimationErrors] = useGasEstimate(from, to, fromValue, frequencyValue);
 
   const [usedTokens] = useUsedTokens();
 
@@ -889,6 +891,26 @@ const Swap = ({
               </Grid>
             </StyledSettingContainer>
           </Grid>
+          {gasEstimation && (
+            <Grid item xs={12}>
+              <StyledSettingContainer>
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="Gas saving"
+                    defaultMessage="You are saving at least ${gasPrice} in gas with this transaction!"
+                    values={{ gasPrice: gasEstimation.toString() }}
+                  />
+                </Typography>
+                <Tooltip
+                  title="Calculated by gas price of one swap multiplied by the amount of swaps minus deposit gas minus withdrawal gas"
+                  arrow
+                  placement="top"
+                >
+                  <StyledHelpOutlineIcon fontSize="small" />
+                </Tooltip>
+              </StyledSettingContainer>
+            </Grid>
+          )}
           <Grid item xs={12}>
             <StyledSettingContainer>
               <Grid container alignItems="stretch" spacing={2}>
