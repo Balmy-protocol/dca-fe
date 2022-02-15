@@ -23,6 +23,7 @@ import CallMadeIcon from '@material-ui/icons/CallMade';
 import Link from '@material-ui/core/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import MigratePositionModal from 'common/migrate-position-modal';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -165,7 +166,11 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
   const history = useHistory();
 
   const isPending = !!pendingTransaction;
-  const [token0, token1] = sortTokens(from, to);
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const [token0, token1] = sortTokens(
+    from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from,
+    to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to
+  );
   const pair = find(
     availablePairs,
     (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
