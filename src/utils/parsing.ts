@@ -43,6 +43,7 @@ export const calculateStale: (
   createdAt: number,
   nextSwapInformation: string | null
 ) => {
+  console.log('calculating stale', lastSwapped, frequencyType.toString(), createdAt, nextSwapInformation)
   let isStale = false;
   if (!nextSwapInformation) {
     return NO_SWAP_INFORMATION;

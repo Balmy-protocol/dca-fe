@@ -29,7 +29,7 @@ function useTokenList(filter = true) {
             : acc,
         { [PROTOCOL_TOKEN_ADDRESS]: getProtocolToken(currentNetwork.chainId) }
       ),
-    [currentNetwork.chainId]
+    [currentNetwork.chainId, savedTokenLists]
   );
 
   return tokenList;

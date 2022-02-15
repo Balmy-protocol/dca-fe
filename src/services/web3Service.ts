@@ -1,5 +1,5 @@
 import { ethers, Signer, BigNumber, VoidSigner } from 'ethers';
-import { Interface } from '@ethersproject/abi';
+import { Interface, LogDescription } from '@ethersproject/abi';
 import {
   ExternalProvider,
   Log,
@@ -491,6 +491,7 @@ export default class Web3Service {
           pairOracle = ORACLES.CHAINLINK;
         }
 
+        console.log((pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0)
         return {
           token0: pair.tokenA,
           token1: pair.tokenB,
@@ -1528,20 +1529,37 @@ export default class Web3Service {
     return this.client.off('block');
   }
 
-  parseLog(log: Log, chainId: number) {
-    if (log.address === COMPANION_ADDRESS[chainId]) {
-      const hubCompanionInstance = new ethers.Contract(
-        COMPANION_ADDRESS[chainId],
-        HUB_COMPANION_ABI.abi,
-        this.getSigner()
-      );
-
-      return hubCompanionInstance.interface.parseLog(log);
-    }
+  parseLog(logs: Log[], chainId: number, eventToSearch: string) {
 
     const hubInstance = new ethers.Contract(HUB_ADDRESS[chainId], HUB_ABI.abi, this.getSigner());
 
-    return hubInstance.interface.parseLog(log);
+    const hubCompanionInstance = new ethers.Contract(
+      COMPANION_ADDRESS[chainId],
+      HUB_COMPANION_ABI.abi,
+      this.getSigner()
+    );
+
+    const parsedLogs: LogDescription[] = [];
+    logs.forEach(log => {
+      try {
+        let parsedLog;
+
+        if (log.address === COMPANION_ADDRESS[chainId]) {
+          parsedLog = hubCompanionInstance.interface.parseLog(log);
+        } else {
+          parsedLog = hubInstance.interface.parseLog(log)
+        }
+
+        if (parsedLog.name === eventToSearch) {
+          parsedLogs.push(parsedLog);
+        }
+      } catch (e) {
+        return
+      }
+    });
+
+
+    return parsedLogs[0];
   }
 
   async setPendingTransaction(transaction: TransactionDetails) {

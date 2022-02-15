@@ -167,10 +167,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const [token0, token1] = sortTokens(
-    from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from,
-    to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to
-  );
+  const [token0, token1] = sortTokens(from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from, to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to);
   const pair = find(
     availablePairs,
     (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
@@ -178,6 +175,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
+  console.log(pair, availablePairs, token0, token1);
   const isStale =
     calculateStale(pair?.lastExecutedAt || 0, swapInterval, position.startedAt, pair?.swapInfo || '1') === STALE;
 
