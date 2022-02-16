@@ -172,9 +172,17 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
               }
               label={
                 hasWrappedOrProtocol && hasProtocolToken ? (
-                  <FormattedMessage description="Terminate get weth" defaultMessage="Get ETH as WETH instead" />
+                  <FormattedMessage
+                    description="Terminate get weth"
+                    defaultMessage="Get {protocolToken} as {wrappedProtocolToken} instead"
+                    values={{ protocolToken: protocolToken.symbol, wrappedProtocolToken: wrappedProtocolToken.symbol }}
+                  />
                 ) : (
-                  <FormattedMessage description="Terminate get eth" defaultMessage="Get WETH as ETH instead" />
+                  <FormattedMessage
+                    description="Terminate get eth"
+                    defaultMessage="Get {wrappedProtocolToken} as {protocolToken} instead"
+                    values={{ protocolToken: protocolToken.symbol, wrappedProtocolToken: wrappedProtocolToken.symbol }}
+                  />
                 )
               }
             />

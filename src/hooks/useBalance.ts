@@ -20,6 +20,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
+  const prevResult = usePrevious(result);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -56,7 +57,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
   }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount(), prevBlockNumber, blockNumber]);
 
   if (!from) {
-    return [BigNumber.from('0'), false, undefined];
+    return [prevResult || BigNumber.from('0'), false, undefined];
   }
 
   return [result, isLoading, error];

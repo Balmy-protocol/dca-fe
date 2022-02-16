@@ -86,9 +86,9 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
 
   React.useEffect(() => {
     async function getNetwork() {
-      const currentNetwork = await web3Service.getNetwork();
-      if (SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
-        dispatch(setNetwork(currentNetwork));
+      const web3Network = await web3Service.getNetwork();
+      if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
+        dispatch(setNetwork(web3Network));
       } else {
         dispatch(setNetwork(NETWORKS.optimism));
       }

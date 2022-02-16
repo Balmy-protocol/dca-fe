@@ -491,7 +491,6 @@ export default class Web3Service {
           pairOracle = ORACLES.CHAINLINK;
         }
 
-        console.log((pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0)
         return {
           token0: pair.tokenA,
           token1: pair.tokenB,
@@ -1530,7 +1529,6 @@ export default class Web3Service {
   }
 
   parseLog(logs: Log[], chainId: number, eventToSearch: string) {
-
     const hubInstance = new ethers.Contract(HUB_ADDRESS[chainId], HUB_ABI.abi, this.getSigner());
 
     const hubCompanionInstance = new ethers.Contract(
@@ -1540,24 +1538,23 @@ export default class Web3Service {
     );
 
     const parsedLogs: LogDescription[] = [];
-    logs.forEach(log => {
+    logs.forEach((log) => {
       try {
         let parsedLog;
 
         if (log.address === COMPANION_ADDRESS[chainId]) {
           parsedLog = hubCompanionInstance.interface.parseLog(log);
         } else {
-          parsedLog = hubInstance.interface.parseLog(log)
+          parsedLog = hubInstance.interface.parseLog(log);
         }
 
         if (parsedLog.name === eventToSearch) {
           parsedLogs.push(parsedLog);
         }
       } catch (e) {
-        return
+        console.error(e);
       }
     });
-
 
     return parsedLogs[0];
   }

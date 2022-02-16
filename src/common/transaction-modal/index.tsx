@@ -156,7 +156,7 @@ export const TransactionModal = ({
           target="_blank"
           rel="noreferrer"
         >
-          <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
+          <FormattedMessage description="View on etherscan" defaultMessage="View on chain explorer" />
         </StyledLink>
       )}
     </>
