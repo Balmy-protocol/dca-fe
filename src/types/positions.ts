@@ -57,6 +57,7 @@ export interface FullPosition {
   id: string;
   status: string;
   startedAt: number;
+  executedSwaps: string;
   pendingTransaction: string;
   pair: {
     id: string;

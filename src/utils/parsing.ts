@@ -127,6 +127,7 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),
     totalDeposits: BigNumber.from(position.totalDeposits),
+    executedSwaps: BigNumber.from(position.executedSwaps),
     pendingTransaction: '',
   };
 }

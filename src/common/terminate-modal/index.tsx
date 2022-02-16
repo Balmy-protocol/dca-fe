@@ -18,6 +18,7 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import { BigNumber } from 'ethers';
 
 const useStyles = makeStyles({
   paper: {
@@ -65,6 +66,11 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
     hasProtocolToken ||
     position.from.address === wrappedProtocolToken.address ||
     position.to.address === wrappedProtocolToken.address;
+  const protocolIsFrom =
+    position.from.address === protocolToken.address || position.from.address === wrappedProtocolToken.address;
+  const swappedOrLiquidity = protocolIsFrom ? position.remainingLiquidity : position.toWithdraw;
+
+  const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : BigNumber.from(0);
 
   const handleCancel = () => {
     onCancel();
@@ -159,7 +165,7 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         <Typography variant="body1">
           <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
         </Typography>
-        {hasWrappedOrProtocol && (
+        {hasWrappedOrProtocol && protocolBalance.gt(BigNumber.from(0)) && (
           <FormGroup row>
             <FormControlLabel
               control={
