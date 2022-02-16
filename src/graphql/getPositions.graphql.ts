@@ -15,6 +15,7 @@ const getCurrentPositions = gql`
       totalSwaps
       totalSwapped
       totalWithdrawn
+      executedSwaps
       user
       from {
         address: id

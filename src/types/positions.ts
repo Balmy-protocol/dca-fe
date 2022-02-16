@@ -41,6 +41,7 @@ export interface Position {
   totalSwaps: BigNumber; // cuanto puse originalmente
   rate: BigNumber;
   toWithdraw: BigNumber;
+  executedSwaps: BigNumber;
   id: string;
   status: string;
   startedAt: number;

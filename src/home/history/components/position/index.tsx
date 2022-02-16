@@ -85,7 +85,7 @@ interface ActivePositionProps {
 }
 
 const ActivePosition = ({ position }: ActivePositionProps) => {
-  const { from, to, swapInterval, swapped, totalDeposits, totalSwaps, remainingSwaps } = position;
+  const { from, to, swapInterval, swapped, totalDeposits, totalSwaps, remainingSwaps, executedSwaps } = position;
   const history = useHistory();
 
   const onViewDetails = () => {
@@ -112,7 +112,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                       defaultMessage="Ran for {type}"
                       values={{
                         remainingDays: totalSwaps.sub(remainingSwaps).toString(),
-                        type: getFrequencyLabel(swapInterval.toString(), totalSwaps.toString()),
+                        type: getFrequencyLabel(swapInterval.toString(), executedSwaps.toString()),
                       }}
                     />
                   </Typography>
