@@ -16,7 +16,8 @@ const ZEROX_API_URLS = {
 }
 
 export interface ZeroXResponse {
-  estimatedGas: string
+  estimatedGas: string;
+  data: string;
 }
 
 const getZeroQuote = async (tokenToSend: Token, tokenToGet: Token, toSell: BigNumber, chainId: number, address: string) => {
@@ -40,6 +41,32 @@ const buildZeroTokenQueryParams = (tokenToSend: Token, tokenToGet: Token, toSell
 
 const DEPOSIT_GAS = BigNumber.from('214648');
 const WITHDRAW_GAS = BigNumber.from('105926');
+const DEPOSIT_OE_L1_DATA = BigNumber.from('17504');
+const OE_FIXED_OVERHEAD = BigNumber.from('2100');
+const OE_DYNAMIC_OVERHEAD = 1.24;
+
+const hex2bin = (hex: string) => (parseInt(hex, 16).toString(2)).padStart(8, '0');
+
+const oeZeroOnesCount = (bin: string) => {
+  let ones = 0;
+  let zeros = 0;
+
+  for(let i=0; i < bin.length; i++) {
+    if (bin[0] === '0') {
+      zeros++;
+    } else {
+      ones++;
+    }
+  }
+  return ones * 16 + zeros * 4
+}
+
+const calcZeroL1Gas = (data: string, ethPrice: number, l1GasPrice: BigNumber) => {
+  const dataBin = hex2bin(data);
+  const txDataGas = oeZeroOnesCount(dataBin);
+
+  return parseFloat(formatEther(l1GasPrice)) * (txDataGas + OE_FIXED_OVERHEAD.toNumber()) * OE_DYNAMIC_OVERHEAD * ethPrice;
+}
 
 function useGasEstimate(
   from: Token | undefined | null,
@@ -49,7 +76,7 @@ function useGasEstimate(
 ): [number | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const { web3Service } = React.useContext(WalletContext);
-  const [result, setResult] = React.useState<{ gas: BigNumber, gasPrice: BigNumber, ethPrice: number } | undefined>(undefined);
+  const [result, setResult] = React.useState<{ gas: BigNumber, gasPrice: BigNumber, ethPrice: number, zeroL1Gas: number } | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
@@ -66,10 +93,13 @@ function useGasEstimate(
           const gasPrice = await web3Service.getClient().getGasPrice();
           const ethPrice = await web3Service.getUsdPrice(WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId));
           const promiseResult = await getZeroQuote(from,to,parseUnits(rate, from.decimals), currentNetwork.chainId, web3Service.getAccount())
+          const l1GasPrice = await web3Service.getL1GasPrice();
+          console.log(promiseResult);
           setResult({
             gas: BigNumber.from(promiseResult.estimatedGas),
             gasPrice,
             ethPrice,
+            zeroL1Gas: calcZeroL1Gas(promiseResult.data, ethPrice, l1GasPrice),
           });
           setError(undefined);
         } catch (e) {
@@ -108,7 +138,19 @@ function useGasEstimate(
   console.log('gas calc formatted to eth with parseFloat: ', result && parseFloat(formatEther(result.gas.mul(BigNumber.from(amountOfSwaps || '0')).sub(DEPOSIT_GAS).sub(WITHDRAW_GAS).mul(result.gasPrice))))
   console.log('total usd: ', result && parseFloat(formatEther(result.gas.mul(BigNumber.from(amountOfSwaps || '0')).sub(DEPOSIT_GAS).sub(WITHDRAW_GAS).mul(result.gasPrice))) * result.ethPrice)
 
-  let returnedValue = result && parseFloat(formatEther(result.gas.mul(BigNumber.from(amountOfSwaps || '0')).sub(DEPOSIT_GAS).sub(WITHDRAW_GAS).mul(result.gasPrice))) * result.ethPrice;
+  if (!result) {
+    return [undefined, isLoading, error];
+  }
+
+  const gasCalc = result.gas.mul(BigNumber.from(amountOfSwaps || '0')).sub(DEPOSIT_GAS).sub(WITHDRAW_GAS).mul(result.gasPrice);
+  const gasCalcInUsd = parseFloat(formatEther(gasCalc)) * result.ethPrice;
+  let returnedValue = gasCalcInUsd;
+
+  if (currentNetwork.chainId === NETWORKS.optimism.chainId) {
+    console.log(result.zeroL1Gas)
+    // returnedValue = returnedValue + parseFloat(result.l1GasPrice.mul(DEPOSIT_OE_L1_DATA).toString());
+  }
+
   return [returnedValue, isLoading, error];
 }
 

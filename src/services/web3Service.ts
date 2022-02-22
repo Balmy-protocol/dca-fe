@@ -752,6 +752,15 @@ export default class Web3Service {
     );
   }
 
+  async getL1GasPrice() {
+    const l1GasPrice = await axios.get<TxPriceResponse>('https://api.txprice.com/');
+
+    return parseUnits(
+      l1GasPrice.data.blockPrices[0].estimatedPrices[2].price.toString(),
+      l1GasPrice.data.unit
+    );
+  }
+
   async getEstimatedPairCreation(
     token0: Token,
     token1: Token,
