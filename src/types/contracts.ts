@@ -152,4 +152,8 @@ export class HubContract extends Contract {
     recipient: string
   ) => Promise<TransactionResponse>;
 }
+
+export class OEGasOracle extends Contract {
+  getL1Fee: (data: string) => Promise<BigNumber>;
+}
 /* eslint-enable */

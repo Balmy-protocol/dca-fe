@@ -101,6 +101,11 @@ const StyledSettingContainer = styled.div`
   margin-top: 32px;
 `;
 
+const StyledGasSavingContainer = styled.div`
+  margin-top: 32px;
+  display: flex;
+`;
+
 const StyledButton = styled(Button)`
   padding: 18px 22px;
   border-radius: 12px;
@@ -181,7 +186,12 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
-  const [gasEstimation, isLoadingGasEstimation, gasEstimationErrors] = useGasEstimate(from, to, fromValue, frequencyValue);
+  const [gasEstimation, isLoadingGasEstimation, gasEstimationErrors] = useGasEstimate(
+    from,
+    to,
+    fromValue,
+    frequencyValue
+  );
 
   const [usedTokens] = useUsedTokens();
 
@@ -893,12 +903,13 @@ const Swap = ({
           </Grid>
           {gasEstimation && (
             <Grid item xs={12}>
-              <StyledSettingContainer>
+              <StyledGasSavingContainer>
                 <Typography variant="body2">
                   <FormattedMessage
                     description="Gas saving"
-                    defaultMessage="You are saving at least ${gasPrice} in gas with this transaction!"
-                    values={{ gasPrice: gasEstimation.toString() }}
+                    /* eslint-disable-next-line no-template-curly-in-string */
+                    defaultMessage="You are saving at least ${gasPrice} of gas in trades!"
+                    values={{ gasPrice: gasEstimation.toFixed(2).toString() }}
                   />
                 </Typography>
                 <Tooltip
@@ -908,7 +919,7 @@ const Swap = ({
                 >
                   <StyledHelpOutlineIcon fontSize="small" />
                 </Tooltip>
-              </StyledSettingContainer>
+              </StyledGasSavingContainer>
             </Grid>
           )}
           <Grid item xs={12}>

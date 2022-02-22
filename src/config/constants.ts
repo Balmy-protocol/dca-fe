@@ -240,6 +240,7 @@ export const TESTNETS = [
   NETWORKS.optimismGoerli.chainId,
 ];
 export const SUPPORTED_NETWORKS = [NETWORKS.kovan.chainId, NETWORKS.optimismKovan.chainId, NETWORKS.optimism.chainId];
+export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [NETWORKS.optimism.chainId];
 
 export const COINGECKO_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',
@@ -312,6 +313,8 @@ export const UNI_GRAPHQL_URL = {
 export const CHAINLINK_GRAPHQL_URL = {
   [NETWORKS.mainnet.chainId]: 'https://gql.graph.chain.link/subgraphs/name/ethereum-mainnet',
 };
+
+export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';
 
 export const EXPLORER_URL = {
   [NETWORKS.mainnet.chainId]: 'https://etherscan.io/',
