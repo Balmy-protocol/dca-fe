@@ -56,6 +56,7 @@ import Switch from '@material-ui/core/Switch';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import useAllowance from 'hooks/useAllowance';
+import useGasEstimate from 'hooks/useGasEstimate';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -98,6 +99,11 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 
 const StyledSettingContainer = styled.div`
   margin-top: 32px;
+`;
+
+const StyledGasSavingContainer = styled.div`
+  margin-top: 32px;
+  display: flex;
 `;
 
 const StyledButton = styled(Button)`
@@ -180,6 +186,12 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
+  const [gasEstimation, isLoadingGasEstimation, gasEstimationErrors] = useGasEstimate(
+    from,
+    to,
+    fromValue,
+    frequencyValue
+  );
 
   const [usedTokens] = useUsedTokens();
 
@@ -889,6 +901,27 @@ const Swap = ({
               </Grid>
             </StyledSettingContainer>
           </Grid>
+          {gasEstimation && (
+            <Grid item xs={12}>
+              <StyledGasSavingContainer>
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="Gas saving"
+                    /* eslint-disable-next-line no-template-curly-in-string */
+                    defaultMessage="You are saving at least ${gasPrice} of gas in trades!"
+                    values={{ gasPrice: gasEstimation.toFixed(2).toString() }}
+                  />
+                </Typography>
+                <Tooltip
+                  title="Calculated by gas price of one swap multiplied by the amount of swaps minus deposit gas minus withdrawal gas"
+                  arrow
+                  placement="top"
+                >
+                  <StyledHelpOutlineIcon fontSize="small" />
+                </Tooltip>
+              </StyledGasSavingContainer>
+            </Grid>
+          )}
           <Grid item xs={12}>
             <StyledSettingContainer>
               <Grid container alignItems="stretch" spacing={2}>

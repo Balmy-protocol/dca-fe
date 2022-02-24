@@ -72,6 +72,7 @@ import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
 import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 import BETA_MIGRATOR_ABI from 'abis/BetaMigrator.json';
+import OE_GAS_ORACLE_ABI from 'abis/OEGasOracle.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
@@ -85,10 +86,12 @@ import {
   MAX_UINT_32,
   MEAN_GRAPHQL_URL,
   NETWORKS,
+  OE_GAS_ORACLE_ADDRESS,
   ORACLES,
   ORACLE_ADDRESS,
   PERMISSIONS,
   PERMISSION_MANAGER_ADDRESS,
+  SWAP_INTERVALS,
   SWAP_INTERVALS_MAP,
   TOKEN_DESCRIPTOR_ADDRESS,
   TRANSACTION_TYPES,
@@ -100,6 +103,7 @@ import {
   ERC20Contract,
   HubCompanionContract,
   HubContract,
+  OEGasOracle,
   OracleContract,
   Oracles,
   PermissionManagerContract,
@@ -749,6 +753,20 @@ export default class Web3Service {
       tokenA.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : tokenA.address,
       tokenB.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : tokenB.address
     );
+  }
+
+  async getL1GasPrice(data: string) {
+    const currentNetwork = await this.getNetwork();
+
+    if (currentNetwork.chainId !== NETWORKS.optimism.chainId) return BigNumber.from(0);
+
+    const oeGasOracle = new ethers.Contract(
+      OE_GAS_ORACLE_ADDRESS,
+      OE_GAS_ORACLE_ABI.abi,
+      this.getClient()
+    ) as unknown as OEGasOracle;
+
+    return oeGasOracle.getL1Fee(data);
   }
 
   async getEstimatedPairCreation(
