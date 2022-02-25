@@ -12,6 +12,7 @@ import { Web3Service } from 'types';
 import Button from 'common/button';
 import WalletMenu from 'common/wallet-menu';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import Address from 'common/address';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -65,7 +66,9 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
           onClick={onOpen}
           style={{ maxWidth: '220px', textTransform: 'none' }}
         >
-          <Typography noWrap>{web3Service.getAccount()}</Typography>
+          <Typography noWrap>
+            <Address address={web3Service.getAccount()} />
+          </Typography>
         </StyledButton>
       </Badge>
       <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />

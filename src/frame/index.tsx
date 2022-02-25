@@ -24,6 +24,7 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import Leaderboard from 'leaderboard';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -136,6 +137,9 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
                       </Route>
                       <Route path="/positions/:positionId">
                         <PositionDetail />
+                      </Route>
+                      <Route path="/leaderboard">
+                        <Leaderboard />
                       </Route>
                       <Route path="/:from?/:to?">
                         <Home isLoading={isLoading || isLoadingNetwork} />

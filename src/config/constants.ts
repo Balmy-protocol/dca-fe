@@ -178,7 +178,7 @@ export const NETWORKS = {
   },
   optimism: {
     chainId: 10,
-    name: 'Optimistic Ethereum',
+    name: 'Optimism',
     mainCurrency: 'OPTIMISM',
     nativeCurrency: {
       name: 'Ethereum',
@@ -189,7 +189,7 @@ export const NETWORKS = {
   },
   optimismKovan: {
     chainId: 69,
-    name: 'Optimistic Ethereum Kovan',
+    name: 'Optimism Kovan',
     mainCurrency: 'OPTIMISM',
     nativeCurrency: {
       name: 'Ethereum',
@@ -200,7 +200,7 @@ export const NETWORKS = {
   },
   optimismGoerli: {
     chainId: 420,
-    name: 'Optimistic Ethereum Goerli',
+    name: 'Optimism Goerli',
     mainCurrency: 'OPTIMISM',
     nativeCurrency: {
       name: 'Ethereum',
@@ -506,6 +506,7 @@ const toReadable = (left: number, frequency: number) => {
 
   return `${asMinutes} minutes`;
 };
+
 export const STRING_SWAP_INTERVALS = {
   [ONE_MINUTE.toString()]: {
     singular: '1 minute (1 swap)',

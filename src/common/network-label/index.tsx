@@ -113,7 +113,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const componentToRender = SUPPORTED_NETWORKS.includes(network.chainId) ? (
     buttonToRender
   ) : (
-    <Tooltip title="We do not support this network. You are seeing data from Optimistic Ethereum" arrow placement="top">
+    <Tooltip title="We do not support this network. You are seeing data from Optimism" arrow placement="top">
       {buttonToRender}
     </Tooltip>
   );

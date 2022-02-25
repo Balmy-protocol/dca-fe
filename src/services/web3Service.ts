@@ -342,29 +342,31 @@ export default class Web3Service {
       'network-only'
     );
 
-    this.currentPositions = keyBy(
-      currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
-        from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-        to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-        user: position.user,
-        swapInterval: BigNumber.from(position.swapInterval.interval),
-        swapped: BigNumber.from(position.totalSwapped),
-        rate: BigNumber.from(position.current.rate),
-        remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-        remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-        withdrawn: BigNumber.from(position.totalWithdrawn),
-        toWithdraw: BigNumber.from(position.current.idleSwapped),
-        totalSwaps: BigNumber.from(position.totalSwaps),
-        executedSwaps: BigNumber.from(position.executedSwaps),
-        id: position.id,
-        status: position.status,
-        startedAt: position.createdAtTimestamp,
-        totalDeposits: BigNumber.from(position.totalDeposits),
-        pendingTransaction: '',
-        pairId: position.pair.id,
-      })),
-      'id'
-    );
+    if (currentPositionsResponse.data) {
+      this.currentPositions = keyBy(
+        currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
+          from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+          to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+          user: position.user,
+          swapInterval: BigNumber.from(position.swapInterval.interval),
+          swapped: BigNumber.from(position.totalSwapped),
+          rate: BigNumber.from(position.current.rate),
+          remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+          remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+          withdrawn: BigNumber.from(position.totalWithdrawn),
+          toWithdraw: BigNumber.from(position.current.idleSwapped),
+          totalSwaps: BigNumber.from(position.totalSwaps),
+          id: position.id,
+          status: position.status,
+          startedAt: position.createdAtTimestamp,
+          executedSwaps: BigNumber.from(position.executedSwaps),
+          totalDeposits: BigNumber.from(position.totalDeposits),
+          pendingTransaction: '',
+          pairId: position.pair.id,
+        })),
+        'id'
+      );
+    }
 
     const pastPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
       this.apolloClient.getClient(),
@@ -377,29 +379,31 @@ export default class Web3Service {
       'network-only'
     );
 
-    this.pastPositions = keyBy(
-      pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
-        from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-        to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-        user: position.user,
-        totalDeposits: BigNumber.from(position.totalDeposits),
-        swapInterval: BigNumber.from(position.swapInterval.interval),
-        swapped: BigNumber.from(position.totalSwapped),
-        rate: BigNumber.from(position.current.rate),
-        remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-        remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-        totalSwaps: BigNumber.from(position.totalSwaps),
-        withdrawn: BigNumber.from(position.totalWithdrawn),
-        toWithdraw: BigNumber.from(position.current.idleSwapped),
-        executedSwaps: BigNumber.from(position.executedSwaps),
-        id: position.id,
-        status: position.status,
-        startedAt: position.createdAtTimestamp,
-        pendingTransaction: '',
-        pairId: position.pair.id,
-      })),
-      'id'
-    );
+    if (pastPositionsResponse.data) {
+      this.pastPositions = keyBy(
+        pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
+          from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+          to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+          user: position.user,
+          totalDeposits: BigNumber.from(position.totalDeposits),
+          swapInterval: BigNumber.from(position.swapInterval.interval),
+          swapped: BigNumber.from(position.totalSwapped),
+          rate: BigNumber.from(position.current.rate),
+          remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+          remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+          totalSwaps: BigNumber.from(position.totalSwaps),
+          withdrawn: BigNumber.from(position.totalWithdrawn),
+          toWithdraw: BigNumber.from(position.current.idleSwapped),
+          executedSwaps: BigNumber.from(position.executedSwaps),
+          id: position.id,
+          status: position.status,
+          startedAt: position.createdAtTimestamp,
+          pendingTransaction: '',
+          pairId: position.pair.id,
+        })),
+        'id'
+      );
+    }
 
     this.setAccount(account);
   }
@@ -480,30 +484,32 @@ export default class Web3Service {
       'network-only'
     );
 
-    this.availablePairs = await Promise.all(
-      availablePairsResponse.data.pairs.map(async (pair: AvailablePairResponse) => {
-        const oldestCreatedPosition =
-          (pair.positions && pair.positions[0] && pair.positions[0].createdAtTimestamp) || 0;
-        const lastCreatedAt =
-          oldestCreatedPosition > pair.createdAtTimestamp ? oldestCreatedPosition : pair.createdAtTimestamp;
-        let pairOracle;
-        try {
-          pairOracle = await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true);
-        } catch {
-          pairOracle = ORACLES.CHAINLINK;
-        }
+    if (availablePairsResponse.data) {
+      this.availablePairs = await Promise.all(
+        availablePairsResponse.data.pairs.map(async (pair: AvailablePairResponse) => {
+          const oldestCreatedPosition =
+            (pair.positions && pair.positions[0] && pair.positions[0].createdAtTimestamp) || 0;
+          const lastCreatedAt =
+            oldestCreatedPosition > pair.createdAtTimestamp ? oldestCreatedPosition : pair.createdAtTimestamp;
+          let pairOracle;
+          try {
+            pairOracle = await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true);
+          } catch {
+            pairOracle = ORACLES.CHAINLINK;
+          }
 
-        return {
-          token0: pair.tokenA,
-          token1: pair.tokenB,
-          lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
-          id: pair.id,
-          lastCreatedAt,
-          swapInfo: pair.nextSwapAvailableAt,
-          oracle: pairOracle,
-        };
-      })
-    );
+          return {
+            token0: pair.tokenA,
+            token1: pair.tokenB,
+            lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
+            id: pair.id,
+            lastCreatedAt,
+            swapInfo: pair.nextSwapAvailableAt,
+            oracle: pairOracle,
+          };
+        })
+      );
+    }
   }
 
   // TOKEN METHODS
@@ -519,6 +525,20 @@ export default class Web3Service {
   }
 
   // ADDRESS METHODS
+  async getEns(address: string) {
+    let ens = null;
+    try {
+      const provider = ethers.getDefaultProvider('homestead', {
+        infura: '5744aff1d49f4eee923c5f3e5af4cc1c',
+        etherscan: '4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF',
+      });
+      ens = await provider.lookupAddress(address);
+      // eslint-disable-next-line no-empty
+    } catch {}
+
+    return ens;
+  }
+
   async changeNetwork(newChainId: number): Promise<void> {
     if (!window.ethereum) {
       return;
@@ -724,14 +744,17 @@ export default class Web3Service {
       'pools'
     );
 
-    const liquidity: number = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
-      pool.poolHourData.forEach((hourData) => {
-        // eslint-disable-next-line no-param-reassign
-        acc += parseFloat(hourData.volumeUSD);
-      });
+    let liquidity = 0;
+    if (poolsWithLiquidityResponse.data) {
+      liquidity = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
+        pool.poolHourData.forEach((hourData) => {
+          // eslint-disable-next-line no-param-reassign
+          acc += parseFloat(hourData.volumeUSD);
+        });
 
-      return acc;
-    }, 0);
+        return acc;
+      }, 0);
+    }
 
     return liquidity;
   }

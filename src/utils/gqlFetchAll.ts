@@ -9,7 +9,8 @@ import {
 } from '@apollo/client';
 
 interface GraphqlResults<T> {
-  data: T;
+  data: T | undefined;
+  loading: boolean;
 }
 
 export default async function gqlFetchAll<T>(
