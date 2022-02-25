@@ -85,14 +85,19 @@ export const MATIC = (chainId: number): Token => ({
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270/logo.png',
 });
 
+const WMATIC_ADDRESSES = {
+  [NETWORKS.polygon.chainId]: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
+  [NETWORKS.mumbai.chainId]: '0x9c3c9283d3e44854697cd22d3faa240cfb032889',
+};
+
 export const WMATIC = (chainId: number): Token => ({
   chainId,
   decimals: 18,
-  address: PROTOCOL_TOKEN_ADDRESS,
+  address: WMATIC_ADDRESSES[chainId] || WMATIC_ADDRESSES[1],
   name: 'Wrapped Matic',
   symbol: 'WMATIC',
   logoURI:
-    'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270/logo.png',
+    'https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png',
 });
 
 export const PROTOCOL_TOKEN = {
@@ -102,6 +107,7 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.goerli.chainId]: ETH,
   [NETWORKS.kovan.chainId]: ETH,
   [NETWORKS.polygon.chainId]: MATIC,
+  [NETWORKS.mumbai.chainId]: MATIC,
   [NETWORKS.optimismKovan.chainId]: ETH,
   [NETWORKS.optimism.chainId]: ETH,
   [NETWORKS.optimismGoerli.chainId]: ETH,
@@ -114,6 +120,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.goerli.chainId]: WETH,
   [NETWORKS.kovan.chainId]: WETH,
   [NETWORKS.polygon.chainId]: WMATIC,
+  [NETWORKS.mumbai.chainId]: WMATIC,
   [NETWORKS.optimismKovan.chainId]: WETH,
   [NETWORKS.optimismGoerli.chainId]: WETH,
   [NETWORKS.optimism.chainId]: WETH,

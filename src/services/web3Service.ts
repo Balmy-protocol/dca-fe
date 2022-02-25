@@ -1,5 +1,5 @@
 import { ethers, Signer, BigNumber, VoidSigner } from 'ethers';
-import { Interface } from '@ethersproject/abi';
+import { Interface, LogDescription } from '@ethersproject/abi';
 import {
   ExternalProvider,
   Log,
@@ -355,6 +355,7 @@ export default class Web3Service {
         withdrawn: BigNumber.from(position.totalWithdrawn),
         toWithdraw: BigNumber.from(position.current.idleSwapped),
         totalSwaps: BigNumber.from(position.totalSwaps),
+        executedSwaps: BigNumber.from(position.executedSwaps),
         id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
@@ -390,6 +391,7 @@ export default class Web3Service {
         totalSwaps: BigNumber.from(position.totalSwaps),
         withdrawn: BigNumber.from(position.totalWithdrawn),
         toWithdraw: BigNumber.from(position.current.idleSwapped),
+        executedSwaps: BigNumber.from(position.executedSwaps),
         id: position.id,
         status: position.status,
         startedAt: position.createdAtTimestamp,
@@ -1528,20 +1530,35 @@ export default class Web3Service {
     return this.client.off('block');
   }
 
-  parseLog(log: Log, chainId: number) {
-    if (log.address === COMPANION_ADDRESS[chainId]) {
-      const hubCompanionInstance = new ethers.Contract(
-        COMPANION_ADDRESS[chainId],
-        HUB_COMPANION_ABI.abi,
-        this.getSigner()
-      );
-
-      return hubCompanionInstance.interface.parseLog(log);
-    }
-
+  parseLog(logs: Log[], chainId: number, eventToSearch: string) {
     const hubInstance = new ethers.Contract(HUB_ADDRESS[chainId], HUB_ABI.abi, this.getSigner());
 
-    return hubInstance.interface.parseLog(log);
+    const hubCompanionInstance = new ethers.Contract(
+      COMPANION_ADDRESS[chainId],
+      HUB_COMPANION_ABI.abi,
+      this.getSigner()
+    );
+
+    const parsedLogs: LogDescription[] = [];
+    logs.forEach((log) => {
+      try {
+        let parsedLog;
+
+        if (log.address === COMPANION_ADDRESS[chainId]) {
+          parsedLog = hubCompanionInstance.interface.parseLog(log);
+        } else {
+          parsedLog = hubInstance.interface.parseLog(log);
+        }
+
+        if (parsedLog.name === eventToSearch) {
+          parsedLogs.push(parsedLog);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    });
+
+    return parsedLogs[0];
   }
 
   async setPendingTransaction(transaction: TransactionDetails) {
@@ -1575,6 +1592,7 @@ export default class Web3Service {
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         withdrawn: BigNumber.from(0),
+        executedSwaps: BigNumber.from(0),
         id,
         startedAt: newPositionTypeData.startedAt,
         totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),

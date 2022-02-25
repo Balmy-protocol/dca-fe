@@ -119,6 +119,19 @@ export const NETWORKS = {
       'https://matic-mainnet-full-rpc.bwarelabs.com',
     ],
   },
+  mumbai: {
+    chainId: 80001,
+    name: 'Mumbai',
+    mainCurrency: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
+    nativeCurrency: {
+      name: 'Matic',
+      symbol: 'MATIC',
+      decimals: 18,
+    },
+    rpc: [
+      'https://matic-mumbai.chainstacklabs.com',
+    ],
+  },
   fantom: {
     chainId: 250,
     name: 'Fantom',
@@ -238,9 +251,10 @@ export const TESTNETS = [
   NETWORKS.kovan.chainId,
   NETWORKS.optimismKovan.chainId,
   NETWORKS.optimismGoerli.chainId,
+  NETWORKS.mumbai.chainId,
 ];
-export const SUPPORTED_NETWORKS = [NETWORKS.kovan.chainId, NETWORKS.optimismKovan.chainId, NETWORKS.optimism.chainId];
 export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [NETWORKS.optimism.chainId];
+export const SUPPORTED_NETWORKS = [NETWORKS.kovan.chainId, NETWORKS.optimismKovan.chainId, NETWORKS.optimism.chainId, NETWORKS.mumbai.chainId];
 
 export const COINGECKO_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',
@@ -252,6 +266,7 @@ export const COINGECKO_IDS = {
   [NETWORKS.optimism.chainId]: 'optimistic-ethereum',
   [NETWORKS.optimismGoerli.chainId]: 'optimistic-ethereum',
   [NETWORKS.optimismKovan.chainId]: 'optimistic-ethereum',
+  [NETWORKS.mumbai.chainId]: 'mumbai',
 };
 
 export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId];
@@ -260,54 +275,64 @@ export const HUB_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567',
   [NETWORKS.optimismKovan.chainId]: '0xB1EDC6ea9011bCC5318e2b36954008357b59292F',
   [NETWORKS.optimism.chainId]: '0x230C63702D1B5034461ab2ca889a30E343D81349',
+  [NETWORKS.mumbai.chainId]: '0x898D220C7cd30bf2DCacc9178ca3463e39cbB803',
 };
 export const ORACLE_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0xF8736BB2a48bB5D9dF88b393eC3053a52a440edE',
   [NETWORKS.optimismKovan.chainId]: '0x52c15a9a93E853CbfA3D19E74380cA45F9fF79D7',
   [NETWORKS.optimism.chainId]: '0x38D504062dc7059B11e87bf818ef573A4EccaEdE',
+  [NETWORKS.mumbai.chainId]: '0x4C717217f53c2e618F0f91f8464438957Fe17e07',
 };
 export const COMPANION_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0x50ed158bfed47ee565f31404c98a9f9ac0fa0cac',
   [NETWORKS.optimismKovan.chainId]: '0x41518588eD4326125Cd74c9D72fd609370F94507',
   [NETWORKS.optimism.chainId]: '0x749Fc5a81B2Fe1470e54E1bF452b71a4fb0e1BBf',
+  [NETWORKS.mumbai.chainId]: '0x8847480C34C7DceEf73647c57766f28c3A07596B',
 };
 export const TOKEN_DESCRIPTOR_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0x0aB7CF8A552Fa296632e280213c392473D6d0933',
   [NETWORKS.optimismKovan.chainId]: '0x6D61f0cDd59aa9F91106e53dC4Ec47FD6e38D926',
   [NETWORKS.optimism.chainId]: '0x70Ee0AA330E3590F6348Fd54E71FD18aD3Bc914F',
+  [NETWORKS.mumbai.chainId]: '0x38f788A370E56Ca5978B60F7a2D383c678C4144C',
 };
 export const CHAINLINK_ORACLE_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0x5aB88a77f609B47AD752dca6d8537746861A5839',
   [NETWORKS.optimismKovan.chainId]: '0x446BD0Feba3c6377Bc9ecfb7Fda25801Ce372376',
   [NETWORKS.optimism.chainId]: '0x507Eb4C22A5088645e7B610ef385bF1C5452A539',
+  [NETWORKS.mumbai.chainId]: '0x3f16797F023629559843A61Aea04F118A41E5992',
 };
 export const UNISWAP_ORACLE_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0xF929d119a2c108928b20346dAd609751ddc0ad18',
   [NETWORKS.optimismKovan.chainId]: '0x038b3782C27AAC8FB2561b9E6f444751e067f9AD',
   [NETWORKS.optimism.chainId]: '0x615DcCB17f762Cae61A36a336A1340AFcE764c71',
+  [NETWORKS.mumbai.chainId]: '0xa6ED933303fCbE44a9eF2eA3C681b646fdc024B7',
 };
 
 export const PERMISSION_MANAGER_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0xbB3E83D7C2fD7c1D07bb2dCCe435728Da2e42463',
   [NETWORKS.optimismKovan.chainId]: '0xE0af2abE284771Bb73071f4f373Fb5DC1AFF1849',
   [NETWORKS.optimism.chainId]: '0xB4Edfb45446C6A207643Ea846BFA42021cE5ae11',
+  [NETWORKS.mumbai.chainId]: '0x8CC0Df843610cefF7f4AFa01100B6abf6756Bdf2',
 };
 
 export const BETA_MIGRATOR_ADDRESS = {
   [NETWORKS.optimismKovan.chainId]: '0x90892f95b0E93E82B414A9aC0717A325170ED211',
   [NETWORKS.optimism.chainId]: '0x96ae36292c522F375D8800832B81cc5fb6667b1A',
+  [NETWORKS.mumbai.chainId]: '0x96ae36292c522F375D8800832B81cc5fb6667b1A',
 };
 
 export const MEAN_GRAPHQL_URL = {
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/mean-kovan',
   [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism-kovan',
   [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism',
+  [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/dca-v2-mumbai',
 };
 
 export const UNI_GRAPHQL_URL = {
   [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/fibofinance/uniswap-v3-kovan',
   [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/uniswap-v3-optimism-kovan',
   [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
+  [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
 };
 
 export const CHAINLINK_GRAPHQL_URL = {
@@ -324,7 +349,8 @@ export const EXPLORER_URL = {
   [NETWORKS.kovan.chainId]: 'https://kovan.etherscan.io/',
   [NETWORKS.meanfinance.chainId]: 'https://etherscan.io/',
   [NETWORKS.bsc.chainId]: 'https://bscscan.com',
-  [NETWORKS.polygon.chainId]: 'https://polygonscan.com',
+  [NETWORKS.polygon.chainId]: 'https://polygonscan.com/',
+  [NETWORKS.mumbai.chainId]: 'https://mumbai.polygonscan.com/',
   [NETWORKS.fantom.chainId]: 'https://ftmscan.com/',
   [NETWORKS.avalanche.chainId]: 'https://cchain.explorer.avax.network/',
   [NETWORKS.arbitrum.chainId]: 'https://arbiscan.io/',
@@ -564,6 +590,14 @@ export const WHALE_MODE_FREQUENCIES = {
     ONE_HOUR.toString(),
     FOUR_HOURS.toString(),
   ],
+  [NETWORKS.mumbai.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+    ONE_HOUR.toString(),
+    FOUR_HOURS.toString(),
+  ],
   [NETWORKS.kovan.chainId]: [
     ONE_MINUTE.toString(),
     FIVE_MINUTES.toString(),
@@ -600,6 +634,14 @@ export const WHALE_MINIMUM_VALUES = {
     [FOUR_HOURS.toString()]: 10000,
   },
   [NETWORKS.polygon.chainId]: {
+    [ONE_MINUTE.toString()]: 10000,
+    [FIVE_MINUTES.toString()]: 10000,
+    [FIFTEEN_MINUTES.toString()]: 10000,
+    [THIRTY_MINUTES.toString()]: 10000,
+    [ONE_HOUR.toString()]: 10000,
+    [FOUR_HOURS.toString()]: 10000,
+  },
+  [NETWORKS.mumbai.chainId]: {
     [ONE_MINUTE.toString()]: 10000,
     [FIVE_MINUTES.toString()]: 10000,
     [FIFTEEN_MINUTES.toString()]: 10000,

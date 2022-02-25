@@ -149,7 +149,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
             rel="noreferrer"
           >
             <Typography variant="body2" component="span">
-              <FormattedMessage description="view on etherscan" defaultMessage="View on explorer" />
+              <FormattedMessage description="view on etherscan" defaultMessage="View on chain explorer" />
             </Typography>
             <CallMadeIcon style={{ fontSize: '1rem' }} />
           </StyledLink>

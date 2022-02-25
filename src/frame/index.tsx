@@ -20,6 +20,10 @@ import { SnackbarProvider } from 'notistack';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
+import useWeb3Service from 'hooks/useWeb3Service';
+import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
+import { setNetwork } from 'state/config/actions';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -68,6 +72,7 @@ const StyledWarningContainer = styled.div`
 `;
 
 const AppFrame = ({ isLoading }: AppFrameProps) => {
+  const web3Service = useWeb3Service();
   const type = useThemeMode();
 
   const theme = createMuiTheme({
@@ -77,11 +82,25 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
   });
 
   const dispatch = useAppDispatch();
+  const currentNetwork = useCurrentNetwork();
 
   React.useEffect(() => {
+    async function getNetwork() {
+      const web3Network = await web3Service.getNetwork();
+      if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
+        dispatch(setNetwork(web3Network));
+      } else {
+        dispatch(setNetwork(NETWORKS.optimism));
+      }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    getNetwork();
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispatch(startFetchingTokenLists());
   }, []);
+
+  const isLoadingNetwork = !currentNetwork;
 
   return (
     <MuiThemeProvider theme={theme}>
@@ -98,7 +117,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
         </StyledBetaContainer>
         <SnackbarProvider>
           <TransactionModalProvider>
-            {!isLoading && (
+            {!isLoading && !isLoadingNetwork && (
               <>
                 <TransactionUpdater />
                 <BlockNumberUpdater />
@@ -108,7 +127,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
               <StyledContainer>
                 <StyledGridContainer container direction="column">
                   <StyledNavBarGridContainer item xs={12}>
-                    <NavBar isLoading={isLoading} />
+                    <NavBar isLoading={isLoading || isLoadingNetwork} />
                   </StyledNavBarGridContainer>
                   <StyledAppGridContainer item xs={12}>
                     <Switch>
@@ -119,7 +138,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
                         <PositionDetail />
                       </Route>
                       <Route path="/:from?/:to?">
-                        <Home isLoading={isLoading} />
+                        <Home isLoading={isLoading || isLoadingNetwork} />
                       </Route>
                     </Switch>
                   </StyledAppGridContainer>

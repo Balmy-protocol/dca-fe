@@ -138,7 +138,7 @@ export default function Updater(): null {
                 extendedTypeData = {
                   // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                   id: web3Service
-                    .parseLog(receipt.logs[receipt.logs.length - 1], currentNetwork.chainId)
+                    .parseLog(receipt.logs, currentNetwork.chainId, 'Deposited')
                     .args.positionId.toString(),
                 };
               }

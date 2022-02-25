@@ -24,7 +24,7 @@ const EtherscanLink = ({ hash }: EtherscanLinkProps) => {
   return (
     <StyledLinkWrapper>
       <StyledLink href={buildEtherscanTransaction(hash, currentNetwork.chainId)} target="_blank" rel="noreferrer">
-        <FormattedMessage description="View on etherscan" defaultMessage="View on etherscan" />
+        <FormattedMessage description="View on etherscan" defaultMessage="View on chain explorer" />
       </StyledLink>
     </StyledLinkWrapper>
   );

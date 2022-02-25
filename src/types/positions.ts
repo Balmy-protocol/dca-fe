@@ -41,6 +41,7 @@ export interface Position {
   totalSwaps: BigNumber; // cuanto puse originalmente
   rate: BigNumber;
   toWithdraw: BigNumber;
+  executedSwaps: BigNumber;
   id: string;
   status: string;
   startedAt: number;
@@ -56,6 +57,7 @@ export interface FullPosition {
   id: string;
   status: string;
   startedAt: number;
+  executedSwaps: string;
   pendingTransaction: string;
   pair: {
     id: string;
