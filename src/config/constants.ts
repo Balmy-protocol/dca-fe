@@ -337,7 +337,7 @@ export const MEAN_GRAPHQL_URL = {
   [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism-kovan',
   [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism',
   [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/dca-v2-mumbai',
-  [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/storres93/poly',
+  [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-polygon',
 };
 
 export const UNI_GRAPHQL_URL = {
