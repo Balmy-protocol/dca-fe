@@ -251,7 +251,7 @@ export const TESTNETS = [
   NETWORKS.optimismGoerli.chainId,
   NETWORKS.mumbai.chainId,
 ];
-export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [NETWORKS.optimism.chainId];
+export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
 export const SUPPORTED_NETWORKS = [
   NETWORKS.kovan.chainId,
   NETWORKS.optimismKovan.chainId,

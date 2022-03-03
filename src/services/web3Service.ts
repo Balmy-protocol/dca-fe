@@ -780,6 +780,34 @@ export default class Web3Service {
     );
   }
 
+  async getGasPrice() {
+    const currentNetwork = await this.getNetwork();
+
+    if (currentNetwork.chainId !== NETWORKS.optimism.chainId && currentNetwork.chainId !== NETWORKS.polygon.chainId)
+      return BigNumber.from(0);
+
+    if (currentNetwork.chainId === NETWORKS.optimism.chainId) {
+      return this.client.getGasPrice();
+    }
+
+    if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
+      try {
+        const polyGasResponse = await axios.get<{ estimatedBaseFee: number; standard: { maxPriorityFee: number } }>(
+          'https://gasstation-mainnet.matic.network/v2'
+        );
+
+        return parseUnits(
+          (polyGasResponse.data.estimatedBaseFee + polyGasResponse.data.standard.maxPriorityFee).toFixed(9).toString(),
+          'gwei'
+        );
+      } catch {
+        return BigNumber.from(0);
+      }
+    }
+
+    return BigNumber.from(0);
+  }
+
   async getL1GasPrice(data: string) {
     const currentNetwork = await this.getNetwork();
 
