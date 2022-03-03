@@ -13,6 +13,7 @@ import useCurrentNetwork from './useCurrentNetwork';
 
 const ZEROX_API_URLS = {
   [NETWORKS.optimism.chainId]: 'https://optimism.api.0x.org/swap/v1/quote',
+  [NETWORKS.polygon.chainId]: 'https://polygon.api.0x.org/swap/v1/quote',
 };
 
 export interface ZeroXResponse {
@@ -20,10 +21,14 @@ export interface ZeroXResponse {
   data: string;
 }
 
-const buildZeroTokenQueryParams = (tokenToSend: Token, tokenToGet: Token, toSell: BigNumber) => {
+const buildZeroTokenQueryParams = (tokenToSend: Token, tokenToGet: Token, toSell: BigNumber, chainId: number) => {
   const queryParams = [];
 
-  queryParams.push(`sellToken=${tokenToSend.address === PROTOCOL_TOKEN_ADDRESS ? 'ETH' : tokenToSend.address}`);
+  const toSellToken =
+    tokenToSend.address === PROTOCOL_TOKEN_ADDRESS && chainId !== NETWORKS.polygon.chainId
+      ? 'ETH'
+      : tokenToSend.address;
+  queryParams.push(`sellToken=${toSellToken}`);
   queryParams.push(`buyToken=${tokenToGet.address}`);
   queryParams.push(`sellAmount=${toSell.toString()}`);
   queryParams.push(`skipValidation=true`);
@@ -32,7 +37,7 @@ const buildZeroTokenQueryParams = (tokenToSend: Token, tokenToGet: Token, toSell
 };
 
 const getZeroQuote = async (tokenToSend: Token, tokenToGet: Token, toSell: BigNumber, chainId: number) => {
-  const inchQueryParams = buildZeroTokenQueryParams(tokenToSend, tokenToGet, toSell);
+  const inchQueryParams = buildZeroTokenQueryParams(tokenToSend, tokenToGet, toSell, chainId);
 
   const inchResponse = await axios.get<ZeroXResponse>(`${ZEROX_API_URLS[chainId]}?${inchQueryParams}`);
 
@@ -69,7 +74,7 @@ function useGasEstimate(
     async function callPromise() {
       if (from && to && rate && SUPPORTED_GAS_CALCULATOR_NETWORKS.includes(currentNetwork.chainId)) {
         try {
-          const gasPrice = await web3Service.getClient().getGasPrice();
+          const gasPrice = await web3Service.getGasPrice();
           const ethPrice = await web3Service.getUsdPrice(
             WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId)
           );

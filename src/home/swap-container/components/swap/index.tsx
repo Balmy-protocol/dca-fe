@@ -901,7 +901,7 @@ const Swap = ({
               </Grid>
             </StyledSettingContainer>
           </Grid>
-          {gasEstimation && (
+          {gasEstimation && gasEstimation > 9 && (
             <Grid item xs={12}>
               <StyledGasSavingContainer>
                 <Typography variant="body2">
