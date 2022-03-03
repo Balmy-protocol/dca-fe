@@ -107,15 +107,6 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
     <MuiThemeProvider theme={theme}>
       <ThemeProvider theme={theme as DefaultTheme}>
         <CssBaseline />
-        <StyledBetaContainer>
-          <Typography variant="caption">
-            <FormattedMessage
-              description="betaMessage"
-              defaultMessage="Mean Finance v2 is finally launched! If you want to look at your v1 positions visit"
-            />
-            <Link href="https://v1.mean.finance">{` v1.mean.finance`}</Link>
-          </Typography>
-        </StyledBetaContainer>
         <SnackbarProvider>
           <TransactionModalProvider>
             {!isLoading && !isLoadingNetwork && (
