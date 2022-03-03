@@ -1,6 +1,7 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import orderBy from 'lodash/orderBy';
+import styled from 'styled-components';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import getPositions from 'graphql/getLeaderboardPosition.graphql';
 import getTokens from 'graphql/getTokens.graphql';
@@ -14,7 +15,22 @@ import { appleTabsStylesHook } from 'common/tabs';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { Duration } from 'luxon';
+import Button from 'common/button';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { FormattedMessage } from 'react-intl';
 import Leaderboard from '../leaderboard';
+
+const StyledTitleContainer = styled(Paper)`
+  ${({ theme }) => `
+    padding: 25px;
+    border-radius: 10px;
+    flex-grow: 0;
+    background-color: ${theme.palette.type === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
+    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+  `}
+`;
 
 const toReadable = (time: number) => {
   const customDuration = Duration.fromMillis(time * 1000);
@@ -46,8 +62,30 @@ const toReadable = (time: number) => {
   return `${asMinutes.toFixed(2)} minutes`;
 };
 
+const messagesByLeaderboard = [
+  <FormattedMessage
+    description="leaderboard position"
+    defaultMessage="Compete on who has the most positions on Mean Finance"
+  />,
+  <FormattedMessage
+    description="leaderboard total value locked"
+    defaultMessage="Compete on who has the most total value locked on Mean Finance. This includes both swapped and unswapped liquidity on your positions"
+  />,
+  <FormattedMessage
+    description="leaderboard traded volume"
+    defaultMessage="Compete on who has the most traded volume locked on Mean Finance. This includes swapped liquidity on your positions"
+  />,
+  <FormattedMessage
+    description="leaderboard forgot"
+    defaultMessage="Did you forget about your position? This are the addresses that have the most value to withdraw between their positions"
+  />,
+  <FormattedMessage
+    description="leaderbord truedcaor"
+    defaultMessage="The TRUE DCAOR is the one who's position has been set to run for the longest time"
+  />,
+];
+
 const LeaderboardFrame = () => {
-  const currentNetwork = useCurrentNetwork();
   const web3Service = useWeb3Service();
 
   const [tabIndex, setTabIndex] = React.useState(0);
@@ -235,7 +273,14 @@ const LeaderboardFrame = () => {
 
   return (
     <Grid container spacing={4}>
-      <Grid item xs={12} style={{ display: 'flex', paddingBottom: '15px' }}>
+      <Grid item xs={12} style={{ paddingBottom: '0px', paddingTop: '0px' }}>
+        <Button variant="text" color="default" onClick={() => window.open('https://mean.finance/')}>
+          <Typography variant="body2" component="div" style={{ display: 'flex', alignItems: 'center' }}>
+            <ArrowBackIcon fontSize="inherit" /> Back to app
+          </Typography>
+        </Button>
+      </Grid>
+      <Grid item xs={12} style={{ display: 'flex', paddingBottom: '15px', justifyContent: 'center' }}>
         <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
           <Tab classes={tabItemStyles} disableRipple label="Created positions" />
           <Tab classes={tabItemStyles} disableRipple label="Total value locked" />
@@ -243,6 +288,11 @@ const LeaderboardFrame = () => {
           <Tab classes={tabItemStyles} disableRipple label="I forgot about this leaderboard" />
           <Tab classes={tabItemStyles} disableRipple label="The true dcaoor" />
         </Tabs>
+      </Grid>
+      <Grid item xs={12}>
+        <StyledTitleContainer elevation={0}>
+          <Typography variant="body1">{messagesByLeaderboard[tabIndex]}</Typography>
+        </StyledTitleContainer>
       </Grid>
       <Grid item xs={12}>
         <Leaderboard rows={rows[tabIndex]} />

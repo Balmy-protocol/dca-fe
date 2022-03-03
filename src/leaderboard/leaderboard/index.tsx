@@ -52,10 +52,12 @@ const StyledLeadearboardItemUser = styled.div`
   flex-grow: 1;
   margin-left: 30px;
   font-weight: 400 !important;
+  overflow: hidden;
 `;
 
 const StyledLeadearboardItemValue = styled.div`
   font-weight: 400 !important;
+  flex-shrink: 0;
 `;
 
 const StyledLink = styled(Link)<{ isFirsts: boolean }>`
@@ -106,7 +108,7 @@ const Leaderboard = ({ rows }: LeaderboardProps) => {
               </Typography>
             </StyledLeadearboardItemPosition>
             <StyledLeadearboardItemUser>
-              <Typography variant={getTypographySize(index)} style={{ fontWeight: 400 }}>
+              <Typography variant={getTypographySize(index)} style={{ fontWeight: 400 }} noWrap>
                 <StyledLink
                   isFirsts={index < 3}
                   href={buildEtherscanAddress(row.name, currentNetwork.chainId)}
