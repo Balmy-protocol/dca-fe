@@ -23,6 +23,7 @@ import Link from '@material-ui/core/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
 import FingerprintIcon from '@material-ui/icons/Fingerprint';
+import Address from 'common/address';
 
 const StyledCard = styled(Card)``;
 
@@ -275,7 +276,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
             }}
           />
           <StyledLink href={buildEtherscanAddress(positionState.from, chainId)} target="_blank" rel="noreferrer">
-            {positionState.from}
+            <Address address={positionState.from} />
             <CallMadeIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
           <FormattedMessage
@@ -288,7 +289,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
             }}
           />
           <StyledLink href={buildEtherscanAddress(positionState.to, chainId)} target="_blank" rel="noreferrer">
-            {positionState.to}
+            <Address address={positionState.to} />
             <CallMadeIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
         </Typography>
@@ -322,9 +323,11 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
             {permission.permissions.length ? (
               <>
                 <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
-                  {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase()
-                    ? 'Mean Finance Companion'
-                    : permission.operator}
+                  {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase() ? (
+                    'Mean Finance Companion'
+                  ) : (
+                    <Address address={permission.operator} />
+                  )}
                   <CallMadeIcon style={{ fontSize: '1rem' }} />
                 </StyledLink>
                 <FormattedMessage
@@ -353,9 +356,11 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                   defaultMessage="Removed all permissions for"
                 />
                 <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
-                  {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase()
-                    ? 'Mean Finance Companion'
-                    : permission.operator}
+                  {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase() ? (
+                    'Mean Finance Companion'
+                  ) : (
+                    <Address address={permission.operator} />
+                  )}
                   <CallMadeIcon style={{ fontSize: '1rem' }} />
                 </StyledLink>
               </>

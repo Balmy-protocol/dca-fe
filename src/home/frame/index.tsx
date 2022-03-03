@@ -40,6 +40,12 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
             <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => dispatch(changeMainTab(index))}>
               <Tab classes={tabItemStyles} disableRipple label="Create" />
               <Tab classes={tabItemStyles} disableRipple label="Positions" />
+              <Tab
+                classes={tabItemStyles}
+                disableRipple
+                label="Leaderboard"
+                onClick={() => window.open('https://mean.finance/leaderboard', '_blank')}
+              />
             </Tabs>
           </Grid>
           {tabIndex === 0 ? (

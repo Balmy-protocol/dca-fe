@@ -19,6 +19,7 @@ import { COMPANION_ADDRESS, STRING_PERMISSIONS } from 'config/constants';
 import { FormattedMessage } from 'react-intl';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import Address from 'common/address';
 
 interface PositionPermissionProps {
   positionPermission: PositionPermission;
@@ -130,9 +131,11 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable }: PositionP
                   rel="noreferrer"
                 >
                   <Typography variant="body2" component="span">
-                    {positionPermission.operator.toLowerCase() === companionAddress.toLowerCase()
-                      ? 'Mean Finance Companion'
-                      : positionPermission.operator}
+                    {positionPermission.operator.toLowerCase() === companionAddress.toLowerCase() ? (
+                      'Mean Finance Companion'
+                    ) : (
+                      <Address address={positionPermission.operator} />
+                    )}
                   </Typography>
                   <CallMadeIcon style={{ fontSize: '1rem' }} />
                 </StyledLink>

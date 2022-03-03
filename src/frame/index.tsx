@@ -24,6 +24,7 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import Leaderboard from 'leaderboard';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -106,15 +107,6 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
     <MuiThemeProvider theme={theme}>
       <ThemeProvider theme={theme as DefaultTheme}>
         <CssBaseline />
-        <StyledBetaContainer>
-          <Typography variant="caption">
-            <FormattedMessage
-              description="betaMessage"
-              defaultMessage="Mean Finance v2 is finally launched! If you want to look at your v1 positions visit"
-            />
-            <Link href="https://v1.mean.finance">{` v1.mean.finance`}</Link>
-          </Typography>
-        </StyledBetaContainer>
         <SnackbarProvider>
           <TransactionModalProvider>
             {!isLoading && !isLoadingNetwork && (
@@ -136,6 +128,9 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
                       </Route>
                       <Route path="/positions/:positionId">
                         <PositionDetail />
+                      </Route>
+                      <Route path="/leaderboard">
+                        <Leaderboard />
                       </Route>
                       <Route path="/:from?/:to?">
                         <Home isLoading={isLoading || isLoadingNetwork} />
