@@ -521,7 +521,9 @@ export default class Web3Service {
       }?contract_addresses=${token.address}&vs_currencies=usd`
     );
 
-    return price.data[token.address].usd;
+    const usdPrice = price.data[token.address] && price.data[token.address].usd;
+
+    return usdPrice || 0;
   }
 
   // ADDRESS METHODS
