@@ -14,7 +14,8 @@ import { formatCurrencyAmount } from 'utils/currency';
 import Divider from '@material-ui/core/Divider';
 
 import { getFrequencyLabel } from 'utils/parsing';
-import { STRING_SWAP_INTERVALS } from 'config/constants';
+import { POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
+import { parseUnits } from '@ethersproject/units';
 
 interface DetailsProps {
   position: FullPosition;
@@ -37,162 +38,217 @@ const StyledPaper = styled(Paper)`
   flex-grow: 1;
 `;
 
-const Details = ({ position }: DetailsProps) => (
-  <StyledPaper>
-    <Grid container spacing={1} direction="column" wrap="nowrap">
-      <Grid item xs={12}>
-        <StyledCardTitleHeader>
-          <TokenIcon token={position.from} size="24px" />
-          <Typography variant="body1">{position.from.symbol}</Typography>
-          <ArrowRight size="20px" />
-          <TokenIcon token={position.to} size="24px" />
-          <Typography variant="body1">{position.to.symbol}</Typography>
-        </StyledCardTitleHeader>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider variant="middle" />
-      </Grid>
-      <Grid item xs={12} md={12}>
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography variant="body1">
-              <FormattedMessage description="positionDetailsHistoricallySwappedTitle" defaultMessage="Swapped:" />
-            </Typography>
+const Details = ({ position }: DetailsProps) => {
+  const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
+  let summedPrices = BigNumber.from(0);
+  swappedActions.forEach((action) => {
+    // eslint-disable-next-line no-nested-ternary
+    const rate = STABLE_COINS.includes(position.to.symbol)
+      ? BigNumber.from(action.ratePerUnitBToAWithFee)
+      : position.pair.tokenA.address === position.from.address
+      ? BigNumber.from(action.ratePerUnitAToBWithFee)
+      : BigNumber.from(action.ratePerUnitBToAWithFee);
+
+    summedPrices = summedPrices.add(rate);
+  });
+  const averageBuyPrice = summedPrices.div(swappedActions.length);
+  const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
+  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+
+  return (
+    <StyledPaper>
+      <Grid container spacing={1} direction="column" wrap="nowrap">
+        <Grid item xs={12}>
+          <StyledCardTitleHeader>
+            <TokenIcon token={position.from} size="24px" />
+            <Typography variant="body1">{position.from.symbol}</Typography>
+            <ArrowRight size="20px" />
+            <TokenIcon token={position.to} size="24px" />
+            <Typography variant="body1">{position.to.symbol}</Typography>
+          </StyledCardTitleHeader>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider variant="middle" />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <FormattedMessage description="positionDetailsHistoricallySwappedTitle" defaultMessage="Swapped:" />
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption">
+                <FormattedMessage
+                  description="positionDetailsHistoricallySwapped"
+                  defaultMessage="{swapped} {to}"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    swapped: formatCurrencyAmount(BigNumber.from(position.totalSwapped), position.to),
+                    to: position.to.symbol,
+                  }}
+                />
+              </Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Typography variant="caption">
+        </Grid>
+        <Grid item xs={12}>
+          <Divider variant="middle" />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="positionDetailsToWithdrawTitle"
+                  defaultMessage="Available to withdraw:"
+                />
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption">
+                <FormattedMessage
+                  description="positionDetailsToWithdraw"
+                  defaultMessage="{toWithdraw} {to}"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    toWithdraw: formatCurrencyAmount(BigNumber.from(position.current.idleSwapped), position.to),
+                    to: position.to.symbol,
+                  }}
+                />
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider variant="middle" />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <FormattedMessage description="positionDetailsCurrentRateTitle" defaultMessage="Rate:" />
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption">
+                <FormattedMessage
+                  description="positionDetailsCurrentRate"
+                  defaultMessage="{rate} {from} {frequency}"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    rate: formatCurrencyAmount(BigNumber.from(position.current.rate), position.from),
+                    from: position.from.symbol,
+                    frequency:
+                      STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every,
+                  }}
+                />
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider variant="middle" />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <FormattedMessage description="positionDetailsRemainingFundsTitle" defaultMessage="Remaining funds:" />
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption">
+                <FormattedMessage
+                  description="positionDetailsRemainingFunds"
+                  defaultMessage="{funds} {from}"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    funds: formatCurrencyAmount(BigNumber.from(position.current.remainingLiquidity), position.from),
+                    from: position.from.symbol,
+                  }}
+                />
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider variant="middle" />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="positionDetailsAverageBuyPriceTitle"
+                  defaultMessage="Average buy price:"
+                />
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption">
+                <FormattedMessage
+                  description="positionDetailsAverageBuyPrice"
+                  defaultMessage="1 {from} = {average} {to}"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    from: tokenFromAverage.symbol,
+                    to: tokenToAverage.symbol,
+                    average: formatCurrencyAmount(averageBuyPrice, tokenToAverage),
+                  }}
+                />
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider variant="middle" />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                <FormattedMessage description="positionDetailsRemainingSwaps" defaultMessage="Remaining time:" />
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption">
+                {parseInt(position.current.remainingSwaps, 10) > 0 ? (
+                  getFrequencyLabel(position.swapInterval.interval, position.current.remainingSwaps)
+                ) : (
+                  <FormattedMessage
+                    description="positionDetailsRemainingSwapsNone"
+                    defaultMessage="Position finished"
+                  />
+                )}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider variant="middle" />
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip
+            title={DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toLocaleString(
+              DateTime.DATETIME_FULL
+            )}
+            arrow
+            placement="top"
+          >
+            <Typography variant="body2" component="span">
               <FormattedMessage
-                description="positionDetailsHistoricallySwapped"
-                defaultMessage="{swapped} {to}"
+                description="positionDetailsCreatedAt"
+                defaultMessage="Created at {created}"
                 values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  swapped: formatCurrencyAmount(BigNumber.from(position.totalSwapped), position.to),
-                  to: position.to.symbol,
+                  created: DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toRelative(),
                 }}
               />
             </Typography>
-          </Grid>
+          </Tooltip>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Divider variant="middle" />
-      </Grid>
-      <Grid item xs={12} md={12}>
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography variant="body1">
-              <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="Available to withdraw:" />
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="caption">
-              <FormattedMessage
-                description="positionDetailsToWithdraw"
-                defaultMessage="{toWithdraw} {to}"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  toWithdraw: formatCurrencyAmount(BigNumber.from(position.current.idleSwapped), position.to),
-                  to: position.to.symbol,
-                }}
-              />
-            </Typography>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider variant="middle" />
-      </Grid>
-      <Grid item xs={12} md={12}>
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography variant="body1">
-              <FormattedMessage description="positionDetailsCurrentRateTitle" defaultMessage="Rate:" />
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="caption">
-              <FormattedMessage
-                description="positionDetailsCurrentRate"
-                defaultMessage="{rate} {from} {frequency}"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  rate: formatCurrencyAmount(BigNumber.from(position.current.rate), position.from),
-                  from: position.from.symbol,
-                  frequency:
-                    STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every,
-                }}
-              />
-            </Typography>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider variant="middle" />
-      </Grid>
-      <Grid item xs={12} md={12}>
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography variant="body1">
-              <FormattedMessage description="positionDetailsRemainingFundsTitle" defaultMessage="Remaining funds:" />
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="caption">
-              <FormattedMessage
-                description="positionDetailsRemainingFunds"
-                defaultMessage="{funds} {from}"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  funds: formatCurrencyAmount(BigNumber.from(position.current.remainingLiquidity), position.from),
-                  from: position.from.symbol,
-                }}
-              />
-            </Typography>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider variant="middle" />
-      </Grid>
-      <Grid item xs={12} md={12}>
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography variant="body1">
-              <FormattedMessage description="positionDetailsRemainingSwaps" defaultMessage="Remaining time:" />
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="caption">
-              {parseInt(position.current.remainingSwaps, 10) > 0 ? (
-                getFrequencyLabel(position.swapInterval.interval, position.current.remainingSwaps)
-              ) : (
-                <FormattedMessage description="positionDetailsRemainingSwapsNone" defaultMessage="Position finished" />
-              )}
-            </Typography>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider variant="middle" />
-      </Grid>
-      <Grid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toLocaleString(DateTime.DATETIME_FULL)}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            <FormattedMessage
-              description="positionDetailsCreatedAt"
-              defaultMessage="Created at {created}"
-              values={{
-                created: DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toRelative(),
-              }}
-            />
-          </Typography>
-        </Tooltip>
-      </Grid>
-    </Grid>
-  </StyledPaper>
-);
+    </StyledPaper>
+  );
+};
 export default Details;
