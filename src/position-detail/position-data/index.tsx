@@ -60,12 +60,9 @@ const Details = ({ position, initiallySwapped }: DetailsProps) => {
   const averageBuyPrice = summedPrices.div(swappedActions.length);
   const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  const totalSwapped = BigNumber.from(position.totalSwapped);
   const profitPercentage =
-    (initiallySwapped &&
-      (parseFloat(BigNumber.from(position.totalSwapped).mul(100).div(initiallySwapped).toString()) / 100 - 1).toFixed(
-        2
-      )) ||
-    0;
+    (initiallySwapped && (totalSwapped.mul(10000).div(initiallySwapped).sub(10000).toNumber() / 100).toFixed(2)) || 0;
   const profitPercentageToShow = profitPercentage > 0 ? profitPercentage : 0;
 
   return (

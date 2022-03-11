@@ -543,10 +543,15 @@ export default class Web3Service {
     const tokenAPrice = price.data.coins[`${DEFILLAMA_IDS[network.chainId]}:${tokenA.address}`].price;
     const tokenBPrice = price.data.coins[`${DEFILLAMA_IDS[network.chainId]}:${tokenB.address}`].price;
 
-    const rateAToB = tokenAPrice / tokenBPrice;
-    const rateBToA = tokenBPrice / tokenAPrice;
+    const rateAToB = parseUnits(tokenAPrice.toString(), 18).div(parseUnits(tokenBPrice.toString(), 18));
+    const rateBToA = parseUnits(tokenBPrice.toString(), 18).div(parseUnits(tokenAPrice.toString(), 18));
 
-    return { rateAToB, rateBToA };
+    return {
+      rateAToB,
+      rateBToA,
+      tokenAPrice: parseUnits(tokenAPrice.toString(), 18),
+      tokenBPrice: parseUnits(tokenBPrice.toString(), 18),
+    };
   }
 
   // ADDRESS METHODS

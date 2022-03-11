@@ -81,23 +81,27 @@ const PositionDetailFrame = () => {
       if (!position) {
         return;
       }
+      try {
+        const { tokenAPrice, tokenBPrice } = await web3Service.getUsdHistoricPrice(
+          position.from,
+          position.to,
+          position.createdAtTimestamp
+        );
 
-      const { rateAToB } = await web3Service.getUsdHistoricPrice(
-        position.from,
-        position.to,
-        position.createdAtTimestamp
-      );
+        const summedRates = position.history
+          .filter((action) => action.action === POSITION_ACTIONS.SWAPPED)
+          .reduce((acc, action) => acc.add(action.rate), BigNumber.from(0));
 
-      const summedRates = position.history
-        .filter((action) => action.action === POSITION_ACTIONS.SWAPPED)
-        .reduce((acc, action) => acc.add(action.rate), BigNumber.from(0));
+        const totalBoughtInitially = summedRates
+          .mul(tokenAPrice)
+          .mul(BigNumber.from(10).pow(position.to.decimals))
+          .div(BigNumber.from(10).pow(position.from.decimals))
+          .div(tokenBPrice);
 
-      const totalBoughtInitially = parseFloat(formatUnits(summedRates, position.from.decimals)) * rateAToB;
-
-      setWhatInitiallyWouldBeSwapped(
-        parseUnits(totalBoughtInitially.toString().substring(0, position.to.decimals), position.to.decimals)
-      );
-      setIsLoadingPrices(false);
+        setWhatInitiallyWouldBeSwapped(totalBoughtInitially);
+      } finally {
+        setIsLoadingPrices(false);
+      }
     };
 
     if (position && !isLoading) {
