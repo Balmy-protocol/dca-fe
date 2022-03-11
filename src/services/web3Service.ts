@@ -622,8 +622,12 @@ export default class Web3Service {
 
   // PAIR METHODS
   async getPairOracle(pair: { tokenA: string; tokenB: string }, isExistingPair: boolean): Promise<Oracles> {
-    const [tokenA, tokenB] = sortTokensByAddress(pair.tokenA, pair.tokenB);
     const currentNetwork = await this.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const [tokenA, tokenB] = sortTokensByAddress(
+      pair.tokenA === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : pair.tokenA,
+      pair.tokenB === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : pair.tokenB
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let provider: any = this.client;
     if (!this.client) {
