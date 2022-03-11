@@ -82,6 +82,7 @@ import {
   CHAINLINK_ORACLE_ADDRESS,
   COINGECKO_IDS,
   COMPANION_ADDRESS,
+  DEFILLAMA_IDS,
   HUB_ADDRESS,
   MAX_UINT_32,
   MEAN_GRAPHQL_URL,
@@ -524,6 +525,28 @@ export default class Web3Service {
     const usdPrice = price.data[token.address] && price.data[token.address].usd;
 
     return usdPrice || 0;
+  }
+
+  async getUsdHistoricPrice(tokenA: Token, tokenB: Token, date: string) {
+    const network = await this.getNetwork();
+    const price = await axiosClient.post<{ coins: Record<string, { price: number }> }>(
+      'https://coins.llama.fi/prices',
+      {
+        coins: [
+          `${DEFILLAMA_IDS[network.chainId]}:${tokenA.address}`,
+          `${DEFILLAMA_IDS[network.chainId]}:${tokenB.address}`,
+        ],
+        timestamp: parseInt(date, 10),
+      }
+    );
+
+    const tokenAPrice = price.data.coins[`${DEFILLAMA_IDS[network.chainId]}:${tokenA.address}`].price;
+    const tokenBPrice = price.data.coins[`${DEFILLAMA_IDS[network.chainId]}:${tokenB.address}`].price;
+
+    const rateAToB = tokenAPrice / tokenBPrice;
+    const rateBToA = tokenBPrice / tokenAPrice;
+
+    return { rateAToB, rateBToA };
   }
 
   // ADDRESS METHODS

@@ -273,6 +273,19 @@ export const COINGECKO_IDS = {
   [NETWORKS.mumbai.chainId]: 'mumbai',
 };
 
+export const DEFILLAMA_IDS = {
+  [NETWORKS.mainnet.chainId]: 'ethereum',
+  [NETWORKS.ropsten.chainId]: 'ethereum',
+  [NETWORKS.rinkeby.chainId]: 'ethereum',
+  [NETWORKS.goerli.chainId]: 'ethereum',
+  [NETWORKS.kovan.chainId]: 'ethereum',
+  [NETWORKS.polygon.chainId]: 'polygon',
+  [NETWORKS.optimism.chainId]: 'optimism',
+  [NETWORKS.optimismGoerli.chainId]: 'optimism',
+  [NETWORKS.optimismKovan.chainId]: 'optimism',
+  [NETWORKS.mumbai.chainId]: 'mumbai',
+};
+
 export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
 
 export const HUB_ADDRESS = {

@@ -23,6 +23,10 @@ import { changeMainTab, changePositionDetailsTab } from 'state/tabs/actions';
 import { usePositionDetailsTab } from 'state/tabs/hooks';
 import PositionPermissionsContainer from 'position-detail/permissions-container';
 import { setPermissions } from 'state/position-permissions/actions';
+import useWeb3Service from 'hooks/useWeb3Service';
+import { POSITION_ACTIONS } from 'config/constants';
+import { BigNumber } from 'ethers';
+import { formatUnits, parseUnits } from '@ethersproject/units';
 import PositionSummaryContainer from '../summary-container';
 
 const WAIT_FOR_SUBGRAPH = 5000;
@@ -36,6 +40,9 @@ const PositionDetailFrame = () => {
   const tabsStyles = appleTabsStylesHook.useTabs();
   const tabItemStyles = appleTabsStylesHook.useTabItem();
   const currentNetwork = useCurrentNetwork();
+  const [whatInitiallyWouldBeSwapped, setWhatInitiallyWouldBeSwapped] = React.useState<BigNumber | null>(null);
+  const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
+  const web3Service = useWeb3Service();
   const {
     loading: isLoading,
     data,
@@ -70,6 +77,29 @@ const PositionDetailFrame = () => {
   }, [position, isPending]);
 
   React.useEffect(() => {
+    const fetchTokenRate = async () => {
+      if (!position) {
+        return;
+      }
+
+      const { rateAToB } = await web3Service.getUsdHistoricPrice(
+        position.from,
+        position.to,
+        position.createdAtTimestamp
+      );
+
+      const summedRates = position.history
+        .filter((action) => action.action === POSITION_ACTIONS.SWAPPED)
+        .reduce((acc, action) => acc.add(action.rate), BigNumber.from(0));
+
+      const totalBoughtInitially = parseFloat(formatUnits(summedRates, position.from.decimals)) * rateAToB;
+
+      setWhatInitiallyWouldBeSwapped(
+        parseUnits(totalBoughtInitially.toString().substring(0, position.to.decimals), position.to.decimals)
+      );
+      setIsLoadingPrices(false);
+    };
+
     if (position && !isLoading) {
       dispatch(
         setPermissions({
@@ -83,12 +113,17 @@ const PositionDetailFrame = () => {
           ),
         })
       );
+      if (!whatInitiallyWouldBeSwapped && !isLoadingPrices) {
+        setIsLoadingPrices(true);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
+        fetchTokenRate();
+      }
     }
   }, [position, isLoading]);
 
   const positionNotFound = !position && data && !isLoading;
 
-  if (isLoading || !data || (!position && !positionNotFound) || isLoadingSwaps) {
+  if (isLoading || !data || (!position && !positionNotFound) || isLoadingSwaps || isLoadingPrices) {
     return (
       <Grid container>
         <CenteredLoadingIndicator size={70} />
@@ -138,6 +173,7 @@ const PositionDetailFrame = () => {
               position={position}
               pendingTransaction={pendingTransaction}
               swapsData={swapsData?.pair}
+              initiallySwapped={whatInitiallyWouldBeSwapped}
             />
           )}
           {tabIndex === 1 && (

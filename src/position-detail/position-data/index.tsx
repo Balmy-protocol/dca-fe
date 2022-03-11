@@ -12,13 +12,19 @@ import { DateTime } from 'luxon';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
 import Divider from '@material-ui/core/Divider';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 
 import { getFrequencyLabel } from 'utils/parsing';
 import { POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
-import { parseUnits } from '@ethersproject/units';
+import { formatUnits } from '@ethersproject/units';
 
+const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
+  margin-left: 3px;
+  font-size: 15px;
+`;
 interface DetailsProps {
   position: FullPosition;
+  initiallySwapped: BigNumber | null;
 }
 
 const StyledCardTitleHeader = styled.div`
@@ -38,7 +44,7 @@ const StyledPaper = styled(Paper)`
   flex-grow: 1;
 `;
 
-const Details = ({ position }: DetailsProps) => {
+const Details = ({ position, initiallySwapped }: DetailsProps) => {
   const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
   let summedPrices = BigNumber.from(0);
   swappedActions.forEach((action) => {
@@ -201,6 +207,55 @@ const Details = ({ position }: DetailsProps) => {
             </Grid>
           </Grid>
         </Grid>
+        {initiallySwapped && (
+          <>
+            <Grid item xs={12}>
+              <Divider variant="middle" />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography variant="body1">
+                    <FormattedMessage
+                      description="positionDetailsProfitPercentageTitle"
+                      defaultMessage="Profit percentage:"
+                    />
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} style={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography variant="caption">
+                    <FormattedMessage
+                      description="positionDetailsProfitPercentage"
+                      defaultMessage="{rate}%"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        rate:
+                          parseFloat(BigNumber.from(position.totalSwapped).mul(100).div(initiallySwapped).toString()) /
+                          100,
+                      }}
+                    />
+                  </Typography>
+                  <Tooltip
+                    title={
+                      <FormattedMessage
+                        description="positionDetailsProfitPercentageTooltip"
+                        defaultMessage="What you would have bought initially: {initialAmount} {to}"
+                        values={{
+                          initialAmount: formatCurrencyAmount(initiallySwapped, position.to),
+                          to: position.to.symbol,
+                        }}
+                      />
+                    }
+                    arrow
+                    placement="top"
+                  >
+                    <StyledHelpOutlineIcon fontSize="inherit" />
+                  </Tooltip>
+                </Grid>
+              </Grid>
+            </Grid>
+          </>
+        )}
         <Grid item xs={12}>
           <Divider variant="middle" />
         </Grid>

@@ -56,9 +56,15 @@ interface PositionSummaryContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
   swapsData: GetPairSwapsData | undefined;
+  initiallySwapped: BigNumber | null;
 }
 
-const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: PositionSummaryContainerProps) => {
+const PositionSummaryContainer = ({
+  position,
+  pendingTransaction,
+  swapsData,
+  initiallySwapped,
+}: PositionSummaryContainerProps) => {
   const [actionToShow, setActionToShow] = React.useState<null | 'modifyRate' | 'removeFunds'>(null);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const [showWithdrawModal, setShowWithdrawModal] = React.useState(false);
@@ -283,7 +289,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, swapsData }: P
           </StyledPaper>
         </Collapse>
         <StyledFlexGridItem item xs={12} md={4}>
-          <Details position={position} />
+          <Details position={position} initiallySwapped={initiallySwapped} />
         </StyledFlexGridItem>
         <StyledFlexGridItem item xs={12} md={8}>
           <SwapsGraph position={position} />
