@@ -60,6 +60,13 @@ const Details = ({ position, initiallySwapped }: DetailsProps) => {
   const averageBuyPrice = summedPrices.div(swappedActions.length);
   const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  const profitPercentage =
+    (initiallySwapped &&
+      (parseFloat(BigNumber.from(position.totalSwapped).mul(100).div(initiallySwapped).toString()) / 100 - 1).toFixed(
+        2
+      )) ||
+    0;
+  const profitPercentageToShow = profitPercentage > 0 ? profitPercentage : 0;
 
   return (
     <StyledPaper>
@@ -229,9 +236,7 @@ const Details = ({ position, initiallySwapped }: DetailsProps) => {
                       defaultMessage="{rate}%"
                       values={{
                         b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                        rate:
-                          parseFloat(BigNumber.from(position.totalSwapped).mul(100).div(initiallySwapped).toString()) /
-                          100,
+                        rate: profitPercentageToShow,
                       }}
                     />
                   </Typography>
