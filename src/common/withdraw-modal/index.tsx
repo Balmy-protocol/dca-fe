@@ -73,8 +73,8 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
             <Typography variant="body1">
               <FormattedMessage
                 description="Withdrawing from"
-                defaultMessage="Withdrawing {from}"
-                values={{ from: position.to.symbol }}
+                defaultMessage="Withdrawing {toSymbol}"
+                values={{ toSymbol }}
               />
             </Typography>
             {useProtocolToken && !hasPermission && (
