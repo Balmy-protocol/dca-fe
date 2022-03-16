@@ -51,7 +51,9 @@ const Details = ({ position }: DetailsProps) => {
 
     summedPrices = summedPrices.add(rate);
   });
-  const averageBuyPrice = summedPrices.div(swappedActions.length);
+  const averageBuyPrice = summedPrices.gt(BigNumber.from(0))
+    ? summedPrices.div(swappedActions.length)
+    : BigNumber.from(0);
   const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
 
@@ -187,16 +189,20 @@ const Details = ({ position }: DetailsProps) => {
             </Grid>
             <Grid item xs={12}>
               <Typography variant="caption">
-                <FormattedMessage
-                  description="positionDetailsAverageBuyPrice"
-                  defaultMessage="1 {from} = {average} {to}"
-                  values={{
-                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                    from: tokenFromAverage.symbol,
-                    to: tokenToAverage.symbol,
-                    average: formatCurrencyAmount(averageBuyPrice, tokenToAverage),
-                  }}
-                />
+                {averageBuyPrice.gt(BigNumber.from(0)) ? (
+                  <FormattedMessage
+                    description="positionDetailsAverageBuyPrice"
+                    defaultMessage="1 {from} = {average} {to}"
+                    values={{
+                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                      from: tokenFromAverage.symbol,
+                      to: tokenToAverage.symbol,
+                      average: formatCurrencyAmount(averageBuyPrice, tokenToAverage),
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage description="positionDetailsAverageBuyPriceNotSwap" defaultMessage="No swaps yet" />
+                )}
               </Typography>
             </Grid>
           </Grid>
