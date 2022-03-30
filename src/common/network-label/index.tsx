@@ -76,11 +76,13 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
     setShouldOpenNetworkMenu(true);
   };
 
-  const handleClose = (chainId: number) => {
+  const handleClose = (chainId?: number) => {
     setAnchorEl(null);
     setShouldOpenNetworkMenu(false);
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    web3Service.changeNetwork(chainId);
+    if (chainId) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      web3Service.changeNetwork(chainId);
+    }
   };
 
   const networkName = React.useMemo(() => {
@@ -133,6 +135,8 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
         anchorEl={anchorEl}
         open={shouldOpenNetworkMenu}
         classes={popoverClasses}
+        onClose={() => handleClose()}
+        disableEnforceFocus
       >
         <StyledMenu>
           {NETWORKS_FOR_MENU.map((chainId) => (
