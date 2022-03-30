@@ -395,6 +395,13 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
   MIGRATE_POSITION: 'MIGRATE_POSITION',
 };
 
+export const DEFILLAMA_IDS = {
+  [NETWORKS.mainnet.chainId]: 'ethereum',
+  [NETWORKS.polygon.chainId]: 'polygon',
+  [NETWORKS.optimism.chainId]: 'optimism',
+  [NETWORKS.mumbai.chainId]: 'mumbai',
+};
+
 export const FULL_DEPOSIT_TYPE = 'full_deposit';
 export const RATE_TYPE = 'by_rate';
 
@@ -435,7 +442,7 @@ export const TOKEN_LISTS = {
   },
 };
 
-export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST'];
+export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST', 'jEUR', 'jGBP', 'jCHF'];
 
 export const ONE_MINUTE = BigNumber.from(60);
 export const FIVE_MINUTES = ONE_MINUTE.mul(BigNumber.from(5));

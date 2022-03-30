@@ -6,13 +6,14 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from 'common/button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
 import { Position, Token } from 'types';
 import { useHistory } from 'react-router-dom';
-import { STRING_SWAP_INTERVALS } from 'config/constants';
+import { STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import { createStyles, withStyles, Theme } from '@material-ui/core/styles';
@@ -24,6 +25,7 @@ import Link from '@material-ui/core/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import MigratePositionModal from 'common/migrate-position-modal';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import useUsdPrice from 'hooks/useUsdPrice';
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -50,6 +52,10 @@ const BorderLinearProgress = withStyles((theme: Theme) =>
     },
   })
 )(LinearProgress);
+
+const StyledChip = styled(Chip)`
+  margin: 0px 5px;
+`;
 
 const StyledCard = styled(Card)`
   margin: 10px;
@@ -163,6 +169,8 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
   const [shouldShowMigrate, setShouldShowMigrate] = React.useState(false);
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw);
   const history = useHistory();
 
   const isPending = !!pendingTransaction;
@@ -175,6 +183,8 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
     availablePairs,
     (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
   );
+  const showFromPrice = !STABLE_COINS.includes(from.symbol) && !isLoadingFromPrice && !!fromPrice;
+  const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
@@ -215,23 +225,53 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                 )}
               </StyledCardHeader>
               <StyledDetailWrapper>
-                <Typography variant="body2">
+                <Typography
+                  variant="body2"
+                  style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+                >
                   <FormattedMessage
                     description="current remaining"
-                    defaultMessage="Remaining: <b>{remainingLiquidity} {from} ({rate} {from} {frequency})</b>"
+                    defaultMessage="Remaining: <b>{remainingLiquidity} {from}</b>"
+                    values={{
+                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                      remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from),
+                      from: from.symbol,
+                    }}
+                  />
+                  {showFromPrice && (
+                    <StyledChip
+                      color="primary"
+                      size="small"
+                      label={
+                        <FormattedMessage
+                          description="current remaining price"
+                          defaultMessage="({toPrice} USD)"
+                          values={{
+                            b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                            toPrice: fromPrice?.toFixed(2),
+                          }}
+                        />
+                      }
+                    />
+                  )}
+                  <FormattedMessage
+                    description="current remaining rate"
+                    defaultMessage="({rate} {from} {frequency})"
                     values={{
                       b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                       rate: formatCurrencyAmount(rate, from),
                       frequency:
                         STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
-                      remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from),
                       from: from.symbol,
                     }}
                   />
                 </Typography>
               </StyledDetailWrapper>
               <StyledDetailWrapper>
-                <Typography variant="body2" component="span">
+                <Typography
+                  variant="body2"
+                  style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+                >
                   <FormattedMessage
                     description="current swapped in position"
                     defaultMessage="To withdraw: <b>{exercised} {to}</b>"
@@ -239,8 +279,26 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                       b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                       exercised: formatCurrencyAmount(toWithdraw, to),
                       to: to.symbol,
+                      showToPrice: !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice,
+                      toPrice: toPrice?.toFixed(2),
                     }}
                   />
+                  {showToPrice && (
+                    <StyledChip
+                      color="primary"
+                      size="small"
+                      label={
+                        <FormattedMessage
+                          description="current swapped in position price"
+                          defaultMessage="({toPrice} USD)"
+                          values={{
+                            b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                            toPrice: toPrice?.toFixed(2),
+                          }}
+                        />
+                      }
+                    />
+                  )}
                 </Typography>
               </StyledDetailWrapper>
             </StyledContentContainer>

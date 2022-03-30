@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
@@ -11,6 +11,7 @@ import CallMadeIcon from '@material-ui/icons/CallMade';
 import SettingsIcon from '@material-ui/icons/Settings';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import CreatedIcon from '@material-ui/icons/NewReleases';
+import Chip from '@material-ui/core/Chip';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import { ActionState, FullPosition } from 'types';
@@ -24,8 +25,24 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
 import FingerprintIcon from '@material-ui/icons/Fingerprint';
 import Address from 'common/address';
+import useUsdPrice from 'hooks/useUsdPrice';
+import { withStyles } from '@material-ui/styles';
+import { Theme } from '@material-ui/core';
+
+const DarkTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.common.white,
+    boxShadow: theme.shadows[1],
+    fontSize: 11,
+  },
+}))(Tooltip);
 
 const StyledCard = styled(Card)``;
+
+const StyledChip = styled(Chip)`
+  margin: 0px 5px;
+`;
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 3px;
@@ -151,6 +168,34 @@ interface PositionTimelineProps {
 }
 
 const buildSwappedItem = (positionState: ActionState, position: FullPosition) => {
+  const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.swapped));
+  const [toPrice, isLoadingToPrice] = useUsdPrice(
+    position.to,
+    BigNumber.from(positionState.swapped),
+    positionState.createdAtTimestamp
+  );
+  const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigNumber.from(positionState.rate));
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
+    position.from,
+    BigNumber.from(positionState.rate),
+    positionState.createdAtTimestamp
+  );
+
+  const showToPrices =
+    !STABLE_COINS.includes(position.to.symbol) &&
+    !isLoadingToPrice &&
+    !!toPrice &&
+    !isLoadingToCurrentPrice &&
+    !!toCurrentPrice;
+  const showFromPrices =
+    !STABLE_COINS.includes(position.from.symbol) &&
+    !isLoadingFromPrice &&
+    !!fromPrice &&
+    !isLoadingFromCurrentPrice &&
+    !!fromCurrentPrice;
+  const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
+  const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
+
   const TooltipMessage = (
     <FormattedMessage
       description="pairSwapDetails"
@@ -174,10 +219,14 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
     content: (
       <>
         <StyledCenteredGrid item xs={12}>
-          <Typography variant="body1" component="span">
+          <Typography
+            variant="body1"
+            component="p"
+            style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+          >
             <FormattedMessage
               description="pairSwapDetails"
-              defaultMessage="Swapped <b>{rate} {from}</b> for <b>{result} {to}</b>"
+              defaultMessage="Swapped <b>{rate} {from} </b>"
               values={{
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                 result: formatCurrencyAmount(BigNumber.from(positionState.swapped), position.to),
@@ -186,6 +235,69 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                 rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
               }}
             />
+            {showFromPrices && (
+              <DarkTooltip
+                title={
+                  showFromPrices
+                    ? 'Displaying current value. Click to show value on day of withdrawal'
+                    : 'Estimated value on day of withdrawal'
+                }
+                arrow
+                placement="top"
+              >
+                <StyledChip
+                  onClick={() => setShouldShowFromCurrentPrice(!showFromPrices)}
+                  color="primary"
+                  label={
+                    <FormattedMessage
+                      description="pairSwapDetailsFromPrice"
+                      defaultMessage="<b>({fromPrice} USD)</b>"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        fromPrice: showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2),
+                      }}
+                    />
+                  }
+                />
+              </DarkTooltip>
+            )}
+            <FormattedMessage
+              description="pairSwapDetailsFor"
+              defaultMessage=" for <b>{result} {to}</b>"
+              values={{
+                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                result: formatCurrencyAmount(BigNumber.from(positionState.swapped), position.to),
+                from: position.from.symbol,
+                to: position.to.symbol,
+                rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
+              }}
+            />
+            {showToPrices && (
+              <DarkTooltip
+                title={
+                  showToCurrentPrice
+                    ? 'Displaying current value. Click to show value on day of withdrawal'
+                    : 'Estimated value on day of withdrawal'
+                }
+                arrow
+                placement="top"
+              >
+                <StyledChip
+                  onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
+                  color="primary"
+                  label={
+                    <FormattedMessage
+                      description="pairSwapDetailsToPrice"
+                      defaultMessage="<b>({toPrice} USD)</b>"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        toPrice: showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2),
+                      }}
+                    />
+                  }
+                />
+              </DarkTooltip>
+            )}
           </Typography>
           <Tooltip title={TooltipMessage} arrow placement="top">
             <StyledHelpOutlineIcon fontSize="inherit" />
@@ -526,41 +638,87 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
   toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
-const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <CallMadeIcon />,
-  content: (
-    <>
-      <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionWithdrawn"
-            defaultMessage="Withdraw <b>{withdraw} {to}</b> from position"
-            values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-              withdraw: formatCurrencyAmount(BigNumber.from(positionState.withdrawn), position.to),
-              to: position.to.symbol,
-            }}
-          />
-        </Typography>
-      </Grid>
-      <StyledRightGrid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-            DateTime.DATETIME_FULL
-          )}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
+const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => {
+  const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.withdrawn));
+  const [toPrice, isLoadingToPrice] = useUsdPrice(
+    position.to,
+    BigNumber.from(positionState.withdrawn),
+    positionState.createdAtTimestamp
+  );
+
+  const showPrices =
+    !STABLE_COINS.includes(position.to.symbol) &&
+    !isLoadingToPrice &&
+    !!toPrice &&
+    !isLoadingToCurrentPrice &&
+    !!toCurrentPrice;
+  const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
+
+  return {
+    icon: <CallMadeIcon />,
+    content: (
+      <>
+        <Grid item xs={12}>
+          <Typography variant="body1" style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}>
+            <FormattedMessage
+              description="positionWithdrawn"
+              defaultMessage="Withdraw <b>{withdraw} {to}</b>"
+              values={{
+                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                withdraw: formatCurrencyAmount(BigNumber.from(positionState.withdrawn), position.to),
+                to: position.to.symbol,
+                showToPrice: showPrices,
+                toPrice: toPrice?.toFixed(2),
+              }}
+            />
+            {showPrices && (
+              <DarkTooltip
+                title={
+                  showCurrentPrice
+                    ? 'Displaying current value. Click to show value on day of withdrawal'
+                    : 'Estimated value on day of withdrawal'
+                }
+                arrow
+                placement="top"
+              >
+                <StyledChip
+                  onClick={() => setShouldShowCurrentPrice(!showCurrentPrice)}
+                  color="primary"
+                  label={
+                    <FormattedMessage
+                      description="positionWithdrawnPrice"
+                      defaultMessage="<b>({toPrice} USD)</b>"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        toPrice: showCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2),
+                      }}
+                    />
+                  }
+                />
+              </DarkTooltip>
+            )}
+            <FormattedMessage description="positionWithdrawnSecond" defaultMessage=" from position" />
           </Typography>
-        </Tooltip>
-      </StyledRightGrid>
-    </>
-  ),
-  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-});
+        </Grid>
+        <StyledRightGrid item xs={12}>
+          <Tooltip
+            title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
+              DateTime.DATETIME_FULL
+            )}
+            arrow
+            placement="top"
+          >
+            <Typography variant="body2" component="span">
+              {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
+            </Typography>
+          </Tooltip>
+        </StyledRightGrid>
+      </>
+    ),
+    title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
+    toOrder: parseInt(positionState.createdAtBlock, 10),
+  };
+};
 
 const buildTerminatedItem = (positionState: ActionState) => ({
   icon: <DeleteSweepIcon />,
