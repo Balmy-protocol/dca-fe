@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
-import { setupCache } from 'axios-cache-adapter';
+import { setupCache, setup } from 'axios-cache-adapter';
 import axios from 'axios';
 
 import blockNumber from './block-number/reducer';
@@ -24,6 +24,17 @@ const cache = setupCache({
 export const axiosClient = axios.create({
   adapter: cache.adapter,
 });
+
+export const setupAxiosClient = () =>
+  setup({
+    cache: {
+      maxAge: 15 * 60 * 1000,
+      exclude: {
+        query: false,
+        methods: ['put', 'patch', 'delete'],
+      },
+    },
+  });
 
 const PERSISTED_STATES: string[] = ['transactions', 'badge', 'tokenLists.activeLists', 'config'];
 

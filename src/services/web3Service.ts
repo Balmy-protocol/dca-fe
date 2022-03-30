@@ -17,7 +17,7 @@ import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import keyBy from 'lodash/keyBy';
 import find from 'lodash/find';
-import axios, { AxiosResponse } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import {
   CoinGeckoPriceResponse,
@@ -82,6 +82,7 @@ import {
   CHAINLINK_ORACLE_ADDRESS,
   COINGECKO_IDS,
   COMPANION_ADDRESS,
+  DEFILLAMA_IDS,
   HUB_ADDRESS,
   MAX_UINT_32,
   MEAN_GRAPHQL_URL,
@@ -107,7 +108,7 @@ import {
   Oracles,
   PermissionManagerContract,
 } from 'types/contracts';
-import { axiosClient } from 'state';
+import { setupAxiosClient } from 'state';
 import { fromRpcSig } from 'ethereumjs-util';
 import GraphqlService from './graphql';
 import injectedConnector from './InjectedConnector';
@@ -139,6 +140,8 @@ export default class Web3Service {
 
   providerInfo: { id: string; logo: string; name: string };
 
+  axiosClient: AxiosInstance;
+
   constructor(
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
     client?: ethers.providers.Web3Provider,
@@ -155,6 +158,7 @@ export default class Web3Service {
       this.modal = modal;
     }
 
+    this.axiosClient = setupAxiosClient();
     this.apolloClient = new GraphqlService();
     this.uniClient = new GraphqlService();
     this.chainlinkClient = new GraphqlService();
@@ -239,7 +243,7 @@ export default class Web3Service {
   }
 
   getUsedTokens() {
-    return axios.get<GetUsedTokensData>(
+    return this.axiosClient.get<GetUsedTokensData>(
       `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${process.env.ETHPLORER_KEY || ''}`
     );
   }
@@ -524,7 +528,7 @@ export default class Web3Service {
   // TOKEN METHODS
   async getUsdPrice(token: Token) {
     const network = await this.getNetwork();
-    const price = await axiosClient.get<Record<string, { usd: number }>>(
+    const price = await this.axiosClient.get<Record<string, { usd: number }>>(
       `https://api.coingecko.com/api/v3/simple/token_price/${
         COINGECKO_IDS[network.chainId] || COINGECKO_IDS[NETWORKS.optimism.chainId]
       }?contract_addresses=${token.address}&vs_currencies=usd`
@@ -533,6 +537,21 @@ export default class Web3Service {
     const usdPrice = price.data[token.address] && price.data[token.address].usd;
 
     return usdPrice || 0;
+  }
+
+  async getUsdHistoricPrice(token: Token, date?: string) {
+    const network = await this.getNetwork();
+    const price = await this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
+      'https://coins.llama.fi/prices',
+      {
+        coins: [`${DEFILLAMA_IDS[network.chainId]}:${token.address}`],
+        ...(date && { timestamp: parseInt(date, 10) }),
+      }
+    );
+
+    const tokenPrice = price.data.coins[`${DEFILLAMA_IDS[network.chainId]}:${token.address}`].price;
+
+    return parseUnits(tokenPrice.toString(), 18);
   }
 
   // ADDRESS METHODS
@@ -807,9 +826,10 @@ export default class Web3Service {
 
     if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
       try {
-        const polyGasResponse = await axios.get<{ estimatedBaseFee: number; standard: { maxPriorityFee: number } }>(
-          'https://gasstation-mainnet.matic.network/v2'
-        );
+        const polyGasResponse = await this.axiosClient.get<{
+          estimatedBaseFee: number;
+          standard: { maxPriorityFee: number };
+        }>('https://gasstation-mainnet.matic.network/v2');
 
         return parseUnits(
           (polyGasResponse.data.estimatedBaseFee + polyGasResponse.data.standard.maxPriorityFee).toFixed(9).toString(),
@@ -875,8 +895,8 @@ export default class Web3Service {
         this.account,
         []
       ),
-      axios.get<TxPriceResponse>('https://api.txprice.com/'),
-      axios.get<CoinGeckoPriceResponse>(
+      this.axiosClient.get<TxPriceResponse>('https://api.txprice.com/'),
+      this.axiosClient.get<CoinGeckoPriceResponse>(
         'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&order=market_cap_desc&per_page=1&page=1&sparkline=false'
       ),
     ]).then((promiseValues: [BigNumber, AxiosResponse<TxPriceResponse>, AxiosResponse<CoinGeckoPriceResponse>]) => {

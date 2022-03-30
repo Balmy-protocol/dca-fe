@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { FullPosition } from 'types';
 import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
 import Tooltip from '@material-ui/core/Tooltip';
 import TokenIcon from 'common/token-icon';
 import ArrowRight from 'assets/svg/atom/arrow-right';
@@ -15,11 +16,15 @@ import Divider from '@material-ui/core/Divider';
 
 import { getFrequencyLabel } from 'utils/parsing';
 import { POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
-import { parseUnits } from '@ethersproject/units';
+import useUsdPrice from 'hooks/useUsdPrice';
 
 interface DetailsProps {
   position: FullPosition;
 }
+
+const StyledChip = styled(Chip)`
+  margin: 0px 5px;
+`;
 
 const StyledCardTitleHeader = styled.div`
   display: flex;
@@ -56,6 +61,15 @@ const Details = ({ position }: DetailsProps) => {
     : BigNumber.from(0);
   const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
+    position.from,
+    BigNumber.from(position.current.remainingLiquidity)
+  );
+  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, BigNumber.from(position.current.idleSwapped));
+  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, BigNumber.from(position.totalSwapped));
+  const showToFullPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToFullPrice && !!toFullPrice;
+  const showToPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToPrice && !!toPrice;
+  const showFromPrice = !STABLE_COINS.includes(position.from.symbol) && !isLoadingFromPrice && !!fromPrice;
 
   return (
     <StyledPaper>
@@ -80,7 +94,10 @@ const Details = ({ position }: DetailsProps) => {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="caption">
+              <Typography
+                variant="caption"
+                style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+              >
                 <FormattedMessage
                   description="positionDetailsHistoricallySwapped"
                   defaultMessage="{swapped} {to}"
@@ -90,6 +107,22 @@ const Details = ({ position }: DetailsProps) => {
                     to: position.to.symbol,
                   }}
                 />
+                {showToFullPrice && (
+                  <StyledChip
+                    color="primary"
+                    size="small"
+                    label={
+                      <FormattedMessage
+                        description="positionDetailsHistoricallySwappedPrice"
+                        defaultMessage="({toPrice} USD)"
+                        values={{
+                          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                          toPrice: toFullPrice?.toFixed(2),
+                        }}
+                      />
+                    }
+                  />
+                )}
               </Typography>
             </Grid>
           </Grid>
@@ -108,16 +141,37 @@ const Details = ({ position }: DetailsProps) => {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="caption">
+              <Typography
+                variant="caption"
+                style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+              >
                 <FormattedMessage
                   description="positionDetailsToWithdraw"
-                  defaultMessage="{toWithdraw} {to}"
+                  defaultMessage="{toWithdraw} {to} {showToPrice, select, true {({toPrice} USD)} other {}}"
                   values={{
                     b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                     toWithdraw: formatCurrencyAmount(BigNumber.from(position.current.idleSwapped), position.to),
                     to: position.to.symbol,
+                    showToPrice: !STABLE_COINS.includes(position.to.symbol) && !isLoadingToPrice && !!toPrice,
+                    toPrice: toPrice?.toFixed(2),
                   }}
                 />
+                {showToPrice && (
+                  <StyledChip
+                    color="primary"
+                    size="small"
+                    label={
+                      <FormattedMessage
+                        description="positionDetailsToWithdrawPrice"
+                        defaultMessage="({toPrice} USD)"
+                        values={{
+                          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                          toPrice: toFullPrice?.toFixed(2),
+                        }}
+                      />
+                    }
+                  />
+                )}
               </Typography>
             </Grid>
           </Grid>
@@ -160,7 +214,10 @@ const Details = ({ position }: DetailsProps) => {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="caption">
+              <Typography
+                variant="caption"
+                style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+              >
                 <FormattedMessage
                   description="positionDetailsRemainingFunds"
                   defaultMessage="{funds} {from}"
@@ -170,6 +227,22 @@ const Details = ({ position }: DetailsProps) => {
                     from: position.from.symbol,
                   }}
                 />
+                {showFromPrice && (
+                  <StyledChip
+                    color="primary"
+                    size="small"
+                    label={
+                      <FormattedMessage
+                        description="positionDetailsRemainingFundsPrice"
+                        defaultMessage="({fromPrice} USD)"
+                        values={{
+                          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                          fromPrice: toFullPrice?.toFixed(2),
+                        }}
+                      />
+                    }
+                  />
+                )}
               </Typography>
             </Grid>
           </Grid>
