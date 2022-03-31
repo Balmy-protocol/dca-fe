@@ -27,7 +27,11 @@ const SwapContainer = () => {
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const client = useDCAGraphql();
-  const { from: fromParam, to: toParam } = useParams<{ from: string; to: string }>();
+  const {
+    from: fromParam,
+    to: toParam,
+    chainId: chainIdParam,
+  } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();
@@ -64,12 +68,12 @@ const SwapContainer = () => {
     }
 
     dispatch(setFrom(newFrom));
-    history.replace(`/${newFrom.address}/${to?.address || ''}`);
+    history.replace(`/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
   };
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
     if (from) {
-      history.replace(`/${from.address || ''}/${newTo.address}`);
+      history.replace(`/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
   };
 
@@ -89,7 +93,7 @@ const SwapContainer = () => {
     dispatch(setFrom(to));
 
     if (to) {
-      history.replace(`/${to.address || ''}/${from?.address || ''}`);
+      history.replace(`/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
   };
 
