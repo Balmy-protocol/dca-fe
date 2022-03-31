@@ -1,4 +1,5 @@
 import React from 'react';
+import find from 'lodash/find';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -8,6 +9,12 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useMainTab } from 'state/tabs/hooks';
 import { useAppDispatch } from 'state/hooks';
 import { changeMainTab } from 'state/tabs/actions';
+import { useParams } from 'react-router-dom';
+import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
+import { setNetwork } from 'state/config/actions';
+import { NetworkStruct } from 'types';
+import useWeb3Service from 'hooks/useWeb3Service';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 
@@ -25,8 +32,27 @@ const StyledGridContainer = styled(Grid).withConfig({
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const tabIndex = useMainTab();
   const dispatch = useAppDispatch();
+  const web3Service = useWeb3Service();
   const tabsStyles = appleTabsStylesHook.useTabs();
   const tabItemStyles = appleTabsStylesHook.useTabItem();
+  const currentNetwork = useCurrentNetwork();
+  const { chainId } = useParams<{ chainId: string }>();
+
+  React.useEffect(() => {
+    if (
+      chainId &&
+      SUPPORTED_NETWORKS.includes(parseInt(chainId, 10)) &&
+      chainId !== currentNetwork.chainId.toString()
+    ) {
+      const foundNetwork = find(Object.values(NETWORKS), { chainId: parseInt(chainId, 10) });
+
+      dispatch(
+        setNetwork({ chainId: (foundNetwork as NetworkStruct).chainId, name: (foundNetwork as NetworkStruct).name })
+      );
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      web3Service.changeNetwork(parseInt(chainId, 10));
+    }
+  }, [chainId, currentNetwork]);
 
   return (
     <StyledGridContainer container spacing={8} isLoading={isLoading}>

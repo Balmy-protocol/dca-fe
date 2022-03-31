@@ -1,5 +1,6 @@
 import type Web3Service from 'services/web3Service';
 import React from 'react';
+import { Token } from './tokens';
 
 export * from './tokens';
 export * from './positions';
@@ -29,4 +30,12 @@ export type Web3ServicePromisableMethods =
 
 export interface Network {
   chainId: number;
+}
+
+export interface NetworkStruct {
+  chainId: number;
+  name: string;
+  mainCurrency: string;
+  nativeCurrency: Partial<Token>;
+  rpc: string[];
 }

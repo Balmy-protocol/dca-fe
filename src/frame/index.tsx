@@ -132,7 +132,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
                       <Route path="/leaderboard">
                         <Leaderboard />
                       </Route>
-                      <Route path="/:from?/:to?">
+                      <Route path="/:chainId?/:from?/:to?">
                         <Home isLoading={isLoading || isLoadingNetwork} />
                       </Route>
                     </Switch>
