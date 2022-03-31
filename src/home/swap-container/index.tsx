@@ -18,6 +18,8 @@ import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
 import { useCreatePositionState } from 'state/create-position/hooks';
 import { useAppDispatch } from 'state/hooks';
 import { setFrequencyType, setFrequencyValue, setFrom, setFromValue, setTo } from 'state/create-position/actions';
+import { useHistory, useParams } from 'react-router-dom';
+import useToken from 'hooks/useToken';
 import Swap from './components/swap';
 
 const SwapContainer = () => {
@@ -25,6 +27,11 @@ const SwapContainer = () => {
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const client = useDCAGraphql();
+  const { from: fromParam, to: toParam } = useParams<{ from: string; to: string }>();
+  const fromParamToken = useToken(fromParam);
+  const toParamToken = useToken(toParam);
+  const history = useHistory();
+
   const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
     getAvailableIntervals,
     {
@@ -33,10 +40,15 @@ const SwapContainer = () => {
   );
 
   React.useEffect(() => {
-    if (!from) {
+    if (fromParamToken) {
+      dispatch(setFrom(fromParamToken));
+    } else if (!from) {
       dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
     }
-    // setTo(USDC(currentNetwork.chainId));
+
+    if (toParamToken && !to) {
+      dispatch(setTo(toParamToken));
+    }
   }, [currentNetwork.chainId]);
 
   const onSetFrom = (newFrom: Token) => {
@@ -52,9 +64,13 @@ const SwapContainer = () => {
     }
 
     dispatch(setFrom(newFrom));
+    history.replace(`/${newFrom.address}/${to?.address || ''}`);
   };
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
+    if (from) {
+      history.replace(`/${from.address || ''}/${newTo.address}`);
+    }
   };
 
   const toggleFromTo = () => {
@@ -71,6 +87,10 @@ const SwapContainer = () => {
       dispatch(setFromValue(newFromValue));
     }
     dispatch(setFrom(to));
+
+    if (to) {
+      history.replace(`/${to.address || ''}/${from?.address || ''}`);
+    }
   };
 
   const isLoading = isLoadingSwapIntervals || !swapIntervalsData;

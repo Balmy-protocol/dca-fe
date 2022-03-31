@@ -5,6 +5,7 @@ import { enableTokenList, fetchTokenList } from './actions';
 export interface TokenListsState {
   byUrl: { [tokenListUrl: string]: TokensLists };
   activeLists: string[];
+  hasLoaded: boolean;
 }
 
 export const getDefaultByUrl = () => ({
@@ -79,6 +80,7 @@ export const initialState: TokenListsState = {
     'https://static.optimism.io/optimism.tokenlist.json',
   ],
   byUrl: getDefaultByUrl(),
+  hasLoaded: false,
 };
 
 export default createReducer(initialState, (builder) =>
