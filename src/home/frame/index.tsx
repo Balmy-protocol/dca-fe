@@ -44,11 +44,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       SUPPORTED_NETWORKS.includes(parseInt(chainId, 10)) &&
       chainId !== currentNetwork.chainId.toString()
     ) {
-      const foundNetwork = find(Object.values(NETWORKS), { chainId: parseInt(chainId, 10) });
-
-      dispatch(
-        setNetwork({ chainId: (foundNetwork as NetworkStruct).chainId, name: (foundNetwork as NetworkStruct).name })
-      );
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       web3Service.changeNetwork(parseInt(chainId, 10));
     }
