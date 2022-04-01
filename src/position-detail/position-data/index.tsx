@@ -237,7 +237,7 @@ const Details = ({ position }: DetailsProps) => {
                         defaultMessage="({fromPrice} USD)"
                         values={{
                           b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                          fromPrice: toFullPrice?.toFixed(2),
+                          fromPrice: fromPrice?.toFixed(2),
                         }}
                       />
                     }
