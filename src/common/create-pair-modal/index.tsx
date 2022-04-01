@@ -87,7 +87,7 @@ const CreatePairModal = ({ from, to, open, onCancel, onCreatePair }: CreatePairM
             <Typography variant="body1">
               <FormattedMessage
                 description="create pair question"
-                defaultMessage="You are the first person to create a position for this pair of tokens. Beacuse of this, the gas cost is going to be higher than a normal position creation. This, however, will be a one time operation. Are you sure you want to create the {from}/{to} position?"
+                defaultMessage="You are the first person to create a position for this pair of tokens. Because of this, the gas cost is going to be higher than a normal position creation. This, however, will be a one time operation. Are you sure you want to create the {from}/{to} position?"
                 values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
               />
             </Typography>
