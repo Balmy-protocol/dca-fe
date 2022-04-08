@@ -42,6 +42,7 @@ import {
   NETWORKS,
   MAX_UINT_32,
   ORACLE_STRINGS,
+  STABLE_COINS,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -67,6 +68,14 @@ const StyledPaper = styled(Paper)`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
+`;
+
+const StyledPaperInPaper = styled(Paper)`
+  ${({ theme }) => `
+    padding: 16px;
+    margin-top: 32px;
+    background-color: ${theme.palette.type === 'light' ? '#f6f6f6' : '#303030'};
+  `}
 `;
 
 const StyledSwapContainer = styled.div`
@@ -105,7 +114,6 @@ const StyledSettingContainer = styled.div`
 `;
 
 const StyledGasSavingContainer = styled.div`
-  margin-top: 32px;
   display: flex;
 `;
 
@@ -189,7 +197,7 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
-  const [inTokenQuote] = useOracleQuote(from, to, parseUnits('1', from?.decimals || 18));
+  const [inTokenQuote] = useOracleQuote(from, to);
   const [oracleInUse] = useOracleInUse(from, to);
   const [gasEstimation] = useGasEstimate(from, to, fromValue, frequencyValue);
 
@@ -893,44 +901,63 @@ const Swap = ({
               </Grid>
             </StyledSettingContainer>
           </Grid>
-          {gasEstimation && gasEstimation > 9 && (
+          {!!(gasEstimation || inTokenQuote) && (
             <Grid item xs={12}>
-              <StyledGasSavingContainer>
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="Gas saving"
-                    /* eslint-disable-next-line no-template-curly-in-string */
-                    defaultMessage="You are saving at least ${gasPrice} of gas in trades!"
-                    values={{ gasPrice: gasEstimation.toFixed(2).toString() }}
-                  />
-                </Typography>
-                <Tooltip
-                  title="Calculated by gas price of one swap multiplied by the amount of swaps minus deposit gas minus withdrawal gas"
-                  arrow
-                  placement="top"
-                >
-                  <StyledHelpOutlineIcon fontSize="small" />
-                </Tooltip>
-              </StyledGasSavingContainer>
-            </Grid>
-          )}
-          {inTokenQuote && to && from && (
-            <Grid item xs={12}>
-              <StyledGasSavingContainer>
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="Gas saving"
-                    /* eslint-disable-next-line no-template-curly-in-string */
-                    defaultMessage="Current quote: 1 {from} = {amount} {to}"
-                    values={{ from: from?.symbol, to: to?.symbol, amount: formatCurrencyAmount(inTokenQuote, to) }}
-                  />
-                </Typography>
-                {oracleInUse && (
-                  <Tooltip title={`Calculated by using ${ORACLE_STRINGS[oracleInUse]} Oracle`} arrow placement="top">
-                    <StyledHelpOutlineIcon fontSize="small" />
-                  </Tooltip>
-                )}
-              </StyledGasSavingContainer>
+              <StyledPaperInPaper variant="outlined">
+                <Grid container>
+                  {gasEstimation && (
+                    <Grid item xs={12}>
+                      <StyledGasSavingContainer>
+                        <Typography variant="body2">
+                          <FormattedMessage
+                            description="Gas saving"
+                            /* eslint-disable-next-line no-template-curly-in-string */
+                            defaultMessage="You are saving at least ${gasPrice} of gas in trades!"
+                            values={{ gasPrice: gasEstimation.toFixed(2).toString() }}
+                          />
+                        </Typography>
+                        <Tooltip
+                          title="Calculated by gas price of one swap multiplied by the amount of swaps minus deposit gas minus withdrawal gas"
+                          arrow
+                          placement="top"
+                        >
+                          <StyledHelpOutlineIcon fontSize="small" />
+                        </Tooltip>
+                      </StyledGasSavingContainer>
+                    </Grid>
+                  )}
+                  {inTokenQuote && to && from && (
+                    <Grid item xs={12}>
+                      <StyledGasSavingContainer>
+                        <Typography variant="body2">
+                          <FormattedMessage
+                            description="Gas saving"
+                            /* eslint-disable-next-line no-template-curly-in-string */
+                            defaultMessage="Current quote: 1 {from} = {amount} {to}"
+                            values={{
+                              from: STABLE_COINS.includes(from.symbol) ? to.symbol : from.symbol,
+                              to: STABLE_COINS.includes(from.symbol) ? from.symbol : to.symbol,
+                              amount: formatCurrencyAmount(
+                                inTokenQuote,
+                                STABLE_COINS.includes(from.symbol) ? from : to
+                              ),
+                            }}
+                          />
+                        </Typography>
+                        {oracleInUse && (
+                          <Tooltip
+                            title={`Calculated by using ${ORACLE_STRINGS[oracleInUse]} Oracle`}
+                            arrow
+                            placement="top"
+                          >
+                            <StyledHelpOutlineIcon fontSize="small" />
+                          </Tooltip>
+                        )}
+                      </StyledGasSavingContainer>
+                    </Grid>
+                  )}
+                </Grid>
+              </StyledPaperInPaper>
             </Grid>
           )}
           <Grid item xs={12}>

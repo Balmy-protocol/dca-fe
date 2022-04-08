@@ -5,12 +5,13 @@ import isUndefined from 'lodash/isUndefined';
 import usePrevious from 'hooks/usePrevious';
 import WalletContext from 'common/wallet-context';
 import { BigNumber } from 'ethers';
+import { parseUnits } from '@ethersproject/units';
+import { STABLE_COINS } from 'config/constants';
 import useCurrentNetwork from './useCurrentNetwork';
 
 function useOracleQuote(
   from: Token | undefined | null,
-  to: Token | undefined | null,
-  amount: BigNumber
+  to: Token | undefined | null
 ): [BigNumber | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const { web3Service } = React.useContext(WalletContext);
@@ -24,7 +25,9 @@ function useOracleQuote(
     async function callPromise() {
       if (from && to) {
         try {
-          const price = await web3Service.getTokenQuote(from, to, amount);
+          const fromToUse = STABLE_COINS.includes(from.symbol) ? to : from;
+          const toToUse = STABLE_COINS.includes(from.symbol) ? from : to;
+          const price = await web3Service.getTokenQuote(fromToUse, toToUse, parseUnits('1', fromToUse.decimals || 18));
           setResult(price);
           setError(undefined);
         } catch (e) {
