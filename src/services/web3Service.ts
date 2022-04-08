@@ -648,6 +648,23 @@ export default class Web3Service {
     return erc20.approve(addressToApprove, MaxUint256);
   }
 
+  async getTokenQuote(from: Token, to: Token, fromAmount: BigNumber) {
+    const currentNetwork = await this.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const fromToUse = from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from;
+    const toToUse = to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to;
+
+    const oracleAddress = await this.getOracleAddress();
+
+    const oracleInstance = new ethers.Contract(
+      oracleAddress,
+      ORACLE_AGGREGATOR_ABI.abi,
+      this.getSigner()
+    ) as unknown as OracleContract;
+
+    return oracleInstance.quote(fromToUse.address, fromAmount, toToUse.address);
+  }
+
   // PAIR METHODS
   async getPairOracle(pair: { tokenA: string; tokenB: string }, isExistingPair: boolean): Promise<Oracles> {
     const currentNetwork = await this.getNetwork();

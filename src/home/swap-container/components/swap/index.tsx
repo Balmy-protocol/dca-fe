@@ -41,6 +41,7 @@ import {
   TESTNETS,
   NETWORKS,
   MAX_UINT_32,
+  ORACLE_STRINGS,
 } from 'config/constants';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -57,6 +58,8 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import useAllowance from 'hooks/useAllowance';
 import useGasEstimate from 'hooks/useGasEstimate';
+import useOracleQuote from 'hooks/useOracleQuote';
+import useOracleInUse from 'hooks/useOracleInUse';
 
 const StyledPaper = styled(Paper)`
   padding: 8px;
@@ -186,12 +189,9 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
-  const [gasEstimation, isLoadingGasEstimation, gasEstimationErrors] = useGasEstimate(
-    from,
-    to,
-    fromValue,
-    frequencyValue
-  );
+  const [inTokenQuote] = useOracleQuote(from, to, parseUnits('1', from?.decimals || 18));
+  const [oracleInUse] = useOracleInUse(from, to);
+  const [gasEstimation] = useGasEstimate(from, to, fromValue, frequencyValue);
 
   const [usedTokens] = useUsedTokens();
 
@@ -490,11 +490,11 @@ const Swap = ({
     setIsLoading(true);
     if (!from || !to) return;
 
-    const oracleInUse = await web3Service.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
+    const oracle = await web3Service.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
 
-    let hasLowLiquidity = oracleInUse === ORACLES.UNISWAP;
+    let hasLowLiquidity = oracle === ORACLES.UNISWAP;
 
-    if (oracleInUse === ORACLES.UNISWAP) {
+    if (oracle === ORACLES.UNISWAP) {
       try {
         const liquidity = await web3Service.getPairLiquidity(from, to);
         hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
@@ -586,14 +586,6 @@ const Swap = ({
     <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={() => web3Service.connect()}>
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
-      </Typography>
-    </StyledButton>
-  );
-
-  const NotWhitelistedButton = (
-    <StyledButton size="large" variant="contained" fullWidth color="primary" disabled>
-      <Typography variant="body1">
-        <FormattedMessage description="not whitelisted" defaultMessage="We are sorry, but you are not whitelisted" />
       </Typography>
     </StyledButton>
   );
@@ -919,6 +911,25 @@ const Swap = ({
                 >
                   <StyledHelpOutlineIcon fontSize="small" />
                 </Tooltip>
+              </StyledGasSavingContainer>
+            </Grid>
+          )}
+          {inTokenQuote && to && from && (
+            <Grid item xs={12}>
+              <StyledGasSavingContainer>
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="Gas saving"
+                    /* eslint-disable-next-line no-template-curly-in-string */
+                    defaultMessage="Current quote: 1 {from} = {amount} {to}"
+                    values={{ from: from?.symbol, to: to?.symbol, amount: formatCurrencyAmount(inTokenQuote, to) }}
+                  />
+                </Typography>
+                {oracleInUse && (
+                  <Tooltip title={`Calculated by using ${ORACLE_STRINGS[oracleInUse]} Oracle`} arrow placement="top">
+                    <StyledHelpOutlineIcon fontSize="small" />
+                  </Tooltip>
+                )}
               </StyledGasSavingContainer>
             </Grid>
           )}

@@ -705,6 +705,12 @@ export const ORACLES: Record<'NONE' | 'CHAINLINK' | 'UNISWAP', Oracles> = {
   UNISWAP: 2,
 };
 
+export const ORACLE_STRINGS = {
+  [ORACLES.NONE]: 'Not found',
+  [ORACLES.CHAINLINK]: 'Chainlink',
+  [ORACLES.UNISWAP]: 'Uniswap V3',
+};
+
 export const PERMISSIONS = {
   INCREASE: 0,
   REDUCE: 1,
