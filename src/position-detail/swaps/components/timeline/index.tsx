@@ -167,56 +167,58 @@ interface PositionTimelineProps {
   filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
 }
 
-const buildSwappedItem = (positionState: ActionState, position: FullPosition) => {
-  const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.swapped));
-  const [toPrice, isLoadingToPrice] = useUsdPrice(
-    position.to,
-    BigNumber.from(positionState.swapped),
-    positionState.createdAtTimestamp
-  );
-  const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigNumber.from(positionState.rate));
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
-    position.from,
-    BigNumber.from(positionState.rate),
-    positionState.createdAtTimestamp
-  );
+const buildSwappedItem = (positionState: ActionState, position: FullPosition) => ({
+  icon: <CompareArrowsIcon />,
+  content: () => {
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.swapped));
+    const [toPrice, isLoadingToPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(positionState.swapped),
+      positionState.createdAtTimestamp
+    );
+    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
+      position.from,
+      BigNumber.from(positionState.rate)
+    );
+    const [fromPrice, isLoadingFromPrice] = useUsdPrice(
+      position.from,
+      BigNumber.from(positionState.rate),
+      positionState.createdAtTimestamp
+    );
 
-  const showToPrices =
-    !STABLE_COINS.includes(position.to.symbol) &&
-    !isLoadingToPrice &&
-    !!toPrice &&
-    !isLoadingToCurrentPrice &&
-    !!toCurrentPrice;
-  const showFromPrices =
-    !STABLE_COINS.includes(position.from.symbol) &&
-    !isLoadingFromPrice &&
-    !!fromPrice &&
-    !isLoadingFromCurrentPrice &&
-    !!fromCurrentPrice;
-  const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
-  const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
+    const showToPrices =
+      !STABLE_COINS.includes(position.to.symbol) &&
+      !isLoadingToPrice &&
+      !!toPrice &&
+      !isLoadingToCurrentPrice &&
+      !!toCurrentPrice;
+    const showFromPrices =
+      !STABLE_COINS.includes(position.from.symbol) &&
+      !isLoadingFromPrice &&
+      !!fromPrice &&
+      !isLoadingFromCurrentPrice &&
+      !!fromCurrentPrice;
+    const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
+    const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
 
-  const TooltipMessage = (
-    <FormattedMessage
-      description="pairSwapDetails"
-      defaultMessage="1 {from} = {swapRate} {to}"
-      values={{
-        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-        from: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
-        to: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
-        // eslint-disable-next-line no-nested-ternary
-        swapRate: STABLE_COINS.includes(position.to.symbol)
-          ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA)
-          : position.pair.tokenA.address === position.from.address
-          ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitAToBWithFee), position.pair.tokenB)
-          : formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA),
-      }}
-    />
-  );
-
-  return {
-    icon: <CompareArrowsIcon />,
-    content: (
+    const TooltipMessage = (
+      <FormattedMessage
+        description="pairSwapDetails"
+        defaultMessage="1 {from} = {swapRate} {to}"
+        values={{
+          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+          from: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
+          to: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
+          // eslint-disable-next-line no-nested-ternary
+          swapRate: STABLE_COINS.includes(position.to.symbol)
+            ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA)
+            : position.pair.tokenA.address === position.from.address
+            ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitAToBWithFee), position.pair.tokenB)
+            : formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA),
+        }}
+      />
+    );
+    return (
       <>
         <StyledCenteredGrid item xs={12}>
           <Typography
@@ -317,15 +319,15 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
           </Tooltip>
         </StyledRightGrid>
       </>
-    ),
-    title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
-    toOrder: parseInt(positionState.createdAtBlock, 10),
-  };
-};
+    );
+  },
+  title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
+});
 
 const buildCreatedItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <CreatedIcon />,
-  content: (
+  content: () => (
     <>
       <Grid item xs={12}>
         <Typography variant="body1">
@@ -374,7 +376,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
 
 const buildTransferedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
   icon: <CardGiftcardIcon />,
-  content: (
+  content: () => (
     <>
       <Grid item xs={12}>
         <Typography variant="body1">
@@ -427,7 +429,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
 
 const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
   icon: <FingerprintIcon />,
-  content: (
+  content: () => (
     <>
       <Grid item xs={12}>
         {positionState.permissions.map((permission) => (
@@ -501,7 +503,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
 
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
-  content: (
+  content: () => (
     <>
       <Grid item xs={12}>
         <Typography variant="body1">
@@ -541,7 +543,7 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
 
 const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
-  content: (
+  content: () => (
     <>
       <Grid item xs={12}>
         <Typography variant="body1">
@@ -582,7 +584,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
 
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
-  content: (
+  content: () => (
     <>
       <Grid item xs={12}>
         <Typography variant="body1">
@@ -638,25 +640,25 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
   toOrder: parseInt(positionState.createdAtBlock, 10),
 });
 
-const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => {
-  const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.withdrawn));
-  const [toPrice, isLoadingToPrice] = useUsdPrice(
-    position.to,
-    BigNumber.from(positionState.withdrawn),
-    positionState.createdAtTimestamp
-  );
+const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
+  icon: <CallMadeIcon />,
+  content: () => {
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.withdrawn));
+    const [toPrice, isLoadingToPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(positionState.withdrawn),
+      positionState.createdAtTimestamp
+    );
 
-  const showPrices =
-    !STABLE_COINS.includes(position.to.symbol) &&
-    !isLoadingToPrice &&
-    !!toPrice &&
-    !isLoadingToCurrentPrice &&
-    !!toCurrentPrice;
-  const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
+    const showPrices =
+      !STABLE_COINS.includes(position.to.symbol) &&
+      !isLoadingToPrice &&
+      !!toPrice &&
+      !isLoadingToCurrentPrice &&
+      !!toCurrentPrice;
+    const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
 
-  return {
-    icon: <CallMadeIcon />,
-    content: (
+    return (
       <>
         <Grid item xs={12}>
           <Typography variant="body1" style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}>
@@ -714,15 +716,15 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
           </Tooltip>
         </StyledRightGrid>
       </>
-    ),
-    title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
-    toOrder: parseInt(positionState.createdAtBlock, 10),
-  };
-};
+    );
+  },
+  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
+});
 
 const buildTerminatedItem = (positionState: ActionState) => ({
   icon: <DeleteSweepIcon />,
-  content: (
+  content: () => (
     <>
       <StyledRightGrid item xs={12}>
         <Tooltip
@@ -802,7 +804,9 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
                   <Typography variant="h6">{historyItem.title}</Typography>
                 </StyledTimelineContentTitle>
                 <Grid item xs={12}>
-                  <StyledTimelineContentText container>{historyItem.content}</StyledTimelineContentText>
+                  <StyledTimelineContentText container>
+                    <historyItem.content />
+                  </StyledTimelineContentText>
                 </Grid>
               </Grid>
             </StyledCard>
