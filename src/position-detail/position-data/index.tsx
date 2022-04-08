@@ -147,13 +147,11 @@ const Details = ({ position }: DetailsProps) => {
               >
                 <FormattedMessage
                   description="positionDetailsToWithdraw"
-                  defaultMessage="{toWithdraw} {to} {showToPrice, select, true {({toPrice} USD)} other {}}"
+                  defaultMessage="{toWithdraw} {to}"
                   values={{
                     b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                     toWithdraw: formatCurrencyAmount(BigNumber.from(position.current.idleSwapped), position.to),
                     to: position.to.symbol,
-                    showToPrice: !STABLE_COINS.includes(position.to.symbol) && !isLoadingToPrice && !!toPrice,
-                    toPrice: toPrice?.toFixed(2),
                   }}
                 />
                 {showToPrice && (
@@ -166,7 +164,7 @@ const Details = ({ position }: DetailsProps) => {
                         defaultMessage="({toPrice} USD)"
                         values={{
                           b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                          toPrice: toFullPrice?.toFixed(2),
+                          toPrice: toPrice?.toFixed(2),
                         }}
                       />
                     }
