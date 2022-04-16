@@ -31,6 +31,13 @@ declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
 }
 
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'};
+  `}
+  margin-left: 5px;
+`;
+
 interface AppFrameProps {
   isLoading: boolean;
 }
@@ -70,6 +77,7 @@ const StyledWarningContainer = styled.div`
   background-color: #f5b000;
   justify-content: center;
   align-items: center;
+  color: black;
 `;
 
 const AppFrame = ({ isLoading }: AppFrameProps) => {
@@ -107,6 +115,17 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
     <MuiThemeProvider theme={theme}>
       <ThemeProvider theme={theme as DefaultTheme}>
         <CssBaseline />
+        <StyledWarningContainer>
+          <Typography variant="caption">
+            <FormattedMessage
+              description="deposits paused"
+              defaultMessage="Deposits and swaps have been disabled for the moment, you can still withdraw your funds and swapped liquidity. Read more about it "
+            />
+            <StyledLink href="https://twitter.com/mean_fi/status/1515523252793323522" target="_blank">
+              here
+            </StyledLink>
+          </Typography>
+        </StyledWarningContainer>
         <SnackbarProvider>
           <TransactionModalProvider>
             {!isLoading && !isLoadingNetwork && (

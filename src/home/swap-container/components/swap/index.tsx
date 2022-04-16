@@ -604,7 +604,7 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="primary"
-      disabled={!!isApproved || hasPendingApproval || isLoading}
+      disabled
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
       style={{ pointerEvents: 'all' }}
     >
@@ -638,9 +638,7 @@ const Swap = ({
     <StyledButton
       size="large"
       variant="contained"
-      disabled={
-        !!shouldDisableButton || isLoading || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax
-      }
+      disabled
       color="secondary"
       fullWidth
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
