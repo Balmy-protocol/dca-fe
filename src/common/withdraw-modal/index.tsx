@@ -65,7 +65,11 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
   const handleWithdraw = async () => {
     try {
       onCancel();
-      const hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
+      let hasPermission;
+
+      if (useProtocolToken) {
+        hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
+      }
 
       setModalLoading({
         content: (
