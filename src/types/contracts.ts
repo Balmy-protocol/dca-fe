@@ -34,6 +34,8 @@ export class OracleContract extends Contract {
   canSupportPair: (tokenA: string, tokenB: string) => Promise<boolean>;
 
   oracleInUse: (tokenA: string, tokenB: string) => Promise<0 | 1 | 2>;
+
+  quote: (tokenIn: string, amountIn: BigNumber, tokenOut: string) => Promise<BigNumber>;
 }
 
 export class TokenDescriptorContract extends Contract {

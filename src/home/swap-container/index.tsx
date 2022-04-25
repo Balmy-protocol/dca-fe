@@ -27,11 +27,7 @@ const SwapContainer = () => {
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const client = useDCAGraphql();
-  const {
-    from: fromParam,
-    to: toParam,
-    chainId: chainIdParam,
-  } = useParams<{ from: string; to: string; chainId: string }>();
+  const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();

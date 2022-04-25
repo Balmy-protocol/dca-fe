@@ -7,6 +7,7 @@ export * from './positions';
 export * from './pairs';
 export * from './responses';
 export * from './transactions';
+export * from './contracts';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
