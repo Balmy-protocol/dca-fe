@@ -2,19 +2,21 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { useHistory } from 'react-router-dom';
 
-import { CategoryProvider, CategoryTitle, CategoryItem } from '@mui-treasury/components/menu/category';
-import Link from '@material-ui/core/Link';
-import { useNikiCategoryMenuStyles } from '@mui-treasury/styles/categoryMenu/niki';
+import Link from '@mui/material/Link';
 import styled from 'styled-components';
-import Box from '@material-ui/core/Box';
-import Divider from '@material-ui/core/Divider';
-import Grid from '@material-ui/core/Grid';
-import TwitterIcon from '@material-ui/icons/Twitter';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import TwitterIcon from '@mui/icons-material/Twitter';
 import DiscordIcon from 'assets/svg/atom/discord';
-import DescriptionIcon from '@material-ui/icons/Description';
-import GitHubIcon from '@material-ui/icons/GitHub';
+import DescriptionIcon from '@mui/icons-material/Description';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import MeanLogo from 'common/mean-logo';
 import { useThemeMode } from 'state/config/hooks';
+
+const CategoryProvider = styled.div``;
+const CategoryTitle = styled.div``;
+const CategoryItem = styled.a``;
 
 const StyledCategoryTitle = styled(CategoryTitle)`
   margin: 0px;
@@ -52,7 +54,7 @@ const Footer = () => {
           <Grid item xs={12} md={8} lg={4}>
             <Grid container spacing={2}>
               <Grid item xs={6} sm={4}>
-                <CategoryProvider useStyles={useNikiCategoryMenuStyles}>
+                <CategoryProvider>
                   <StyledCategoryTitle>
                     <FormattedMessage description="community" defaultMessage="Community" />
                   </StyledCategoryTitle>
@@ -96,7 +98,7 @@ const Footer = () => {
           <Grid item xs={12} md={8} lg={4}>
             <Grid container spacing={2}>
               <Grid item xs={6} sm={4}>
-                <CategoryProvider useStyles={useNikiCategoryMenuStyles}>
+                <CategoryProvider>
                   <StyledCategoryTitle>
                     <FormattedMessage description="resources" defaultMessage="Resources" />
                   </StyledCategoryTitle>

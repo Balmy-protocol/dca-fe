@@ -2,32 +2,32 @@ import React, { useState } from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
-import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
-import CallMadeIcon from '@material-ui/icons/CallMade';
-import SettingsIcon from '@material-ui/icons/Settings';
-import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
-import CreatedIcon from '@material-ui/icons/NewReleases';
-import Chip from '@material-ui/core/Chip';
-import Tooltip from '@material-ui/core/Tooltip';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import Typography from '@mui/material/Typography';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import CallMadeIcon from '@mui/icons-material/CallMade';
+import SettingsIcon from '@mui/icons-material/Settings';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import CreatedIcon from '@mui/icons-material/NewReleases';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { ActionState, FullPosition } from 'types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
 import { COMPANION_ADDRESS, POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS } from 'config/constants';
 import { getFrequencyLabel } from 'utils/parsing';
 import { buildEtherscanAddress } from 'utils/etherscan';
-import Link from '@material-ui/core/Link';
+import Link from '@mui/material/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import CardGiftcardIcon from '@material-ui/icons/CardGiftcard';
-import FingerprintIcon from '@material-ui/icons/Fingerprint';
+import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import Address from 'common/address';
 import useUsdPrice from 'hooks/useUsdPrice';
-import { withStyles } from '@material-ui/styles';
-import { Theme } from '@material-ui/core';
+import { withStyles } from '@mui/styles';
+import { Theme } from '@mui/material';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -51,7 +51,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
-    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'};
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}
   margin: 0px 5px;
 `;
@@ -81,7 +81,7 @@ const StyledTimelineContainer = styled(Grid)`
         top: 20px;
         width: 4px;
         bottom: 0;
-        background: ${theme.palette.type === 'light' ? '#ffffff' : '#303030'};
+        background: ${theme.palette.mode === 'light' ? '#ffffff' : '#303030'};
       }
     }
   `}
@@ -108,7 +108,7 @@ const StyledTimelineIcon = styled.div`
     border-radius: 50%;
     text-align: center;
     font-size: 2rem;
-    background: ${theme.palette.type === 'light' ? '#eee' : '#424242'};
+    background: ${theme.palette.mode === 'light' ? '#eee' : '#424242'};
 
     i {
       position: absolute;
@@ -138,7 +138,7 @@ const StyledTimelineContent = styled.div`
     position: relative;
     &:before {
       content: '';
-      background: ${theme.palette.type === 'light' ? '#eee' : '#595959'};
+      background: ${theme.palette.mode === 'light' ? '#eee' : '#595959'};
       width: 20px;
       height: 20px;
       left: 35px;
@@ -158,7 +158,7 @@ const StyledTimelineContentText = styled(Grid)`
 const StyledTimelineContentTitle = styled(Grid)`
   ${({ theme }) => `
     padding: 10px 20px;
-    background-color: ${theme.palette.type === 'light' ? '#eee' : '#595959'};
+    background-color: ${theme.palette.mode === 'light' ? '#eee' : '#595959'};
   `}
 `;
 

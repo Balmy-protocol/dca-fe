@@ -1,7 +1,7 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
-import Menu, { MenuProps } from '@material-ui/core/Menu';
+import { withStyles } from '@mui/styles';
+import IconButton from '@mui/material/IconButton';
+import Menu, { MenuProps } from '@mui/material/Menu';
 import styled from 'styled-components';
 
 const StyledButton = styled(IconButton)`
@@ -31,7 +31,6 @@ const StyledMenu = withStyles({
 })((props: MenuProps) => (
   <Menu
     elevation={0}
-    getContentAnchorEl={null}
     anchorOrigin={{
       vertical: 'bottom',
       horizontal: 'right',

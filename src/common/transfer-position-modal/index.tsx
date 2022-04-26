@@ -1,18 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from 'common/button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import { FullPosition } from 'types';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 
 const useStyles = makeStyles({
   paper: {

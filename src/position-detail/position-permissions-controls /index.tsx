@@ -2,14 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import CallMadeIcon from '@material-ui/icons/CallMade';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
+import CallMadeIcon from '@mui/icons-material/CallMade';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { FullPosition } from 'types';
 import useWeb3Service from 'hooks/useWeb3Service';
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 
 const PositionControlsContainer = styled.div`
   display: flex;

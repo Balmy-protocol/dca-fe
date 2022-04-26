@@ -1,11 +1,11 @@
 import React from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import Paper from '@material-ui/core/Paper';
+import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import { ActionState, FullPosition } from 'types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';

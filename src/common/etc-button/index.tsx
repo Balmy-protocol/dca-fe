@@ -1,13 +1,13 @@
 import React from 'react';
 import FloatingMenu from 'common/floating-menu';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import List from '@material-ui/core/List';
-import ListItem, { ListItemProps } from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import TwitterIcon from '@material-ui/icons/Twitter';
-import DescriptionIcon from '@material-ui/icons/Description';
-import GitHubIcon from '@material-ui/icons/GitHub';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import List from '@mui/material/List';
+import ListItem, { ListItemProps } from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import DescriptionIcon from '@mui/icons-material/Description';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 function ListItemLink(props: ListItemProps<'a', { button?: true }>) {
   return <ListItem button component="a" {...props} />;

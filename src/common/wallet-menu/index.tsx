@@ -1,31 +1,31 @@
 import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Typography from '@material-ui/core/Typography';
-import Dialog from '@material-ui/core/Dialog';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import CallMadeIcon from '@material-ui/icons/CallMade';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import CircularProgress from '@mui/material/CircularProgress';
+import CallMadeIcon from '@mui/icons-material/CallMade';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import {
   useAllNotClearedTransactions,
   useHasPendingTransactions,
   useIsTransactionPending,
 } from 'state/transactions/hooks';
-import Paper from '@material-ui/core/Paper';
-import Card from '@material-ui/core/Card';
+import Paper from '@mui/material/Paper';
+import Card from '@mui/material/Card';
 import { TransactionDetails } from 'types';
 import useBuildTransactionDetail from 'hooks/useBuildTransactionDetail';
 import { clearAllTransactions } from 'state/transactions/actions';
 import { useAppDispatch } from 'state/hooks';
-import Link from '@material-ui/core/Link';
+import Link from '@mui/material/Link';
 import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/etherscan';
 import useWeb3Service from 'hooks/useWeb3Service';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const useStyles = makeStyles({
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
-    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
 `;
 

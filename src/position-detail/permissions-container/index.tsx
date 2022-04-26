@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import { FullPosition } from 'types';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -12,13 +12,13 @@ import {
   usePositionPermissions,
 } from 'state/position-permissions/hooks';
 import PositionPermission from 'position-detail/permission';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { TRANSACTION_TYPES } from 'config/constants';
 import { discardChanges, submitPermissionChanges } from 'state/position-permissions/actions';
 import { useAppDispatch } from 'state/hooks';
 import AddAddressPermissionModal from 'common/add-address-permission-modal';
-import Card from '@material-ui/core/Card';
+import Card from '@mui/material/Card';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;
