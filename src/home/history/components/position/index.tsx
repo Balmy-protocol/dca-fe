@@ -1,8 +1,8 @@
 import * as React from 'react';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
 import Button from 'common/button';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
@@ -55,7 +55,7 @@ const StyledFreqLeft = styled.div`
     padding: 10px 13px;
     border-radius: 15px;
     text-align: center;
-    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
   `}
 `;
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 
 const StyledPaper = styled(Paper)`
   padding: 30px;
@@ -33,7 +33,7 @@ const StyledPaper = styled(Paper)`
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
-    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'};
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}
   margin: 0px 5px;
 `;

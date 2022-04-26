@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import styled from 'styled-components';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
@@ -31,7 +31,7 @@ const CurrentPositions = () => {
   }
 
   return (
-    <Grid container direction="column" alignItems="flex-start" justify="center" spacing={3}>
+    <Grid container direction="column" alignItems="flex-start" justifyContent="center" spacing={3}>
       {/* dont know why I need the 100% width :shrug: */}
       <Grid item xs={12} style={{ width: '100%' }}>
         <Grid container alignItems="stretch">

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import { FullPosition, GetPairSwapsData } from 'types';
 import { calculateStale, getFrequencyLabel, STALE } from 'utils/parsing';
 import { BigNumber } from 'ethers';
@@ -15,8 +15,8 @@ const StyledFreqLeft = styled.div`
   ${({ theme }) => `
     padding: 8px 11px;
     border-radius: 5px;
-    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
-    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+    background-color: ${theme.palette.mode === 'light' ? '#dceff9' : '#275f7c'};
+    color: ${theme.palette.mode === 'light' ? '#0088cc' : '#ffffff'};
     margin-right: 15px;
   `}
 `;
@@ -35,8 +35,8 @@ const StyledNoFunds = styled.div`
   ${({ theme }) => `
     padding: 8px 11px;
     border-radius: 5px;
-    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
-    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+    background-color: ${theme.palette.mode === 'light' ? '#dceff9' : '#275f7c'};
+    color: ${theme.palette.mode === 'light' ? '#0088cc' : '#ffffff'};
   `}
 `;
 

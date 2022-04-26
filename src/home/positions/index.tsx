@@ -1,11 +1,11 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Paper from '@material-ui/core/Paper';
+import Grid from '@mui/material/Grid';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
 import { appleTabsStylesHook } from 'common/tabs';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from 'state/tabs/hooks';
 import { useAppDispatch } from 'state/hooks';
@@ -18,7 +18,7 @@ const StyledTitleContainer = styled(Paper)`
     padding: 25px;
     border-radius: 10px;
     flex-grow: 0;
-    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
     margin-bottom: 15px;
     flex-grow: 1;
     margin-top: 15px;
@@ -32,7 +32,7 @@ const StyledPaper = styled(Paper)`
     flex-grow: 1;
     padding: 25px;
     border-radius: 10px;
-    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
   `}
 `;
 const Positions = () => {

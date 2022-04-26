@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import { useHistory } from 'react-router-dom';
-import SentimentVeryDissatisfiedIcon from '@material-ui/icons/SentimentVeryDissatisfied';
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 
 const StyledContainer = styled.div`
   display: flex;

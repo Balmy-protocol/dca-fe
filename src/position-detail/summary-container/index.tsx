@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 import PositionControls from 'position-detail/position-summary-controls';
 import { fullPositionToMappedPosition, getFrequencyLabel } from 'utils/parsing';
-import Collapse from '@material-ui/core/Collapse';
+import Collapse from '@mui/material/Collapse';
 import ModifyRateSettings from 'common/modify-rate-settings';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import PositionSwaps from 'position-detail/swaps';
 import { FullPosition, GetPairSwapsData, NFTData, Token } from 'types';
 import SwapsGraph from 'position-detail/swap-graph';

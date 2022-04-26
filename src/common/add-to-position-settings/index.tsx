@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
-import Slide from '@material-ui/core/Slide';
+import Slide from '@mui/material/Slide';
 import { Position } from 'types';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Typography from '@material-ui/core/Typography';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 import TokenInput from 'common/token-input';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';

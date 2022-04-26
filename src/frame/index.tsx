@@ -1,35 +1,48 @@
 import React from 'react';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Container from '@material-ui/core/Container';
+import Container from '@mui/material/Container';
 import NavBar from 'common/navbar';
 import AppFooter from 'common/footer';
 import Home from 'home';
 import FAQ from 'faq';
 import TransactionUpdater from 'state/transactions/transactionUpdater';
 import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
-import { MuiThemeProvider, createMuiTheme, Theme } from '@material-ui/core/styles';
+import { createTheme, ThemeProvider, Theme } from '@mui/material/styles';
 import PositionDetail from 'position-detail';
-import styled, { DefaultTheme, ThemeProvider } from 'styled-components';
+import styled, { DefaultTheme, ThemeProvider as SCThemeProvider } from 'styled-components';
 import { useThemeMode } from 'state/config/hooks';
 import TransactionModalProvider from 'common/transaction-modal';
 import { useAppDispatch } from 'hooks/state';
 import { startFetchingTokenLists } from 'state/token-lists/actions';
 import { SnackbarProvider } from 'notistack';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import Leaderboard from 'leaderboard';
+import Vector1 from 'assets/svg/vector1.svg';
+import Vector2 from 'assets/svg/vector2.svg';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   export interface DefaultTheme extends Theme {}
 }
+
+const StyledVector1Container = styled.div`
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+`;
+const StyledVector2Container = styled.div`
+  position: absolute;
+  top: 0px;
+  right: 0px;
+`;
 
 interface AppFrameProps {
   isLoading: boolean;
@@ -74,11 +87,11 @@ const StyledWarningContainer = styled.div`
 
 const AppFrame = ({ isLoading }: AppFrameProps) => {
   const web3Service = useWeb3Service();
-  const type = useThemeMode();
+  const mode = useThemeMode();
 
-  const theme = createMuiTheme({
+  const theme = createTheme({
     palette: {
-      type,
+      mode,
     },
   });
 
@@ -104,8 +117,8 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
   const isLoadingNetwork = !currentNetwork;
 
   return (
-    <MuiThemeProvider theme={theme}>
-      <ThemeProvider theme={theme as DefaultTheme}>
+    <ThemeProvider theme={theme as DefaultTheme}>
+      <SCThemeProvider theme={theme}>
         <CssBaseline />
         <SnackbarProvider>
           <TransactionModalProvider>
@@ -116,6 +129,12 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
               </>
             )}
             <Router>
+              <StyledVector1Container>
+                <Vector1 />
+              </StyledVector1Container>
+              <StyledVector2Container>
+                <Vector2 />
+              </StyledVector2Container>
               <StyledContainer>
                 <StyledGridContainer container direction="column">
                   <StyledNavBarGridContainer item xs={12}>
@@ -145,8 +164,8 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
             </Router>
           </TransactionModalProvider>
         </SnackbarProvider>
-      </ThemeProvider>
-    </MuiThemeProvider>
+      </SCThemeProvider>
+    </ThemeProvider>
   );
 };
 export default AppFrame;

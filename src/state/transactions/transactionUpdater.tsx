@@ -5,7 +5,7 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import omit from 'lodash/omit';
 import useBuildTransactionMessage from 'hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from 'hooks/useBuildRejectedTransactionMessage';
-import Zoom from '@material-ui/core/Zoom';
+import Zoom from '@mui/material/Zoom';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';

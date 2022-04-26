@@ -1,10 +1,10 @@
 import React from 'react';
 import { parseUnits, formatUnits } from '@ethersproject/units';
-import Paper from '@material-ui/core/Paper';
+import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import { Web3Service, Token } from 'types';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
 import TokenButton from 'common/token-button';
@@ -12,9 +12,9 @@ import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-easy-input';
 import FrequencyTypeInput from 'common/frequency-type-input';
 import Button from 'common/button';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import SwapVertIcon from '@material-ui/icons/SwapVert';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
 import find from 'lodash/find';
 import usePromise from 'hooks/usePromise';
 import useBalance from 'hooks/useBalance';
@@ -44,7 +44,7 @@ import {
   ORACLE_STRINGS,
   STABLE_COINS,
 } from 'config/constants';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { useTransactionAdder, useHasPendingApproval, useHasPendingPairCreation } from 'state/transactions/hooks';
@@ -54,9 +54,9 @@ import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import Switch from '@material-ui/core/Switch';
+import Switch from '@mui/material/Switch';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import useAllowance from 'hooks/useAllowance';
 import useGasEstimate from 'hooks/useGasEstimate';
 import useOracleQuote from 'hooks/useOracleQuote';
@@ -81,7 +81,7 @@ const StyledPaperInPaper = styled(Paper)`
 const StyledSwapContainer = styled.div`
   ${({ theme }) => `
     display: flex;
-    background-color: ${theme.palette.type === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
+    background-color: ${theme.palette.mode === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
     border-radius: 20px;
     padding: 0px;
   `}
@@ -93,7 +93,7 @@ const StyledFromContainer = styled(Grid)`
 
 const StyledToContainer = styled(Grid)`
   ${({ theme }) => `
-    background-color: ${theme.palette.type === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.1)'};
+    background-color: ${theme.palette.mode === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.1)'};
     padding: 24px;
     border-bottom-right-radius: 20px;
     border-bottom-left-radius: 20px;
@@ -130,13 +130,13 @@ const StyledWhaleModeContainer = styled.div`
 const StyledSwapTokenButton = styled(IconButton)`
   ${({ theme }) => `
     position: absolute;
-    border: 3px solid ${theme.palette.type === 'light' ? '#e3e3e3' : '#6a6a6a'};
-    background-color: ${theme.palette.type === 'light' ? '#ffffff' : '#595959'};
+    border: 3px solid ${theme.palette.mode === 'light' ? '#e3e3e3' : '#6a6a6a'};
+    background-color: ${theme.palette.mode === 'light' ? '#ffffff' : '#595959'};
     left: 50%;
     top: 24px;
     transform: translateX(-50%) translateY(-100%);
     :hover {
-      background-color: ${theme.palette.type === 'light' ? '#f0f0f0' : '#484848'};
+      background-color: ${theme.palette.mode === 'light' ? '#f0f0f0' : '#484848'};
     }
   `}
 `;
@@ -769,7 +769,7 @@ const Swap = ({
       />
       <StyledSwapContainer>
         <Grid container>
-          <StyledFromContainer container alignItems="center" justify="space-between">
+          <StyledFromContainer container alignItems="center" justifyContent="space-between">
             {/* <Grid item xs={12}>
               <StyledWhaleModeContainer>
                 <FormControlLabel
@@ -817,7 +817,7 @@ const Swap = ({
               />
             </Grid>
             <Grid item xs={6}>
-              <Grid container alignItems="center" justify="flex-end">
+              <Grid container alignItems="center" justifyContent="flex-end">
                 <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
               </Grid>
             </Grid>
@@ -848,7 +848,7 @@ const Swap = ({
               </StyledSettingContainer>
             </Grid>
           </StyledFromContainer>
-          <StyledToContainer container alignItems="center" justify="space-between">
+          <StyledToContainer container alignItems="center" justifyContent="space-between">
             <StyledSwapTokenButton onClick={() => toggleFromTo()}>
               <SwapVertIcon />
             </StyledSwapTokenButton>
@@ -858,7 +858,7 @@ const Swap = ({
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Grid container alignItems="center" justify="flex-end">
+              <Grid container alignItems="center" justifyContent="flex-end">
                 <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
               </Grid>
             </Grid>
@@ -868,7 +868,7 @@ const Swap = ({
       <StyledSettingsContainer>
         <Grid container>
           <Grid item xs={12}>
-            <Grid container alignItems="center" justify="space-between" spacing={2}>
+            <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="body1">
                   <FormattedMessage description="executes once" defaultMessage="Executes once" />
@@ -885,7 +885,7 @@ const Swap = ({
           </Grid>
           <Grid item xs={12}>
             <StyledSettingContainer>
-              <Grid container alignItems="center" justify="space-between" spacing={2}>
+              <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
                 <Grid item xs={12}>
                   <Typography variant="body1">
                     <FormattedMessage

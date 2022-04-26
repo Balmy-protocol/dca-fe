@@ -1,12 +1,12 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import Card from '@material-ui/core/Card';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import CardContent from '@material-ui/core/CardContent';
+import Card from '@mui/material/Card';
+import LinearProgress from '@mui/material/LinearProgress';
+import CardContent from '@mui/material/CardContent';
 import Button from 'common/button';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Chip from '@material-ui/core/Chip';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
@@ -16,16 +16,19 @@ import { useHistory } from 'react-router-dom';
 import { STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRight from 'assets/svg/atom/arrow-right';
-import { createStyles, withStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, Theme } from '@mui/material/styles';
+import { withStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
 import { buildEtherscanTransaction } from 'utils/etherscan';
-import CallMadeIcon from '@material-ui/icons/CallMade';
-import Link from '@material-ui/core/Link';
+import CallMadeIcon from '@mui/icons-material/CallMade';
+import Link from '@mui/material/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import MigratePositionModal from 'common/migrate-position-modal';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useUsdPrice from 'hooks/useUsdPrice';
+
+const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -44,14 +47,14 @@ const BorderLinearProgress = withStyles((theme: Theme) =>
       },
     },
     colorPrimary: {
-      backgroundColor: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
+      backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 700],
     },
     bar: {
       borderRadius: 5,
       backgroundColor: '#1a90ff',
     },
   })
-)(LinearProgress);
+)(StyledSwapsLinearProgress);
 
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
@@ -108,7 +111,7 @@ const StyledFreqLeft = styled.div`
     padding: 10px 13px;
     border-radius: 15px;
     text-align: center;
-    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
   `}
 `;
 
@@ -127,8 +130,8 @@ const StyledNoFunds = styled.div`
   ${({ theme }) => `
     padding: 8px 11px;
     border-radius: 5px;
-    background-color: ${theme.palette.type === 'light' ? '#dceff9' : '#275f7c'};
-    color: ${theme.palette.type === 'light' ? '#0088cc' : '#ffffff'};
+    background-color: ${theme.palette.mode === 'light' ? '#dceff9' : '#275f7c'};
+    color: ${theme.palette.mode === 'light' ? '#0088cc' : '#ffffff'};
     text-align: center;
   `}
 `;

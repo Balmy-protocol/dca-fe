@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { FullPosition, NFTData } from 'types';
 
@@ -21,7 +21,7 @@ const NftViewer = ({ position }: NftViewerProps) => {
   }, [position]);
 
   return (
-    <Grid container justify="center">
+    <Grid container justifyContent="center">
       {nftData && <img src={nftData.image} alt="nft" />}
     </Grid>
   );

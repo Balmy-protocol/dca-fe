@@ -4,27 +4,27 @@ import styled from 'styled-components';
 import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import Slide from '@material-ui/core/Slide';
+import Slide from '@mui/material/Slide';
 import { Token, TokenList } from 'types';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import ListItem from '@material-ui/core/ListItem';
-import Divider from '@material-ui/core/Divider';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InputBase from '@material-ui/core/InputBase';
-import Search from '@material-ui/icons/Search';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Chip from '@material-ui/core/Chip';
+import ListItem from '@mui/material/ListItem';
+import Divider from '@mui/material/Divider';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InputBase from '@mui/material/InputBase';
+import Search from '@mui/icons-material/Search';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Chip from '@mui/material/Chip';
 import TokenIcon from 'common/token-icon';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import useAvailablePairs from 'hooks/useAvailablePairs';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useTokenList from 'hooks/useTokenList';
 import Button from 'common/button';
@@ -35,16 +35,16 @@ import { formatCurrencyAmount } from 'utils/currency';
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 interface PartialTheme {
   spacing: (space: number) => number;
-  palette: { grey: string[]; type: 'light' | 'dark' };
+  palette: { grey: string[]; mode: 'light' | 'dark' };
 }
 
 const searchStyles = ({ spacing, palette }: PartialTheme) => {
   // ATTENTION!
   // you can customize some important variables here!!
-  const backgroundColor = palette.type === 'light' ? palette.grey[100] : 'rgba(255, 255, 255, 0.12)';
+  const backgroundColor = palette.mode === 'light' ? palette.grey[100] : 'rgba(255, 255, 255, 0.12)';
   const space = spacing(1); // default = 8;
   const borderRadius = 30;
-  const iconColor = palette.type === 'light' ? palette.grey[500] : '#ffffff';
+  const iconColor = palette.mode === 'light' ? palette.grey[500] : '#ffffff';
   // end of variables
   return {
     root: {
@@ -75,7 +75,7 @@ const StyledOverlay = styled.div`
     left: 0;
     right: 0;
     z-index: 99;
-    background-color: ${theme.palette.type === 'light' ? '#ffffff' : '#424242'};
+    background-color: ${theme.palette.mode === 'light' ? '#ffffff' : '#424242'};
     padding: 32px;
     display: flex;
   `}
@@ -105,8 +105,8 @@ const StyledGridWithScrollbar = styled(Grid)<{ hasScrollbar: boolean }>`
     overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-    --scrollbarBG: ${theme.palette.type === 'light' ? '#ffffff' : '#424242'};
-    --thumbBG: ${theme.palette.type === 'light' ? '#90a4ae' : '#ffffff'};
+    --scrollbarBG: ${theme.palette.mode === 'light' ? '#ffffff' : '#424242'};
+    --thumbBG: ${theme.palette.mode === 'light' ? '#90a4ae' : '#ffffff'};
     ::-webkit-scrollbar {
       width: 11px;
     }
@@ -125,8 +125,8 @@ const StyledList = styled(List)`
   ${({ theme }) => `
     scrollbar-width: thin;
     scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-    --scrollbarBG: ${theme.palette.type === 'light' ? '#ffffff' : '#424242'};
-    --thumbBG: ${theme.palette.type === 'light' ? '#90a4ae' : '#ffffff'};
+    --scrollbarBG: ${theme.palette.mode === 'light' ? '#ffffff' : '#424242'};
+    --thumbBG: ${theme.palette.mode === 'light' ? '#90a4ae' : '#ffffff'};
     ::-webkit-scrollbar {
       width: 11px;
     }
@@ -174,7 +174,7 @@ const useListItemStyles = makeStyles(({ palette }) => ({
     padding: '0.5rem 1rem',
     '&:hover': {
       color: palette.text.primary,
-      backgroundColor: palette.type === 'light' ? palette.grey[100] : palette.grey[700],
+      backgroundColor: palette.mode === 'light' ? palette.grey[100] : palette.grey[700],
     },
   },
   selected: {
@@ -194,7 +194,7 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps
 
   const tokenBalance = useTokenBalance(tokenList[tokenKeys[index]]);
   return (
-    <StyledListItem classes={classes} button onClick={() => onClick(tokenKeys[index])} style={style}>
+    <StyledListItem classes={classes} onClick={() => onClick(tokenKeys[index])} style={style}>
       <StyledListItemIcon>
         <TokenIcon size="32px" token={tokenList[tokenKeys[index]]} />
       </StyledListItemIcon>

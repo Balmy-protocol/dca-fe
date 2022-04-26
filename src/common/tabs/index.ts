@@ -1,12 +1,12 @@
-import { createStyles, Theme } from '@material-ui/core/styles';
-import makeStyles from '@material-ui/styles/makeStyles';
+import { createStyles, Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
 
 export const tabsStyles =
   (isFullWidth = false) =>
   ({ palette, breakpoints }: Theme) =>
     createStyles({
       root: {
-        backgroundColor: palette.type === 'light' ? '#eee' : palette.divider,
+        backgroundColor: palette.mode === 'light' ? '#eee' : palette.divider,
         borderRadius: 50,
         minHeight: 44,
         padding: 5,
@@ -36,7 +36,7 @@ export const tabsStyles =
           right: 4,
           bottom: 0,
           borderRadius: 20,
-          backgroundColor: palette.type === 'light' ? '#fff' : palette.action.selected,
+          backgroundColor: palette.mode === 'light' ? '#fff' : palette.action.selected,
           boxShadow: '0 4px 12px 0 rgba(0,0,0,0.16)',
         },
       },

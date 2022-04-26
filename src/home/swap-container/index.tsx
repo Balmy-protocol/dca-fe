@@ -1,12 +1,12 @@
 import * as React from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import orderBy from 'lodash/orderBy';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import GraphWidget from 'common/graph-widget';
 import WalletContext from 'common/wallet-context';
 import { getProtocolToken } from 'mocks/tokens';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import Hidden from '@material-ui/core/Hidden';
+import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { NETWORKS, STRING_SWAP_INTERVALS } from 'config/constants';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
@@ -96,7 +96,7 @@ const SwapContainer = () => {
   const isLoading = isLoadingSwapIntervals || !swapIntervalsData;
 
   return (
-    <Grid container spacing={2} alignItems="center" justify="space-around">
+    <Grid container spacing={2} alignItems="center" justifyContent="space-around">
       <WalletContext.Consumer>
         {({ web3Service }) => (
           <>

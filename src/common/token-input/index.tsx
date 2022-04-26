@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import Button from 'common/button';
 import { Token } from 'types';
 import { FormattedMessage } from 'react-intl';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
-import Input from '@material-ui/core/Input';
+import Input from '@mui/material/Input';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 const StyledInput = styled(Input)`
@@ -15,7 +15,7 @@ const StyledInput = styled(Input)`
 
 const StyledInputContainer = styled.div`
   ${({ theme }) => `
-    background-color: ${theme.palette.type === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.12)'};
+    background-color: ${theme.palette.mode === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.12)'};
     padding: 5px 10px;
     border-radius: 10px;
     display: inline-flex;

@@ -5,9 +5,9 @@ import { useAllTransactions, useHasPendingTransactions } from 'state/transaction
 import { useBadgeNumber } from 'state/transactions-badge/hooks';
 import { updateBadgeNumber } from 'state/transactions-badge/actions';
 
-import Badge from '@material-ui/core/Badge';
-import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import Badge from '@mui/material/Badge';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Web3Service } from 'types';
 import Button from 'common/button';
 import WalletMenu from 'common/wallet-menu';

@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Typography from '@material-ui/core/Typography';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 
 const StyledActionsContainer = styled.div`
   display: flex;
