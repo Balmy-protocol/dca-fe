@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import orderBy from 'lodash/orderBy';
 import styled from 'styled-components';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
@@ -12,13 +12,13 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import { appleTabsStylesHook } from 'common/tabs';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import { Duration } from 'luxon';
 import Button from 'common/button';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FormattedMessage } from 'react-intl';
 import Leaderboard from '../leaderboard';
 
@@ -27,8 +27,8 @@ const StyledTitleContainer = styled(Paper)`
     padding: 25px;
     border-radius: 10px;
     flex-grow: 0;
-    background-color: ${theme.palette.type === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
-    border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+    background-color: ${theme.palette.mode === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
+    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
   `}
 `;
 

@@ -1,14 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from 'common/button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import LoadingIndicator from 'common/centered-loading-indicator';
 import { Token, Web3Service } from 'types';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
 
 const useStyles = makeStyles({

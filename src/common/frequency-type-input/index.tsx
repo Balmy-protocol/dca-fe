@@ -3,7 +3,7 @@ import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { SetStateCallback } from 'types';
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 
 interface SelectOption {
   value: BigNumber;
@@ -19,7 +19,7 @@ const StyledTabsContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    background: ${theme.palette.type === 'light' ? '#eee' : 'rgba(255, 255, 255, 0.12)'};
+    background: ${theme.palette.mode === 'light' ? '#eee' : 'rgba(255, 255, 255, 0.12)'};
     align-items: center;
     padding: 5px;
     border-radius: 30px;
@@ -64,7 +64,7 @@ const StyledTabIndicator = styled.div<{ width: number; left: number; height: num
     &:after {
       content: '';
       position: absolute;
-      background-color: ${theme.palette.type === 'light' ? '#fff' : 'rgba(255, 255, 255, 0.12)'};
+      background-color: ${theme.palette.mode === 'light' ? '#fff' : 'rgba(255, 255, 255, 0.12)'};
       border-radius: 20px;
       box-shadow: 0 4px 12px 0 rgb(0 0 0 / 16%);
       top: 0;

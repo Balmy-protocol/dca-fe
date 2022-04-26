@@ -1,8 +1,8 @@
 import React from 'react';
 import { Token } from 'types';
-import SvgIcon from '@material-ui/core/SvgIcon';
+import SvgIcon from '@mui/material/SvgIcon';
 import CryptoIcons from 'assets/svg/color';
-import HelpIcon from '@material-ui/icons/Help';
+import HelpIcon from '@mui/icons-material/Help';
 import useTokenList from 'hooks/useTokenList';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
@@ -28,7 +28,8 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
   let componentToRender = null;
   const tokenList = useTokenList(false);
   const tokenLogoUri = token?.logoURI || (token && tokenList[token.address] && tokenList[token.address].logoURI);
-  const addressToUse = token?.address && (token.address === PROTOCOL_TOKEN_ADDRESS ? `${token.chainId}-${token.address}` : token.address);
+  const addressToUse =
+    token?.address && (token.address === PROTOCOL_TOKEN_ADDRESS ? `${token.chainId}-${token.address}` : token.address);
 
   if (CryptoIcons[addressToUse as keyof typeof CryptoIcons]) {
     componentToRender = (

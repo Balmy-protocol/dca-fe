@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from '@material-ui/core/Link';
+import Link from '@mui/material/Link';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { buildEtherscanTransaction } from 'utils/etherscan';
@@ -11,7 +11,7 @@ interface EtherscanLinkProps {
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
-    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
 `;
 

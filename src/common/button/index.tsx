@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button, { ButtonProps } from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core/styles';
+import Button, { ButtonProps } from '@mui/material/Button';
+import { withStyles } from '@mui/styles';
+import { Theme } from '@mui/material';
 
 const colors = {
   primary: {
@@ -208,211 +209,211 @@ const StyledDisabledFontButton = styled(Button)`
   text-transform: none;
 `;
 
-const PrimaryButton = withStyles((theme) => ({
+const PrimaryButton = withStyles((theme: Theme) => ({
   text: {
-    color: colors.primary[theme.palette.type],
+    color: colors.primary[theme.palette.mode],
   },
   outlined: {
-    color: colors.primary[theme.palette.type],
-    borderColor: borderColors.primary[theme.palette.type].default,
+    color: colors.primary[theme.palette.mode],
+    borderColor: borderColors.primary[theme.palette.mode].default,
     '&:hover': {
-      borderColor: borderColors.primary[theme.palette.type].hover,
+      borderColor: borderColors.primary[theme.palette.mode].hover,
     },
     '&:active': {
-      borderColor: borderColors.primary[theme.palette.type].hover,
+      borderColor: borderColors.primary[theme.palette.mode].hover,
     },
   },
   contained: {
-    color: colors.secondary[theme.palette.type],
-    backgroundColor: backgroundColors.primary[theme.palette.type].default,
+    color: colors.secondary[theme.palette.mode],
+    backgroundColor: backgroundColors.primary[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.primary[theme.palette.type].hover,
+      backgroundColor: backgroundColors.primary[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.primary[theme.palette.type].hover,
+      backgroundColor: backgroundColors.primary[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
 
-const SecondaryButton = withStyles((theme) => ({
+const SecondaryButton = withStyles((theme: Theme) => ({
   text: {
-    color: backgroundColors.secondary[theme.palette.type].default,
+    color: backgroundColors.secondary[theme.palette.mode].default,
   },
   outlined: {
-    color: borderColors.secondary[theme.palette.type].default,
-    borderColor: borderColors.secondary[theme.palette.type].default,
+    color: borderColors.secondary[theme.palette.mode].default,
+    borderColor: borderColors.secondary[theme.palette.mode].default,
     '&:hover': {
-      borderColor: borderColors.secondary[theme.palette.type].hover,
+      borderColor: borderColors.secondary[theme.palette.mode].hover,
     },
     '&:active': {
-      borderColor: borderColors.secondary[theme.palette.type].hover,
+      borderColor: borderColors.secondary[theme.palette.mode].hover,
     },
   },
   contained: {
-    color: colors.secondary[theme.palette.type],
-    backgroundColor: backgroundColors.secondary[theme.palette.type].default,
+    color: colors.secondary[theme.palette.mode],
+    backgroundColor: backgroundColors.secondary[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.secondary[theme.palette.type].hover,
+      backgroundColor: backgroundColors.secondary[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.secondary[theme.palette.type].hover,
+      backgroundColor: backgroundColors.secondary[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
 
-const TertiaryButton = withStyles((theme) => ({
+const TertiaryButton = withStyles((theme: Theme) => ({
   text: {
-    color: colors.tertiary[theme.palette.type],
+    color: colors.tertiary[theme.palette.mode],
   },
   outlined: {
-    color: borderColors.tertiary[theme.palette.type].default,
-    borderColor: borderColors.tertiary[theme.palette.type].default,
+    color: borderColors.tertiary[theme.palette.mode].default,
+    borderColor: borderColors.tertiary[theme.palette.mode].default,
     '&:hover': {
-      borderColor: borderColors.tertiary[theme.palette.type].hover,
+      borderColor: borderColors.tertiary[theme.palette.mode].hover,
     },
     '&:active': {
-      borderColor: borderColors.tertiary[theme.palette.type].hover,
+      borderColor: borderColors.tertiary[theme.palette.mode].hover,
     },
   },
   contained: {
-    color: colors.tertiary[theme.palette.type],
-    backgroundColor: backgroundColors.tertiary[theme.palette.type].default,
+    color: colors.tertiary[theme.palette.mode],
+    backgroundColor: backgroundColors.tertiary[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.tertiary[theme.palette.type].hover,
+      backgroundColor: backgroundColors.tertiary[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.tertiary[theme.palette.type].hover,
+      backgroundColor: backgroundColors.tertiary[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
 
-const DefaultButton = withStyles((theme) => ({
+const DefaultButton = withStyles((theme: Theme) => ({
   text: {
-    color: colors.default[theme.palette.type],
+    color: colors.default[theme.palette.mode],
   },
   outlined: {
-    color: colors.default[theme.palette.type],
-    borderColor: borderColors.default[theme.palette.type].default,
-    backgroundColor: backgroundColors.default[theme.palette.type].default,
+    color: colors.default[theme.palette.mode],
+    borderColor: borderColors.default[theme.palette.mode].default,
+    backgroundColor: backgroundColors.default[theme.palette.mode].default,
     '&:hover': {
-      borderColor: borderColors.default[theme.palette.type].hover,
+      borderColor: borderColors.default[theme.palette.mode].hover,
     },
     '&:active': {
-      borderColor: borderColors.default[theme.palette.type].hover,
+      borderColor: borderColors.default[theme.palette.mode].hover,
     },
   },
   contained: {
-    color: colors.default[theme.palette.type],
-    backgroundColor: backgroundColors.default[theme.palette.type].default,
+    color: colors.default[theme.palette.mode],
+    backgroundColor: backgroundColors.default[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.default[theme.palette.type].hover,
+      backgroundColor: backgroundColors.default[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.default[theme.palette.type].hover,
+      backgroundColor: backgroundColors.default[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
 
-const WhiteButton = withStyles((theme) => ({
+const WhiteButton = withStyles((theme: Theme) => ({
   text: {
-    color: colors.white[theme.palette.type],
+    color: colors.white[theme.palette.mode],
   },
   outlined: {
-    color: colors.white[theme.palette.type],
-    borderColor: borderColors.white[theme.palette.type].default,
+    color: colors.white[theme.palette.mode],
+    borderColor: borderColors.white[theme.palette.mode].default,
     '&:hover': {
-      borderColor: borderColors.white[theme.palette.type].hover,
+      borderColor: borderColors.white[theme.palette.mode].hover,
     },
     '&:active': {
-      borderColor: borderColors.white[theme.palette.type].hover,
+      borderColor: borderColors.white[theme.palette.mode].hover,
     },
   },
   contained: {
-    color: colors.white[theme.palette.type],
-    backgroundColor: backgroundColors.white[theme.palette.type].default,
+    color: colors.white[theme.palette.mode],
+    backgroundColor: backgroundColors.white[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.white[theme.palette.type].hover,
+      backgroundColor: backgroundColors.white[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.white[theme.palette.type].hover,
+      backgroundColor: backgroundColors.white[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
 
-const ErrorButton = withStyles((theme) => ({
+const ErrorButton = withStyles((theme: Theme) => ({
   text: {
-    color: colors.error[theme.palette.type],
+    color: colors.error[theme.palette.mode],
   },
   outlined: {
-    color: colors.error[theme.palette.type],
-    borderColor: borderColors.error[theme.palette.type].default,
+    color: colors.error[theme.palette.mode],
+    borderColor: borderColors.error[theme.palette.mode].default,
     '&:hover': {
-      borderColor: borderColors.error[theme.palette.type].hover,
+      borderColor: borderColors.error[theme.palette.mode].hover,
     },
     '&:active': {
-      borderColor: borderColors.error[theme.palette.type].hover,
+      borderColor: borderColors.error[theme.palette.mode].hover,
     },
   },
   contained: {
-    color: colors.error[theme.palette.type],
-    backgroundColor: backgroundColors.error[theme.palette.type].default,
+    color: colors.error[theme.palette.mode],
+    backgroundColor: backgroundColors.error[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.error[theme.palette.type].hover,
+      backgroundColor: backgroundColors.error[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.error[theme.palette.type].hover,
+      backgroundColor: backgroundColors.error[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
 
-const WarningButton = withStyles((theme) => ({
+const WarningButton = withStyles((theme: Theme) => ({
   text: {
-    color: colors.warning[theme.palette.type],
+    color: colors.warning[theme.palette.mode],
   },
   outlined: {
-    color: colors.warning[theme.palette.type],
-    borderColor: borderColors.warning[theme.palette.type].default,
+    color: colors.warning[theme.palette.mode],
+    borderColor: borderColors.warning[theme.palette.mode].default,
     '&:hover': {
-      borderColor: borderColors.warning[theme.palette.type].hover,
+      borderColor: borderColors.warning[theme.palette.mode].hover,
     },
     '&:active': {
-      borderColor: borderColors.warning[theme.palette.type].hover,
+      borderColor: borderColors.warning[theme.palette.mode].hover,
     },
   },
   contained: {
-    color: colors.warning[theme.palette.type],
-    backgroundColor: backgroundColors.warning[theme.palette.type].default,
+    color: colors.warning[theme.palette.mode],
+    backgroundColor: backgroundColors.warning[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.warning[theme.palette.type].hover,
+      backgroundColor: backgroundColors.warning[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.warning[theme.palette.type].hover,
+      backgroundColor: backgroundColors.warning[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
 
-const PendingButton = withStyles((theme) => ({
+const PendingButton = withStyles((theme: Theme) => ({
   text: {
-    color: colors.pending[theme.palette.type],
+    color: colors.pending[theme.palette.mode],
   },
   outlined: {
-    color: colors.pending[theme.palette.type],
-    borderColor: borderColors.pending[theme.palette.type].default,
+    color: colors.pending[theme.palette.mode],
+    borderColor: borderColors.pending[theme.palette.mode].default,
     '&:hover': {
-      borderColor: borderColors.pending[theme.palette.type].hover,
+      borderColor: borderColors.pending[theme.palette.mode].hover,
     },
     '&:active': {
-      borderColor: borderColors.pending[theme.palette.type].hover,
+      borderColor: borderColors.pending[theme.palette.mode].hover,
     },
   },
   contained: {
-    color: colors.pending[theme.palette.type],
-    backgroundColor: backgroundColors.pending[theme.palette.type].default,
+    color: colors.pending[theme.palette.mode],
+    backgroundColor: backgroundColors.pending[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.pending[theme.palette.type].hover,
+      backgroundColor: backgroundColors.pending[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.pending[theme.palette.type].hover,
+      backgroundColor: backgroundColors.pending[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);

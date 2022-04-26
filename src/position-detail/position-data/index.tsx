@@ -1,10 +1,10 @@
 import React from 'react';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 import { FullPosition } from 'types';
-import Typography from '@material-ui/core/Typography';
-import Chip from '@material-ui/core/Chip';
-import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
 import TokenIcon from 'common/token-icon';
 import ArrowRight from 'assets/svg/atom/arrow-right';
 import { FormattedMessage } from 'react-intl';
@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import { DateTime } from 'luxon';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
-import Divider from '@material-ui/core/Divider';
+import Divider from '@mui/material/Divider';
 
 import { getFrequencyLabel } from 'utils/parsing';
 import { POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';

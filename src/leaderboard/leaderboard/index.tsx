@@ -6,10 +6,10 @@ import BronzeTrophy from 'assets/svg/atom/bronze-trophy';
 import Address from 'common/address';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { buildEtherscanAddress } from 'utils/etherscan';
-import Link from '@material-ui/core/Link';
-import CallMadeIcon from '@material-ui/icons/CallMade';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
+import Link from '@mui/material/Link';
+import CallMadeIcon from '@mui/icons-material/CallMade';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
 
 const StyledLoadearboardContainer = styled.div`
   display: flex;
@@ -29,7 +29,7 @@ const StyledLeaderboardItemContainer = styled.div<{ index: number }>`
     ${index === 1 ? 'padding: 20px 20px 20px 35px;' : ''}
     ${index === 2 ? 'padding: 15px 20px 15px 35px;' : ''}
     ${index > 2 ? 'padding: 10px 20px;' : ''}
-    // border: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+    // border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
     align-items: center;
 
     &:nth-child(even) {
@@ -38,7 +38,7 @@ const StyledLeaderboardItemContainer = styled.div<{ index: number }>`
     }
 
     &:last-child {
-      // border-bottom: 1px solid ${theme.palette.type === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
+      // border-bottom: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
     }
   `}
 `;
@@ -62,7 +62,7 @@ const StyledLeadearboardItemValue = styled.div`
 
 const StyledLink = styled(Link)<{ isFirsts: boolean }>`
   ${({ theme }) => `
-    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#ffffff'};
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#ffffff'};
   `}
   margin: 0px 5px;
 `;

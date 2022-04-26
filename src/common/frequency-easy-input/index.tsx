@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { SetStateCallback } from 'types';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import { maximalAppleTabsStylesHook } from 'common/tabs';
 import findIndex from 'lodash/findIndex';
 
@@ -46,7 +46,7 @@ const StyledCustomContainer = styled.div`
     align-items: center;
     justify-content: center;
     margin-left: 20px;
-    background-color: ${theme.palette.type === 'light' ? '#eee' : 'rgba(255, 255, 255, 0.12)'};
+    background-color: ${theme.palette.mode === 'light' ? '#eee' : 'rgba(255, 255, 255, 0.12)'};
     border-radius: 50px;
     max-width: 100px;
     min-width: 100px;
@@ -67,10 +67,10 @@ const StyledInput = styled.input`
     line-height: 1.75;
     white-space: normal;
     letter-spacing: 0.02857;
-    color: ${theme.palette.type === 'light' ? 'rgba(0, 0, 0, 0.87)' : '#fff'};
+    color: ${theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87)' : '#fff'};
     background-color: transparent;
     ::placeholder {
-      color: ${theme.palette.type === 'light' ? '#a8a8a8' : '#a1a1a1'};
+      color: ${theme.palette.mode === 'light' ? '#a8a8a8' : '#a1a1a1'};
     }
   `}
 `;

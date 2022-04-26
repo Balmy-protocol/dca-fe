@@ -1,18 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from 'common/button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
 import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
-import { makeStyles } from '@material-ui/core/styles';
-import Link from '@material-ui/core/Link';
+import { makeStyles } from '@mui/styles';
+import Link from '@mui/material/Link';
 
 const useStyles = makeStyles({
   paper: {
@@ -22,7 +22,7 @@ const useStyles = makeStyles({
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
-    color: ${theme.palette.type === 'light' ? '#3f51b5' : '#8699ff'}
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
 `;
 

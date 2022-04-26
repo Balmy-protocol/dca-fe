@@ -1,8 +1,8 @@
 import React from 'react';
 import find from 'lodash/find';
-import Grid from '@material-ui/core/Grid';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Grid from '@mui/material/Grid';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import { appleTabsStylesHook } from 'common/tabs';
 import styled from 'styled-components';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
@@ -25,9 +25,8 @@ interface HomeFrameProps {
 const StyledGridContainer = styled(Grid).withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
     (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
-})<HomeFrameProps>`
-  height: ${(props) => (props.isLoading ? `calc(100% + ${(props?.spacing || 0) * 4}px)` : 'auto')}; ;
-`;
+})<HomeFrameProps>``;
+// height: ${(props) => (props.isLoading ? `calc(100% + ${(parseInt(props?.spacing || '0', 10) || 0) * 4}px)` : 'auto')}; ;
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const tabIndex = useMainTab();

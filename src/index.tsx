@@ -8,7 +8,13 @@ import { ApolloProvider } from '@apollo/client';
 import DCASubgraph from 'utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
 import store, { axiosClient } from 'state';
+import { Theme } from '@mui/material/styles';
 import MainApp from './frame';
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
 
 type AppProps = {
   messages: Record<string, string>;
