@@ -22,6 +22,7 @@ const StyledButton = styled(Button)`
   :hover {
     box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.302), 0 4px 8px 3px rgba(60, 64, 67, 0.149);
   }
+  padding: 4px 8px;
 `;
 
 interface ConnectWalletButtonProps {
@@ -61,13 +62,13 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
         <StyledButton
           aria-controls="customized-menu"
           aria-haspopup="true"
-          color="default"
+          color="transparent"
           variant="outlined"
           onClick={onOpen}
           style={{ maxWidth: '220px', textTransform: 'none' }}
         >
           <Typography noWrap>
-            <Address address={web3Service.getAccount()} />
+            <Address address={web3Service.getAccount()} trimAddress/>
           </Typography>
         </StyledButton>
       </Badge>

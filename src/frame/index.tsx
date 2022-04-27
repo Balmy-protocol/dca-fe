@@ -19,7 +19,6 @@ import { startFetchingTokenLists } from 'state/token-lists/actions';
 import { SnackbarProvider } from 'notistack';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
@@ -35,13 +34,15 @@ declare module 'styled-components' {
 
 const StyledVector1Container = styled.div`
   position: absolute;
-  bottom: 0px;
+  bottom: -5px;
   left: 0px;
+  z-index: -99;
 `;
 const StyledVector2Container = styled.div`
   position: absolute;
   top: 0px;
   right: 0px;
+  z-index: -99;
 `;
 
 interface AppFrameProps {
@@ -129,6 +130,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
               </>
             )}
             <Router>
+              <NavBar isLoading={isLoading || isLoadingNetwork} />
               <StyledVector1Container>
                 <Vector1 />
               </StyledVector1Container>
@@ -137,9 +139,6 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
               </StyledVector2Container>
               <StyledContainer>
                 <StyledGridContainer container direction="column">
-                  <StyledNavBarGridContainer item xs={12}>
-                    <NavBar isLoading={isLoading || isLoadingNetwork} />
-                  </StyledNavBarGridContainer>
                   <StyledAppGridContainer item xs={12}>
                     <Switch>
                       <Route path="/faq">

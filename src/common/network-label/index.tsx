@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@mui/material/Button';
+import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
 import { NETWORKS, NETWORKS_FOR_MENU, SUPPORTED_NETWORKS } from 'config/constants';
@@ -37,22 +37,16 @@ const StyledTokenIconContainer = styled.div`
   display: flex;
 `;
 
-const StyledButton = styled(Button).withConfig({
-  shouldForwardProp: (prop, defaultValidatorFn) =>
-    (!['isMainnet'].includes(prop) && defaultValidatorFn(prop)) || ['startIcon'].includes(prop),
-})<{ isMainnet: boolean }>`
+const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
-  color: #333333;
-  background-color: #ffffff;
   cursor: pointer;
   box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 1px 3px 1px rgba(60, 64, 67, 0.149);
   :hover {
     box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.302), 0 4px 8px 3px rgba(60, 64, 67, 0.149);
   }
-  background-color: ${(props) => (props.isMainnet ? '#FFF' : 'rgba(243, 132, 30, 0.2)')};
-  color: ${(props) => (props.isMainnet ? 'black' : 'rgb(188 135 0)')};
   margin-right: 10px;
+  padding: 4px 8px;
 `;
 interface NetworkLabelProps {
   network: {
@@ -94,10 +88,10 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
     <StyledButton
       aria-controls="customized-menu"
       aria-haspopup="true"
-      color="primary"
+      color="transparent"
+      variant="outlined"
       onClick={handleClick}
       style={{ maxWidth: '220px', textTransform: 'none' }}
-      isMainnet={NETWORKS_FOR_MENU.includes(network.chainId)}
       startIcon={SUPPORTED_NETWORKS.includes(network.chainId) ? null : <WarningIcon />}
     >
       {NETWORKS_FOR_MENU.includes(network.chainId) && (
@@ -140,7 +134,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
       >
         <StyledMenu>
           {NETWORKS_FOR_MENU.map((chainId) => (
-            <StyledMenuItem key={chainId} variant="outlined" size="small" onClick={() => handleClose(chainId)}>
+            <StyledMenuItem key={chainId} color="transparent" variant="outlined" size="small" onClick={() => handleClose(chainId)}>
               <StyledTokenIconContainer>
                 <TokenIcon
                   size="20px"
