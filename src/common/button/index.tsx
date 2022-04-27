@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Button, { ButtonProps } from '@mui/material/Button';
 import { withStyles } from '@mui/styles';
-import { Theme } from '@mui/material';
+import { Theme } from '@mui/material/styles';
 
 const colors = {
   primary: {
@@ -57,6 +57,16 @@ const backgroundColors = {
     },
     dark: {
       default: '#424242',
+      hover: '#525252',
+    },
+  },
+  transparent: {
+    light: {
+      default: 'rgba(255, 255, 255, 0.1)',
+      hover: '#c9c9c9',
+    },
+    dark: {
+      default: 'rgba(255, 255, 255, 0.1)',
       hover: '#525252',
     },
   },
@@ -141,6 +151,16 @@ const borderColors = {
     dark: {
       default: 'rgba(255,255,255,0.1)',
       hover: 'rgba(255,255,255,0.2)',
+    },
+  },
+  transparent: {
+    light: {
+      default: '#D9D9D9',
+      hover: '#c9c9c9',
+    },
+    dark: {
+      default: 'transparent',
+      hover: 'transparent',
     },
   },
   white: {
@@ -314,6 +334,35 @@ const DefaultButton = withStyles((theme: Theme) => ({
   },
 }))(StyledDisabledFontButton);
 
+const TransparentButton = withStyles((theme: Theme) => ({
+  text: {
+    color: colors.default[theme.palette.mode],
+  },
+  outlined: {
+    color: colors.default[theme.palette.mode],
+    borderColor: borderColors.transparent[theme.palette.mode].default,
+    backgroundColor: backgroundColors.transparent[theme.palette.mode].default,
+    '&:hover': {
+      borderColor: borderColors.transparent[theme.palette.mode].hover,
+    },
+    '&:active': {
+      borderColor: borderColors.transparent[theme.palette.mode].hover,
+    },
+    backdropFilter: 'blur(6px)',
+  },
+  contained: {
+    color: colors.default[theme.palette.mode],
+    backgroundColor: backgroundColors.transparent[theme.palette.mode].default,
+    '&:hover': {
+      backgroundColor: backgroundColors.transparent[theme.palette.mode].hover,
+    },
+    '&:active': {
+      backgroundColor: backgroundColors.transparent[theme.palette.mode].hover,
+    },
+    backdropFilter: 'blur(6px)',
+  },
+}))(StyledDisabledFontButton);
+
 const WhiteButton = withStyles((theme: Theme) => ({
   text: {
     color: colors.white[theme.palette.mode],
@@ -427,6 +476,7 @@ const ButtonTypes = {
   warning: WarningButton,
   tertiary: TertiaryButton,
   pending: PendingButton,
+  transparent: TransparentButton,
 };
 
 interface CustomButtonProps extends Omit<ButtonProps, 'color'> {

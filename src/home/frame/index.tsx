@@ -56,7 +56,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
         </Grid>
       ) : (
         <>
-          <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px', justifyContent: 'center' }}>
+          {/* <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px', justifyContent: 'center' }}>
             <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => dispatch(changeMainTab(index))}>
               <Tab classes={tabItemStyles} disableRipple label="Create" />
               <Tab classes={tabItemStyles} disableRipple label="Positions" />
@@ -67,7 +67,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
                 onClick={() => window.open('https://mean.finance/leaderboard', '_blank')}
               />
             </Tabs>
-          </Grid>
+          </Grid> */}
           {tabIndex === 0 ? (
             <Grid item xs={12}>
               <SwapContainer />

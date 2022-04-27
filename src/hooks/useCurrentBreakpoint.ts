@@ -4,8 +4,8 @@ function useCurrentBreakpoint() {
   const theme = useTheme();
   const isXsBreakpoint = useMediaQuery(theme.breakpoints.only('xs'));
   const isSmBreakpoint = useMediaQuery(theme.breakpoints.only('sm'));
-  const isMdBreakpoint = useMediaQuery(theme.breakpoints.only('sm'));
-  const isLgBreakpoint = useMediaQuery(theme.breakpoints.only('sm'));
+  const isMdBreakpoint = useMediaQuery(theme.breakpoints.only('md'));
+  const isLgBreakpoint = useMediaQuery(theme.breakpoints.only('lg'));
 
   if (isXsBreakpoint) {
     return 'xs';
