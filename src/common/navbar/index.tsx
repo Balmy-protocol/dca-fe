@@ -1,38 +1,45 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
 import styled from 'styled-components';
 import WalletContext from 'common/wallet-context';
-import Link from '@mui/material/Link';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import NetworkLabel from 'common/network-label';
-import MeanLogo from 'common/mean-logo';
-import Brightness3Icon from '@mui/icons-material/Brightness3';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
-import { useThemeMode } from 'state/config/hooks';
-import IconButton from '@mui/material/IconButton';
-import { toggleTheme } from 'state/config/actions';
-import { useAppDispatch } from 'hooks/state';
-import WalletButtom from '../wallet';
+import WhaveLogoDark from 'assets/logo/wave_logo_dark';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import { useAppDispatch } from 'state/hooks';
+import { useMainTab } from 'state/tabs/hooks';
+import { changeMainTab } from 'state/tabs/actions';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
+import { FormattedMessage } from 'react-intl';
 import ConnectWalletButtom from '../connect-wallet';
+import WalletButtom from '../wallet';
 
-const StyledBox = styled(Box)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
-  flex: 1;
-  display: flex;
-  ${(props) =>
-    props.breakpoint === 'xs'
-      ? `
-    justify-content: center;
-    margin-bottom: 30px;
-  `
-      : ''}
+const StyledNavbarWrapper = styled.div`
+  width: 100%;
+  background: rgba(5, 3, 13, 0.1);
+  box-shadow: inset 0px -1px 0px rgba(255, 255, 255, 0.1);
+  padding: 10px;
 `;
 
-const StyledNavbarContainer = styled(Grid)`
+const StyledNavbarContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-width: 1500px;
+  margin: 0 auto;
+  width: 100%;
+`;
+
+const StyledNavbarMainContent = styled.div`
+  display: flex;
+  flex: 1;
+`;
+
+const StyledNavbarEndContent = styled.div`
+  display: flex;
+  flex: 0
 `;
 
 const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
@@ -42,6 +49,26 @@ const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurr
   justify-content: ${(props) => (props.breakpoint === 'xs' ? 'center' : 'flex-end')};
 `;
 
+const StyledTab = styled(Tab)`
+  text-transform: none;
+  padding: 5px 10px;
+`;
+
+const RawTabs = withStyles(() =>
+  createStyles({
+    root: {
+      overflow: 'visible',
+    },
+    scroller: {
+      overflow: 'visible !important',
+    },
+  })
+)(Tabs);
+
+const StyledTabs = styled(RawTabs)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
+  margin-left: ${({ breakpoint }) => breakpoint !== 'xl' ? '50px' : '145px' };
+`;
+
 interface NavBarProps {
   isLoading: boolean;
 }
@@ -49,36 +76,59 @@ interface NavBarProps {
 const NavBar = ({ isLoading }: NavBarProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
   const currentNetwork = useCurrentNetwork();
-  const theme = useThemeMode();
+  const tabIndex = useMainTab();
   const dispatch = useAppDispatch();
 
+  const handleTabChange = (e: any, index: number) => {
+    if (index !== 2) {
+      dispatch(changeMainTab(index))
+    } else {
+      window.open('https://mean.finance/leaderboard', '_blank')
+    }
+  }
+
   return (
-    <StyledNavbarContainer container>
-      <Grid item xs={12} sm={6}>
-        <StyledBox breakpoint={currentBreakPoint}>
-          <Link href="https://mean.finance">
-            <MeanLogo theme={theme} />
-          </Link>
-        </StyledBox>
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <StyledButtonContainer breakpoint={currentBreakPoint}>
-          <NetworkLabel network={currentNetwork} />
-          <WalletContext.Consumer>
-            {({ web3Service }) =>
-              !web3Service.getAccount() && !isLoading ? (
-                <ConnectWalletButtom web3Service={web3Service} />
-              ) : (
-                <WalletButtom isLoading={isLoading} web3Service={web3Service} />
-              )
-            }
-          </WalletContext.Consumer>
-          <IconButton onClick={() => dispatch(toggleTheme())} color="inherit">
-            {theme === 'dark' ? <WbSunnyIcon /> : <Brightness3Icon />}
-          </IconButton>
-        </StyledButtonContainer>
-      </Grid>
-    </StyledNavbarContainer>
+    <StyledNavbarWrapper>
+      <StyledNavbarContainer>
+        <StyledNavbarMainContent>
+          <WhaveLogoDark size='45px' />
+          <StyledTabs breakpoint={currentBreakPoint} TabIndicatorProps={{ style: { bottom: '-10px' } }} value={tabIndex} onChange={handleTabChange}>
+            <StyledTab label={
+              <FormattedMessage
+                description="create"
+                defaultMessage="Create"
+              />}
+            />
+            <StyledTab label={
+              <FormattedMessage
+                description="positions"
+                defaultMessage="Positions"
+              />}
+            />
+            <StyledTab label={
+              <FormattedMessage
+                description="leaderboard"
+                defaultMessage="Leaderboard"
+              />}
+            />
+          </StyledTabs>
+        </StyledNavbarMainContent>
+        <StyledNavbarEndContent>
+          <StyledButtonContainer breakpoint={currentBreakPoint}>
+            <NetworkLabel network={currentNetwork} />
+            <WalletContext.Consumer>
+              {({ web3Service }) =>
+                !web3Service.getAccount() && !isLoading ? (
+                  <ConnectWalletButtom web3Service={web3Service} />
+                ) : (
+                  <WalletButtom isLoading={isLoading} web3Service={web3Service} />
+                )
+              }
+            </WalletContext.Consumer>
+          </StyledButtonContainer>
+        </StyledNavbarEndContent>
+      </StyledNavbarContainer>
+    </StyledNavbarWrapper>
   );
 };
 

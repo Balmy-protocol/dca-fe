@@ -3,9 +3,10 @@ import React from 'react';
 
 interface AddressProps {
   address: string;
+  trimAddress?: boolean;
 }
 
-const Address = ({ address }: AddressProps) => {
+const Address = ({ address, trimAddress }: AddressProps) => {
   const web3Service = useWeb3Service();
   const [addressEns, setAddressEns] = React.useState<string | null>(null);
   const [hasSearchedForEns, setSearchedForEns] = React.useState(false);
@@ -20,6 +21,6 @@ const Address = ({ address }: AddressProps) => {
     }
   }, [addressEns, hasSearchedForEns]);
 
-  return <>{addressEns || address}</>;
+  return <>{addressEns || (trimAddress ? `${address.slice(0, 6)}...${address.slice(-6)}` : address)}</>;
 };
 export default Address;
