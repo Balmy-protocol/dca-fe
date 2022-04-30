@@ -8,20 +8,45 @@ import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import Input from '@mui/material/Input';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import TokenIcon from 'common/token-icon';
+import { createStyles, FilledInput } from '@mui/material';
+import { withStyles } from '@mui/styles';
+import { formatCurrencyAmount } from 'utils/currency';
 
 const StyledInput = styled(Input)`
   text-align: center;
 `;
 
 const StyledInputContainer = styled.div`
-  ${({ theme }) => `
-    background-color: ${theme.palette.mode === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.12)'};
-    padding: 5px 10px;
-    border-radius: 10px;
-    display: inline-flex;
-    margin: 0px 6px;
-  `}
+  display: inline-flex;
+  margin: 0px 6px;
 `;
+
+const StyledTokenInputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const StyledControls = styled.div`
+  display: flex;
+  flex: 1;
+  gap: 8px;
+`;
+
+const StyledFilledInput = withStyles(() =>
+  createStyles({
+    root: {
+      paddingLeft: '8px',
+      borderRadius: '8px',
+    },
+    input: {
+      paddingTop: '8px',
+    },
+  })
+)(FilledInput);
 
 interface TokenInputProps {
   id: string;
@@ -34,6 +59,8 @@ interface TokenInputProps {
   error?: string;
   isMinimal?: boolean;
   fullWidth?: boolean;
+  withMax?: boolean;
+  withHalf?: boolean;
 }
 
 const TokenInput = ({
@@ -47,6 +74,8 @@ const TokenInput = ({
   error,
   isMinimal,
   fullWidth,
+  withHalf,
+  withMax,
 }: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
@@ -70,60 +99,100 @@ const TokenInput = ({
     }
   };
 
+  const handleHalfValue = () => {
+    if (balance && token) {
+      if (token.address === PROTOCOL_TOKEN_ADDRESS) {
+        const halfValue = balance.gte(parseUnits('1', token.decimals))
+          ? balance.sub(parseUnits('0.1', token.decimals))
+          : balance.div(BigNumber.from(2));
+        onChange(formatUnits(halfValue, token.decimals));
+      } else {
+        onChange(formatUnits(balance.div(BigNumber.from(2)), token.decimals));
+      }
+    }
+  };
+
+  if (isMinimal) {
+    return (
+      <StyledInputContainer>
+        <StyledFilledInput
+          id={id}
+          value={value}
+          onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+          style={{ width: `calc(${value.length + 1}ch + 55px)` }}
+          type="text"
+          disableUnderline
+          inputProps={{
+            style: { textAlign: 'center' },
+          }}
+          startAdornment={
+            token && (
+              <InputAdornment position="start">
+                <TokenIcon token={token} />
+              </InputAdornment>
+            )
+          }
+        />
+      </StyledInputContainer>
+    );
+  }
+
   return (
-    <>
-      {isMinimal ? (
-        <StyledInputContainer>
-          <StyledInput
-            id={id}
-            value={value}
-            onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-            style={{ width: `${value.length + 1}ch` }}
-            type="text"
-            inputProps={{
-              style: { textAlign: 'center' },
-            }}
-          />
-        </StyledInputContainer>
-      ) : (
-        <TextField
+    <StyledTokenInputContainer>
+      <StyledControls>
+        <StyledFilledInput
           id={id}
           value={value}
           error={!!error}
-          helperText={error}
           placeholder="0"
           inputMode="decimal"
           autoComplete="off"
           autoCorrect="off"
           type="text"
-          margin="normal"
+          margin="none"
           disabled={disabled}
+          disableUnderline
           spellCheck="false"
           fullWidth={fullWidth}
           onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-          InputProps={{
-            endAdornment:
-              withBalance && balance && token ? (
-                <Button
-                  color="tertiary"
-                  variant="contained"
-                  size="small"
-                  onClick={handleMaxValue}
-                  style={{ marginBottom: '8px', minWidth: '41px' }}
-                >
-                  <FormattedMessage description="max" defaultMessage="MAX" />
-                </Button>
-              ) : null,
-          }}
-          // eslint-disable-next-line react/jsx-no-duplicate-props
-          inputProps={{
-            pattern: '^[0-9]*[.,]?[0-9]*$',
-            minLength: 1,
-            maxLength: 79,
-          }}
+          startAdornment={
+            token && (
+              <InputAdornment position="start">
+                <TokenIcon token={token} />
+              </InputAdornment>
+            )
+          }
         />
+
+        {withMax && (
+          <Button color="default" variant="outlined" size="small" onClick={handleMaxValue}>
+            <FormattedMessage description="max" defaultMessage="Max" />
+          </Button>
+        )}
+        {withHalf && (
+          <Button color="default" variant="outlined" size="small" onClick={handleHalfValue}>
+            <FormattedMessage description="half" defaultMessage="Half" />
+          </Button>
+        )}
+      </StyledControls>
+      {withBalance && token && balance && (
+        <FormHelperText id="component-error-text">
+          <FormattedMessage
+            description="in position"
+            defaultMessage="In wallet: {balance} {symbol}"
+            values={{
+              balance: formatCurrencyAmount(balance, token, 4),
+              symbol: token.symbol,
+            }}
+          />
+        </FormHelperText>
       )}
-    </>
+      {!!error && (
+        <FormHelperText error id="component-error-text">
+          {error}
+        </FormHelperText>
+      )}
+    </StyledTokenInputContainer>
   );
 };
 export default TokenInput;

@@ -3,7 +3,7 @@ import Button from 'common/button';
 import { Token } from 'types';
 import styled from 'styled-components';
 import TokenIcon from 'common/token-icon';
-import CaretDown from 'assets/svg/atom/caret-down';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 interface TokenButtonProps {
   token?: Token | null;
@@ -12,19 +12,20 @@ interface TokenButtonProps {
 
 const StyledButton = styled(Button)`
   border-radius: 50px;
-  padding: 7px 10px;
+  padding: 4px 8px;
+  align-self: flex-start;
 `;
 
 const Swap = ({ token, onClick }: TokenButtonProps) => (
   <StyledButton
     size="large"
-    color={token ? 'default' : 'secondary'}
-    variant={token ? 'outlined' : 'contained'}
-    startIcon={token && <TokenIcon size="24px" token={token} />}
-    endIcon={<CaretDown size="10px" />}
+    color="transparent"
+    variant="outlined"
+    startIcon={<TokenIcon size="24px" token={token || undefined} />}
+    endIcon={<KeyboardArrowDownIcon fontSize="small" />}
     onClick={onClick}
   >
-    {token ? token.symbol : 'Select a token'}
+    {token ? token.symbol : 'Select'}
   </StyledButton>
 );
 export default Swap;
