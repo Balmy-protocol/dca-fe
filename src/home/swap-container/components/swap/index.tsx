@@ -14,7 +14,7 @@ import FrequencyTypeInput from 'common/frequency-type-input';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
-import SwapVertIcon from '@mui/icons-material/SwapVert';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import find from 'lodash/find';
 import usePromise from 'hooks/usePromise';
 import useBalance from 'hooks/useBalance';
@@ -59,51 +59,23 @@ import useAllowance from 'hooks/useAllowance';
 import useGasEstimate from 'hooks/useGasEstimate';
 
 const StyledPaper = styled(Paper)`
-  padding: 8px;
+  padding: 16px;
   position: relative;
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(6px);
 `;
 
-const StyledSwapContainer = styled.div`
-  ${({ theme }) => `
-    display: flex;
-    background-color: ${theme.palette.mode === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
-    border-radius: 20px;
-    padding: 0px;
-  `}
-`;
-
-const StyledFromContainer = styled(Grid)`
-  padding: 24px 24px 32px 24px;
-`;
-
-const StyledToContainer = styled(Grid)`
-  ${({ theme }) => `
-    background-color: ${theme.palette.mode === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.1)'};
-    padding: 24px;
-    border-bottom-right-radius: 20px;
-    border-bottom-left-radius: 20px;
-    position: relative;
-  `}
-`;
-
-const StyledSettingsContainer = styled.div`
+const StyledContentContainer = styled.div`
+  background-color: #292929;
   padding: 24px;
+  border-radius: 8px;
 `;
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
-`;
-
-const StyledSettingContainer = styled.div`
-  margin-top: 32px;
-`;
-
-const StyledGasSavingContainer = styled.div`
-  margin-top: 32px;
-  display: flex;
 `;
 
 const StyledButton = styled(Button)`
@@ -116,18 +88,38 @@ const StyledWhaleModeContainer = styled.div`
   display: flex;
   align-items: center;
 `;
-const StyledSwapTokenButton = styled(IconButton)`
-  ${({ theme }) => `
-    position: absolute;
-    border: 3px solid ${theme.palette.mode === 'light' ? '#e3e3e3' : '#6a6a6a'};
-    background-color: ${theme.palette.mode === 'light' ? '#ffffff' : '#595959'};
-    left: 50%;
-    top: 24px;
-    transform: translateX(-50%) translateY(-100%);
-    :hover {
-      background-color: ${theme.palette.mode === 'light' ? '#f0f0f0' : '#484848'};
-    }
-  `}
+
+const StyledTokensContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  align-items: center;
+`;
+
+const StyledTokenContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 0;
+  gap: 5px;
+`
+
+const StyledToggleContainer = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+`;
+
+const StyledToggleTokenButton = styled(IconButton)`
+  border: 4px solid #1B1821;
+  background-color: #292929;
+  :hover {
+    background-color: #484848;
+  }
+`;
+
+const StyledRateContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 interface AvailableSwapInterval {
@@ -739,7 +731,7 @@ const Swap = ({
       );
 
   return (
-    <StyledPaper elevation={3}>
+    <StyledPaper elevation={3} variant="outlined">
       <CreatePairModal
         open={shouldShowPairModal}
         onCancel={() => setShouldShowPairModal(false)}
@@ -767,45 +759,37 @@ const Swap = ({
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
       />
-      <StyledSwapContainer>
-        <Grid container>
-          <StyledFromContainer container alignItems="center" justifyContent="space-between">
-            {/* <Grid item xs={12}>
-              <StyledWhaleModeContainer>
-                <FormControlLabel
-                  style={{ margin: 0 }}
-                  control={<Switch checked={whaleMode} color="primary" onChange={toggleWhaleMode} />}
-                  label="Whale mode"
-                />
-                <Tooltip
-                  title="This mode will allow you to create positions with shorter frequencies, but you will have to deposit more funds"
-                  arrow
-                  placement="top"
-                >
-                  <StyledHelpOutlineIcon fontSize="small" />
-                </Tooltip>
-              </StyledWhaleModeContainer>
-            </Grid> */}
-            <Grid item xs={6}>
-              <Typography variant="body1">
-                <FormattedMessage description="You pay" defaultMessage="You pay" />
-              </Typography>
-            </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right' }}>
-              {from && (
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="in position"
-                    defaultMessage="In wallet: {balance} {symbol}"
-                    values={{
-                      balance: formatCurrencyAmount(balance, from, 4),
-                      symbol: from.symbol,
-                    }}
-                  />
+      <Grid container rowSpacing={2}>
+        <Grid item xs={12}>
+          <StyledContentContainer>
+            <StyledTokensContainer>
+              <StyledTokenContainer>
+                <Typography variant='body1'>
+                  <FormattedMessage description="sell" defaultMessage="Sell" />
                 </Typography>
-              )}
-            </Grid>
-            <Grid item xs={6}>
+                <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
+              </StyledTokenContainer>
+              <StyledToggleContainer>
+                <StyledToggleTokenButton onClick={() => toggleFromTo()}>
+                  <SwapHorizIcon />
+                </StyledToggleTokenButton>
+              </StyledToggleContainer>
+              <StyledTokenContainer>
+                <Typography variant='body1'>
+                  <FormattedMessage description="receive" defaultMessage="Receive" />
+                </Typography>
+                <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
+              </StyledTokenContainer>
+            </StyledTokensContainer>
+          </StyledContentContainer>
+        </Grid>
+        <Grid item xs={12}>
+          <StyledContentContainer>
+            {/* rate */}
+            <StyledRateContainer>
+              <Typography variant='body1'>
+                <FormattedMessage description="howMuchToSell" defaultMessage="How much {from} do you want to invest?" values={{ from: (from?.symbol || '') }} />
+              </Typography>
               <TokenInput
                 id="from-value"
                 error={cantFund ? 'Amount cannot exceed balance' : ''}
@@ -814,125 +798,24 @@ const Swap = ({
                 withBalance={!isLoadingBalance}
                 balance={balance}
                 token={from}
+                withMax
+                withHalf
+                fullWidth
               />
-            </Grid>
-            <Grid item xs={6}>
-              <Grid container alignItems="center" justifyContent="flex-end">
-                <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <StyledSettingContainer>
-                <Typography variant="body1" component="span">
-                  <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
-                </Typography>
-                <TokenInput
-                  id="rate-value"
-                  value={rate}
-                  onChange={handleRateValueChange}
-                  withBalance={false}
-                  token={from}
-                  isMinimal
-                />
-                <Typography variant="body1" component="span">
-                  <FormattedMessage
-                    description="rate detail"
-                    defaultMessage="{from} {frequency} for you"
-                    values={{
-                      from: (from && from.symbol) || '',
-                      frequency:
-                        STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
-                    }}
-                  />
-                </Typography>
-              </StyledSettingContainer>
-            </Grid>
-          </StyledFromContainer>
-          <StyledToContainer container alignItems="center" justifyContent="space-between">
-            <StyledSwapTokenButton onClick={() => toggleFromTo()}>
-              <SwapVertIcon />
-            </StyledSwapTokenButton>
-            <Grid item xs={6}>
-              <Typography variant="body1">
-                <FormattedMessage description="will be swapped for" defaultMessage="Will be swapped for" />
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Grid container alignItems="center" justifyContent="flex-end">
-                <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
-              </Grid>
-            </Grid>
-          </StyledToContainer>
+            </StyledRateContainer>
+          </StyledContentContainer>
         </Grid>
-      </StyledSwapContainer>
-      <StyledSettingsContainer>
-        <Grid container>
-          <Grid item xs={12}>
-            <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <FormattedMessage description="executes once" defaultMessage="Executes once" />
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <FrequencyTypeInput
-                  options={filteredFrequencies}
-                  selected={frequencyType}
-                  onChange={setFrequencyType}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <StyledSettingContainer>
-              <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="body1">
-                    <FormattedMessage
-                      description="completes in"
-                      defaultMessage="Amount of {type}"
-                      values={{ type: STRING_SWAP_INTERVALS[frequencyType.toString()].subject }}
-                    />
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} />
-                </Grid>
-              </Grid>
-            </StyledSettingContainer>
-          </Grid>
-          {gasEstimation && gasEstimation > 9 && (
-            <Grid item xs={12}>
-              <StyledGasSavingContainer>
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="Gas saving"
-                    /* eslint-disable-next-line no-template-curly-in-string */
-                    defaultMessage="You are saving at least ${gasPrice} of gas in trades!"
-                    values={{ gasPrice: gasEstimation.toFixed(2).toString() }}
-                  />
-                </Typography>
-                <Tooltip
-                  title="Calculated by gas price of one swap multiplied by the amount of swaps minus deposit gas minus withdrawal gas"
-                  arrow
-                  placement="top"
-                >
-                  <StyledHelpOutlineIcon fontSize="small" />
-                </Tooltip>
-              </StyledGasSavingContainer>
-            </Grid>
-          )}
-          <Grid item xs={12}>
-            <StyledSettingContainer>
-              <Grid container alignItems="stretch" spacing={2}>
-                <Grid item xs={12}>
-                  {ButtonToShow}
-                </Grid>
-              </Grid>
-            </StyledSettingContainer>
-          </Grid>
+        <Grid item xs={12}>
+          <StyledContentContainer>
+            {/* frequency */}
+          </StyledContentContainer>
         </Grid>
-      </StyledSettingsContainer>
+        <Grid item xs={12}>
+          <StyledContentContainer>
+            {/* call to action */}
+          </StyledContentContainer>
+        </Grid>
+      </Grid>
     </StyledPaper>
   );
 };
