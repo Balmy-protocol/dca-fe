@@ -21,7 +21,6 @@ const StyledTabsContainer = styled.div`
     justify-content: center;
     background: ${theme.palette.mode === 'light' ? '#eee' : 'rgba(255, 255, 255, 0.12)'};
     align-items: center;
-    padding: 5px;
     border-radius: 30px;
     position: relative;
   `}
@@ -39,7 +38,8 @@ const StyledTabItemsContainer = styled.div`
 
 const StyledTabItem = styled(Button)<{ isSelected: boolean }>`
   flex-grow: 1;
-  padding: 10px;
+  padding: 5px 10px;
+  min-width: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,22 +56,22 @@ const StyledTabItem = styled(Button)<{ isSelected: boolean }>`
 const StyledTabIndicator = styled.div<{ width: number; left: number; height: number; top: number }>`
   ${({ theme, left, top, width, height }) => `
     transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    left: ${left + 7}px;
-    top: ${top + 7}px;
-    width: ${width - 5}px;
+    left: ${left + 2}px;
+    top: ${top + 2}px;
+    width: ${width - 10}px;
     height: ${height - 5}px;
     position: absolute;
     &:after {
       content: '';
       position: absolute;
-      background-color: ${theme.palette.mode === 'light' ? '#fff' : 'rgba(255, 255, 255, 0.12)'};
+      background-color: ${theme.palette.mode === 'light' ? '#fff' : '#3076F6'};
       border-radius: 20px;
       box-shadow: 0 4px 12px 0 rgb(0 0 0 / 16%);
       top: 0;
       bottom: 0;
       left: 0;
       right: 0;
-      width: ${width}px;
+      width: ${width - 5}px;
     }
   `}
 `;

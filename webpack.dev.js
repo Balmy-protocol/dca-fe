@@ -9,5 +9,6 @@ module.exports = merge(common, {
     port: 3000,
     contentBase: './dist',
     historyApiFallback: true,
+    hot: true,
   },
 });

@@ -56,7 +56,7 @@ const backgroundColors = {
       hover: '#c9c9c9',
     },
     dark: {
-      default: '#424242',
+      default: '#292929',
       hover: '#525252',
     },
   },
@@ -149,8 +149,8 @@ const borderColors = {
       hover: '#c9c9c9',
     },
     dark: {
-      default: 'rgba(255,255,255,0.1)',
-      hover: 'rgba(255,255,255,0.2)',
+      default: 'rgba(255,255,255,0.5)',
+      hover: 'rgba(255,255,255,0.6)',
     },
   },
   transparent: {

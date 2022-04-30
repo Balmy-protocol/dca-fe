@@ -76,3 +76,7 @@ function bootstrapApplication(locale: string) {
 }
 
 bootstrapApplication('en');
+
+if (module.hot) {
+  module.hot.accept();
+}

@@ -5,11 +5,16 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import { maximalAppleTabsStylesHook } from 'common/tabs';
 import findIndex from 'lodash/findIndex';
+import FilledInput from '@mui/material/FilledInput';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
+import Button from 'common/button';
 
 interface FrequencyEasyInputProps {
   id: string;
   value: string;
   onChange: (newValue: string) => void | SetStateCallback<string>;
+  isMinimal?: boolean;
 }
 
 interface SelectOption {
@@ -35,86 +40,91 @@ const StyledFrequencyInputContainer = styled.div`
   flex-grow: 1;
 `;
 
+const StyledInputContainer = styled.div`
+  display: inline-flex;
+  margin: 0px 6px;
+`;
+
+const StyledButton = styled(Button)<{ isSelected: boolean }>`
+  min-width: 45px;
+  border-color: ${({ isSelected }) => (isSelected ? '#3076F6' : 'rgba(255,255,255,0.5)')} !important;
+`;
+
 const StyledTabContainer = styled.div`
-  flex-grow: 1;
+  display: flex;
+  gap: 8px;
+  margin-left: 8px;
 `;
 
-const StyledCustomContainer = styled.div`
-  ${({ theme }) => `
-    flex-grow: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 20px;
-    background-color: ${theme.palette.mode === 'light' ? '#eee' : 'rgba(255, 255, 255, 0.12)'};
-    border-radius: 50px;
-    max-width: 100px;
-    min-width: 100px;
-    padding: 0px 10px;
-  `}
-`;
+const StyledFilledInput = withStyles(() =>
+  createStyles({
+    root: {
+      paddingLeft: '8px',
+      borderRadius: '8px',
+    },
+    input: {
+      paddingTop: '8px',
+    },
+  })
+)(FilledInput);
 
-const StyledInput = styled.input`
-  ${({ theme }) => `
-    border: 0;
-    outline: 0;
-    text-align: center;
-    margin: 0px;
-    max-width: 60px;
-    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-    font-weight: 400;
-    font-size: 0.875rem;
-    line-height: 1.75;
-    white-space: normal;
-    letter-spacing: 0.02857;
-    color: ${theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.87)' : '#fff'};
-    background-color: transparent;
-    ::placeholder {
-      color: ${theme.palette.mode === 'light' ? '#a8a8a8' : '#a1a1a1'};
-    }
-  `}
-`;
-
-const FrequencyEasyInput = ({ id, onChange, value }: FrequencyEasyInputProps) => {
-  const [tabIndex, setTabIndex] = React.useState(findIndex(PREDEFINED_RANGES, { value }));
+const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInputProps) => {
+  const tabIndex = findIndex(PREDEFINED_RANGES, { value });
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
       onChange(nextValue);
-      setTabIndex(-1);
     }
   };
 
-  const tabsStyles = maximalAppleTabsStylesHook.useTabs();
-  const tabItemStyles = maximalAppleTabsStylesHook.useTabItem();
   const handleChange = (index: number) => {
-    setTabIndex(index);
     onChange(PREDEFINED_RANGES[index].value);
   };
 
-  return (
-    <StyledFrequencyInputContainer>
-      <StyledTabContainer>
-        <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => handleChange(index)}>
-          {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption) => (
-            <Tab
-              classes={tabItemStyles}
-              key={predefinedRangeOption.value}
-              disableRipple
-              label={predefinedRangeOption.value}
-            />
-          ))}
-        </Tabs>
-      </StyledTabContainer>
-      <StyledCustomContainer>
-        <StyledInput
-          type="text"
+  if (isMinimal) {
+    return (
+      <StyledInputContainer>
+        <StyledFilledInput
           id={id}
           placeholder="Custom"
           onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-          value={tabIndex === -1 ? value : ''}
+          style={{ width: `calc(${value.length + 1}ch + 29px)` }}
+          value={value}
+          fullWidth
+          disableUnderline
+          type="text"
+          margin="none"
         />
-      </StyledCustomContainer>
+      </StyledInputContainer>
+    );
+  }
+
+  return (
+    <StyledFrequencyInputContainer>
+      <StyledFilledInput
+        id={id}
+        placeholder="Custom"
+        onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+        value={tabIndex === -1 ? value : ''}
+        fullWidth
+        disableUnderline
+        type="text"
+        margin="none"
+      />
+      <StyledTabContainer>
+        {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
+          <StyledButton
+            color="default"
+            variant="outlined"
+            isSelected={index === tabIndex}
+            size="small"
+            key={index}
+            onClick={() => handleChange(index)}
+          >
+            {predefinedRangeOption.value}
+          </StyledButton>
+        ))}
+      </StyledTabContainer>
     </StyledFrequencyInputContainer>
   );
 };
