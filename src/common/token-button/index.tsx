@@ -21,7 +21,7 @@ const Swap = ({ token, onClick }: TokenButtonProps) => (
     size="large"
     color="transparent"
     variant="outlined"
-    startIcon={<TokenIcon size="24px" token={token ? token : undefined} />}
+    startIcon={<TokenIcon size="24px" token={token || undefined} />}
     endIcon={<KeyboardArrowDownIcon fontSize="small" />}
     onClick={onClick}
   >

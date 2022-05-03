@@ -14,19 +14,15 @@ import FormHelperText from '@mui/material/FormHelperText';
 import TokenIcon from 'common/token-icon';
 import { createStyles, FilledInput } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import { formatCurrencyAmount } from 'utils/currency';
 
 const StyledInput = styled(Input)`
   text-align: center;
 `;
 
 const StyledInputContainer = styled.div`
-  ${({ theme }) => `
-    background-color: ${theme.palette.mode === 'light' ? '#e3e3e3' : 'rgba(255, 255, 255, 0.12)'};
-    padding: 5px 10px;
-    border-radius: 10px;
-    display: inline-flex;
-    margin: 0px 6px;
-  `}
+  display: inline-flex;
+  margin: 0px 6px;
 `;
 
 const StyledTokenInputContainer = styled.div`
@@ -44,6 +40,7 @@ const StyledFilledInput = withStyles(() =>
   createStyles({
     root: {
       paddingLeft: '8px',
+      borderRadius: '8px',
     },
     input: {
       paddingTop: '8px',
@@ -118,18 +115,26 @@ const TokenInput = ({
   if (isMinimal) {
     return (
       <StyledInputContainer>
-        <StyledInput
+        <StyledFilledInput
           id={id}
           value={value}
           onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-          style={{ width: `${value.length + 1}ch` }}
+          style={{ width: `calc(${value.length + 1}ch + 55px)` }}
           type="text"
+          disableUnderline
           inputProps={{
             style: { textAlign: 'center' },
           }}
+          startAdornment={
+            token && (
+              <InputAdornment position="start">
+                <TokenIcon token={token} />
+              </InputAdornment>
+            )
+          }
         />
       </StyledInputContainer>
-    )
+    );
   }
 
   return (
@@ -146,6 +151,7 @@ const TokenInput = ({
           type="text"
           margin="none"
           disabled={disabled}
+          disableUnderline
           spellCheck="false"
           fullWidth={fullWidth}
           onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
@@ -158,28 +164,34 @@ const TokenInput = ({
           }
         />
 
-        { withMax && (
-          <Button
-            color="default"
-            variant="outlined"
-            size="small"
-            onClick={handleMaxValue}
-          >
+        {withMax && (
+          <Button color="default" variant="outlined" size="small" onClick={handleMaxValue}>
             <FormattedMessage description="max" defaultMessage="Max" />
           </Button>
         )}
-        { withHalf && (
-          <Button
-            color="default"
-            variant="outlined"
-            size="small"
-            onClick={handleHalfValue}
-          >
+        {withHalf && (
+          <Button color="default" variant="outlined" size="small" onClick={handleHalfValue}>
             <FormattedMessage description="half" defaultMessage="Half" />
           </Button>
         )}
       </StyledControls>
-      {!!error && <FormHelperText error id="component-error-text">{error}</FormHelperText>}
+      {withBalance && token && balance && (
+        <FormHelperText id="component-error-text">
+          <FormattedMessage
+            description="in position"
+            defaultMessage="In wallet: {balance} {symbol}"
+            values={{
+              balance: formatCurrencyAmount(balance, token, 4),
+              symbol: token.symbol,
+            }}
+          />
+        </FormHelperText>
+      )}
+      {!!error && (
+        <FormHelperText error id="component-error-text">
+          {error}
+        </FormHelperText>
+      )}
     </StyledTokenInputContainer>
   );
 };

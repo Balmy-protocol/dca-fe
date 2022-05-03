@@ -79,8 +79,9 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 `;
 
 const StyledButton = styled(Button)`
-  padding: 18px 22px;
+  padding: 10px 18px;
   border-radius: 12px;
+  margin-top: 16px;
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -100,7 +101,7 @@ const StyledTokenContainer = styled.div`
   flex-direction: column;
   flex: 0;
   gap: 5px;
-`
+`;
 
 const StyledToggleContainer = styled.div`
   flex: 1;
@@ -109,7 +110,7 @@ const StyledToggleContainer = styled.div`
 `;
 
 const StyledToggleTokenButton = styled(IconButton)`
-  border: 4px solid #1B1821;
+  border: 4px solid #1b1821;
   background-color: #292929;
   :hover {
     background-color: #484848;
@@ -121,6 +122,26 @@ const StyledRateContainer = styled.div`
   flex-direction: column;
   gap: 10px;
 `;
+
+const StyledFrequencyContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const StyledFrequencyTypeContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+const StyledFrequencyValueContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const StyledSummaryContainer = styled.div``;
 
 interface AvailableSwapInterval {
   label: {
@@ -731,7 +752,7 @@ const Swap = ({
       );
 
   return (
-    <StyledPaper elevation={3} variant="outlined">
+    <StyledPaper variant="outlined">
       <CreatePairModal
         open={shouldShowPairModal}
         onCancel={() => setShouldShowPairModal(false)}
@@ -764,7 +785,7 @@ const Swap = ({
           <StyledContentContainer>
             <StyledTokensContainer>
               <StyledTokenContainer>
-                <Typography variant='body1'>
+                <Typography variant="body1">
                   <FormattedMessage description="sell" defaultMessage="Sell" />
                 </Typography>
                 <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
@@ -775,7 +796,7 @@ const Swap = ({
                 </StyledToggleTokenButton>
               </StyledToggleContainer>
               <StyledTokenContainer>
-                <Typography variant='body1'>
+                <Typography variant="body1">
                   <FormattedMessage description="receive" defaultMessage="Receive" />
                 </Typography>
                 <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
@@ -787,8 +808,12 @@ const Swap = ({
           <StyledContentContainer>
             {/* rate */}
             <StyledRateContainer>
-              <Typography variant='body1'>
-                <FormattedMessage description="howMuchToSell" defaultMessage="How much {from} do you want to invest?" values={{ from: (from?.symbol || '') }} />
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="howMuchToSell"
+                  defaultMessage="How much {from} do you want to invest?"
+                  values={{ from: from?.symbol || '' }}
+                />
               </Typography>
               <TokenInput
                 id="from-value"
@@ -807,12 +832,61 @@ const Swap = ({
         </Grid>
         <Grid item xs={12}>
           <StyledContentContainer>
-            {/* frequency */}
+            <StyledFrequencyContainer>
+              <StyledFrequencyTypeContainer>
+                <Typography variant="body1">
+                  <FormattedMessage description="executes" defaultMessage="Executes" />
+                </Typography>
+                <FrequencyTypeInput
+                  options={filteredFrequencies}
+                  selected={frequencyType}
+                  onChange={setFrequencyType}
+                />
+              </StyledFrequencyTypeContainer>
+              <StyledFrequencyValueContainer>
+                <Typography variant="body1">
+                  <FormattedMessage
+                    description="howManyFreq"
+                    defaultMessage="How many {type}?"
+                    values={{
+                      type: STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                        .subject,
+                    }}
+                  />
+                </Typography>
+                <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} />
+              </StyledFrequencyValueContainer>
+            </StyledFrequencyContainer>
           </StyledContentContainer>
         </Grid>
         <Grid item xs={12}>
           <StyledContentContainer>
-            {/* call to action */}
+            <StyledSummaryContainer>
+              <Typography variant="body1" component="span">
+                <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
+              </Typography>
+              <TokenInput
+                id="rate-value"
+                value={rate}
+                onChange={handleRateValueChange}
+                withBalance={false}
+                token={from}
+                isMinimal
+              />
+              <Typography variant="body1" component="span">
+                <FormattedMessage
+                  description="rate detail"
+                  defaultMessage="{frequency} for you for"
+                  values={{
+                    frequency:
+                      STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
+                  }}
+                />
+              </Typography>
+              <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} isMinimal />
+              {STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].subject}
+            </StyledSummaryContainer>
+            {ButtonToShow}
           </StyledContentContainer>
         </Grid>
       </Grid>
