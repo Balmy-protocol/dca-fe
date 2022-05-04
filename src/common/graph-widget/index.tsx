@@ -1,15 +1,13 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, AreaChart, Area, Line, ComposedChart, CartesianGrid } from 'recharts';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import map from 'lodash/map';
 import find from 'lodash/find';
 import orderBy from 'lodash/orderBy';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import { appleTabsStylesHook } from 'common/tabs';
 import getPoolPrices from 'graphql/getPoolPrices.graphql';
 import { AvailablePair, GetPairPriceResponseData, GetPairResponseSwapData, Token } from 'types';
@@ -23,13 +21,13 @@ import useUNIGraphql from 'hooks/useUNIGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { ORACLES, STABLE_COINS } from 'config/constants';
-import usePromise from 'hooks/usePromise';
-import { Oracles } from 'types/contracts';
+import { STABLE_COINS } from 'config/constants';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { useThemeMode } from 'state/config/hooks';
-import useChainlinkGraphql from 'hooks/useChainlinkGraphql';
-import getChainlinkPrices from 'graphql/getChainlinkPrices.graphql';
+import GraphFooter from 'common/graph-footer';
+import EmptyGraph from 'assets/svg/emptyGraph';
+import MinimalTabs from 'common/minimal-tabs';
+import GraphTooltip from 'common/graph-tooltip';
 
 interface GraphWidgetProps {
   from: Token | null;
@@ -71,32 +69,49 @@ interface PriceUniData {
 
 type Prices = (PriceMeanData | PriceUniData)[];
 
-const StyledPaper = styled(Paper)`
-  padding: 8px;
+const StyledPaper = styled(Paper)<{ column?: boolean }>`
+  padding: 16px;
   position: relative;
+  overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(6px);
   display: flex;
-  flex-direction: column;
+  gap: 24px;
+  flex-direction: ${({ column }) => column ? 'column' : 'row'};
 `;
 
-const StyledTitleContainer = styled(Paper)`
-  ${({ theme }) => `
-    padding: 25px;
-    border-radius: 10px;
-    flex-grow: 0;
-    background-color: ${theme.palette.mode === 'light' ? '#f6f6f6' : 'rgba(255, 255, 255, 0.12)'};
-    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
-    margin-bottom: 15px;
-  `}
+const StyledTitleContainer = styled.div`
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const StyledLegendContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+const StyledHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
 `;
 
 const StyledGraphContainer = styled(Paper)`
-  padding: 17px;
   flex-grow: 1;
   display: flex;
   width: 100%;
   flex-direction: column;
+  background-color: transparent;
+  margin-bottom: 30px;
+
+  .recharts-surface {
+    overflow: visible;
+  }
 `;
 
 const StyledGraphAxis = styled.div`
@@ -125,6 +140,21 @@ const StyledCenteredWrapper = styled.div`
   flex: 1;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  gap: 10px
+`;
+
+const StyledLegend = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 7px;
+`
+
+const StyledLegendIndicator = styled.div<{ fill: string }>`
+  width: 12px;
+  height: 12px;
+  background-color: ${({ fill }) => fill};
+  border-radius: 99px;
 `;
 
 const PERIODS = [7, 30];
@@ -287,100 +317,137 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     return orderBy([...mappedUniData, ...mappedSwapData], ['date'], ['desc']).reverse();
   }, [uniData, swapData]);
 
-  const tooltipFormatter = (value: string) =>
-    `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
+  const tooltipFormatter = (value: string, name: string) => {
+    if (name === 'uniswap') {
+      return null;
+    }
+
+    return `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
       tokenA.isBaseToken ? '' : tokenB.symbol
     }`;
+  }
   const isLoading = loadingPool || loadingMeanData;
   // const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
   const noData = prices.length === 0;
 
-  return (
-    <StyledPaper elevation={3}>
-      <StyledTitleContainer elevation={0}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="graph description"
-            defaultMessage="{from}/{to} Chart"
-            values={{
-              from: tokenA.symbol,
-              to: tokenB.symbol,
-            }}
-          />
-        </Typography>
-      </StyledTitleContainer>
-      <StyledTabsContainer elevation={0}>
-        <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => setTabIndex(index)}>
-          <Tab classes={tabItemStyles} disableRipple label="1W" />
-          <Tab classes={tabItemStyles} disableRipple label="1M" />
-        </Tabs>
-      </StyledTabsContainer>
-      {isLoading ? (
+  if (isLoading) {
+    return (
+      <StyledPaper variant="outlined" column>
         <CenteredLoadingIndicator />
-      ) : (
-        <>
-          {noData ? (
-            <>
-              {from && to && (
-                <StyledCenteredWrapper>
-                  <Typography variant="h6">
-                    <FormattedMessage
-                      description="No data available"
-                      defaultMessage="There is no data available about this pair"
-                    />
-                  </Typography>
-                </StyledCenteredWrapper>
-              )}
-              {!from ||
-                (!to && (
-                  <StyledCenteredWrapper>
-                    <Typography variant="h6">
-                      <FormattedMessage
-                        description="No pair selected"
-                        defaultMessage="Select a pair to view its price history"
-                      />
-                    </Typography>
-                  </StyledCenteredWrapper>
-                ))}
-            </>
-          ) : (
-            <StyledGraphContainer elevation={0}>
-              <ResponsiveContainer width="100%">
-                <LineChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                  {uniData.length && (
-                    <Line connectNulls type="monotone" dataKey="Uniswap" stroke="#BD00FF" dot={false} />
-                  )}
-                  {swapData.length && <Line connectNulls type="monotone" dataKey="Mean Finance" stroke="#36a3f5" />}
-                  <XAxis hide dataKey="name" />
-                  <YAxis hide domain={['auto', 'auto']} />
-                  <Tooltip
-                    formatter={tooltipFormatter}
-                    contentStyle={{ backgroundColor: mode === 'light' ? '#ffffff' : '#424242' }}
+        <GraphFooter />
+      </StyledPaper>
+    )
+  }
+
+  if (!from || !to) {
+    return (
+      <StyledPaper variant="outlined" column>
+        <StyledPaper variant="outlined">
+          <StyledCenteredWrapper>
+            <EmptyGraph size="100px" />
+            <Typography variant="h6">
+              <FormattedMessage
+                description="No pair selected"
+                defaultMessage="Select a pair to view its price history"
+              />
+            </Typography>
+          </StyledCenteredWrapper>
+        </StyledPaper>
+        <GraphFooter />
+      </StyledPaper>
+    )
+  }
+
+  if (noData) {
+    return (
+      <StyledPaper variant="outlined" column>
+        <StyledPaper variant="outlined">
+          <StyledCenteredWrapper>
+            <EmptyGraph size="100px" />
+            <Typography variant="h6">
+              <FormattedMessage
+                description="No data available"
+                defaultMessage="There is no data available about this pair"
+              />
+            </Typography>
+          </StyledCenteredWrapper>
+        </StyledPaper>
+        <GraphFooter />
+      </StyledPaper>
+    )
+  }
+
+  return (
+    <StyledPaper variant="outlined" column>
+      <StyledGraphContainer elevation={0}>
+        <StyledHeader>
+          <StyledTitleContainer>
+            <Typography variant="h6">
+              <FormattedMessage
+                description="graph description"
+                defaultMessage="{from}/{to}"
+                values={{
+                  from: tokenA.symbol,
+                  to: tokenB.symbol,
+                }}
+              />
+            </Typography>
+            <MinimalTabs options={[{ key: 0, label: 'Week' }, { key: 1, label: 'Month' }]} selected={{ key: tabIndex, label: '' }} onChange={({ key }) => setTabIndex(key as number)}/>
+          </StyledTitleContainer>
+          <StyledLegendContainer>
+            { !!uniData.length && (
+              <StyledLegend>
+                <StyledLegendIndicator fill="#7C37ED" />
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="uniswapLegend"
+                    defaultMessage="Uniswap"
                   />
-                  <Legend />
-                </LineChart>
-              </ResponsiveContainer>
-              <StyledGraphAxis />
-              <StyledGraphAxisLabels>
-                <Typography variant="caption">
-                  {DateTime.fromSeconds(parseInt(prices[0].date, 10)).toLocaleString({
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
                 </Typography>
-                <Typography variant="caption">
-                  {DateTime.fromSeconds(parseInt(prices[prices.length - 1].date, 10)).toLocaleString({
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
+              </StyledLegend>
+            )}
+            { !!swapData.length && (
+              <StyledLegend>
+                <StyledLegendIndicator fill="#DCE2F9" />
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="meanFinanceLegend"
+                    defaultMessage="Mean Finance"
+                  />
                 </Typography>
-              </StyledGraphAxisLabels>
-            </StyledGraphContainer>
-          )}
-        </>
-      )}
+              </StyledLegend>
+            )}
+
+          </StyledLegendContainer>
+        </StyledHeader>
+        <ResponsiveContainer width="100%">
+          <ComposedChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }} style={{ overflow: 'visible' }}>
+            <defs>
+              <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5}/>
+                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
+            {uniData.length && (
+              <Area legendType="none" name="uniswap" connectNulls dataKey="Uniswap" fill="url(#colorUniswap)" strokeWidth="2px" dot={false} activeDot={false} stroke="#7C37ED" />
+            )}
+            {swapData.length && (
+              <Line legendType="none" connectNulls dataKey="Mean Finance" type="monotone" strokeWidth="3px" stroke="#DCE2F9" dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9'}} strokeDasharray="5 5" />
+            )}
+            <XAxis tickMargin={30} minTickGap={30} interval="preserveStartEnd" dataKey="name" axisLine={false} tickLine={false} tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}/>
+            <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false}/>
+            <Tooltip
+              content={({ payload, label }) => (
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                <GraphTooltip payload={payload as any} label={label} tokenA={tokenA} tokenB={tokenB} />
+              )}
+            />
+            <Legend />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </StyledGraphContainer>
+      <GraphFooter />
     </StyledPaper>
   );
 };

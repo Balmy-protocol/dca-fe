@@ -1,5 +1,5 @@
 import React from 'react';
-import Dialog from '@mui/material/Dialog';
+import Modal from 'common/modal';
 import { NFTData } from 'types';
 import { makeStyles } from '@mui/styles';
 
@@ -20,10 +20,6 @@ interface ViewNFTModalProps {
 const ViewNFTModal = ({ nftData, open, onCancel }: ViewNFTModalProps) => {
   const classes = useStyles();
 
-  return (
-    <Dialog open={open} fullWidth maxWidth="xs" onClose={onCancel} classes={{ paper: classes.paper }}>
-      {nftData && <img src={nftData.image} alt="nft" />}
-    </Dialog>
-  );
+  return <Modal open={open}>{nftData && <img src={nftData.image} alt="nft" />}</Modal>;
 };
 export default ViewNFTModal;
