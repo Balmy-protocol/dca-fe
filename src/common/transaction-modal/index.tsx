@@ -1,9 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from 'common/button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
 import LoadingIndicator from 'common/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
@@ -12,42 +8,20 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import Link from '@mui/material/Link';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import { TRANSACTION_ERRORS } from 'utils/errors';
-import { makeStyles } from '@mui/styles';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import Modal from 'common/modal';
+
+const StyledContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
-`;
-
-const useStyles = makeStyles({
-  paper: {
-    borderRadius: 20,
-  },
-});
-
-const StyledDialogContent = styled(DialogContent)<{ withActions: boolean }>`
-  display: flex;
-  flex-direction: column;
-  padding: ${(props) => (props.withActions ? '40px 72px 20px 72px' : '40px 72px')} !important;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StyledDialogActions = styled(DialogActions)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0px 32px 32px 32px;
-`;
-
-const StyledDialog = styled(Dialog)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
 `;
 
 const StyledLoadingIndicatorWrapper = styled.div<{ withMargin?: boolean }>`
@@ -121,7 +95,6 @@ export const TransactionModal = ({
   onClose,
 }: CreatePairModalProps) => {
   const open = selectedConfig !== 'closed';
-  const classes = useStyles();
   const currentNetwork = useCurrentNetwork();
 
   const LoadingContent = (
@@ -210,27 +183,18 @@ export const TransactionModal = ({
   );
 
   return (
-    <StyledDialog
+    <Modal
       open={open}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-      fullWidth
-      maxWidth="xs"
-      classes={{ paper: classes.paper }}
+      showCloseButton={selectedConfig === 'success' || selectedConfig === 'error'}
+      onClose={onClose}
+      actions={[]}
     >
-      <StyledDialogContent withActions={selectedConfig === 'success' || selectedConfig === 'error'}>
+      <StyledContainer>
         {selectedConfig === 'loading' && LoadingContent}
         {selectedConfig === 'success' && SuccessContent}
         {selectedConfig === 'error' && ErrorContent}
-      </StyledDialogContent>
-      {selectedConfig === 'success' || selectedConfig === 'error' ? (
-        <StyledDialogActions>
-          <Button onClick={onClose} variant="outlined" color="default" size="large" style={{ width: '100%' }}>
-            <FormattedMessage description="Close" defaultMessage="Close" />
-          </Button>
-        </StyledDialogActions>
-      ) : null}
-    </StyledDialog>
+      </StyledContainer>
+    </Modal>
   );
 };
 

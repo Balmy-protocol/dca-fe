@@ -467,7 +467,7 @@ const PendingButton = withStyles((theme: Theme) => ({
   },
 }))(StyledDisabledFontButton);
 
-const ButtonTypes = {
+export const ButtonTypes = {
   primary: PrimaryButton,
   secondary: SecondaryButton,
   default: DefaultButton,

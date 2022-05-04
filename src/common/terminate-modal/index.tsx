@@ -2,9 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { formatUnits } from '@ethersproject/units';
 import Button from 'common/button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
+import Modal from 'common/modal';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
 import WalletContext from 'common/wallet-context';
@@ -20,31 +18,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { BigNumber } from 'ethers';
 
-const useStyles = makeStyles({
-  paper: {
-    borderRadius: 20,
-  },
-});
-
-const StyledDialogContent = styled(DialogContent)`
-  display: flex;
-  flex-direction: column;
-  padding: 40px 72px !important;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  & > *:not(:last-child) {
-    margin-bottom: 10px;
-  }
-`;
-
-const StyledDialogActions = styled(DialogActions)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0px 32px 32px 32px;
-`;
-
 interface WithdrawModalProps {
   position: Position;
   onCancel: () => void;
@@ -52,7 +25,6 @@ interface WithdrawModalProps {
 }
 
 const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
-  const classes = useStyles();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
   const addTransaction = useTransactionAdder();
@@ -135,75 +107,77 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
   };
 
   return (
-    <Dialog open={open} fullWidth maxWidth="xs" classes={{ paper: classes.paper }}>
-      <StyledDialogContent>
-        <Typography variant="h6">
-          <FormattedMessage
-            description="terminate title"
-            defaultMessage="Terminate {from}/{to} position"
-            values={{ from: position.from.symbol, to: position.to.symbol }}
-          />
-        </Typography>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="terminate description"
-            defaultMessage="Swaps are no longer going to be executed, you won't be able to make any new modifications to this position."
-          />
-        </Typography>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="terminate returns"
-            defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
-            values={{
-              from: formatUnits(position.remainingLiquidity, position.from.decimals),
-              fromSymbol: position.from.symbol,
-              to: formatUnits(position.toWithdraw, position.to.decimals),
-              toSymbol: position.to.symbol,
-            }}
-          />
-        </Typography>
-        <Typography variant="body1">
-          <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
-        </Typography>
-        {hasWrappedOrProtocol && protocolBalance.gt(BigNumber.from(0)) && (
-          <FormGroup row>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  color="primary"
-                  checked={useProtocolToken}
-                  onChange={(evt) => setUseProtocolToken(evt.target.checked)}
-                  name="useProtocolToken"
+    <Modal
+      open={open}
+      showCloseButton
+      onClose={handleCancel}
+      actions={[
+        {
+          color: 'error',
+          variant: 'contained',
+          label: <FormattedMessage description="Terminate" defaultMessage="Terminate" />,
+          onClick: handleTerminate,
+        },
+      ]}
+    >
+      <Typography variant="h6">
+        <FormattedMessage
+          description="terminate title"
+          defaultMessage="Terminate {from}/{to} position"
+          values={{ from: position.from.symbol, to: position.to.symbol }}
+        />
+      </Typography>
+      <Typography variant="body1">
+        <FormattedMessage
+          description="terminate description"
+          defaultMessage="Swaps are no longer going to be executed, you won't be able to make any new modifications to this position."
+        />
+      </Typography>
+      <Typography variant="body1">
+        <FormattedMessage
+          description="terminate returns"
+          defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
+          values={{
+            from: formatUnits(position.remainingLiquidity, position.from.decimals),
+            fromSymbol: position.from.symbol,
+            to: formatUnits(position.toWithdraw, position.to.decimals),
+            toSymbol: position.to.symbol,
+          }}
+        />
+      </Typography>
+      <Typography variant="body1">
+        <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
+      </Typography>
+      {hasWrappedOrProtocol && protocolBalance.gt(BigNumber.from(0)) && (
+        <FormGroup row>
+          <FormControlLabel
+            control={
+              <Checkbox
+                color="primary"
+                checked={useProtocolToken}
+                onChange={(evt) => setUseProtocolToken(evt.target.checked)}
+                name="useProtocolToken"
+              />
+            }
+            label={
+              hasWrappedOrProtocol && hasProtocolToken ? (
+                <FormattedMessage
+                  description="Terminate get weth"
+                  defaultMessage="Get {protocolToken} as {wrappedProtocolToken} instead"
+                  values={{ protocolToken: protocolToken.symbol, wrappedProtocolToken: wrappedProtocolToken.symbol }}
                 />
-              }
-              label={
-                hasWrappedOrProtocol && hasProtocolToken ? (
-                  <FormattedMessage
-                    description="Terminate get weth"
-                    defaultMessage="Get {protocolToken} as {wrappedProtocolToken} instead"
-                    values={{ protocolToken: protocolToken.symbol, wrappedProtocolToken: wrappedProtocolToken.symbol }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    description="Terminate get eth"
-                    defaultMessage="Get {wrappedProtocolToken} as {protocolToken} instead"
-                    values={{ protocolToken: protocolToken.symbol, wrappedProtocolToken: wrappedProtocolToken.symbol }}
-                  />
-                )
-              }
-            />
-          </FormGroup>
-        )}
-      </StyledDialogContent>
-      <StyledDialogActions>
-        <Button onClick={handleCancel} color="default" variant="outlined" fullWidth>
-          <FormattedMessage description="go back" defaultMessage="Go back" />
-        </Button>
-        <Button color="error" variant="contained" fullWidth onClick={handleTerminate} autoFocus>
-          <FormattedMessage description="Terminate" defaultMessage="Terminate" />
-        </Button>
-      </StyledDialogActions>
-    </Dialog>
+              ) : (
+                <FormattedMessage
+                  description="Terminate get eth"
+                  defaultMessage="Get {wrappedProtocolToken} as {protocolToken} instead"
+                  values={{ protocolToken: protocolToken.symbol, wrappedProtocolToken: wrappedProtocolToken.symbol }}
+                />
+              )
+            }
+          />
+        </FormGroup>
+      )}
+    </Modal>
   );
 };
 export default TerminateModal;
