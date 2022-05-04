@@ -2,7 +2,7 @@ import React from 'react';
 import { Token } from 'types';
 import SvgIcon from '@mui/material/SvgIcon';
 import CryptoIcons from 'assets/svg/color';
-import HelpIcon from '@mui/icons-material/Help';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import useTokenList from 'hooks/useTokenList';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
@@ -51,7 +51,7 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
       />
     );
   } else {
-    componentToRender = <HelpIcon style={{ fontSize: realSize }} className={isInChip ? 'MuiChip-icon' : ''} />;
+    componentToRender = <HelpOutlineOutlinedIcon style={{ fontSize: realSize }} className={isInChip ? 'MuiChip-icon' : ''} />;
   }
 
   return componentToRender;
