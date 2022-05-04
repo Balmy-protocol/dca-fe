@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
-import Dialog from '@mui/material/Dialog';
+import Modal from 'common/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -28,32 +28,17 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import { makeStyles } from '@mui/styles';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
-const useStyles = makeStyles({
-  paper: {
-    borderRadius: 20,
-  },
-});
-
 const StyledLink = styled(Link)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
 `;
 
-const StyledPaper = styled(Paper)`
-  padding: 30px;
-`;
+const StyledPaper = styled(Paper)``;
 
 const StyledWalletInformationContainer = styled(Card)`
   padding: 10px;
   margin-bottom: 10px;
-`;
-
-const StyledCloseButton = styled(IconButton)`
-  position: absolute;
-  right: 0px;
-  top: -5px;
-  color: #9e9e9e;
 `;
 
 const StyledCircularProgress = styled(CircularProgress)`
@@ -97,7 +82,6 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
   const dispatch = useAppDispatch();
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
-  const classes = useStyles();
   const currentNetwork = useCurrentNetwork();
 
   const allOrderedTransactions = React.useMemo(
@@ -124,11 +108,13 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
   };
 
   return (
-    <Dialog open={open} fullWidth maxWidth="xs" classes={{ paper: classes.paper }}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      showCloseIcon
+      title={<FormattedMessage description="walletSettings" defaultMessage="Wallet settings" />}
+    >
       <StyledPaper>
-        <StyledCloseButton aria-label="close" onClick={onClose}>
-          <CloseIcon />
-        </StyledCloseButton>
         <StyledWalletInformationContainer variant="outlined">
           <StyledRecentTransactionsTitleContainer>
             <Typography variant="body2" component="span">
@@ -180,7 +166,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
           </StyledTransactionDetail>
         ))}
       </StyledPaper>
-    </Dialog>
+    </Modal>
   );
 };
 

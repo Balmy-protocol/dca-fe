@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from 'common/button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
+import Modal from 'common/modal';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
 import WalletContext from 'common/wallet-context';
@@ -11,38 +8,12 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
-import { makeStyles } from '@mui/styles';
 import Link from '@mui/material/Link';
-
-const useStyles = makeStyles({
-  paper: {
-    borderRadius: 20,
-  },
-});
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
-`;
-
-const StyledDialogContent = styled(DialogContent)`
-  display: flex;
-  flex-direction: column;
-  padding: 40px 72px !important;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  *:not(:last-child) {
-    margin-bottom: 10px;
-  }
-`;
-
-const StyledDialogActions = styled(DialogActions)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0px 32px 32px 32px;
 `;
 
 interface MigratePositionModalProps {
@@ -52,7 +23,6 @@ interface MigratePositionModalProps {
 }
 
 const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModalProps) => {
-  const classes = useStyles();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
   const addTransaction = useTransactionAdder();
@@ -103,43 +73,45 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
   };
 
   return (
-    <Dialog open={open} fullWidth maxWidth="xs" classes={{ paper: classes.paper }}>
-      <StyledDialogContent>
-        <Typography variant="h6">
-          <FormattedMessage
-            description="migrate title"
-            defaultMessage="Migrate {from}/{to} position"
-            values={{ from: position.from.symbol, to: position.to.symbol }}
-          />
-        </Typography>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="migrate description"
-            defaultMessage="Your position will be terminated here and we will create a new one on"
-          />
-          <StyledLink href="https://mean.finance" target="_blank">
-            {` mean.finance`}
-          </StyledLink>
-        </Typography>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="terminate description"
-            defaultMessage="You will get back whatever has been swapped on your position and the remaining funds will be used for the new position"
-          />
-        </Typography>
-        <Typography variant="body1">
-          <FormattedMessage description="migrate warning" defaultMessage="This cannot be undone." />
-        </Typography>
-      </StyledDialogContent>
-      <StyledDialogActions>
-        <Button onClick={onCancel} color="default" variant="outlined" fullWidth>
-          <FormattedMessage description="cancel" defaultMessage="Cancel" />
-        </Button>
-        <Button color="primary" variant="contained" fullWidth onClick={handleMigrate} autoFocus>
-          <FormattedMessage description="migrate position" defaultMessage="Migrate position" />
-        </Button>
-      </StyledDialogActions>
-    </Dialog>
+    <Modal
+      open={open}
+      showCloseButton
+      onClose={onCancel}
+      actions={[
+        {
+          color: 'primary',
+          variant: 'contained',
+          onClick: handleMigrate,
+          label: <FormattedMessage description="migrate position" defaultMessage="Migrate position" />,
+        },
+      ]}
+    >
+      <Typography variant="h6">
+        <FormattedMessage
+          description="migrate title"
+          defaultMessage="Migrate {from}/{to} position"
+          values={{ from: position.from.symbol, to: position.to.symbol }}
+        />
+      </Typography>
+      <Typography variant="body1">
+        <FormattedMessage
+          description="migrate description"
+          defaultMessage="Your position will be terminated here and we will create a new one on"
+        />
+        <StyledLink href="https://mean.finance" target="_blank">
+          {` mean.finance`}
+        </StyledLink>
+      </Typography>
+      <Typography variant="body1">
+        <FormattedMessage
+          description="terminate description"
+          defaultMessage="You will get back whatever has been swapped on your position and the remaining funds will be used for the new position"
+        />
+      </Typography>
+      <Typography variant="body1">
+        <FormattedMessage description="migrate warning" defaultMessage="This cannot be undone." />
+      </Typography>
+    </Modal>
   );
 };
 export default MigratePositionModal;

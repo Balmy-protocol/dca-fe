@@ -1,10 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
 import { formatUnits } from '@ethersproject/units';
 import Button from 'common/button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
+import Modal from 'common/modal';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
 import WalletContext from 'common/wallet-context';
@@ -12,34 +9,8 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
-import { makeStyles } from '@mui/styles';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-
-const useStyles = makeStyles({
-  paper: {
-    borderRadius: 20,
-  },
-});
-
-const StyledDialogContent = styled(DialogContent)`
-  display: flex;
-  flex-direction: column;
-  padding: 40px 72px !important;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  *:not(:last-child) {
-    margin-bottom: 10px;
-  }
-`;
-
-const StyledDialogActions = styled(DialogActions)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0px 32px 32px 32px;
-`;
 
 interface WithdrawModalProps {
   position: Position;
@@ -49,7 +20,6 @@ interface WithdrawModalProps {
 }
 
 const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawModalProps) => {
-  const classes = useStyles();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const currentNetwork = useCurrentNetwork();
   const { web3Service } = React.useContext(WalletContext);
@@ -112,35 +82,36 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
   };
 
   return (
-    <Dialog open={open} fullWidth maxWidth="xs" classes={{ paper: classes.paper }}>
-      <StyledDialogContent>
-        <Typography variant="h6">
-          <FormattedMessage
-            description="withdraw title"
-            defaultMessage="Withdraw {toSymbol} from {from}/{to} position"
-            values={{ from: position.from.symbol, to: position.to.symbol, toSymbol }}
-          />
-        </Typography>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="Withdraw warning"
-            defaultMessage="Are you sure you want to withdraw {ammount} {to}?"
-            values={{
-              to: toSymbol,
-              ammount: formatUnits(position.toWithdraw, position.to.decimals),
-            }}
-          />
-        </Typography>
-      </StyledDialogContent>
-      <StyledDialogActions>
-        <Button onClick={onCancel} color="default" variant="outlined" fullWidth>
-          <FormattedMessage description="go back" defaultMessage="Go back" />
-        </Button>
-        <Button color="secondary" variant="contained" fullWidth onClick={handleWithdraw} autoFocus>
-          <FormattedMessage description="Withdraw" defaultMessage="Withdraw" />
-        </Button>
-      </StyledDialogActions>
-    </Dialog>
+    <Modal
+      open={open}
+      showCloseButton
+      actions={[
+        {
+          label: <FormattedMessage description="Withdraw" defaultMessage="Withdraw" />,
+          color: 'secondary',
+          variant: 'contained',
+          onClick: handleWithdraw,
+        },
+      ]}
+    >
+      <Typography variant="h6">
+        <FormattedMessage
+          description="withdraw title"
+          defaultMessage="Withdraw {toSymbol} from {from}/{to} position"
+          values={{ from: position.from.symbol, to: position.to.symbol, toSymbol }}
+        />
+      </Typography>
+      <Typography variant="body1">
+        <FormattedMessage
+          description="Withdraw warning"
+          defaultMessage="Are you sure you want to withdraw {ammount} {to}?"
+          values={{
+            to: toSymbol,
+            ammount: formatUnits(position.toWithdraw, position.to.decimals),
+          }}
+        />
+      </Typography>
+    </Modal>
   );
 };
 export default WithdrawModal;
