@@ -21,7 +21,7 @@ import { withStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
 import { buildEtherscanTransaction } from 'utils/etherscan';
-import CallMadeIcon from '@mui/icons-material/CallMade';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import MigratePositionModal from 'common/migrate-position-modal';
@@ -346,7 +346,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
                     <Typography variant="body2" component="span">
                       <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
                     </Typography>
-                    <CallMadeIcon style={{ fontSize: '1rem' }} />
+                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
                   </Link>
                 ) : (
                   <Typography variant="body2">
