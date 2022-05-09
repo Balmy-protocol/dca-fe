@@ -7,7 +7,7 @@ import Address from 'common/address';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { buildEtherscanAddress } from 'utils/etherscan';
 import Link from '@mui/material/Link';
-import CallMadeIcon from '@mui/icons-material/CallMade';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 
@@ -116,7 +116,7 @@ const Leaderboard = ({ rows }: LeaderboardProps) => {
                   rel="noreferrer"
                 >
                   <Address address={row.name} />
-                  <CallMadeIcon fontSize="inherit" />
+                  <OpenInNewIcon fontSize="inherit" />
                 </StyledLink>
               </Typography>
             </StyledLeadearboardItemUser>

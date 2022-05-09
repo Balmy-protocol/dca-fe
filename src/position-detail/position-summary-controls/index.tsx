@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Link from '@mui/material/Link';
-import CallMadeIcon from '@mui/icons-material/CallMade';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { FullPosition } from 'types';
@@ -73,7 +73,7 @@ const PositionSummaryControls = ({
                 <Typography variant="body2" component="span">
                   <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
                 </Typography>
-                <CallMadeIcon style={{ fontSize: '1rem' }} />
+                <OpenInNewIcon style={{ fontSize: '1rem' }} />
               </Link>
             </Button>
           )}

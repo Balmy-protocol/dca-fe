@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { Breakpoint, Typography } from '@mui/material';
 
 const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
   display: flex;
@@ -30,6 +31,7 @@ const StyledDialogTitle = styled.div`
   align-items: center;
   justify-content: space-between;
   flex-grow: 0;
+  margin-bottom: 28px;
 `;
 
 const StyledDialogActions = styled(DialogActions)`
@@ -62,6 +64,7 @@ interface ModalProps {
   onClose?: () => void;
   showCloseIcon?: boolean;
   showCloseButton?: boolean;
+  maxWidth?: Breakpoint;
   title?: React.ReactNode;
   actions?: {
     label: React.ReactNode;
@@ -72,7 +75,16 @@ interface ModalProps {
   }[];
 }
 
-const Modal: React.FC<ModalProps> = ({ title, open, onClose, showCloseIcon, showCloseButton, actions, children }) => {
+const Modal: React.FC<ModalProps> = ({
+  title,
+  open,
+  onClose,
+  maxWidth,
+  showCloseIcon,
+  showCloseButton,
+  actions,
+  children,
+}) => {
   const classes = useStyles();
 
   const handleClose = () => {
@@ -84,11 +96,13 @@ const Modal: React.FC<ModalProps> = ({ title, open, onClose, showCloseIcon, show
   const withTitle = showCloseIcon || !!title;
 
   return (
-    <StyledDialog open={open} fullWidth maxWidth="lg" classes={classes} onClose={handleClose}>
+    <StyledDialog open={open} fullWidth maxWidth={maxWidth || 'lg'} classes={classes} onClose={handleClose}>
       <StyledDialogContent withTitle={withTitle}>
         {withTitle && (
           <StyledDialogTitle>
-            {title}
+            <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+              {title}
+            </Typography>
             <IconButton aria-label="close" onClick={onClose}>
               <CloseIcon />
             </IconButton>
