@@ -7,7 +7,7 @@ import Card from '@mui/material/Card';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import CallMadeIcon from '@mui/icons-material/CallMade';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import CreatedIcon from '@mui/icons-material/NewReleases';
@@ -391,7 +391,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
           />
           <StyledLink href={buildEtherscanAddress(positionState.from, chainId)} target="_blank" rel="noreferrer">
             <Address address={positionState.from} />
-            <CallMadeIcon style={{ fontSize: '1rem' }} />
+            <OpenInNewIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
           <FormattedMessage
             description="to"
@@ -404,7 +404,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
           />
           <StyledLink href={buildEtherscanAddress(positionState.to, chainId)} target="_blank" rel="noreferrer">
             <Address address={positionState.to} />
-            <CallMadeIcon style={{ fontSize: '1rem' }} />
+            <OpenInNewIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
         </Typography>
       </Grid>
@@ -442,7 +442,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                   ) : (
                     <Address address={permission.operator} />
                   )}
-                  <CallMadeIcon style={{ fontSize: '1rem' }} />
+                  <OpenInNewIcon style={{ fontSize: '1rem' }} />
                 </StyledLink>
                 <FormattedMessage
                   description="positionPermissionsModified only"
@@ -475,7 +475,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                   ) : (
                     <Address address={permission.operator} />
                   )}
-                  <CallMadeIcon style={{ fontSize: '1rem' }} />
+                  <OpenInNewIcon style={{ fontSize: '1rem' }} />
                 </StyledLink>
               </>
             )}
@@ -641,7 +641,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
 });
 
 const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <CallMadeIcon />,
+  icon: <OpenInNewIcon />,
   content: () => {
     const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.withdrawn));
     const [toPrice, isLoadingToPrice] = useUsdPrice(

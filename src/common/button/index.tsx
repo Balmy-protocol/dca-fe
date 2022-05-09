@@ -31,7 +31,7 @@ const colors = {
   },
   error: {
     light: '#F50000',
-    dark: '#ffafaf',
+    dark: '#FF5359',
   },
   pending: {
     light: '#CC00AB',

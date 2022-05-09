@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Permission, PositionPermission } from 'types';
 
-import CallMadeIcon from '@mui/icons-material/CallMade';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -137,7 +137,7 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable }: PositionP
                       <Address address={positionPermission.operator} />
                     )}
                   </Typography>
-                  <CallMadeIcon style={{ fontSize: '1rem' }} />
+                  <OpenInNewIcon style={{ fontSize: '1rem' }} />
                 </StyledLink>
               </Typography>
             </StyledCardTitleHeader>
