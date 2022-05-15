@@ -50,16 +50,16 @@ interface AppFrameProps {
 }
 
 const StyledGridContainer = styled(Grid)`
-  // background-color: #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
 `;
 
 const StyledNavBarGridContainer = styled(Grid)`
-  flex: 0;
   margin-top: 40px !important;
 `;
 
 const StyledAppGridContainer = styled(Grid)`
-  flex: 1;
   margin-top: 40px !important;
 `;
 
@@ -69,23 +69,9 @@ const StyledContainer = styled(Container)`
   display: flex;
 `;
 
-const StyledBetaContainer = styled.div`
-  display: flex;
-  width: 100%;
-  background-color: #2cc941;
-  color: #ffffff;
-  justify-content: center;
-  align-items: center;
+const StyledFooterGridContainer = styled(Grid)`
+  margin-top: 62px !important;
 `;
-
-const StyledWarningContainer = styled.div`
-  display: flex;
-  width: 100%;
-  background-color: #f5b000;
-  justify-content: center;
-  align-items: center;
-`;
-
 const AppFrame = ({ isLoading }: AppFrameProps) => {
   const web3Service = useWeb3Service();
   const mode = useThemeMode();
@@ -155,9 +141,9 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
                       </Route>
                     </Switch>
                   </StyledAppGridContainer>
-                  <StyledNavBarGridContainer item xs={12}>
+                  <StyledFooterGridContainer item xs={12}>
                     <AppFooter />
-                  </StyledNavBarGridContainer>
+                  </StyledFooterGridContainer>
                 </StyledGridContainer>
               </StyledContainer>
             </Router>
