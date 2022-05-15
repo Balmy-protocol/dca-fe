@@ -21,7 +21,7 @@ function useTokenBalance(token: Token) {
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getTokenBalance();
-  }, [transactions, web3Service.getAccount(), token]);
+  }, [JSON.stringify(transactions), web3Service.getAccount(), token]);
 
   return tokenBalance;
 }

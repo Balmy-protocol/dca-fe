@@ -17,17 +17,48 @@ const StyledLink = styled(Link)`
   `}
 `;
 
-const StyledTokenListContainer = styled(Grid)`
-  padding: 32px;
+const StyledCard = styled(Card)`
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  background: rgba(216, 216, 216, 0.1);
+  gap: 16px;
 `;
 
-const StyledCard = styled(Card)`
-  padding: 20px 10px;
+const StyledCardMainContent = styled.div`
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 20px;
+`;
+
+const StyledGrid = styled(Grid)`
+  padding-top: 8px;
+  padding-left: 8px;
+`;
+
+const ScrollableGrid = styled(Grid)`
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+  --scrollbarBG: #1b1b1c;
+  --thumbBG: #ffffff;
+  ::-webkit-scrollbar {
+    width: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbarBG);
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--thumbBG);
+    border-radius: 6px;
+    border: 3px solid var(--scrollbarBG);
+  }
+`;
+
+const StyledGridItem = styled(Grid)`
+  padding: 4px 24px;
 `;
 
 function getLogoURL(logoURI: string) {
@@ -42,6 +73,35 @@ function getLogoURL(logoURI: string) {
 
 const buildTokenListUrl = (tokenListUrl: string) => `https://tokenlists.org/token-list?url=${tokenListUrl}`;
 
+interface TokenListProps {
+  logo: string;
+  name: string;
+  url: string;
+  tokens: number;
+  isEnabled: boolean;
+  onToggle: () => void;
+}
+const RawTokenList = ({ logo, name, tokens, isEnabled, onToggle, url }: TokenListProps) => (
+  <StyledCard raised elevation={0}>
+    <img src={logo} width="35px" height="35px" alt={name} />
+    <StyledCardMainContent>
+      <Typography variant="body1">{name}</Typography>
+      <Typography variant="body2" color="rgba(255,255,255,0.5)">
+        <FormattedMessage
+          description="tokenlisttokens"
+          defaultMessage="{tokenNumber} tokens"
+          values={{ tokenNumber: tokens }}
+        />
+      </Typography>
+    </StyledCardMainContent>
+    <FormGroup row>
+      <Switch checked={isEnabled} onChange={onToggle} name={`enableDisable${url}`} color="primary" />
+    </FormGroup>
+  </StyledCard>
+);
+
+const TokenList = React.memo(RawTokenList);
+
 const TokenLists = () => {
   const tokenList = useTokensLists();
   const savedTokenList = useSavedTokenLists();
@@ -52,47 +112,31 @@ const TokenLists = () => {
   };
 
   return (
-    <StyledTokenListContainer container spacing={4} style={{ flexGrow: 1 }}>
-      {Object.keys(tokenList).map((tokenListUrl) =>
-        tokenList[tokenListUrl] ? (
-          <Grid item xs={12} md={6} key={tokenListUrl}>
-            <StyledCard raised elevation={5}>
-              <img
-                src={getLogoURL(tokenList[tokenListUrl].logoURI)}
-                width="50px"
-                height="50px"
-                alt={tokenList[tokenListUrl].name}
-              />
-              <Typography variant="body1">{tokenList[tokenListUrl].name}</Typography>
-              <Typography variant="body1">
-                <FormattedMessage
-                  description="tokenlisttokens"
-                  defaultMessage="{tokenNumber} tokens"
-                  values={{ tokenNumber: Object.keys(tokenList[tokenListUrl].tokens).length }}
+    <>
+      <StyledGrid item xs={12} style={{ flexBasis: 'auto' }}>
+        <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+          <FormattedMessage description="manageListAndTokens" defaultMessage="Manage list & tokens" />
+        </Typography>
+      </StyledGrid>
+      <ScrollableGrid item xs={12} style={{ flexGrow: 1 }}>
+        <Grid container spacing={2} direction="column">
+          {Object.keys(tokenList).map((tokenListUrl) =>
+            tokenList[tokenListUrl] ? (
+              <StyledGridItem item xs={12} key={tokenListUrl}>
+                <TokenList
+                  logo={getLogoURL(tokenList[tokenListUrl].logoURI)}
+                  name={tokenList[tokenListUrl].name}
+                  tokens={Object.keys(tokenList[tokenListUrl].tokens).length}
+                  isEnabled={savedTokenList.includes(tokenListUrl)}
+                  onToggle={() => onEnableDisableList(tokenListUrl)}
+                  url={buildTokenListUrl(tokenListUrl)}
                 />
-              </Typography>
-              {tokenList[tokenListUrl].version && (
-                <Typography variant="body2">
-                  v{tokenList[tokenListUrl].version.major}.{tokenList[tokenListUrl].version.minor}.
-                  {tokenList[tokenListUrl].version.patch}
-                </Typography>
-              )}
-              <StyledLink target="_blank" href={buildTokenListUrl(tokenListUrl)}>
-                <FormattedMessage description="view list" defaultMessage="View list" />
-              </StyledLink>
-              <FormGroup row>
-                <Switch
-                  checked={savedTokenList.includes(tokenListUrl)}
-                  onChange={() => onEnableDisableList(tokenListUrl)}
-                  name={`enableDisable${tokenListUrl}`}
-                  color="primary"
-                />
-              </FormGroup>
-            </StyledCard>
-          </Grid>
-        ) : null
-      )}
-    </StyledTokenListContainer>
+              </StyledGridItem>
+            ) : null
+          )}
+        </Grid>
+      </ScrollableGrid>
+    </>
   );
 };
 

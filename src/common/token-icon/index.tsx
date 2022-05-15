@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { Token } from 'types';
 import SvgIcon from '@mui/material/SvgIcon';
 import CryptoIcons from 'assets/svg/color';
@@ -6,6 +7,9 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import useTokenList from 'hooks/useTokenList';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
+const StyledHelpOutlineIcon = styled(HelpOutlineOutlinedIcon)<{ realSize: string }>`
+  font-size: ${({ realSize }) => realSize};
+`;
 interface TokenButtonProps {
   token?: Token;
   isInChip?: boolean;
@@ -51,7 +55,7 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
       />
     );
   } else {
-    componentToRender = <HelpOutlineOutlinedIcon style={{ fontSize: realSize }} className={isInChip ? 'MuiChip-icon' : ''} />;
+    componentToRender = <StyledHelpOutlineIcon realSize={realSize} className={isInChip ? 'MuiChip-icon' : ''} />;
   }
 
   return componentToRender;
