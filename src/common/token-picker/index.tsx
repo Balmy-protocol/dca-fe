@@ -13,17 +13,15 @@ import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InputBase from '@mui/material/InputBase';
 import Search from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Chip from '@mui/material/Chip';
 import TokenIcon from 'common/token-icon';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, withStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import useAvailablePairs from 'hooks/useAvailablePairs';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import TuneIcon from '@mui/icons-material/Tune';
 import Switch from '@mui/material/Switch';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useTokenList from 'hooks/useTokenList';
@@ -31,94 +29,58 @@ import Button from 'common/button';
 import TokenLists from 'common/token-lists';
 import useTokenBalance from 'hooks/useTokenBalance';
 import { formatCurrencyAmount } from 'utils/currency';
+import FilledInput from '@mui/material/FilledInput';
+import { createStyles } from '@mui/material';
+import useUsdPrice from 'hooks/useUsdPrice';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
-interface PartialTheme {
-  spacing: (space: number) => number;
-  palette: { grey: string[]; mode: 'light' | 'dark' };
-}
-
-const searchStyles = ({ spacing, palette }: PartialTheme) => {
-  // ATTENTION!
-  // you can customize some important variables here!!
-  const backgroundColor = palette.mode === 'light' ? palette.grey[100] : 'rgba(255, 255, 255, 0.12)';
-  const space = spacing(1); // default = 8;
-  const borderRadius = 30;
-  const iconColor = palette.mode === 'light' ? palette.grey[500] : '#ffffff';
-  // end of variables
-  return {
-    root: {
-      backgroundColor,
-      borderRadius,
-      padding: `${space}px ${space * 2}px`,
-    },
-    input: {
-      fontSize: 16,
-    },
-    adornedStart: {
-      '& > *:first-child': {
-        // * is the icon at the beginning of input
-        fontSize: 20,
-        color: iconColor,
-        marginRight: space,
-      },
-    },
-  };
-};
-const useSearchInputStyles = makeStyles(searchStyles);
 
 const StyledOverlay = styled.div`
-  ${({ theme }) => `
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 99;
-    background-color: ${theme.palette.mode === 'light' ? '#ffffff' : '#424242'};
-    padding: 32px;
-    display: flex;
-  `}
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background-color: #1b1b1c;
+  padding: 24px;
+  display: flex;
 `;
+
+const StyledFilledInput = withStyles(() =>
+  createStyles({
+    root: {
+      borderRadius: '8px',
+    },
+    input: {
+      paddingTop: '8px',
+    },
+  })
+)(FilledInput);
 
 const StyledChip = styled(Chip)`
   margin-right: 5px;
 `;
 
+const StyledTuneIcon = styled(TuneIcon)`
+  color: rgba(255, 255, 255, 0.5);
+`;
+
 const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 0px;
-  margin-right: 16px;
+  margin-right: 7px;
 `;
 
 const StyledListItem = styled(ListItem)`
   padding-left: 0px;
 `;
 
-const StyledButton = styled(Button)`
-  padding: 18px 22px;
-  border-radius: 12px;
-`;
-
-const StyledGridWithScrollbar = styled(Grid)<{ hasScrollbar: boolean }>`
-  ${({ theme, hasScrollbar }) => `
-    overflow-y: ${hasScrollbar ? 'scroll' : 'hidden'};
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-    --scrollbarBG: ${theme.palette.mode === 'light' ? '#ffffff' : '#424242'};
-    --thumbBG: ${theme.palette.mode === 'light' ? '#90a4ae' : '#ffffff'};
-    ::-webkit-scrollbar {
-      width: 11px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--scrollbarBG);
-    }
-    ::-webkit-scrollbar-thumb {
-      background-color: var(--thumbBG);
-      border-radius: 6px;
-      border: 3px solid var(--scrollbarBG);
-    }
-  `}
+const StyledSwitchGrid = styled(Grid)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.5) !important;
+  flex: 0;
 `;
 
 const StyledList = styled(List)`
@@ -141,8 +103,20 @@ const StyledList = styled(List)`
   `}
 `;
 
+const StyledDialogTitle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 0;
+`;
+
 const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
   margin-top: ${(props) => props.customSpacing || 0}px;
+`;
+
+const StyledBalanceContainer = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 interface RowData {
@@ -171,7 +145,6 @@ const useListItemStyles = makeStyles(({ palette }) => ({
   root: {
     borderRadius: 6,
     color: palette.text.secondary,
-    padding: '0.5rem 1rem',
     '&:hover': {
       color: palette.text.primary,
       backgroundColor: palette.mode === 'light' ? palette.grey[100] : palette.grey[700],
@@ -193,25 +166,35 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps
   const classes = useListItemStyles();
 
   const tokenBalance = useTokenBalance(tokenList[tokenKeys[index]]);
+  const [tokenValue] = useUsdPrice(tokenList[tokenKeys[index]], tokenBalance);
+
   return (
     <StyledListItem classes={classes} onClick={() => onClick(tokenKeys[index])} style={style}>
       <StyledListItemIcon>
-        <TokenIcon size="32px" token={tokenList[tokenKeys[index]]} />
+        <TokenIcon size="24px" token={tokenList[tokenKeys[index]]} />
       </StyledListItemIcon>
       <ListItemText disableTypography>
         <span>
-          <Typography variant="body1" component="span">
+          <Typography variant="body1" component="span" color="#FFFFFF">
             {tokenList[tokenKeys[index]].name}
           </Typography>
-          <Typography variant="subtitle1" component="span">
-            {` - `}
-          </Typography>
-          <Typography variant="subtitle2" component="span">
-            {tokenList[tokenKeys[index]].symbol}
+          <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)">
+            {` (${tokenList[tokenKeys[index]].symbol})`}
           </Typography>
         </span>
       </ListItemText>
-      {tokenBalance && <div>{formatCurrencyAmount(tokenBalance, tokenList[tokenKeys[index]], 6)}</div>}
+      <StyledBalanceContainer>
+        {tokenBalance && (
+          <Typography variant="body1" color="#FFFFFF">
+            {formatCurrencyAmount(tokenBalance, tokenList[tokenKeys[index]], 6)}
+          </Typography>
+        )}
+        {!!tokenValue && (
+          <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+            ${tokenValue.toFixed(2)}
+          </Typography>
+        )}
+      </StyledBalanceContainer>
     </StyledListItem>
   );
 };
@@ -231,7 +214,6 @@ const TokenPicker = ({
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
   let tokenKeysToUse: string[] = [];
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
-  const inputStyles = useSearchInputStyles();
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
 
@@ -287,6 +269,11 @@ const TokenPicker = ({
     return filteredTokenKeys;
   }, [tokenKeys, search, usedTokens, ignoreValues, tokenKeysToUse, availableFrom, currentNetwork.chainId]);
 
+  const itemData = React.useMemo(
+    () => ({ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }),
+    [memoizedTokenKeys, tokenList]
+  );
+
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
       <StyledOverlay>
@@ -294,52 +281,49 @@ const TokenPicker = ({
           aria-label="close"
           size="small"
           onClick={handleOnClose}
-          style={{ position: 'absolute', top: '32px', right: '32px' }}
+          style={{ position: 'absolute', top: '24px', right: '32px' }}
         >
           <CloseIcon fontSize="inherit" />
         </IconButton>
-        <StyledGridWithScrollbar
-          container
-          spacing={1}
-          direction="column"
-          hasScrollbar={shouldShowTokenLists}
-          style={{ flexWrap: 'nowrap' }}
-        >
+        <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
           {shouldShowTokenLists ? (
             <TokenLists />
           ) : (
             <>
               <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-                <Typography variant="h6">
+                <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
                   {isFrom ? (
-                    <FormattedMessage description="You pay" defaultMessage="You pay" />
+                    <FormattedMessage description="You sell" defaultMessage="You sell" />
                   ) : (
-                    <FormattedMessage description="You get" defaultMessage="You get" />
+                    <FormattedMessage description="You receive" defaultMessage="You receive" />
                   )}
                 </Typography>
-                <FormGroup row>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={isOnlyPairs}
-                        onChange={() => setIsOnlyPairs(!isOnlyPairs)}
-                        name="isOnlyPairs"
-                        color="primary"
-                      />
-                    }
-                    label="Only tokens with created pairs"
-                  />
-                </FormGroup>
               </Grid>
               <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
-                <InputBase
-                  classes={inputStyles}
-                  placeholder="Search by ETH, Ethereum or Ether"
-                  startAdornment={<Search />}
+                <StyledFilledInput
+                  placeholder="Search your token"
+                  onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
+                    setSearch(evt.currentTarget.value)
+                  }
                   fullWidth
-                  onChange={(evt) => setSearch(evt.currentTarget.value)}
+                  disableUnderline
+                  endAdornment={<Search />}
+                  type="text"
+                  margin="none"
                 />
               </StyledGrid>
+              <StyledSwitchGrid item xs={12}>
+                <FormattedMessage
+                  description="createdPairsSwitchToken"
+                  defaultMessage="Only tokens with created pairs"
+                />
+                <Switch
+                  checked={isOnlyPairs}
+                  onChange={() => setIsOnlyPairs(!isOnlyPairs)}
+                  name="isOnlyPairs"
+                  color="primary"
+                />
+              </StyledSwitchGrid>
               {!!memoizedUsedTokens.length && (
                 <>
                   <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
@@ -362,7 +346,17 @@ const TokenPicker = ({
                   </StyledGrid>
                 </>
               )}
-              <StyledGrid item xs={12} customSpacing={12} style={{ flexGrow: 1 }}>
+              <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
+                <StyledDialogTitle>
+                  <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+                    <FormattedMessage description="token list" defaultMessage="Token list" />
+                  </Typography>
+                  <IconButton aria-label="close" onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}>
+                    <StyledTuneIcon />
+                  </IconButton>
+                </StyledDialogTitle>
+              </StyledGrid>
+              <StyledGrid item xs={12} style={{ flexGrow: 1 }}>
                 <AutoSizer>
                   {({ height, width }) => (
                     <StyledList
@@ -370,7 +364,7 @@ const TokenPicker = ({
                       itemCount={memoizedTokenKeys.length}
                       itemSize={52}
                       width={width}
-                      itemData={{ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }}
+                      itemData={itemData}
                     >
                       {Row}
                     </StyledList>
@@ -379,24 +373,7 @@ const TokenPicker = ({
               </StyledGrid>
             </>
           )}
-          <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
-            <StyledButton
-              size="large"
-              variant="contained"
-              color="default"
-              fullWidth
-              onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}
-            >
-              <Typography variant="body1">
-                {!shouldShowTokenLists ? (
-                  <FormattedMessage description="manage token list" defaultMessage="Manage Token Lists" />
-                ) : (
-                  <FormattedMessage description="doneManagingTokenLists" defaultMessage="Done" />
-                )}
-              </Typography>
-            </StyledButton>
-          </StyledGrid>
-        </StyledGridWithScrollbar>
+        </Grid>
       </StyledOverlay>
     </Slide>
   );

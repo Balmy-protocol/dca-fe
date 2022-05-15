@@ -8,11 +8,12 @@ import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import { STABLE_COINS } from 'config/constants';
+import { formatCurrencyAmount } from 'utils/currency';
 import useCurrentNetwork from './useCurrentNetwork';
 
 function useUsdPrice(
   from: Token | undefined | null,
-  amount: BigNumber,
+  amount: BigNumber | null,
   date?: string
 ): [number | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -26,7 +27,7 @@ function useUsdPrice(
 
   React.useEffect(() => {
     async function callPromise() {
-      if (from && !STABLE_COINS.includes(from.symbol)) {
+      if (from && !STABLE_COINS.includes(from.symbol) && amount && amount.gt(BigNumber.from(0))) {
         try {
           const price = await web3Service.getUsdHistoricPrice(
             from.address === protocolToken.address ? wrappedProtocolToken : from,
@@ -50,13 +51,23 @@ function useUsdPrice(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, web3Service.getAccount(), currentNetwork]);
+  }, [from, amount, isLoading, result, error, web3Service.getAccount(), currentNetwork]);
 
-  if (!from) {
-    return [undefined, false, undefined];
-  }
+  return React.useMemo(() => {
+    if (!from || !amount) {
+      return [undefined, false, undefined];
+    }
 
-  return [result, isLoading, error];
+    if (STABLE_COINS.includes(from.symbol)) {
+      return [parseFloat(formatCurrencyAmount(amount, from, 6)), false, undefined];
+    }
+
+    if (amount.lte(BigNumber.from(0))) {
+      return [0, false, undefined];
+    }
+
+    return [result, isLoading, error];
+  }, [result, from, amount, isLoading, error]);
 }
 
 export default useUsdPrice;
