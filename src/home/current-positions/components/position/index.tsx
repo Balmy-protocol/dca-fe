@@ -4,7 +4,6 @@ import Card from '@mui/material/Card';
 import LinearProgress from '@mui/material/LinearProgress';
 import CardContent from '@mui/material/CardContent';
 import Button from 'common/button';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
@@ -15,7 +14,7 @@ import { Position, Token } from 'types';
 import { useHistory } from 'react-router-dom';
 import { STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
-import ArrowRight from 'assets/svg/atom/arrow-right';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles, Theme } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
@@ -25,7 +24,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import MigratePositionModal from 'common/migrate-position-modal';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useUsdPrice from 'hooks/useUsdPrice';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
@@ -33,25 +32,13 @@ const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
     root: {
-      height: 22,
-      borderRadius: 5,
-      '&::after': {
-        content: (props: { swaps: number }) =>
-          `"${props.swaps !== 0 ? `${props.swaps} swap${props.swaps > 1 ? 's' : ''} left` : ''}"`,
-        position: 'absolute',
-        top: '0',
-        bottom: '0',
-        right: '0',
-        left: '0',
-        textAlign: 'center',
-      },
-    },
-    colorPrimary: {
-      backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 700],
+      height: 8,
+      borderRadius: 10,
+      background: '#D8D8D8',
     },
     bar: {
-      borderRadius: 5,
-      backgroundColor: '#1a90ff',
+      borderRadius: 10,
+      background: 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)',
     },
   })
 )(StyledSwapsLinearProgress);
@@ -61,17 +48,17 @@ const StyledChip = styled(Chip)`
 `;
 
 const StyledCard = styled(Card)`
-  margin: 10px;
   border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
+  background: #292929;
 `;
 
 const StyledCardContent = styled(CardContent)`
-  padding-bottom: 10px !important;
-  flex-grow: 1;
   display: flex;
+  flex-grow: 1;
+  flex-direction: column;
 `;
 
 const StyledCardHeader = styled.div`
@@ -80,10 +67,17 @@ const StyledCardHeader = styled.div`
   flex-wrap: wrap;
 `;
 
+const StyledArrowRightContainer = styled.div`
+  margin: 0 5px !important;
+  font-size: 35px;
+  display: flex;
+`;
+
 const StyledCardTitleHeader = styled.div`
   display: flex;
   align-items: center;
   margin-right: 10px;
+  flex-grow: 1;
   *:not(:first-child) {
     margin-left: 4px;
     font-weight: 500;
@@ -98,8 +92,7 @@ const StyledDetailWrapper = styled.div`
 `;
 
 const StyledProgressWrapper = styled.div`
-  margin-top: 14px;
-  margin-bottom: 21px;
+  margin: 12px 0px;
 `;
 
 const StyledCardFooterButton = styled(Button)`
@@ -107,33 +100,23 @@ const StyledCardFooterButton = styled(Button)`
 `;
 
 const StyledFreqLeft = styled.div`
-  ${({ theme }) => `
-    padding: 10px 13px;
-    border-radius: 15px;
-    text-align: center;
-    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
-  `}
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
 `;
 
 const StyledStale = styled.div`
-  padding: 8px 11px;
-  border-radius: 5px;
-  background-color: #f9f3dc;
   color: #cc6d00;
-  text-align: center;
-  * {
-    font-weight: 600 !important;
-  }
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
 `;
 
-const StyledNoFunds = styled.div`
-  ${({ theme }) => `
-    padding: 8px 11px;
-    border-radius: 5px;
-    background-color: ${theme.palette.mode === 'light' ? '#dceff9' : '#275f7c'};
-    color: ${theme.palette.mode === 'light' ? '#0088cc' : '#ffffff'};
-    text-align: center;
-  `}
+const StyledFinished = styled.div`
+  color: #33ac2e;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
 `;
 
 const StyledContentContainer = styled.div`
@@ -144,8 +127,9 @@ const StyledContentContainer = styled.div`
 
 const StyledCallToActionContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: space-between;
+  gap: 16px;
 `;
 
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
@@ -155,9 +139,10 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
 
 interface ActivePositionProps {
   position: PositionProp;
+  onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
 }
 
-const ActivePosition = ({ position }: ActivePositionProps) => {
+const ActivePosition = ({ position, onWithdraw }: ActivePositionProps) => {
   const {
     from,
     to,
@@ -172,6 +157,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
   const [shouldShowMigrate, setShouldShowMigrate] = React.useState(false);
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
+  const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity);
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw);
   const history = useHistory();
@@ -202,182 +188,216 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
     <StyledCard variant="outlined">
       <MigratePositionModal onCancel={() => setShouldShowMigrate(false)} open={shouldShowMigrate} position={position} />
       <StyledCardContent>
-        <Grid container>
-          <Grid item xs={12} sm={9} md={10}>
-            <StyledContentContainer>
-              <StyledCardHeader>
-                <StyledCardTitleHeader>
-                  <TokenIcon token={from} size="20px" />
-                  <Typography variant="body1">{from.symbol}</Typography>
-                  <ArrowRight size="20px" />
-                  <TokenIcon token={to} size="20px" />
-                  <Typography variant="body1">{to.symbol}</Typography>
-                </StyledCardTitleHeader>
-                {!isPending && !hasNoFunds && (
-                  <StyledFreqLeft>
-                    <Typography variant="body2">
-                      <FormattedMessage
-                        description="days to finish"
-                        defaultMessage="{type} left"
-                        values={{
-                          type: getTimeFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
-                        }}
-                      />
-                    </Typography>
-                  </StyledFreqLeft>
-                )}
-              </StyledCardHeader>
-              <StyledDetailWrapper>
-                <Typography
-                  variant="body2"
-                  style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-                >
+        <StyledContentContainer>
+          <StyledCardHeader>
+            <StyledCardTitleHeader>
+              <TokenIcon token={from} size="27px" />
+              <Typography variant="body1">{from.symbol}</Typography>
+              <StyledArrowRightContainer>
+                <ArrowRightAltIcon fontSize="inherit" />
+              </StyledArrowRightContainer>
+              <TokenIcon token={to} size="27px" />
+              <Typography variant="body1">{to.symbol}</Typography>
+            </StyledCardTitleHeader>
+            {!isPending && !hasNoFunds && !isStale && (
+              <StyledFreqLeft>
+                <Typography variant="caption">
                   <FormattedMessage
-                    description="current remaining"
-                    defaultMessage="Remaining: <b>{remainingLiquidity} {from}</b>"
+                    description="days to finish"
+                    defaultMessage="{type} left"
                     values={{
-                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                      remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from),
-                      from: from.symbol,
-                    }}
-                  />
-                  {showFromPrice && (
-                    <StyledChip
-                      color="primary"
-                      size="small"
-                      label={
-                        <FormattedMessage
-                          description="current remaining price"
-                          defaultMessage="({toPrice} USD)"
-                          values={{
-                            b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                            toPrice: fromPrice?.toFixed(2),
-                          }}
-                        />
-                      }
-                    />
-                  )}
-                  <FormattedMessage
-                    description="current remaining rate"
-                    defaultMessage="({rate} {from} {frequency})"
-                    values={{
-                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                      rate: formatCurrencyAmount(rate, from),
-                      frequency:
-                        STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
-                      from: from.symbol,
+                      type: getTimeFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
                     }}
                   />
                 </Typography>
-              </StyledDetailWrapper>
-              <StyledDetailWrapper>
-                <Typography
-                  variant="body2"
-                  style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-                >
-                  <FormattedMessage
-                    description="current swapped in position"
-                    defaultMessage="To withdraw: <b>{exercised} {to}</b>"
-                    values={{
-                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                      exercised: formatCurrencyAmount(toWithdraw, to),
-                      to: to.symbol,
-                      showToPrice: !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice,
-                      toPrice: toPrice?.toFixed(2),
-                    }}
-                  />
-                  {showToPrice && (
-                    <StyledChip
-                      color="primary"
-                      size="small"
-                      label={
-                        <FormattedMessage
-                          description="current swapped in position price"
-                          defaultMessage="({toPrice} USD)"
-                          values={{
-                            b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                            toPrice: toPrice?.toFixed(2),
-                          }}
-                        />
-                      }
-                    />
-                  )}
+              </StyledFreqLeft>
+            )}
+            {!isPending && hasNoFunds && (
+              <StyledFinished>
+                <Typography variant="caption">
+                  <FormattedMessage description="finishedPosition" defaultMessage="FINISHED" />
                 </Typography>
-              </StyledDetailWrapper>
-            </StyledContentContainer>
-          </Grid>
-          <Grid item xs={12} sm={3} md={2}>
-            <StyledCallToActionContainer>
-              {!isPending && !hasNoFunds && !isStale && (
-                <StyledFreqLeft>
-                  <Typography variant="body2">
-                    <FormattedMessage description="in progress" defaultMessage="In progress" />
-                  </Typography>
-                </StyledFreqLeft>
-              )}
-              {!isPending && hasNoFunds && (
-                <StyledNoFunds>
-                  <Typography variant="body2">
-                    <FormattedMessage description="no funds" defaultMessage="Position finished" />
-                  </Typography>
-                </StyledNoFunds>
-              )}
-              {!isPending && !hasNoFunds && isStale && (
-                <StyledStale>
-                  <Typography variant="body2">
-                    <FormattedMessage description="stale" defaultMessage="Stale" />
-                  </Typography>
-                </StyledStale>
-              )}
-              <StyledCardFooterButton
-                variant="contained"
-                color={isPending ? 'pending' : 'secondary'}
-                onClick={() => !isPending && onViewDetails()}
-                fullWidth
-              >
-                {isPending ? (
-                  <Link
-                    href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    underline="none"
-                    color="inherit"
-                  >
-                    <Typography variant="body2" component="span">
-                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                    </Typography>
-                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
-                  </Link>
-                ) : (
-                  <Typography variant="body2">
-                    <FormattedMessage description="View details" defaultMessage="View details" />
-                  </Typography>
-                )}
-              </StyledCardFooterButton>
-              {/* {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => setShouldShowMigrate(true)}
-                  fullWidth
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
-                  </Typography>
-                </StyledCardFooterButton>
-              )} */}
-            </StyledCallToActionContainer>
-          </Grid>
-          <Grid item xs={12}>
-            <StyledProgressWrapper>
-              <BorderLinearProgress
-                swaps={remainingSwaps.toNumber()}
-                variant="determinate"
-                value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
+              </StyledFinished>
+            )}
+            {!isPending && !hasNoFunds && isStale && (
+              <StyledStale>
+                <Typography variant="caption">
+                  <FormattedMessage description="stale" defaultMessage="STALE" />
+                </Typography>
+              </StyledStale>
+            )}
+          </StyledCardHeader>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage
+                description="current remaining"
+                defaultMessage="Remaining:"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                }}
               />
-            </StyledProgressWrapper>
-          </Grid>
-        </Grid>
+            </Typography>
+            {/* {showFromPrice && (
+                <StyledChip
+                  color="primary"
+                  size="small"
+                  label={
+                    <FormattedMessage
+                      description="current remaining price"
+                      defaultMessage="({toPrice} USD)"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        toPrice: fromPrice?.toFixed(2),
+                      }}
+                    />
+                  }
+                />
+              )} */}
+            <Typography
+              variant="body1"
+              color={remainingLiquidity.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              sx={{ marginLeft: '5px' }}
+            >
+              <FormattedMessage
+                description="current remaining rate"
+                defaultMessage="{remainingLiquidity} {from} ({rate} {from} {frequency})"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                  rate: formatCurrencyAmount(rate, from),
+                  frequency:
+                    STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+                  from: from.symbol,
+                  remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from),
+                }}
+              />
+            </Typography>
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="current swapped in position" defaultMessage="To withdraw: " />
+            </Typography>
+            <Typography
+              variant="body1"
+              color={toWithdraw.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              sx={{ marginLeft: '5px' }}
+            >
+              {`${formatCurrencyAmount(toWithdraw, to)} ${to.symbol}`}
+            </Typography>
+            <Typography variant="body1">
+              {showToPrice && (
+                <StyledChip
+                  color="primary"
+                  size="small"
+                  label={
+                    <FormattedMessage
+                      description="current swapped in position price"
+                      defaultMessage="({toPrice} USD)"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        toPrice: toPrice?.toFixed(2),
+                      }}
+                    />
+                  }
+                />
+              )}
+            </Typography>
+          </StyledDetailWrapper>
+        </StyledContentContainer>
+        <StyledProgressWrapper>
+          {remainingSwaps.toNumber() > 0 && (
+            <BorderLinearProgress
+              swaps={remainingSwaps.toNumber()}
+              variant="determinate"
+              value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
+            />
+          )}
+        </StyledProgressWrapper>
+        <StyledCallToActionContainer>
+          <StyledCardFooterButton
+            variant={isPending ? 'contained' : 'outlined'}
+            color={isPending ? 'pending' : 'default'}
+            onClick={() => !isPending && onViewDetails()}
+            fullWidth
+          >
+            {isPending ? (
+              <Link
+                href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
+                target="_blank"
+                rel="noreferrer"
+                underline="none"
+                color="inherit"
+              >
+                <Typography variant="body2" component="span">
+                  <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                </Typography>
+                <OpenInNewIcon style={{ fontSize: '1rem' }} />
+              </Link>
+            ) : (
+              <Typography variant="body2">
+                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+              </Typography>
+            )}
+          </StyledCardFooterButton>
+          {!isPending && toWithdraw.gt(BigNumber.from(0)) && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+            <StyledCardFooterButton
+              variant="contained"
+              color="secondary"
+              onClick={() => onWithdraw(position, true)}
+              fullWidth
+            >
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="withdraw"
+                  defaultMessage="Withdraw {protocolToken}"
+                  values={{ protocolToken: protocolToken.symbol }}
+                />
+              </Typography>
+            </StyledCardFooterButton>
+          )}
+          {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
+            <StyledCardFooterButton
+              variant="contained"
+              color="secondary"
+              onClick={() => onWithdraw(position, false)}
+              fullWidth
+            >
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="withdraw"
+                  defaultMessage="Withdraw {wrappedProtocolToken}"
+                  values={{
+                    wrappedProtocolToken:
+                      position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
+                  }}
+                />
+              </Typography>
+            </StyledCardFooterButton>
+          )}
+          {!isPending && toWithdraw.lte(BigNumber.from(0)) && (
+            <StyledCardFooterButton
+              variant="contained"
+              color="secondary"
+              onClick={() => onWithdraw(position)}
+              fullWidth
+            >
+              <Typography variant="body2">
+                <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
+              </Typography>
+            </StyledCardFooterButton>
+          )}
+          {/* {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
+            <StyledCardFooterButton
+              variant="contained"
+              color="secondary"
+              onClick={() => setShouldShowMigrate(true)}
+              fullWidth
+            >
+              <Typography variant="body2">
+                <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
+              </Typography>
+            </StyledCardFooterButton>
+          )} */}
+        </StyledCallToActionContainer>
       </StyledCardContent>
     </StyledCard>
   );
