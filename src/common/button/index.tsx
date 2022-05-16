@@ -86,8 +86,8 @@ const backgroundColors = {
       hover: '#0294de',
     },
     dark: {
-      default: '#006fa7',
-      hover: '#008ed5',
+      default: '#3076F6',
+      hover: '#3c7bed',
     },
   },
   tertiary: {

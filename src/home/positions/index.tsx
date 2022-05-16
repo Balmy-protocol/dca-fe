@@ -4,76 +4,100 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { appleTabsStylesHook } from 'common/tabs';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from 'state/tabs/hooks';
 import { useAppDispatch } from 'state/hooks';
 import { changeOpenClosePositionTab } from 'state/tabs/actions';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
 import History from '../history';
 import CurrentPositions from '../current-positions';
 
-const StyledTitleContainer = styled(Paper)`
-  ${({ theme }) => `
-    padding: 25px;
-    border-radius: 10px;
-    flex-grow: 0;
-    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
-    margin-bottom: 15px;
-    flex-grow: 1;
-    margin-top: 15px;
-  `}
-`;
+const StyledTab = withStyles(() =>
+  createStyles({
+    root: {
+      textTransform: 'none',
+      overflow: 'visible',
+      padding: '5px',
+      color: 'rgba(255,255,255,0.5)',
+    },
+    selected: {
+      color: '#FFFFFF !important',
+      fontWeight: '500',
+    },
+  })
+)(Tab);
+
+const StyledTabs = withStyles(() =>
+  createStyles({
+    root: {
+      overflow: 'visible',
+    },
+    scroller: {
+      overflow: 'visible !important',
+    },
+  })
+)(Tabs);
 
 const StyledPaper = styled(Paper)`
-  ${({ theme }) => `
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    padding: 25px;
-    border-radius: 10px;
-    border: 1px solid ${theme.palette.mode === 'light' ? '#f5f5f5' : 'rgba(255, 255, 255, 0.1)'};
-  `}
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  flex-grow: 1;
+  background-color: rgba(216, 216, 216, 0.05);
+  backdrop-filter: blur(6px);
 `;
+
 const Positions = () => {
   const tabIndex = useOpenClosePositionTab();
   const dispatch = useAppDispatch();
-  const tabsStyles = appleTabsStylesHook.useTabs();
-  const tabItemStyles = appleTabsStylesHook.useTabItem();
 
   return (
     <>
-      <Grid item xs={12} style={{ display: 'flex' }}>
-        <StyledTitleContainer elevation={3}>
-          <Typography variant="h4">
-            <FormattedMessage description="positions title" defaultMessage="Your positions" />
-          </Typography>
-          <Typography variant="body1">
-            <FormattedMessage
-              description="positions description"
-              defaultMessage="Here you will see the details of your open positions and be able to see further details about them"
-            />
-          </Typography>
-        </StyledTitleContainer>
+      <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', marginBottom: '24px' }}>
+        <Typography variant="h4">
+          <FormattedMessage description="positions title" defaultMessage="Your positions" />
+        </Typography>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="positions description"
+            defaultMessage="Here you will see the details of your open positions and be able to see further details about them"
+          />
+        </Typography>
       </Grid>
       <Grid item xs={12} style={{ display: 'flex', paddingTop: '0px' }}>
-        <StyledPaper elevation={3}>
-          <Grid container>
-            <Grid item xs={12} style={{ display: 'flex', paddingBottom: '15px' }}>
-              <Tabs
-                classes={tabsStyles}
-                value={tabIndex}
-                onChange={(e, index) => dispatch(changeOpenClosePositionTab(index))}
-              >
-                <Tab classes={tabItemStyles} disableRipple label="Open positions" />
-                <Tab classes={tabItemStyles} disableRipple label="Terminated positions" />
-              </Tabs>
-            </Grid>
-            <Grid item xs={12}>
-              {tabIndex === 0 ? <CurrentPositions /> : <History />}
-            </Grid>
+        <Grid container>
+          <Grid item xs={12} style={{ display: 'flex', paddingBottom: '15px' }}>
+            <StyledTabs
+              value={tabIndex}
+              onChange={(e, index) => dispatch(changeOpenClosePositionTab(index))}
+              TabIndicatorProps={{ style: { bottom: '8px' } }}
+            >
+              <StyledTab
+                disableRipple
+                label={
+                  <Typography variant="h6">
+                    <FormattedMessage description="openPositions" defaultMessage="Open positions" />
+                  </Typography>
+                }
+              />
+              <StyledTab
+                disableRipple
+                sx={{ marginLeft: '32px' }}
+                label={
+                  <Typography variant="h6">
+                    <FormattedMessage description="terminatedPositions" defaultMessage="Terminated positions" />
+                  </Typography>
+                }
+              />
+            </StyledTabs>
           </Grid>
-        </StyledPaper>
+          <Grid item xs={12}>
+            <StyledPaper variant="outlined">{tabIndex === 0 ? <CurrentPositions /> : <History />}</StyledPaper>
+          </Grid>
+        </Grid>
       </Grid>
     </>
   );
