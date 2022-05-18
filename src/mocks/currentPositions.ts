@@ -1,52 +1,36 @@
-import { NETWORKS, ONE_DAY } from 'config/constants';
-import { parseUnits } from '@ethersproject/units';
-import { WETH, DAI, UNI } from './tokens';
+import { ONE_DAY } from 'config/constants';
+import { Position } from 'types';
+import { BigNumber } from 'ethers';
+import { PROTOCOL_TOKEN_ADDRESS } from './tokens';
 
-const mockedCurrentPositions = [
-  {
-    from: UNI(NETWORKS.mainnet.chainId).address,
-    to: DAI(NETWORKS.mainnet.chainId).address,
-    swapInterval: ONE_DAY,
-    startedAt: new Date(1623624089 * 1000),
-    swapped: parseUnits('50', DAI(NETWORKS.mainnet.chainId).decimals),
-    remainingLiquidity: parseUnits('0.00004', UNI(NETWORKS.mainnet.chainId).decimals),
-    remainingSwaps: 2,
-    withdrawn: parseUnits('25', DAI(NETWORKS.mainnet.chainId).decimals),
-    id: 1,
+export const EmptyPosition: Position = {
+  from: {
+    address: PROTOCOL_TOKEN_ADDRESS,
+    name: 'PROTOCOL TOKEN',
+    decimals: 18,
+    chainId: 10,
+    symbol: 'MEAN',
   },
-  {
-    from: UNI(NETWORKS.mainnet.chainId).address,
-    to: DAI(NETWORKS.mainnet.chainId).address,
-    swapInterval: ONE_DAY,
-    startedAt: new Date(1623624089 * 1000),
-    swapped: parseUnits('2', DAI(NETWORKS.mainnet.chainId).decimals),
-    remainingLiquidity: parseUnits('0.000000015', UNI(NETWORKS.mainnet.chainId).decimals),
-    remainingSwaps: 5,
-    withdrawn: parseUnits('4', DAI(NETWORKS.mainnet.chainId).decimals),
-    id: 2,
+  to: {
+    address: PROTOCOL_TOKEN_ADDRESS,
+    name: 'PROTOCOL TOKEN',
+    decimals: 18,
+    chainId: 10,
+    symbol: 'MEAN',
   },
-  {
-    from: DAI(NETWORKS.mainnet.chainId).address,
-    to: UNI(NETWORKS.mainnet.chainId).address,
-    swapInterval: ONE_DAY,
-    startedAt: new Date(1623624089 * 1000),
-    swapped: parseUnits('0.0001', UNI(NETWORKS.mainnet.chainId).decimals),
-    remainingLiquidity: parseUnits('50', DAI(NETWORKS.mainnet.chainId).decimals),
-    remainingSwaps: 1,
-    withdrawn: parseUnits('0.00001', UNI(NETWORKS.mainnet.chainId).decimals),
-    id: 3,
-  },
-  {
-    from: WETH(NETWORKS.mainnet.chainId).address,
-    to: DAI(NETWORKS.mainnet.chainId).address,
-    swapInterval: ONE_DAY,
-    startedAt: new Date(1623624089 * 1000),
-    swapped: parseUnits('50', DAI(NETWORKS.mainnet.chainId).decimals),
-    remainingLiquidity: parseUnits('0.00004', WETH(NETWORKS.mainnet.chainId).decimals),
-    remainingSwaps: 2,
-    withdrawn: parseUnits('25', DAI(NETWORKS.mainnet.chainId).decimals),
-    id: 99999,
-  },
-];
-
-export default mockedCurrentPositions;
+  swapInterval: ONE_DAY,
+  user: PROTOCOL_TOKEN_ADDRESS,
+  swapped: BigNumber.from(0),
+  remainingLiquidity: BigNumber.from(0),
+  rate: BigNumber.from(1),
+  remainingSwaps: BigNumber.from(0),
+  totalDeposits: BigNumber.from(0),
+  withdrawn: BigNumber.from(0),
+  totalSwaps: BigNumber.from(0),
+  toWithdraw: BigNumber.from(0),
+  id: 'PROTOCOL',
+  startedAt: 0,
+  status: 'TERMINATED',
+  pendingTransaction: '',
+  executedSwaps: BigNumber.from(0),
+};

@@ -17,6 +17,10 @@ const StyledFooterContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  left: 0;
+  right: 0;
+  position: absolute;
+  bottom: 30px;
 `;
 
 const StyledFooterMainContent = styled.div`

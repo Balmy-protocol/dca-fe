@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { SetStateCallback } from 'types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import { maximalAppleTabsStylesHook } from 'common/tabs';
 import findIndex from 'lodash/findIndex';
 import FilledInput from '@mui/material/FilledInput';
 import { withStyles } from '@mui/styles';

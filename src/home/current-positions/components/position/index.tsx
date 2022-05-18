@@ -140,9 +140,10 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
 interface ActivePositionProps {
   position: PositionProp;
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
+  onReusePosition: (position: Position) => void;
 }
 
-const ActivePosition = ({ position, onWithdraw }: ActivePositionProps) => {
+const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositionProps) => {
   const {
     from,
     to,
@@ -239,7 +240,7 @@ const ActivePosition = ({ position, onWithdraw }: ActivePositionProps) => {
             </Typography>
             {/* {showFromPrice && (
                 <StyledChip
-                  color="primary"
+                  variant="outlined"
                   size="small"
                   label={
                     <FormattedMessage
@@ -286,8 +287,8 @@ const ActivePosition = ({ position, onWithdraw }: ActivePositionProps) => {
             <Typography variant="body1">
               {showToPrice && (
                 <StyledChip
-                  color="primary"
                   size="small"
+                  variant="outlined"
                   label={
                     <FormattedMessage
                       description="current swapped in position price"
@@ -377,7 +378,7 @@ const ActivePosition = ({ position, onWithdraw }: ActivePositionProps) => {
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
-              onClick={() => onWithdraw(position)}
+              onClick={() => onReusePosition(position)}
               fullWidth
             >
               <Typography variant="body2">

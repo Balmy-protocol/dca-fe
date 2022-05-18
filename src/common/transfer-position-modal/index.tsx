@@ -12,6 +12,15 @@ import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import TextField from '@mui/material/TextField';
 
+const StyledTransferContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  gap: 10px;
+`;
+
 interface TransferPositionModalProps {
   position: FullPosition;
   open: boolean;
@@ -80,56 +89,60 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
     <Modal
       open={open}
       showCloseButton
+      showCloseIcon
       onClose={onCancel}
-      actions={[
-        {
-          label: <FormattedMessage description="Transfer" defaultMessage="Transfer" />,
-          color: 'secondary',
-          variant: 'outlined',
-          onClick: handleTransfer,
-        },
-      ]}
-    >
-      <Typography variant="h6">
+      maxWidth="sm"
+      title={
         <FormattedMessage
           description="transfer title"
           defaultMessage="Transfer {from}/{to} position"
           values={{ from: position.from.symbol, to: position.to.symbol }}
         />
-      </Typography>
-      <Typography variant="body1">
-        <FormattedMessage
-          description="transfer description"
-          defaultMessage="Set to whom you want to transfer your position to"
+      }
+      actions={[
+        {
+          label: <FormattedMessage description="Transfer" defaultMessage="Transfer" />,
+          color: 'secondary',
+          variant: 'contained',
+          onClick: handleTransfer,
+        },
+      ]}
+    >
+      <StyledTransferContainer>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="transfer description"
+            defaultMessage="Set to whom you want to transfer your position to"
+          />
+        </Typography>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="transfer sub description"
+            defaultMessage="This will transfer your position, your NFT and all the liquidity stored in the position to the new address."
+          />
+        </Typography>
+        <TextField
+          id="toAddress"
+          value={toAddress}
+          placeholder="Set the address to transfer to"
+          autoComplete="off"
+          autoCorrect="off"
+          fullWidth
+          type="text"
+          margin="normal"
+          spellCheck="false"
+          onChange={(evt) => validator(evt.target.value)}
+          // eslint-disable-next-line react/jsx-no-duplicate-props
+          inputProps={{
+            pattern: '^0x[A-Fa-f0-9]*$',
+            minLength: 1,
+            maxLength: 79,
+          }}
         />
-      </Typography>
-      <Typography variant="body1">
-        <FormattedMessage
-          description="transfer sub description"
-          defaultMessage="This will transfer your position, your NFT and all the liquidity stored in the position to the new address."
-        />
-      </Typography>
-      <TextField
-        id="toAddress"
-        value={toAddress}
-        placeholder="Set the address to transfer to"
-        autoComplete="off"
-        autoCorrect="off"
-        fullWidth
-        type="text"
-        margin="normal"
-        spellCheck="false"
-        onChange={(evt) => validator(evt.target.value)}
-        // eslint-disable-next-line react/jsx-no-duplicate-props
-        inputProps={{
-          pattern: '^0x[A-Fa-f0-9]*$',
-          minLength: 1,
-          maxLength: 79,
-        }}
-      />
-      <Typography variant="body1">
-        <FormattedMessage description="transfer warning" defaultMessage="This cannot be undone." />
-      </Typography>
+        <Typography variant="body1">
+          <FormattedMessage description="transfer warning" defaultMessage="This cannot be undone." />
+        </Typography>
+      </StyledTransferContainer>
     </Modal>
   );
 };

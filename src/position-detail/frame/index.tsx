@@ -7,23 +7,66 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import getPosition from 'graphql/getPosition.graphql';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import { useHistory, useParams } from 'react-router-dom';
-import { FullPosition, GetPairSwapsData } from 'types';
+import { FullPosition, GetPairSwapsData, NFTData } from 'types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import getPairSwaps from 'graphql/getPairSwaps.graphql';
-import { usePositionHasPendingTransaction } from 'state/transactions/hooks';
+import { usePositionHasPendingTransaction, useTransactionAdder } from 'state/transactions/hooks';
 import Button from 'common/button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PositionNotFound from 'position-detail/position-not-found';
-import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'state/hooks';
-import { appleTabsStylesHook } from 'common/tabs';
 import { changeMainTab, changePositionDetailsTab } from 'state/tabs/actions';
 import { usePositionDetailsTab } from 'state/tabs/hooks';
 import PositionPermissionsContainer from 'position-detail/permissions-container';
 import { setPermissions } from 'state/position-permissions/actions';
+import { FormattedMessage } from 'react-intl';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
+import NFTModal from 'common/view-nft-modal';
+import TransferPositionModal from 'common/transfer-position-modal';
+import TerminateModal from 'common/terminate-modal';
+import ModifySettingsModal from 'common/modify-settings-modal';
+import useWeb3Service from 'hooks/useWeb3Service';
+import { fullPositionToMappedPosition } from 'utils/parsing';
+import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import useTransactionModal from 'hooks/useTransactionModal';
+import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
+import { formatUnits } from '@ethersproject/units';
+import { BigNumber } from 'ethers';
+import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
+
+const StyledTab = withStyles(() =>
+  createStyles({
+    root: {
+      textTransform: 'none',
+      overflow: 'visible',
+      padding: '5px',
+      color: 'rgba(255,255,255,0.5)',
+    },
+    selected: {
+      color: '#FFFFFF !important',
+      fontWeight: '500',
+    },
+  })
+)(Tab);
+
+const StyledTabs = withStyles(() =>
+  createStyles({
+    root: {
+      overflow: 'visible',
+    },
+    indicator: {
+      background: '#3076F6',
+    },
+    scroller: {
+      overflow: 'visible !important',
+    },
+  })
+)(Tabs);
 
 const WAIT_FOR_SUBGRAPH = 5000;
 
@@ -33,9 +76,9 @@ const PositionDetailFrame = () => {
   const history = useHistory();
   const tabIndex = usePositionDetailsTab();
   const dispatch = useAppDispatch();
-  const tabsStyles = appleTabsStylesHook.useTabs();
-  const tabItemStyles = appleTabsStylesHook.useTabItem();
+  const web3Service = useWeb3Service();
   const currentNetwork = useCurrentNetwork();
+  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const {
     loading: isLoading,
     data,
@@ -61,6 +104,13 @@ const PositionDetailFrame = () => {
     skip: !position,
     client,
   });
+
+  const [showTerminateModal, setShowTerminateModal] = React.useState(false);
+  const [showTransferModal, setShowTransferModal] = React.useState(false);
+  const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
+  const addTransaction = useTransactionAdder();
+  const [showNFTModal, setShowNFTModal] = React.useState(false);
+  const [nftData, setNFTData] = React.useState<NFTData | null>(null);
 
   React.useEffect(() => {
     if (position && !isPending) {
@@ -100,6 +150,13 @@ const PositionDetailFrame = () => {
     return <PositionNotFound />;
   }
 
+  const handleViewNFT = async () => {
+    if (!position) return;
+    const tokenNFT = await web3Service.getTokenNFT(position.id);
+    setNFTData(tokenNFT);
+    setShowNFTModal(true);
+  };
+
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   position = {
@@ -112,25 +169,142 @@ const PositionDetailFrame = () => {
     dispatch(changeMainTab(1));
     history.push('/');
   };
+
+  const onWithdraw = async (useProtocolToken = false) => {
+    if (!position) {
+      return;
+    }
+    try {
+      const hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
+
+      const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
+      const toSymbol =
+        position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address
+          ? protocolOrWrappedToken
+          : position.to.symbol;
+      setModalLoading({
+        content: (
+          <>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="Withdrawing from"
+                defaultMessage="Withdrawing {toSymbol}"
+                values={{ toSymbol }}
+              />
+            </Typography>
+            {useProtocolToken && !hasPermission && (
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="Approve signature companion text"
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                />
+              </Typography>
+            )}
+          </>
+        ),
+      });
+      const result = await web3Service.withdraw(fullPositionToMappedPosition(position), useProtocolToken);
+      addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
+      setModalSuccess({
+        hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="withdraw from success"
+            defaultMessage="Your withdrawal of {toSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+              toSymbol,
+            }}
+          />
+        ),
+      });
+    } catch (e) {
+      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setModalError({ content: 'Error while withdrawing', error: { code: e.code, message: e.message, data: e.data } });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    }
+  };
+
+  const onShowModifyRateSettings = () => {
+    if (!position) {
+      return;
+    }
+
+    dispatch(
+      initializeModifyRateSettings({
+        fromValue: formatUnits(position.current.remainingLiquidity, position.from.decimals),
+        rate: formatUnits(position.current.rate, position.from.decimals),
+        frequencyValue: position.current.remainingSwaps.toString(),
+        modeType: BigNumber.from(position.current.remainingLiquidity).gt(BigNumber.from(0))
+          ? FULL_DEPOSIT_TYPE
+          : RATE_TYPE,
+      })
+    );
+    setShowModifyRateSettingsModal(true);
+  };
+
   return (
     <>
-      <Grid container spacing={4}>
-        <Grid item xs={12} style={{ paddingBottom: '0px', paddingTop: '0px' }}>
+      <TerminateModal
+        open={showTerminateModal}
+        position={fullPositionToMappedPosition(position)}
+        onCancel={() => setShowTerminateModal(false)}
+      />
+      <ModifySettingsModal
+        open={showModifyRateSettingsModal}
+        position={fullPositionToMappedPosition(position)}
+        onCancel={() => setShowModifyRateSettingsModal(false)}
+      />
+      <TransferPositionModal
+        open={showTransferModal}
+        position={position}
+        onCancel={() => setShowTransferModal(false)}
+      />
+      <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
+      <Grid container>
+        <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
           <Button variant="text" color="default" onClick={onBackToPositions}>
-            <Typography variant="body2" component="div" style={{ display: 'flex', alignItems: 'center' }}>
-              <ArrowBackIcon fontSize="inherit" /> Back to positions
+            <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
+              <ArrowBackIcon fontSize="inherit" />{' '}
+              <FormattedMessage description="backToPositions" defaultMessage="Back to positions" />
             </Typography>
           </Button>
         </Grid>
-        <Grid item xs={12} style={{ display: 'flex', paddingBottom: '15px' }}>
-          <Tabs
-            classes={tabsStyles}
+        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+          <StyledTabs
             value={tabIndex}
             onChange={(e, index) => dispatch(changePositionDetailsTab(index))}
+            TabIndicatorProps={{ style: { bottom: '8px' } }}
           >
-            <Tab classes={tabItemStyles} disableRipple label="View summary" />
-            <Tab classes={tabItemStyles} disableRipple label="View permissions" />
-          </Tabs>
+            <StyledTab
+              disableRipple
+              label={
+                <Typography variant="h6">
+                  <FormattedMessage description="viewSummary" defaultMessage="View summary" />
+                </Typography>
+              }
+            />
+            <StyledTab
+              disableRipple
+              sx={{ marginLeft: '32px' }}
+              label={
+                <Typography variant="h6">
+                  <FormattedMessage description="viewPermissions" defaultMessage="View permissions" />
+                </Typography>
+              }
+            />
+          </StyledTabs>
+          {position.status !== 'TERMINATED' && (
+            <PositionControls
+              onTerminate={() => setShowTerminateModal(true)}
+              onModifyRate={onShowModifyRateSettings}
+              onTransfer={() => setShowTransferModal(true)}
+              onViewNFT={handleViewNFT}
+              position={position}
+              pendingTransaction={pendingTransaction}
+            />
+          )}
         </Grid>
         <Grid item xs={12}>
           {tabIndex === 0 && (
@@ -138,6 +312,8 @@ const PositionDetailFrame = () => {
               position={position}
               pendingTransaction={pendingTransaction}
               swapsData={swapsData?.pair}
+              onWithdraw={onWithdraw}
+              onReusePosition={onShowModifyRateSettings}
             />
           )}
           {tabIndex === 1 && (
