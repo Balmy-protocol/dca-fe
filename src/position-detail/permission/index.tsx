@@ -35,11 +35,11 @@ const StyledLink = styled(Link)`
 `;
 
 const StyledCard = styled(Card)`
-  margin: 10px;
   border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
+  background: #292929;
 `;
 
 const StyledLabel = styled.div`

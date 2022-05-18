@@ -37,6 +37,9 @@ const StyledTabs = withStyles(() =>
     scroller: {
       overflow: 'visible !important',
     },
+    indicator: {
+      background: '#3076F6',
+    },
   })
 )(Tabs);
 

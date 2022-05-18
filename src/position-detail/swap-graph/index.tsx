@@ -2,7 +2,7 @@ import React from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
-import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
@@ -12,6 +12,8 @@ import { DateTime } from 'luxon';
 import { POSITION_ACTIONS } from 'config/constants';
 import { formatUnits } from '@ethersproject/units';
 import { useThemeMode } from 'state/config/hooks';
+import GraphTooltip from 'common/graph-tooltip';
+import EmptyGraph from 'assets/svg/emptyGraph';
 
 const StyledGraphAxis = styled.div`
   height: 0px;
@@ -29,11 +31,16 @@ const StyledGraphAxisLabels = styled.div`
 `;
 
 const StyledGraphContainer = styled(Paper)`
-  padding: 17px;
   flex-grow: 1;
   display: flex;
   width: 100%;
-  border-radius: 20px;
+  flex-direction: column;
+  background-color: transparent;
+  margin-bottom: 30px;
+
+  .recharts-surface {
+    overflow: visible;
+  }
 `;
 
 const StyledCenteredWrapper = styled.div`
@@ -41,6 +48,38 @@ const StyledCenteredWrapper = styled.div`
   flex: 1;
   align-items: center;
   justify-content: center;
+`;
+
+const StyledTitleContainer = styled.div`
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const StyledLegendContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+const StyledHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+`;
+
+const StyledLegend = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 7px;
+`
+
+const StyledLegendIndicator = styled.div<{ fill: string }>`
+  width: 12px;
+  height: 12px;
+  background-color: ${({ fill }) => fill};
+  border-radius: 99px;
 `;
 interface SwapsGraphProps {
   position: FullPosition;
@@ -161,92 +200,94 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
     return orderBy(mappedSwapData, ['date'], ['desc']).reverse();
   }, [position]);
 
-  const tooltipFormatter = (value: string, name: string) => `${value} ${name}`;
-
   const noData = position.history.length === 0;
 
+  if (noData) {
+    return (
+      <StyledCenteredWrapper>
+        <EmptyGraph size="100px" />
+        <Typography variant="h6">
+          <FormattedMessage
+            description="No data available"
+            defaultMessage="There is no data available about this pair"
+          />
+        </Typography>
+      </StyledCenteredWrapper>
+    )
+  }
+
   return (
-    <StyledGraphContainer>
-      <Grid container>
-        <Grid item xs={12}>
-          <Typography variant="h4">
-            <FormattedMessage description="PositionGraph" defaultMessage="Your position through time" />
+    <StyledGraphContainer elevation={0}>
+      <StyledHeader>
+        <StyledTitleContainer>
+          <Typography variant="h6">
+            <FormattedMessage
+              description="averagevsCurrentPrice"
+              defaultMessage="Average price vs current price"
+            />
           </Typography>
-        </Grid>
-        <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column' }}>
-          {noData ? (
-            <StyledCenteredWrapper>
-              <Typography variant="h6">
-                <FormattedMessage
-                  description="No data available"
-                  defaultMessage="There is no data available about this pair"
-                />
-              </Typography>
-            </StyledCenteredWrapper>
-          ) : (
-            <>
-              <ResponsiveContainer width="100%">
-                <AreaChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                  <defs>
-                    <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#36a3f5" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#36a3f5" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#BD00FF" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#BD00FF" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <Area
-                    connectNulls
-                    type="monotone"
-                    dataKey={position.from.symbol}
-                    stroke="#BD00FF"
-                    fillOpacity={1}
-                    yAxisId={1}
-                    fill="url(#colorPv)"
-                  />
-                  <Area
-                    connectNulls
-                    type="monotone"
-                    dataKey={position.to.symbol}
-                    stroke="#36a3f5"
-                    fillOpacity={1}
-                    fill="url(#colorUv)"
-                  />
-                  <XAxis hide dataKey="name" />
-                  <YAxis hide domain={['auto', 'auto']} dataKey={position.to.symbol} />
-                  <YAxis hide domain={['auto', 'auto']} dataKey={position.from.symbol} yAxisId={1} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: mode === 'light' ? '#ffffff' : '#424242' }}
-                    formatter={tooltipFormatter}
-                  />
-                  <Legend />
-                </AreaChart>
-              </ResponsiveContainer>
-              <StyledGraphAxis />
-              <StyledGraphAxisLabels>
-                <Typography variant="caption">
-                  {DateTime.fromSeconds(parseInt(position.history[0].createdAtTimestamp, 10)).toLocaleString({
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </Typography>
-                <Typography variant="caption">
-                  {DateTime.fromSeconds(
-                    parseInt(position.history[position.history.length - 1].createdAtTimestamp, 10)
-                  ).toLocaleString({
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </Typography>
-              </StyledGraphAxisLabels>
-            </>
-          )}
-        </Grid>
-      </Grid>
+        </StyledTitleContainer>
+        <StyledLegendContainer>
+          <StyledLegend>
+            <StyledLegendIndicator fill="#7C37ED" />
+            <Typography variant="body2">
+              <FormattedMessage
+                description="uniswapLegend"
+                defaultMessage="Uniswap"
+              />
+            </Typography>
+          </StyledLegend>
+          <StyledLegend>
+            <StyledLegendIndicator fill="#DCE2F9" />
+            <Typography variant="body2">
+              <FormattedMessage
+                description="meanFinanceLegend"
+                defaultMessage="Mean Finance"
+              />
+            </Typography>
+          </StyledLegend>
+        </StyledLegendContainer>
+      </StyledHeader>
+      <ResponsiveContainer width="100%" minHeight={200}>
+        <AreaChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+          <defs>
+            <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5}/>
+              <stop offset="95%" stopColor="#7C37ED" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <Area
+            connectNulls
+            legendType="none"
+            fill="url(#colorUniswap)"
+            strokeWidth="2px"
+            dot={false}
+            activeDot={false}
+            stroke="#7C37ED"
+            dataKey={position.from.symbol}
+          />
+          <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
+          <Area
+            connectNulls
+            legendType="none"
+            type="monotone"
+            strokeWidth="3px"
+            stroke="#DCE2F9"
+            dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9'}}
+            strokeDasharray="5 5"
+            dataKey={position.to.symbol}
+          />
+          <XAxis tickMargin={30} minTickGap={30} interval="preserveStartEnd" dataKey="name" axisLine={false} tickLine={false} tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}/>
+          <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false}/>
+          <Tooltip
+            content={({ payload, label }) => (
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              <GraphTooltip payload={payload as any} label={label} tokenA={{ ...position.from, isBaseToken: false }} tokenB={{ ...position.to, isBaseToken: false }} />
+            )}
+          />
+          <Legend />
+        </AreaChart>
+      </ResponsiveContainer>
     </StyledGraphContainer>
   );
 };

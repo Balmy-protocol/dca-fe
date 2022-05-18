@@ -60,13 +60,12 @@ const PositionPermissionsControls = ({
     </Button>
   ) : (
     <>
-      <Button onClick={onAddAddress} variant="outlined" color="default" size="large">
+      <Button onClick={onAddAddress} variant="contained" color="secondary" size="large">
         <FormattedMessage description="add new address" defaultMessage="Add new address" />
-        <AddIcon />
       </Button>
       {!shouldDisable && (
         <PositionControlsContainer>
-          <Button onClick={onDiscardChanges} variant="contained" color="secondary" size="large">
+          <Button onClick={onDiscardChanges} variant="outlined" color="default" size="large">
             <FormattedMessage description="discard changes" defaultMessage="Discard changes" />
           </Button>
 

@@ -21,6 +21,10 @@ const StyledNavbarWrapper = styled.div`
   background: rgba(5, 3, 13, 0.1);
   box-shadow: inset 0px -1px 0px rgba(255, 255, 255, 0.1);
   padding: 10px;
+  position: sticky;
+  top: 0;
+  background: #121212;
+  z-index: 90;
 `;
 
 const StyledNavbarContainer = styled.div`

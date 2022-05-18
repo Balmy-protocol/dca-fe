@@ -11,9 +11,14 @@ import { Position } from 'types';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
+import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import ModifySettingsModal from 'common/modify-settings-modal';
+import { useAppDispatch } from 'state/hooks';
+import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
+import { formatUnits } from '@ethersproject/units';
+import { EmptyPosition } from 'mocks/currentPositions';
 import ActivePosition from './components/position';
 
 const StyledGridItem = styled(Grid)`
@@ -40,6 +45,9 @@ const CurrentPositions = () => {
   const positionsToFill =
     currentPositions.length % positionsPerRow !== 0 ? positionsPerRow - (currentPositions.length % positionsPerRow) : 0;
   const emptyPositions = [];
+  const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
+  const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
+  const dispatch = useAppDispatch();
 
   for (let i = 0; i < positionsToFill; i += 1) {
     emptyPositions.push(i);
@@ -121,8 +129,30 @@ const CurrentPositions = () => {
     ({ toWithdraw, remainingSwaps }) => toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0))
   );
 
+  const onShowModifyRateSettings = (position: Position) => {
+    if (!position) {
+      return;
+    }
+
+    setSelectedPosition(position);
+    dispatch(
+      initializeModifyRateSettings({
+        fromValue: formatUnits(position.remainingLiquidity, position.from.decimals),
+        rate: formatUnits(position.rate, position.from.decimals),
+        frequencyValue: position.remainingSwaps.toString(),
+        modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0)) ? FULL_DEPOSIT_TYPE : RATE_TYPE,
+      })
+    );
+    setShowModifyRateSettingsModal(true);
+  };
+
   return (
     <>
+      <ModifySettingsModal
+        open={showModifyRateSettingsModal}
+        position={selectedPosition}
+        onCancel={() => setShowModifyRateSettingsModal(false)}
+      />
       <Grid container spacing={1}>
         {/* dont know why I need the 100% width :shrug: */}
         <StyledGridItem item xs={12}>
@@ -134,7 +164,11 @@ const CurrentPositions = () => {
           <Grid container spacing={2}>
             {positionsInProgress.map((position) => (
               <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
-                <ActivePosition position={position} onWithdraw={onWithdraw} />
+                <ActivePosition
+                  position={position}
+                  onWithdraw={onWithdraw}
+                  onReusePosition={onShowModifyRateSettings}
+                />
               </StyledGridItem>
             ))}
           </Grid>
@@ -148,7 +182,11 @@ const CurrentPositions = () => {
           <Grid container spacing={2}>
             {positionsFinished.map((position) => (
               <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
-                <ActivePosition position={position} onWithdraw={onWithdraw} />
+                <ActivePosition
+                  position={position}
+                  onWithdraw={onWithdraw}
+                  onReusePosition={onShowModifyRateSettings}
+                />
               </StyledGridItem>
             ))}
           </Grid>

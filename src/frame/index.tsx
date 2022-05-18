@@ -33,13 +33,13 @@ declare module 'styled-components' {
 }
 
 const StyledVector1Container = styled.div`
-  position: absolute;
+  position: fixed;
   bottom: -5px;
   left: 0px;
   z-index: -99;
 `;
 const StyledVector2Container = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0px;
   right: 0px;
   z-index: -99;
@@ -70,7 +70,8 @@ const StyledContainer = styled(Container)`
 `;
 
 const StyledFooterGridContainer = styled(Grid)`
-  margin-top: 62px !important;
+  margin-top: 92px !important;
+  position: relative;
 `;
 const AppFrame = ({ isLoading }: AppFrameProps) => {
   const web3Service = useWeb3Service();
