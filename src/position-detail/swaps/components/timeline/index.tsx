@@ -31,8 +31,8 @@ import { Theme } from '@mui/material';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {
-    backgroundColor: theme.palette.primary.dark,
-    color: theme.palette.common.white,
+    // backgroundColor: theme.palette.primary.dark,
+    // color: theme.palette.common.white,
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },
@@ -58,33 +58,47 @@ const StyledLink = styled(Link)`
 
 const StyledTimeline = styled(Grid)`
   position: relative;
-  padding: 0px 0px 0px 10px;
-  margin-top: 10px;
+  padding: 0px 0px 0px 21px;
   &:before {
     content: '';
     position: absolute;
-    left: 10px;
-    top: 0;
+    left: 21px;
+    top: 5px;
     width: 4px;
-    height: 100%;
-    background: #0088cc;
+    bottom: 0;
+    border-left: 3px dashed #dce2f9;
   }
 `;
 
 const StyledTimelineContainer = styled(Grid)`
-  ${({ theme }) => `
-    position: relative;
-    &:last-child {
-      :before {
-        content: '';
-        position: absolute;
-        top: 20px;
-        width: 4px;
-        bottom: 0;
-        background: ${theme.palette.mode === 'light' ? '#ffffff' : '#303030'};
-      }
+  position: relative;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  &:first-child {
+    :before {
+      content: '';
+      position: absolute;
+      bottom: calc(50% + 21px);
+      width: 4px;
+      left: 0;
+      top: 0;
+      background: #202020;
     }
-  `}
+  }
+  &:last-child {
+    margin-bottom: 0px;
+    :before {
+      content: '';
+      position: absolute;
+      top: calc(50% - 21px);
+      width: 4px;
+      left: 0;
+      bottom: 0;
+      background: #202020;
+    }
+  }
 `;
 
 const StyledCenteredGrid = styled(Grid)`
@@ -92,74 +106,57 @@ const StyledCenteredGrid = styled(Grid)`
   align-items: center;
 `;
 
-const StyledRightGrid = styled(Grid)`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-`;
-
 const StyledTimelineIcon = styled.div`
-  ${({ theme }) => `
+  position: absolute;
+  left: -21px;
+  top: calc(50% - 21px);
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+  text-align: center;
+  border: 1px solid #dce2f9;
+  background: #202020;
+
+  i {
     position: absolute;
-    left: -24px;
-    top: 20px;
-    width: 50px;
-    height: 50px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  svg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    text-align: center;
-    font-size: 2rem;
-    background: ${theme.palette.mode === 'light' ? '#eee' : '#424242'};
-
-    i {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    svg {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-    }
-  `}
+  }
 `;
 
 const StyledTimelineContent = styled.div`
-  ${({ theme }) => `
-    padding: 20px 0px 15px 45px;
-    position: relative;
-    &:before {
-      content: '';
-      background: ${theme.palette.mode === 'light' ? '#eee' : '#595959'};
-      width: 20px;
-      height: 20px;
-      left: 35px;
-      top: 35px;
-      display: block;
-      position: absolute;
-      transform: rotate(45deg);
-      border-radius: 0 0 0 2px;
-    }
-  `}
+  padding: 0px;
+  position: relative;
+  text-align: start;
+  padding: 0px 10px 0px 22px;
+  overflow-wrap: anywhere;
+  flex-grow: 1;
 `;
 
-const StyledTimelineContentText = styled(Grid)`
-  padding: 10px 20px;
-`;
+const StyledTimelineContentText = styled(Grid)``;
 
 const StyledTimelineContentTitle = styled(Grid)`
-  ${({ theme }) => `
-    padding: 10px 20px;
-    background-color: ${theme.palette.mode === 'light' ? '#eee' : '#595959'};
-  `}
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const StyledTitleMainText = styled(Typography)`
+  color: rgba(255, 255, 255, 0.5);
 `;
 
 interface PositionTimelineProps {
@@ -176,11 +173,11 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
       BigNumber.from(positionState.swapped),
       positionState.createdAtTimestamp
     );
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
+    const [fromCurrentPrice, isLoadingFromCurrentPrice, errorFromFullPrice] = useUsdPrice(
       position.from,
       BigNumber.from(positionState.rate)
     );
-    const [fromPrice, isLoadingFromPrice] = useUsdPrice(
+    const [fromPrice, isLoadingFromPrice, errorFromPrice] = useUsdPrice(
       position.from,
       BigNumber.from(positionState.rate),
       positionState.createdAtTimestamp
@@ -206,7 +203,6 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
         description="pairSwapDetails"
         defaultMessage="1 {from} = {swapRate} {to}"
         values={{
-          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
           from: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
           to: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
           // eslint-disable-next-line no-nested-ternary
@@ -226,36 +222,29 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
             component="p"
             style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
           >
-            <FormattedMessage
-              description="pairSwapDetails"
-              defaultMessage="Swapped <b>{rate} {from} </b>"
-              values={{
-                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                result: formatCurrencyAmount(BigNumber.from(positionState.swapped), position.to),
-                from: position.from.symbol,
-                to: position.to.symbol,
-                rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
-              }}
-            />
+            <StyledTitleMainText variant="body1">
+              <FormattedMessage description="pairSwapDetails" defaultMessage="Swapped:" />
+            </StyledTitleMainText>
+            {` ${formatCurrencyAmount(BigNumber.from(positionState.rate), position.from)} ${position.from.symbol} `}
             {showFromPrices && (
               <DarkTooltip
                 title={
-                  showFromPrices
+                  showFromCurrentPrice
                     ? 'Displaying current value. Click to show value on day of withdrawal'
-                    : 'Estimated value on day of withdrawal'
+                    : 'Estimated value on day of swap'
                 }
                 arrow
                 placement="top"
               >
                 <StyledChip
-                  onClick={() => setShouldShowFromCurrentPrice(!showFromPrices)}
-                  color="primary"
+                  onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
+                  variant="outlined"
+                  size="small"
                   label={
                     <FormattedMessage
                       description="pairSwapDetailsFromPrice"
-                      defaultMessage="<b>({fromPrice} USD)</b>"
+                      defaultMessage="{fromPrice} USD"
                       values={{
-                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                         fromPrice: showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2),
                       }}
                     />
@@ -265,13 +254,10 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
             )}
             <FormattedMessage
               description="pairSwapDetailsFor"
-              defaultMessage=" for <b>{result} {to}</b>"
+              defaultMessage="for {result} {to}"
               values={{
-                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                 result: formatCurrencyAmount(BigNumber.from(positionState.swapped), position.to),
-                from: position.from.symbol,
                 to: position.to.symbol,
-                rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
               }}
             />
             {showToPrices && (
@@ -279,20 +265,20 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                 title={
                   showToCurrentPrice
                     ? 'Displaying current value. Click to show value on day of withdrawal'
-                    : 'Estimated value on day of withdrawal'
+                    : 'Estimated value on day of swap'
                 }
                 arrow
                 placement="top"
               >
                 <StyledChip
                   onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
-                  color="primary"
+                  variant="outlined"
+                  size="small"
                   label={
                     <FormattedMessage
                       description="pairSwapDetailsToPrice"
-                      defaultMessage="<b>({toPrice} USD)</b>"
+                      defaultMessage="{toPrice} USD"
                       values={{
-                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                         toPrice: showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2),
                       }}
                     />
@@ -305,24 +291,12 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
             <StyledHelpOutlineIcon fontSize="inherit" />
           </Tooltip>
         </StyledCenteredGrid>
-        <StyledRightGrid item xs={12}>
-          <Tooltip
-            title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-              DateTime.DATETIME_FULL
-            )}
-            arrow
-            placement="top"
-          >
-            <Typography variant="body2" component="span">
-              {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-            </Typography>
-          </Tooltip>
-        </StyledRightGrid>
       </>
     );
   },
   title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const buildCreatedItem = (positionState: ActionState, position: FullPosition) => ({
@@ -330,48 +304,41 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
   content: () => (
     <>
       <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionCreatedRate"
-            defaultMessage="Rate: <b>{rate} {from}</b>"
-            values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-              rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
-              from: position.from.symbol,
-            }}
-          />
+        <Typography
+          variant="body1"
+          component="p"
+          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+        >
+          <StyledTitleMainText variant="body1">
+            <FormattedMessage
+              description="positionCreatedRate"
+              defaultMessage="Rate:"
+              values={{
+                rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
+                from: position.from.symbol,
+              }}
+            />
+          </StyledTitleMainText>
+          {` ${formatCurrencyAmount(BigNumber.from(positionState.rate), position.from)} ${position.from.symbol}`}
         </Typography>
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionCreatedSwaps"
-            defaultMessage="Set to run for <b>{frequency}</b>"
-            values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-              swaps: positionState.remainingSwaps,
-              frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
-            }}
-          />
+        <Typography
+          variant="body1"
+          component="p"
+          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+        >
+          <StyledTitleMainText variant="body1">
+            <FormattedMessage description="positionCreatedSwaps" defaultMessage="Set to run for:" />
+          </StyledTitleMainText>
+          {` ${getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps)}`}
         </Typography>
       </Grid>
-      <StyledRightGrid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-            DateTime.DATETIME_FULL
-          )}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-          </Typography>
-        </Tooltip>
-      </StyledRightGrid>
     </>
   ),
   title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const buildTransferedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
@@ -379,52 +346,40 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
   content: () => (
     <>
       <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="from"
-            defaultMessage="From "
-            values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-              from: positionState.from,
-              to: positionState.to,
-            }}
-          />
+        <Typography
+          variant="body1"
+          component="p"
+          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+        >
+          <StyledTitleMainText variant="body1">
+            <FormattedMessage description="transferedFrom" defaultMessage="Transfered from:" />
+          </StyledTitleMainText>
           <StyledLink href={buildEtherscanAddress(positionState.from, chainId)} target="_blank" rel="noreferrer">
             <Address address={positionState.from} />
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
-          <FormattedMessage
-            description="to"
-            defaultMessage=" to"
-            values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-              from: positionState.from,
-              to: positionState.to,
-            }}
-          />
+        </Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <Typography
+          variant="body1"
+          component="p"
+          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+        >
+          <StyledTitleMainText variant="body1">
+            <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
+          </StyledTitleMainText>
           <StyledLink href={buildEtherscanAddress(positionState.to, chainId)} target="_blank" rel="noreferrer">
             <Address address={positionState.to} />
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
         </Typography>
       </Grid>
-      <StyledRightGrid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-            DateTime.DATETIME_FULL
-          )}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-          </Typography>
-        </Tooltip>
-      </StyledRightGrid>
     </>
   ),
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
@@ -482,23 +437,11 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
           </Typography>
         ))}
       </Grid>
-      <StyledRightGrid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-            DateTime.DATETIME_FULL
-          )}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-          </Typography>
-        </Tooltip>
-      </StyledRightGrid>
     </>
   ),
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position permissions modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
@@ -509,9 +452,8 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
         <Typography variant="body1">
           <FormattedMessage
             description="positionModifiedRate"
-            defaultMessage="{increaseDecrease} rate from <b>{oldRate} {from}</b> to <b>{rate} {from}</b>"
+            defaultMessage="{increaseDecrease} rate from {oldRate} {from} to {rate} {from}"
             values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               increaseDecrease: BigNumber.from(positionState.oldRate).lt(BigNumber.from(positionState.rate))
                 ? 'Increased'
                 : 'Decreased',
@@ -522,23 +464,11 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
           />
         </Typography>
       </Grid>
-      <StyledRightGrid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-            DateTime.DATETIME_FULL
-          )}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-          </Typography>
-        </Tooltip>
-      </StyledRightGrid>
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Rate Modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -549,9 +479,8 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
         <Typography variant="body1">
           <FormattedMessage
             description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for <b>{frequency}</b> from <b>{oldFrequency}</b>"
+            defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
             values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
                 BigNumber.from(positionState.remainingSwaps)
               )
@@ -563,23 +492,11 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
           />
         </Typography>
       </Grid>
-      <StyledRightGrid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-            DateTime.DATETIME_FULL
-          )}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-          </Typography>
-        </Tooltip>
-      </StyledRightGrid>
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Changed duration" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -590,9 +507,8 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
         <Typography variant="body1">
           <FormattedMessage
             description="positionModifiedRate"
-            defaultMessage="{increaseDecrease} rate from <b>{oldRate} {from}</b> to <b>{rate} {from}</b>"
+            defaultMessage="{increaseDecrease} rate from {oldRate} {from} to {rate} {from}"
             values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               increaseDecrease: BigNumber.from(positionState.oldRate).lt(BigNumber.from(positionState.rate))
                 ? 'Increased'
                 : 'Decreased',
@@ -607,9 +523,8 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
         <Typography variant="body1">
           <FormattedMessage
             description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for <b>{frequency}</b> from <b>{oldFrequency}</b>"
+            defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
             values={{
-              b: (chunks: React.ReactNode) => <b>{chunks}</b>,
               increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
                 BigNumber.from(positionState.remainingSwaps)
               )
@@ -621,23 +536,11 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
           />
         </Typography>
       </Grid>
-      <StyledRightGrid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-            DateTime.DATETIME_FULL
-          )}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-          </Typography>
-        </Tooltip>
-      </StyledRightGrid>
     </>
   ),
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
@@ -664,9 +567,8 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
           <Typography variant="body1" style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}>
             <FormattedMessage
               description="positionWithdrawn"
-              defaultMessage="Withdraw <b>{withdraw} {to}</b>"
+              defaultMessage="Withdraw {withdraw} {to}"
               values={{
-                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                 withdraw: formatCurrencyAmount(BigNumber.from(positionState.withdrawn), position.to),
                 to: position.to.symbol,
                 showToPrice: showPrices,
@@ -685,13 +587,13 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
               >
                 <StyledChip
                   onClick={() => setShouldShowCurrentPrice(!showCurrentPrice)}
-                  color="primary"
+                  variant="outlined"
+                  size="small"
                   label={
                     <FormattedMessage
                       description="positionWithdrawnPrice"
-                      defaultMessage="<b>({toPrice} USD)</b>"
+                      defaultMessage="{toPrice} USD"
                       values={{
-                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                         toPrice: showCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2),
                       }}
                     />
@@ -702,47 +604,20 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
             <FormattedMessage description="positionWithdrawnSecond" defaultMessage=" from position" />
           </Typography>
         </Grid>
-        <StyledRightGrid item xs={12}>
-          <Tooltip
-            title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-              DateTime.DATETIME_FULL
-            )}
-            arrow
-            placement="top"
-          >
-            <Typography variant="body2" component="span">
-              {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-            </Typography>
-          </Tooltip>
-        </StyledRightGrid>
       </>
     );
   },
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const buildTerminatedItem = (positionState: ActionState) => ({
   icon: <DeleteSweepIcon />,
-  content: () => (
-    <>
-      <StyledRightGrid item xs={12}>
-        <Tooltip
-          title={DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toLocaleString(
-            DateTime.DATETIME_FULL
-          )}
-          arrow
-          placement="top"
-        >
-          <Typography variant="body2" component="span">
-            {DateTime.fromSeconds(parseInt(positionState.createdAtTimestamp, 10)).toRelative()}
-          </Typography>
-        </Tooltip>
-      </StyledRightGrid>
-    </>
-  ),
+  content: () => <></>,
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Terminated" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
 const MESSAGE_MAP = {
@@ -795,21 +670,30 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
   return (
     <StyledTimeline container>
       {history.map((historyItem) => (
-        <StyledTimelineContainer item xs={12}>
+        <StyledTimelineContainer item xs={12} key={historyItem.time}>
           <StyledTimelineIcon>{historyItem.icon}</StyledTimelineIcon>
           <StyledTimelineContent>
-            <StyledCard variant="outlined">
-              <Grid container>
-                <StyledTimelineContentTitle item xs={12}>
-                  <Typography variant="h6">{historyItem.title}</Typography>
-                </StyledTimelineContentTitle>
-                <Grid item xs={12}>
-                  <StyledTimelineContentText container>
-                    <historyItem.content />
-                  </StyledTimelineContentText>
-                </Grid>
+            <Grid container>
+              <StyledTimelineContentTitle item xs={12}>
+                <Typography variant="body1" fontWeight={500}>
+                  {historyItem.title}
+                </Typography>
+                <Tooltip
+                  title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_FULL)}
+                  arrow
+                  placement="top"
+                >
+                  <StyledTitleMainText variant="body2">
+                    {DateTime.fromSeconds(historyItem.time).toRelative()}
+                  </StyledTitleMainText>
+                </Tooltip>
+              </StyledTimelineContentTitle>
+              <Grid item xs={12}>
+                <StyledTimelineContentText container>
+                  <historyItem.content />
+                </StyledTimelineContentText>
               </Grid>
-            </StyledCard>
+            </Grid>
           </StyledTimelineContent>
         </StyledTimelineContainer>
       ))}

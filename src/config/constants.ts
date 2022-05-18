@@ -713,10 +713,10 @@ export const PERMISSIONS = {
 };
 
 export const STRING_PERMISSIONS: Record<Permission, string> = {
-  INCREASE: 'Increase',
-  REDUCE: 'Reduce',
+  INCREASE: 'Increase position',
+  REDUCE: 'Reduce position',
   WITHDRAW: 'Withdraw',
-  TERMINATE: 'Terminate',
+  TERMINATE: 'Terminate position',
 };
 
 export const MAX_UINT_32 = 4294967295;

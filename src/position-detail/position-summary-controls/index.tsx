@@ -1,128 +1,117 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Link from '@mui/material/Link';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { buildEtherscanTransaction } from 'utils/etherscan';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { FullPosition } from 'types';
-import { BigNumber } from 'ethers';
 import useWeb3Service from 'hooks/useWeb3Service';
-import Grid from '@mui/material/Grid';
-import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
-import WithdrawButton from './withdraw-button';
+import IconButton from '@mui/material/IconButton';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
 
 const PositionControlsContainer = styled.div`
   display: flex;
   align-self: flex-end;
+  border-radius: 20px;
+  background-color: rgba(216, 216, 216, 0.05);
 `;
 
-const StyledGrid = styled(Grid)`
-  display: flex;
-  justify-content: flex-end;
-`;
+const StyledMenu = withStyles(() =>
+  createStyles({
+    paper: {
+      border: '2px solid #A5AAB5',
+      borderRadius: '8px',
+    },
+  })
+)(Menu);
 
-const StyledButtonGroup = styled(ButtonGroup)`
-  margin-left: 10px;
-`;
 interface PositionSummaryControlsProps {
-  onWithdraw: (useProtocolToken: boolean) => void;
   onTerminate: () => void;
   onModifyRate: () => void;
   onTransfer: () => void;
   onViewNFT: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
-  shouldDisable?: boolean;
 }
 
 const PositionSummaryControls = ({
-  onWithdraw,
   onTerminate,
   onModifyRate,
   onTransfer,
   pendingTransaction,
   position,
   onViewNFT,
-  shouldDisable,
 }: PositionSummaryControlsProps) => {
-  const currentNetwork = useCurrentNetwork();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const isPending = pendingTransaction !== null;
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
-  const wrappedProtocolToken = WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId);
 
   if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
 
   return (
     <PositionControlsContainer>
-      <Grid container spacing={2}>
-        <StyledGrid item xs={12}>
-          {isPending && (
-            <Button variant="contained" color="pending" size="large">
-              <Link
-                href={buildEtherscanTransaction(pendingTransaction as string, currentNetwork.chainId)}
-                target="_blank"
-                rel="noreferrer"
-                underline="none"
-                color="inherit"
-              >
-                <Typography variant="body2" component="span">
-                  <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                </Typography>
-                <OpenInNewIcon style={{ fontSize: '1rem' }} />
-              </Link>
-            </Button>
-          )}
-          {!isPending && (
-            <>
-              {(position.to.address === PROTOCOL_TOKEN_ADDRESS ||
-                position.to.address === wrappedProtocolToken.address) && (
-                <WithdrawButton
-                  position={position}
-                  onClick={onWithdraw}
-                  disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || !!shouldDisable}
-                />
-              )}
-
-              {position.to.address !== PROTOCOL_TOKEN_ADDRESS && position.to.address !== wrappedProtocolToken.address && (
-                <Button
-                  variant="contained"
-                  color="white"
-                  onClick={() => onWithdraw(false)}
-                  disabled={BigNumber.from(position.current.idleSwapped).lte(BigNumber.from(0)) || !!shouldDisable}
-                >
-                  <FormattedMessage
-                    description="withdraw swapped"
-                    defaultMessage="Withdraw {to}"
-                    values={{
-                      to: position.to.symbol,
-                    }}
-                  />
-                </Button>
-              )}
-              <StyledButtonGroup>
-                <Button variant="contained" color="white" onClick={onViewNFT} disabled={shouldDisable}>
-                  <FormattedMessage description="view nft" defaultMessage="View NFT" />
-                </Button>
-                ,
-                <Button variant="contained" color="white" onClick={onModifyRate} disabled={shouldDisable}>
-                  <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
-                </Button>
-                <Button variant="contained" color="white" onClick={onTransfer}>
-                  <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-                </Button>
-                <Button variant="outlined" color="error" onClick={onTerminate} disabled={shouldDisable}>
-                  <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
-                </Button>
-              </StyledButtonGroup>
-            </>
-          )}
-        </StyledGrid>
-      </Grid>
+      <IconButton onClick={handleClick} disabled={isPending}>
+        <MoreVertIcon />
+      </IconButton>
+      <StyledMenu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            onViewNFT();
+          }}
+        >
+          <FormattedMessage description="view nft" defaultMessage="View NFT" />
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            onModifyRate();
+          }}
+          disabled={isPending}
+        >
+          <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            onTransfer();
+          }}
+          disabled={isPending}
+        >
+          <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            onTerminate();
+          }}
+          disabled={isPending}
+          style={{ color: '#FF5359' }}
+        >
+          <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
+        </MenuItem>
+      </StyledMenu>
     </PositionControlsContainer>
   );
 };

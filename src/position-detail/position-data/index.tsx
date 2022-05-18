@@ -1,49 +1,148 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import { FullPosition } from 'types';
+import { FullPosition, GetPairSwapsData } from 'types';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
-import Tooltip from '@mui/material/Tooltip';
 import TokenIcon from 'common/token-icon';
-import ArrowRight from 'assets/svg/atom/arrow-right';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { DateTime } from 'luxon';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
-import Divider from '@mui/material/Divider';
-
-import { getFrequencyLabel } from 'utils/parsing';
+import Button from 'common/button';
+import { calculateStale, fullPositionToMappedPosition, getTimeFrequencyLabel, STALE } from 'utils/parsing';
 import { POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useUsdPrice from 'hooks/useUsdPrice';
+import LinearProgress from '@mui/material/LinearProgress';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+
+import { createStyles, Theme } from '@mui/material/styles';
+import { withStyles } from '@mui/styles';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 interface DetailsProps {
   position: FullPosition;
+  pair?: GetPairSwapsData;
+  pendingTransaction: string | null;
+  onWithdraw: (useProtocolToken: boolean) => void;
+  onReusePosition: () => void;
 }
+
+const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
+
+const BorderLinearProgress = withStyles(() =>
+  createStyles({
+    root: {
+      height: 8,
+      borderRadius: 10,
+      background: '#D8D8D8',
+    },
+    bar: {
+      borderRadius: 10,
+      background: 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)',
+    },
+  })
+)(StyledSwapsLinearProgress);
 
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
 `;
 
+const StyledCard = styled(Card)`
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  background: #292929;
+`;
+
+const StyledCardContent = styled(CardContent)`
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+`;
+
+const StyledCardHeader = styled.div`
+  display: flex;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+`;
+
+const StyledArrowRightContainer = styled.div`
+  margin: 0 5px !important;
+  font-size: 35px;
+  display: flex;
+`;
+
 const StyledCardTitleHeader = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  margin-right: 10px;
+  flex-grow: 1;
   *:not(:first-child) {
     margin-left: 4px;
+    font-weight: 500;
   }
-  margin-bottom: 10px;
 `;
 
-const StyledPaper = styled(Paper)`
-  border-radius: 20px;
-  padding: 20px;
+const StyledDetailWrapper = styled.div`
+  margin-bottom: 5px;
   display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+const StyledProgressWrapper = styled.div`
+  margin: 12px 0px;
+`;
+
+const StyledCardFooterButton = styled(Button)`
+  margin-top: 8px;
+`;
+
+const StyledFreqLeft = styled.div`
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+`;
+
+const StyledStale = styled.div`
+  color: #cc6d00;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+`;
+
+const StyledFinished = styled.div`
+  color: #33ac2e;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+`;
+
+const StyledContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
 `;
 
-const Details = ({ position }: DetailsProps) => {
+const StyledCallToActionContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+`;
+
+const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePosition }: DetailsProps) => {
+  const { from, to, swapInterval, current } = position;
+
+  const { toWithdraw, remainingLiquidity, remainingSwaps, totalSwaps } = fullPositionToMappedPosition(position);
+
+  const currentNetwork = useCurrentNetwork();
+  const protocolToken = getProtocolToken(currentNetwork.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const isPending = pendingTransaction !== null;
   const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
   let summedPrices = BigNumber.from(0);
   swappedActions.forEach((action) => {
@@ -71,261 +170,289 @@ const Details = ({ position }: DetailsProps) => {
   const showToPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToPrice && !!toPrice;
   const showFromPrice = !STABLE_COINS.includes(position.from.symbol) && !isLoadingFromPrice && !!fromPrice;
 
+  const hasNoFunds = BigNumber.from(current.remainingLiquidity).lte(BigNumber.from(0));
+
+  const lastExecutedAt = (pair?.swaps && pair?.swaps[0] && pair?.swaps[0].executedAtTimestamp) || '0';
+
+  const isStale =
+    calculateStale(
+      parseInt(lastExecutedAt, 10) || 0,
+      BigNumber.from(position.swapInterval.interval),
+      parseInt(position.createdAtTimestamp, 10) || 0,
+      pair?.nextSwapAvailableAt ?? null
+    ) === STALE;
+
   return (
-    <StyledPaper>
-      <Grid container spacing={1} direction="column" wrap="nowrap">
-        <Grid item xs={12}>
-          <StyledCardTitleHeader>
-            <TokenIcon token={position.from} size="24px" />
-            <Typography variant="body1">{position.from.symbol}</Typography>
-            <ArrowRight size="20px" />
-            <TokenIcon token={position.to} size="24px" />
-            <Typography variant="body1">{position.to.symbol}</Typography>
-          </StyledCardTitleHeader>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider variant="middle" />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <FormattedMessage description="positionDetailsHistoricallySwappedTitle" defaultMessage="Swapped:" />
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography
-                variant="caption"
-                style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-              >
-                <FormattedMessage
-                  description="positionDetailsHistoricallySwapped"
-                  defaultMessage="{swapped} {to}"
-                  values={{
-                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                    swapped: formatCurrencyAmount(BigNumber.from(position.totalSwapped), position.to),
-                    to: position.to.symbol,
-                  }}
-                />
-                {showToFullPrice && (
-                  <StyledChip
-                    color="primary"
-                    size="small"
-                    label={
-                      <FormattedMessage
-                        description="positionDetailsHistoricallySwappedPrice"
-                        defaultMessage="({toPrice} USD)"
-                        values={{
-                          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                          toPrice: toFullPrice?.toFixed(2),
-                        }}
-                      />
-                    }
-                  />
-                )}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider variant="middle" />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <FormattedMessage
-                  description="positionDetailsToWithdrawTitle"
-                  defaultMessage="Available to withdraw:"
-                />
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography
-                variant="caption"
-                style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-              >
-                <FormattedMessage
-                  description="positionDetailsToWithdraw"
-                  defaultMessage="{toWithdraw} {to}"
-                  values={{
-                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                    toWithdraw: formatCurrencyAmount(BigNumber.from(position.current.idleSwapped), position.to),
-                    to: position.to.symbol,
-                  }}
-                />
-                {showToPrice && (
-                  <StyledChip
-                    color="primary"
-                    size="small"
-                    label={
-                      <FormattedMessage
-                        description="positionDetailsToWithdrawPrice"
-                        defaultMessage="({toPrice} USD)"
-                        values={{
-                          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                          toPrice: toPrice?.toFixed(2),
-                        }}
-                      />
-                    }
-                  />
-                )}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider variant="middle" />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <FormattedMessage description="positionDetailsCurrentRateTitle" defaultMessage="Rate:" />
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="caption">
-                <FormattedMessage
-                  description="positionDetailsCurrentRate"
-                  defaultMessage="{rate} {from} {frequency}"
-                  values={{
-                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                    rate: formatCurrencyAmount(BigNumber.from(position.current.rate), position.from),
-                    from: position.from.symbol,
-                    frequency:
-                      STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every,
-                  }}
-                />
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider variant="middle" />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <FormattedMessage description="positionDetailsRemainingFundsTitle" defaultMessage="Remaining funds:" />
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography
-                variant="caption"
-                style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-              >
-                <FormattedMessage
-                  description="positionDetailsRemainingFunds"
-                  defaultMessage="{funds} {from}"
-                  values={{
-                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                    funds: formatCurrencyAmount(BigNumber.from(position.current.remainingLiquidity), position.from),
-                    from: position.from.symbol,
-                  }}
-                />
-                {showFromPrice && (
-                  <StyledChip
-                    color="primary"
-                    size="small"
-                    label={
-                      <FormattedMessage
-                        description="positionDetailsRemainingFundsPrice"
-                        defaultMessage="({fromPrice} USD)"
-                        values={{
-                          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                          fromPrice: fromPrice?.toFixed(2),
-                        }}
-                      />
-                    }
-                  />
-                )}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider variant="middle" />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <FormattedMessage
-                  description="positionDetailsAverageBuyPriceTitle"
-                  defaultMessage="Average buy price:"
-                />
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="caption">
-                {averageBuyPrice.gt(BigNumber.from(0)) ? (
+    <StyledCard>
+      <StyledCardContent>
+        <StyledContentContainer>
+          <StyledCardHeader>
+            <StyledCardTitleHeader>
+              <TokenIcon token={from} size="27px" />
+              <Typography variant="body1">{from.symbol}</Typography>
+              <StyledArrowRightContainer>
+                <ArrowRightAltIcon fontSize="inherit" />
+              </StyledArrowRightContainer>
+              <TokenIcon token={to} size="27px" />
+              <Typography variant="body1">{to.symbol}</Typography>
+            </StyledCardTitleHeader>
+            {!isPending && !hasNoFunds && !isStale && (
+              <StyledFreqLeft>
+                <Typography variant="caption">
                   <FormattedMessage
-                    description="positionDetailsAverageBuyPrice"
-                    defaultMessage="1 {from} = {average} {to}"
+                    description="days to finish"
+                    defaultMessage="{type} left"
                     values={{
-                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                      from: tokenFromAverage.symbol,
-                      to: tokenToAverage.symbol,
-                      average: formatCurrencyAmount(averageBuyPrice, tokenToAverage),
+                      type: getTimeFrequencyLabel(swapInterval.interval, remainingSwaps.toString()),
                     }}
                   />
-                ) : (
-                  <FormattedMessage description="positionDetailsAverageBuyPriceNotSwap" defaultMessage="No swaps yet" />
-                )}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider variant="middle" />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <FormattedMessage description="positionDetailsRemainingSwaps" defaultMessage="Remaining time:" />
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="caption">
-                {parseInt(position.current.remainingSwaps, 10) > 0 ? (
-                  getFrequencyLabel(position.swapInterval.interval, position.current.remainingSwaps)
-                ) : (
-                  <FormattedMessage
-                    description="positionDetailsRemainingSwapsNone"
-                    defaultMessage="Position finished"
-                  />
-                )}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider variant="middle" />
-        </Grid>
-        <Grid item xs={12}>
-          <Tooltip
-            title={DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toLocaleString(
-              DateTime.DATETIME_FULL
+                </Typography>
+              </StyledFreqLeft>
             )}
-            arrow
-            placement="top"
-          >
-            <Typography variant="body2" component="span">
+            {!isPending && hasNoFunds && (
+              <StyledFinished>
+                <Typography variant="caption">
+                  <FormattedMessage description="finishedPosition" defaultMessage="FINISHED" />
+                </Typography>
+              </StyledFinished>
+            )}
+            {!isPending && !hasNoFunds && isStale && (
+              <StyledStale>
+                <Typography variant="caption">
+                  <FormattedMessage description="stale" defaultMessage="STALE" />
+                </Typography>
+              </StyledStale>
+            )}
+          </StyledCardHeader>
+          <StyledProgressWrapper>
+            {remainingSwaps.toNumber() > 0 && (
+              <BorderLinearProgress
+                swaps={remainingSwaps.toNumber()}
+                variant="determinate"
+                value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
+              />
+            )}
+          </StyledProgressWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
-                description="positionDetailsCreatedAt"
-                defaultMessage="Created at {created}"
+                description="swappedTo"
+                defaultMessage="Swapped:"
                 values={{
-                  created: DateTime.fromSeconds(parseInt(position.createdAtTimestamp, 10)).toRelative(),
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                 }}
               />
             </Typography>
-          </Tooltip>
-        </Grid>
-      </Grid>
-    </StyledPaper>
+            <Typography
+              variant="body1"
+              color={
+                BigNumber.from(position.totalSwapped).gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'
+              }
+              sx={{ marginLeft: '5px' }}
+            >
+              <FormattedMessage
+                description="positionDetailsHistoricallySwapped"
+                defaultMessage="{swapped} {to}"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                  swapped: formatCurrencyAmount(BigNumber.from(position.totalSwapped), position.to),
+                  to: position.to.symbol,
+                }}
+              />
+            </Typography>
+            {showToFullPrice && (
+              <StyledChip
+                size="small"
+                variant="outlined"
+                label={
+                  <FormattedMessage
+                    description="current remaining price"
+                    defaultMessage="({toPrice} USD)"
+                    values={{
+                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                      toPrice: toFullPrice?.toFixed(2),
+                    }}
+                  />
+                }
+              />
+            )}
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage
+                description="current remaining"
+                defaultMessage="Rate:"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                }}
+              />
+            </Typography>
+            <Typography
+              variant="body1"
+              color={
+                BigNumber.from(position.current.rate).gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'
+              }
+              sx={{ marginLeft: '5px' }}
+            >
+              <FormattedMessage
+                description="positionDetailsCurrentRate"
+                defaultMessage="{rate} {from} {frequency}"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                  rate: formatCurrencyAmount(BigNumber.from(position.current.rate), position.from),
+                  from: position.from.symbol,
+                  frequency:
+                    STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every,
+                }}
+              />
+            </Typography>
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage
+                description="positionDetailsRemainingFundsTitle"
+                defaultMessage="Remaining:"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                }}
+              />
+            </Typography>
+            <Typography
+              variant="body1"
+              color={remainingLiquidity.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              sx={{ marginLeft: '5px' }}
+            >
+              <FormattedMessage
+                description="positionDetailsRemainingFunds"
+                defaultMessage="{funds} {from}"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                  funds: formatCurrencyAmount(BigNumber.from(position.current.remainingLiquidity), position.from),
+                  from: position.from.symbol,
+                }}
+              />
+            </Typography>
+            {showFromPrice && (
+              <StyledChip
+                size="small"
+                variant="outlined"
+                label={
+                  <FormattedMessage
+                    description="current remaining price"
+                    defaultMessage="({toPrice} USD)"
+                    values={{
+                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                      toPrice: fromPrice?.toFixed(2),
+                    }}
+                  />
+                }
+              />
+            )}
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
+            </Typography>
+            <Typography
+              variant="body1"
+              color={toWithdraw.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              sx={{ marginLeft: '5px' }}
+            >
+              {`${formatCurrencyAmount(toWithdraw, to)} ${to.symbol}`}
+            </Typography>
+            <Typography variant="body1">
+              {showToPrice && (
+                <StyledChip
+                  size="small"
+                  variant="outlined"
+                  label={
+                    <FormattedMessage
+                      description="current swapped in position price"
+                      defaultMessage="({toPrice} USD)"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        toPrice: toPrice?.toFixed(2),
+                      }}
+                    />
+                  }
+                />
+              )}
+            </Typography>
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
+            </Typography>
+            <Typography
+              variant="body1"
+              color={averageBuyPrice.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              sx={{ marginLeft: '5px' }}
+            >
+              {averageBuyPrice.gt(BigNumber.from(0)) ? (
+                <FormattedMessage
+                  description="positionDetailsAverageBuyPrice"
+                  defaultMessage="1 {from} = {average} {to}"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    from: tokenFromAverage.symbol,
+                    to: tokenToAverage.symbol,
+                    average: formatCurrencyAmount(averageBuyPrice, tokenToAverage),
+                  }}
+                />
+              ) : (
+                <FormattedMessage description="positionDetailsAverageBuyPriceNotSwap" defaultMessage="No swaps yet" />
+              )}
+            </Typography>
+          </StyledDetailWrapper>
+        </StyledContentContainer>
+        <StyledCallToActionContainer>
+          {!isPending && toWithdraw.gt(BigNumber.from(0)) && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+            <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onWithdraw(true)} fullWidth>
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="withdraw"
+                  defaultMessage="Withdraw {protocolToken}"
+                  values={{ protocolToken: protocolToken.symbol }}
+                />
+              </Typography>
+            </StyledCardFooterButton>
+          )}
+          {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
+            <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onWithdraw(false)} fullWidth>
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="withdraw"
+                  defaultMessage="Withdraw {wrappedProtocolToken}"
+                  values={{
+                    wrappedProtocolToken:
+                      position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
+                  }}
+                />
+              </Typography>
+            </StyledCardFooterButton>
+          )}
+          {!isPending && toWithdraw.lte(BigNumber.from(0)) && (
+            <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onReusePosition()} fullWidth>
+              <Typography variant="body2">
+                <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
+              </Typography>
+            </StyledCardFooterButton>
+          )}
+          {/* {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
+            <StyledCardFooterButton
+              variant="contained"
+              color="secondary"
+              onClick={() => setShouldShowMigrate(true)}
+              fullWidth
+            >
+              <Typography variant="body2">
+                <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
+              </Typography>
+            </StyledCardFooterButton>
+          )} */}
+        </StyledCallToActionContainer>
+      </StyledCardContent>
+    </StyledCard>
   );
 };
 export default Details;

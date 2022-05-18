@@ -4,12 +4,15 @@ import { RootState } from '../index';
 export function useModifyRateSettingsFromValue() {
   return useAppSelector((state: RootState) => state.modifyRateSettings.fromValue);
 }
+export function useModifyRateSettingsRate() {
+  return useAppSelector((state: RootState) => state.modifyRateSettings.rate);
+}
+export function useModifyRateSettingsModeType() {
+  return useAppSelector((state: RootState) => state.modifyRateSettings.modeType);
+}
 export function useModifyRateSettingsFrequencyValue() {
   return useAppSelector((state: RootState) => state.modifyRateSettings.frequencyValue);
 }
 export function useModifyRateSettingsUseWrappedProtocolToken() {
   return useAppSelector((state: RootState) => state.modifyRateSettings.useWrappedProtocolToken);
-}
-export function useModifyRateSettingsActiveStep() {
-  return useAppSelector((state: RootState) => state.modifyRateSettings.activeStep);
 }

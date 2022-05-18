@@ -19,6 +19,7 @@ import { discardChanges, submitPermissionChanges } from 'state/position-permissi
 import { useAppDispatch } from 'state/hooks';
 import AddAddressPermissionModal from 'common/add-address-permission-modal';
 import Card from '@mui/material/Card';
+import Paper from '@mui/material/Paper';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;
@@ -29,9 +30,16 @@ const StyledFlexGridItem = styled(Grid)`
   display: flex;
 `;
 
-const StyledCard = styled(Card)`
-  padding: 20px 40px;
+const StyledPaper = styled(Paper)`
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  flex-grow: 1;
+  background-color: rgba(216, 216, 216, 0.05);
+  backdrop-filter: blur(6px);
 `;
+
 interface PositionPermissionsContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
@@ -115,21 +123,14 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
       />
       <Grid container spacing={2} alignItems="stretch">
         <Grid item xs={12}>
-          <StyledCard variant="outlined">
-            <Typography variant="h6">
-              <FormattedMessage description="Permissions title" defaultMessage="View permissions" />
-            </Typography>
-            <Typography variant="body1">
-              <FormattedMessage
-                description="AddressessPermissions"
-                defaultMessage="This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones"
-              />
-            </Typography>
-          </StyledCard>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant="h5">
             <FormattedMessage description="AddressessPermissions" defaultMessage="Permissions on your position:" />
+          </Typography>
+          <Typography variant="body1">
+            <FormattedMessage
+              description="AddressessPermissions"
+              defaultMessage="This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones"
+            />
           </Typography>
         </Grid>
         <StyledControlsWrapper item xs={12} isPending={!!pendingTransaction}>
@@ -145,13 +146,15 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
           )}
         </StyledControlsWrapper>
         <StyledFlexGridItem item xs={12}>
-          <Grid container>
-            {Object.values(permissions).map((permission) => (
-              <Grid item xs={4}>
-                <PositionPermission positionPermission={permission} shouldDisable={shouldDisable} />
-              </Grid>
-            ))}
-          </Grid>
+          <StyledPaper variant="outlined">
+            <Grid container spacing={2}>
+              {Object.values(permissions).map((permission) => (
+                <Grid item xs={4}>
+                  <PositionPermission positionPermission={permission} shouldDisable={shouldDisable} />
+                </Grid>
+              ))}
+            </Grid>
+          </StyledPaper>
         </StyledFlexGridItem>
       </Grid>
     </>
