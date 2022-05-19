@@ -42,6 +42,7 @@ export class TokenDescriptorContract extends Contract {
 
 export class BetaMigratorContract extends Contract {
   migrate: (
+    _sourceHub: string,
     _positionId: string,
     _signature: {
       permissions: { operator: string; permissions: number[] }[];
@@ -49,7 +50,8 @@ export class BetaMigratorContract extends Contract {
       v: BigNumberish;
       r: BytesLike;
       s: BytesLike;
-    }
+    },
+    targetHub: string
   ) => Promise<TransactionResponse>;
 }
 

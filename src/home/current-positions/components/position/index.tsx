@@ -12,7 +12,7 @@ import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
 import { Position, Token } from 'types';
 import { useHistory } from 'react-router-dom';
-import { STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
+import { POSITION_VERSION_2, POSITION_VERSION_3, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles, Theme } from '@mui/material/styles';
@@ -23,7 +23,6 @@ import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import MigratePositionModal from 'common/migrate-position-modal';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useUsdPrice from 'hooks/useUsdPrice';
 
@@ -112,6 +111,13 @@ const StyledStale = styled.div`
   text-transform: uppercase;
 `;
 
+const StyledDeprecated = styled.div`
+  color: #cc6d00;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+`;
+
 const StyledFinished = styled.div`
   color: #33ac2e;
   display: flex;
@@ -140,10 +146,12 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
 interface ActivePositionProps {
   position: PositionProp;
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
+  onTerminate: (position: Position) => void;
   onReusePosition: (position: Position) => void;
+  onMigrate: (position: Position) => void;
 }
 
-const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositionProps) => {
+const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, onMigrate }: ActivePositionProps) => {
   const {
     from,
     to,
@@ -155,7 +163,6 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositio
     pendingTransaction,
     toWithdraw,
   } = position;
-  const [shouldShowMigrate, setShouldShowMigrate] = React.useState(false);
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
@@ -185,9 +192,10 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositio
     history.push(`/positions/${position.id}`);
   };
 
+  const isOldVersion = position.version !== POSITION_VERSION_3;
+
   return (
     <StyledCard variant="outlined">
-      <MigratePositionModal onCancel={() => setShouldShowMigrate(false)} open={shouldShowMigrate} position={position} />
       <StyledCardContent>
         <StyledContentContainer>
           <StyledCardHeader>
@@ -200,7 +208,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositio
               <TokenIcon token={to} size="27px" />
               <Typography variant="body1">{to.symbol}</Typography>
             </StyledCardTitleHeader>
-            {!isPending && !hasNoFunds && !isStale && (
+            {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
               <StyledFreqLeft>
                 <Typography variant="caption">
                   <FormattedMessage
@@ -213,19 +221,26 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositio
                 </Typography>
               </StyledFreqLeft>
             )}
-            {!isPending && hasNoFunds && (
+            {!isPending && hasNoFunds && !isOldVersion && (
               <StyledFinished>
                 <Typography variant="caption">
                   <FormattedMessage description="finishedPosition" defaultMessage="FINISHED" />
                 </Typography>
               </StyledFinished>
             )}
-            {!isPending && !hasNoFunds && isStale && (
+            {!isPending && !hasNoFunds && isStale && !isOldVersion && (
               <StyledStale>
                 <Typography variant="caption">
                   <FormattedMessage description="stale" defaultMessage="STALE" />
                 </Typography>
               </StyledStale>
+            )}
+            {isOldVersion && (
+              <StyledDeprecated>
+                <Typography variant="caption">
+                  <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />
+                </Typography>
+              </StyledDeprecated>
             )}
           </StyledCardHeader>
           <StyledDetailWrapper>
@@ -264,11 +279,11 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositio
                 defaultMessage="{remainingLiquidity} {from} ({rate} {from} {frequency})"
                 values={{
                   b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  rate: formatCurrencyAmount(rate, from),
+                  rate: formatCurrencyAmount(rate, from, 4),
                   frequency:
                     STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
                   from: from.symbol,
-                  remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from),
+                  remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from, 4),
                 }}
               />
             </Typography>
@@ -282,7 +297,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositio
               color={toWithdraw.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
               sx={{ marginLeft: '5px' }}
             >
-              {`${formatCurrencyAmount(toWithdraw, to)} ${to.symbol}`}
+              {`${formatCurrencyAmount(toWithdraw, to, 4)} ${to.symbol}`}
             </Typography>
             <Typography variant="body1">
               {showToPrice && (
@@ -314,90 +329,126 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition }: ActivePositio
           )}
         </StyledProgressWrapper>
         <StyledCallToActionContainer>
-          <StyledCardFooterButton
-            variant={isPending ? 'contained' : 'outlined'}
-            color={isPending ? 'pending' : 'default'}
-            onClick={() => !isPending && onViewDetails()}
-            fullWidth
-          >
-            {isPending ? (
-              <Link
-                href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
-                target="_blank"
-                rel="noreferrer"
-                underline="none"
-                color="inherit"
+          {position.version === POSITION_VERSION_3 && (
+            <>
+              <StyledCardFooterButton
+                variant={isPending ? 'contained' : 'outlined'}
+                color={isPending ? 'pending' : 'default'}
+                onClick={() => !isPending && onViewDetails()}
+                fullWidth
               >
-                <Typography variant="body2" component="span">
-                  <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                </Typography>
-                <OpenInNewIcon style={{ fontSize: '1rem' }} />
-              </Link>
-            ) : (
-              <Typography variant="body2">
-                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
-              </Typography>
-            )}
-          </StyledCardFooterButton>
-          {!isPending && toWithdraw.gt(BigNumber.from(0)) && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-            <StyledCardFooterButton
-              variant="contained"
-              color="secondary"
-              onClick={() => onWithdraw(position, true)}
-              fullWidth
-            >
-              <Typography variant="body2">
-                <FormattedMessage
-                  description="withdraw"
-                  defaultMessage="Withdraw {protocolToken}"
-                  values={{ protocolToken: protocolToken.symbol }}
-                />
-              </Typography>
-            </StyledCardFooterButton>
+                {isPending ? (
+                  <Link
+                    href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
+                    target="_blank"
+                    rel="noreferrer"
+                    underline="none"
+                    color="inherit"
+                  >
+                    <Typography variant="body2" component="span">
+                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                    </Typography>
+                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
+                  </Link>
+                ) : (
+                  <Typography variant="body2">
+                    <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+                  </Typography>
+                )}
+              </StyledCardFooterButton>
+              {!isPending && toWithdraw.gt(BigNumber.from(0)) && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+                <StyledCardFooterButton
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => onWithdraw(position, true)}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage
+                      description="withdraw"
+                      defaultMessage="Withdraw {protocolToken}"
+                      values={{ protocolToken: protocolToken.symbol }}
+                    />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
+              {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
+                <StyledCardFooterButton
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => onWithdraw(position, false)}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage
+                      description="withdraw"
+                      defaultMessage="Withdraw {wrappedProtocolToken}"
+                      values={{
+                        wrappedProtocolToken:
+                          position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
+                      }}
+                    />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
+              {!isPending && remainingSwaps.lte(BigNumber.from(0)) && toWithdraw.lte(BigNumber.from(0)) && (
+                <StyledCardFooterButton
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => onReusePosition(position)}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
+            </>
           )}
-          {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
-            <StyledCardFooterButton
-              variant="contained"
-              color="secondary"
-              onClick={() => onWithdraw(position, false)}
-              fullWidth
-            >
-              <Typography variant="body2">
-                <FormattedMessage
-                  description="withdraw"
-                  defaultMessage="Withdraw {wrappedProtocolToken}"
-                  values={{
-                    wrappedProtocolToken:
-                      position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
-                  }}
-                />
-              </Typography>
-            </StyledCardFooterButton>
+          {position.version === POSITION_VERSION_2 && (
+            <>
+              {isPending && (
+                <StyledCardFooterButton variant="contained" color="pending" fullWidth>
+                  <Link
+                    href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
+                    target="_blank"
+                    rel="noreferrer"
+                    underline="none"
+                    color="inherit"
+                  >
+                    <Typography variant="body2" component="span">
+                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                    </Typography>
+                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
+                  </Link>
+                </StyledCardFooterButton>
+              )}
+              {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
+                <StyledCardFooterButton
+                  variant="contained"
+                  color="migrate"
+                  onClick={() => onMigrate(position)}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
+              {!isPending && (toWithdraw.gt(BigNumber.from(0)) || remainingLiquidity.gt(BigNumber.from(0))) && (
+                <StyledCardFooterButton
+                  variant="contained"
+                  color="error"
+                  onClick={() => onTerminate(position)}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage description="terminate" defaultMessage="Terminate" />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
+            </>
           )}
-          {!isPending && toWithdraw.lte(BigNumber.from(0)) && (
-            <StyledCardFooterButton
-              variant="contained"
-              color="secondary"
-              onClick={() => onReusePosition(position)}
-              fullWidth
-            >
-              <Typography variant="body2">
-                <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
-              </Typography>
-            </StyledCardFooterButton>
-          )}
-          {/* {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
-            <StyledCardFooterButton
-              variant="contained"
-              color="secondary"
-              onClick={() => setShouldShowMigrate(true)}
-              fullWidth
-            >
-              <Typography variant="body2">
-                <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
-              </Typography>
-            </StyledCardFooterButton>
-          )} */}
         </StyledCallToActionContainer>
       </StyledCardContent>
     </StyledCard>

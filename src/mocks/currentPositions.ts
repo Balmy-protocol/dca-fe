@@ -1,4 +1,4 @@
-import { ONE_DAY } from 'config/constants';
+import { ONE_DAY, POSITION_VERSION_3 } from 'config/constants';
 import { Position } from 'types';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from './tokens';
@@ -33,4 +33,5 @@ export const EmptyPosition: Position = {
   status: 'TERMINATED',
   pendingTransaction: '',
   executedSwaps: BigNumber.from(0),
+  version: POSITION_VERSION_3,
 };

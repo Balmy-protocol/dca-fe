@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import { FullPosition, Position, Token } from 'types';
-import { MAX_BI, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
+import { MAX_BI, POSITION_VERSION_3, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -129,5 +129,6 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
     totalDeposits: BigNumber.from(position.totalDeposits),
     executedSwaps: BigNumber.from(position.executedSwaps),
     pendingTransaction: '',
+    version: POSITION_VERSION_3,
   };
 }

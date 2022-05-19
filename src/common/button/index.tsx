@@ -18,8 +18,12 @@ const colors = {
     dark: '#ffffff',
   },
   secondary: {
-    light: '#FAFAFA',
-    dark: '#FAFAFA',
+    light: '#FFFFFF',
+    dark: '#FFFFFF',
+  },
+  migrate: {
+    light: '#FFFFFF',
+    dark: '#FFFFFF',
   },
   tertiary: {
     light: '#0088CC',
@@ -90,6 +94,16 @@ const backgroundColors = {
       hover: '#3c7bed',
     },
   },
+  migrate: {
+    light: {
+      default: '#00A3F5',
+      hover: '#0294de',
+    },
+    dark: {
+      default: 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)',
+      hover: 'linear-gradient(90deg, #5484dc 0%, #b850e9 123.4%)',
+    },
+  },
   tertiary: {
     light: {
       default: '#DCEFF9',
@@ -116,7 +130,7 @@ const backgroundColors = {
       hover: '#e6caca',
     },
     dark: {
-      default: '#9d3f3f',
+      default: '#FF5359',
       hover: '#d55858',
     },
   },
@@ -174,6 +188,16 @@ const borderColors = {
     },
   },
   secondary: {
+    light: {
+      default: '#00A3F5',
+      hover: '#0294de',
+    },
+    dark: {
+      default: '#00A3F5',
+      hover: '#0294de',
+    },
+  },
+  migrate: {
     light: {
       default: '#00A3F5',
       hover: '#0294de',
@@ -245,12 +269,12 @@ const PrimaryButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.secondary[theme.palette.mode],
-    backgroundColor: backgroundColors.primary[theme.palette.mode].default,
+    background: backgroundColors.primary[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.primary[theme.palette.mode].hover,
+      background: backgroundColors.primary[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.primary[theme.palette.mode].hover,
+      background: backgroundColors.primary[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
@@ -271,12 +295,38 @@ const SecondaryButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.secondary[theme.palette.mode],
-    backgroundColor: backgroundColors.secondary[theme.palette.mode].default,
+    background: backgroundColors.secondary[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.secondary[theme.palette.mode].hover,
+      background: backgroundColors.secondary[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.secondary[theme.palette.mode].hover,
+      background: backgroundColors.secondary[theme.palette.mode].hover,
+    },
+  },
+}))(StyledDisabledFontButton);
+
+const MigrateButton = withStyles((theme: Theme) => ({
+  text: {
+    color: backgroundColors.migrate[theme.palette.mode].default,
+  },
+  outlined: {
+    color: borderColors.migrate[theme.palette.mode].default,
+    borderColor: borderColors.migrate[theme.palette.mode].default,
+    '&:hover': {
+      borderColor: borderColors.migrate[theme.palette.mode].hover,
+    },
+    '&:active': {
+      borderColor: borderColors.migrate[theme.palette.mode].hover,
+    },
+  },
+  contained: {
+    color: colors.migrate[theme.palette.mode],
+    background: backgroundColors.migrate[theme.palette.mode].default,
+    '&:hover': {
+      background: backgroundColors.migrate[theme.palette.mode].hover,
+    },
+    '&:active': {
+      background: backgroundColors.migrate[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
@@ -297,12 +347,12 @@ const TertiaryButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.tertiary[theme.palette.mode],
-    backgroundColor: backgroundColors.tertiary[theme.palette.mode].default,
+    background: backgroundColors.tertiary[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.tertiary[theme.palette.mode].hover,
+      background: backgroundColors.tertiary[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.tertiary[theme.palette.mode].hover,
+      background: backgroundColors.tertiary[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
@@ -314,7 +364,7 @@ const DefaultButton = withStyles((theme: Theme) => ({
   outlined: {
     color: colors.default[theme.palette.mode],
     borderColor: borderColors.default[theme.palette.mode].default,
-    backgroundColor: backgroundColors.default[theme.palette.mode].default,
+    background: backgroundColors.default[theme.palette.mode].default,
     '&:hover': {
       borderColor: borderColors.default[theme.palette.mode].hover,
     },
@@ -324,12 +374,12 @@ const DefaultButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.default[theme.palette.mode],
-    backgroundColor: backgroundColors.default[theme.palette.mode].default,
+    background: backgroundColors.default[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.default[theme.palette.mode].hover,
+      background: backgroundColors.default[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.default[theme.palette.mode].hover,
+      background: backgroundColors.default[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
@@ -341,7 +391,7 @@ const TransparentButton = withStyles((theme: Theme) => ({
   outlined: {
     color: colors.default[theme.palette.mode],
     borderColor: borderColors.transparent[theme.palette.mode].default,
-    backgroundColor: backgroundColors.transparent[theme.palette.mode].default,
+    background: backgroundColors.transparent[theme.palette.mode].default,
     '&:hover': {
       borderColor: borderColors.transparent[theme.palette.mode].hover,
     },
@@ -352,12 +402,12 @@ const TransparentButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.default[theme.palette.mode],
-    backgroundColor: backgroundColors.transparent[theme.palette.mode].default,
+    background: backgroundColors.transparent[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.transparent[theme.palette.mode].hover,
+      background: backgroundColors.transparent[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.transparent[theme.palette.mode].hover,
+      background: backgroundColors.transparent[theme.palette.mode].hover,
     },
     backdropFilter: 'blur(6px)',
   },
@@ -379,12 +429,12 @@ const WhiteButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.white[theme.palette.mode],
-    backgroundColor: backgroundColors.white[theme.palette.mode].default,
+    background: backgroundColors.white[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.white[theme.palette.mode].hover,
+      background: backgroundColors.white[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.white[theme.palette.mode].hover,
+      background: backgroundColors.white[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
@@ -405,12 +455,12 @@ const ErrorButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.error[theme.palette.mode],
-    backgroundColor: backgroundColors.error[theme.palette.mode].default,
+    background: backgroundColors.error[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.error[theme.palette.mode].hover,
+      background: backgroundColors.error[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.error[theme.palette.mode].hover,
+      background: backgroundColors.error[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
@@ -431,12 +481,12 @@ const WarningButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.warning[theme.palette.mode],
-    backgroundColor: backgroundColors.warning[theme.palette.mode].default,
+    background: backgroundColors.warning[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.warning[theme.palette.mode].hover,
+      background: backgroundColors.warning[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.warning[theme.palette.mode].hover,
+      background: backgroundColors.warning[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
@@ -457,12 +507,12 @@ const PendingButton = withStyles((theme: Theme) => ({
   },
   contained: {
     color: colors.pending[theme.palette.mode],
-    backgroundColor: backgroundColors.pending[theme.palette.mode].default,
+    background: backgroundColors.pending[theme.palette.mode].default,
     '&:hover': {
-      backgroundColor: backgroundColors.pending[theme.palette.mode].hover,
+      background: backgroundColors.pending[theme.palette.mode].hover,
     },
     '&:active': {
-      backgroundColor: backgroundColors.pending[theme.palette.mode].hover,
+      background: backgroundColors.pending[theme.palette.mode].hover,
     },
   },
 }))(StyledDisabledFontButton);
@@ -477,6 +527,7 @@ export const ButtonTypes = {
   tertiary: TertiaryButton,
   pending: PendingButton,
   transparent: TransparentButton,
+  migrate: MigrateButton,
 };
 
 interface CustomButtonProps extends Omit<ButtonProps, 'color'> {
