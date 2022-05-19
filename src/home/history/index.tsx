@@ -19,19 +19,14 @@ const History = () => {
   const positionsPerRow = POSITIONS_PER_ROW[currentBreakPoint];
   const positionsToFill =
     pastPositions.length % positionsPerRow !== 0 ? positionsPerRow - (pastPositions.length % positionsPerRow) : 0;
-  const emptyPositions = [];
-
-  for (let i = 0; i < positionsToFill; i += 1) {
-    emptyPositions.push(i);
-  }
 
   return (
     <Grid container direction="column" alignItems="flex-start" justifyContent="center" spacing={3}>
       <Grid item xs={12} style={{ width: '100%' }}>
-        <Grid container alignItems="stretch">
+        <Grid container alignItems="stretch" spacing={2}>
           {pastPositions
             ? pastPositions.map((position) => (
-                <Grid item xs={12} key={position.id}>
+                <Grid item xs={12} sm={6} md={4} key={position.id}>
                   <PastPosition position={position} />
                 </Grid>
               ))

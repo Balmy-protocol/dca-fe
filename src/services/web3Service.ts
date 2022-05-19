@@ -470,6 +470,47 @@ export default class Web3Service {
       );
     }
 
+    const pastPositionsV2Response = await gqlFetchAll<PositionsGraphqlResponse>(
+      v2Client.getClient(),
+      GET_POSITIONS,
+      {
+        address: account.toLowerCase(),
+        status: ['TERMINATED'],
+      },
+      'positions',
+      'network-only'
+    );
+
+    if (pastPositionsV2Response.data) {
+      this.pastPositions = {
+        ...this.pastPositions,
+        ...keyBy(
+          pastPositionsV2Response.data.positions.map((position: PositionResponse) => ({
+            from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+            to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+            user: position.user,
+            totalDeposits: BigNumber.from(position.totalDeposits),
+            swapInterval: BigNumber.from(position.swapInterval.interval),
+            swapped: BigNumber.from(position.totalSwapped),
+            rate: BigNumber.from(position.current.rate),
+            remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+            remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+            totalSwaps: BigNumber.from(position.totalSwaps),
+            withdrawn: BigNumber.from(position.totalWithdrawn),
+            toWithdraw: BigNumber.from(position.current.idleSwapped),
+            executedSwaps: BigNumber.from(position.executedSwaps),
+            id: position.id,
+            status: position.status,
+            startedAt: position.createdAtTimestamp,
+            pendingTransaction: '',
+            pairId: position.pair.id,
+            version: POSITION_VERSION_2,
+          })),
+          'id'
+        ),
+      };
+    }
+
     this.setAccount(account);
   }
 
