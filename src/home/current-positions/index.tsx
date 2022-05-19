@@ -11,7 +11,7 @@ import { Position } from 'types';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import { FULL_DEPOSIT_TYPE, PERMISSIONS, POSITION_VERSION_3, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import ModifySettingsModal from 'common/modify-settings-modal';
@@ -19,6 +19,8 @@ import { useAppDispatch } from 'state/hooks';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
 import { EmptyPosition } from 'mocks/currentPositions';
+import TerminateModal from 'common/terminate-modal';
+import MigratePositionModal from 'common/migrate-position-modal';
 import ActivePosition from './components/position';
 
 const StyledGridItem = styled(Grid)`
@@ -46,6 +48,8 @@ const CurrentPositions = () => {
     currentPositions.length % positionsPerRow !== 0 ? positionsPerRow - (currentPositions.length % positionsPerRow) : 0;
   const emptyPositions = [];
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
+  const [showTerminateModal, setShowTerminateModal] = React.useState(false);
+  const [showMigrateModal, setShowMigrateModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
 
@@ -71,7 +75,9 @@ const CurrentPositions = () => {
 
   const onWithdraw = async (position: Position, useProtocolToken = false) => {
     try {
-      const hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
+      const positionId =
+        position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
+      const hasPermission = await web3Service.companionHasPermission(positionId, PERMISSIONS.WITHDRAW);
 
       const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
       const toSymbol =
@@ -99,7 +105,7 @@ const CurrentPositions = () => {
           </>
         ),
       });
-      const result = await web3Service.withdraw(position, useProtocolToken);
+      const result = await web3Service.withdraw({ ...position, id: positionId }, useProtocolToken);
       addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,
@@ -146,12 +152,40 @@ const CurrentPositions = () => {
     setShowModifyRateSettingsModal(true);
   };
 
+  const onShowTerminate = (position: Position) => {
+    if (!position) {
+      return;
+    }
+
+    setSelectedPosition(position);
+    setShowTerminateModal(true);
+  };
+
+  const onShowMigrate = (position: Position) => {
+    if (!position) {
+      return;
+    }
+
+    setSelectedPosition(position);
+    setShowMigrateModal(true);
+  };
+
   return (
     <>
       <ModifySettingsModal
         open={showModifyRateSettingsModal}
         position={selectedPosition}
         onCancel={() => setShowModifyRateSettingsModal(false)}
+      />
+      <TerminateModal
+        open={showTerminateModal}
+        position={selectedPosition}
+        onCancel={() => setShowTerminateModal(false)}
+      />
+      <MigratePositionModal
+        onCancel={() => setShowMigrateModal(false)}
+        open={showMigrateModal}
+        position={selectedPosition}
       />
       <Grid container spacing={1}>
         {/* dont know why I need the 100% width :shrug: */}
@@ -168,6 +202,8 @@ const CurrentPositions = () => {
                   position={position}
                   onWithdraw={onWithdraw}
                   onReusePosition={onShowModifyRateSettings}
+                  onTerminate={onShowTerminate}
+                  onMigrate={onShowMigrate}
                 />
               </StyledGridItem>
             ))}
@@ -186,6 +222,8 @@ const CurrentPositions = () => {
                   position={position}
                   onWithdraw={onWithdraw}
                   onReusePosition={onShowModifyRateSettings}
+                  onTerminate={onShowTerminate}
+                  onMigrate={onShowMigrate}
                 />
               </StyledGridItem>
             ))}

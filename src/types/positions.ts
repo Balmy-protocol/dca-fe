@@ -28,6 +28,8 @@ type PositionActions =
   | 'SWAPPED'
   | 'CREATED'
   | 'TERMINATED';
+
+type PositionVersions = '3' | '2';
 export interface Position {
   from: Token;
   to: Token;
@@ -46,6 +48,7 @@ export interface Position {
   status: string;
   startedAt: number;
   pendingTransaction: string;
+  version: PositionVersions;
 }
 
 export interface FullPosition {

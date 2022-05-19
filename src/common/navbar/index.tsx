@@ -43,7 +43,6 @@ const StyledNavbarMainContent = styled.div`
 
 const StyledNavbarEndContent = styled.div`
   display: flex;
-  flex: 0
 `;
 
 const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
@@ -70,7 +69,7 @@ const RawTabs = withStyles(() =>
 )(Tabs);
 
 const StyledTabs = styled(RawTabs)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
-  margin-left: ${({ breakpoint }) => breakpoint !== 'xl' ? '50px' : '145px' };
+  margin-left: ${({ breakpoint }) => (breakpoint !== 'xl' ? '50px' : '145px')};
 `;
 
 interface NavBarProps {
@@ -85,36 +84,26 @@ const NavBar = ({ isLoading }: NavBarProps) => {
 
   const handleTabChange = (e: any, index: number) => {
     if (index !== 2) {
-      dispatch(changeMainTab(index))
+      dispatch(changeMainTab(index));
     } else {
-      window.open('https://mean.finance/leaderboard', '_blank')
+      window.open('https://mean.finance/leaderboard', '_blank');
     }
-  }
+  };
 
   return (
     <StyledNavbarWrapper>
       <StyledNavbarContainer>
         <StyledNavbarMainContent>
-          <WhaveLogoDark size='45px' />
-          <StyledTabs breakpoint={currentBreakPoint} TabIndicatorProps={{ style: { bottom: '-10px' } }} value={tabIndex} onChange={handleTabChange}>
-            <StyledTab label={
-              <FormattedMessage
-                description="create"
-                defaultMessage="Create"
-              />}
-            />
-            <StyledTab label={
-              <FormattedMessage
-                description="positions"
-                defaultMessage="Positions"
-              />}
-            />
-            <StyledTab label={
-              <FormattedMessage
-                description="leaderboard"
-                defaultMessage="Leaderboard"
-              />}
-            />
+          <WhaveLogoDark size="45px" />
+          <StyledTabs
+            breakpoint={currentBreakPoint}
+            TabIndicatorProps={{ style: { bottom: '-10px' } }}
+            value={tabIndex}
+            onChange={handleTabChange}
+          >
+            <StyledTab label={<FormattedMessage description="create" defaultMessage="Create" />} />
+            <StyledTab label={<FormattedMessage description="positions" defaultMessage="Positions" />} />
+            <StyledTab label={<FormattedMessage description="leaderboard" defaultMessage="Leaderboard" />} />
           </StyledTabs>
         </StyledNavbarMainContent>
         <StyledNavbarEndContent>

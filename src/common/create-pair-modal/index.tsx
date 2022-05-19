@@ -10,6 +10,8 @@ const StyledLoadingIndicatorWrapper = styled.div`
   margin: 40px;
 `;
 
+const StyledCreatePositionContainer = styled.div``;
+
 interface CreatePairModalProps {
   from: Token | null;
   to: Token | null;
@@ -26,6 +28,15 @@ const CreatePairModal = ({ from, to, open, onCancel, onCreatePair }: CreatePairM
       open={open}
       showCloseButton
       onClose={onCancel}
+      showCloseIcon
+      maxWidth="md"
+      title={
+        <FormattedMessage
+          description="First deposit"
+          defaultMessage="Create position for {from}/{to}"
+          values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
+        />
+      }
       actions={[
         {
           color: 'secondary',
@@ -35,13 +46,6 @@ const CreatePairModal = ({ from, to, open, onCancel, onCreatePair }: CreatePairM
         },
       ]}
     >
-      <Typography variant="h6">
-        <FormattedMessage
-          description="First deposit"
-          defaultMessage="Create position for {from}/{to}"
-          values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
-        />
-      </Typography>
       {isLoading ? (
         <>
           <StyledLoadingIndicatorWrapper>

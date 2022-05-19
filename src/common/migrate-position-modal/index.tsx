@@ -16,6 +16,13 @@ const StyledLink = styled(Link)`
   `}
 `;
 
+const StyledMigrateContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+`;
+
 interface MigratePositionModalProps {
   position: Position;
   onCancel: () => void;
@@ -44,7 +51,7 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
           </Typography>
         ),
       });
-      const result = await web3Service.migratePosition(position.id);
+      const result = await web3Service.migratePosition(position.id.substring(0, position.id.length - 3));
       addTransaction(result, {
         type: TRANSACTION_TYPES.MIGRATE_POSITION,
         typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol },
@@ -77,40 +84,43 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
       open={open}
       showCloseButton
       onClose={onCancel}
+      showCloseIcon
+      title={
+        <FormattedMessage
+          description="migrate title"
+          defaultMessage="Migrate {from}/{to} position"
+          values={{ from: position.from.symbol, to: position.to.symbol }}
+        />
+      }
       actions={[
         {
-          color: 'primary',
+          color: 'migrate',
           variant: 'contained',
           onClick: handleMigrate,
           label: <FormattedMessage description="migrate position" defaultMessage="Migrate position" />,
         },
       ]}
     >
-      <Typography variant="h6">
-        <FormattedMessage
-          description="migrate title"
-          defaultMessage="Migrate {from}/{to} position"
-          values={{ from: position.from.symbol, to: position.to.symbol }}
-        />
-      </Typography>
-      <Typography variant="body1">
-        <FormattedMessage
-          description="migrate description"
-          defaultMessage="Your position will be terminated here and we will create a new one on"
-        />
-        <StyledLink href="https://mean.finance" target="_blank">
-          {` mean.finance`}
-        </StyledLink>
-      </Typography>
-      <Typography variant="body1">
-        <FormattedMessage
-          description="terminate description"
-          defaultMessage="You will get back whatever has been swapped on your position and the remaining funds will be used for the new position"
-        />
-      </Typography>
-      <Typography variant="body1">
-        <FormattedMessage description="migrate warning" defaultMessage="This cannot be undone." />
-      </Typography>
+      <StyledMigrateContainer>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="migrate description"
+            defaultMessage="Your position will be terminated here and we will create a new one on"
+          />
+          <StyledLink href="https://mean.finance" target="_blank">
+            {` mean.finance`}
+          </StyledLink>
+        </Typography>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="terminate description"
+            defaultMessage="You will get back whatever has been swapped on your position and the remaining funds will be used for the new position"
+          />
+        </Typography>
+        <Typography variant="body1">
+          <FormattedMessage description="migrate warning" defaultMessage="This cannot be undone." />
+        </Typography>
+      </StyledMigrateContainer>
     </Modal>
   );
 };
