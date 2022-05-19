@@ -84,14 +84,19 @@ import {
   COMPANION_ADDRESS,
   DEFILLAMA_IDS,
   HUB_ADDRESS,
+  HUB_V2_ADDRESS,
   MAX_UINT_32,
   MEAN_GRAPHQL_URL,
+  MEAN_V2_GRAPHQL_URL,
   NETWORKS,
   OE_GAS_ORACLE_ADDRESS,
   ORACLES,
   ORACLE_ADDRESS,
   PERMISSIONS,
   PERMISSION_MANAGER_ADDRESS,
+  PERMISSION_V2_MANAGER_ADDRESS,
+  POSITION_VERSION_2,
+  POSITION_VERSION_3,
   SWAP_INTERVALS_MAP,
   TOKEN_DESCRIPTOR_ADDRESS,
   TRANSACTION_TYPES,
@@ -255,10 +260,22 @@ export default class Web3Service {
     return HUB_ADDRESS[network.chainId] || HUB_ADDRESS[NETWORKS.optimism.chainId];
   }
 
+  async getHUBV2Address() {
+    const network = await this.getNetwork();
+
+    return HUB_V2_ADDRESS[network.chainId] || HUB_V2_ADDRESS[NETWORKS.optimism.chainId];
+  }
+
   async getPermissionManagerAddress() {
     const network = await this.getNetwork();
 
     return PERMISSION_MANAGER_ADDRESS[network.chainId] || PERMISSION_MANAGER_ADDRESS[NETWORKS.optimism.chainId];
+  }
+
+  async getPermissionManagerV2Address() {
+    const network = await this.getNetwork();
+
+    return PERMISSION_V2_MANAGER_ADDRESS[network.chainId] || PERMISSION_V2_MANAGER_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getBetaMigratorAddress() {
@@ -314,6 +331,7 @@ export default class Web3Service {
     const chain = await ethersProvider.getNetwork();
 
     this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
+    const v2Client = new GraphqlService(MEAN_V2_GRAPHQL_URL[chain.chainId] || MEAN_V2_GRAPHQL_URL[10]);
     this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
     this.chainlinkClient = new GraphqlService(CHAINLINK_GRAPHQL_URL[chain.chainId] || CHAINLINK_GRAPHQL_URL[1]);
     this.setClient(ethersProvider);
@@ -367,9 +385,51 @@ export default class Web3Service {
           totalDeposits: BigNumber.from(position.totalDeposits),
           pendingTransaction: '',
           pairId: position.pair.id,
+          version: POSITION_VERSION_3,
         })),
         'id'
       );
+    }
+
+    const currentV2PositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
+      v2Client.getClient(),
+      GET_POSITIONS,
+      {
+        address: account.toLowerCase(),
+        status: ['ACTIVE', 'COMPLETED'],
+      },
+      'positions',
+      'network-only'
+    );
+
+    if (currentV2PositionsResponse.data) {
+      this.currentPositions = {
+        ...this.currentPositions,
+        ...keyBy(
+          currentV2PositionsResponse.data.positions.map((position: PositionResponse) => ({
+            from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+            to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+            user: position.user,
+            swapInterval: BigNumber.from(position.swapInterval.interval),
+            swapped: BigNumber.from(position.totalSwapped),
+            rate: BigNumber.from(position.current.rate),
+            remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+            remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+            withdrawn: BigNumber.from(position.totalWithdrawn),
+            toWithdraw: BigNumber.from(position.current.idleSwapped),
+            totalSwaps: BigNumber.from(position.totalSwaps),
+            id: `${position.id}-v2`,
+            status: position.status,
+            startedAt: position.createdAtTimestamp,
+            executedSwaps: BigNumber.from(position.executedSwaps),
+            totalDeposits: BigNumber.from(position.totalDeposits),
+            pendingTransaction: '',
+            pairId: position.pair.id,
+            version: POSITION_VERSION_2,
+          })),
+          'id'
+        ),
+      };
     }
 
     const pastPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
@@ -404,6 +464,7 @@ export default class Web3Service {
           startedAt: position.createdAtTimestamp,
           pendingTransaction: '',
           pairId: position.pair.id,
+          version: POSITION_VERSION_3,
         })),
         'id'
       );
@@ -937,9 +998,14 @@ export default class Web3Service {
   }
 
   // POSITION METHODS
-  async getSignatureForPermission(positionId: string, contractAddress: string, permission: number) {
+  async getSignatureForPermission(
+    positionId: string,
+    contractAddress: string,
+    permission: number,
+    permissionManagerAddressProvided?: string
+  ) {
     const signer = this.getSigner();
-    const permissionManagerAddress = await this.getPermissionManagerAddress();
+    const permissionManagerAddress = permissionManagerAddressProvided || (await this.getPermissionManagerAddress());
     const currentNetwork = await this.getNetwork();
     const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
 
@@ -1005,7 +1071,9 @@ export default class Web3Service {
   async migratePosition(positionId: string): Promise<TransactionResponse> {
     const signer = this.getSigner();
     const betaMigratorAddress = await this.getBetaMigratorAddress();
-
+    const permissionManagerV2Address = await this.getPermissionManagerV2Address();
+    const hubAddress = await this.getHUBAddress();
+    const hubV2Address = await this.getHUBV2Address();
     const betaMigratorInstance = new ethers.Contract(
       betaMigratorAddress,
       BETA_MIGRATOR_ABI.abi,
@@ -1015,10 +1083,11 @@ export default class Web3Service {
     const generatedSignature = await this.getSignatureForPermission(
       positionId,
       betaMigratorAddress,
-      PERMISSIONS.TERMINATE
+      PERMISSIONS.TERMINATE,
+      permissionManagerV2Address
     );
 
-    return betaMigratorInstance.migrate(positionId, generatedSignature);
+    return betaMigratorInstance.migrate(hubV2Address, positionId, generatedSignature, hubAddress);
   }
 
   async companionHasPermission(positionId: string, permission: number) {
@@ -1701,6 +1770,7 @@ export default class Web3Service {
         totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         pendingTransaction: '',
         status: 'ACTIVE',
+        version: POSITION_VERSION_3,
       };
     }
 
