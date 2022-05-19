@@ -60,6 +60,7 @@ export interface MigratePositionTypeData {
   id: number | string;
   from: string;
   to: string;
+  newId?: string;
 }
 
 export interface ApproveCompanionTypeData {
