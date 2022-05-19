@@ -1871,12 +1871,25 @@ export default class Web3Service {
         break;
       }
       case TRANSACTION_TYPES.MIGRATE_POSITION: {
-        const terminatePositionTypeData = transaction.typeData as MigratePositionTypeData;
-        this.pastPositions[terminatePositionTypeData.id] = {
-          ...this.currentPositions[terminatePositionTypeData.id],
+        const migratePositionTypeData = transaction.typeData as MigratePositionTypeData;
+        this.pastPositions[migratePositionTypeData.id] = {
+          ...this.currentPositions[migratePositionTypeData.id],
           pendingTransaction: '',
         };
-        delete this.currentPositions[terminatePositionTypeData.id];
+        if (migratePositionTypeData.newId) {
+          this.currentPositions[migratePositionTypeData.newId] = {
+            ...this.currentPositions[migratePositionTypeData.id],
+            pendingTransaction: '',
+            toWithdraw: BigNumber.from(0),
+            swapped: BigNumber.from(0),
+            withdrawn: BigNumber.from(0),
+            executedSwaps: BigNumber.from(0),
+            status: 'ACTIVE',
+            version: POSITION_VERSION_3,
+            id: migratePositionTypeData.newId,
+          };
+        }
+        delete this.currentPositions[migratePositionTypeData.id];
         break;
       }
       case TRANSACTION_TYPES.WITHDRAW_POSITION: {

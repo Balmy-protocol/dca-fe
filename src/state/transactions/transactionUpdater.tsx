@@ -142,6 +142,14 @@ export default function Updater(): null {
                     .args.positionId.toString(),
                 };
               }
+              if (transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION) {
+                extendedTypeData = {
+                  // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                  newId: web3Service
+                    .parseLog(receipt.logs, currentNetwork.chainId, 'Deposited')
+                    .args.positionId.toString(),
+                };
+              }
 
               web3Service.handleTransaction({
                 ...transactions[hash],
