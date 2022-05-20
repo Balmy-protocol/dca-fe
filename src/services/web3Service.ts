@@ -1285,6 +1285,7 @@ export default class Web3Service {
     const hubInstance = new ethers.Contract(hubAddress, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
     const toToUse = to.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken : to;
+
     return hubInstance['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'](
       from.address,
       toToUse.address,
