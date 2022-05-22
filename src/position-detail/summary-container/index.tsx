@@ -16,6 +16,9 @@ const StyledPaper = styled(Paper)`
   flex-grow: 1;
   background-color: rgba(216, 216, 216, 0.05);
   backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledFlexGridItem = styled(Grid)`
@@ -58,11 +61,11 @@ const PositionSummaryContainer = ({
       </StyledFlexGridItem>
       <Grid item xs={12} md={7}>
         <Grid container direction="column" spacing={3}>
-          {/* <Grid item xs={12}>
+          <Grid item xs={12}>
             <StyledPaper variant="outlined">
               <SwapsGraph position={position} />
             </StyledPaper>
-          </Grid> */}
+          </Grid>
           <Grid item xs={12}>
             <StyledPaper variant="outlined">
               <PositionSwaps position={position} />

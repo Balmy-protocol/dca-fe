@@ -67,12 +67,14 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         { ...position, id: positionId },
         PERMISSIONS.TERMINATE
       );
-      if (hasWrappedOrProtocol) {
+      if (hasWrappedOrProtocol && protocolBalance.gt(BigNumber.from(0))) {
         if (hasProtocolToken) {
           terminateWithUnwrap = !useProtocolToken;
         } else {
           terminateWithUnwrap = useProtocolToken;
         }
+      } else {
+        terminateWithUnwrap = false;
       }
 
       setModalLoading({
