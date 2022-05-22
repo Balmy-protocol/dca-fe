@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { formatUnits } from '@ethersproject/units';
-import Button from 'common/button';
 import Modal from 'common/modal';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
@@ -9,8 +8,7 @@ import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
-import { makeStyles } from '@mui/styles';
+import { PERMISSIONS, POSITION_VERSION_3, TRANSACTION_TYPES } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import FormGroup from '@mui/material/FormGroup';
@@ -18,7 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { BigNumber } from 'ethers';
 
-interface WithdrawModalProps {
+interface TerminateModalProps {
   position: Position;
   onCancel: () => void;
   open: boolean;
@@ -33,7 +31,7 @@ const StyledTerminateContainer = styled.div`
   gap: 10px;
 `;
 
-const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
+const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const { web3Service } = React.useContext(WalletContext);
   const addTransaction = useTransactionAdder();
@@ -63,7 +61,12 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
       handleCancel();
       let terminateWithUnwrap = false;
 
-      const hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.TERMINATE);
+      const positionId =
+        position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
+      const hasPermission = await web3Service.companionHasPermission(
+        { ...position, id: positionId },
+        PERMISSIONS.TERMINATE
+      );
       if (hasWrappedOrProtocol) {
         if (hasProtocolToken) {
           terminateWithUnwrap = !useProtocolToken;
@@ -90,7 +93,13 @@ const TerminateModal = ({ position, open, onCancel }: WithdrawModalProps) => {
         ),
       });
 
-      const result = await web3Service.terminate(position, terminateWithUnwrap);
+      const result = await web3Service.terminate(
+        {
+          ...position,
+          id: positionId,
+        },
+        terminateWithUnwrap
+      );
       addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,

@@ -77,7 +77,10 @@ const CurrentPositions = () => {
     try {
       const positionId =
         position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
-      const hasPermission = await web3Service.companionHasPermission(positionId, PERMISSIONS.WITHDRAW);
+      const hasPermission = await web3Service.companionHasPermission(
+        { ...position, id: positionId },
+        PERMISSIONS.WITHDRAW
+      );
 
       const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
       const toSymbol =
@@ -188,47 +191,54 @@ const CurrentPositions = () => {
         position={selectedPosition}
       />
       <Grid container spacing={1}>
-        {/* dont know why I need the 100% width :shrug: */}
-        <StyledGridItem item xs={12}>
-          <Typography variant="body2">
-            <FormattedMessage description="inProgressPositions" defaultMessage="IN PROGRESS" />
-          </Typography>
-        </StyledGridItem>
-        <Grid item xs={12}>
-          <Grid container spacing={2}>
-            {positionsInProgress.map((position) => (
-              <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
-                <ActivePosition
-                  position={position}
-                  onWithdraw={onWithdraw}
-                  onReusePosition={onShowModifyRateSettings}
-                  onTerminate={onShowTerminate}
-                  onMigrate={onShowMigrate}
-                />
-              </StyledGridItem>
-            ))}
-          </Grid>
-        </Grid>
-        <StyledGridItem item xs={12} sx={{ marginTop: '32px' }}>
-          <Typography variant="body2">
-            <FormattedMessage description="finishedPositions" defaultMessage="FINISHED" />
-          </Typography>
-        </StyledGridItem>
-        <Grid item xs={12}>
-          <Grid container spacing={2}>
-            {positionsFinished.map((position) => (
-              <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
-                <ActivePosition
-                  position={position}
-                  onWithdraw={onWithdraw}
-                  onReusePosition={onShowModifyRateSettings}
-                  onTerminate={onShowTerminate}
-                  onMigrate={onShowMigrate}
-                />
-              </StyledGridItem>
-            ))}
-          </Grid>
-        </Grid>
+        {!!positionsInProgress.length && (
+          <>
+            <StyledGridItem item xs={12}>
+              <Typography variant="body2">
+                <FormattedMessage description="inProgressPositions" defaultMessage="IN PROGRESS" />
+              </Typography>
+            </StyledGridItem>
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                {positionsInProgress.map((position) => (
+                  <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
+                    <ActivePosition
+                      position={position}
+                      onWithdraw={onWithdraw}
+                      onReusePosition={onShowModifyRateSettings}
+                      onTerminate={onShowTerminate}
+                      onMigrate={onShowMigrate}
+                    />
+                  </StyledGridItem>
+                ))}
+              </Grid>
+            </Grid>
+          </>
+        )}
+        {!!positionsFinished.length && (
+          <>
+            <StyledGridItem item xs={12} sx={{ marginTop: '32px' }}>
+              <Typography variant="body2">
+                <FormattedMessage description="finishedPositions" defaultMessage="FINISHED" />
+              </Typography>
+            </StyledGridItem>
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                {positionsFinished.map((position) => (
+                  <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
+                    <ActivePosition
+                      position={position}
+                      onWithdraw={onWithdraw}
+                      onReusePosition={onShowModifyRateSettings}
+                      onTerminate={onShowTerminate}
+                      onMigrate={onShowMigrate}
+                    />
+                  </StyledGridItem>
+                ))}
+              </Grid>
+            </Grid>
+          </>
+        )}
       </Grid>
     </>
   );

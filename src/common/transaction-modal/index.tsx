@@ -129,7 +129,7 @@ export const TransactionModal = ({
           target="_blank"
           rel="noreferrer"
         >
-          <FormattedMessage description="View on etherscan" defaultMessage="View on chain explorer" />
+          <FormattedMessage description="View on etherscan" defaultMessage="View on explorer" />
         </StyledLink>
       )}
     </>
@@ -187,6 +187,7 @@ export const TransactionModal = ({
       open={open}
       showCloseButton={selectedConfig === 'success' || selectedConfig === 'error'}
       onClose={onClose}
+      maxWidth="sm"
       actions={[]}
     >
       <StyledContainer>

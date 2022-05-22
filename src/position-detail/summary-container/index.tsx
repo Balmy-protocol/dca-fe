@@ -58,11 +58,11 @@ const PositionSummaryContainer = ({
       </StyledFlexGridItem>
       <Grid item xs={12} md={7}>
         <Grid container direction="column" spacing={3}>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <StyledPaper variant="outlined">
               <SwapsGraph position={position} />
             </StyledPaper>
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <StyledPaper variant="outlined">
               <PositionSwaps position={position} />

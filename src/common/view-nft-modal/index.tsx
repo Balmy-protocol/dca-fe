@@ -10,7 +10,7 @@ interface ViewNFTModalProps {
 
 const ViewNFTModal = ({ nftData, open, onCancel }: ViewNFTModalProps) => (
   <Modal open={open} showCloseIcon onClose={onCancel}>
-    {nftData && <img src={nftData.image} style={{ minWidth: '30rem' }} alt="nft" />}
+    {nftData && <img src={nftData.image} style={{ minHeight: '50rem' }} alt="nft" />}
   </Modal>
 );
 export default ViewNFTModal;

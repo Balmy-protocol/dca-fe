@@ -104,17 +104,25 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
       <StyledMigrateContainer>
         <Typography variant="body1">
           <FormattedMessage
+            description="migrate description primary"
+            defaultMessage="You are migrating a position from a deprecated version of Mean Finance to the newest one."
+          />
+          <FormattedMessage
             description="migrate description"
             defaultMessage="Your position will be terminated here and we will create a new one on"
           />
           <StyledLink href="https://mean.finance" target="_blank">
-            {` mean.finance`}
+            {` mean.finance.`}
           </StyledLink>
         </Typography>
         <Typography variant="body1">
           <FormattedMessage
             description="terminate description"
-            defaultMessage="You will get back whatever has been swapped on your position and the remaining funds will be used for the new position"
+            defaultMessage="All {to} balance will be sent to you and all {from} balance will be used to create a new position with the same rate and remaining swaps."
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+            }}
           />
         </Typography>
         <Typography variant="body1">

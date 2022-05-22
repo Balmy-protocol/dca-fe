@@ -97,7 +97,8 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
   };
 
   const handleAddAddress = () => {
-    toAddresses.forEach((address) => dispatch(addOperator({ operator: address.toLowerCase(), permissions })));
+    const addressesToAdd = toAddresses.filter((address) => !!address.trim());
+    addressesToAdd.forEach((address) => dispatch(addOperator({ operator: address.toLowerCase(), permissions })));
     onCancel();
   };
 
@@ -116,7 +117,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
     }
   };
 
-  const shouldDisable = !toAddresses.filter((address) => address !== '').length;
+  const shouldDisable = !toAddresses.filter((address) => address.trim() !== '').length;
 
   return (
     <Modal

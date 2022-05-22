@@ -147,6 +147,11 @@ const StyledFrequencyValueContainer = styled.div`
 
 const StyledSummaryContainer = styled.div``;
 
+const StyledInputContainer = styled.div`
+  margin: 5px 6px;
+  display: inline-flex;
+`;
+
 interface AvailableSwapInterval {
   label: {
     singular: string;
@@ -858,14 +863,16 @@ const Swap = ({
               <Typography variant="body1" component="span">
                 <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
               </Typography>
-              <TokenInput
-                id="rate-value"
-                value={rate}
-                onChange={handleRateValueChange}
-                withBalance={false}
-                token={from}
-                isMinimal
-              />
+              <StyledInputContainer>
+                <TokenInput
+                  id="rate-value"
+                  value={rate}
+                  onChange={handleRateValueChange}
+                  withBalance={false}
+                  token={from}
+                  isMinimal
+                />
+              </StyledInputContainer>
               <Typography variant="body1" component="span">
                 <FormattedMessage
                   description="rate detail"
@@ -876,7 +883,14 @@ const Swap = ({
                   }}
                 />
               </Typography>
-              <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} isMinimal />
+              <StyledInputContainer>
+                <FrequencyInput
+                  id="frequency-value"
+                  value={frequencyValue}
+                  onChange={handleFrequencyChange}
+                  isMinimal
+                />
+              </StyledInputContainer>
               {STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].subject}
             </StyledSummaryContainer>
             {ButtonToShow}
