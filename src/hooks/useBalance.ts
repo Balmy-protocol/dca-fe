@@ -60,7 +60,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
     return [prevResult || BigNumber.from('0'), false, undefined];
   }
 
-  return [result, isLoading, error];
+  return [result || prevResult, isLoading, error];
 }
 
 export default useBalance;
