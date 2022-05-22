@@ -145,17 +145,19 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
             />
           )}
         </StyledControlsWrapper>
-        <StyledFlexGridItem item xs={12}>
-          <StyledPaper variant="outlined">
-            <Grid container spacing={2}>
-              {Object.values(permissions).map((permission) => (
-                <Grid item xs={4}>
-                  <PositionPermission positionPermission={permission} shouldDisable={shouldDisable} />
-                </Grid>
-              ))}
-            </Grid>
-          </StyledPaper>
-        </StyledFlexGridItem>
+        {!!Object.values(permissions).length && (
+          <StyledFlexGridItem item xs={12}>
+            <StyledPaper variant="outlined">
+              <Grid container spacing={2}>
+                {Object.values(permissions).map((permission) => (
+                  <Grid item xs={4}>
+                    <PositionPermission positionPermission={permission} shouldDisable={shouldDisable} />
+                  </Grid>
+                ))}
+              </Grid>
+            </StyledPaper>
+          </StyledFlexGridItem>
+        )}
       </Grid>
     </>
   );

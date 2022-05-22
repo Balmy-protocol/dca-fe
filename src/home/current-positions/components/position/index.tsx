@@ -83,10 +83,10 @@ const StyledCardTitleHeader = styled.div`
   }
 `;
 
-const StyledDetailWrapper = styled.div`
+const StyledDetailWrapper = styled.div<{ alignItems?: string }>`
   margin-bottom: 5px;
   display: flex;
-  align-items: center;
+  align-items: ${({ alignItems }) => alignItems || 'center'};
   justify-content: flex-start;
 `;
 
@@ -243,7 +243,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
               </StyledDeprecated>
             )}
           </StyledCardHeader>
-          <StyledDetailWrapper>
+          <StyledDetailWrapper alignItems="flex-start">
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
                 description="current remaining"
@@ -288,7 +288,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
               />
             </Typography>
           </StyledDetailWrapper>
-          <StyledDetailWrapper>
+          <StyledDetailWrapper alignItems="flex-start">
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="current swapped in position" defaultMessage="To withdraw: " />
             </Typography>

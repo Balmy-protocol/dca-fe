@@ -82,6 +82,7 @@ import {
   CHAINLINK_ORACLE_ADDRESS,
   COINGECKO_IDS,
   COMPANION_ADDRESS,
+  COMPANION_V2_ADDRESS,
   DEFILLAMA_IDS,
   HUB_ADDRESS,
   HUB_V2_ADDRESS,
@@ -288,6 +289,12 @@ export default class Web3Service {
     const network = await this.getNetwork();
 
     return COMPANION_ADDRESS[network.chainId] || COMPANION_ADDRESS[NETWORKS.optimism.chainId];
+  }
+
+  async getHUBCompanionV2Address() {
+    const network = await this.getNetwork();
+
+    return COMPANION_V2_ADDRESS[network.chainId] || COMPANION_V2_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getOracleAddress() {
@@ -1131,9 +1138,15 @@ export default class Web3Service {
     return betaMigratorInstance.migrate(hubV2Address, positionId, generatedSignature, hubAddress);
   }
 
-  async companionHasPermission(positionId: string, permission: number) {
-    const permissionManagerAddress = await this.getPermissionManagerAddress();
-    const companionAddress = await this.getHUBCompanionAddress();
+  async companionHasPermission(position: Position, permission: number) {
+    const permissionManagerAddress =
+      position.version === POSITION_VERSION_3
+        ? await this.getPermissionManagerAddress()
+        : await this.getPermissionManagerV2Address();
+    const companionAddress =
+      position.version === POSITION_VERSION_3
+        ? await this.getHUBCompanionAddress()
+        : await this.getHUBCompanionV2Address();
 
     const permissionManagerInstance = new ethers.Contract(
       permissionManagerAddress,
@@ -1141,7 +1154,7 @@ export default class Web3Service {
       this.getSigner()
     ) as unknown as PermissionManagerContract;
 
-    return permissionManagerInstance.hasPermission(positionId, companionAddress, permission);
+    return permissionManagerInstance.hasPermission(position.id, companionAddress, permission);
   }
 
   async companionIsApproved(position: FullPosition): Promise<boolean> {
@@ -1325,7 +1338,7 @@ export default class Web3Service {
       this.getSigner()
     ) as unknown as HubCompanionContract;
 
-    const companionHasPermission = await this.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
 
     if (companionHasPermission) {
       return hubCompanionInstance.withdrawSwappedUsingProtocolToken(position.id, this.account);
@@ -1361,7 +1374,10 @@ export default class Web3Service {
   async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
     const currentNetwork = await this.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const companionAddress = await this.getHUBCompanionAddress();
+    const companionAddress =
+      position.version === POSITION_VERSION_3
+        ? await this.getHUBCompanionAddress()
+        : await this.getHUBCompanionV2Address();
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -1374,7 +1390,8 @@ export default class Web3Service {
     }
 
     if (!useProtocolToken) {
-      const hubAddress = await this.getHUBAddress();
+      const hubAddress =
+        position.version === POSITION_VERSION_3 ? await this.getHUBAddress() : await this.getHUBV2Address();
 
       const hubInstance = new ethers.Contract(hubAddress, HUB_ABI.abi, this.getSigner()) as unknown as HubContract;
 
@@ -1387,7 +1404,7 @@ export default class Web3Service {
       this.getSigner()
     ) as unknown as HubCompanionContract;
 
-    const companionHasPermission = await this.companionHasPermission(position.id, PERMISSIONS.TERMINATE);
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
     if (companionHasPermission) {
       if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
@@ -1396,10 +1413,16 @@ export default class Web3Service {
       return hubCompanionInstance.terminateUsingProtocolTokenAsFrom(position.id, this.account, this.account);
     }
 
+    const permissionManagerAddress =
+      position.version === POSITION_VERSION_3
+        ? await this.getPermissionManagerAddress()
+        : await this.getPermissionManagerV2Address();
+
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position.id,
       companionAddress,
-      PERMISSIONS.TERMINATE
+      PERMISSIONS.TERMINATE,
+      permissionManagerAddress
     );
 
     const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
@@ -1583,7 +1606,7 @@ export default class Web3Service {
     }
 
     if (newAmount.gte(position.remainingLiquidity)) {
-      const companionHasIncrease = await this.companionHasPermission(position.id, PERMISSIONS.INCREASE);
+      const companionHasIncrease = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
 
       if (companionHasIncrease) {
         return hubCompanionInstance.increasePositionUsingProtocolToken(
@@ -1624,7 +1647,7 @@ export default class Web3Service {
       });
     }
 
-    const companionHasReduce = await this.companionHasPermission(position.id, PERMISSIONS.REDUCE);
+    const companionHasReduce = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
 
     if (companionHasReduce) {
       return hubCompanionInstance.reducePositionUsingProtocolToken(

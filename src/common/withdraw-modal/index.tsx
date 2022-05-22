@@ -8,7 +8,7 @@ import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
+import { PERMISSIONS, POSITION_VERSION_3, TRANSACTION_TYPES } from 'config/constants';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
@@ -37,9 +37,15 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
       onCancel();
       let hasPermission;
 
+      const positionId =
+        position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
       if (useProtocolToken) {
-        hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
+        hasPermission = await web3Service.companionHasPermission(
+          { ...position, id: positionId },
+          PERMISSIONS.WITHDRAW
+        );
       }
+
 
       setModalLoading({
         content: (

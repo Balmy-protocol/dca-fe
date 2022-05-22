@@ -14,8 +14,8 @@ const StyledTimeline = styled(Grid)`
     position: absolute;
     left: 10px;
     top: 5px;
+    bottom: 0px;
     width: 4px;
-    height: 100%;
     border-left: 3px dashed #dce2f9;
   }
 `;
@@ -25,6 +25,9 @@ const StyledTimelineContainer = styled(Grid)`
   margin-bottom: 24px;
   display: flex;
   align-items: center;
+  &:last-child {
+    margin-bottom: 0px;
+  }
 `;
 
 const StyledTimelineIcon = styled.div`

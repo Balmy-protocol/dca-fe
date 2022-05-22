@@ -175,7 +175,10 @@ const PositionDetailFrame = () => {
       return;
     }
     try {
-      const hasPermission = await web3Service.companionHasPermission(position.id, PERMISSIONS.WITHDRAW);
+      const hasPermission = await web3Service.companionHasPermission(
+        fullPositionToMappedPosition(position),
+        PERMISSIONS.WITHDRAW
+      );
 
       const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
       const toSymbol =
@@ -236,9 +239,7 @@ const PositionDetailFrame = () => {
         fromValue: formatUnits(position.current.remainingLiquidity, position.from.decimals),
         rate: formatUnits(position.current.rate, position.from.decimals),
         frequencyValue: position.current.remainingSwaps.toString(),
-        modeType: BigNumber.from(position.current.remainingLiquidity).gt(BigNumber.from(0))
-          ? FULL_DEPOSIT_TYPE
-          : RATE_TYPE,
+        modeType: RATE_TYPE,
       })
     );
     setShowModifyRateSettingsModal(true);

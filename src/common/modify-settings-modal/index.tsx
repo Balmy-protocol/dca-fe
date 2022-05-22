@@ -66,6 +66,11 @@ const StyledSummaryContainer = styled.div`
   flex-wrap: wrap;
 `;
 
+const StyledInputContainer = styled.div`
+  margin: 5px 6px;
+  display: inline-flex;
+`;
+
 interface ModifySettingsModalProps {
   position: Position;
   onCancel: () => void;
@@ -188,7 +193,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
     try {
       const hasPermission = await web3Service.companionHasPermission(
-        position.id,
+        position,
         isIncreasingPosition ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
       );
 
@@ -262,7 +267,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const handleApproveToken = async () => {
     if (!from) return;
-    const fromSymbol = from.symbol;
+    const fromSymbol = fromToUse.symbol;
 
     try {
       setModalLoading({
@@ -276,11 +281,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </Typography>
         ),
       });
-      const result = await web3Service.approveToken(from);
+      const result = await web3Service.approveToken(fromToUse);
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
-          token: from,
+          token: fromToUse,
           addressFor:
             to.address === PROTOCOL_TOKEN_ADDRESS
               ? COMPANION_ADDRESS[currentNetwork.chainId]
@@ -384,7 +389,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               />
             </Typography>
             {shouldShowWrappedProtocolSwitch && (
-              <FormGroup row style={{ paddingLeft: '5px' }}>
+              <FormGroup row>
                 <FormControlLabel
                   labelPlacement="start"
                   control={
@@ -432,14 +437,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             <Typography variant="body1" component="span">
               <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
             </Typography>
-            <TokenInput
-              id="rate-value"
-              value={rate}
-              onChange={handleRateValueChange}
-              withBalance={false}
-              token={fromToUse}
-              isMinimal
-            />
+            <StyledInputContainer>
+              <TokenInput
+                id="rate-value"
+                value={rate}
+                onChange={handleRateValueChange}
+                withBalance={false}
+                token={fromToUse}
+                isMinimal
+              />
+            </StyledInputContainer>
             <Typography variant="body1" component="span">
               <FormattedMessage
                 description="rate detail"
@@ -449,14 +456,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 }}
               />
             </Typography>
-            <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} isMinimal />
+            <StyledInputContainer>
+              <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} isMinimal />
+            </StyledInputContainer>
             {STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject}
           </StyledSummaryContainer>
         </Grid>
         <Grid item xs={12}>
           {remainingLiquidity.gt(BigNumber.from(0)) &&
             !position.remainingLiquidity
-              .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue || '0', fromToUse.decimals)))
+              .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
               .eq(BigNumber.from(0)) && (
               <Typography variant="body2">
                 {isIncreasingPosition ? (

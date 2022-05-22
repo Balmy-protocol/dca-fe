@@ -182,6 +182,7 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
       pair?.nextSwapAvailableAt ?? null
     ) === STALE;
 
+  const shouldDisableWithdraw = toWithdraw.lte(BigNumber.from(0));
   return (
     <StyledCard>
       <StyledCardContent>
@@ -406,32 +407,48 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
           </StyledDetailWrapper>
         </StyledContentContainer>
         <StyledCallToActionContainer>
-          {!isPending && toWithdraw.gt(BigNumber.from(0)) && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-            <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onWithdraw(true)} fullWidth>
-              <Typography variant="body2">
-                <FormattedMessage
-                  description="withdraw"
-                  defaultMessage="Withdraw {protocolToken}"
-                  values={{ protocolToken: protocolToken.symbol }}
-                />
-              </Typography>
-            </StyledCardFooterButton>
-          )}
-          {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
-            <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onWithdraw(false)} fullWidth>
-              <Typography variant="body2">
-                <FormattedMessage
-                  description="withdraw"
-                  defaultMessage="Withdraw {wrappedProtocolToken}"
-                  values={{
-                    wrappedProtocolToken:
-                      position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
-                  }}
-                />
-              </Typography>
-            </StyledCardFooterButton>
-          )}
-          {!isPending && toWithdraw.lte(BigNumber.from(0)) && (
+          {!isPending &&
+            (toWithdraw.gt(BigNumber.from(0)) ||
+              (toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.gt(BigNumber.from(0)))) &&
+            position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+              <StyledCardFooterButton
+                disabled={shouldDisableWithdraw}
+                variant="contained"
+                color="secondary"
+                onClick={() => onWithdraw(true)}
+                fullWidth
+              >
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="withdraw"
+                    defaultMessage="Withdraw {protocolToken}"
+                    values={{ protocolToken: protocolToken.symbol }}
+                  />
+                </Typography>
+              </StyledCardFooterButton>
+            )}
+          {(!isPending && toWithdraw.gt(BigNumber.from(0))) ||
+            (toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.gt(BigNumber.from(0)) && (
+              <StyledCardFooterButton
+                disabled={shouldDisableWithdraw}
+                variant="contained"
+                color="secondary"
+                onClick={() => onWithdraw(false)}
+                fullWidth
+              >
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="withdraw"
+                    defaultMessage="Withdraw {wrappedProtocolToken}"
+                    values={{
+                      wrappedProtocolToken:
+                        position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
+                    }}
+                  />
+                </Typography>
+              </StyledCardFooterButton>
+            ))}
+          {!isPending && toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.eq(BigNumber.from(0)) && (
             <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onReusePosition()} fullWidth>
               <Typography variant="body2">
                 <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
