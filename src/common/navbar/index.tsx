@@ -13,6 +13,7 @@ import { changeMainTab } from 'state/tabs/actions';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
+import { useHistory } from 'react-router-dom';
 import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
 
@@ -79,12 +80,14 @@ interface NavBarProps {
 const NavBar = ({ isLoading }: NavBarProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
   const currentNetwork = useCurrentNetwork();
+  const history = useHistory();
   const tabIndex = useMainTab();
   const dispatch = useAppDispatch();
 
   const handleTabChange = (e: any, index: number) => {
     if (index !== 2) {
       dispatch(changeMainTab(index));
+      history.push('/');
     } else {
       window.open('https://mean.finance/leaderboard', '_blank');
     }
