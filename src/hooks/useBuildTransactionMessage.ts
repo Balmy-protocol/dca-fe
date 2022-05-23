@@ -133,7 +133,7 @@ function useBuildTransactionMessages() {
               STRING_SWAP_INTERVALS[
                 (modifiedRatePosition as Position).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
               ].every
-            } for ${modifyRateAndSwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
+            } for ${getFrequencyLabel(
               (modifiedRatePosition as Position).swapInterval.toString(),
               modifyRateAndSwapsPositionTypeData.newSwaps
             )}`;

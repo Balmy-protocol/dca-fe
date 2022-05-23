@@ -1054,10 +1054,12 @@ export default class Web3Service {
     positionId: string,
     contractAddress: string,
     permission: number,
-    permissionManagerAddressProvided?: string
+    permissionManagerAddressProvided?: string,
+    erc712Name?: string
   ) {
     const signer = this.getSigner();
     const permissionManagerAddress = permissionManagerAddressProvided || (await this.getPermissionManagerAddress());
+    const signName = erc712Name || 'Mean Finance - DCA Position';
     const currentNetwork = await this.getNetwork();
     const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
 
@@ -1100,7 +1102,7 @@ export default class Web3Service {
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await (signer as VoidSigner)._signTypedData(
       {
-        name: 'Mean Finance DCA',
+        name: signName,
         version: '1',
         chainId: currentNetwork.chainId,
         verifyingContract: permissionManagerAddress,
@@ -1132,11 +1134,14 @@ export default class Web3Service {
       signer
     ) as unknown as BetaMigratorContract;
 
+    const erc712Name = 'Mean Finance DCA';
+
     const generatedSignature = await this.getSignatureForPermission(
       positionId,
       migratorAddress,
       PERMISSIONS.TERMINATE,
-      permissionManagerV2Address
+      permissionManagerV2Address,
+      erc712Name
     );
 
     return betaMigratorInstance.migrate(hubV2Address, positionId, generatedSignature, hubAddress);
@@ -1422,11 +1427,14 @@ export default class Web3Service {
         ? await this.getPermissionManagerAddress()
         : await this.getPermissionManagerV2Address();
 
+    const erc712Name = position.version === POSITION_VERSION_3 ? undefined : 'Mean Finance DCA';
+
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position.id,
       companionAddress,
       PERMISSIONS.TERMINATE,
-      permissionManagerAddress
+      permissionManagerAddress,
+      erc712Name
     );
 
     const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
@@ -1893,6 +1901,9 @@ export default class Web3Service {
         const terminatePositionTypeData = transaction.typeData as TerminatePositionTypeData;
         this.pastPositions[terminatePositionTypeData.id] = {
           ...this.currentPositions[terminatePositionTypeData.id],
+          toWithdraw: BigNumber.from(0),
+          remainingLiquidity: BigNumber.from(0),
+          remainingSwaps: BigNumber.from(0),
           pendingTransaction: '',
         };
         delete this.currentPositions[terminatePositionTypeData.id];
@@ -1925,6 +1936,7 @@ export default class Web3Service {
         this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[withdrawPositionTypeData.id].withdrawn =
           this.currentPositions[withdrawPositionTypeData.id].swapped;
+        this.currentPositions[withdrawPositionTypeData.id].toWithdraw = BigNumber.from(0);
         break;
       }
       case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {

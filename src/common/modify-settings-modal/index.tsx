@@ -192,6 +192,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     }
 
     try {
+      handleCancel();
+
       const hasPermission = await web3Service.companionHasPermission(
         position,
         isIncreasingPosition ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
@@ -270,6 +272,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     const fromSymbol = fromToUse.symbol;
 
     try {
+      handleCancel();
+
       setModalLoading({
         content: (
           <Typography variant="body1">
@@ -476,9 +480,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                       from: fromToUse.symbol,
                       addAmmount: formatUnits(
                         position.remainingLiquidity
-                          .sub(
-                            BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue || '0', fromToUse.decimals))
-                          )
+                          .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
                           .abs(),
                         fromToUse.decimals
                       ),
@@ -492,9 +494,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                       from: fromToUse.symbol,
                       returnAmmount: formatUnits(
                         position.remainingLiquidity
-                          .sub(
-                            BigNumber.from(frequencyValue || '0').mul(parseUnits(fromValue || '0', fromToUse.decimals))
-                          )
+                          .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
                           .abs(),
                         fromToUse.decimals
                       ),
