@@ -71,13 +71,13 @@ import HUB_ABI from 'abis/Hub.json';
 import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
 import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
-import BETA_MIGRATOR_ABI from 'abis/BetaMigrator.json';
+import MIGRATOR_ABI from 'abis/BetaMigrator.json';
 import OE_GAS_ORACLE_ABI from 'abis/OEGasOracle.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
 import {
-  BETA_MIGRATOR_ADDRESS,
+  MIGRATOR_ADDRESS,
   CHAINLINK_GRAPHQL_URL,
   CHAINLINK_ORACLE_ADDRESS,
   COINGECKO_IDS,
@@ -279,10 +279,10 @@ export default class Web3Service {
     return PERMISSION_V2_MANAGER_ADDRESS[network.chainId] || PERMISSION_V2_MANAGER_ADDRESS[NETWORKS.optimism.chainId];
   }
 
-  async getBetaMigratorAddress() {
+  async getMigratorAddress() {
     const network = await this.getNetwork();
 
-    return BETA_MIGRATOR_ADDRESS[network.chainId] || BETA_MIGRATOR_ADDRESS[NETWORKS.optimism.chainId];
+    return MIGRATOR_ADDRESS[network.chainId] || MIGRATOR_ADDRESS[NETWORKS.optimism.chainId];
   }
 
   async getHUBCompanionAddress() {
@@ -338,7 +338,7 @@ export default class Web3Service {
     const chain = await ethersProvider.getNetwork();
 
     this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
-    const v2Client = new GraphqlService(MEAN_V2_GRAPHQL_URL[chain.chainId] || MEAN_V2_GRAPHQL_URL[10]);
+    const v2Client = MEAN_V2_GRAPHQL_URL[chain.chainId] && new GraphqlService(MEAN_V2_GRAPHQL_URL[chain.chainId]);
     this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
     this.chainlinkClient = new GraphqlService(CHAINLINK_GRAPHQL_URL[chain.chainId] || CHAINLINK_GRAPHQL_URL[1]);
     this.setClient(ethersProvider);
@@ -398,45 +398,47 @@ export default class Web3Service {
       );
     }
 
-    const currentV2PositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
-      v2Client.getClient(),
-      GET_POSITIONS,
-      {
-        address: account.toLowerCase(),
-        status: ['ACTIVE', 'COMPLETED'],
-      },
-      'positions',
-      'network-only'
-    );
+    if (v2Client) {
+      const currentV2PositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
+        v2Client.getClient(),
+        GET_POSITIONS,
+        {
+          address: account.toLowerCase(),
+          status: ['ACTIVE', 'COMPLETED'],
+        },
+        'positions',
+        'network-only'
+      );
 
-    if (currentV2PositionsResponse.data) {
-      this.currentPositions = {
-        ...this.currentPositions,
-        ...keyBy(
-          currentV2PositionsResponse.data.positions.map((position: PositionResponse) => ({
-            from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-            to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-            user: position.user,
-            swapInterval: BigNumber.from(position.swapInterval.interval),
-            swapped: BigNumber.from(position.totalSwapped),
-            rate: BigNumber.from(position.current.rate),
-            remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-            remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-            withdrawn: BigNumber.from(position.totalWithdrawn),
-            toWithdraw: BigNumber.from(position.current.idleSwapped),
-            totalSwaps: BigNumber.from(position.totalSwaps),
-            id: `${position.id}-v2`,
-            status: position.status,
-            startedAt: position.createdAtTimestamp,
-            executedSwaps: BigNumber.from(position.executedSwaps),
-            totalDeposits: BigNumber.from(position.totalDeposits),
-            pendingTransaction: '',
-            pairId: position.pair.id,
-            version: POSITION_VERSION_2,
-          })),
-          'id'
-        ),
-      };
+      if (currentV2PositionsResponse.data) {
+        this.currentPositions = {
+          ...this.currentPositions,
+          ...keyBy(
+            currentV2PositionsResponse.data.positions.map((position: PositionResponse) => ({
+              from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+              to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+              user: position.user,
+              swapInterval: BigNumber.from(position.swapInterval.interval),
+              swapped: BigNumber.from(position.totalSwapped),
+              rate: BigNumber.from(position.current.rate),
+              remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+              remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+              withdrawn: BigNumber.from(position.totalWithdrawn),
+              toWithdraw: BigNumber.from(position.current.idleSwapped),
+              totalSwaps: BigNumber.from(position.totalSwaps),
+              id: `${position.id}-v2`,
+              status: position.status,
+              startedAt: position.createdAtTimestamp,
+              executedSwaps: BigNumber.from(position.executedSwaps),
+              totalDeposits: BigNumber.from(position.totalDeposits),
+              pendingTransaction: '',
+              pairId: position.pair.id,
+              version: POSITION_VERSION_2,
+            })),
+            'id'
+          ),
+        };
+      }
     }
 
     const pastPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
@@ -477,45 +479,47 @@ export default class Web3Service {
       );
     }
 
-    const pastPositionsV2Response = await gqlFetchAll<PositionsGraphqlResponse>(
-      v2Client.getClient(),
-      GET_POSITIONS,
-      {
-        address: account.toLowerCase(),
-        status: ['TERMINATED'],
-      },
-      'positions',
-      'network-only'
-    );
+    if (v2Client) {
+      const pastPositionsV2Response = await gqlFetchAll<PositionsGraphqlResponse>(
+        v2Client.getClient(),
+        GET_POSITIONS,
+        {
+          address: account.toLowerCase(),
+          status: ['TERMINATED'],
+        },
+        'positions',
+        'network-only'
+      );
 
-    if (pastPositionsV2Response.data) {
-      this.pastPositions = {
-        ...this.pastPositions,
-        ...keyBy(
-          pastPositionsV2Response.data.positions.map((position: PositionResponse) => ({
-            from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-            to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-            user: position.user,
-            totalDeposits: BigNumber.from(position.totalDeposits),
-            swapInterval: BigNumber.from(position.swapInterval.interval),
-            swapped: BigNumber.from(position.totalSwapped),
-            rate: BigNumber.from(position.current.rate),
-            remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-            remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-            totalSwaps: BigNumber.from(position.totalSwaps),
-            withdrawn: BigNumber.from(position.totalWithdrawn),
-            toWithdraw: BigNumber.from(position.current.idleSwapped),
-            executedSwaps: BigNumber.from(position.executedSwaps),
-            id: position.id,
-            status: position.status,
-            startedAt: position.createdAtTimestamp,
-            pendingTransaction: '',
-            pairId: position.pair.id,
-            version: POSITION_VERSION_2,
-          })),
-          'id'
-        ),
-      };
+      if (pastPositionsV2Response.data) {
+        this.pastPositions = {
+          ...this.pastPositions,
+          ...keyBy(
+            pastPositionsV2Response.data.positions.map((position: PositionResponse) => ({
+              from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+              to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+              user: position.user,
+              totalDeposits: BigNumber.from(position.totalDeposits),
+              swapInterval: BigNumber.from(position.swapInterval.interval),
+              swapped: BigNumber.from(position.totalSwapped),
+              rate: BigNumber.from(position.current.rate),
+              remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+              remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+              totalSwaps: BigNumber.from(position.totalSwaps),
+              withdrawn: BigNumber.from(position.totalWithdrawn),
+              toWithdraw: BigNumber.from(position.current.idleSwapped),
+              executedSwaps: BigNumber.from(position.executedSwaps),
+              id: position.id,
+              status: position.status,
+              startedAt: position.createdAtTimestamp,
+              pendingTransaction: '',
+              pairId: position.pair.id,
+              version: POSITION_VERSION_2,
+            })),
+            'id'
+          ),
+        };
+      }
     }
 
     this.setAccount(account);
@@ -1118,19 +1122,19 @@ export default class Web3Service {
 
   async migratePosition(positionId: string): Promise<TransactionResponse> {
     const signer = this.getSigner();
-    const betaMigratorAddress = await this.getBetaMigratorAddress();
+    const migratorAddress = await this.getMigratorAddress();
     const permissionManagerV2Address = await this.getPermissionManagerV2Address();
     const hubAddress = await this.getHUBAddress();
     const hubV2Address = await this.getHUBV2Address();
     const betaMigratorInstance = new ethers.Contract(
-      betaMigratorAddress,
-      BETA_MIGRATOR_ABI.abi,
+      migratorAddress,
+      MIGRATOR_ABI.abi,
       signer
     ) as unknown as BetaMigratorContract;
 
     const generatedSignature = await this.getSignatureForPermission(
       positionId,
-      betaMigratorAddress,
+      migratorAddress,
       PERMISSIONS.TERMINATE,
       permissionManagerV2Address
     );
