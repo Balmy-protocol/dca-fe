@@ -74,11 +74,7 @@ export const getDefaultByUrl = () => ({
   },
 });
 export const initialState: TokenListsState = {
-  activeLists: [
-    'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
-    'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
-    'https://static.optimism.io/optimism.tokenlist.json',
-  ],
+  activeLists: ['https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json'],
   byUrl: getDefaultByUrl(),
   hasLoaded: false,
 };

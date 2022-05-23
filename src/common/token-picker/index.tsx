@@ -351,9 +351,9 @@ const TokenPicker = ({
                   <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
                     <FormattedMessage description="token list" defaultMessage="Token list" />
                   </Typography>
-                  <IconButton aria-label="close" onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}>
+                  {/* <IconButton aria-label="close" onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}>
                     <StyledTuneIcon />
-                  </IconButton>
+                  </IconButton> */}
                 </StyledDialogTitle>
               </StyledGrid>
               <StyledGrid item xs={12} style={{ flexGrow: 1 }}>
