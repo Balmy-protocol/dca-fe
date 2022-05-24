@@ -10,7 +10,12 @@ const StyledLoadingIndicatorWrapper = styled.div`
   margin: 40px;
 `;
 
-const StyledCreatePositionContainer = styled.div``;
+const StyledCreatePositionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+`;
 
 interface CreatePairModalProps {
   from: Token | null;
@@ -29,7 +34,7 @@ const CreatePairModal = ({ from, to, open, onCancel, onCreatePair }: CreatePairM
       showCloseButton
       onClose={onCancel}
       showCloseIcon
-      maxWidth="md"
+      maxWidth="sm"
       title={
         <FormattedMessage
           description="First deposit"
@@ -59,7 +64,7 @@ const CreatePairModal = ({ from, to, open, onCancel, onCreatePair }: CreatePairM
           </Typography>
         </>
       ) : (
-        <>
+        <StyledCreatePositionContainer>
           <Typography variant="body1">
             <FormattedMessage
               description="create pair question"
@@ -67,7 +72,7 @@ const CreatePairModal = ({ from, to, open, onCancel, onCreatePair }: CreatePairM
               values={{ from: (from && from.symbol) || '', to: (to && to.symbol) || '' }}
             />
           </Typography>
-        </>
+        </StyledCreatePositionContainer>
       )}
     </Modal>
   );

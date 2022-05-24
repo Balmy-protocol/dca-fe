@@ -27,7 +27,8 @@ interface TransferPositionModalProps {
   onCancel: () => void;
 }
 
-const inputRegex = RegExp(/^0x[A-Za-z0-9]*$/);
+const inputRegex = RegExp(/^[A-Fa-f0-9]*$/);
+const validRegex = RegExp(/^0x[A-Fa-f0-9]*$/);
 
 const TransferPositionModal = ({ position, open, onCancel }: TransferPositionModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -85,6 +86,8 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
     }
   };
 
+  const isValid = validRegex.test(toAddress);
+
   return (
     <Modal
       open={open}
@@ -104,6 +107,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
           label: <FormattedMessage description="Transfer" defaultMessage="Transfer" />,
           color: 'secondary',
           variant: 'contained',
+          disabled: toAddress === '' || (!isValid && toAddress !== ''),
           onClick: handleTransfer,
         },
       ]}
@@ -127,6 +131,8 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
           placeholder="Set the address to transfer to"
           autoComplete="off"
           autoCorrect="off"
+          error={toAddress !== '' && !isValid}
+          helperText={toAddress !== '' && !isValid ? 'This is not a valid address' : ''}
           fullWidth
           type="text"
           margin="normal"

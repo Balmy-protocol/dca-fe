@@ -85,12 +85,8 @@ const NavBar = ({ isLoading }: NavBarProps) => {
   const dispatch = useAppDispatch();
 
   const handleTabChange = (e: any, index: number) => {
-    if (index !== 2) {
-      dispatch(changeMainTab(index));
-      history.push('/');
-    } else {
-      window.open('https://mean.finance/leaderboard', '_blank');
-    }
+    dispatch(changeMainTab(index));
+    history.push('/');
   };
 
   return (
@@ -102,11 +98,15 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             breakpoint={currentBreakPoint}
             TabIndicatorProps={{ style: { bottom: '-10px' } }}
             value={tabIndex}
-            onChange={handleTabChange}
           >
-            <StyledTab label={<FormattedMessage description="create" defaultMessage="Create" />} />
-            <StyledTab label={<FormattedMessage description="positions" defaultMessage="Positions" />} />
-            <StyledTab label={<FormattedMessage description="leaderboard" defaultMessage="Leaderboard" />} />
+            <StyledTab
+              onClick={() => handleTabChange({}, 0)}
+              label={<FormattedMessage description="create" defaultMessage="Create" />}
+            />
+            <StyledTab
+              onClick={() => handleTabChange({}, 1)}
+              label={<FormattedMessage description="positions" defaultMessage="Positions" />}
+            />
           </StyledTabs>
         </StyledNavbarMainContent>
         <StyledNavbarEndContent>

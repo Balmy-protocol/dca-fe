@@ -17,8 +17,6 @@ import TransactionModalProvider from 'common/transaction-modal';
 import { useAppDispatch } from 'hooks/state';
 import { startFetchingTokenLists } from 'state/token-lists/actions';
 import { SnackbarProvider } from 'notistack';
-import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
@@ -61,6 +59,8 @@ const StyledNavBarGridContainer = styled(Grid)`
 
 const StyledAppGridContainer = styled(Grid)`
   margin-top: 40px !important;
+  flex: 1;
+  display: flex;
 `;
 
 const StyledContainer = styled(Container)`
@@ -72,6 +72,7 @@ const StyledContainer = styled(Container)`
 const StyledFooterGridContainer = styled(Grid)`
   margin-top: 92px !important;
   position: relative;
+  flex: 0;
 `;
 const AppFrame = ({ isLoading }: AppFrameProps) => {
   const web3Service = useWeb3Service();
@@ -125,7 +126,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
                 <Vector2 />
               </StyledVector2Container>
               <StyledContainer>
-                <StyledGridContainer container direction="column">
+                <StyledGridContainer container direction="row">
                   <StyledAppGridContainer item xs={12}>
                     <Switch>
                       <Route path="/faq">

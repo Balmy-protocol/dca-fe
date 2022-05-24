@@ -272,8 +272,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     const fromSymbol = fromToUse.symbol;
 
     try {
-      handleCancel();
-
       setModalLoading({
         content: (
           <Typography variant="body1">

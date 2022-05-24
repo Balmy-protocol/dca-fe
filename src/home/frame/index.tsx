@@ -12,9 +12,12 @@ import { changeMainTab } from 'state/tabs/actions';
 import { useParams } from 'react-router-dom';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
-import { NetworkStruct } from 'types';
+import { GetSwapIntervalsGraphqlResponse, NetworkStruct } from 'types';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { useQuery } from '@apollo/client';
+import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
+import useDCAGraphql from 'hooks/useDCAGraphql';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 
@@ -25,17 +28,17 @@ interface HomeFrameProps {
 const StyledGridContainer = styled(Grid).withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
     (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
-})<HomeFrameProps>``;
+})<HomeFrameProps>`
+  ${({ isLoading }) => !isLoading && 'align-self: flex-start'}
+`;
 // height: ${(props) => (props.isLoading ? `calc(100% + ${(parseInt(props?.spacing || '0', 10) || 0) * 4}px)` : 'auto')}; ;
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const tabIndex = useMainTab();
-  const dispatch = useAppDispatch();
   const web3Service = useWeb3Service();
-  const tabsStyles = appleTabsStylesHook.useTabs();
-  const tabItemStyles = appleTabsStylesHook.useTabItem();
   const currentNetwork = useCurrentNetwork();
   const { chainId } = useParams<{ chainId: string }>();
+  const client = useDCAGraphql();
 
   React.useEffect(() => {
     if (
@@ -48,29 +51,26 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     }
   }, [chainId, currentNetwork]);
 
+  const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
+    getAvailableIntervals,
+    {
+      client,
+    }
+  );
+
+  const isLoadingIntervals = isLoading || isLoadingSwapIntervals;
+
   return (
-    <StyledGridContainer container spacing={8} isLoading={isLoading}>
-      {isLoading ? (
+    <StyledGridContainer container spacing={8} isLoading={isLoadingIntervals}>
+      {isLoadingIntervals ? (
         <Grid item xs={12} style={{ display: 'flex' }}>
           <CenteredLoadingIndicator size={70} />
         </Grid>
       ) : (
         <>
-          {/* <Grid item xs={12} style={{ display: 'flex', paddingBottom: '0px', justifyContent: 'center' }}>
-            <Tabs classes={tabsStyles} value={tabIndex} onChange={(e, index) => dispatch(changeMainTab(index))}>
-              <Tab classes={tabItemStyles} disableRipple label="Create" />
-              <Tab classes={tabItemStyles} disableRipple label="Positions" />
-              <Tab
-                classes={tabItemStyles}
-                disableRipple
-                label="Leaderboard"
-                onClick={() => window.open('https://mean.finance/leaderboard', '_blank')}
-              />
-            </Tabs>
-          </Grid> */}
           {tabIndex === 0 ? (
             <Grid item xs={12}>
-              <SwapContainer />
+              <SwapContainer swapIntervalsData={swapIntervalsData} />
             </Grid>
           ) : (
             <Positions />
