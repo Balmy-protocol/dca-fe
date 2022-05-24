@@ -16,6 +16,7 @@ const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
   justify-content: center;
   padding: 0px;
   ${({ withTitle }) => withTitle && 'flex-direction: column;'}
+  overflow-y: visible;
 `;
 
 const StyledDialogColumnContent = styled.div`
@@ -56,6 +57,7 @@ const useStyles = makeStyles({
     background: '#1B1B1C',
     padding: '24px',
     gap: '24px',
+    overflow: 'auto',
   },
 });
 

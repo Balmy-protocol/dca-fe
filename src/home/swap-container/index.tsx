@@ -22,22 +22,22 @@ import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
 import Swap from './components/swap';
 
-const SwapContainer = () => {
+interface SwapContainerProps {
+  swapIntervalsData?: GetSwapIntervalsGraphqlResponse;
+}
+
+const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const { fromValue, frequencyType, frequencyValue, from, to } = useCreatePositionState();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
-  const client = useDCAGraphql();
-  const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
+  const {
+    from: fromParam,
+    to: toParam,
+    chainId: chainIdParam,
+  } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();
-
-  const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
-    getAvailableIntervals,
-    {
-      client,
-    }
-  );
 
   React.useEffect(() => {
     if (fromParamToken) {
@@ -93,59 +93,46 @@ const SwapContainer = () => {
     }
   };
 
-  const isLoading = isLoadingSwapIntervals || !swapIntervalsData;
-
   return (
     <Grid container spacing={2} alignItems="center" justifyContent="space-around">
       <WalletContext.Consumer>
         {({ web3Service }) => (
           <>
-            {isLoading && (
-              <Grid item xs={12}>
-                <CenteredLoadingIndicator size={50} />
+            <Grid item xs={12} md={5}>
+              <Swap
+                from={from}
+                to={to}
+                setFrom={onSetFrom}
+                setTo={onSetTo}
+                frequencyType={frequencyType}
+                frequencyValue={frequencyValue}
+                setFrequencyType={(newFrequencyType) => dispatch(setFrequencyType(newFrequencyType))}
+                setFrequencyValue={(newFrequencyValue) => dispatch(setFrequencyValue(newFrequencyValue))}
+                fromValue={fromValue}
+                setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
+                web3Service={web3Service}
+                currentNetwork={currentNetwork || NETWORKS.optimism}
+                toggleFromTo={toggleFromTo}
+                availableFrequencies={
+                  (swapIntervalsData &&
+                    orderBy(
+                      swapIntervalsData.swapIntervals,
+                      [(swapInterval) => parseInt(swapInterval.interval, 10)],
+                      ['asc']
+                    ).map((swapInterval) => ({
+                      label:
+                        STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                      value: BigNumber.from(swapInterval.interval),
+                    }))) ||
+                  []
+                }
+              />
+            </Grid>
+            <Hidden mdDown>
+              <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
+                <GraphWidget from={from} to={to} />
               </Grid>
-            )}
-            {!isLoading && (
-              <>
-                <Grid item xs={12} md={5}>
-                  <Swap
-                    from={from}
-                    to={to}
-                    setFrom={onSetFrom}
-                    setTo={onSetTo}
-                    frequencyType={frequencyType}
-                    frequencyValue={frequencyValue}
-                    setFrequencyType={(newFrequencyType) => dispatch(setFrequencyType(newFrequencyType))}
-                    setFrequencyValue={(newFrequencyValue) => dispatch(setFrequencyValue(newFrequencyValue))}
-                    fromValue={fromValue}
-                    setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
-                    web3Service={web3Service}
-                    currentNetwork={currentNetwork || NETWORKS.optimism}
-                    toggleFromTo={toggleFromTo}
-                    availableFrequencies={
-                      (swapIntervalsData &&
-                        orderBy(
-                          swapIntervalsData.swapIntervals,
-                          [(swapInterval) => parseInt(swapInterval.interval, 10)],
-                          ['asc']
-                        ).map((swapInterval) => ({
-                          label:
-                            STRING_SWAP_INTERVALS[
-                              swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS
-                            ],
-                          value: BigNumber.from(swapInterval.interval),
-                        }))) ||
-                      []
-                    }
-                  />
-                </Grid>
-                <Hidden mdDown>
-                  <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
-                    <GraphWidget from={from} to={to} />
-                  </Grid>
-                </Hidden>
-              </>
-            )}
+            </Hidden>
           </>
         )}
       </WalletContext.Consumer>

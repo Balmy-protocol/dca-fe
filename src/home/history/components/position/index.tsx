@@ -180,7 +180,7 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
         <StyledProgressWrapper />
         <StyledCallToActionContainer>
           {position.version === POSITION_VERSION_3 && (
-            <StyledCardFooterButton variant="outlined" color="pending" onClick={onViewDetails} fullWidth>
+            <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
               <Typography variant="body2">
                 <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
               </Typography>

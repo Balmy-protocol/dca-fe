@@ -1,5 +1,6 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
+import styled from 'styled-components';
 import keyBy from 'lodash/keyBy';
 import Typography from '@mui/material/Typography';
 import { useQuery } from '@apollo/client';
@@ -31,11 +32,10 @@ import TerminateModal from 'common/terminate-modal';
 import ModifySettingsModal from 'common/modify-settings-modal';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { fullPositionToMappedPosition } from 'utils/parsing';
-import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
-import { BigNumber } from 'ethers';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
 
@@ -67,6 +67,10 @@ const StyledTabs = withStyles(() =>
     },
   })
 )(Tabs);
+
+const StyledPositionDetailsContainer = styled(Grid)`
+  align-self: flex-start;
+`;
 
 const WAIT_FOR_SUBGRAPH = 5000;
 
@@ -111,6 +115,10 @@ const PositionDetailFrame = () => {
   const addTransaction = useTransactionAdder();
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
+
+  React.useEffect(() => {
+    dispatch(changeMainTab(1));
+  }, []);
 
   React.useEffect(() => {
     if (position && !isPending) {
@@ -263,7 +271,7 @@ const PositionDetailFrame = () => {
         onCancel={() => setShowTransferModal(false)}
       />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
-      <Grid container>
+      <StyledPositionDetailsContainer container>
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
           <Button variant="text" color="default" onClick={onBackToPositions}>
             <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
@@ -321,7 +329,7 @@ const PositionDetailFrame = () => {
             <PositionPermissionsContainer position={position} pendingTransaction={pendingTransaction} />
           )}
         </Grid>
-      </Grid>
+      </StyledPositionDetailsContainer>
     </>
   );
 };

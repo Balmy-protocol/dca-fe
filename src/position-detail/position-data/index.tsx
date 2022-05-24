@@ -210,14 +210,21 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
                 </Typography>
               </StyledFreqLeft>
             )}
-            {!isPending && hasNoFunds && (
+            {!isPending && hasNoFunds && position.status === 'TERMINATED' && (
+              <StyledStale>
+                <Typography variant="caption">
+                  <FormattedMessage description="finishedPosition" defaultMessage="TERMINATED" />
+                </Typography>
+              </StyledStale>
+            )}
+            {!isPending && hasNoFunds && position.status !== 'TERMINATED' && (
               <StyledFinished>
                 <Typography variant="caption">
                   <FormattedMessage description="finishedPosition" defaultMessage="FINISHED" />
                 </Typography>
               </StyledFinished>
             )}
-            {!isPending && !hasNoFunds && isStale && (
+            {!isPending && !hasNoFunds && position.status !== 'TERMINATED' && isStale && (
               <StyledStale>
                 <Typography variant="caption">
                   <FormattedMessage description="stale" defaultMessage="STALE" />
@@ -448,13 +455,16 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
                 </Typography>
               </StyledCardFooterButton>
             ))}
-          {!isPending && toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.eq(BigNumber.from(0)) && (
-            <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onReusePosition()} fullWidth>
-              <Typography variant="body2">
-                <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
-              </Typography>
-            </StyledCardFooterButton>
-          )}
+          {!isPending &&
+            position.status !== 'TERMINATED' &&
+            toWithdraw.lte(BigNumber.from(0)) &&
+            remainingSwaps.eq(BigNumber.from(0)) && (
+              <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onReusePosition()} fullWidth>
+                <Typography variant="body2">
+                  <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
+                </Typography>
+              </StyledCardFooterButton>
+            )}
           {/* {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
             <StyledCardFooterButton
               variant="contained"

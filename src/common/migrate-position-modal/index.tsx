@@ -85,6 +85,7 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
       showCloseButton
       onClose={onCancel}
       showCloseIcon
+      maxWidth="sm"
       title={
         <FormattedMessage
           description="migrate title"

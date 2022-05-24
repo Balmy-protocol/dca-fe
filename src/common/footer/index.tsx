@@ -57,7 +57,7 @@ const Footer = () => {
         <MeanLogo theme={mode} />
       </Link>
       <StyledFooterMainContent>
-        <StyledLink underline="none" target="_blank" href="https://github.com/Mean-Finance/dca-v2-core">
+        <StyledLink underline="none" target="_blank" href="https://github.com/Mean-Finance">
           <GitHubIcon />
         </StyledLink>
         <StyledLink underline="none" target="_blank" href="https://twitter.com/mean_fi">

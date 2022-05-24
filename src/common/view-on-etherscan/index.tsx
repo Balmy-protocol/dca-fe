@@ -11,7 +11,7 @@ interface EtherscanLinkProps {
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#3076F6'}
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#093991'}
   `}
 `;
 
@@ -24,7 +24,7 @@ const EtherscanLink = ({ hash }: EtherscanLinkProps) => {
   return (
     <StyledLinkWrapper>
       <StyledLink href={buildEtherscanTransaction(hash, currentNetwork.chainId)} target="_blank" rel="noreferrer">
-        <FormattedMessage description="View on etherscan" defaultMessage="View on chain explorer" />
+        <FormattedMessage description="View on etherscan" defaultMessage="View on explorer" />
       </StyledLink>
     </StyledLinkWrapper>
   );
