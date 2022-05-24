@@ -112,9 +112,10 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const needsToApprove =
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
     allowance &&
+    allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
     isIncreasingPosition &&
     !hasPendingApproval &&
-    parseUnits(allowance.allowance, position.from.decimals).lt(
+    parseUnits(allowance.allowance, fromToUse.decimals).lt(
       position.remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
     );
 
