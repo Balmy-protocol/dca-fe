@@ -88,12 +88,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const web3Service = useWeb3Service();
   const addTransaction = useTransactionAdder();
   const currentNetwork = useCurrentNetwork();
-  const [balance, isLoadingBalance] = useBalance(from);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
   const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS;
   const [allowance] = useAllowance(useWrappedProtocolToken ? wrappedProtocolToken : position.from);
   const fromToUse = shouldShowWrappedProtocolSwitch && useWrappedProtocolToken ? wrappedProtocolToken : position.from;
+  const [balance, isLoadingBalance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, web3Service.getAccount());
   const realBalance = balance && balance.add(position.remainingLiquidity);
 
