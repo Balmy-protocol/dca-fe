@@ -252,8 +252,13 @@ export const TESTNETS = [
   NETWORKS.mumbai.chainId,
 ];
 
-export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [NETWORKS.optimism.chainId];
-export const SUPPORTED_NETWORKS = [NETWORKS.optimismKovan.chainId, NETWORKS.optimism.chainId, NETWORKS.mumbai.chainId];
+export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
+export const SUPPORTED_NETWORKS = [
+  NETWORKS.optimismKovan.chainId,
+  NETWORKS.optimism.chainId,
+  NETWORKS.mumbai.chainId,
+  NETWORKS.polygon.chainId,
+];
 
 export const COINGECKO_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',
@@ -268,7 +273,7 @@ export const COINGECKO_IDS = {
   [NETWORKS.mumbai.chainId]: 'mumbai',
 };
 
-export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId];
+export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
 
 export const HUB_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0x059d306A25c4cE8D7437D25743a8B94520536BD5',
