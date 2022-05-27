@@ -5,7 +5,7 @@ import { Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import { FullPosition } from 'types';
+import { FullPosition, Token } from 'types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
 import { POSITION_ACTIONS, STABLE_COINS } from 'config/constants';
@@ -101,8 +101,49 @@ type PricesAccum = PriceDataAccum[];
 
 type Prices = PriceData[];
 
+interface TokenWithBase extends Token {
+  isBaseToken: boolean;
+}
+
+type GraphToken = TokenWithBase;
+
+const EMPTY_GRAPH_TOKEN: TokenWithBase = {
+  address: '',
+  symbol: '',
+  decimals: 1,
+  isBaseToken: false,
+  name: '',
+  chainId: 0,
+};
+
 const SwapsGraph = ({ position }: SwapsGraphProps) => {
   let prices: Prices = [];
+
+  let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
+  let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
+
+  if (position.from.address < position.to.address) {
+    tokenA = {
+      ...position.from,
+      isBaseToken: STABLE_COINS.includes(position.from.symbol),
+    };
+    tokenB = {
+      ...position.to,
+      isBaseToken: STABLE_COINS.includes(position.to.symbol),
+    };
+  } else {
+    tokenA = {
+      ...position.to,
+      isBaseToken: STABLE_COINS.includes(position.to.symbol),
+    };
+    tokenB = {
+      ...position.from,
+      isBaseToken: STABLE_COINS.includes(position.from.symbol),
+    };
+  }
+
+  // BigNumber.from(tokenA.isBaseToken ? ratePerUnitBToA : ratePerUnitAToB),
+  // tokenA.isBaseToken ? tokenA : tokenB
 
   const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
 
@@ -112,16 +153,17 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
     const swappedSummed = swappedActions.reduce<{ summed: BigNumber; current: number; date: number; name: string }[]>(
       (acc, action, index) => {
         // eslint-disable-next-line no-nested-ternary
-        const rate = STABLE_COINS.includes(position.to.symbol)
-          ? BigNumber.from(action.ratePerUnitBToAWithFee)
-          : position.pair.tokenA.address === position.from.address
-          ? BigNumber.from(action.ratePerUnitAToBWithFee)
-          : BigNumber.from(action.ratePerUnitBToAWithFee);
+        const rate = BigNumber.from(tokenA.isBaseToken ? action.ratePerUnitAToBWithFee : action.ratePerUnitBToAWithFee);
+        // STABLE_COINS.includes(position.to.symbol)
+        //   ? BigNumber.from(action.ratePerUnitBToAWithFee)
+        //   : position.pair.tokenA.address === position.from.address
+        //   ? BigNumber.from(action.ratePerUnitAToBWithFee)
+        //   : BigNumber.from(action.ratePerUnitBToAWithFee);
 
         const prevSummed = (acc[index - 1] && acc[index - 1].summed) || BigNumber.from(0);
         acc.push({
           summed: prevSummed.add(rate),
-          current: parseFloat(formatCurrencyAmount(rate, tokenToAverage)),
+          current: parseFloat(formatCurrencyAmount(rate, tokenA.isBaseToken ? tokenA : tokenB)),
           date: parseInt(action.createdAtTimestamp, 10),
           name: DateTime.fromSeconds(parseInt(action.createdAtTimestamp, 10)).toFormat('MMM d t'),
         });
@@ -133,7 +175,7 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
 
     const swappedAverages = swappedSummed.map((swappedItem, index) => ({
       ...swappedItem,
-      average: parseFloat(formatCurrencyAmount(swappedItem.summed.div(BigNumber.from(index + 1)), tokenToAverage)),
+      average: parseFloat(formatCurrencyAmount(swappedItem.summed.div(BigNumber.from(index + 1)), tokenA.isBaseToken ? tokenA : tokenB)),
     }));
 
     return orderBy(swappedAverages, ['date'], ['desc']).reverse();
@@ -226,8 +268,8 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
                   payload={payload as any}
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   label={label}
-                  tokenA={{ ...position.from, isBaseToken: STABLE_COINS.includes(position.from.symbol) }}
-                  tokenB={{ ...position.to, isBaseToken: STABLE_COINS.includes(position.to.symbol) }}
+                  tokenA={tokenA}
+                  tokenB={tokenB}
                 />
               )}
             />
