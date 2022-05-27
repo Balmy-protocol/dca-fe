@@ -20,7 +20,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
-  const prevResult = usePrevious(result);
+  const prevResult = usePrevious(result, false);
 
   React.useEffect(() => {
     async function callPromise() {
