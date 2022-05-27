@@ -1,9 +1,16 @@
+import isUndefined from 'lodash/isUndefined';
 import React from 'react';
 
-function usePrevious<T>(value: T) {
+function usePrevious<T>(value: T, updateOnUndefined = true) {
   const ref = React.useRef<T>();
   React.useEffect(() => {
-    ref.current = value;
+    if (isUndefined(value)) {
+      if(updateOnUndefined) {
+        ref.current = value;
+      }
+    } else {
+      ref.current = value;
+    }
   });
   return ref.current;
 }

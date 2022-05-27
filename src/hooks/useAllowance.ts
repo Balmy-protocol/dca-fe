@@ -22,6 +22,7 @@ function useAllowance(
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
+  const prevResult = usePrevious(result, false);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -61,7 +62,7 @@ function useAllowance(
     return [{ token: from || EMPTY_TOKEN, allowance: '0' }, false, undefined];
   }
 
-  return [result, isLoading, error];
+  return [result || prevResult, isLoading, error];
 }
 
 export default useAllowance;

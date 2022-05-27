@@ -818,7 +818,7 @@ const Swap = ({
                 error={cantFund ? 'Amount cannot exceed balance' : ''}
                 value={fromValue}
                 onChange={handleFromValueChange}
-                withBalance={!isLoadingBalance}
+                withBalance={!!balance}
                 balance={balance}
                 token={from}
                 withMax
