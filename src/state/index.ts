@@ -36,7 +36,7 @@ export const setupAxiosClient = () =>
     },
   });
 
-const PERSISTED_STATES: string[] = ['transactions', 'badge', 'tokenLists.activeLists', 'config'];
+const PERSISTED_STATES: string[] = ['transactions', 'badge', 'config'];
 
 const store = configureStore({
   reducer: {
@@ -60,11 +60,7 @@ const store = configureStore({
     preloadedState: {
       tokenLists: {
         byUrl: getDefaultByUrl(),
-        activeLists: [
-          'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
-          'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
-          'https://static.optimism.io/optimism.tokenlist.json',
-        ],
+        activeLists: ['https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json'],
       },
     },
   }),
