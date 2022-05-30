@@ -9,7 +9,7 @@ import useCurrentNetwork from './useCurrentNetwork';
 function useTokenList(filter = true) {
   const currentNetwork = useCurrentNetwork();
   const tokensLists = useTokensLists();
-  const savedTokenLists = ["https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json"];
+  const savedTokenLists = ["Mean Finance Graph Allowed Tokens"];
 
   const tokenList: TokenList = React.useMemo(
     () =>

@@ -1,7 +1,11 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
-import { TokenListResponse, TokensLists } from 'types';
+import { MEAN_GRAPHQL_URL } from 'config/constants';
+import GraphqlService from 'services/graphql';
+import { Token, TokenListResponse, TokensLists } from 'types';
+import gqlFetchAll from 'utils/gqlFetchAll';
 import { getURLFromQuery } from 'utils/parsing';
+import GET_TOKEN_LIST from 'graphql/getTokenList.graphql';
 
 export const enableTokenList =
   createAction<{
@@ -18,6 +22,30 @@ export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extr
   }
 );
 
+export const fetchGraphTokenList = createAsyncThunk<Token[], undefined, { extra: AxiosInstance }>(
+  'tokenLists/fetchGraphTokenList',
+  async (garbage, { getState }) => {
+    const { config: { network } } = getState() as {
+      config: { network: { chainId: number, name: string } }
+    };
+
+    const dcaClient = new GraphqlService((network && MEAN_GRAPHQL_URL[network.chainId]) || MEAN_GRAPHQL_URL[10])
+
+    const tokens = await gqlFetchAll<{ tokens: Token[] }>(
+      dcaClient.getClient(),
+      GET_TOKEN_LIST,
+      {},
+      'tokens'
+    );
+
+    return tokens.data?.tokens.map((token) => ({
+      ...token,
+      address: token.address.toLowerCase(),
+      chainId: network.chainId,
+    })) ?? [];
+  }
+);
+
 export const startFetchingTokenLists = createAsyncThunk(
   'tokenLists/startFetchingTokenLists',
   (nothing, { dispatch, getState }) => {
@@ -27,5 +55,6 @@ export const startFetchingTokenLists = createAsyncThunk(
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     Object.keys(state.tokenLists.byUrl).forEach((listUrl) => dispatch(fetchTokenList(listUrl)));
+    dispatch(fetchGraphTokenList());
   }
 );

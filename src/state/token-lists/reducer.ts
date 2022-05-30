@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { TokensLists, Token } from 'types';
-import { enableTokenList, fetchTokenList } from './actions';
+import { enableTokenList, fetchGraphTokenList, fetchTokenList } from './actions';
 
 export interface TokenListsState {
   byUrl: { [tokenListUrl: string]: TokensLists };
@@ -74,7 +74,7 @@ export const getDefaultByUrl = () => ({
   },
 });
 export const initialState: TokenListsState = {
-  activeLists: ['https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json'],
+  activeLists: ['Mean Finance Graph Allowed Tokens'],
   byUrl: getDefaultByUrl(),
   hasLoaded: false,
 };
@@ -102,6 +102,24 @@ export default createReducer(initialState, (builder) =>
         ...state.byUrl[arg],
         ...payload,
         tokens: mappedTokens,
+        hasLoaded: true,
+      };
+    })
+    .addCase(fetchGraphTokenList.pending, (state, { meta: { requestId, arg } }) => {
+      state.byUrl['Mean Finance Graph Allowed Tokens'] = {
+        name: 'Mean Finance',
+        logoURI: '',
+        timestamp: new Date().getTime(),
+        tokens: [],
+        version: { major: 0, minor: 0, patch: 0 },
+        hasLoaded: false,
+        requestId: requestId,
+      };
+    })
+    .addCase(fetchGraphTokenList.fulfilled, (state, { payload, meta: { arg } }) => {
+      state.byUrl['Mean Finance Graph Allowed Tokens'] = {
+        ...state.byUrl['Mean Finance Graph Allowed Tokens'],
+        tokens: payload,
         hasLoaded: true,
       };
     })
