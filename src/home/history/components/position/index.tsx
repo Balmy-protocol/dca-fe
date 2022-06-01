@@ -113,7 +113,7 @@ interface TerminantedPositionProps {
 }
 
 const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
-  const { from, to, swapInterval, swapped, totalDeposits, executedSwaps, chainId } = position;
+  const { from, to, swapInterval, swapped, totalDeposits, totalExecutedSwaps, chainId } = position;
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -176,7 +176,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
               <FormattedMessage description="history run for in position" defaultMessage="Run for: " />
             </Typography>
             <Typography variant="body1" color="#FFFFFF" sx={{ marginLeft: '5px' }}>
-              {getFrequencyLabel(swapInterval.toString(), executedSwaps.toString())}
+              {getFrequencyLabel(swapInterval.toString(), totalExecutedSwaps.toString())}
             </Typography>
           </StyledDetailWrapper>
           <StyledDetailWrapper>

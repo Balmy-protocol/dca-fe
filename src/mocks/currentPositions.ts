@@ -33,7 +33,7 @@ export const EmptyPosition: Position = {
   startedAt: 0,
   status: 'TERMINATED',
   pendingTransaction: '',
-  executedSwaps: BigNumber.from(0),
+  totalExecutedSwaps: BigNumber.from(0),
   version: POSITION_VERSION_3,
   chainId: 10,
   pairLastSwappedAt: 0,
