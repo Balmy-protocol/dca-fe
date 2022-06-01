@@ -54,7 +54,7 @@ export type PositionResponse = {
     }[];
   };
   status: string;
-  executedSwaps: BigNumber;
+  totalExecutedSwaps: BigNumber;
   swapInterval: {
     id: string;
     interval: BigNumber;

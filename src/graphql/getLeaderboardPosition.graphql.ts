@@ -9,7 +9,6 @@ const getLeaderboardPositions = gql`
       totalSwaps
       totalSwapped
       totalWithdrawn
-      startedAtSwap
       user
       terminatedAtTimestamp
       from {
@@ -44,6 +43,11 @@ const getLeaderboardPositions = gql`
         id
         interval
       }
+      permissions {
+        id
+        operator
+        permissions
+      }
       current {
         id
         rate
@@ -51,11 +55,6 @@ const getLeaderboardPositions = gql`
         remainingLiquidity
         withdrawn
         idleSwapped
-        permissions {
-          id
-          operator
-          permissions
-        }
       }
       history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc) {
         id
