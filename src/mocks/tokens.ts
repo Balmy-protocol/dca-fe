@@ -30,6 +30,7 @@ const WETH_ADDRESSES = {
   [NETWORKS.kovan.chainId]: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
   [NETWORKS.optimismKovan.chainId]: '0x4200000000000000000000000000000000000006',
   [NETWORKS.optimism.chainId]: '0x4200000000000000000000000000000000000006',
+  [NETWORKS.arbitrum.chainId]: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
 };
 
 export const WETH = (chainId: number): Token => ({
@@ -96,8 +97,7 @@ export const WMATIC = (chainId: number): Token => ({
   address: WMATIC_ADDRESSES[chainId] || WMATIC_ADDRESSES[1],
   name: 'Wrapped Matic',
   symbol: 'WMATIC',
-  logoURI:
-    'https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png',
+  logoURI: 'https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png',
 });
 
 export const PROTOCOL_TOKEN = {
@@ -111,6 +111,7 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.optimismKovan.chainId]: ETH,
   [NETWORKS.optimism.chainId]: ETH,
   [NETWORKS.optimismGoerli.chainId]: ETH,
+  [NETWORKS.arbitrum.chainId]: ETH,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
@@ -124,6 +125,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.optimismKovan.chainId]: WETH,
   [NETWORKS.optimismGoerli.chainId]: WETH,
   [NETWORKS.optimism.chainId]: WETH,
+  [NETWORKS.arbitrum.chainId]: WETH,
 };
 
 export const getProtocolToken = (chainId: number) =>

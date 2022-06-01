@@ -283,6 +283,7 @@ import ONG from './ong.svg';
 import ONT from './ont.svg';
 import OOT from './oot.svg';
 import OPTIMISM from './optimism.svg';
+import ARBITRUM from './arbitrum.svg';
 import OST from './ost.svg';
 import OX from './ox.svg';
 import OXT from './oxt.svg';
@@ -936,6 +937,7 @@ const manifest = {
   '0x8290333cef9e6d528dd5618fb97a76f268f3edd4': ANKR,
   '0xa117000000f279d81a1d3cc75430faa017fa5a2e': ANT,
   '0x1a7a8bd9106f2b8d977e08582dc7d24c723ab0db': APPC,
+  ARBITRUM,
   ARDR,
   ARG,
   ARK,
@@ -1070,6 +1072,7 @@ const manifest = {
   '4-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '5-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '42-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
+  '42161-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '69-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '420-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '137-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,

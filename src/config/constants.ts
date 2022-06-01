@@ -154,14 +154,14 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   },
   arbitrum: {
     chainId: 42161,
-    name: 'Arbitrum',
-    mainCurrency: '',
+    name: 'Arbitrum One',
+    mainCurrency: 'ARBITRUM',
     nativeCurrency: {
       name: 'Ethereum',
-      symbol: 'ETH',
+      symbol: 'AETH',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://arb1.arbitrum.io/rpc'],
   },
   heco: {
     chainId: 128,
@@ -252,12 +252,17 @@ export const TESTNETS = [
   NETWORKS.mumbai.chainId,
 ];
 
-export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
+export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
+  NETWORKS.optimism.chainId,
+  NETWORKS.polygon.chainId,
+  NETWORKS.arbitrum.chainId,
+];
 export const SUPPORTED_NETWORKS = [
   NETWORKS.optimismKovan.chainId,
   NETWORKS.optimism.chainId,
   NETWORKS.mumbai.chainId,
   NETWORKS.polygon.chainId,
+  NETWORKS.arbitrum.chainId,
 ];
 
 export const COINGECKO_IDS = {
@@ -271,9 +276,10 @@ export const COINGECKO_IDS = {
   [NETWORKS.optimismGoerli.chainId]: 'optimistic-ethereum',
   [NETWORKS.optimismKovan.chainId]: 'optimistic-ethereum',
   [NETWORKS.mumbai.chainId]: 'mumbai',
+  [NETWORKS.arbitrum.chainId]: 'arbitrum-one',
 };
 
-export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
+export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId, NETWORKS.arbitrum.chainId];
 
 export const HUB_ADDRESS = {
   [NETWORKS.kovan.chainId]: '0x059d306A25c4cE8D7437D25743a8B94520536BD5',
@@ -281,6 +287,7 @@ export const HUB_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0x059d306A25c4cE8D7437D25743a8B94520536BD5',
   [NETWORKS.mumbai.chainId]: '0x059d306A25c4cE8D7437D25743a8B94520536BD5',
   [NETWORKS.polygon.chainId]: '0x059d306A25c4cE8D7437D25743a8B94520536BD5',
+  [NETWORKS.arbitrum.chainId]: '0x059d306A25c4cE8D7437D25743a8B94520536BD5',
 };
 
 export const HUB_V2_ADDRESS = {
@@ -297,6 +304,7 @@ export const ORACLE_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0x4b0C54236B86f41C5e5A5dc5d020f832692ff06d',
   [NETWORKS.mumbai.chainId]: '0x4b0C54236B86f41C5e5A5dc5d020f832692ff06d',
   [NETWORKS.polygon.chainId]: '0x4b0C54236B86f41C5e5A5dc5d020f832692ff06d',
+  [NETWORKS.arbitrum.chainId]: '0x4b0C54236B86f41C5e5A5dc5d020f832692ff06d',
 };
 
 export const COMPANION_ADDRESS = {
@@ -305,6 +313,7 @@ export const COMPANION_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0xa3DB2c0D23720e8CDA0f4d80A53B94d20d02b061',
   [NETWORKS.mumbai.chainId]: '0xa3DB2c0D23720e8CDA0f4d80A53B94d20d02b061',
   [NETWORKS.polygon.chainId]: '0xa3DB2c0D23720e8CDA0f4d80A53B94d20d02b061',
+  [NETWORKS.arbitrum.chainId]: '0xa3DB2c0D23720e8CDA0f4d80A53B94d20d02b061',
 };
 
 export const COMPANION_V2_ADDRESS = {
@@ -321,6 +330,7 @@ export const TOKEN_DESCRIPTOR_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
   [NETWORKS.mumbai.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
   [NETWORKS.polygon.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
+  [NETWORKS.arbitrum.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
 };
 
 export const CHAINLINK_ORACLE_ADDRESS = {
@@ -329,6 +339,7 @@ export const CHAINLINK_ORACLE_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0x86E8cB7Cd38F7dE6Ef7fb62A5D7cCEe350C40310',
   [NETWORKS.mumbai.chainId]: '0x86E8cB7Cd38F7dE6Ef7fb62A5D7cCEe350C40310',
   [NETWORKS.polygon.chainId]: '0x86E8cB7Cd38F7dE6Ef7fb62A5D7cCEe350C40310',
+  [NETWORKS.arbitrum.chainId]: '0x86E8cB7Cd38F7dE6Ef7fb62A5D7cCEe350C40310',
 };
 
 export const UNISWAP_ORACLE_ADDRESS = {
@@ -337,6 +348,7 @@ export const UNISWAP_ORACLE_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0x14AF365e0825B835C60867C985724e1DF11449ad',
   [NETWORKS.mumbai.chainId]: '0x14AF365e0825B835C60867C985724e1DF11449ad',
   [NETWORKS.polygon.chainId]: '0x14AF365e0825B835C60867C985724e1DF11449ad',
+  [NETWORKS.arbitrum.chainId]: '0x14AF365e0825B835C60867C985724e1DF11449ad',
 };
 
 export const PERMISSION_MANAGER_ADDRESS = {
@@ -345,6 +357,7 @@ export const PERMISSION_MANAGER_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0x6f54391fE0386D506b51d69Deeb8b04E0544E088',
   [NETWORKS.mumbai.chainId]: '0x6f54391fE0386D506b51d69Deeb8b04E0544E088',
   [NETWORKS.polygon.chainId]: '0x6f54391fE0386D506b51d69Deeb8b04E0544E088',
+  [NETWORKS.arbitrum.chainId]: '0x6f54391fE0386D506b51d69Deeb8b04E0544E088',
 };
 
 export const PERMISSION_V2_MANAGER_ADDRESS = {
@@ -360,6 +373,7 @@ export const MIGRATOR_ADDRESS = {
   [NETWORKS.optimism.chainId]: '0xCf51244AE89dE8f062ebc963C64bA96C1723e27e',
   [NETWORKS.mumbai.chainId]: '0xCf51244AE89dE8f062ebc963C64bA96C1723e27e',
   [NETWORKS.polygon.chainId]: '0xCf51244AE89dE8f062ebc963C64bA96C1723e27e',
+  [NETWORKS.arbitrum.chainId]: '0xCf51244AE89dE8f062ebc963C64bA96C1723e27e',
 };
 
 export const MEAN_GRAPHQL_URL = {
@@ -367,6 +381,7 @@ export const MEAN_GRAPHQL_URL = {
   [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism',
   [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-mumbai',
   [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-polygon',
+  [NETWORKS.arbitrum.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-arbitrum',
 };
 
 export const MEAN_V2_GRAPHQL_URL = {
@@ -382,6 +397,7 @@ export const UNI_GRAPHQL_URL = {
   [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
   [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
   [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon',
+  [NETWORKS.arbitrum.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-dev',
 };
 
 export const CHAINLINK_GRAPHQL_URL = {
@@ -435,6 +451,7 @@ export const DEFILLAMA_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',
   [NETWORKS.polygon.chainId]: 'polygon',
   [NETWORKS.optimism.chainId]: 'optimism',
+  [NETWORKS.arbitrum.chainId]: 'arbitrum',
   [NETWORKS.mumbai.chainId]: 'mumbai',
 };
 
@@ -679,6 +696,14 @@ export const WHALE_MODE_FREQUENCIES = {
     ONE_HOUR.toString(),
     FOUR_HOURS.toString(),
   ],
+  [NETWORKS.arbitrum.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+    ONE_HOUR.toString(),
+    FOUR_HOURS.toString(),
+  ],
 };
 
 export const WHALE_MINIMUM_VALUES = {
@@ -715,6 +740,14 @@ export const WHALE_MINIMUM_VALUES = {
     [FOUR_HOURS.toString()]: 10000,
   },
   [NETWORKS.optimism.chainId]: {
+    [ONE_MINUTE.toString()]: 10000,
+    [FIVE_MINUTES.toString()]: 10000,
+    [FIFTEEN_MINUTES.toString()]: 10000,
+    [THIRTY_MINUTES.toString()]: 10000,
+    [ONE_HOUR.toString()]: 10000,
+    [FOUR_HOURS.toString()]: 10000,
+  },
+  [NETWORKS.arbitrum.chainId]: {
     [ONE_MINUTE.toString()]: 10000,
     [FIVE_MINUTES.toString()]: 10000,
     [FIFTEEN_MINUTES.toString()]: 10000,
