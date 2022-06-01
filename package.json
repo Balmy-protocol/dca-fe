@@ -159,8 +159,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md}": [
-      "prettier --write",
-      "eslint --ext .js,.jsx,.ts,.tsx --format=pretty ./src"
+      "prettier --write"
     ]
   },
   "resolutions": {
