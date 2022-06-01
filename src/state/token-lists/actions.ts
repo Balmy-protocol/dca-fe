@@ -25,24 +25,23 @@ export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extr
 export const fetchGraphTokenList = createAsyncThunk<Token[], undefined, { extra: AxiosInstance }>(
   'tokenLists/fetchGraphTokenList',
   async (garbage, { getState }) => {
-    const { config: { network } } = getState() as {
-      config: { network: { chainId: number, name: string } }
+    const {
+      config: { network },
+    } = getState() as {
+      config: { network: { chainId: number; name: string } };
     };
 
-    const dcaClient = new GraphqlService((network && MEAN_GRAPHQL_URL[network.chainId]) || MEAN_GRAPHQL_URL[10])
+    const dcaClient = new GraphqlService((network && MEAN_GRAPHQL_URL[network.chainId]) || MEAN_GRAPHQL_URL[10]);
 
-    const tokens = await gqlFetchAll<{ tokens: Token[] }>(
-      dcaClient.getClient(),
-      GET_TOKEN_LIST,
-      {},
-      'tokens'
+    const tokens = await gqlFetchAll<{ tokens: Token[] }>(dcaClient.getClient(), GET_TOKEN_LIST, {}, 'tokens');
+
+    return (
+      tokens.data?.tokens.map((token) => ({
+        ...token,
+        address: token.address.toLowerCase(),
+        chainId: network.chainId,
+      })) ?? []
     );
-
-    return tokens.data?.tokens.map((token) => ({
-      ...token,
-      address: token.address.toLowerCase(),
-      chainId: network.chainId,
-    })) ?? [];
   }
 );
 
@@ -55,6 +54,7 @@ export const startFetchingTokenLists = createAsyncThunk(
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     Object.keys(state.tokenLists.byUrl).forEach((listUrl) => dispatch(fetchTokenList(listUrl)));
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispatch(fetchGraphTokenList());
   }
 );

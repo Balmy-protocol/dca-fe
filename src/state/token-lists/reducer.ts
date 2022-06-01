@@ -105,7 +105,7 @@ export default createReducer(initialState, (builder) =>
         hasLoaded: true,
       };
     })
-    .addCase(fetchGraphTokenList.pending, (state, { meta: { requestId, arg } }) => {
+    .addCase(fetchGraphTokenList.pending, (state, { meta: { requestId } }) => {
       state.byUrl['Mean Finance Graph Allowed Tokens'] = {
         name: 'Mean Finance',
         logoURI: '',
@@ -113,10 +113,10 @@ export default createReducer(initialState, (builder) =>
         tokens: [],
         version: { major: 0, minor: 0, patch: 0 },
         hasLoaded: false,
-        requestId: requestId,
+        requestId,
       };
     })
-    .addCase(fetchGraphTokenList.fulfilled, (state, { payload, meta: { arg } }) => {
+    .addCase(fetchGraphTokenList.fulfilled, (state, { payload }) => {
       state.byUrl['Mean Finance Graph Allowed Tokens'] = {
         ...state.byUrl['Mean Finance Graph Allowed Tokens'],
         tokens: payload,
