@@ -95,12 +95,12 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
       } else {
         dispatch(setNetwork(NETWORKS.optimism));
       }
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispatch(startFetchingTokenLists());
     }
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getNetwork();
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    dispatch(startFetchingTokenLists());
   }, []);
 
   const isLoadingNetwork = !currentNetwork;
