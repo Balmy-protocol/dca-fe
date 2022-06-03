@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import PositionSwaps from 'position-detail/swaps';
 import { FullPosition, GetPairSwapsData } from 'types';
-import SwapsGraph from 'position-detail/swap-graph';
+import AveragePriceGraph from 'position-detail/average-price-graph';
 import Details from 'position-detail/position-data';
 import Sticky from 'react-stickynode';
 
@@ -63,7 +63,7 @@ const PositionSummaryContainer = ({
         <Grid container direction="column" spacing={3}>
           <Grid item xs={12}>
             <StyledPaper variant="outlined">
-              <SwapsGraph position={position} />
+              <AveragePriceGraph position={position} />
             </StyledPaper>
           </Grid>
           <Grid item xs={12}>

@@ -71,7 +71,7 @@ const StyledLegendIndicator = styled.div<{ fill: string }>`
   background-color: ${({ fill }) => fill};
   border-radius: 99px;
 `;
-interface SwapsGraphProps {
+interface AveragePriceGraphProps {
   position: FullPosition;
 }
 
@@ -88,7 +88,7 @@ interface TokenWithBase extends Token {
 
 type GraphToken = TokenWithBase;
 
-const SwapsGraph = ({ position }: SwapsGraphProps) => {
+const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   let prices: Prices = [];
   const currentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -242,4 +242,4 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
     </StyledContainer>
   );
 };
-export default SwapsGraph;
+export default AveragePriceGraph;
