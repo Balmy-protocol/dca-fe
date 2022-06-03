@@ -8,8 +8,8 @@ const StyledPaper = styled.div`
   position: relative;
   overflow: hidden;
   border-radius: 20px;
-  border: 2px solid #A5AAB5;
-  background-color: #1B1B1C;
+  border: 2px solid #a5aab5;
+  background-color: #1b1b1c;
   display: flex;
   gap: 10px;
   flex-direction: column;
@@ -35,24 +35,20 @@ interface GraphTooltipProps {
 const GraphTooltip = (props: GraphTooltipProps) => {
   const { payload, label, tokenA, tokenB } = props;
 
-  // const filteredPoints = payload?.filter(point => point.name !== 'uniswap')
-  // if (!filteredPoints?.length) {
-  //   return null;
-  // }
+  const tokenFrom = tokenA.isBaseToken ? tokenB : tokenA;
+  const tokenTo = tokenA.isBaseToken ? tokenA : tokenB;
 
   return (
     <StyledPaper>
-      <Typography variant="body2">
-        {label}
-      </Typography>
-      { payload?.map(({ value, dataKey }) => (
-          <Typography variant="body1">
-            {dataKey}: 1 {tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = {tokenA.isBaseToken ? '$' : ''}{value} {tokenA.isBaseToken ? '' : tokenB.symbol}
-          </Typography>
-        ))
-      }
+      <Typography variant="body2">{label}</Typography>
+      {payload?.map(({ value, dataKey }) => (
+        <Typography variant="body1">
+          {dataKey}: 1 {tokenFrom.symbol} = {tokenTo.isBaseToken ? '$' : ''}
+          {value} {tokenTo.isBaseToken ? 'USD' : tokenB.symbol}
+        </Typography>
+      ))}
     </StyledPaper>
   );
-}
+};
 
 export default React.memo(GraphTooltip);
