@@ -1,14 +1,24 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
-import { ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, AreaChart, Area, Line, ComposedChart, CartesianGrid } from 'recharts';
+import {
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  AreaChart,
+  Area,
+  Line,
+  ComposedChart,
+  CartesianGrid,
+} from 'recharts';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import map from 'lodash/map';
 import find from 'lodash/find';
 import orderBy from 'lodash/orderBy';
-import { appleTabsStylesHook } from 'common/tabs';
 import getPoolPrices from 'graphql/getPoolPrices.graphql';
 import { AvailablePair, GetPairPriceResponseData, GetPairResponseSwapData, Token } from 'types';
 import { DateTime } from 'luxon';
@@ -79,7 +89,7 @@ const StyledPaper = styled(Paper)<{ column?: boolean }>`
   backdrop-filter: blur(6px);
   display: flex;
   gap: 24px;
-  flex-direction: ${({ column }) => column ? 'column' : 'row'};
+  flex-direction: ${({ column }) => (column ? 'column' : 'row')};
 `;
 
 const StyledTitleContainer = styled.div`
@@ -114,41 +124,20 @@ const StyledGraphContainer = styled(Paper)`
   }
 `;
 
-const StyledGraphAxis = styled.div`
-  height: 0px;
-  border: 1px dotted #b8b8b8;
-  flex-grow: 0;
-  margin-top: 20px;
-`;
-
-const StyledGraphAxisLabels = styled.div`
-  flex-grow: 0;
-  margin-top: 7px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const StyledTabsContainer = styled(Paper)`
-  padding: 17px;
-  flex-grow: 0;
-  display: flex;
-`;
-
 const StyledCenteredWrapper = styled.div`
   display: flex;
   flex: 1;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 10px
+  gap: 10px;
 `;
 
 const StyledLegend = styled.div`
   display: flex;
   align-items: center;
   gap: 7px;
-`
+`;
 
 const StyledLegendIndicator = styled.div<{ fill: string }>`
   width: 12px;
@@ -187,14 +176,13 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   let swapData: GetPairResponseSwapData[] = [];
   let prices: Prices = [];
   const [tabIndex, setTabIndex] = React.useState(0);
-  const tabsStyles = appleTabsStylesHook.useTabs();
   const availablePairs = useAvailablePairs();
-  const tabItemStyles = appleTabsStylesHook.useTabItem();
   const dateFilter = React.useMemo(
     () => parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),
     [tabIndex]
   );
   const currentNetwork = useCurrentNetwork();
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
   if (to && from) {
     const toAddress =
@@ -235,13 +223,6 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
       ) as AvailablePair | null,
     [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]
   );
-
-  // const [oracleInUse, isLoadingOracle] = usePromise<Oracles>(
-  //   web3Service,
-  //   'getPairOracle',
-  //   [{...(to && from ? { tokenA: from.address, tokenB: to.address } : {})}, !!existingPair],
-  //   !from || !to
-  // );
 
   const { loading: loadingMeanData, data: pairData } = useQuery<GetPairPriceResponseData>(getPairPrices, {
     variables: {
@@ -325,7 +306,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     return `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
       tokenA.isBaseToken ? '' : tokenB.symbol
     }`;
-  }
+  };
   const isLoading = loadingPool || loadingMeanData;
   // const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
   const noData = prices.length === 0;
@@ -336,7 +317,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
         <CenteredLoadingIndicator />
         <GraphFooter />
       </StyledPaper>
-    )
+    );
   }
 
   if (!from || !to) {
@@ -355,7 +336,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
         </StyledPaper>
         <GraphFooter />
       </StyledPaper>
-    )
+    );
   }
 
   if (noData) {
@@ -374,7 +355,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
         </StyledPaper>
         <GraphFooter />
       </StyledPaper>
-    )
+    );
   }
 
   return (
@@ -392,51 +373,82 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
                 }}
               />
             </Typography>
-            <MinimalTabs options={[{ key: 0, label: 'Week' }, { key: 1, label: 'Month' }]} selected={{ key: tabIndex, label: '' }} onChange={({ key }) => setTabIndex(key as number)}/>
+            <MinimalTabs
+              options={[
+                { key: 0, label: 'Week' },
+                { key: 1, label: 'Month' },
+              ]}
+              selected={{ key: tabIndex, label: '' }}
+              onChange={({ key }) => setTabIndex(key as number)}
+            />
           </StyledTitleContainer>
           <StyledLegendContainer>
-            { !!uniData.length && (
+            {!!uniData.length && (
               <StyledLegend>
                 <StyledLegendIndicator fill="#7C37ED" />
                 <Typography variant="body2">
-                  <FormattedMessage
-                    description="uniswapLegend"
-                    defaultMessage="Uniswap"
-                  />
+                  <FormattedMessage description="uniswapLegend" defaultMessage="Uniswap" />
                 </Typography>
               </StyledLegend>
             )}
-            { !!swapData.length && (
+            {!!swapData.length && (
               <StyledLegend>
                 <StyledLegendIndicator fill="#DCE2F9" />
                 <Typography variant="body2">
-                  <FormattedMessage
-                    description="meanFinanceLegend"
-                    defaultMessage="Mean Finance"
-                  />
+                  <FormattedMessage description="meanFinanceLegend" defaultMessage="Mean Finance" />
                 </Typography>
               </StyledLegend>
             )}
-
           </StyledLegendContainer>
         </StyledHeader>
         <ResponsiveContainer width="100%">
-          <ComposedChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }} style={{ overflow: 'visible' }}>
+          <ComposedChart
+            data={prices}
+            margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+            style={{ overflow: 'visible' }}
+          >
             <defs>
               <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5}/>
-                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
+                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
             {uniData.length && (
-              <Area legendType="none" name="uniswap" connectNulls dataKey="Uniswap" fill="url(#colorUniswap)" strokeWidth="2px" dot={false} activeDot={false} stroke="#7C37ED" />
+              <Area
+                legendType="none"
+                name="uniswap"
+                connectNulls
+                dataKey="Uniswap"
+                fill="url(#colorUniswap)"
+                strokeWidth="2px"
+                dot={false}
+                activeDot={false}
+                stroke="#7C37ED"
+              />
             )}
             {swapData.length && (
-              <Line legendType="none" connectNulls dataKey="Mean Finance" type="monotone" strokeWidth="3px" stroke="#DCE2F9" dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9'}} strokeDasharray="5 5" />
+              <Line
+                legendType="none"
+                connectNulls
+                dataKey="Mean Finance"
+                type="monotone"
+                strokeWidth="3px"
+                stroke="#DCE2F9"
+                dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
+                strokeDasharray="5 5"
+              />
             )}
-            <XAxis tickMargin={30} minTickGap={30} interval="preserveStartEnd" dataKey="name" axisLine={false} tickLine={false} tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}/>
-            <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false}/>
+            <XAxis
+              tickMargin={30}
+              minTickGap={30}
+              interval="preserveStartEnd"
+              dataKey="name"
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
+            />
+            <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false} />
             <Tooltip
               content={({ payload, label }) => (
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

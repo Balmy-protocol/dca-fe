@@ -20,6 +20,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useWeb3Service from 'hooks/useWeb3Service';
 
 interface DetailsProps {
   position: FullPosition;
@@ -138,6 +139,8 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
   const { from, to, swapInterval, current } = position;
 
   const { toWithdraw, remainingLiquidity, remainingSwaps, totalSwaps } = fullPositionToMappedPosition(position);
+  const web3Service = useWeb3Service();
+  const account = web3Service.getAccount();
 
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
@@ -145,21 +148,27 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
   const isPending = pendingTransaction !== null;
   const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
   let summedPrices = BigNumber.from(0);
+  let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
+  tokenFromAverage =
+    tokenFromAverage.address === PROTOCOL_TOKEN_ADDRESS
+      ? { ...wrappedProtocolToken, symbol: tokenFromAverage.symbol }
+      : tokenFromAverage;
+  tokenToAverage =
+    tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
+      ? { ...wrappedProtocolToken, symbol: tokenFromAverage.symbol }
+      : tokenToAverage;
   swappedActions.forEach((action) => {
-    // eslint-disable-next-line no-nested-ternary
-    const rate = STABLE_COINS.includes(position.to.symbol)
-      ? BigNumber.from(action.ratePerUnitBToAWithFee)
-      : position.pair.tokenA.address === position.from.address
-      ? BigNumber.from(action.ratePerUnitAToBWithFee)
-      : BigNumber.from(action.ratePerUnitBToAWithFee);
+    const rate =
+      position.pair.tokenA.address === tokenFromAverage.address
+        ? BigNumber.from(action.ratePerUnitAToBWithFee)
+        : BigNumber.from(action.ratePerUnitBToAWithFee);
 
     summedPrices = summedPrices.add(rate);
   });
   const averageBuyPrice = summedPrices.gt(BigNumber.from(0))
     ? summedPrices.div(swappedActions.length)
     : BigNumber.from(0);
-  const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
-  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   const [fromPrice, isLoadingFromPrice] = useUsdPrice(
     position.from,
     BigNumber.from(position.current.remainingLiquidity)
@@ -183,6 +192,8 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
     ) === STALE;
 
   const shouldDisableWithdraw = toWithdraw.lte(BigNumber.from(0));
+
+  const isOwner = account && account.toLowerCase() === position.user.toLowerCase();
   return (
     <StyledCard>
       <StyledCardContent>
@@ -399,12 +410,13 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
               {averageBuyPrice.gt(BigNumber.from(0)) ? (
                 <FormattedMessage
                   description="positionDetailsAverageBuyPrice"
-                  defaultMessage="1 {from} = {average} {to}"
+                  defaultMessage="1 {from} = {currencySymbol}{average} {to}"
                   values={{
                     b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                     from: tokenFromAverage.symbol,
-                    to: tokenToAverage.symbol,
+                    to: STABLE_COINS.includes(tokenToAverage.symbol) ? 'USD' : tokenToAverage.symbol,
                     average: formatCurrencyAmount(averageBuyPrice, tokenToAverage),
+                    currencySymbol: STABLE_COINS.includes(tokenToAverage.symbol) ? '$' : '',
                   }}
                 />
               ) : (
@@ -413,71 +425,79 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
             </Typography>
           </StyledDetailWrapper>
         </StyledContentContainer>
-        <StyledCallToActionContainer>
-          {!isPending &&
-            (toWithdraw.gt(BigNumber.from(0)) ||
-              (toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.gt(BigNumber.from(0)))) &&
-            position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+        {isOwner && (
+          <StyledCallToActionContainer>
+            {!isPending &&
+              (toWithdraw.gt(BigNumber.from(0)) ||
+                (toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.gt(BigNumber.from(0)))) &&
+              position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+                <StyledCardFooterButton
+                  disabled={shouldDisableWithdraw}
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => onWithdraw(true)}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage
+                      description="withdraw"
+                      defaultMessage="Withdraw {protocolToken}"
+                      values={{ protocolToken: protocolToken.symbol }}
+                    />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
+            {!isPending &&
+              (toWithdraw.gt(BigNumber.from(0)) ||
+                (toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.gt(BigNumber.from(0)))) && (
+                <StyledCardFooterButton
+                  disabled={shouldDisableWithdraw}
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => onWithdraw(false)}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage
+                      description="withdraw"
+                      defaultMessage="Withdraw {wrappedProtocolToken}"
+                      values={{
+                        wrappedProtocolToken:
+                          position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
+                      }}
+                    />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
+            {!isPending &&
+              position.status !== 'TERMINATED' &&
+              toWithdraw.lte(BigNumber.from(0)) &&
+              remainingSwaps.eq(BigNumber.from(0)) && (
+                <StyledCardFooterButton
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => onReusePosition()}
+                  fullWidth
+                >
+                  <Typography variant="body2">
+                    <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
+                  </Typography>
+                </StyledCardFooterButton>
+              )}
+            {/* {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
               <StyledCardFooterButton
-                disabled={shouldDisableWithdraw}
                 variant="contained"
                 color="secondary"
-                onClick={() => onWithdraw(true)}
+                onClick={() => setShouldShowMigrate(true)}
                 fullWidth
               >
                 <Typography variant="body2">
-                  <FormattedMessage
-                    description="withdraw"
-                    defaultMessage="Withdraw {protocolToken}"
-                    values={{ protocolToken: protocolToken.symbol }}
-                  />
+                  <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
                 </Typography>
               </StyledCardFooterButton>
-            )}
-          {(!isPending && toWithdraw.gt(BigNumber.from(0))) ||
-            (toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.gt(BigNumber.from(0)) && (
-              <StyledCardFooterButton
-                disabled={shouldDisableWithdraw}
-                variant="contained"
-                color="secondary"
-                onClick={() => onWithdraw(false)}
-                fullWidth
-              >
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="withdraw"
-                    defaultMessage="Withdraw {wrappedProtocolToken}"
-                    values={{
-                      wrappedProtocolToken:
-                        position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
-                    }}
-                  />
-                </Typography>
-              </StyledCardFooterButton>
-            ))}
-          {!isPending &&
-            position.status !== 'TERMINATED' &&
-            toWithdraw.lte(BigNumber.from(0)) &&
-            remainingSwaps.eq(BigNumber.from(0)) && (
-              <StyledCardFooterButton variant="contained" color="secondary" onClick={() => onReusePosition()} fullWidth>
-                <Typography variant="body2">
-                  <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
-                </Typography>
-              </StyledCardFooterButton>
-            )}
-          {/* {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
-            <StyledCardFooterButton
-              variant="contained"
-              color="secondary"
-              onClick={() => setShouldShowMigrate(true)}
-              fullWidth
-            >
-              <Typography variant="body2">
-                <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
-              </Typography>
-            </StyledCardFooterButton>
-          )} */}
-        </StyledCallToActionContainer>
+            )} */}
+          </StyledCallToActionContainer>
+        )}
       </StyledCardContent>
     </StyledCard>
   );

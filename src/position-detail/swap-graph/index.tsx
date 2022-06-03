@@ -12,6 +12,8 @@ import { POSITION_ACTIONS, STABLE_COINS } from 'config/constants';
 import GraphTooltip from 'common/graph-tooltip';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import { formatCurrencyAmount } from 'utils/currency';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 const StyledGraphAxis = styled.div`
   height: 0px;
@@ -118,52 +120,43 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
 
 const SwapsGraph = ({ position }: SwapsGraphProps) => {
   let prices: Prices = [];
+  const currentNetwork = useCurrentNetwork();
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
-  let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
-  let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
+  let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
+  tokenFromAverage =
+    tokenFromAverage.address === PROTOCOL_TOKEN_ADDRESS
+      ? { ...wrappedProtocolToken, symbol: tokenFromAverage.symbol }
+      : tokenFromAverage;
+  tokenToAverage =
+    tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
+      ? { ...wrappedProtocolToken, symbol: tokenFromAverage.symbol }
+      : tokenToAverage;
 
-  if (position.from.address < position.to.address) {
-    tokenA = {
-      ...position.from,
-      isBaseToken: STABLE_COINS.includes(position.from.symbol),
-    };
-    tokenB = {
-      ...position.to,
-      isBaseToken: STABLE_COINS.includes(position.to.symbol),
-    };
-  } else {
-    tokenA = {
-      ...position.to,
-      isBaseToken: STABLE_COINS.includes(position.to.symbol),
-    };
-    tokenB = {
-      ...position.from,
-      isBaseToken: STABLE_COINS.includes(position.from.symbol),
-    };
-  }
-
-  // BigNumber.from(tokenA.isBaseToken ? ratePerUnitBToA : ratePerUnitAToB),
-  // tokenA.isBaseToken ? tokenA : tokenB
-
-  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  const tokenA: GraphToken = {
+    ...tokenFromAverage,
+    isBaseToken: STABLE_COINS.includes(tokenFromAverage.symbol),
+  };
+  const tokenB: GraphToken = {
+    ...tokenToAverage,
+    isBaseToken: STABLE_COINS.includes(tokenToAverage.symbol),
+  };
 
   prices = React.useMemo(() => {
     const swappedActions = position.history.filter((state) => state.action === POSITION_ACTIONS.SWAPPED);
 
     const swappedSummed = swappedActions.reduce<{ summed: BigNumber; current: number; date: number; name: string }[]>(
       (acc, action, index) => {
-        // eslint-disable-next-line no-nested-ternary
-        const rate = BigNumber.from(tokenA.isBaseToken ? action.ratePerUnitAToBWithFee : action.ratePerUnitBToAWithFee);
-        // STABLE_COINS.includes(position.to.symbol)
-        //   ? BigNumber.from(action.ratePerUnitBToAWithFee)
-        //   : position.pair.tokenA.address === position.from.address
-        //   ? BigNumber.from(action.ratePerUnitAToBWithFee)
-        //   : BigNumber.from(action.ratePerUnitBToAWithFee);
+        const rate =
+          position.pair.tokenA.address === tokenFromAverage.address
+            ? BigNumber.from(action.ratePerUnitAToBWithFee)
+            : BigNumber.from(action.ratePerUnitBToAWithFee);
 
         const prevSummed = (acc[index - 1] && acc[index - 1].summed) || BigNumber.from(0);
         acc.push({
           summed: prevSummed.add(rate),
-          current: parseFloat(formatCurrencyAmount(rate, tokenA.isBaseToken ? tokenA : tokenB)),
+          current: parseFloat(formatCurrencyAmount(rate, tokenToAverage)),
           date: parseInt(action.createdAtTimestamp, 10),
           name: DateTime.fromSeconds(parseInt(action.createdAtTimestamp, 10)).toFormat('MMM d t'),
         });
@@ -175,7 +168,7 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
 
     const swappedAverages = swappedSummed.map((swappedItem, index) => ({
       ...swappedItem,
-      average: parseFloat(formatCurrencyAmount(swappedItem.summed.div(BigNumber.from(index + 1)), tokenA.isBaseToken ? tokenA : tokenB)),
+      average: parseFloat(formatCurrencyAmount(swappedItem.summed.div(BigNumber.from(index + 1)), tokenToAverage)),
     }));
 
     return orderBy(swappedAverages, ['date'], ['desc']).reverse();
@@ -268,8 +261,8 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
                   payload={payload as any}
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   label={label}
-                  tokenA={tokenA}
-                  tokenB={tokenB}
+                  tokenA={tokenB}
+                  tokenB={tokenA}
                 />
               )}
             />

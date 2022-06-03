@@ -28,6 +28,7 @@ import Address from 'common/address';
 import useUsdPrice from 'hooks/useUsdPrice';
 import { withStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -164,7 +165,7 @@ interface PositionTimelineProps {
   filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
 }
 
-const buildSwappedItem = (positionState: ActionState, position: FullPosition) => ({
+const buildSwappedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
   icon: <CompareArrowsIcon />,
   content: () => {
     const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.swapped));
@@ -197,20 +198,27 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
       !!fromCurrentPrice;
     const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
     const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
+    const wrappedProtocolToken = getWrappedProtocolToken(chainId);
+
+    let tokenFrom = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+    let tokenTo = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
+    tokenFrom =
+      tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? { ...wrappedProtocolToken, symbol: tokenFrom.symbol } : tokenFrom;
+    tokenTo =
+      tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? { ...wrappedProtocolToken, symbol: tokenFrom.symbol } : tokenTo;
 
     const TooltipMessage = (
       <FormattedMessage
         description="pairSwapDetails"
-        defaultMessage="1 {from} = {swapRate} {to}"
+        defaultMessage="1 {from} = {currencySymbol}{swapRate} {to}"
         values={{
-          from: STABLE_COINS.includes(position.to.symbol) ? position.to.symbol : position.from.symbol,
-          to: STABLE_COINS.includes(position.to.symbol) ? position.from.symbol : position.to.symbol,
-          // eslint-disable-next-line no-nested-ternary
-          swapRate: STABLE_COINS.includes(position.to.symbol)
-            ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA)
-            : position.pair.tokenA.address === position.from.address
-            ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitAToBWithFee), position.pair.tokenB)
-            : formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), position.pair.tokenA),
+          from: tokenFrom.symbol,
+          to: STABLE_COINS.includes(tokenTo.symbol) ? 'USD' : tokenTo.symbol,
+          swapRate:
+            position.pair.tokenA.address === tokenFrom.address
+              ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitAToBWithFee), tokenTo)
+              : formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), tokenFrom),
+          currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
         }}
       />
     );
