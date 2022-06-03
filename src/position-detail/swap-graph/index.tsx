@@ -261,8 +261,8 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
                   payload={payload as any}
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   label={label}
-                  tokenA={tokenB}
-                  tokenB={tokenA}
+                  tokenA={tokenA}
+                  tokenB={tokenB}
                 />
               )}
             />
