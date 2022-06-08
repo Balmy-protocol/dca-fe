@@ -3,7 +3,6 @@ import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
 import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
@@ -38,8 +37,6 @@ const DarkTooltip = withStyles((theme: Theme) => ({
     fontSize: 11,
   },
 }))(Tooltip);
-
-const StyledCard = styled(Card)``;
 
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
@@ -174,11 +171,11 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
       BigNumber.from(positionState.swapped),
       positionState.createdAtTimestamp
     );
-    const [fromCurrentPrice, isLoadingFromCurrentPrice, errorFromFullPrice] = useUsdPrice(
+    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
       position.from,
       BigNumber.from(positionState.rate)
     );
-    const [fromPrice, isLoadingFromPrice, errorFromPrice] = useUsdPrice(
+    const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
       BigNumber.from(positionState.rate),
       positionState.createdAtTimestamp

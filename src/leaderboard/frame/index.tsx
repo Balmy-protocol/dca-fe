@@ -6,7 +6,6 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import getPositions from 'graphql/getLeaderboardPosition.graphql';
 import getTokens from 'graphql/getTokens.graphql';
 import { FullPosition, Token } from 'types';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useGqlFetchAll from 'hooks/useGqlFetchAll';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { BigNumber } from 'ethers';

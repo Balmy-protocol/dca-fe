@@ -15,7 +15,7 @@ import { useHistory } from 'react-router-dom';
 import { POSITION_VERSION_2, POSITION_VERSION_3, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
-import { createStyles, Theme } from '@mui/material/styles';
+import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
@@ -28,7 +28,7 @@ import useUsdPrice from 'hooks/useUsdPrice';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
-const BorderLinearProgress = withStyles((theme: Theme) =>
+const BorderLinearProgress = withStyles(() =>
   createStyles({
     root: {
       height: 8,
@@ -166,7 +166,6 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity);
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw);
   const history = useHistory();
 
@@ -180,7 +179,6 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
     availablePairs,
     (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
   );
-  const showFromPrice = !STABLE_COINS.includes(from.symbol) && !isLoadingFromPrice && !!fromPrice;
   const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));

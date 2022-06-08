@@ -7,7 +7,7 @@ import useDCAGraphql from './useDCAGraphql';
 
 function useGqlFetchAll<T>(
   queryToRun: DocumentNode,
-  variables: any,
+  variables: unknown,
   dataToSearch: string,
   skip = false
 ): QueryResult<T> | { data: undefined; loading: boolean } {
@@ -23,7 +23,7 @@ function useGqlFetchAll<T>(
     async function callPromise() {
       try {
         const gqlResult = await gqlFetchAll<T>(client, queryToRun, variables, dataToSearch);
-        setResult(gqlResult as any);
+        setResult(gqlResult as never);
       } catch (e) {
         console.error(e);
       }

@@ -1,6 +1,5 @@
 import React from 'react';
 import { formatUnits } from '@ethersproject/units';
-import Button from 'common/button';
 import Modal from 'common/modal';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
@@ -40,12 +39,8 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
       const positionId =
         position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
       if (useProtocolToken) {
-        hasPermission = await web3Service.companionHasPermission(
-          { ...position, id: positionId },
-          PERMISSIONS.WITHDRAW
-        );
+        hasPermission = await web3Service.companionHasPermission({ ...position, id: positionId }, PERMISSIONS.WITHDRAW);
       }
-
 
       setModalLoading({
         content: (

@@ -46,7 +46,9 @@ interface ErrorConfig {
   error?: {
     code: number;
     message: string;
-    data: any;
+    data: {
+      message: string;
+    } | null;
   };
 }
 

@@ -1,24 +1,11 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import usePastPositions from 'hooks/usePastPositions';
-import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
 import PastPosition from './components/position';
 
-const POSITIONS_PER_ROW = {
-  xs: 1,
-  sm: 2,
-  md: 4,
-  lg: 4,
-  xl: 4,
-};
 const History = () => {
   const pastPositions = usePastPositions();
-  const currentBreakPoint = useCurrentBreakpoint();
-
-  const positionsPerRow = POSITIONS_PER_ROW[currentBreakPoint];
-  const positionsToFill =
-    pastPositions.length % positionsPerRow !== 0 ? positionsPerRow - (pastPositions.length % positionsPerRow) : 0;
 
   return (
     <Grid container direction="column" alignItems="flex-start" justifyContent="center" spacing={3}>

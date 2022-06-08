@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
-import { BigNumber } from 'ethers';
-import { SetStateCallback } from 'types';
 import Button from '@mui/material/Button';
 
 const StyledTabsContainer = styled.div`
@@ -88,7 +85,7 @@ interface CustomCurrent {
   offsetHeight: number;
 }
 
-export default function<T>({ options, selected, onChange }: MinimalSelectProps<T>) {
+export default function MinimalTabs<T>({ options, selected, onChange }: MinimalSelectProps<T>) {
   const [selectedRef, setSelectedRef] = useState<CustomCurrent | null>(null);
 
   return (
@@ -117,4 +114,4 @@ export default function<T>({ options, selected, onChange }: MinimalSelectProps<T
       )}
     </StyledTabsContainer>
   );
-};
+}

@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
 import { Token } from 'types';
 
@@ -24,9 +25,9 @@ type GraphToken = TokenWithBase;
 interface GraphTooltipProps {
   label?: string;
   payload?: {
-    value: string;
-    name: string;
-    dataKey: string;
+    value?: ValueType;
+    name?: NameType;
+    dataKey?: string | number;
   }[];
   tokenA: GraphToken;
   tokenB: GraphToken;

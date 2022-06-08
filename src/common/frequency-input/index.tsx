@@ -9,7 +9,7 @@ interface FrequencyInputProps {
   value: string;
   disabled?: boolean;
   error?: string;
-  onChange: (newValue: string) => any;
+  onChange: (newValue: string) => void;
 }
 
 const inputRegex = RegExp(/^[0-9]*$/);

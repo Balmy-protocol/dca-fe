@@ -9,7 +9,6 @@ import { buildEtherscanTransaction } from 'utils/etherscan';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { FullPosition } from 'types';
 import useWeb3Service from 'hooks/useWeb3Service';
-import AddIcon from '@mui/icons-material/Add';
 
 const PositionControlsContainer = styled.div`
   display: flex;

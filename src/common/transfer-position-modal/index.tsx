@@ -1,12 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from 'common/button';
 import Modal from 'common/modal';
 import { FullPosition } from 'types';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { makeStyles } from '@mui/styles';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';

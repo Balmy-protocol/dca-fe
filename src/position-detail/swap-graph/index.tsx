@@ -15,21 +15,6 @@ import { formatCurrencyAmount } from 'utils/currency';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
-const StyledGraphAxis = styled.div`
-  height: 0px;
-  border: 1px dotted #b8b8b8;
-  flex-grow: 0;
-  margin-top: 20px;
-`;
-
-const StyledGraphAxisLabels = styled.div`
-  flex-grow: 0;
-  margin-top: 7px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 const StyledContainer = styled(Paper)`
   display: flex;
   flex-direction: column;
@@ -95,12 +80,6 @@ interface PriceData {
   date: number;
 }
 
-interface PriceDataAccum extends PriceData {
-  [x: string]: string | number;
-}
-
-type PricesAccum = PriceDataAccum[];
-
 type Prices = PriceData[];
 
 interface TokenWithBase extends Token {
@@ -108,15 +87,6 @@ interface TokenWithBase extends Token {
 }
 
 type GraphToken = TokenWithBase;
-
-const EMPTY_GRAPH_TOKEN: TokenWithBase = {
-  address: '',
-  symbol: '',
-  decimals: 1,
-  isBaseToken: false,
-  name: '',
-  chainId: 0,
-};
 
 const SwapsGraph = ({ position }: SwapsGraphProps) => {
   let prices: Prices = [];
@@ -257,8 +227,7 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
             <Tooltip
               content={({ payload, label }) => (
                 <GraphTooltip
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  payload={payload as any}
+                  payload={payload}
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   label={label}
                   tokenA={tokenA}
