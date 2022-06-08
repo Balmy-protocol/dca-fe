@@ -645,7 +645,7 @@ export const WHALE_MODE_FREQUENCIES = {
     FIFTEEN_MINUTES.toString(),
     THIRTY_MINUTES.toString(),
     ONE_HOUR.toString(),
-    FOUR_HOURS.toString(),
+    // FOUR_HOURS.toString(),
   ],
   [NETWORKS.mumbai.chainId]: [
     ONE_MINUTE.toString(),
