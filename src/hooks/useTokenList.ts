@@ -3,13 +3,13 @@ import { TokenList } from 'types';
 import reduce from 'lodash/reduce';
 import keyBy from 'lodash/keyBy';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { useSavedTokenLists, useTokensLists } from 'state/token-lists/hooks';
+import { useTokensLists } from 'state/token-lists/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 
 function useTokenList(filter = true) {
   const currentNetwork = useCurrentNetwork();
   const tokensLists = useTokensLists();
-  const savedTokenLists = ["Mean Finance Graph Allowed Tokens"];
+  const savedTokenLists = ['Mean Finance Graph Allowed Tokens'];
 
   const tokenList: TokenList = React.useMemo(
     () =>

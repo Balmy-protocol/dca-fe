@@ -1,18 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
-import {
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  AreaChart,
-  Area,
-  Line,
-  ComposedChart,
-  CartesianGrid,
-} from 'recharts';
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Area, Line, ComposedChart, CartesianGrid } from 'recharts';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
@@ -32,8 +21,6 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { STABLE_COINS } from 'config/constants';
-import useWeb3Service from 'hooks/useWeb3Service';
-import { useThemeMode } from 'state/config/hooks';
 import GraphFooter from 'common/graph-footer';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import MinimalTabs from 'common/minimal-tabs';
@@ -166,10 +153,8 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   chainId: 0,
 };
 const GraphWidget = ({ from, to }: GraphWidgetProps) => {
-  const mode = useThemeMode();
   const client = useDCAGraphql();
   const uniClient = useUNIGraphql();
-  const web3Service = useWeb3Service();
   let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
   let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
   let uniData: UniMappedPrice[] = [];
@@ -182,7 +167,6 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     [tabIndex]
   );
   const currentNetwork = useCurrentNetwork();
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
   if (to && from) {
     const toAddress =
@@ -298,15 +282,6 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     return orderBy([...mappedUniData, ...mappedSwapData], ['date'], ['desc']).reverse();
   }, [uniData, swapData]);
 
-  const tooltipFormatter = (value: string, name: string) => {
-    if (name === 'uniswap') {
-      return null;
-    }
-
-    return `1 ${tokenA.isBaseToken ? tokenB.symbol : tokenA.symbol} = ${tokenA.isBaseToken ? '$' : ''}${value} ${
-      tokenA.isBaseToken ? '' : tokenB.symbol
-    }`;
-  };
   const isLoading = loadingPool || loadingMeanData;
   // const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
   const noData = prices.length === 0;
@@ -452,7 +427,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
             <Tooltip
               content={({ payload, label }) => (
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                <GraphTooltip payload={payload as any} label={label} tokenA={tokenA} tokenB={tokenB} />
+                <GraphTooltip payload={payload} label={label} tokenA={tokenA} tokenB={tokenB} />
               )}
             />
             <Legend />

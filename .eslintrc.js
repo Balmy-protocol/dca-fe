@@ -19,8 +19,6 @@ module.exports = {
     project: './tsconfig.json',
   },
   rules: {
-    // Too restrictive, writing ugly code to defend against a very unlikely scenario: https://eslint.org/docs/rules/no-prototype-builtins
-    'no-prototype-builtins': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/destructuring-assignment': ['error'],
     // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
@@ -28,8 +26,10 @@ module.exports = {
     // Use function hoisting to improve code readability
     'no-use-before-define': ['error'],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-explicit-any': ['error'],
     'react/no-array-index-key': 'off',
     'import/prefer-default-export': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
     '@typescript-eslint/no-use-before-define': [
       'error',
       { functions: false, classes: true, variables: true, typedefs: true },

@@ -21,11 +21,9 @@ import TokenIcon from 'common/token-icon';
 import { makeStyles, withStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import useAvailablePairs from 'hooks/useAvailablePairs';
-import TuneIcon from '@mui/icons-material/Tune';
 import Switch from '@mui/material/Switch';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useTokenList from 'hooks/useTokenList';
-import Button from 'common/button';
 import TokenLists from 'common/token-lists';
 import useTokenBalance from 'hooks/useTokenBalance';
 import { formatCurrencyAmount } from 'utils/currency';
@@ -60,10 +58,6 @@ const StyledFilledInput = withStyles(() =>
 
 const StyledChip = styled(Chip)`
   margin-right: 5px;
-`;
-
-const StyledTuneIcon = styled(TuneIcon)`
-  color: rgba(255, 255, 255, 0.5);
 `;
 
 const StyledListItemIcon = styled(ListItemIcon)`

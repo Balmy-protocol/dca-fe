@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
-import Link from '@mui/material/Link';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
@@ -10,12 +9,6 @@ import { FormattedMessage } from 'react-intl';
 import { useSavedTokenLists, useTokensLists } from 'state/token-lists/hooks';
 import { useAppDispatch } from 'hooks/state';
 import { enableTokenList } from 'state/token-lists/actions';
-
-const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
-`;
 
 const StyledCard = styled(Card)`
   padding: 16px;

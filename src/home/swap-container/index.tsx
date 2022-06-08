@@ -9,12 +9,8 @@ import { getProtocolToken } from 'mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { NETWORKS, STRING_SWAP_INTERVALS } from 'config/constants';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
-import { useQuery } from '@apollo/client';
-import useDCAGraphql from 'hooks/useDCAGraphql';
 import { BigNumber } from 'ethers';
-import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
 import { useCreatePositionState } from 'state/create-position/hooks';
 import { useAppDispatch } from 'state/hooks';
 import { setFrequencyType, setFrequencyValue, setFrom, setFromValue, setTo } from 'state/create-position/actions';
@@ -30,11 +26,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const { fromValue, frequencyType, frequencyValue, from, to } = useCreatePositionState();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
-  const {
-    from: fromParam,
-    to: toParam,
-    chainId: chainIdParam,
-  } = useParams<{ from: string; to: string; chainId: string }>();
+  const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();

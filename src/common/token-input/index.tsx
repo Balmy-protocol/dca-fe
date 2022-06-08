@@ -1,24 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
-import TextField from '@mui/material/TextField';
 import Button from 'common/button';
 import { Token } from 'types';
 import { FormattedMessage } from 'react-intl';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
-import Input from '@mui/material/Input';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import InputAdornment from '@mui/material/InputAdornment';
-import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import TokenIcon from 'common/token-icon';
 import { createStyles, FilledInput } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { formatCurrencyAmount } from 'utils/currency';
-
-const StyledInput = styled(Input)`
-  text-align: center;
-`;
 
 const StyledInputContainer = styled.div`
   display: inline-flex;
@@ -52,7 +45,7 @@ interface TokenInputProps {
   id: string;
   value: string;
   disabled?: boolean;
-  onChange: (newValue: string) => any;
+  onChange: (newValue: string) => void;
   withBalance?: boolean;
   balance?: BigNumber;
   token: Token | null;

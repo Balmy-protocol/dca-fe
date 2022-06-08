@@ -53,10 +53,6 @@ const StyledGridContainer = styled(Grid)`
   flex-wrap: nowrap;
 `;
 
-const StyledNavBarGridContainer = styled(Grid)`
-  margin-top: 40px !important;
-`;
-
 const StyledAppGridContainer = styled(Grid)`
   margin-top: 40px !important;
   flex: 1;

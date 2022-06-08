@@ -84,7 +84,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
   const tabIndex = useMainTab();
   const dispatch = useAppDispatch();
 
-  const handleTabChange = (e: any, index: number) => {
+  const handleTabChange = (index: number) => {
     dispatch(changeMainTab(index));
     history.push('/');
   };
@@ -100,11 +100,11 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             value={tabIndex}
           >
             <StyledTab
-              onClick={() => handleTabChange({}, 0)}
+              onClick={() => handleTabChange(0)}
               label={<FormattedMessage description="create" defaultMessage="Create" />}
             />
             <StyledTab
-              onClick={() => handleTabChange({}, 1)}
+              onClick={() => handleTabChange(1)}
               label={<FormattedMessage description="positions" defaultMessage="Positions" />}
             />
           </StyledTabs>

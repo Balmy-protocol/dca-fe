@@ -1,6 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 import { BigNumber } from 'ethers';
-import { Permission, TransactionTypesConstant, Token, NetworkStruct } from 'types';
+import { Permission, TransactionTypesConstant, NetworkStruct } from 'types';
 import { Oracles } from 'types/contracts';
 import { Duration } from 'luxon';
 

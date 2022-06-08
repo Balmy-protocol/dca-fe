@@ -14,7 +14,7 @@ import useUsdPrice from 'hooks/useUsdPrice';
 import LinearProgress from '@mui/material/LinearProgress';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 
-import { createStyles, Theme } from '@mui/material/styles';
+import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';

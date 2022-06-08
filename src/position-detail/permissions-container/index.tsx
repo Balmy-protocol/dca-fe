@@ -18,7 +18,6 @@ import { TRANSACTION_TYPES } from 'config/constants';
 import { discardChanges, submitPermissionChanges } from 'state/position-permissions/actions';
 import { useAppDispatch } from 'state/hooks';
 import AddAddressPermissionModal from 'common/add-address-permission-modal';
-import Card from '@mui/material/Card';
 import Paper from '@mui/material/Paper';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
