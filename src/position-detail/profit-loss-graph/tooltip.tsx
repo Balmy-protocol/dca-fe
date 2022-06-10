@@ -9,13 +9,14 @@ import { Token } from 'types';
 const StyledPaper = styled.div`
   padding: 16px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 20px;
   border: 2px solid #a5aab5;
   background-color: #1b1b1c;
   display: flex;
   gap: 10px;
   flex-direction: column;
+  z-index: 99;
 `;
 
 interface ProfitLossTooltipProps {
@@ -50,14 +51,15 @@ const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
   return (
     <StyledPaper>
       <Typography variant="body2">{label}</Typography>
-      <Typography variant="body1">TokenA: {tokenA.symbol}</Typography>
-      <Typography variant="body1">TokenB: {tokenB.symbol}</Typography>
+      <Typography variant="body2">TokenA: {tokenA.symbol}</Typography>
+      <Typography variant="body2">TokenB: {tokenB.symbol}</Typography>
       <Typography variant="body1">Profit/loss: %{profitLoss}</Typography>
-      <Typography variant="body1">Profit/loss: %{profitLoss}</Typography>
-      <Typography variant="body1">TokenAPrice: {tokenAPrice.toString()}</Typography>
-      <Typography variant="body1">TokenBPrice: {tokenBPrice.toString()}</Typography>
+      <Typography variant="body1">TokenAPrice: {formatUnits(tokenAPrice.toString(), 18)}</Typography>
+      <Typography variant="body1">TokenBPrice: {formatUnits(tokenBPrice.toString(), 18)}</Typography>
       <Typography variant="body1">SummedRate: {formatUnits(summedRate, tokenA.decimals)}</Typography>
-      <Typography variant="body1">SummedBougth: {formatUnits(summedBougth, tokenB.decimals)}</Typography>
+      <Typography variant="body1">
+        SummedBougth with token price: {formatUnits(summedBougth, tokenB.decimals)}
+      </Typography>
     </StyledPaper>
   );
 };
