@@ -29,8 +29,8 @@ function useUsdPrice(
     async function callPromise() {
       if (from && !STABLE_COINS.includes(from.symbol) && amount && amount.gt(BigNumber.from(0))) {
         try {
-          const price = await web3Service.getUsdHistoricPrice(
-            from.address === protocolToken.address ? wrappedProtocolToken : from,
+          const [price] = await web3Service.getUsdHistoricPrice(
+            [from.address === protocolToken.address ? wrappedProtocolToken : from],
             date
           );
           const multiplied = amount.mul(price);
