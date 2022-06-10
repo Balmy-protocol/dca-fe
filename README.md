@@ -1,5 +1,3 @@
-[![Lint](https://github.com/Uniswap/interface/actions/workflows/lint.yml/badge.svg)](https://github.com/Uniswap/interface/actions/workflows/lint.yml)
-
 # Mean Finance FE
 
 This repository contains the code for the Mean Finance public web dApp.
