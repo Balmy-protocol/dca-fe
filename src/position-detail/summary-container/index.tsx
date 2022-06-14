@@ -7,7 +7,7 @@ import { FullPosition, GetPairSwapsData } from 'types';
 // import AveragePriceGraph from 'position-detail/average-price-graph';
 import Details from 'position-detail/position-data';
 import Sticky from 'react-stickynode';
-import ProfitLossGraph from 'position-detail/profit-loss-graph';
+import GraphContainer from 'position-detail/graph-container';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -64,7 +64,7 @@ const PositionSummaryContainer = ({
         <Grid container direction="column" spacing={3}>
           <Grid item xs={12}>
             <StyledPaper variant="outlined">
-              <ProfitLossGraph position={position} />
+              <GraphContainer position={position} />
             </StyledPaper>
           </Grid>
           <Grid item xs={12}>

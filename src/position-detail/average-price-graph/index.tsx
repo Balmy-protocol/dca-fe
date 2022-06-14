@@ -20,11 +20,10 @@ const StyledContainer = styled(Paper)`
   flex-direction: column;
   flex-grow: 1;
   background-color: transparent;
-  margin-bottom: 30px;
 `;
 
 const StyledGraphContainer = styled.div`
-  width: 90%;
+  width: 100%;
   align-self: center;
   .recharts-surface {
     overflow: visible;
@@ -38,13 +37,6 @@ const StyledCenteredWrapper = styled.div`
   justify-content: center;
   flex-direction: column;
   gap: 16px;
-`;
-
-const StyledTitleContainer = styled.div`
-  margin-bottom: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 const StyledLegendContainer = styled.div`
@@ -163,11 +155,6 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   return (
     <StyledContainer elevation={0}>
       <StyledHeader>
-        <StyledTitleContainer>
-          <Typography variant="h6">
-            <FormattedMessage description="averagevsCurrentPrice" defaultMessage="Market price vs DCA price" />
-          </Typography>
-        </StyledTitleContainer>
         <StyledLegendContainer>
           <StyledLegend>
             <StyledLegendIndicator fill="#7C37ED" />

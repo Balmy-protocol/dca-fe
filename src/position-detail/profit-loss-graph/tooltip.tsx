@@ -1,10 +1,10 @@
-import { formatUnits } from '@ethersproject/units';
+import { parseUnits } from '@ethersproject/units';
 import Typography from '@mui/material/Typography';
-import { BigNumber } from 'ethers';
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
 import { Token } from 'types';
+import { formatCurrencyAmount } from 'utils/currency';
 
 const StyledPaper = styled.div`
   padding: 16px;
@@ -26,19 +26,15 @@ interface ProfitLossTooltipProps {
     name?: NameType;
     dataKey?: string | number;
     payload?: {
-      profitLoss: string;
-      tokenAPrice: BigNumber;
-      tokenBPrice: BigNumber;
-      summedRate: BigNumber;
-      summedBougth: BigNumber;
+      swappedIfLumpSum: number;
+      swappedIfDCA: number;
     };
   }[];
-  tokenA: Token;
-  tokenB: Token;
+  tokenTo: Token;
 }
 
 const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
-  const { payload, label, tokenA, tokenB } = props;
+  const { payload, label, tokenTo } = props;
 
   const firstPayload = payload && payload[0];
 
@@ -46,19 +42,17 @@ const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
     return null;
   }
 
-  const { profitLoss, tokenAPrice, tokenBPrice, summedRate, summedBougth } = firstPayload?.payload;
+  const { swappedIfLumpSum, swappedIfDCA } = firstPayload?.payload;
 
   return (
     <StyledPaper>
       <Typography variant="body2">{label}</Typography>
-      <Typography variant="body2">TokenA: {tokenA.symbol}</Typography>
-      <Typography variant="body2">TokenB: {tokenB.symbol}</Typography>
-      <Typography variant="body1">Profit/loss: %{profitLoss}</Typography>
-      <Typography variant="body1">TokenAPrice: {formatUnits(tokenAPrice.toString(), 18)}</Typography>
-      <Typography variant="body1">TokenBPrice: {formatUnits(tokenBPrice.toString(), 18)}</Typography>
-      <Typography variant="body1">SummedRate: {formatUnits(summedRate, tokenA.decimals)}</Typography>
       <Typography variant="body1">
-        SummedBougth with token price: {formatUnits(summedBougth, tokenB.decimals)}
+        DCA: {formatCurrencyAmount(parseUnits(swappedIfDCA.toString(), tokenTo.decimals), tokenTo)} {tokenTo.symbol}
+      </Typography>
+      <Typography variant="body1">
+        Lump sum: {formatCurrencyAmount(parseUnits(swappedIfLumpSum.toString(), tokenTo.decimals), tokenTo)}{' '}
+        {tokenTo.symbol}
       </Typography>
     </StyledPaper>
   );
