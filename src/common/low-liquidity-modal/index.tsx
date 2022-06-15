@@ -11,6 +11,14 @@ const StyledLink = styled(Link)`
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
 `;
+
+const StyledLowLiquidityContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+`;
+
 interface LowLiquidityModalProps {
   onCancel: () => void;
   onConfirm: () => void;
@@ -37,6 +45,8 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
       showCloseButton
       showCloseIcon
       onClose={onCancel}
+      maxWidth="sm"
+      title={<FormattedMessage description="low liquidity title" defaultMessage="Low liquidity on pair" />}
       actions={[
         {
           color: 'secondary',
@@ -46,17 +56,19 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
         },
       ]}
     >
-      <Typography variant="body1" component="p">
-        <FormattedMessage
-          description="low liquidity message"
-          defaultMessage="Due to low volume, the price oracle for this pair of tokens might not be reliable right now. Proceed with caution or try another pair"
-        />
-      </Typography>
-      <Typography variant="body1" component="p">
-        <StyledLink href="https://docs.mean.finance/concepts/price-oracle" target="_blank">
-          <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
-        </StyledLink>
-      </Typography>
+      <StyledLowLiquidityContainer>
+        <Typography variant="body1" component="p">
+          <FormattedMessage
+            description="low liquidity message"
+            defaultMessage="Due to low volume, the price oracle for this pair of tokens might not be reliable right now. Proceed with caution or try another pair"
+          />
+        </Typography>
+        <Typography variant="body1" component="p">
+          <StyledLink href="https://docs.mean.finance/concepts/price-oracle" target="_blank">
+            <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
+          </StyledLink>
+        </Typography>
+      </StyledLowLiquidityContainer>
     </Modal>
   );
 };
