@@ -50,6 +50,7 @@ import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import useAllowance from 'hooks/useAllowance';
+import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -190,6 +191,7 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const availablePairs = useAvailablePairs();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
+  const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
 
   const [usedTokens] = useUsedTokens();
 
@@ -581,9 +583,27 @@ const Swap = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={() => web3Service.connect()}>
+    <StyledButton
+      size="large"
+      color="primary"
+      variant="contained"
+      fullWidth
+      onClick={() => web3Service.connect(currentNetwork.chainId)}
+    >
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
+      </Typography>
+    </StyledButton>
+  );
+
+  const IncorrectNetworkButton = (
+    <StyledButton size="large" color="primary" variant="contained" disabled fullWidth>
+      <Typography variant="body1">
+        <FormattedMessage
+          description="incorrect network"
+          defaultMessage="Change network to {network}"
+          values={{ network: currentNetwork.name }}
+        />
       </Typography>
     </StyledButton>
   );
@@ -707,6 +727,8 @@ const Swap = ({
     ButtonToShow = NotConnectedButton;
   } else if (isLoading || isLoadingPairIsSupported) {
     ButtonToShow = LoadingButton;
+  } else if (!isOnCorrectNetwork) {
+    ButtonToShow = IncorrectNetworkButton;
   } else if (!pairIsSupported && !isLoadingPairIsSupported && from && to) {
     ButtonToShow = PairNotSupportedButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {

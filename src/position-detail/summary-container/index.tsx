@@ -35,6 +35,7 @@ interface PositionSummaryContainerProps {
   swapsData: GetPairSwapsData | undefined;
   onWithdraw: (useProtocolToken: boolean) => void;
   onReusePosition: () => void;
+  disabled: boolean;
 }
 
 const PositionSummaryContainer = ({
@@ -43,6 +44,7 @@ const PositionSummaryContainer = ({
   swapsData,
   onWithdraw,
   onReusePosition,
+  disabled,
 }: PositionSummaryContainerProps) => (
   <>
     <Grid container spacing={4} alignItems="flex-start">
@@ -55,6 +57,7 @@ const PositionSummaryContainer = ({
               pendingTransaction={pendingTransaction}
               onWithdraw={onWithdraw}
               onReusePosition={onReusePosition}
+              disabled={disabled}
             />
           </StyledPaper>
         </Sticky>

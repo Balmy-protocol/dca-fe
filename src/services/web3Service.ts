@@ -103,6 +103,7 @@ import {
   TRANSACTION_TYPES,
   UNISWAP_ORACLE_ADDRESS,
   UNI_GRAPHQL_URL,
+  SUPPORTED_NETWORKS,
 } from 'config/constants';
 import {
   BetaMigratorContract,
@@ -322,8 +323,8 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect() {
-    const provider: Provider = (await this.modal?.requestProvider()) as Provider;
+  async connect(chainId: number, suppliedProvider?: Provider) {
+    const provider: Provider = suppliedProvider || ((await this.modal?.requestProvider()) as Provider);
 
     this.providerInfo = getProviderInfo(provider);
     // A Web3Provider wraps a standard Web3 provider, which is
@@ -335,12 +336,10 @@ export default class Web3Service {
     // For this, you need the account signer...
     const signer = ethersProvider.getSigner();
 
-    const chain = await ethersProvider.getNetwork();
-
-    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
-    const v2Client = MEAN_V2_GRAPHQL_URL[chain.chainId] && new GraphqlService(MEAN_V2_GRAPHQL_URL[chain.chainId]);
-    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
-    this.chainlinkClient = new GraphqlService(CHAINLINK_GRAPHQL_URL[chain.chainId] || CHAINLINK_GRAPHQL_URL[1]);
+    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chainId] || MEAN_GRAPHQL_URL[10]);
+    const v2Client = MEAN_V2_GRAPHQL_URL[chainId] && new GraphqlService(MEAN_V2_GRAPHQL_URL[chainId]);
+    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chainId] || UNI_GRAPHQL_URL[10]);
+    this.chainlinkClient = new GraphqlService(CHAINLINK_GRAPHQL_URL[chainId] || CHAINLINK_GRAPHQL_URL[1]);
     this.setClient(ethersProvider);
     this.setSigner(signer);
 
@@ -356,9 +355,8 @@ export default class Web3Service {
       }
     });
 
-    const network = await this.getNetwork();
-    const protocolToken = getProtocolToken(network.chainId);
-    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
+    const protocolToken = getProtocolToken(chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(chainId);
 
     const currentPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
       this.apolloClient.getClient(),
@@ -526,6 +524,8 @@ export default class Web3Service {
   }
 
   async disconnect() {
+    this.modal?.clearCachedProvider();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     if (this.client && (this.client as any).disconnect) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -538,14 +538,13 @@ export default class Web3Service {
       await (this.client as any).close();
     }
 
-    this.modal?.clearCachedProvider();
-
     this.setAccount('');
 
     this.setClient(new ethers.providers.Web3Provider({}));
   }
 
-  async setUpModal() {
+  async setUpModal(chainId = NETWORKS.optimism.chainId) {
+    let chainIdToUse = chainId;
     const providerOptions = {
       walletconnect: {
         package: WalletConnectProvider, // required
@@ -553,6 +552,9 @@ export default class Web3Service {
           infuraId: '5744aff1d49f4eee923c5f3e5af4cc1c', // required
         },
       },
+      // frame: {
+      //   package: ethProvider as WalletConnectProvider,
+      // },
       'custom-bitkeep': {
         display: {
           logo: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAVwAAAFcCAMAAACzyPYeAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAANlBMVEUAAABJW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/9JW/////8wP+YWAAAAEHRSTlMAUO+/n3BAr2AQgN8gj88wjuffUQAAAAFiS0dEEeK1PboAAAAHdElNRQfmAw8SLg15Hjo2AAAAAW9yTlQBz6J3mgAADNJJREFUeNrtnel2qzAMhBNo9o33f9qbdLltEjAebbaR5m/PKeYLCI8s2atVKBQKtaz1MAxd/7HZlh7IEtUPP9rtD6UHszT9wr3rI55fUT3BHYY+8ArqBW7gldQb3HtwiNgrpBG4Q3csPaqFaAzuMJzWpce1CI3DvYfec+mRLUBTcIfhEqGXq2m4Q7cpPbj6dd5sEq94Au499Ma0LKnD5UFpP/n3JNy7J47QO61N9/WGT8bPGbjDcIzQO67t9QfR5Ps9C3fo9sglvei8+yXEgBuO+F2H418+LLh3Rxyh96/2p0EQbjjiP9q+MuPCDUf8o/PHGxo+3HvovZW+sQp07AYVuJGMXK1PY1hk4Dp3xLcJWEJwPTviL6+rCtdtMnLTTRIRhOvSEW9PCR6icN054r9eVx3uMFwdhd5nr2sA15Ej3ndzKOTh3h2xh9D7m1g0hXufli0+9I54XSu4S3fEh+NsRNCEu2hHvD5lMlCDu9hk5C2fjB7cZTriaa9rDHeBjviWGxEM4C6tPOeW9yGzgrsoRwyy1Ye7IEd8yPAN1nAXU56DfMvs4C4jGXmG79oI7hIccZbjLQK3/fKcA37LdnBbd8T7uuG27YjxqGALt+nyHAIQY7gNO2LCvZrDbdYRtwG30fKcRuC2mYxsBm6LjrghuO054qbgtpaMlIRLmDPDasoRS8I9g4lhmhoqz5GEu7qhqWGSanLE6+vpYgQ3pxhKQrU44q8l8+kpuDDc+TI+GdVQnnP4/sb0ZnDvkVd/0vBQ8WTk//JwS7gzpdNiKuuI/9yjLdxk0b+gyjnip7fTGi5WwkNXmWTky3fFHC5UfMZRAUf8OiMqABcom2TJ2hG/l4cXgTve3Covy/KcsV6cQnAzS9XZsnLE4+XhpeCObCigIpuGlf14nCsHd3JIwtIvz5n8QpeEuwxHfJgOcEXhzrZkSknREac+zYXh5vW38aWVjEz7+eJwW3bEc5moCuC26ojnh10DXLNkpGh5znr+hasDrlkyUmyh4pDzJa4FrpUj3sk8vHktZPXATU0YBXWSmPRmLghWBNcoGSmQLMutC68KrpEj5tLNrrmvDG727gMF6eb3M9QG1yYZyaG7zb9MfXBNHDH9q4ZUZtUI16A8pyPPyJAfvk64+snInjgwaFyVwtV3xLQ02U3oFywMV90Rk9I42C+uD3e7ufR9f9wQviGqyUhKYAC7SpXhnj9++Zwu8MOimowkvGfgu6QK923Kiuf8FB0x/uii7dCKcMfMFqEAUa88B3500R9aD+4EFEIVjJYj3oHjgHf30IKbeJ3xljwtRwwOBP4A6MCdSc3iVTA65TlgjILjkwrc2SkUIaeqkYy8QiPA9/xRgJs1+cdb8jQcMfQGbcrDzbateAGifHkO9ALhVxeFu4Fm/YQqGOlk5AW5OB6XROEOPTZpIrTkyTpiyEdI/nvJm5i+PJxxkHXEwIWBFYhK4FIcsWQyErh4i3DLOmJgzoJPFiqASypAlHLEwJUJM8Ea4FIKEIXKczzApThikWQkMBtsGG4hR+wELiUZyS/PcQO3hCN2BJfSksdzxJ7gkhwxpzzHF1ySI6ZPy7zBpbTkEXap9gqXkIyk0nUIl+CIiXRdwsUdMW1O5hQumow8kOYMbuGCjpi0fukXLuaISY+uZ7hQeQ5ltusbLuCI1wEXV+4mNXhFTMAdsstzAi5NWY6YsDQRcB/KccQBl6x5RxxwGZqLDQGXo2uabsBVpBtweUr2iARcplKGIuAylerlD7hcJXAEXK5OAVdR014i4LI1zSPgsjU9Yo9wr8ftdn0Ua3KaDrr+4P5fIhdr3w2433pKZQm17wbcT7026si07wbch0ZShBLtuwF3shSU374bcBNFzNz2Xe9w08UGzPZd53BnG0dY7buu4WZVGTD2EnQMN7s0kdxD5hcu0OtE7RPxChfcMozWvusTLqG1n+KIPcKlnRNNaN91CJd8qBDsiP3B5RwOAG5w4g4u71gLbNze4H6w2IJYvMHlnoMFbSvlDC73wcWOtnAGl38IFjJyZ3D550MgbU4BFxQSdANuwA24ATfgBtyAG3ADbsANuAE34AbcgBtwA27ADbgBN+AG3IAbcANuwA24ATfgBtyAG3ADbsANuAE34AbcgPsi5PQXZ3BJTVJPQpopncG9suEizWjO4LLjAnQmlDe4V17HCXbyize4vJaTA7btjTu4w47+7J7BLYX8waWcOP09aLSz2iFcyonTd63xPQFcwiWcOE3aSMgpXPDEaeIWWF7hQidOUzdv8ws3+8Rp+raDnuFmna/F2TDTN9zZ7W54W706hzuzURNzk2L3cBMnTrO31w64w8R+TWfiNngB90Ujjpi8gWPAfdOLIyZ43YCb0J/dHWk7NwbchLrLF94bP9gG3BGd+r6XOSLioekFu4bgSh1IIq2d5IhLweXt2q6naffXEFxkNypLTeeMG4K7kguTkkoMuCW4UDGBmRJJi5bgVvnopsbbFFxob1AbdalMfFNwKf9PWcn1+7bgQsWHxdm2Breyye5M3UlrcFdrgRyhkGaPoWgOLvd8LTFllES0B5d5vpaUcg6maRGuVJKbobwyNMIodeF2mf+5ZOjNLaAk/GtduENm7Rz1fC0B5dafUTyPMtzsslqxE6cx9dmVk+ApNBZwd/n/XujEaUTIKWCU4jNluLlx4SGZE6fzBZ0CRsqEaMOFekUkTpzOHxnUZ0GKWtpwh7ySz/8PCPvE6UxllqL+iLZwog4XbSLbW0zLgCLqT2GtbHZwkW/a142oO2Ks/H8Ft7IZwsVb9JQdMdy4QmVrAXfo4RY9xonTs4OBW65u5O+ABVxKi56SI7YdiQlcyvOi4ojRYMt8h4zgotPKh6TqFv8LPPF6xY7+ZnDv32j01mQdMX7iNXveYgcXn12STpyeEOHEa2qbYBm4sC9aiXQ5PISfeC3hFW3hFrpLwm8qkuUA3haZpBXh/WQ6Yko0ErlVZHMeqapPwpeFcbMlv6PAjcoVd+Xn/39EnhPhM0DBNREgGp3FLmo2my/sXZALC16W4kPhqdGpsOs+IVeWdUz4pjXgU4W/HcIVFFCyVTrRCuf+EEeMe11xuw19SsWbROCsdfbDRXgt5HP00Oz6IH55pbBYxOu+jwIbgcbirIIjJrhAjeQ8uAKj04EjPBUlTKJ1VvRtFkHnRDFRUyOxtX8pQROxh7Tq5aSQSP5MXMFDkTRpzxJ5mYt63Rd1+MapiqWehM/QM5liyeJR4e+Q4qNLmkDdLj+f+esFfvTlljnGboay469qJSJlG9fD9iHCneh2C5COCDjoVtHippUoca/7LOIJAdotu7gjpjwiym0CHRz+v6VdJ0dwxKgUvO6z6OeGqHcv4CluSIqFaN9inA5ALvoDRqcXeg2aCllHspz165MJVivvwTDou2CeGXIzqP7GF8QzZFG2zmTLKVkFhDuuGZk0XLDZmsTdgZIrSMimVUhmyCa9/ARHPPU02PQXS43XZiMKPBk5Kpv2zKtcIDPaiAJPRr5J2et+S3iGYzNoriM2aomXn5vbbERBPlPqIXWv+ynSuUyzsvlQ0Mdu0q3N+vVT0kzn/xE1GWnx22tm8mw2oiCU5zykPzCBL25SJt3QtGSk9kdBaK6YktFGFARHrLsLspzLScpoI4qaVs8pK9ZU2WxEUVHdh3hmKSmbKWW57hzmMJiq1hGLBy2tbH76LmwccZmOyF8prkMlZeSIS9Y3K6+gJlWrIxYKWmpeN/MuanXEEkHLpGolKaOtGY13/iD9oBqyyf0b756jk1gkyGjVyrAD1cjr5snKERu189l53TxZOWL4tvGgpZ1YpMgoGam9e4651828CyNHrNkQUcTrZt6FzbSMkIzMDFqihT/i0q+I/Xy+dHbPKel182QzLVNonzSoc+fLyBELJyOJi6L2MirPkWxZr8Pr5qna8pzxZGQ1XjdPRo5YJBlZOLFIUbXlOa/zxdq8bp6qdcR/g1aNXjdP1Zbn/AQtgyIaPVmV5xBmvf3Q9e0F22dV64iXISNHXG/GRVe1lucsQ9WW5yxD1TriZaja8pxlqNZk5DJUrSNehqotz1mGbBxxg4kuERk54sZStGKqtjxnGaq2YWUZsnHE6ImjS5GNIzbtcKpJFslIp1+1h/Qdsdsn9yFlR9yXvr+yUi3P8Zoj+5WaI/aa3X2WSsOK13WJN8mX57j1D2MSdsRe14KnJOiI669htpdQMrKJGmZ7iThir3nyebEdsdcVnjyxynO8JsjzRZ6WeV3agUR0xOF180Qozwmvmy8wGem1EIQoxBGH14WVXZ4TXpeiLEdsuxHgkjSbjAyvy1ES7zXQMrX9GP+0dR8RECS0vrxG3/4Sky9BbdfH467v+93xuI5HNhTS1D+AVjddJe3U1gAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0wMy0xNVQxODo0NTo0MyswMDowMFg7oTQAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMDMtMTVUMTg6NDU6NDMrMDA6MDApZhmIAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAABJRU5ErkJggg==',
@@ -580,7 +582,16 @@ export default class Web3Service {
     const loadedAsSafeApp = await web3Modal.isSafeApp();
 
     if (web3Modal.cachedProvider || loadedAsSafeApp) {
-      await this.connect();
+      const provider = (await this.modal?.requestProvider()) as Provider;
+      const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider);
+
+      const fetchedNetwork = await ethersProvider.getNetwork();
+
+      if (SUPPORTED_NETWORKS.includes(fetchedNetwork.chainId)) {
+        chainIdToUse = fetchedNetwork.chainId;
+      }
+
+      await this.connect(chainIdToUse, provider);
     }
 
     if (window.ethereum) {
@@ -595,11 +606,9 @@ export default class Web3Service {
       window.ethereum.on('chainChanged', () => window.location.reload());
     }
 
-    const chain = await this.getNetwork();
-
     if (!this.apolloClient.getClient() || !this.uniClient.getClient()) {
-      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
-      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
+      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chainIdToUse] || MEAN_GRAPHQL_URL[10]);
+      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chainIdToUse] || UNI_GRAPHQL_URL[10]);
     }
 
     const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(

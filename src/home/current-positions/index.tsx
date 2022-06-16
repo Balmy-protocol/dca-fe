@@ -19,6 +19,7 @@ import { useAppDispatch } from 'state/hooks';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
 import { EmptyPosition } from 'mocks/currentPositions';
+import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import TerminateModal from 'common/terminate-modal';
 import MigratePositionModal from 'common/migrate-position-modal';
 import ActivePosition from './components/position';
@@ -52,6 +53,7 @@ const CurrentPositions = () => {
   const [showMigrateModal, setShowMigrateModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
+  const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
 
   for (let i = 0; i < positionsToFill; i += 1) {
     emptyPositions.push(i);
@@ -208,6 +210,7 @@ const CurrentPositions = () => {
                       onReusePosition={onShowModifyRateSettings}
                       onTerminate={onShowTerminate}
                       onMigrate={onShowMigrate}
+                      disabled={!isOnCorrectNetwork}
                     />
                   </StyledGridItem>
                 ))}
@@ -232,6 +235,7 @@ const CurrentPositions = () => {
                       onReusePosition={onShowModifyRateSettings}
                       onTerminate={onShowTerminate}
                       onMigrate={onShowMigrate}
+                      disabled={!isOnCorrectNetwork}
                     />
                   </StyledGridItem>
                 ))}

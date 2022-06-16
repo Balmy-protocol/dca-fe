@@ -36,6 +36,7 @@ import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
+import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
 
@@ -83,6 +84,7 @@ const PositionDetailFrame = () => {
   const web3Service = useWeb3Service();
   const currentNetwork = useCurrentNetwork();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
+  const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const {
     loading: isLoading,
     data,
@@ -312,6 +314,7 @@ const PositionDetailFrame = () => {
               onViewNFT={handleViewNFT}
               position={position}
               pendingTransaction={pendingTransaction}
+              disabled={!isOnCorrectNetwork}
             />
           )}
         </Grid>
@@ -323,10 +326,15 @@ const PositionDetailFrame = () => {
               swapsData={swapsData?.pair}
               onWithdraw={onWithdraw}
               onReusePosition={onShowModifyRateSettings}
+              disabled={!isOnCorrectNetwork}
             />
           )}
           {tabIndex === 1 && (
-            <PositionPermissionsContainer position={position} pendingTransaction={pendingTransaction} />
+            <PositionPermissionsContainer
+              position={position}
+              pendingTransaction={pendingTransaction}
+              disabled={!isOnCorrectNetwork}
+            />
           )}
         </Grid>
       </StyledPositionDetailsContainer>

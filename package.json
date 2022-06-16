@@ -126,6 +126,7 @@
     "crypto-browserify": "^3.12.0",
     "cryptocurrency-icons": "^0.17.2",
     "decimal.js-light": "^2.5.1",
+    "eth-provider": "^0.12.1",
     "ethereumjs-util": "^7.1.3",
     "ethers": "^5.5.1",
     "graphql": "^15.5.0",

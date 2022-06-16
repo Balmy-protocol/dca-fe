@@ -33,6 +33,7 @@ interface PositionSummaryControlsProps {
   onViewNFT: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
+  disabled: boolean;
 }
 
 const PositionSummaryControls = ({
@@ -42,6 +43,7 @@ const PositionSummaryControls = ({
   pendingTransaction,
   position,
   onViewNFT,
+  disabled,
 }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -80,6 +82,7 @@ const PositionSummaryControls = ({
             handleClose();
             onViewNFT();
           }}
+          disabled={disabled}
         >
           <FormattedMessage description="view nft" defaultMessage="View NFT" />
         </MenuItem>
@@ -88,7 +91,7 @@ const PositionSummaryControls = ({
             handleClose();
             onModifyRate();
           }}
-          disabled={isPending}
+          disabled={isPending || disabled}
         >
           <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
         </MenuItem>
@@ -97,7 +100,7 @@ const PositionSummaryControls = ({
             handleClose();
             onTransfer();
           }}
-          disabled={isPending}
+          disabled={isPending || disabled}
         >
           <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
         </MenuItem>
@@ -106,7 +109,7 @@ const PositionSummaryControls = ({
             handleClose();
             onTerminate();
           }}
-          disabled={isPending}
+          disabled={isPending || disabled}
           style={{ color: '#FF5359' }}
         >
           <FormattedMessage description="terminate position" defaultMessage="Terminate position" />

@@ -11,7 +11,8 @@ import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
 import TokenIcon from 'common/token-icon';
 import { emptyTokenWithAddress } from 'utils/currency';
-import WarningIcon from '@mui/icons-material/Warning';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,6 +38,10 @@ const StyledTokenIconContainer = styled.div`
   display: flex;
 `;
 
+const StyledWarningIcon = styled(WarningAmberIcon)`
+  margin-right: 5px;
+`;
+
 const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
@@ -59,11 +64,18 @@ function capitalizeFirstLetter(toCap: string) {
   return toCap.charAt(0).toUpperCase() + toCap.slice(1);
 }
 
+const Warning = () => (
+  <Tooltip title="You are not connected to this network" open arrow placement="bottom">
+    <StyledWarningIcon />
+  </Tooltip>
+);
+
 const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const popoverClasses = usePopoverStyles();
   const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
   const web3Service = useWeb3Service();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -92,7 +104,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
       variant="outlined"
       onClick={handleClick}
       style={{ maxWidth: '220px', textTransform: 'none' }}
-      startIcon={SUPPORTED_NETWORKS.includes(network.chainId) ? null : <WarningIcon />}
+      endIcon={isOnCorrectNetwork ? null : <Warning />}
     >
       {NETWORKS_FOR_MENU.includes(network.chainId) && (
         <StyledTokenIconContainer>
@@ -134,7 +146,13 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
       >
         <StyledMenu>
           {NETWORKS_FOR_MENU.map((chainId) => (
-            <StyledMenuItem key={chainId} color="transparent" variant="outlined" size="small" onClick={() => handleClose(chainId)}>
+            <StyledMenuItem
+              key={chainId}
+              color="transparent"
+              variant="outlined"
+              size="small"
+              onClick={() => handleClose(chainId)}
+            >
               <StyledTokenIconContainer>
                 <TokenIcon
                   size="20px"

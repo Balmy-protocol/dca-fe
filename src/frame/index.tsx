@@ -24,6 +24,8 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import Leaderboard from 'leaderboard';
 import Vector1 from 'assets/svg/vector1.svg';
 import Vector2 from 'assets/svg/vector2.svg';
+import find from 'lodash/find';
+import { NetworkStruct } from 'types';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -87,9 +89,8 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
     async function getNetwork() {
       const web3Network = await web3Service.getNetwork();
       if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
-        dispatch(setNetwork(web3Network));
-      } else {
-        dispatch(setNetwork(NETWORKS.optimism));
+        const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
+        dispatch(setNetwork(networkToSet as NetworkStruct));
       }
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispatch(startFetchingTokenLists());
