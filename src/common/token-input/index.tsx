@@ -95,7 +95,7 @@ const TokenInput = ({
   const handleHalfValue = () => {
     if (balance && token) {
       if (token.address === PROTOCOL_TOKEN_ADDRESS) {
-        const halfValue = balance.gte(parseUnits('1', token.decimals))
+        const halfValue = balance.lte(parseUnits('1', token.decimals))
           ? balance.sub(parseUnits('0.1', token.decimals))
           : balance.div(BigNumber.from(2));
         onChange(formatUnits(halfValue, token.decimals));
