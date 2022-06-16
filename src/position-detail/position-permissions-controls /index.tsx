@@ -25,6 +25,7 @@ interface PositionPermissionsControlsProps {
   onSave: () => void;
   onDiscardChanges: () => void;
   onAddAddress: () => void;
+  disabled: boolean;
 }
 
 const PositionPermissionsControls = ({
@@ -34,6 +35,7 @@ const PositionPermissionsControls = ({
   onSave,
   onDiscardChanges,
   onAddAddress,
+  disabled,
 }: PositionPermissionsControlsProps) => {
   const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
@@ -59,16 +61,22 @@ const PositionPermissionsControls = ({
     </Button>
   ) : (
     <>
-      <Button onClick={onAddAddress} variant="contained" color="secondary" size="large">
+      <Button onClick={onAddAddress} variant="contained" color="secondary" size="large" disabled={disabled}>
         <FormattedMessage description="add new address" defaultMessage="Add new address" />
       </Button>
       {!shouldDisable && (
         <PositionControlsContainer>
-          <Button onClick={onDiscardChanges} variant="outlined" color="default" size="large">
+          <Button onClick={onDiscardChanges} variant="outlined" color="default" size="large" disabled={disabled}>
             <FormattedMessage description="discard changes" defaultMessage="Discard changes" />
           </Button>
 
-          <Button onClick={onSave} disabled={shouldDisable} variant="contained" color="primary" size="large">
+          <Button
+            onClick={onSave}
+            disabled={shouldDisable || disabled}
+            variant="contained"
+            color="primary"
+            size="large"
+          >
             <FormattedMessage description="save" defaultMessage="Save" />
           </Button>
         </PositionControlsContainer>

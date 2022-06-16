@@ -149,9 +149,17 @@ interface ActivePositionProps {
   onTerminate: (position: Position) => void;
   onReusePosition: (position: Position) => void;
   onMigrate: (position: Position) => void;
+  disabled: boolean;
 }
 
-const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, onMigrate }: ActivePositionProps) => {
+const ActivePosition = ({
+  position,
+  onWithdraw,
+  onReusePosition,
+  onTerminate,
+  onMigrate,
+  disabled,
+}: ActivePositionProps) => {
   const {
     from,
     to,
@@ -360,6 +368,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
                   color="secondary"
                   onClick={() => onWithdraw(position, true)}
                   fullWidth
+                  disabled={disabled}
                 >
                   <Typography variant="body2">
                     <FormattedMessage
@@ -375,6 +384,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
                   variant="contained"
                   color="secondary"
                   onClick={() => onWithdraw(position, false)}
+                  disabled={disabled}
                   fullWidth
                 >
                   <Typography variant="body2">
@@ -394,6 +404,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
                   variant="contained"
                   color="secondary"
                   onClick={() => onReusePosition(position)}
+                  disabled={disabled}
                   fullWidth
                 >
                   <Typography variant="body2">
@@ -427,6 +438,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
                   color="migrate"
                   onClick={() => onMigrate(position)}
                   fullWidth
+                  disabled={disabled}
                 >
                   <Typography variant="body2">
                     <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
@@ -439,6 +451,7 @@ const ActivePosition = ({ position, onWithdraw, onReusePosition, onTerminate, on
                   color="error"
                   onClick={() => onTerminate(position)}
                   fullWidth
+                  disabled={disabled}
                 >
                   <Typography variant="body2">
                     <FormattedMessage description="terminate" defaultMessage="Terminate" />
