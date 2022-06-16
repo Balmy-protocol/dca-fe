@@ -167,23 +167,6 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             const deposited = currentRemainingSwaps.mul(currentRate);
 
             const originalRatePerUnitFromToTo = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
-
-            console.log('============================');
-            console.log('Fetched token from price:', fetchedTokenFromPrice.toString());
-            console.log('Fetched token from price:', fetchedTokenToPrice.toString());
-            console.log('To magnitude:', toMagnitude.toString());
-            console.log('From magnitude:', fromMagnitude.toString());
-            console.log('originalRatePerUnitFromToTo:', originalRatePerUnitFromToTo.toString());
-            console.log('fetchedTokenFromPrice.mul(toMagnitude):', fetchedTokenFromPrice.mul(fromMagnitude).toString());
-            console.log(
-              'fetchedTokenFromPrice.mul(toMagnitude).div(fromMagnitude):',
-              fetchedTokenFromPrice.mul(fromMagnitude).div(toMagnitude).toString()
-            );
-            console.log(
-              'fetchedTokenFromPrice.mul(toMagnitude).div(fromMagnitude).div(fetchedTokenToPrice):',
-              fetchedTokenFromPrice.mul(fromMagnitude).div(toMagnitude).div(fetchedTokenToPrice).toString()
-            );
-            console.log('============================');
             subPositions.push({ amountLeft: deposited, ratePerUnit: originalRatePerUnitFromToTo });
           }
 
@@ -200,23 +183,6 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
 
             const ratePerUnit = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
 
-            console.log('============================ INCREASE ===============');
-            console.log('Fetched token from price:', fetchedTokenFromPrice.toString());
-            console.log('Fetched token from price:', fetchedTokenToPrice.toString());
-            console.log('To magnitude:', toMagnitude.toString());
-            console.log('From magnitude:', fromMagnitude.toString());
-            console.log('originalRatePerUnitFromToTo:', ratePerUnit.toString());
-            console.log('fetchedTokenFromPrice.mul(toMagnitude):', fetchedTokenFromPrice.mul(fromMagnitude).toString());
-            console.log(
-              'fetchedTokenFromPrice.mul(toMagnitude).div(fromMagnitude):',
-              fetchedTokenFromPrice.mul(fromMagnitude).div(toMagnitude).toString()
-            );
-            console.log(
-              'fetchedTokenFromPrice.mul(toMagnitude).div(fromMagnitude).div(fetchedTokenToPrice):',
-              fetchedTokenFromPrice.mul(fromMagnitude).div(toMagnitude).div(fetchedTokenToPrice).toString()
-            );
-            console.log('============================');
-
             subPositions.push({ amountLeft: amountAdded, ratePerUnit });
           }
 
@@ -232,6 +198,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
                 amountWithdrawn = amountWithdrawn.sub(amountLeft);
               } else {
                 subPositions[j].amountLeft = subPositions[j].amountLeft.sub(amountWithdrawn);
+                amountWithdrawn = BigNumber.from(0);
               }
             }
           }
@@ -251,24 +218,6 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
 
             for (let j = subPositions.length - 1; j >= 0; j -= 1) {
               const { amountLeft, ratePerUnit } = subPositions[j];
-
-              console.log('------------------------');
-              console.log('calculating for subposition:', j);
-              console.log('amount left:', amountLeft.toString());
-              console.log('rate per unit:', ratePerUnit.toString());
-              console.log('current lump sum:', swappedIfLumpSum.toString());
-              console.log('currentRate:', currentRate.toString());
-              console.log('totalDeposited:', totalDeposited.toString());
-              console.log('currentRate.mul(amountLeft):', currentRate.mul(amountLeft).toString());
-              console.log(
-                'currentRate.mul(amountLeft).mul(ratePerUnit):',
-                currentRate.mul(amountLeft).mul(ratePerUnit).toString()
-              );
-              console.log(
-                'currentRate.mul(amountLeft).mul(ratePerUnit).div(totalDeposited):',
-                currentRate.mul(amountLeft).mul(ratePerUnit).div(totalDeposited).toString()
-              );
-              console.log('------------------------');
               // We do it this way, first multiply and then divide, and avoid losing precision
               const lumpSum = currentRate.mul(amountLeft).mul(ratePerUnit).div(totalDeposited).div(fromMagnitude);
 

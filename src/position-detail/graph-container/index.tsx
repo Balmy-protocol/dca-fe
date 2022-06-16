@@ -29,7 +29,7 @@ interface GraphContainerProps {
 
 const GRAPHS = [
   {
-    title: <FormattedMessage description="dcaVsLumpSumTitle" defaultMessage="DCA vs All in" />,
+    title: <FormattedMessage description="dcaVsLumpSumTitle" defaultMessage="DCA vs Lump sum" />,
     component: ({ position }: GraphContainerProps) => <ProfitLossGraph position={position} />,
   },
   {
