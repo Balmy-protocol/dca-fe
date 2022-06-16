@@ -20,11 +20,10 @@ const StyledContainer = styled(Paper)`
   flex-direction: column;
   flex-grow: 1;
   background-color: transparent;
-  margin-bottom: 30px;
 `;
 
 const StyledGraphContainer = styled.div`
-  width: 90%;
+  width: 100%;
   align-self: center;
   .recharts-surface {
     overflow: visible;
@@ -38,13 +37,6 @@ const StyledCenteredWrapper = styled.div`
   justify-content: center;
   flex-direction: column;
   gap: 16px;
-`;
-
-const StyledTitleContainer = styled.div`
-  margin-bottom: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 const StyledLegendContainer = styled.div`
@@ -71,7 +63,7 @@ const StyledLegendIndicator = styled.div<{ fill: string }>`
   background-color: ${({ fill }) => fill};
   border-radius: 99px;
 `;
-interface SwapsGraphProps {
+interface AveragePriceGraphProps {
   position: FullPosition;
 }
 
@@ -88,7 +80,7 @@ interface TokenWithBase extends Token {
 
 type GraphToken = TokenWithBase;
 
-const SwapsGraph = ({ position }: SwapsGraphProps) => {
+const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   let prices: Prices = [];
   const currentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -163,11 +155,6 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
   return (
     <StyledContainer elevation={0}>
       <StyledHeader>
-        <StyledTitleContainer>
-          <Typography variant="h6">
-            <FormattedMessage description="averagevsCurrentPrice" defaultMessage="Market price vs DCA price" />
-          </Typography>
-        </StyledTitleContainer>
         <StyledLegendContainer>
           <StyledLegend>
             <StyledLegendIndicator fill="#7C37ED" />
@@ -242,4 +229,4 @@ const SwapsGraph = ({ position }: SwapsGraphProps) => {
     </StyledContainer>
   );
 };
-export default SwapsGraph;
+export default AveragePriceGraph;

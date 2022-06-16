@@ -661,19 +661,25 @@ export default class Web3Service {
     return usdPrice || 0;
   }
 
-  async getUsdHistoricPrice(token: Token, date?: string) {
+  async getUsdHistoricPrice(tokens: Token[], date?: string) {
     const network = await this.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
+    const mappedTokens = tokens.map((token) =>
+      token.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : token
+    );
     const price = await this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
       'https://coins.llama.fi/prices',
       {
-        coins: [`${DEFILLAMA_IDS[network.chainId]}:${token.address}`],
+        coins: mappedTokens.map((token) => `${DEFILLAMA_IDS[network.chainId]}:${token.address}`),
         ...(date && { timestamp: parseInt(date, 10) }),
       }
     );
 
-    const tokenPrice = price.data.coins[`${DEFILLAMA_IDS[network.chainId]}:${token.address}`].price;
+    const tokensPrices = mappedTokens.map((token) =>
+      parseUnits(price.data.coins[`${DEFILLAMA_IDS[network.chainId]}:${token.address}`].price.toString(), 18)
+    );
 
-    return parseUnits(tokenPrice.toString(), 18);
+    return tokensPrices;
   }
 
   // ADDRESS METHODS
