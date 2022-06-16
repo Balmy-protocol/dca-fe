@@ -449,14 +449,7 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
             {!isPending && (
               <>
                 {disabled && (
-                  <StyledCardFooterButton
-                    size="large"
-                    color="primary"
-                    variant="contained"
-                    disabled
-                    fullWidth
-                    onClick={() => web3Service.connect()}
-                  >
+                  <StyledCardFooterButton size="large" color="primary" variant="contained" disabled fullWidth>
                     <Typography variant="body2">
                       <FormattedMessage
                         description="incorrect network"

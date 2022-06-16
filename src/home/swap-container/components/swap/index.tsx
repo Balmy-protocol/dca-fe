@@ -583,7 +583,13 @@ const Swap = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={() => web3Service.connect()}>
+    <StyledButton
+      size="large"
+      color="primary"
+      variant="contained"
+      fullWidth
+      onClick={() => web3Service.connect(currentNetwork.chainId)}
+    >
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
@@ -591,14 +597,7 @@ const Swap = ({
   );
 
   const IncorrectNetworkButton = (
-    <StyledButton
-      size="large"
-      color="primary"
-      variant="contained"
-      disabled
-      fullWidth
-      onClick={() => web3Service.connect()}
-    >
+    <StyledButton size="large" color="primary" variant="contained" disabled fullWidth>
       <Typography variant="body1">
         <FormattedMessage
           description="incorrect network"

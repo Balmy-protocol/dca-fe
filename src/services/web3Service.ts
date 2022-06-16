@@ -17,7 +17,6 @@ import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import keyBy from 'lodash/keyBy';
 import find from 'lodash/find';
-import ethProvider from 'eth-provider';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import {
@@ -104,6 +103,7 @@ import {
   TRANSACTION_TYPES,
   UNISWAP_ORACLE_ADDRESS,
   UNI_GRAPHQL_URL,
+  SUPPORTED_NETWORKS,
 } from 'config/constants';
 import {
   BetaMigratorContract,
@@ -323,8 +323,8 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect() {
-    const provider: Provider = (await this.modal?.requestProvider()) as Provider;
+  async connect(chainId: number, suppliedProvider?: Provider) {
+    const provider: Provider = suppliedProvider || ((await this.modal?.requestProvider()) as Provider);
 
     this.providerInfo = getProviderInfo(provider);
     // A Web3Provider wraps a standard Web3 provider, which is
@@ -336,12 +336,10 @@ export default class Web3Service {
     // For this, you need the account signer...
     const signer = ethersProvider.getSigner();
 
-    const chain = await ethersProvider.getNetwork();
-
-    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
-    const v2Client = MEAN_V2_GRAPHQL_URL[chain.chainId] && new GraphqlService(MEAN_V2_GRAPHQL_URL[chain.chainId]);
-    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
-    this.chainlinkClient = new GraphqlService(CHAINLINK_GRAPHQL_URL[chain.chainId] || CHAINLINK_GRAPHQL_URL[1]);
+    this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chainId] || MEAN_GRAPHQL_URL[10]);
+    const v2Client = MEAN_V2_GRAPHQL_URL[chainId] && new GraphqlService(MEAN_V2_GRAPHQL_URL[chainId]);
+    this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chainId] || UNI_GRAPHQL_URL[10]);
+    this.chainlinkClient = new GraphqlService(CHAINLINK_GRAPHQL_URL[chainId] || CHAINLINK_GRAPHQL_URL[1]);
     this.setClient(ethersProvider);
     this.setSigner(signer);
 
@@ -357,9 +355,8 @@ export default class Web3Service {
       }
     });
 
-    const network = await this.getNetwork();
-    const protocolToken = getProtocolToken(network.chainId);
-    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
+    const protocolToken = getProtocolToken(chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(chainId);
 
     const currentPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
       this.apolloClient.getClient(),
@@ -527,6 +524,8 @@ export default class Web3Service {
   }
 
   async disconnect() {
+    this.modal?.clearCachedProvider();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     if (this.client && (this.client as any).disconnect) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -539,14 +538,13 @@ export default class Web3Service {
       await (this.client as any).close();
     }
 
-    this.modal?.clearCachedProvider();
-
     this.setAccount('');
 
     this.setClient(new ethers.providers.Web3Provider({}));
   }
 
-  async setUpModal() {
+  async setUpModal(chainId = NETWORKS.optimism.chainId) {
+    let chainIdToUse = chainId;
     const providerOptions = {
       walletconnect: {
         package: WalletConnectProvider, // required
@@ -584,7 +582,16 @@ export default class Web3Service {
     const loadedAsSafeApp = await web3Modal.isSafeApp();
 
     if (web3Modal.cachedProvider || loadedAsSafeApp) {
-      await this.connect();
+      const provider = (await this.modal?.requestProvider()) as Provider;
+      const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider);
+
+      const fetchedNetwork = await ethersProvider.getNetwork();
+
+      if (SUPPORTED_NETWORKS.includes(fetchedNetwork.chainId)) {
+        chainIdToUse = fetchedNetwork.chainId;
+      }
+
+      await this.connect(chainIdToUse, provider);
     }
 
     if (window.ethereum) {
@@ -599,11 +606,9 @@ export default class Web3Service {
       window.ethereum.on('chainChanged', () => window.location.reload());
     }
 
-    const chain = await this.getNetwork();
-
     if (!this.apolloClient.getClient() || !this.uniClient.getClient()) {
-      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chain.chainId] || MEAN_GRAPHQL_URL[10]);
-      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chain.chainId] || UNI_GRAPHQL_URL[10]);
+      this.apolloClient = new GraphqlService(MEAN_GRAPHQL_URL[chainIdToUse] || MEAN_GRAPHQL_URL[10]);
+      this.uniClient = new GraphqlService(UNI_GRAPHQL_URL[chainIdToUse] || UNI_GRAPHQL_URL[10]);
     }
 
     const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(
