@@ -30,7 +30,7 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
   const actionMessages = React.useMemo(
     () => ({
       [POSSIBLE_ACTIONS.createPosition]: (
-        <FormattedMessage description="lowLiqCreatePosition" defaultMessage="Create position" />
+        <FormattedMessage description="lowLiqCreatePosition" defaultMessage="Create position anyway" />
       ),
       [POSSIBLE_ACTIONS.approveToken]: (
         <FormattedMessage description="lowLiqApproveToken" defaultMessage="Approve token" />
@@ -49,7 +49,7 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
       title={<FormattedMessage description="low liquidity title" defaultMessage="Low liquidity on pair" />}
       actions={[
         {
-          color: 'secondary',
+          color: 'error',
           variant: 'contained',
           onClick: onConfirm,
           label: actionMessages[actionToTake],
@@ -60,7 +60,7 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
         <Typography variant="body1" component="p">
           <FormattedMessage
             description="low liquidity message"
-            defaultMessage="Due to low volume, the price oracle for this pair of tokens might not be reliable right now. Proceed with caution or try another pair"
+            defaultMessage="Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair."
           />
         </Typography>
         <Typography variant="body1" component="p">
