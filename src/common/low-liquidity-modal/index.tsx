@@ -60,7 +60,7 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
         <Typography variant="body1" component="p">
           <FormattedMessage
             description="low liquidity message"
-            defaultMessage="Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair"
+            defaultMessage="Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair."
           />
         </Typography>
         <Typography variant="body1" component="p">
