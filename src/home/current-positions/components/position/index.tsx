@@ -23,8 +23,9 @@ import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useUsdPrice from 'hooks/useUsdPrice';
+import CurrentPositionControls from '../position-control';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
@@ -94,9 +95,7 @@ const StyledProgressWrapper = styled.div`
   margin: 12px 0px;
 `;
 
-const StyledCardFooterButton = styled(Button)`
-  margin-top: 8px;
-`;
+const StyledCardFooterButton = styled(Button)``;
 
 const StyledFreqLeft = styled.div`
   display: flex;
@@ -136,12 +135,19 @@ const StyledCallToActionContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  margin-top: 8px;
 `;
 
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
 }
+
+const POSITION_STATUSES = {
+  FINISHED: 'FINISHED',
+  ONGOING: 'ONGOING',
+  TOWITHDRAW: 'TOWITHDRAW',
+};
 
 interface ActivePositionProps {
   position: PositionProp;
@@ -173,7 +179,6 @@ const ActivePosition = ({
   } = position;
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
-  const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw);
   const history = useHistory();
 
@@ -199,6 +204,16 @@ const ActivePosition = ({
   };
 
   const isOldVersion = position.version !== POSITION_VERSION_3;
+
+  let positionStatus;
+
+  if (remainingSwaps.gt(BigNumber.from(0))) {
+    positionStatus = POSITION_STATUSES.ONGOING;
+  } else if (toWithdraw.gt(BigNumber.from(0))) {
+    positionStatus = POSITION_STATUSES.TOWITHDRAW;
+  } else {
+    positionStatus = POSITION_STATUSES.FINISHED;
+  }
 
   return (
     <StyledCard variant="outlined">
@@ -337,13 +352,8 @@ const ActivePosition = ({
         <StyledCallToActionContainer>
           {position.version === POSITION_VERSION_3 && (
             <>
-              <StyledCardFooterButton
-                variant={isPending ? 'contained' : 'outlined'}
-                color={isPending ? 'pending' : 'default'}
-                onClick={() => !isPending && onViewDetails()}
-                fullWidth
-              >
-                {isPending ? (
+              {isPending && (
+                <StyledCardFooterButton variant="contained" color="pending" fullWidth>
                   <Link
                     href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
                     target="_blank"
@@ -356,61 +366,63 @@ const ActivePosition = ({
                     </Typography>
                     <OpenInNewIcon style={{ fontSize: '1rem' }} />
                   </Link>
-                ) : (
-                  <Typography variant="body2">
-                    <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
-                  </Typography>
-                )}
-              </StyledCardFooterButton>
-              {!isPending && toWithdraw.gt(BigNumber.from(0)) && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onWithdraw(position, true)}
-                  fullWidth
-                  disabled={disabled}
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage
-                      description="withdraw"
-                      defaultMessage="Withdraw {protocolToken}"
-                      values={{ protocolToken: protocolToken.symbol }}
-                    />
-                  </Typography>
                 </StyledCardFooterButton>
               )}
-              {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onWithdraw(position, false)}
-                  disabled={disabled}
-                  fullWidth
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage
-                      description="withdraw"
-                      defaultMessage="Withdraw {wrappedProtocolToken}"
-                      values={{
-                        wrappedProtocolToken:
-                          position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
-                      }}
-                    />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-              {!isPending && remainingSwaps.lte(BigNumber.from(0)) && toWithdraw.lte(BigNumber.from(0)) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onReusePosition(position)}
-                  disabled={disabled}
-                  fullWidth
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
-                  </Typography>
-                </StyledCardFooterButton>
+              {!isPending && (
+                <>
+                  {/* { (positionStatus === POSITION_STATUSES.ONGOING || positionStatus === POSITION_STATUSES.FINISHED) && ( */}
+                  <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
+                    <Typography variant="body2">
+                      <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+                    </Typography>
+                  </StyledCardFooterButton>
+                  {/* )} */}
+                  {positionStatus === POSITION_STATUSES.ONGOING && (
+                    <>
+                      <StyledCardFooterButton
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => onReusePosition(position)}
+                        disabled={disabled}
+                        fullWidth
+                      >
+                        <Typography variant="body2">
+                          <FormattedMessage description="addFundsPosition" defaultMessage="Add funds" />
+                        </Typography>
+                      </StyledCardFooterButton>
+                      <CurrentPositionControls position={position} disabled={disabled} onWithdraw={onWithdraw} />
+                    </>
+                  )}
+                  {positionStatus === POSITION_STATUSES.TOWITHDRAW && (
+                    <>
+                      <StyledCardFooterButton
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => onReusePosition(position)}
+                        disabled={disabled}
+                        fullWidth
+                      >
+                        <Typography variant="body2">
+                          <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
+                        </Typography>
+                      </StyledCardFooterButton>
+                      <CurrentPositionControls position={position} disabled={disabled} onWithdraw={onWithdraw} />
+                    </>
+                  )}
+                  {positionStatus === POSITION_STATUSES.FINISHED && (
+                    <StyledCardFooterButton
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => onReusePosition(position)}
+                      disabled={disabled}
+                      fullWidth
+                    >
+                      <Typography variant="body2">
+                        <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
+                      </Typography>
+                    </StyledCardFooterButton>
+                  )}
+                </>
               )}
             </>
           )}

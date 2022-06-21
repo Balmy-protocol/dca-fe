@@ -133,12 +133,28 @@ const CurrentPositions = () => {
     }
   };
 
-  const positionsInProgress = currentPositions.filter(
-    ({ toWithdraw, remainingSwaps }) => toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))
-  );
-  const positionsFinished = currentPositions.filter(
-    ({ toWithdraw, remainingSwaps }) => toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0))
-  );
+  const positionsInProgress = currentPositions
+    .filter(({ remainingSwaps }) => remainingSwaps.gt(BigNumber.from(0)))
+    .sort(({ toWithdraw: toWithdrawPosition1 }, { toWithdraw: toWithdrawPosition2 }) => {
+      if (toWithdrawPosition1.lt(toWithdrawPosition2)) {
+        return 1;
+      }
+      if (toWithdrawPosition1.gt(toWithdrawPosition2)) {
+        return -1;
+      }
+      return 0;
+    });
+  const positionsFinished = currentPositions
+    .filter(({ remainingSwaps }) => remainingSwaps.lte(BigNumber.from(0)))
+    .sort(({ toWithdraw: toWithdrawPosition1 }, { toWithdraw: toWithdrawPosition2 }) => {
+      if (toWithdrawPosition1.lt(toWithdrawPosition2)) {
+        return 1;
+      }
+      if (toWithdrawPosition1.gt(toWithdrawPosition2)) {
+        return -1;
+      }
+      return 0;
+    });
 
   const onShowModifyRateSettings = (position: Position) => {
     if (!position) {
