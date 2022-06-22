@@ -20,7 +20,7 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-      process: 'process/browser',
+      process: 'process/browser.js',
     }),
     new webpack.DefinePlugin({
       'process.env.ETHPLORER_KEY': JSON.stringify('EK-7xNxe-HDazjQ3-smGdU'),

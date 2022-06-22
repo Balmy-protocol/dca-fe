@@ -47,7 +47,7 @@ const PositionPermissionsControls = ({
   return isPending ? (
     <Button variant="contained" color="pending" size="large">
       <Link
-        href={buildEtherscanTransaction(pendingTransaction as string, currentNetwork.chainId)}
+        href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
         target="_blank"
         rel="noreferrer"
         underline="none"
