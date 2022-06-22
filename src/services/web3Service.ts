@@ -12,7 +12,6 @@ import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import { getProviderInfo } from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import detectEthereumProvider from '@metamask/detect-provider';
-import Authereum from 'authereum';
 import Torus from '@toruslabs/torus-embed';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
@@ -577,9 +576,6 @@ export default class Web3Service {
         },
         package: injectedConnector,
         connector: injectedConnector,
-      },
-      authereum: {
-        package: Authereum as WalletConnectProvider, // required
       },
       torus: {
         package: Torus, // required
