@@ -16,7 +16,7 @@ function useIsOnCorrectNetwork() {
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const promiseResult = await web3Service.getNetwork();
+        const promiseResult = await web3Service.getNetwork(true);
         const isSameNetwork = currentNetwork.chainId === promiseResult.chainId;
         setResult(isSameNetwork);
         setError(undefined);
