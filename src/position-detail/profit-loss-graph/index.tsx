@@ -136,6 +136,7 @@ const isReduce = (positionAction: ActionState) => {
 const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   const [prices, setPrices] = React.useState<Prices>([]);
   const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
+  const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
   const web3Service = useWeb3Service();
 
   React.useEffect(() => {
@@ -249,10 +250,11 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         setPrices(newPrices);
       } finally {
         setIsLoadingPrices(false);
+        setHasLoadedPrices(true);
       }
     };
 
-    if (prices.length === 0 && !isLoadingPrices) {
+    if (prices.length === 0 && !isLoadingPrices && !hasLoadedPrices) {
       setIsLoadingPrices(true);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
       fetchTokenRate();

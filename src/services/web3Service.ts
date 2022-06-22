@@ -6,6 +6,7 @@ import {
   Provider,
   TransactionResponse,
   getNetwork as getStringNetwork,
+  Network,
 } from '@ethersproject/providers';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import { getProviderInfo } from 'web3modal';
@@ -135,6 +136,8 @@ export default class Web3Service {
 
   chainlinkClient: GraphqlService;
 
+  network: Network;
+
   account: string;
 
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
@@ -213,7 +216,18 @@ export default class Web3Service {
     this.setAccountCallback(account);
   }
 
-  async getNetwork() {
+  setNetwork(chainId: number) {
+    const foundNetwork = find(NETWORKS, { chainId });
+    if (foundNetwork) {
+      this.network = foundNetwork;
+    }
+  }
+
+  async getNetwork(skipDefaultNetwork = false) {
+    if (!skipDefaultNetwork && this.network) {
+      return this.network;
+    }
+
     if (this.client) {
       return this.client.getNetwork();
     }
@@ -593,6 +607,8 @@ export default class Web3Service {
 
       await this.connect(chainIdToUse, provider);
     }
+
+    this.setNetwork(chainIdToUse);
 
     if (window.ethereum) {
       // handle metamask account change
