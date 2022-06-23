@@ -14,6 +14,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
 import FilledInput from '@mui/material/FilledInput';
+import TextField from '@mui/material/TextField';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -50,7 +51,7 @@ const StyledFilledInput = withStyles(() =>
       paddingTop: '8px',
     },
   })
-)(FilledInput);
+)(TextField);
 
 const StyledInputContainer = styled.div`
   display: flex;
@@ -66,7 +67,8 @@ interface AddAddressPermissionModalProps {
   onCancel: () => void;
 }
 
-const inputRegex = RegExp(/^0x[A-Za-z0-9]*$/);
+const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
+const validRegex = RegExp(/^0x[A-Fa-f0-9]*$/);
 
 const hasPermission = (permissions: Permission[], permission: Permission) => permissions.indexOf(permission) !== -1;
 
@@ -155,8 +157,14 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
                 fullWidth
                 type="text"
                 spellCheck="false"
+                error={address !== '' && !validRegex.test(address)}
+                helperText={address !== '' && !validRegex.test(address) ? 'This is not a valid address' : ''}
                 onChange={(evt) => validator(evt.target.value, index)}
-                disableUnderline
+                InputProps={{
+                  disableUnderline: true,
+                }}
+                hiddenLabel
+                variant="filled"
                 margin="none"
                 key={index}
               />
