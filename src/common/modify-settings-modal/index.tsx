@@ -97,6 +97,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const hasPendingApproval = useHasPendingApproval(fromToUse, web3Service.getAccount());
   const realBalance = balance && balance.add(position.remainingLiquidity);
 
+  console.log(realBalance, balance);
   const cantFund =
     fromValue &&
     realBalance &&
@@ -412,7 +413,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               error={cantFund ? 'Amount cannot exceed balance' : ''}
               value={fromValue}
               onChange={handleFromValueChange}
-              withBalance={!isLoadingBalance}
+              withBalance={!!balance}
               balance={balance}
               token={fromToUse}
               withMax
