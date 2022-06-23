@@ -13,7 +13,6 @@ import { STRING_PERMISSIONS } from 'config/constants';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
-import FilledInput from '@mui/material/FilledInput';
 import TextField from '@mui/material/TextField';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';

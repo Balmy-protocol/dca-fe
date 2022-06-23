@@ -695,6 +695,11 @@ export default class Web3Service {
   }
 
   // ADDRESS METHODS
+  async getSignSupport() {
+    const isSafeApp = await this.modal.isSafeApp();
+    return !isSafeApp;
+  }
+
   async getEns(address: string) {
     let ens = null;
     try {

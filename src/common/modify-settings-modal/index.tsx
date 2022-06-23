@@ -45,6 +45,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import { ButtonTypes } from 'common/button';
+import useSupportsSigning from 'hooks/useSupportsSigning';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -78,7 +79,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { from, to, swapInterval, remainingLiquidity } = position;
+  const { to, swapInterval, remainingLiquidity } = position;
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -89,22 +90,33 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const addTransaction = useTransactionAdder();
   const currentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
-  const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS;
+  const [hasSignSupport] = useSupportsSigning();
+  let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
+
+  let fromToUse = position.from;
+  if (fromToUse.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (hasSignSupport) {
+      if (useWrappedProtocolToken) {
+        fromToUse = wrappedProtocolToken;
+      }
+    } else {
+      fromToUse = wrappedProtocolToken;
+      useWrappedProtocolToken = true;
+    }
+  }
+  const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport;
   const [allowance] = useAllowance(useWrappedProtocolToken ? wrappedProtocolToken : position.from);
-  const fromToUse = shouldShowWrappedProtocolSwitch && useWrappedProtocolToken ? wrappedProtocolToken : position.from;
-  const [balance, isLoadingBalance] = useBalance(fromToUse);
+  const [balance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, web3Service.getAccount());
   const realBalance = balance && balance.add(position.remainingLiquidity);
 
-  console.log(realBalance, balance);
   const cantFund =
     fromValue &&
     realBalance &&
-    parseUnits(fromValue, position.from.decimals).gt(BigNumber.from(0)) &&
+    parseUnits(fromValue, fromToUse.decimals).gt(BigNumber.from(0)) &&
     frequencyValue &&
     BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-    parseUnits(fromValue, position.from.decimals).gt(realBalance);
+    parseUnits(fromValue, fromToUse.decimals).gt(realBalance);
 
   const isIncreasingPosition = position.remainingLiquidity
     .sub(parseUnits(fromValue || '0', fromToUse.decimals))
@@ -125,51 +137,60 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   };
 
   const handleFromValueChange = (newFromValue: string) => {
-    if (!from) return;
+    if (!fromToUse) return;
     dispatch(setModeType(FULL_DEPOSIT_TYPE));
     dispatch(setFromValue(newFromValue));
     dispatch(
       setRate(
         (newFromValue &&
-          parseUnits(newFromValue, from.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(newFromValue, fromToUse.decimals).gt(BigNumber.from(0)) &&
           frequencyValue &&
           BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-          from &&
-          formatUnits(parseUnits(newFromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
+          fromToUse &&
+          formatUnits(
+            parseUnits(newFromValue, fromToUse.decimals).div(BigNumber.from(frequencyValue)),
+            fromToUse.decimals
+          )) ||
           '0'
       )
     );
   };
 
   const handleRateValueChange = (newRate: string) => {
-    if (!from) return;
+    if (!fromToUse) return;
     dispatch(setModeType(RATE_TYPE));
     dispatch(setRate(newRate));
     dispatch(
       setFromValue(
         (newRate &&
-          parseUnits(newRate, from.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(newRate, fromToUse.decimals).gt(BigNumber.from(0)) &&
           frequencyValue &&
           BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-          from &&
-          formatUnits(parseUnits(newRate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
+          fromToUse &&
+          formatUnits(
+            parseUnits(newRate, fromToUse.decimals).mul(BigNumber.from(frequencyValue)),
+            fromToUse.decimals
+          )) ||
           ''
       )
     );
   };
 
   const handleFrequencyChange = (newFrequencyValue: string) => {
-    if (!from) return;
+    if (!fromToUse) return;
     dispatch(setFrequencyValue(newFrequencyValue));
     if (modeType === RATE_TYPE) {
       dispatch(
         setFromValue(
           (rate &&
-            parseUnits(rate, from.decimals).gt(BigNumber.from(0)) &&
+            parseUnits(rate, fromToUse.decimals).gt(BigNumber.from(0)) &&
             newFrequencyValue &&
             BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
-            from &&
-            formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(newFrequencyValue)), from.decimals)) ||
+            fromToUse &&
+            formatUnits(
+              parseUnits(rate, fromToUse.decimals).mul(BigNumber.from(newFrequencyValue)),
+              fromToUse.decimals
+            )) ||
             ''
         )
       );
@@ -177,11 +198,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       dispatch(
         setRate(
           (fromValue &&
-            parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
+            parseUnits(fromValue, fromToUse.decimals).gt(BigNumber.from(0)) &&
             newFrequencyValue &&
             BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
-            from &&
-            formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(newFrequencyValue)), from.decimals)) ||
+            fromToUse &&
+            formatUnits(
+              parseUnits(fromValue, fromToUse.decimals).div(BigNumber.from(newFrequencyValue)),
+              fromToUse.decimals
+            )) ||
             '0'
         )
       );
@@ -270,7 +294,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   };
 
   const handleApproveToken = async () => {
-    if (!from) return;
+    if (!fromToUse) return;
     const fromSymbol = fromToUse.symbol;
 
     try {
@@ -389,7 +413,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               <FormattedMessage
                 description="howMuchToSell"
                 defaultMessage="How much {from} do you want to invest?"
-                values={{ from: from?.symbol || '' }}
+                values={{ from: fromToUse.symbol || '' }}
               />
             </Typography>
             {shouldShowWrappedProtocolSwitch && (
