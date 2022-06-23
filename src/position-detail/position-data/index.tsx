@@ -23,6 +23,7 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useWeb3Service from 'hooks/useWeb3Service';
 import Link from '@mui/material/Link';
 import { buildEtherscanTransaction } from 'utils/etherscan';
+import useSupportsSigning from 'hooks/useSupportsSigning';
 
 interface DetailsProps {
   position: FullPosition;
@@ -181,6 +182,7 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
   const showToFullPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToFullPrice && !!toFullPrice;
   const showToPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToPrice && !!toPrice;
   const showFromPrice = !STABLE_COINS.includes(position.from.symbol) && !isLoadingFromPrice && !!fromPrice;
+  const [hasSignSupport] = useSupportsSigning();
 
   const hasNoFunds = BigNumber.from(current.remainingLiquidity).lte(BigNumber.from(0));
 
@@ -462,7 +464,8 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
                 {!disabled &&
                   (toWithdraw.gt(BigNumber.from(0)) ||
                     (toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.gt(BigNumber.from(0)))) &&
-                  position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+                  position.to.address === PROTOCOL_TOKEN_ADDRESS &&
+                  hasSignSupport && (
                     <StyledCardFooterButton
                       disabled={shouldDisableWithdraw || disabled}
                       variant="contained"
@@ -495,7 +498,9 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
                           defaultMessage="Withdraw {wrappedProtocolToken}"
                           values={{
                             wrappedProtocolToken:
-                              position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
+                              position.to.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport
+                                ? wrappedProtocolToken.symbol
+                                : '',
                           }}
                         />
                       </Typography>

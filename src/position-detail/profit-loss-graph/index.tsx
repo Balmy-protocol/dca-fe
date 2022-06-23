@@ -261,17 +261,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
     }
   }, [position, isLoadingPrices]);
 
-  // prices = React.useMemo(() => {
-  //   return [];
-  // }, [position]);
-
   const noData = prices.length === 0;
-
-  // const totalSwapped = BigNumber.from(position.totalSwapped);
-  // const profitPercentage =
-  //   (initiallySwapped && (totalSwapped.mul(10000).div(initiallySwapped).sub(10000).toNumber() / 100).toFixed(2)) || 0;
-
-  // console.log(profitPercentage);
 
   const mappedPrices = prices.map((price) => {
     const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);

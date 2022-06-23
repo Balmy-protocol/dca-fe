@@ -20,6 +20,7 @@ import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions
 import { formatUnits } from '@ethersproject/units';
 import { EmptyPosition } from 'mocks/currentPositions';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
+import useSupportsSigning from 'hooks/useSupportsSigning';
 import TerminateModal from 'common/terminate-modal';
 import MigratePositionModal from 'common/migrate-position-modal';
 import ActivePosition from './components/position';
@@ -36,6 +37,7 @@ const POSITIONS_PER_ROW = {
   xl: 4,
 };
 const CurrentPositions = () => {
+  const [hasSignSupport] = useSupportsSigning();
   const currentPositions = useCurrentPositions();
   const currentBreakPoint = useCurrentBreakpoint();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -211,6 +213,7 @@ const CurrentPositions = () => {
                       onTerminate={onShowTerminate}
                       onMigrate={onShowMigrate}
                       disabled={!isOnCorrectNetwork}
+                      hasSignSupport={!!hasSignSupport}
                     />
                   </StyledGridItem>
                 ))}
@@ -236,6 +239,7 @@ const CurrentPositions = () => {
                       onTerminate={onShowTerminate}
                       onMigrate={onShowMigrate}
                       disabled={!isOnCorrectNetwork}
+                      hasSignSupport={!!hasSignSupport}
                     />
                   </StyledGridItem>
                 ))}

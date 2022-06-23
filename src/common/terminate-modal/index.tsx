@@ -15,6 +15,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { BigNumber } from 'ethers';
+import useSupportsSigning from 'hooks/useSupportsSigning';
 
 interface TerminateModalProps {
   position: Position;
@@ -47,9 +48,21 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
     position.to.address === wrappedProtocolToken.address;
   const protocolIsFrom =
     position.from.address === protocolToken.address || position.from.address === wrappedProtocolToken.address;
+  const protocolIsTo =
+    position.to.address === protocolToken.address || position.to.address === wrappedProtocolToken.address;
   const swappedOrLiquidity = protocolIsFrom ? position.remainingLiquidity : position.toWithdraw;
+  const [hasSignSupport] = useSupportsSigning();
 
   const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : BigNumber.from(0);
+  let fromSymbol = position.from.symbol;
+  let toSymbol = position.to.symbol;
+
+  if (protocolIsFrom && !hasSignSupport) {
+    fromSymbol = wrappedProtocolToken.symbol;
+  }
+  if (protocolIsTo && !hasSignSupport) {
+    toSymbol = wrappedProtocolToken.symbol;
+  }
 
   const handleCancel = () => {
     onCancel();
@@ -76,6 +89,8 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       } else {
         terminateWithUnwrap = false;
       }
+
+      terminateWithUnwrap = terminateWithUnwrap && !!hasSignSupport;
 
       setModalLoading({
         content: (
@@ -110,8 +125,8 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
             description="position termination success"
             defaultMessage="Your {from}/{to} position termination has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
-              from: position.from.symbol,
-              to: position.to.symbol,
+              from: fromSymbol,
+              to: toSymbol,
             }}
           />
         ),
@@ -137,7 +152,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         <FormattedMessage
           description="terminate title"
           defaultMessage="Terminate {from}/{to} position"
-          values={{ from: position.from.symbol, to: position.to.symbol }}
+          values={{ from: fromSymbol, to: toSymbol }}
         />
       }
       actions={[
@@ -162,16 +177,16 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
             defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
             values={{
               from: formatUnits(position.remainingLiquidity, position.from.decimals),
-              fromSymbol: position.from.symbol,
+              fromSymbol,
               to: formatUnits(position.toWithdraw, position.to.decimals),
-              toSymbol: position.to.symbol,
+              toSymbol,
             }}
           />
         </Typography>
         <Typography variant="body1">
           <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
         </Typography>
-        {hasWrappedOrProtocol && protocolBalance.gt(BigNumber.from(0)) && (
+        {hasWrappedOrProtocol && hasSignSupport && protocolBalance.gt(BigNumber.from(0)) && (
           <FormGroup row>
             <FormControlLabel
               control={

@@ -150,6 +150,7 @@ interface ActivePositionProps {
   onReusePosition: (position: Position) => void;
   onMigrate: (position: Position) => void;
   disabled: boolean;
+  hasSignSupport: boolean;
 }
 
 const ActivePosition = ({
@@ -159,6 +160,7 @@ const ActivePosition = ({
   onTerminate,
   onMigrate,
   disabled,
+  hasSignSupport,
 }: ActivePositionProps) => {
   const {
     from,
@@ -362,23 +364,26 @@ const ActivePosition = ({
                   </Typography>
                 )}
               </StyledCardFooterButton>
-              {!isPending && toWithdraw.gt(BigNumber.from(0)) && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onWithdraw(position, true)}
-                  fullWidth
-                  disabled={disabled}
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage
-                      description="withdraw"
-                      defaultMessage="Withdraw {protocolToken}"
-                      values={{ protocolToken: protocolToken.symbol }}
-                    />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
+              {!isPending &&
+                toWithdraw.gt(BigNumber.from(0)) &&
+                hasSignSupport &&
+                position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+                  <StyledCardFooterButton
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => onWithdraw(position, true)}
+                    fullWidth
+                    disabled={disabled}
+                  >
+                    <Typography variant="body2">
+                      <FormattedMessage
+                        description="withdraw"
+                        defaultMessage="Withdraw {protocolToken}"
+                        values={{ protocolToken: protocolToken.symbol }}
+                      />
+                    </Typography>
+                  </StyledCardFooterButton>
+                )}
               {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
                 <StyledCardFooterButton
                   variant="contained"
@@ -393,7 +398,9 @@ const ActivePosition = ({
                       defaultMessage="Withdraw {wrappedProtocolToken}"
                       values={{
                         wrappedProtocolToken:
-                          position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.symbol : '',
+                          position.to.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport
+                            ? wrappedProtocolToken.symbol
+                            : '',
                       }}
                     />
                   </Typography>
@@ -432,7 +439,7 @@ const ActivePosition = ({
                   </Link>
                 </StyledCardFooterButton>
               )}
-              {!isPending && remainingSwaps.gt(BigNumber.from(0)) && (
+              {!isPending && hasSignSupport && remainingSwaps.gt(BigNumber.from(0)) && (
                 <StyledCardFooterButton
                   variant="contained"
                   color="migrate"
