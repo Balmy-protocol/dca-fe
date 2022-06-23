@@ -25,7 +25,7 @@ interface TransferPositionModalProps {
   onCancel: () => void;
 }
 
-const inputRegex = RegExp(/^[A-Fa-f0-9]*$/);
+const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 const validRegex = RegExp(/^0x[A-Fa-f0-9]*$/);
 
 const TransferPositionModal = ({ position, open, onCancel }: TransferPositionModalProps) => {
