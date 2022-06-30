@@ -6,7 +6,11 @@ import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { useTokensLists } from 'state/token-lists/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 
-const BLACKLIST = ['0x5fe2b58c013d7601147dcdd68c143a77499f5531', '0x50b728d8d964fd00c2d0aad81718b71311fef68a'];
+const BLACKLIST = [
+  '0x5fe2b58c013d7601147dcdd68c143a77499f5531',
+  '0x50b728d8d964fd00c2d0aad81718b71311fef68a',
+  '0x7fb688ccf682d58f86d7e38e03f9d22e7705448b',
+];
 
 function useTokenList(filter = true) {
   const currentNetwork = useCurrentNetwork();
