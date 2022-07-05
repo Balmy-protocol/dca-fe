@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch } from 'state/hooks';
 import useDebounce from 'hooks/useDebounce';
-import useWeb3Service from 'hooks/useWeb3Service';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useTransactionService from 'hooks/useTransactionService';
+import useWalletService from 'hooks/useWalletService';
 import { updateBlockNumber } from './actions';
 
 export default function Updater(): null {
-  const web3Service = useWeb3Service();
+  const walletService = useWalletService();
+  const transactionService = useTransactionService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
 
@@ -26,20 +28,20 @@ export default function Updater(): null {
 
   // attach/detach listeners
   useEffect(() => {
-    if (!web3Service.getAccount()) return undefined;
+    if (!walletService.getAccount()) return undefined;
 
     setState({ blockNumber: null });
 
-    web3Service
+    transactionService
       .getBlockNumber()
       .then(blockNumberCallback)
       .catch((error) => console.error('Failed to get block number for chainId', error));
 
-    web3Service.onBlock(blockNumberCallback);
+    transactionService.onBlock(blockNumberCallback);
     return () => {
-      web3Service.removeOnBlock();
+      transactionService.removeOnBlock();
     };
-  }, [dispatch, web3Service.getAccount(), blockNumberCallback]);
+  }, [dispatch, walletService.getAccount(), blockNumberCallback]);
 
   const debouncedState = useDebounce(state, 100);
 

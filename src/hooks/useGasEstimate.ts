@@ -10,6 +10,7 @@ import axios from 'axios';
 import { NETWORKS, SUPPORTED_GAS_CALCULATOR_NETWORKS } from 'config/constants';
 import { PROTOCOL_TOKEN_ADDRESS, WRAPPED_PROTOCOL_TOKEN } from 'mocks/tokens';
 import useCurrentNetwork from './useCurrentNetwork';
+import usePriceService from './usePriceService';
 
 const ZEROX_API_URLS = {
   [NETWORKS.optimism.chainId]: 'https://optimism.api.0x.org/swap/v1/quote',
@@ -57,10 +58,10 @@ function useGasEstimate(
 ): [number | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const { web3Service } = React.useContext(WalletContext);
-  const [result, setResult] =
-    React.useState<{ gas: BigNumber; gasPrice: BigNumber; ethPrice: number; zeroL1Gas: BigNumber } | undefined>(
-      undefined
-    );
+  const priceService = usePriceService();
+  const [result, setResult] = React.useState<
+    { gas: BigNumber; gasPrice: BigNumber; ethPrice: number; zeroL1Gas: BigNumber } | undefined
+  >(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
@@ -74,12 +75,12 @@ function useGasEstimate(
     async function callPromise() {
       if (from && to && rate && SUPPORTED_GAS_CALCULATOR_NETWORKS.includes(currentNetwork.chainId)) {
         try {
-          const gasPrice = await web3Service.getGasPrice();
-          const ethPrice = await web3Service.getUsdPrice(
+          const gasPrice = await priceService.getGasPrice();
+          const ethPrice = await priceService.getUsdPrice(
             WRAPPED_PROTOCOL_TOKEN[currentNetwork.chainId](currentNetwork.chainId)
           );
           const promiseResult = await getZeroQuote(from, to, parseUnits(rate, from.decimals), currentNetwork.chainId);
-          const l1GasPrice = await web3Service.getL1GasPrice(promiseResult.data);
+          const l1GasPrice = await priceService.getL1GasPrice(promiseResult.data);
 
           setResult({
             gas: BigNumber.from(promiseResult.estimatedGas),

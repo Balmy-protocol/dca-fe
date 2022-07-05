@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import { FullPosition } from 'types';
-import useWeb3Service from 'hooks/useWeb3Service';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import PositionPermissionsControls from 'position-detail/position-permissions-controls ';
@@ -19,6 +18,8 @@ import { discardChanges, submitPermissionChanges } from 'state/position-permissi
 import { useAppDispatch } from 'state/hooks';
 import AddAddressPermissionModal from 'common/add-address-permission-modal';
 import Paper from '@mui/material/Paper';
+import usePositionService from 'hooks/usePositionService';
+import useWalletService from 'hooks/useWalletService';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;
@@ -53,8 +54,9 @@ const PositionPermissionsContainer = ({
   const permissions = usePositionPermissions(position.id);
   const hasModifiedPermissions = useHasModifiedPermissions();
   const modifiedPermissions = useModifiedPermissions();
-  const web3Service = useWeb3Service();
-  const account = web3Service.getAccount();
+  const positionService = usePositionService();
+  const walletService = useWalletService();
+  const account = walletService.getAccount();
   const [shouldShowAddAddressModal, setShouldShowAddAddressModal] = React.useState(false);
   const dispatch = useAppDispatch();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -80,7 +82,7 @@ const PositionPermissionsContainer = ({
           </Typography>
         ),
       });
-      const result = await web3Service.modifyPermissions(position, modifiedPermissions);
+      const result = await positionService.modifyPermissions(position, modifiedPermissions);
       addTransaction(result, {
         type: TRANSACTION_TYPES.MODIFY_PERMISSIONS,
         typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol },

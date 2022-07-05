@@ -15,7 +15,7 @@ import { buildEtherscanAddress } from 'utils/etherscan';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'hooks/state';
 import { addPermission, removePermission } from 'state/position-permissions/actions';
-import { COMPANION_ADDRESS, STRING_PERMISSIONS } from 'config/constants';
+import { COMPANION_ADDRESS, POSITION_VERSION_3, STRING_PERMISSIONS } from 'config/constants';
 import { FormattedMessage } from 'react-intl';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -108,7 +108,7 @@ const HelpTexts = {
 const PositionPermissionItem = ({ positionPermission, shouldDisable }: PositionPermissionProps) => {
   const currentNetwork = useCurrentNetwork();
   const dispatch = useAppDispatch();
-  const companionAddress = COMPANION_ADDRESS[currentNetwork.chainId];
+  const companionAddress = COMPANION_ADDRESS[POSITION_VERSION_3][currentNetwork.chainId];
 
   const handlePermissionChange = (permission: Permission, newValue: boolean) => {
     if (newValue) {

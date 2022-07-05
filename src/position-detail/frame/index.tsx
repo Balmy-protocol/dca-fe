@@ -30,12 +30,12 @@ import NFTModal from 'common/view-nft-modal';
 import TransferPositionModal from 'common/transfer-position-modal';
 import TerminateModal from 'common/terminate-modal';
 import ModifySettingsModal from 'common/modify-settings-modal';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { fullPositionToMappedPosition } from 'utils/parsing';
 import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
+import usePositionService from 'hooks/usePositionService';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useGqlFetchAll from 'hooks/useGqlFetchAll';
 import PositionControls from '../position-summary-controls';
@@ -82,7 +82,7 @@ const PositionDetailFrame = () => {
   const history = useHistory();
   const tabIndex = usePositionDetailsTab();
   const dispatch = useAppDispatch();
-  const web3Service = useWeb3Service();
+  const positionService = usePositionService();
   const currentNetwork = useCurrentNetwork();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
@@ -164,7 +164,7 @@ const PositionDetailFrame = () => {
 
   const handleViewNFT = async () => {
     if (!position) return;
-    const tokenNFT = await web3Service.getTokenNFT(position.id);
+    const tokenNFT = await positionService.getTokenNFT(position.id);
     setNFTData(tokenNFT);
     setShowNFTModal(true);
   };
@@ -187,7 +187,7 @@ const PositionDetailFrame = () => {
       return;
     }
     try {
-      const hasPermission = await web3Service.companionHasPermission(
+      const hasPermission = await positionService.companionHasPermission(
         fullPositionToMappedPosition(position),
         PERMISSIONS.WITHDRAW
       );
@@ -218,7 +218,7 @@ const PositionDetailFrame = () => {
           </>
         ),
       });
-      const result = await web3Service.withdraw(fullPositionToMappedPosition(position), useProtocolToken);
+      const result = await positionService.withdraw(fullPositionToMappedPosition(position), useProtocolToken);
       addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,

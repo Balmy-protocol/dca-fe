@@ -3,13 +3,13 @@ import { formatUnits } from '@ethersproject/units';
 import Modal from 'common/modal';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
-import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { PERMISSIONS, POSITION_VERSION_3, TRANSACTION_TYPES } from 'config/constants';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import usePositionService from 'hooks/usePositionService';
 
 interface WithdrawModalProps {
   position: Position;
@@ -21,7 +21,7 @@ interface WithdrawModalProps {
 const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const currentNetwork = useCurrentNetwork();
-  const { web3Service } = React.useContext(WalletContext);
+  const positionService = usePositionService();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const addTransaction = useTransactionAdder();
@@ -39,7 +39,10 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
       const positionId =
         position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
       if (useProtocolToken) {
-        hasPermission = await web3Service.companionHasPermission({ ...position, id: positionId }, PERMISSIONS.WITHDRAW);
+        hasPermission = await positionService.companionHasPermission(
+          { ...position, id: positionId },
+          PERMISSIONS.WITHDRAW
+        );
       }
 
       setModalLoading({
@@ -63,7 +66,7 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
           </>
         ),
       });
-      const result = await web3Service.withdraw(position, useProtocolToken);
+      const result = await positionService.withdraw(position, useProtocolToken);
       addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,

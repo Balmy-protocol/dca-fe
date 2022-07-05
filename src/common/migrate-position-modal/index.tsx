@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import Modal from 'common/modal';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
-import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import Link from '@mui/material/Link';
+import usePositionService from 'hooks/usePositionService';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -31,7 +31,7 @@ interface MigratePositionModalProps {
 
 const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
-  const { web3Service } = React.useContext(WalletContext);
+  const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
 
   const handleMigrate = async () => {
@@ -51,7 +51,7 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
           </Typography>
         ),
       });
-      const result = await web3Service.migratePosition(position.id.substring(0, position.id.length - 3));
+      const result = await positionService.migratePosition(position.id.substring(0, position.id.length - 3));
       addTransaction(result, {
         type: TRANSACTION_TYPES.MIGRATE_POSITION,
         typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol },

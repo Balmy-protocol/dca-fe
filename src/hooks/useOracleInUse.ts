@@ -4,17 +4,19 @@ import find from 'lodash/find';
 import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
 import usePrevious from 'hooks/usePrevious';
-import WalletContext from 'common/wallet-context';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from './useCurrentNetwork';
 import useAvailablePairs from './useAvailablePairs';
+import usePairService from './usePairService';
+import useWalletService from './useWalletService';
 
 function useOracleInUse(
   from: Token | undefined | null,
   to: Token | undefined | null
 ): [Oracles | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
-  const { web3Service } = React.useContext(WalletContext);
+  const pairService = usePairService();
+  const walletService = useWalletService();
   const [result, setResult] = React.useState<Oracles | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const prevFrom = usePrevious(from);
@@ -49,7 +51,7 @@ function useOracleInUse(
     async function callPromise() {
       if (from && to) {
         try {
-          const oracle = await web3Service.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
+          const oracle = await pairService.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
           setResult(oracle);
           setError(undefined);
         } catch (e) {
@@ -78,7 +80,7 @@ function useOracleInUse(
     isLoading,
     result,
     error,
-    web3Service.getAccount(),
+    walletService.getAccount(),
     currentNetwork,
     existingPair,
     prevExistingPair,

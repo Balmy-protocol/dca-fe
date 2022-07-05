@@ -6,11 +6,11 @@ import { useMainTab } from 'state/tabs/hooks';
 import { useParams } from 'react-router-dom';
 import { SUPPORTED_NETWORKS } from 'config/constants';
 import { GetSwapIntervalsGraphqlResponse } from 'types';
-import useWeb3Service from 'hooks/useWeb3Service';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useQuery } from '@apollo/client';
 import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
 import useDCAGraphql from 'hooks/useDCAGraphql';
+import useWalletService from 'hooks/useWalletService';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 
@@ -28,7 +28,7 @@ const StyledGridContainer = styled(Grid).withConfig({
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const tabIndex = useMainTab();
-  const web3Service = useWeb3Service();
+  const walletService = useWalletService();
   const currentNetwork = useCurrentNetwork();
   const { chainId } = useParams<{ chainId: string }>();
   const client = useDCAGraphql();
@@ -40,7 +40,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       chainId !== currentNetwork.chainId.toString()
     ) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      web3Service.changeNetwork(parseInt(chainId, 10));
+      walletService.changeNetwork(parseInt(chainId, 10));
     }
   }, [chainId, currentNetwork]);
 

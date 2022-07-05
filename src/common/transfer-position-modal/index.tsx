@@ -5,10 +5,10 @@ import { FullPosition } from 'types';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import useTransactionModal from 'hooks/useTransactionModal';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import TextField from '@mui/material/TextField';
+import usePositionService from 'hooks/usePositionService';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -31,7 +31,7 @@ const validRegex = RegExp(/^0x[A-Fa-f0-9]*$/);
 const TransferPositionModal = ({ position, open, onCancel }: TransferPositionModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const [toAddress, setToAddress] = React.useState('');
-  const web3Service = useWeb3Service();
+  const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
 
   const validator = (nextValue: string) => {
@@ -55,7 +55,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
           </Typography>
         ),
       });
-      const result = await web3Service.transfer(position, toAddress);
+      const result = await positionService.transfer(position, toAddress);
       addTransaction(result, {
         type: TRANSACTION_TYPES.TRANSFER_POSITION,
         typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol, toAddress },

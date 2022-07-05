@@ -1,15 +1,17 @@
 import React from 'react';
-import WalletContext from 'common/wallet-context';
 import { Positions } from 'types';
 import { useAllTransactions } from 'state/transactions/hooks';
+import usePositionService from './usePositionService';
+import useWalletService from './useWalletService';
 
 function usePastPositions() {
-  const { web3Service } = React.useContext(WalletContext);
+  const positionService = usePositionService();
+  const walletService = useWalletService();
   const transactions = useAllTransactions();
 
   const pastPositions: Positions = React.useMemo(
-    () => web3Service.getPastPositions(),
-    [transactions, web3Service.getAccount()]
+    () => positionService.getPastPositions(),
+    [transactions, walletService.getAccount()]
   );
 
   return pastPositions;

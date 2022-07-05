@@ -7,7 +7,6 @@ import getPositions from 'graphql/getLeaderboardPosition.graphql';
 import getTokens from 'graphql/getTokens.graphql';
 import { FullPosition, Token } from 'types';
 import useGqlFetchAll from 'hooks/useGqlFetchAll';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import { appleTabsStylesHook } from 'common/tabs';
@@ -17,6 +16,7 @@ import { Duration } from 'luxon';
 import Button from 'common/button';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
+import usePriceService from 'hooks/usePriceService';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FormattedMessage } from 'react-intl';
 import Leaderboard from '../leaderboard';
@@ -85,7 +85,7 @@ const messagesByLeaderboard = [
 ];
 
 const LeaderboardFrame = () => {
-  const web3Service = useWeb3Service();
+  const priceService = usePriceService();
 
   const [tabIndex, setTabIndex] = React.useState(0);
   const tabsStyles = appleTabsStylesHook.useTabs();
@@ -101,7 +101,7 @@ const LeaderboardFrame = () => {
 
   React.useEffect(() => {
     const loadTokenPrices = async (tokens: Token[]) => {
-      const tokenPrices = await Promise.all(tokens.map((token) => web3Service.getUsdPrice(token)));
+      const tokenPrices = await Promise.all(tokens.map((token) => priceService.getUsdPrice(token)));
 
       const reducedTokenPrices = tokenPrices.reduce<Record<string, number>>((acc, price, index) => {
         // eslint-disable-next-line no-param-reassign

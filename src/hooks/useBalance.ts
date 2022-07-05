@@ -2,21 +2,21 @@ import React from 'react';
 import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
-import WalletContext from 'common/wallet-context';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
+import useWalletService from './useWalletService';
 
 function useBalance(from: Token | undefined | null): [BigNumber | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
-  const { web3Service } = React.useContext(WalletContext);
+  const walletService = useWalletService();
   const [result, setResult] = React.useState<BigNumber | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = usePrevious(web3Service.getAccount());
+  const account = usePrevious(walletService.getAccount());
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
@@ -26,7 +26,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await web3Service.getBalance(from.address);
+          const promiseResult = await walletService.getBalance(from.address);
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {
@@ -39,7 +39,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
     if (
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
-      !isEqual(account, web3Service.getAccount()) ||
+      !isEqual(account, walletService.getAccount()) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       (blockNumber &&
         prevBlockNumber &&
@@ -54,7 +54,16 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount(), prevBlockNumber, blockNumber]);
+  }, [
+    from,
+    isLoading,
+    result,
+    error,
+    hasPendingTransactions,
+    walletService.getAccount(),
+    prevBlockNumber,
+    blockNumber,
+  ]);
 
   if (!from) {
     return [prevResult || BigNumber.from('0'), false, undefined];

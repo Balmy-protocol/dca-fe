@@ -16,7 +16,13 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { ActionState, FullPosition } from 'types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
-import { COMPANION_ADDRESS, POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS } from 'config/constants';
+import {
+  COMPANION_ADDRESS,
+  POSITION_ACTIONS,
+  POSITION_VERSION_3,
+  STABLE_COINS,
+  STRING_PERMISSIONS,
+} from 'config/constants';
 import { getFrequencyLabel } from 'utils/parsing';
 import { buildEtherscanAddress } from 'utils/etherscan';
 import Link from '@mui/material/Link';
@@ -397,7 +403,8 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
             {permission.permissions.length ? (
               <>
                 <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
-                  {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase() ? (
+                  {permission.operator.toLowerCase() ===
+                  COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
                     'Mean Finance Companion'
                   ) : (
                     <Address address={permission.operator} />
@@ -430,7 +437,8 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                   defaultMessage="Removed all permissions for"
                 />
                 <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
-                  {permission.operator.toLowerCase() === COMPANION_ADDRESS[chainId].toLowerCase() ? (
+                  {permission.operator.toLowerCase() ===
+                  COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
                     'Mean Finance Companion'
                   ) : (
                     <Address address={permission.operator} />

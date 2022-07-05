@@ -1,18 +1,18 @@
 import React from 'react';
-import WalletContext from 'common/wallet-context';
 import { Token } from 'types';
 import { useAllTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
+import useWalletService from './useWalletService';
 
 function useTokenBalance(token: Token) {
-  const { web3Service } = React.useContext(WalletContext);
+  const walletService = useWalletService();
   const transactions = useAllTransactions();
   const [tokenBalance, setTokenBalance] = React.useState<BigNumber | null>(null);
 
   React.useEffect(() => {
     const getTokenBalance = async () => {
       try {
-        const balance = await web3Service.getBalance(token.address);
+        const balance = await walletService.getBalance(token.address);
         setTokenBalance(balance);
       } catch (e) {
         console.error('Error getting token balance', token, e);
@@ -21,7 +21,7 @@ function useTokenBalance(token: Token) {
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getTokenBalance();
-  }, [JSON.stringify(transactions), web3Service.getAccount(), token]);
+  }, [JSON.stringify(transactions), walletService.getAccount(), token]);
 
   return tokenBalance;
 }
