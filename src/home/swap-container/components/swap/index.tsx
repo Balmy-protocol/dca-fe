@@ -16,7 +16,6 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import find from 'lodash/find';
-import usePromise from 'hooks/usePromise';
 import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
 import CreatePairModal from 'common/create-pair-modal';
@@ -32,8 +31,6 @@ import {
   SUPPORTED_NETWORKS,
   TRANSACTION_TYPES,
   ORACLES,
-  COMPANION_ADDRESS,
-  HUB_ADDRESS,
   WHALE_MODE_FREQUENCIES,
   WHALE_MINIMUM_VALUES,
   TESTNETS,
@@ -51,6 +48,12 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import useAllowance from 'hooks/useAllowance';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
+import useCanSupportPair from 'hooks/useCanSupportPair';
+import useUsdPrice from 'hooks/useUsdPrice';
+import useWalletService from 'hooks/useWalletService';
+import useContractService from 'hooks/useContractService';
+import usePositionService from 'hooks/usePositionService';
+import usePairService from 'hooks/usePairService';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -189,7 +192,11 @@ const Swap = ({
   const [whaleMode, setWhaleMode] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
+  const walletService = useWalletService();
+  const positionService = usePositionService();
+  const contractService = useContractService();
   const availablePairs = useAvailablePairs();
+  const pairService = usePairService();
   const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
 
@@ -221,18 +228,11 @@ const Swap = ({
 
   const [allowance, isLoadingAllowance, allowanceErrors] = useAllowance(from);
 
-  const [pairIsSupported, isLoadingPairIsSupported] = usePromise<boolean>(
-    web3Service,
-    'canSupportPair',
-    [from, to],
-    !from || !to
-  );
+  const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
 
-  const [usdPrice, isLoadingUsdPrice] = usePromise<number>(
-    web3Service,
-    'getUsdPrice',
-    [from && from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(currentNetwork.chainId) : from || null],
-    !from
+  const [usdPrice, isLoadingUsdPrice] = useUsdPrice(
+    from,
+    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null
   );
 
   React.useEffect(() => {
@@ -286,12 +286,13 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await web3Service.approveToken(from);
+      const result = await walletService.approveToken(from);
+      const hubAddress = await contractService.getHUBAddress();
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: from,
-          addressFor: HUB_ADDRESS[currentNetwork.chainId],
+          addressFor: hubAddress,
         },
       });
       setModalSuccess({
@@ -328,7 +329,10 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await web3Service.deposit(from, to, fromValue, frequencyType, frequencyValue);
+      const result = await positionService.deposit(from, to, fromValue, frequencyType, frequencyValue);
+      const hubAddress = await contractService.getHUBAddress();
+      const companionAddress = await contractService.getHUBCompanionAddress();
+
       addTransaction(result, {
         type: TRANSACTION_TYPES.NEW_POSITION,
         typeData: {
@@ -342,8 +346,8 @@ const Swap = ({
           isCreatingPair: !existingPair,
           addressFor:
             to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
-              ? COMPANION_ADDRESS[currentNetwork.chainId]
-              : HUB_ADDRESS[currentNetwork.chainId],
+              ? companionAddress
+              : hubAddress,
         },
       });
       setModalSuccess({
@@ -490,13 +494,13 @@ const Swap = ({
     setIsLoading(true);
     if (!from || !to) return;
 
-    const oracle = await web3Service.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
+    const oracle = await pairService.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
 
     let hasLowLiquidity = oracle === ORACLES.UNISWAP;
 
     if (oracle === ORACLES.UNISWAP) {
       try {
-        const liquidity = await web3Service.getPairLiquidity(from, to);
+        const liquidity = await pairService.getPairLiquidity(from, to);
         hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
       } catch {
         hasLowLiquidity = false;

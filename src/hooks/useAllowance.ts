@@ -2,23 +2,23 @@ import React from 'react';
 import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
-import WalletContext from 'common/wallet-context';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { EMPTY_TOKEN } from 'mocks/tokens';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
+import useWalletService from './useWalletService';
 
 function useAllowance(
   from: Token | undefined | null
 ): [{ token: Token; allowance: string } | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
-  const { web3Service } = React.useContext(WalletContext);
+  const walletService = useWalletService();
   const [result, setResult] = React.useState<{ token: Token; allowance: string } | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = usePrevious(web3Service.getAccount());
+  const account = usePrevious(walletService.getAccount());
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
@@ -28,7 +28,7 @@ function useAllowance(
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await web3Service.getAllowance(from);
+          const promiseResult = await walletService.getAllowance(from);
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {
@@ -41,7 +41,7 @@ function useAllowance(
     if (
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
-      !isEqual(account, web3Service.getAccount()) ||
+      !isEqual(account, walletService.getAccount()) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       (blockNumber &&
         prevBlockNumber &&
@@ -56,7 +56,16 @@ function useAllowance(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, hasPendingTransactions, web3Service.getAccount(), prevBlockNumber, blockNumber]);
+  }, [
+    from,
+    isLoading,
+    result,
+    error,
+    hasPendingTransactions,
+    walletService.getAccount(),
+    prevBlockNumber,
+    blockNumber,
+  ]);
 
   if (!from) {
     return [{ token: from || EMPTY_TOKEN, allowance: '0' }, false, undefined];

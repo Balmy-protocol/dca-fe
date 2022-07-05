@@ -1,0 +1,1109 @@
+import { ethers, Signer, BigNumber, VoidSigner } from 'ethers';
+import keyBy from 'lodash/keyBy';
+import { TransactionResponse } from '@ethersproject/providers';
+import { parseUnits } from '@ethersproject/units';
+import values from 'lodash/values';
+import orderBy from 'lodash/orderBy';
+import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
+import {
+  Token,
+  TransactionPositionTypeDataOptions,
+  Position,
+  PositionKeyBy,
+  TransactionDetails,
+  NewPositionTypeData,
+  TerminatePositionTypeData,
+  WithdrawTypeData,
+  AddFundsTypeData,
+  ModifySwapsPositionTypeData,
+  RemoveFundsTypeData,
+  ResetPositionTypeData,
+  ModifyRateAndSwapsPositionTypeData,
+  NFTData,
+  FullPosition,
+  TransferTypeData,
+  PositionPermission,
+  MigratePositionTypeData,
+  ModifyPermissionsTypeData,
+  PositionsGraphqlResponse,
+  PositionResponse,
+} from 'types';
+
+// GRAPHQL
+import GET_POSITIONS from 'graphql/getPositions.graphql';
+
+// ABIS
+import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
+
+// MOCKS
+import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
+import { MAX_UINT_32, PERMISSIONS, POSITION_VERSION_2, POSITION_VERSION_3, TRANSACTION_TYPES } from 'config/constants';
+import { PermissionManagerContract } from 'types/contracts';
+import { fromRpcSig } from 'ethereumjs-util';
+import gqlFetchAll from 'utils/gqlFetchAll';
+import GraphqlService from './graphql';
+import ContractService from './contractService';
+import WalletService from './walletService';
+import PairService from './pairService';
+
+export default class PositionService {
+  modal: SafeAppWeb3Modal;
+
+  signer: Signer;
+
+  currentPositions: PositionKeyBy;
+
+  pastPositions: PositionKeyBy;
+
+  contractService: ContractService;
+
+  walletService: WalletService;
+
+  pairService: PairService;
+
+  constructor(walletService: WalletService, pairService: PairService, contractService: ContractService) {
+    this.contractService = contractService;
+    this.walletService = walletService;
+    this.pairService = pairService;
+  }
+
+  getSigner() {
+    return this.signer;
+  }
+
+  getCurrentPositions() {
+    return orderBy(values(this.currentPositions), 'startedAt', 'desc');
+  }
+
+  getPastPositions() {
+    return orderBy(values(this.pastPositions), 'startedAt', 'desc');
+  }
+
+  async fetchPositions(account: string, apolloClient: GraphqlService, v2Client?: GraphqlService) {
+    const currentNetwork = await this.walletService.getNetwork();
+    const protocolToken = getProtocolToken(currentNetwork.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+
+    const currentPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
+      apolloClient.getClient(),
+      GET_POSITIONS,
+      {
+        address: account.toLowerCase(),
+        status: ['ACTIVE', 'COMPLETED'],
+      },
+      'positions',
+      'network-only'
+    );
+
+    if (currentPositionsResponse.data) {
+      this.currentPositions = keyBy(
+        currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
+          from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+          to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+          user: position.user,
+          swapInterval: BigNumber.from(position.swapInterval.interval),
+          swapped: BigNumber.from(position.totalSwapped),
+          rate: BigNumber.from(position.current.rate),
+          remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+          remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+          withdrawn: BigNumber.from(position.totalWithdrawn),
+          toWithdraw: BigNumber.from(position.current.idleSwapped),
+          totalSwaps: BigNumber.from(position.totalSwaps),
+          id: position.id,
+          status: position.status,
+          startedAt: position.createdAtTimestamp,
+          executedSwaps: BigNumber.from(position.executedSwaps),
+          totalDeposits: BigNumber.from(position.totalDeposits),
+          pendingTransaction: '',
+          pairId: position.pair.id,
+          version: POSITION_VERSION_3,
+        })),
+        'id'
+      );
+    }
+
+    if (v2Client) {
+      const currentV2PositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
+        v2Client.getClient(),
+        GET_POSITIONS,
+        {
+          address: account.toLowerCase(),
+          status: ['ACTIVE', 'COMPLETED'],
+        },
+        'positions',
+        'network-only'
+      );
+
+      if (currentV2PositionsResponse.data) {
+        this.currentPositions = {
+          ...this.currentPositions,
+          ...keyBy(
+            currentV2PositionsResponse.data.positions.map((position: PositionResponse) => ({
+              from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+              to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+              user: position.user,
+              swapInterval: BigNumber.from(position.swapInterval.interval),
+              swapped: BigNumber.from(position.totalSwapped),
+              rate: BigNumber.from(position.current.rate),
+              remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+              remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+              withdrawn: BigNumber.from(position.totalWithdrawn),
+              toWithdraw: BigNumber.from(position.current.idleSwapped),
+              totalSwaps: BigNumber.from(position.totalSwaps),
+              id: `${position.id}-v2`,
+              status: position.status,
+              startedAt: position.createdAtTimestamp,
+              executedSwaps: BigNumber.from(position.executedSwaps),
+              totalDeposits: BigNumber.from(position.totalDeposits),
+              pendingTransaction: '',
+              pairId: position.pair.id,
+              version: POSITION_VERSION_2,
+            })),
+            'id'
+          ),
+        };
+      }
+    }
+
+    const pastPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
+      apolloClient.getClient(),
+      GET_POSITIONS,
+      {
+        address: account.toLowerCase(),
+        status: ['TERMINATED'],
+      },
+      'positions',
+      'network-only'
+    );
+
+    if (pastPositionsResponse.data) {
+      this.pastPositions = keyBy(
+        pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
+          from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+          to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+          user: position.user,
+          totalDeposits: BigNumber.from(position.totalDeposits),
+          swapInterval: BigNumber.from(position.swapInterval.interval),
+          swapped: BigNumber.from(position.totalSwapped),
+          rate: BigNumber.from(position.current.rate),
+          remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+          remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+          totalSwaps: BigNumber.from(position.totalSwaps),
+          withdrawn: BigNumber.from(position.totalWithdrawn),
+          toWithdraw: BigNumber.from(position.current.idleSwapped),
+          executedSwaps: BigNumber.from(position.executedSwaps),
+          id: position.id,
+          status: position.status,
+          startedAt: position.createdAtTimestamp,
+          pendingTransaction: '',
+          pairId: position.pair.id,
+          version: POSITION_VERSION_3,
+        })),
+        'id'
+      );
+    }
+
+    if (v2Client) {
+      const pastPositionsV2Response = await gqlFetchAll<PositionsGraphqlResponse>(
+        v2Client.getClient(),
+        GET_POSITIONS,
+        {
+          address: account.toLowerCase(),
+          status: ['TERMINATED'],
+        },
+        'positions',
+        'network-only'
+      );
+
+      if (pastPositionsV2Response.data) {
+        this.pastPositions = {
+          ...this.pastPositions,
+          ...keyBy(
+            pastPositionsV2Response.data.positions.map((position: PositionResponse) => ({
+              from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+              to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+              user: position.user,
+              totalDeposits: BigNumber.from(position.totalDeposits),
+              swapInterval: BigNumber.from(position.swapInterval.interval),
+              swapped: BigNumber.from(position.totalSwapped),
+              rate: BigNumber.from(position.current.rate),
+              remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+              remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+              totalSwaps: BigNumber.from(position.totalSwaps),
+              withdrawn: BigNumber.from(position.totalWithdrawn),
+              toWithdraw: BigNumber.from(position.current.idleSwapped),
+              executedSwaps: BigNumber.from(position.executedSwaps),
+              id: position.id,
+              status: position.status,
+              startedAt: position.createdAtTimestamp,
+              pendingTransaction: '',
+              pairId: position.pair.id,
+              version: POSITION_VERSION_2,
+            })),
+            'id'
+          ),
+        };
+      }
+    }
+  }
+
+  // POSITION METHODS
+  async getSignatureForPermission(
+    positionId: string,
+    contractAddress: string,
+    permission: number,
+    permissionManagerAddressProvided?: string,
+    erc712Name?: string
+  ) {
+    const signer = this.getSigner();
+    const permissionManagerAddress =
+      permissionManagerAddressProvided || (await this.contractService.getPermissionManagerAddress());
+    const signName = erc712Name || 'Mean Finance - DCA Position';
+    const currentNetwork = await this.walletService.getNetwork();
+    const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
+
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      signer
+    ) as unknown as PermissionManagerContract;
+
+    const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.INCREASE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.REDUCE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.WITHDRAW),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.TERMINATE),
+    ]);
+
+    const defaultPermissions = [
+      ...(hasIncrease ? [PERMISSIONS.INCREASE] : []),
+      ...(hasReduce ? [PERMISSIONS.REDUCE] : []),
+      ...(hasWithdraw ? [PERMISSIONS.WITHDRAW] : []),
+      ...(hasTerminate ? [PERMISSIONS.TERMINATE] : []),
+    ];
+
+    const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
+
+    const PermissionSet = [
+      { name: 'operator', type: 'address' },
+      { name: 'permissions', type: 'uint8[]' },
+    ];
+
+    const PermissionPermit = [
+      { name: 'permissions', type: 'PermissionSet[]' },
+      { name: 'tokenId', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ];
+
+    const permissions = [{ operator: contractAddress, permissions: [...defaultPermissions, permission] }];
+
+    // eslint-disable-next-line no-underscore-dangle
+    const rawSignature = await (signer as VoidSigner)._signTypedData(
+      {
+        name: signName,
+        version: '1',
+        chainId: currentNetwork.chainId,
+        verifyingContract: permissionManagerAddress,
+      },
+      { PermissionSet, PermissionPermit },
+      { tokenId: positionId, permissions, nonce: nextNonce, deadline: MAX_UINT_256 }
+    );
+
+    const { v, r, s } = fromRpcSig(rawSignature);
+
+    return {
+      permissions,
+      deadline: MAX_UINT_256,
+      v,
+      r,
+      s,
+    };
+  }
+
+  async migratePosition(positionId: string): Promise<TransactionResponse> {
+    const permissionManagerV2Address = await this.contractService.getPermissionManagerAddress(POSITION_VERSION_2);
+    const hubAddress = await this.contractService.getHUBAddress();
+    const hubV2Address = await this.contractService.getHUBAddress(POSITION_VERSION_2);
+    const migratorAddress = await this.contractService.getMigratorAddress();
+    const betaMigratorInstance = await this.contractService.getMigratorInstance();
+
+    const erc712Name = 'Mean Finance DCA';
+
+    const generatedSignature = await this.getSignatureForPermission(
+      positionId,
+      migratorAddress,
+      PERMISSIONS.TERMINATE,
+      permissionManagerV2Address,
+      erc712Name
+    );
+
+    return betaMigratorInstance.migrate(hubV2Address, positionId, generatedSignature, hubAddress);
+  }
+
+  async companionHasPermission(position: Position, permission: number) {
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
+    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+
+    return permissionManagerInstance.hasPermission(position.id, companionAddress, permission);
+  }
+
+  async companionIsApproved(position: FullPosition): Promise<boolean> {
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance();
+    const companionAddress = await this.contractService.getHUBCompanionAddress();
+
+    try {
+      await permissionManagerInstance.ownerOf(position.id);
+    } catch (e) {
+      // hack for when the subgraph has not updated yet but the position has been terminated
+      const error = e as { data?: { message?: string } };
+      if (
+        error &&
+        error.data &&
+        error.data.message &&
+        error.data.message === 'execution reverted: ERC721: owner query for nonexistent token'
+      )
+        return true;
+    }
+
+    const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
+      permissionManagerInstance.hasPermission(position.id, companionAddress, PERMISSIONS.INCREASE),
+      permissionManagerInstance.hasPermission(position.id, companionAddress, PERMISSIONS.REDUCE),
+      permissionManagerInstance.hasPermission(position.id, companionAddress, PERMISSIONS.WITHDRAW),
+      permissionManagerInstance.hasPermission(position.id, companionAddress, PERMISSIONS.TERMINATE),
+    ]);
+
+    return hasIncrease && hasReduce && hasWithdraw && hasTerminate;
+  }
+
+  async approveCompanionForPosition(position: FullPosition): Promise<TransactionResponse> {
+    const companionAddress = await this.contractService.getHUBCompanionAddress();
+
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance();
+
+    return permissionManagerInstance.modify(position.id, [
+      {
+        operator: companionAddress,
+        permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE, PERMISSIONS.WITHDRAW],
+      },
+    ]);
+  }
+
+  async modifyPermissions(position: FullPosition, newPermissions: PositionPermission[]): Promise<TransactionResponse> {
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance();
+
+    return permissionManagerInstance.modify(
+      position.id,
+      newPermissions.map(({ permissions, operator }) => ({
+        operator,
+        permissions: permissions.map((permission) => PERMISSIONS[permission]),
+      }))
+    );
+  }
+
+  async transfer(position: FullPosition, toAddress: string): Promise<TransactionResponse> {
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance();
+
+    return permissionManagerInstance.transferFrom(position.user, toAddress, position.id);
+  }
+
+  async getTokenNFT(id: string): Promise<NFTData> {
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance();
+
+    const tokenData = await permissionManagerInstance.tokenURI(id);
+    return JSON.parse(atob(tokenData.substring(29))) as NFTData;
+  }
+
+  async deposit(
+    from: Token,
+    to: Token,
+    fromValue: string,
+    frequencyType: BigNumber,
+    frequencyValue: string
+  ): Promise<TransactionResponse> {
+    const token = from;
+
+    const weiValue = parseUnits(fromValue, token.decimals);
+
+    const amountOfSwaps = BigNumber.from(frequencyValue);
+    const swapInterval = frequencyType;
+    const currentNetwork = await this.walletService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+
+    if (amountOfSwaps.gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
+
+    if (from.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase()) {
+      const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
+
+      return hubCompanionInstance.depositUsingProtocolToken(
+        from.address === PROTOCOL_TOKEN_ADDRESS ? ETH_COMPANION_ADDRESS : from.address,
+        to.address === PROTOCOL_TOKEN_ADDRESS ? ETH_COMPANION_ADDRESS : to.address,
+        weiValue,
+        amountOfSwaps,
+        swapInterval,
+        this.walletService.getAccount(),
+        [],
+        [],
+        from.address === PROTOCOL_TOKEN_ADDRESS ? { value: weiValue } : {}
+      );
+    }
+
+    const hubInstance = await this.contractService.getHubInstance();
+
+    const toToUse = to.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken : to;
+
+    return hubInstance['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'](
+      from.address,
+      toToUse.address,
+      weiValue,
+      amountOfSwaps,
+      swapInterval,
+      this.walletService.getAccount(),
+      []
+    );
+  }
+
+  async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
+    const currentNetwork = await this.walletService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+
+    if (
+      position.to.address !== PROTOCOL_TOKEN_ADDRESS &&
+      position.to.address !== wrappedProtocolToken.address &&
+      useProtocolToken
+    ) {
+      throw new Error('Should not call withdraw without it being protocol token');
+    }
+
+    if (!useProtocolToken) {
+      const hubInstance = await this.contractService.getHubInstance();
+
+      return hubInstance.withdrawSwapped(position.id, this.walletService.getAccount());
+    }
+
+    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
+
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
+
+    if (companionHasPermission) {
+      return hubCompanionInstance.withdrawSwappedUsingProtocolToken(position.id, this.walletService.getAccount());
+    }
+
+    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+      position.id,
+      await this.contractService.getHUBCompanionAddress(),
+      PERMISSIONS.WITHDRAW
+    );
+
+    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
+      permissions,
+      position.id,
+      deadline,
+      v,
+      r,
+      s
+    );
+
+    const { data: withdrawData } = await hubCompanionInstance.populateTransaction.withdrawSwappedUsingProtocolToken(
+      position.id,
+      this.walletService.getAccount()
+    );
+
+    if (!permissionData || !withdrawData) {
+      throw new Error('Permission or withdraw data cannot be undefined');
+    }
+
+    return hubCompanionInstance.multicall([permissionData, withdrawData]);
+  }
+
+  async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
+    const currentNetwork = await this.walletService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
+
+    if (
+      position.from.address !== wrappedProtocolToken.address &&
+      position.from.address !== PROTOCOL_TOKEN_ADDRESS &&
+      position.to.address !== PROTOCOL_TOKEN_ADDRESS &&
+      position.to.address !== wrappedProtocolToken.address &&
+      useProtocolToken
+    ) {
+      throw new Error('Should not call terminate without it being protocol token');
+    }
+
+    if (!useProtocolToken) {
+      const hubInstance = await this.contractService.getHubInstance(position.version);
+
+      return hubInstance.terminate(position.id, this.walletService.getAccount(), this.walletService.getAccount());
+    }
+
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
+
+    if (companionHasPermission) {
+      if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
+        return hubCompanionInstance.terminateUsingProtocolTokenAsTo(
+          position.id,
+          this.walletService.getAccount(),
+          this.walletService.getAccount()
+        );
+      }
+      return hubCompanionInstance.terminateUsingProtocolTokenAsFrom(
+        position.id,
+        this.walletService.getAccount(),
+        this.walletService.getAccount()
+      );
+    }
+
+    const permissionManagerAddress = await this.contractService.getPermissionManagerAddress(position.version);
+    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+
+    const erc712Name = position.version === POSITION_VERSION_3 ? undefined : 'Mean Finance DCA';
+
+    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+      position.id,
+      companionAddress,
+      PERMISSIONS.TERMINATE,
+      permissionManagerAddress,
+      erc712Name
+    );
+
+    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
+      permissions,
+      position.id,
+      deadline,
+      v,
+      r,
+      s
+    );
+
+    let terminateData;
+    if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
+      ({ data: terminateData } = await hubCompanionInstance.populateTransaction.terminateUsingProtocolTokenAsTo(
+        position.id,
+        this.walletService.getAccount(),
+        this.walletService.getAccount()
+      ));
+    } else {
+      ({ data: terminateData } = await hubCompanionInstance.populateTransaction.terminateUsingProtocolTokenAsFrom(
+        position.id,
+        this.walletService.getAccount(),
+        this.walletService.getAccount()
+      ));
+    }
+
+    if (!permissionData || !terminateData) {
+      throw new Error('Permission or withdraw data cannot be undefined');
+    }
+
+    return hubCompanionInstance.multicall([permissionData, terminateData]);
+  }
+
+  async addFunds(position: Position, newDeposit: string): Promise<TransactionResponse> {
+    const hubInstance = await this.contractService.getHubInstance();
+    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
+
+    const newRate = parseUnits(newDeposit, position.from.decimals)
+      .add(position.remainingLiquidity)
+      .div(BigNumber.from(position.remainingSwaps));
+
+    const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
+    if (newAmount.gte(position.remainingLiquidity)) {
+      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
+        return hubCompanionInstance.increasePositionUsingProtocolToken(
+          position.id,
+          newAmount.sub(position.remainingLiquidity),
+          position.remainingSwaps,
+          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
+        );
+      }
+      return hubInstance.increasePosition(
+        position.id,
+        newAmount.sub(position.remainingLiquidity),
+        position.remainingSwaps
+      );
+    }
+
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
+      return hubCompanionInstance.reducePositionUsingProtocolToken(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        position.remainingSwaps,
+        this.walletService.getAccount()
+      );
+    }
+
+    return hubInstance.reducePosition(
+      position.id,
+      position.remainingLiquidity.sub(newAmount),
+      position.remainingSwaps,
+      this.walletService.getAccount()
+    );
+  }
+
+  async resetPosition(position: Position, newDeposit: string, newSwaps: string): Promise<TransactionResponse> {
+    const hubInstance = await this.contractService.getHubInstance();
+    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
+
+    if (BigNumber.from(newSwaps).gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
+
+    const newRate = parseUnits(newDeposit, position.from.decimals)
+      .add(position.remainingLiquidity)
+      .div(BigNumber.from(newSwaps));
+
+    const newAmount = newRate.mul(BigNumber.from(newSwaps));
+    if (newAmount.gte(position.remainingLiquidity)) {
+      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
+        return hubCompanionInstance.increasePositionUsingProtocolToken(
+          position.id,
+          newAmount.sub(position.remainingLiquidity),
+          BigNumber.from(newSwaps),
+          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
+        );
+      }
+      return hubInstance.increasePosition(
+        position.id,
+        newAmount.sub(position.remainingLiquidity),
+        BigNumber.from(newSwaps)
+      );
+    }
+
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
+      return hubCompanionInstance.reducePositionUsingProtocolToken(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.walletService.getAccount()
+      );
+    }
+
+    return hubInstance.reducePosition(
+      position.id,
+      position.remainingLiquidity.sub(newAmount),
+      BigNumber.from(newSwaps),
+      this.walletService.getAccount()
+    );
+  }
+
+  async modifyRateAndSwaps(
+    position: Position,
+    newRate: string,
+    newSwaps: string,
+    useWrappedProtocolToken: boolean
+  ): Promise<TransactionResponse> {
+    const hubInstance = await this.contractService.getHubInstance();
+    const currentNetwork = await this.walletService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
+    const companionAddress = await this.contractService.getHUBCompanionAddress();
+
+    if (
+      position.from.address !== wrappedProtocolToken.address &&
+      position.from.address !== PROTOCOL_TOKEN_ADDRESS &&
+      useWrappedProtocolToken
+    ) {
+      throw new Error('Should not call modify rate and swaps without it being protocol token');
+    }
+
+    if (BigNumber.from(newSwaps).gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
+
+    const newAmount = BigNumber.from(parseUnits(newRate, position.from.decimals)).mul(BigNumber.from(newSwaps));
+
+    if (position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) {
+      if (newAmount.gte(position.remainingLiquidity)) {
+        return hubInstance.increasePosition(
+          position.id,
+          newAmount.sub(position.remainingLiquidity),
+          BigNumber.from(newSwaps)
+        );
+      }
+
+      return hubInstance.reducePosition(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.walletService.getAccount()
+      );
+    }
+
+    if (newAmount.gte(position.remainingLiquidity)) {
+      const companionHasIncrease = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
+
+      if (companionHasIncrease) {
+        return hubCompanionInstance.increasePositionUsingProtocolToken(
+          position.id,
+          newAmount.sub(position.remainingLiquidity),
+          BigNumber.from(newSwaps),
+          { value: newAmount.sub(position.remainingLiquidity) }
+        );
+      }
+
+      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+        position.id,
+        companionAddress,
+        PERMISSIONS.INCREASE
+      );
+
+      const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
+        permissions,
+        position.id,
+        deadline,
+        v,
+        r,
+        s
+      );
+
+      const { data: increaseData } = await hubCompanionInstance.populateTransaction.increasePositionUsingProtocolToken(
+        position.id,
+        newAmount.sub(position.remainingLiquidity),
+        BigNumber.from(newSwaps)
+      );
+
+      if (!permissionData || !increaseData) {
+        throw new Error('Permission or increase data cannot be undefined');
+      }
+
+      return hubCompanionInstance.multicall([permissionData, increaseData], {
+        value: newAmount.sub(position.remainingLiquidity),
+      });
+    }
+
+    const companionHasReduce = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
+
+    if (companionHasReduce) {
+      return hubCompanionInstance.reducePositionUsingProtocolToken(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.walletService.getAccount()
+      );
+    }
+
+    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+      position.id,
+      companionAddress,
+      PERMISSIONS.REDUCE
+    );
+
+    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
+      permissions,
+      position.id,
+      deadline,
+      v,
+      r,
+      s
+    );
+
+    const { data: reduceData } = await hubCompanionInstance.populateTransaction.reducePositionUsingProtocolToken(
+      position.id,
+      position.remainingLiquidity.sub(newAmount),
+      BigNumber.from(newSwaps),
+      this.walletService.getAccount()
+    );
+
+    if (!permissionData || !reduceData) {
+      throw new Error('Permission or reduce data cannot be undefined');
+    }
+
+    return hubCompanionInstance.multicall([permissionData, reduceData]);
+  }
+
+  async removeFunds(position: Position, ammountToRemove: string): Promise<TransactionResponse> {
+    const hubInstance = await this.contractService.getHubInstance();
+    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
+
+    const newSwaps = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
+      ? BigNumber.from(0)
+      : position.remainingSwaps;
+
+    const newRate = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
+      ? BigNumber.from(0)
+      : position.remainingLiquidity
+          .sub(parseUnits(ammountToRemove, position.from.decimals))
+          .div(BigNumber.from(position.remainingSwaps));
+
+    if (newSwaps.gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
+
+    const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
+    if (newAmount.gte(position.remainingLiquidity)) {
+      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
+        return hubCompanionInstance.increasePositionUsingProtocolToken(
+          position.id,
+          newAmount.sub(position.remainingLiquidity),
+          newSwaps,
+          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
+        );
+      }
+
+      return hubInstance.increasePosition(position.id, newAmount.sub(position.remainingLiquidity), newSwaps);
+    }
+
+    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
+      return hubCompanionInstance.reducePositionUsingProtocolToken(
+        position.id,
+        position.remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.walletService.getAccount()
+      );
+    }
+
+    return hubInstance.reducePosition(
+      position.id,
+      position.remainingLiquidity.sub(newAmount),
+      BigNumber.from(newSwaps),
+      this.walletService.getAccount()
+    );
+  }
+
+  async setPendingTransaction(transaction: TransactionDetails) {
+    if (
+      transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
+      transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+      transaction.type === TRANSACTION_TYPES.WRAP_ETHER
+    )
+      return;
+
+    const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
+    let { id } = typeData;
+    const network = await this.walletService.getNetwork();
+    const protocolToken = getProtocolToken(network.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
+    if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
+      const newPositionTypeData = typeData as NewPositionTypeData;
+      id = `pending-transaction-${transaction.hash}`;
+      this.currentPositions[id] = {
+        from:
+          newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from,
+        to: newPositionTypeData.to.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to,
+        user: this.walletService.getAccount(),
+        toWithdraw: BigNumber.from(0),
+        swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
+        swapped: BigNumber.from(0),
+        rate: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
+          BigNumber.from(newPositionTypeData.frequencyValue)
+        ),
+        remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
+        remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
+        totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
+        withdrawn: BigNumber.from(0),
+        executedSwaps: BigNumber.from(0),
+        id,
+        startedAt: newPositionTypeData.startedAt,
+        totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
+        pendingTransaction: '',
+        status: 'ACTIVE',
+        version: POSITION_VERSION_3,
+      };
+    }
+
+    this.currentPositions[id].pendingTransaction = transaction.hash;
+  }
+
+  handleTransactionRejection(transaction: TransactionDetails) {
+    if (
+      transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
+      transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+      transaction.type === TRANSACTION_TYPES.WRAP_ETHER
+    )
+      return;
+    const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
+    const { id } = typeData;
+    if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
+      delete this.currentPositions[`pending-transaction-${transaction.hash}`];
+    } else {
+      this.currentPositions[id].pendingTransaction = '';
+    }
+  }
+
+  handleTransaction(transaction: TransactionDetails) {
+    switch (transaction.type) {
+      case TRANSACTION_TYPES.NEW_POSITION: {
+        const newPositionTypeData = transaction.typeData as NewPositionTypeData;
+        const newId = newPositionTypeData.id;
+        if (!this.currentPositions[newId]) {
+          this.currentPositions[newId] = {
+            ...this.currentPositions[`pending-transaction-${transaction.hash}`],
+            pendingTransaction: '',
+            id: newId,
+          };
+        }
+        delete this.currentPositions[`pending-transaction-${transaction.hash}`];
+        this.pairService.addNewPair(newPositionTypeData.from, newPositionTypeData.to, newPositionTypeData.oracle);
+        break;
+      }
+      case TRANSACTION_TYPES.TERMINATE_POSITION: {
+        const terminatePositionTypeData = transaction.typeData as TerminatePositionTypeData;
+        this.pastPositions[terminatePositionTypeData.id] = {
+          ...this.currentPositions[terminatePositionTypeData.id],
+          toWithdraw: BigNumber.from(0),
+          remainingLiquidity: BigNumber.from(0),
+          remainingSwaps: BigNumber.from(0),
+          pendingTransaction: '',
+        };
+        delete this.currentPositions[terminatePositionTypeData.id];
+        break;
+      }
+      case TRANSACTION_TYPES.MIGRATE_POSITION: {
+        const migratePositionTypeData = transaction.typeData as MigratePositionTypeData;
+        this.pastPositions[migratePositionTypeData.id] = {
+          ...this.currentPositions[migratePositionTypeData.id],
+          pendingTransaction: '',
+        };
+        if (migratePositionTypeData.newId) {
+          this.currentPositions[migratePositionTypeData.newId] = {
+            ...this.currentPositions[migratePositionTypeData.id],
+            pendingTransaction: '',
+            toWithdraw: BigNumber.from(0),
+            swapped: BigNumber.from(0),
+            withdrawn: BigNumber.from(0),
+            executedSwaps: BigNumber.from(0),
+            status: 'ACTIVE',
+            version: POSITION_VERSION_3,
+            id: migratePositionTypeData.newId,
+          };
+        }
+        delete this.currentPositions[migratePositionTypeData.id];
+        break;
+      }
+      case TRANSACTION_TYPES.WITHDRAW_POSITION: {
+        const withdrawPositionTypeData = transaction.typeData as WithdrawTypeData;
+        this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
+        this.currentPositions[withdrawPositionTypeData.id].withdrawn =
+          this.currentPositions[withdrawPositionTypeData.id].swapped;
+        this.currentPositions[withdrawPositionTypeData.id].toWithdraw = BigNumber.from(0);
+        break;
+      }
+      case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
+        const addFundsTypeData = transaction.typeData as AddFundsTypeData;
+        this.currentPositions[addFundsTypeData.id].pendingTransaction = '';
+        this.currentPositions[addFundsTypeData.id].remainingLiquidity = this.currentPositions[
+          addFundsTypeData.id
+        ].remainingLiquidity.add(parseUnits(addFundsTypeData.newFunds, addFundsTypeData.decimals));
+        this.currentPositions[addFundsTypeData.id].rate = this.currentPositions[
+          addFundsTypeData.id
+        ].remainingLiquidity.div(this.currentPositions[addFundsTypeData.id].remainingSwaps);
+        break;
+      }
+      case TRANSACTION_TYPES.RESET_POSITION: {
+        const resetPositionTypeData = transaction.typeData as ResetPositionTypeData;
+        const resetPositionSwapDifference = BigNumber.from(resetPositionTypeData.newSwaps).lt(
+          this.currentPositions[resetPositionTypeData.id].remainingSwaps
+        )
+          ? this.currentPositions[resetPositionTypeData.id].remainingSwaps.sub(
+              BigNumber.from(resetPositionTypeData.newSwaps)
+            )
+          : BigNumber.from(resetPositionTypeData.newSwaps).sub(
+              this.currentPositions[resetPositionTypeData.id].remainingSwaps
+            );
+        this.currentPositions[resetPositionTypeData.id].pendingTransaction = '';
+        this.currentPositions[resetPositionTypeData.id].remainingLiquidity = this.currentPositions[
+          resetPositionTypeData.id
+        ].remainingLiquidity.add(parseUnits(resetPositionTypeData.newFunds, resetPositionTypeData.decimals));
+        this.currentPositions[resetPositionTypeData.id].totalSwaps = BigNumber.from(resetPositionTypeData.newSwaps).lt(
+          this.currentPositions[resetPositionTypeData.id].remainingSwaps
+        )
+          ? this.currentPositions[resetPositionTypeData.id].totalSwaps.sub(resetPositionSwapDifference)
+          : this.currentPositions[resetPositionTypeData.id].totalSwaps.add(resetPositionSwapDifference);
+        this.currentPositions[resetPositionTypeData.id].remainingSwaps = this.currentPositions[
+          resetPositionTypeData.id
+        ].remainingSwaps.add(BigNumber.from(resetPositionTypeData.newSwaps));
+        this.currentPositions[resetPositionTypeData.id].rate = this.currentPositions[
+          resetPositionTypeData.id
+        ].remainingLiquidity.div(this.currentPositions[resetPositionTypeData.id].remainingSwaps);
+        break;
+      }
+      case TRANSACTION_TYPES.REMOVE_FUNDS: {
+        const removeFundsTypeData = transaction.typeData as RemoveFundsTypeData;
+        const removeFundsDifference = parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals).eq(
+          this.currentPositions[removeFundsTypeData.id].remainingLiquidity
+        )
+          ? this.currentPositions[removeFundsTypeData.id].remainingSwaps
+          : BigNumber.from(0);
+        const originalRemainingLiquidity = this.currentPositions[removeFundsTypeData.id].remainingLiquidity.toString();
+        this.currentPositions[removeFundsTypeData.id].pendingTransaction = '';
+        this.currentPositions[removeFundsTypeData.id].totalSwaps = parseUnits(
+          removeFundsTypeData.ammountToRemove,
+          removeFundsTypeData.decimals
+        ).eq(this.currentPositions[removeFundsTypeData.id].remainingLiquidity)
+          ? this.currentPositions[removeFundsTypeData.id].totalSwaps.sub(removeFundsDifference)
+          : this.currentPositions[removeFundsTypeData.id].totalSwaps;
+        this.currentPositions[removeFundsTypeData.id].remainingLiquidity = this.currentPositions[
+          removeFundsTypeData.id
+        ].remainingLiquidity.sub(parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals));
+        this.currentPositions[removeFundsTypeData.id].rate = this.currentPositions[
+          removeFundsTypeData.id
+        ].remainingLiquidity.div(this.currentPositions[removeFundsTypeData.id].remainingSwaps);
+        this.currentPositions[removeFundsTypeData.id].remainingSwaps = parseUnits(
+          removeFundsTypeData.ammountToRemove,
+          removeFundsTypeData.decimals
+        ).eq(BigNumber.from(originalRemainingLiquidity))
+          ? BigNumber.from(0)
+          : this.currentPositions[removeFundsTypeData.id].remainingSwaps;
+        break;
+      }
+      case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION: {
+        const modifySwapsPositionTypeData = transaction.typeData as ModifySwapsPositionTypeData;
+        this.currentPositions[modifySwapsPositionTypeData.id].pendingTransaction = '';
+        this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps = BigNumber.from(
+          modifySwapsPositionTypeData.newSwaps
+        );
+        this.currentPositions[modifySwapsPositionTypeData.id].rate = this.currentPositions[
+          modifySwapsPositionTypeData.id
+        ].remainingLiquidity.div(this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps);
+        break;
+      }
+      case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
+        const modifyRateAndSwapsPositionTypeData = transaction.typeData as ModifyRateAndSwapsPositionTypeData;
+        const modifiedRateAndSwapsSwapDifference = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
+          this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps
+        )
+          ? this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps.sub(
+              BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps)
+            )
+          : BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).sub(
+              this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps
+            );
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].pendingTransaction = '';
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = parseUnits(
+          modifyRateAndSwapsPositionTypeData.newRate,
+          modifyRateAndSwapsPositionTypeData.decimals
+        );
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps = BigNumber.from(
+          modifyRateAndSwapsPositionTypeData.newSwaps
+        ).lt(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps)
+          ? this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps.sub(
+              modifiedRateAndSwapsSwapDifference
+            )
+          : this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps.add(
+              modifiedRateAndSwapsSwapDifference
+            );
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps = BigNumber.from(
+          modifyRateAndSwapsPositionTypeData.newSwaps
+        );
+        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity = this.currentPositions[
+          modifyRateAndSwapsPositionTypeData.id
+        ].rate.mul(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
+        break;
+      }
+      case TRANSACTION_TYPES.TRANSFER_POSITION: {
+        const transferPositionTypeData = transaction.typeData as TransferTypeData;
+        delete this.currentPositions[transferPositionTypeData.id];
+        break;
+      }
+      case TRANSACTION_TYPES.MODIFY_PERMISSIONS: {
+        const modifyPermissionsTypeData = transaction.typeData as ModifyPermissionsTypeData;
+        this.currentPositions[modifyPermissionsTypeData.id].pendingTransaction = '';
+        break;
+      }
+      default:
+        break;
+    }
+  }
+}

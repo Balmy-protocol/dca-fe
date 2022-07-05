@@ -17,7 +17,6 @@ import TransactionModalProvider from 'common/transaction-modal';
 import { useAppDispatch } from 'hooks/state';
 import { startFetchingTokenLists } from 'state/token-lists/actions';
 import { SnackbarProvider } from 'notistack';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -26,6 +25,7 @@ import Vector1 from 'assets/svg/vector1.svg';
 import Vector2 from 'assets/svg/vector2.svg';
 import find from 'lodash/find';
 import { NetworkStruct } from 'types';
+import useWalletService from 'hooks/useWalletService';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -73,7 +73,7 @@ const StyledFooterGridContainer = styled(Grid)`
   flex: 0;
 `;
 const AppFrame = ({ isLoading }: AppFrameProps) => {
-  const web3Service = useWeb3Service();
+  const walletService = useWalletService();
   const mode = useThemeMode();
 
   const theme = createTheme({
@@ -87,7 +87,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
 
   React.useEffect(() => {
     async function getNetwork() {
-      const web3Network = await web3Service.getNetwork();
+      const web3Network = await walletService.getNetwork();
       if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
         const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
         dispatch(setNetwork(networkToSet as NetworkStruct));

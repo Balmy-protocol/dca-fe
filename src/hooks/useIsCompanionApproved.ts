@@ -2,25 +2,27 @@ import React from 'react';
 import { FullPosition } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
-import WalletContext from 'common/wallet-context';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
+import useWalletService from './useWalletService';
+import usePositionService from './usePositionService';
 
 function useIsCompanionApproved(position: FullPosition | undefined): [boolean | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
-  const { web3Service } = React.useContext(WalletContext);
+  const walletService = useWalletService();
+  const positionService = usePositionService();
   const [result, setResult] = React.useState<boolean | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(position);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = usePrevious(web3Service.getAccount());
-  const currentAccount = web3Service.getAccount();
+  const account = usePrevious(walletService.getAccount());
+  const currentAccount = walletService.getAccount();
 
   React.useEffect(() => {
     async function callPromise() {
       if (position) {
         try {
-          const promiseResult = await web3Service.companionIsApproved(position);
+          const promiseResult = await positionService.companionIsApproved(position);
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {

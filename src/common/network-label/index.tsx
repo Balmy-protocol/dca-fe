@@ -6,13 +6,13 @@ import find from 'lodash/find';
 import { NETWORKS, NETWORKS_FOR_MENU, SUPPORTED_NETWORKS } from 'config/constants';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
 import TokenIcon from 'common/token-icon';
 import { emptyTokenWithAddress } from 'utils/currency';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
+import useWalletService from 'hooks/useWalletService';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -73,7 +73,7 @@ const Warning = () => (
 const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const popoverClasses = usePopoverStyles();
   const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
-  const web3Service = useWeb3Service();
+  const walletService = useWalletService();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
 
@@ -87,7 +87,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
     setShouldOpenNetworkMenu(false);
     if (chainId) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      web3Service.changeNetwork(chainId);
+      walletService.changeNetwork(chainId);
     }
   };
 

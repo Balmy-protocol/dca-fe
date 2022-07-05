@@ -7,15 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useHasPendingApproval, useTransactionAdder } from 'state/transactions/hooks';
-import {
-  COMPANION_ADDRESS,
-  FULL_DEPOSIT_TYPE,
-  HUB_ADDRESS,
-  PERMISSIONS,
-  RATE_TYPE,
-  STRING_SWAP_INTERVALS,
-  TRANSACTION_TYPES,
-} from 'config/constants';
+import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, STRING_SWAP_INTERVALS, TRANSACTION_TYPES } from 'config/constants';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { BigNumber } from 'ethers';
@@ -37,7 +29,6 @@ import {
   useModifyRateSettingsUseWrappedProtocolToken,
 } from 'state/modify-rate-settings/hooks';
 import useBalance from 'hooks/useBalance';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { useAppDispatch } from 'state/hooks';
 import { getFrequencyLabel } from 'utils/parsing';
 import useAllowance from 'hooks/useAllowance';
@@ -46,6 +37,9 @@ import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import { ButtonTypes } from 'common/button';
 import useSupportsSigning from 'hooks/useSupportsSigning';
+import usePositionService from 'hooks/usePositionService';
+import useWalletService from 'hooks/useWalletService';
+import useContractService from 'hooks/useContractService';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -86,7 +80,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const dispatch = useAppDispatch();
   const rate = useModifyRateSettingsRate();
   const modeType = useModifyRateSettingsModeType();
-  const web3Service = useWeb3Service();
+  const positionService = usePositionService();
+  const walletService = useWalletService();
+  const contractService = useContractService();
   const addTransaction = useTransactionAdder();
   const currentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -107,7 +103,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport;
   const [allowance] = useAllowance(useWrappedProtocolToken ? wrappedProtocolToken : position.from);
   const [balance] = useBalance(fromToUse);
-  const hasPendingApproval = useHasPendingApproval(fromToUse, web3Service.getAccount());
+  const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount());
   const realBalance = balance && balance.add(position.remainingLiquidity);
 
   const cantFund =
@@ -220,7 +216,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     try {
       handleCancel();
 
-      const hasPermission = await web3Service.companionHasPermission(
+      const hasPermission = await positionService.companionHasPermission(
         position,
         isIncreasingPosition ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
       );
@@ -261,7 +257,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </>
         ),
       });
-      const result = await web3Service.modifyRateAndSwaps(position, rate, frequencyValue, useWrappedProtocolToken);
+      const result = await positionService.modifyRateAndSwaps(position, rate, frequencyValue, useWrappedProtocolToken);
       addTransaction(result, {
         type: TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION,
         typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
@@ -309,15 +305,15 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </Typography>
         ),
       });
-      const result = await web3Service.approveToken(fromToUse);
+      const result = await walletService.approveToken(fromToUse);
+      const hubAddress = await contractService.getHUBAddress();
+      const companionAddress = await contractService.getHUBCompanionAddress();
+
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: fromToUse,
-          addressFor:
-            to.address === PROTOCOL_TOKEN_ADDRESS
-              ? COMPANION_ADDRESS[currentNetwork.chainId]
-              : HUB_ADDRESS[currentNetwork.chainId],
+          addressFor: to.address === PROTOCOL_TOKEN_ADDRESS ? companionAddress : hubAddress,
         },
       });
       setModalSuccess({

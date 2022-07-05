@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
 import { Position } from 'types';
-import useWeb3Service from 'hooks/useWeb3Service';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { FULL_DEPOSIT_TYPE, PERMISSIONS, POSITION_VERSION_3, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
@@ -19,6 +18,7 @@ import { useAppDispatch } from 'state/hooks';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
 import { EmptyPosition } from 'mocks/currentPositions';
+import usePositionService from 'hooks/usePositionService';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import TerminateModal from 'common/terminate-modal';
@@ -45,7 +45,7 @@ const CurrentPositions = () => {
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const addTransaction = useTransactionAdder();
-  const web3Service = useWeb3Service();
+  const positionService = usePositionService();
   const positionsPerRow = POSITIONS_PER_ROW[currentBreakPoint];
   const positionsToFill =
     currentPositions.length % positionsPerRow !== 0 ? positionsPerRow - (currentPositions.length % positionsPerRow) : 0;
@@ -81,7 +81,7 @@ const CurrentPositions = () => {
     try {
       const positionId =
         position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
-      const hasPermission = await web3Service.companionHasPermission(
+      const hasPermission = await positionService.companionHasPermission(
         { ...position, id: positionId },
         PERMISSIONS.WITHDRAW
       );
@@ -112,7 +112,7 @@ const CurrentPositions = () => {
           </>
         ),
       });
-      const result = await web3Service.withdraw({ ...position, id: positionId }, useProtocolToken);
+      const result = await positionService.withdraw({ ...position, id: positionId }, useProtocolToken);
       addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
       setModalSuccess({
         hash: result.hash,

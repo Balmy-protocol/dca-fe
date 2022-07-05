@@ -3,13 +3,14 @@ import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
 import usePrevious from 'hooks/usePrevious';
-import WalletContext from 'common/wallet-context';
 import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import { STABLE_COINS } from 'config/constants';
 import { formatCurrencyAmount } from 'utils/currency';
 import useCurrentNetwork from './useCurrentNetwork';
+import usePriceService from './usePriceService';
+import useWalletService from './useWalletService';
 
 function useUsdPrice(
   from: Token | undefined | null,
@@ -17,7 +18,8 @@ function useUsdPrice(
   date?: string
 ): [number | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
-  const { web3Service } = React.useContext(WalletContext);
+  const priceService = usePriceService();
+  const walletService = useWalletService();
   const [result, setResult] = React.useState<number | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const prevFrom = usePrevious(from);
@@ -29,7 +31,7 @@ function useUsdPrice(
     async function callPromise() {
       if (from && !STABLE_COINS.includes(from.symbol) && amount && amount.gt(BigNumber.from(0))) {
         try {
-          const [price] = await web3Service.getUsdHistoricPrice(
+          const [price] = await priceService.getUsdHistoricPrice(
             [from.address === protocolToken.address ? wrappedProtocolToken : from],
             date
           );
@@ -51,7 +53,7 @@ function useUsdPrice(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, amount, isLoading, result, error, web3Service.getAccount(), currentNetwork]);
+  }, [from, amount, isLoading, result, error, walletService.getAccount(), currentNetwork]);
 
   return React.useMemo(() => {
     if (!from || !amount) {

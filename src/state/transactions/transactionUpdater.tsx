@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
-import useWeb3Service from 'hooks/useWeb3Service';
 import omit from 'lodash/omit';
 import useBuildTransactionMessage from 'hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from 'hooks/useBuildRejectedTransactionMessage';
@@ -12,6 +11,9 @@ import { TRANSACTION_TYPES } from 'config/constants';
 import EtherscanLink from 'common/view-on-etherscan';
 import { TransactionReceipt } from 'types';
 import { setInitialized } from 'state/initializer/actions';
+import useTransactionService from 'hooks/useTransactionService';
+import useWalletService from 'hooks/useWalletService';
+import usePositionService from 'hooks/usePositionService';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { usePendingTransactions } from './hooks';
 import { checkedTransaction, finalizeTransaction, removeTransaction, transactionFailed } from './actions';
@@ -42,7 +44,9 @@ export function shouldCheck(lastBlockNumber: number, tx: TxInterface): boolean {
 }
 
 export default function Updater(): null {
-  const web3Service = useWeb3Service();
+  const transactionService = useTransactionService();
+  const walletService = useWalletService();
+  const positionService = usePositionService();
 
   const currentNetwork = useCurrentNetwork();
 
@@ -62,18 +66,18 @@ export default function Updater(): null {
 
   const getReceipt = useCallback(
     (hash: string) => {
-      if (!web3Service.getAccount()) throw new Error('No library or chainId');
-      return web3Service.getTransactionReceipt(hash);
+      if (!walletService.getAccount()) throw new Error('No library or chainId');
+      return transactionService.getTransactionReceipt(hash);
     },
-    [web3Service]
+    [walletService]
   );
   const checkIfTransactionExists = useCallback(
     (hash: string) => {
-      if (!web3Service.getAccount()) throw new Error('No library or chainId');
-      return web3Service.getTransaction(hash).then((tx: ethers.providers.TransactionResponse) => {
+      if (!walletService.getAccount()) throw new Error('No library or chainId');
+      return transactionService.getTransaction(hash).then((tx: ethers.providers.TransactionResponse) => {
         if (!tx) {
           if (transactions[hash].retries > 2) {
-            web3Service.handleTransactionRejection({
+            positionService.handleTransactionRejection({
               ...transactions[hash],
               typeData: {
                 ...transactions[hash].typeData,
@@ -106,26 +110,26 @@ export default function Updater(): null {
         return true;
       });
     },
-    [web3Service, web3Service.getAccount(), transactions, lastBlockNumber, dispatch, currentNetwork]
+    [walletService, walletService.getAccount(), transactions, lastBlockNumber, dispatch, currentNetwork]
   );
 
   useEffect(() => {
     pendingTransactions.forEach((transaction) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      web3Service.setPendingTransaction(transaction);
+      positionService.setPendingTransaction(transaction);
     });
     dispatch(setInitialized());
   }, []);
 
   useEffect(() => {
-    if (!web3Service.getAccount() || !lastBlockNumber) return;
+    if (!walletService.getAccount() || !lastBlockNumber) return;
 
     Object.keys(transactions)
       .filter((hash) => shouldCheck(lastBlockNumber, transactions[hash]))
       .forEach((hash) => {
         const promise = getReceipt(hash);
         promise
-          .then((receipt) => {
+          .then(async (receipt) => {
             if (receipt && !transactions[hash].receipt) {
               let extendedTypeData = {};
 
@@ -135,23 +139,22 @@ export default function Updater(): null {
                 };
               }
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
+                const parsedLog = await transactionService.parseLog(receipt.logs, currentNetwork.chainId, 'Deposited');
                 extendedTypeData = {
-                  // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                  id: web3Service
-                    .parseLog(receipt.logs, currentNetwork.chainId, 'Deposited')
-                    .args.positionId.toString(),
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+                  id: parsedLog.args.positionId.toString(),
                 };
               }
               if (transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION) {
+                const parsedLog = await transactionService.parseLog(receipt.logs, currentNetwork.chainId, 'Deposited');
+
                 extendedTypeData = {
-                  // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-                  newId: web3Service
-                    .parseLog(receipt.logs, currentNetwork.chainId, 'Deposited')
-                    .args.positionId.toString(),
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+                  newId: parsedLog.args.positionId.toString(),
                 };
               }
 
-              web3Service.handleTransaction({
+              positionService.handleTransaction({
                 ...transactions[hash],
                 typeData: {
                   ...transactions[hash].typeData,
@@ -204,7 +207,7 @@ export default function Updater(): null {
             console.error(`Failed to check transaction hash: ${hash}`, error);
           });
       });
-  }, [web3Service.getAccount(), transactions, lastBlockNumber, dispatch, getReceipt, checkIfTransactionExists]);
+  }, [walletService.getAccount(), transactions, lastBlockNumber, dispatch, getReceipt, checkIfTransactionExists]);
 
   return null;
 }

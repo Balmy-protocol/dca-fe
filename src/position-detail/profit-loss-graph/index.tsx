@@ -10,7 +10,7 @@ import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
 import { POSITION_ACTIONS } from 'config/constants';
 import EmptyGraph from 'assets/svg/emptyGraph';
-import useWeb3Service from 'hooks/useWeb3Service';
+import usePriceService from 'hooks/usePriceService';
 import { formatUnits } from '@ethersproject/units';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import ProfitLossTooltip from './tooltip';
@@ -139,7 +139,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   const [prices, setPrices] = React.useState<Prices>([]);
   const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
   const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
-  const web3Service = useWeb3Service();
+  const priceService = usePriceService();
 
   React.useEffect(() => {
     const fetchTokenRate = async () => {
@@ -163,7 +163,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
 
           if (CREATED_ACTIONS.includes(action)) {
             // eslint-disable-next-line no-await-in-loop
-            const [fetchedTokenFromPrice, fetchedTokenToPrice] = await web3Service.getUsdHistoricPrice(
+            const [fetchedTokenFromPrice, fetchedTokenToPrice] = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
               positionAction.createdAtTimestamp
             );
@@ -179,7 +179,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             const amountAdded = newFunds.sub(oldFunds);
 
             // eslint-disable-next-line no-await-in-loop
-            const [fetchedTokenFromPrice, fetchedTokenToPrice] = await web3Service.getUsdHistoricPrice(
+            const [fetchedTokenFromPrice, fetchedTokenToPrice] = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
               positionAction.createdAtTimestamp
             );

@@ -3,18 +3,20 @@ import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
 import usePrevious from 'hooks/usePrevious';
-import WalletContext from 'common/wallet-context';
 import { BigNumber } from 'ethers';
 import { parseUnits } from '@ethersproject/units';
 import { STABLE_COINS } from 'config/constants';
 import useCurrentNetwork from './useCurrentNetwork';
+import usePriceService from './usePriceService';
+import useWalletService from './useWalletService';
 
 function useOracleQuote(
   from: Token | undefined | null,
   to: Token | undefined | null
 ): [BigNumber | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
-  const { web3Service } = React.useContext(WalletContext);
+  const priceService = usePriceService();
+  const walletService = useWalletService();
   const [result, setResult] = React.useState<BigNumber | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const prevFrom = usePrevious(from);
@@ -27,7 +29,7 @@ function useOracleQuote(
         try {
           const fromToUse = STABLE_COINS.includes(from.symbol) ? to : from;
           const toToUse = STABLE_COINS.includes(from.symbol) ? from : to;
-          const price = await web3Service.getTokenQuote(fromToUse, toToUse, parseUnits('1', fromToUse.decimals || 18));
+          const price = await priceService.getTokenQuote(fromToUse, toToUse, parseUnits('1', fromToUse.decimals || 18));
           setResult(price);
           setError(undefined);
         } catch (e) {
@@ -45,7 +47,7 @@ function useOracleQuote(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, to, isLoading, result, error, web3Service.getAccount(), currentNetwork]);
+  }, [from, to, isLoading, result, error, walletService.getAccount(), currentNetwork]);
 
   if (!from || !to) {
     return [undefined, false, undefined];

@@ -1,4 +1,4 @@
-import useWeb3Service from 'hooks/useWeb3Service';
+import useWalletService from 'hooks/useWalletService';
 import React from 'react';
 
 interface AddressProps {
@@ -7,12 +7,12 @@ interface AddressProps {
 }
 
 const Address = ({ address, trimAddress }: AddressProps) => {
-  const web3Service = useWeb3Service();
+  const walletService = useWalletService();
   const [addressEns, setAddressEns] = React.useState<string | null>(null);
   const [hasSearchedForEns, setSearchedForEns] = React.useState(false);
   React.useEffect(() => {
     const fetchENS = async () => {
-      setAddressEns(await web3Service.getEns(address));
+      setAddressEns(await walletService.getEns(address));
       setSearchedForEns(true);
     };
     if (!addressEns && !hasSearchedForEns) {

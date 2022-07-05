@@ -15,9 +15,11 @@ import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 import useWeb3Service from 'hooks/useWeb3Service';
-import { HUB_ADDRESS, TRANSACTION_TYPES } from 'config/constants';
+import { HUB_ADDRESS, POSITION_VERSION_3, TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
+import usePositionService from 'hooks/usePositionService';
+import useWalletService from 'hooks/useWalletService';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { addTransaction } from './actions';
 
@@ -32,7 +34,8 @@ export function useTransactionAdder(): (
     typeData: TransactionTypeDataOptions;
   }
 ) => void {
-  const web3Service = useWeb3Service();
+  const positionService = usePositionService();
+  const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
 
@@ -53,7 +56,7 @@ export function useTransactionAdder(): (
         approval?: { tokenAddress: string; spender: string };
       } = { type: TRANSACTION_TYPES.NO_OP, typeData: { id: 'NO_OP' } }
     ) => {
-      if (!web3Service.getAccount()) return;
+      if (!walletService.getAccount()) return;
 
       const { hash } = response;
       if (!hash) {
@@ -62,7 +65,7 @@ export function useTransactionAdder(): (
       dispatch(
         addTransaction({
           hash,
-          from: web3Service.getAccount(),
+          from: walletService.getAccount(),
           approval,
           summary,
           claim,
@@ -72,9 +75,9 @@ export function useTransactionAdder(): (
         })
       );
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      web3Service.setPendingTransaction({
+      positionService.setPendingTransaction({
         hash,
-        from: web3Service.getAccount(),
+        from: walletService.getAccount(),
         approval,
         summary,
         claim,
@@ -84,7 +87,7 @@ export function useTransactionAdder(): (
         retries: 0,
       });
     },
-    [dispatch, web3Service.getAccount(), currentNetwork]
+    [dispatch, walletService.getAccount(), currentNetwork]
   );
 }
 
@@ -173,7 +176,7 @@ export function useHasPendingApproval(token: Token | null, spender: string | und
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
-  const addressToCheck = HUB_ADDRESS[currentNetwork.chainId];
+  const addressToCheck = HUB_ADDRESS[POSITION_VERSION_3][currentNetwork.chainId];
 
   return useMemo(
     () =>
@@ -297,7 +300,7 @@ export function useHasConfirmedApproval(token: Token | null, spender: string | u
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
-  const addressToCheck = HUB_ADDRESS[currentNetwork.chainId];
+  const addressToCheck = HUB_ADDRESS[POSITION_VERSION_3][currentNetwork.chainId];
   // const blockNumber = useBlockNumber(currentNetwork.chainId);
 
   return useMemo(

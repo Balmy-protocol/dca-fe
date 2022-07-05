@@ -4,7 +4,6 @@ import { formatUnits } from '@ethersproject/units';
 import Modal from 'common/modal';
 import { Position } from 'types';
 import { FormattedMessage } from 'react-intl';
-import WalletContext from 'common/wallet-context';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
@@ -16,6 +15,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { BigNumber } from 'ethers';
 import useSupportsSigning from 'hooks/useSupportsSigning';
+import usePositionService from 'hooks/usePositionService';
 
 interface TerminateModalProps {
   position: Position;
@@ -34,7 +34,7 @@ const StyledTerminateContainer = styled.div`
 
 const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
-  const { web3Service } = React.useContext(WalletContext);
+  const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
@@ -76,7 +76,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
 
       const positionId =
         position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
-      const hasPermission = await web3Service.companionHasPermission(
+      const hasPermission = await positionService.companionHasPermission(
         { ...position, id: positionId },
         PERMISSIONS.TERMINATE
       );
@@ -110,7 +110,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         ),
       });
 
-      const result = await web3Service.terminate(
+      const result = await positionService.terminate(
         {
           ...position,
           id: positionId,

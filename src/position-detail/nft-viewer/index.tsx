@@ -1,7 +1,7 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { FullPosition, NFTData } from 'types';
+import usePositionService from 'hooks/usePositionService';
 
 interface NftViewerProps {
   position: FullPosition;
@@ -9,11 +9,11 @@ interface NftViewerProps {
 
 const NftViewer = ({ position }: NftViewerProps) => {
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
-  const web3Service = useWeb3Service();
+  const positionService = usePositionService();
 
   React.useEffect(() => {
     const fetchNFTData = async () => {
-      const tokenNFT = await web3Service.getTokenNFT(position.id);
+      const tokenNFT = await positionService.getTokenNFT(position.id);
       setNFTData(tokenNFT);
     };
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
