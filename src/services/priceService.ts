@@ -50,22 +50,23 @@ export default class PriceService {
     return usdPrice || 0;
   }
 
-  async getUsdHistoricPrice(tokens: Token[], date?: string) {
+  async getUsdHistoricPrice(tokens: Token[], date?: string, chainId?: number) {
     const network = await this.walletService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
+    const chainIdToUse = chainId || network.chainId;
+    const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
     const mappedTokens = tokens.map((token) =>
       token.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : token
     );
     const price = await this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
       'https://coins.llama.fi/prices',
       {
-        coins: mappedTokens.map((token) => `${DEFILLAMA_IDS[network.chainId]}:${token.address}`),
+        coins: mappedTokens.map((token) => `${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`),
         ...(date && { timestamp: parseInt(date, 10) }),
       }
     );
 
     const tokensPrices = mappedTokens.map((token) =>
-      parseUnits(price.data.coins[`${DEFILLAMA_IDS[network.chainId]}:${token.address}`].price.toString(), 18)
+      parseUnits(price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price.toString(), 18)
     );
 
     return tokensPrices;

@@ -54,7 +54,9 @@ export const startFetchingTokenLists = createAsyncThunk(
     };
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    Object.keys(state.tokenLists.byUrl).forEach((listUrl) => dispatch(fetchTokenList(listUrl)));
+    Object.keys(state.tokenLists.byUrl)
+      .filter((listUrl) => listUrl !== 'Mean Finance Graph Allowed Tokens')
+      .forEach((listUrl) => dispatch(fetchTokenList(listUrl)));
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     dispatch(fetchGraphTokenList());
   }

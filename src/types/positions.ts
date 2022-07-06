@@ -49,6 +49,7 @@ export interface Position {
   startedAt: number;
   pendingTransaction: string;
   version: PositionVersions;
+  chainId: number;
 }
 
 export interface FullPosition {
@@ -72,6 +73,7 @@ export interface FullPosition {
   totalWithdrawn: string;
   startedAtSwap: string;
   terminatedAtTimestamp: string;
+  chainId: number;
   swapInterval: {
     id: string;
     interval: string;

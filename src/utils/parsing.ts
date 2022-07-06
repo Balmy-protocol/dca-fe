@@ -130,5 +130,6 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
     executedSwaps: BigNumber.from(position.executedSwaps),
     pendingTransaction: '',
     version: POSITION_VERSION_3,
+    chainId: position.chainId,
   };
 }
