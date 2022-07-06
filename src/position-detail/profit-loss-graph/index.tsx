@@ -85,6 +85,8 @@ type Prices = PriceData[];
 //   isBaseToken: boolean;
 // }
 
+const POINT_LIMIT = 30;
+
 const MODIFY_ACTIONS = [
   POSITION_ACTIONS.MODIFIED_DURATION,
   POSITION_ACTIONS.MODIFIED_RATE,
@@ -263,17 +265,19 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
 
   const noData = prices.length === 0;
 
-  const mappedPrices = prices.map((price) => {
-    const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);
-    const swappedIfLumpSum = formatUnits(price.swappedIfLumpSum, position.to.decimals);
+  const mappedPrices = prices
+    .map((price) => {
+      const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);
+      const swappedIfLumpSum = formatUnits(price.swappedIfLumpSum, position.to.decimals);
 
-    // console.log(swappedIfDCA, swappedIfLumpSum);
-    return {
-      ...price,
-      swappedIfDCA: parseFloat(swappedIfDCA),
-      swappedIfLumpSum: parseFloat(swappedIfLumpSum),
-    };
-  });
+      // console.log(swappedIfDCA, swappedIfLumpSum);
+      return {
+        ...price,
+        swappedIfDCA: parseFloat(swappedIfDCA),
+        swappedIfLumpSum: parseFloat(swappedIfLumpSum),
+      };
+    })
+    .slice(-POINT_LIMIT);
 
   if (noData) {
     return (

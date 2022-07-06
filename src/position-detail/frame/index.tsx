@@ -37,6 +37,7 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
+import useGqlFetchAll from 'hooks/useGqlFetchAll';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
 
@@ -73,7 +74,7 @@ const StyledPositionDetailsContainer = styled(Grid)`
   align-self: flex-start;
 `;
 
-const WAIT_FOR_SUBGRAPH = 5000;
+// const WAIT_FOR_SUBGRAPH = 5000;
 
 const PositionDetailFrame = () => {
   const { positionId } = useParams<{ positionId: string }>();
@@ -88,14 +89,15 @@ const PositionDetailFrame = () => {
   const {
     loading: isLoading,
     data,
-    refetch,
-  } = useQuery<{ position: FullPosition }>(getPosition, {
-    client,
-    variables: {
+    // refetch,
+  } = useGqlFetchAll<{ position: FullPosition }>(
+    getPosition,
+    {
       id: positionId,
     },
-    skip: positionId === '' || positionId === null,
-  });
+    'position.history',
+    positionId === '' || positionId === null
+  );
 
   let position = data && data.position;
 
@@ -125,7 +127,7 @@ const PositionDetailFrame = () => {
   React.useEffect(() => {
     if (position && !isPending) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
-      setTimeout(refetch, WAIT_FOR_SUBGRAPH);
+      // setTimeout(refetch, WAIT_FOR_SUBGRAPH);
     }
   }, [position, isPending]);
 

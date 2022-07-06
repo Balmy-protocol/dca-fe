@@ -23,7 +23,7 @@ function useGqlFetchAll<T>(
     async function callPromise() {
       try {
         const gqlResult = await gqlFetchAll<T>(client, queryToRun, variables, dataToSearch);
-        setResult(gqlResult as never);
+        setResult({ ...gqlResult, loading: false } as never);
       } catch (e) {
         console.error(e);
       }
