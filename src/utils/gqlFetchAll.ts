@@ -23,7 +23,7 @@ export default async function gqlFetchAll<T>(
   dataToSearch: string,
   fetchPolicy: WatchQueryFetchPolicy = 'cache-and-network',
   offset = 0,
-  limit = 100,
+  limit = 1000,
   query: ObservableQuery<any, OperationVariables> | null = null
 ): Promise<GraphqlResults<T>> {
   if (query) {
