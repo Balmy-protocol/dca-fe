@@ -7,6 +7,9 @@ import {
   DocumentNode,
   WatchQueryFetchPolicy,
 } from '@apollo/client';
+import cloneDeep from 'lodash/cloneDeep';
+import set from 'lodash/set';
+import get from 'lodash/get';
 
 interface GraphqlResults<T> {
   data: T | undefined;
@@ -20,13 +23,28 @@ export default async function gqlFetchAll<T>(
   dataToSearch: string,
   fetchPolicy: WatchQueryFetchPolicy = 'cache-and-network',
   offset = 0,
-  limit = 1000,
+  limit = 100,
   query: ObservableQuery<any, OperationVariables> | null = null
 ): Promise<GraphqlResults<T>> {
   if (query) {
-    const newResults = await query.result();
+    const newResults = await query.fetchMore({
+      variables: {
+        first: limit,
+        skip: offset,
+      },
+      updateQuery: (prevResults, options) => {
+        let updatedQueryResults = cloneDeep(prevResults);
 
-    if (newResults.data[dataToSearch].length === limit + offset) {
+        const resultsToUpdate = get(options.fetchMoreResult, dataToSearch);
+        const prevResultsToUpdate = get(updatedQueryResults, dataToSearch);
+
+        set(updatedQueryResults, dataToSearch, [...prevResultsToUpdate, ...resultsToUpdate]);
+
+        return updatedQueryResults;
+      },
+    });
+
+    if (get(newResults.data, dataToSearch).length === limit) {
       return gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, query);
     }
 
@@ -45,7 +63,7 @@ export default async function gqlFetchAll<T>(
 
   const results = await newQuery.result();
 
-  if (results.data[dataToSearch].length === limit) {
+  if (get(results.data, dataToSearch).length === limit) {
     return gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, newQuery);
   }
 

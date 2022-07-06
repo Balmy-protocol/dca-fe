@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 const getPosition = gql`
-  query getPosition($id: String!) {
+  query getPosition($id: String!, $first: Int, $skip: Int) {
     position(id: $id) {
       id
       createdAtTimestamp
@@ -58,7 +58,7 @@ const getPosition = gql`
           permissions
         }
       }
-      history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc) {
+      history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc, first: $first, skip: $skip) {
         id
         action
         rate
