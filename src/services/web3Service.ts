@@ -10,7 +10,7 @@ import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import {
   MEAN_GRAPHQL_URL,
   NETWORKS,
-  POSITION_VERSION_2,
+  // POSITION_VERSION_2,
   POSITION_VERSION_3,
   UNI_GRAPHQL_URL,
   SUPPORTED_NETWORKS,
@@ -198,10 +198,10 @@ export default class Web3Service {
     this.apolloClient = new GraphqlService(
       MEAN_GRAPHQL_URL[POSITION_VERSION_3][chainId] || MEAN_GRAPHQL_URL[POSITION_VERSION_3][10]
     );
-    const v2Client =
-      (!!MEAN_GRAPHQL_URL[POSITION_VERSION_2][chainId] &&
-        new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_2][chainId])) ||
-      undefined;
+    // const v2Client =
+    //   (!!MEAN_GRAPHQL_URL[POSITION_VERSION_2][chainId] &&
+    //     new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_2][chainId])) ||
+    //   undefined;
     this.uniClient = new GraphqlService(
       UNI_GRAPHQL_URL[POSITION_VERSION_3][chainId] || UNI_GRAPHQL_URL[POSITION_VERSION_3][10]
     );
@@ -222,7 +222,7 @@ export default class Web3Service {
       }
     });
 
-    await this.positionService.fetchPositions(account, this.apolloClient, v2Client);
+    await this.positionService.fetchPositions(account);
 
     this.setAccount(account);
   }

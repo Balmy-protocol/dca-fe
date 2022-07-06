@@ -34,4 +34,5 @@ export const EmptyPosition: Position = {
   pendingTransaction: '',
   executedSwaps: BigNumber.from(0),
   version: POSITION_VERSION_3,
+  chainId: 10,
 };

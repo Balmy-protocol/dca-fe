@@ -4,8 +4,8 @@ import { Token } from 'types';
 import SvgIcon from '@mui/material/SvgIcon';
 import CryptoIcons from 'assets/svg/color';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import useTokenList from 'hooks/useTokenList';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import useTokenListUnfiltered from 'hooks/useTokenFromList';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineOutlinedIcon)<{ realSize: string }>`
   font-size: ${({ realSize }) => realSize};
@@ -30,8 +30,8 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
   const realSize = size || '28px';
   const [hasError, setHasError] = React.useState(false);
   let componentToRender = null;
-  const tokenList = useTokenList(false);
-  const tokenLogoUri = token?.logoURI || (token && tokenList[token.address] && tokenList[token.address].logoURI);
+  const foundToken = useTokenListUnfiltered(token?.address);
+  const tokenLogoUri = token?.logoURI || (token && foundToken && foundToken.logoURI);
   const addressToUse =
     token?.address && (token.address === PROTOCOL_TOKEN_ADDRESS ? `${token.chainId}-${token.address}` : token.address);
 

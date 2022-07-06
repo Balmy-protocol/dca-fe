@@ -15,7 +15,8 @@ import useWalletService from './useWalletService';
 function useUsdPrice(
   from: Token | undefined | null,
   amount: BigNumber | null,
-  date?: string
+  date?: string,
+  chainId?: number
 ): [number | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const priceService = usePriceService();
@@ -24,8 +25,8 @@ function useUsdPrice(
   const [error, setError] = React.useState<string | undefined>(undefined);
   const prevFrom = usePrevious(from);
   const currentNetwork = useCurrentNetwork();
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const protocolToken = getProtocolToken(currentNetwork.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(chainId || currentNetwork.chainId);
+  const protocolToken = getProtocolToken(chainId || currentNetwork.chainId);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -33,7 +34,8 @@ function useUsdPrice(
         try {
           const [price] = await priceService.getUsdHistoricPrice(
             [from.address === protocolToken.address ? wrappedProtocolToken : from],
-            date
+            date,
+            chainId
           );
           const multiplied = amount.mul(price);
           setResult(parseFloat(formatUnits(multiplied, from.decimals + 18)));
@@ -53,7 +55,7 @@ function useUsdPrice(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, amount, isLoading, result, error, walletService.getAccount(), currentNetwork]);
+  }, [from, amount, isLoading, result, error, walletService.getAccount(), currentNetwork, chainId]);
 
   return React.useMemo(() => {
     if (!from || !amount) {

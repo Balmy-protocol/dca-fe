@@ -12,13 +12,19 @@ import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
 import { Position, Token } from 'types';
 import { useHistory } from 'react-router-dom';
-import { POSITION_VERSION_2, POSITION_VERSION_3, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
+import {
+  NETWORKS,
+  POSITION_VERSION_2,
+  POSITION_VERSION_3,
+  STABLE_COINS,
+  STRING_SWAP_INTERVALS,
+} from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
-import { formatCurrencyAmount } from 'utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
@@ -46,12 +52,19 @@ const StyledChip = styled(Chip)`
   margin: 0px 5px;
 `;
 
+const StyledNetworkLogoContainer = styled.div`
+  position: absolute;
+  top: -15px;
+  right: -15px;
+`;
+
 const StyledCard = styled(Card)`
   border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
   background: #292929;
+  overflow: visible;
 `;
 
 const StyledCardContent = styled(CardContent)`
@@ -172,11 +185,12 @@ const ActivePosition = ({
     totalSwaps,
     pendingTransaction,
     toWithdraw,
+    chainId,
   } = position;
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw, undefined, chainId);
   const history = useHistory();
 
   const isPending = !!pendingTransaction;
@@ -202,8 +216,18 @@ const ActivePosition = ({
 
   const isOldVersion = position.version !== POSITION_VERSION_3;
 
+  const network = React.useMemo(() => {
+    const supportedNetwork = find(NETWORKS, { chainId });
+    return supportedNetwork;
+  }, [chainId]);
+
   return (
     <StyledCard variant="outlined">
+      {network && (
+        <StyledNetworkLogoContainer>
+          <TokenIcon size="30px" token={emptyTokenWithAddress(network.mainCurrency || '')} />
+        </StyledNetworkLogoContainer>
+      )}
       <StyledCardContent>
         <StyledContentContainer>
           <StyledCardHeader>
