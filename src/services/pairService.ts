@@ -20,7 +20,7 @@ import gqlFetchAll from 'utils/gqlFetchAll';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { ORACLES, SWAP_INTERVALS_MAP } from 'config/constants';
+import { ORACLES, POSITION_VERSION_3, SWAP_INTERVALS_MAP, VERSIONS } from 'config/constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -33,28 +33,43 @@ export default class PairService {
 
   walletService: WalletService;
 
-  uniClient: GraphqlService;
+  uniClient: Record<VERSIONS, Record<number, GraphqlService>>;
 
-  constructor(walletService: WalletService, contractService: ContractService, uniClient?: GraphqlService) {
+  apolloClient: Record<VERSIONS, Record<number, GraphqlService>>;
+
+  hasFetchedAvailablePairs: boolean;
+
+  constructor(
+    walletService: WalletService,
+    contractService: ContractService,
+    DCASubgraphs?: Record<VERSIONS, Record<number, GraphqlService>>,
+    UNISubgraphs?: Record<VERSIONS, Record<number, GraphqlService>>
+  ) {
     this.contractService = contractService;
     this.walletService = walletService;
+    this.availablePairs = [];
+    this.hasFetchedAvailablePairs = false;
 
-    if (uniClient) {
-      this.uniClient = uniClient;
+    if (UNISubgraphs) {
+      this.uniClient = UNISubgraphs;
+    }
+    if (DCASubgraphs) {
+      this.apolloClient = DCASubgraphs;
     }
   }
 
-  setUniClient(uniClient: GraphqlService) {
-    this.uniClient = uniClient;
+  getHasFetchedAvailablePairs() {
+    return this.hasFetchedAvailablePairs;
   }
 
   getAvailablePairs() {
     return this.availablePairs;
   }
 
-  async fetchAvailablePairs(apolloClient: GraphqlService) {
+  async fetchAvailablePairs() {
+    const network = await this.walletService.getNetwork();
     const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(
-      apolloClient.getClient(),
+      this.apolloClient[POSITION_VERSION_3][network.chainId].getClient(),
       GET_AVAILABLE_PAIRS,
       {},
       'pairs',
@@ -87,6 +102,8 @@ export default class PairService {
         })
       );
     }
+
+    this.hasFetchedAvailablePairs = true;
   }
 
   // PAIR METHODS
@@ -182,6 +199,7 @@ export default class PairService {
   async getPairLiquidity(token0: Token, token1: Token) {
     let tokenA;
     let tokenB;
+    const currentNetwork = await this.walletService.getNetwork();
     if (token0.address < token1.address) {
       tokenA = token0.address;
       tokenB = token1.address;
@@ -190,7 +208,7 @@ export default class PairService {
       tokenB = token0.address;
     }
     const poolsWithLiquidityResponse = await gqlFetchAll<PoolsLiquidityDataGraphqlResponse>(
-      this.uniClient.getClient(),
+      this.uniClient[POSITION_VERSION_3][currentNetwork.chainId].getClient(),
       GET_PAIR_LIQUIDITY,
       {
         tokenA,

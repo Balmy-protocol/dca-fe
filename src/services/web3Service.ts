@@ -7,14 +7,7 @@ import { AxiosInstance } from 'axios';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 
 // MOCKS
-import {
-  MEAN_GRAPHQL_URL,
-  NETWORKS,
-  // POSITION_VERSION_2,
-  POSITION_VERSION_3,
-  UNI_GRAPHQL_URL,
-  SUPPORTED_NETWORKS,
-} from 'config/constants';
+import { NETWORKS, SUPPORTED_NETWORKS, VERSIONS } from 'config/constants';
 
 import { getProviderInfo } from 'web3modal';
 import { setupAxiosClient } from 'state';
@@ -34,9 +27,9 @@ export default class Web3Service {
 
   signer: Signer;
 
-  apolloClient: GraphqlService;
+  apolloClient: Record<VERSIONS, Record<number, GraphqlService>>;
 
-  uniClient: GraphqlService;
+  uniClient: Record<VERSIONS, Record<number, GraphqlService>>;
 
   network: Network;
 
@@ -61,6 +54,8 @@ export default class Web3Service {
   walletService: WalletService;
 
   constructor(
+    DCASubgraphs?: Record<VERSIONS, Record<number, GraphqlService>>,
+    UNISubgraphs?: Record<VERSIONS, Record<number, GraphqlService>>,
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
     client?: ethers.providers.Web3Provider,
     modal?: SafeAppWeb3Modal
@@ -75,6 +70,12 @@ export default class Web3Service {
     if (modal) {
       this.modal = modal;
     }
+    if (DCASubgraphs) {
+      this.apolloClient = DCASubgraphs;
+    }
+    if (UNISubgraphs) {
+      this.uniClient = UNISubgraphs;
+    }
 
     this.axiosClient = setupAxiosClient();
 
@@ -82,12 +83,14 @@ export default class Web3Service {
     this.contractService = new ContractService(client);
     this.transactionService = new TransactionService(client);
     this.walletService = new WalletService(this.contractService, this.axiosClient, client);
-    this.pairService = new PairService(this.walletService, this.contractService);
-    this.positionService = new PositionService(this.walletService, this.pairService, this.contractService);
+    this.pairService = new PairService(this.walletService, this.contractService, this.apolloClient, this.uniClient);
+    this.positionService = new PositionService(
+      this.walletService,
+      this.pairService,
+      this.contractService,
+      this.apolloClient
+    );
     this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
-
-    this.apolloClient = new GraphqlService();
-    this.uniClient = new GraphqlService();
   }
 
   getContractService() {
@@ -195,20 +198,8 @@ export default class Web3Service {
     // For this, you need the account signer...
     const signer = ethersProvider.getSigner();
 
-    this.apolloClient = new GraphqlService(
-      MEAN_GRAPHQL_URL[POSITION_VERSION_3][chainId] || MEAN_GRAPHQL_URL[POSITION_VERSION_3][10]
-    );
-    // const v2Client =
-    //   (!!MEAN_GRAPHQL_URL[POSITION_VERSION_2][chainId] &&
-    //     new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_2][chainId])) ||
-    //   undefined;
-    this.uniClient = new GraphqlService(
-      UNI_GRAPHQL_URL[POSITION_VERSION_3][chainId] || UNI_GRAPHQL_URL[POSITION_VERSION_3][10]
-    );
     this.setClient(ethersProvider);
     this.setSigner(signer);
-
-    this.pairService.setUniClient(this.uniClient);
 
     const account = await this.signer.getAddress();
 
@@ -222,7 +213,7 @@ export default class Web3Service {
       }
     });
 
-    await this.positionService.fetchPositions(account);
+    // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
 
     this.setAccount(account);
   }
@@ -309,17 +300,6 @@ export default class Web3Service {
       window.ethereum.on('chainChanged', () => window.location.reload());
     }
 
-    if (!this.apolloClient.getClient() || !this.uniClient.getClient()) {
-      this.apolloClient = new GraphqlService(
-        MEAN_GRAPHQL_URL[POSITION_VERSION_3][chainIdToUse] || MEAN_GRAPHQL_URL[POSITION_VERSION_3][10]
-      );
-      this.uniClient = new GraphqlService(
-        UNI_GRAPHQL_URL[POSITION_VERSION_3][chainIdToUse] || UNI_GRAPHQL_URL[POSITION_VERSION_3][10]
-      );
-      this.pairService.setUniClient(this.uniClient);
-    }
-
-    // [TODO] FETCH AVAILABLE PAIRS
-    await this.pairService.fetchAvailablePairs(this.apolloClient);
+    // await this.pairService.fetchAvailablePairs();
   }
 }

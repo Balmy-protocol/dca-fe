@@ -132,6 +132,9 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
                       <Route path="/positions/:positionId">
                         <PositionDetail />
                       </Route>
+                      <Route path="/:chainId/positions/:positionVersion/:positionId">
+                        <PositionDetail />
+                      </Route>
                       <Route path="/leaderboard">
                         <Leaderboard />
                       </Route>

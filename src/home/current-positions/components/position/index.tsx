@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
-import { Position, Token } from 'types';
+import { NetworkStruct, Position, Token } from 'types';
 import { useHistory } from 'react-router-dom';
 import {
   NETWORKS,
@@ -28,7 +28,6 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useUsdPrice from 'hooks/useUsdPrice';
 
@@ -164,6 +163,7 @@ interface ActivePositionProps {
   onMigrate: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
+  network: NetworkStruct;
 }
 
 const ActivePosition = ({
@@ -174,6 +174,7 @@ const ActivePosition = ({
   onMigrate,
   disabled,
   hasSignSupport,
+  network,
 }: ActivePositionProps) => {
   const {
     from,
@@ -187,14 +188,20 @@ const ActivePosition = ({
     toWithdraw,
     chainId,
   } = position;
+  const positionNetwork = React.useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const supportedNetwork = find(NETWORKS, { chainId })!;
+    return supportedNetwork;
+  }, [chainId]);
+
+  const isOnNetwork = network.chainId === positionNetwork.chainId;
   const availablePairs = useAvailablePairs();
-  const currentNetwork = useCurrentNetwork();
-  const protocolToken = getProtocolToken(currentNetwork.chainId);
+  const protocolToken = getProtocolToken(positionNetwork.chainId);
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw, undefined, chainId);
   const history = useHistory();
 
   const isPending = !!pendingTransaction;
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
   const [token0, token1] = sortTokens(
     from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from,
     to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to
@@ -211,21 +218,16 @@ const ActivePosition = ({
     calculateStale(pair?.lastExecutedAt || 0, swapInterval, position.startedAt, pair?.swapInfo || '1') === STALE;
 
   const onViewDetails = () => {
-    history.push(`/positions/${position.id}`);
+    history.push(`/${chainId}/positions/${position.version}/${position.id}`);
   };
 
   const isOldVersion = position.version !== POSITION_VERSION_3;
 
-  const network = React.useMemo(() => {
-    const supportedNetwork = find(NETWORKS, { chainId });
-    return supportedNetwork;
-  }, [chainId]);
-
   return (
     <StyledCard variant="outlined">
-      {network && (
+      {positionNetwork && (
         <StyledNetworkLogoContainer>
-          <TokenIcon size="30px" token={emptyTokenWithAddress(network.mainCurrency || '')} />
+          <TokenIcon size="30px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
         </StyledNetworkLogoContainer>
       )}
       <StyledCardContent>
@@ -361,33 +363,33 @@ const ActivePosition = ({
           )}
         </StyledProgressWrapper>
         <StyledCallToActionContainer>
+          <StyledCardFooterButton
+            variant={isPending ? 'contained' : 'outlined'}
+            color={isPending ? 'pending' : 'default'}
+            onClick={() => !isPending && onViewDetails()}
+            fullWidth
+          >
+            {isPending ? (
+              <Link
+                href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
+                target="_blank"
+                rel="noreferrer"
+                underline="none"
+                color="inherit"
+              >
+                <Typography variant="body2" component="span">
+                  <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                </Typography>
+                <OpenInNewIcon style={{ fontSize: '1rem' }} />
+              </Link>
+            ) : (
+              <Typography variant="body2">
+                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+              </Typography>
+            )}
+          </StyledCardFooterButton>
           {position.version === POSITION_VERSION_3 && (
             <>
-              <StyledCardFooterButton
-                variant={isPending ? 'contained' : 'outlined'}
-                color={isPending ? 'pending' : 'default'}
-                onClick={() => !isPending && onViewDetails()}
-                fullWidth
-              >
-                {isPending ? (
-                  <Link
-                    href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    underline="none"
-                    color="inherit"
-                  >
-                    <Typography variant="body2" component="span">
-                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                    </Typography>
-                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
-                  </Link>
-                ) : (
-                  <Typography variant="body2">
-                    <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
-                  </Typography>
-                )}
-              </StyledCardFooterButton>
               {!isPending &&
                 toWithdraw.gt(BigNumber.from(0)) &&
                 hasSignSupport &&
@@ -397,7 +399,7 @@ const ActivePosition = ({
                     color="secondary"
                     onClick={() => onWithdraw(position, true)}
                     fullWidth
-                    disabled={disabled}
+                    disabled={disabled || isOnNetwork}
                   >
                     <Typography variant="body2">
                       <FormattedMessage
@@ -413,7 +415,7 @@ const ActivePosition = ({
                   variant="contained"
                   color="secondary"
                   onClick={() => onWithdraw(position, false)}
-                  disabled={disabled}
+                  disabled={disabled || isOnNetwork}
                   fullWidth
                 >
                   <Typography variant="body2">
@@ -435,7 +437,7 @@ const ActivePosition = ({
                   variant="contained"
                   color="secondary"
                   onClick={() => onReusePosition(position)}
-                  disabled={disabled}
+                  disabled={disabled || isOnNetwork}
                   fullWidth
                 >
                   <Typography variant="body2">
@@ -450,7 +452,7 @@ const ActivePosition = ({
               {isPending && (
                 <StyledCardFooterButton variant="contained" color="pending" fullWidth>
                   <Link
-                    href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
+                    href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
                     target="_blank"
                     rel="noreferrer"
                     underline="none"
@@ -469,7 +471,7 @@ const ActivePosition = ({
                   color="migrate"
                   onClick={() => onMigrate(position)}
                   fullWidth
-                  disabled={disabled}
+                  disabled={disabled || isOnNetwork}
                 >
                   <Typography variant="body2">
                     <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
@@ -482,7 +484,7 @@ const ActivePosition = ({
                   color="error"
                   onClick={() => onTerminate(position)}
                   fullWidth
-                  disabled={disabled}
+                  disabled={disabled || isOnNetwork}
                 >
                   <Typography variant="body2">
                     <FormattedMessage description="terminate" defaultMessage="Terminate" />

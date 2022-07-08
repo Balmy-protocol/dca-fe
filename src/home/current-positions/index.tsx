@@ -1,5 +1,6 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
+import find from 'lodash/find';
 import styled from 'styled-components';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
@@ -10,7 +11,14 @@ import { BigNumber } from 'ethers';
 import { Position } from 'types';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { FULL_DEPOSIT_TYPE, PERMISSIONS, POSITION_VERSION_3, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import {
+  FULL_DEPOSIT_TYPE,
+  NETWORKS,
+  PERMISSIONS,
+  POSITION_VERSION_3,
+  RATE_TYPE,
+  TRANSACTION_TYPES,
+} from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import ModifySettingsModal from 'common/modify-settings-modal';
@@ -21,6 +29,7 @@ import { EmptyPosition } from 'mocks/currentPositions';
 import usePositionService from 'hooks/usePositionService';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useSupportsSigning from 'hooks/useSupportsSigning';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import TerminateModal from 'common/terminate-modal';
 import MigratePositionModal from 'common/migrate-position-modal';
 import ActivePosition from './components/position';
@@ -56,25 +65,36 @@ const CurrentPositions = () => {
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
+  const [hasLoadedPositions, setHasLoadedPositions] = React.useState(positionService.getHasFetchedCurrentPositions());
+
+  React.useEffect(() => {
+    const fetchPositions = async () => {
+      await positionService.fetchCurrentPositions();
+      setHasLoadedPositions(true);
+    };
+
+    if (!hasLoadedPositions) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetchPositions();
+    }
+  }, []);
+
+  const network = React.useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const supportedNetwork = find(NETWORKS, { chainId: currentNetwork.chainId })!;
+    return supportedNetwork;
+  }, [currentNetwork.chainId]);
 
   for (let i = 0; i < positionsToFill; i += 1) {
     emptyPositions.push(i);
   }
 
+  if (!hasLoadedPositions) {
+    return <CenteredLoadingIndicator size={70} />;
+  }
+
   if (currentPositions && !currentPositions.length) {
-    return (
-      <Grid container direction="column" alignItems="flex-start" justifyContent="center" spacing={3}>
-        <Grid item xs={12} style={{ width: '100%' }}>
-          <Grid container>
-            {currentPositions && !currentPositions.length && (
-              <Grid item xs={12}>
-                <EmptyPositions />
-              </Grid>
-            )}
-          </Grid>
-        </Grid>
-      </Grid>
-    );
+    return <EmptyPositions />;
   }
 
   const onWithdraw = async (position: Position, useProtocolToken = false) => {
@@ -214,6 +234,7 @@ const CurrentPositions = () => {
                       onMigrate={onShowMigrate}
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
+                      network={network}
                     />
                   </StyledGridItem>
                 ))}
@@ -240,6 +261,7 @@ const CurrentPositions = () => {
                       onMigrate={onShowMigrate}
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
+                      network={network}
                     />
                   </StyledGridItem>
                 ))}

@@ -29,6 +29,7 @@ export const EmptyPosition: Position = {
   totalSwaps: BigNumber.from(0),
   toWithdraw: BigNumber.from(0),
   id: 'PROTOCOL',
+  positionId: 'PROTOCOL',
   startedAt: 0,
   status: 'TERMINATED',
   pendingTransaction: '',

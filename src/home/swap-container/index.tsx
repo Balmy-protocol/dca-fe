@@ -1,11 +1,8 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import orderBy from 'lodash/orderBy';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import GraphWidget from 'common/graph-widget';
-import WalletContext from 'common/wallet-context';
 import { getProtocolToken } from 'mocks/tokens';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { NETWORKS, STRING_SWAP_INTERVALS } from 'config/constants';
@@ -16,6 +13,8 @@ import { useAppDispatch } from 'state/hooks';
 import { setFrequencyType, setFrequencyValue, setFrom, setFromValue, setTo } from 'state/create-position/actions';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
+import usePairService from 'hooks/usePairService';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Swap from './components/swap';
 
 interface SwapContainerProps {
@@ -25,11 +24,25 @@ interface SwapContainerProps {
 const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const { fromValue, frequencyType, frequencyValue, from, to } = useCreatePositionState();
   const dispatch = useAppDispatch();
+  const pairService = usePairService();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();
+  const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
+
+  React.useEffect(() => {
+    const fetchPairs = async () => {
+      await pairService.fetchAvailablePairs();
+      setHasLoadedPairs(true);
+    };
+
+    if (!hasLoadedPairs) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetchPairs();
+    }
+  }, []);
 
   React.useEffect(() => {
     if (fromParamToken) {
@@ -85,49 +98,45 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
     }
   };
 
+  if (!hasLoadedPairs) {
+    return <CenteredLoadingIndicator size={70} />;
+  }
+
   return (
     <Grid container spacing={2} alignItems="center" justifyContent="space-around">
-      <WalletContext.Consumer>
-        {({ web3Service }) => (
-          <>
-            <Grid item xs={12} md={5}>
-              <Swap
-                from={from}
-                to={to}
-                setFrom={onSetFrom}
-                setTo={onSetTo}
-                frequencyType={frequencyType}
-                frequencyValue={frequencyValue}
-                setFrequencyType={(newFrequencyType) => dispatch(setFrequencyType(newFrequencyType))}
-                setFrequencyValue={(newFrequencyValue) => dispatch(setFrequencyValue(newFrequencyValue))}
-                fromValue={fromValue}
-                setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
-                web3Service={web3Service}
-                currentNetwork={currentNetwork || NETWORKS.optimism}
-                toggleFromTo={toggleFromTo}
-                availableFrequencies={
-                  (swapIntervalsData &&
-                    orderBy(
-                      swapIntervalsData.swapIntervals,
-                      [(swapInterval) => parseInt(swapInterval.interval, 10)],
-                      ['asc']
-                    ).map((swapInterval) => ({
-                      label:
-                        STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS],
-                      value: BigNumber.from(swapInterval.interval),
-                    }))) ||
-                  []
-                }
-              />
-            </Grid>
-            <Hidden mdDown>
-              <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
-                <GraphWidget from={from} to={to} />
-              </Grid>
-            </Hidden>
-          </>
-        )}
-      </WalletContext.Consumer>
+      <Grid item xs={12} md={5}>
+        <Swap
+          from={from}
+          to={to}
+          setFrom={onSetFrom}
+          setTo={onSetTo}
+          frequencyType={frequencyType}
+          frequencyValue={frequencyValue}
+          setFrequencyType={(newFrequencyType) => dispatch(setFrequencyType(newFrequencyType))}
+          setFrequencyValue={(newFrequencyValue) => dispatch(setFrequencyValue(newFrequencyValue))}
+          fromValue={fromValue}
+          setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
+          currentNetwork={currentNetwork || NETWORKS.optimism}
+          toggleFromTo={toggleFromTo}
+          availableFrequencies={
+            (swapIntervalsData &&
+              orderBy(
+                swapIntervalsData.swapIntervals,
+                [(swapInterval) => parseInt(swapInterval.interval, 10)],
+                ['asc']
+              ).map((swapInterval) => ({
+                label: STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                value: BigNumber.from(swapInterval.interval),
+              }))) ||
+            []
+          }
+        />
+      </Grid>
+      <Hidden mdDown>
+        <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
+          <GraphWidget from={from} to={to} />
+        </Grid>
+      </Hidden>
     </Grid>
   );
 };

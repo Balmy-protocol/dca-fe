@@ -4,8 +4,8 @@ import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
 import WalletContext from 'common/wallet-context';
 import Web3Service from 'services/web3Service';
-import { ApolloProvider } from '@apollo/client';
-import DCASubgraph from 'utils/dcaSubgraphApolloClient';
+import DCASubgraphs from 'utils/dcaSubgraphApolloClient';
+import UNISubgraphs from 'utils/graphPricesApolloClient';
 import { Provider } from 'react-redux';
 import store, { axiosClient } from 'state';
 import { Theme } from '@mui/material/styles';
@@ -30,7 +30,7 @@ function loadLocaleData(locale: string) {
 
 const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) => {
   const [account, setAccount] = React.useState('');
-  const [web3Service] = React.useState(new Web3Service(setAccount));
+  const [web3Service] = React.useState(new Web3Service(DCASubgraphs, UNISubgraphs, setAccount));
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
   const {
     config: { network },
@@ -55,18 +55,14 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       value={{
         web3Service,
         account,
-        graphPricesClient: web3Service.getUNIGraphqlClient().getClient(),
-        DCASubgraph: web3Service.getDCAGraphqlClient().getClient(),
         axiosClient,
       }}
     >
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
-        <ApolloProvider client={DCASubgraph}>
-          <Provider store={store}>
-            <MainApp isLoading={isLoading} />
-          </Provider>
-        </ApolloProvider>
+        <Provider store={store}>
+          <MainApp isLoading={isLoading} />
+        </Provider>
       </IntlProvider>
     </WalletContext.Provider>
   );
