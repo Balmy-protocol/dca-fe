@@ -3,7 +3,7 @@ import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
-import { Web3Service, Token } from 'types';
+import { Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
@@ -54,6 +54,7 @@ import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import usePositionService from 'hooks/usePositionService';
 import usePairService from 'hooks/usePairService';
+import useWeb3Service from 'hooks/useWeb3Service';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -159,7 +160,6 @@ interface SwapProps {
   setFromValue: (newFromValue: string) => void;
   setFrequencyType: (newFrequencyType: BigNumber) => void;
   setFrequencyValue: (newFrequencyValue: string) => void;
-  web3Service: Web3Service;
   currentNetwork: { chainId: number; name: string };
   availableFrequencies: AvailableSwapInterval[];
 }
@@ -177,9 +177,9 @@ const Swap = ({
   frequencyType,
   frequencyValue,
   currentNetwork,
-  web3Service,
   availableFrequencies,
 }: SwapProps) => {
+  const web3Service = useWeb3Service();
   const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
   const [rate, setRate] = React.useState('0');
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);

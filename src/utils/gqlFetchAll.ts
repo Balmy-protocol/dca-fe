@@ -11,7 +11,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 import get from 'lodash/get';
 
-interface GraphqlResults<T> {
+export interface GraphqlResults<T> {
   data: T | undefined;
   loading: boolean;
 }

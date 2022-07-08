@@ -40,16 +40,17 @@ import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
 import {
   MAX_UINT_32,
-  MEAN_GRAPHQL_URL,
   NETWORKS_FOR_MENU,
   PERMISSIONS,
+  POSITIONS_VERSIONS,
   POSITION_VERSION_2,
   POSITION_VERSION_3,
   TRANSACTION_TYPES,
+  VERSIONS,
 } from 'config/constants';
 import { PermissionManagerContract } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
-import gqlFetchAll from 'utils/gqlFetchAll';
+import gqlFetchAll, { GraphqlResults } from 'utils/gqlFetchAll';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -70,10 +71,26 @@ export default class PositionService {
 
   pairService: PairService;
 
-  constructor(walletService: WalletService, pairService: PairService, contractService: ContractService) {
+  apolloClient: Record<VERSIONS, Record<number, GraphqlService>>;
+
+  hasFetchedCurrentPositions: boolean;
+
+  hasFetchedPastPositions: boolean;
+
+  constructor(
+    walletService: WalletService,
+    pairService: PairService,
+    contractService: ContractService,
+    DCASubgraph: Record<VERSIONS, Record<number, GraphqlService>>
+  ) {
     this.contractService = contractService;
     this.walletService = walletService;
     this.pairService = pairService;
+    this.apolloClient = DCASubgraph;
+    this.currentPositions = {};
+    this.pastPositions = {};
+    this.hasFetchedCurrentPositions = false;
+    this.hasFetchedPastPositions = false;
   }
 
   getSigner() {
@@ -88,37 +105,49 @@ export default class PositionService {
     return orderBy(values(this.pastPositions), 'startedAt', 'desc');
   }
 
-  async fetchPositions(account: string) {
-    this.currentPositions = {};
-    this.pastPositions = {};
-    // eslint-disable-next-line no-restricted-syntax
-    for (const network of NETWORKS_FOR_MENU) {
-      const currentApolloClient = new GraphqlService(
-        MEAN_GRAPHQL_URL[POSITION_VERSION_3][network] || MEAN_GRAPHQL_URL[POSITION_VERSION_3][10]
-      );
-      const currentV2Client =
-        (!!MEAN_GRAPHQL_URL[POSITION_VERSION_2][network] &&
-          new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_2][network])) ||
-        undefined;
+  getHasFetchedCurrentPositions() {
+    return this.hasFetchedCurrentPositions;
+  }
+
+  getHasFetchedPastPositions() {
+    return this.hasFetchedPastPositions;
+  }
+
+  async fetchCurrentPositions() {
+    const account = this.walletService.getAccount();
+    const promises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
+    const networksAndVersions: { network: number; version: VERSIONS }[] = [];
+
+    POSITIONS_VERSIONS.forEach((version) =>
+      NETWORKS_FOR_MENU.forEach((network) => {
+        const currentApolloClient = this.apolloClient[version][network];
+        networksAndVersions.push({ version, network });
+        promises.push(
+          gqlFetchAll<PositionsGraphqlResponse>(
+            currentApolloClient.getClient(),
+            GET_POSITIONS,
+            {
+              address: account.toLowerCase(),
+              status: ['ACTIVE', 'COMPLETED'],
+            },
+            'positions',
+            'network-only'
+          )
+        );
+      })
+    );
+
+    const results = await Promise.all(promises);
+
+    this.currentPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
+      const { network, version } = networksAndVersions[index];
       const protocolToken = getProtocolToken(network);
       const wrappedProtocolToken = getWrappedProtocolToken(network);
-
-      const currentPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
-        currentApolloClient.getClient(),
-        GET_POSITIONS,
-        {
-          address: account.toLowerCase(),
-          status: ['ACTIVE', 'COMPLETED'],
-        },
-        'positions',
-        'network-only'
-      );
-
-      if (currentPositionsResponse.data) {
-        this.currentPositions = {
-          ...this.currentPositions,
+      if (gqlResult.data) {
+        return {
+          ...acc,
           ...keyBy(
-            currentPositionsResponse.data.positions.map((position: PositionResponse) => ({
+            gqlResult.data.positions.map((position: PositionResponse) => ({
               from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
               to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
               user: position.user,
@@ -130,151 +159,92 @@ export default class PositionService {
               withdrawn: BigNumber.from(position.totalWithdrawn),
               toWithdraw: BigNumber.from(position.current.idleSwapped),
               totalSwaps: BigNumber.from(position.totalSwaps),
-              id: position.id,
+              id: `${position.id}-v${version}`,
+              positionId: position.id,
               status: position.status,
               startedAt: position.createdAtTimestamp,
               executedSwaps: BigNumber.from(position.executedSwaps),
               totalDeposits: BigNumber.from(position.totalDeposits),
               pendingTransaction: '',
               pairId: position.pair.id,
-              version: POSITION_VERSION_3,
+              version,
               chainId: network,
             })),
             'id'
           ),
         };
       }
+      return acc;
+    }, {});
 
-      if (currentV2Client) {
-        const currentV2PositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
-          currentV2Client.getClient(),
-          GET_POSITIONS,
-          {
-            address: account.toLowerCase(),
-            status: ['ACTIVE', 'COMPLETED'],
-          },
-          'positions',
-          'network-only'
+    this.hasFetchedCurrentPositions = true;
+  }
+
+  async fetchPastPositions() {
+    const account = this.walletService.getAccount();
+    const promises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
+    const networksAndVersions: { network: number; version: VERSIONS }[] = [];
+
+    POSITIONS_VERSIONS.forEach((version) =>
+      NETWORKS_FOR_MENU.forEach((network) => {
+        const currentApolloClient = this.apolloClient[version][network];
+        networksAndVersions.push({ version, network });
+        promises.push(
+          gqlFetchAll<PositionsGraphqlResponse>(
+            currentApolloClient.getClient(),
+            GET_POSITIONS,
+            {
+              address: account.toLowerCase(),
+              status: ['TERMINATED'],
+            },
+            'positions',
+            'network-only'
+          )
         );
+      })
+    );
 
-        if (currentV2PositionsResponse.data) {
-          this.currentPositions = {
-            ...this.currentPositions,
-            ...keyBy(
-              currentV2PositionsResponse.data.positions.map((position: PositionResponse) => ({
-                from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-                to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-                user: position.user,
-                swapInterval: BigNumber.from(position.swapInterval.interval),
-                swapped: BigNumber.from(position.totalSwapped),
-                rate: BigNumber.from(position.current.rate),
-                remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-                remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-                withdrawn: BigNumber.from(position.totalWithdrawn),
-                toWithdraw: BigNumber.from(position.current.idleSwapped),
-                totalSwaps: BigNumber.from(position.totalSwaps),
-                id: `${position.id}-v2`,
-                status: position.status,
-                startedAt: position.createdAtTimestamp,
-                executedSwaps: BigNumber.from(position.executedSwaps),
-                totalDeposits: BigNumber.from(position.totalDeposits),
-                pendingTransaction: '',
-                pairId: position.pair.id,
-                version: POSITION_VERSION_2,
-                chainId: network,
-              })),
-              'id'
-            ),
-          };
-        }
-      }
+    const results = await Promise.all(promises);
 
-      const pastPositionsResponse = await gqlFetchAll<PositionsGraphqlResponse>(
-        currentApolloClient.getClient(),
-        GET_POSITIONS,
-        {
-          address: account.toLowerCase(),
-          status: ['TERMINATED'],
-        },
-        'positions',
-        'network-only'
-      );
-
-      if (pastPositionsResponse.data) {
-        this.pastPositions = {
-          ...this.pastPositions,
+    this.pastPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
+      const { network, version } = networksAndVersions[index];
+      const protocolToken = getProtocolToken(network);
+      const wrappedProtocolToken = getWrappedProtocolToken(network);
+      if (gqlResult.data) {
+        return {
+          ...acc,
           ...keyBy(
-            pastPositionsResponse.data.positions.map((position: PositionResponse) => ({
+            gqlResult.data.positions.map((position: PositionResponse) => ({
               from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
               to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
               user: position.user,
-              totalDeposits: BigNumber.from(position.totalDeposits),
               swapInterval: BigNumber.from(position.swapInterval.interval),
               swapped: BigNumber.from(position.totalSwapped),
               rate: BigNumber.from(position.current.rate),
               remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
               remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-              totalSwaps: BigNumber.from(position.totalSwaps),
               withdrawn: BigNumber.from(position.totalWithdrawn),
               toWithdraw: BigNumber.from(position.current.idleSwapped),
-              executedSwaps: BigNumber.from(position.executedSwaps),
-              id: position.id,
+              totalSwaps: BigNumber.from(position.totalSwaps),
+              id: `${position.id}-v${version}`,
+              positionId: position.id,
               status: position.status,
               startedAt: position.createdAtTimestamp,
+              executedSwaps: BigNumber.from(position.executedSwaps),
+              totalDeposits: BigNumber.from(position.totalDeposits),
               pendingTransaction: '',
               pairId: position.pair.id,
-              version: POSITION_VERSION_3,
+              version,
               chainId: network,
             })),
             'id'
           ),
         };
       }
+      return acc;
+    }, {});
 
-      if (currentV2Client) {
-        const pastPositionsV2Response = await gqlFetchAll<PositionsGraphqlResponse>(
-          currentV2Client.getClient(),
-          GET_POSITIONS,
-          {
-            address: account.toLowerCase(),
-            status: ['TERMINATED'],
-          },
-          'positions',
-          'network-only'
-        );
-
-        if (pastPositionsV2Response.data) {
-          this.pastPositions = {
-            ...this.pastPositions,
-            ...keyBy(
-              pastPositionsV2Response.data.positions.map((position: PositionResponse) => ({
-                from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-                to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-                user: position.user,
-                totalDeposits: BigNumber.from(position.totalDeposits),
-                swapInterval: BigNumber.from(position.swapInterval.interval),
-                swapped: BigNumber.from(position.totalSwapped),
-                rate: BigNumber.from(position.current.rate),
-                remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-                remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-                totalSwaps: BigNumber.from(position.totalSwaps),
-                withdrawn: BigNumber.from(position.totalWithdrawn),
-                toWithdraw: BigNumber.from(position.current.idleSwapped),
-                executedSwaps: BigNumber.from(position.executedSwaps),
-                id: position.id,
-                status: position.status,
-                startedAt: position.createdAtTimestamp,
-                pendingTransaction: '',
-                pairId: position.pair.id,
-                version: POSITION_VERSION_2,
-                chainId: network,
-              })),
-              'id'
-            ),
-          };
-        }
-      }
-    }
+    this.hasFetchedPastPositions = true;
   }
 
   // POSITION METHODS
@@ -908,12 +878,13 @@ export default class PositionService {
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
       const newPositionTypeData = typeData as NewPositionTypeData;
       id = `pending-transaction-${transaction.hash}`;
-      this.currentPositions[id] = {
+      this.currentPositions[`${id}-v${POSITION_VERSION_3}`] = {
         from:
           newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from,
         to: newPositionTypeData.to.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to,
         user: this.walletService.getAccount(),
         chainId: network.chainId,
+        positionId: id,
         toWithdraw: BigNumber.from(0),
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
         swapped: BigNumber.from(0),

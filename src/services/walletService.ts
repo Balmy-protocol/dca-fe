@@ -74,19 +74,8 @@ export default class WalletService {
   }
 
   async getNetwork(skipDefaultNetwork = false) {
-    if (!skipDefaultNetwork && this.network) {
-      return this.network;
-    }
-
-    if (this.client) {
-      return this.client.getNetwork();
-    }
-
-    if (window.ethereum) {
-      return new ethers.providers.Web3Provider(window.ethereum).getNetwork();
-    }
-
-    return Promise.resolve(NETWORKS.optimism);
+    // [TODO] Remove references to walletService.getNetwork()
+    return this.contractService.getNetwork(skipDefaultNetwork);
   }
 
   async getEns(address: string) {

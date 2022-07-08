@@ -31,7 +31,7 @@ import TransferPositionModal from 'common/transfer-position-modal';
 import TerminateModal from 'common/terminate-modal';
 import ModifySettingsModal from 'common/modify-settings-modal';
 import { fullPositionToMappedPosition } from 'utils/parsing';
-import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES, VERSIONS } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
@@ -77,8 +77,12 @@ const StyledPositionDetailsContainer = styled(Grid)`
 // const WAIT_FOR_SUBGRAPH = 5000;
 
 const PositionDetailFrame = () => {
-  const { positionId } = useParams<{ positionId: string }>();
-  const client = useDCAGraphql();
+  const { positionId, chainId, positionVersion } = useParams<{
+    positionId: string;
+    chainId: string;
+    positionVersion: VERSIONS;
+  }>();
+  const client = useDCAGraphql(Number(chainId), positionVersion);
   const history = useHistory();
   const tabIndex = usePositionDetailsTab();
   const dispatch = useAppDispatch();

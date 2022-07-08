@@ -1,6 +1,5 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
-import styled from 'styled-components';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useMainTab } from 'state/tabs/hooks';
 import { useParams } from 'react-router-dom';
@@ -17,14 +16,6 @@ import Positions from '../positions';
 interface HomeFrameProps {
   isLoading: boolean;
 }
-
-const StyledGridContainer = styled(Grid).withConfig({
-  shouldForwardProp: (prop, defaultValidatorFn) =>
-    (!['isLoading'].includes(prop) && defaultValidatorFn(prop)) || ['container'].includes(prop),
-})<HomeFrameProps>`
-  ${({ isLoading }) => !isLoading && 'align-self: flex-start'}
-`;
-// height: ${(props) => (props.isLoading ? `calc(100% + ${(parseInt(props?.spacing || '0', 10) || 0) * 4}px)` : 'auto')}; ;
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const tabIndex = useMainTab();
@@ -54,7 +45,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const isLoadingIntervals = isLoading || isLoadingSwapIntervals;
 
   return (
-    <StyledGridContainer container spacing={8} isLoading={isLoadingIntervals}>
+    <Grid container spacing={8}>
       {isLoadingIntervals ? (
         <Grid item xs={12} style={{ display: 'flex' }}>
           <CenteredLoadingIndicator size={70} />
@@ -62,15 +53,17 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       ) : (
         <>
           {tabIndex === 0 ? (
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{ display: 'flex' }}>
               <SwapContainer swapIntervalsData={swapIntervalsData} />
             </Grid>
           ) : (
-            <Positions />
+            <Grid item xs={12} style={{ display: 'flex' }}>
+              <Positions />
+            </Grid>
           )}
         </>
       )}
-    </StyledGridContainer>
+    </Grid>
   );
 };
 export default HomeFrame;
