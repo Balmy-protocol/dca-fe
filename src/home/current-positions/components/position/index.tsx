@@ -30,6 +30,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useUsdPrice from 'hooks/useUsdPrice';
+import useWalletService from 'hooks/useWalletService';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
@@ -199,6 +200,7 @@ const ActivePosition = ({
   const protocolToken = getProtocolToken(positionNetwork.chainId);
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw, undefined, chainId);
   const history = useHistory();
+  const walletService = useWalletService();
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
@@ -215,10 +217,20 @@ const ActivePosition = ({
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
   const isStale =
-    calculateStale(pair?.lastExecutedAt || 0, swapInterval, position.startedAt, pair?.swapInfo || '1') === STALE;
+    calculateStale(
+      pair?.lastExecutedAt || position.pairLastSwappedAt || 0,
+      swapInterval,
+      position.startedAt,
+      pair?.swapInfo || position.pairNextSwapAvailableAt || '1'
+    ) === STALE;
 
   const onViewDetails = () => {
-    history.push(`/${chainId}/positions/${position.version}/${position.id}`);
+    history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
+  };
+
+  const onChangeNetwork = () => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    walletService.changeNetwork(chainId);
   };
 
   const isOldVersion = position.version !== POSITION_VERSION_3;
@@ -353,15 +365,15 @@ const ActivePosition = ({
             </Typography>
           </StyledDetailWrapper>
         </StyledContentContainer>
-        <StyledProgressWrapper>
-          {remainingSwaps.toNumber() > 0 && (
+        {remainingSwaps.toNumber() > 0 && (
+          <StyledProgressWrapper>
             <BorderLinearProgress
               swaps={remainingSwaps.toNumber()}
               variant="determinate"
               value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
             />
-          )}
-        </StyledProgressWrapper>
+          </StyledProgressWrapper>
+        )}
         <StyledCallToActionContainer>
           <StyledCardFooterButton
             variant={isPending ? 'contained' : 'outlined'}
@@ -388,62 +400,77 @@ const ActivePosition = ({
               </Typography>
             )}
           </StyledCardFooterButton>
-          {position.version === POSITION_VERSION_3 && (
+          {position.version !== POSITION_VERSION_2 && (
             <>
-              {!isPending &&
-                toWithdraw.gt(BigNumber.from(0)) &&
-                hasSignSupport &&
-                position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-                  <StyledCardFooterButton
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => onWithdraw(position, true)}
-                    fullWidth
-                    disabled={disabled || isOnNetwork}
-                  >
-                    <Typography variant="body2">
-                      <FormattedMessage
-                        description="withdraw"
-                        defaultMessage="Withdraw {protocolToken}"
-                        values={{ protocolToken: protocolToken.symbol }}
-                      />
-                    </Typography>
-                  </StyledCardFooterButton>
-                )}
-              {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onWithdraw(position, false)}
-                  disabled={disabled || isOnNetwork}
-                  fullWidth
-                >
+              {(!isOnNetwork || disabled) && (
+                <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
                   <Typography variant="body2">
                     <FormattedMessage
-                      description="withdraw"
-                      defaultMessage="Withdraw {wrappedProtocolToken}"
-                      values={{
-                        wrappedProtocolToken:
-                          position.to.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport
-                            ? wrappedProtocolToken.symbol
-                            : '',
-                      }}
+                      description="incorrect network"
+                      defaultMessage="Switch to {network}"
+                      values={{ network: positionNetwork.name }}
                     />
                   </Typography>
                 </StyledCardFooterButton>
               )}
-              {!isPending && remainingSwaps.lte(BigNumber.from(0)) && toWithdraw.lte(BigNumber.from(0)) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onReusePosition(position)}
-                  disabled={disabled || isOnNetwork}
-                  fullWidth
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
-                  </Typography>
-                </StyledCardFooterButton>
+              {isOnNetwork && !disabled && (
+                <>
+                  {!isPending &&
+                    toWithdraw.gt(BigNumber.from(0)) &&
+                    hasSignSupport &&
+                    position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+                      <StyledCardFooterButton
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => onWithdraw(position, true)}
+                        fullWidth
+                        disabled={disabled || !isOnNetwork}
+                      >
+                        <Typography variant="body2">
+                          <FormattedMessage
+                            description="withdraw"
+                            defaultMessage="Withdraw {protocolToken}"
+                            values={{ protocolToken: protocolToken.symbol }}
+                          />
+                        </Typography>
+                      </StyledCardFooterButton>
+                    )}
+                  {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
+                    <StyledCardFooterButton
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => onWithdraw(position, false)}
+                      disabled={disabled || !isOnNetwork}
+                      fullWidth
+                    >
+                      <Typography variant="body2">
+                        <FormattedMessage
+                          description="withdraw"
+                          defaultMessage="Withdraw {wrappedProtocolToken}"
+                          values={{
+                            wrappedProtocolToken:
+                              position.to.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport
+                                ? wrappedProtocolToken.symbol
+                                : '',
+                          }}
+                        />
+                      </Typography>
+                    </StyledCardFooterButton>
+                  )}
+                  {!isPending && remainingSwaps.lte(BigNumber.from(0)) && toWithdraw.lte(BigNumber.from(0)) && (
+                    <StyledCardFooterButton
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => onReusePosition(position)}
+                      disabled={disabled || !isOnNetwork}
+                      fullWidth
+                    >
+                      <Typography variant="body2">
+                        <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
+                      </Typography>
+                    </StyledCardFooterButton>
+                  )}
+                </>
               )}
             </>
           )}
@@ -471,7 +498,7 @@ const ActivePosition = ({
                   color="migrate"
                   onClick={() => onMigrate(position)}
                   fullWidth
-                  disabled={disabled || isOnNetwork}
+                  disabled={disabled || !isOnNetwork}
                 >
                   <Typography variant="body2">
                     <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
@@ -484,7 +511,7 @@ const ActivePosition = ({
                   color="error"
                   onClick={() => onTerminate(position)}
                   fullWidth
-                  disabled={disabled || isOnNetwork}
+                  disabled={disabled || !isOnNetwork}
                 >
                   <Typography variant="body2">
                     <FormattedMessage description="terminate" defaultMessage="Terminate" />

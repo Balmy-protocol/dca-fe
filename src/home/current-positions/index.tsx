@@ -11,14 +11,7 @@ import { BigNumber } from 'ethers';
 import { Position } from 'types';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import {
-  FULL_DEPOSIT_TYPE,
-  NETWORKS,
-  PERMISSIONS,
-  POSITION_VERSION_3,
-  RATE_TYPE,
-  TRANSACTION_TYPES,
-} from 'config/constants';
+import { FULL_DEPOSIT_TYPE, NETWORKS, PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import ModifySettingsModal from 'common/modify-settings-modal';
@@ -99,8 +92,7 @@ const CurrentPositions = () => {
 
   const onWithdraw = async (position: Position, useProtocolToken = false) => {
     try {
-      const positionId =
-        position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
+      const { positionId } = position;
       const hasPermission = await positionService.companionHasPermission(
         { ...position, id: positionId },
         PERMISSIONS.WITHDRAW
@@ -132,8 +124,9 @@ const CurrentPositions = () => {
           </>
         ),
       });
-      const result = await positionService.withdraw({ ...position, id: positionId }, useProtocolToken);
-      addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
+
+      const result = await positionService.withdraw(position, useProtocolToken);
+      addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id }, position });
       setModalSuccess({
         hash: result.hash,
         content: (

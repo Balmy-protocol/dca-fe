@@ -25,7 +25,7 @@ import {
   ORACLE_ADDRESS,
   PERMISSION_MANAGER_ADDRESS,
   UNISWAP_ORACLE_ADDRESS,
-  VERSIONS,
+  PositionVersions,
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
 } from 'config/constants';
@@ -107,13 +107,13 @@ export default class ContractService {
   }
 
   // ADDRESSES
-  async getHUBAddress(version?: VERSIONS): Promise<string> {
+  async getHUBAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
     return HUB_ADDRESS[version || LATEST_VERSION][network.chainId] || HUB_ADDRESS[LATEST_VERSION][network.chainId];
   }
 
-  async getPermissionManagerAddress(version?: VERSIONS): Promise<string> {
+  async getPermissionManagerAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
     return (
@@ -122,7 +122,7 @@ export default class ContractService {
     );
   }
 
-  async getMigratorAddress(version?: VERSIONS): Promise<string> {
+  async getMigratorAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
     return (
@@ -130,7 +130,7 @@ export default class ContractService {
     );
   }
 
-  async getHUBCompanionAddress(version?: VERSIONS): Promise<string> {
+  async getHUBCompanionAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
     return (
@@ -139,7 +139,7 @@ export default class ContractService {
     );
   }
 
-  async getOracleAddress(version?: VERSIONS): Promise<string> {
+  async getOracleAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
     return (
@@ -147,7 +147,7 @@ export default class ContractService {
     );
   }
 
-  async getChainlinkOracleAddress(version?: VERSIONS): Promise<string> {
+  async getChainlinkOracleAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
     return (
@@ -156,7 +156,7 @@ export default class ContractService {
     );
   }
 
-  async getUniswapOracleAddress(version?: VERSIONS): Promise<string> {
+  async getUniswapOracleAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
     return (
@@ -166,14 +166,14 @@ export default class ContractService {
   }
 
   // CONTRACTS
-  async getHubInstance(version?: VERSIONS): Promise<HubContract> {
+  async getHubInstance(version?: PositionVersions): Promise<HubContract> {
     const hubAddress = await this.getHUBAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
     return new ethers.Contract(hubAddress, HUB_ABI.abi, provider) as unknown as HubContract;
   }
 
-  async getPermissionManagerInstance(version?: VERSIONS): Promise<PermissionManagerContract> {
+  async getPermissionManagerInstance(version?: PositionVersions): Promise<PermissionManagerContract> {
     const permissionManagerAddress = await this.getPermissionManagerAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
@@ -184,35 +184,35 @@ export default class ContractService {
     ) as unknown as PermissionManagerContract;
   }
 
-  async getMigratorInstance(version?: VERSIONS): Promise<BetaMigratorContract> {
+  async getMigratorInstance(version?: PositionVersions): Promise<BetaMigratorContract> {
     const migratorAddress = await this.getMigratorAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
     return new ethers.Contract(migratorAddress, MIGRATOR_ABI.abi, provider) as unknown as BetaMigratorContract;
   }
 
-  async getHUBCompanionInstance(version?: VERSIONS): Promise<HubCompanionContract> {
+  async getHUBCompanionInstance(version?: PositionVersions): Promise<HubCompanionContract> {
     const hubCompanionAddress = await this.getHUBCompanionAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
     return new ethers.Contract(hubCompanionAddress, HUB_COMPANION_ABI.abi, provider) as unknown as HubCompanionContract;
   }
 
-  async getOracleInstance(version?: VERSIONS): Promise<OracleContract> {
+  async getOracleInstance(version?: PositionVersions): Promise<OracleContract> {
     const oracleAddress = await this.getOracleAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
     return new ethers.Contract(oracleAddress, ORACLE_AGGREGATOR_ABI.abi, provider) as unknown as OracleContract;
   }
 
-  async getChainlinkOracleInstance(version?: VERSIONS): Promise<OracleContract> {
+  async getChainlinkOracleInstance(version?: PositionVersions): Promise<OracleContract> {
     const chainlinkOracleAddress = await this.getChainlinkOracleAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
     return new ethers.Contract(chainlinkOracleAddress, CHAINLINK_ORACLE_ABI.abi, provider) as unknown as OracleContract;
   }
 
-  async getUniswapOracleInstance(version?: VERSIONS): Promise<OracleContract> {
+  async getUniswapOracleInstance(version?: PositionVersions): Promise<OracleContract> {
     const uniswapOracleAddress = await this.getUniswapOracleAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 

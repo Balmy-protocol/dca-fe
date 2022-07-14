@@ -3,6 +3,7 @@ import { FullPosition } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
+import { fullPositionToMappedPosition } from 'utils/parsing';
 import useWalletService from './useWalletService';
 import usePositionService from './usePositionService';
 
@@ -22,7 +23,7 @@ function useIsCompanionApproved(position: FullPosition | undefined): [boolean | 
     async function callPromise() {
       if (position) {
         try {
-          const promiseResult = await positionService.companionIsApproved(position);
+          const promiseResult = await positionService.companionIsApproved(fullPositionToMappedPosition(position));
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {

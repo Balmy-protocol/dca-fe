@@ -47,6 +47,11 @@ export type PositionResponse = {
   user: string;
   pair: {
     id: string;
+    nextSwapAvailableAt: string;
+    swaps: {
+      id: string;
+      executedAtTimestamp: string;
+    }[];
   };
   status: string;
   executedSwaps: BigNumber;

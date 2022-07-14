@@ -31,6 +31,11 @@ const getCurrentPositions = gql`
       }
       pair {
         id
+        nextSwapAvailableAt
+        swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1) {
+          id
+          executedAtTimestamp
+        }
       }
       status
       swapInterval {

@@ -20,6 +20,7 @@ import AddAddressPermissionModal from 'common/add-address-permission-modal';
 import Paper from '@mui/material/Paper';
 import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
+import { fullPositionToMappedPosition } from 'utils/parsing';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;
@@ -82,10 +83,14 @@ const PositionPermissionsContainer = ({
           </Typography>
         ),
       });
-      const result = await positionService.modifyPermissions(position, modifiedPermissions);
+      const result = await positionService.modifyPermissions(
+        fullPositionToMappedPosition(position),
+        modifiedPermissions
+      );
       addTransaction(result, {
         type: TRANSACTION_TYPES.MODIFY_PERMISSIONS,
         typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol },
+        position: fullPositionToMappedPosition(position),
       });
       setModalSuccess({
         hash: result.hash,

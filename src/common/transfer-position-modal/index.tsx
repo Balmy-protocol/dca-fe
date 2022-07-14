@@ -9,6 +9,7 @@ import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import TextField from '@mui/material/TextField';
 import usePositionService from 'hooks/usePositionService';
+import { fullPositionToMappedPosition } from 'utils/parsing';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -55,10 +56,11 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
           </Typography>
         ),
       });
-      const result = await positionService.transfer(position, toAddress);
+      const result = await positionService.transfer(fullPositionToMappedPosition(position), toAddress);
       addTransaction(result, {
         type: TRANSACTION_TYPES.TRANSFER_POSITION,
         typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol, toAddress },
+        position: fullPositionToMappedPosition(position),
       });
       setModalSuccess({
         hash: result.hash,

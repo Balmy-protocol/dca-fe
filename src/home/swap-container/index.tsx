@@ -13,8 +13,6 @@ import { useAppDispatch } from 'state/hooks';
 import { setFrequencyType, setFrequencyValue, setFrom, setFromValue, setTo } from 'state/create-position/actions';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
-import usePairService from 'hooks/usePairService';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Swap from './components/swap';
 
 interface SwapContainerProps {
@@ -24,25 +22,11 @@ interface SwapContainerProps {
 const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const { fromValue, frequencyType, frequencyValue, from, to } = useCreatePositionState();
   const dispatch = useAppDispatch();
-  const pairService = usePairService();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();
-  const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
-
-  React.useEffect(() => {
-    const fetchPairs = async () => {
-      await pairService.fetchAvailablePairs();
-      setHasLoadedPairs(true);
-    };
-
-    if (!hasLoadedPairs) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      fetchPairs();
-    }
-  }, []);
 
   React.useEffect(() => {
     if (fromParamToken) {
@@ -97,10 +81,6 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
       history.replace(`/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
   };
-
-  if (!hasLoadedPairs) {
-    return <CenteredLoadingIndicator size={70} />;
-  }
 
   return (
     <Grid container spacing={2} alignItems="center" justifyContent="space-around">

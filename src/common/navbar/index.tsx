@@ -13,7 +13,7 @@ import { changeMainTab } from 'state/tabs/actions';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
 
@@ -83,10 +83,21 @@ const NavBar = ({ isLoading }: NavBarProps) => {
   const history = useHistory();
   const tabIndex = useMainTab();
   const dispatch = useAppDispatch();
+  const location = useLocation();
 
-  const handleTabChange = (index: number) => {
-    dispatch(changeMainTab(index));
-    history.push('/');
+  React.useEffect(() => {
+    if (location.pathname === '/positions') {
+      dispatch(changeMainTab(1));
+      history.push(`/positions`);
+    } else if (location.pathname === '/' || location.pathname === '/create') {
+      dispatch(changeMainTab(0));
+      history.push(`/create`);
+    }
+  }, []);
+
+  const handleTabChange = (tabValue: { index: number; url: string }) => {
+    dispatch(changeMainTab(tabValue.index));
+    history.push(`/${tabValue.url}`);
   };
 
   return (
@@ -100,11 +111,11 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             value={tabIndex}
           >
             <StyledTab
-              onClick={() => handleTabChange(0)}
+              onClick={() => handleTabChange({ index: 0, url: 'create' })}
               label={<FormattedMessage description="create" defaultMessage="Create" />}
             />
             <StyledTab
-              onClick={() => handleTabChange(1)}
+              onClick={() => handleTabChange({ index: 1, url: 'positions' })}
               label={<FormattedMessage description="positions" defaultMessage="Positions" />}
             />
           </StyledTabs>

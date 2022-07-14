@@ -1,15 +1,15 @@
 /* eslint-disable no-template-curly-in-string */
 
 import { NetworkStruct } from 'types';
-import { POSITION_VERSION_2, POSITION_VERSION_3, VERSIONS } from './common';
+import { POSITION_VERSION_2, POSITION_VERSION_3, PositionVersions } from './common';
 
 // type WithKey<K extends string | number | symbol> = {
 //   [k in K]: boolean
 // }
-type AddressMap<K extends VERSIONS> = {
+type AddressMap<K extends PositionVersions> = {
   [k in K]: Record<number, string>;
 };
-// type AddressMap<VERSIONS> = Record<VERSIONS, Record<number, string>>
+// type AddressMap<PositionVersions> = Record<PositionVersions, Record<number, string>>
 
 export const NETWORKS: Record<string, NetworkStruct> = {
   mainnet: {
@@ -282,7 +282,7 @@ export const COINGECKO_IDS = {
 
 export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
 
-export const HUB_ADDRESS: AddressMap<VERSIONS> = {
+export const HUB_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {
     [NETWORKS.kovan.chainId]: '0xA9DFAe8b08eCA017E4f33C0C580b7B5b97974567',
     [NETWORKS.optimismKovan.chainId]: '0xB1EDC6ea9011bCC5318e2b36954008357b59292F',
@@ -299,7 +299,7 @@ export const HUB_ADDRESS: AddressMap<VERSIONS> = {
   },
 };
 
-export const ORACLE_ADDRESS: AddressMap<VERSIONS> = {
+export const ORACLE_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {},
   [POSITION_VERSION_3]: {
     [NETWORKS.kovan.chainId]: '0x4b0C54236B86f41C5e5A5dc5d020f832692ff06d',
@@ -310,7 +310,7 @@ export const ORACLE_ADDRESS: AddressMap<VERSIONS> = {
   },
 };
 
-export const COMPANION_ADDRESS: AddressMap<VERSIONS> = {
+export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {
     [NETWORKS.kovan.chainId]: '0x50ed158bfed47ee565f31404c98a9f9ac0fa0cac',
     [NETWORKS.optimismKovan.chainId]: '0x749Fc5a81B2Fe1470e54E1bF452b71a4fb0e1BBf',
@@ -327,7 +327,7 @@ export const COMPANION_ADDRESS: AddressMap<VERSIONS> = {
   },
 };
 
-export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<VERSIONS> = {
+export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {},
   [POSITION_VERSION_3]: {
     [NETWORKS.kovan.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
@@ -338,7 +338,7 @@ export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<VERSIONS> = {
   },
 };
 
-export const CHAINLINK_ORACLE_ADDRESS: AddressMap<VERSIONS> = {
+export const CHAINLINK_ORACLE_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {},
   [POSITION_VERSION_3]: {
     [NETWORKS.kovan.chainId]: '0x86E8cB7Cd38F7dE6Ef7fb62A5D7cCEe350C40310',
@@ -349,7 +349,7 @@ export const CHAINLINK_ORACLE_ADDRESS: AddressMap<VERSIONS> = {
   },
 };
 
-export const UNISWAP_ORACLE_ADDRESS: AddressMap<VERSIONS> = {
+export const UNISWAP_ORACLE_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {},
   [POSITION_VERSION_3]: {
     [NETWORKS.kovan.chainId]: '0x14AF365e0825B835C60867C985724e1DF11449ad',
@@ -360,7 +360,7 @@ export const UNISWAP_ORACLE_ADDRESS: AddressMap<VERSIONS> = {
   },
 };
 
-export const PERMISSION_MANAGER_ADDRESS: AddressMap<VERSIONS> = {
+export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {
     [NETWORKS.kovan.chainId]: '0xbB3E83D7C2fD7c1D07bb2dCCe435728Da2e42463',
     [NETWORKS.optimismKovan.chainId]: '0xE0af2abE284771Bb73071f4f373Fb5DC1AFF1849',
@@ -377,7 +377,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<VERSIONS> = {
   },
 };
 
-export const MIGRATOR_ADDRESS: AddressMap<VERSIONS> = {
+export const MIGRATOR_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {},
   [POSITION_VERSION_3]: {
     [NETWORKS.optimismKovan.chainId]: '0xCf51244AE89dE8f062ebc963C64bA96C1723e27e',
@@ -387,7 +387,7 @@ export const MIGRATOR_ADDRESS: AddressMap<VERSIONS> = {
   },
 };
 
-export const MEAN_GRAPHQL_URL: AddressMap<VERSIONS> = {
+export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {
     [NETWORKS.optimismKovan.chainId]:
       'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-vulnerable-optimism-kovan',
@@ -402,7 +402,7 @@ export const MEAN_GRAPHQL_URL: AddressMap<VERSIONS> = {
   },
 };
 
-export const UNI_GRAPHQL_URL: AddressMap<VERSIONS> = {
+export const UNI_GRAPHQL_URL: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {},
   [POSITION_VERSION_3]: {
     [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/fibofinance/uniswap-v3-kovan',

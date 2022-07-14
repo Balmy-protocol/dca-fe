@@ -51,10 +51,11 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
           </Typography>
         ),
       });
-      const result = await positionService.migratePosition(position.id.substring(0, position.id.length - 3));
+      const result = await positionService.migratePosition(position);
       addTransaction(result, {
         type: TRANSACTION_TYPES.MIGRATE_POSITION,
         typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol },
+        position,
       });
       setModalSuccess({
         hash: result.hash,

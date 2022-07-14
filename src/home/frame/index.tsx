@@ -10,6 +10,7 @@ import { useQuery } from '@apollo/client';
 import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import useWalletService from 'hooks/useWalletService';
+import usePairService from 'hooks/usePairService';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 
@@ -23,6 +24,8 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const currentNetwork = useCurrentNetwork();
   const { chainId } = useParams<{ chainId: string }>();
   const client = useDCAGraphql();
+  const pairService = usePairService();
+  const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
 
   React.useEffect(() => {
     if (
@@ -33,7 +36,17 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       walletService.changeNetwork(parseInt(chainId, 10));
     }
-  }, [chainId, currentNetwork]);
+
+    const fetchPairs = async () => {
+      await pairService.fetchAvailablePairs();
+      setHasLoadedPairs(true);
+    };
+
+    if (!isLoading && !hasLoadedPairs) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetchPairs();
+    }
+  }, [chainId, currentNetwork, isLoading]);
 
   const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
     getAvailableIntervals,
@@ -42,7 +55,19 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     }
   );
 
-  const isLoadingIntervals = isLoading || isLoadingSwapIntervals;
+  const isLoadingIntervals = isLoading || isLoadingSwapIntervals || !hasLoadedPairs;
+
+  React.useEffect(() => {
+    const fetchPairs = async () => {
+      await pairService.fetchAvailablePairs();
+      setHasLoadedPairs(true);
+    };
+
+    if (!hasLoadedPairs) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetchPairs();
+    }
+  }, []);
 
   return (
     <Grid container spacing={8}>
