@@ -80,6 +80,7 @@ const StyledPaper = styled(Paper)`
   background-color: rgba(216, 216, 216, 0.05);
   backdrop-filter: blur(6px);
   display: flex;
+  align-items: flex-start;
 `;
 
 const Positions = () => {
