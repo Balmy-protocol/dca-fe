@@ -68,7 +68,6 @@ export default class PairService {
 
   async fetchAvailablePairs() {
     const network = await this.walletService.getNetwork();
-    console.log('using network', network);
     const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(
       this.apolloClient[POSITION_VERSION_3][network.chainId].getClient(),
       GET_AVAILABLE_PAIRS,
