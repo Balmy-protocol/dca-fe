@@ -138,6 +138,12 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
                       <Route path="/leaderboard">
                         <Leaderboard />
                       </Route>
+                      <Route path="/positions">
+                        <Home isLoading={isLoading || isLoadingNetwork} />
+                      </Route>
+                      <Route path="/create/:chainId?/:from?/:to?">
+                        <Home isLoading={isLoading || isLoadingNetwork} />
+                      </Route>
                       <Route path="/:chainId?/:from?/:to?">
                         <Home isLoading={isLoading || isLoadingNetwork} />
                       </Route>

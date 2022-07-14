@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { PERMISSIONS, POSITION_VERSION_3, TRANSACTION_TYPES } from 'config/constants';
+import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import FormGroup from '@mui/material/FormGroup';
@@ -74,12 +74,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       handleCancel();
       let terminateWithUnwrap = false;
 
-      const positionId =
-        position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
-      const hasPermission = await positionService.companionHasPermission(
-        { ...position, id: positionId },
-        PERMISSIONS.TERMINATE
-      );
+      const hasPermission = await positionService.companionHasPermission(position, PERMISSIONS.TERMINATE);
       if (hasWrappedOrProtocol && protocolBalance.gt(BigNumber.from(0))) {
         if (hasProtocolToken) {
           terminateWithUnwrap = !useProtocolToken;
@@ -110,14 +105,8 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         ),
       });
 
-      const result = await positionService.terminate(
-        {
-          ...position,
-          id: positionId,
-        },
-        terminateWithUnwrap
-      );
-      addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id } });
+      const result = await positionService.terminate(position, terminateWithUnwrap);
+      addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id }, position });
       setModalSuccess({
         hash: result.hash,
         content: (

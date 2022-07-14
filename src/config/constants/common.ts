@@ -9,8 +9,8 @@ type PositionVersion3Type = '3';
 export const POSITION_VERSION_2: PositionVersion2Type = '2';
 export const POSITION_VERSION_3: PositionVersion3Type = '3';
 
-export type VERSIONS = PositionVersion2Type | PositionVersion3Type;
+export type PositionVersions = PositionVersion2Type | PositionVersion3Type;
 
-export const LATEST_VERSION: VERSIONS = POSITION_VERSION_3;
+export const LATEST_VERSION: PositionVersions = POSITION_VERSION_3;
 
-export const POSITIONS_VERSIONS: VERSIONS[] = [POSITION_VERSION_2, POSITION_VERSION_3];
+export const POSITIONS_VERSIONS: PositionVersions[] = [POSITION_VERSION_2, POSITION_VERSION_3];

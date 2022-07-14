@@ -261,6 +261,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       addTransaction(result, {
         type: TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION,
         typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
+        position,
       });
       setModalSuccess({
         hash: result.hash,
@@ -306,8 +307,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         ),
       });
       const result = await walletService.approveToken(fromToUse);
-      const hubAddress = await contractService.getHUBAddress();
-      const companionAddress = await contractService.getHUBCompanionAddress();
+      const hubAddress = await contractService.getHUBAddress(position.version);
+      const companionAddress = await contractService.getHUBCompanionAddress(position.version);
 
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
@@ -315,6 +316,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           token: fromToUse,
           addressFor: to.address === PROTOCOL_TOKEN_ADDRESS ? companionAddress : hubAddress,
         },
+        position,
       });
       setModalSuccess({
         hash: result.hash,

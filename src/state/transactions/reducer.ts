@@ -24,7 +24,7 @@ export default createReducer(initialState, (builder) =>
   builder
     .addCase(
       addTransaction,
-      (state, { payload: { from, hash, approval, summary, claim, type, typeData, chainId } }) => {
+      (state, { payload: { from, hash, approval, summary, claim, type, typeData, chainId, position } }) => {
         if (state[chainId] && state[chainId][hash]) {
           throw Error('Attempted to add existing transaction.');
         }
@@ -42,6 +42,7 @@ export default createReducer(initialState, (builder) =>
           typeData,
           isCleared: false,
           retries: 0,
+          position,
         };
       }
     )

@@ -10,6 +10,7 @@ import {
   Token,
   TransactionPositionTypeDataOptions,
   NewPositionTypeData,
+  Position,
 } from 'types';
 import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -32,6 +33,7 @@ export function useTransactionAdder(): (
     claim?: { recipient: string };
     type: TransactionTypes;
     typeData: TransactionTypeDataOptions;
+    position?: Position;
   }
 ) => void {
   const positionService = usePositionService();
@@ -48,12 +50,14 @@ export function useTransactionAdder(): (
         claim,
         type,
         typeData,
+        position,
       }: {
         type: TransactionTypes;
         typeData: TransactionTypeDataOptions;
         summary?: string;
         claim?: { recipient: string };
         approval?: { tokenAddress: string; spender: string };
+        position?: Position;
       } = { type: TRANSACTION_TYPES.NO_OP, typeData: { id: 'NO_OP' } }
     ) => {
       if (!walletService.getAccount()) return;
@@ -72,6 +76,7 @@ export function useTransactionAdder(): (
           type,
           typeData,
           chainId: currentNetwork.chainId,
+          position,
         })
       );
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -85,6 +90,7 @@ export function useTransactionAdder(): (
         typeData,
         addedTime: new Date().getTime(),
         retries: 0,
+        position,
       });
     },
     [dispatch, walletService.getAccount(), currentNetwork]

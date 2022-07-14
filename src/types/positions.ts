@@ -1,3 +1,4 @@
+import { PositionVersions } from 'config';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 
@@ -29,7 +30,6 @@ type PositionActions =
   | 'CREATED'
   | 'TERMINATED';
 
-type PositionVersions = '3' | '2';
 export interface Position {
   from: Token;
   to: Token;
@@ -51,6 +51,8 @@ export interface Position {
   pendingTransaction: string;
   version: PositionVersions;
   chainId: number;
+  pairLastSwappedAt: number;
+  pairNextSwapAvailableAt: string;
 }
 
 export interface FullPosition {
@@ -65,6 +67,7 @@ export interface FullPosition {
   startedAt: number;
   executedSwaps: string;
   pendingTransaction: string;
+  version: PositionVersions;
   pair: {
     id: string;
     tokenA: Token;

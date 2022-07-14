@@ -1,17 +1,17 @@
 import { createAction } from '@reduxjs/toolkit';
-import { TransactionReceipt, TransactionTypes, TransactionTypeDataOptions } from 'types';
+import { TransactionReceipt, TransactionTypes, TransactionTypeDataOptions, Position } from 'types';
 
-export const addTransaction =
-  createAction<{
-    hash: string;
-    from: string;
-    approval?: { tokenAddress: string; spender: string };
-    claim?: { recipient: string };
-    summary?: string;
-    type: TransactionTypes;
-    typeData: TransactionTypeDataOptions;
-    chainId: number;
-  }>('transactions/addTransaction');
+export const addTransaction = createAction<{
+  hash: string;
+  from: string;
+  approval?: { tokenAddress: string; spender: string };
+  claim?: { recipient: string };
+  summary?: string;
+  type: TransactionTypes;
+  typeData: TransactionTypeDataOptions;
+  chainId: number;
+  position?: Position;
+}>('transactions/addTransaction');
 export const finalizeTransaction = createAction<{
   hash: string;
   receipt: TransactionReceipt;

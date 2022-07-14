@@ -31,7 +31,7 @@ import TransferPositionModal from 'common/transfer-position-modal';
 import TerminateModal from 'common/terminate-modal';
 import ModifySettingsModal from 'common/modify-settings-modal';
 import { fullPositionToMappedPosition } from 'utils/parsing';
-import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES, VERSIONS } from 'config/constants';
+import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES, PositionVersions } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
@@ -80,7 +80,7 @@ const PositionDetailFrame = () => {
   const { positionId, chainId, positionVersion } = useParams<{
     positionId: string;
     chainId: string;
-    positionVersion: VERSIONS;
+    positionVersion: PositionVersions;
   }>();
   const client = useDCAGraphql(Number(chainId), positionVersion);
   const history = useHistory();
@@ -103,7 +103,11 @@ const PositionDetailFrame = () => {
     positionId === '' || positionId === null
   );
 
-  let position = data && data.position;
+  let position: FullPosition | undefined = data && {
+    ...data.position,
+    chainId: Number(chainId),
+    version: positionVersion,
+  };
 
   const pendingTransaction = usePositionHasPendingTransaction((position && position.id) || '');
 
@@ -168,7 +172,7 @@ const PositionDetailFrame = () => {
 
   const handleViewNFT = async () => {
     if (!position) return;
-    const tokenNFT = await positionService.getTokenNFT(position.id);
+    const tokenNFT = await positionService.getTokenNFT(fullPositionToMappedPosition(position));
     setNFTData(tokenNFT);
     setShowNFTModal(true);
   };
@@ -183,7 +187,7 @@ const PositionDetailFrame = () => {
 
   const onBackToPositions = () => {
     dispatch(changeMainTab(1));
-    history.push('/');
+    history.push('/positions');
   };
 
   const onWithdraw = async (useProtocolToken = false) => {
@@ -223,7 +227,11 @@ const PositionDetailFrame = () => {
         ),
       });
       const result = await positionService.withdraw(fullPositionToMappedPosition(position), useProtocolToken);
-      addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id } });
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.WITHDRAW_POSITION,
+        typeData: { id: position.id },
+        position: fullPositionToMappedPosition(position),
+      });
       setModalSuccess({
         hash: result.hash,
         content: (

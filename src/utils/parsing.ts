@@ -36,12 +36,12 @@ export const calculateStale: (
   lastSwapped: number | undefined,
   frequencyType: BigNumber,
   createdAt: number,
-  nextSwapInformation: string | null
+  nextSwapInformation: string | number | null
 ) => -1 | 0 | 1 | 2 = (
   lastSwapped = 0,
   frequencyType: BigNumber,
   createdAt: number,
-  nextSwapInformation: string | null
+  nextSwapInformation: string | number | null
 ) => {
   let isStale = false;
   if (!nextSwapInformation) {
@@ -123,14 +123,16 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
     remainingSwaps: BigNumber.from(position.current.remainingSwaps),
     withdrawn: BigNumber.from(position.totalWithdrawn),
     totalSwaps: BigNumber.from(position.totalSwaps),
-    id: `${position.id}-${POSITION_VERSION_3}`,
+    id: `${position.id}-${position.version || POSITION_VERSION_3}`,
     positionId: position.id,
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),
     totalDeposits: BigNumber.from(position.totalDeposits),
     executedSwaps: BigNumber.from(position.executedSwaps),
     pendingTransaction: '',
-    version: POSITION_VERSION_3,
+    version: position.version || POSITION_VERSION_3,
     chainId: position.chainId,
+    pairLastSwappedAt: parseInt(position.createdAtTimestamp, 10),
+    pairNextSwapAvailableAt: position.createdAtTimestamp,
   };
 }

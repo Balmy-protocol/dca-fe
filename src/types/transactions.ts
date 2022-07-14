@@ -1,5 +1,6 @@
 import { Log } from '@ethersproject/providers';
 import { Oracles } from './contracts';
+import { Position } from './positions';
 import { Token } from './tokens';
 
 export interface TransactionReceipt {
@@ -175,4 +176,5 @@ export interface TransactionDetails {
   from: string;
   type: TransactionTypes;
   typeData: TransactionTypeDataOptions;
+  position?: Position;
 }

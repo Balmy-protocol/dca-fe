@@ -7,7 +7,7 @@ import { AxiosInstance } from 'axios';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 
 // MOCKS
-import { NETWORKS, SUPPORTED_NETWORKS, VERSIONS } from 'config/constants';
+import { NETWORKS, SUPPORTED_NETWORKS, PositionVersions } from 'config/constants';
 
 import { getProviderInfo } from 'web3modal';
 import { setupAxiosClient } from 'state';
@@ -27,9 +27,9 @@ export default class Web3Service {
 
   signer: Signer;
 
-  apolloClient: Record<VERSIONS, Record<number, GraphqlService>>;
+  apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
-  uniClient: Record<VERSIONS, Record<number, GraphqlService>>;
+  uniClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
   network: Network;
 
@@ -54,8 +54,8 @@ export default class Web3Service {
   walletService: WalletService;
 
   constructor(
-    DCASubgraphs?: Record<VERSIONS, Record<number, GraphqlService>>,
-    UNISubgraphs?: Record<VERSIONS, Record<number, GraphqlService>>,
+    DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
+    UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
     client?: ethers.providers.Web3Provider,
     modal?: SafeAppWeb3Modal
@@ -240,6 +240,7 @@ export default class Web3Service {
 
   async setUpModal(chainId = NETWORKS.optimism.chainId) {
     let chainIdToUse = chainId;
+    this.setNetwork(chainIdToUse);
     const providerOptions = {
       walletconnect: {
         package: WalletConnectProvider, // required
@@ -285,8 +286,6 @@ export default class Web3Service {
 
       await this.connect(chainIdToUse, provider);
     }
-
-    this.setNetwork(chainIdToUse);
 
     if (window.ethereum) {
       // handle metamask account change
