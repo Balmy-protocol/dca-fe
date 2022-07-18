@@ -83,7 +83,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   };
 
   return (
-    <Grid container spacing={2} alignItems="center" justifyContent="space-around">
+    <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around">
       <Grid item xs={12} md={5}>
         <Swap
           from={from}
