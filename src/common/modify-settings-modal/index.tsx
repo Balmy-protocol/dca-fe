@@ -437,8 +437,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               error={cantFund ? 'Amount cannot exceed balance' : ''}
               value={fromValue}
               onChange={handleFromValueChange}
-              withBalance={!!balance}
-              balance={balance}
+              withBalance={!!realBalance}
+              balance={realBalance}
               token={fromToUse}
               withMax
               withHalf
