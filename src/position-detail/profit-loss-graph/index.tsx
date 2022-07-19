@@ -270,7 +270,6 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
       const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);
       const swappedIfLumpSum = formatUnits(price.swappedIfLumpSum, position.to.decimals);
 
-      // console.log(swappedIfDCA, swappedIfLumpSum);
       return {
         ...price,
         swappedIfDCA: parseFloat(swappedIfDCA),

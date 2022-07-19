@@ -138,6 +138,10 @@ export default class PositionService {
 
     const results = await Promise.all(promises);
 
+    const currentPositions = {
+      ...this.currentPositions,
+    };
+
     this.currentPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
       const protocolToken = getProtocolToken(network);
@@ -178,7 +182,7 @@ export default class PositionService {
         };
       }
       return acc;
-    }, {});
+    }, currentPositions);
 
     this.hasFetchedCurrentPositions = true;
   }
@@ -208,6 +212,10 @@ export default class PositionService {
     );
 
     const results = await Promise.all(promises);
+
+    const pastPositions = {
+      ...this.pastPositions,
+    };
 
     this.pastPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
@@ -249,7 +257,7 @@ export default class PositionService {
         };
       }
       return acc;
-    }, {});
+    }, pastPositions);
 
     this.hasFetchedPastPositions = true;
   }
@@ -890,10 +898,11 @@ export default class PositionService {
     const network = await this.walletService.getNetwork();
     const protocolToken = getProtocolToken(network.chainId);
     const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
+
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
       const newPositionTypeData = typeData as NewPositionTypeData;
       id = `pending-transaction-${transaction.hash}`;
-      this.currentPositions[`${id}-v${POSITION_VERSION_3}`] = {
+      this.currentPositions[`${id}-v${newPositionTypeData.version}`] = {
         from:
           newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from,
         to: newPositionTypeData.to.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to,
@@ -914,7 +923,7 @@ export default class PositionService {
         id,
         startedAt: newPositionTypeData.startedAt,
         totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
-        pendingTransaction: '',
+        pendingTransaction: transaction.hash,
         status: 'ACTIVE',
         version: POSITION_VERSION_3,
         pairLastSwappedAt: newPositionTypeData.startedAt,
@@ -923,7 +932,9 @@ export default class PositionService {
     }
 
     if (!this.currentPositions[id] && transaction.position) {
-      this.currentPositions[id] = transaction.position;
+      this.currentPositions[id] = {
+        ...transaction.position,
+      };
     }
 
     if (this.currentPositions[id]) {
@@ -953,9 +964,11 @@ export default class PositionService {
     }
 
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
-    if (!this.currentPositions[typeData.id]) {
+    if (!this.currentPositions[typeData.id] && transaction.type !== TRANSACTION_TYPES.NEW_POSITION) {
       if (transaction.position) {
-        this.currentPositions[typeData.id] = transaction.position;
+        this.currentPositions[typeData.id] = {
+          ...transaction.position,
+        };
       } else {
         return;
       }
@@ -965,14 +978,15 @@ export default class PositionService {
       case TRANSACTION_TYPES.NEW_POSITION: {
         const newPositionTypeData = transaction.typeData as NewPositionTypeData;
         const newId = newPositionTypeData.id;
-        if (!this.currentPositions[newId]) {
-          this.currentPositions[newId] = {
-            ...this.currentPositions[`pending-transaction-${transaction.hash}`],
+        if (!this.currentPositions[`${newId}-${newPositionTypeData.version}`]) {
+          this.currentPositions[`${newId}-${newPositionTypeData.version}`] = {
+            ...this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
             pendingTransaction: '',
-            id: newId,
+            id: `${newId}-v${newPositionTypeData.version}`,
+            positionId: newId,
           };
         }
-        delete this.currentPositions[`pending-transaction-${transaction.hash}`];
+        delete this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
         this.pairService.addNewPair(newPositionTypeData.from, newPositionTypeData.to, newPositionTypeData.oracle);
         break;
       }
@@ -1012,6 +1026,7 @@ export default class PositionService {
       }
       case TRANSACTION_TYPES.WITHDRAW_POSITION: {
         const withdrawPositionTypeData = transaction.typeData as WithdrawTypeData;
+        console.log(withdrawPositionTypeData);
         this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[withdrawPositionTypeData.id].withdrawn =
           this.currentPositions[withdrawPositionTypeData.id].swapped;
