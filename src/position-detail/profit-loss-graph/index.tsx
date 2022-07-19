@@ -275,6 +275,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         ...price,
         swappedIfDCA: parseFloat(swappedIfDCA),
         swappedIfLumpSum: parseFloat(swappedIfLumpSum),
+        rawSwappedIfDCA: price.swappedIfDCA,
+        rawSwappedIfLumpSum: price.swappedIfLumpSum,
       };
     })
     .slice(-POINT_LIMIT);
