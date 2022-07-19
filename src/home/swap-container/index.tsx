@@ -53,12 +53,12 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
     }
 
     dispatch(setFrom(newFrom));
-    history.replace(`/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    history.replace(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
   };
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
     if (from) {
-      history.replace(`/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
+      history.replace(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
   };
 
@@ -78,7 +78,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
     dispatch(setFrom(to));
 
     if (to) {
-      history.replace(`/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
+      history.replace(`/create/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
   };
 

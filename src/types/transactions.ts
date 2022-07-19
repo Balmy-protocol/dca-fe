@@ -1,4 +1,5 @@
 import { Log } from '@ethersproject/providers';
+import { PositionVersions } from 'config';
 import { Oracles } from './contracts';
 import { Position } from './positions';
 import { Token } from './tokens';
@@ -123,6 +124,7 @@ export interface NewPositionTypeData {
   isCreatingPair: boolean;
   oracle: Oracles;
   addressFor: string;
+  version: PositionVersions;
 }
 
 export interface NewPairTypeData {

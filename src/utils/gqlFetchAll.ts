@@ -44,7 +44,7 @@ export default async function gqlFetchAll<T>(
       },
     });
 
-    if (get(newResults.data, dataToSearch).length === limit) {
+    if (get(newResults.data, dataToSearch) && get(newResults.data, dataToSearch).length === limit) {
       return gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, query);
     }
 
@@ -63,7 +63,7 @@ export default async function gqlFetchAll<T>(
 
   const results = await newQuery.result();
 
-  if (get(results.data, dataToSearch).length === limit) {
+  if (get(results.data, dataToSearch) && get(results.data, dataToSearch).length === limit) {
     return gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, newQuery);
   }
 

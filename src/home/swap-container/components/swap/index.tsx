@@ -36,6 +36,7 @@ import {
   TESTNETS,
   NETWORKS,
   MAX_UINT_32,
+  LATEST_VERSION,
 } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -344,6 +345,7 @@ const Swap = ({
           startedAt: Date.now(),
           id: result.hash,
           isCreatingPair: !existingPair,
+          version: LATEST_VERSION,
           addressFor:
             to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
               ? companionAddress
