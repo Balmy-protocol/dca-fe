@@ -1,5 +1,5 @@
-import { parseUnits } from '@ethersproject/units';
 import Typography from '@mui/material/Typography';
+import { BigNumber } from 'ethers';
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
@@ -28,6 +28,8 @@ interface ProfitLossTooltipProps {
     payload?: {
       swappedIfLumpSum: number;
       swappedIfDCA: number;
+      rawSwappedIfLumpSum: BigNumber;
+      rawSwappedIfDCA: BigNumber;
     };
   }[];
   tokenTo: Token;
@@ -42,17 +44,16 @@ const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
     return null;
   }
 
-  const { swappedIfLumpSum, swappedIfDCA } = firstPayload?.payload;
+  const { rawSwappedIfLumpSum, rawSwappedIfDCA } = firstPayload?.payload;
 
   return (
     <StyledPaper>
       <Typography variant="body2">{label}</Typography>
       <Typography variant="body1">
-        DCA: {formatCurrencyAmount(parseUnits(swappedIfDCA.toString(), tokenTo.decimals), tokenTo)} {tokenTo.symbol}
+        DCA: {formatCurrencyAmount(rawSwappedIfDCA, tokenTo)} {tokenTo.symbol}
       </Typography>
       <Typography variant="body1">
-        Lump sum: {formatCurrencyAmount(parseUnits(swappedIfLumpSum.toString(), tokenTo.decimals), tokenTo)}{' '}
-        {tokenTo.symbol}
+        Lump sum: {formatCurrencyAmount(rawSwappedIfLumpSum, tokenTo)} {tokenTo.symbol}
       </Typography>
     </StyledPaper>
   );
