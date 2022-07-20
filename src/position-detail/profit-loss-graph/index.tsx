@@ -165,7 +165,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             // eslint-disable-next-line no-await-in-loop
             const [fetchedTokenFromPrice, fetchedTokenToPrice] = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
-              positionAction.createdAtTimestamp
+              positionAction.createdAtTimestamp,
+              position.chainId
             );
             const deposited = currentRemainingSwaps.mul(currentRate);
 
@@ -181,7 +182,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             // eslint-disable-next-line no-await-in-loop
             const [fetchedTokenFromPrice, fetchedTokenToPrice] = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
-              positionAction.createdAtTimestamp
+              positionAction.createdAtTimestamp,
+              position.chainId
             );
 
             const ratePerUnit = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);

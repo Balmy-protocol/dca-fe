@@ -65,9 +65,16 @@ export default class PriceService {
       }
     );
 
-    const tokensPrices = mappedTokens.map((token) =>
-      parseUnits(price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price.toString(), 18)
-    );
+    const tokensPrices = mappedTokens
+      .filter(
+        (token) =>
+          price.data.coins &&
+          price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`] &&
+          price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price
+      )
+      .map((token) =>
+        parseUnits(price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price.toString(), 18)
+      );
 
     return tokensPrices;
   }

@@ -11,13 +11,20 @@ import Chip from '@mui/material/Chip';
 import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { useHistory } from 'react-router-dom';
-import { formatCurrencyAmount } from 'utils/currency';
-import { POSITION_VERSION_3, STABLE_COINS } from 'config/constants';
+import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
+import { NETWORKS, POSITION_VERSION_3, STABLE_COINS } from 'config/constants';
 import { BigNumber } from 'ethers';
 import useUsdPrice from 'hooks/useUsdPrice';
+import find from 'lodash/find';
 
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
+`;
+
+const StyledNetworkLogoContainer = styled.div`
+  position: absolute;
+  top: -15px;
+  right: -15px;
 `;
 
 const StyledCard = styled(Card)`
@@ -26,6 +33,7 @@ const StyledCard = styled(Card)`
   display: flex;
   flex-grow: 1;
   background: #292929;
+  overflow: visible;
 `;
 
 const StyledCardContent = styled(CardContent)`
@@ -90,21 +98,38 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
   to: Token;
 }
 
-interface ActivePositionProps {
+interface TerminantedPositionProps {
   position: PositionProp;
 }
 
-const ActivePosition = ({ position }: ActivePositionProps) => {
-  const { from, to, swapInterval, swapped, totalDeposits, executedSwaps } = position;
+interface TerminantedPositionProps {
+  position: PositionProp;
+}
+
+const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
+  const { from, to, swapInterval, swapped, totalDeposits, executedSwaps, chainId } = position;
+
+  const positionNetwork = React.useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const supportedNetwork = find(NETWORKS, { chainId })!;
+    return supportedNetwork;
+  }, [chainId]);
+
   const history = useHistory();
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped);
   const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
 
   const onViewDetails = () => {
-    history.push(`/positions/${position.id}`);
+    history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
+
   return (
     <StyledCard variant="outlined">
+      {positionNetwork && (
+        <StyledNetworkLogoContainer>
+          <TokenIcon size="30px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
+        </StyledNetworkLogoContainer>
+      )}
       <StyledCardContent>
         <StyledContentContainer>
           <StyledCardHeader>
@@ -191,4 +216,4 @@ const ActivePosition = ({ position }: ActivePositionProps) => {
     </StyledCard>
   );
 };
-export default ActivePosition;
+export default TerminantedPosition;

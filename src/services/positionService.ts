@@ -1026,7 +1026,6 @@ export default class PositionService {
       }
       case TRANSACTION_TYPES.WITHDRAW_POSITION: {
         const withdrawPositionTypeData = transaction.typeData as WithdrawTypeData;
-        console.log(withdrawPositionTypeData);
         this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[withdrawPositionTypeData.id].withdrawn =
           this.currentPositions[withdrawPositionTypeData.id].swapped;

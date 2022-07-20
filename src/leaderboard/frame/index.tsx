@@ -93,11 +93,17 @@ const LeaderboardFrame = () => {
   const [isLoadingTokenPrices, setIsLoadingTokenPrices] = React.useState(false);
   const [tokensByPrice, setTokensByPrice] = React.useState<Record<string, number>>({});
   const { loading: isLoadingPositions, data: positionsData } = useGqlFetchAll<{ positions: FullPosition[] }>(
+    undefined,
     getPositions,
     {},
     'positions'
   );
-  const { loading: isLoadingTokens, data: tokensData } = useGqlFetchAll<{ tokens: Token[] }>(getTokens, {}, 'tokens');
+  const { loading: isLoadingTokens, data: tokensData } = useGqlFetchAll<{ tokens: Token[] }>(
+    undefined,
+    getTokens,
+    {},
+    'tokens'
+  );
 
   React.useEffect(() => {
     const loadTokenPrices = async (tokens: Token[]) => {

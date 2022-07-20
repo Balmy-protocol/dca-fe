@@ -90,11 +90,15 @@ const PositionDetailFrame = () => {
   const currentNetwork = useCurrentNetwork();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
+
+  const shouldShowChangeNetwork = Number(chainId) !== currentNetwork.chainId || !isOnCorrectNetwork;
+
   const {
     loading: isLoading,
     data,
     // refetch,
   } = useGqlFetchAll<{ position: FullPosition }>(
+    client,
     getPosition,
     {
       id: positionId,
@@ -328,7 +332,7 @@ const PositionDetailFrame = () => {
               onViewNFT={handleViewNFT}
               position={position}
               pendingTransaction={pendingTransaction}
-              disabled={!isOnCorrectNetwork}
+              disabled={shouldShowChangeNetwork}
             />
           )}
         </Grid>
@@ -340,14 +344,14 @@ const PositionDetailFrame = () => {
               swapsData={swapsData?.pair}
               onWithdraw={onWithdraw}
               onReusePosition={onShowModifyRateSettings}
-              disabled={!isOnCorrectNetwork}
+              disabled={shouldShowChangeNetwork}
             />
           )}
           {tabIndex === 1 && (
             <PositionPermissionsContainer
               position={position}
               pendingTransaction={pendingTransaction}
-              disabled={!isOnCorrectNetwork}
+              disabled={shouldShowChangeNetwork}
             />
           )}
         </Grid>
