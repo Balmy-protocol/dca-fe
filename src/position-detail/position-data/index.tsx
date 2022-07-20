@@ -9,7 +9,7 @@ import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
 import Button from 'common/button';
 import { calculateStale, fullPositionToMappedPosition, getTimeFrequencyLabel, STALE } from 'utils/parsing';
-import { POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
+import { NETWORKS, POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useUsdPrice from 'hooks/useUsdPrice';
 import LinearProgress from '@mui/material/LinearProgress';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -24,6 +24,8 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import Link from '@mui/material/Link';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import useSupportsSigning from 'hooks/useSupportsSigning';
+import find from 'lodash/find';
+import useWalletService from 'hooks/useWalletService';
 
 interface DetailsProps {
   position: FullPosition;
@@ -140,7 +142,13 @@ const StyledCallToActionContainer = styled.div`
 `;
 
 const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePosition, disabled }: DetailsProps) => {
-  const { from, to, swapInterval, current } = position;
+  const { from, to, swapInterval, current, chainId } = position;
+
+  const positionNetwork = React.useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const supportedNetwork = find(NETWORKS, { chainId })!;
+    return supportedNetwork;
+  }, [chainId]);
 
   const { toWithdraw, remainingLiquidity, remainingSwaps, totalSwaps } = fullPositionToMappedPosition(position);
   const web3Service = useWeb3Service();
@@ -148,6 +156,7 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
 
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
+  const walletService = useWalletService();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const isPending = pendingTransaction !== null;
   const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
@@ -187,6 +196,11 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
   const hasNoFunds = BigNumber.from(current.remainingLiquidity).lte(BigNumber.from(0));
 
   const lastExecutedAt = (pair?.swaps && pair?.swaps[0] && pair?.swaps[0].executedAtTimestamp) || '0';
+
+  const onChangeNetwork = () => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    walletService.changeNetwork(chainId);
+  };
 
   const isStale =
     calculateStale(
@@ -451,12 +465,18 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
             {!isPending && (
               <>
                 {disabled && (
-                  <StyledCardFooterButton size="large" color="primary" variant="contained" disabled fullWidth>
+                  <StyledCardFooterButton
+                    size="large"
+                    color="secondary"
+                    variant="contained"
+                    onClick={onChangeNetwork}
+                    fullWidth
+                  >
                     <Typography variant="body2">
                       <FormattedMessage
                         description="incorrect network"
                         defaultMessage="Change network to {network}"
-                        values={{ network: currentNetwork.name }}
+                        values={{ network: positionNetwork.name }}
                       />
                     </Typography>
                   </StyledCardFooterButton>

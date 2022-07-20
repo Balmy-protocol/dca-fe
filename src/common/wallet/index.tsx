@@ -13,6 +13,8 @@ import Button from 'common/button';
 import WalletMenu from 'common/wallet-menu';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import Address from 'common/address';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -24,6 +26,17 @@ const StyledButton = styled(Button)`
   }
   padding: 4px 8px;
 `;
+
+const StyledBadge = withStyles(() =>
+  createStyles({
+    badge: {
+      backgroundColor: '#292929',
+      border: '2px solid #121212',
+      padding: '2px 6px',
+      color: 'white',
+    },
+  })
+)(Badge);
 
 interface ConnectWalletButtonProps {
   web3Service: Web3Service;
@@ -52,12 +65,11 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
 
   return (
     <>
-      <Badge
+      <StyledBadge
         badgeContent={
           hasPendingTransactions ? <CircularProgress size={10} /> : Object.keys(transactions).length - badge
         }
-        color="secondary"
-        component="div"
+        color="primary"
       >
         <StyledButton
           aria-controls="customized-menu"
@@ -68,10 +80,10 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
           style={{ maxWidth: '220px', textTransform: 'none' }}
         >
           <Typography noWrap>
-            <Address address={web3Service.getAccount()} trimAddress/>
+            <Address address={web3Service.getAccount()} trimAddress />
           </Typography>
         </StyledButton>
-      </Badge>
+      </StyledBadge>
       <WalletMenu open={shouldOpenMenu} onClose={() => setShouldOpenMenu(false)} />
     </>
   );

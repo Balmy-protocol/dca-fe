@@ -103,6 +103,7 @@ export default class WalletService {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${newChainId.toString(16)}` }],
       });
+      window.location.reload();
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (switchError.code === 4902) {
@@ -122,6 +123,7 @@ export default class WalletService {
                 },
               ],
             });
+            window.location.reload();
           }
         } catch (addError) {
           console.error('Error adding new chain to metamask');

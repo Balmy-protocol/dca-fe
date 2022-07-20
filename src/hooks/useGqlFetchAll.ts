@@ -1,11 +1,12 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
-import { DocumentNode, QueryResult } from '@apollo/client';
+import { ApolloClient, DocumentNode, NormalizedCacheObject, QueryResult } from '@apollo/client';
 import gqlFetchAll from 'utils/gqlFetchAll';
 import useDCAGraphql from './useDCAGraphql';
 
 function useGqlFetchAll<T>(
+  client: ApolloClient<NormalizedCacheObject> | undefined,
   queryToRun: DocumentNode,
   variables: unknown,
   dataToSearch: string,
@@ -17,12 +18,13 @@ function useGqlFetchAll<T>(
   });
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const prevParameters = usePrevious(variables);
-  const client = useDCAGraphql();
+  const defaultClient = useDCAGraphql();
+  const clientToUse = client || defaultClient;
 
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const gqlResult = await gqlFetchAll<T>(client, queryToRun, variables, dataToSearch);
+        const gqlResult = await gqlFetchAll<T>(clientToUse, queryToRun, variables, dataToSearch);
         setResult({ ...gqlResult, loading: false } as never);
       } catch (e) {
         console.error(e);

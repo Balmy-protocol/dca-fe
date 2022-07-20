@@ -76,7 +76,7 @@ export function useTransactionAdder(): (
           type,
           typeData,
           chainId: currentNetwork.chainId,
-          position,
+          position: position && { ...position },
         })
       );
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -90,7 +90,7 @@ export function useTransactionAdder(): (
         typeData,
         addedTime: new Date().getTime(),
         retries: 0,
-        position,
+        position: position && { ...position },
       });
     },
     [dispatch, walletService.getAccount(), currentNetwork]

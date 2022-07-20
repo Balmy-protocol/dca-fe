@@ -26,6 +26,7 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import TerminateModal from 'common/terminate-modal';
 import MigratePositionModal from 'common/migrate-position-modal';
 import ActivePosition from './components/position';
+import FinishedPosition from './components/finished-position';
 
 const StyledGridItem = styled(Grid)`
   display: flex;
@@ -246,7 +247,7 @@ const CurrentPositions = () => {
               <Grid container spacing={2}>
                 {positionsFinished.map((position) => (
                   <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
-                    <ActivePosition
+                    <FinishedPosition
                       position={position}
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
