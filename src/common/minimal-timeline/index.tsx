@@ -30,15 +30,15 @@ const StyledTimelineContainer = styled(Grid)`
   }
 `;
 
-const StyledTimelineIcon = styled.div`
+const StyledTimelineIcon = styled.div<{ hasIcon?: boolean }>`
   position: absolute;
-  left: -7px;
-  top: calc(50% - 8px);
-  width: 16px;
-  height: 16px;
+  left: ${(props) => (!props.hasIcon && '-7px') || '-8px'};
+  top: calc(50% - ${(props) => (!props.hasIcon && '7px') || '10px'});
+  width: ${(props) => (!props.hasIcon && '16px') || '20px'};
+  height: ${(props) => (!props.hasIcon && '16px') || '20px'};
   border-radius: 50%;
   text-align: center;
-  background: #dce2f9;
+  background: ${(props) => (!props.hasIcon && '#dce2f9') || 'transparent'};
 
   i {
     position: absolute;
@@ -78,6 +78,7 @@ interface TimelineItemProps {
   content: React.ReactNode;
   link: string;
   isPending: boolean;
+  icon?: React.ReactElement;
 }
 
 interface TimelineProps {
@@ -88,7 +89,7 @@ const MinimalTimeline = ({ items }: TimelineProps) => (
   <StyledTimeline container>
     {items.map((item) => (
       <StyledTimelineContainer item xs={12}>
-        <StyledTimelineIcon />
+        {item.icon ? <StyledTimelineIcon hasIcon>{item.icon}</StyledTimelineIcon> : <StyledTimelineIcon />}
         <StyledTimelineContent>
           <Typography variant="body1">{item.content}</Typography>
         </StyledTimelineContent>
