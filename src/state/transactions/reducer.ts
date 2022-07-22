@@ -42,6 +42,7 @@ export default createReducer(initialState, (builder) =>
           typeData,
           isCleared: false,
           retries: 0,
+          chainId,
           position,
         };
       }

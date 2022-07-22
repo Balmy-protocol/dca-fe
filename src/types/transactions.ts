@@ -172,6 +172,7 @@ export interface TransactionDetails {
   claim?: { recipient: string };
   retries: number;
   receipt?: TransactionReceipt;
+  chainId: number;
   lastCheckedBlockNumber?: number;
   addedTime: number;
   confirmedTime?: number;

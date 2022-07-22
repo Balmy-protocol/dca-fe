@@ -88,6 +88,7 @@ export function useTransactionAdder(): (
         claim,
         type,
         typeData,
+        chainId: currentNetwork.chainId,
         addedTime: new Date().getTime(),
         retries: 0,
         position: position && { ...position },
@@ -114,15 +115,23 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
 export function useAllNotClearedTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((appState) => appState.transactions);
   const web3Service = useWeb3Service();
-  const currentNetwork = useCurrentNetwork();
+
+  const mergedState = useMemo(
+    () =>
+      Object.keys(state).reduce<Record<string, TransactionDetails>>(
+        (acc, value) => ({
+          ...acc,
+          ...state[Number(value)],
+        }),
+        {}
+      ),
+    [web3Service.getAccount(), Object.keys(state)]
+  );
 
   const returnValue = useMemo(
     () =>
-      pickBy(
-        state[currentNetwork.chainId],
-        (tx: TransactionDetails) => tx.from === web3Service.getAccount() && tx.isCleared === false
-      ),
-    [Object.keys(state[currentNetwork.chainId] || {}), web3Service.getAccount(), currentNetwork]
+      pickBy(mergedState, (tx: TransactionDetails) => tx.from === web3Service.getAccount() && tx.isCleared === false),
+    [Object.keys(mergedState || {}), web3Service.getAccount()]
   );
   return returnValue || {};
 }

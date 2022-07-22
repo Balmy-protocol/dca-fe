@@ -1,6 +1,7 @@
 import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
+import find from 'lodash/find';
 import Button from 'common/button';
 import Typography from '@mui/material/Typography';
 import Modal from 'common/modal';
@@ -12,7 +13,7 @@ import {
   useHasPendingTransactions,
   useIsTransactionPending,
 } from 'state/transactions/hooks';
-import { TransactionDetails } from 'types';
+import { NetworkStruct, TransactionDetails } from 'types';
 import useBuildTransactionDetail from 'hooks/useBuildTransactionDetail';
 import { clearAllTransactions } from 'state/transactions/actions';
 import { useAppDispatch } from 'state/hooks';
@@ -21,6 +22,9 @@ import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/ethersca
 import useWeb3Service from 'hooks/useWeb3Service';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import MinimalTimeline from 'common/minimal-timeline';
+import { NETWORKS, NETWORKS_FOR_MENU } from 'config';
+import TokenIcon from 'common/token-icon';
+import { emptyTokenWithAddress } from 'utils/currency';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -70,6 +74,16 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
   const currentNetwork = useCurrentNetwork();
+
+  const networks = React.useMemo(
+    () =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      NETWORKS_FOR_MENU.reduce<Record<number, NetworkStruct>>(
+        (acc, chainId) => ({ ...acc, [chainId]: find(NETWORKS, { chainId })! }),
+        {}
+      ),
+    []
+  );
 
   const allOrderedTransactions = React.useMemo(
     () =>
@@ -143,6 +157,9 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
             content: buildTransactionDetail(transaction),
             link: buildEtherscanTransaction(transaction.hash, currentNetwork.chainId),
             isPending: transaction.isPending,
+            icon: networks[transaction.chainId] && (
+              <TokenIcon size="20px" token={emptyTokenWithAddress(networks[transaction.chainId]?.mainCurrency || '')} />
+            ),
           }))}
         />
       </StyledWalletContainer>
