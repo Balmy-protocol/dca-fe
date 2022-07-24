@@ -43,8 +43,9 @@ function useUsdPrice(
         } catch (e) {
           setError(e);
         }
-        setIsLoading(false);
       }
+
+      setIsLoading(false);
     }
 
     if ((!isLoading && isUndefined(result) && !error) || !isEqual(prevFrom, from)) {
