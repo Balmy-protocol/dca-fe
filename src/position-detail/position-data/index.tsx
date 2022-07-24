@@ -345,78 +345,82 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
               />
             </Typography>
           </StyledDetailWrapper>
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage
-                description="positionDetailsRemainingFundsTitle"
-                defaultMessage="Remaining:"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                }}
-              />
-            </Typography>
-            <Typography
-              variant="body1"
-              color={remainingLiquidity.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              <FormattedMessage
-                description="positionDetailsRemainingFunds"
-                defaultMessage="{funds} {from}"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  funds: formatCurrencyAmount(BigNumber.from(position.current.remainingLiquidity), position.from),
-                  from: position.from.symbol,
-                }}
-              />
-            </Typography>
-            {showFromPrice && (
-              <StyledChip
-                size="small"
-                variant="outlined"
-                label={
-                  <FormattedMessage
-                    description="current remaining price"
-                    defaultMessage="({toPrice} USD)"
-                    values={{
-                      b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                      toPrice: fromPrice?.toFixed(2),
-                    }}
-                  />
-                }
-              />
-            )}
-          </StyledDetailWrapper>
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
-            </Typography>
-            <Typography
-              variant="body1"
-              color={toWithdraw.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              {`${formatCurrencyAmount(toWithdraw, to)} ${to.symbol}`}
-            </Typography>
-            <Typography variant="body1">
-              {showToPrice && (
+          {position.status !== 'TERMINATED' && (
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="positionDetailsRemainingFundsTitle"
+                  defaultMessage="Remaining:"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                  }}
+                />
+              </Typography>
+              <Typography
+                variant="body1"
+                color={remainingLiquidity.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+                sx={{ marginLeft: '5px' }}
+              >
+                <FormattedMessage
+                  description="positionDetailsRemainingFunds"
+                  defaultMessage="{funds} {from}"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    funds: formatCurrencyAmount(BigNumber.from(position.current.remainingLiquidity), position.from),
+                    from: position.from.symbol,
+                  }}
+                />
+              </Typography>
+              {showFromPrice && (
                 <StyledChip
                   size="small"
                   variant="outlined"
                   label={
                     <FormattedMessage
-                      description="current swapped in position price"
+                      description="current remaining price"
                       defaultMessage="({toPrice} USD)"
                       values={{
                         b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                        toPrice: toPrice?.toFixed(2),
+                        toPrice: fromPrice?.toFixed(2),
                       }}
                     />
                   }
                 />
               )}
-            </Typography>
-          </StyledDetailWrapper>
+            </StyledDetailWrapper>
+          )}
+          {position.status !== 'TERMINATED' && (
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
+              </Typography>
+              <Typography
+                variant="body1"
+                color={toWithdraw.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+                sx={{ marginLeft: '5px' }}
+              >
+                {`${formatCurrencyAmount(toWithdraw, to)} ${to.symbol}`}
+              </Typography>
+              <Typography variant="body1">
+                {showToPrice && (
+                  <StyledChip
+                    size="small"
+                    variant="outlined"
+                    label={
+                      <FormattedMessage
+                        description="current swapped in position price"
+                        defaultMessage="({toPrice} USD)"
+                        values={{
+                          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                          toPrice: toPrice?.toFixed(2),
+                        }}
+                      />
+                    }
+                  />
+                )}
+              </Typography>
+            </StyledDetailWrapper>
+          )}
           <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
@@ -444,7 +448,7 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
             </Typography>
           </StyledDetailWrapper>
         </StyledContentContainer>
-        {isOwner && (
+        {isOwner && position.status !== 'TERMINATED' && (
           <StyledCallToActionContainer>
             {isPending && pendingTransaction && (
               <StyledCardFooterButton variant="contained" color="pending" fullWidth>
