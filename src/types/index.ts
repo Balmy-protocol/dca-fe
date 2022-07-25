@@ -39,4 +39,5 @@ export interface NetworkStruct {
   mainCurrency: string;
   nativeCurrency: Partial<Token>;
   rpc: string[];
+  mainColor?: string;
 }

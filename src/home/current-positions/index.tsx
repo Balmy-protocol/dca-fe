@@ -25,8 +25,6 @@ import useSupportsSigning from 'hooks/useSupportsSigning';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import TerminateModal from 'common/terminate-modal';
 import MigratePositionModal from 'common/migrate-position-modal';
-import useWalletService from 'hooks/useWalletService';
-import usePrevious from 'hooks/usePrevious';
 import ActivePosition from './components/position';
 import FinishedPosition from './components/finished-position';
 
@@ -41,7 +39,12 @@ const POSITIONS_PER_ROW = {
   lg: 4,
   xl: 4,
 };
-const CurrentPositions = () => {
+
+interface CurrentPositionsProps {
+  isLoading: boolean;
+}
+
+const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const [hasSignSupport] = useSupportsSigning();
   const currentPositions = useCurrentPositions();
   const currentBreakPoint = useCurrentBreakpoint();
@@ -60,26 +63,7 @@ const CurrentPositions = () => {
   const [showMigrateModal, setShowMigrateModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const walletService = useWalletService();
-  const account = walletService.getAccount();
-  const prevAccount = usePrevious(account);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
-  const [hasLoadedPositions, setHasLoadedPositions] = React.useState(positionService.getHasFetchedCurrentPositions());
-
-  React.useEffect(() => {
-    const fetchPositions = async () => {
-      await positionService.fetchCurrentPositions();
-      setHasLoadedPositions(true);
-      setIsLoading(false);
-    };
-
-    if (!hasLoadedPositions || account !== prevAccount) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      fetchPositions();
-      setIsLoading(true);
-    }
-  }, [account, prevAccount]);
 
   const network = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
