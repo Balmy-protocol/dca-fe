@@ -10,8 +10,12 @@ import { useAppDispatch } from 'state/hooks';
 import { changeOpenClosePositionTab } from 'state/tabs/actions';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
+import usePositionService from 'hooks/usePositionService';
+import useWalletService from 'hooks/useWalletService';
+import usePrevious from 'hooks/usePrevious';
 import History from '../history';
 import CurrentPositions from '../current-positions';
+import PositionDashboard from './components/dashboard';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -20,6 +24,12 @@ const StyledContainer = styled.div`
 `;
 
 const StyledTitle = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+`;
+
+const StyledDashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 24px;
@@ -86,6 +96,26 @@ const StyledPaper = styled(Paper)`
 const Positions = () => {
   const tabIndex = useOpenClosePositionTab();
   const dispatch = useAppDispatch();
+  const positionService = usePositionService();
+  const [hasLoadedPositions, setHasLoadedPositions] = React.useState(positionService.getHasFetchedCurrentPositions());
+  const walletService = useWalletService();
+  const account = walletService.getAccount();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const prevAccount = usePrevious(account);
+
+  React.useEffect(() => {
+    const fetchPositions = async () => {
+      await positionService.fetchCurrentPositions();
+      setHasLoadedPositions(true);
+      setIsLoading(false);
+    };
+
+    if (!hasLoadedPositions || account !== prevAccount) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetchPositions();
+      setIsLoading(true);
+    }
+  }, [account, prevAccount]);
 
   return (
     <StyledContainer>
@@ -100,6 +130,7 @@ const Positions = () => {
           />
         </Typography>
       </StyledTitle>
+      <StyledDashboardContainer>{hasLoadedPositions && !isLoading && <PositionDashboard />}</StyledDashboardContainer>
       <StyledPositions>
         <StyledTabsContainers>
           <StyledTabs
@@ -127,7 +158,9 @@ const Positions = () => {
           </StyledTabs>
         </StyledTabsContainers>
         <StyledPositionsContainer>
-          <StyledPaper variant="outlined">{tabIndex === 0 ? <CurrentPositions /> : <History />}</StyledPaper>
+          <StyledPaper variant="outlined">
+            {tabIndex === 0 ? <CurrentPositions isLoading={!hasLoadedPositions || isLoading} /> : <History />}
+          </StyledPaper>
         </StyledPositionsContainer>
       </StyledPositions>
     </StyledContainer>

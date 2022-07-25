@@ -16,6 +16,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
     chainId: 1,
     name: 'Ethereum',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    mainColor: '#3076F6',
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'ETH',
@@ -31,6 +32,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   ropsten: {
     chainId: 3,
     name: 'Ropsten',
+    mainColor: '#3076F6',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     nativeCurrency: {
       name: 'Ethereum',
@@ -42,6 +44,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   rinkeby: {
     chainId: 4,
     name: 'Rinkeby',
+    mainColor: '#3076F6',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     nativeCurrency: {
       name: 'Ethereum',
@@ -53,6 +56,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   goerli: {
     chainId: 5,
     name: 'Goerli',
+    mainColor: '#3076F6',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     nativeCurrency: {
       name: 'Ethereum',
@@ -64,6 +68,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   kovan: {
     chainId: 42,
     name: 'Kovan',
+    mainColor: '#3076F6',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     nativeCurrency: {
       name: 'Ethereum',
@@ -75,6 +80,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   meanfinance: {
     chainId: 31337,
     name: 'Mean Finance',
+    mainColor: '#3076F6',
     mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     nativeCurrency: {
       name: 'Ethereum',
@@ -112,6 +118,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
     chainId: 137,
     name: 'Polygon',
     mainCurrency: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
+    mainColor: '#6f41d8',
     nativeCurrency: {
       name: 'Matic',
       symbol: 'MATIC',
@@ -130,6 +137,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
     chainId: 80001,
     name: 'Mumbai',
     mainCurrency: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
+    mainColor: '#6f41d8',
     nativeCurrency: {
       name: 'Matic',
       symbol: 'MATIC',
@@ -185,6 +193,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
     chainId: 10,
     name: 'Optimism',
     mainCurrency: 'OPTIMISM',
+    mainColor: '#FF0615',
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'OETH',
@@ -196,6 +205,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
     chainId: 69,
     name: 'Optimism Kovan',
     mainCurrency: 'OPTIMISM',
+    mainColor: '#FF0615',
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'OETH',
@@ -207,6 +217,7 @@ export const NETWORKS: Record<string, NetworkStruct> = {
     chainId: 420,
     name: 'Optimism Goerli',
     mainCurrency: 'OPTIMISM',
+    mainColor: '#FF0615',
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'OETH',
