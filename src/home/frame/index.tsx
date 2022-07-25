@@ -57,18 +57,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
 
   const isLoadingIntervals = isLoading || isLoadingSwapIntervals || !hasLoadedPairs;
 
-  React.useEffect(() => {
-    const fetchPairs = async () => {
-      await pairService.fetchAvailablePairs();
-      setHasLoadedPairs(true);
-    };
-
-    if (!hasLoadedPairs) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      fetchPairs();
-    }
-  }, []);
-
   return (
     <Grid container spacing={8}>
       {isLoadingIntervals ? (
