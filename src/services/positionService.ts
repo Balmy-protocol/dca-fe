@@ -114,6 +114,9 @@ export default class PositionService {
 
   async fetchCurrentPositions() {
     const account = this.walletService.getAccount();
+    if (!account) {
+      return;
+    }
     const promises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
     const networksAndVersions: { network: number; version: PositionVersions }[] = [];
 
