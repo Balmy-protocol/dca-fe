@@ -38,7 +38,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       walletService.changeNetwork(parseInt(chainId, 10));
     }
-  }, []);
+  }, [currentNetwork]);
   React.useEffect(() => {
     const fetchPairs = async () => {
       await pairService.fetchAvailablePairs();

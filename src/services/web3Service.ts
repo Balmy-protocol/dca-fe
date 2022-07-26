@@ -7,7 +7,7 @@ import { AxiosInstance } from 'axios';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 
 // MOCKS
-import { NETWORKS, SUPPORTED_NETWORKS, PositionVersions } from 'config/constants';
+import { NETWORKS, PositionVersions } from 'config/constants';
 
 import { getProviderInfo } from 'web3modal';
 import { setupAxiosClient } from 'state';
@@ -185,7 +185,7 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect(chainId: number, suppliedProvider?: Provider) {
+  async connect(suppliedProvider?: Provider) {
     const provider: Provider = suppliedProvider || ((await this.modal?.requestProvider()) as Provider);
 
     this.providerInfo = getProviderInfo(provider);
@@ -241,9 +241,7 @@ export default class Web3Service {
     this.setClient(new ethers.providers.Web3Provider({}));
   }
 
-  async setUpModal(chainId = NETWORKS.optimism.chainId) {
-    let chainIdToUse = chainId;
-    this.setNetwork(chainIdToUse);
+  async setUpModal() {
     const providerOptions = {
       walletconnect: {
         package: WalletConnectProvider, // required
@@ -279,15 +277,8 @@ export default class Web3Service {
 
     if (web3Modal.cachedProvider || loadedAsSafeApp) {
       const provider = (await this.modal?.requestProvider()) as Provider;
-      const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider);
 
-      const fetchedNetwork = await ethersProvider.getNetwork();
-
-      if (SUPPORTED_NETWORKS.includes(fetchedNetwork.chainId)) {
-        chainIdToUse = fetchedNetwork.chainId;
-      }
-
-      await this.connect(chainIdToUse, provider);
+      await this.connect(provider);
     }
 
     if (window.ethereum) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
+import isUndefined from 'lodash/isUndefined';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePrevious from './usePrevious';
 import useWalletService from './useWalletService';
@@ -12,12 +13,14 @@ function useIsOnCorrectNetwork() {
   const currentNetwork = useCurrentNetwork();
   const account = usePrevious(walletService.getAccount());
   const currentAccount = walletService.getAccount();
+  const previousChainId = usePrevious(currentNetwork.chainId);
 
   React.useEffect(() => {
     async function callPromise() {
       try {
         const promiseResult = await walletService.getNetwork(true);
         const isSameNetwork = currentNetwork.chainId === promiseResult.chainId;
+        console.log(isSameNetwork, currentNetwork, promiseResult);
         setResult(isSameNetwork);
         setError(undefined);
       } catch (e) {
@@ -26,7 +29,11 @@ function useIsOnCorrectNetwork() {
       setIsLoading(false);
     }
 
-    if ((!isLoading && result === undefined && !error) || !isEqual(account, currentAccount)) {
+    if (
+      (!isLoading && isUndefined(result) && !error) ||
+      !isEqual(account, currentAccount) ||
+      !isEqual(previousChainId, currentNetwork.chainId)
+    ) {
       setIsLoading(true);
       setResult(undefined);
       setError(undefined);
@@ -34,7 +41,7 @@ function useIsOnCorrectNetwork() {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [isLoading, result, error, currentAccount, account, currentNetwork]);
+  }, [isLoading, result, error, currentAccount, account, currentNetwork, previousChainId]);
 
   return [result, isLoading, error];
 }
