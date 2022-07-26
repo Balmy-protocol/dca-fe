@@ -51,7 +51,7 @@ function useBuildTransactionDetail() {
           }
           case TRANSACTION_TYPES.TERMINATE_POSITION: {
             const terminatePositionTypeData = tx.typeData as TerminatePositionTypeData;
-            const terminatedPosition = find(positions, { id: terminatePositionTypeData.id });
+            const terminatedPosition = tx.position || find(positions, { id: terminatePositionTypeData.id });
             if (terminatedPosition) {
               message = `Terminate ${(terminatedPosition as Position).from.symbol}:${
                 (terminatedPosition as Position).to.symbol
@@ -61,7 +61,7 @@ function useBuildTransactionDetail() {
           }
           case TRANSACTION_TYPES.WITHDRAW_POSITION: {
             const withdrawPositionTypeData = tx.typeData as WithdrawTypeData;
-            const withdrawnPosition = find(positions, { id: withdrawPositionTypeData.id });
+            const withdrawnPosition = tx.position || find(positions, { id: withdrawPositionTypeData.id });
             if (withdrawnPosition) {
               message = `Withdraw from ${(withdrawnPosition as Position).from.symbol}:${
                 (withdrawnPosition as Position).to.symbol
@@ -71,7 +71,7 @@ function useBuildTransactionDetail() {
           }
           case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
             const addFundsTypeData = tx.typeData as AddFundsTypeData;
-            const fundedPosition = find(positions, { id: addFundsTypeData.id });
+            const fundedPosition = tx.position || find(positions, { id: addFundsTypeData.id });
             if (fundedPosition) {
               message = `Add ${addFundsTypeData.newFunds} ${(fundedPosition as Position).from.symbol} to the ${
                 (fundedPosition as Position).from.symbol
@@ -81,7 +81,7 @@ function useBuildTransactionDetail() {
           }
           case TRANSACTION_TYPES.REMOVE_FUNDS: {
             const removeFundsTypeData = tx.typeData as RemoveFundsTypeData;
-            const removeFundedPosition = find(positions, { id: removeFundsTypeData.id });
+            const removeFundedPosition = tx.position || find(positions, { id: removeFundsTypeData.id });
             if (removeFundedPosition) {
               message = `Remove ${removeFundsTypeData.ammountToRemove} ${
                 (removeFundedPosition as Position).from.symbol
@@ -93,7 +93,7 @@ function useBuildTransactionDetail() {
           }
           case TRANSACTION_TYPES.RESET_POSITION: {
             const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
-            const resettedPosition = find(positions, { id: resetPositionTypeData.id });
+            const resettedPosition = tx.position || find(positions, { id: resetPositionTypeData.id });
             if (resettedPosition) {
               message = `Add ${resetPositionTypeData.newFunds} ${(resettedPosition as Position).from.symbol} to your ${
                 (resettedPosition as Position).from.symbol
@@ -108,7 +108,7 @@ function useBuildTransactionDetail() {
           }
           case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION: {
             const modifySwapsPositionTypeData = tx.typeData as ModifySwapsPositionTypeData;
-            const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
+            const modifiedPosition = tx.position || find(positions, { id: modifySwapsPositionTypeData.id });
             if (modifiedPosition) {
               message = `Modify ${(modifiedPosition as Position).from.symbol}:${
                 (modifiedPosition as Position).to.symbol
@@ -141,7 +141,7 @@ function useBuildTransactionDetail() {
           }
           case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
             const modifyRateAndSwapsPositionTypeData = tx.typeData as ModifyRateAndSwapsPositionTypeData;
-            const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
+            const modifiedRatePosition = tx.position || find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
             if (modifiedRatePosition) {
               message = `Modify ${(modifiedRatePosition as Position).from.symbol}:${
                 (modifiedRatePosition as Position).to.symbol
