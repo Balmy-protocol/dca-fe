@@ -232,9 +232,7 @@ export default class PairService {
     return liquidity;
   }
 
-  async canSupportPair(token0: Token, token1: Token) {
-    const [tokenA, tokenB] = sortTokens(token0, token1);
-
+  async canSupportPair(tokenFrom: Token, tokenTo: Token) {
     // if they are not connected we show everything as available
     if (!this.walletService.getClient()) return true;
 
@@ -242,9 +240,11 @@ export default class PairService {
 
     const oracleInstance = await this.contractService.getOracleInstance();
 
-    return oracleInstance.canSupportPair(
-      tokenA.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : tokenA.address,
-      tokenB.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : tokenB.address
-    );
+    const token0 = tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenFrom;
+    const token1 = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenTo;
+
+    const [tokenA, tokenB] = sortTokens(token0, token1);
+
+    return oracleInstance.canSupportPair(tokenA.address, tokenB.address);
   }
 }

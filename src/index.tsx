@@ -32,13 +32,10 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
   const [account, setAccount] = React.useState('');
   const [web3Service] = React.useState(new Web3Service(DCASubgraphs, UNISubgraphs, setAccount));
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
-  const {
-    config: { network },
-  } = store.getState();
 
   React.useEffect(() => {
     async function setWeb3ModalEffect() {
-      await web3Service.setUpModal(network?.chainId);
+      await web3Service.setUpModal();
       setIsLoadingWeb3(false);
     }
 
@@ -46,7 +43,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       setWeb3ModalEffect();
     }
-  }, [web3Service, network]);
+  }, [web3Service]);
 
   const isLoading = isLoadingWeb3;
 
