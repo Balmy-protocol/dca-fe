@@ -453,7 +453,7 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
             {isPending && pendingTransaction && (
               <StyledCardFooterButton variant="contained" color="pending" fullWidth>
                 <Link
-                  href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
+                  href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
                   target="_blank"
                   rel="noreferrer"
                   underline="none"
