@@ -8,12 +8,14 @@ import useWalletService from './useWalletService';
 function useCurrentPositions() {
   const positionService = usePositionService();
   const walletService = useWalletService();
+  const account = walletService.getAccount();
   const transactions = useAllTransactions();
+  const hasFetchedCurrentPositions = positionService.getHasFetchedCurrentPositions();
   const hasInitialized = useHasInitialized();
 
   const currentPositions: Positions = React.useMemo(
-    () => positionService.getCurrentPositions(),
-    [transactions, walletService.getAccount(), hasInitialized]
+    () => (account ? positionService.getCurrentPositions() : []),
+    [transactions, account, hasInitialized, hasFetchedCurrentPositions]
   );
 
   return currentPositions;

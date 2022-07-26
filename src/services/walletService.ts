@@ -6,6 +6,7 @@ import { formatUnits } from '@ethersproject/units';
 import find from 'lodash/find';
 import { GetUsedTokensData, Token } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
+import isUndefined from 'lodash/isUndefined';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
@@ -23,7 +24,7 @@ export default class WalletService {
 
   network: Network;
 
-  account: string;
+  account: string | null;
 
   contractService: ContractService;
 
@@ -55,12 +56,12 @@ export default class WalletService {
     return this.client;
   }
 
-  async setAccount() {
-    this.account = await this.client.getSigner().getAddress();
+  async setAccount(account?: string | null) {
+    this.account = isUndefined(account) ? await this.client.getSigner().getAddress() : account;
   }
 
   getAccount() {
-    return this.account;
+    return this.account || '';
   }
 
   getSigner() {
@@ -69,7 +70,7 @@ export default class WalletService {
 
   getUsedTokens() {
     return this.axiosClient.get<GetUsedTokensData>(
-      `https://api.ethplorer.io/getAddressInfo/${this.getAccount()}?apiKey=${process.env.ETHPLORER_KEY || ''}`
+      `https://api.ethplorer.io/getAddressInfo/${this.getAccount() || ''}?apiKey=${process.env.ETHPLORER_KEY || ''}`
     );
   }
 
@@ -136,7 +137,9 @@ export default class WalletService {
   }
 
   getBalance(address?: string): Promise<BigNumber> {
-    if (!address) return Promise.resolve(BigNumber.from(0));
+    const account = this.getAccount();
+
+    if (!address || !account) return Promise.resolve(BigNumber.from(0));
 
     if (address === PROTOCOL_TOKEN_ADDRESS) return this.signer.getBalance();
 
@@ -144,11 +147,13 @@ export default class WalletService {
 
     const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as unknown as ERC20Contract;
 
-    return erc20.balanceOf(this.getAccount());
+    return erc20.balanceOf(account);
   }
 
   async getAllowance(token: Token) {
-    if (token.address === PROTOCOL_TOKEN_ADDRESS) {
+    const account = this.getAccount();
+
+    if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, 18) });
     }
 
@@ -156,7 +161,7 @@ export default class WalletService {
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
-    const allowance = await erc20.allowance(this.getAccount(), addressToCheck);
+    const allowance = await erc20.allowance(account, addressToCheck);
 
     return {
       token,

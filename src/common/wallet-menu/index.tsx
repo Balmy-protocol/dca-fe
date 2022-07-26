@@ -79,6 +79,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
     () =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       NETWORKS_FOR_MENU.reduce<Record<number, NetworkStruct>>(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         (acc, chainId) => ({ ...acc, [chainId]: find(NETWORKS, { chainId })! }),
         {}
       ),

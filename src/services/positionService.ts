@@ -113,8 +113,11 @@ export default class PositionService {
   }
 
   async fetchCurrentPositions() {
+    this.hasFetchedCurrentPositions = false;
     const account = this.walletService.getAccount();
     if (!account) {
+      this.currentPositions = {};
+      this.hasFetchedCurrentPositions = true;
       return;
     }
     const promises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
@@ -191,7 +194,16 @@ export default class PositionService {
   }
 
   async fetchPastPositions() {
+    this.hasFetchedPastPositions = false;
+
     const account = this.walletService.getAccount();
+
+    if (!account) {
+      this.pastPositions = {};
+      this.hasFetchedPastPositions = true;
+      return;
+    }
+
     const promises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
     const networksAndVersions: { network: number; version: PositionVersions }[] = [];
 
