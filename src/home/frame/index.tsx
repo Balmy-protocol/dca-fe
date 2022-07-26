@@ -31,6 +31,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     if (
       chainId &&
       SUPPORTED_NETWORKS.includes(parseInt(chainId, 10)) &&
+      currentNetwork.isSet &&
       chainId !== currentNetwork.chainId.toString()
     ) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
