@@ -2,6 +2,7 @@ import React from 'react';
 import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
+import isUndefined from 'lodash/isUndefined';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import usePairService from './usePairService';
 
@@ -34,7 +35,7 @@ function useCanSupportPair(
     }
 
     if (
-      (!isLoading && !result && !error) ||
+      (!isLoading && isUndefined(result) && !error) ||
       !isEqual(prevFrom, from) ||
       !isEqual(prevTo, to) ||
       !isEqual(prevPendingTrans, hasPendingTransactions)

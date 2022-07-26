@@ -36,7 +36,7 @@ export const setupAxiosClient = () =>
     },
   });
 
-const PERSISTED_STATES: string[] = ['transactions', 'badge', 'config'];
+const PERSISTED_STATES: string[] = ['transactions', 'badge'];
 
 const store = configureStore({
   reducer: {

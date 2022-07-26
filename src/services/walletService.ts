@@ -92,7 +92,7 @@ export default class WalletService {
     return ens;
   }
 
-  async changeNetwork(newChainId: number): Promise<void> {
+  async changeNetwork(newChainId: number, callbackBeforeReload?: () => void): Promise<void> {
     if (!window.ethereum) {
       return;
     }
@@ -103,6 +103,9 @@ export default class WalletService {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${newChainId.toString(16)}` }],
       });
+      if (callbackBeforeReload) {
+        callbackBeforeReload();
+      }
       window.location.reload();
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

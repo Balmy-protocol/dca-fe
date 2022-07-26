@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
-import { NETWORKS, NETWORKS_FOR_MENU, SUPPORTED_NETWORKS } from 'config/constants';
+import { NETWORKS, NETWORKS_FOR_MENU, PositionVersions, SUPPORTED_NETWORKS } from 'config/constants';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
 import { createStyles, makeStyles } from '@mui/styles';
@@ -13,6 +13,7 @@ import { emptyTokenWithAddress } from 'utils/currency';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useWalletService from 'hooks/useWalletService';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -70,12 +71,17 @@ const Warning = () => (
   </Tooltip>
 );
 
+type PositionDetailUrlParams = { positionId: string; chainId: string; positionVersion: PositionVersions };
+
 const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const popoverClasses = usePopoverStyles();
   const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
   const walletService = useWalletService();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
+  const location = useLocation();
+  const urlParams = useParams<PositionDetailUrlParams>();
+  const history = useHistory();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -87,7 +93,16 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
     setShouldOpenNetworkMenu(false);
     if (chainId) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      walletService.changeNetwork(chainId);
+      walletService.changeNetwork(chainId, () => {
+        if (location.pathname.startsWith('/positions')) {
+          history.replace('/positions');
+        } else if (location.pathname === '/' || location.pathname.startsWith('/create')) {
+          history.replace(`/create/${chainId}`);
+        } else if (location.pathname.startsWith('/position')) {
+          const { positionId, positionVersion } = urlParams;
+          history.replace(`/${chainId}/positions/${positionVersion}/${positionId}`);
+        }
+      });
     }
   };
 
