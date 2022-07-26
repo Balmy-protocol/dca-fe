@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { buildEtherscanTransaction } from 'utils/etherscan';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { FullPosition } from 'types';
 import useWeb3Service from 'hooks/useWeb3Service';
 
@@ -37,7 +36,6 @@ const PositionPermissionsControls = ({
   onAddAddress,
   disabled,
 }: PositionPermissionsControlsProps) => {
-  const currentNetwork = useCurrentNetwork();
   const isPending = pendingTransaction !== null;
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
@@ -47,7 +45,7 @@ const PositionPermissionsControls = ({
   return isPending ? (
     <Button variant="contained" color="pending" size="large">
       <Link
-        href={buildEtherscanTransaction(pendingTransaction, currentNetwork.chainId)}
+        href={buildEtherscanTransaction(pendingTransaction, position.chainId)}
         target="_blank"
         rel="noreferrer"
         underline="none"

@@ -155,7 +155,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
         <MinimalTimeline
           items={allOrderedTransactions.map((transaction) => ({
             content: buildTransactionDetail(transaction),
-            link: buildEtherscanTransaction(transaction.hash, currentNetwork.chainId),
+            link: buildEtherscanTransaction(transaction.hash, transaction.chainId || currentNetwork.chainId),
             isPending: transaction.isPending,
             icon: networks[transaction.chainId] && (
               <TokenIcon size="20px" token={emptyTokenWithAddress(networks[transaction.chainId]?.mainCurrency || '')} />
