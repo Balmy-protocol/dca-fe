@@ -154,14 +154,20 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
           </Typography>
         </StyledRecentTransactionsTitleContainer>
         <MinimalTimeline
-          items={allOrderedTransactions.map((transaction) => ({
-            content: buildTransactionDetail(transaction),
-            link: buildEtherscanTransaction(transaction.hash, transaction.chainId || currentNetwork.chainId),
-            isPending: transaction.isPending,
-            icon: networks[transaction.chainId] && (
-              <TokenIcon size="20px" token={emptyTokenWithAddress(networks[transaction.chainId]?.mainCurrency || '')} />
-            ),
-          }))}
+          items={allOrderedTransactions.map((transaction) => {
+            const chainId = transaction.chainId || transaction.position?.chainId;
+
+            return {
+              content: buildTransactionDetail(transaction),
+              link: buildEtherscanTransaction(transaction.hash, transaction.chainId || currentNetwork.chainId),
+              isPending: transaction.isPending,
+              icon:
+                (chainId && networks[chainId] && (
+                  <TokenIcon size="20px" token={emptyTokenWithAddress(networks[chainId].mainCurrency || '')} />
+                )) ||
+                undefined,
+            };
+          })}
         />
       </StyledWalletContainer>
     </Modal>
