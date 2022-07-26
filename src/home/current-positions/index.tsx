@@ -25,6 +25,8 @@ import useSupportsSigning from 'hooks/useSupportsSigning';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import TerminateModal from 'common/terminate-modal';
 import MigratePositionModal from 'common/migrate-position-modal';
+import useWalletService from 'hooks/useWalletService';
+import usePrevious from 'hooks/usePrevious';
 import ActivePosition from './components/position';
 import FinishedPosition from './components/finished-position';
 
@@ -58,6 +60,10 @@ const CurrentPositions = () => {
   const [showMigrateModal, setShowMigrateModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const walletService = useWalletService();
+  const account = walletService.getAccount();
+  const prevAccount = usePrevious(account);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const [hasLoadedPositions, setHasLoadedPositions] = React.useState(positionService.getHasFetchedCurrentPositions());
 
@@ -65,13 +71,15 @@ const CurrentPositions = () => {
     const fetchPositions = async () => {
       await positionService.fetchCurrentPositions();
       setHasLoadedPositions(true);
+      setIsLoading(false);
     };
 
-    if (!hasLoadedPositions) {
+    if (!hasLoadedPositions || account !== prevAccount) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchPositions();
+      setIsLoading(true);
     }
-  }, []);
+  }, [account, prevAccount]);
 
   const network = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -83,7 +91,7 @@ const CurrentPositions = () => {
     emptyPositions.push(i);
   }
 
-  if (!hasLoadedPositions) {
+  if (isLoading) {
     return <CenteredLoadingIndicator size={70} />;
   }
 

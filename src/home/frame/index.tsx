@@ -35,8 +35,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       currentNetwork.isSet &&
       chainId !== currentNetwork.chainId.toString()
     ) {
-      console.log(chainId, currentNetwork.isSet, currentNetwork.chainId);
-      debugger;
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       walletService.changeNetwork(parseInt(chainId, 10));
     }

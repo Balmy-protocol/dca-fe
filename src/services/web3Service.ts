@@ -235,6 +235,9 @@ export default class Web3Service {
 
     this.setAccount('');
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    this.walletService.setAccount(null);
+
     this.setClient(new ethers.providers.Web3Provider({}));
   }
 
