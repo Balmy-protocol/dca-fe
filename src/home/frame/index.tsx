@@ -26,6 +26,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const client = useDCAGraphql();
   const pairService = usePairService();
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
+  // const hasInitiallySetNetwork = React.useState()
 
   React.useEffect(() => {
     if (
@@ -34,10 +35,13 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       currentNetwork.isSet &&
       chainId !== currentNetwork.chainId.toString()
     ) {
+      console.log(chainId, currentNetwork.isSet, currentNetwork.chainId);
+      debugger;
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       walletService.changeNetwork(parseInt(chainId, 10));
     }
-
+  }, []);
+  React.useEffect(() => {
     const fetchPairs = async () => {
       await pairService.fetchAvailablePairs();
       setHasLoadedPairs(true);
@@ -47,7 +51,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchPairs();
     }
-  }, [chainId, currentNetwork, isLoading]);
+  }, [isLoading, hasLoadedPairs]);
 
   const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
     getAvailableIntervals,

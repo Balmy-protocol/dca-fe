@@ -531,15 +531,16 @@ const Swap = ({
   const cantFund = from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
 
   const isApproved =
-    from &&
-    (!fromValue
-      ? true
-      : (!isLoadingAllowance &&
-          allowance &&
-          allowance.allowance &&
-          allowance.token.address === from.address &&
-          parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
-        from.address === PROTOCOL_TOKEN_ADDRESS);
+    !from ||
+    (from &&
+      (!fromValue
+        ? true
+        : (!isLoadingAllowance &&
+            allowance &&
+            allowance.allowance &&
+            allowance.token.address === from.address &&
+            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
+          from.address === PROTOCOL_TOKEN_ADDRESS));
 
   const shouldDisableButton =
     !from ||
