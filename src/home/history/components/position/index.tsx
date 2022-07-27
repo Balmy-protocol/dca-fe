@@ -16,6 +16,8 @@ import { NETWORKS, POSITION_VERSION_3, STABLE_COINS } from 'config/constants';
 import { BigNumber } from 'ethers';
 import useUsdPrice from 'hooks/useUsdPrice';
 import find from 'lodash/find';
+import { useAppDispatch } from 'state/hooks';
+import { setPosition } from 'state/position-details/actions';
 
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
@@ -122,8 +124,10 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
   const history = useHistory();
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped);
   const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
+  const dispatch = useAppDispatch();
 
   const onViewDetails = () => {
+    dispatch(setPosition(null));
     history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
 

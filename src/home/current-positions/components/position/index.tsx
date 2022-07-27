@@ -31,6 +31,8 @@ import Link from '@mui/material/Link';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useUsdPrice from 'hooks/useUsdPrice';
 import useWalletService from 'hooks/useWalletService';
+import { useAppDispatch } from 'state/hooks';
+import { setPosition } from 'state/position-details/actions';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
@@ -205,6 +207,7 @@ const ActivePosition = ({
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw, undefined, chainId);
   const history = useHistory();
   const walletService = useWalletService();
+  const dispatch = useAppDispatch();
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
@@ -229,6 +232,7 @@ const ActivePosition = ({
     ) === STALE;
 
   const onViewDetails = () => {
+    dispatch(setPosition(null));
     history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
 

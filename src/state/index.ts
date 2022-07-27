@@ -9,6 +9,7 @@ import badge from './transactions-badge/reducer';
 import createPosition from './create-position/reducer';
 import initializer from './initializer/reducer';
 import modifyRateSettings from './modify-rate-settings/reducer';
+import positionDetails from './position-details/reducer';
 import positionPermissions from './position-permissions/reducer';
 import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
@@ -88,6 +89,7 @@ const store = configureStore({
     positionPermissions,
     modifyRateSettings,
     error,
+    positionDetails,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient }, serializableCheck: false }).concat([

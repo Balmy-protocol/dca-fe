@@ -31,12 +31,14 @@ import TransferPositionModal from 'common/transfer-position-modal';
 import TerminateModal from 'common/terminate-modal';
 import ModifySettingsModal from 'common/modify-settings-modal';
 import { fullPositionToMappedPosition } from 'utils/parsing';
-import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES, PositionVersions } from 'config/constants';
+import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES, PositionVersions, NETWORKS } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
 import usePositionService from 'hooks/usePositionService';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
+import { setPosition } from 'state/position-details/actions';
+import { usePositionDetails } from 'state/position-details/hooks';
 import useGqlFetchAll from 'hooks/useGqlFetchAll';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
@@ -107,15 +109,18 @@ const PositionDetailFrame = () => {
     positionId === '' || positionId === null
   );
 
-  let position: FullPosition | undefined = data && {
+  const wrappedProtocolToken = getWrappedProtocolToken(Number(chainId) || NETWORKS.optimism.chainId);
+  const protocolToken = getProtocolToken(Number(chainId));
+
+  const position: FullPosition | undefined = data && {
     ...data.position,
     chainId: Number(chainId),
     version: positionVersion,
+    from: data.position.from.address === wrappedProtocolToken.address ? protocolToken : data.position.from,
+    to: data.position.to.address === wrappedProtocolToken.address ? protocolToken : data.position.to,
   };
 
   const pendingTransaction = usePositionHasPendingTransaction((position && position.id) || '');
-
-  const isPending = pendingTransaction !== null;
 
   const { loading: isLoadingSwaps, data: swapsData } = useQuery<{ pair: GetPairSwapsData }>(getPairSwaps, {
     variables: {
@@ -131,20 +136,15 @@ const PositionDetailFrame = () => {
   const addTransaction = useTransactionAdder();
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
+  const positionInUse = usePositionDetails();
 
   React.useEffect(() => {
     dispatch(changeMainTab(1));
   }, []);
 
   React.useEffect(() => {
-    if (position && !isPending) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
-      // setTimeout(refetch, WAIT_FOR_SUBGRAPH);
-    }
-  }, [position, isPending]);
-
-  React.useEffect(() => {
-    if (position && !isLoading) {
+    if (position && !isLoading && !positionInUse) {
+      dispatch(setPosition(position));
       dispatch(
         setPermissions({
           id: position.id,
@@ -170,23 +170,15 @@ const PositionDetailFrame = () => {
     );
   }
 
-  if (positionNotFound || !position) {
+  if (positionNotFound || !position || !positionInUse) {
     return <PositionNotFound />;
   }
 
   const handleViewNFT = async () => {
-    if (!position) return;
-    const tokenNFT = await positionService.getTokenNFT(fullPositionToMappedPosition(position));
+    if (!positionInUse) return;
+    const tokenNFT = await positionService.getTokenNFT(fullPositionToMappedPosition(positionInUse));
     setNFTData(tokenNFT);
     setShowNFTModal(true);
-  };
-
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const protocolToken = getProtocolToken(currentNetwork.chainId);
-  position = {
-    ...position,
-    from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-    to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
   };
 
   const onBackToPositions = () => {
@@ -195,7 +187,7 @@ const PositionDetailFrame = () => {
   };
 
   const onWithdraw = async (useProtocolToken = false) => {
-    if (!position) {
+    if (!positionInUse) {
       return;
     }
     try {
@@ -208,9 +200,9 @@ const PositionDetailFrame = () => {
       }
       const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
       const toSymbol =
-        position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address
+        positionInUse.to.address === PROTOCOL_TOKEN_ADDRESS || positionInUse.to.address === wrappedProtocolToken.address
           ? protocolOrWrappedToken
-          : position.to.symbol;
+          : positionInUse.to.symbol;
       setModalLoading({
         content: (
           <>
@@ -232,11 +224,11 @@ const PositionDetailFrame = () => {
           </>
         ),
       });
-      const result = await positionService.withdraw(fullPositionToMappedPosition(position), useProtocolToken);
+      const result = await positionService.withdraw(fullPositionToMappedPosition(positionInUse), useProtocolToken);
       addTransaction(result, {
         type: TRANSACTION_TYPES.WITHDRAW_POSITION,
-        typeData: { id: position.id },
-        position: fullPositionToMappedPosition(position),
+        typeData: { id: positionInUse.id },
+        position: fullPositionToMappedPosition(positionInUse),
       });
       setModalSuccess({
         hash: result.hash,
@@ -245,8 +237,8 @@ const PositionDetailFrame = () => {
             description="withdraw from success"
             defaultMessage="Your withdrawal of {toSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
-              from: position.from.symbol,
-              to: position.to.symbol,
+              from: positionInUse.from.symbol,
+              to: positionInUse.to.symbol,
               toSymbol,
             }}
           />
@@ -260,15 +252,15 @@ const PositionDetailFrame = () => {
   };
 
   const onShowModifyRateSettings = () => {
-    if (!position) {
+    if (!positionInUse) {
       return;
     }
 
     dispatch(
       initializeModifyRateSettings({
-        fromValue: formatUnits(position.current.remainingLiquidity, position.from.decimals),
-        rate: formatUnits(position.current.rate, position.from.decimals),
-        frequencyValue: position.current.remainingSwaps.toString(),
+        fromValue: formatUnits(positionInUse.current.remainingLiquidity, positionInUse.from.decimals),
+        rate: formatUnits(positionInUse.current.rate, positionInUse.from.decimals),
+        frequencyValue: positionInUse.current.remainingSwaps.toString(),
         modeType: RATE_TYPE,
       })
     );
@@ -279,17 +271,17 @@ const PositionDetailFrame = () => {
     <>
       <TerminateModal
         open={showTerminateModal}
-        position={fullPositionToMappedPosition(position)}
+        position={fullPositionToMappedPosition(positionInUse)}
         onCancel={() => setShowTerminateModal(false)}
       />
       <ModifySettingsModal
         open={showModifyRateSettingsModal}
-        position={fullPositionToMappedPosition(position)}
+        position={fullPositionToMappedPosition(positionInUse)}
         onCancel={() => setShowModifyRateSettingsModal(false)}
       />
       <TransferPositionModal
         open={showTransferModal}
-        position={position}
+        position={positionInUse}
         onCancel={() => setShowTransferModal(false)}
       />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
@@ -326,13 +318,13 @@ const PositionDetailFrame = () => {
               }
             />
           </StyledTabs>
-          {position.status !== 'TERMINATED' && (
+          {positionInUse.status !== 'TERMINATED' && (
             <PositionControls
               onTerminate={() => setShowTerminateModal(true)}
               onModifyRate={onShowModifyRateSettings}
               onTransfer={() => setShowTransferModal(true)}
               onViewNFT={handleViewNFT}
-              position={position}
+              position={positionInUse}
               pendingTransaction={pendingTransaction}
               disabled={shouldShowChangeNetwork}
             />
@@ -341,7 +333,7 @@ const PositionDetailFrame = () => {
         <Grid item xs={12}>
           {tabIndex === 0 && (
             <PositionSummaryContainer
-              position={position}
+              position={positionInUse}
               pendingTransaction={pendingTransaction}
               swapsData={swapsData?.pair}
               onWithdraw={onWithdraw}
@@ -351,7 +343,7 @@ const PositionDetailFrame = () => {
           )}
           {tabIndex === 1 && (
             <PositionPermissionsContainer
-              position={position}
+              position={positionInUse}
               pendingTransaction={pendingTransaction}
               disabled={shouldShowChangeNetwork}
             />
