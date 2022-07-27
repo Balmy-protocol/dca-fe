@@ -20,6 +20,8 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useWalletService from 'hooks/useWalletService';
+import { useAppDispatch } from 'state/hooks';
+import { setPosition } from 'state/position-details/actions';
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;
@@ -159,6 +161,7 @@ const ActivePosition = ({
   const protocolToken = getProtocolToken(positionNetwork.chainId);
   const history = useHistory();
   const walletService = useWalletService();
+  const dispatch = useAppDispatch();
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
@@ -182,6 +185,7 @@ const ActivePosition = ({
     ) === STALE;
 
   const onViewDetails = () => {
+    dispatch(setPosition(null));
     history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
 

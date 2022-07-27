@@ -1,4 +1,4 @@
-import { Oracles, Permission, TransactionTypesConstant } from 'types';
+import { Oracles, Permission, PositionActions, TransactionTypesConstant } from 'types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
 
@@ -128,7 +128,7 @@ export const WHALE_MINIMUM_VALUES = {
   },
 };
 
-export const POSITION_ACTIONS = {
+export const POSITION_ACTIONS: Record<string, PositionActions> = {
   MODIFIED_RATE: 'MODIFIED_RATE',
   MODIFIED_DURATION: 'MODIFIED_DURATION',
   MODIFIED_RATE_AND_DURATION: 'MODIFIED_RATE_AND_DURATION',

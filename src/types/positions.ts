@@ -21,14 +21,16 @@ export interface PositionPermission {
   permissions: Permission[];
 }
 
-type PositionActions =
+export type PositionActions =
   | 'MODIFIED_RATE'
   | 'MODIFIED_DURATION'
   | 'MODIFIED_RATE_AND_DURATION'
   | 'WITHDREW'
   | 'SWAPPED'
   | 'CREATED'
-  | 'TERMINATED';
+  | 'TERMINATED'
+  | 'TRANSFERED'
+  | 'PERMISSIONS_MODIFIED';
 
 export interface Position {
   from: Token;

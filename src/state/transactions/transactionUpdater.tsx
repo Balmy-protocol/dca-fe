@@ -14,6 +14,7 @@ import { setInitialized } from 'state/initializer/actions';
 import useTransactionService from 'hooks/useTransactionService';
 import useWalletService from 'hooks/useWalletService';
 import usePositionService from 'hooks/usePositionService';
+import { updatePosition } from 'state/position-details/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { usePendingTransactions } from './hooks';
 import { checkedTransaction, finalizeTransaction, removeTransaction, transactionFailed } from './actions';
@@ -161,6 +162,16 @@ export default function Updater(): null {
                   ...extendedTypeData,
                 },
               });
+
+              dispatch(
+                updatePosition({
+                  ...transactions[hash],
+                  typeData: {
+                    ...transactions[hash].typeData,
+                    ...extendedTypeData,
+                  },
+                })
+              );
 
               dispatch(
                 finalizeTransaction({
