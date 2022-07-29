@@ -6,7 +6,7 @@ import TokenIcon from 'common/token-icon';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
-import { formatCurrencyAmount } from 'utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import Button from 'common/button';
 import { calculateStale, fullPositionToMappedPosition, getTimeFrequencyLabel, STALE } from 'utils/parsing';
 import { NETWORKS, POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
@@ -52,6 +52,16 @@ const BorderLinearProgress = withStyles(() =>
   })
 )(StyledSwapsLinearProgress);
 
+const StyledNetworkLogoContainer = styled.div`
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  border-radius: 30px;
+  border: 3px solid #1b1923;
+  width: 32px;
+  height: 32px;
+`;
+
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
 `;
@@ -62,6 +72,7 @@ const StyledCard = styled(Card)`
   display: flex;
   flex-grow: 1;
   background: #292929;
+  overflow: visible;
 `;
 
 const StyledCardContent = styled(CardContent)`
@@ -215,6 +226,11 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
   const isOwner = account && account.toLowerCase() === position.user.toLowerCase();
   return (
     <StyledCard>
+      {positionNetwork && (
+        <StyledNetworkLogoContainer>
+          <TokenIcon size="26px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
+        </StyledNetworkLogoContainer>
+      )}
       <StyledCardContent>
         <StyledContentContainer>
           <StyledCardHeader>
