@@ -4,14 +4,9 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import PositionSwaps from 'position-detail/swaps';
 import { FullPosition, GetPairSwapsData } from 'types';
-// import AveragePriceGraph from 'position-detail/average-price-graph';
 import Details from 'position-detail/position-data';
 import Sticky from 'react-stickynode';
 import GraphContainer from 'position-detail/graph-container';
-import find from 'lodash/find';
-import TokenIcon from 'common/token-icon';
-import { NETWORKS } from 'config';
-import { emptyTokenWithAddress } from 'utils/currency';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -35,12 +30,6 @@ const StyledFlexGridItem = styled(Grid)`
   }
 `;
 
-const StyledNetworkLogoContainer = styled.div`
-  position: absolute;
-  top: -15px;
-  right: -15px;
-`;
-
 interface PositionSummaryContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
@@ -57,53 +46,39 @@ const PositionSummaryContainer = ({
   onWithdraw,
   onReusePosition,
   disabled,
-}: PositionSummaryContainerProps) => {
-  const { chainId } = position;
-  const positionNetwork = React.useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const supportedNetwork = find(NETWORKS, { chainId })!;
-    return supportedNetwork;
-  }, [chainId]);
-
-  return (
-    <>
-      <Grid container spacing={4} alignItems="flex-start">
-        <StyledFlexGridItem item xs={12} md={5}>
-          <Sticky enabled top={95}>
+}: PositionSummaryContainerProps) => (
+  <>
+    <Grid container spacing={4} alignItems="flex-start">
+      <StyledFlexGridItem item xs={12} md={5}>
+        <Sticky enabled top={95}>
+          <StyledPaper variant="outlined">
+            <Details
+              position={position}
+              pair={swapsData}
+              pendingTransaction={pendingTransaction}
+              onWithdraw={onWithdraw}
+              onReusePosition={onReusePosition}
+              disabled={disabled}
+            />
+          </StyledPaper>
+        </Sticky>
+      </StyledFlexGridItem>
+      <Grid item xs={12} md={7}>
+        <Grid container direction="column" spacing={3}>
+          <Grid item xs={12}>
             <StyledPaper variant="outlined">
-              {positionNetwork && (
-                <StyledNetworkLogoContainer>
-                  <TokenIcon size="30px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
-                </StyledNetworkLogoContainer>
-              )}
-              <Details
-                position={position}
-                pair={swapsData}
-                pendingTransaction={pendingTransaction}
-                onWithdraw={onWithdraw}
-                onReusePosition={onReusePosition}
-                disabled={disabled}
-              />
+              <GraphContainer position={position} />
             </StyledPaper>
-          </Sticky>
-        </StyledFlexGridItem>
-        <Grid item xs={12} md={7}>
-          <Grid container direction="column" spacing={3}>
-            <Grid item xs={12}>
-              <StyledPaper variant="outlined">
-                <GraphContainer position={position} />
-              </StyledPaper>
-            </Grid>
-            <Grid item xs={12}>
-              <StyledPaper variant="outlined">
-                <PositionSwaps position={position} />
-              </StyledPaper>
-            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <StyledPaper variant="outlined">
+              <PositionSwaps position={position} />
+            </StyledPaper>
           </Grid>
         </Grid>
       </Grid>
-    </>
-  );
-};
+    </Grid>
+  </>
+);
 
 export default PositionSummaryContainer;

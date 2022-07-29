@@ -23,8 +23,12 @@ import useWalletService from 'hooks/useWalletService';
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;
-  top: -15px;
-  right: -15px;
+  top: -10px;
+  right: -10px;
+  border-radius: 30px;
+  border: 3px solid #1b1923;
+  width: 32px;
+  height: 32px;
 `;
 
 const StyledCard = styled(Card)`
@@ -192,7 +196,7 @@ const ActivePosition = ({
     <StyledCard variant="outlined">
       {positionNetwork && (
         <StyledNetworkLogoContainer>
-          <TokenIcon size="30px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
+          <TokenIcon size="26px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
         </StyledNetworkLogoContainer>
       )}
       <StyledCardContent>
