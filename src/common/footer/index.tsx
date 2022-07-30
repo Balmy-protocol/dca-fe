@@ -63,7 +63,7 @@ const Footer = () => {
         <StyledLink underline="none" target="_blank" href="https://twitter.com/mean_fi">
           <TwitterIcon />
         </StyledLink>
-        <StyledLink underline="none" target="_blank" href="https://discord.mean.finance">
+        <StyledLink underline="none" target="_blank" href="http://discord.mean.finance">
           <DiscordIcon size="24px" />
         </StyledLink>
       </StyledFooterMainContent>
