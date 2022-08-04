@@ -59,3 +59,19 @@ export const emptyTokenWithAddress: (address: string) => Token = (address: strin
   name: '',
   symbol: '',
 });
+
+export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) => ({
+  decimals: 18,
+  chainId: 1,
+  symbol,
+  name: '',
+  address: '0x00000000000000000',
+});
+
+export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: number) => ({
+  decimals,
+  chainId: 1,
+  symbol: '',
+  name: '',
+  address: '0x00000000000000000',
+});
