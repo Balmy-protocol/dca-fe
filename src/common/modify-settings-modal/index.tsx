@@ -120,6 +120,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const needsToApprove =
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
+    position.user === walletService.getAccount() &&
     allowance &&
     allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
     isIncreasingPosition &&
