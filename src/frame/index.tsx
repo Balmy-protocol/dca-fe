@@ -26,6 +26,7 @@ import Vector2 from 'assets/svg/vector2.svg';
 import find from 'lodash/find';
 import { NetworkStruct } from 'types';
 import useWalletService from 'hooks/useWalletService';
+import useWeb3Service from 'hooks/useWeb3Service';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -75,6 +76,8 @@ const StyledFooterGridContainer = styled(Grid)`
 const AppFrame = ({ isLoading }: AppFrameProps) => {
   const walletService = useWalletService();
   const mode = useThemeMode();
+  const web3Service = useWeb3Service();
+  const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
 
   const theme = createTheme({
     palette: {
@@ -88,10 +91,16 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
   React.useEffect(() => {
     async function getNetwork() {
       const web3Network = await walletService.getNetwork();
+      const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
       if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
-        const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
         dispatch(setNetwork(networkToSet as NetworkStruct));
+        if (networkToSet) {
+          web3Service.setNetwork(networkToSet?.chainId);
+        }
+      } else {
+        web3Service.setNetwork(NETWORKS.optimism.chainId);
       }
+      setHasSetNetwork(true);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispatch(startFetchingTokenLists());
     }
@@ -100,7 +109,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
     getNetwork();
   }, []);
 
-  const isLoadingNetwork = !currentNetwork;
+  const isLoadingNetwork = !currentNetwork || !hasSetNetwork;
 
   return (
     <ThemeProvider theme={theme as DefaultTheme}>
