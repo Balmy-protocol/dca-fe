@@ -14,6 +14,42 @@ import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 
+const LATEST_VERSION = '1.0.0';
+const LATEST_TRANSACTION_VERSION = '1.0.0';
+const TRANSACTION_VERSION_KEY = 'transactions_version';
+const TRANSACTION_KEY = 'redux_localstorage_simple_transactions';
+const BADGE_KEY = 'redux_localstorage_simple_badge';
+const MEAN_UI_VERSION_KEY = 'mean_ui_version';
+
+function checkStorageValidity() {
+  const meanUIVersion = localStorage.getItem(MEAN_UI_VERSION_KEY);
+  const transactionVersion = localStorage.getItem(TRANSACTION_VERSION_KEY);
+
+  if (transactionVersion !== LATEST_TRANSACTION_VERSION) {
+    console.warn('different transaction version detected, clearing transaction storage');
+    localStorage.setItem(TRANSACTION_VERSION_KEY, LATEST_TRANSACTION_VERSION);
+    localStorage.removeItem(TRANSACTION_KEY);
+    localStorage.removeItem(BADGE_KEY);
+  }
+
+  const currentTransactions = localStorage.getItem(TRANSACTION_KEY);
+  const currentTransactionVersion = localStorage.getItem(TRANSACTION_VERSION_KEY);
+
+  if (meanUIVersion !== LATEST_VERSION) {
+    console.warn('different version detected, clearing storage');
+    localStorage.clear();
+    localStorage.setItem(MEAN_UI_VERSION_KEY, LATEST_VERSION);
+    if (currentTransactionVersion) {
+      localStorage.setItem(TRANSACTION_VERSION_KEY, currentTransactionVersion);
+    }
+    if (currentTransactions) {
+      localStorage.setItem(TRANSACTION_KEY, currentTransactions);
+    }
+  }
+}
+
+checkStorageValidity();
+
 // this should not be here
 // Create `axios-cache-adapter` instance
 const cache = setupCache({
