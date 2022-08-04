@@ -156,33 +156,38 @@ export default class PositionService {
         return {
           ...acc,
           ...keyBy(
-            gqlResult.data.positions.map((position: PositionResponse) => ({
-              from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-              to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-              user: position.user,
-              swapInterval: BigNumber.from(position.swapInterval.interval),
-              swapped: BigNumber.from(position.totalSwapped),
-              rate: BigNumber.from(position.current.rate),
-              remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-              remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-              withdrawn: BigNumber.from(position.totalWithdrawn),
-              toWithdraw: BigNumber.from(position.current.idleSwapped),
-              totalSwaps: BigNumber.from(position.totalSwaps),
-              id: `${position.id}-v${version}`,
-              positionId: position.id,
-              status: position.status,
-              startedAt: position.createdAtTimestamp,
-              executedSwaps: BigNumber.from(position.executedSwaps),
-              totalDeposits: BigNumber.from(position.totalDeposits),
-              pendingTransaction: '',
-              pairId: position.pair.id,
-              version,
-              chainId: network,
-              pairLastSwappedAt:
-                (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
-                position.createdAtTimestamp,
-              pairNextSwapAvailableAt: position.pair.nextSwapAvailableAt || '0',
-            })),
+            gqlResult.data.positions.map((position: PositionResponse) => {
+              const existingPosition = this.currentPositions[`${position.id}-v${version}`];
+
+              const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
+              return {
+                from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
+                to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+                user: position.user,
+                swapInterval: BigNumber.from(position.swapInterval.interval),
+                swapped: BigNumber.from(position.totalSwapped),
+                rate: BigNumber.from(position.current.rate),
+                remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
+                remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+                withdrawn: BigNumber.from(position.totalWithdrawn),
+                toWithdraw: BigNumber.from(position.current.idleSwapped),
+                totalSwaps: BigNumber.from(position.totalSwaps),
+                id: `${position.id}-v${version}`,
+                positionId: position.id,
+                status: position.status,
+                startedAt: position.createdAtTimestamp,
+                executedSwaps: BigNumber.from(position.executedSwaps),
+                totalDeposits: BigNumber.from(position.totalDeposits),
+                pendingTransaction,
+                pairId: position.pair.id,
+                version,
+                chainId: network,
+                pairLastSwappedAt:
+                  (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
+                  position.createdAtTimestamp,
+                pairNextSwapAvailableAt: position.pair.nextSwapAvailableAt || '0',
+              };
+            }),
             'id'
           ),
         };
