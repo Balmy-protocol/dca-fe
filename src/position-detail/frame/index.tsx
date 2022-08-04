@@ -199,11 +199,13 @@ const PositionDetailFrame = () => {
       return;
     }
     try {
-      const hasPermission = await positionService.companionHasPermission(
-        fullPositionToMappedPosition(position),
-        PERMISSIONS.WITHDRAW
-      );
-
+      let hasPermission = true;
+      if (useProtocolToken) {
+        hasPermission = await positionService.companionHasPermission(
+          fullPositionToMappedPosition(position),
+          PERMISSIONS.WITHDRAW
+        );
+      }
       const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
       const toSymbol =
         position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address
