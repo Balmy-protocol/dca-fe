@@ -3,6 +3,7 @@ import find from 'lodash/find';
 import orderBy from 'lodash/orderBy';
 import Grid from '@mui/material/Grid';
 import styled from 'styled-components';
+import intersection from 'lodash/intersection';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { NETWORKS } from 'config';
@@ -76,7 +77,7 @@ const BorderLinearProgress = withStyles(() =>
 interface CountDashboardProps {
   selectedChain: null | number;
   onSelectChain: (chain: number | null) => void;
-  selectedToken: string | null;
+  selectedTokens: string[] | null;
 }
 
 interface ChainCounter extends Record<string, number> {
@@ -85,7 +86,7 @@ interface ChainCounter extends Record<string, number> {
 
 type PositionCountRaw = Record<string, ChainCounter>;
 
-const CountDashboard = ({ selectedChain, onSelectChain, selectedToken }: CountDashboardProps) => {
+const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountDashboardProps) => {
   const positions = useCurrentPositions();
 
   const positionsCountRaw = React.useMemo(() => {
@@ -145,7 +146,8 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedToken }: CountDa
         }
 
         const positionSymbols = Object.keys(positionCount.positions);
-        if (selectedToken && positionSymbols.indexOf(selectedToken) === -1) {
+        const selected = (selectedTokens && intersection(positionSymbols, selectedTokens)) || [];
+        if (selectedTokens && selected.length === 0) {
           fill = 'rgba(255, 255, 255, 0.5)';
         }
 
@@ -154,7 +156,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedToken }: CountDa
           fill,
         };
       }),
-    [selectedChain, positionsCountRaw, selectedToken]
+    [selectedChain, positionsCountRaw, selectedTokens]
   );
 
   const totalPositions = React.useMemo(
@@ -165,7 +167,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedToken }: CountDa
   const shownTotalPositions = React.useMemo(
     () =>
       positionsCount.reduce((acc, value) => {
-        if (!selectedChain && !selectedToken) {
+        if (!selectedChain && !selectedTokens) {
           return acc + value.value;
         }
 
@@ -175,13 +177,19 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedToken }: CountDa
           return acc + value.value;
         }
 
-        if (selectedToken && positionSymbols.indexOf(selectedToken) !== -1) {
-          return acc + value.positions[selectedToken];
+        const selected = (selectedTokens && intersection(positionSymbols, selectedTokens)) || [];
+        if (selected.length !== 0) {
+          let summed = acc;
+          selected.forEach((selectedToken) => {
+            summed += value.positions[selectedToken];
+          });
+          return summed;
+          // return acc + value.positions[selectedTokens];
         }
 
         return acc;
       }, 0),
-    [positionsCount, selectedChain, selectedToken]
+    [positionsCount, selectedChain, selectedTokens]
   );
 
   const positionsCountLabels = React.useMemo(
@@ -195,9 +203,9 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedToken }: CountDa
 
           let count = value.value;
 
-          if (selectedToken) {
+          if (selectedTokens) {
             count = Object.keys(value.positions).reduce((acc, positionKey) => {
-              if (positionKey === selectedToken) {
+              if (selectedTokens.includes(positionKey)) {
                 return acc + value.positions[positionKey];
               }
               return acc;
@@ -218,7 +226,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedToken }: CountDa
         'fullCount',
         'desc'
       ),
-    [positionsCount, selectedToken]
+    [positionsCount, selectedTokens]
   );
 
   return (

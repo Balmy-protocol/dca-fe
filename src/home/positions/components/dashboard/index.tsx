@@ -19,7 +19,7 @@ const StyledPaper = styled(Paper)`
 
 const PositionDashboard = () => {
   const [selectedChain, setSelectedChain] = React.useState<null | number>(null);
-  const [selectedToken, setSelectedToken] = React.useState<null | string>(null);
+  const [selectedTokens, setSelectedTokens] = React.useState<null | string[]>(null);
 
   return (
     <Grid container spacing={4}>
@@ -28,13 +28,17 @@ const PositionDashboard = () => {
           <CountDashboard
             selectedChain={selectedChain}
             onSelectChain={setSelectedChain}
-            selectedToken={selectedToken}
+            selectedTokens={selectedTokens}
           />
         </StyledPaper>
       </Grid>
       <Grid item xs={5}>
         <StyledPaper variant="outlined">
-          <UsdDashboard selectedToken={selectedToken} onSelectToken={setSelectedToken} selectedChain={selectedChain} />
+          <UsdDashboard
+            selectedTokens={selectedTokens}
+            onSelectTokens={setSelectedTokens}
+            selectedChain={selectedChain}
+          />
         </StyledPaper>
       </Grid>
     </Grid>

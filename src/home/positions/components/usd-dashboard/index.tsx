@@ -1,22 +1,28 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import orderBy from 'lodash/orderBy';
+import union from 'lodash/union';
+import intersection from 'lodash/intersection';
+import mergeWith from 'lodash/mergeWith';
 import styled from 'styled-components';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import LinearProgress from '@mui/material/LinearProgress';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import Popper from '@mui/material/Popper';
 import { BigNumber } from 'ethers';
 import usePriceService from 'hooks/usePriceService';
 import { Token } from 'types';
 import { formatUnits } from 'ethers/lib/utils';
 import find from 'lodash/find';
 import { NETWORKS } from 'config';
-import { formatCurrencyAmount } from 'utils/currency';
+import { emptyTokenWithSymbol, formatCurrencyAmount } from 'utils/currency';
 import { FormattedMessage } from 'react-intl';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import { usdFormatter } from 'utils/parsing';
+import DashboardPopper from './popper';
 
 const StyledCountDashboardContainer = styled(Grid)`
   min-height: 190px;
@@ -111,8 +117,8 @@ type TokenCount = Record<
 
 interface UsdDashboardProps {
   selectedChain: number | null;
-  selectedToken: string | null;
-  onSelectToken: (token: string | null) => void;
+  selectedTokens: string[] | null;
+  onSelectTokens: (token: string[] | null) => void;
 }
 
 interface ChainBreakdown {
@@ -120,12 +126,33 @@ interface ChainBreakdown {
   balanceUSD: BigNumber;
 }
 
-const UsdDashboard = ({ selectedChain, onSelectToken, selectedToken }: UsdDashboardProps) => {
+interface RawCount {
+  name: string;
+  value: number;
+  summedRawBalance: BigNumber;
+  summedBalanceToShow: BigNumber;
+  summedBalanceUsdToShow: number;
+  chains: string[];
+  valuePerChain: Record<string, ChainBreakdown>;
+  token: Token;
+  tokens?: string[];
+  isOther?: boolean;
+  tokensBreakdown?: Record<string, { summedBalanceUsdToShow: number; summedRawBalance: BigNumber; decimals: number }>;
+}
+
+const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDashboardProps) => {
   const positions = useCurrentPositions();
   const priceService = usePriceService();
   const [hasLoadedUSDValues, setHasLoadedUSDValues] = React.useState(false);
   const [isLoadingUSDValues, setIsLoadingUSDValues] = React.useState(false);
   const [tokenUSDPrices, setTokenUSDPrices] = React.useState<Record<string, Record<string, BigNumber>>>({});
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [showPopper, setShowPopper] = React.useState(false);
+
+  const handlePopperEl = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    setTimeout(() => setShowPopper(true), 200);
+  };
 
   const tokensCountRaw = React.useMemo(
     () =>
@@ -312,31 +339,91 @@ const UsdDashboard = ({ selectedChain, onSelectToken, selectedToken }: UsdDashbo
       };
     });
 
-    rawCounts = orderBy(rawCounts, 'summedBalanceUsd', 'desc');
+    rawCounts = orderBy(rawCounts, 'value', 'desc');
 
-    return rawCounts.map((rawCount, index) => {
+    const filteredRawCounts = rawCounts.reduce<RawCount[]>((acc, count) => {
+      const newAcc: RawCount[] = [...acc];
+      if (newAcc.length < 4) {
+        newAcc.push(count);
+      } else if (newAcc.length === 4) {
+        newAcc.push({
+          ...count,
+          name: 'Other',
+          token: emptyTokenWithSymbol('Other'),
+          tokens: [count.token.symbol],
+          isOther: true,
+          tokensBreakdown: {
+            [count.token.symbol]: {
+              summedBalanceUsdToShow: count.summedBalanceUsdToShow,
+              summedRawBalance: count.summedRawBalance,
+              decimals: count.token.decimals,
+            },
+          },
+        });
+      } else if (newAcc.length > 4) {
+        const other = {
+          ...newAcc[4],
+        };
+
+        other.value += count.value;
+        other.summedRawBalance = other.summedRawBalance.add(count.summedRawBalance);
+        other.summedBalanceToShow = other.summedBalanceToShow.add(count.summedBalanceToShow);
+        other.summedBalanceUsdToShow += count.summedBalanceUsdToShow;
+        other.chains = union(other.chains, count.chains);
+        other.tokens = [...(other.tokens || []), count.token.symbol];
+        other.tokensBreakdown = {
+          ...(other.tokensBreakdown || {}),
+          [count.token.symbol]: {
+            summedBalanceUsdToShow: count.summedBalanceUsdToShow,
+            summedRawBalance: count.summedRawBalance,
+            decimals: count.token.decimals,
+          },
+        };
+
+        other.valuePerChain = mergeWith(other.valuePerChain, count.valuePerChain, (value, srcValue) => {
+          if (BigNumber.isBigNumber(value) && BigNumber.isBigNumber(srcValue)) {
+            return value.add(srcValue);
+          }
+
+          return undefined;
+        });
+
+        newAcc[4] = other;
+      }
+
+      return newAcc;
+    }, []);
+
+    return filteredRawCounts.map((rawCount, index) => {
       let fill =
         COLORS[rawCount.token.symbol as keyof typeof COLORS] ||
         DEFAULT_COLORS[index] ||
         DEFAULT_COLORS[DEFAULT_COLORS.length - 1];
 
-      if (selectedToken && rawCount.token.symbol !== selectedToken) {
+      let isSelected = true;
+
+      const selected =
+        (selectedTokens && intersection((rawCount.tokens && rawCount.tokens) || [rawCount.name], selectedTokens)) || [];
+
+      if (selectedTokens && selected.length === 0) {
+        isSelected = false;
         fill = 'rgba(255, 255, 255, 0.5)';
       }
 
       if (selectedChain && !rawCount.chains.includes(selectedChain.toString())) {
+        isSelected = false;
         fill = 'rgba(255, 255, 255, 0.5)';
       }
-      return { ...rawCount, fill };
+      return { ...rawCount, fill, isSelected };
     });
-  }, [hasLoadedUSDValues, tokenUSDPrices, tokensCountRaw, selectedToken, selectedChain]);
+  }, [hasLoadedUSDValues, tokenUSDPrices, tokensCountRaw, selectedTokens, selectedChain]);
 
   const totalUSDAmount = React.useMemo(() => tokensCount.reduce((acc, value) => acc + value.value, 0), [tokensCount]);
 
   const shownTotalUSDAmount = React.useMemo(
     () =>
       tokensCount.reduce((acc, value) => {
-        if (!selectedChain && !selectedToken) {
+        if (!selectedChain && !selectedTokens) {
           return acc + value.value;
         }
 
@@ -347,13 +434,15 @@ const UsdDashboard = ({ selectedChain, onSelectToken, selectedToken }: UsdDashbo
           );
         }
 
-        if (selectedToken && value.name === selectedToken) {
+        const selected =
+          (selectedTokens && intersection((value.tokens && value.tokens) || [value.name], selectedTokens)) || [];
+        if (selected.length !== 0) {
           return acc + value.value;
         }
 
         return acc;
       }, 0),
-    [tokensCount, selectedToken]
+    [tokensCount, selectedTokens]
   );
 
   const tokensCountLabels = React.useMemo(
@@ -394,16 +483,18 @@ const UsdDashboard = ({ selectedChain, onSelectToken, selectedToken }: UsdDashbo
                   paddingAngle={1}
                   outerRadius={75}
                   fill="#8884d8"
-                  onMouseOver={(data: { name: string }) => onSelectToken(data.name)}
-                  onMouseOut={() => onSelectToken(null)}
+                  onMouseOver={(data: { name: string; token: Token; tokens?: string[] }) =>
+                    onSelectTokens(data.tokens ? data.tokens : [data.name])
+                  }
+                  onMouseOut={() => onSelectTokens(null)}
                 >
                   {tokensCount.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
                   ))}
                   <Label
-                    value={`$${shownTotalUSDAmount.toFixed(2)}`}
+                    value={`$${usdFormatter(shownTotalUSDAmount)}`}
                     position="centerBottom"
-                    fontSize="2.125rem"
+                    fontSize="1.7rem"
                     fontWeight={400}
                     offset={-10}
                     letterSpacing="0.0075em"
@@ -431,8 +522,16 @@ const UsdDashboard = ({ selectedChain, onSelectToken, selectedToken }: UsdDashbo
                 <Grid
                   container
                   alignItems="center"
-                  onMouseOut={() => onSelectToken(null)}
-                  onMouseOver={() => onSelectToken(positionCountLabel.name)}
+                  onMouseOut={() => {
+                    onSelectTokens(null);
+                    setShowPopper(false);
+                  }}
+                  onMouseOver={(event) => {
+                    onSelectTokens(positionCountLabel.tokens ? positionCountLabel.tokens : [positionCountLabel.name]);
+                    if (positionCountLabel.isOther) {
+                      handlePopperEl(event);
+                    }
+                  }}
                   sx={{ cursor: 'pointer' }}
                 >
                   <Grid item xs={1}>
@@ -447,16 +546,25 @@ const UsdDashboard = ({ selectedChain, onSelectToken, selectedToken }: UsdDashbo
                     </StyledTypography>
                   </Grid>
                   <Grid item xs={5}>
-                    <BorderLinearProgress
-                      variant="buffer"
-                      value={positionCountLabel.relativeLengthToShow}
-                      valueBuffer={positionCountLabel.relativeLength}
-                      fill={positionCountLabel.fill}
-                    />
+                    {positionCountLabel.isOther && (
+                      <Popper id="other-popper" open={showPopper} anchorEl={anchorEl}>
+                        <DashboardPopper tokensBreakdown={positionCountLabel.tokensBreakdown} />
+                      </Popper>
+                    )}
+                    {!positionCountLabel.isOther && (
+                      <BorderLinearProgress
+                        variant="buffer"
+                        value={positionCountLabel.relativeLengthToShow}
+                        valueBuffer={positionCountLabel.relativeLength}
+                        fill={positionCountLabel.fill}
+                      />
+                    )}
                   </Grid>
                   <Grid item xs={3} sx={{ textAlign: 'right' }}>
                     <Typography variant="body2">
-                      {formatCurrencyAmount(positionCountLabel.summedBalanceToShow, positionCountLabel.token, 4)}
+                      {!positionCountLabel.isOther
+                        ? formatCurrencyAmount(positionCountLabel.summedBalanceToShow, positionCountLabel.token, 4)
+                        : `$${positionCountLabel.summedBalanceUsdToShow.toFixed(2)}`}
                     </Typography>
                   </Grid>
                 </Grid>
