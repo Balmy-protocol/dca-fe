@@ -66,7 +66,7 @@ interface PriceUniData {
 
 type Prices = (PriceMeanData | PriceUniData)[];
 
-const StyledPaper = styled(Paper)<{ column?: boolean }>`
+const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   padding: 16px;
   position: relative;
   overflow: hidden;
@@ -76,7 +76,7 @@ const StyledPaper = styled(Paper)<{ column?: boolean }>`
   backdrop-filter: blur(6px);
   display: flex;
   gap: 24px;
-  flex-direction: ${({ column }) => (column ? 'column' : 'row')};
+  flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
 `;
 
 const StyledTitleContainer = styled.div`
@@ -288,7 +288,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
 
   if (isLoading) {
     return (
-      <StyledPaper variant="outlined" column>
+      <StyledPaper variant="outlined" $column>
         <CenteredLoadingIndicator />
         <GraphFooter />
       </StyledPaper>
@@ -297,7 +297,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
 
   if (!from || !to) {
     return (
-      <StyledPaper variant="outlined" column>
+      <StyledPaper variant="outlined" $column>
         <StyledPaper variant="outlined">
           <StyledCenteredWrapper>
             <EmptyGraph size="100px" />
@@ -316,7 +316,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
 
   if (noData) {
     return (
-      <StyledPaper variant="outlined" column>
+      <StyledPaper variant="outlined" $column>
         <StyledPaper variant="outlined">
           <StyledCenteredWrapper>
             <EmptyGraph size="100px" />
@@ -334,7 +334,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   }
 
   return (
-    <StyledPaper variant="outlined" column>
+    <StyledPaper variant="outlined" $column>
       <StyledGraphContainer elevation={0}>
         <StyledHeader>
           <StyledTitleContainer>

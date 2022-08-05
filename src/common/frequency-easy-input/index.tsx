@@ -42,9 +42,9 @@ const StyledInputContainer = styled.div`
   margin: 0px 6px;
 `;
 
-const StyledButton = styled(Button)<{ isSelected: boolean }>`
+const StyledButton = styled(Button)<{ $isSelected: boolean }>`
   min-width: 45px;
-  border-color: ${({ isSelected }) => (isSelected ? '#3076F6' : 'rgba(255,255,255,0.5)')} !important;
+  border-color: ${({ $isSelected }) => ($isSelected ? '#3076F6' : 'rgba(255,255,255,0.5)')} !important;
 `;
 
 const StyledTabContainer = styled.div`
@@ -113,7 +113,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
           <StyledButton
             color="default"
             variant="outlined"
-            isSelected={index === tabIndex}
+            $isSelected={index === tabIndex}
             size="small"
             key={index}
             onClick={() => handleChange(index)}

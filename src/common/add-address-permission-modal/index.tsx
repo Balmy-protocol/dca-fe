@@ -146,7 +146,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
             />
           </Typography>
           {toAddresses.map((address, index) => (
-            <StyledInputWrapper>
+            <StyledInputWrapper key={index}>
               <StyledFilledInput
                 id="toAddress"
                 value={address}
@@ -188,7 +188,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
           <FormGroup>
             <Grid container>
               {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: Permission) => (
-                <StyledGrid item xs={12} sm={6}>
+                <StyledGrid item xs={12} sm={6} key={stringPermissionKey}>
                   <FormControlLabel
                     control={
                       <Checkbox

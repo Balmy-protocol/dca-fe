@@ -7,8 +7,8 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useTokenListUnfiltered from 'hooks/useTokenFromList';
 
-const StyledHelpOutlineIcon = styled(HelpOutlineOutlinedIcon)<{ realSize: string }>`
-  font-size: ${({ realSize }) => realSize};
+const StyledHelpOutlineIcon = styled(HelpOutlineOutlinedIcon)<{ $realSize: string }>`
+  font-size: ${({ $realSize }) => $realSize};
 `;
 interface TokenButtonProps {
   token?: Token;
@@ -55,7 +55,7 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
       />
     );
   } else {
-    componentToRender = <StyledHelpOutlineIcon realSize={realSize} className={isInChip ? 'MuiChip-icon' : ''} />;
+    componentToRender = <StyledHelpOutlineIcon $realSize={realSize} className={isInChip ? 'MuiChip-icon' : ''} />;
   }
 
   return componentToRender;
