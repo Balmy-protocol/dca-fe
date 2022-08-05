@@ -13,6 +13,7 @@ import positionPermissions from './position-permissions/reducer';
 import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
+import error from './error/reducer';
 
 // this should not be here
 // Create `axios-cache-adapter` instance
@@ -50,6 +51,7 @@ const store = configureStore({
     tabs,
     positionPermissions,
     modifyRateSettings,
+    error,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient }, serializableCheck: false }).concat([

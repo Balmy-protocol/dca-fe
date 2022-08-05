@@ -11,6 +11,8 @@ import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import useWalletService from 'hooks/useWalletService';
 import usePairService from 'hooks/usePairService';
+import { useAppDispatch } from 'state/hooks';
+import { setError } from 'state/error/actions';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 
@@ -25,6 +27,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const { chainId } = useParams<{ chainId: string }>();
   const client = useDCAGraphql();
   const pairService = usePairService();
+  const dispatch = useAppDispatch();
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
   // const hasInitiallySetNetwork = React.useState()
 
@@ -41,7 +44,11 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   }, [currentNetwork]);
   React.useEffect(() => {
     const fetchPairs = async () => {
-      await pairService.fetchAvailablePairs();
+      try {
+        await pairService.fetchAvailablePairs();
+      } catch (e) {
+        dispatch(setError({ error: e as Error }));
+      }
       setHasLoadedPairs(true);
     };
 
