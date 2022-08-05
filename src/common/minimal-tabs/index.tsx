@@ -24,7 +24,7 @@ const StyledTabItemsContainer = styled.div`
   flex: 1;
 `;
 
-const StyledTabItem = styled(Button)<{ isSelected: boolean }>`
+const StyledTabItem = styled(Button)<{ $isSelected: boolean }>`
   flex-grow: 1;
   padding: 5px 10px;
   min-width: auto;
@@ -33,7 +33,7 @@ const StyledTabItem = styled(Button)<{ isSelected: boolean }>`
   justify-content: center;
   color: inherit;
   text-transform: initial;
-  opacity: ${(props) => (props.isSelected ? '1' : '0.7')};
+  opacity: ${(props) => (props.$isSelected ? '1' : '0.7')};
 
   &:hover {
     background-color: transparent;
@@ -97,7 +97,7 @@ export default function MinimalTabs<T>({ options, selected, onChange }: MinimalS
             disableRipple
             key={option.key}
             color="inherit"
-            isSelected={selected.key === option.key}
+            $isSelected={selected.key === option.key}
             onClick={() => onChange(option)}
           >
             {option.label}

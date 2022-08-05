@@ -119,7 +119,7 @@ const Modal: React.FC<ModalProps> = ({
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>
           )}
-          {actions?.map((action) => (
+          {actions?.map((action, index) => (
             <Button
               onClick={action.onClick}
               disabled={action.disabled}
@@ -127,6 +127,7 @@ const Modal: React.FC<ModalProps> = ({
               color={action.color ?? 'primary'}
               size="large"
               fullWidth
+              key={index}
             >
               {action.label}
             </Button>
