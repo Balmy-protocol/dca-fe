@@ -27,6 +27,7 @@ import find from 'lodash/find';
 import { NetworkStruct } from 'types';
 import useWalletService from 'hooks/useWalletService';
 import useWeb3Service from 'hooks/useWeb3Service';
+import ErrorBoundary from 'common/error-boundary/indext';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -134,29 +135,31 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
               <StyledContainer>
                 <StyledGridContainer container direction="row">
                   <StyledAppGridContainer item xs={12}>
-                    <Switch>
-                      <Route path="/faq">
-                        <FAQ />
-                      </Route>
-                      <Route path="/positions/:positionId">
-                        <PositionDetail />
-                      </Route>
-                      <Route path="/:chainId/positions/:positionVersion/:positionId">
-                        <PositionDetail />
-                      </Route>
-                      <Route path="/leaderboard">
-                        <Leaderboard />
-                      </Route>
-                      <Route path="/positions">
-                        <Home isLoading={isLoading || isLoadingNetwork} />
-                      </Route>
-                      <Route path="/create/:chainId?/:from?/:to?">
-                        <Home isLoading={isLoading || isLoadingNetwork} />
-                      </Route>
-                      <Route path="/:chainId?/:from?/:to?">
-                        <Home isLoading={isLoading || isLoadingNetwork} />
-                      </Route>
-                    </Switch>
+                    <ErrorBoundary>
+                      <Switch>
+                        <Route path="/faq">
+                          <FAQ />
+                        </Route>
+                        <Route path="/positions/:positionId">
+                          <PositionDetail />
+                        </Route>
+                        <Route path="/:chainId/positions/:positionVersion/:positionId">
+                          <PositionDetail />
+                        </Route>
+                        <Route path="/leaderboard">
+                          <Leaderboard />
+                        </Route>
+                        <Route path="/positions">
+                          <Home isLoading={isLoading || isLoadingNetwork} />
+                        </Route>
+                        <Route path="/create/:chainId?/:from?/:to?">
+                          <Home isLoading={isLoading || isLoadingNetwork} />
+                        </Route>
+                        <Route path="/:chainId?/:from?/:to?">
+                          <Home isLoading={isLoading || isLoadingNetwork} />
+                        </Route>
+                      </Switch>
+                    </ErrorBoundary>
                   </StyledAppGridContainer>
                   <StyledFooterGridContainer item xs={12}>
                     <AppFooter />
