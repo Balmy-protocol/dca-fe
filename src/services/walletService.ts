@@ -1,5 +1,5 @@
 import { ethers, Signer, BigNumber } from 'ethers';
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import { Interface } from '@ethersproject/abi';
 import { TransactionResponse, Network } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
@@ -68,7 +68,11 @@ export default class WalletService {
     return this.signer;
   }
 
-  getUsedTokens() {
+  getUsedTokens(): Promise<AxiosResponse<GetUsedTokensData> | null> {
+    if (!this.getAccount()) {
+      return Promise.resolve(null);
+    }
+
     return this.axiosClient.get<GetUsedTokensData>(
       `https://api.ethplorer.io/getAddressInfo/${this.getAccount() || ''}?apiKey=${process.env.ETHPLORER_KEY || ''}`
     );
@@ -81,6 +85,11 @@ export default class WalletService {
 
   async getEns(address: string) {
     let ens = null;
+
+    if (!address) {
+      return ens;
+    }
+
     try {
       const provider = ethers.getDefaultProvider('homestead', {
         infura: '5744aff1d49f4eee923c5f3e5af4cc1c',
