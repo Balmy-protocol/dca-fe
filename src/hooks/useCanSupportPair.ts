@@ -5,6 +5,7 @@ import usePrevious from 'hooks/usePrevious';
 import isUndefined from 'lodash/isUndefined';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import usePairService from './usePairService';
+import useWalletService from './useWalletService';
 
 function useCanSupportPair(
   from: Token | undefined | null,
@@ -19,6 +20,9 @@ function useCanSupportPair(
   const prevTo = usePrevious(to);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevResult = usePrevious(result, false);
+  const walletService = useWalletService();
+  const account = walletService.getAccount();
+  const prevAccount = usePrevious(account);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -38,7 +42,8 @@ function useCanSupportPair(
       (!isLoading && isUndefined(result) && !error) ||
       !isEqual(prevFrom, from) ||
       !isEqual(prevTo, to) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions)
+      !isEqual(prevPendingTrans, hasPendingTransactions) ||
+      !isEqual(account, prevAccount)
     ) {
       setIsLoading(true);
       setResult(undefined);
@@ -47,7 +52,7 @@ function useCanSupportPair(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, to, isLoading, result, error, hasPendingTransactions]);
+  }, [from, to, isLoading, result, error, hasPendingTransactions, account, prevAccount]);
 
   if (!from) {
     return [prevResult || true, false, undefined];
