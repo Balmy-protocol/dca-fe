@@ -128,6 +128,12 @@ export default class PairService {
   }
 
   async getPairOracle(pair: { tokenA: string; tokenB: string }, isExistingPair: boolean): Promise<Oracles> {
+    const connected = this.walletService.getAccount();
+
+    if (!connected) {
+      return ORACLES.CHAINLINK;
+    }
+
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const [tokenA, tokenB] = sortTokensByAddress(
