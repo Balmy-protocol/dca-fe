@@ -217,10 +217,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     try {
       handleCancel();
 
-      const hasPermission = await positionService.companionHasPermission(
-        position,
-        isIncreasingPosition ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
-      );
+      let hasPermission = true;
+
+      if (!useWrappedProtocolToken) {
+        hasPermission = await positionService.companionHasPermission(
+          position,
+          isIncreasingPosition ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
+        );
+      }
 
       setModalLoading({
         content: (

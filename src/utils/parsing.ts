@@ -110,7 +110,7 @@ export function getURLFromQuery(query: string) {
   return '';
 }
 
-export function fullPositionToMappedPosition(position: FullPosition): Position {
+export function fullPositionToMappedPosition(position: FullPosition, positionVersion?: string): Position {
   return {
     from: position.from,
     to: position.to,
@@ -130,7 +130,7 @@ export function fullPositionToMappedPosition(position: FullPosition): Position {
     totalDeposits: BigNumber.from(position.totalDeposits),
     executedSwaps: BigNumber.from(position.executedSwaps),
     pendingTransaction: '',
-    version: position.version || POSITION_VERSION_3,
+    version: position.version || positionVersion || POSITION_VERSION_3,
     chainId: position.chainId,
     pairLastSwappedAt: parseInt(position.createdAtTimestamp, 10),
     pairNextSwapAvailableAt: position.createdAtTimestamp,

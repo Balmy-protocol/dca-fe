@@ -28,10 +28,10 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(updatePosition, (state, { payload }) => {
       if (!state.position) {
-        return;
+        return state;
       }
-      if (payload.position?.id !== `${state.position?.id}-${payload.position?.version || LATEST_VERSION}`) {
-        return;
+      if (payload.position?.id !== `${state.position?.id}-v${payload.position?.version || LATEST_VERSION}`) {
+        return state;
       }
 
       const transaction = payload;
@@ -436,9 +436,7 @@ export default createReducer(initialState, (builder) =>
         default:
           break;
       }
-      state.position = {
-        ...position,
-        history: [...history],
-      };
+
+      return { ...state, position: { ...position, history: [...history] } };
     })
 );
