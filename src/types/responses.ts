@@ -1,3 +1,4 @@
+import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 
@@ -167,4 +168,16 @@ export type AvailablePairResponse = {
 
 export interface AvailablePairsGraphqlResponse {
   pairs: AvailablePairResponse[];
+}
+
+export interface DefillamaResponse {
+  data: {
+    apy: number;
+    underlyingTokens: string[];
+    pool: string;
+  }[];
+}
+
+export interface MeanFinanceResponse {
+  tx: TransactionRequest;
 }
