@@ -236,7 +236,7 @@ const ActivePosition = ({
     walletService.changeNetwork(chainId);
   };
 
-  const isOldVersion = position.version !== POSITION_VERSION_3;
+  const isOldVersion = position.version === POSITION_VERSION_2;
 
   return (
     <StyledCard variant="outlined">

@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { CoreTypechained, PeripheryTypechained, OraclesTypechained } from '@mean-finance/typechained/lib/index';
 import { ethers, Signer } from 'ethers';
 import { Network, getNetwork as getStringNetwork, Provider } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import find from 'lodash/find';
+// import allExportedFromTypechained from '@mean-finance/typechained/lib';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
-import ORACLE_AGGREGATOR_ABI from 'abis/OracleAggregator.json';
-import HUB_COMPANION_ABI from 'abis/HubCompanion.json';
-import HUB_ABI from 'abis/Hub.json';
 import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
-import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 import MIGRATOR_ABI from 'abis/BetaMigrator.json';
 import OE_GAS_ORACLE_ABI from 'abis/OEGasOracle.json';
 
@@ -29,16 +27,9 @@ import {
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
 } from 'config/constants';
-import {
-  BetaMigratorContract,
-  ERC20Contract,
-  HubCompanionContract,
-  HubContract,
-  OEGasOracle,
-  OracleContract,
-  PermissionManagerContract,
-} from 'types';
+import { BetaMigratorContract, ERC20Contract, HubContract, OEGasOracle, OracleContract } from 'types';
 
+// const { CoreTypechained, PeripheryTypechained, OraclesTypechained } = allExportedFromTypechained;
 export default class ContractService {
   client: ethers.providers.Web3Provider;
 
@@ -186,18 +177,23 @@ export default class ContractService {
     const hubAddress = await this.getHUBAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(hubAddress, HUB_ABI.abi, provider) as unknown as HubContract;
+    // @ts-ignore
+    const hub = CoreTypechained.DCAHub__factory.connect(hubAddress, provider as Signer);
+
+    (hub as unknown as HubContract).deposit =
+      hub['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'];
+    (hub as unknown as HubContract).estimateGas.deposit =
+      hub.estimateGas['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'];
+
+    return hub as unknown as HubContract;
   }
 
-  async getPermissionManagerInstance(version?: PositionVersions): Promise<PermissionManagerContract> {
+  async getPermissionManagerInstance(version?: PositionVersions) {
     const permissionManagerAddress = await this.getPermissionManagerAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(
-      permissionManagerAddress,
-      PERMISSION_MANAGER_ABI.abi,
-      provider
-    ) as unknown as PermissionManagerContract;
+    // @ts-ignore
+    return CoreTypechained.DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
   }
 
   async getMigratorInstance(version?: PositionVersions): Promise<BetaMigratorContract> {
@@ -207,18 +203,20 @@ export default class ContractService {
     return new ethers.Contract(migratorAddress, MIGRATOR_ABI.abi, provider) as unknown as BetaMigratorContract;
   }
 
-  async getHUBCompanionInstance(version?: PositionVersions): Promise<HubCompanionContract> {
+  async getHUBCompanionInstance(version?: PositionVersions) {
     const hubCompanionAddress = await this.getHUBCompanionAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(hubCompanionAddress, HUB_COMPANION_ABI.abi, provider) as unknown as HubCompanionContract;
+    // @ts-ignore
+    return PeripheryTypechained.DCAHubCompanion__factory.connect(hubCompanionAddress, provider);
   }
 
-  async getOracleInstance(version?: PositionVersions): Promise<OracleContract> {
+  async getOracleInstance(version?: PositionVersions) {
     const oracleAddress = await this.getOracleAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(oracleAddress, ORACLE_AGGREGATOR_ABI.abi, provider) as unknown as OracleContract;
+    // @ts-ignore
+    return OraclesTypechained.OracleAggregator__factory.connect(oracleAddress, provider);
   }
 
   async getChainlinkOracleInstance(version?: PositionVersions): Promise<OracleContract> {
