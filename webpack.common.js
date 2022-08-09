@@ -4,6 +4,7 @@ const tsTransformer = require('@formatjs/ts-transformer');
 const webpack = require('webpack');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 const WebpackBar = require('webpackbar');
+const { mean } = require('lodash');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
 
@@ -57,15 +58,16 @@ module.exports = {
       },
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
+        // exclude: /node_modules\/(?!@mean-finance\/typechained)/,
         loader: 'babel-loader',
         options: { presets: ['@babel/env'] },
       },
       {
         test: /\.(ts|tsx)$/,
-        exclude: /node_modules/,
+        // exclude: /node_modules\/(?!@mean-finance\/typechained)/,
         loader: 'ts-loader',
         options: {
+          allowTsInNodeModules: true,
           getCustomTransformers() {
             return {
               before: [

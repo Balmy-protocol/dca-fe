@@ -36,7 +36,7 @@ import GET_POSITIONS from 'graphql/getPositions.graphql';
 import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
 import {
   MAX_UINT_32,
   NETWORKS_FOR_MENU,
@@ -54,6 +54,7 @@ import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import PairService from './pairService';
+import MeanApiService from './meanApiService';
 
 export default class PositionService {
   modal: SafeAppWeb3Modal;
@@ -70,6 +71,8 @@ export default class PositionService {
 
   pairService: PairService;
 
+  meanApiService: MeanApiService;
+
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
   hasFetchedCurrentPositions: boolean;
@@ -80,11 +83,13 @@ export default class PositionService {
     walletService: WalletService,
     pairService: PairService,
     contractService: ContractService,
+    meanApiService: MeanApiService,
     DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
     this.pairService = pairService;
+    this.meanApiService = meanApiService;
     this.apolloClient = DCASubgraph;
     this.currentPositions = {};
     this.pastPositions = {};
@@ -471,18 +476,14 @@ export default class PositionService {
     }
 
     if (from.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase()) {
-      const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
-
-      return hubCompanionInstance.depositUsingProtocolToken(
-        from.address === PROTOCOL_TOKEN_ADDRESS ? ETH_COMPANION_ADDRESS : from.address,
-        to.address === PROTOCOL_TOKEN_ADDRESS ? ETH_COMPANION_ADDRESS : to.address,
+      return this.meanApiService.depositUsingProtocolToken(
+        from.address,
+        to.address,
         weiValue,
         amountOfSwaps,
         swapInterval,
         this.walletService.getAccount(),
-        [],
-        [],
-        from.address === PROTOCOL_TOKEN_ADDRESS ? { value: weiValue } : {}
+        []
       );
     }
 
@@ -490,7 +491,7 @@ export default class PositionService {
 
     const toToUse = to.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken : to;
 
-    return hubInstance['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'](
+    return hubInstance.deposit(
       from.address,
       toToUse.address,
       weiValue,
@@ -519,14 +520,13 @@ export default class PositionService {
       return hubInstance.withdrawSwapped(position.positionId, this.walletService.getAccount());
     }
 
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
-
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
 
     if (companionHasPermission) {
-      return hubCompanionInstance.withdrawSwappedUsingProtocolToken(
+      return this.meanApiService.withdrawSwappedUsingProtocolToken(
         position.positionId,
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version
       );
     }
 
@@ -536,31 +536,17 @@ export default class PositionService {
       PERMISSIONS.WITHDRAW
     );
 
-    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
-      permissions,
+    return this.meanApiService.withdrawSwappedUsingProtocolToken(
       position.positionId,
-      deadline,
-      v,
-      r,
-      s
+      this.walletService.getAccount(),
+      position.version,
+      { permissions, deadline: deadline.toString(), v, r: r.toString(), s: s.toString(), tokenId: position.positionId }
     );
-
-    const { data: withdrawData } = await hubCompanionInstance.populateTransaction.withdrawSwappedUsingProtocolToken(
-      position.positionId,
-      this.walletService.getAccount()
-    );
-
-    if (!permissionData || !withdrawData) {
-      throw new Error('Permission or withdraw data cannot be undefined');
-    }
-
-    return hubCompanionInstance.multicall([permissionData, withdrawData]);
   }
 
   async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -586,16 +572,18 @@ export default class PositionService {
 
     if (companionHasPermission) {
       if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
-        return hubCompanionInstance.terminateUsingProtocolTokenAsTo(
+        return this.meanApiService.terminateUsingProtocolTokenAsTo(
           position.positionId,
           this.walletService.getAccount(),
-          this.walletService.getAccount()
+          this.walletService.getAccount(),
+          position.version
         );
       }
-      return hubCompanionInstance.terminateUsingProtocolTokenAsFrom(
+      return this.meanApiService.terminateUsingProtocolTokenAsFrom(
         position.positionId,
         this.walletService.getAccount(),
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version
       );
     }
 
@@ -612,40 +600,34 @@ export default class PositionService {
       erc712Name
     );
 
-    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
-      permissions,
-      position.positionId,
-      deadline,
-      v,
-      r,
-      s
-    );
-
-    let terminateData;
     if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
-      ({ data: terminateData } = await hubCompanionInstance.populateTransaction.terminateUsingProtocolTokenAsTo(
+      return this.meanApiService.terminateUsingProtocolTokenAsTo(
         position.positionId,
         this.walletService.getAccount(),
-        this.walletService.getAccount()
-      ));
-    } else {
-      ({ data: terminateData } = await hubCompanionInstance.populateTransaction.terminateUsingProtocolTokenAsFrom(
-        position.positionId,
         this.walletService.getAccount(),
-        this.walletService.getAccount()
-      ));
+        position.version,
+        {
+          permissions,
+          deadline: deadline.toString(),
+          v,
+          r: r.toString(),
+          s: s.toString(),
+          tokenId: position.positionId,
+        }
+      );
     }
 
-    if (!permissionData || !terminateData) {
-      throw new Error('Permission or withdraw data cannot be undefined');
-    }
-
-    return hubCompanionInstance.multicall([permissionData, terminateData]);
+    return this.meanApiService.terminateUsingProtocolTokenAsFrom(
+      position.positionId,
+      this.walletService.getAccount(),
+      this.walletService.getAccount(),
+      position.version,
+      { permissions, deadline: deadline.toString(), v, r: r.toString(), s: s.toString(), tokenId: position.positionId }
+    );
   }
 
   async addFunds(position: Position, newDeposit: string): Promise<TransactionResponse> {
     const hubInstance = await this.contractService.getHubInstance(position.version);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
 
     const newRate = parseUnits(newDeposit, position.from.decimals)
       .add(position.remainingLiquidity)
@@ -654,11 +636,11 @@ export default class PositionService {
     const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
       if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return hubCompanionInstance.increasePositionUsingProtocolToken(
+        return this.meanApiService.increasePositionUsingProtocolToken(
           position.positionId,
           newAmount.sub(position.remainingLiquidity),
           position.remainingSwaps,
-          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
+          position.version
         );
       }
       return hubInstance.increasePosition(
@@ -669,11 +651,12 @@ export default class PositionService {
     }
 
     if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return hubCompanionInstance.reducePositionUsingProtocolToken(
+      return this.meanApiService.reducePositionUsingProtocolToken(
         position.positionId,
         position.remainingLiquidity.sub(newAmount),
         position.remainingSwaps,
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version
       );
     }
 
@@ -687,7 +670,6 @@ export default class PositionService {
 
   async resetPosition(position: Position, newDeposit: string, newSwaps: string): Promise<TransactionResponse> {
     const hubInstance = await this.contractService.getHubInstance(position.version);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
 
     if (BigNumber.from(newSwaps).gt(BigNumber.from(MAX_UINT_32))) {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
@@ -700,11 +682,11 @@ export default class PositionService {
     const newAmount = newRate.mul(BigNumber.from(newSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
       if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return hubCompanionInstance.increasePositionUsingProtocolToken(
+        return this.meanApiService.increasePositionUsingProtocolToken(
           position.positionId,
           newAmount.sub(position.remainingLiquidity),
           BigNumber.from(newSwaps),
-          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
+          position.version
         );
       }
       return hubInstance.increasePosition(
@@ -715,11 +697,12 @@ export default class PositionService {
     }
 
     if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return hubCompanionInstance.reducePositionUsingProtocolToken(
+      return this.meanApiService.reducePositionUsingProtocolToken(
         position.positionId,
         position.remainingLiquidity.sub(newAmount),
         BigNumber.from(newSwaps),
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version
       );
     }
 
@@ -740,7 +723,6 @@ export default class PositionService {
     const hubInstance = await this.contractService.getHubInstance(position.version);
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
     const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
 
     if (
@@ -778,11 +760,11 @@ export default class PositionService {
       const companionHasIncrease = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
 
       if (companionHasIncrease) {
-        return hubCompanionInstance.increasePositionUsingProtocolToken(
+        return this.meanApiService.increasePositionUsingProtocolToken(
           position.positionId,
           newAmount.sub(position.remainingLiquidity),
           BigNumber.from(newSwaps),
-          { value: newAmount.sub(position.remainingLiquidity) }
+          position.version
         );
       }
 
@@ -792,38 +774,31 @@ export default class PositionService {
         PERMISSIONS.INCREASE
       );
 
-      const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
-        permissions,
-        position.positionId,
-        deadline,
-        v,
-        r,
-        s
-      );
-
-      const { data: increaseData } = await hubCompanionInstance.populateTransaction.increasePositionUsingProtocolToken(
+      return this.meanApiService.increasePositionUsingProtocolToken(
         position.positionId,
         newAmount.sub(position.remainingLiquidity),
-        BigNumber.from(newSwaps)
+        BigNumber.from(newSwaps),
+        position.version,
+        {
+          permissions,
+          deadline: deadline.toString(),
+          v,
+          r: r.toString(),
+          s: s.toString(),
+          tokenId: position.positionId,
+        }
       );
-
-      if (!permissionData || !increaseData) {
-        throw new Error('Permission or increase data cannot be undefined');
-      }
-
-      return hubCompanionInstance.multicall([permissionData, increaseData], {
-        value: newAmount.sub(position.remainingLiquidity),
-      });
     }
 
     const companionHasReduce = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
 
     if (companionHasReduce) {
-      return hubCompanionInstance.reducePositionUsingProtocolToken(
+      return this.meanApiService.reducePositionUsingProtocolToken(
         position.positionId,
         position.remainingLiquidity.sub(newAmount),
         BigNumber.from(newSwaps),
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version
       );
     }
 
@@ -833,32 +808,18 @@ export default class PositionService {
       PERMISSIONS.REDUCE
     );
 
-    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
-      permissions,
-      position.positionId,
-      deadline,
-      v,
-      r,
-      s
-    );
-
-    const { data: reduceData } = await hubCompanionInstance.populateTransaction.reducePositionUsingProtocolToken(
+    return this.meanApiService.reducePositionUsingProtocolToken(
       position.positionId,
       position.remainingLiquidity.sub(newAmount),
       BigNumber.from(newSwaps),
-      this.walletService.getAccount()
+      this.walletService.getAccount(),
+      position.version,
+      { permissions, deadline: deadline.toString(), v, r: r.toString(), s: s.toString(), tokenId: position.positionId }
     );
-
-    if (!permissionData || !reduceData) {
-      throw new Error('Permission or reduce data cannot be undefined');
-    }
-
-    return hubCompanionInstance.multicall([permissionData, reduceData]);
   }
 
   async removeFunds(position: Position, ammountToRemove: string): Promise<TransactionResponse> {
     const hubInstance = await this.contractService.getHubInstance(position.version);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
 
     const newSwaps = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
       ? BigNumber.from(0)
@@ -877,11 +838,11 @@ export default class PositionService {
     const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
     if (newAmount.gte(position.remainingLiquidity)) {
       if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return hubCompanionInstance.increasePositionUsingProtocolToken(
+        return this.meanApiService.increasePositionUsingProtocolToken(
           position.positionId,
           newAmount.sub(position.remainingLiquidity),
           newSwaps,
-          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
+          position.version
         );
       }
 
@@ -889,11 +850,12 @@ export default class PositionService {
     }
 
     if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return hubCompanionInstance.reducePositionUsingProtocolToken(
+      return this.meanApiService.reducePositionUsingProtocolToken(
         position.positionId,
         position.remainingLiquidity.sub(newAmount),
         BigNumber.from(newSwaps),
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version
       );
     }
 
