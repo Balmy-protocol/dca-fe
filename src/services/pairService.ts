@@ -3,15 +3,12 @@ import {
   Token,
   AvailablePairs,
   PoolLiquidityData,
-  GetNextSwapInfo,
   PoolsLiquidityDataGraphqlResponse,
-  SwapsToPerform,
   Oracles,
   AvailablePairsGraphqlResponse,
   AvailablePairResponse,
 } from 'types';
 import { activePositionsPerIntervalToHasToExecute, sortTokens, sortTokensByAddress } from 'utils/parsing';
-import { buildSwapInput } from 'utils/swap';
 
 // GQL queries
 import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
@@ -20,7 +17,7 @@ import gqlFetchAll from 'utils/gqlFetchAll';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { ORACLES, POSITION_VERSION_3, SWAP_INTERVALS_MAP, PositionVersions } from 'config/constants';
+import { ORACLES, POSITION_VERSION_3, PositionVersions } from 'config/constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -143,9 +140,22 @@ export default class PairService {
 
     if (isExistingPair) {
       const oracleInstance = await this.contractService.getOracleInstance();
-      let oracleInUse: Oracles = ORACLES.NONE;
+      const oracleInUse: Oracles = ORACLES.NONE;
       try {
-        oracleInUse = await oracleInstance.oracleInUse(tokenA, tokenB);
+        const oracleInUseAddress = (await oracleInstance.assignedOracle(tokenA, tokenB)).oracle;
+        const chainlinkAddress = await this.contractService.getChainlinkOracleAddress();
+        const isChainlink = oracleInUseAddress === chainlinkAddress;
+
+        if (isChainlink) {
+          return ORACLES.CHAINLINK;
+        }
+
+        const uniswapAddress = await this.contractService.getUniswapOracleAddress();
+        const isUniswap = oracleInUseAddress === uniswapAddress;
+
+        if (isUniswap) {
+          return ORACLES.UNISWAP;
+        }
       } catch (e) {
         console.error('Error fetching oracle in use for existing pair', pair, e);
       }
@@ -172,34 +182,6 @@ export default class PairService {
     }
 
     return oracleInUse;
-  }
-
-  async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
-    const [tokenA, tokenB] = sortTokensByAddress(pair.tokenA, pair.tokenB);
-
-    const hubContract = await this.contractService.getHubInstance();
-
-    const { tokens, pairIndexes } = buildSwapInput([{ tokenA, tokenB }], []);
-
-    let swapsToPerform: SwapsToPerform[] = [];
-    try {
-      const nextSwapInfo = await hubContract.getNextSwapInfo(tokens, pairIndexes);
-
-      const { pairs } = nextSwapInfo;
-
-      const [{ intervalsInSwap }] = pairs;
-
-      swapsToPerform = SWAP_INTERVALS_MAP.filter(
-        // eslint-disable-next-line no-bitwise
-        (swapInterval) => swapInterval.key & parseInt(intervalsInSwap, 16)
-      ).map((swapInterval) => ({ interval: swapInterval.value.toNumber() }));
-    } catch {
-      console.error('Error fetching pair', pair);
-    }
-
-    return {
-      swapsToPerform,
-    };
   }
 
   async getPairLiquidity(token0: Token, token1: Token) {

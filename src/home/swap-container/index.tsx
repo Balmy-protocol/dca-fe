@@ -10,8 +10,18 @@ import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from 'state/create-position/hooks';
 import { useAppDispatch } from 'state/hooks';
-import { setFrequencyType, setFrequencyValue, setFrom, setFromValue, setTo } from 'state/create-position/actions';
+import {
+  setFrequencyType,
+  setFrequencyValue,
+  setFrom,
+  setFromValue,
+  setFromYield,
+  setTo,
+  setToYield,
+  setYieldEnabled,
+} from 'state/create-position/actions';
 import { useHistory, useParams } from 'react-router-dom';
+import useYieldOptions from 'hooks/useYieldOptions';
 import useToken from 'hooks/useToken';
 import Swap from './components/swap';
 
@@ -20,13 +30,15 @@ interface SwapContainerProps {
 }
 
 const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
-  const { fromValue, frequencyType, frequencyValue, from, to } = useCreatePositionState();
+  const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield } =
+    useCreatePositionState();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();
+  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions();
 
   React.useEffect(() => {
     if (fromParamToken) {
@@ -94,10 +106,18 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
           frequencyValue={frequencyValue}
           setFrequencyType={(newFrequencyType) => dispatch(setFrequencyType(newFrequencyType))}
           setFrequencyValue={(newFrequencyValue) => dispatch(setFrequencyValue(newFrequencyValue))}
+          setYieldEnabled={(newYieldEnabled) => dispatch(setYieldEnabled(newYieldEnabled))}
           fromValue={fromValue}
           setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
           currentNetwork={currentNetwork || NETWORKS.optimism}
           toggleFromTo={toggleFromTo}
+          yieldEnabled={yieldEnabled}
+          yieldOptions={yieldOptions || []}
+          isLoadingYieldOptions={isLoadingYieldOptions}
+          fromYield={fromYield}
+          toYield={toYield}
+          setFromYield={(newYield) => dispatch(setFromYield(newYield))}
+          setToYield={(newYield) => dispatch(setToYield(newYield))}
           availableFrequencies={
             (swapIntervalsData &&
               orderBy(

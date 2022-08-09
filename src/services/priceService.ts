@@ -87,7 +87,7 @@ export default class PriceService {
 
     const oracleInstance = await this.contractService.getOracleInstance();
 
-    return oracleInstance.quote(fromToUse.address, fromAmount, toToUse.address);
+    return oracleInstance.quote(fromToUse.address, fromAmount, toToUse.address, []);
   }
 
   async getGasPrice() {

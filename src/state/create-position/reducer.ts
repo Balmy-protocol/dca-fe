@@ -1,8 +1,17 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { ONE_DAY } from 'config/constants';
 import { BigNumber } from 'ethers';
-import { Token } from 'types';
-import { setFromValue, setFrom, setTo, setFrequencyType, setFrequencyValue } from './actions';
+import { Token, YieldOption } from 'types';
+import {
+  setFromValue,
+  setFrom,
+  setTo,
+  setFrequencyType,
+  setFrequencyValue,
+  setYieldEnabled,
+  setFromYield,
+  setToYield,
+} from './actions';
 
 export interface CreatePositionState {
   fromValue: string;
@@ -10,6 +19,9 @@ export interface CreatePositionState {
   frequencyValue: string;
   from: Token | null;
   to: Token | null;
+  yieldEnabled: boolean;
+  fromYield: YieldOption | null | undefined;
+  toYield: YieldOption | null | undefined;
 }
 
 const initialState: CreatePositionState = {
@@ -18,6 +30,9 @@ const initialState: CreatePositionState = {
   frequencyValue: '5',
   from: null,
   to: null,
+  yieldEnabled: true,
+  fromYield: undefined,
+  toYield: undefined,
 };
 
 export default createReducer(initialState, (builder) =>
@@ -36,5 +51,14 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setFrequencyValue, (state, { payload }) => {
       state.frequencyValue = payload;
+    })
+    .addCase(setYieldEnabled, (state, { payload }) => {
+      state.yieldEnabled = payload;
+    })
+    .addCase(setFromYield, (state, { payload }) => {
+      state.fromYield = payload;
+    })
+    .addCase(setToYield, (state, { payload }) => {
+      state.toYield = payload;
     })
 );
