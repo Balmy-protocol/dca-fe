@@ -95,12 +95,28 @@ export default class ContractService {
       return this.network;
     }
 
-    if (this.client) {
-      return this.client.getNetwork();
+    try {
+      if (this.client) {
+        return await this.client.getNetwork();
+      }
+    } catch (e) {
+      console.error('Failed to getNetwork through this.client');
     }
 
-    if (window.ethereum) {
-      return new ethers.providers.Web3Provider(window.ethereum).getNetwork();
+    try {
+      if (window.ethereum) {
+        if (window.ethereum.isMetaMask) {
+          // eslint-disable-next-line no-underscore-dangle
+          if (window?.ethereum?._state?.initialized || window?.ethereum?._state?.isUnlocked) {
+            // eslint-disable-next-line no-underscore-dangle
+            return await new ethers.providers.Web3Provider(window.ethereum).getNetwork();
+          }
+        } else {
+          return await new ethers.providers.Web3Provider(window.ethereum).getNetwork();
+        }
+      }
+    } catch (e) {
+      console.error('Failed to getNetwork through metamask');
     }
 
     return Promise.resolve(NETWORKS.optimism);

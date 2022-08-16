@@ -49,6 +49,7 @@ const StyledVector2Container = styled.div`
 
 interface AppFrameProps {
   isLoading: boolean;
+  initializationError: Error | null;
 }
 
 const StyledGridContainer = styled(Grid)`
@@ -74,7 +75,7 @@ const StyledFooterGridContainer = styled(Grid)`
   position: relative;
   flex: 0;
 `;
-const AppFrame = ({ isLoading }: AppFrameProps) => {
+const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
   const walletService = useWalletService();
   const mode = useThemeMode();
   const web3Service = useWeb3Service();
@@ -91,15 +92,19 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
 
   React.useEffect(() => {
     async function getNetwork() {
-      const web3Network = await walletService.getNetwork();
-      const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
-      if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
-        dispatch(setNetwork(networkToSet as NetworkStruct));
-        if (networkToSet) {
-          web3Service.setNetwork(networkToSet?.chainId);
+      try {
+        const web3Network = await walletService.getNetwork();
+        const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
+        if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
+          dispatch(setNetwork(networkToSet as NetworkStruct));
+          if (networkToSet) {
+            web3Service.setNetwork(networkToSet?.chainId);
+          }
+        } else {
+          web3Service.setNetwork(NETWORKS.optimism.chainId);
         }
-      } else {
-        web3Service.setNetwork(NETWORKS.optimism.chainId);
+      } catch (e) {
+        console.error('Found error while trying to set up network');
       }
       setHasSetNetwork(true);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -135,7 +140,7 @@ const AppFrame = ({ isLoading }: AppFrameProps) => {
               <StyledContainer>
                 <StyledGridContainer container direction="row">
                   <StyledAppGridContainer item xs={12}>
-                    <ErrorBoundary>
+                    <ErrorBoundary error={initializationError}>
                       <Switch>
                         <Route path="/faq">
                           <FAQ />

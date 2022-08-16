@@ -35,10 +35,12 @@ interface Props {
   hasError: boolean;
   history: { listen: (callback: () => void) => void };
   dismissError: () => void;
+  error: Error | null;
 }
 
 interface HistoryhProps {
   history: { listen: (callback: () => void) => void };
+  error: Error | null;
 }
 
 interface State {
@@ -112,8 +114,15 @@ class ErrorBoundary extends Component<Props, State> {
       errorMessage: errorMessageProp,
       errorName: errorNameProp,
       errorStackTrace: errorStackTraceProp,
+      error,
     } = this.props;
-    if (hasError || hasErrorProp) {
+
+    const actuallyHasError = hasError || hasErrorProp || !!error;
+    if (actuallyHasError) {
+      const errorMessageToShow = errorMessage || errorMessageProp || (error && error.message);
+      const errorNameToShow = errorName || errorNameProp || (error && error.name) || 'Unkown Error';
+      const errorStackToShow =
+        errorStackTrace || errorStackTraceProp || (error && error.stack) || 'Unknown error stack';
       return (
         <StyledErrorContainer>
           <Typography variant="h1">
@@ -128,13 +137,13 @@ class ErrorBoundary extends Component<Props, State> {
               defaultMessage="Seems like we encountered an error we could not handle"
             />
           </Typography>
-          {(errorMessage || errorMessageProp) && (
+          {errorMessageToShow && (
             <Typography variant="h5">
               <FormattedMessage
                 description="errorEncounteredName"
                 defaultMessage="This was due to: {name}"
                 values={{
-                  name: errorMessage || errorMessageProp,
+                  name: errorMessageToShow,
                 }}
               />
             </Typography>
@@ -155,9 +164,9 @@ class ErrorBoundary extends Component<Props, State> {
             onClick={() =>
               this.copyTextToClipboard(
                 `\`\`\`${JSON.stringify({
-                  errorName: errorName || errorNameProp,
-                  errorMessage: errorMessage || errorMessageProp,
-                  errorStackTrace: errorStackTrace || errorStackTraceProp,
+                  errorName: errorNameToShow,
+                  errorMessage: errorMessageToShow,
+                  errorStackTrace: errorStackToShow,
                 })}\`\`\``
               )
             }
@@ -189,4 +198,5 @@ const mapDispatchToProps = (dispatch: AppDispatch) => ({
   dismissError: () => dispatch(setError(null)),
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ErrorBoundary));
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default withRouter<any, any>(connect(mapStateToProps, mapDispatchToProps)(ErrorBoundary));
