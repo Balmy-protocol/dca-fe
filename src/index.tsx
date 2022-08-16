@@ -32,10 +32,15 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
   const [account, setAccount] = React.useState('');
   const [web3Service] = React.useState(new Web3Service(DCASubgraphs, UNISubgraphs, setAccount));
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
+  const [setUpModalError, setSetUpModalError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
     async function setWeb3ModalEffect() {
-      await web3Service.setUpModal();
+      try {
+        await web3Service.setUpModal();
+      } catch (e) {
+        setSetUpModalError(e);
+      }
       setIsLoadingWeb3(false);
     }
 
@@ -58,7 +63,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
         <Provider store={store}>
-          <MainApp isLoading={isLoading} />
+          <MainApp isLoading={isLoading} initializationError={setUpModalError} />
         </Provider>
       </IntlProvider>
     </WalletContext.Provider>

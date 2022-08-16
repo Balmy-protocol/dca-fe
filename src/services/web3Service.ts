@@ -275,22 +275,29 @@ export default class Web3Service {
 
     const loadedAsSafeApp = await web3Modal.isSafeApp();
 
-    if (web3Modal.cachedProvider || loadedAsSafeApp) {
-      const provider = (await this.modal?.requestProvider()) as Provider;
-
-      await this.connect(provider);
+    try {
+      if (web3Modal.cachedProvider || loadedAsSafeApp) {
+        const provider = (await this.modal?.requestProvider()) as Provider;
+        await this.connect(provider);
+      }
+    } catch (e) {
+      console.error('Avoidable error when initializing connect', e);
     }
 
-    if (window.ethereum) {
-      // handle metamask account change
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      window.ethereum.on('accountsChanged', () => {
-        window.location.reload();
-      });
+    try {
+      if (window.ethereum) {
+        // handle metamask account change
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        window.ethereum.on('accountsChanged', () => {
+          window.location.reload();
+        });
 
-      // extremely recommended by metamask
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      window.ethereum.on('chainChanged', () => window.location.reload());
+        // extremely recommended by metamask
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        window.ethereum.on('chainChanged', () => window.location.reload());
+      }
+    } catch (e) {
+      console.error('Avoidable error when initializing metamask events', e);
     }
 
     // await this.pairService.fetchAvailablePairs();
