@@ -63,7 +63,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
       {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
       <IntlProvider locale={locale} defaultLocale="en" messages={messages}>
         <Provider store={store}>
-          <MainApp isLoading={isLoading} initializationError={setUpModalError} />
+          {!isLoading && <MainApp isLoading={isLoading} initializationError={setUpModalError} />}
         </Provider>
       </IntlProvider>
     </WalletContext.Provider>
