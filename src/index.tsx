@@ -78,7 +78,7 @@ function bootstrapApplication(locale: string) {
   ReactDOM.render(<App locale={locale} messages={messages} />, document.getElementById('root'));
 }
 
-bootstrapApplication('en');
+bootstrapApplication('es');
 
 if (module.hot) {
   module.hot.accept();

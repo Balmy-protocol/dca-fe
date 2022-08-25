@@ -2,25 +2,25 @@
   "+NIeZ0": [
     {
       "type": 0,
-      "value": "Token list"
+      "value": "Lista de token"
     }
   ],
   "+O0pfN": [
     {
       "type": 0,
-      "value": "here"
+      "value": "aqui"
     }
   ],
   "+UA1IX": [
     {
       "type": 0,
-      "value": "No account required"
+      "value": "No se requiere una cuenta"
     }
   ],
   "+VGlht": [
     {
       "type": 0,
-      "value": "Waiting for your "
+      "value": "Esperando a que tu "
     },
     {
       "type": 1,
@@ -28,13 +28,13 @@
     },
     {
       "type": 0,
-      "value": " to be approved"
+      "value": " sea aprobado"
     }
   ],
   "+s/1rR": [
     {
       "type": 0,
-      "value": "In wallet: "
+      "value": "En la cartera: "
     },
     {
       "type": 1,
@@ -52,61 +52,61 @@
   "+tYhzH": [
     {
       "type": 0,
-      "value": "Como funciona Mean Finance?"
+      "value": "¿Cómo funciona el promedio de finanzas?"
     }
   ],
   "//GmlN": [
     {
       "type": 0,
-      "value": "Timing the market can be extremely difficult. The goal of performing DCA is to reduce the overall impact of volatility on the price of the target asset; as the price will likely vary each time one of the periodic swaps is executed, the investment is not as highly subject to volatility. DCA aims to avoid making the mistake of making one lump-sum investment that is poorly timed with regard to asset pricing."
+      "value": "El momento del mercado puede ser extremadamente difícil. El objetivo de la DCA es reducir el impacto general de la volatilidad en el precio del activo objetivo; ya que es probable que el precio varía cada vez que se ejecuta uno de los swaps periódicos, la inversión no está tan sujeta a volatilidad. El objetivo del DCA es evitar cometer el error de hacer una inversión de suma fija que no es oportuna, con respecto a la fijación de precios de los activos."
     }
   ],
   "/0oLaV": [
     {
       "type": 0,
-      "value": "Setting or revoking permissions"
+      "value": "Ajuste o revocación de permisos"
     }
   ],
   "/LSdRt": [
     {
       "type": 0,
-      "value": "Users need to pay gas fees when interacting with their positions. At the same time, there is a protocol fee that is charged in each swap. That fee is currently 0.6%."
+      "value": "Los usuarios deben pagar las tarifas de gas al interactuar con sus posiciones. Al mismo tiempo, hay una tasa de protocolo que se cobra en cada swap, que actualmente es del 0,6%."
     }
   ],
   "/gkMmp": [
     {
       "type": 0,
-      "value": "Insufficient funds"
+      "value": "Fondos insuficientes"
     }
   ],
   "00Lmy0": [
     {
       "type": 0,
-      "value": "Half"
+      "value": "Medio"
     }
   ],
   "0CdUh0": [
     {
       "type": 0,
-      "value": "Creating their position"
+      "value": "Creando su posición"
     }
   ],
   "0aFe3m": [
     {
       "type": 0,
-      "value": "Transfered from:"
+      "value": "Transferido de:"
     }
   ],
   "0dHtRR": [
     {
       "type": 0,
-      "value": "DCA price"
+      "value": "Precio DCA"
     }
   ],
   "0t0iJb": [
     {
       "type": 0,
-      "value": "Migrating your "
+      "value": "Migrando tu posición "
     },
     {
       "type": 1,
@@ -119,16 +119,12 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " position"
     }
   ],
   "19HyDE": [
     {
       "type": 0,
-      "value": "Approve "
+      "value": "Aprobar "
     },
     {
       "type": 1,
@@ -138,7 +134,7 @@
   "1HDQ5y": [
     {
       "type": 0,
-      "value": "How many "
+      "value": "¿Cuántos "
     },
     {
       "type": 1,
@@ -152,13 +148,13 @@
   "2TSf/Q": [
     {
       "type": 0,
-      "value": "You don’t need to execute your swaps by yourself since Mean Finance incentivizes other users to execute swaps, for a profit. Now, these incentives can be affected by different factors:"
+      "value": "No necesitas ejecutar tus swaps por ti mismo ya que Media Finance viza a otros usuarios para ejecutar swaps, para obtener un beneficio. Ahora bien, estos incentivos pueden verse afectados por diferentes factores:"
     }
   ],
   "2l6dgp": [
     {
       "type": 0,
-      "value": "View on explorer"
+      "value": "Ver en explorador"
     }
   ],
   "4IAoDw": [
@@ -178,17 +174,21 @@
   "4ZFv5V": [
     {
       "type": 0,
-      "value": "Only tokens with created pairs"
+      "value": "Sólo tokens con pares creados"
     }
   ],
   "4fwo65": [
+    {
+      "type": 0,
+      "value": "Tipo de cambio de "
+    },
     {
       "type": 1,
       "value": "increaseDecrease"
     },
     {
       "type": 0,
-      "value": " rate from "
+      "value": " de "
     },
     {
       "type": 1,
@@ -204,7 +204,7 @@
     },
     {
       "type": 0,
-      "value": " to "
+      "value": " a "
     },
     {
       "type": 1,
@@ -222,13 +222,13 @@
   "5B6pOD": [
     {
       "type": 0,
-      "value": "The general sentiment of the crypto market"
+      "value": "El sentimiento general del mercado de criptomonedas"
     }
   ],
   "5CBYQl": [
     {
       "type": 0,
-      "value": "Setting your "
+      "value": "Configurando tus permisos de posición "
     },
     {
       "type": 1,
@@ -241,22 +241,18 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " position permissions"
     }
   ],
   "5GXmRY": [
     {
       "type": 0,
-      "value": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+      "value": "Usted necesitará firmar primero un mensaje (que es sin costo) para aprobar nuestro contrato de Companion. Luego, usted tendrá que enviar la transacción donde recupere su saldo como ETH."
     }
   ],
   "5TdrSw": [
     {
       "type": 0,
-      "value": "but in the future we will support more on-chain oracles."
+      "value": "pero en el futuro apoyaremos más oráculos en cadena."
     }
   ],
   "5aO6ef": [
@@ -272,13 +268,13 @@
   "5q/G80": [
     {
       "type": 0,
-      "value": "Changed duration"
+      "value": "Duración cambiada"
     }
   ],
   "6OXLzE": [
     {
       "type": 0,
-      "value": "Terminate position"
+      "value": "Posición de la terminal"
     }
   ],
   "6aAaI0": [
@@ -294,19 +290,19 @@
   "6lcY/P": [
     {
       "type": 0,
-      "value": "When will my position be swapped?"
+      "value": "¿Cuándo se intercambiará mi posición?"
     }
   ],
   "7NwTX3": [
     {
       "type": 0,
-      "value": "Migrate position"
+      "value": "Migrar posición"
     }
   ],
   "7S36Rv": [
     {
       "type": 0,
-      "value": "How much "
+      "value": "¿Cuánto "
     },
     {
       "type": 1,
@@ -314,37 +310,37 @@
     },
     {
       "type": 0,
-      "value": " do you want to invest?"
+      "value": " quieres invertir?"
     }
   ],
   "7gnUZ7": [
     {
       "type": 0,
-      "value": "Terminate"
+      "value": "Terminar"
     }
   ],
   "7oK1Kh": [
     {
       "type": 0,
-      "value": "When a specific pair has some swaps that haven’t been executed in quite some time, the pair is signaled as stale."
+      "value": "Cuando una pareja específica tiene algunos swaps que no han sido ejecutados en algún tiempo, la pareja es señalizada como stale."
     }
   ],
   "8/zKxY": [
     {
       "type": 0,
-      "value": "Back"
+      "value": "Atrás"
     }
   ],
   "81zTuv": [
     {
       "type": 0,
-      "value": "IN PROGRESS"
+      "value": "EN PROGRESO"
     }
   ],
   "87RlBy": [
     {
       "type": 0,
-      "value": "Withdraw "
+      "value": "Retirar "
     },
     {
       "type": 1,
@@ -354,19 +350,19 @@
   "8okGX/": [
     {
       "type": 0,
-      "value": "will only be able to"
+      "value": "sólo podrá"
     }
   ],
   "8uwFtl": [
     {
       "type": 0,
-      "value": "We do not support this chain yet"
+      "value": "Todavía no apoyamos esta cadena"
     }
   ],
   "9RbwAu": [
     {
       "type": 0,
-      "value": "Terminate "
+      "value": "Posición de la terminal "
     },
     {
       "type": 1,
@@ -379,10 +375,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " position"
     }
   ],
   "9Rp/uO": [
@@ -394,13 +386,13 @@
   "9Xjz4q": [
     {
       "type": 0,
-      "value": "This allows the address to terminate your position"
+      "value": "Esto permite que la dirección termine su posición"
     }
   ],
   "9ka/f/": [
     {
       "type": 0,
-      "value": "No "
+      "value": "No hay "
     },
     {
       "type": 1,
@@ -408,31 +400,31 @@
     },
     {
       "type": 0,
-      "value": " positions yet."
+      "value": " posiciones aún."
     }
   ],
   "A7a2Lo": [
     {
       "type": 0,
-      "value": "Rate:"
+      "value": "Valoración:"
     }
   ],
   "ALg0aQ": [
     {
       "type": 0,
-      "value": "Swapped:"
+      "value": "Intercambiado:"
     }
   ],
   "AhEpzv": [
     {
       "type": 0,
-      "value": "This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones"
+      "value": "Aquí encontrará la lista completa de direcciones que tienen permisos sobre su posición. También puede agregar nuevas direcciones o modificar los permisos para las existentes"
     }
   ],
   "AiRKI+": [
     {
       "type": 0,
-      "value": "Withdraw swapped"
+      "value": "Retiro intercambiado"
     }
   ],
   "Ak27ll": [
@@ -448,7 +440,7 @@
   "Akxy6C": [
     {
       "type": 0,
-      "value": "Withdraw "
+      "value": "Retirar "
     },
     {
       "type": 1,
@@ -458,19 +450,19 @@
   "AzL+qV": [
     {
       "type": 0,
-      "value": "Discard changes"
+      "value": "Descartar cambios"
     }
   ],
   "B+lMoB": [
     {
       "type": 0,
-      "value": "Additional information:"
+      "value": "Información adicional:"
     }
   ],
   "B2rEXZ": [
     {
       "type": 0,
-      "value": "Approving use of "
+      "value": "Aprobando el uso de "
     },
     {
       "type": 1,
@@ -494,7 +486,7 @@
   "B5YYgc": [
     {
       "type": 0,
-      "value": "Why is my position stale?"
+      "value": "¿Por qué mi posición es obsoleta?"
     }
   ],
   "BWP9H/": [
@@ -506,13 +498,13 @@
   "BZcZ2I": [
     {
       "type": 0,
-      "value": "When you set up a position, you are creating an intention to swap one token for the other. Then, some external user can come and execute the swap for you, honoring the desired frequency of course. When they execute your swap, you are charged a 0.6% fee on the amount that was swapped. This fee is then split between Mean Finance and the swapper. Since you don’t have to execute the swap by yourself, you don’t need to pay any gas."
+      "value": "Cuando configuras una posición, estás creando una intención de intercambiar un token por el otro. Entonces, algún usuario externo puede venir y ejecutar el intercambio por usted, honrando la frecuencia deseada, por supuesto. Cuando ejecutan su swap, se le cobrará una comisión del 0,6% sobre la cantidad que fue intercambiada. Esta cuota se reparte entre Media Finance y el swapper. Como usted no tiene que ejecutar el intercambio por sí mismo, no necesita pagar ningún gas."
     }
   ],
   "Bh1aAA": [
     {
       "type": 0,
-      "value": "You will need to provide an aditional "
+      "value": "Necesitarás proporcionar un adicional "
     },
     {
       "type": 1,
@@ -530,7 +522,7 @@
   "Bq70E5": [
     {
       "type": 0,
-      "value": "View on explorer"
+      "value": "Ver en explorador"
     }
   ],
   "BrtGyj": [
@@ -540,31 +532,31 @@
     },
     {
       "type": 0,
-      "value": " for you for"
+      "value": " para ti"
     }
   ],
   "BrtSAY": [
     {
       "type": 0,
-      "value": "Disconnect"
+      "value": "Desconectar"
     }
   ],
   "BsPq9s": [
     {
       "type": 0,
-      "value": "Compete on who has the most positions on Mean Finance"
+      "value": "Compite en quién tiene más posiciones en las finanzas medias"
     }
   ],
   "Bxzkan": [
     {
       "type": 0,
-      "value": "The popularity/demand of the tokens involved in the swap"
+      "value": "La popularidad/demanda de las fichas involucradas en el intercambio"
     }
   ],
   "C5Zkoh": [
     {
       "type": 0,
-      "value": "Transfering your position to "
+      "value": "Transfiriendo tu posición a "
     },
     {
       "type": 1,
@@ -574,29 +566,29 @@
   "C5cDUK": [
     {
       "type": 0,
-      "value": "Remaining:"
+      "value": "Restante:"
     }
   ],
   "CUp6QA": [
     {
-      "type": 1,
-      "value": "type"
+      "type": 0,
+      "value": "Quedan "
     },
     {
-      "type": 0,
-      "value": " left"
+      "type": 1,
+      "value": "type"
     }
   ],
   "CZmJ1O": [
     {
       "type": 0,
-      "value": "Modify position"
+      "value": "Modificar posición"
     }
   ],
   "Cxag1C": [
     {
       "type": 0,
-      "value": "View your positions"
+      "value": "Ver tus posiciones"
     }
   ],
   "CyXVN7": [
@@ -624,7 +616,7 @@
   "DaGzbO": [
     {
       "type": 0,
-      "value": "Unknown error: "
+      "value": "Error desconocido: "
     },
     {
       "type": 1,
@@ -634,25 +626,25 @@
   "Do1Kxz": [
     {
       "type": 0,
-      "value": "Recent transactions"
+      "value": "Transacciones recientes"
     }
   ],
   "E5yqT8": [
     {
       "type": 0,
-      "value": "Position Terminated"
+      "value": "Posición terminada"
     }
   ],
   "E6P1+X": [
     {
       "type": 0,
-      "value": "Swaps"
+      "value": "Intercambio"
     }
   ],
   "E9JRmw": [
     {
       "type": 0,
-      "value": "Get "
+      "value": "Obtén "
     },
     {
       "type": 1,
@@ -660,7 +652,7 @@
     },
     {
       "type": 0,
-      "value": " as "
+      "value": " como "
     },
     {
       "type": 1,
@@ -668,13 +660,13 @@
     },
     {
       "type": 0,
-      "value": " instead"
+      "value": " en su lugar"
     }
   ],
   "EJMVdh": [
     {
       "type": 0,
-      "value": "Changing your "
+      "value": "Cambiando su tasa de posición "
     },
     {
       "type": 1,
@@ -690,7 +682,7 @@
     },
     {
       "type": 0,
-      "value": " position rate to swap "
+      "value": " para intercambiar "
     },
     {
       "type": 1,
@@ -714,7 +706,7 @@
     },
     {
       "type": 0,
-      "value": " for "
+      "value": " para "
     },
     {
       "type": 1,
@@ -722,13 +714,13 @@
     },
     {
       "type": 0,
-      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " ha sido enviado con éxito a la cadena de bloques y será confirmado pronto"
     }
   ],
   "ER8GVt": [
     {
       "type": 0,
-      "value": "Your withdrawal of "
+      "value": "Su retiro de "
     },
     {
       "type": 1,
@@ -736,7 +728,7 @@
     },
     {
       "type": 0,
-      "value": " from your "
+      "value": " de su posición "
     },
     {
       "type": 1,
@@ -752,43 +744,43 @@
     },
     {
       "type": 0,
-      "value": " position has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " ha sido enviado con éxito a la cadena de bloques y será confirmado pronto"
     }
   ],
   "EeY1Iw": [
     {
       "type": 0,
-      "value": "Run for:"
+      "value": "Ejecutar para:"
     }
   ],
   "Eo86hF": [
     {
       "type": 0,
-      "value": "Permissions on your position:"
+      "value": "Permisos en tu posición:"
     }
   ],
   "Es2JRi": [
     {
       "type": 0,
-      "value": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary ETH."
+      "value": "Usted necesitará firmar primero un mensaje (que es sin costo) para aprobar nuestro contrato de Companion. Luego deberá enviar la transacción donde envíe la ETH."
     }
   ],
   "EzTqXK": [
     {
       "type": 0,
-      "value": "View permissions"
+      "value": "Ver permisos"
     }
   ],
   "F5F9dl": [
     {
       "type": 0,
-      "value": "Transfer position"
+      "value": "Posición de transferencia"
     }
   ],
   "FW4Fp5": [
     {
       "type": 0,
-      "value": "Get "
+      "value": "Obtén "
     },
     {
       "type": 1,
@@ -796,7 +788,7 @@
     },
     {
       "type": 0,
-      "value": " as "
+      "value": " como "
     },
     {
       "type": 1,
@@ -804,37 +796,37 @@
     },
     {
       "type": 0,
-      "value": " instead"
+      "value": " en su lugar"
     }
   ],
   "FfyCRZ": [
     {
       "type": 0,
-      "value": "stale"
+      "value": "obsoleto"
     }
   ],
   "FlMmaB": [
     {
       "type": 0,
-      "value": "Waiting for confirmation"
+      "value": "Esperando confirmación"
     }
   ],
   "FwDtZA": [
     {
       "type": 0,
-      "value": "Positions"
+      "value": "Posiciones"
     }
   ],
   "G0w2LI": [
     {
       "type": 0,
-      "value": "Docs"
+      "value": "Documentos"
     }
   ],
   "GChBDN": [
     {
       "type": 0,
-      "value": "Change network to "
+      "value": "Cambiar red a "
     },
     {
       "type": 1,
@@ -844,13 +836,13 @@
   "GFyhCr": [
     {
       "type": 0,
-      "value": "You are disconnected from the net"
+      "value": "Estás desconectado de la red"
     }
   ],
   "GQoxnF": [
     {
       "type": 0,
-      "value": "All "
+      "value": "Se te enviará todo el saldo de "
     },
     {
       "type": 1,
@@ -858,7 +850,7 @@
     },
     {
       "type": 0,
-      "value": " balance will be sent to you and all "
+      "value": " y todo el saldo de "
     },
     {
       "type": 1,
@@ -866,13 +858,13 @@
     },
     {
       "type": 0,
-      "value": " balance will be used to create a new position with the same rate and remaining swaps."
+      "value": " se utilizará para crear una nueva posición con la misma tasa y swaps restantes."
     }
   ],
   "GoFOv6": [
     {
       "type": 0,
-      "value": "Changing your "
+      "value": "Cambiando la tasa de posición "
     },
     {
       "type": 1,
@@ -888,7 +880,7 @@
     },
     {
       "type": 0,
-      "value": " position rate to swap "
+      "value": " para intercambiar "
     },
     {
       "type": 1,
@@ -912,7 +904,7 @@
     },
     {
       "type": 0,
-      "value": " for "
+      "value": " por "
     },
     {
       "type": 1,
@@ -922,43 +914,43 @@
   "Gvb3qN": [
     {
       "type": 0,
-      "value": "End users don’t have to pay gas fees when the swaps are executed."
+      "value": "Los usuarios finales no tienen que pagar las tasas de gas cuando se ejecutan los swaps."
     }
   ],
   "Gzs80Q": [
     {
       "type": 0,
-      "value": "Rate:"
+      "value": "Valoración:"
     }
   ],
   "Hbiw7t": [
     {
       "type": 0,
-      "value": "For more information, feel free to check our"
+      "value": "Para más información, no dude en consultar nuestro"
     }
   ],
   "HuMusT": [
     {
       "type": 0,
-      "value": "Withdraw funds"
+      "value": "Retirar fondos"
     }
   ],
   "I0PpAd": [
     {
       "type": 0,
-      "value": "Average buy price:"
+      "value": "Precio medio de compra:"
     }
   ],
   "ILcAj5": [
     {
       "type": 0,
-      "value": "Change duration"
+      "value": "Cambiar duración"
     }
   ],
   "IUxcS/": [
     {
       "type": 0,
-      "value": "for "
+      "value": "para "
     },
     {
       "type": 1,
@@ -976,19 +968,19 @@
   "IrR4U4": [
     {
       "type": 0,
-      "value": "Stale"
+      "value": "Obtención"
     }
   ],
   "ItXuIA": [
     {
       "type": 0,
-      "value": "Change duration and rate"
+      "value": "Cambiar duración y tasa"
     }
   ],
   "IuW2wC": [
     {
       "type": 0,
-      "value": "Withdrawing "
+      "value": "Retirando "
     },
     {
       "type": 1,
@@ -998,67 +990,67 @@
   "J4ZbBX": [
     {
       "type": 0,
-      "value": "No trading limits"
+      "value": "Sin límites de trading"
     }
   ],
   "J9ovKV": [
     {
       "type": 0,
-      "value": "You receive"
+      "value": "Recibes"
     }
   ],
   "JG8+vM": [
     {
       "type": 0,
-      "value": "Generated"
+      "value": "Generado"
     }
   ],
   "JPkF9Y": [
     {
       "type": 0,
-      "value": "Terminated"
+      "value": "Terminado"
     }
   ],
   "Jh14HF": [
     {
       "type": 0,
-      "value": "This cannot be undone."
+      "value": "Esto no se puede deshacer."
     }
   ],
   "K/HInO": [
     {
       "type": 0,
-      "value": "This allows the address to decrease the funds and modify the duration of your position"
+      "value": "Esto permite que la dirección disminuya los fondos y modifique la duración de su posición"
     }
   ],
   "KAw6CL": [
     {
       "type": 0,
-      "value": "Mean Finance incentivizes other users to execute swaps, for a profit. Now, these incentives can be affected by different factors:"
+      "value": "Media de Finanzas anima a otros usuarios a ejecutar swaps, para obtener una ganancia. Ahora, estos incentivos pueden verse afectados por diferentes factores:"
     }
   ],
   "KK9T66": [
     {
       "type": 0,
-      "value": "Rate Modified"
+      "value": "Tasa modificada"
     }
   ],
   "KKIhxJ": [
     {
       "type": 0,
-      "value": "Set to run for:"
+      "value": "Establecer para ejecutar:"
     }
   ],
   "KmmquQ": [
     {
       "type": 0,
-      "value": "Select a pair to view its price history"
+      "value": "Seleccione un par para ver su historial de precios"
     }
   ],
   "KpQxqG": [
     {
       "type": 0,
-      "value": "We'll swap "
+      "value": "Intercambiaremos "
     },
     {
       "type": 1,
@@ -1082,7 +1074,7 @@
     },
     {
       "type": 0,
-      "value": " for "
+      "value": " por "
     },
     {
       "type": 1,
@@ -1090,7 +1082,7 @@
     },
     {
       "type": 0,
-      "value": " for you"
+      "value": " por ti"
     }
   ],
   "KwWbnt": [
@@ -1102,31 +1094,31 @@
   "KxGrUy": [
     {
       "type": 0,
-      "value": "Add permissions for new address"
+      "value": "Añadir permisos para la nueva dirección"
     }
   ],
   "LJHU2o": [
     {
       "type": 0,
-      "value": "Withdraws"
+      "value": "Retira"
     }
   ],
   "LLaqNx": [
     {
       "type": 0,
-      "value": "The volume of the tokens involved in the swap"
+      "value": "El volumen de las fichas involucradas en el intercambio"
     }
   ],
   "LQR2sQ": [
     {
       "type": 0,
-      "value": "This allows the address to increase the funds and modify the duration of your position"
+      "value": "Esto permite que la dirección aumente los fondos y modifique la duración de su posición"
     }
   ],
   "LbRNWF": [
     {
       "type": 0,
-      "value": "Migrate "
+      "value": "Migrar posición "
     },
     {
       "type": 1,
@@ -1139,16 +1131,12 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " position"
     }
   ],
   "LqWNDv": [
     {
       "type": 0,
-      "value": "Add new address"
+      "value": "Añadir nueva dirección"
     }
   ],
   "MCA6GY": [
@@ -1158,7 +1146,7 @@
     },
     {
       "type": 0,
-      "value": " duration to run for "
+      "value": " duración a ejecutar para "
     },
     {
       "type": 1,
@@ -1166,7 +1154,7 @@
     },
     {
       "type": 0,
-      "value": " from "
+      "value": " desde "
     },
     {
       "type": 1,
@@ -1176,19 +1164,19 @@
   "MV0UQs": [
     {
       "type": 0,
-      "value": "To withdraw:"
+      "value": "Para retirar:"
     }
   ],
   "NPuJa6": [
     {
       "type": 0,
-      "value": "Mean Finance contracts have been audited by Pessimistic and PeckShield. You can read the reports"
+      "value": "Los contratos medios de financiación han sido auditados por Pessimist y PeckShield. Puedes leer los informes"
     }
   ],
   "NXDtFv": [
     {
       "type": 0,
-      "value": "Your position creation to swap "
+      "value": "Su creación de posición para intercambiar "
     },
     {
       "type": 1,
@@ -1196,7 +1184,7 @@
     },
     {
       "type": 0,
-      "value": " to "
+      "value": " a "
     },
     {
       "type": 1,
@@ -1204,67 +1192,67 @@
     },
     {
       "type": 0,
-      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " se ha enviado correctamente a la cadena de bloques y se confirmará pronto"
     }
   ],
   "Nh6p/v": [
     {
       "type": 0,
-      "value": "To withdraw:"
+      "value": "Para retirar:"
     }
   ],
   "Nha1kE": [
     {
       "type": 0,
-      "value": "Pending transaction"
+      "value": "Transacción pendiente"
     }
   ],
   "NpsctG": [
     {
       "type": 0,
-      "value": "Open positions"
+      "value": "Posición abierta"
     }
   ],
   "NxEUb6": [
     {
       "type": 0,
-      "value": "Position settings"
+      "value": "Ajustes de posición"
     }
   ],
   "OAyRMn": [
     {
       "type": 0,
-      "value": "Reuse position"
+      "value": "Reutilizar posición"
     }
   ],
   "OalKNY": [
     {
       "type": 0,
-      "value": "Compete on who has the most traded volume locked on Mean Finance. This includes swapped liquidity on your positions"
+      "value": "Compite en quién tiene el volumen más negociado bloqueado en Media Finanzas. Esto incluye liquidez intercambiada en tus posiciones"
     }
   ],
   "OnZ2T/": [
     {
       "type": 0,
-      "value": "Tokens in your wallet"
+      "value": "Tokens en su cartera"
     }
   ],
   "Oo1GS9": [
     {
       "type": 0,
-      "value": "Terminating your position"
+      "value": "Terminando tu posición"
     }
   ],
   "OqTl06": [
     {
       "type": 0,
-      "value": "We do not support this pair"
+      "value": "No apoyamos este par"
     }
   ],
   "OttW6a": [
     {
       "type": 0,
-      "value": "We will return "
+      "value": "Te devolveremos "
     },
     {
       "type": 1,
@@ -1277,40 +1265,36 @@
     {
       "type": 1,
       "value": "from"
-    },
-    {
-      "type": 0,
-      "value": " to you"
     }
   ],
   "POGYlh": [
     {
       "type": 0,
-      "value": "Position permissions modified"
+      "value": "Permisos de posición modificados"
     }
   ],
   "PwFUUt": [
     {
       "type": 0,
-      "value": "Sell"
+      "value": "Vender"
     }
   ],
   "Q36Jtl": [
     {
       "type": 0,
-      "value": "Next"
+      "value": "Siguiente"
     }
   ],
   "QCZdI3": [
     {
       "type": 0,
-      "value": "Set position"
+      "value": "Definir posición"
     }
   ],
   "QYjgIw": [
     {
       "type": 0,
-      "value": "Current: "
+      "value": "Actual: "
     },
     {
       "type": 1,
@@ -1318,25 +1302,25 @@
     },
     {
       "type": 0,
-      "value": " left"
+      "value": " restantes"
     }
   ],
   "Qe8t1L": [
     {
       "type": 0,
-      "value": "Connect wallet"
+      "value": "Conectar cartera"
     }
   ],
   "Qes1qB": [
     {
       "type": 0,
-      "value": "DCA vs Lump sum"
+      "value": "DCA vs suma de volcado"
     }
   ],
   "QkC4KE": [
     {
       "type": 0,
-      "value": "This was due to: "
+      "value": "Esto fue debido a: "
     },
     {
       "type": 1,
@@ -1346,19 +1330,19 @@
   "Qp2So2": [
     {
       "type": 0,
-      "value": "Add funds"
+      "value": "Añadir fondos"
     }
   ],
   "RXcwxI": [
     {
       "type": 0,
-      "value": "Mean Finance relies on on-chain oracles to determine the price at the moment of the swap. Right now Mean Finance uses"
+      "value": "Las finanzas medias dependen de oráculos en cadena para determinar el precio en el momento del swap. En este momento, el promedio de uso de las finanzas"
     }
   ],
   "RcB3pW": [
     {
       "type": 0,
-      "value": "Approving use of "
+      "value": "La aprobación del uso de "
     },
     {
       "type": 1,
@@ -1366,49 +1350,49 @@
     },
     {
       "type": 0,
-      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " se ha enviado con éxito a la cadena de bloques y se confirmará pronto"
     }
   ],
   "RyEoxs": [
     {
       "type": 0,
-      "value": "Wallet settings"
+      "value": "Ajustes de cartera"
     }
   ],
   "S2QomY": [
     {
       "type": 0,
-      "value": "Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."
+      "value": "Aquí verás los detalles de tus posiciones abiertas y podrás ver más detalles sobre ellas. Sólo podrá interactuar con ellos si está en la red correcta."
     }
   ],
   "S2dFpy": [
     {
       "type": 0,
-      "value": "COPY ERROR LOG"
+      "value": "COPIAR ERROR LOG"
     }
   ],
   "S4SLAq": [
     {
       "type": 0,
-      "value": "Since swaps are executed by external users, they can decide when to execute them. For example, let’s assume that you had created a position with daily swaps. This means that from 00 AM UTC to 11.59 PM UTC, your position can only be executed once. Once it is executed, it can't be executed again until 00 AM of the following day. The same happens with other frequencies, such as weekly or monthly."
+      "value": "Dado que los swaps son ejecutados por usuarios externos, pueden decidir cuándo ejecutarlos. Por ejemplo, supongamos que había creado una posición con swaps diarios. Esto significa que de 00 AM UTC a 11. 9 PM UTC, su posición sólo puede ser ejecutada una vez. Una vez ejecutado, no puede ser ejecutado de nuevo hasta las 00 AM del día siguiente. Lo mismo ocurre con otras frecuencias, como semanales o mensuales."
     }
   ],
   "SNN905": [
     {
       "type": 0,
-      "value": "For more information, feel free to check our"
+      "value": "Para más información, no dude en consultar nuestro"
     }
   ],
   "SwiTok": [
     {
       "type": 0,
-      "value": "Withdrawing balance from their position"
+      "value": "Retiro de saldo desde su posición"
     }
   ],
   "Ti+ws9": [
     {
       "type": 0,
-      "value": "What does it mean for a pair to be stale?"
+      "value": "¿Qué significa que un par sea stale?"
     }
   ],
   "Tj1jig": [
@@ -1424,31 +1408,31 @@
   "UHHRwl": [
     {
       "type": 0,
-      "value": "Add address"
+      "value": "Añadir dirección"
     }
   ],
   "UhD0bk": [
     {
       "type": 0,
-      "value": "Confirm this transaction in your wallet"
+      "value": "Confirmar esta transacción en su cartera"
     }
   ],
   "Umk6mn": [
     {
       "type": 0,
-      "value": "View NFT"
+      "value": "Ver NFT"
     }
   ],
   "UpJRc6": [
     {
       "type": 0,
-      "value": "View summary"
+      "value": "Ver resumen"
     }
   ],
   "V314M5": [
     {
       "type": 0,
-      "value": "Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period while neutralizing the short-term volatility in the market."
+      "value": "El promedio de costos de dólar es una herramienta que un inversor puede utilizar para generar ahorros y riqueza durante un largo período mientras neutraliza la volatilidad de corto plazo en el mercado."
     },
     {
       "type": 1,
@@ -1456,31 +1440,31 @@
     },
     {
       "type": 0,
-      "value": "The purchases occur regardless of the asset's price and at regular intervals. In effect, this strategy removes much of the detailed work of attempting to time the market in order to make purchases of assets at the best prices."
+      "value": "Las compras ocurren independientemente del precio del activo y en intervalos regulares. En efecto, esta estrategia elimina gran parte del trabajo detallado de tratar de programar el mercado para hacer compras de activos a los mejores precios."
     }
   ],
   "V3QwUk": [
     {
       "type": 0,
-      "value": "Lump sum"
+      "value": "Suma de volcado"
     }
   ],
   "VdhnM+": [
     {
       "type": 0,
-      "value": "Swapped:"
+      "value": "Intercambiado:"
     }
   ],
   "Vm9A8k": [
     {
       "type": 0,
-      "value": "Deposited:"
+      "value": "Depositado:"
     }
   ],
   "VoFvlu": [
     {
       "type": 0,
-      "value": "Executes"
+      "value": "Ejecutar"
     }
   ],
   "VuSyBR": [
@@ -1522,43 +1506,43 @@
   "W6JmVw": [
     {
       "type": 0,
-      "value": "Seems like we encountered an error we could not handle"
+      "value": "Parece que hemos encontrado un error que no pudimos manejar"
     }
   ],
   "WaK61o": [
     {
       "type": 0,
-      "value": "The general sentiment of the crypto market"
+      "value": "El sentimiento general del mercado de criptomonedas"
     }
   ],
   "WetLa9": [
     {
       "type": 0,
-      "value": "No swaps yet"
+      "value": "Aún no hay swaps"
     }
   ],
   "X/B1lK": [
     {
       "type": 0,
-      "value": "let us know you encountered this error, it would be helpful to copy the error log with the button below and paste that in the message"
+      "value": "háganos saber que usted encontró este error, sería útil copiar el registro de errores con el botón de abajo y pegarlo en el mensaje"
     }
   ],
   "XOwvOZ": [
     {
       "type": 0,
-      "value": "You are migrating a position from a deprecated version of Mean Finance to the newest one."
+      "value": "Usted está migrando una posición de una versión obsoleta de Media Finanzas a la más reciente."
     }
   ],
   "XbrtpH": [
     {
       "type": 0,
-      "value": "All"
+      "value": "Todos"
     }
   ],
   "XjX4PP": [
     {
       "type": 0,
-      "value": "Withdraw "
+      "value": "Retirar "
     },
     {
       "type": 1,
@@ -1576,49 +1560,49 @@
   "XtV8h8": [
     {
       "type": 0,
-      "value": "Approve token"
+      "value": "Aprobar token"
     }
   ],
   "YRoLhe": [
     {
       "type": 0,
-      "value": "This will transfer your position, your NFT and all the liquidity stored in the position to the new address."
+      "value": "Esto transferirá su posición, su NFT y toda la liquidez almacenada en la posición a la nueva dirección."
     }
   ],
   "YWW6wc": [
     {
       "type": 0,
-      "value": "Oooops"
+      "value": "Vayas"
     }
   ],
   "YhEuCJ": [
     {
       "type": 0,
-      "value": "Withdraw"
+      "value": "Retirar"
     }
   ],
   "YmpFX8": [
     {
       "type": 0,
-      "value": "Your positions"
+      "value": "Tus posiciones"
     }
   ],
   "YpaT9e": [
     {
       "type": 0,
-      "value": "Compete on who has the most total value locked on Mean Finance. This includes both swapped and unswapped liquidity on your positions"
+      "value": "Compite en quién tiene el valor más total bloqueado en Media Finanzas. Esto incluye liquidez intercambiada y no cambiada en tus posiciones"
     }
   ],
   "ZATHUb": [
     {
       "type": 0,
-      "value": "Go to position"
+      "value": "Ir a la posición"
     }
   ],
   "ZAcmjS": [
     {
       "type": 0,
-      "value": "Switch to "
+      "value": "Cambiar a "
     },
     {
       "type": 1,
@@ -1628,25 +1612,25 @@
   "ZB9sn4": [
     {
       "type": 0,
-      "value": "FINISHED"
+      "value": "FINISHADO"
     }
   ],
   "ZBW4xA": [
     {
       "type": 0,
-      "value": "Is Mean Finance audited?"
+      "value": "¿Se auditan las finanzas medias?"
     }
   ],
   "ZCPyG3": [
     {
       "type": 0,
-      "value": "Unsupported method"
+      "value": "Método no soportado"
     }
   ],
   "ZDyEAS": [
     {
       "type": 0,
-      "value": "Your "
+      "value": "Tu transferencia de posición de "
     },
     {
       "type": 1,
@@ -1662,7 +1646,7 @@
     },
     {
       "type": 0,
-      "value": " position transfer to "
+      "value": " a "
     },
     {
       "type": 1,
@@ -1670,31 +1654,31 @@
     },
     {
       "type": 0,
-      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " ha sido enviada con éxito a la cadena de bloques y pronto será confirmada"
     }
   ],
   "ZIFOHu": [
     {
       "type": 0,
-      "value": "Position Transfered"
+      "value": "Posición Transferida"
     }
   ],
   "ZO613Q": [
     {
       "type": 0,
-      "value": "Position Modified"
+      "value": "Posición modificada"
     }
   ],
   "ZRhYby": [
     {
       "type": 0,
-      "value": "Why should I use Mean Finance?"
+      "value": "¿Por qué debo usar Mean Finance?"
     }
   ],
   "Zw7FaX": [
     {
       "type": 0,
-      "value": "You can only deposit with a minimum value of "
+      "value": "Solo puedes depositar con un valor mínimo de "
     },
     {
       "type": 1,
@@ -1708,37 +1692,37 @@
   "a+Yvwn": [
     {
       "type": 0,
-      "value": "Modifying their position"
+      "value": "Modificando su posición"
     }
   ],
   "aBc6K3": [
     {
       "type": 0,
-      "value": "Swaps are no longer going to be executed, you won't be able to make any new modifications to this position."
+      "value": "Los swaps ya no se van a ejecutar, no podrás hacer nuevas modificaciones a esta posición."
     }
   ],
   "aEQUw9": [
     {
       "type": 0,
-      "value": "fees section."
+      "value": "sección de tasas."
     }
   ],
   "aPrJJm": [
     {
       "type": 0,
-      "value": "Removed all permissions for"
+      "value": "Quitar todos los permisos para"
     }
   ],
   "agFL3X": [
     {
       "type": 0,
-      "value": "Create"
+      "value": "Crear"
     }
   ],
   "amTVUS": [
     {
       "type": 0,
-      "value": "Creating a position to swap "
+      "value": "Creando una posición para intercambiar "
     },
     {
       "type": 1,
@@ -1746,7 +1730,7 @@
     },
     {
       "type": 0,
-      "value": " to "
+      "value": " a "
     },
     {
       "type": 1,
@@ -1756,7 +1740,7 @@
   "aoHWJU": [
     {
       "type": 0,
-      "value": "In position: "
+      "value": "En posición: "
     },
     {
       "type": 1,
@@ -1774,43 +1758,43 @@
   "b6x2Rx": [
     {
       "type": 0,
-      "value": "Position Created"
+      "value": "Posición creada"
     }
   ],
   "bIgRS1": [
     {
       "type": 0,
-      "value": "There is no data available about this position yet"
+      "value": "Aún no hay datos disponibles sobre esta posición"
     }
   ],
   "bZG2wW": [
     {
       "type": 0,
-      "value": "Create position"
+      "value": "Crear posición"
     }
   ],
   "bdyKpA": [
     {
       "type": 0,
-      "value": "Timeline"
+      "value": "Línea de tiempo"
     }
   ],
   "bjS3bz": [
     {
       "type": 0,
-      "value": "Read about price oracle"
+      "value": "Lea sobre el oráculo de precios"
     }
   ],
   "c73eqf": [
     {
       "type": 0,
-      "value": "Error encountered"
+      "value": "Error encontrado"
     }
   ],
   "c9qXGP": [
     {
       "type": 0,
-      "value": "Migrating your "
+      "value": "Migrando tu posición "
     },
     {
       "type": 1,
@@ -1826,31 +1810,31 @@
     },
     {
       "type": 0,
-      "value": " position has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " ha sido enviada con éxito a la cadena de bloques y pronto será confirmada"
     }
   ],
   "cDcRwD": [
     {
       "type": 0,
-      "value": "Transfered to:"
+      "value": "Transferido a:"
     }
   ],
   "cDfs6q": [
     {
       "type": 0,
-      "value": "Set duration"
+      "value": "Definir duración"
     }
   ],
   "cESB9o": [
     {
       "type": 0,
-      "value": "Transaction sent!"
+      "value": "¡Transacción enviada!"
     }
   ],
   "dMaFCd": [
     {
       "type": 0,
-      "value": "Remaining:"
+      "value": "Restante:"
     }
   ],
   "dWCU9I": [
@@ -1870,43 +1854,43 @@
   "di6jKR": [
     {
       "type": 0,
-      "value": "You are disconnected from the net"
+      "value": "Estás desconectado de la red"
     }
   ],
   "e2q+Fu": [
     {
       "type": 0,
-      "value": "Frequency:"
+      "value": "Frecuencia:"
     }
   ],
   "enTSiQ": [
     {
       "type": 0,
-      "value": "Manage list & tokens"
+      "value": "Administrar lista y tokens"
     }
   ],
   "f++zf9": [
     {
       "type": 0,
-      "value": "Position finished"
+      "value": "Posición finalizada"
     }
   ],
   "f73Eff": [
     {
       "type": 0,
-      "value": "Your position will be terminated here and we will create a new one on"
+      "value": "Su posición será terminada aquí y crearemos una nueva en"
     }
   ],
   "fi6uGQ": [
     {
       "type": 0,
-      "value": "This position does not appear to be indexed yet"
+      "value": "Esta posición no parece estar indexada aún"
     }
   ],
   "ftX4Ln": [
     {
       "type": 0,
-      "value": "Setting your "
+      "value": "Establecer sus permisos de posición "
     },
     {
       "type": 1,
@@ -1922,13 +1906,13 @@
     },
     {
       "type": 0,
-      "value": " position permissions has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " se ha enviado correctamente a la cadena de bloques y se confirmará pronto"
     }
   ],
   "gIl4Bi": [
     {
       "type": 0,
-      "value": "Are you sure you want to withdraw "
+      "value": "¿Estás seguro de que quieres retirar "
     },
     {
       "type": 1,
@@ -1950,61 +1934,61 @@
   "gWebsb": [
     {
       "type": 0,
-      "value": "Set to what address you want to give permissions to"
+      "value": "Establecer a qué dirección quieres dar permisos"
     }
   ],
   "gadoJR": [
     {
       "type": 0,
-      "value": "Migrate position"
+      "value": "Migrar posición"
     }
   ],
   "gqaG8I": [
     {
       "type": 0,
-      "value": "Withdraw deposited"
+      "value": "Retiro depositado"
     }
   ],
   "gqiFWl": [
     {
       "type": 0,
-      "value": "Swapped:"
+      "value": "Intercambiado:"
     }
   ],
   "h2Jlvd": [
     {
       "type": 0,
-      "value": "Terminated positions"
+      "value": "Posiciones terminadas"
     }
   ],
   "h5NicW": [
     {
       "type": 0,
-      "value": "Swap Executed"
+      "value": "Intercambio Ejecutado"
     }
   ],
   "hUTWyY": [
     {
       "type": 0,
-      "value": "This allows the address to withdraw your swapped liquidity from your position"
+      "value": "Esto permite a la dirección retirar su liquidez intercambiada de su posición"
     }
   ],
   "haoCMr": [
     {
       "type": 0,
-      "value": "Calculating the cost of creating this position"
+      "value": "Calculando el costo de crear esta posición"
     }
   ],
   "hmyz7z": [
     {
       "type": 0,
-      "value": "This cannot be undone."
+      "value": "Esto no se puede deshacer."
     }
   ],
   "huUVCB": [
     {
       "type": 0,
-      "value": "You are the first person to create a position for this pair of tokens. Because of this, the gas cost is going to be higher than a normal position creation. This, however, will be a one time operation. Are you sure you want to create the "
+      "value": "Eres la primera persona en crear una posición para este par de tokens. Debido a ello, el coste del gas va a ser mayor que la creación de una posición normal. Esto, sin embargo, será una operación única. ¿Estás seguro de que quieres crear la posición "
     },
     {
       "type": 1,
@@ -2020,7 +2004,7 @@
     },
     {
       "type": 0,
-      "value": " position?"
+      "value": "?"
     }
   ],
   "i1xngQ": [
@@ -2056,73 +2040,73 @@
   "iUehtc": [
     {
       "type": 0,
-      "value": "We'll swap"
+      "value": "Intercambiaremos"
     }
   ],
   "iY28lu": [
     {
       "type": 0,
-      "value": "Do I need to pay any fees?"
+      "value": "¿Necesito pagar alguna cuota?"
     }
   ],
   "iZzIMa": [
     {
       "type": 0,
-      "value": "DEPRECATED"
+      "value": "DEPRECADO"
     }
   ],
   "iaCRAO": [
     {
       "type": 0,
-      "value": "Back to app"
+      "value": "Volver a la app"
     }
   ],
   "iijofU": [
     {
       "type": 0,
-      "value": "Terminate"
+      "value": "Terminar"
     }
   ],
   "ioNoF4": [
     {
       "type": 0,
-      "value": "Change duration and rate"
+      "value": "Cambiar duración y tasa"
     }
   ],
   "jKP6bq": [
     {
       "type": 0,
-      "value": "When do I need to pay gas fees?"
+      "value": "¿Cuándo necesito pagar las tasas de gas?"
     }
   ],
   "jPjwIW": [
     {
       "type": 0,
-      "value": "Low liquidity on pair"
+      "value": "Baja liquidez en par"
     }
   ],
   "jbb8PB": [
     {
       "type": 0,
-      "value": "And set what permissions to set for this address"
+      "value": "Y establezca qué permisos establecer para esta dirección"
     }
   ],
   "js69XA": [
     {
       "type": 0,
-      "value": "Cancel"
+      "value": "Cancelar"
     }
   ],
   "k7+HKZ": [
     {
       "type": 0,
-      "value": "Market price vs DCA price"
+      "value": "Precio de mercado vs precio DCA"
     }
   ],
   "k7UbIH": [
     {
       "type": 0,
-      "value": "Connected with "
+      "value": "Conectado con "
     },
     {
       "type": 1,
@@ -2132,49 +2116,49 @@
   "k9QmN/": [
     {
       "type": 0,
-      "value": "FINISHED"
+      "value": "FINISHADO"
     }
   ],
   "kNNrdH": [
     {
       "type": 0,
-      "value": "Mean Finance is the state-of-the-art DCA protocol. It enables you to set up actions like “Swap 10 USDC for WBTC every day, for 30 days”. You can create these actions between almost all ERC20 tokens, in the frequency of your choosing. These token swaps will then occur regardless of the asset's price and at regular intervals, reducing the impact of volatility on your investment."
+      "value": "Media Finance es el protocolo DCA de última generación, que le permite poner en marcha acciones como “Swap 10 USDC por WBTC todos los días, por 30 días”. Puede crear estas acciones entre casi todos los tokens ERC20, en la frecuencia de su elección. Estos swaps de tokens se producirán sin importar el precio del activo y en intervalos regulares, reduciendo el impacto de la volatilidad en su inversión."
     }
   ],
   "kS1Q7P": [
     {
       "type": 0,
-      "value": "from position"
+      "value": "desde la posición"
     }
   ],
   "kY2alH": [
     {
       "type": 0,
-      "value": "Save"
+      "value": "Guardar"
     }
   ],
   "kksiFn": [
     {
       "type": 0,
-      "value": "your position"
+      "value": "tu posición"
     }
   ],
   "l4VKpl": [
     {
       "type": 0,
-      "value": "The volume of the tokens involved in the swap"
+      "value": "El volumen de las fichas involucradas en el intercambio"
     }
   ],
   "l4oYE+": [
     {
       "type": 0,
-      "value": "Position Withdrawn"
+      "value": "Posición retirada"
     }
   ],
   "lJRhFc": [
     {
       "type": 0,
-      "value": "We'll return "
+      "value": "Te devolveremos "
     },
     {
       "type": 1,
@@ -2182,13 +2166,13 @@
     },
     {
       "type": 0,
-      "value": " to you and stop swapping this position"
+      "value": " y dejaremos de cambiar esta posición"
     }
   ],
   "lQ1Iy9": [
     {
       "type": 0,
-      "value": "Create position for "
+      "value": "Crear posición para "
     },
     {
       "type": 1,
@@ -2206,13 +2190,13 @@
   "lltepo": [
     {
       "type": 0,
-      "value": "STALE"
+      "value": "ESTABLECER"
     }
   ],
   "lnpkd2": [
     {
       "type": 0,
-      "value": "Withdraw "
+      "value": "Retirar "
     },
     {
       "type": 1,
@@ -2222,37 +2206,37 @@
   "lsm/sD": [
     {
       "type": 0,
-      "value": "You sell"
+      "value": "Ventas"
     }
   ],
   "m3YpJM": [
     {
       "type": 0,
-      "value": "How is the price calculated for each swap?"
+      "value": "¿Cómo se calcula el precio de cada swap?"
     }
   ],
   "mljOZT": [
     {
       "type": 0,
-      "value": "There is no data available about this pair"
+      "value": "No hay datos disponibles sobre este par"
     }
   ],
   "msqsvt": [
     {
       "type": 0,
-      "value": "and"
+      "value": "y"
     }
   ],
   "mz7RzW": [
     {
       "type": 0,
-      "value": "+ Add another wallet"
+      "value": "+ Añadir otra cartera"
     }
   ],
   "n5CC+1": [
     {
       "type": 0,
-      "value": "Your "
+      "value": "Su posición de terminación "
     },
     {
       "type": 1,
@@ -2268,31 +2252,31 @@
     },
     {
       "type": 0,
-      "value": " position termination has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " ha sido enviada con éxito a la cadena de bloques y será confirmada pronto"
     }
   ],
   "o0WR6j": [
     {
       "type": 0,
-      "value": "Creating this pair"
+      "value": "Creando este par"
     }
   ],
   "p3Xa0W": [
     {
       "type": 0,
-      "value": "Set to whom you want to transfer your position to"
+      "value": "Establecer a quien desea transferir su posición a"
     }
   ],
   "pc75Ig": [
     {
       "type": 0,
-      "value": "Come by to our"
+      "value": "Venga a nuestro"
     }
   ],
   "pgGJ91": [
     {
       "type": 0,
-      "value": "Receive"
+      "value": "Recibir"
     }
   ],
   "plg+Yp": [
@@ -2312,49 +2296,49 @@
   "pwMHax": [
     {
       "type": 0,
-      "value": "So it could happen that your swap is not executed within your specified frequency. If this were to happen to your position, remember that fees are only charged on swaps, so your balance will remain unaffected."
+      "value": "Así que puede suceder que su swap no se ejecute dentro de la frecuencia especificada. Si esto ocurriera con su posición, recuerde que las comisiones sólo se cobran en swaps, por lo que su saldo no se verá afectado."
     }
   ],
   "qC950V": [
     {
       "type": 0,
-      "value": "Mean Finance will allow you to perform DCA, in a gasless and decentralized fashion. This means:"
+      "value": "Las finanzas medias le permitirán realizar el DCA, de una manera sin gas y descentralizada. Esto significa:"
     }
   ],
   "qCw/BH": [
     {
       "type": 0,
-      "value": "Did you forget about your position? This are the addresses that have the most value to withdraw between their positions"
+      "value": "¿Has olvidado tu posición? Estas son las direcciones que tienen más valor para retirarse entre sus posiciones"
     }
   ],
   "qQYnqF": [
     {
       "type": 0,
-      "value": "The TRUE DCAOR is the one who's position has been set to run for the longest time"
+      "value": "El TRUE DCAOR es el que ha sido configurado para ejecutarse por el más largo tiempo"
     }
   ],
   "qTiaEE": [
     {
       "type": 0,
-      "value": "If you have just created the position, wait a few minutes and try again."
+      "value": "Si acabas de crear la posición, espera unos minutos e inténtalo de nuevo."
     }
   ],
   "qaVSQ/": [
     {
       "type": 0,
-      "value": "Market price"
+      "value": "Precio de mercado"
     }
   ],
   "qbwUnh": [
     {
       "type": 0,
-      "value": "Modifications"
+      "value": "Modificaciones"
     }
   ],
   "r0L/01": [
     {
       "type": 0,
-      "value": "Withdraw "
+      "value": "Retirar "
     },
     {
       "type": 1,
@@ -2362,7 +2346,7 @@
     },
     {
       "type": 0,
-      "value": " from "
+      "value": " desde la posición "
     },
     {
       "type": 1,
@@ -2375,16 +2359,12 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " position"
     }
   ],
   "r3H6D4": [
     {
       "type": 0,
-      "value": "You are not authorized to make this operation"
+      "value": "No está autorizado a realizar esta operación"
     }
   ],
   "rLAWQK": [
@@ -2404,13 +2384,13 @@
   "rxgILP": [
     {
       "type": 0,
-      "value": "What is Mean Finance?"
+      "value": "¿Qué es la financiación media?"
     }
   ],
   "s5i7V0": [
     {
       "type": 0,
-      "value": "Amount of swaps cannot be higher than "
+      "value": "La cantidad de swaps no puede ser superior a "
     },
     {
       "type": 1,
@@ -2420,19 +2400,19 @@
   "s7Q4TB": [
     {
       "type": 0,
-      "value": "Terminating their position"
+      "value": "Terminando su posición"
     }
   ],
   "sMTz8x": [
     {
       "type": 0,
-      "value": "Ongoing positions"
+      "value": "Posición en curso"
     }
   ],
   "t0oI3L": [
     {
       "type": 0,
-      "value": "You will get back "
+      "value": "Recibirás "
     },
     {
       "type": 1,
@@ -2448,7 +2428,7 @@
     },
     {
       "type": 0,
-      "value": " and "
+      "value": " y "
     },
     {
       "type": 1,
@@ -2466,43 +2446,43 @@
   "t2bZTZ": [
     {
       "type": 0,
-      "value": "Create position anyway"
+      "value": "Crear posición de todos modos"
     }
   ],
   "tAHtfP": [
     {
       "type": 0,
-      "value": "for that frequency. Are you sure you want to create a position?"
+      "value": "para esa frecuencia. ¿Está seguro de que desea crear una posición?"
     }
   ],
   "tHSyQw": [
     {
       "type": 0,
-      "value": "Add to position"
+      "value": "Añadir a la posición"
     }
   ],
   "tX40vS": [
     {
       "type": 0,
-      "value": "Users need to pay gas only when they interact with the positions. This includes:"
+      "value": "Los usuarios deben pagar gas sólo cuando interactúan con las posiciones. Esto incluye:"
     }
   ],
   "taCH+c": [
     {
       "type": 0,
-      "value": "Transfer"
+      "value": "Transferir"
     }
   ],
   "twerhs": [
     {
       "type": 0,
-      "value": "Max"
+      "value": "Máx"
     }
   ],
   "u/XTL7": [
     {
       "type": 0,
-      "value": "Create position"
+      "value": "Crear posición"
     }
   ],
   "u1/Pzc": [
@@ -2550,19 +2530,19 @@
   "uh6oE2": [
     {
       "type": 0,
-      "value": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+      "value": "Usted necesitará firmar primero un mensaje (que es sin costo) para aprobar nuestro contrato de Companion. Luego, usted tendrá que enviar la transacción donde recupere su saldo como ETH."
     }
   ],
   "vNNVGj": [
     {
       "type": 0,
-      "value": "For example, let’s assume that you’ve created a position that swaps 2000 USDC for ETH each day. Let’s also assume that, when the swap is executed, 2000 USDC = 1 ETH. Instead of getting 1 ETH, you would be getting 1 ETH - 0.6% = 0.994 ETH. That 0.6% will be split between Mean Finance and the user who actually executed the swap."
+      "value": "Por ejemplo, supongamos que ha creado una posición que cambia el USDC 2000 por ETH cada día. Supongamos también que, cuando se ejecuta el swap, 2000 USDC = 1 ETH. En lugar de obtener 1 ETH, obtendría 1 ETH - 0,6% = 0,994 ETH. % se dividirá entre Mediar Finanzas y el usuario que realmente ejecutó el swap."
     }
   ],
   "vVsvjq": [
     {
       "type": 0,
-      "value": "Withdraw as "
+      "value": "Retirar como "
     },
     {
       "type": 1,
@@ -2572,13 +2552,13 @@
   "vXfC3z": [
     {
       "type": 0,
-      "value": "You rejected the transaction"
+      "value": "Has rechazado la transacción"
     }
   ],
   "vy3jnS": [
     {
       "type": 0,
-      "value": "Transfer "
+      "value": "Posición de la transferencia "
     },
     {
       "type": 1,
@@ -2591,70 +2571,66 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " position"
     }
   ],
   "wEwpFI": [
     {
       "type": 0,
-      "value": "Create position"
+      "value": "Crear posición"
     }
   ],
   "wY55VA": [
     {
       "type": 0,
-      "value": "No deposit or withdrawal fees"
+      "value": "Sin cargos de depósito o retiro"
     }
   ],
   "wZ9OAC": [
     {
       "type": 0,
-      "value": "The popularity/demand of the tokens involved in the swap"
+      "value": "La popularidad/demanda de las fichas involucradas en el intercambio"
     }
   ],
   "wbAHBV": [
     {
       "type": 0,
-      "value": "TERMINATED"
+      "value": "TERMINADO"
     }
   ],
   "wzEneQ": [
     {
       "type": 0,
-      "value": "Close"
+      "value": "Cerrar"
     }
   ],
   "xTAANF": [
     {
       "type": 0,
-      "value": "This pair is"
+      "value": "Este par es"
     }
   ],
   "xurFDH": [
     {
       "type": 0,
-      "value": "Mean Finance"
+      "value": "Finanzas medias"
     }
   ],
   "xybHU6": [
     {
       "type": 0,
-      "value": "This cannot be undone."
+      "value": "Esto no se puede deshacer."
     }
   ],
   "y2BvnY": [
     {
       "type": 0,
-      "value": "Que es DCA?"
+      "value": "¿Qué es DCA?"
     }
   ],
   "z43qzX": [
     {
       "type": 0,
-      "value": "Connect Wallet"
+      "value": "Conectar cartera"
     }
   ],
   "zfveEm": [
@@ -2674,13 +2650,13 @@
   "zr2gP1": [
     {
       "type": 0,
-      "value": "Back to positions"
+      "value": "Volver a las posiciones"
     }
   ],
   "zwn/c2": [
     {
       "type": 0,
-      "value": "Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair."
+      "value": "Debido al bajo volumen, el oráculo del precio de este par puede no ser fiable o preciso, esto significa que los swaps pueden no ser ejecutados o ejecutados con precios incorrectos. Proceda con precaución o pruebe con otro par."
     }
   ]
 }
