@@ -12,7 +12,10 @@
     "test": "jest --config jest.config.ts",
     "prettier": "prettier --write --ignore-unknown ./src",
     "prepare-husky": "husky install",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "formatjs-extract": "formatjs extract 'src/**/*.ts*' --ignore='**/*.d.ts' --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
+    "formatjs-compile-en": "formatjs compile formatjs-compile lang/en.json --ast --out-file src/config/lang/en.json",
+    "formatjs-compile-es": "formatjs compile formatjs-compile lang/es.json --ast --out-file src/config/lang/es.json"
   },
   "repository": {
     "type": "git",

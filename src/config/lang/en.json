@@ -1,0 +1,2686 @@
+{
+  "+NIeZ0": [
+    {
+      "type": 0,
+      "value": "Token list"
+    }
+  ],
+  "+O0pfN": [
+    {
+      "type": 0,
+      "value": "here"
+    }
+  ],
+  "+UA1IX": [
+    {
+      "type": 0,
+      "value": "No account required"
+    }
+  ],
+  "+VGlht": [
+    {
+      "type": 0,
+      "value": "Waiting for your "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    },
+    {
+      "type": 0,
+      "value": " to be approved"
+    }
+  ],
+  "+s/1rR": [
+    {
+      "type": 0,
+      "value": "In wallet: "
+    },
+    {
+      "type": 1,
+      "value": "balance"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "+tYhzH": [
+    {
+      "type": 0,
+      "value": "How does Mean Finance work?"
+    }
+  ],
+  "//GmlN": [
+    {
+      "type": 0,
+      "value": "Timing the market can be extremely difficult. The goal of performing DCA is to reduce the overall impact of volatility on the price of the target asset; as the price will likely vary each time one of the periodic swaps is executed, the investment is not as highly subject to volatility. DCA aims to avoid making the mistake of making one lump-sum investment that is poorly timed with regard to asset pricing."
+    }
+  ],
+  "/0oLaV": [
+    {
+      "type": 0,
+      "value": "Setting or revoking permissions"
+    }
+  ],
+  "/LSdRt": [
+    {
+      "type": 0,
+      "value": "Users need to pay gas fees when interacting with their positions. At the same time, there is a protocol fee that is charged in each swap. That fee is currently 0.6%."
+    }
+  ],
+  "/gkMmp": [
+    {
+      "type": 0,
+      "value": "Insufficient funds"
+    }
+  ],
+  "00Lmy0": [
+    {
+      "type": 0,
+      "value": "Half"
+    }
+  ],
+  "0CdUh0": [
+    {
+      "type": 0,
+      "value": "Creating their position"
+    }
+  ],
+  "0aFe3m": [
+    {
+      "type": 0,
+      "value": "Transfered from:"
+    }
+  ],
+  "0dHtRR": [
+    {
+      "type": 0,
+      "value": "DCA price"
+    }
+  ],
+  "0t0iJb": [
+    {
+      "type": 0,
+      "value": "Migrating your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position"
+    }
+  ],
+  "19HyDE": [
+    {
+      "type": 0,
+      "value": "Approve "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "1HDQ5y": [
+    {
+      "type": 0,
+      "value": "How many "
+    },
+    {
+      "type": 1,
+      "value": "type"
+    },
+    {
+      "type": 0,
+      "value": "?"
+    }
+  ],
+  "2TSf/Q": [
+    {
+      "type": 0,
+      "value": "You don’t need to execute your swaps by yourself since Mean Finance incentivizes other users to execute swaps, for a profit. Now, these incentives can be affected by different factors:"
+    }
+  ],
+  "2l6dgp": [
+    {
+      "type": 0,
+      "value": "View on explorer"
+    }
+  ],
+  "4IAoDw": [
+    {
+      "type": 0,
+      "value": "("
+    },
+    {
+      "type": 1,
+      "value": "toPrice"
+    },
+    {
+      "type": 0,
+      "value": " USD)"
+    }
+  ],
+  "4ZFv5V": [
+    {
+      "type": 0,
+      "value": "Only tokens with created pairs"
+    }
+  ],
+  "4fwo65": [
+    {
+      "type": 1,
+      "value": "increaseDecrease"
+    },
+    {
+      "type": 0,
+      "value": " rate from "
+    },
+    {
+      "type": 1,
+      "value": "oldRate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " to "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "5B6pOD": [
+    {
+      "type": 0,
+      "value": "The general sentiment of the crypto market"
+    }
+  ],
+  "5CBYQl": [
+    {
+      "type": 0,
+      "value": "Setting your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position permissions"
+    }
+  ],
+  "5GXmRY": [
+    {
+      "type": 0,
+      "value": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+    }
+  ],
+  "5TdrSw": [
+    {
+      "type": 0,
+      "value": "but in the future we will support more on-chain oracles."
+    }
+  ],
+  "5aO6ef": [
+    {
+      "type": 1,
+      "value": "fromPrice"
+    },
+    {
+      "type": 0,
+      "value": " USD"
+    }
+  ],
+  "5q/G80": [
+    {
+      "type": 0,
+      "value": "Changed duration"
+    }
+  ],
+  "6OXLzE": [
+    {
+      "type": 0,
+      "value": "Terminate position"
+    }
+  ],
+  "6aAaI0": [
+    {
+      "type": 1,
+      "value": "toPrice"
+    },
+    {
+      "type": 0,
+      "value": " USD"
+    }
+  ],
+  "6lcY/P": [
+    {
+      "type": 0,
+      "value": "When will my position be swapped?"
+    }
+  ],
+  "7NwTX3": [
+    {
+      "type": 0,
+      "value": "Migrate position"
+    }
+  ],
+  "7S36Rv": [
+    {
+      "type": 0,
+      "value": "How much "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " do you want to invest?"
+    }
+  ],
+  "7gnUZ7": [
+    {
+      "type": 0,
+      "value": "Terminate"
+    }
+  ],
+  "7oK1Kh": [
+    {
+      "type": 0,
+      "value": "When a specific pair has some swaps that haven’t been executed in quite some time, the pair is signaled as stale."
+    }
+  ],
+  "8/zKxY": [
+    {
+      "type": 0,
+      "value": "Back"
+    }
+  ],
+  "81zTuv": [
+    {
+      "type": 0,
+      "value": "IN PROGRESS"
+    }
+  ],
+  "87RlBy": [
+    {
+      "type": 0,
+      "value": "Withdraw "
+    },
+    {
+      "type": 1,
+      "value": "wrappedProtocolToken"
+    }
+  ],
+  "8okGX/": [
+    {
+      "type": 0,
+      "value": "will only be able to"
+    }
+  ],
+  "8uwFtl": [
+    {
+      "type": 0,
+      "value": "We do not support this chain yet"
+    }
+  ],
+  "9RbwAu": [
+    {
+      "type": 0,
+      "value": "Terminate "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position"
+    }
+  ],
+  "9Rp/uO": [
+    {
+      "type": 0,
+      "value": "FAQ"
+    }
+  ],
+  "9Xjz4q": [
+    {
+      "type": 0,
+      "value": "This allows the address to terminate your position"
+    }
+  ],
+  "9ka/f/": [
+    {
+      "type": 0,
+      "value": "No "
+    },
+    {
+      "type": 1,
+      "value": "status"
+    },
+    {
+      "type": 0,
+      "value": " positions yet."
+    }
+  ],
+  "A7a2Lo": [
+    {
+      "type": 0,
+      "value": "Rate:"
+    }
+  ],
+  "ALg0aQ": [
+    {
+      "type": 0,
+      "value": "Swapped:"
+    }
+  ],
+  "AhEpzv": [
+    {
+      "type": 0,
+      "value": "This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones"
+    }
+  ],
+  "AiRKI+": [
+    {
+      "type": 0,
+      "value": "Withdraw swapped"
+    }
+  ],
+  "Ak27ll": [
+    {
+      "type": 1,
+      "value": "tokenNumber"
+    },
+    {
+      "type": 0,
+      "value": " tokens"
+    }
+  ],
+  "Akxy6C": [
+    {
+      "type": 0,
+      "value": "Withdraw "
+    },
+    {
+      "type": 1,
+      "value": "protocolToken"
+    }
+  ],
+  "AzL+qV": [
+    {
+      "type": 0,
+      "value": "Discard changes"
+    }
+  ],
+  "B+lMoB": [
+    {
+      "type": 0,
+      "value": "Additional information:"
+    }
+  ],
+  "B2rEXZ": [
+    {
+      "type": 0,
+      "value": "Approving use of "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "B5YHLB": [
+    {
+      "type": 1,
+      "value": "totalDepositted"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "B5YYgc": [
+    {
+      "type": 0,
+      "value": "Why is my position stale?"
+    }
+  ],
+  "BWP9H/": [
+    {
+      "type": 0,
+      "value": "Uniswap"
+    }
+  ],
+  "BZcZ2I": [
+    {
+      "type": 0,
+      "value": "When you set up a position, you are creating an intention to swap one token for the other. Then, some external user can come and execute the swap for you, honoring the desired frequency of course. When they execute your swap, you are charged a 0.6% fee on the amount that was swapped. This fee is then split between Mean Finance and the swapper. Since you don’t have to execute the swap by yourself, you don’t need to pay any gas."
+    }
+  ],
+  "Bh1aAA": [
+    {
+      "type": 0,
+      "value": "You will need to provide an aditional "
+    },
+    {
+      "type": 1,
+      "value": "addAmmount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "Bq70E5": [
+    {
+      "type": 0,
+      "value": "View on explorer"
+    }
+  ],
+  "BrtGyj": [
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " for you for"
+    }
+  ],
+  "BrtSAY": [
+    {
+      "type": 0,
+      "value": "Disconnect"
+    }
+  ],
+  "BsPq9s": [
+    {
+      "type": 0,
+      "value": "Compete on who has the most positions on Mean Finance"
+    }
+  ],
+  "Bxzkan": [
+    {
+      "type": 0,
+      "value": "The popularity/demand of the tokens involved in the swap"
+    }
+  ],
+  "C5Zkoh": [
+    {
+      "type": 0,
+      "value": "Transfering your position to "
+    },
+    {
+      "type": 1,
+      "value": "toAddress"
+    }
+  ],
+  "C5cDUK": [
+    {
+      "type": 0,
+      "value": "Remaining:"
+    }
+  ],
+  "CUp6QA": [
+    {
+      "type": 1,
+      "value": "type"
+    },
+    {
+      "type": 0,
+      "value": " left"
+    }
+  ],
+  "CZmJ1O": [
+    {
+      "type": 0,
+      "value": "Modify position"
+    }
+  ],
+  "Cxag1C": [
+    {
+      "type": 0,
+      "value": "View your positions"
+    }
+  ],
+  "CyXVN7": [
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    }
+  ],
+  "DaGzbO": [
+    {
+      "type": 0,
+      "value": "Unknown error: "
+    },
+    {
+      "type": 1,
+      "value": "message"
+    }
+  ],
+  "Do1Kxz": [
+    {
+      "type": 0,
+      "value": "Recent transactions"
+    }
+  ],
+  "E5yqT8": [
+    {
+      "type": 0,
+      "value": "Position Terminated"
+    }
+  ],
+  "E6P1+X": [
+    {
+      "type": 0,
+      "value": "Swaps"
+    }
+  ],
+  "E9JRmw": [
+    {
+      "type": 0,
+      "value": "Get "
+    },
+    {
+      "type": 1,
+      "value": "wrappedProtocolToken"
+    },
+    {
+      "type": 0,
+      "value": " as "
+    },
+    {
+      "type": 1,
+      "value": "protocolToken"
+    },
+    {
+      "type": 0,
+      "value": " instead"
+    }
+  ],
+  "EJMVdh": [
+    {
+      "type": 0,
+      "value": "Changing your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position rate to swap "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequencyType"
+    },
+    {
+      "type": 0,
+      "value": " for "
+    },
+    {
+      "type": 1,
+      "value": "frequencyTypePlural"
+    },
+    {
+      "type": 0,
+      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+    }
+  ],
+  "ER8GVt": [
+    {
+      "type": 0,
+      "value": "Your withdrawal of "
+    },
+    {
+      "type": 1,
+      "value": "toSymbol"
+    },
+    {
+      "type": 0,
+      "value": " from your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position has been succesfully submitted to the blockchain and will be confirmed soon"
+    }
+  ],
+  "EeY1Iw": [
+    {
+      "type": 0,
+      "value": "Run for:"
+    }
+  ],
+  "Eo86hF": [
+    {
+      "type": 0,
+      "value": "Permissions on your position:"
+    }
+  ],
+  "Es2JRi": [
+    {
+      "type": 0,
+      "value": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary ETH."
+    }
+  ],
+  "EzTqXK": [
+    {
+      "type": 0,
+      "value": "View permissions"
+    }
+  ],
+  "F5F9dl": [
+    {
+      "type": 0,
+      "value": "Transfer position"
+    }
+  ],
+  "FW4Fp5": [
+    {
+      "type": 0,
+      "value": "Get "
+    },
+    {
+      "type": 1,
+      "value": "protocolToken"
+    },
+    {
+      "type": 0,
+      "value": " as "
+    },
+    {
+      "type": 1,
+      "value": "wrappedProtocolToken"
+    },
+    {
+      "type": 0,
+      "value": " instead"
+    }
+  ],
+  "FfyCRZ": [
+    {
+      "type": 0,
+      "value": "stale"
+    }
+  ],
+  "FlMmaB": [
+    {
+      "type": 0,
+      "value": "Waiting for confirmation"
+    }
+  ],
+  "FwDtZA": [
+    {
+      "type": 0,
+      "value": "Positions"
+    }
+  ],
+  "G0w2LI": [
+    {
+      "type": 0,
+      "value": "Docs"
+    }
+  ],
+  "GChBDN": [
+    {
+      "type": 0,
+      "value": "Change network to "
+    },
+    {
+      "type": 1,
+      "value": "network"
+    }
+  ],
+  "GFyhCr": [
+    {
+      "type": 0,
+      "value": "You are disconnected from the net"
+    }
+  ],
+  "GQoxnF": [
+    {
+      "type": 0,
+      "value": "All "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " balance will be sent to you and all "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " balance will be used to create a new position with the same rate and remaining swaps."
+    }
+  ],
+  "GoFOv6": [
+    {
+      "type": 0,
+      "value": "Changing your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position rate to swap "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequencyType"
+    },
+    {
+      "type": 0,
+      "value": " for "
+    },
+    {
+      "type": 1,
+      "value": "frequencyTypePlural"
+    }
+  ],
+  "Gvb3qN": [
+    {
+      "type": 0,
+      "value": "End users don’t have to pay gas fees when the swaps are executed."
+    }
+  ],
+  "Gzs80Q": [
+    {
+      "type": 0,
+      "value": "Rate:"
+    }
+  ],
+  "Hbiw7t": [
+    {
+      "type": 0,
+      "value": "For more information, feel free to check our"
+    }
+  ],
+  "HuMusT": [
+    {
+      "type": 0,
+      "value": "Withdraw funds"
+    }
+  ],
+  "I0PpAd": [
+    {
+      "type": 0,
+      "value": "Average buy price:"
+    }
+  ],
+  "ILcAj5": [
+    {
+      "type": 0,
+      "value": "Change duration"
+    }
+  ],
+  "IUxcS/": [
+    {
+      "type": 0,
+      "value": "for "
+    },
+    {
+      "type": 1,
+      "value": "result"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "IrR4U4": [
+    {
+      "type": 0,
+      "value": "Stale"
+    }
+  ],
+  "ItXuIA": [
+    {
+      "type": 0,
+      "value": "Change duration and rate"
+    }
+  ],
+  "IuW2wC": [
+    {
+      "type": 0,
+      "value": "Withdrawing "
+    },
+    {
+      "type": 1,
+      "value": "toSymbol"
+    }
+  ],
+  "J4ZbBX": [
+    {
+      "type": 0,
+      "value": "No trading limits"
+    }
+  ],
+  "J9ovKV": [
+    {
+      "type": 0,
+      "value": "You receive"
+    }
+  ],
+  "JG8+vM": [
+    {
+      "type": 0,
+      "value": "Generated"
+    }
+  ],
+  "JPkF9Y": [
+    {
+      "type": 0,
+      "value": "Terminated"
+    }
+  ],
+  "Jh14HF": [
+    {
+      "type": 0,
+      "value": "This cannot be undone."
+    }
+  ],
+  "K/HInO": [
+    {
+      "type": 0,
+      "value": "This allows the address to decrease the funds and modify the duration of your position"
+    }
+  ],
+  "KAw6CL": [
+    {
+      "type": 0,
+      "value": "Mean Finance incentivizes other users to execute swaps, for a profit. Now, these incentives can be affected by different factors:"
+    }
+  ],
+  "KK9T66": [
+    {
+      "type": 0,
+      "value": "Rate Modified"
+    }
+  ],
+  "KKIhxJ": [
+    {
+      "type": 0,
+      "value": "Set to run for:"
+    }
+  ],
+  "KmmquQ": [
+    {
+      "type": 0,
+      "value": "Select a pair to view its price history"
+    }
+  ],
+  "KpQxqG": [
+    {
+      "type": 0,
+      "value": "We'll swap "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " for "
+    },
+    {
+      "type": 1,
+      "value": "frequencyPlural"
+    },
+    {
+      "type": 0,
+      "value": " for you"
+    }
+  ],
+  "KwWbnt": [
+    {
+      "type": 0,
+      "value": "DCA"
+    }
+  ],
+  "KxGrUy": [
+    {
+      "type": 0,
+      "value": "Add permissions for new address"
+    }
+  ],
+  "LJHU2o": [
+    {
+      "type": 0,
+      "value": "Withdraws"
+    }
+  ],
+  "LLaqNx": [
+    {
+      "type": 0,
+      "value": "The volume of the tokens involved in the swap"
+    }
+  ],
+  "LQR2sQ": [
+    {
+      "type": 0,
+      "value": "This allows the address to increase the funds and modify the duration of your position"
+    }
+  ],
+  "LbRNWF": [
+    {
+      "type": 0,
+      "value": "Migrate "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position"
+    }
+  ],
+  "LqWNDv": [
+    {
+      "type": 0,
+      "value": "Add new address"
+    }
+  ],
+  "MCA6GY": [
+    {
+      "type": 1,
+      "value": "increaseDecrease"
+    },
+    {
+      "type": 0,
+      "value": " duration to run for "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " from "
+    },
+    {
+      "type": 1,
+      "value": "oldFrequency"
+    }
+  ],
+  "MV0UQs": [
+    {
+      "type": 0,
+      "value": "To withdraw:"
+    }
+  ],
+  "NPuJa6": [
+    {
+      "type": 0,
+      "value": "Mean Finance contracts have been audited by Pessimistic and PeckShield. You can read the reports"
+    }
+  ],
+  "NXDtFv": [
+    {
+      "type": 0,
+      "value": "Your position creation to swap "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " to "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+    }
+  ],
+  "Nh6p/v": [
+    {
+      "type": 0,
+      "value": "To withdraw:"
+    }
+  ],
+  "Nha1kE": [
+    {
+      "type": 0,
+      "value": "Pending transaction"
+    }
+  ],
+  "NpsctG": [
+    {
+      "type": 0,
+      "value": "Open positions"
+    }
+  ],
+  "NxEUb6": [
+    {
+      "type": 0,
+      "value": "Position settings"
+    }
+  ],
+  "OAyRMn": [
+    {
+      "type": 0,
+      "value": "Reuse position"
+    }
+  ],
+  "OalKNY": [
+    {
+      "type": 0,
+      "value": "Compete on who has the most traded volume locked on Mean Finance. This includes swapped liquidity on your positions"
+    }
+  ],
+  "OnZ2T/": [
+    {
+      "type": 0,
+      "value": "Tokens in your wallet"
+    }
+  ],
+  "Oo1GS9": [
+    {
+      "type": 0,
+      "value": "Terminating your position"
+    }
+  ],
+  "OqTl06": [
+    {
+      "type": 0,
+      "value": "We do not support this pair"
+    }
+  ],
+  "OttW6a": [
+    {
+      "type": 0,
+      "value": "We will return "
+    },
+    {
+      "type": 1,
+      "value": "returnAmmount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " to you"
+    }
+  ],
+  "POGYlh": [
+    {
+      "type": 0,
+      "value": "Position permissions modified"
+    }
+  ],
+  "PwFUUt": [
+    {
+      "type": 0,
+      "value": "Sell"
+    }
+  ],
+  "Q36Jtl": [
+    {
+      "type": 0,
+      "value": "Next"
+    }
+  ],
+  "QCZdI3": [
+    {
+      "type": 0,
+      "value": "Set position"
+    }
+  ],
+  "QYjgIw": [
+    {
+      "type": 0,
+      "value": "Current: "
+    },
+    {
+      "type": 1,
+      "value": "type"
+    },
+    {
+      "type": 0,
+      "value": " left"
+    }
+  ],
+  "Qe8t1L": [
+    {
+      "type": 0,
+      "value": "Connect wallet"
+    }
+  ],
+  "Qes1qB": [
+    {
+      "type": 0,
+      "value": "DCA vs Lump sum"
+    }
+  ],
+  "QkC4KE": [
+    {
+      "type": 0,
+      "value": "This was due to: "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "Qp2So2": [
+    {
+      "type": 0,
+      "value": "Add funds"
+    }
+  ],
+  "RXcwxI": [
+    {
+      "type": 0,
+      "value": "Mean Finance relies on on-chain oracles to determine the price at the moment of the swap. Right now Mean Finance uses"
+    }
+  ],
+  "RcB3pW": [
+    {
+      "type": 0,
+      "value": "Approving use of "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+    }
+  ],
+  "RyEoxs": [
+    {
+      "type": 0,
+      "value": "Wallet settings"
+    }
+  ],
+  "S2QomY": [
+    {
+      "type": 0,
+      "value": "Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."
+    }
+  ],
+  "S2dFpy": [
+    {
+      "type": 0,
+      "value": "COPY ERROR LOG"
+    }
+  ],
+  "S4SLAq": [
+    {
+      "type": 0,
+      "value": "Since swaps are executed by external users, they can decide when to execute them. For example, let’s assume that you had created a position with daily swaps. This means that from 00 AM UTC to 11.59 PM UTC, your position can only be executed once. Once it is executed, it can't be executed again until 00 AM of the following day. The same happens with other frequencies, such as weekly or monthly."
+    }
+  ],
+  "SNN905": [
+    {
+      "type": 0,
+      "value": "For more information, feel free to check our"
+    }
+  ],
+  "SwiTok": [
+    {
+      "type": 0,
+      "value": "Withdrawing balance from their position"
+    }
+  ],
+  "Ti+ws9": [
+    {
+      "type": 0,
+      "value": "What does it mean for a pair to be stale?"
+    }
+  ],
+  "Tj1jig": [
+    {
+      "type": 1,
+      "value": "toPrice"
+    },
+    {
+      "type": 0,
+      "value": " USD"
+    }
+  ],
+  "UHHRwl": [
+    {
+      "type": 0,
+      "value": "Add address"
+    }
+  ],
+  "UhD0bk": [
+    {
+      "type": 0,
+      "value": "Confirm this transaction in your wallet"
+    }
+  ],
+  "Umk6mn": [
+    {
+      "type": 0,
+      "value": "View NFT"
+    }
+  ],
+  "UpJRc6": [
+    {
+      "type": 0,
+      "value": "View summary"
+    }
+  ],
+  "V314M5": [
+    {
+      "type": 0,
+      "value": "Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period while neutralizing the short-term volatility in the market."
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "The purchases occur regardless of the asset's price and at regular intervals. In effect, this strategy removes much of the detailed work of attempting to time the market in order to make purchases of assets at the best prices."
+    }
+  ],
+  "V3QwUk": [
+    {
+      "type": 0,
+      "value": "Lump sum"
+    }
+  ],
+  "VdhnM+": [
+    {
+      "type": 0,
+      "value": "Swapped:"
+    }
+  ],
+  "Vm9A8k": [
+    {
+      "type": 0,
+      "value": "Deposited:"
+    }
+  ],
+  "VoFvlu": [
+    {
+      "type": 0,
+      "value": "Executes"
+    }
+  ],
+  "VuSyBR": [
+    {
+      "type": 1,
+      "value": "frequency"
+    }
+  ],
+  "VuiHqN": [
+    {
+      "type": 0,
+      "value": "1 "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " = "
+    },
+    {
+      "type": 1,
+      "value": "currencySymbol"
+    },
+    {
+      "type": 1,
+      "value": "swapRate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "W6JmVw": [
+    {
+      "type": 0,
+      "value": "Seems like we encountered an error we could not handle"
+    }
+  ],
+  "WaK61o": [
+    {
+      "type": 0,
+      "value": "The general sentiment of the crypto market"
+    }
+  ],
+  "WetLa9": [
+    {
+      "type": 0,
+      "value": "No swaps yet"
+    }
+  ],
+  "X/B1lK": [
+    {
+      "type": 0,
+      "value": "let us know you encountered this error, it would be helpful to copy the error log with the button below and paste that in the message"
+    }
+  ],
+  "XOwvOZ": [
+    {
+      "type": 0,
+      "value": "You are migrating a position from a deprecated version of Mean Finance to the newest one."
+    }
+  ],
+  "XbrtpH": [
+    {
+      "type": 0,
+      "value": "All"
+    }
+  ],
+  "XjX4PP": [
+    {
+      "type": 0,
+      "value": "Withdraw "
+    },
+    {
+      "type": 1,
+      "value": "withdraw"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "XtV8h8": [
+    {
+      "type": 0,
+      "value": "Approve token"
+    }
+  ],
+  "YRoLhe": [
+    {
+      "type": 0,
+      "value": "This will transfer your position, your NFT and all the liquidity stored in the position to the new address."
+    }
+  ],
+  "YWW6wc": [
+    {
+      "type": 0,
+      "value": "Oooops"
+    }
+  ],
+  "YhEuCJ": [
+    {
+      "type": 0,
+      "value": "Withdraw"
+    }
+  ],
+  "YmpFX8": [
+    {
+      "type": 0,
+      "value": "Your positions"
+    }
+  ],
+  "YpaT9e": [
+    {
+      "type": 0,
+      "value": "Compete on who has the most total value locked on Mean Finance. This includes both swapped and unswapped liquidity on your positions"
+    }
+  ],
+  "ZATHUb": [
+    {
+      "type": 0,
+      "value": "Go to position"
+    }
+  ],
+  "ZAcmjS": [
+    {
+      "type": 0,
+      "value": "Switch to "
+    },
+    {
+      "type": 1,
+      "value": "network"
+    }
+  ],
+  "ZB9sn4": [
+    {
+      "type": 0,
+      "value": "FINISHED"
+    }
+  ],
+  "ZBW4xA": [
+    {
+      "type": 0,
+      "value": "Is Mean Finance audited?"
+    }
+  ],
+  "ZCPyG3": [
+    {
+      "type": 0,
+      "value": "Unsupported method"
+    }
+  ],
+  "ZDyEAS": [
+    {
+      "type": 0,
+      "value": "Your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position transfer to "
+    },
+    {
+      "type": 1,
+      "value": "toAddress"
+    },
+    {
+      "type": 0,
+      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+    }
+  ],
+  "ZIFOHu": [
+    {
+      "type": 0,
+      "value": "Position Transfered"
+    }
+  ],
+  "ZO613Q": [
+    {
+      "type": 0,
+      "value": "Position Modified"
+    }
+  ],
+  "ZRhYby": [
+    {
+      "type": 0,
+      "value": "Why should I use Mean Finance?"
+    }
+  ],
+  "Zw7FaX": [
+    {
+      "type": 0,
+      "value": "You can only deposit with a minimum value of "
+    },
+    {
+      "type": 1,
+      "value": "value"
+    },
+    {
+      "type": 0,
+      "value": " USD"
+    }
+  ],
+  "a+Yvwn": [
+    {
+      "type": 0,
+      "value": "Modifying their position"
+    }
+  ],
+  "aBc6K3": [
+    {
+      "type": 0,
+      "value": "Swaps are no longer going to be executed, you won't be able to make any new modifications to this position."
+    }
+  ],
+  "aEQUw9": [
+    {
+      "type": 0,
+      "value": "fees section."
+    }
+  ],
+  "aPrJJm": [
+    {
+      "type": 0,
+      "value": "Removed all permissions for"
+    }
+  ],
+  "agFL3X": [
+    {
+      "type": 0,
+      "value": "Create"
+    }
+  ],
+  "amTVUS": [
+    {
+      "type": 0,
+      "value": "Creating a position to swap "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " to "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "aoHWJU": [
+    {
+      "type": 0,
+      "value": "In position: "
+    },
+    {
+      "type": 1,
+      "value": "balance"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "b6x2Rx": [
+    {
+      "type": 0,
+      "value": "Position Created"
+    }
+  ],
+  "bIgRS1": [
+    {
+      "type": 0,
+      "value": "There is no data available about this position yet"
+    }
+  ],
+  "bZG2wW": [
+    {
+      "type": 0,
+      "value": "Create position"
+    }
+  ],
+  "bdyKpA": [
+    {
+      "type": 0,
+      "value": "Timeline"
+    }
+  ],
+  "bjS3bz": [
+    {
+      "type": 0,
+      "value": "Read about price oracle"
+    }
+  ],
+  "c73eqf": [
+    {
+      "type": 0,
+      "value": "Error encountered"
+    }
+  ],
+  "c9qXGP": [
+    {
+      "type": 0,
+      "value": "Migrating your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position has been succesfully submitted to the blockchain and will be confirmed soon"
+    }
+  ],
+  "cDcRwD": [
+    {
+      "type": 0,
+      "value": "Transfered to:"
+    }
+  ],
+  "cDfs6q": [
+    {
+      "type": 0,
+      "value": "Set duration"
+    }
+  ],
+  "cESB9o": [
+    {
+      "type": 0,
+      "value": "Transaction sent!"
+    }
+  ],
+  "dMaFCd": [
+    {
+      "type": 0,
+      "value": "Remaining:"
+    }
+  ],
+  "dWCU9I": [
+    {
+      "type": 1,
+      "value": "swapped"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "di6jKR": [
+    {
+      "type": 0,
+      "value": "You are disconnected from the net"
+    }
+  ],
+  "e2q+Fu": [
+    {
+      "type": 0,
+      "value": "Frequency:"
+    }
+  ],
+  "enTSiQ": [
+    {
+      "type": 0,
+      "value": "Manage list & tokens"
+    }
+  ],
+  "f++zf9": [
+    {
+      "type": 0,
+      "value": "Position finished"
+    }
+  ],
+  "f73Eff": [
+    {
+      "type": 0,
+      "value": "Your position will be terminated here and we will create a new one on"
+    }
+  ],
+  "fi6uGQ": [
+    {
+      "type": 0,
+      "value": "This position does not appear to be indexed yet"
+    }
+  ],
+  "ftX4Ln": [
+    {
+      "type": 0,
+      "value": "Setting your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position permissions has been succesfully submitted to the blockchain and will be confirmed soon"
+    }
+  ],
+  "gIl4Bi": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to withdraw "
+    },
+    {
+      "type": 1,
+      "value": "ammount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": "?"
+    }
+  ],
+  "gWebsb": [
+    {
+      "type": 0,
+      "value": "Set to what address you want to give permissions to"
+    }
+  ],
+  "gadoJR": [
+    {
+      "type": 0,
+      "value": "Migrate position"
+    }
+  ],
+  "gqaG8I": [
+    {
+      "type": 0,
+      "value": "Withdraw deposited"
+    }
+  ],
+  "gqiFWl": [
+    {
+      "type": 0,
+      "value": "Swapped:"
+    }
+  ],
+  "h2Jlvd": [
+    {
+      "type": 0,
+      "value": "Terminated positions"
+    }
+  ],
+  "h5NicW": [
+    {
+      "type": 0,
+      "value": "Swap Executed"
+    }
+  ],
+  "hUTWyY": [
+    {
+      "type": 0,
+      "value": "This allows the address to withdraw your swapped liquidity from your position"
+    }
+  ],
+  "haoCMr": [
+    {
+      "type": 0,
+      "value": "Calculating the cost of creating this position"
+    }
+  ],
+  "hmyz7z": [
+    {
+      "type": 0,
+      "value": "This cannot be undone."
+    }
+  ],
+  "huUVCB": [
+    {
+      "type": 0,
+      "value": "You are the first person to create a position for this pair of tokens. Because of this, the gas cost is going to be higher than a normal position creation. This, however, will be a one time operation. Are you sure you want to create the "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position?"
+    }
+  ],
+  "i1xngQ": [
+    {
+      "type": 0,
+      "value": "1 "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " = "
+    },
+    {
+      "type": 1,
+      "value": "currencySymbol"
+    },
+    {
+      "type": 1,
+      "value": "average"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "iUehtc": [
+    {
+      "type": 0,
+      "value": "We'll swap"
+    }
+  ],
+  "iY28lu": [
+    {
+      "type": 0,
+      "value": "Do I need to pay any fees?"
+    }
+  ],
+  "iZzIMa": [
+    {
+      "type": 0,
+      "value": "DEPRECATED"
+    }
+  ],
+  "iaCRAO": [
+    {
+      "type": 0,
+      "value": "Back to app"
+    }
+  ],
+  "iijofU": [
+    {
+      "type": 0,
+      "value": "Terminate"
+    }
+  ],
+  "ioNoF4": [
+    {
+      "type": 0,
+      "value": "Change duration and rate"
+    }
+  ],
+  "jKP6bq": [
+    {
+      "type": 0,
+      "value": "When do I need to pay gas fees?"
+    }
+  ],
+  "jPjwIW": [
+    {
+      "type": 0,
+      "value": "Low liquidity on pair"
+    }
+  ],
+  "jbb8PB": [
+    {
+      "type": 0,
+      "value": "And set what permissions to set for this address"
+    }
+  ],
+  "js69XA": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "k7+HKZ": [
+    {
+      "type": 0,
+      "value": "Market price vs DCA price"
+    }
+  ],
+  "k7UbIH": [
+    {
+      "type": 0,
+      "value": "Connected with "
+    },
+    {
+      "type": 1,
+      "value": "provider"
+    }
+  ],
+  "k9QmN/": [
+    {
+      "type": 0,
+      "value": "FINISHED"
+    }
+  ],
+  "kNNrdH": [
+    {
+      "type": 0,
+      "value": "Mean Finance is the state-of-the-art DCA protocol. It enables you to set up actions like “Swap 10 USDC for WBTC every day, for 30 days”. You can create these actions between almost all ERC20 tokens, in the frequency of your choosing. These token swaps will then occur regardless of the asset's price and at regular intervals, reducing the impact of volatility on your investment."
+    }
+  ],
+  "kS1Q7P": [
+    {
+      "type": 0,
+      "value": "from position"
+    }
+  ],
+  "kY2alH": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
+  "kksiFn": [
+    {
+      "type": 0,
+      "value": "your position"
+    }
+  ],
+  "l4VKpl": [
+    {
+      "type": 0,
+      "value": "The volume of the tokens involved in the swap"
+    }
+  ],
+  "l4oYE+": [
+    {
+      "type": 0,
+      "value": "Position Withdrawn"
+    }
+  ],
+  "lJRhFc": [
+    {
+      "type": 0,
+      "value": "We'll return "
+    },
+    {
+      "type": 1,
+      "value": "fromValue"
+    },
+    {
+      "type": 0,
+      "value": " to you and stop swapping this position"
+    }
+  ],
+  "lQ1Iy9": [
+    {
+      "type": 0,
+      "value": "Create position for "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "lltepo": [
+    {
+      "type": 0,
+      "value": "STALE"
+    }
+  ],
+  "lnpkd2": [
+    {
+      "type": 0,
+      "value": "Withdraw "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "lsm/sD": [
+    {
+      "type": 0,
+      "value": "You sell"
+    }
+  ],
+  "m3YpJM": [
+    {
+      "type": 0,
+      "value": "How is the price calculated for each swap?"
+    }
+  ],
+  "mljOZT": [
+    {
+      "type": 0,
+      "value": "There is no data available about this pair"
+    }
+  ],
+  "msqsvt": [
+    {
+      "type": 0,
+      "value": "and"
+    }
+  ],
+  "mz7RzW": [
+    {
+      "type": 0,
+      "value": "+ Add another wallet"
+    }
+  ],
+  "n5CC+1": [
+    {
+      "type": 0,
+      "value": "Your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position termination has been succesfully submitted to the blockchain and will be confirmed soon"
+    }
+  ],
+  "o0WR6j": [
+    {
+      "type": 0,
+      "value": "Creating this pair"
+    }
+  ],
+  "p3Xa0W": [
+    {
+      "type": 0,
+      "value": "Set to whom you want to transfer your position to"
+    }
+  ],
+  "pc75Ig": [
+    {
+      "type": 0,
+      "value": "Come by to our"
+    }
+  ],
+  "pgGJ91": [
+    {
+      "type": 0,
+      "value": "Receive"
+    }
+  ],
+  "plg+Yp": [
+    {
+      "type": 0,
+      "value": "("
+    },
+    {
+      "type": 1,
+      "value": "toPrice"
+    },
+    {
+      "type": 0,
+      "value": " USD)"
+    }
+  ],
+  "pwMHax": [
+    {
+      "type": 0,
+      "value": "So it could happen that your swap is not executed within your specified frequency. If this were to happen to your position, remember that fees are only charged on swaps, so your balance will remain unaffected."
+    }
+  ],
+  "qC950V": [
+    {
+      "type": 0,
+      "value": "Mean Finance will allow you to perform DCA, in a gasless and decentralized fashion. This means:"
+    }
+  ],
+  "qCw/BH": [
+    {
+      "type": 0,
+      "value": "Did you forget about your position? This are the addresses that have the most value to withdraw between their positions"
+    }
+  ],
+  "qQYnqF": [
+    {
+      "type": 0,
+      "value": "The TRUE DCAOR is the one who's position has been set to run for the longest time"
+    }
+  ],
+  "qTiaEE": [
+    {
+      "type": 0,
+      "value": "If you have just created the position, wait a few minutes and try again."
+    }
+  ],
+  "qaVSQ/": [
+    {
+      "type": 0,
+      "value": "Market price"
+    }
+  ],
+  "qbwUnh": [
+    {
+      "type": 0,
+      "value": "Modifications"
+    }
+  ],
+  "r0L/01": [
+    {
+      "type": 0,
+      "value": "Withdraw "
+    },
+    {
+      "type": 1,
+      "value": "toSymbol"
+    },
+    {
+      "type": 0,
+      "value": " from "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position"
+    }
+  ],
+  "r3H6D4": [
+    {
+      "type": 0,
+      "value": "You are not authorized to make this operation"
+    }
+  ],
+  "rLAWQK": [
+    {
+      "type": 1,
+      "value": "funds"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "rxgILP": [
+    {
+      "type": 0,
+      "value": "What is Mean Finance?"
+    }
+  ],
+  "s5i7V0": [
+    {
+      "type": 0,
+      "value": "Amount of swaps cannot be higher than "
+    },
+    {
+      "type": 1,
+      "value": "MAX_UINT_32"
+    }
+  ],
+  "s7Q4TB": [
+    {
+      "type": 0,
+      "value": "Terminating their position"
+    }
+  ],
+  "sMTz8x": [
+    {
+      "type": 0,
+      "value": "Ongoing positions"
+    }
+  ],
+  "t0oI3L": [
+    {
+      "type": 0,
+      "value": "You will get back "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "fromSymbol"
+    },
+    {
+      "type": 0,
+      "value": " and "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "toSymbol"
+    }
+  ],
+  "t2bZTZ": [
+    {
+      "type": 0,
+      "value": "Create position anyway"
+    }
+  ],
+  "tAHtfP": [
+    {
+      "type": 0,
+      "value": "for that frequency. Are you sure you want to create a position?"
+    }
+  ],
+  "tHSyQw": [
+    {
+      "type": 0,
+      "value": "Add to position"
+    }
+  ],
+  "tX40vS": [
+    {
+      "type": 0,
+      "value": "Users need to pay gas only when they interact with the positions. This includes:"
+    }
+  ],
+  "taCH+c": [
+    {
+      "type": 0,
+      "value": "Transfer"
+    }
+  ],
+  "twerhs": [
+    {
+      "type": 0,
+      "value": "Max"
+    }
+  ],
+  "u/XTL7": [
+    {
+      "type": 0,
+      "value": "Create position"
+    }
+  ],
+  "u1/Pzc": [
+    {
+      "type": 1,
+      "value": "remainingLiquidity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "uh6oE2": [
+    {
+      "type": 0,
+      "value": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+    }
+  ],
+  "vNNVGj": [
+    {
+      "type": 0,
+      "value": "For example, let’s assume that you’ve created a position that swaps 2000 USDC for ETH each day. Let’s also assume that, when the swap is executed, 2000 USDC = 1 ETH. Instead of getting 1 ETH, you would be getting 1 ETH - 0.6% = 0.994 ETH. That 0.6% will be split between Mean Finance and the user who actually executed the swap."
+    }
+  ],
+  "vVsvjq": [
+    {
+      "type": 0,
+      "value": "Withdraw as "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "vXfC3z": [
+    {
+      "type": 0,
+      "value": "You rejected the transaction"
+    }
+  ],
+  "vy3jnS": [
+    {
+      "type": 0,
+      "value": "Transfer "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " position"
+    }
+  ],
+  "wEwpFI": [
+    {
+      "type": 0,
+      "value": "Create position"
+    }
+  ],
+  "wY55VA": [
+    {
+      "type": 0,
+      "value": "No deposit or withdrawal fees"
+    }
+  ],
+  "wZ9OAC": [
+    {
+      "type": 0,
+      "value": "The popularity/demand of the tokens involved in the swap"
+    }
+  ],
+  "wbAHBV": [
+    {
+      "type": 0,
+      "value": "TERMINATED"
+    }
+  ],
+  "wzEneQ": [
+    {
+      "type": 0,
+      "value": "Close"
+    }
+  ],
+  "xTAANF": [
+    {
+      "type": 0,
+      "value": "This pair is"
+    }
+  ],
+  "xurFDH": [
+    {
+      "type": 0,
+      "value": "Mean Finance"
+    }
+  ],
+  "xybHU6": [
+    {
+      "type": 0,
+      "value": "This cannot be undone."
+    }
+  ],
+  "y2BvnY": [
+    {
+      "type": 0,
+      "value": "What is DCA?"
+    }
+  ],
+  "z43qzX": [
+    {
+      "type": 0,
+      "value": "Connect Wallet"
+    }
+  ],
+  "zfveEm": [
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "zr2gP1": [
+    {
+      "type": 0,
+      "value": "Back to positions"
+    }
+  ],
+  "zwn/c2": [
+    {
+      "type": 0,
+      "value": "Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair."
+    }
+  ]
+}

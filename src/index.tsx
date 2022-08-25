@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { IntlProvider } from 'react-intl';
-import EnMessages from 'config/lang/en_US.json';
+import { IntlProvider, MessageFormatElement } from 'react-intl';
+import EnMessages from 'config/lang/en.json';
+import EsMessages from 'config/lang/es.json';
 import WalletContext from 'common/wallet-context';
 import Web3Service from 'services/web3Service';
 import DCASubgraphs from 'utils/dcaSubgraphApolloClient';
@@ -17,12 +18,14 @@ declare module '@mui/styles/defaultTheme' {
 }
 
 type AppProps = {
-  messages: Record<string, string>;
+  messages: Record<string, MessageFormatElement[]>;
   locale: string;
 };
 
-function loadLocaleData(locale: string) {
+function loadLocaleData(locale: string): Record<string, MessageFormatElement[]> {
   switch (locale) {
+    case 'es':
+      return EsMessages;
     default:
       return EnMessages;
   }
