@@ -12,7 +12,7 @@ import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { useHistory } from 'react-router-dom';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
-import { NETWORKS, STABLE_COINS } from 'config/constants';
+import { NETWORKS, POSITION_VERSION_2, STABLE_COINS } from 'config/constants';
 import { BigNumber } from 'ethers';
 import useUsdPrice from 'hooks/useUsdPrice';
 import find from 'lodash/find';

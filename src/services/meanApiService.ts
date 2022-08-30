@@ -1,13 +1,12 @@
 import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
 import { MEAN_API_URL, PositionVersions } from 'config';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { MeanFinanceResponse, PermissionPermit } from 'types';
 
 // MOCKS
 import ContractService from './contractService';
 import WalletService from './walletService';
-import { getWrappedProtocolToken } from 'mocks/tokens';
-import { TransactionRequest } from '@ethersproject/providers';
-import { MeanFinanceResponse, PermissionPermit } from 'types';
 
 export default class MeanApiService {
   axiosClient: AxiosInstance;
@@ -68,7 +67,7 @@ export default class MeanApiService {
     return singer.sendTransaction(transactionToSend.data.tx);
   }
 
-  withdrawSwappedUsingProtocolToken(
+  async withdrawSwappedUsingProtocolToken(
     id: string,
     recipient: string,
     positionVersion: PositionVersions,
@@ -76,13 +75,25 @@ export default class MeanApiService {
   ) {
     const singer = this.walletService.getSigner();
 
-    // Call to api and get transaction
-    const transactionToSend = {};
+    const currentNetwork = await this.walletService.getNetwork();
+    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
-    return singer.sendTransaction(transactionToSend);
+    // Call to api and get transaction
+    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/withdraw-and-swap`,
+      {
+        positionId: id,
+        convertTo: PROTOCOL_TOKEN_ADDRESS,
+        recipient,
+        hub: hubAddress,
+        permissionPermit,
+      }
+    );
+
+    return singer.sendTransaction(transactionToSend.data.tx);
   }
 
-  terminateUsingProtocolTokenAsFrom(
+  async terminateUsingProtocolTokenAsFrom(
     id: string,
     recipientUnswapped: string,
     recipientSwapped: string,
@@ -91,13 +102,25 @@ export default class MeanApiService {
   ) {
     const singer = this.walletService.getSigner();
 
-    // Call to api and get transaction
-    const transactionToSend = {};
+    const currentNetwork = await this.walletService.getNetwork();
+    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
-    return singer.sendTransaction(transactionToSend);
+    // Call to api and get transaction
+    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/terminate-and-swap`,
+      {
+        positionId: id,
+        recipient: recipientSwapped,
+        unswappedConvertTo: PROTOCOL_TOKEN_ADDRESS,
+        hub: hubAddress,
+        permissionPermit,
+      }
+    );
+
+    return singer.sendTransaction(transactionToSend.data.tx);
   }
 
-  terminateUsingProtocolTokenAsTo(
+  async terminateUsingProtocolTokenAsTo(
     id: string,
     recipientUnswapped: string,
     recipientSwapped: string,
@@ -106,13 +129,25 @@ export default class MeanApiService {
   ) {
     const singer = this.walletService.getSigner();
 
-    // Call to api and get transaction
-    const transactionToSend = {};
+    const currentNetwork = await this.walletService.getNetwork();
+    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
-    return singer.sendTransaction(transactionToSend);
+    // Call to api and get transaction
+    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/terminate-and-swap`,
+      {
+        positionId: id,
+        recipient: recipientSwapped,
+        swappedConvertTo: PROTOCOL_TOKEN_ADDRESS,
+        hub: hubAddress,
+        permissionPermit,
+      }
+    );
+
+    return singer.sendTransaction(transactionToSend.data.tx);
   }
 
-  increasePositionUsingProtocolToken(
+  async increasePositionUsingProtocolToken(
     id: string,
     newAmount: BigNumber,
     newSwaps: BigNumber,
@@ -121,13 +156,25 @@ export default class MeanApiService {
   ) {
     const singer = this.walletService.getSigner();
 
-    // Call to api and get transaction
-    const transactionToSend = {};
+    const currentNetwork = await this.walletService.getNetwork();
+    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
-    return singer.sendTransaction(transactionToSend);
+    // Call to api and get transaction
+    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/swap-and-increase`,
+      {
+        takeFromCaller: { token: PROTOCOL_TOKEN_ADDRESS, amount: newAmount.toString() },
+        positionId: id,
+        amountOfSwaps: newSwaps.toNumber(),
+        hub: hubAddress,
+        permissionPermit,
+      }
+    );
+
+    return singer.sendTransaction(transactionToSend.data.tx);
   }
 
-  reducePositionUsingProtocolToken(
+  async reducePositionUsingProtocolToken(
     id: string,
     newAmount: BigNumber,
     newSwaps: BigNumber,
@@ -137,9 +184,23 @@ export default class MeanApiService {
   ) {
     const singer = this.walletService.getSigner();
 
-    // Call to api and get transaction
-    const transactionToSend = {};
+    const currentNetwork = await this.walletService.getNetwork();
+    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
-    return singer.sendTransaction(transactionToSend);
+    // Call to api and get transaction
+    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/reduce-and-swap`,
+      {
+        positionId: id,
+        amount: newAmount.toString(),
+        amountOfSwaps: newSwaps.toNumber(),
+        convertTo: PROTOCOL_TOKEN_ADDRESS,
+        recipient,
+        hub: hubAddress,
+        permissionPermit,
+      }
+    );
+
+    return singer.sendTransaction(transactionToSend.data.tx);
   }
 }
