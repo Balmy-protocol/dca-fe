@@ -2,7 +2,7 @@
 import { BigNumber, BigNumberish, BytesLike } from 'ethers';
 import { Contract } from '@ethersproject/contracts';
 import { TransactionResponse } from '@ethersproject/providers';
-import { CoreTypechained } from '@mean-finance/typechained/lib';
+import { DCAHub } from '@mean-finance/dca-v2-core/dist';
 
 export interface PermissionSet {
   operator: string;
@@ -116,7 +116,7 @@ export class PermissionManagerContract extends Contract {
   nonces: (address: string) => Promise<number>;
 }
 
-export interface HubContract extends CoreTypechained.DCAHub {
+export interface HubContract extends DCAHub {
   deposit: (
     from: string,
     to: string,
@@ -127,7 +127,7 @@ export interface HubContract extends CoreTypechained.DCAHub {
     permissions: { operator: string; permissions: string[] }[]
   ) => Promise<TransactionResponse>;
 
-  estimateGas: CoreTypechained.DCAHub['estimateGas'] & {
+  estimateGas: DCAHub['estimateGas'] & {
     deposit: (
       from: string,
       to: string,

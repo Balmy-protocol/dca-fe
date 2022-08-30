@@ -59,7 +59,12 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       const result = await positionService.transfer(fullPositionToMappedPosition(position), toAddress);
       addTransaction(result, {
         type: TRANSACTION_TYPES.TRANSFER_POSITION,
-        typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol, toAddress },
+        typeData: {
+          id: fullPositionToMappedPosition(position).id,
+          from: position.from.symbol,
+          to: position.to.symbol,
+          toAddress,
+        },
         position: fullPositionToMappedPosition(position),
       });
       setModalSuccess({
