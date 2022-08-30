@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import some from 'lodash/some';
 import { FullPosition, Position, Token } from 'types';
-import { POSITION_VERSION_3, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
+import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -117,14 +117,14 @@ export function fullPositionToMappedPosition(position: FullPosition, positionVer
     remainingSwaps: BigNumber.from(position.current.remainingSwaps),
     withdrawn: BigNumber.from(position.totalWithdrawn),
     totalSwaps: BigNumber.from(position.totalSwaps),
-    id: `${position.id}-v${position.version || POSITION_VERSION_3}`,
+    id: `${position.id}-v${position.version || LATEST_VERSION}`,
     positionId: position.id,
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),
     totalDeposited: BigNumber.from(position.totalDeposited),
     totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
     pendingTransaction: '',
-    version: position.version || positionVersion || POSITION_VERSION_3,
+    version: position.version || positionVersion || LATEST_VERSION,
     chainId: position.chainId,
     pairLastSwappedAt: parseInt(position.createdAtTimestamp, 10),
     pairNextSwapAvailableAt: position.createdAtTimestamp,
