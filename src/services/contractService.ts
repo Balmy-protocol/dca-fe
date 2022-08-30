@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { CoreTypechained, PeripheryTypechained, OraclesTypechained } from '@mean-finance/typechained/lib/index';
+import { DCAHub__factory, DCAPermissionsManager__factory } from '@mean-finance/dca-v2-core/dist';
+import { DCAHubCompanion__factory } from '@mean-finance/dca-v2-periphery/dist';
+import { OracleAggregator__factory } from '@mean-finance/oracles/dist';
 import { ethers, Signer } from 'ethers';
 import { Network, getNetwork as getStringNetwork, Provider } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
@@ -29,7 +31,6 @@ import {
 } from 'config/constants';
 import { BetaMigratorContract, ERC20Contract, HubContract, OEGasOracle, OracleContract } from 'types';
 
-// const { CoreTypechained, PeripheryTypechained, OraclesTypechained } = allExportedFromTypechained;
 export default class ContractService {
   client: ethers.providers.Web3Provider;
 
@@ -177,8 +178,7 @@ export default class ContractService {
     const hubAddress = await this.getHUBAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    // @ts-ignore
-    const hub = CoreTypechained.DCAHub__factory.connect(hubAddress, provider as Signer);
+    const hub = DCAHub__factory.connect(hubAddress, provider as Signer);
 
     (hub as unknown as HubContract).deposit =
       hub['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'];
@@ -192,8 +192,7 @@ export default class ContractService {
     const permissionManagerAddress = await this.getPermissionManagerAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    // @ts-ignore
-    return CoreTypechained.DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
+    return DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
   }
 
   async getMigratorInstance(version?: PositionVersions): Promise<BetaMigratorContract> {
@@ -207,16 +206,14 @@ export default class ContractService {
     const hubCompanionAddress = await this.getHUBCompanionAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    // @ts-ignore
-    return PeripheryTypechained.DCAHubCompanion__factory.connect(hubCompanionAddress, provider);
+    return DCAHubCompanion__factory.connect(hubCompanionAddress, provider);
   }
 
   async getOracleInstance(version?: PositionVersions) {
     const oracleAddress = await this.getOracleAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    // @ts-ignore
-    return OraclesTypechained.OracleAggregator__factory.connect(oracleAddress, provider);
+    return OracleAggregator__factory.connect(oracleAddress, provider);
   }
 
   async getChainlinkOracleInstance(version?: PositionVersions): Promise<OracleContract> {
