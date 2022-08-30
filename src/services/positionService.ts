@@ -5,6 +5,7 @@ import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
+import { hexlify } from 'ethers/lib/utils';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import {
   Token,
@@ -384,14 +385,14 @@ export default class PositionService {
 
   async companionHasPermission(position: Position, permission: number) {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
     return permissionManagerInstance.hasPermission(position.positionId, companionAddress, permission);
   }
 
   async companionIsApproved(position: Position): Promise<boolean> {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
     try {
       await permissionManagerInstance.ownerOf(position.positionId);
@@ -418,7 +419,7 @@ export default class PositionService {
   }
 
   async approveCompanionForPosition(position: Position): Promise<TransactionResponse> {
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
 
@@ -532,7 +533,7 @@ export default class PositionService {
 
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
-      await this.contractService.getHUBCompanionAddress(position.version),
+      await this.contractService.getHUBCompanionAddress(LATEST_VERSION),
       PERMISSIONS.WITHDRAW
     );
 
@@ -540,7 +541,7 @@ export default class PositionService {
       position.positionId,
       this.walletService.getAccount(),
       position.version,
-      { permissions, deadline: deadline.toString(), v, r: r.toString(), s: s.toString(), tokenId: position.positionId }
+      { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
   }
 
@@ -588,7 +589,7 @@ export default class PositionService {
     }
 
     const permissionManagerAddress = await this.contractService.getPermissionManagerAddress(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
     const erc712Name = position.version !== POSITION_VERSION_2 ? undefined : 'Mean Finance DCA';
 
@@ -610,8 +611,8 @@ export default class PositionService {
           permissions,
           deadline: deadline.toString(),
           v,
-          r: r.toString(),
-          s: s.toString(),
+          r: hexlify(r),
+          s: hexlify(s),
           tokenId: position.positionId,
         }
       );
@@ -622,7 +623,7 @@ export default class PositionService {
       this.walletService.getAccount(),
       this.walletService.getAccount(),
       position.version,
-      { permissions, deadline: deadline.toString(), v, r: r.toString(), s: s.toString(), tokenId: position.positionId }
+      { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
   }
 
@@ -723,7 +724,7 @@ export default class PositionService {
     const hubInstance = await this.contractService.getHubInstance(position.version);
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -783,8 +784,8 @@ export default class PositionService {
           permissions,
           deadline: deadline.toString(),
           v,
-          r: r.toString(),
-          s: s.toString(),
+          r: hexlify(r),
+          s: hexlify(s),
           tokenId: position.positionId,
         }
       );
@@ -814,7 +815,7 @@ export default class PositionService {
       BigNumber.from(newSwaps),
       this.walletService.getAccount(),
       position.version,
-      { permissions, deadline: deadline.toString(), v, r: r.toString(), s: s.toString(), tokenId: position.positionId }
+      { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
   }
 

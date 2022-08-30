@@ -58,13 +58,13 @@ module.exports = {
       },
       {
         test: /\.(js|jsx)$/,
-        // exclude: /node_modules\/(?!@mean-finance\/typechained)/,
+        exclude: /node_modules/,
         loader: 'babel-loader',
         options: { presets: ['@babel/env'] },
       },
       {
         test: /\.(ts|tsx)$/,
-        // exclude: /node_modules\/(?!@mean-finance\/typechained)/,
+        exclude: /node_modules/,
         loader: 'ts-loader',
         options: {
           allowTsInNodeModules: true,
