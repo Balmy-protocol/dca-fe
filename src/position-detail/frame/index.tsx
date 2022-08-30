@@ -120,7 +120,9 @@ const PositionDetailFrame = () => {
     to: data.position.to.address === wrappedProtocolToken.address ? protocolToken : data.position.to,
   };
 
-  const pendingTransaction = usePositionHasPendingTransaction((position && position.id) || '');
+  const pendingTransaction = usePositionHasPendingTransaction(
+    (position && fullPositionToMappedPosition(position).id) || ''
+  );
 
   const { loading: isLoadingSwaps, data: swapsData } = useQuery<{ pair: GetPairSwapsData }>(getPairSwaps, {
     variables: {
@@ -227,7 +229,7 @@ const PositionDetailFrame = () => {
       const result = await positionService.withdraw(fullPositionToMappedPosition(positionInUse), useProtocolToken);
       addTransaction(result, {
         type: TRANSACTION_TYPES.WITHDRAW_POSITION,
-        typeData: { id: positionInUse.id },
+        typeData: { id: fullPositionToMappedPosition(positionInUse).id },
         position: fullPositionToMappedPosition(positionInUse),
       });
       setModalSuccess({
