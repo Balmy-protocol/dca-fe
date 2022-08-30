@@ -43,9 +43,9 @@ import {
   PERMISSIONS,
   POSITIONS_VERSIONS,
   POSITION_VERSION_2,
-  POSITION_VERSION_3,
   TRANSACTION_TYPES,
   PositionVersions,
+  LATEST_VERSION,
 } from 'config/constants';
 import { PermissionManagerContract } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
@@ -590,7 +590,7 @@ export default class PositionService {
     const permissionManagerAddress = await this.contractService.getPermissionManagerAddress(position.version);
     const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
 
-    const erc712Name = position.version === POSITION_VERSION_3 ? undefined : 'Mean Finance DCA';
+    const erc712Name = position.version !== POSITION_VERSION_2 ? undefined : 'Mean Finance DCA';
 
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
@@ -907,7 +907,7 @@ export default class PositionService {
         totalDeposited: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         pendingTransaction: transaction.hash,
         status: 'ACTIVE',
-        version: POSITION_VERSION_3,
+        version: LATEST_VERSION,
         pairLastSwappedAt: newPositionTypeData.startedAt,
         pairNextSwapAvailableAt: newPositionTypeData.startedAt.toString(),
       };
@@ -999,7 +999,7 @@ export default class PositionService {
             withdrawn: BigNumber.from(0),
             totalExecutedSwaps: BigNumber.from(0),
             status: 'ACTIVE',
-            version: POSITION_VERSION_3,
+            version: LATEST_VERSION,
             id: migratePositionTypeData.newId,
           };
         }
