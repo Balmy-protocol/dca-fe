@@ -12,7 +12,7 @@ import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { useHistory } from 'react-router-dom';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
-import { NETWORKS, POSITION_VERSION_3, STABLE_COINS } from 'config/constants';
+import { NETWORKS, STABLE_COINS } from 'config/constants';
 import { BigNumber } from 'ethers';
 import useUsdPrice from 'hooks/useUsdPrice';
 import find from 'lodash/find';
@@ -212,7 +212,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
         </StyledContentContainer>
         <StyledProgressWrapper />
         <StyledCallToActionContainer>
-          {position.version === POSITION_VERSION_3 && (
+          {position.version !== POSITION_VERSION_2 && (
             <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
               <Typography variant="body2">
                 <FormattedMessage description="goToPosition" defaultMessage="Go to position" />

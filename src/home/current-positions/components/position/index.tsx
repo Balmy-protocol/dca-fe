@@ -12,13 +12,7 @@ import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
 import { NetworkStruct, Position, Token } from 'types';
 import { useHistory } from 'react-router-dom';
-import {
-  NETWORKS,
-  POSITION_VERSION_2,
-  POSITION_VERSION_3,
-  STABLE_COINS,
-  STRING_SWAP_INTERVALS,
-} from 'config/constants';
+import { NETWORKS, POSITION_VERSION_2, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
