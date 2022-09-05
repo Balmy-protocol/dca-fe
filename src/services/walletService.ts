@@ -163,7 +163,7 @@ export default class WalletService {
     const account = this.getAccount();
 
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
-      return Promise.resolve({ token, allowance: formatUnits(MaxUint256, 18) });
+      return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
     }
 
     const addressToCheck = await this.contractService.getHUBAddress();
