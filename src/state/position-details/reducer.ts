@@ -71,7 +71,7 @@ export default createReducer(initialState, (builder) =>
             status: 'TERMINATED',
             current: {
               ...position.current,
-              idleSwapped: BigNumber.from(0).toString(),
+              toWithdraw: BigNumber.from(0).toString(),
               remainingLiquidity: BigNumber.from(0).toString(),
               remainingSwaps: BigNumber.from(0).toString(),
             },
@@ -106,7 +106,7 @@ export default createReducer(initialState, (builder) =>
             status: 'TERMINATED',
             current: {
               ...position.current,
-              idleSwapped: BigNumber.from(0).toString(),
+              toWithdraw: BigNumber.from(0).toString(),
               remainingLiquidity: BigNumber.from(0).toString(),
               remainingSwaps: BigNumber.from(0).toString(),
             },
@@ -124,7 +124,7 @@ export default createReducer(initialState, (builder) =>
             remainingSwaps: position.current.remainingSwaps,
             oldRemainingSwaps: position.current.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.idleSwapped,
+            withdrawn: position.current.toWithdraw,
             permissions: [],
             ratePerUnitBToAWithFee: '1',
             ratePerUnitAToBWithFee: '1',
@@ -139,11 +139,11 @@ export default createReducer(initialState, (builder) =>
           position = {
             ...position,
             totalWithdrawn: BigNumber.from(position.totalWithdrawn)
-              .add(BigNumber.from(position.current.idleSwapped))
+              .add(BigNumber.from(position.current.toWithdraw))
               .toString(),
             current: {
               ...position.current,
-              idleSwapped: BigNumber.from(0).toString(),
+              toWithdraw: BigNumber.from(0).toString(),
             },
           };
 
