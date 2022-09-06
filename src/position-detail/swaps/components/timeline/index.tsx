@@ -219,8 +219,8 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
           to: STABLE_COINS.includes(tokenTo.symbol) ? 'USD' : tokenTo.symbol,
           swapRate:
             position.pair.tokenA.address === tokenFrom.address
-              ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitAToBWithFee), tokenTo)
-              : formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), tokenFrom),
+              ? formatCurrencyAmount(BigNumber.from(positionState.ratioPerUnitAToBWithFee), tokenTo)
+              : formatCurrencyAmount(BigNumber.from(positionState.ratioPerUnitBToAWithFee), tokenFrom),
           currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
         }}
       />

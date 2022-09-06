@@ -185,8 +185,8 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
   swappedActions.forEach((action) => {
     const rate =
       position.pair.tokenA.address === tokenFromAverage.address
-        ? BigNumber.from(action.ratePerUnitAToBWithFee)
-        : BigNumber.from(action.ratePerUnitBToAWithFee);
+        ? BigNumber.from(action.ratioPerUnitAToBWithFee)
+        : BigNumber.from(action.ratioPerUnitBToAWithFee);
 
     summedPrices = summedPrices.add(rate);
   });
