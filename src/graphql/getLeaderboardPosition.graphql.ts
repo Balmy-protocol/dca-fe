@@ -54,7 +54,7 @@ const getLeaderboardPositions = gql`
         remainingSwaps
         remainingLiquidity
         withdrawn
-        idleSwapped
+        toWithdraw
       }
       history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc) {
         id

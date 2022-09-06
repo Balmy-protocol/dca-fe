@@ -124,7 +124,7 @@ export interface PositionState {
   remainingLiquidity: string;
   createdAtBlock: string;
   createdAtTimestamp: string;
-  idleSwapped: string;
+  toWithdraw: string;
   transaction: {
     id: string;
     hash: string;
