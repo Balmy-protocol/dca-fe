@@ -102,8 +102,8 @@ export interface ActionState {
   swapped: string;
   withdrawn: string;
   permissions: PositionPermission[];
-  ratePerUnitBToAWithFee: string;
-  ratePerUnitAToBWithFee: string;
+  ratioPerUnitBToAWithFee: string;
+  ratioPerUnitAToBWithFee: string;
   createdAtBlock: string;
   createdAtTimestamp: string;
   transaction: {
