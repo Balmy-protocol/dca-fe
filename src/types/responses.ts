@@ -70,7 +70,7 @@ export type PositionResponse = {
     toWithdraw: BigNumber;
   };
   rate: BigNumber;
-  totalDeposits: BigNumber;
+  totalDeposited: BigNumber;
   totalSwaps: BigNumber;
   totalSwapped: BigNumber;
   totalWithdrawn: BigNumber;

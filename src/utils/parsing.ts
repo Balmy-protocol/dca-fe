@@ -127,7 +127,7 @@ export function fullPositionToMappedPosition(position: FullPosition, positionVer
     positionId: position.id,
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),
-    totalDeposits: BigNumber.from(position.totalDeposits),
+    totalDeposited: BigNumber.from(position.totalDeposited),
     totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
     pendingTransaction: '',
     version: position.version || positionVersion || POSITION_VERSION_3,
