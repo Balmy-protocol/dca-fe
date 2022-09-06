@@ -11,7 +11,7 @@ const getCurrentPositions = gql`
     ) {
       id
       createdAtTimestamp
-      totalDeposits
+      totalDeposited
       totalSwaps
       totalSwapped
       totalWithdrawn
