@@ -10,7 +10,7 @@ import {
   AvailablePairsGraphqlResponse,
   AvailablePairResponse,
 } from 'types';
-import { sortTokens, sortTokensByAddress } from 'utils/parsing';
+import { activePositionsPerIntervalToHasToExecute, sortTokens, sortTokensByAddress } from 'utils/parsing';
 import { buildSwapInput } from 'utils/swap';
 
 // GQL queries
@@ -96,7 +96,7 @@ export default class PairService {
             lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
             id: pair.id,
             lastCreatedAt,
-            swapInfo: pair.nextSwapAvailableAt,
+            swapInfo: activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval),
             oracle: pairOracle,
           };
         })
@@ -117,7 +117,7 @@ export default class PairService {
         id: `${token0.address}-${token1.address}`,
         lastExecutedAt: 0,
         lastCreatedAt: Math.floor(Date.now() / 1000),
-        swapInfo: '1',
+        swapInfo: true,
         oracle,
       });
     }
