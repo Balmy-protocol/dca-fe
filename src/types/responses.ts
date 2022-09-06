@@ -67,7 +67,7 @@ export type PositionResponse = {
     swapped: BigNumber;
     withdrawn: BigNumber;
     remainingLiquidity: BigNumber;
-    idleSwapped: BigNumber;
+    toWithdraw: BigNumber;
   };
   rate: BigNumber;
   totalDeposits: BigNumber;
