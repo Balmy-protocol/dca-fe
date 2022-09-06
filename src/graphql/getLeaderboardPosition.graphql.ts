@@ -69,8 +69,8 @@ const getLeaderboardPositions = gql`
         withdrawn
         createdAtBlock
         createdAtTimestamp
-        ratePerUnitAToBWithFee
-        ratePerUnitBToAWithFee
+        ratioPerUnitAToBWithFee
+        ratioPerUnitBToAWithFee
         permissions {
           operator
           id
