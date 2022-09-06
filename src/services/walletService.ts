@@ -159,14 +159,16 @@ export default class WalletService {
     return erc20.balanceOf(account);
   }
 
-  async getAllowance(token: Token) {
+  async getAllowance(token: Token, shouldCheckCompanion?: boolean) {
     const account = this.getAccount();
 
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
     }
 
-    const addressToCheck = await this.contractService.getHUBAddress();
+    const addressToCheck = shouldCheckCompanion
+      ? await this.contractService.getHUBCompanionAddress()
+      : await this.contractService.getHUBAddress();
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
@@ -178,8 +180,10 @@ export default class WalletService {
     };
   }
 
-  async approveToken(token: Token): Promise<TransactionResponse> {
-    const addressToApprove = await this.contractService.getHUBAddress();
+  async approveToken(token: Token, shouldUseCompanion = false): Promise<TransactionResponse> {
+    const addressToApprove = shouldUseCompanion
+      ? await this.contractService.getHUBCompanionAddress()
+      : await this.contractService.getHUBAddress();
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 

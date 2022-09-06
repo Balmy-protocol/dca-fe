@@ -461,7 +461,9 @@ export default class PositionService {
     to: Token,
     fromValue: string,
     frequencyType: BigNumber,
-    frequencyValue: string
+    frequencyValue: string,
+    yieldFrom?: string,
+    yieldTo?: string
   ): Promise<TransactionResponse> {
     const token = from;
 
@@ -476,10 +478,24 @@ export default class PositionService {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
+    if (yieldFrom) {
+      return this.meanApiService.depositUsingYield(
+        from.address,
+        to.address,
+        weiValue,
+        amountOfSwaps,
+        swapInterval,
+        yieldFrom,
+        yieldTo,
+        this.walletService.getAccount(),
+        []
+      );
+    }
+
     if (from.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase()) {
       return this.meanApiService.depositUsingProtocolToken(
         from.address,
-        to.address,
+        yieldTo || to.address,
         weiValue,
         amountOfSwaps,
         swapInterval,
@@ -494,7 +510,7 @@ export default class PositionService {
 
     return hubInstance.deposit(
       from.address,
-      toToUse.address,
+      yieldTo || toToUse.address,
       weiValue,
       amountOfSwaps,
       swapInterval,
