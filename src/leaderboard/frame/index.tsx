@@ -197,12 +197,12 @@ const LeaderboardFrame = () => {
     if (!acc[position.user]) {
       // eslint-disable-next-line no-param-reassign
       acc[position.user] =
-        parseFloat(formatUnits(BigNumber.from(position.current.idleSwapped), position.to.decimals)) *
+        parseFloat(formatUnits(BigNumber.from(position.current.toWithdraw), position.to.decimals)) *
         tokensByPrice[position.to.address];
     } else {
       // eslint-disable-next-line no-param-reassign
       acc[position.user] +=
-        parseFloat(formatUnits(BigNumber.from(position.current.idleSwapped), position.to.decimals)) *
+        parseFloat(formatUnits(BigNumber.from(position.current.toWithdraw), position.to.decimals)) *
         tokensByPrice[position.to.address];
     }
 

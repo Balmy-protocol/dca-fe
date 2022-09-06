@@ -197,7 +197,7 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
     position.from,
     BigNumber.from(position.current.remainingLiquidity)
   );
-  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, BigNumber.from(position.current.idleSwapped));
+  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, BigNumber.from(position.current.toWithdraw));
   const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, BigNumber.from(position.totalSwapped));
   const showToFullPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToFullPrice && !!toFullPrice;
   const showToPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToPrice && !!toPrice;

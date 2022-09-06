@@ -55,7 +55,7 @@ const getPosition = gql`
         remainingSwaps
         remainingLiquidity
         withdrawn
-        idleSwapped
+        toWithdraw
       }
       history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc, first: $first, skip: $skip) {
         id
