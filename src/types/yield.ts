@@ -7,6 +7,7 @@ export interface YieldOption {
   apy: number;
   enabledTokens: string[];
   token: Token;
+  tokenAddress: string;
 }
 
 export type YieldOptions = YieldOption[];
