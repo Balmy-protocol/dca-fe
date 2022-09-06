@@ -19,7 +19,7 @@ const getAvailablePairs = gql`
       swaps(first: 1, orderBy: executedAtTimestamp, orderDirection: desc) {
         executedAtTimestamp
       }
-      nextSwapAvailableAt
+      activePositionsPerInterval
       positions(first: 1, orderBy: createdAtTimestamp, orderDirection: asc, where: { status: ACTIVE }) {
         id
         createdAtTimestamp

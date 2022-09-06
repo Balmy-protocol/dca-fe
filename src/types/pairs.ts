@@ -14,7 +14,7 @@ export type AvailablePair = {
   lastExecutedAt: number;
   lastCreatedAt: number;
   id: string;
-  swapInfo: string;
+  swapInfo: boolean;
   oracle: Oracles;
 };
 
@@ -57,5 +57,5 @@ export interface GetPairSwapsData {
     address: string;
   };
   swaps: PairSwaps[];
-  nextSwapAvailableAt: string;
+  activePositionsPerInterval: number[];
 }

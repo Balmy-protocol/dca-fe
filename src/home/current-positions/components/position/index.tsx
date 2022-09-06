@@ -224,12 +224,7 @@ const ActivePosition = ({
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
   const isStale =
-    calculateStale(
-      pair?.lastExecutedAt || position.pairLastSwappedAt || 0,
-      swapInterval,
-      position.startedAt,
-      pair?.swapInfo || position.pairNextSwapAvailableAt || '1'
-    ) === STALE;
+    calculateStale(pair?.lastExecutedAt || position.pairLastSwappedAt || 0, swapInterval, position.startedAt) === STALE;
 
   const onViewDetails = () => {
     dispatch(setPosition(null));
