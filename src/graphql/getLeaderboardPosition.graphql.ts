@@ -56,7 +56,7 @@ const getLeaderboardPositions = gql`
         withdrawn
         toWithdraw
       }
-      history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc) {
+      history(orderBy: createdAtTimestamp, orderDirection: asc) {
         id
         action
         transaction {
