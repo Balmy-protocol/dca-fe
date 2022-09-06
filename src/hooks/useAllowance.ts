@@ -9,7 +9,8 @@ import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
 
 function useAllowance(
-  from: Token | undefined | null
+  from: Token | undefined | null,
+  usesYield?: boolean
 ): [{ token: Token; allowance: string } | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const walletService = useWalletService();
@@ -28,7 +29,7 @@ function useAllowance(
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await walletService.getAllowance(from);
+          const promiseResult = await walletService.getAllowance(from, usesYield);
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {

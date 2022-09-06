@@ -35,6 +35,39 @@ export default class MeanApiService {
     this.client = client;
   }
 
+  async depositUsingYield(
+    from: string,
+    to: string,
+    totalAmmount: BigNumber,
+    swaps: BigNumber,
+    interval: BigNumber,
+    yieldFrom: string | undefined,
+    yieldTo: string | undefined,
+    account: string,
+    permissions: { operator: string; permissions: string[] }[]
+  ) {
+    const singer = this.walletService.getSigner();
+    const currentNetwork = await this.walletService.getNetwork();
+    const hubAddress = await this.contractService.getHUBAddress();
+
+    // Call to api and get transaction
+    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
+      {
+        takeFromCaller: { token: from, amount: totalAmmount.toString() },
+        from: yieldFrom || from,
+        to: yieldTo || to,
+        amountOfSwaps: swaps.toNumber(),
+        swapInterval: interval.toNumber(),
+        owner: account,
+        hub: hubAddress,
+        permissions,
+      }
+    );
+
+    return singer.sendTransaction(transactionToSend.data.tx);
+  }
+
   async depositUsingProtocolToken(
     from: string,
     to: string,

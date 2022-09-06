@@ -178,7 +178,7 @@ const Swap = ({
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount());
 
-  const [allowance, , allowanceErrors] = useAllowance(from);
+  const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
 
@@ -238,8 +238,10 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(from);
-      const hubAddress = await contractService.getHUBAddress();
+      const result = await walletService.approveToken(from, !!fromYield?.tokenAddress);
+      const hubAddress = fromYield?.tokenAddress
+        ? await contractService.getHUBCompanionAddress()
+        : await contractService.getHUBAddress();
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
@@ -281,7 +283,15 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await positionService.deposit(from, to, fromValue, frequencyType, frequencyValue);
+      const result = await positionService.deposit(
+        from,
+        to,
+        fromValue,
+        frequencyType,
+        frequencyValue,
+        fromYield?.tokenAddress,
+        toYield?.tokenAddress
+      );
       const hubAddress = await contractService.getHUBAddress();
       const companionAddress = await contractService.getHUBCompanionAddress();
 
