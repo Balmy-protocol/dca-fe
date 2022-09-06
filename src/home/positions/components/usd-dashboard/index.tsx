@@ -304,6 +304,11 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
       const valuePerChain = chains.reduce<Record<string, ChainBreakdown>>((acc, chainKey) => {
         const point = tokensCountRaw[tokenSymbol][Number(chainKey)];
         const usdPrice = tokenUSDPrices[chainKey][point.token.address];
+
+        if (!usdPrice) {
+          return acc;
+        }
+
         const usdValue = point.balance.mul(usdPrice);
 
         return {
@@ -318,6 +323,10 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
       chains.forEach((chain) => {
         const point = tokensCountRaw[tokenSymbol][Number(chain)];
         const pointBalance = valuePerChain[chain];
+
+        if (!pointBalance || !pointBalance.balance) {
+          return;
+        }
 
         if (!selectedChain || selectedChain === Number(chain)) {
           summedBalanceToShow = summedBalanceToShow.add(pointBalance.balance);
