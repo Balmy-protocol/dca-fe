@@ -1,7 +1,8 @@
 import { BigNumber } from 'ethers';
 import find from 'lodash/find';
+import some from 'lodash/some';
 import { FullPosition, Position, Token } from 'types';
-import { MAX_BI, POSITION_VERSION_3, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
+import { POSITION_VERSION_3, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -36,19 +37,12 @@ export const calculateStale: (
   lastSwapped: number | undefined,
   frequencyType: BigNumber,
   createdAt: number,
-  nextSwapInformation: string | number | null
-) => -1 | 0 | 1 | 2 = (
-  lastSwapped = 0,
-  frequencyType: BigNumber,
-  createdAt: number,
-  nextSwapInformation: string | number | null
-) => {
+  hasToExecute?: boolean | null
+) => -1 | 0 | 1 | 2 = (lastSwapped = 0, frequencyType: BigNumber, createdAt: number, hasToExecute = true) => {
   let isStale = false;
-  if (!nextSwapInformation) {
+  if (hasToExecute === null) {
     return NO_SWAP_INFORMATION;
   }
-
-  const hasToExecute = BigNumber.from(nextSwapInformation).lt(MAX_BI);
 
   if (!hasToExecute) {
     return NOTHING_TO_EXECUTE;
@@ -157,3 +151,6 @@ export const usdFormatter = (num: number) => {
   }
   return (num / si[i].value).toFixed(3).replace(rx, '$1') + si[i].symbol;
 };
+
+export const activePositionsPerIntervalToHasToExecute = (activePositionsPerInterval: number[]) =>
+  some(activePositionsPerInterval, (activePositions) => activePositions !== 0);

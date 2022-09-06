@@ -1,4 +1,4 @@
-import { MAX_BI, SWAP_INTERVALS_MAP } from 'config/constants';
+import { SWAP_INTERVALS_MAP } from 'config/constants';
 import { BigNumber } from 'ethers';
 import { calculateStale, HEALTHY, NO_SWAP_INFORMATION, STALE, NOTHING_TO_EXECUTE } from './parsing';
 
@@ -7,7 +7,7 @@ describe('Parsing', () => {
     let lastSwapped: number | undefined;
     let frequencyType: BigNumber;
     let createdAt: number;
-    let nextSwapInformation: string | null;
+    let nextSwapInformation: boolean | null;
     const mockedTodaySeconds = 1642439808;
 
     beforeEach(() => {
@@ -27,7 +27,7 @@ describe('Parsing', () => {
           frequencyType = value;
           lastSwapped = 0;
           createdAt = 0;
-          nextSwapInformation = '1';
+          nextSwapInformation = true;
         });
 
         describe('when nextSwapInformation is null', () => {
@@ -40,7 +40,7 @@ describe('Parsing', () => {
 
         describe("when nextSwapInformation hasn't got the interval to execute", () => {
           beforeEach(() => {
-            nextSwapInformation = MAX_BI.toString();
+            nextSwapInformation = true;
           });
 
           it('should return NOTHING_TO_EXECUTE', () => {
