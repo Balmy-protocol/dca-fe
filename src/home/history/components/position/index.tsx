@@ -113,7 +113,7 @@ interface TerminantedPositionProps {
 }
 
 const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
-  const { from, to, swapInterval, swapped, totalDeposits, totalExecutedSwaps, chainId } = position;
+  const { from, to, swapInterval, swapped, totalDeposited, totalExecutedSwaps, chainId } = position;
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -157,7 +157,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
             </Typography>
             <Typography
               variant="body1"
-              color={totalDeposits.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              color={totalDeposited.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
               sx={{ marginLeft: '5px' }}
             >
               <FormattedMessage
@@ -165,7 +165,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
                 defaultMessage="{totalDepositted} {from}"
                 values={{
                   b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  totalDepositted: formatCurrencyAmount(totalDeposits, from, 4),
+                  totalDepositted: formatCurrencyAmount(totalDeposited, from, 4),
                   from: from.symbol,
                 }}
               />

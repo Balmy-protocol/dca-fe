@@ -5,7 +5,7 @@ const getLeaderboardPositions = gql`
     positions(first: $first, skip: $skip) {
       id
       createdAtTimestamp
-      totalDeposits
+      totalDeposited
       totalSwaps
       totalSwapped
       totalWithdrawn
