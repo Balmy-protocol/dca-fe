@@ -185,7 +185,7 @@ export default class PositionService {
                 pairLastSwappedAt:
                   (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
                   position.createdAtTimestamp,
-                pairNextSwapAvailableAt: position.pair.nextSwapAvailableAt || '0',
+                pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
               };
             }),
             'id'
@@ -270,7 +270,7 @@ export default class PositionService {
               pairLastSwappedAt:
                 (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
                 position.createdAtTimestamp,
-              pairNextSwapAvailableAt: position.pair.nextSwapAvailableAt || '0',
+              pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
             })),
             'id'
           ),
