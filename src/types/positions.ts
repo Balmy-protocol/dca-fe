@@ -115,9 +115,7 @@ export interface ActionState {
 
 export interface PositionState {
   id: string;
-  startingSwap: string;
   rate: string;
-  lastSwap: string;
   remainingSwaps: string;
   swapped: string;
   withdrawn: string;
