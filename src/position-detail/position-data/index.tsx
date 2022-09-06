@@ -8,7 +8,13 @@ import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import Button from 'common/button';
-import { calculateStale, fullPositionToMappedPosition, getTimeFrequencyLabel, STALE } from 'utils/parsing';
+import {
+  activePositionsPerIntervalToHasToExecute,
+  calculateStale,
+  fullPositionToMappedPosition,
+  getTimeFrequencyLabel,
+  STALE,
+} from 'utils/parsing';
 import { NETWORKS, POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useUsdPrice from 'hooks/useUsdPrice';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -218,7 +224,9 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
       parseInt(lastExecutedAt, 10) || 0,
       BigNumber.from(position.swapInterval.interval),
       parseInt(position.createdAtTimestamp, 10) || 0,
-      pair?.nextSwapAvailableAt ?? null
+      pair?.activePositionsPerInterval
+        ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
+        : null
     ) === STALE;
 
   const shouldDisableWithdraw = toWithdraw.lte(BigNumber.from(0));

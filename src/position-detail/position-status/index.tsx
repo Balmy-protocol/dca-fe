@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import { FullPosition, GetPairSwapsData } from 'types';
-import { calculateStale, getFrequencyLabel, STALE } from 'utils/parsing';
+import { activePositionsPerIntervalToHasToExecute, calculateStale, getFrequencyLabel, STALE } from 'utils/parsing';
 import { BigNumber } from 'ethers';
 
 const PositionStatusContainer = styled.div<{ alignedEnd?: boolean }>`
@@ -55,7 +55,7 @@ const PositionStatus = ({ position, pair, alignedEnd }: PositionStatusProps) => 
       parseInt(lastExecutedAt, 10) || 0,
       BigNumber.from(position.swapInterval.interval),
       parseInt(position.createdAtTimestamp, 10) || 0,
-      pair.nextSwapAvailableAt
+      activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval)
     ) === STALE;
 
   const hasNoFunds = BigNumber.from(position.current.remainingLiquidity).lte(BigNumber.from(0));

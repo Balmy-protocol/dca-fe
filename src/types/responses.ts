@@ -47,7 +47,7 @@ export type PositionResponse = {
   user: string;
   pair: {
     id: string;
-    nextSwapAvailableAt: string;
+    activePositionsPerInterval: number[];
     swaps: {
       id: string;
       executedAtTimestamp: string;
@@ -162,7 +162,7 @@ export type AvailablePairResponse = {
   createdAtTimestamp: number;
   status: string; // active, stale
   positions: PositionResponse[];
-  nextSwapAvailableAt: string;
+  activePositionsPerInterval: number[];
 };
 
 export interface AvailablePairsGraphqlResponse {
