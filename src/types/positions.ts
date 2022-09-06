@@ -40,7 +40,7 @@ export interface Position {
   swapped: BigNumber; // total de swappeado
   remainingLiquidity: BigNumber;
   remainingSwaps: BigNumber;
-  totalDeposits: BigNumber;
+  totalDeposited: BigNumber;
   withdrawn: BigNumber; // cuanto saque
   totalSwaps: BigNumber; // cuanto puse originalmente
   rate: BigNumber;
@@ -61,7 +61,7 @@ export interface FullPosition {
   from: Token;
   to: Token;
   user: string;
-  totalDeposits: string;
+  totalDeposited: string;
   totalSwaps: string; // cuanto puse originalmente
   id: string;
   positionId: string;

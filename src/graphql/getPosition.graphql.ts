@@ -5,7 +5,7 @@ const getPosition = gql`
     position(id: $id) {
       id
       createdAtTimestamp
-      totalDeposits
+      totalDeposited
       totalSwaps
       totalSwapped
       totalWithdrawn
