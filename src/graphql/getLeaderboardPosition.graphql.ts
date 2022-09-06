@@ -59,27 +59,62 @@ const getLeaderboardPositions = gql`
       history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc) {
         id
         action
-        rate
-        oldRate
-        from
-        to
-        remainingSwaps
-        oldRemainingSwaps
-        swapped
-        withdrawn
-        createdAtBlock
-        createdAtTimestamp
-        ratioPerUnitAToBWithFee
-        ratioPerUnitBToAWithFee
-        permissions {
-          operator
-          id
-          permissions
-        }
         transaction {
           id
           hash
           timestamp
+        }
+        createdAtBlock
+        createdAtTimestamp
+
+        ... on PermissionsModifiedAction {
+          permissions {
+            operator
+            id
+            permissions
+          }
+        }
+
+        ... on ModifiedRateAndDurationAction {
+          rate
+          oldRate
+          remainingSwaps
+          oldRemainingSwaps
+        }
+
+        ... on ModifiedDurationAction {
+          remainingSwaps
+          oldRemainingSwaps
+        }
+
+        ... on ModifiedRateAction {
+          rate
+          oldRate
+        }
+        ... on WithdrewAction {
+          withdrawn
+        }
+
+        ... on SwappedAction {
+          ratioPerUnitAToBWithFee
+          ratioPerUnitBToAWithFee
+          swapped
+          rate
+        }
+
+        ... on TransferedAction {
+          from
+          to
+        }
+
+        ... on CreatedAction {
+          rate
+          remainingSwaps
+          permissions {
+            operator
+            id
+            permissions
+          }
         }
       }
     }
