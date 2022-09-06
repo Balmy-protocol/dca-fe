@@ -176,7 +176,7 @@ const Swap = ({
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
   const isCreatingPair = useHasPendingPairCreation(from, to);
 
-  const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount());
+  const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
 
   const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
