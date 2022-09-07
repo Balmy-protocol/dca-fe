@@ -203,15 +203,16 @@ export default class Web3Service {
 
     const account = await this.signer.getAddress();
 
-    provider.on('network', (newNetwork: number, oldNetwork: null | number) => {
-      // When a Provider makes its initial connection, it emits a "network"
-      // event with a null oldNetwork along with the newNetwork. So, if the
-      // oldNetwork exists, it represents a changing network
+    // provider.on('network', (newNetwork: number, oldNetwork: null | number) => {
+    //   // When a Provider makes its initial connection, it emits a "network"
+    //   // event with a null oldNetwork along with the newNetwork. So, if the
+    //   // oldNetwork exists, it represents a changing network
 
-      if (oldNetwork) {
-        window.location.reload();
-      }
-    });
+    //   console.log('network', newNetwork, oldNetwork);
+    //   if (oldNetwork) {
+    //     window.location.reload();
+    //   }
+    // });
 
     // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
 
