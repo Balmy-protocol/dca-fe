@@ -291,7 +291,8 @@ export const COINGECKO_IDS = {
   [NETWORKS.mumbai.chainId]: 'mumbai',
 };
 
-export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
+// export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
+export const NETWORKS_FOR_MENU = [NETWORKS.polygon.chainId];
 
 export const HUB_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {

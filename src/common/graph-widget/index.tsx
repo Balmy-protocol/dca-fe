@@ -20,7 +20,7 @@ import useUNIGraphql from 'hooks/useUNIGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { STABLE_COINS } from 'config/constants';
+import { STABLE_COINS, TOKEN_TYPE_BASE } from 'config/constants';
 import GraphFooter from 'common/graph-footer';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import MinimalTabs from 'common/minimal-tabs';
@@ -151,6 +151,8 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   isBaseToken: false,
   name: '',
   chainId: 0,
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
 };
 const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const client = useDCAGraphql();
