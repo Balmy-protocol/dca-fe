@@ -24,6 +24,7 @@ import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import TerminateModal from 'common/terminate-modal';
+import useYieldOptions from 'hooks/useYieldOptions';
 import MigratePositionModal from 'common/migrate-position-modal';
 import ActivePosition from './components/position';
 import FinishedPosition from './components/finished-position';
@@ -64,6 +65,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
+  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions();
 
   const network = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -75,7 +77,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     emptyPositions.push(i);
   }
 
-  if (isLoading) {
+  if (isLoading || isLoadingYieldOptions) {
     return <CenteredLoadingIndicator size={70} />;
   }
 
@@ -221,6 +223,8 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
                       network={network}
+                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                      yieldOptions={yieldOptions!}
                     />
                   </StyledGridItem>
                 ))}
@@ -248,6 +252,8 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
                       network={network}
+                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                      yieldOptions={yieldOptions!}
                     />
                   </StyledGridItem>
                 ))}
