@@ -110,7 +110,7 @@ const Positions = () => {
       setIsLoading(false);
     };
 
-    if (!hasLoadedPositions || account !== prevAccount) {
+    if (!isLoading && (!hasLoadedPositions || account !== prevAccount)) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchPositions();
       setIsLoading(true);

@@ -1,4 +1,4 @@
-import { LATEST_VERSION, ONE_DAY } from 'config/constants';
+import { LATEST_VERSION, ONE_DAY, TOKEN_TYPE_BASE } from 'config/constants';
 import { Position } from 'types';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from './tokens';
@@ -10,6 +10,8 @@ export const EmptyPosition: Position = {
     decimals: 18,
     chainId: 10,
     symbol: 'MEAN',
+    type: TOKEN_TYPE_BASE,
+    underlyingTokens: [],
   },
   to: {
     address: PROTOCOL_TOKEN_ADDRESS,
@@ -17,6 +19,8 @@ export const EmptyPosition: Position = {
     decimals: 18,
     chainId: 10,
     symbol: 'MEAN',
+    type: TOKEN_TYPE_BASE,
+    underlyingTokens: [],
   },
   swapInterval: ONE_DAY,
   user: PROTOCOL_TOKEN_ADDRESS,

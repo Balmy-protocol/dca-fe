@@ -17,12 +17,28 @@ const getPosition = gql`
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       to {
         address: id
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       pair {
         id
@@ -31,12 +47,28 @@ const getPosition = gql`
           decimals
           name
           symbol
+          type
+          underlyingTokens {
+            address: id
+            decimals
+            name
+            symbol
+            type
+          }
         }
         tokenB {
           address: id
           decimals
           name
           symbol
+          type
+          underlyingTokens {
+            address: id
+            decimals
+            name
+            symbol
+            type
+          }
         }
       }
       status
