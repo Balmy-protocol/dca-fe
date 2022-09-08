@@ -165,10 +165,50 @@ export default class PositionService {
             gqlResult.data.positions.map((position: PositionResponse) => {
               const existingPosition = this.currentPositions[`${position.id}-v${version}`];
 
+              let underlyingTokenFrom =
+                !!position.from.underlyingTokens.length &&
+                position.from.underlyingTokens[0].address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
+                position.from.underlyingTokens[0];
+              underlyingTokenFrom = underlyingTokenFrom && {
+                ...underlyingTokenFrom,
+                underlyingTokens: [position.from],
+              };
+              if (underlyingTokenFrom && underlyingTokenFrom.address === wrappedProtocolToken.address) {
+                underlyingTokenFrom = {
+                  ...protocolToken,
+                  underlyingTokens: [position.from],
+                };
+              }
+              let underlyingTokenTo =
+                !!position.to.underlyingTokens.length &&
+                position.to.underlyingTokens[0].address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
+                position.to.underlyingTokens[0];
+              underlyingTokenTo = underlyingTokenTo && {
+                ...underlyingTokenTo,
+                underlyingTokens: [position.to],
+              };
+              if (
+                underlyingTokenTo &&
+                underlyingTokenTo.address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
+                underlyingTokenTo.address === wrappedProtocolToken.address
+              ) {
+                underlyingTokenTo = {
+                  ...protocolToken,
+                  underlyingTokens: [position.to],
+                };
+              }
+              const baseFrom = position.from.address === wrappedProtocolToken.address ? protocolToken : position.from;
+              const baseTo = position.to.address === wrappedProtocolToken.address ? protocolToken : position.to;
+
+              const fromToUse = underlyingTokenFrom || baseFrom;
+              const toToUse = underlyingTokenTo || baseTo;
+
+              console.log(fromToUse, toToUse, position.from, position.to);
+
               const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
               return {
-                from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-                to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+                from: fromToUse,
+                to: toToUse,
                 user: position.user,
                 swapInterval: BigNumber.from(position.swapInterval.interval),
                 swapped: BigNumber.from(position.totalSwapped),
@@ -200,6 +240,8 @@ export default class PositionService {
       }
       return acc;
     }, currentPositions);
+
+    console.log(this.currentPositions);
 
     this.hasFetchedCurrentPositions = true;
   }

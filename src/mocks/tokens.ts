@@ -1,4 +1,4 @@
-import { NETWORKS } from 'config/constants';
+import { NETWORKS, TOKEN_TYPE_BASE, TOKEN_TYPE_WRAPPED } from 'config/constants';
 import { Token } from 'types';
 
 const DAI_ADDRESSES = {
@@ -17,6 +17,8 @@ export const DAI = (chainId: number): Token => ({
   address: DAI_ADDRESSES[chainId] || DAI_ADDRESSES[1],
   name: 'Dai stable coin',
   symbol: 'DAI',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png',
 });
@@ -38,6 +40,8 @@ export const WETH = (chainId: number): Token => ({
   address: WETH_ADDRESSES[chainId] || WETH_ADDRESSES[1],
   name: 'Wrapped Ether',
   symbol: 'WETH',
+  type: TOKEN_TYPE_WRAPPED,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
 });
@@ -59,6 +63,8 @@ export const USDC = (chainId: number): Token => ({
   address: USDC_ADDRESSES[chainId] || USDC_ADDRESSES[1],
   name: 'USD Coin',
   symbol: 'USDC',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
 });
@@ -72,6 +78,8 @@ export const ETH = (chainId: number): Token => ({
   address: PROTOCOL_TOKEN_ADDRESS,
   name: 'Ethereum',
   symbol: 'ETH',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
 });
 
@@ -81,6 +89,8 @@ export const MATIC = (chainId: number): Token => ({
   address: PROTOCOL_TOKEN_ADDRESS,
   name: 'Matic',
   symbol: 'MATIC',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270/logo.png',
 });
@@ -96,8 +106,9 @@ export const WMATIC = (chainId: number): Token => ({
   address: WMATIC_ADDRESSES[chainId] || WMATIC_ADDRESSES[1],
   name: 'Wrapped Matic',
   symbol: 'WMATIC',
-  logoURI:
-    'https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+  logoURI: 'https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png',
 });
 
 export const PROTOCOL_TOKEN = {
@@ -148,6 +159,8 @@ export const UNI = (chainId: number): Token => ({
   address: UNI_ADDRESSES[chainId] || UNI_ADDRESSES[1],
   name: 'Uniswap',
   symbol: 'UNI',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984/logo.png',
 });
@@ -163,6 +176,8 @@ export const USDT = (chainId: number): Token => ({
   address: USDT_ADDRESSES[chainId] || USDT_ADDRESSES[1],
   name: 'Tether USD',
   symbol: 'USDT',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
 });
@@ -178,6 +193,8 @@ export const WBTC = (chainId: number): Token => ({
   address: WBTC_ADDRESSES[chainId] || WBTC_ADDRESSES[1],
   name: 'Wrapped BTC',
   symbol: 'WBTC',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png',
 });
@@ -193,6 +210,8 @@ export const CDAI = (chainId: number): Token => ({
   address: CDAI_ADDRESSES[chainId] || CDAI_ADDRESSES[1],
   name: 'Compound DAI',
   symbol: 'cDAI',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png',
 });
@@ -208,6 +227,8 @@ export const CUSDC = (chainId: number): Token => ({
   address: CUSDC_ADDRESSES[chainId] || CUSDC_ADDRESSES[1],
   name: 'Compound USDC',
   symbol: 'cUSDC',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
 });
@@ -223,6 +244,8 @@ export const MKR = (chainId: number): Token => ({
   address: MKR_ADDRESSES[chainId] || MKR_ADDRESSES[1],
   name: 'MakerDAO',
   symbol: 'MKR',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2/logo.png',
 });
@@ -238,6 +261,8 @@ export const COMP = (chainId: number): Token => ({
   address: COMP_ADDRESSES[chainId] || COMP_ADDRESSES[1],
   name: 'Compound',
   symbol: 'COMP',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc00e94Cb662C3520282E6f5717214004A7f26888/logo.png',
 });
@@ -253,6 +278,8 @@ export const LINK = (chainId: number): Token => ({
   address: LINK_ADDRESSES[chainId] || LINK_ADDRESSES[1],
   name: 'ChainLink',
   symbol: 'LINK',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x514910771AF9Ca656af840dff83E8264EcF986CA/logo.png',
 });
@@ -268,16 +295,20 @@ export const SNX = (chainId: number): Token => ({
   address: SNX_ADDRESSES[chainId] || SNX_ADDRESSES[1],
   name: 'SNX',
   symbol: 'SNX',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
 });
 
-export const EMPTY_TOKEN = {
+export const EMPTY_TOKEN: Token = {
   chainId: -1,
   decimals: 18,
   address: 'none',
   name: 'EMPTY',
   symbol: 'EMTPY',
   logoURI: '',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
 };
 
 export const KOVAN_TOKENS = {
