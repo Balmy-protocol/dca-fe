@@ -55,6 +55,8 @@ export interface Position {
   chainId: number;
   pairLastSwappedAt: number;
   pairNextSwapAvailableAt: string;
+  yieldFrom?: string;
+  yieldTo?: string;
 }
 
 export interface FullPosition {
