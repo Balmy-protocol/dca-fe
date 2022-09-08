@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { TOKEN_TYPE_BASE } from 'config';
 import _Decimal from 'decimal.js-light';
 import { BigNumber } from 'ethers';
 import JSBI from 'jsbi';
@@ -58,6 +59,8 @@ export const emptyTokenWithAddress: (address: string) => Token = (address: strin
   address,
   name: '',
   symbol: '',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
 });
 
 export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) => ({
@@ -66,6 +69,8 @@ export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) 
   symbol,
   name: '',
   address: '0x00000000000000000',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
 });
 
 export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: number) => ({
@@ -74,4 +79,6 @@ export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: nu
   symbol: '',
   name: '',
   address: '0x00000000000000000',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
 });
