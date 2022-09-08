@@ -203,8 +203,6 @@ export default class PositionService {
               const fromToUse = underlyingTokenFrom || baseFrom;
               const toToUse = underlyingTokenTo || baseTo;
 
-              console.log(fromToUse, toToUse, position.from, position.to);
-
               const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
               return {
                 from: fromToUse,
@@ -240,8 +238,6 @@ export default class PositionService {
       }
       return acc;
     }, currentPositions);
-
-    console.log(this.currentPositions);
 
     this.hasFetchedCurrentPositions = true;
   }
