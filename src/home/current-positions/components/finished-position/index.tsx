@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
-import { NetworkStruct, Position, Token } from 'types';
+import { NetworkStruct, Position, Token, YieldOptions } from 'types';
 import { useHistory } from 'react-router-dom';
 import { NETWORKS, POSITION_VERSION_2, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -22,6 +22,8 @@ import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } fro
 import useWalletService from 'hooks/useWalletService';
 import { useAppDispatch } from 'state/hooks';
 import { setPosition } from 'state/position-details/actions';
+import ComposedTokenIcon from 'common/composed-token-icon';
+import CustomChip from 'common/custom-chip';
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;
@@ -71,11 +73,12 @@ const StyledCardTitleHeader = styled.div`
   }
 `;
 
-const StyledDetailWrapper = styled.div<{ alignItems?: string }>`
+const StyledDetailWrapper = styled.div<{ alignItems?: string; gap?: boolean }>`
   margin-bottom: 5px;
   display: flex;
   align-items: ${({ alignItems }) => alignItems || 'center'};
   justify-content: flex-start;
+  ${({ gap }) => (gap ? 'gap: 5px;' : '')}
 `;
 
 const StyledCardFooterButton = styled(Button)`
@@ -136,6 +139,7 @@ interface ActivePositionProps {
   disabled: boolean;
   hasSignSupport: boolean;
   network: NetworkStruct;
+  yieldOptions: YieldOptions;
 }
 
 const ActivePosition = ({
@@ -147,6 +151,7 @@ const ActivePosition = ({
   disabled,
   hasSignSupport,
   network,
+  yieldOptions,
 }: ActivePositionProps) => {
   const { from, to, swapInterval, remainingLiquidity, remainingSwaps, pendingTransaction, toWithdraw, chainId } =
     position;
@@ -190,6 +195,12 @@ const ActivePosition = ({
   };
 
   const isOldVersion = position.version === POSITION_VERSION_2;
+
+  const foundYieldFrom =
+    position.from.underlyingTokens[0] &&
+    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
+  const foundYieldTo =
+    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
   return (
     <StyledCard variant="outlined">
@@ -270,6 +281,42 @@ const ActivePosition = ({
               />
             </Typography>
           </StyledDetailWrapper>
+          {!foundYieldFrom && !foundYieldTo && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="positionNotGainingInterest"
+                  defaultMessage="Position not gaining interest"
+                />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {(foundYieldFrom || foundYieldTo) && (
+            <StyledDetailWrapper alignItems="flex-start" gap>
+              {foundYieldFrom && (
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon isInChip size="20px" tokenTop={foundYieldFrom.token} tokenBottom={position.to} />
+                  }
+                >
+                  <Typography variant="body2" fontWeight={500}>
+                    APY {foundYieldFrom.apy.toFixed(0)}%
+                  </Typography>
+                </CustomChip>
+              )}
+              {foundYieldTo && (
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon isInChip size="20px" tokenTop={foundYieldTo.token} tokenBottom={position.from} />
+                  }
+                >
+                  <Typography variant="body2" fontWeight={500}>
+                    APY {foundYieldTo.apy.toFixed(0)}%
+                  </Typography>
+                </CustomChip>
+              )}
+            </StyledDetailWrapper>
+          )}
         </StyledContentContainer>
         <StyledCallToActionContainer>
           <StyledCardFooterButton
