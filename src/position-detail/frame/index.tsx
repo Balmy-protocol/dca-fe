@@ -195,8 +195,9 @@ const PositionDetailFrame = () => {
       return;
     }
     try {
+      const hasYield = position.to.underlyingTokens.length;
       let hasPermission = true;
-      if (useProtocolToken) {
+      if (useProtocolToken || hasYield) {
         hasPermission = await positionService.companionHasPermission(
           fullPositionToMappedPosition(position),
           PERMISSIONS.WITHDRAW
@@ -221,7 +222,8 @@ const PositionDetailFrame = () => {
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
-                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}."
+                  values={{ from: position.to.symbol }}
                 />
               </Typography>
             )}
