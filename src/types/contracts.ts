@@ -68,7 +68,7 @@ export class HubCompanionContract extends Contract {
     overrides?: { value?: BigNumber }
   ) => Promise<TransactionResponse>;
 
-  withdrawSwappedUsingProtocolToken: (id: string, recipient: string) => Promise<TransactionResponse>;
+  withdrawSwappedUsingOtherToken: (id: string, recipient: string) => Promise<TransactionResponse>;
 
   terminateUsingProtocolTokenAsFrom: (
     id: string,
