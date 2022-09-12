@@ -50,6 +50,7 @@ import {
 } from 'config/constants';
 import { PermissionManagerContract } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
+import { getDisplayToken } from 'utils/parsing';
 import gqlFetchAll, { GraphqlResults } from 'utils/gqlFetchAll';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -156,52 +157,14 @@ export default class PositionService {
 
     this.currentPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
-      const protocolToken = getProtocolToken(network);
-      const wrappedProtocolToken = getWrappedProtocolToken(network);
       if (gqlResult.data) {
         return {
           ...acc,
           ...keyBy(
             gqlResult.data.positions.map((position: PositionResponse) => {
               const existingPosition = this.currentPositions[`${position.id}-v${version}`];
-
-              let underlyingTokenFrom =
-                !!position.from.underlyingTokens.length &&
-                position.from.underlyingTokens[0].address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
-                position.from.underlyingTokens[0];
-              underlyingTokenFrom = underlyingTokenFrom && {
-                ...underlyingTokenFrom,
-                underlyingTokens: [position.from],
-              };
-              if (underlyingTokenFrom && underlyingTokenFrom.address === wrappedProtocolToken.address) {
-                underlyingTokenFrom = {
-                  ...protocolToken,
-                  underlyingTokens: [position.from],
-                };
-              }
-              let underlyingTokenTo =
-                !!position.to.underlyingTokens.length &&
-                position.to.underlyingTokens[0].address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
-                position.to.underlyingTokens[0];
-              underlyingTokenTo = underlyingTokenTo && {
-                ...underlyingTokenTo,
-                underlyingTokens: [position.to],
-              };
-              if (
-                underlyingTokenTo &&
-                underlyingTokenTo.address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
-                underlyingTokenTo.address === wrappedProtocolToken.address
-              ) {
-                underlyingTokenTo = {
-                  ...protocolToken,
-                  underlyingTokens: [position.to],
-                };
-              }
-              const baseFrom = position.from.address === wrappedProtocolToken.address ? protocolToken : position.from;
-              const baseTo = position.to.address === wrappedProtocolToken.address ? protocolToken : position.to;
-
-              const fromToUse = underlyingTokenFrom || baseFrom;
-              const toToUse = underlyingTokenTo || baseTo;
+              const fromToUse = getDisplayToken(position.from, network);
+              const toToUse = getDisplayToken(position.to, network);
 
               const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
               return {
