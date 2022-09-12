@@ -27,23 +27,25 @@ export default class YieldService {
     this.client = client;
   }
 
-  async getYieldOptions(): Promise<YieldOptions> {
+  async getYieldOptions(chainId?: number): Promise<YieldOptions> {
     const network = await this.walletService.getNetwork();
+
+    const chainidTouse = chainId || network.chainId;
 
     const defillamaYields = await this.axiosClient.get<DefillamaResponse>('https://yields.llama.fi/pools');
 
     const yields = defillamaYields.data.data;
 
-    const yieldsByChain = ALLOWED_YIELDS[network.chainId];
+    const yieldsByChain = ALLOWED_YIELDS[chainidTouse];
 
     return yieldsByChain.map((baseYield) => {
       const foundYield = find(yields, { pool: baseYield.poolId });
 
       let enabledTokens = foundYield?.underlyingTokens || [];
 
-      const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
+      const wrappedProtocolToken = getWrappedProtocolToken(chainidTouse);
 
-      const protocolToken = getProtocolToken(network.chainId);
+      const protocolToken = getProtocolToken(chainidTouse);
 
       if (enabledTokens.includes(wrappedProtocolToken.address)) {
         enabledTokens = [...enabledTokens, protocolToken.address];

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FullPosition, GetPairSwapsData } from 'types';
+import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import TokenIcon from 'common/token-icon';
@@ -32,6 +32,8 @@ import { buildEtherscanTransaction } from 'utils/etherscan';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import find from 'lodash/find';
 import useWalletService from 'hooks/useWalletService';
+import CustomChip from 'common/custom-chip';
+import ComposedTokenIcon from 'common/composed-token-icon';
 
 interface DetailsProps {
   position: FullPosition;
@@ -40,6 +42,7 @@ interface DetailsProps {
   onWithdraw: (useProtocolToken: boolean) => void;
   onReusePosition: () => void;
   disabled: boolean;
+  yieldOptions: YieldOptions;
 }
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
@@ -158,7 +161,15 @@ const StyledCallToActionContainer = styled.div`
   gap: 16px;
 `;
 
-const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePosition, disabled }: DetailsProps) => {
+const Details = ({
+  position,
+  pair,
+  pendingTransaction,
+  onWithdraw,
+  onReusePosition,
+  disabled,
+  yieldOptions,
+}: DetailsProps) => {
   const { from, to, swapInterval, current, chainId } = position;
 
   const positionNetwork = React.useMemo(() => {
@@ -232,6 +243,13 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
   const shouldDisableWithdraw = toWithdraw.lte(BigNumber.from(0));
 
   const isOwner = account && account.toLowerCase() === position.user.toLowerCase();
+
+  const foundYieldFrom =
+    position.from.underlyingTokens[0] &&
+    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
+  const foundYieldTo =
+    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
+
   return (
     <StyledCard>
       {positionNetwork && (
@@ -471,6 +489,55 @@ const Details = ({ position, pair, pendingTransaction, onWithdraw, onReusePositi
               )}
             </Typography>
           </StyledDetailWrapper>
+          {foundYieldFrom && (
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="positionDetailsYieldFromTitle"
+                  defaultMessage="{from} yield:"
+                  values={{ from: position.from.symbol }}
+                />
+              </Typography>
+              <Typography variant="body1" sx={{ marginLeft: '5px' }}>
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon
+                      isInChip
+                      size="16px"
+                      tokenTop={foundYieldFrom.token}
+                      tokenBottom={position.from}
+                    />
+                  }
+                >
+                  <Typography variant="body2" fontWeight={500}>
+                    APY {foundYieldFrom.apy.toFixed(0)}%
+                  </Typography>
+                </CustomChip>
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {foundYieldTo && (
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="positionDetailsYieldFromTitle"
+                  defaultMessage="{to} yield:"
+                  values={{ to: position.to.symbol }}
+                />
+              </Typography>
+              <Typography variant="body1" sx={{ marginLeft: '5px' }}>
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo.token} tokenBottom={position.to} />
+                  }
+                >
+                  <Typography variant="body2" fontWeight={500}>
+                    APY {foundYieldTo.apy.toFixed(0)}%
+                  </Typography>
+                </CustomChip>
+              </Typography>
+            </StyledDetailWrapper>
+          )}
         </StyledContentContainer>
         {isOwner && position.status !== 'TERMINATED' && (
           <StyledCallToActionContainer>
