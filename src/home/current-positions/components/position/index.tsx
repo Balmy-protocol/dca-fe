@@ -387,7 +387,12 @@ const ActivePosition = ({
               {foundYieldFrom && (
                 <CustomChip
                   icon={
-                    <ComposedTokenIcon isInChip size="20px" tokenTop={foundYieldFrom.token} tokenBottom={position.to} />
+                    <ComposedTokenIcon
+                      isInChip
+                      size="16px"
+                      tokenTop={foundYieldFrom.token}
+                      tokenBottom={position.from}
+                    />
                   }
                 >
                   <Typography variant="body2" fontWeight={500}>
@@ -398,7 +403,7 @@ const ActivePosition = ({
               {foundYieldTo && (
                 <CustomChip
                   icon={
-                    <ComposedTokenIcon isInChip size="20px" tokenTop={foundYieldTo.token} tokenBottom={position.from} />
+                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo.token} tokenBottom={position.to} />
                   }
                 >
                   <Typography variant="body2" fontWeight={500}>
