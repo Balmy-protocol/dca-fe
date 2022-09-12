@@ -532,7 +532,9 @@ export default class PositionService {
       throw new Error('Should not call withdraw without it being protocol token');
     }
 
-    if (!useProtocolToken) {
+    const hasYield = position.to.underlyingTokens.length;
+
+    if (!useProtocolToken && !hasYield) {
       const hubInstance = await this.contractService.getHubInstance(position.version);
 
       return hubInstance.withdrawSwapped(position.positionId, this.walletService.getAccount());
@@ -541,10 +543,11 @@ export default class PositionService {
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
 
     if (companionHasPermission) {
-      return this.meanApiService.withdrawSwappedUsingProtocolToken(
+      return this.meanApiService.withdrawSwappedUsingOtherToken(
         position.positionId,
         this.walletService.getAccount(),
-        position.version
+        position.version,
+        useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : position.to.address
       );
     }
 
@@ -554,10 +557,11 @@ export default class PositionService {
       PERMISSIONS.WITHDRAW
     );
 
-    return this.meanApiService.withdrawSwappedUsingProtocolToken(
+    return this.meanApiService.withdrawSwappedUsingOtherToken(
       position.positionId,
       this.walletService.getAccount(),
       position.version,
+      useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : position.to.address,
       { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
   }
@@ -576,7 +580,11 @@ export default class PositionService {
       throw new Error('Should not call terminate without it being protocol token');
     }
 
-    if (!useProtocolToken) {
+    const hasYield =
+      (position.from.underlyingTokens.length && position.remainingLiquidity.gt(BigNumber.from(0))) ||
+      (position.to.underlyingTokens.length && position.toWithdraw.gt(BigNumber.from(0)));
+
+    if (!useProtocolToken && !hasYield) {
       const hubInstance = await this.contractService.getHubInstance(position.version);
 
       return hubInstance.terminate(
@@ -589,19 +597,13 @@ export default class PositionService {
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
     if (companionHasPermission) {
-      if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
-        return this.meanApiService.terminateUsingProtocolTokenAsTo(
-          position.positionId,
-          this.walletService.getAccount(),
-          this.walletService.getAccount(),
-          position.version
-        );
-      }
-      return this.meanApiService.terminateUsingProtocolTokenAsFrom(
+      return this.meanApiService.terminateUsingOtherTokens(
         position.positionId,
         this.walletService.getAccount(),
         this.walletService.getAccount(),
-        position.version
+        position.version,
+        position.to.address,
+        position.from.address
       );
     }
 
@@ -618,29 +620,21 @@ export default class PositionService {
       erc712Name
     );
 
-    if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
-      return this.meanApiService.terminateUsingProtocolTokenAsTo(
-        position.positionId,
-        this.walletService.getAccount(),
-        this.walletService.getAccount(),
-        position.version,
-        {
-          permissions,
-          deadline: deadline.toString(),
-          v,
-          r: hexlify(r),
-          s: hexlify(s),
-          tokenId: position.positionId,
-        }
-      );
-    }
-
-    return this.meanApiService.terminateUsingProtocolTokenAsFrom(
+    return this.meanApiService.terminateUsingOtherTokens(
       position.positionId,
       this.walletService.getAccount(),
       this.walletService.getAccount(),
       position.version,
-      { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
+      position.to.address,
+      position.from.address,
+      {
+        permissions,
+        deadline: deadline.toString(),
+        v,
+        r: hexlify(r),
+        s: hexlify(s),
+        tokenId: position.positionId,
+      }
     );
   }
 
