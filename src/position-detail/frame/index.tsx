@@ -30,7 +30,7 @@ import NFTModal from 'common/view-nft-modal';
 import TransferPositionModal from 'common/transfer-position-modal';
 import TerminateModal from 'common/terminate-modal';
 import ModifySettingsModal from 'common/modify-settings-modal';
-import { fullPositionToMappedPosition } from 'utils/parsing';
+import { fullPositionToMappedPosition, getDisplayToken } from 'utils/parsing';
 import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES, PositionVersions, NETWORKS } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
@@ -40,6 +40,7 @@ import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import { setPosition } from 'state/position-details/actions';
 import { usePositionDetails } from 'state/position-details/hooks';
 import useGqlFetchAll from 'hooks/useGqlFetchAll';
+import useYieldOptions from 'hooks/useYieldOptions';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
 
@@ -111,13 +112,14 @@ const PositionDetailFrame = () => {
 
   const wrappedProtocolToken = getWrappedProtocolToken(Number(chainId) || NETWORKS.optimism.chainId);
   const protocolToken = getProtocolToken(Number(chainId));
+  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(Number(chainId));
 
   const position: FullPosition | undefined = data && {
     ...data.position,
     chainId: Number(chainId),
     version: positionVersion,
-    from: data.position.from.address === wrappedProtocolToken.address ? protocolToken : data.position.from,
-    to: data.position.to.address === wrappedProtocolToken.address ? protocolToken : data.position.to,
+    from: getDisplayToken(data.position.from, Number(chainId)),
+    to: getDisplayToken(data.position.to, Number(chainId)),
   };
 
   const pendingTransaction = usePositionHasPendingTransaction(
@@ -164,7 +166,7 @@ const PositionDetailFrame = () => {
 
   const positionNotFound = !position && data && !isLoading;
 
-  if (isLoading || !data || (!position && !positionNotFound) || isLoadingSwaps) {
+  if (isLoading || !data || (!position && !positionNotFound) || isLoadingSwaps || isLoadingYieldOptions) {
     return (
       <Grid container>
         <CenteredLoadingIndicator size={70} />
@@ -341,6 +343,8 @@ const PositionDetailFrame = () => {
               onWithdraw={onWithdraw}
               onReusePosition={onShowModifyRateSettings}
               disabled={shouldShowChangeNetwork}
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              yieldOptions={yieldOptions!}
             />
           )}
           {tabIndex === 1 && (

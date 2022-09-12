@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import PositionSwaps from 'position-detail/swaps';
-import { FullPosition, GetPairSwapsData } from 'types';
+import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
 import Details from 'position-detail/position-data';
 import Sticky from 'react-stickynode';
 import GraphContainer from 'position-detail/graph-container';
@@ -37,6 +37,7 @@ interface PositionSummaryContainerProps {
   onWithdraw: (useProtocolToken: boolean) => void;
   onReusePosition: () => void;
   disabled: boolean;
+  yieldOptions: YieldOptions;
 }
 
 const PositionSummaryContainer = ({
@@ -46,6 +47,7 @@ const PositionSummaryContainer = ({
   onWithdraw,
   onReusePosition,
   disabled,
+  yieldOptions,
 }: PositionSummaryContainerProps) => (
   <>
     <Grid container spacing={4} alignItems="flex-start">
@@ -59,6 +61,7 @@ const PositionSummaryContainer = ({
               onWithdraw={onWithdraw}
               onReusePosition={onReusePosition}
               disabled={disabled}
+              yieldOptions={yieldOptions}
             />
           </StyledPaper>
         </Sticky>

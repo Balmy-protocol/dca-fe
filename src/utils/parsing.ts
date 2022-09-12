@@ -3,6 +3,7 @@ import find from 'lodash/find';
 import some from 'lodash/some';
 import { FullPosition, Position, Token } from 'types';
 import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -103,6 +104,33 @@ export function getURLFromQuery(query: string) {
   }
   return '';
 }
+
+export const getDisplayToken = (token: Token, chainId?: number) => {
+  const chainIdToUse = chainId || token.chainId;
+  const protocolToken = getProtocolToken(chainIdToUse);
+  const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
+
+  let underlyingToken =
+    !!token.underlyingTokens.length &&
+    token.underlyingTokens[0].address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
+    token.underlyingTokens[0];
+
+  underlyingToken = underlyingToken && {
+    ...underlyingToken,
+    underlyingTokens: [token],
+  };
+
+  if (underlyingToken && underlyingToken.address === wrappedProtocolToken.address) {
+    underlyingToken = {
+      ...protocolToken,
+      underlyingTokens: [token],
+    };
+  }
+
+  const baseToken = token.address === wrappedProtocolToken.address ? protocolToken : token;
+
+  return underlyingToken || baseToken;
+};
 
 export function fullPositionToMappedPosition(position: FullPosition, positionVersion?: string): Position {
   return {

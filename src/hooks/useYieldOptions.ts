@@ -6,19 +6,20 @@ import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
 import useYieldService from './useYieldService';
 
-function useYieldOptions(): [YieldOptions | undefined, boolean, string?] {
+function useYieldOptions(chainId?: number): [YieldOptions | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const yieldService = useYieldService();
   const walletService = useWalletService();
   const [result, setResult] = React.useState<YieldOptions | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const currentNetwork = useCurrentNetwork();
+  const chainIdToUse = chainId || currentNetwork.chainId;
   const prevResult = usePrevious(result, false);
 
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const options = await yieldService.getYieldOptions();
+        const options = await yieldService.getYieldOptions(chainIdToUse);
         setResult(options);
         setError(undefined);
       } catch (e) {
