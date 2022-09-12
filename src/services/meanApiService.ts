@@ -100,10 +100,11 @@ export default class MeanApiService {
     return singer.sendTransaction(transactionToSend.data.tx);
   }
 
-  async withdrawSwappedUsingProtocolToken(
+  async withdrawSwappedUsingOtherToken(
     id: string,
     recipient: string,
     positionVersion: PositionVersions,
+    convertTo: string,
     permissionPermit?: PermissionPermit
   ) {
     const singer = this.walletService.getSigner();
@@ -116,8 +117,38 @@ export default class MeanApiService {
       `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/withdraw-and-swap`,
       {
         positionId: id,
-        convertTo: PROTOCOL_TOKEN_ADDRESS,
+        convertTo,
         recipient,
+        hub: hubAddress,
+        permissionPermit,
+      }
+    );
+
+    return singer.sendTransaction(transactionToSend.data.tx);
+  }
+
+  async terminateUsingOtherTokens(
+    id: string,
+    recipientUnswapped: string,
+    recipientSwapped: string,
+    positionVersion: PositionVersions,
+    tokenFrom: string,
+    tokenTo: string,
+    permissionPermit?: PermissionPermit
+  ) {
+    const singer = this.walletService.getSigner();
+
+    const currentNetwork = await this.walletService.getNetwork();
+    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
+
+    // Call to api and get transaction
+    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/terminate-and-swap`,
+      {
+        positionId: id,
+        recipient: recipientSwapped,
+        unswappedConvertFrom: tokenFrom,
+        unswappedConvertTo: tokenTo,
         hub: hubAddress,
         permissionPermit,
       }
