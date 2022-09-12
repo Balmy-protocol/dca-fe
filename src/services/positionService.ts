@@ -998,8 +998,8 @@ export default class PositionService {
       case TRANSACTION_TYPES.NEW_POSITION: {
         const newPositionTypeData = transaction.typeData as NewPositionTypeData;
         const newId = newPositionTypeData.id;
-        if (!this.currentPositions[`${newId}-${newPositionTypeData.version}`]) {
-          this.currentPositions[`${newId}-${newPositionTypeData.version}`] = {
+        if (!this.currentPositions[`${newId}-v${newPositionTypeData.version}`]) {
+          this.currentPositions[`${newId}-v${newPositionTypeData.version}`] = {
             ...this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
             pendingTransaction: '',
             id: `${newId}-v${newPositionTypeData.version}`,
