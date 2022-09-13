@@ -219,7 +219,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
       let hasPermission = true;
 
-      if (!useWrappedProtocolToken) {
+      const hasYield = position.from.underlyingTokens.length;
+
+      if (!useWrappedProtocolToken || hasYield) {
         hasPermission = await positionService.companionHasPermission(
           position,
           isIncreasingPosition ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
@@ -243,22 +245,23 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 }}
               />
             </Typography>
-            {position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken && !hasPermission && (
-              <Typography variant="body1">
-                {!isIncreasingPosition && (
-                  <FormattedMessage
-                    description="Approve signature companion text decrease"
-                    defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
-                  />
-                )}
-                {isIncreasingPosition && (
-                  <FormattedMessage
-                    description="Approve signature companion text increase"
-                    defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary ETH."
-                  />
-                )}
-              </Typography>
-            )}
+            {((position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken) || hasYield) &&
+              !hasPermission && (
+                <Typography variant="body1">
+                  {!isIncreasingPosition && (
+                    <FormattedMessage
+                      description="Approve signature companion text decrease"
+                      defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                    />
+                  )}
+                  {isIncreasingPosition && (
+                    <FormattedMessage
+                      description="Approve signature companion text increase"
+                      defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary ETH."
+                    />
+                  )}
+                </Typography>
+              )}
           </>
         ),
       });

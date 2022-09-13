@@ -98,6 +98,9 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address
           ? protocolOrWrappedToken
           : position.to.symbol;
+
+      const hasYield = position.to.underlyingTokens.length;
+
       setModalLoading({
         content: (
           <>
@@ -108,7 +111,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                 values={{ toSymbol }}
               />
             </Typography>
-            {useProtocolToken && !hasPermission && (
+            {(useProtocolToken || hasYield) && !hasPermission && (
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"

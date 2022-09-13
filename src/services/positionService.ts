@@ -47,6 +47,7 @@ import {
   TRANSACTION_TYPES,
   PositionVersions,
   LATEST_VERSION,
+  SIGN_VERSION,
 } from 'config/constants';
 import { PermissionManagerContract } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
@@ -345,7 +346,7 @@ export default class PositionService {
     const rawSignature = await (signer as VoidSigner)._signTypedData(
       {
         name: signName,
-        version: '1',
+        version: SIGN_VERSION[position.version],
         chainId: currentNetwork.chainId,
         verifyingContract: permissionManagerAddress,
       },
@@ -638,94 +639,6 @@ export default class PositionService {
     );
   }
 
-  async addFunds(position: Position, newDeposit: string): Promise<TransactionResponse> {
-    const hubInstance = await this.contractService.getHubInstance(position.version);
-
-    const newRate = parseUnits(newDeposit, position.from.decimals)
-      .add(position.remainingLiquidity)
-      .div(BigNumber.from(position.remainingSwaps));
-
-    const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
-    if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return this.meanApiService.increasePositionUsingProtocolToken(
-          position.positionId,
-          newAmount.sub(position.remainingLiquidity),
-          position.remainingSwaps,
-          position.version
-        );
-      }
-      return hubInstance.increasePosition(
-        position.positionId,
-        newAmount.sub(position.remainingLiquidity),
-        position.remainingSwaps
-      );
-    }
-
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return this.meanApiService.reducePositionUsingProtocolToken(
-        position.positionId,
-        position.remainingLiquidity.sub(newAmount),
-        position.remainingSwaps,
-        this.walletService.getAccount(),
-        position.version
-      );
-    }
-
-    return hubInstance.reducePosition(
-      position.positionId,
-      position.remainingLiquidity.sub(newAmount),
-      position.remainingSwaps,
-      this.walletService.getAccount()
-    );
-  }
-
-  async resetPosition(position: Position, newDeposit: string, newSwaps: string): Promise<TransactionResponse> {
-    const hubInstance = await this.contractService.getHubInstance(position.version);
-
-    if (BigNumber.from(newSwaps).gt(BigNumber.from(MAX_UINT_32))) {
-      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
-    }
-
-    const newRate = parseUnits(newDeposit, position.from.decimals)
-      .add(position.remainingLiquidity)
-      .div(BigNumber.from(newSwaps));
-
-    const newAmount = newRate.mul(BigNumber.from(newSwaps));
-    if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return this.meanApiService.increasePositionUsingProtocolToken(
-          position.positionId,
-          newAmount.sub(position.remainingLiquidity),
-          BigNumber.from(newSwaps),
-          position.version
-        );
-      }
-      return hubInstance.increasePosition(
-        position.positionId,
-        newAmount.sub(position.remainingLiquidity),
-        BigNumber.from(newSwaps)
-      );
-    }
-
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return this.meanApiService.reducePositionUsingProtocolToken(
-        position.positionId,
-        position.remainingLiquidity.sub(newAmount),
-        BigNumber.from(newSwaps),
-        this.walletService.getAccount(),
-        position.version
-      );
-    }
-
-    return hubInstance.reducePosition(
-      position.positionId,
-      position.remainingLiquidity.sub(newAmount),
-      BigNumber.from(newSwaps),
-      this.walletService.getAccount()
-    );
-  }
-
   async modifyRateAndSwaps(
     position: Position,
     newRate: string,
@@ -751,7 +664,9 @@ export default class PositionService {
 
     const newAmount = BigNumber.from(parseUnits(newRate, position.from.decimals)).mul(BigNumber.from(newSwaps));
 
-    if (position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) {
+    const hasYield = position.from.underlyingTokens.length;
+
+    if ((position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) && !hasYield) {
       if (newAmount.gte(position.remainingLiquidity)) {
         return hubInstance.increasePosition(
           position.positionId,
@@ -772,11 +687,12 @@ export default class PositionService {
       const companionHasIncrease = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
 
       if (companionHasIncrease) {
-        return this.meanApiService.increasePositionUsingProtocolToken(
+        return this.meanApiService.increasePositionUsingOtherToken(
           position.positionId,
           newAmount.sub(position.remainingLiquidity),
           BigNumber.from(newSwaps),
-          position.version
+          position.version,
+          position.from.address
         );
       }
 
@@ -786,11 +702,12 @@ export default class PositionService {
         PERMISSIONS.INCREASE
       );
 
-      return this.meanApiService.increasePositionUsingProtocolToken(
+      return this.meanApiService.increasePositionUsingOtherToken(
         position.positionId,
         newAmount.sub(position.remainingLiquidity),
         BigNumber.from(newSwaps),
         position.version,
+        position.from.address,
         {
           permissions,
           deadline: deadline.toString(),
@@ -805,12 +722,13 @@ export default class PositionService {
     const companionHasReduce = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
 
     if (companionHasReduce) {
-      return this.meanApiService.reducePositionUsingProtocolToken(
+      return this.meanApiService.reducePositionUsingOtherToken(
         position.positionId,
         position.remainingLiquidity.sub(newAmount),
         BigNumber.from(newSwaps),
         this.walletService.getAccount(),
-        position.version
+        position.version,
+        position.from.address
       );
     }
 
@@ -820,62 +738,14 @@ export default class PositionService {
       PERMISSIONS.REDUCE
     );
 
-    return this.meanApiService.reducePositionUsingProtocolToken(
+    return this.meanApiService.reducePositionUsingOtherToken(
       position.positionId,
       position.remainingLiquidity.sub(newAmount),
       BigNumber.from(newSwaps),
       this.walletService.getAccount(),
       position.version,
+      position.from.address,
       { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
-    );
-  }
-
-  async removeFunds(position: Position, ammountToRemove: string): Promise<TransactionResponse> {
-    const hubInstance = await this.contractService.getHubInstance(position.version);
-
-    const newSwaps = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
-      ? BigNumber.from(0)
-      : position.remainingSwaps;
-
-    const newRate = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
-      ? BigNumber.from(0)
-      : position.remainingLiquidity
-          .sub(parseUnits(ammountToRemove, position.from.decimals))
-          .div(BigNumber.from(position.remainingSwaps));
-
-    if (newSwaps.gt(BigNumber.from(MAX_UINT_32))) {
-      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
-    }
-
-    const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
-    if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return this.meanApiService.increasePositionUsingProtocolToken(
-          position.positionId,
-          newAmount.sub(position.remainingLiquidity),
-          newSwaps,
-          position.version
-        );
-      }
-
-      return hubInstance.increasePosition(position.positionId, newAmount.sub(position.remainingLiquidity), newSwaps);
-    }
-
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return this.meanApiService.reducePositionUsingProtocolToken(
-        position.positionId,
-        position.remainingLiquidity.sub(newAmount),
-        BigNumber.from(newSwaps),
-        this.walletService.getAccount(),
-        position.version
-      );
-    }
-
-    return hubInstance.reducePosition(
-      position.positionId,
-      position.remainingLiquidity.sub(newAmount),
-      BigNumber.from(newSwaps),
-      this.walletService.getAccount()
     );
   }
 
