@@ -3,10 +3,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { Token } from 'types';
 
-const StyledComposedTokenIconContainer = styled.div`
+const StyledComposedTokenIconContainer = styled.div<{ hasTokenTop: boolean }>`
   display: flex;
   position: relative;
-  margin-right: 10px;
+  margin-right: ${({ hasTokenTop }) => (hasTokenTop ? '10px' : '0px')};
 `;
 
 const StyledBottomTokenContainer = styled.div`
@@ -33,13 +33,15 @@ const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size }: TokenButto
   const realSize = size || '28px';
 
   return (
-    <StyledComposedTokenIconContainer>
+    <StyledComposedTokenIconContainer hasTokenTop={!!tokenTop}>
       <StyledBottomTokenContainer>
         <TokenIcon token={tokenBottom} isInChip={isInChip} size={realSize} />
       </StyledBottomTokenContainer>
-      <StyledTopTokenContainer>
-        <TokenIcon token={tokenTop} isInChip={isInChip} size={realSize} />
-      </StyledTopTokenContainer>
+      {tokenTop && (
+        <StyledTopTokenContainer>
+          <TokenIcon token={tokenTop} isInChip={isInChip} size={realSize} />
+        </StyledTopTokenContainer>
+      )}
     </StyledComposedTokenIconContainer>
   );
 };

@@ -80,14 +80,11 @@ const getLeaderboardPositions = gql`
         operator
         permissions
       }
-      current {
-        id
-        rate
-        remainingSwaps
-        remainingLiquidity
-        withdrawn
-        toWithdraw
-      }
+      rate
+      remainingSwaps
+      remainingLiquidity
+      withdrawn
+      toWithdraw
       history(orderBy: createdAtTimestamp, orderDirection: asc) {
         id
         action

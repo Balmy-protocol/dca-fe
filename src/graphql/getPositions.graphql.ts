@@ -58,13 +58,13 @@ const getCurrentPositions = gql`
         id
         interval
       }
-      current {
-        id
-        rate
-        remainingSwaps
-        remainingLiquidity
-        toWithdraw
-      }
+      rate
+      depositedRateUnderlying
+      accumSwappedUnderlying
+      remainingSwaps
+      remainingLiquidity
+      withdrawn
+      toWithdraw
     }
   }
 `;
