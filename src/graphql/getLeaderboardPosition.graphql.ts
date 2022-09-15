@@ -104,24 +104,18 @@ const getLeaderboardPositions = gql`
           }
         }
 
-        ... on ModifiedRateAndDurationAction {
+        ... on ModifiedAction {
           rate
           oldRate
           remainingSwaps
           oldRemainingSwaps
+          depositedRateUnderlying
+          oldDepositedRateUnderlying
         }
 
-        ... on ModifiedDurationAction {
-          remainingSwaps
-          oldRemainingSwaps
-        }
-
-        ... on ModifiedRateAction {
-          rate
-          oldRate
-        }
         ... on WithdrewAction {
           withdrawn
+          withdrawnUnderlying
         }
 
         ... on SwappedAction {

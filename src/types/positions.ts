@@ -114,6 +114,11 @@ export interface ActionState {
   withdrawn: string;
   permissions: PositionPermission[];
   ratioPerUnitBToAWithFee: string;
+  depositedRateUnderlying: string;
+  swappedUnderlying: string;
+  oldDepositedRateUnderlying: string;
+  withdrawnUnderlying: string;
+  rateUnderlying: string;
   ratioPerUnitAToBWithFee: string;
   createdAtBlock: string;
   createdAtTimestamp: string;
