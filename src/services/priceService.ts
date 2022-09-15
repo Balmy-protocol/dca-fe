@@ -5,7 +5,7 @@ import { CoinGeckoPriceResponse, Token, TxPriceResponse } from 'types';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { COINGECKO_IDS, DEFILLAMA_IDS, NETWORKS } from 'config/constants';
+import { COINGECKO_IDS, DEFILLAMA_IDS, LATEST_VERSION, NETWORKS } from 'config/constants';
 import ContractService from './contractService';
 import WalletService from './walletService';
 
@@ -127,6 +127,12 @@ export default class PriceService {
     const oeGasOracle = await this.contractService.getOEGasOracleInstance();
 
     return oeGasOracle.getL1Fee(data);
+  }
+
+  async getTransformerValue(token: string, value: BigNumber) {
+    const transformerRegistryInstance = await this.contractService.getTransformerRegistryInstance(LATEST_VERSION);
+
+    return transformerRegistryInstance.calculateTransformToUnderlying(token, value);
   }
 
   async getEstimatedPairCreation(

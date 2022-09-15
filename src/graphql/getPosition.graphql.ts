@@ -81,14 +81,15 @@ const getPosition = gql`
         operator
         permissions
       }
-      current {
-        id
-        rate
-        remainingSwaps
-        remainingLiquidity
-        withdrawn
-        toWithdraw
-      }
+
+      rate
+      depositedRateUnderlying
+      accumSwappedUnderlying
+      remainingSwaps
+      remainingLiquidity
+      withdrawn
+      toWithdraw
+
       history(orderBy: createdAtTimestamp, orderDirection: asc, first: $first, skip: $skip) {
         id
         action

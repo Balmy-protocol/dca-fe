@@ -139,12 +139,14 @@ export function fullPositionToMappedPosition(position: FullPosition, positionVer
     user: position.user,
     swapInterval: BigNumber.from(position.swapInterval.interval),
     swapped: BigNumber.from(position.totalSwapped),
-    rate: BigNumber.from(position.current.rate),
-    toWithdraw: BigNumber.from(position.current.toWithdraw),
-    remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-    remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+    rate: BigNumber.from(position.rate),
+    toWithdraw: BigNumber.from(position.toWithdraw),
+    remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+    remainingSwaps: BigNumber.from(position.remainingSwaps),
     withdrawn: BigNumber.from(position.totalWithdrawn),
     totalSwaps: BigNumber.from(position.totalSwaps),
+    depositedRateUnderlying: position.depositedRateUnderlying ? BigNumber.from(position.depositedRateUnderlying) : null,
+    accumSwappedUnderlying: position.accumSwappedUnderlying ? BigNumber.from(position.accumSwappedUnderlying) : null,
     id: `${position.id}-v${position.version || LATEST_VERSION}`,
     positionId: position.id,
     status: position.status,
@@ -182,3 +184,13 @@ export const usdFormatter = (num: number) => {
 
 export const activePositionsPerIntervalToHasToExecute = (activePositionsPerInterval: number[]) =>
   some(activePositionsPerInterval, (activePositions) => activePositions !== 0);
+
+export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, remainingSwaps: BigNumber) => {
+  const yieldFromGenerated = (remainingLiquidity || remainingLiquidity).sub(rate.mul(remainingSwaps));
+
+  return {
+    total: remainingLiquidity,
+    yieldGenerated: yieldFromGenerated,
+    base: remainingLiquidity.sub(yieldFromGenerated),
+  };
+};
