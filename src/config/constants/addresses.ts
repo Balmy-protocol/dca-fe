@@ -438,6 +438,30 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
   },
 };
 
+export const TRANSFORMER_REGISTRY_ADDRESS: AddressMap<PositionVersions> = {
+  [POSITION_VERSION_2]: {
+    [NETWORKS.kovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.optimismKovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.optimism.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.mumbai.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.polygon.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+  },
+  [POSITION_VERSION_3]: {
+    [NETWORKS.kovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.optimismKovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.optimism.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.mumbai.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.polygon.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+  },
+  [POSITION_VERSION_4]: {
+    [NETWORKS.kovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.optimismKovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.optimism.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.mumbai.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+    [NETWORKS.polygon.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
+  },
+};
+
 export const MIGRATOR_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {},
   [POSITION_VERSION_3]: {

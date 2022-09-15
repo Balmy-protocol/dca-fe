@@ -161,14 +161,14 @@ const LeaderboardFrame = () => {
     if (!acc[position.user]) {
       // eslint-disable-next-line no-param-reassign
       acc[position.user] =
-        parseFloat(formatUnits(BigNumber.from(position.current.remainingLiquidity), position.from.decimals)) *
+        parseFloat(formatUnits(BigNumber.from(position.remainingLiquidity), position.from.decimals)) *
           tokensByPrice[position.from.address] +
         parseFloat(formatUnits(BigNumber.from(position.totalSwapped), position.to.decimals)) *
           tokensByPrice[position.to.address];
     } else {
       // eslint-disable-next-line no-param-reassign
       acc[position.user] +=
-        parseFloat(formatUnits(BigNumber.from(position.current.remainingLiquidity), position.from.decimals)) *
+        parseFloat(formatUnits(BigNumber.from(position.remainingLiquidity), position.from.decimals)) *
           tokensByPrice[position.from.address] +
         parseFloat(formatUnits(BigNumber.from(position.totalSwapped), position.to.decimals)) *
           tokensByPrice[position.to.address];
@@ -197,12 +197,12 @@ const LeaderboardFrame = () => {
     if (!acc[position.user]) {
       // eslint-disable-next-line no-param-reassign
       acc[position.user] =
-        parseFloat(formatUnits(BigNumber.from(position.current.toWithdraw), position.to.decimals)) *
+        parseFloat(formatUnits(BigNumber.from(position.toWithdraw), position.to.decimals)) *
         tokensByPrice[position.to.address];
     } else {
       // eslint-disable-next-line no-param-reassign
       acc[position.user] +=
-        parseFloat(formatUnits(BigNumber.from(position.current.toWithdraw), position.to.decimals)) *
+        parseFloat(formatUnits(BigNumber.from(position.toWithdraw), position.to.decimals)) *
         tokensByPrice[position.to.address];
     }
 

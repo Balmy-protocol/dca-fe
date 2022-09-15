@@ -47,14 +47,14 @@ export default createReducer(initialState, (builder) =>
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.TERMINATED,
-            rate: position.current.rate,
-            oldRate: position.current.rate,
+            rate: position.rate,
+            oldRate: position.rate,
             from: position.user,
             to: position.user,
-            remainingSwaps: position.current.remainingSwaps,
-            oldRemainingSwaps: position.current.remainingSwaps,
+            remainingSwaps: position.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.withdrawn,
+            withdrawn: position.withdrawn,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',
@@ -69,12 +69,9 @@ export default createReducer(initialState, (builder) =>
           position = {
             ...position,
             status: 'TERMINATED',
-            current: {
-              ...position.current,
-              toWithdraw: BigNumber.from(0).toString(),
-              remainingLiquidity: BigNumber.from(0).toString(),
-              remainingSwaps: BigNumber.from(0).toString(),
-            },
+            toWithdraw: BigNumber.from(0).toString(),
+            remainingLiquidity: BigNumber.from(0).toString(),
+            remainingSwaps: BigNumber.from(0).toString(),
           };
           break;
         }
@@ -82,14 +79,14 @@ export default createReducer(initialState, (builder) =>
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.TERMINATED,
-            rate: position.current.rate,
-            oldRate: position.current.rate,
+            rate: position.rate,
+            oldRate: position.rate,
             from: position.user,
             to: position.user,
-            remainingSwaps: position.current.remainingSwaps,
-            oldRemainingSwaps: position.current.remainingSwaps,
+            remainingSwaps: position.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.withdrawn,
+            withdrawn: position.withdrawn,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',
@@ -104,12 +101,9 @@ export default createReducer(initialState, (builder) =>
           position = {
             ...position,
             status: 'TERMINATED',
-            current: {
-              ...position.current,
-              toWithdraw: BigNumber.from(0).toString(),
-              remainingLiquidity: BigNumber.from(0).toString(),
-              remainingSwaps: BigNumber.from(0).toString(),
-            },
+            toWithdraw: BigNumber.from(0).toString(),
+            remainingLiquidity: BigNumber.from(0).toString(),
+            remainingSwaps: BigNumber.from(0).toString(),
           };
           break;
         }
@@ -117,14 +111,14 @@ export default createReducer(initialState, (builder) =>
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.WITHDREW,
-            rate: position.current.rate,
-            oldRate: position.current.rate,
+            rate: position.rate,
+            oldRate: position.rate,
             from: position.user,
             to: position.user,
-            remainingSwaps: position.current.remainingSwaps,
-            oldRemainingSwaps: position.current.remainingSwaps,
+            remainingSwaps: position.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.toWithdraw,
+            withdrawn: position.toWithdraw,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',
@@ -138,35 +132,30 @@ export default createReducer(initialState, (builder) =>
           });
           position = {
             ...position,
-            totalWithdrawn: BigNumber.from(position.totalWithdrawn)
-              .add(BigNumber.from(position.current.toWithdraw))
-              .toString(),
-            current: {
-              ...position.current,
-              toWithdraw: BigNumber.from(0).toString(),
-            },
+            totalWithdrawn: BigNumber.from(position.totalWithdrawn).add(BigNumber.from(position.toWithdraw)).toString(),
+            toWithdraw: BigNumber.from(0).toString(),
           };
 
           break;
         }
         case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
           const addFundsTypeData = transaction.typeData as AddFundsTypeData;
-          const newRemainingLiquidity = BigNumber.from(position.current.remainingLiquidity).add(
+          const newRemainingLiquidity = BigNumber.from(position.remainingLiquidity).add(
             parseUnits(addFundsTypeData.newFunds, addFundsTypeData.decimals)
           );
-          const newRate = newRemainingLiquidity.div(BigNumber.from(position.current.remainingSwaps)).toString();
+          const newRate = newRemainingLiquidity.div(BigNumber.from(position.remainingSwaps)).toString();
 
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.MODIFIED_RATE,
             rate: newRate,
-            oldRate: position.current.rate,
+            oldRate: position.rate,
             from: position.user,
             to: position.user,
-            remainingSwaps: position.current.remainingSwaps,
-            oldRemainingSwaps: position.current.remainingSwaps,
+            remainingSwaps: position.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.withdrawn,
+            withdrawn: position.withdrawn,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',
@@ -181,25 +170,22 @@ export default createReducer(initialState, (builder) =>
 
           position = {
             ...position,
-            current: {
-              ...position.current,
-              remainingLiquidity: newRemainingLiquidity.toString(),
-              rate: newRate,
-            },
+            remainingLiquidity: newRemainingLiquidity.toString(),
+            rate: newRate,
           };
           break;
         }
         case TRANSACTION_TYPES.RESET_POSITION: {
           const resetPositionTypeData = transaction.typeData as ResetPositionTypeData;
           const resetPositionSwapDifference = BigNumber.from(resetPositionTypeData.newSwaps).lt(
-            BigNumber.from(position.current.remainingSwaps)
+            BigNumber.from(position.remainingSwaps)
           )
-            ? BigNumber.from(position.current.remainingSwaps).sub(BigNumber.from(resetPositionTypeData.newSwaps))
-            : BigNumber.from(resetPositionTypeData.newSwaps).sub(BigNumber.from(position.current.remainingSwaps));
-          const newRemaininLiquidity = BigNumber.from(position.current.remainingLiquidity).add(
+            ? BigNumber.from(position.remainingSwaps).sub(BigNumber.from(resetPositionTypeData.newSwaps))
+            : BigNumber.from(resetPositionTypeData.newSwaps).sub(BigNumber.from(position.remainingSwaps));
+          const newRemaininLiquidity = BigNumber.from(position.remainingLiquidity).add(
             parseUnits(resetPositionTypeData.newFunds, resetPositionTypeData.decimals)
           );
-          const newRemainingSwaps = BigNumber.from(position.current.remainingSwaps).add(
+          const newRemainingSwaps = BigNumber.from(position.remainingSwaps).add(
             BigNumber.from(resetPositionTypeData.newSwaps)
           );
           const newRate = newRemaininLiquidity.div(newRemainingSwaps).toString();
@@ -208,13 +194,13 @@ export default createReducer(initialState, (builder) =>
             id: transaction.hash,
             action: POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
             rate: newRate,
-            oldRate: position.current.rate,
+            oldRate: position.rate,
             from: position.user,
             to: position.user,
             remainingSwaps: newRemainingSwaps.toString(),
-            oldRemainingSwaps: position.current.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.withdrawn,
+            withdrawn: position.withdrawn,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',
@@ -229,17 +215,12 @@ export default createReducer(initialState, (builder) =>
 
           position = {
             ...position,
-            totalSwaps: BigNumber.from(resetPositionTypeData.newSwaps).lt(
-              BigNumber.from(position.current.remainingSwaps)
-            )
+            totalSwaps: BigNumber.from(resetPositionTypeData.newSwaps).lt(BigNumber.from(position.remainingSwaps))
               ? BigNumber.from(position.totalSwaps).sub(resetPositionSwapDifference).toString()
               : BigNumber.from(position.totalSwaps).add(resetPositionSwapDifference).toString(),
-            current: {
-              ...position.current,
-              remainingLiquidity: newRemaininLiquidity.toString(),
-              remainingSwaps: newRemainingSwaps.toString(),
-              rate: newRate,
-            },
+            remainingLiquidity: newRemaininLiquidity.toString(),
+            remainingSwaps: newRemainingSwaps.toString(),
+            rate: newRate,
           };
           break;
         }
@@ -248,33 +229,33 @@ export default createReducer(initialState, (builder) =>
           const removeFundsDifference = parseUnits(
             removeFundsTypeData.ammountToRemove,
             removeFundsTypeData.decimals
-          ).eq(BigNumber.from(position.current.remainingLiquidity))
-            ? BigNumber.from(position.current.remainingSwaps)
+          ).eq(BigNumber.from(position.remainingLiquidity))
+            ? BigNumber.from(position.remainingSwaps)
             : BigNumber.from(0);
-          const originalRemainingLiquidity = BigNumber.from(position.current.remainingLiquidity).toString();
-          const newRemainingLiquidity = BigNumber.from(position.current.remainingLiquidity).sub(
+          const originalRemainingLiquidity = BigNumber.from(position.remainingLiquidity).toString();
+          const newRemainingLiquidity = BigNumber.from(position.remainingLiquidity).sub(
             parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals)
           );
 
-          const newRate = newRemainingLiquidity.div(BigNumber.from(position.current.remainingSwaps)).toString();
+          const newRate = newRemainingLiquidity.div(BigNumber.from(position.remainingSwaps)).toString();
 
           const newRemainingSwaps = parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals).eq(
             BigNumber.from(originalRemainingLiquidity)
           )
             ? BigNumber.from(0).toString()
-            : position.current.remainingSwaps;
+            : position.remainingSwaps;
 
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
             rate: newRate,
-            oldRate: position.current.rate,
+            oldRate: position.rate,
             from: position.user,
             to: position.user,
             remainingSwaps: newRemainingSwaps,
-            oldRemainingSwaps: position.current.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.withdrawn,
+            withdrawn: position.withdrawn,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',
@@ -290,16 +271,13 @@ export default createReducer(initialState, (builder) =>
           position = {
             ...position,
             totalSwaps: parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals).eq(
-              BigNumber.from(position.current.remainingLiquidity)
+              BigNumber.from(position.remainingLiquidity)
             )
               ? BigNumber.from(position.totalSwaps).sub(removeFundsDifference).toString()
               : BigNumber.from(position.totalSwaps).toString(),
-            current: {
-              ...position.current,
-              remainingLiquidity: newRemainingLiquidity.toString(),
-              rate: newRate,
-              remainingSwaps: newRemainingSwaps,
-            },
+            remainingLiquidity: newRemainingLiquidity.toString(),
+            rate: newRate,
+            remainingSwaps: newRemainingSwaps,
           };
           break;
         }
@@ -307,19 +285,19 @@ export default createReducer(initialState, (builder) =>
           const modifySwapsPositionTypeData = transaction.typeData as ModifySwapsPositionTypeData;
           const newRemainingSwaps = BigNumber.from(modifySwapsPositionTypeData.newSwaps);
 
-          const newRate = BigNumber.from(position.current.remainingLiquidity).div(newRemainingSwaps).toString();
+          const newRate = BigNumber.from(position.remainingLiquidity).div(newRemainingSwaps).toString();
 
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
             rate: newRate,
-            oldRate: position.current.rate,
+            oldRate: position.rate,
             from: position.user,
             to: position.user,
             remainingSwaps: newRemainingSwaps.toString(),
-            oldRemainingSwaps: position.current.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.withdrawn,
+            withdrawn: position.withdrawn,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',
@@ -334,27 +312,20 @@ export default createReducer(initialState, (builder) =>
 
           position = {
             ...position,
-            current: {
-              ...position.current,
-              remainingSwaps: newRemainingSwaps.toString(),
-              rate: newRate,
-            },
+            remainingSwaps: newRemainingSwaps.toString(),
+            rate: newRate,
           };
           break;
         }
         case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
           const modifyRateAndSwapsPositionTypeData = transaction.typeData as ModifyRateAndSwapsPositionTypeData;
           const modifiedRateAndSwapsSwapDifference = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
-            BigNumber.from(position.current.remainingSwaps)
+            BigNumber.from(position.remainingSwaps)
           )
-            ? BigNumber.from(position.current.remainingSwaps).sub(
-                BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps)
-              )
-            : BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).sub(
-                BigNumber.from(position.current.remainingSwaps)
-              );
+            ? BigNumber.from(position.remainingSwaps).sub(BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps))
+            : BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).sub(BigNumber.from(position.remainingSwaps));
           const newTotalSwaps = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
-            BigNumber.from(position.current.remainingSwaps)
+            BigNumber.from(position.remainingSwaps)
           )
             ? BigNumber.from(position.totalSwaps).sub(modifiedRateAndSwapsSwapDifference)
             : BigNumber.from(position.totalSwaps).add(modifiedRateAndSwapsSwapDifference);
@@ -370,13 +341,13 @@ export default createReducer(initialState, (builder) =>
             id: transaction.hash,
             action: POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
             rate: newRate.toString(),
-            oldRate: position.current.rate,
+            oldRate: position.rate,
             from: position.user,
             to: position.user,
             remainingSwaps: newRemainingSwaps.toString(),
-            oldRemainingSwaps: position.current.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.withdrawn,
+            withdrawn: position.withdrawn,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',
@@ -392,12 +363,9 @@ export default createReducer(initialState, (builder) =>
           position = {
             ...position,
             totalSwaps: newTotalSwaps.toString(),
-            current: {
-              ...position.current,
-              remainingSwaps: newRemainingSwaps.toString(),
-              remainingLiquidity: newRate.mul(newRemainingSwaps).toString(),
-              rate: newRate.toString(),
-            },
+            remainingSwaps: newRemainingSwaps.toString(),
+            remainingLiquidity: newRate.mul(newRemainingSwaps).toString(),
+            rate: newRate.toString(),
           };
           break;
         }
@@ -407,14 +375,14 @@ export default createReducer(initialState, (builder) =>
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.TRANSFERED,
-            rate: position.current.rate,
-            oldRate: position.current.rate,
+            rate: position.rate,
+            oldRate: position.rate,
             from: position.user,
             to: transferPositionTypeData.toAddress,
-            remainingSwaps: position.current.remainingSwaps,
-            oldRemainingSwaps: position.current.remainingSwaps,
+            remainingSwaps: position.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
             swapped: '0',
-            withdrawn: position.current.withdrawn,
+            withdrawn: position.withdrawn,
             permissions: [],
             ratioPerUnitBToAWithFee: '1',
             ratioPerUnitAToBWithFee: '1',

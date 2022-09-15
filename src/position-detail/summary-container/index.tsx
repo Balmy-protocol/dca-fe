@@ -7,6 +7,7 @@ import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
 import Details from 'position-detail/position-data';
 import Sticky from 'react-stickynode';
 import GraphContainer from 'position-detail/graph-container';
+import { BigNumber } from 'ethers';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -38,6 +39,8 @@ interface PositionSummaryContainerProps {
   onReusePosition: () => void;
   disabled: boolean;
   yieldOptions: YieldOptions;
+  toWithdrawUnderlying?: BigNumber | null;
+  remainingLiquidityUnderlying?: BigNumber | null;
 }
 
 const PositionSummaryContainer = ({
@@ -48,6 +51,8 @@ const PositionSummaryContainer = ({
   onReusePosition,
   disabled,
   yieldOptions,
+  toWithdrawUnderlying,
+  remainingLiquidityUnderlying,
 }: PositionSummaryContainerProps) => (
   <>
     <Grid container spacing={4} alignItems="flex-start">
@@ -62,6 +67,8 @@ const PositionSummaryContainer = ({
               onReusePosition={onReusePosition}
               disabled={disabled}
               yieldOptions={yieldOptions}
+              toWithdrawUnderlying={toWithdrawUnderlying}
+              remainingLiquidityUnderlying={remainingLiquidityUnderlying}
             />
           </StyledPaper>
         </Sticky>
