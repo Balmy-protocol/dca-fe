@@ -189,12 +189,19 @@ const Details = ({
     rate: positionRate,
     remainingSwaps,
     totalSwaps,
+    accumSwappedUnderlying,
   } = fullPositionToMappedPosition(position);
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
   const rate = depositedRateUnderlying || positionRate;
   const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
-  const { yieldGenerated, base: remainingLiquidity } = calculateYield(
+  const toWithdrawYield =
+    accumSwappedUnderlying && toWithdrawUnderlying
+      ? toWithdrawUnderlying.sub(accumSwappedUnderlying)
+      : BigNumber.from(0);
+  const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
+
+  const { yieldGenerated: yieldFromGenerated, base: remainingLiquidity } = calculateYield(
     remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw),
     rate,
     remainingSwaps
@@ -229,11 +236,16 @@ const Details = ({
     ? summedPrices.div(swappedActions.length)
     : BigNumber.from(0);
   const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigNumber.from(remainingLiquidity));
-  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, BigNumber.from(position.toWithdraw));
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(position.from, BigNumber.from(yieldFromGenerated));
+  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase);
+  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield);
   const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, BigNumber.from(position.totalSwapped));
   const showToFullPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToFullPrice && !!toFullPrice;
   const showToPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToPrice && !!toPrice;
+  const showToYieldPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToYieldPrice && !!toYieldPrice;
   const showFromPrice = !STABLE_COINS.includes(position.from.symbol) && !isLoadingFromPrice && !!fromPrice;
+  const showFromYieldPrice =
+    !STABLE_COINS.includes(position.from.symbol) && !isLoadingFromYieldPrice && !!fromYieldPrice;
   const [hasSignSupport] = useSupportsSigning();
 
   const hasNoFunds = BigNumber.from(remainingLiquidity).lte(BigNumber.from(0));
@@ -418,40 +430,30 @@ const Details = ({
                 color={remainingLiquidity.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
                 sx={{ marginLeft: '5px', display: 'flex', gap: ' 5px' }}
               >
-                <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+                <CustomChip
+                  extraText={showFromPrice && `(${fromPrice} USD)`}
+                  icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+                >
                   <Typography variant="body2">
                     {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from)}
                   </Typography>
                 </CustomChip>
-                {yieldGenerated.gt(BigNumber.from(0)) && (
+                {yieldFromGenerated.gt(BigNumber.from(0)) && (
                   <>
-                    <Typography variant="body2">
+                    <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
                       <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                     </Typography>
-                    <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+                    <CustomChip
+                      icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+                      extraText={showFromYieldPrice && `(${fromYieldPrice} USD)`}
+                    >
                       <Typography variant="body2">
-                        {formatCurrencyAmount(BigNumber.from(yieldGenerated), position.from)}
+                        {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from)}
                       </Typography>
                     </CustomChip>
                   </>
                 )}
               </Typography>
-              {showFromPrice && (
-                <StyledChip
-                  size="small"
-                  variant="outlined"
-                  label={
-                    <FormattedMessage
-                      description="current remaining price"
-                      defaultMessage="({toPrice} USD)"
-                      values={{
-                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                        toPrice: fromPrice?.toFixed(2),
-                      }}
-                    />
-                  }
-                />
-              )}
             </StyledDetailWrapper>
           )}
           {position.status !== 'TERMINATED' && (
@@ -461,27 +463,29 @@ const Details = ({
               </Typography>
               <Typography
                 variant="body1"
-                color={toWithdraw.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+                color={toWithdrawBase.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
                 sx={{ marginLeft: '5px' }}
               >
-                {`${formatCurrencyAmount(toWithdraw, to)} ${to.symbol}`}
-              </Typography>
-              <Typography variant="body1">
-                {showToPrice && (
-                  <StyledChip
-                    size="small"
-                    variant="outlined"
-                    label={
-                      <FormattedMessage
-                        description="current swapped in position price"
-                        defaultMessage="({toPrice} USD)"
-                        values={{
-                          b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                          toPrice: toPrice?.toFixed(2),
-                        }}
-                      />
-                    }
-                  />
+                <CustomChip
+                  extraText={showToPrice && `(${toPrice} USD)`}
+                  icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
+                >
+                  <Typography variant="body2">
+                    {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to)}
+                  </Typography>
+                </CustomChip>
+                {toWithdrawYield.gt(BigNumber.from(0)) && (
+                  <>
+                    <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                      <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+                    </Typography>
+                    <CustomChip
+                      icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
+                      extraText={showToYieldPrice && `(${toYieldPrice} USD)`}
+                    >
+                      <Typography variant="body2">{formatCurrencyAmount(toWithdrawYield, position.to)}</Typography>
+                    </CustomChip>
+                  </>
                 )}
               </Typography>
             </StyledDetailWrapper>
