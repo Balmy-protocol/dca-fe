@@ -34,6 +34,8 @@ import useUsdPrice from 'hooks/useUsdPrice';
 import { withStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import CustomChip from 'common/custom-chip';
+import ComposedTokenIcon from 'common/composed-token-icon';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -171,19 +173,19 @@ interface PositionTimelineProps {
 const buildSwappedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
   icon: <CompareArrowsIcon />,
   content: () => {
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.swapped));
+    const swapped = positionState.swappedUnderlying || positionState.swapped;
+    const rate = positionState.depositedRateUnderlying || positionState.rate;
+    const yieldFrom = BigNumber.from(positionState.rateUnderlying || rate).sub(rate);
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(swapped));
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
-      BigNumber.from(positionState.swapped),
+      BigNumber.from(swapped),
       positionState.createdAtTimestamp
     );
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(positionState.rate)
-    );
+    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigNumber.from(rate));
     const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(positionState.rate),
+      BigNumber.from(rate),
       positionState.createdAtTimestamp
     );
 
@@ -236,7 +238,19 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
             <StyledTitleMainText variant="body1">
               <FormattedMessage description="pairSwapDetails" defaultMessage="Swapped:" />
             </StyledTitleMainText>
-            {` ${formatCurrencyAmount(BigNumber.from(positionState.rate), position.from)} ${position.from.symbol} `}
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+            </CustomChip>
+            {yieldFrom.gt(BigNumber.from(0)) && (
+              <>
+                <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                  <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+                </Typography>
+                <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+                  <Typography variant="body1">{formatCurrencyAmount(yieldFrom, position.from)}</Typography>
+                </CustomChip>
+              </>
+            )}
             {showFromPrices && (
               <DarkTooltip
                 title={
@@ -263,14 +277,10 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
                 />
               </DarkTooltip>
             )}
-            <FormattedMessage
-              description="pairSwapDetailsFor"
-              defaultMessage="for {result} {to}"
-              values={{
-                result: formatCurrencyAmount(BigNumber.from(positionState.swapped), position.to),
-                to: position.to.symbol,
-              }}
-            />
+            <FormattedMessage description="pairSwapDetailsFor" defaultMessage="for" />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(swapped), position.to)}</Typography>
+            </CustomChip>
             {showToPrices && (
               <DarkTooltip
                 title={
@@ -318,19 +328,16 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
         <Typography
           variant="body1"
           component="p"
-          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces', gap: '5px' }}
         >
           <StyledTitleMainText variant="body1">
-            <FormattedMessage
-              description="positionCreatedRate"
-              defaultMessage="Rate:"
-              values={{
-                rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
-                from: position.from.symbol,
-              }}
-            />
+            <FormattedMessage description="positionCreatedRate" defaultMessage="Rate:" />
           </StyledTitleMainText>
-          {` ${formatCurrencyAmount(BigNumber.from(positionState.rate), position.from)} ${position.from.symbol}`}
+          <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+            <Typography variant="body1">
+              {formatCurrencyAmount(BigNumber.from(positionState.rate), position.from)}
+            </Typography>
+          </CustomChip>
         </Typography>
       </Grid>
       <Grid item xs={12}>
@@ -459,26 +466,32 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
 
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
-  content: () => (
-    <>
-      <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionModifiedRate"
-            defaultMessage="{increaseDecrease} rate from {oldRate} {from} to {rate} {from}"
-            values={{
-              increaseDecrease: BigNumber.from(positionState.oldRate).lt(BigNumber.from(positionState.rate))
-                ? 'Increased'
-                : 'Decreased',
-              rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
-              oldRate: formatCurrencyAmount(BigNumber.from(positionState.oldRate), position.from),
-              from: position.from.symbol,
-            }}
-          />
-        </Typography>
-      </Grid>
-    </>
-  ),
+  content: () => {
+    const rate = positionState.depositedRateUnderlying || positionState.rate;
+    const oldRate = positionState.oldDepositedRateUnderlying || positionState.oldRate;
+    return (
+      <>
+        <Grid item xs={12}>
+          <Typography variant="body1" sx={{ display: 'flex', gap: '5px', aligItems: 'center' }}>
+            <FormattedMessage
+              description="positionModifiedRateFrom"
+              defaultMessage="{increaseDecrease} rate from"
+              values={{
+                increaseDecrease: BigNumber.from(oldRate).lt(BigNumber.from(rate)) ? 'Increased' : 'Decreased',
+              }}
+            />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
+            </CustomChip>
+            <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+            </CustomChip>
+          </Typography>
+        </Grid>
+      </>
+    );
+  },
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Rate Modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
@@ -514,43 +527,49 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
 
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
-  content: () => (
-    <>
-      <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionModifiedRate"
-            defaultMessage="{increaseDecrease} rate from {oldRate} {from} to {rate} {from}"
-            values={{
-              increaseDecrease: BigNumber.from(positionState.oldRate).lt(BigNumber.from(positionState.rate))
-                ? 'Increased'
-                : 'Decreased',
-              rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
-              oldRate: formatCurrencyAmount(BigNumber.from(positionState.oldRate), position.from),
-              from: position.from.symbol,
-            }}
-          />
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
-            values={{
-              increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
-                BigNumber.from(positionState.remainingSwaps)
-              )
-                ? 'Increased'
-                : 'Decreased',
-              frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
-              oldFrequency: getFrequencyLabel(position.swapInterval.interval, positionState.oldRemainingSwaps),
-            }}
-          />
-        </Typography>
-      </Grid>
-    </>
-  ),
+  content: () => {
+    const rate = positionState.depositedRateUnderlying || positionState.rate;
+    const oldRate = positionState.oldDepositedRateUnderlying || positionState.oldRate;
+    return (
+      <>
+        <Grid item xs={12}>
+          <Typography variant="body1" sx={{ display: 'flex', gap: '5px', aligItems: 'center' }}>
+            <FormattedMessage
+              description="positionModifiedRateFrom"
+              defaultMessage="{increaseDecrease} rate from"
+              values={{
+                increaseDecrease: BigNumber.from(oldRate).lt(BigNumber.from(rate)) ? 'Increased' : 'Decreased',
+              }}
+            />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
+            </CustomChip>
+            <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+            </CustomChip>
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="body1">
+            <FormattedMessage
+              description="positionModifiedSwaps"
+              defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
+              values={{
+                increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
+                  BigNumber.from(positionState.remainingSwaps)
+                )
+                  ? 'Increased'
+                  : 'Decreased',
+                frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
+                oldFrequency: getFrequencyLabel(position.swapInterval.interval, positionState.oldRemainingSwaps),
+              }}
+            />
+          </Typography>
+        </Grid>
+      </>
+    );
+  },
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
@@ -559,10 +578,11 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
 const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <OpenInNewIcon />,
   content: () => {
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.withdrawn));
+    const withdrawn = positionState.withdrawnUnderlying || positionState.withdrawn;
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(withdrawn));
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
-      BigNumber.from(positionState.withdrawn),
+      BigNumber.from(withdrawn),
       positionState.createdAtTimestamp
     );
 
@@ -578,16 +598,10 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
       <>
         <Grid item xs={12}>
           <Typography variant="body1" style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}>
-            <FormattedMessage
-              description="positionWithdrawn"
-              defaultMessage="Withdraw {withdraw} {to}"
-              values={{
-                withdraw: formatCurrencyAmount(BigNumber.from(positionState.withdrawn), position.to),
-                to: position.to.symbol,
-                showToPrice: showPrices,
-                toPrice: toPrice?.toFixed(2),
-              }}
-            />
+            <FormattedMessage description="positionWithdrawn" defaultMessage="Withdraw" />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(withdrawn), position.to)}</Typography>
+            </CustomChip>
             {showPrices && (
               <DarkTooltip
                 title={
