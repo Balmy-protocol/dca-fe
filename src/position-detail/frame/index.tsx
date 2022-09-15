@@ -41,6 +41,8 @@ import { setPosition } from 'state/position-details/actions';
 import { usePositionDetails } from 'state/position-details/hooks';
 import useGqlFetchAll from 'hooks/useGqlFetchAll';
 import useYieldOptions from 'hooks/useYieldOptions';
+import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
+import { BigNumber } from 'ethers';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
 
@@ -141,6 +143,16 @@ const PositionDetailFrame = () => {
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const positionInUse = usePositionDetails();
+  const [toWithdrawUnderlying, isLoadingToWithdrawUnderlying] = useUnderlyingAmount(
+    positionInUse?.to,
+    positionInUse ? BigNumber.from(positionInUse?.toWithdraw) : null,
+    !positionInUse?.to.underlyingTokens.length
+  );
+  const [remainingLiquidityUnderlying, isLoadingToRemainingLiquidityUnderlying] = useUnderlyingAmount(
+    positionInUse?.from,
+    positionInUse ? BigNumber.from(positionInUse.rate).mul(BigNumber.from(positionInUse.remainingSwaps)) : null,
+    !positionInUse?.from.underlyingTokens.length
+  );
 
   React.useEffect(() => {
     dispatch(changeMainTab(1));
@@ -166,7 +178,15 @@ const PositionDetailFrame = () => {
 
   const positionNotFound = !position && data && !isLoading;
 
-  if (isLoading || !data || (!position && !positionNotFound) || isLoadingSwaps || isLoadingYieldOptions) {
+  if (
+    isLoading ||
+    !data ||
+    (!position && !positionNotFound) ||
+    isLoadingSwaps ||
+    isLoadingYieldOptions ||
+    isLoadingToWithdrawUnderlying ||
+    isLoadingToRemainingLiquidityUnderlying
+  ) {
     return (
       <Grid container>
         <CenteredLoadingIndicator size={70} />
@@ -264,9 +284,9 @@ const PositionDetailFrame = () => {
 
     dispatch(
       initializeModifyRateSettings({
-        fromValue: formatUnits(positionInUse.current.remainingLiquidity, positionInUse.from.decimals),
-        rate: formatUnits(positionInUse.current.rate, positionInUse.from.decimals),
-        frequencyValue: positionInUse.current.remainingSwaps.toString(),
+        fromValue: formatUnits(positionInUse.remainingLiquidity, positionInUse.from.decimals),
+        rate: formatUnits(positionInUse.rate, positionInUse.from.decimals),
+        frequencyValue: positionInUse.remainingSwaps.toString(),
         modeType: RATE_TYPE,
       })
     );
@@ -343,6 +363,8 @@ const PositionDetailFrame = () => {
               pendingTransaction={pendingTransaction}
               swapsData={swapsData?.pair}
               onWithdraw={onWithdraw}
+              toWithdrawUnderlying={toWithdrawUnderlying}
+              remainingLiquidityUnderlying={remainingLiquidityUnderlying}
               onReusePosition={onShowModifyRateSettings}
               disabled={shouldShowChangeNetwork}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

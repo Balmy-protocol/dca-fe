@@ -58,7 +58,7 @@ const PositionStatus = ({ position, pair, alignedEnd }: PositionStatusProps) => 
       activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval)
     ) === STALE;
 
-  const hasNoFunds = BigNumber.from(position.current.remainingLiquidity).lte(BigNumber.from(0));
+  const hasNoFunds = BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0));
 
   const isTerminated = position.status === 'TERMINATED';
   return (
@@ -90,7 +90,7 @@ const PositionStatus = ({ position, pair, alignedEnd }: PositionStatusProps) => 
               description="days to finish"
               defaultMessage="{type} left"
               values={{
-                type: getFrequencyLabel(position.swapInterval.interval, position.current.remainingSwaps),
+                type: getFrequencyLabel(position.swapInterval.interval, position.remainingSwaps),
               }}
             />
           </Typography>
