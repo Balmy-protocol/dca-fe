@@ -97,10 +97,11 @@ const CREATED_ACTIONS = [POSITION_ACTIONS.CREATED];
 const ACTIONS_TO_FILTER = [...MODIFY_ACTIONS, ...SWAPPED_ACTIONS, ...CREATED_ACTIONS];
 
 const getFunds = (positionAction: ActionState) => {
-  const { rate, oldRate, remainingSwaps, oldRemainingSwaps } = positionAction;
+  const { rate, oldRate, depositedRateUnderlying, oldDepositedRateUnderlying, remainingSwaps, oldRemainingSwaps } =
+    positionAction;
 
-  const previousRate = BigNumber.from(oldRate);
-  const currentRate = BigNumber.from(rate);
+  const previousRate = BigNumber.from(oldDepositedRateUnderlying || oldRate);
+  const currentRate = BigNumber.from(depositedRateUnderlying || rate);
   const previousRemainingSwaps = BigNumber.from(oldRemainingSwaps);
   const currentRemainingSwaps = BigNumber.from(remainingSwaps);
   const oldFunds = previousRate.mul(previousRemainingSwaps);
@@ -157,7 +158,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < filteredPositionActions.length; i++) {
           const positionAction = filteredPositionActions[i];
-          const { action, rate } = positionAction;
+          const { action, rate: rawRate, depositedRateUnderlying } = positionAction;
+          const rate = depositedRateUnderlying || rawRate;
           const currentRate = BigNumber.from(rate || 0);
           const currentRemainingSwaps = BigNumber.from(positionAction.remainingSwaps || 0);
 
