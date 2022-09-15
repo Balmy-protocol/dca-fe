@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Typography from '@mui/material/Typography';
 
 const StyledChipContainer = styled.div`
   display: flex;
@@ -16,10 +17,21 @@ const StyledIconContainer = styled.div``;
 
 const StyledChildrenContainer = styled.div``;
 
-const CustomChip: React.FC<{ icon: React.ReactNode }> = ({ children, icon }) => (
+const StyledExtraTextContainer = styled(Typography)``;
+
+const CustomChip: React.FC<{ icon: React.ReactNode; extraText?: React.ReactNode }> = ({
+  children,
+  icon,
+  extraText,
+}) => (
   <StyledChipContainer>
     <StyledIconContainer>{icon}</StyledIconContainer>
     <StyledChildrenContainer>{children}</StyledChildrenContainer>
+    {extraText && (
+      <StyledExtraTextContainer variant="body2" color="rgba(255, 255, 255, 0.5)">
+        {extraText}
+      </StyledExtraTextContainer>
+    )}
   </StyledChipContainer>
 );
 
