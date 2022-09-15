@@ -61,15 +61,13 @@ export type PositionResponse = {
     interval: BigNumber;
     description: BigNumber;
   };
-  current: {
-    id: string;
-    rate: BigNumber;
-    remainingSwaps: BigNumber;
-    swapped: BigNumber;
-    withdrawn: BigNumber;
-    remainingLiquidity: BigNumber;
-    toWithdraw: BigNumber;
-  };
+  remainingSwaps: BigNumber;
+  swapped: BigNumber;
+  withdrawn: BigNumber;
+  remainingLiquidity: BigNumber;
+  toWithdraw: BigNumber;
+  depositedRateUnderlying: Nullable<BigNumber>;
+  accumSwappedUnderlying: Nullable<BigNumber>;
   rate: BigNumber;
   totalDeposited: BigNumber;
   totalSwaps: BigNumber;

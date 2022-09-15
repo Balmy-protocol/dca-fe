@@ -174,12 +174,18 @@ export default class PositionService {
                 user: position.user,
                 swapInterval: BigNumber.from(position.swapInterval.interval),
                 swapped: BigNumber.from(position.totalSwapped),
-                rate: BigNumber.from(position.current.rate),
-                remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-                remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+                rate: BigNumber.from(position.rate),
+                remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+                remainingSwaps: BigNumber.from(position.remainingSwaps),
                 withdrawn: BigNumber.from(position.totalWithdrawn),
-                toWithdraw: BigNumber.from(position.current.toWithdraw),
+                toWithdraw: BigNumber.from(position.toWithdraw),
                 totalSwaps: BigNumber.from(position.totalSwaps),
+                depositedRateUnderlying: position.depositedRateUnderlying
+                  ? BigNumber.from(position.depositedRateUnderlying)
+                  : null,
+                accumSwappedUnderlying: position.accumSwappedUnderlying
+                  ? BigNumber.from(position.accumSwappedUnderlying)
+                  : null,
                 id: `${position.id}-v${version}`,
                 positionId: position.id,
                 status: position.status,
@@ -259,12 +265,18 @@ export default class PositionService {
               user: position.user,
               swapInterval: BigNumber.from(position.swapInterval.interval),
               swapped: BigNumber.from(position.totalSwapped),
-              rate: BigNumber.from(position.current.rate),
-              remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-              remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+              rate: BigNumber.from(position.rate),
+              remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+              remainingSwaps: BigNumber.from(position.remainingSwaps),
               withdrawn: BigNumber.from(position.totalWithdrawn),
-              toWithdraw: BigNumber.from(position.current.toWithdraw),
+              toWithdraw: BigNumber.from(position.toWithdraw),
               totalSwaps: BigNumber.from(position.totalSwaps),
+              depositedRateUnderlying: position.depositedRateUnderlying
+                ? BigNumber.from(position.depositedRateUnderlying)
+                : null,
+              accumSwappedUnderlying: position.accumSwappedUnderlying
+                ? BigNumber.from(position.accumSwappedUnderlying)
+                : null,
               id: `${position.id}-v${version}`,
               positionId: position.id,
               status: position.status,
@@ -779,6 +791,10 @@ export default class PositionService {
         rate: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
           BigNumber.from(newPositionTypeData.frequencyValue)
         ),
+        depositedRateUnderlying: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
+          BigNumber.from(newPositionTypeData.frequencyValue)
+        ),
+        accumSwappedUnderlying: BigNumber.from(0),
         remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),

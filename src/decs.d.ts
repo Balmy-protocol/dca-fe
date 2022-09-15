@@ -6,3 +6,5 @@ declare module '*.svg' {
 
   export default ReactComponent;
 }
+
+type Nullable<T> = T | null;

@@ -46,6 +46,8 @@ export interface Position {
   rate: BigNumber;
   toWithdraw: BigNumber;
   totalExecutedSwaps: BigNumber;
+  depositedRateUnderlying: Nullable<BigNumber>;
+  accumSwappedUnderlying: Nullable<BigNumber>;
   id: string;
   positionId: string;
   status: string;
@@ -88,7 +90,14 @@ export interface FullPosition {
     interval: string;
     description: string;
   };
-  current: PositionState;
+  rate: string;
+  remainingSwaps: string;
+  swapped: string;
+  withdrawn: string;
+  remainingLiquidity: string;
+  toWithdraw: string;
+  depositedRateUnderlying: Nullable<string>;
+  accumSwappedUnderlying: Nullable<string>;
   history: ActionState[];
 }
 
@@ -108,23 +117,6 @@ export interface ActionState {
   ratioPerUnitAToBWithFee: string;
   createdAtBlock: string;
   createdAtTimestamp: string;
-  transaction: {
-    id: string;
-    hash: string;
-    timestamp: string;
-  };
-}
-
-export interface PositionState {
-  id: string;
-  rate: string;
-  remainingSwaps: string;
-  swapped: string;
-  withdrawn: string;
-  remainingLiquidity: string;
-  createdAtBlock: string;
-  createdAtTimestamp: string;
-  toWithdraw: string;
   transaction: {
     id: string;
     hash: string;

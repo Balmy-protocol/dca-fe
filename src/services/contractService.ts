@@ -2,6 +2,7 @@
 import { DCAHub__factory, DCAPermissionsManager__factory } from '@mean-finance/dca-v2-core/dist';
 import { DCAHubCompanion__factory } from '@mean-finance/dca-v2-periphery/dist';
 import { OracleAggregator__factory } from '@mean-finance/oracles/dist';
+import { TransformerRegistry__factory } from '@mean-finance/transformers/dist';
 import { ethers, Signer } from 'ethers';
 import { Network, getNetwork as getStringNetwork, Provider } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
@@ -28,6 +29,7 @@ import {
   PositionVersions,
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
+  TRANSFORMER_REGISTRY_ADDRESS,
 } from 'config/constants';
 import { BetaMigratorContract, ERC20Contract, HubContract, OEGasOracle, OracleContract } from 'types';
 
@@ -130,6 +132,15 @@ export default class ContractService {
     );
   }
 
+  async getTransformerRegistryAddress(version?: PositionVersions): Promise<string> {
+    const network = await this.getNetwork();
+
+    return (
+      TRANSFORMER_REGISTRY_ADDRESS[version || LATEST_VERSION][network.chainId] ||
+      TRANSFORMER_REGISTRY_ADDRESS[LATEST_VERSION][network.chainId]
+    );
+  }
+
   async getMigratorAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
@@ -193,6 +204,13 @@ export default class ContractService {
     const provider = await this.getProvider();
 
     return DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
+  }
+
+  async getTransformerRegistryInstance(version?: PositionVersions) {
+    const transformerRegistryAddress = await this.getTransformerRegistryAddress(version || LATEST_VERSION);
+    const provider = await this.getProvider();
+
+    return TransformerRegistry__factory.connect(transformerRegistryAddress, provider);
   }
 
   async getMigratorInstance(version?: PositionVersions): Promise<BetaMigratorContract> {

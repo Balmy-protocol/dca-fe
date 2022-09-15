@@ -186,9 +186,10 @@ const ActivePosition = ({
     from,
     to,
     swapInterval,
-    remainingLiquidity,
+    remainingLiquidity: rawRemainingLiquidity,
     remainingSwaps,
     rate,
+    depositedRateUnderlying,
     totalSwaps,
     pendingTransaction,
     toWithdraw,
@@ -207,6 +208,11 @@ const ActivePosition = ({
   const history = useHistory();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
+
+  const rateToUse = depositedRateUnderlying || rate;
+  const remainingLiquidity = depositedRateUnderlying
+    ? depositedRateUnderlying.mul(remainingSwaps)
+    : rawRemainingLiquidity;
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
@@ -333,7 +339,7 @@ const ActivePosition = ({
                 defaultMessage="{remainingLiquidity} {from} ({rate} {from} {frequency})"
                 values={{
                   b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  rate: formatCurrencyAmount(rate, from, 4),
+                  rate: formatCurrencyAmount(rateToUse, from, 4),
                   frequency:
                     STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
                   from: from.symbol,
