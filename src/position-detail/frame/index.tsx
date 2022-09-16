@@ -148,6 +148,11 @@ const PositionDetailFrame = () => {
     positionInUse ? BigNumber.from(positionInUse?.toWithdraw) : null,
     !positionInUse?.to.underlyingTokens.length
   );
+  const [swappedUnderlying, isLoadingSwappedUnderlying] = useUnderlyingAmount(
+    positionInUse?.to,
+    positionInUse ? BigNumber.from(positionInUse?.totalSwapped) : null,
+    !positionInUse?.to.underlyingTokens.length
+  );
   const [remainingLiquidityUnderlying, isLoadingToRemainingLiquidityUnderlying] = useUnderlyingAmount(
     positionInUse?.from,
     positionInUse ? BigNumber.from(positionInUse.rate).mul(BigNumber.from(positionInUse.remainingSwaps)) : null,
@@ -185,7 +190,8 @@ const PositionDetailFrame = () => {
     isLoadingSwaps ||
     isLoadingYieldOptions ||
     isLoadingToWithdrawUnderlying ||
-    isLoadingToRemainingLiquidityUnderlying
+    isLoadingToRemainingLiquidityUnderlying ||
+    isLoadingSwappedUnderlying
   ) {
     return (
       <Grid container>
@@ -364,6 +370,7 @@ const PositionDetailFrame = () => {
               swapsData={swapsData?.pair}
               onWithdraw={onWithdraw}
               toWithdrawUnderlying={toWithdrawUnderlying}
+              swappedUnderlying={swappedUnderlying}
               remainingLiquidityUnderlying={remainingLiquidityUnderlying}
               onReusePosition={onShowModifyRateSettings}
               disabled={shouldShowChangeNetwork}
