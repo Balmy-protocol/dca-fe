@@ -41,6 +41,7 @@ interface PositionSummaryContainerProps {
   yieldOptions: YieldOptions;
   toWithdrawUnderlying?: BigNumber | null;
   remainingLiquidityUnderlying?: BigNumber | null;
+  swappedUnderlying?: BigNumber | null;
 }
 
 const PositionSummaryContainer = ({
@@ -53,6 +54,7 @@ const PositionSummaryContainer = ({
   yieldOptions,
   toWithdrawUnderlying,
   remainingLiquidityUnderlying,
+  swappedUnderlying,
 }: PositionSummaryContainerProps) => (
   <>
     <Grid container spacing={4} alignItems="flex-start">
@@ -69,6 +71,7 @@ const PositionSummaryContainer = ({
               yieldOptions={yieldOptions}
               toWithdrawUnderlying={toWithdrawUnderlying}
               remainingLiquidityUnderlying={remainingLiquidityUnderlying}
+              swappedUnderlying={swappedUnderlying}
             />
           </StyledPaper>
         </Sticky>
