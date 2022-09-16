@@ -84,8 +84,8 @@ const getPosition = gql`
 
       rate
       depositedRateUnderlying
-      accumSwappedUnderlying
-      accumToWithdrawUnderlying
+      totalSwappedUnderlyingAccum
+      toWithdrawUnderlyingAccum
       remainingSwaps
       remainingLiquidity
       withdrawn
@@ -115,8 +115,8 @@ const getPosition = gql`
           oldRate
           remainingSwaps
           oldRemainingSwaps
-          depositedRateUnderlying
-          oldDepositedRateUnderlying
+          rateUnderlying
+          oldRateUnderlying
         }
 
         ... on WithdrewAction {
@@ -125,8 +125,8 @@ const getPosition = gql`
         }
 
         ... on SwappedAction {
-          ratioPerUnitAToBWithFee
-          ratioPerUnitBToAWithFee
+          ratioAToBWithFee
+          ratioBToAWithFee
           swapped
           rate
           rateUnderlying
