@@ -47,8 +47,8 @@ export interface Position {
   toWithdraw: BigNumber;
   totalExecutedSwaps: BigNumber;
   depositedRateUnderlying: Nullable<BigNumber>;
-  accumSwappedUnderlying: Nullable<BigNumber>;
-  accumToWithdrawUnderlying: Nullable<BigNumber>;
+  totalSwappedUnderlyingAccum: Nullable<BigNumber>;
+  toWithdrawUnderlyingAccum: Nullable<BigNumber>;
   id: string;
   positionId: string;
   status: string;
@@ -98,8 +98,8 @@ export interface FullPosition {
   remainingLiquidity: string;
   toWithdraw: string;
   depositedRateUnderlying: Nullable<string>;
-  accumSwappedUnderlying: Nullable<string>;
-  accumToWithdrawUnderlying: Nullable<string>;
+  totalSwappedUnderlyingAccum: Nullable<string>;
+  toWithdrawUnderlyingAccum: Nullable<string>;
   history: ActionState[];
 }
 
@@ -115,13 +115,13 @@ export interface ActionState {
   swapped: string;
   withdrawn: string;
   permissions: PositionPermission[];
-  ratioPerUnitBToAWithFee: string;
+  ratioBToAWithFee: string;
   depositedRateUnderlying: string;
   swappedUnderlying: string;
-  oldDepositedRateUnderlying: string;
+  oldRateUnderlying: string;
   withdrawnUnderlying: string;
   rateUnderlying: string;
-  ratioPerUnitAToBWithFee: string;
+  ratioAToBWithFee: string;
   createdAtBlock: string;
   createdAtTimestamp: string;
   transaction: {

@@ -183,11 +183,11 @@ export default class PositionService {
                 depositedRateUnderlying: position.depositedRateUnderlying
                   ? BigNumber.from(position.depositedRateUnderlying)
                   : null,
-                accumSwappedUnderlying: position.accumSwappedUnderlying
-                  ? BigNumber.from(position.accumSwappedUnderlying)
+                totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
+                  ? BigNumber.from(position.totalSwappedUnderlyingAccum)
                   : null,
-                accumToWithdrawUnderlying: position.accumToWithdrawUnderlying
-                  ? BigNumber.from(position.accumToWithdrawUnderlying)
+                toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
+                  ? BigNumber.from(position.toWithdrawUnderlyingAccum)
                   : null,
                 id: `${position.id}-v${version}`,
                 positionId: position.id,
@@ -277,11 +277,11 @@ export default class PositionService {
               depositedRateUnderlying: position.depositedRateUnderlying
                 ? BigNumber.from(position.depositedRateUnderlying)
                 : null,
-              accumSwappedUnderlying: position.accumSwappedUnderlying
-                ? BigNumber.from(position.accumSwappedUnderlying)
+              totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
+                ? BigNumber.from(position.totalSwappedUnderlyingAccum)
                 : null,
-              accumToWithdrawUnderlying: position.accumToWithdrawUnderlying
-                ? BigNumber.from(position.accumToWithdrawUnderlying)
+              toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
+                ? BigNumber.from(position.toWithdrawUnderlyingAccum)
                 : null,
               id: `${position.id}-v${version}`,
               positionId: position.id,
@@ -800,8 +800,8 @@ export default class PositionService {
         depositedRateUnderlying: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
           BigNumber.from(newPositionTypeData.frequencyValue)
         ),
-        accumSwappedUnderlying: BigNumber.from(0),
-        accumToWithdrawUnderlying: BigNumber.from(0),
+        totalSwappedUnderlyingAccum: BigNumber.from(0),
+        toWithdrawUnderlyingAccum: BigNumber.from(0),
         remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),

@@ -97,11 +97,10 @@ const CREATED_ACTIONS = [POSITION_ACTIONS.CREATED];
 const ACTIONS_TO_FILTER = [...MODIFY_ACTIONS, ...SWAPPED_ACTIONS, ...CREATED_ACTIONS];
 
 const getFunds = (positionAction: ActionState) => {
-  const { rate, oldRate, depositedRateUnderlying, oldDepositedRateUnderlying, remainingSwaps, oldRemainingSwaps } =
-    positionAction;
+  const { rate, oldRate, rateUnderlying, oldRateUnderlying, remainingSwaps, oldRemainingSwaps } = positionAction;
 
-  const previousRate = BigNumber.from(oldDepositedRateUnderlying || oldRate);
-  const currentRate = BigNumber.from(depositedRateUnderlying || rate);
+  const previousRate = BigNumber.from(oldRateUnderlying || oldRate);
+  const currentRate = BigNumber.from(rateUnderlying || rate);
   const previousRemainingSwaps = BigNumber.from(oldRemainingSwaps);
   const currentRemainingSwaps = BigNumber.from(remainingSwaps);
   const oldFunds = previousRate.mul(previousRemainingSwaps);
