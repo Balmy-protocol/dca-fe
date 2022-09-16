@@ -68,6 +68,7 @@ export type PositionResponse = {
   toWithdraw: BigNumber;
   depositedRateUnderlying: Nullable<BigNumber>;
   accumSwappedUnderlying: Nullable<BigNumber>;
+  accumToWithdrawUnderlying: Nullable<BigNumber>;
   rate: BigNumber;
   totalDeposited: BigNumber;
   totalSwaps: BigNumber;

@@ -85,6 +85,7 @@ const getPosition = gql`
       rate
       depositedRateUnderlying
       accumSwappedUnderlying
+      accumToWithdrawUnderlying
       remainingSwaps
       remainingLiquidity
       withdrawn

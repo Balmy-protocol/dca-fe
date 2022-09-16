@@ -147,6 +147,9 @@ export function fullPositionToMappedPosition(position: FullPosition, positionVer
     totalSwaps: BigNumber.from(position.totalSwaps),
     depositedRateUnderlying: position.depositedRateUnderlying ? BigNumber.from(position.depositedRateUnderlying) : null,
     accumSwappedUnderlying: position.accumSwappedUnderlying ? BigNumber.from(position.accumSwappedUnderlying) : null,
+    accumToWithdrawUnderlying: position.accumToWithdrawUnderlying
+      ? BigNumber.from(position.accumToWithdrawUnderlying)
+      : null,
     id: `${position.id}-v${position.version || LATEST_VERSION}`,
     positionId: position.id,
     status: position.status,
