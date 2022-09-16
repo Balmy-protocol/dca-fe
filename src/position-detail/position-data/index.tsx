@@ -188,8 +188,8 @@ const Details = ({
     rate: positionRate,
     remainingSwaps,
     totalSwaps,
-    accumSwappedUnderlying,
-    accumToWithdrawUnderlying,
+    totalSwappedUnderlyingAccum,
+    toWithdrawUnderlyingAccum,
     swapped: rawSwapped,
   } = fullPositionToMappedPosition(position);
   const web3Service = useWeb3Service();
@@ -197,14 +197,16 @@ const Details = ({
   const rate = depositedRateUnderlying || positionRate;
   const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
   const toWithdrawYield =
-    accumToWithdrawUnderlying && toWithdrawUnderlying
-      ? toWithdrawUnderlying.sub(accumToWithdrawUnderlying)
+    toWithdrawUnderlyingAccum && toWithdrawUnderlying
+      ? toWithdrawUnderlying.sub(toWithdrawUnderlyingAccum)
       : BigNumber.from(0);
   const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
 
   const swapped = swappedUnderlying || rawSwapped;
   const swappedYield =
-    accumSwappedUnderlying && swappedUnderlying ? swappedUnderlying.sub(accumSwappedUnderlying) : BigNumber.from(0);
+    totalSwappedUnderlyingAccum && swappedUnderlying
+      ? swappedUnderlying.sub(totalSwappedUnderlyingAccum)
+      : BigNumber.from(0);
   const swappedBase = swapped.sub(swappedYield);
 
   const { yieldGenerated: yieldFromGenerated, base: remainingLiquidity } = calculateYield(
@@ -233,8 +235,8 @@ const Details = ({
   swappedActions.forEach((action) => {
     const swappedRate =
       position.pair.tokenA.address === tokenFromAverage.address
-        ? BigNumber.from(action.ratioPerUnitAToBWithFee)
-        : BigNumber.from(action.ratioPerUnitBToAWithFee);
+        ? BigNumber.from(action.ratioAToBWithFee)
+        : BigNumber.from(action.ratioBToAWithFee);
 
     summedPrices = summedPrices.add(swappedRate);
   });

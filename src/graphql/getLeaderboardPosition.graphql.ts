@@ -109,8 +109,8 @@ const getLeaderboardPositions = gql`
           oldRate
           remainingSwaps
           oldRemainingSwaps
-          depositedRateUnderlying
-          oldDepositedRateUnderlying
+          rateUnderlying
+          oldRateUnderlying
         }
 
         ... on WithdrewAction {
@@ -119,8 +119,8 @@ const getLeaderboardPositions = gql`
         }
 
         ... on SwappedAction {
-          ratioPerUnitAToBWithFee
-          ratioPerUnitBToAWithFee
+          ratioAToBWithFee
+          ratioBToAWithFee
           swapped
           rate
         }

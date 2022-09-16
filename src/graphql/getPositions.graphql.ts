@@ -60,7 +60,7 @@ const getCurrentPositions = gql`
       }
       rate
       depositedRateUnderlying
-      accumSwappedUnderlying
+      totalSwappedUnderlyingAccum
       remainingSwaps
       remainingLiquidity
       withdrawn

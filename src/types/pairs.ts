@@ -33,8 +33,8 @@ export interface PairSwaps {
   id: string;
   executedAtTimestamp: string;
   executedAtBlock: string;
-  ratioPerUnitBToAWithFee: string;
-  ratioPerUnitAToBWithFee: string;
+  ratioBToAWithFee: string;
+  ratioAToBWithFee: string;
   transaction: {
     id: string;
     hash: string;

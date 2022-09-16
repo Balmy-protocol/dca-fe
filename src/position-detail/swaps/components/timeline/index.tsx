@@ -240,8 +240,8 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
           to: STABLE_COINS.includes(tokenTo.symbol) ? 'USD' : tokenTo.symbol,
           swapRate:
             position.pair.tokenA.address === tokenFrom.address
-              ? formatCurrencyAmount(BigNumber.from(positionState.ratioPerUnitAToBWithFee), tokenTo)
-              : formatCurrencyAmount(BigNumber.from(positionState.ratioPerUnitBToAWithFee), tokenFrom),
+              ? formatCurrencyAmount(BigNumber.from(positionState.ratioAToBWithFee), tokenTo)
+              : formatCurrencyAmount(BigNumber.from(positionState.ratioBToAWithFee), tokenFrom),
           currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
         }}
       />
@@ -483,8 +483,8 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
   content: () => {
-    const rate = positionState.depositedRateUnderlying || positionState.rate;
-    const oldRate = positionState.oldDepositedRateUnderlying || positionState.oldRate;
+    const rate = positionState.rateUnderlying || positionState.rate;
+    const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
     return (
       <>
         <Grid item xs={12}>
@@ -544,8 +544,8 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
   content: () => {
-    const rate = positionState.depositedRateUnderlying || positionState.rate;
-    const oldRate = positionState.oldDepositedRateUnderlying || positionState.oldRate;
+    const rate = positionState.rateUnderlying || positionState.rate;
+    const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
     return (
       <>
         <Grid item xs={12}>
