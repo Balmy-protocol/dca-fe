@@ -29,6 +29,7 @@ export const EmptyPosition: Position = {
   rate: BigNumber.from(1),
   depositedRateUnderlying: BigNumber.from(1),
   accumSwappedUnderlying: BigNumber.from(1),
+  accumToWithdrawUnderlying: BigNumber.from(1),
   remainingSwaps: BigNumber.from(0),
   totalDeposited: BigNumber.from(0),
   withdrawn: BigNumber.from(0),
