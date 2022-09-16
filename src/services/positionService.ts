@@ -186,6 +186,9 @@ export default class PositionService {
                 accumSwappedUnderlying: position.accumSwappedUnderlying
                   ? BigNumber.from(position.accumSwappedUnderlying)
                   : null,
+                accumToWithdrawUnderlying: position.accumToWithdrawUnderlying
+                  ? BigNumber.from(position.accumToWithdrawUnderlying)
+                  : null,
                 id: `${position.id}-v${version}`,
                 positionId: position.id,
                 status: position.status,
@@ -276,6 +279,9 @@ export default class PositionService {
                 : null,
               accumSwappedUnderlying: position.accumSwappedUnderlying
                 ? BigNumber.from(position.accumSwappedUnderlying)
+                : null,
+              accumToWithdrawUnderlying: position.accumToWithdrawUnderlying
+                ? BigNumber.from(position.accumToWithdrawUnderlying)
                 : null,
               id: `${position.id}-v${version}`,
               positionId: position.id,
@@ -795,6 +801,7 @@ export default class PositionService {
           BigNumber.from(newPositionTypeData.frequencyValue)
         ),
         accumSwappedUnderlying: BigNumber.from(0),
+        accumToWithdrawUnderlying: BigNumber.from(0),
         remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
