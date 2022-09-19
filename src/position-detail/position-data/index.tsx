@@ -34,6 +34,9 @@ import find from 'lodash/find';
 import useWalletService from 'hooks/useWalletService';
 import CustomChip from 'common/custom-chip';
 import ComposedTokenIcon from 'common/composed-token-icon';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
 interface DetailsProps {
   position: FullPosition;
@@ -153,6 +156,7 @@ const StyledContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  gap: 10px;
 `;
 
 const StyledCallToActionContainer = styled.div`
@@ -352,6 +356,15 @@ const Details = ({
             )}
           </StyledProgressWrapper>
           <StyledDetailWrapper>
+            <FormGroup row>
+              <FormControlLabel
+                labelPlacement="end"
+                control={<Switch checked name="enableDisableWrappedProtocolToken" color="primary" size="small" />}
+                label="Breakdown yield"
+              />
+            </FormGroup>
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
                 description="swappedTo"
@@ -371,11 +384,19 @@ const Details = ({
             </CustomChip>
             {swappedYield.gt(BigNumber.from(0)) && (
               <>
-                <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                +
+                {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                </Typography>
+                </Typography> */}
                 <CustomChip
-                  icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
+                  icon={
+                    <ComposedTokenIcon
+                      isInChip
+                      size="16px"
+                      tokenTop={foundYieldFrom?.token}
+                      tokenBottom={position.to}
+                    />
+                  }
                   extraText={showToYieldFullPrice && `(${toYieldFullPrice.toFixed(2)} USD)`}
                 >
                   <Typography variant="body2">{formatCurrencyAmount(swappedYield, position.to, 4)}</Typography>
@@ -428,11 +449,19 @@ const Details = ({
               </CustomChip>
               {yieldFromGenerated.gt(BigNumber.from(0)) && (
                 <>
-                  <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                  +
+                  {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
                     <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                  </Typography>
+                  </Typography> */}
                   <CustomChip
-                    icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+                    icon={
+                      <ComposedTokenIcon
+                        isInChip
+                        size="16px"
+                        tokenTop={foundYieldFrom?.token}
+                        tokenBottom={position.from}
+                      />
+                    }
                     extraText={showFromYieldPrice && `(${fromYieldPrice.toFixed(2)} USD)`}
                   >
                     <Typography variant="body2">
@@ -458,11 +487,19 @@ const Details = ({
               </CustomChip>
               {toWithdrawYield.gt(BigNumber.from(0)) && (
                 <>
-                  <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                  +
+                  {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
                     <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                  </Typography>
+                  </Typography> */}
                   <CustomChip
-                    icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
+                    icon={
+                      <ComposedTokenIcon
+                        isInChip
+                        size="16px"
+                        tokenTop={foundYieldTo?.token}
+                        tokenBottom={position.to}
+                      />
+                    }
                     extraText={showToYieldPrice && `(${toYieldPrice.toFixed(2)} USD)`}
                   >
                     <Typography variant="body2">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
