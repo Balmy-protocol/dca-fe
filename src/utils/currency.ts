@@ -35,7 +35,7 @@ export const toSignificantFromBigDecimal = (
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 
-export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token, sigFigs = 6) {
+export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token, sigFigs = 6, maxDecimals = 5) {
   if (!amount) {
     return '-';
   }
@@ -45,8 +45,8 @@ export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token
     return '0';
   }
 
-  if (new Decimal(amount.toString()).div(decimalScale.toString()).lessThan(new Decimal(1).div(100000))) {
-    return '<0.00001';
+  if (new Decimal(amount.toString()).div(decimalScale.toString()).lessThan(new Decimal(1).div(10 ** maxDecimals))) {
+    return `<${new Decimal(1).div(10 ** maxDecimals).toString()}`;
   }
 
   return toSignificant(amount.toString(), token.decimals, sigFigs);
