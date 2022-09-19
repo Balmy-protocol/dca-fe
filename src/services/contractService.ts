@@ -30,6 +30,7 @@ import {
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
   TRANSFORMER_REGISTRY_ADDRESS,
+  DEFAULT_NETWORK_FOR_VERSION,
 } from 'config/constants';
 import { BetaMigratorContract, ERC20Contract, HubContract, OEGasOracle, OracleContract } from 'types';
 
@@ -113,7 +114,7 @@ export default class ContractService {
       console.error('Failed to getNetwork through metamask');
     }
 
-    return Promise.resolve(NETWORKS.optimism);
+    return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
 
   // ADDRESSES

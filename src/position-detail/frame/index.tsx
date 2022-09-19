@@ -31,7 +31,14 @@ import TransferPositionModal from 'common/transfer-position-modal';
 import TerminateModal from 'common/terminate-modal';
 import ModifySettingsModal from 'common/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from 'utils/parsing';
-import { PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES, PositionVersions, NETWORKS } from 'config/constants';
+import {
+  PERMISSIONS,
+  RATE_TYPE,
+  TRANSACTION_TYPES,
+  PositionVersions,
+  DEFAULT_NETWORK_FOR_VERSION,
+  LATEST_VERSION,
+} from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
@@ -112,7 +119,9 @@ const PositionDetailFrame = () => {
     positionId === '' || positionId === null
   );
 
-  const wrappedProtocolToken = getWrappedProtocolToken(Number(chainId) || NETWORKS.optimism.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(
+    Number(chainId) || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId
+  );
   const protocolToken = getProtocolToken(Number(chainId));
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(Number(chainId));
 

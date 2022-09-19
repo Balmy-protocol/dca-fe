@@ -292,7 +292,13 @@ export const COINGECKO_IDS = {
 };
 
 // export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
-export const NETWORKS_FOR_MENU = [NETWORKS.polygon.chainId];
+export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
+
+export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
+  [POSITION_VERSION_2]: NETWORKS.optimism,
+  [POSITION_VERSION_3]: NETWORKS.optimism,
+  [POSITION_VERSION_4]: NETWORKS.polygon,
+};
 
 export const HUB_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_2]: {
@@ -310,10 +316,6 @@ export const HUB_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0x059d306A25c4cE8D7437D25743a8B94520536BD5',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: '0xa43cc0B95Ec985BF45fc03262150c20caE180952',
-    [NETWORKS.optimismKovan.chainId]: '0xa43cc0B95Ec985BF45fc03262150c20caE180952',
-    [NETWORKS.optimism.chainId]: '0xa43cc0B95Ec985BF45fc03262150c20caE180952',
-    [NETWORKS.mumbai.chainId]: '0xa43cc0B95Ec985BF45fc03262150c20caE180952',
     [NETWORKS.polygon.chainId]: '0xa43cc0B95Ec985BF45fc03262150c20caE180952',
   },
 };
@@ -328,10 +330,6 @@ export const ORACLE_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0x4b0C54236B86f41C5e5A5dc5d020f832692ff06d',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: '0xf868Db942463a8b312C9A3241a2B83f91117aAC7',
-    [NETWORKS.optimismKovan.chainId]: '0xf868Db942463a8b312C9A3241a2B83f91117aAC7',
-    [NETWORKS.optimism.chainId]: '0xf868Db942463a8b312C9A3241a2B83f91117aAC7',
-    [NETWORKS.mumbai.chainId]: '0xf868Db942463a8b312C9A3241a2B83f91117aAC7',
     [NETWORKS.polygon.chainId]: '0xf868Db942463a8b312C9A3241a2B83f91117aAC7',
   },
 };
@@ -352,10 +350,6 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0xa3DB2c0D23720e8CDA0f4d80A53B94d20d02b061',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
-    [NETWORKS.optimismKovan.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
-    [NETWORKS.optimism.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
-    [NETWORKS.mumbai.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
     [NETWORKS.polygon.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
   },
 };
@@ -370,10 +364,6 @@ export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
-    [NETWORKS.optimismKovan.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
-    [NETWORKS.optimism.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
-    [NETWORKS.mumbai.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
     [NETWORKS.polygon.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
   },
 };
@@ -388,10 +378,6 @@ export const CHAINLINK_ORACLE_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0x86E8cB7Cd38F7dE6Ef7fb62A5D7cCEe350C40310',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: '0xc89C662382987784b76280AC27A175DB6b03A187',
-    [NETWORKS.optimismKovan.chainId]: '0xc89C662382987784b76280AC27A175DB6b03A187',
-    [NETWORKS.optimism.chainId]: '0xc89C662382987784b76280AC27A175DB6b03A187',
-    [NETWORKS.mumbai.chainId]: '0xc89C662382987784b76280AC27A175DB6b03A187',
     [NETWORKS.polygon.chainId]: '0xc89C662382987784b76280AC27A175DB6b03A187',
   },
 };
@@ -406,10 +392,6 @@ export const UNISWAP_ORACLE_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0x14AF365e0825B835C60867C985724e1DF11449ad',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: '0x849D1aCc6b4674138AC34F7287Ecfa77B4b23E1f',
-    [NETWORKS.optimismKovan.chainId]: '0x849D1aCc6b4674138AC34F7287Ecfa77B4b23E1f',
-    [NETWORKS.optimism.chainId]: '0x849D1aCc6b4674138AC34F7287Ecfa77B4b23E1f',
-    [NETWORKS.mumbai.chainId]: '0x849D1aCc6b4674138AC34F7287Ecfa77B4b23E1f',
     [NETWORKS.polygon.chainId]: '0x849D1aCc6b4674138AC34F7287Ecfa77B4b23E1f',
   },
 };
@@ -430,34 +412,14 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0x6f54391fE0386D506b51d69Deeb8b04E0544E088',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: '0x516cB11697bf1bA2dbb5C081C23F169791c4bd01',
-    [NETWORKS.optimismKovan.chainId]: '0x516cB11697bf1bA2dbb5C081C23F169791c4bd01',
-    [NETWORKS.optimism.chainId]: '0x516cB11697bf1bA2dbb5C081C23F169791c4bd01',
-    [NETWORKS.mumbai.chainId]: '0x516cB11697bf1bA2dbb5C081C23F169791c4bd01',
     [NETWORKS.polygon.chainId]: '0x516cB11697bf1bA2dbb5C081C23F169791c4bd01',
   },
 };
 
 export const TRANSFORMER_REGISTRY_ADDRESS: AddressMap<PositionVersions> = {
-  [POSITION_VERSION_2]: {
-    [NETWORKS.kovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.optimismKovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.optimism.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.mumbai.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.polygon.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-  },
-  [POSITION_VERSION_3]: {
-    [NETWORKS.kovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.optimismKovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.optimism.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.mumbai.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.polygon.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-  },
+  [POSITION_VERSION_2]: {},
+  [POSITION_VERSION_3]: {},
   [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.optimismKovan.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.optimism.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
-    [NETWORKS.mumbai.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
     [NETWORKS.polygon.chainId]: '0xa57C9aCD776d8f96Fcf99fA9559B5d2f1c022925',
   },
 };
@@ -471,9 +433,6 @@ export const MIGRATOR_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0xCf51244AE89dE8f062ebc963C64bA96C1723e27e',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.optimismKovan.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
-    [NETWORKS.optimism.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
-    [NETWORKS.mumbai.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
     [NETWORKS.polygon.chainId]: '0x5A069ac25AeDBd31a3986b68E6c167cD35E67161',
   },
 };
@@ -492,9 +451,6 @@ export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-polygon-canary',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism-kovan',
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism',
-    [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-mumbai',
     [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/fiboape/dca-v3-polygon-test',
   },
 };
