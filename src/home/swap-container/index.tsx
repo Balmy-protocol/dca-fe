@@ -5,7 +5,7 @@ import GraphWidget from 'common/graph-widget';
 import { getProtocolToken } from 'mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { NETWORKS, STRING_SWAP_INTERVALS } from 'config/constants';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, STRING_SWAP_INTERVALS } from 'config/constants';
 import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from 'state/create-position/hooks';
@@ -109,7 +109,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
           setYieldEnabled={(newYieldEnabled) => dispatch(setYieldEnabled(newYieldEnabled))}
           fromValue={fromValue}
           setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
-          currentNetwork={currentNetwork || NETWORKS.optimism}
+          currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
           toggleFromTo={toggleFromTo}
           yieldEnabled={yieldEnabled}
           yieldOptions={yieldOptions || []}

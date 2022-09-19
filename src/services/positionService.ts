@@ -134,6 +134,9 @@ export default class PositionService {
     POSITIONS_VERSIONS.forEach((version) =>
       NETWORKS_FOR_MENU.forEach((network) => {
         const currentApolloClient = this.apolloClient[version][network];
+        if (!currentApolloClient || !currentApolloClient.getClient()) {
+          return;
+        }
         networksAndVersions.push({ version, network });
         promises.push(
           gqlFetchAll<PositionsGraphqlResponse>(
@@ -232,6 +235,9 @@ export default class PositionService {
     POSITIONS_VERSIONS.forEach((version) =>
       NETWORKS_FOR_MENU.forEach((network) => {
         const currentApolloClient = this.apolloClient[version][network];
+        if (!currentApolloClient || !currentApolloClient.getClient()) {
+          return;
+        }
         networksAndVersions.push({ version, network });
         promises.push(
           gqlFetchAll<PositionsGraphqlResponse>(
@@ -405,14 +411,22 @@ export default class PositionService {
 
   async companionHasPermission(position: Position, permission: number) {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     return permissionManagerInstance.hasPermission(position.positionId, companionAddress, permission);
   }
 
   async companionIsApproved(position: Position): Promise<boolean> {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     try {
       await permissionManagerInstance.ownerOf(position.positionId);
@@ -439,7 +453,11 @@ export default class PositionService {
   }
 
   async approveCompanionForPosition(position: Position): Promise<TransactionResponse> {
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
 
@@ -569,10 +587,15 @@ export default class PositionService {
         useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : position.to.address
       );
     }
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
-      await this.contractService.getHUBCompanionAddress(LATEST_VERSION),
+      companionAddress,
       PERMISSIONS.WITHDRAW
     );
 
@@ -627,7 +650,11 @@ export default class PositionService {
     }
 
     const permissionManagerAddress = await this.contractService.getPermissionManagerAddress(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     const erc712Name = position.version !== POSITION_VERSION_2 ? undefined : 'Mean Finance DCA';
 
@@ -666,7 +693,11 @@ export default class PositionService {
     const hubInstance = await this.contractService.getHubInstance(position.version);
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
