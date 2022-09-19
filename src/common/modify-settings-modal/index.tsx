@@ -73,7 +73,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { to, swapInterval, remainingLiquidity } = position;
+  const { to, swapInterval, remainingLiquidity, from } = position;
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -105,6 +105,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const [balance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount());
   const realBalance = balance && balance.add(position.remainingLiquidity);
+  const hasYield = !!from.underlyingTokens.length;
 
   const cantFund =
     fromValue &&
@@ -218,8 +219,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       handleCancel();
 
       let hasPermission = true;
-
-      const hasYield = position.from.underlyingTokens.length;
 
       if (!useWrappedProtocolToken || hasYield) {
         hasPermission = await positionService.companionHasPermission(
@@ -484,9 +483,10 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             <Typography variant="body1" component="span">
               <FormattedMessage
                 description="rate detail"
-                defaultMessage="{frequency} for you for"
+                defaultMessage="{yield}{frequency} for you for"
                 values={{
                   frequency: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
+                  yield: hasYield ? '+ yield ' : '',
                 }}
               />
             </Typography>
