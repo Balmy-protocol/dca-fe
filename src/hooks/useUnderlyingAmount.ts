@@ -10,10 +10,12 @@ function useUnderlyingAmount(
   amount: BigNumber | undefined | null,
   returnSame?: boolean
 ): [BigNumber | null | undefined, boolean, string?] {
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [{ result, isLoading, error }, setParams] = React.useState<{
+    result: BigNumber | null | undefined;
+    error: string | undefined;
+    isLoading: boolean;
+  }>({ result: undefined, error: undefined, isLoading: false });
   const priceService = usePriceService();
-  const [result, setResult] = React.useState<BigNumber | null | undefined>(undefined);
-  const [error, setError] = React.useState<string | undefined>(undefined);
   const prevToken = usePrevious(token);
   const prevAmount = usePrevious(amount);
 
@@ -22,30 +24,24 @@ function useUnderlyingAmount(
       if (token && amount) {
         try {
           const promiseResult = await priceService.getTransformerValue(token.underlyingTokens[0].address, amount);
-          setResult(promiseResult[0].amount);
-          setError(undefined);
+          setParams({ isLoading: false, result: promiseResult[0].amount, error: undefined });
         } catch (e) {
-          setError(e);
+          setParams({ isLoading: false, result: undefined, error: e as string });
         }
-        setIsLoading(false);
       }
     }
 
     if ((!isLoading && !result && !error) || !isEqual(prevToken, token) || !isEqual(prevAmount, amount)) {
       if (!returnSame) {
-        setIsLoading(true);
-        setResult(undefined);
-        setError(undefined);
+        setParams({ isLoading: true, result: undefined, error: undefined });
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         callPromise();
       } else {
-        setIsLoading(false);
-        setResult(amount);
-        setError(undefined);
+        setParams({ isLoading: false, result: amount, error: undefined });
       }
     }
-  }, [token, returnSame, isLoading, result, error]);
+  }, [token, returnSame, isLoading, result, error, amount, prevAmount, token, prevToken]);
 
   if (!token) {
     return [null, false, undefined];
