@@ -487,9 +487,9 @@ export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
   },
   [POSITION_VERSION_3]: {
     [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism-kovan',
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism',
+    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-optimism-canary',
     [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-mumbai',
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-polygon',
+    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-polygon-canary',
   },
   [POSITION_VERSION_4]: {
     [NETWORKS.optimismKovan.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-optimism-kovan',
