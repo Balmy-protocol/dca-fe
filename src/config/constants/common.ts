@@ -7,16 +7,16 @@ export const MAX_BI = BigNumber.from('115792089237316195423570985008687907853269
 type PositionVersion2Type = '2';
 type PositionVersion3Type = '3';
 type PositionVersion4Type = '4';
-export const POSITION_VERSION_2: PositionVersion2Type = '2';
-export const POSITION_VERSION_3: PositionVersion3Type = '3';
-export const POSITION_VERSION_4: PositionVersion4Type = '4';
+export const POSITION_VERSION_2: PositionVersion2Type = '2'; // VULN
+export const POSITION_VERSION_3: PositionVersion3Type = '3'; // POST-VULN
+export const POSITION_VERSION_4: PositionVersion4Type = '4'; // Yield
 
 export type PositionVersions = PositionVersion2Type | PositionVersion3Type | PositionVersion4Type;
 
 export const LATEST_VERSION: PositionVersions = POSITION_VERSION_4;
 
 // export const POSITIONS_VERSIONS: PositionVersions[] = [POSITION_VERSION_2, POSITION_VERSION_3, POSITION_VERSION_4];
-export const POSITIONS_VERSIONS: PositionVersions[] = [POSITION_VERSION_4];
+export const POSITIONS_VERSIONS: PositionVersions[] = [POSITION_VERSION_3, POSITION_VERSION_4];
 
 export const TOKEN_TYPE_BASE = 'BASE';
 export const TOKEN_TYPE_WRAPPED = 'WRAPPED_PROTOCOL_TOKEN';
