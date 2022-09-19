@@ -17,7 +17,7 @@ import gqlFetchAll from 'utils/gqlFetchAll';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { ORACLES, PositionVersions, LATEST_VERSION } from 'config/constants';
+import { ORACLES, PositionVersions, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config/constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -65,8 +65,12 @@ export default class PairService {
 
   async fetchAvailablePairs() {
     const network = await this.walletService.getNetwork();
+    const client = (
+      this.apolloClient[LATEST_VERSION][network.chainId] ||
+      this.apolloClient[LATEST_VERSION][DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId]
+    ).getClient();
     const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(
-      this.apolloClient[LATEST_VERSION][network.chainId].getClient(),
+      client,
       GET_AVAILABLE_PAIRS,
       {},
       'pairs',

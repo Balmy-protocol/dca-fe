@@ -5,7 +5,7 @@ import { CoinGeckoPriceResponse, Token, TxPriceResponse } from 'types';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { COINGECKO_IDS, DEFILLAMA_IDS, LATEST_VERSION, NETWORKS } from 'config/constants';
+import { COINGECKO_IDS, DEFAULT_NETWORK_FOR_VERSION, DEFILLAMA_IDS, LATEST_VERSION, NETWORKS } from 'config/constants';
 import ContractService from './contractService';
 import WalletService from './walletService';
 
@@ -41,7 +41,7 @@ export default class PriceService {
     const network = await this.walletService.getNetwork();
     const price = await this.axiosClient.get<Record<string, { usd: number }>>(
       `https://api.coingecko.com/api/v3/simple/token_price/${
-        COINGECKO_IDS[network.chainId] || COINGECKO_IDS[NETWORKS.optimism.chainId]
+        COINGECKO_IDS[network.chainId] || COINGECKO_IDS[DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId]
       }?contract_addresses=${token.address}&vs_currencies=usd`
     );
 
