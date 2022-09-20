@@ -18,9 +18,12 @@ import {
   ApproveCompanionTypeData,
   ModifyPermissionsTypeData,
   MigratePositionTypeData,
+  WithdrawFundsTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
+import { formatCurrencyAmount } from 'utils/currency';
+import { BigNumber } from 'ethers';
 import { getFrequencyLabel } from 'utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
@@ -55,6 +58,19 @@ function useBuildTransactionMessages() {
             message = `Your ${(terminatedPosition as Position).from.symbol}:${
               (terminatedPosition as Position).to.symbol
             } position has been terminated`;
+          }
+          break;
+        }
+        case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+          const withdrawFundsPositionTypeData = tx.typeData as WithdrawFundsTypeData;
+          const withdrawnPosition = tx.position || find(positions, { id: withdrawFundsPositionTypeData.id });
+          if (withdrawnPosition) {
+            message = `You have withdrawn ${formatCurrencyAmount(
+              BigNumber.from(withdrawFundsPositionTypeData.removedFunds),
+              (withdrawnPosition as Position).from
+            )} ${(withdrawnPosition as Position).from.symbol} funds from your ${
+              (withdrawnPosition as Position).from.symbol
+            }:${(withdrawnPosition as Position).to.symbol} position`;
           }
           break;
         }

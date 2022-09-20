@@ -292,6 +292,90 @@ const PositionDetailFrame = () => {
     }
   };
 
+  const onWithdrawFunds = async (useProtocolToken = true) => {
+    if (!positionInUse) {
+      return;
+    }
+    try {
+      const hasYield = position.from.underlyingTokens.length;
+      let hasPermission = true;
+      if (useProtocolToken || hasYield) {
+        hasPermission = await positionService.companionHasPermission(
+          fullPositionToMappedPosition(position),
+          PERMISSIONS.REDUCE
+        );
+      }
+      const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
+      const fromSymbol =
+        positionInUse.from.address === PROTOCOL_TOKEN_ADDRESS ||
+        positionInUse.from.address === wrappedProtocolToken.address
+          ? protocolOrWrappedToken
+          : positionInUse.from.symbol;
+
+      const removedFunds = BigNumber.from(positionInUse.depositedRateUnderlying || positionInUse.rate).mul(
+        BigNumber.from(positionInUse.remainingSwaps)
+      );
+      setModalLoading({
+        content: (
+          <>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="Withdrawing funds from"
+                defaultMessage="Withdrawing {fromSymbol} funds"
+                values={{ fromSymbol }}
+              />
+            </Typography>
+            {useProtocolToken && !hasPermission && (
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="Approve signature companion text"
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}."
+                  values={{ from: position.from.symbol }}
+                />
+              </Typography>
+            )}
+          </>
+        ),
+      });
+      const result = await positionService.modifyRateAndSwaps(
+        fullPositionToMappedPosition(positionInUse),
+        '0',
+        '0',
+        !useProtocolToken
+      );
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.WITHDRAW_FUNDS,
+        typeData: {
+          id: fullPositionToMappedPosition(positionInUse).id,
+          from: fromSymbol,
+          removedFunds: removedFunds.toString(),
+        },
+        position: fullPositionToMappedPosition(positionInUse),
+      });
+      setModalSuccess({
+        hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="withdraw from success"
+            defaultMessage="Your withdrawal of funds of {fromSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: positionInUse.from.symbol,
+              to: positionInUse.to.symbol,
+              fromSymbol,
+            }}
+          />
+        ),
+      });
+    } catch (e) {
+      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setModalError({
+        content: 'Error while withdrawing funds',
+        error: { code: e.code, message: e.message, data: e.data },
+      });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    }
+  };
+
   const onShowModifyRateSettings = () => {
     if (!positionInUse) {
       return;
@@ -368,6 +452,7 @@ const PositionDetailFrame = () => {
               position={positionInUse}
               pendingTransaction={pendingTransaction}
               disabled={shouldShowChangeNetwork}
+              onWithdrawFunds={onWithdrawFunds}
             />
           )}
         </Grid>
