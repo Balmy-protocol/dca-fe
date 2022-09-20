@@ -18,6 +18,7 @@ import {
   ApproveCompanionTypeData,
   ModifyPermissionsTypeData,
   MigratePositionTypeData,
+  WithdrawFundsTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -56,6 +57,15 @@ function useBuildTransactionMessages() {
               (terminatedPosition as Position).to.symbol
             } position`;
           }
+          break;
+        }
+        case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+          const withdrawFundsTypeData = tx.typeData as WithdrawFundsTypeData;
+          const withdrawnPosition = find(positions, { id: withdrawFundsTypeData.id });
+
+          message = `Withdrawing your ${withdrawFundsTypeData.from} funds from your ${
+            (withdrawnPosition as Position).from.symbol
+          }:${(withdrawnPosition as Position).to.symbol} position`;
           break;
         }
         case TRANSACTION_TYPES.WITHDRAW_POSITION: {
