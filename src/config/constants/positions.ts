@@ -19,6 +19,7 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
   MODIFY_PERMISSIONS: 'MODIFY_PERMISSIONS',
   NO_OP: 'NO_OP',
   MIGRATE_POSITION: 'MIGRATE_POSITION',
+  WITHDRAW_FUNDS: 'WITHDRAW_FUNDS',
 };
 
 export const FULL_DEPOSIT_TYPE = 'full_deposit';

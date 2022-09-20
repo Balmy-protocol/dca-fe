@@ -28,6 +28,7 @@ import {
   ModifyPermissionsTypeData,
   PositionsGraphqlResponse,
   PositionResponse,
+  WithdrawFundsTypeData,
 } from 'types';
 
 // GRAPHQL
@@ -1060,6 +1061,22 @@ export default class PositionService {
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity = this.currentPositions[
           modifyRateAndSwapsPositionTypeData.id
         ].rate.mul(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
+        break;
+      }
+      case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+        const withdrawFundsTypeData = transaction.typeData as WithdrawFundsTypeData;
+        this.currentPositions[withdrawFundsTypeData.id].pendingTransaction = '';
+        this.currentPositions[withdrawFundsTypeData.id].rate = BigNumber.from(0);
+        this.currentPositions[withdrawFundsTypeData.id].depositedRateUnderlying = this.currentPositions[
+          withdrawFundsTypeData.id
+        ].depositedRateUnderlying
+          ? BigNumber.from('0')
+          : null;
+        this.currentPositions[withdrawFundsTypeData.id].totalSwaps = this.currentPositions[
+          withdrawFundsTypeData.id
+        ].totalSwaps.sub(this.currentPositions[withdrawFundsTypeData.id].remainingSwaps);
+        this.currentPositions[withdrawFundsTypeData.id].remainingSwaps = BigNumber.from(0);
+        this.currentPositions[withdrawFundsTypeData.id].remainingLiquidity = BigNumber.from(0);
         break;
       }
       case TRANSACTION_TYPES.TRANSFER_POSITION: {

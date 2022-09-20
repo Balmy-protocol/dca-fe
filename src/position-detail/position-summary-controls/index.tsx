@@ -31,6 +31,7 @@ interface PositionSummaryControlsProps {
   onModifyRate: () => void;
   onTransfer: () => void;
   onViewNFT: () => void;
+  onWithdrawFunds: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
   disabled: boolean;
@@ -40,6 +41,7 @@ const PositionSummaryControls = ({
   onTerminate,
   onModifyRate,
   onTransfer,
+  onWithdrawFunds,
   pendingTransaction,
   position,
   onViewNFT,
@@ -85,6 +87,15 @@ const PositionSummaryControls = ({
           disabled={disabled}
         >
           <FormattedMessage description="view nft" defaultMessage="View NFT" />
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            onWithdrawFunds();
+          }}
+          disabled={isPending || disabled}
+        >
+          <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
         </MenuItem>
         <MenuItem
           onClick={() => {

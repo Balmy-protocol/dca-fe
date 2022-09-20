@@ -409,6 +409,44 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
+        case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+          history.push({
+            id: transaction.hash,
+            action: POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
+            rate: '0',
+            oldRate: position.rate,
+            from: position.user,
+            to: position.user,
+            remainingSwaps: '0',
+            oldRemainingSwaps: position.remainingSwaps,
+            depositedRateUnderlying: '0',
+            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
+            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            swappedUnderlying: '0',
+            swapped: '0',
+            withdrawn: position.withdrawn,
+            permissions: [],
+            rateUnderlying: '0',
+            ratioBToAWithFee: '1',
+            ratioAToBWithFee: '1',
+            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
+            createdAtTimestamp: (Date.now() / 1000).toString(),
+            transaction: {
+              id: transaction.hash,
+              hash: transaction.hash,
+              timestamp: (Date.now() / 1000).toString(),
+            },
+          });
+
+          position = {
+            ...position,
+            remainingSwaps: '0',
+            remainingLiquidity: '0',
+            rate: '0',
+            depositedRateUnderlying: '0',
+          };
+          break;
+        }
         case TRANSACTION_TYPES.TRANSFER_POSITION: {
           const transferPositionTypeData = transaction.typeData as TransferTypeData;
 

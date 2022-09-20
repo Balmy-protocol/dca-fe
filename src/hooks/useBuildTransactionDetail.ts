@@ -18,8 +18,11 @@ import {
   ApproveCompanionTypeData,
   ModifyPermissionsTypeData,
   MigratePositionTypeData,
+  WithdrawFundsTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
+import { formatCurrencyAmount } from 'utils/currency';
+import { BigNumber } from 'ethers';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { getFrequencyLabel } from 'utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
@@ -56,6 +59,19 @@ function useBuildTransactionDetail() {
               message = `Terminate ${(terminatedPosition as Position).from.symbol}:${
                 (terminatedPosition as Position).to.symbol
               } position`;
+            }
+            break;
+          }
+          case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+            const withdrawFundsPositionTypeData = tx.typeData as WithdrawFundsTypeData;
+            const withdrawnPosition = tx.position || find(positions, { id: withdrawFundsPositionTypeData.id });
+            if (withdrawnPosition) {
+              message = `Withdraw ${formatCurrencyAmount(
+                BigNumber.from(withdrawFundsPositionTypeData.removedFunds),
+                (withdrawnPosition as Position).from
+              )} ${(withdrawnPosition as Position).from.symbol} funds from your ${
+                (withdrawnPosition as Position).from.symbol
+              }:${(withdrawnPosition as Position).to.symbol} position`;
             }
             break;
           }
