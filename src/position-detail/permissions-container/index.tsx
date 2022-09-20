@@ -163,7 +163,12 @@ const PositionPermissionsContainer = ({
               <Grid container spacing={2}>
                 {Object.values(permissions).map((permission) => (
                   <Grid item xs={4}>
-                    <PositionPermission positionPermission={permission} shouldDisable={shouldDisable} />
+                    <PositionPermission
+                      positionPermission={permission}
+                      shouldDisable={shouldDisable}
+                      positionVersion={position.version}
+                      chainId={position.chainId}
+                    />
                   </Grid>
                 ))}
               </Grid>
