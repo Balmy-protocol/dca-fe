@@ -17,6 +17,7 @@ import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
 import {
   COMPANION_ADDRESS,
+  LATEST_VERSION,
   POSITION_ACTIONS,
   POSITION_VERSION_3,
   STABLE_COINS,
@@ -427,7 +428,8 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
               <>
                 <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
                   {permission.operator.toLowerCase() ===
-                  COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
+                  (COMPANION_ADDRESS[position.version][chainId].toLowerCase() ||
+                    COMPANION_ADDRESS[LATEST_VERSION][chainId].toLowerCase()) ? (
                     'Mean Finance Companion'
                   ) : (
                     <Address address={permission.operator} />
