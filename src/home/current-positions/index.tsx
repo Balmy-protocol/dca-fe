@@ -2,16 +2,24 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import find from 'lodash/find';
 import styled from 'styled-components';
+import orderBy from 'lodash/orderBy';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
-import { Position } from 'types';
+import { ChainId, Position, YieldOptions } from 'types';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { FULL_DEPOSIT_TYPE, NETWORKS, PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import {
+  FULL_DEPOSIT_TYPE,
+  NETWORKS,
+  PERMISSIONS,
+  RATE_TYPE,
+  SUPPORTED_NETWORKS,
+  TRANSACTION_TYPES,
+} from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import ModifySettingsModal from 'common/modify-settings-modal';
@@ -65,7 +73,13 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
-  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions();
+  const yieldOptionsByChain: Record<ChainId, YieldOptions> = {};
+  let isLoadingAllChainsYieldOptions = false;
+  SUPPORTED_NETWORKS.forEach((supportedNetwork) => {
+    const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(supportedNetwork);
+    yieldOptionsByChain[supportedNetwork] = yieldOptions || [];
+    isLoadingAllChainsYieldOptions = isLoadingYieldOptions || isLoadingAllChainsYieldOptions;
+  });
 
   const network = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -77,7 +91,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     emptyPositions.push(i);
   }
 
-  if (isLoading || isLoadingYieldOptions) {
+  if (isLoading || isLoadingAllChainsYieldOptions) {
     return <CenteredLoadingIndicator size={70} />;
   }
 
@@ -146,11 +160,19 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     }
   };
 
-  const positionsInProgress = currentPositions.filter(
-    ({ toWithdraw, remainingSwaps }) => toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))
+  const positionsInProgress = orderBy(
+    currentPositions.filter(
+      ({ toWithdraw, remainingSwaps }) => toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))
+    ),
+    ['version', 'positionId'],
+    ['desc', 'desc']
   );
-  const positionsFinished = currentPositions.filter(
-    ({ toWithdraw, remainingSwaps }) => toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0))
+  const positionsFinished = orderBy(
+    currentPositions.filter(
+      ({ toWithdraw, remainingSwaps }) => toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0))
+    ),
+    ['version', 'positionId'],
+    ['desc', 'desc']
   );
 
   const onShowModifyRateSettings = (position: Position) => {
@@ -210,7 +232,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
           <>
             <StyledGridItem item xs={12}>
               <Typography variant="body2">
-                <FormattedMessage description="inProgressPositions" defaultMessage="IN PROGRESS" />
+                <FormattedMessage description="inProgressPositions" defaultMessage="ACTIVE" />
               </Typography>
             </StyledGridItem>
             <Grid item xs={12}>
@@ -227,7 +249,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       hasSignSupport={!!hasSignSupport}
                       network={network}
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      yieldOptions={yieldOptions!}
+                      yieldOptionsByChain={yieldOptionsByChain}
                     />
                   </StyledGridItem>
                 ))}
@@ -239,7 +261,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
           <>
             <StyledGridItem item xs={12} sx={{ marginTop: '32px' }}>
               <Typography variant="body2">
-                <FormattedMessage description="finishedPositions" defaultMessage="FINISHED" />
+                <FormattedMessage description="donePositions" defaultMessage="DONE" />
               </Typography>
             </StyledGridItem>
             <Grid item xs={12}>
@@ -256,7 +278,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       hasSignSupport={!!hasSignSupport}
                       network={network}
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      yieldOptions={yieldOptions!}
+                      yieldOptionsByChain={yieldOptionsByChain}
                     />
                   </StyledGridItem>
                 ))}

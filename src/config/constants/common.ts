@@ -13,6 +13,8 @@ export const POSITION_VERSION_4: PositionVersion4Type = '4'; // Yield
 
 export type PositionVersions = PositionVersion2Type | PositionVersion3Type | PositionVersion4Type;
 
+export const OLD_VERSIONS: PositionVersions[] = [POSITION_VERSION_2, POSITION_VERSION_3];
+
 export const LATEST_VERSION: PositionVersions = POSITION_VERSION_4;
 
 // export const POSITIONS_VERSIONS: PositionVersions[] = [POSITION_VERSION_2, POSITION_VERSION_3, POSITION_VERSION_4];

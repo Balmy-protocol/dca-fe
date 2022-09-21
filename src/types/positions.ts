@@ -15,6 +15,7 @@ export interface NFTData {
 }
 
 export type Permission = 'INCREASE' | 'REDUCE' | 'WITHDRAW' | 'TERMINATE';
+export type PositionStatus = 'ACTIVE' | 'COMPLETED' | 'TERMINATED';
 export interface PositionPermission {
   id: string;
   operator: string;

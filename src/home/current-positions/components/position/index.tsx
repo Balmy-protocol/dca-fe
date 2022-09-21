@@ -3,15 +3,13 @@ import find from 'lodash/find';
 import Card from '@mui/material/Card';
 import LinearProgress from '@mui/material/LinearProgress';
 import CardContent from '@mui/material/CardContent';
-import Button from 'common/button';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
-import { NetworkStruct, Position, Token, YieldOptions } from 'types';
-import { useHistory } from 'react-router-dom';
+import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
 import { NETWORKS, POSITION_VERSION_2, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -19,16 +17,11 @@ import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
-import { buildEtherscanTransaction } from 'utils/etherscan';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import Link from '@mui/material/Link';
-import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useUsdPrice from 'hooks/useUsdPrice';
-import useWalletService from 'hooks/useWalletService';
-import { useAppDispatch } from 'state/hooks';
-import { setPosition } from 'state/position-details/actions';
 import ComposedTokenIcon from 'common/composed-token-icon';
 import CustomChip from 'common/custom-chip';
+import PositionControls from '../position-controls';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
@@ -110,10 +103,6 @@ const StyledProgressWrapper = styled.div`
   margin: 12px 0px;
 `;
 
-const StyledCardFooterButton = styled(Button)`
-  margin-top: 8px;
-`;
-
 const StyledFreqLeft = styled.div`
   display: flex;
   align-items: center;
@@ -147,13 +136,6 @@ const StyledContentContainer = styled.div`
   flex-grow: 1;
 `;
 
-const StyledCallToActionContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-`;
-
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
@@ -168,7 +150,7 @@ interface ActivePositionProps {
   disabled: boolean;
   hasSignSupport: boolean;
   network: NetworkStruct;
-  yieldOptions: YieldOptions;
+  yieldOptionsByChain: Record<ChainId, YieldOptions>;
 }
 
 const ActivePosition = ({
@@ -180,7 +162,7 @@ const ActivePosition = ({
   disabled,
   hasSignSupport,
   network,
-  yieldOptions,
+  yieldOptionsByChain,
 }: ActivePositionProps) => {
   const {
     from,
@@ -200,14 +182,10 @@ const ActivePosition = ({
     const supportedNetwork = find(NETWORKS, { chainId })!;
     return supportedNetwork;
   }, [chainId]);
+  const yieldOptions = yieldOptionsByChain[chainId];
 
-  const isOnNetwork = network.chainId === positionNetwork.chainId;
   const availablePairs = useAvailablePairs();
-  const protocolToken = getProtocolToken(positionNetwork.chainId);
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw, undefined, chainId);
-  const history = useHistory();
-  const walletService = useWalletService();
-  const dispatch = useAppDispatch();
 
   const rateToUse = depositedRateUnderlying || rate;
   const remainingLiquidity = depositedRateUnderlying
@@ -230,16 +208,6 @@ const ActivePosition = ({
 
   const isStale =
     calculateStale(pair?.lastExecutedAt || position.pairLastSwappedAt || 0, swapInterval, position.startedAt) === STALE;
-
-  const onViewDetails = () => {
-    dispatch(setPosition(null));
-    history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
-  };
-
-  const onChangeNetwork = () => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId);
-  };
 
   const isOldVersion = position.version === POSITION_VERSION_2;
 
@@ -383,7 +351,7 @@ const ActivePosition = ({
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="positionNotGainingInterest"
-                  defaultMessage="Position not gaining interest"
+                  defaultMessage="Position not generating yield"
                 />
               </Typography>
             </StyledDetailWrapper>
@@ -429,153 +397,17 @@ const ActivePosition = ({
             />
           </StyledProgressWrapper>
         )}
-        <StyledCallToActionContainer>
-          <StyledCardFooterButton
-            variant={isPending ? 'contained' : 'outlined'}
-            color={isPending ? 'pending' : 'default'}
-            onClick={() => !isPending && onViewDetails()}
-            fullWidth
-          >
-            {isPending ? (
-              <Link
-                href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
-                target="_blank"
-                rel="noreferrer"
-                underline="none"
-                color="inherit"
-              >
-                <Typography variant="body2" component="span">
-                  <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                </Typography>
-                <OpenInNewIcon style={{ fontSize: '1rem' }} />
-              </Link>
-            ) : (
-              <Typography variant="body2">
-                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
-              </Typography>
-            )}
-          </StyledCardFooterButton>
-          {position.version !== POSITION_VERSION_2 && (
-            <>
-              {(!isOnNetwork || disabled) && (
-                <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
-                  <Typography variant="body2">
-                    <FormattedMessage
-                      description="incorrect network"
-                      defaultMessage="Switch to {network}"
-                      values={{ network: positionNetwork.name }}
-                    />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-              {isOnNetwork && !disabled && (
-                <>
-                  {!isPending &&
-                    toWithdraw.gt(BigNumber.from(0)) &&
-                    hasSignSupport &&
-                    position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-                      <StyledCardFooterButton
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => onWithdraw(position, true)}
-                        fullWidth
-                        disabled={disabled || !isOnNetwork}
-                      >
-                        <Typography variant="body2">
-                          <FormattedMessage
-                            description="withdraw"
-                            defaultMessage="Withdraw {protocolToken}"
-                            values={{ protocolToken: protocolToken.symbol }}
-                          />
-                        </Typography>
-                      </StyledCardFooterButton>
-                    )}
-                  {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
-                    <StyledCardFooterButton
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => onWithdraw(position, false)}
-                      disabled={disabled || !isOnNetwork}
-                      fullWidth
-                    >
-                      <Typography variant="body2">
-                        <FormattedMessage
-                          description="withdraw"
-                          defaultMessage="Withdraw {wrappedProtocolToken}"
-                          values={{
-                            wrappedProtocolToken:
-                              position.to.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport
-                                ? wrappedProtocolToken.symbol
-                                : '',
-                          }}
-                        />
-                      </Typography>
-                    </StyledCardFooterButton>
-                  )}
-                  {!isPending && remainingSwaps.lte(BigNumber.from(0)) && toWithdraw.lte(BigNumber.from(0)) && (
-                    <StyledCardFooterButton
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => onReusePosition(position)}
-                      disabled={disabled || !isOnNetwork}
-                      fullWidth
-                    >
-                      <Typography variant="body2">
-                        <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
-                      </Typography>
-                    </StyledCardFooterButton>
-                  )}
-                </>
-              )}
-            </>
-          )}
-          {position.version === POSITION_VERSION_2 && (
-            <>
-              {isPending && (
-                <StyledCardFooterButton variant="contained" color="pending" fullWidth>
-                  <Link
-                    href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    underline="none"
-                    color="inherit"
-                  >
-                    <Typography variant="body2" component="span">
-                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                    </Typography>
-                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
-                  </Link>
-                </StyledCardFooterButton>
-              )}
-              {!isPending && hasSignSupport && remainingSwaps.gt(BigNumber.from(0)) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="migrate"
-                  onClick={() => onMigrate(position)}
-                  fullWidth
-                  disabled={disabled || !isOnNetwork}
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-              {!isPending && (toWithdraw.gt(BigNumber.from(0)) || remainingLiquidity.gt(BigNumber.from(0))) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="error"
-                  onClick={() => onTerminate(position)}
-                  fullWidth
-                  disabled={disabled || !isOnNetwork}
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage description="terminate" defaultMessage="Terminate" />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-            </>
-          )}
-        </StyledCallToActionContainer>
+        <PositionControls
+          position={position}
+          onWithdraw={onWithdraw}
+          onReusePosition={onReusePosition}
+          onTerminate={onTerminate}
+          onMigrate={onMigrate}
+          disabled={disabled}
+          hasSignSupport={!!hasSignSupport}
+          network={network}
+          yieldOptions={yieldOptions}
+        />
       </StyledCardContent>
     </StyledCard>
   );

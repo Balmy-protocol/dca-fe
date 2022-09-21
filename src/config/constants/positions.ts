@@ -1,4 +1,4 @@
-import { Oracles, Permission, PositionActions, TransactionTypesConstant } from 'types';
+import { Oracles, Permission, PositionActions, PositionStatus, TransactionTypesConstant } from 'types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
 
@@ -165,4 +165,14 @@ export const STRING_PERMISSIONS: Record<Permission, string> = {
   REDUCE: 'Reduce position',
   WITHDRAW: 'Withdraw',
   TERMINATE: 'Terminate position',
+};
+
+const POSITION_STATUS_ACTIVE: PositionStatus = 'ACTIVE';
+const POSITION_STATUS_COMPLETED: PositionStatus = 'COMPLETED';
+const POSITION_STATUS_TERMINATED: PositionStatus = 'TERMINATED';
+
+export const POSITION_STATUSES: Record<PositionStatus, PositionStatus> = {
+  [POSITION_STATUS_ACTIVE]: POSITION_STATUS_ACTIVE,
+  [POSITION_STATUS_COMPLETED]: POSITION_STATUS_COMPLETED,
+  [POSITION_STATUS_TERMINATED]: POSITION_STATUS_TERMINATED,
 };
