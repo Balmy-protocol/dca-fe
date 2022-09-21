@@ -57,7 +57,7 @@ interface PositionControlsProps {
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
   onTerminate: (position: Position) => void;
   onReusePosition: (position: Position) => void;
-  onMigrate: (position: Position) => void;
+  onMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
   network: NetworkStruct;
@@ -69,7 +69,7 @@ const PositionControls = ({
   onWithdraw,
   onReusePosition,
   onTerminate,
-  onMigrate,
+  onMigrateYield,
   disabled,
   hasSignSupport,
   network,
@@ -260,7 +260,7 @@ const PositionControls = ({
             <StyledCardFooterButton
               variant="contained"
               color="migrate"
-              onClick={() => onMigrate(position)}
+              onClick={() => onMigrateYield(position)}
               fullWidth
               disabled={disabled}
             >
@@ -273,7 +273,7 @@ const PositionControls = ({
             <StyledCardFooterButton
               variant="contained"
               color="migrate"
-              onClick={() => onMigrate(position)}
+              onClick={() => onMigrateYield(position)}
               fullWidth
               disabled={disabled}
             >

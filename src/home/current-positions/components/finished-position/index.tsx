@@ -117,7 +117,7 @@ interface ActivePositionProps {
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
   onTerminate: (position: Position) => void;
   onReusePosition: (position: Position) => void;
-  onMigrate: (position: Position) => void;
+  onMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
   network: NetworkStruct;
@@ -129,7 +129,7 @@ const ActivePosition = ({
   onWithdraw,
   onReusePosition,
   onTerminate,
-  onMigrate,
+  onMigrateYield,
   disabled,
   hasSignSupport,
   network,
@@ -290,7 +290,7 @@ const ActivePosition = ({
           onWithdraw={onWithdraw}
           onReusePosition={onReusePosition}
           onTerminate={onTerminate}
-          onMigrate={onMigrate}
+          onMigrateYield={onMigrateYield}
           disabled={disabled}
           hasSignSupport={!!hasSignSupport}
           network={network}

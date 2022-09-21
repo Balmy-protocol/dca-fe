@@ -33,7 +33,7 @@ import useSupportsSigning from 'hooks/useSupportsSigning';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import TerminateModal from 'common/terminate-modal';
 import useYieldOptions from 'hooks/useYieldOptions';
-import MigratePositionModal from 'common/migrate-position-modal';
+import MigrateYieldModal from 'common/migrate-yield-modal';
 import ActivePosition from './components/position';
 import FinishedPosition from './components/finished-position';
 
@@ -69,7 +69,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const emptyPositions = [];
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
-  const [showMigrateModal, setShowMigrateModal] = React.useState(false);
+  const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
@@ -201,13 +201,13 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setShowTerminateModal(true);
   };
 
-  const onShowMigrate = (position: Position) => {
+  const onShowMigrateYield = (position: Position) => {
     if (!position) {
       return;
     }
 
     setSelectedPosition(position);
-    setShowMigrateModal(true);
+    setShowMigrateYieldModal(true);
   };
 
   return (
@@ -222,9 +222,9 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         position={selectedPosition}
         onCancel={() => setShowTerminateModal(false)}
       />
-      <MigratePositionModal
-        onCancel={() => setShowMigrateModal(false)}
-        open={showMigrateModal}
+      <MigrateYieldModal
+        onCancel={() => setShowMigrateYieldModal(false)}
+        open={showMigrateYieldModal}
         position={selectedPosition}
       />
       <Grid container spacing={1}>
@@ -244,7 +244,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
                       onTerminate={onShowTerminate}
-                      onMigrate={onShowMigrate}
+                      onMigrateYield={onShowMigrateYield}
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
                       network={network}
@@ -273,7 +273,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
                       onTerminate={onShowTerminate}
-                      onMigrate={onShowMigrate}
+                      onMigrateYield={onShowMigrateYield}
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
                       network={network}

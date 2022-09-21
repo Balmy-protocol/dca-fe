@@ -29,6 +29,7 @@ import {
   PositionsGraphqlResponse,
   PositionResponse,
   WithdrawFundsTypeData,
+  YieldOption,
 } from 'types';
 
 // GRAPHQL
@@ -50,7 +51,7 @@ import {
   LATEST_VERSION,
   SIGN_VERSION,
 } from 'config/constants';
-import { PermissionManagerContract } from 'types/contracts';
+import { PermissionManagerContract, PermissionPermit } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
 import { getDisplayToken } from 'utils/parsing';
 import gqlFetchAll, { GraphqlResults } from 'utils/gqlFetchAll';
@@ -358,7 +359,7 @@ export default class PositionService {
       { name: 'permissions', type: 'uint8[]' },
     ];
 
-    const PermissionPermit = [
+    const PermissionPermits = [
       { name: 'permissions', type: 'PermissionSet[]' },
       { name: 'tokenId', type: 'uint256' },
       { name: 'nonce', type: 'uint256' },
@@ -375,7 +376,7 @@ export default class PositionService {
         chainId: currentNetwork.chainId,
         verifyingContract: permissionManagerAddress,
       },
-      { PermissionSet, PermissionPermit },
+      { PermissionSet, PermissionPermit: PermissionPermits },
       { tokenId: positionId, permissions, nonce: nextNonce, deadline: MAX_UINT_256 }
     );
 
@@ -391,23 +392,69 @@ export default class PositionService {
   }
 
   async migratePosition(position: Position): Promise<TransactionResponse> {
-    const permissionManagerV2Address = await this.contractService.getPermissionManagerAddress(POSITION_VERSION_2);
-    const hubAddress = await this.contractService.getHUBAddress();
-    const hubV2Address = await this.contractService.getHUBAddress(POSITION_VERSION_2);
-    const migratorAddress = await this.contractService.getMigratorAddress();
-    const betaMigratorInstance = await this.contractService.getMigratorInstance();
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let permissionsPermit: PermissionPermit | undefined;
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
-    const erc712Name = 'Mean Finance DCA';
+    if (!companionHasPermission) {
+      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+        position,
+        companionAddress,
+        PERMISSIONS.TERMINATE
+      );
+      permissionsPermit = {
+        permissions,
+        deadline: deadline.toString(),
+        v,
+        r: hexlify(r),
+        s: hexlify(s),
+        tokenId: position.positionId,
+      };
+    }
 
-    const generatedSignature = await this.getSignatureForPermission(
-      position,
-      migratorAddress,
-      PERMISSIONS.TERMINATE,
-      permissionManagerV2Address,
-      erc712Name
+    return this.meanApiService.migratePosition(
+      position.positionId,
+      position.from.address,
+      position.to.address,
+      this.walletService.getAccount(),
+      position.version,
+      permissionsPermit
     );
+  }
 
-    return betaMigratorInstance.migrate(hubV2Address, position.positionId, generatedSignature, hubAddress);
+  async migrateYieldPosition(
+    position: Position,
+    fromYield?: YieldOption | null,
+    toYield?: YieldOption | null
+  ): Promise<TransactionResponse> {
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let permissionsPermit: PermissionPermit | undefined;
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
+
+    if (!companionHasPermission) {
+      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+        position,
+        companionAddress,
+        PERMISSIONS.TERMINATE
+      );
+      permissionsPermit = {
+        permissions,
+        deadline: deadline.toString(),
+        v,
+        r: hexlify(r),
+        s: hexlify(s),
+        tokenId: position.positionId,
+      };
+    }
+
+    return this.meanApiService.migratePosition(
+      position.positionId,
+      fromYield?.tokenAddress || position.from.address,
+      toYield?.tokenAddress || position.to.address,
+      this.walletService.getAccount(),
+      position.version,
+      permissionsPermit
+    );
   }
 
   async companionHasPermission(position: Position, permission: number) {
