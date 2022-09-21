@@ -9,6 +9,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
+import { LATEST_VERSION } from 'config';
 
 const PositionControlsContainer = styled.div`
   display: flex;
@@ -61,6 +62,8 @@ const PositionSummaryControls = ({
 
   if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
 
+  const showExtendedFunctions = position.version === LATEST_VERSION;
+
   return (
     <PositionControlsContainer>
       <IconButton onClick={handleClick} disabled={isPending}>
@@ -97,15 +100,17 @@ const PositionSummaryControls = ({
         >
           <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            onModifyRate();
-          }}
-          disabled={isPending || disabled}
-        >
-          <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
-        </MenuItem>
+        {!showExtendedFunctions && (
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              onModifyRate();
+            }}
+            disabled={isPending || disabled}
+          >
+            <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
             handleClose();
