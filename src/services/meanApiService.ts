@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { MEAN_API_URL, PositionVersions } from 'config';
+import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from 'config';
 import { getWrappedProtocolToken } from 'mocks/tokens';
 import { MeanFinanceResponse, PermissionPermit } from 'types';
 
@@ -209,6 +209,37 @@ export default class MeanApiService {
         convertTo: tokenFrom,
         recipient,
         hub: hubAddress,
+        permissionPermit,
+      }
+    );
+
+    return singer.sendTransaction(transactionToSend.data.tx);
+  }
+
+  async migratePosition(
+    id: string,
+    newFrom: string,
+    newTo: string,
+    recipient: string,
+    positionVersion: PositionVersions,
+    permissionPermit?: PermissionPermit
+  ) {
+    const singer = this.walletService.getSigner();
+
+    const currentNetwork = await this.walletService.getNetwork();
+    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
+    const newHubAddress = await this.contractService.getHUBAddress(LATEST_VERSION);
+
+    // Call to api and get transaction
+    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/migrate`,
+      {
+        sourceHub: hubAddress,
+        targetHub: newHubAddress,
+        swappedRecipient: recipient,
+        positionId: id,
+        convertFrom: newFrom,
+        convertTo: newTo,
         permissionPermit,
       }
     );
