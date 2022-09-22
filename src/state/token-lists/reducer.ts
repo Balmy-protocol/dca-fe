@@ -63,15 +63,6 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
   },
-  'https://zapper.fi/api/token-list': {
-    name: 'Zapper Token List',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-  },
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
