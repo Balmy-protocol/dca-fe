@@ -117,6 +117,43 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
+        case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
+          history.push({
+            id: transaction.hash,
+            action: POSITION_ACTIONS.TERMINATED,
+            rate: position.rate,
+            oldRate: position.rate,
+            from: position.user,
+            to: position.user,
+            remainingSwaps: position.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
+            swapped: '0',
+            withdrawn: position.withdrawn,
+            depositedRateUnderlying: position.depositedRateUnderlying || position.rate,
+            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
+            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            swappedUnderlying: '0',
+            permissions: [],
+            ratioBToAWithFee: '1',
+            rateUnderlying: position.rate,
+            ratioAToBWithFee: '1',
+            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
+            createdAtTimestamp: (Date.now() / 1000).toString(),
+            transaction: {
+              id: transaction.hash,
+              hash: transaction.hash,
+              timestamp: (Date.now() / 1000).toString(),
+            },
+          });
+          position = {
+            ...position,
+            status: 'TERMINATED',
+            toWithdraw: BigNumber.from(0).toString(),
+            remainingLiquidity: BigNumber.from(0).toString(),
+            remainingSwaps: BigNumber.from(0).toString(),
+          };
+          break;
+        }
         case TRANSACTION_TYPES.WITHDRAW_POSITION: {
           history.push({
             id: transaction.hash,

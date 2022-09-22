@@ -38,6 +38,7 @@ export type TransactionTypes =
   | 'APPROVE_COMPANION'
   | 'MODIFY_PERMISSIONS'
   | 'MIGRATE_POSITION'
+  | 'MIGRATE_POSITION_YIELD'
   | 'WITHDRAW_FUNDS'
   | 'RESET_POSITION';
 
@@ -69,6 +70,15 @@ export interface MigratePositionTypeData {
   id: number | string;
   from: string;
   to: string;
+  newId?: string;
+}
+
+export interface MigratePositionYieldTypeData {
+  id: number | string;
+  from: string;
+  to: string;
+  fromYield?: string;
+  toYield?: string;
   newId?: string;
 }
 
@@ -153,6 +163,7 @@ export type TransactionPositionTypeDataOptions =
   | ModifyPermissionsTypeData
   | MigratePositionTypeData
   | WithdrawFundsTypeData
+  | MigratePositionYieldTypeData
   | TransferTypeData;
 
 export type TransactionTypeDataOptions =
@@ -171,6 +182,7 @@ export type TransactionTypeDataOptions =
   | ModifyPermissionsTypeData
   | MigratePositionTypeData
   | WithdrawFundsTypeData
+  | MigratePositionYieldTypeData
   | TransferTypeData;
 
 export interface TransactionDetails {

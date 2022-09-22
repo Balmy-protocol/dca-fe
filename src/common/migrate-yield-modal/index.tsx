@@ -77,10 +77,10 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
             <Typography variant="body1">
               <FormattedMessage
                 description="Migrating your position"
-                defaultMessage="Migrating your {from}/{to} position to start earning yield"
+                defaultMessage="Making your {from}/{to} position start generating yield"
                 values={{
-                  from: position.from,
-                  to: position.to,
+                  from: position.from.symbol,
+                  to: position.to.symbol,
                 }}
               />
             </Typography>
@@ -97,8 +97,14 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
       });
       const result = await positionService.migrateYieldPosition(position, fromYield, toYield);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.MIGRATE_POSITION,
-        typeData: { id: position.id },
+        type: TRANSACTION_TYPES.MIGRATE_POSITION_YIELD,
+        typeData: {
+          id: position.id,
+          from: position.from.symbol,
+          to: position.to.symbol,
+          fromYield: fromYield?.tokenAddress,
+          toYield: toYield?.tokenAddress,
+        },
         position,
       });
       setModalSuccess({
@@ -106,14 +112,18 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
         content: (
           <FormattedMessage
             description="success migrating your position"
-            defaultMessage="Migrating your {from}/{to} position to earn yield has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Making your {from}/{to} position start generating yield has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+            }}
           />
         ),
       });
     } catch (e) {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
-        content: 'Error changing rate and swaps',
+        content: 'Error making new positions start generating yield',
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -198,6 +208,15 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
                   values={{
                     toWithdraw: formatCurrencyAmount(toWithdraw, to),
                     to: to.symbol,
+                  }}
+                />
+              </Typography>
+              <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
+                <FormattedMessage
+                  description="howItWorksDescriptionStep4"
+                  defaultMessage="All {from} balance will be used to create a new position with the same rate and remaining swaps as your current one."
+                  values={{
+                    from: from.symbol,
                   }}
                 />
               </Typography>

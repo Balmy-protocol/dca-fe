@@ -30,6 +30,7 @@ import {
   PositionResponse,
   WithdrawFundsTypeData,
   YieldOption,
+  MigratePositionYieldTypeData,
 } from 'types';
 
 // GRAPHQL
@@ -50,9 +51,11 @@ import {
   PositionVersions,
   LATEST_VERSION,
   SIGN_VERSION,
+  TOKEN_TYPE_YIELD_BEARING_SHARES,
 } from 'config/constants';
 import { PermissionManagerContract, PermissionPermit } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
+import { emptyTokenWithAddress } from 'utils/currency';
 import { getDisplayToken } from 'utils/parsing';
 import gqlFetchAll, { GraphqlResults } from 'utils/gqlFetchAll';
 import GraphqlService from './graphql';
@@ -988,6 +991,49 @@ export default class PositionService {
           };
         }
         delete this.currentPositions[migratePositionTypeData.id];
+        break;
+      }
+      case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
+        const migratePositionYieldTypeData = transaction.typeData as MigratePositionYieldTypeData;
+        this.pastPositions[migratePositionYieldTypeData.id] = {
+          ...this.currentPositions[migratePositionYieldTypeData.id],
+          pendingTransaction: '',
+        };
+        if (migratePositionYieldTypeData.newId) {
+          const newPositionId = `${migratePositionYieldTypeData.newId}-v${LATEST_VERSION}`;
+          this.currentPositions[newPositionId] = {
+            ...this.currentPositions[migratePositionYieldTypeData.id],
+            from: !migratePositionYieldTypeData.fromYield
+              ? this.currentPositions[migratePositionYieldTypeData.id].from
+              : {
+                  ...this.currentPositions[migratePositionYieldTypeData.id].from,
+                  underlyingTokens: [
+                    emptyTokenWithAddress(migratePositionYieldTypeData.fromYield, TOKEN_TYPE_YIELD_BEARING_SHARES),
+                  ],
+                },
+            to: !migratePositionYieldTypeData.toYield
+              ? this.currentPositions[migratePositionYieldTypeData.id].to
+              : {
+                  ...this.currentPositions[migratePositionYieldTypeData.id].to,
+                  underlyingTokens: [
+                    emptyTokenWithAddress(migratePositionYieldTypeData.toYield, TOKEN_TYPE_YIELD_BEARING_SHARES),
+                  ],
+                },
+            depositedRateUnderlying: this.currentPositions[migratePositionYieldTypeData.id].rate,
+            toWithdrawUnderlyingAccum: BigNumber.from(0),
+            totalSwappedUnderlyingAccum: BigNumber.from(0),
+            pendingTransaction: '',
+            toWithdraw: BigNumber.from(0),
+            swapped: BigNumber.from(0),
+            withdrawn: BigNumber.from(0),
+            totalExecutedSwaps: BigNumber.from(0),
+            status: 'ACTIVE',
+            version: LATEST_VERSION,
+            positionId: migratePositionYieldTypeData.newId,
+            id: newPositionId,
+          };
+        }
+        delete this.currentPositions[migratePositionYieldTypeData.id];
         break;
       }
       case TRANSACTION_TYPES.WITHDRAW_POSITION: {
