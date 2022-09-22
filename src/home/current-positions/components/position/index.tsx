@@ -91,12 +91,13 @@ const StyledCardTitleHeader = styled.div`
   }
 `;
 
-const StyledDetailWrapper = styled.div<{ alignItems?: string; gap?: boolean }>`
+const StyledDetailWrapper = styled.div<{ alignItems?: string; gap?: boolean; flex?: boolean }>`
   margin-bottom: 5px;
   display: flex;
   align-items: ${({ alignItems }) => alignItems || 'center'};
   justify-content: flex-start;
   ${({ gap }) => (gap ? 'gap: 5px;' : '')}
+  ${({ flex }) => (flex ? 'flex: 1;' : '')}
 `;
 
 const StyledProgressWrapper = styled.div`
@@ -357,7 +358,7 @@ const ActivePosition = ({
             </StyledDetailWrapper>
           )}
           {(foundYieldFrom || foundYieldTo) && (
-            <StyledDetailWrapper alignItems="flex-start" gap>
+            <StyledDetailWrapper alignItems="flex-end" gap flex>
               {foundYieldFrom && (
                 <CustomChip
                   icon={
