@@ -146,7 +146,10 @@ export default function Updater(): null {
                   id: parsedLog.args.positionId.toString(),
                 };
               }
-              if (transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION) {
+              if (
+                transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION ||
+                transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION_YIELD
+              ) {
                 const parsedLog = await transactionService.parseLog(receipt.logs, currentNetwork.chainId, 'Deposited');
 
                 extendedTypeData = {

@@ -19,6 +19,7 @@ import {
   ModifyPermissionsTypeData,
   MigratePositionTypeData,
   WithdrawFundsTypeData,
+  MigratePositionYieldTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { formatCurrencyAmount } from 'utils/currency';
@@ -153,6 +154,11 @@ function useBuildTransactionDetail() {
           case TRANSACTION_TYPES.MIGRATE_POSITION: {
             const approveCompanionTypeData = tx.typeData as MigratePositionTypeData;
             message = `Migrate your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position`;
+            break;
+          }
+          case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
+            const approveCompanionTypeData = tx.typeData as MigratePositionYieldTypeData;
+            message = `Making your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position start generating yield`;
             break;
           }
           case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {

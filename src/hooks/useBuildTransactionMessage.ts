@@ -19,6 +19,7 @@ import {
   ModifyPermissionsTypeData,
   MigratePositionTypeData,
   WithdrawFundsTypeData,
+  MigratePositionYieldTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -174,6 +175,11 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.MIGRATE_POSITION: {
           const approveCompanionTypeData = tx.typeData as MigratePositionTypeData;
           message = `Your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position has been migrated`;
+          break;
+        }
+        case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
+          const approveCompanionTypeData = tx.typeData as MigratePositionYieldTypeData;
+          message = `Your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position has now started generating yield`;
           break;
         }
         case TRANSACTION_TYPES.NEW_PAIR: {

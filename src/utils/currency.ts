@@ -4,7 +4,7 @@ import _Decimal from 'decimal.js-light';
 import { BigNumber } from 'ethers';
 import JSBI from 'jsbi';
 import toFormat from 'toformat';
-import { Token } from 'types';
+import { Token, TokenType } from 'types';
 
 const Decimal = toFormat(_Decimal);
 
@@ -53,13 +53,16 @@ export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token
 }
 /* eslint-enable */
 
-export const emptyTokenWithAddress: (address: string) => Token = (address: string) => ({
+export const emptyTokenWithAddress: (address: string, type?: TokenType) => Token = (
+  address: string,
+  type?: TokenType
+) => ({
   decimals: 18,
   chainId: 1,
   address,
   name: '',
   symbol: '',
-  type: TOKEN_TYPE_BASE,
+  type: type || TOKEN_TYPE_BASE,
   underlyingTokens: [],
 });
 
