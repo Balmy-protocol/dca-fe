@@ -220,13 +220,13 @@ const PositionControls = ({
         <>
           {!disabled && (
             <>
-              {toWithdraw.gt(BigNumber.from(0)) && (
+              {(toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))) && (
                 <StyledCardFooterButton
                   variant="contained"
                   color="secondary"
                   onClick={() => onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
                   fullWidth
-                  disabled={disabled}
+                  disabled={disabled || toWithdraw.lte(BigNumber.from(0))}
                 >
                   <Typography variant="body2">
                     <FormattedMessage
@@ -269,7 +269,7 @@ const PositionControls = ({
               </Typography>
             </StyledCardFooterButton>
           )}
-          {shouldShowMigrate && !shouldMigrateToYield && (
+          {/* {shouldShowMigrate && !shouldMigrateToYield && (
             <StyledCardFooterButton
               variant="contained"
               color="migrate"
@@ -281,7 +281,7 @@ const PositionControls = ({
                 <FormattedMessage description="startSubsidizing" defaultMessage="Start subsidizing" />
               </Typography>
             </StyledCardFooterButton>
-          )}
+          )} */}
           {toWithdraw.gt(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0)) && (
             <StyledCardFooterButton
               variant="contained"
