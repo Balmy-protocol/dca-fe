@@ -20,9 +20,9 @@ function useUnderlyingAmount(
     async function callPromise() {
       if (tokens.length) {
         try {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
           const filteredTokens = tokens.filter<{ token: Token; amount: BigNumber }>(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             (tokenObj) => !!tokenObj.token && !!tokenObj.amount && !tokenObj.returnSame
           );
           const promiseResult = await meanApiService.getUnderlyingTokens(filteredTokens);
