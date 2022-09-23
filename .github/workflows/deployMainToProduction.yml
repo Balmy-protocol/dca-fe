@@ -1,4 +1,4 @@
-name: Deploy main to playground
+name: Deploy main to Production
 
 # Controls when the workflow will run
 on:
