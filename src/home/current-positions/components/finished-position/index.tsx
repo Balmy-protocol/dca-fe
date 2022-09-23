@@ -12,7 +12,7 @@ import { NETWORKS, OLD_VERSIONS, STRING_SWAP_INTERVALS } from 'config/constants'
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import ComposedTokenIcon from 'common/composed-token-icon';
 import CustomChip from 'common/custom-chip';
@@ -71,7 +71,7 @@ const StyledDetailWrapper = styled.div<{ alignItems?: string; gap?: boolean }>`
   display: flex;
   align-items: ${({ alignItems }) => alignItems || 'center'};
   justify-content: flex-start;
-  ${({ gap }) => (gap ? 'gap: 5px;' : '')}
+  gap: 5px;
 `;
 
 const StyledFreqLeft = styled.div`
@@ -135,7 +135,17 @@ const ActivePosition = ({
   network,
   yieldOptionsByChain,
 }: ActivePositionProps) => {
-  const { from, to, swapInterval, remainingLiquidity, remainingSwaps, pendingTransaction, chainId } = position;
+  const {
+    from,
+    to,
+    swapInterval,
+    remainingLiquidity,
+    remainingSwaps,
+    pendingTransaction,
+    chainId,
+    rate,
+    depositedRateUnderlying,
+  } = position;
   const yieldOptions = yieldOptionsByChain[chainId];
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -151,6 +161,7 @@ const ActivePosition = ({
     from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from,
     to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to
   );
+  const rateToUse = depositedRateUnderlying || rate;
   const pair = find(
     availablePairs,
     (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
@@ -233,20 +244,21 @@ const ActivePosition = ({
                 }}
               />
             </Typography>
-            <Typography
-              variant="body1"
-              color={remainingLiquidity.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              <FormattedMessage
-                description="current remaining rate"
-                defaultMessage="{frequency}"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  frequency: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
-                }}
-              />
-            </Typography>
+            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+              <Typography variant="body2">
+                {formatCurrencyAmount(BigNumber.from(rateToUse), position.from, 4)}
+              </Typography>
+            </CustomChip>
+            <FormattedMessage
+              description="positionDetailsCurrentRate"
+              defaultMessage="{frequency} {hasYield}"
+              values={{
+                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                hasYield: position.from.underlyingTokens.length ? '+ yield' : '',
+                frequency:
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+              }}
+            />
           </StyledDetailWrapper>
           {!foundYieldFrom && !foundYieldTo && (
             <StyledDetailWrapper alignItems="flex-start">
