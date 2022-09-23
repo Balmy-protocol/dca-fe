@@ -52,7 +52,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
+      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
       {
         takeFromCaller: { token: from, amount: totalAmmount.toString() },
         from: yieldFrom || from,
@@ -84,7 +84,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
+      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
       {
         takeFromCaller: { token: from, amount: totalAmmount.toString() },
         from: wrappedProtocolToken.address,
@@ -133,7 +133,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/withdraw-and-swap`,
+      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/withdraw-and-swap`,
       {
         positionId: id,
         convertTo,
@@ -162,7 +162,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/terminate-and-swap`,
+      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/terminate-and-swap`,
       {
         positionId: id,
         recipient: recipientSwapped,
@@ -191,7 +191,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/swap-and-increase`,
+      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-increase`,
       {
         takeFromCaller: { token: tokenFrom, amount: newAmount.toString() },
         positionId: id,
@@ -220,7 +220,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/reduce-and-swap`,
+      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/reduce-and-swap`,
       {
         positionId: id,
         amount: newAmount.toString(),
@@ -251,7 +251,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/dca/networks/${currentNetwork.chainId}/actions/swap-and-migrate`,
+      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-migrate`,
       {
         sourceHub: hubAddress,
         targetHub: newHubAddress,
