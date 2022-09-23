@@ -117,17 +117,20 @@ export const getDisplayToken = (token: Token, chainId?: number) => {
 
   underlyingToken = underlyingToken && {
     ...underlyingToken,
+    chainId: chainIdToUse,
     underlyingTokens: [token],
   };
 
   if (underlyingToken && underlyingToken.address === wrappedProtocolToken.address) {
     underlyingToken = {
       ...protocolToken,
+      chainId: chainIdToUse,
       underlyingTokens: [token],
     };
   }
 
-  const baseToken = token.address === wrappedProtocolToken.address ? protocolToken : token;
+  const baseToken =
+    token.address === wrappedProtocolToken.address ? protocolToken : { ...token, chainId: chainIdToUse };
 
   return underlyingToken || baseToken;
 };

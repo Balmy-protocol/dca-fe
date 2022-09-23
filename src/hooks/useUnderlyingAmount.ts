@@ -3,49 +3,43 @@ import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import { BigNumber } from 'ethers';
-import usePriceService from './usePriceService';
+import useMeanApiService from './useMeanApiService';
 
 function useUnderlyingAmount(
-  token: Token | undefined | null,
-  amount: BigNumber | undefined | null,
-  returnSame?: boolean
-): [BigNumber | null | undefined, boolean, string?] {
+  tokens: { token: Token | undefined | null; amount: BigNumber | undefined | null; returnSame?: boolean }[]
+): [BigNumber[], boolean, string?] {
   const [{ result, isLoading, error }, setParams] = React.useState<{
-    result: BigNumber | null | undefined;
+    result: BigNumber[];
     error: string | undefined;
     isLoading: boolean;
-  }>({ result: undefined, error: undefined, isLoading: false });
-  const priceService = usePriceService();
-  const prevToken = usePrevious(token);
-  const prevAmount = usePrevious(amount);
+  }>({ result: [], error: undefined, isLoading: false });
+  const meanApiService = useMeanApiService();
+  const prevTokens = usePrevious(tokens);
 
   React.useEffect(() => {
     async function callPromise() {
-      if (token && amount) {
+      if (tokens.length) {
         try {
-          const promiseResult = await priceService.getTransformerValue(token.underlyingTokens[0].address, amount);
-          setParams({ isLoading: false, result: promiseResult[0].amount, error: undefined });
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const filteredTokens = tokens.filter<{ token: Token; amount: BigNumber }>(
+            (tokenObj) => !!tokenObj.token && !!tokenObj.amount && !tokenObj.returnSame
+          );
+          const promiseResult = await meanApiService.getUnderlyingTokens(filteredTokens);
+          setParams({ isLoading: false, result: promiseResult, error: undefined });
         } catch (e) {
-          setParams({ isLoading: false, result: undefined, error: e as string });
+          setParams({ isLoading: false, result: [], error: e as string });
         }
       }
     }
 
-    if ((!isLoading && !result && !error) || !isEqual(prevToken, token) || !isEqual(prevAmount, amount)) {
-      if (!returnSame) {
-        setParams({ isLoading: true, result: undefined, error: undefined });
+    if ((!isLoading && !result && !error) || !isEqual(prevTokens, tokens)) {
+      setParams({ isLoading: true, result: [], error: undefined });
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        callPromise();
-      } else {
-        setParams({ isLoading: false, result: amount, error: undefined });
-      }
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      callPromise();
     }
-  }, [token, returnSame, isLoading, result, error, amount, prevAmount, token, prevToken]);
-
-  if (!token) {
-    return [null, false, undefined];
-  }
+  }, [isLoading, result, error, tokens, prevTokens]);
 
   return [result, isLoading, error];
 }
