@@ -3,6 +3,7 @@ import { AxiosInstance } from 'axios';
 import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from 'config';
 import { getWrappedProtocolToken } from 'mocks/tokens';
 import { MeanApiUnderlyingResponse, MeanFinanceResponse, PermissionPermit, Token } from 'types';
+import { TransactionRequest } from '@ethersproject/providers';
 
 // MOCKS
 import ContractService from './contractService';
@@ -35,6 +36,17 @@ export default class MeanApiService {
     this.client = client;
   }
 
+  async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
+    const signer = this.walletService.getSigner();
+
+    const gasUsed = await signer.estimateGas(tx);
+
+    return {
+      ...tx,
+      gasLimit: gasUsed.mul(BigNumber.from(130)).div(BigNumber.from(100)), // 30% more
+    };
+  }
+
   async depositUsingYield(
     from: string,
     to: string,
@@ -51,7 +63,7 @@ export default class MeanApiService {
     const hubAddress = await this.contractService.getHUBAddress();
 
     // Call to api and get transaction
-    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
       {
         takeFromCaller: { token: from, amount: totalAmmount.toString() },
@@ -65,7 +77,9 @@ export default class MeanApiService {
       }
     );
 
-    return singer.sendTransaction(transactionToSend.data.tx);
+    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
+
+    return singer.sendTransaction(transactionToSend);
   }
 
   async depositUsingProtocolToken(
@@ -83,7 +97,7 @@ export default class MeanApiService {
     const hubAddress = await this.contractService.getHUBAddress();
 
     // Call to api and get transaction
-    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
       {
         takeFromCaller: { token: from, amount: totalAmmount.toString() },
@@ -97,7 +111,9 @@ export default class MeanApiService {
       }
     );
 
-    return singer.sendTransaction(transactionToSend.data.tx);
+    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
+
+    return singer.sendTransaction(transactionToSend);
   }
 
   async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
@@ -132,7 +148,7 @@ export default class MeanApiService {
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
     // Call to api and get transaction
-    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/withdraw-and-swap`,
       {
         positionId: id,
@@ -143,7 +159,9 @@ export default class MeanApiService {
       }
     );
 
-    return singer.sendTransaction(transactionToSend.data.tx);
+    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
+
+    return singer.sendTransaction(transactionToSend);
   }
 
   async terminateUsingOtherTokens(
@@ -161,7 +179,7 @@ export default class MeanApiService {
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
     // Call to api and get transaction
-    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/terminate-and-swap`,
       {
         positionId: id,
@@ -173,7 +191,9 @@ export default class MeanApiService {
       }
     );
 
-    return singer.sendTransaction(transactionToSend.data.tx);
+    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
+
+    return singer.sendTransaction(transactionToSend);
   }
 
   async increasePositionUsingOtherToken(
@@ -190,7 +210,7 @@ export default class MeanApiService {
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
     // Call to api and get transaction
-    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-increase`,
       {
         takeFromCaller: { token: tokenFrom, amount: newAmount.toString() },
@@ -201,7 +221,9 @@ export default class MeanApiService {
       }
     );
 
-    return singer.sendTransaction(transactionToSend.data.tx);
+    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
+
+    return singer.sendTransaction(transactionToSend);
   }
 
   async reducePositionUsingOtherToken(
@@ -219,7 +241,7 @@ export default class MeanApiService {
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
     // Call to api and get transaction
-    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/reduce-and-swap`,
       {
         positionId: id,
@@ -232,7 +254,9 @@ export default class MeanApiService {
       }
     );
 
-    return singer.sendTransaction(transactionToSend.data.tx);
+    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
+
+    return singer.sendTransaction(transactionToSend);
   }
 
   async migratePosition(
@@ -250,7 +274,7 @@ export default class MeanApiService {
     const newHubAddress = await this.contractService.getHUBAddress(LATEST_VERSION);
 
     // Call to api and get transaction
-    const transactionToSend = await this.axiosClient.post<MeanFinanceResponse>(
+    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-migrate`,
       {
         sourceHub: hubAddress,
@@ -263,6 +287,8 @@ export default class MeanApiService {
       }
     );
 
-    return singer.sendTransaction(transactionToSend.data.tx);
+    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
+
+    return singer.sendTransaction(transactionToSend);
   }
 }
