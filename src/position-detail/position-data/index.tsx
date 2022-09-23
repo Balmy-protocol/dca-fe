@@ -34,6 +34,12 @@ import find from 'lodash/find';
 import useWalletService from 'hooks/useWalletService';
 import CustomChip from 'common/custom-chip';
 import ComposedTokenIcon from 'common/composed-token-icon';
+import { useShowBreakdown } from 'state/position-details/hooks';
+import { useAppDispatch } from 'state/hooks';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { updateShowBreakdown } from 'state/position-details/actions';
 
 interface DetailsProps {
   position: FullPosition;
@@ -129,6 +135,11 @@ const StyledCardFooterButton = styled(Button)`
   margin-top: 8px;
 `;
 
+const StyledBreakdownLeft = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const StyledFreqLeft = styled.div`
   display: flex;
   align-items: center;
@@ -196,6 +207,8 @@ const Details = ({
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
   const rate = depositedRateUnderlying || positionRate;
+  const showBreakdown = useShowBreakdown();
+  const dispatch = useAppDispatch();
   const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
   const toWithdrawYield =
     toWithdrawUnderlyingAccum && toWithdrawUnderlying
@@ -210,11 +223,11 @@ const Details = ({
       : BigNumber.from(0);
   const swappedBase = swapped.sub(swappedYield);
 
-  const { yieldGenerated: yieldFromGenerated, base: remainingLiquidity } = calculateYield(
-    remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw),
-    rate,
-    remainingSwaps
-  );
+  const {
+    total: totalRemainingLiquidity,
+    yieldGenerated: yieldFromGenerated,
+    base: remainingLiquidity,
+  } = calculateYield(remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw), rate, remainingSwaps);
 
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
@@ -299,6 +312,10 @@ const Details = ({
   const foundYieldTo =
     position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
+  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdrawUnderlying;
+  const swappedToShow = showBreakdown ? swappedBase : swappedUnderlying;
+  const remainingLiquidityToShow = showBreakdown ? remainingLiquidity : totalRemainingLiquidity;
+
   return (
     <StyledCard>
       {positionNetwork && (
@@ -318,14 +335,54 @@ const Details = ({
               <TokenIcon token={to} size="27px" />
               <Typography variant="body1">{to.symbol}</Typography>
             </StyledCardTitleHeader>
+            <StyledBreakdownLeft>
+              <Typography variant="body2">
+                <FormGroup row>
+                  <FormControlLabel
+                    labelPlacement="start"
+                    control={
+                      <Switch
+                        checked={showBreakdown}
+                        onChange={() => dispatch(updateShowBreakdown(!showBreakdown))}
+                        name="enableDisableShowBreakdown"
+                        color="primary"
+                      />
+                    }
+                    disableTypography
+                    label="Detailed view:"
+                  />
+                </FormGroup>
+              </Typography>
+            </StyledBreakdownLeft>
+          </StyledCardHeader>
+          <StyledProgressWrapper>
+            {remainingSwaps.toNumber() > 0 && (
+              <BorderLinearProgress
+                swaps={remainingSwaps.toNumber()}
+                variant="determinate"
+                value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
+              />
+            )}
+          </StyledProgressWrapper>
+          <StyledDetailWrapper>
             {!isPending && !hasNoFunds && !isStale && (
               <StyledFreqLeft>
-                <Typography variant="caption">
+                <Typography variant="body2">
                   <FormattedMessage
                     description="days to finish"
                     defaultMessage="{type} left"
                     values={{
                       type: getTimeFrequencyLabel(swapInterval.interval, remainingSwaps.toString()),
+                    }}
+                  />
+                </Typography>
+                <Typography variant="caption" color="rgba(255, 255, 255, 0.5);">
+                  <FormattedMessage
+                    description="days to finish"
+                    defaultMessage="({swaps} SWAP{plural})"
+                    values={{
+                      swaps: remainingSwaps.toString(),
+                      plural: remainingSwaps.toNumber() !== 1 ? 's' : '',
                     }}
                   />
                 </Typography>
@@ -352,16 +409,7 @@ const Details = ({
                 </Typography>
               </StyledStale>
             )}
-          </StyledCardHeader>
-          <StyledProgressWrapper>
-            {remainingSwaps.toNumber() > 0 && (
-              <BorderLinearProgress
-                swaps={remainingSwaps.toNumber()}
-                variant="determinate"
-                value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
-              />
-            )}
-          </StyledProgressWrapper>
+          </StyledDetailWrapper>
           <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
@@ -373,14 +421,16 @@ const Details = ({
               />
             </Typography>
             <CustomChip
-              extraText={showToFullPrice && `(${toFullPrice.toFixed(2)} USD)`}
+              extraText={
+                showToFullPrice && `(${(toFullPrice + (showBreakdown ? 0 : toYieldFullPrice || 0)).toFixed(2)} USD)`
+              }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
             >
               <Typography variant="body2">
-                {formatCurrencyAmount(BigNumber.from(swappedBase), position.to, 4)}
+                {formatCurrencyAmount(BigNumber.from(swappedToShow), position.to, 4)}
               </Typography>
             </CustomChip>
-            {swappedYield.gt(BigNumber.from(0)) && (
+            {swappedYield.gt(BigNumber.from(0)) && showBreakdown && (
               <>
                 +
                 {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
@@ -438,14 +488,16 @@ const Details = ({
                 />
               </Typography>
               <CustomChip
-                extraText={showFromPrice && `(${fromPrice.toFixed(2)} USD)`}
+                extraText={
+                  showFromPrice && `(${(fromPrice + (showBreakdown ? 0 : fromYieldPrice || 0)).toFixed(2)} USD)`
+                }
                 icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
               >
                 <Typography variant="body2">
-                  {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
+                  {formatCurrencyAmount(BigNumber.from(remainingLiquidityToShow), position.from, 4)}
                 </Typography>
               </CustomChip>
-              {yieldFromGenerated.gt(BigNumber.from(0)) && (
+              {yieldFromGenerated.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
@@ -476,14 +528,14 @@ const Details = ({
                 <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
               </Typography>
               <CustomChip
-                extraText={showToPrice && `(${toPrice.toFixed(2)} USD)`}
+                extraText={showToPrice && `(${(toPrice + (showBreakdown ? 0 : toYieldPrice || 0)).toFixed(2)} USD)`}
                 icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
               >
                 <Typography variant="body2">
-                  {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
+                  {formatCurrencyAmount(BigNumber.from(toWithdrawToShow), position.to, 4)}
                 </Typography>
               </CustomChip>
-              {toWithdrawYield.gt(BigNumber.from(0)) && (
+              {toWithdrawYield.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">

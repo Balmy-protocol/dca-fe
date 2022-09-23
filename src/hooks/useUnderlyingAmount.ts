@@ -20,13 +20,40 @@ function useUnderlyingAmount(
     async function callPromise() {
       if (tokens.length) {
         try {
-          const filteredTokens = tokens.filter<{ token: Token; amount: BigNumber }>(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            (tokenObj) => !!tokenObj.token && !!tokenObj.amount && !tokenObj.returnSame
-          );
+          const indexes = tokens.map((tokenObj, index) => ({
+            ...tokenObj,
+            originalIndex: index,
+          }));
+
+          const filteredTokens = indexes
+            .filter<{ token: Token; amount: BigNumber; originalIndex: number }>(
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              (tokenObj) => !!tokenObj.token && !!tokenObj.amount && !tokenObj.returnSame
+            )
+            .map((tokenObj, index) => ({
+              ...tokenObj,
+              sentIndex: index,
+            }));
           const promiseResult = await meanApiService.getUnderlyingTokens(filteredTokens);
-          setParams({ isLoading: false, result: promiseResult, error: undefined });
+          const newResults: BigNumber[] = [];
+
+          indexes
+            .filter<{ token: Token; amount: BigNumber; originalIndex: number }>(
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              (tokenObj) => !!tokenObj.token && !!tokenObj.amount && tokenObj.returnSame
+            )
+            .forEach((tokenObj) => {
+              newResults[tokenObj.originalIndex] = tokenObj.amount;
+            });
+
+          promiseResult.forEach((amount, index) => {
+            const { originalIndex } = filteredTokens[index];
+            newResults[originalIndex] = amount;
+          });
+
+          setParams({ isLoading: false, result: newResults, error: undefined });
         } catch (e) {
           setParams({ isLoading: false, result: [], error: e as string });
         }
