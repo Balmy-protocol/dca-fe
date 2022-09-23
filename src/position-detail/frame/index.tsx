@@ -152,21 +152,23 @@ const PositionDetailFrame = () => {
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const positionInUse = usePositionDetails();
-  const [toWithdrawUnderlying, isLoadingToWithdrawUnderlying] = useUnderlyingAmount(
-    positionInUse?.to,
-    positionInUse ? BigNumber.from(positionInUse?.toWithdraw) : null,
-    !positionInUse?.to.underlyingTokens.length
-  );
-  const [swappedUnderlying, isLoadingSwappedUnderlying] = useUnderlyingAmount(
-    positionInUse?.to,
-    positionInUse ? BigNumber.from(positionInUse?.totalSwapped) : null,
-    !positionInUse?.to.underlyingTokens.length
-  );
-  const [remainingLiquidityUnderlying, isLoadingToRemainingLiquidityUnderlying] = useUnderlyingAmount(
-    positionInUse?.from,
-    positionInUse ? BigNumber.from(positionInUse.rate).mul(BigNumber.from(positionInUse.remainingSwaps)) : null,
-    !positionInUse?.from.underlyingTokens.length
-  );
+  const [[toWithdrawUnderlying, swappedUnderlying, remainingLiquidityUnderlying], isLoadingUnderlyings] =
+    useUnderlyingAmount([
+      {
+        token: positionInUse?.to,
+        amount: positionInUse ? BigNumber.from(positionInUse?.toWithdraw) : null,
+      },
+      {
+        token: positionInUse?.to,
+        amount: positionInUse ? BigNumber.from(positionInUse?.totalSwapped) : null,
+      },
+      {
+        token: positionInUse?.from,
+        amount: positionInUse
+          ? BigNumber.from(positionInUse.rate).mul(BigNumber.from(positionInUse.remainingSwaps))
+          : null,
+      },
+    ]);
 
   React.useEffect(() => {
     dispatch(changeMainTab(1));
@@ -198,9 +200,7 @@ const PositionDetailFrame = () => {
     (!position && !positionNotFound) ||
     isLoadingSwaps ||
     isLoadingYieldOptions ||
-    isLoadingToWithdrawUnderlying ||
-    isLoadingToRemainingLiquidityUnderlying ||
-    isLoadingSwappedUnderlying
+    isLoadingUnderlyings
   ) {
     return (
       <Grid container>

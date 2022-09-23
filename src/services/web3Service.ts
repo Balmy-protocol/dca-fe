@@ -106,6 +106,10 @@ export default class Web3Service {
     return this.contractService;
   }
 
+  getMeanApiService() {
+    return this.meanApiService;
+  }
+
   getProviderInfo() {
     return this.providerInfo;
   }
