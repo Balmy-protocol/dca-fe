@@ -1,4 +1,4 @@
-name: Test deploy main to playground
+name: Deploy main to playground
 
 # Controls when the workflow will run
 on:
@@ -7,8 +7,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  build-and-deploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -26,37 +25,14 @@ jobs:
         run: yarn install --pure-lockfile
       - name: Build
         run: yarn build
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/main'
-
-  #   steps:
-  #   - name: Configure AWS Credentials
-  #     # You may pin to the exact commit or the version.
-  #     # uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838
-  #     uses: aws-actions/configure-aws-credentials@v1
-  #     with:
-  #       # The audience to use for the OIDC provider
-  #       audience: # optional, default is sts.amazonaws.com
-  #       # AWS Access Key ID. This input is required if running in the GitHub hosted environment. It is optional if running in a self-hosted environment that already has AWS credentials, for example on an EC2 instance.
-  #       aws-access-key-id: # optional
-  #       # AWS Secret Access Key. This input is required if running in the GitHub hosted environment. It is optional if running in a self-hosted environment that already has AWS credentials, for example on an EC2 instance.
-  #       aws-secret-access-key: # optional
-  #       # AWS Session Token
-  #       aws-session-token: # optional
-  #       # AWS Region, e.g. us-east-2
-  #       aws-region: us-east-1
-  #       # Whether to set the AWS account ID for these credentials as a secret value, so that it is masked in logs. Valid values are 'true' and 'false'. Defaults to true
-  #       mask-aws-account-id: # optional
-  #       # Use the provided credentials to assume an IAM role and configure the Actions environment with the assumed role credentials rather than with the provided credentials
-  #       role-to-assume: # optional
-  #       # Use the web identity token file from the provided file system path in order to assume an IAM role using a web identity. E.g., from within an Amazon EKS worker node
-  #       web-identity-token-file: # optional
-  #       # Role duration in seconds (default: 6 hours)
-  #       role-duration-seconds: # optional
-  #       # Role session name (default: GitHubActions)
-  #       role-session-name: # optional
-  #       # The external ID of the role to assume
-  #       role-external-id: # optional
-  #       # Skip session tagging during role assumption
-  #       role-skip-session-tagging: # optional
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          mask-aws-account-id: true
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Deploy
+        run: aws s3 sync ./dist s3://${{ secrets.AWS_S3_PLAYGROUND_ID }} --exclude "*" --include "bundle.js.map" --include "bundle.js"
+      - name: Create invalidation
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_PLAYGROUND_ID }} --paths "/bundle.js.map" "/bundle.js"
