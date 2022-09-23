@@ -180,3 +180,14 @@ export interface DefillamaResponse {
 export interface MeanFinanceResponse {
   tx: TransactionRequest;
 }
+
+export interface MeanApiUnderlyingResponse {
+  underlying: {
+    dependent: string;
+    dependentAmount: string;
+    underlying: {
+      underlying: string;
+      underlyingAmount: string;
+    }[];
+  }[];
+}

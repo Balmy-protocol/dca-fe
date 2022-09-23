@@ -34,9 +34,6 @@ import find from 'lodash/find';
 import useWalletService from 'hooks/useWalletService';
 import CustomChip from 'common/custom-chip';
 import ComposedTokenIcon from 'common/composed-token-icon';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 
 interface DetailsProps {
   position: FullPosition;
@@ -247,12 +244,22 @@ const Details = ({
   const averageBuyPrice = summedPrices.gt(BigNumber.from(0))
     ? summedPrices.div(swappedActions.length)
     : BigNumber.from(0);
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigNumber.from(remainingLiquidity));
-  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(position.from, BigNumber.from(yieldFromGenerated));
-  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase);
-  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield);
-  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase);
-  const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
+    position.from,
+    BigNumber.from(remainingLiquidity),
+    undefined,
+    chainId
+  );
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
+    position.from,
+    BigNumber.from(yieldFromGenerated),
+    undefined,
+    chainId
+  );
+  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase, undefined, chainId);
+  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield, undefined, chainId);
+  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase, undefined, chainId);
+  const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield, undefined, chainId);
   const showToFullPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToFullPrice && !!toFullPrice;
   const showToYieldFullPrice =
     !STABLE_COINS.includes(position.to.symbol) && !isLoadingToYieldFullPrice && !!toYieldFullPrice;
@@ -355,15 +362,6 @@ const Details = ({
               />
             )}
           </StyledProgressWrapper>
-          <StyledDetailWrapper>
-            <FormGroup row>
-              <FormControlLabel
-                labelPlacement="end"
-                control={<Switch checked name="enableDisableWrappedProtocolToken" color="primary" size="small" />}
-                label="Breakdown yield"
-              />
-            </FormGroup>
-          </StyledDetailWrapper>
           <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage

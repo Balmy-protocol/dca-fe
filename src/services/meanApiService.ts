@@ -2,7 +2,7 @@ import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
 import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from 'config';
 import { getWrappedProtocolToken } from 'mocks/tokens';
-import { MeanFinanceResponse, PermissionPermit } from 'types';
+import { MeanApiUnderlyingResponse, MeanFinanceResponse, PermissionPermit, Token } from 'types';
 
 // MOCKS
 import ContractService from './contractService';
@@ -98,6 +98,25 @@ export default class MeanApiService {
     );
 
     return singer.sendTransaction(transactionToSend.data.tx);
+  }
+
+  async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
+    const tokensToUse = tokens.filter((tokenObj) => !!tokenObj.token.underlyingTokens.length);
+
+    // Call to api and get transaction
+    const underlyingResponse = await this.axiosClient.post<MeanApiUnderlyingResponse>(
+      `${MEAN_API_URL}/v1/transforms/to-underlying`,
+      {
+        tokens: tokensToUse.map((tokenObj) => ({
+          dependent: `${tokenObj.token.chainId}:${tokenObj.token.underlyingTokens[0].address.toString()}`,
+          dependentAmount: tokenObj.amount.toString(),
+        })),
+      }
+    );
+
+    return underlyingResponse.data.underlying.map((dependantResponse) =>
+      BigNumber.from(dependantResponse.underlying[0].underlyingAmount)
+    );
   }
 
   async withdrawSwappedUsingOtherToken(

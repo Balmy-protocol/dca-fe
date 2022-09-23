@@ -174,32 +174,42 @@ interface PositionTimelineProps {
   filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
 }
 
-const buildSwappedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
+const buildSwappedItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <CompareArrowsIcon />,
   content: () => {
     const swapped = positionState.swappedUnderlying || positionState.swapped;
     const rate = positionState.depositedRateUnderlying || positionState.rate;
     const yieldFrom = BigNumber.from(positionState.rateUnderlying || rate).sub(rate);
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(swapped));
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(swapped),
+      undefined,
+      position.chainId
+    );
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
       BigNumber.from(swapped),
-      positionState.createdAtTimestamp
+      positionState.createdAtTimestamp,
+      position.chainId
     );
     const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigNumber.from(rate));
     const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
       BigNumber.from(rate),
-      positionState.createdAtTimestamp
+      positionState.createdAtTimestamp,
+      position.chainId
     );
     const [fromYieldCurrentPrice, isLoadingFromYieldCurrentPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(yieldFrom)
+      BigNumber.from(yieldFrom),
+      undefined,
+      position.chainId
     );
     const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
       position.from,
       BigNumber.from(yieldFrom),
-      positionState.createdAtTimestamp
+      positionState.createdAtTimestamp,
+      position.chainId
     );
 
     const showToPrices =
@@ -223,7 +233,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
     const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
     const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
     const [showFromYieldCurrentPrice, setShouldShowFromYieldCurrentPrice] = useState(true);
-    const wrappedProtocolToken = getWrappedProtocolToken(chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
     let tokenFrom = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
     let tokenTo = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
@@ -376,7 +386,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
   time: parseInt(positionState.createdAtTimestamp, 10),
 });
 
-const buildTransferedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
+const buildTransferedItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <CardGiftcardIcon />,
   content: () => (
     <>
@@ -389,7 +399,11 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
           <StyledTitleMainText variant="body1">
             <FormattedMessage description="transferedFrom" defaultMessage="Transfered from:" />
           </StyledTitleMainText>
-          <StyledLink href={buildEtherscanAddress(positionState.from, chainId)} target="_blank" rel="noreferrer">
+          <StyledLink
+            href={buildEtherscanAddress(positionState.from, position.chainId)}
+            target="_blank"
+            rel="noreferrer"
+          >
             <Address address={positionState.from} />
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
@@ -404,7 +418,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
           <StyledTitleMainText variant="body1">
             <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
           </StyledTitleMainText>
-          <StyledLink href={buildEtherscanAddress(positionState.to, chainId)} target="_blank" rel="noreferrer">
+          <StyledLink href={buildEtherscanAddress(positionState.to, position.chainId)} target="_blank" rel="noreferrer">
             <Address address={positionState.to} />
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
@@ -426,10 +440,16 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
           <Typography variant="body1">
             {permission.permissions.length ? (
               <>
-                <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
+                <StyledLink
+                  href={buildEtherscanAddress(permission.operator, position.chainId)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {permission.operator.toLowerCase() ===
-                  (COMPANION_ADDRESS[position.version][chainId].toLowerCase() ||
-                    COMPANION_ADDRESS[LATEST_VERSION][chainId].toLowerCase()) ? (
+                  (
+                    COMPANION_ADDRESS[position.version][position.chainId] ||
+                    COMPANION_ADDRESS[LATEST_VERSION][position.chainId]
+                  ).toLowerCase() ? (
                     'Mean Finance Companion'
                   ) : (
                     <Address address={permission.operator} />
@@ -461,7 +481,11 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                   description="positionPermissionsModified all"
                   defaultMessage="Removed all permissions for"
                 />
-                <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
+                <StyledLink
+                  href={buildEtherscanAddress(permission.operator, position.chainId)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {permission.operator.toLowerCase() ===
                   COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
                     'Mean Finance Companion'
@@ -597,11 +621,17 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
   icon: <OpenInNewIcon />,
   content: () => {
     const withdrawn = positionState.withdrawnUnderlying || positionState.withdrawn;
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(withdrawn));
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(withdrawn),
+      undefined,
+      position.chainId
+    );
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
       BigNumber.from(withdrawn),
-      positionState.createdAtTimestamp
+      positionState.createdAtTimestamp,
+      position.chainId
     );
 
     const showPrices =
