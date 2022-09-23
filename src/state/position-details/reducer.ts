@@ -11,20 +11,25 @@ import {
   ResetPositionTypeData,
   TransferTypeData,
 } from 'types';
-import { setPosition, updatePosition } from './actions';
+import { setPosition, updatePosition, updateShowBreakdown } from './actions';
 
 export interface PositionDetailsState {
   position: FullPosition | null;
+  showBreakdown: boolean;
 }
 
 const initialState: PositionDetailsState = {
   position: null,
+  showBreakdown: true,
 };
 
 export default createReducer(initialState, (builder) =>
   builder
     .addCase(setPosition, (state, { payload }) => {
       state.position = payload;
+    })
+    .addCase(updateShowBreakdown, (state, { payload }) => {
+      state.showBreakdown = payload;
     })
     .addCase(updatePosition, (state, { payload }) => {
       if (!state.position) {

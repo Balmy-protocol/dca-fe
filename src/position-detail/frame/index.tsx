@@ -157,16 +157,19 @@ const PositionDetailFrame = () => {
       {
         token: positionInUse?.to,
         amount: positionInUse ? BigNumber.from(positionInUse?.toWithdraw) : null,
+        returnSame: !positionInUse?.to.underlyingTokens.length,
       },
       {
         token: positionInUse?.to,
         amount: positionInUse ? BigNumber.from(positionInUse?.totalSwapped) : null,
+        returnSame: !positionInUse?.to.underlyingTokens.length,
       },
       {
         token: positionInUse?.from,
         amount: positionInUse
           ? BigNumber.from(positionInUse.rate).mul(BigNumber.from(positionInUse.remainingSwaps))
           : null,
+        returnSame: !positionInUse?.from.underlyingTokens.length,
       },
     ]);
 

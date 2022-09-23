@@ -16,11 +16,12 @@ import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 import error from './error/reducer';
 
-const LATEST_VERSION = '1.0.1';
+const LATEST_VERSION = '1.0.2';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
 const TRANSACTION_VERSION_KEY = 'transactions_version';
 const TRANSACTION_KEY = 'redux_localstorage_simple_transactions';
 const BADGE_KEY = 'redux_localstorage_simple_badge';
+const POSITION_DETAILS_KEY = 'redux_localstorage_simple_positionDetails';
 const MEAN_UI_VERSION_KEY = 'mean_ui_version';
 
 function checkStorageValidity() {
@@ -31,6 +32,7 @@ function checkStorageValidity() {
     console.warn('different transaction version detected, clearing transaction storage');
     localStorage.setItem(TRANSACTION_VERSION_KEY, LATEST_TRANSACTION_VERSION);
     localStorage.removeItem(TRANSACTION_KEY);
+    localStorage.removeItem(POSITION_DETAILS_KEY);
     localStorage.removeItem(BADGE_KEY);
   }
 
@@ -74,7 +76,7 @@ export const setupAxiosClient = () =>
     },
   });
 
-const PERSISTED_STATES: string[] = ['transactions', 'badge'];
+const PERSISTED_STATES: string[] = ['transactions', 'badge', 'positionDetails.showBreakdown'];
 
 const store = configureStore({
   reducer: {
@@ -98,6 +100,9 @@ const store = configureStore({
   preloadedState: load({
     states: PERSISTED_STATES,
     preloadedState: {
+      positionDetails: {
+        position: null,
+      },
       tokenLists: {
         byUrl: getDefaultByUrl(),
         activeLists: ['https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json'],
