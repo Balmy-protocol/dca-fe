@@ -164,6 +164,13 @@ export default class PositionService {
       ...this.currentPositions,
     };
 
+    const underlyingsNeededToFetch: {
+      positionId: string;
+      token: Token;
+      amount: BigNumber;
+      attr: 'remainingLiquidityUnderlying' | 'toWithdrawUnderlying';
+    }[] = [];
+
     this.currentPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
       if (gqlResult.data) {
@@ -174,6 +181,23 @@ export default class PositionService {
               const existingPosition = this.currentPositions[`${position.id}-v${version}`];
               const fromToUse = getDisplayToken(position.from, network);
               const toToUse = getDisplayToken(position.to, network);
+
+              if (fromToUse.underlyingTokens.length) {
+                underlyingsNeededToFetch.push({
+                  positionId: `${position.id}-v${version}`,
+                  token: fromToUse,
+                  attr: 'remainingLiquidityUnderlying',
+                  amount: BigNumber.from(position.rate).mul(BigNumber.from(position.remainingSwaps)),
+                });
+              }
+              if (toToUse.underlyingTokens.length) {
+                underlyingsNeededToFetch.push({
+                  positionId: `${position.id}-v${version}`,
+                  token: toToUse,
+                  attr: 'toWithdrawUnderlying',
+                  amount: BigNumber.from(position.toWithdraw),
+                });
+              }
 
               const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
               return {
@@ -188,6 +212,8 @@ export default class PositionService {
                 withdrawn: BigNumber.from(position.totalWithdrawn),
                 toWithdraw: BigNumber.from(position.toWithdraw),
                 totalSwaps: BigNumber.from(position.totalSwaps),
+                toWithdrawUnderlying: null,
+                remainingLiquidityUnderlying: null,
                 depositedRateUnderlying: position.depositedRateUnderlying
                   ? BigNumber.from(position.depositedRateUnderlying)
                   : null,
@@ -219,6 +245,15 @@ export default class PositionService {
       }
       return acc;
     }, currentPositions);
+
+    const underlyingReponses = await this.meanApiService.getUnderlyingTokens(
+      underlyingsNeededToFetch.map(({ token, amount }) => ({ token, amount }))
+    );
+
+    underlyingReponses.forEach((underlyingResponse, index) => {
+      const position = underlyingsNeededToFetch[index];
+      this.currentPositions[position.positionId][position.attr] = underlyingResponse;
+    });
 
     this.hasFetchedCurrentPositions = true;
   }
@@ -285,6 +320,8 @@ export default class PositionService {
               withdrawn: BigNumber.from(position.totalWithdrawn),
               toWithdraw: BigNumber.from(position.toWithdraw),
               totalSwaps: BigNumber.from(position.totalSwaps),
+              toWithdrawUnderlying: null,
+              remainingLiquidityUnderlying: null,
               depositedRateUnderlying: position.depositedRateUnderlying
                 ? BigNumber.from(position.depositedRateUnderlying)
                 : null,
@@ -882,6 +919,8 @@ export default class PositionService {
         depositedRateUnderlying: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
           BigNumber.from(newPositionTypeData.frequencyValue)
         ),
+        toWithdrawUnderlying: null,
+        remainingLiquidityUnderlying: null,
         totalSwappedUnderlyingAccum: BigNumber.from(0),
         toWithdrawUnderlyingAccum: BigNumber.from(0),
         remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),

@@ -169,11 +169,13 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         //   fill = 'rgba(255, 255, 255, 0.5)';
         // }
 
+        const remainingLiquidity = position.remainingLiquidityUnderlying || position.remainingLiquidity;
+
         if (position.remainingLiquidity.gt(BigNumber.from(0))) {
           if (!newAcc[position.from.symbol]) {
             newAcc[position.from.symbol] = {
               [position.chainId]: {
-                balance: position.remainingLiquidity,
+                balance: remainingLiquidity,
                 token: position.from,
                 balanceUSD: 0,
                 fill,
@@ -181,23 +183,24 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
             };
           } else if (!newAcc[position.from.symbol][position.chainId]) {
             newAcc[position.from.symbol][position.chainId] = {
-              balance: position.remainingLiquidity,
+              balance: remainingLiquidity,
               balanceUSD: 0,
               token: position.from,
               fill,
             };
           } else {
-            newAcc[position.from.symbol][position.chainId].balance = newAcc[position.from.symbol][
-              position.chainId
-            ].balance.add(position.remainingLiquidity);
+            newAcc[position.from.symbol][position.chainId].balance =
+              newAcc[position.from.symbol][position.chainId].balance.add(remainingLiquidity);
           }
         }
+
+        const toWithdraw = position.toWithdrawUnderlying || position.toWithdraw;
 
         if (position.toWithdraw.gt(BigNumber.from(0))) {
           if (!newAcc[position.to.symbol]) {
             newAcc[position.to.symbol] = {
               [position.chainId]: {
-                balance: position.toWithdraw,
+                balance: toWithdraw,
                 balanceUSD: 0,
                 token: position.to,
                 fill,
@@ -205,15 +208,14 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
             };
           } else if (!newAcc[position.to.symbol][position.chainId]) {
             newAcc[position.to.symbol][position.chainId] = {
-              balance: position.toWithdraw,
+              balance: toWithdraw,
               token: position.to,
               balanceUSD: 0,
               fill,
             };
           } else {
-            newAcc[position.to.symbol][position.chainId].balance = newAcc[position.to.symbol][
-              position.chainId
-            ].balance.add(position.toWithdraw);
+            newAcc[position.to.symbol][position.chainId].balance =
+              newAcc[position.to.symbol][position.chainId].balance.add(toWithdraw);
           }
         }
 

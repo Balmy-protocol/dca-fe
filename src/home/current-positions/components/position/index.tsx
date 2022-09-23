@@ -4,13 +4,12 @@ import Card from '@mui/material/Card';
 import LinearProgress from '@mui/material/LinearProgress';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
-import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
+import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE, calculateYield } from 'utils/parsing';
 import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, POSITION_VERSION_2, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
+import { NETWORKS, POSITION_VERSION_2, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
@@ -18,7 +17,6 @@ import { withStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import useUsdPrice from 'hooks/useUsdPrice';
 import ComposedTokenIcon from 'common/composed-token-icon';
 import CustomChip from 'common/custom-chip';
 import PositionControls from '../position-controls';
@@ -38,10 +36,6 @@ const BorderLinearProgress = withStyles(() =>
     },
   })
 )(StyledSwapsLinearProgress);
-
-const StyledChip = styled(Chip)`
-  margin: 0px 5px;
-`;
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;
@@ -91,13 +85,15 @@ const StyledCardTitleHeader = styled.div`
   }
 `;
 
-const StyledDetailWrapper = styled.div<{ alignItems?: string; gap?: boolean; flex?: boolean }>`
+const StyledDetailWrapper = styled.div<{ alignItems?: string; flex?: boolean; spacing?: boolean }>`
   margin-bottom: 5px;
   display: flex;
   align-items: ${({ alignItems }) => alignItems || 'center'};
   justify-content: flex-start;
-  ${({ gap }) => (gap ? 'gap: 5px;' : '')}
   ${({ flex }) => (flex ? 'flex: 1;' : '')}
+  ${({ spacing }) => (spacing ? 'margin-top: 10px;' : '')}
+  gap: 5px;
+  flex-wrap: wrap;
 `;
 
 const StyledProgressWrapper = styled.div`
@@ -169,13 +165,16 @@ const ActivePosition = ({
     from,
     to,
     swapInterval,
-    remainingLiquidity: rawRemainingLiquidity,
+    remainingLiquidity: remainingLiquidityRaw,
     remainingSwaps,
     rate,
     depositedRateUnderlying,
     totalSwaps,
     pendingTransaction,
-    toWithdraw,
+    toWithdraw: rawToWithdraw,
+    toWithdrawUnderlying,
+    remainingLiquidityUnderlying,
+    toWithdrawUnderlyingAccum,
     chainId,
   } = position;
   const positionNetwork = React.useMemo(() => {
@@ -186,12 +185,21 @@ const ActivePosition = ({
   const yieldOptions = yieldOptionsByChain[chainId];
 
   const availablePairs = useAvailablePairs();
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw, undefined, chainId);
 
   const rateToUse = depositedRateUnderlying || rate;
-  const remainingLiquidity = depositedRateUnderlying
-    ? depositedRateUnderlying.mul(remainingSwaps)
-    : rawRemainingLiquidity;
+
+  const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
+  const toWithdrawYield =
+    toWithdrawUnderlyingAccum && toWithdrawUnderlying
+      ? toWithdrawUnderlying.sub(toWithdrawUnderlyingAccum)
+      : BigNumber.from(0);
+  const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
+
+  const { yieldGenerated: yieldFromGenerated, base: remainingLiquidity } = calculateYield(
+    remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw),
+    rate,
+    remainingSwaps
+  );
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
@@ -203,8 +211,6 @@ const ActivePosition = ({
     availablePairs,
     (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
   );
-  const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
-
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
   const isStale =
@@ -282,73 +288,84 @@ const ActivePosition = ({
                 }}
               />
             </Typography>
-            {/* {showFromPrice && (
-                <StyledChip
-                  variant="outlined"
-                  size="small"
-                  label={
-                    <FormattedMessage
-                      description="current remaining price"
-                      defaultMessage="({toPrice} USD)"
-                      values={{
-                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                        toPrice: fromPrice?.toFixed(2),
-                      }}
+            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+              <Typography variant="body2">
+                {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
+              </Typography>
+            </CustomChip>
+            {yieldFromGenerated.gt(BigNumber.from(0)) && (
+              <>
+                +
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon
+                      isInChip
+                      size="16px"
+                      tokenTop={foundYieldFrom?.token}
+                      tokenBottom={position.from}
                     />
                   }
-                />
-              )} */}
-            <Typography
-              variant="body1"
-              color={remainingLiquidity.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              <FormattedMessage
-                description="current remaining rate"
-                defaultMessage="{remainingLiquidity} {from} ({rate} {from} {frequency})"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  rate: formatCurrencyAmount(rateToUse, from, 4),
-                  frequency:
-                    STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
-                  from: from.symbol,
-                  remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from, 4),
-                }}
-              />
-            </Typography>
+                >
+                  <Typography variant="body2">
+                    {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from, 4)}
+                  </Typography>
+                </CustomChip>
+              </>
+            )}
           </StyledDetailWrapper>
           <StyledDetailWrapper alignItems="flex-start">
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="current swapped in position" defaultMessage="To withdraw: " />
+              <FormattedMessage
+                description="current rate remaining"
+                defaultMessage="Rate:"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                }}
+              />
             </Typography>
-            <Typography
-              variant="body1"
-              color={toWithdraw.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              {`${formatCurrencyAmount(toWithdraw, to, 4)} ${to.symbol}`}
+            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+              <Typography variant="body2">
+                {formatCurrencyAmount(BigNumber.from(rateToUse), position.from, 4)}
+              </Typography>
+            </CustomChip>
+            <FormattedMessage
+              description="positionDetailsCurrentRate"
+              defaultMessage="{frequency} {hasYield}"
+              values={{
+                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                hasYield: position.from.underlyingTokens.length ? '+ yield' : '',
+                frequency:
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+              }}
+            />
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
             </Typography>
-            <Typography variant="body1">
-              {showToPrice && (
-                <StyledChip
-                  size="small"
-                  variant="outlined"
-                  label={
-                    <FormattedMessage
-                      description="current swapped in position price"
-                      defaultMessage="({toPrice} USD)"
-                      values={{
-                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                        toPrice: toPrice?.toFixed(2),
-                      }}
-                    />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}>
+              <Typography variant="body2">
+                {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
+              </Typography>
+            </CustomChip>
+            {toWithdrawYield.gt(BigNumber.from(0)) && (
+              <>
+                +
+                {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                  <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+                </Typography> */}
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo?.token} tokenBottom={position.to} />
                   }
-                />
-              )}
-            </Typography>
+                >
+                  <Typography variant="body2">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
+                </CustomChip>
+              </>
+            )}
           </StyledDetailWrapper>
           {!foundYieldFrom && !foundYieldTo && (
-            <StyledDetailWrapper alignItems="flex-start">
+            <StyledDetailWrapper alignItems="flex-start" spacing>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="positionNotGainingInterest"
@@ -358,7 +375,7 @@ const ActivePosition = ({
             </StyledDetailWrapper>
           )}
           {(foundYieldFrom || foundYieldTo) && (
-            <StyledDetailWrapper alignItems="flex-end" gap flex>
+            <StyledDetailWrapper alignItems="flex-end" flex spacing>
               {foundYieldFrom && (
                 <CustomChip
                   icon={

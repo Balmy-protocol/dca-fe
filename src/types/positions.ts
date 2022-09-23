@@ -61,6 +61,8 @@ export interface Position {
   pairNextSwapAvailableAt: string;
   yieldFrom?: string;
   yieldTo?: string;
+  toWithdrawUnderlying: Nullable<BigNumber>;
+  remainingLiquidityUnderlying: Nullable<BigNumber>;
 }
 
 export interface FullPosition {

@@ -148,6 +148,8 @@ export function fullPositionToMappedPosition(position: FullPosition, positionVer
     remainingSwaps: BigNumber.from(position.remainingSwaps),
     withdrawn: BigNumber.from(position.totalWithdrawn),
     totalSwaps: BigNumber.from(position.totalSwaps),
+    toWithdrawUnderlying: null,
+    remainingLiquidityUnderlying: null,
     depositedRateUnderlying: position.depositedRateUnderlying ? BigNumber.from(position.depositedRateUnderlying) : null,
     totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
       ? BigNumber.from(position.totalSwappedUnderlyingAccum)
