@@ -456,6 +456,7 @@ const PositionDetailFrame = () => {
               pendingTransaction={pendingTransaction}
               disabled={shouldShowChangeNetwork}
               onWithdrawFunds={onWithdrawFunds}
+              onWithdraw={onWithdraw}
             />
           )}
         </Grid>

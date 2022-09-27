@@ -9,9 +9,30 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import { LATEST_VERSION } from 'config';
+import { LATEST_VERSION, POSITION_VERSION_3 } from 'config';
+import Button from 'common/button';
+import SplitButton from 'common/split-button';
+import useSupportsSigning from 'hooks/useSupportsSigning';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+
+const StyledButton = styled(Button)`
+  border-radius: 30px;
+  padding: 11px 16px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 1px 3px 1px rgba(60, 64, 67, 0.149);
+  :hover {
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.302), 0 4px 8px 3px rgba(60, 64, 67, 0.149);
+  }
+  padding: 4px 8px;
+`;
 
 const PositionControlsContainer = styled.div`
+  display: flex;
+  align-self: flex-end;
+  gap: 10px;
+`;
+
+const PositionControlsMenuContainer = styled.div`
   display: flex;
   align-self: flex-end;
   border-radius: 20px;
@@ -36,6 +57,7 @@ interface PositionSummaryControlsProps {
   pendingTransaction: string | null;
   position: FullPosition;
   disabled: boolean;
+  onWithdraw: (useProtocolToken: boolean) => void;
 }
 
 const PositionSummaryControls = ({
@@ -43,6 +65,7 @@ const PositionSummaryControls = ({
   onModifyRate,
   onTransfer,
   onWithdrawFunds,
+  onWithdraw,
   pendingTransaction,
   position,
   onViewNFT,
@@ -59,78 +82,119 @@ const PositionSummaryControls = ({
   const isPending = pendingTransaction !== null;
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
+  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
+  const [hasSignSupport] = useSupportsSigning();
 
   if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
 
-  const showExtendedFunctions = position.version === LATEST_VERSION;
+  const showExtendedFunctions = position.version === LATEST_VERSION || position.version === POSITION_VERSION_3;
 
   return (
     <PositionControlsContainer>
-      <IconButton onClick={handleClick} disabled={isPending}>
-        <MoreVertIcon />
-      </IconButton>
-      <StyledMenu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            onViewNFT();
-          }}
-          disabled={disabled}
-        >
-          <FormattedMessage description="view nft" defaultMessage="View NFT" />
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            onWithdrawFunds();
-          }}
+      {showExtendedFunctions && (
+        <StyledButton
+          variant="outlined"
+          color="transparent"
+          size="small"
           disabled={isPending || disabled}
+          onClick={onModifyRate}
         >
-          <FormattedMessage description="withdraw funds" defaultMessage="Withdraw funds" />
-        </MenuItem>
-        {!showExtendedFunctions && (
+          <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />
+        </StyledButton>
+      )}
+
+      <SplitButton
+        onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+        text={
+          <FormattedMessage
+            description="withdrawToken"
+            defaultMessage="Withdraw {token}"
+            values={{
+              token:
+                hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                  ? position.to.symbol
+                  : wrappedProtocolToken.symbol,
+            }}
+          />
+        }
+        disabled={isPending || disabled}
+        variant="outlined"
+        color="transparent"
+        options={[
+          {
+            text: (
+              <FormattedMessage
+                description="withdrawWrapped"
+                defaultMessage="Withdraw {wrappedProtocolToken}"
+                values={{
+                  wrappedProtocolToken: wrappedProtocolToken.symbol,
+                }}
+              />
+            ),
+            disabled: isPending || disabled,
+            onClick: () => onWithdraw(false),
+          },
+          {
+            text: (
+              <FormattedMessage
+                description="withdraw funds"
+                defaultMessage="Withdraw remaining {token}"
+                values={{ token: position.from.symbol }}
+              />
+            ),
+            disabled: isPending || disabled,
+            onClick: onWithdrawFunds,
+          },
+        ]}
+      />
+
+      <PositionControlsMenuContainer>
+        <IconButton onClick={handleClick} disabled={isPending}>
+          <MoreVertIcon />
+        </IconButton>
+        <StyledMenu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
           <MenuItem
             onClick={() => {
               handleClose();
-              onModifyRate();
+              onViewNFT();
+            }}
+            disabled={disabled}
+          >
+            <FormattedMessage description="view nft" defaultMessage="View NFT" />
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              onTransfer();
             }}
             disabled={isPending || disabled}
           >
-            <FormattedMessage description="change rate" defaultMessage="Change duration and rate" />
+            <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
           </MenuItem>
-        )}
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            onTransfer();
-          }}
-          disabled={isPending || disabled}
-        >
-          <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            onTerminate();
-          }}
-          disabled={isPending || disabled}
-          style={{ color: '#FF5359' }}
-        >
-          <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
-        </MenuItem>
-      </StyledMenu>
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              onTerminate();
+            }}
+            disabled={isPending || disabled}
+            style={{ color: '#FF5359' }}
+          >
+            <FormattedMessage description="terminate position" defaultMessage="Terminate position" />
+          </MenuItem>
+        </StyledMenu>
+      </PositionControlsMenuContainer>
     </PositionControlsContainer>
   );
 };
