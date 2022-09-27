@@ -165,17 +165,39 @@ const PositionControls = ({
               horizontal: 'left',
             }}
           >
-            {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+            {toWithdraw.gt(BigNumber.from(0)) && (
               <MenuItem
                 onClick={() => {
                   handleClose();
-                  onViewDetails();
+                  onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS);
                 }}
                 disabled={disabled}
               >
                 <Typography variant="body2">
                   <FormattedMessage
-                    description="withdraw"
+                    description="withdrawToken"
+                    defaultMessage="Withdraw {token}"
+                    values={{
+                      token:
+                        hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                          ? position.to.symbol
+                          : wrappedProtocolToken.symbol,
+                    }}
+                  />
+                </Typography>
+              </MenuItem>
+            )}
+            {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  onWithdraw(position, false);
+                }}
+                disabled={disabled}
+              >
+                <Typography variant="body2">
+                  <FormattedMessage
+                    description="withdrawWrapped"
                     defaultMessage="Withdraw {wrappedProtocolToken}"
                     values={{
                       wrappedProtocolToken: wrappedProtocolToken.symbol,
@@ -219,38 +241,17 @@ const PositionControls = ({
       {!OLD_VERSIONS.includes(position.version) && isOnNetwork && (
         <>
           {!disabled && (
-            <>
-              {(toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
-                  fullWidth
-                  disabled={disabled || toWithdraw.lte(BigNumber.from(0))}
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage
-                      description="withdraw simple"
-                      defaultMessage="Withdraw {token}"
-                      values={{ token: position.to.symbol }}
-                    />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-              {remainingSwaps.lte(BigNumber.from(0)) && toWithdraw.lte(BigNumber.from(0)) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => onReusePosition(position)}
-                  disabled={disabled}
-                  fullWidth
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-            </>
+            <StyledCardFooterButton
+              variant="contained"
+              color="secondary"
+              onClick={() => onReusePosition(position)}
+              disabled={disabled}
+              fullWidth
+            >
+              <Typography variant="body2">
+                <FormattedMessage description="addFunds" defaultMessage="Add funds" />
+              </Typography>
+            </StyledCardFooterButton>
           )}
         </>
       )}
