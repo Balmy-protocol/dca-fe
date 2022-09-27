@@ -5,10 +5,14 @@ import {
   POSITION_VERSION_3,
   PositionVersions,
   POSITION_VERSION_4,
+  POSITION_VERSION_1,
 } from 'config';
 import GraphqlService from 'services/graphql';
 
 const clients: Record<PositionVersions, Record<number, GraphqlService>> = {
+  [POSITION_VERSION_1]: {
+    [NETWORKS.optimism.chainId]: new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_1][NETWORKS.optimism.chainId]),
+  },
   [POSITION_VERSION_2]: {
     [NETWORKS.optimism.chainId]: new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_2][NETWORKS.optimism.chainId]),
     [NETWORKS.polygon.chainId]: new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_2][NETWORKS.polygon.chainId]),

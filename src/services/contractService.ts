@@ -13,12 +13,10 @@ import find from 'lodash/find';
 import ERC20ABI from 'abis/erc20.json';
 import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
-import MIGRATOR_ABI from 'abis/BetaMigrator.json';
 import OE_GAS_ORACLE_ABI from 'abis/OEGasOracle.json';
 
 // ADDRESSES
 import {
-  MIGRATOR_ADDRESS,
   CHAINLINK_ORACLE_ADDRESS,
   COMPANION_ADDRESS,
   HUB_ADDRESS,
@@ -32,7 +30,7 @@ import {
   TRANSFORMER_REGISTRY_ADDRESS,
   DEFAULT_NETWORK_FOR_VERSION,
 } from 'config/constants';
-import { BetaMigratorContract, ERC20Contract, HubContract, OEGasOracle, OracleContract } from 'types';
+import { ERC20Contract, HubContract, OEGasOracle, OracleContract } from 'types';
 
 export default class ContractService {
   client: ethers.providers.Web3Provider;
@@ -142,14 +140,6 @@ export default class ContractService {
     );
   }
 
-  async getMigratorAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.getNetwork();
-
-    return (
-      MIGRATOR_ADDRESS[version || LATEST_VERSION][network.chainId] || MIGRATOR_ADDRESS[LATEST_VERSION][network.chainId]
-    );
-  }
-
   async getHUBCompanionAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
@@ -212,13 +202,6 @@ export default class ContractService {
     const provider = await this.getProvider();
 
     return TransformerRegistry__factory.connect(transformerRegistryAddress, provider);
-  }
-
-  async getMigratorInstance(version?: PositionVersions): Promise<BetaMigratorContract> {
-    const migratorAddress = await this.getMigratorAddress(version || LATEST_VERSION);
-    const provider = await this.getProvider();
-
-    return new ethers.Contract(migratorAddress, MIGRATOR_ABI.abi, provider) as unknown as BetaMigratorContract;
   }
 
   async getHUBCompanionInstance(version?: PositionVersions) {
