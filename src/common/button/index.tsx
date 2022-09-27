@@ -530,7 +530,7 @@ export const ButtonTypes = {
   migrate: MigrateButton,
 };
 
-interface CustomButtonProps extends Omit<ButtonProps, 'color'> {
+export interface CustomButtonProps extends Omit<ButtonProps, 'color'> {
   color: keyof typeof ButtonTypes;
 }
 
