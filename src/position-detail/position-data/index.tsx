@@ -38,8 +38,9 @@ import PositionDataControls from './position-data-controls';
 interface DetailsProps {
   position: FullPosition;
   pair?: GetPairSwapsData;
+  onMigrateYield: () => void;
+  onSuggestMigrateYield: () => void;
   pendingTransaction: string | null;
-  onWithdraw: (useProtocolToken: boolean) => void;
   onReusePosition: () => void;
   disabled: boolean;
   yieldOptions: YieldOptions;
@@ -162,13 +163,14 @@ const Details = ({
   position,
   pair,
   pendingTransaction,
-  onWithdraw,
   onReusePosition,
   disabled,
   yieldOptions,
   toWithdrawUnderlying,
   remainingLiquidityUnderlying,
   swappedUnderlying,
+  onMigrateYield,
+  onSuggestMigrateYield,
 }: DetailsProps) => {
   const { from, to, swapInterval, remainingLiquidity: remainingLiquidityRaw, chainId } = position;
 
@@ -609,9 +611,10 @@ const Details = ({
           onReusePosition={onReusePosition}
           disabled={disabled}
           position={position}
-          onWithdraw={onWithdraw}
           yieldOptions={yieldOptions}
           pendingTransaction={pendingTransaction}
+          onMigrateYield={onMigrateYield}
+          onSuggestMigrateYield={onSuggestMigrateYield}
         />
       </StyledCardContent>
     </StyledCard>

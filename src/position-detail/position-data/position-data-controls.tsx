@@ -5,12 +5,11 @@ import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, YieldOptions } from 'types';
-import { NETWORKS, OLD_VERSIONS } from 'config/constants';
+import { NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
-import { getWrappedProtocolToken } from 'mocks/tokens';
 import useWalletService from 'hooks/useWalletService';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -30,21 +29,23 @@ const StyledCallToActionContainer = styled.div`
 interface PositionDataControlsProps {
   position: FullPosition;
   pendingTransaction: string | null;
-  onWithdraw: (useProtocolToken: boolean) => void;
   onReusePosition: () => void;
   disabled: boolean;
   yieldOptions: YieldOptions;
+  onMigrateYield: () => void;
+  onSuggestMigrateYield: () => void;
 }
 
 const PositionDataControls = ({
   position,
-  onWithdraw,
+  onMigrateYield,
   onReusePosition,
   disabled,
   yieldOptions,
   pendingTransaction,
+  onSuggestMigrateYield,
 }: PositionDataControlsProps) => {
-  const { remainingSwaps, toWithdraw, chainId } = fullPositionToMappedPosition(position);
+  const { remainingSwaps, chainId } = fullPositionToMappedPosition(position);
   const [hasSignSupport] = useSupportsSigning();
   const network = useCurrentNetwork();
   const web3Service = useWeb3Service();
@@ -59,7 +60,6 @@ const PositionDataControls = ({
   const isOnNetwork = network.chainId === positionNetwork.chainId;
   const walletService = useWalletService();
   const isPending = !!pendingTransaction;
-  const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
 
   const onChangeNetwork = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -110,11 +110,13 @@ const PositionDataControls = ({
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
 
-  const shouldShowMigrate = hasSignSupport && remainingSwaps.gt(BigNumber.from(0));
-
   const shouldMigrateToYield = fromSupportsYield || toSupportsYield;
 
+  const shouldShowMigrate = hasSignSupport && shouldMigrateToYield && remainingSwaps.gt(BigNumber.from(0));
+
   const isOldVersion = OLD_VERSIONS.includes(position.version);
+
+  const allowsModify = VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
   return (
     <StyledCallToActionContainer>
@@ -125,6 +127,45 @@ const PositionDataControls = ({
           onClick={onReusePosition}
           disabled={disabled}
           fullWidth
+        >
+          <Typography variant="body2">
+            <FormattedMessage description="addFunds" defaultMessage="Add funds" />
+          </Typography>
+        </StyledCardFooterButton>
+      )}
+      {isOldVersion && shouldShowMigrate && (
+        <StyledCardFooterButton
+          variant="contained"
+          color="migrate"
+          onClick={onMigrateYield}
+          fullWidth
+          disabled={disabled}
+        >
+          <Typography variant="body2">
+            <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
+          </Typography>
+        </StyledCardFooterButton>
+      )}
+      {isOldVersion && shouldMigrateToYield && allowsModify && remainingSwaps.lte(BigNumber.from(0)) && (
+        <StyledCardFooterButton
+          variant="contained"
+          color="secondary"
+          onClick={onSuggestMigrateYield}
+          fullWidth
+          disabled={disabled}
+        >
+          <Typography variant="body2">
+            <FormattedMessage description="addFunds" defaultMessage="Add funds" />
+          </Typography>
+        </StyledCardFooterButton>
+      )}
+      {isOldVersion && !shouldMigrateToYield && allowsModify && (
+        <StyledCardFooterButton
+          variant="contained"
+          color="secondary"
+          onClick={onReusePosition}
+          fullWidth
+          disabled={disabled}
         >
           <Typography variant="body2">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />

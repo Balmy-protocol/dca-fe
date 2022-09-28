@@ -46,8 +46,10 @@ import usePositionService from 'hooks/usePositionService';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import { setPosition } from 'state/position-details/actions';
 import { usePositionDetails } from 'state/position-details/hooks';
+import MigrateYieldModal from 'common/migrate-yield-modal';
 import useGqlFetchAll from 'hooks/useGqlFetchAll';
 import useYieldOptions from 'hooks/useYieldOptions';
+import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
 import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
 import { BigNumber } from 'ethers';
 import PositionControls from '../position-summary-controls';
@@ -147,6 +149,8 @@ const PositionDetailFrame = () => {
 
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [showTransferModal, setShowTransferModal] = React.useState(false);
+  const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
+  const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const addTransaction = useTransactionAdder();
   const [showNFTModal, setShowNFTModal] = React.useState(false);
@@ -412,6 +416,18 @@ const PositionDetailFrame = () => {
         position={positionInUse}
         onCancel={() => setShowTransferModal(false)}
       />
+      <MigrateYieldModal
+        open={showMigrateYieldModal}
+        position={fullPositionToMappedPosition(positionInUse)}
+        onCancel={() => setShowMigrateYieldModal(false)}
+      />
+      <SuggestMigrateYieldModal
+        open={showSuggestMigrateYieldModal}
+        position={fullPositionToMappedPosition(positionInUse)}
+        onMigrate={() => setShowMigrateYieldModal(true)}
+        onAddFunds={onShowModifyRateSettings}
+        onCancel={() => setShowSuggestMigrateYieldModal(false)}
+      />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <StyledPositionDetailsContainer container>
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
@@ -466,12 +482,13 @@ const PositionDetailFrame = () => {
               position={positionInUse}
               pendingTransaction={pendingTransaction}
               swapsData={swapsData?.pair}
-              onWithdraw={onWithdraw}
               toWithdrawUnderlying={toWithdrawUnderlying}
               swappedUnderlying={swappedUnderlying}
               remainingLiquidityUnderlying={remainingLiquidityUnderlying}
               onReusePosition={onShowModifyRateSettings}
               disabled={shouldShowChangeNetwork}
+              onMigrateYield={() => setShowMigrateYieldModal(true)}
+              onSuggestMigrateYield={() => setShowSuggestMigrateYieldModal(true)}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               yieldOptions={yieldOptions!}
             />

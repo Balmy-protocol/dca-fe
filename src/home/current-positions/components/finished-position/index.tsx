@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
 import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, OLD_VERSIONS, STRING_SWAP_INTERVALS } from 'config/constants';
+import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { BigNumber } from 'ethers';
@@ -115,9 +115,9 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
 interface ActivePositionProps {
   position: PositionProp;
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
-  onTerminate: (position: Position) => void;
   onReusePosition: (position: Position) => void;
   onMigrateYield: (position: Position) => void;
+  onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
   network: NetworkStruct;
@@ -128,8 +128,8 @@ const ActivePosition = ({
   position,
   onWithdraw,
   onReusePosition,
-  onTerminate,
   onMigrateYield,
+  onSuggestMigrateYield,
   disabled,
   hasSignSupport,
   network,
@@ -172,7 +172,7 @@ const ActivePosition = ({
   const isStale =
     calculateStale(pair?.lastExecutedAt || position.pairLastSwappedAt || 0, swapInterval, position.startedAt) === STALE;
 
-  const isOldVersion = OLD_VERSIONS.includes(position.version);
+  const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
   const foundYieldFrom =
     position.from.underlyingTokens[0] &&
@@ -301,12 +301,12 @@ const ActivePosition = ({
           position={position}
           onWithdraw={onWithdraw}
           onReusePosition={onReusePosition}
-          onTerminate={onTerminate}
           onMigrateYield={onMigrateYield}
           disabled={disabled}
           hasSignSupport={!!hasSignSupport}
           network={network}
           yieldOptions={yieldOptions}
+          onSuggestMigrateYield={onSuggestMigrateYield}
         />
       </StyledCardContent>
     </StyledCard>

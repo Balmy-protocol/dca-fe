@@ -31,7 +31,7 @@ import usePositionService from 'hooks/usePositionService';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import TerminateModal from 'common/terminate-modal';
+import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
 import useYieldOptions from 'hooks/useYieldOptions';
 import MigrateYieldModal from 'common/migrate-yield-modal';
 import ActivePosition from './components/position';
@@ -68,8 +68,8 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     currentPositions.length % positionsPerRow !== 0 ? positionsPerRow - (currentPositions.length % positionsPerRow) : 0;
   const emptyPositions = [];
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
-  const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
+  const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
@@ -125,7 +125,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                 values={{ toSymbol }}
               />
             </Typography>
-            {(useProtocolToken || hasYield) && !hasPermission && (
+            {(!!useProtocolToken || !!hasYield) && !hasPermission && (
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
@@ -192,15 +192,6 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setShowModifyRateSettingsModal(true);
   };
 
-  const onShowTerminate = (position: Position) => {
-    if (!position) {
-      return;
-    }
-
-    setSelectedPosition(position);
-    setShowTerminateModal(true);
-  };
-
   const onShowMigrateYield = (position: Position) => {
     if (!position) {
       return;
@@ -210,6 +201,15 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setShowMigrateYieldModal(true);
   };
 
+  const onSuggestMigrateYieldModal = (position: Position) => {
+    if (!position) {
+      return;
+    }
+
+    setSelectedPosition(position);
+    setShowSuggestMigrateYieldModal(true);
+  };
+
   return (
     <>
       <ModifySettingsModal
@@ -217,14 +217,16 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         position={selectedPosition}
         onCancel={() => setShowModifyRateSettingsModal(false)}
       />
-      <TerminateModal
-        open={showTerminateModal}
-        position={selectedPosition}
-        onCancel={() => setShowTerminateModal(false)}
-      />
       <MigrateYieldModal
         onCancel={() => setShowMigrateYieldModal(false)}
         open={showMigrateYieldModal}
+        position={selectedPosition}
+      />
+      <SuggestMigrateYieldModal
+        onCancel={() => setShowSuggestMigrateYieldModal(false)}
+        open={showSuggestMigrateYieldModal}
+        onMigrate={onShowMigrateYield}
+        onAddFunds={onShowModifyRateSettings}
         position={selectedPosition}
       />
       <Grid container spacing={1}>
@@ -243,8 +245,8 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       position={position}
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
-                      onTerminate={onShowTerminate}
                       onMigrateYield={onShowMigrateYield}
+                      onSuggestMigrateYield={onSuggestMigrateYieldModal}
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
                       network={network}
@@ -272,10 +274,10 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       position={position}
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
-                      onTerminate={onShowTerminate}
                       onMigrateYield={onShowMigrateYield}
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
+                      onSuggestMigrateYield={onSuggestMigrateYieldModal}
                       network={network}
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                       yieldOptionsByChain={yieldOptionsByChain}

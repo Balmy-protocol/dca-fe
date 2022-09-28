@@ -23,6 +23,8 @@ export const OLD_VERSIONS: PositionVersions[] = [POSITION_VERSION_1, POSITION_VE
 
 export const LATEST_VERSION: PositionVersions = POSITION_VERSION_4;
 
+export const VERSIONS_ALLOWED_MODIFY: PositionVersions[] = [POSITION_VERSION_3, POSITION_VERSION_4];
+
 // export const POSITIONS_VERSIONS: PositionVersions[] = [POSITION_VERSION_2, POSITION_VERSION_3, POSITION_VERSION_4];
 export const POSITIONS_VERSIONS: PositionVersions[] = [
   POSITION_VERSION_1,
