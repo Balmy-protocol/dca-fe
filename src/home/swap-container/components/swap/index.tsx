@@ -2,6 +2,7 @@ import React from 'react';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
+import isUndefined from 'lodash/isUndefined';
 import { Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
@@ -500,6 +501,15 @@ const Swap = ({
             parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
 
+  const fromCanHaveYield = !!(
+    from && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(from.address)).length
+  );
+  const toCanHaveYield = !!(
+    to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
+  );
+
+  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield);
+
   const shouldDisableButton =
     !from ||
     !to ||
@@ -511,7 +521,9 @@ const Swap = ({
     allowanceErrors ||
     !isApproved ||
     parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
-    BigNumber.from(frequencyValue).lte(BigNumber.from(0));
+    BigNumber.from(frequencyValue).lte(BigNumber.from(0)) ||
+    (shouldEnableYield && fromCanHaveYield && isUndefined(fromYield)) ||
+    (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
 
   const ignoreValues = [...(from ? [from.address] : []), ...(to ? [to.address] : [])];
 
@@ -687,7 +699,14 @@ const Swap = ({
   };
 
   const NextStepButton = (
-    <StyledButton size="large" color="secondary" variant="contained" fullWidth onClick={() => handleSetStep(1)}>
+    <StyledButton
+      size="large"
+      disabled={!from || !to || !fromValue || fromValue === '0' || !frequencyValue || frequencyValue === '0'}
+      color="secondary"
+      variant="contained"
+      fullWidth
+      onClick={() => handleSetStep(1)}
+    >
       <Typography variant="body1">
         <FormattedMessage description="continue" defaultMessage="Continue" />
       </Typography>
@@ -814,7 +833,7 @@ const Swap = ({
           fromValue={fromValue}
           handleFrequencyChange={handleFrequencyChange}
           buttonToShow={ButtonToShow}
-          yieldEnabled={yieldEnabled}
+          yieldEnabled={shouldEnableYield}
           setYieldEnabled={setYieldEnabled}
           yieldOptions={yieldOptions}
           isLoadingYieldOptions={isLoadingYieldOptions}

@@ -42,9 +42,11 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setFrom, (state, { payload }) => {
       state.from = payload;
+      state.fromYield = undefined;
     })
     .addCase(setTo, (state, { payload }) => {
       state.to = payload;
+      state.toYield = undefined;
     })
     .addCase(setFrequencyType, (state, { payload }) => {
       state.frequencyType = payload;
