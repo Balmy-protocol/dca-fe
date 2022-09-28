@@ -33,94 +33,83 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
       },
-      // {
-      //   id: '3c14db00-4252-40aa-a430-9c756e8dce71', // aave-v3 GHST
-      //   // TODO: put real address
-      //   tokenAddress: '0x8eb270e296023e9d92081fdf967ddd7878724424', // aave-v3 GHST
-      //   poolId: '3c14db00-4252-40aa-a430-9c756e8dce71', // aave-v3 GHST
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'c57bdc97-3100-41ff-845f-075363f6f5a4', // aave-v3 DAI
-      //   // TODO: put real address
-      //   tokenAddress: '0x82e64f49ed5ec1bc6e43dad4fc8af9bb3a2312ee', // aave-v3 DAI
-      //   poolId: 'c57bdc97-3100-41ff-845f-075363f6f5a4', // aave-v3 DAI
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: '7e7821a2-3d20-4ae7-9c3d-04cd57904555', // aave-v3 USDT
-      //   // TODO: put real address
-      //   tokenAddress: '0x6ab707aca953edaefbc4fd23ba73294241490620', // aave-v3 USDT
-      //   poolId: '7e7821a2-3d20-4ae7-9c3d-04cd57904555', // aave-v3 USDT
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'de9b0b53-a6fc-4ff3-a9a7-065dfc1f998b', // aave-v3 AAVE
-      //   // TODO: put real address
-      //   tokenAddress: '0xf329e36c7bf6e5e86ce2150875a84ce77f477375', // aave-v3 AAVE
-      //   poolId: 'de9b0b53-a6fc-4ff3-a9a7-065dfc1f998b', // aave-v3 AAVE
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: '995a6317-1c32-48c2-a8c9-683263b8412e', // aave-v3 LINK
-      //   // TODO: put real address
-      //   tokenAddress: '0x191c10aa4af7c30e871e70c95db0e4eb77237530', // aave-v3 LINK
-      //   poolId: '995a6317-1c32-48c2-a8c9-683263b8412e', // aave-v3 LINK
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
-      //   // TODO: put real address
-      //   tokenAddress: '0x6533afac2e7bccb20dca161449a13a32d391fb00', // aave-v3 jEUR
-      //   poolId: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: '6ee54ffc-6ede-45a8-b35f-60aca8cc4176', // aave-v3 agEUR
-      //   // TODO: put real address
-      //   tokenAddress: '0x8437d7c167dfb82ed4cb79cd44b7a32a1dd95c77', // aave-v3 agEUR
-      //   poolId: '6ee54ffc-6ede-45a8-b35f-60aca8cc4176', // aave-v3 agEUR
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'e95cadc3-0ea7-4932-9b80-a8baba80eff4', // aave-v3 EURS
-      //   // TODO: put real address
-      //   tokenAddress: '0x38d693ce1df5aadf7bc62595a37d667ad57922e5', // aave-v3 EURS
-      //   poolId: 'e95cadc3-0ea7-4932-9b80-a8baba80eff4', // aave-v3 EURS
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: '0e863358-7fc0-4290-b05e-071b80eac40a', // aave-v3 CRV
-      //   // TODO: put real address
-      //   tokenAddress: '0x513c7e3a9c69ca3e22550ef58ac1c0088e918fff', // aave-v3 CRV
-      //   poolId: '0e863358-7fc0-4290-b05e-071b80eac40a', // aave-v3 CRV
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'a5e57d75-82ce-490a-b44e-d426dd3338f7', // aave-v3 SUSHI
-      //   // TODO: put real address
-      //   tokenAddress: '0xc45a479877e1e9dfe9fcd4056c699575a1045daa', // aave-v3 SUSHI
-      //   poolId: 'a5e57d75-82ce-490a-b44e-d426dd3338f7', // aave-v3 SUSHI
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'bec16af1-350f-4b16-bf83-908f4f12df73', // aave-v3 BAL
-      //   // TODO: put real address
-      //   tokenAddress: '0x8ffdf2de812095b1d19cb146e4c004587c0a0692', // aave-v3 BAL
-      //   poolId: 'bec16af1-350f-4b16-bf83-908f4f12df73', // aave-v3 BAL
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
+      {
+        id: '3c14db00-4252-40aa-a430-9c756e8dce71', // aave-v3 GHST
+        tokenAddress: '0x83c0936d916d036f99234fa35de12988abd66a7f', // aave-v3 GHST
+        poolId: '3c14db00-4252-40aa-a430-9c756e8dce71', // aave-v3 GHST
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'c57bdc97-3100-41ff-845f-075363f6f5a4', // aave-v3 DAI
+        tokenAddress: '0x6e6bbc7b9fe1a8e5b9f27cc5c6478f65f120fe52', // aave-v3 DAI
+        poolId: 'c57bdc97-3100-41ff-845f-075363f6f5a4', // aave-v3 DAI
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '7e7821a2-3d20-4ae7-9c3d-04cd57904555', // aave-v3 USDT
+        tokenAddress: '0x018532fde0251473f3bc379e133cdb508c412eed', // aave-v3 USDT
+        poolId: '7e7821a2-3d20-4ae7-9c3d-04cd57904555', // aave-v3 USDT
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'de9b0b53-a6fc-4ff3-a9a7-065dfc1f998b', // aave-v3 AAVE
+        tokenAddress: '0xcc0da22f5e89a7401255682b2e2e74edd4c62fc4', // aave-v3 AAVE
+        poolId: 'de9b0b53-a6fc-4ff3-a9a7-065dfc1f998b', // aave-v3 AAVE
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '995a6317-1c32-48c2-a8c9-683263b8412e', // aave-v3 LINK
+        tokenAddress: '0x5e474399c0d3da173a76ad6676f3c32c97babeaf', // aave-v3 LINK
+        poolId: '995a6317-1c32-48c2-a8c9-683263b8412e', // aave-v3 LINK
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
+        tokenAddress: '0x1dd5629903441b2dd0d03f76ec7673add920e765', // aave-v3 jEUR
+        poolId: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '6ee54ffc-6ede-45a8-b35f-60aca8cc4176', // aave-v3 agEUR
+        tokenAddress: '0xc0b8d48064b9137858ccc2d6c07b7432aae2aa90', // aave-v3 agEUR
+        poolId: '6ee54ffc-6ede-45a8-b35f-60aca8cc4176', // aave-v3 agEUR
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'e95cadc3-0ea7-4932-9b80-a8baba80eff4', // aave-v3 EURS
+        tokenAddress: '0x53e41d76892c681ef0d10df5a0262a3791b771ab', // aave-v3 EURS
+        poolId: 'e95cadc3-0ea7-4932-9b80-a8baba80eff4', // aave-v3 EURS
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '0e863358-7fc0-4290-b05e-071b80eac40a', // aave-v3 CRV
+        tokenAddress: '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11', // aave-v3 CRV
+        poolId: '0e863358-7fc0-4290-b05e-071b80eac40a', // aave-v3 CRV
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'a5e57d75-82ce-490a-b44e-d426dd3338f7', // aave-v3 SUSHI
+        tokenAddress: '0xbf3df32b05efc5d5a084fbe4d2076fbc3ce88f00', // aave-v3 SUSHI
+        poolId: 'a5e57d75-82ce-490a-b44e-d426dd3338f7', // aave-v3 SUSHI
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'bec16af1-350f-4b16-bf83-908f4f12df73', // aave-v3 BAL
+        tokenAddress: '0x68f677e667dac3b29c646f44a154dec80db6e811', // aave-v3 BAL
+        poolId: 'bec16af1-350f-4b16-bf83-908f4f12df73', // aave-v3 BAL
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
       // {
       //   id: '59447a2f-7c4d-433a-a84b-ac6e53986680', // aave-v3 DPI
       //   // TODO: put real address
@@ -129,79 +118,70 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
       //   name: 'Aave V3',
       //   token: emptyTokenWithAddress('AAVE'),
       // },
-      // {
-      //   id: '1a8a5716-bb77-4baf-a2d9-ba3bebc6652a', // aave-v3 miMATIC
-      //   // TODO: put real address
-      //   tokenAddress: '0xebe517846d0f36eced99c735cbf6131e1feb775d', // aave-v3 miMATIC
-      //   poolId: '1a8a5716-bb77-4baf-a2d9-ba3bebc6652a', // aave-v3 miMATIC
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
+      {
+        id: '1a8a5716-bb77-4baf-a2d9-ba3bebc6652a', // aave-v3 miMATIC
+        tokenAddress: '0x25ad39beee8ddc8d6503ef84881426b65e52c640', // aave-v3 miMATIC
+        poolId: '1a8a5716-bb77-4baf-a2d9-ba3bebc6652a', // aave-v3 miMATIC
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
     ],
     [NETWORKS.optimism.chainId]: [
-      // {
-      //   id: '24762515-822a-46af-927c-77a1dc449bd0', // aave-v3 USDC
-      //   // TODO: put real address
-      //   tokenAddress: '24762515-822a-46af-927c-77a1dc449bd0', // aave-v3 USDC
-      //   poolId: '24762515-822a-46af-927c-77a1dc449bd0', // aave-v3 USDC
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: '3e332a41-3a15-41bc-8d5c-438c09609349', // aave-v3 WETH
-      //   // TODO: put real address
-      //   tokenAddress: '3e332a41-3a15-41bc-8d5c-438c09609349', // aave-v3 WETH
-      //   poolId: '3e332a41-3a15-41bc-8d5c-438c09609349', // aave-v3 WETH
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: '363e5586-cfee-402c-9b0b-be70366052e8', // aave-v3 DAI
-      //   // TODO: put real address
-      //   tokenAddress: '363e5586-cfee-402c-9b0b-be70366052e8', // aave-v3 DAI
-      //   poolId: '363e5586-cfee-402c-9b0b-be70366052e8', // aave-v3 DAI
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'e053590b-54f1-40aa-ae0d-14e701ca734c', // aave-v3 WBTC
-      //   // TODO: put real address
-      //   tokenAddress: 'e053590b-54f1-40aa-ae0d-14e701ca734c', // aave-v3 WBTC
-      //   poolId: 'e053590b-54f1-40aa-ae0d-14e701ca734c', // aave-v3 WBTC
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'bde08c85-41c5-4d80-9bb1-0835a4352efa', // aave-v3 USDT
-      //   // TODO: put real address
-      //   tokenAddress: 'bde08c85-41c5-4d80-9bb1-0835a4352efa', // aave-v3 USDT
-      //   poolId: 'bde08c85-41c5-4d80-9bb1-0835a4352efa', // aave-v3 USDT
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: '7fc727a5-813c-405f-96d6-dd8b23f31e1b', // aave-v3 AAVE
-      //   // TODO: put real address
-      //   tokenAddress: '7fc727a5-813c-405f-96d6-dd8b23f31e1b', // aave-v3 AAVE
-      //   poolId: '7fc727a5-813c-405f-96d6-dd8b23f31e1b', // aave-v3 AAVE
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'fa740a7c-430b-4521-8890-22b22e601be6', // aave-v3 sUSDC
-      //   // TODO: put real address
-      //   tokenAddress: 'fa740a7c-430b-4521-8890-22b22e601be6', // aave-v3 sUSDC
-      //   poolId: 'fa740a7c-430b-4521-8890-22b22e601be6', // aave-v3 sUSDC
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
-      // {
-      //   id: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // aave-v3 LINK
-      //   // TODO: put real address
-      //   tokenAddress: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // aave-v3 LINK
-      //   poolId: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // aave-v3 LINK
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
+      {
+        id: '24762515-822a-46af-927c-77a1dc449bd0', // aave-v3 USDC
+        tokenAddress: '0xfe7296c374d996d09e2ffe533eeb85d1896e1b14', // aave-v3 USDC
+        poolId: '24762515-822a-46af-927c-77a1dc449bd0', // aave-v3 USDC
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '3e332a41-3a15-41bc-8d5c-438c09609349', // aave-v3 WETH
+        tokenAddress: '0xdfc636088b4f73f6bda2e9c31e7ffebf4e3646e9', // aave-v3 WETH
+        poolId: '3e332a41-3a15-41bc-8d5c-438c09609349', // aave-v3 WETH
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '363e5586-cfee-402c-9b0b-be70366052e8', // aave-v3 DAI
+        tokenAddress: '0x4a29af8683fFc6259BECcfd583134A0D13BE535c', // aave-v3 DAI
+        poolId: '363e5586-cfee-402c-9b0b-be70366052e8', // aave-v3 DAI
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'e053590b-54f1-40aa-ae0d-14e701ca734c', // aave-v3 WBTC
+        tokenAddress: '0x4f8424ba880b109c31ce8c5eefc4b82b8897eec0', // aave-v3 WBTC
+        poolId: 'e053590b-54f1-40aa-ae0d-14e701ca734c', // aave-v3 WBTC
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'bde08c85-41c5-4d80-9bb1-0835a4352efa', // aave-v3 USDT
+        tokenAddress: '0x58ffcdac112d0c0f7b6ac38fb15d178b83663249', // aave-v3 USDT
+        poolId: 'bde08c85-41c5-4d80-9bb1-0835a4352efa', // aave-v3 USDT
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '7fc727a5-813c-405f-96d6-dd8b23f31e1b', // aave-v3 AAVE
+        tokenAddress: '0xda9a381bcbd9173cc841109840feed4d8d7dcb3b', // aave-v3 AAVE
+        poolId: '7fc727a5-813c-405f-96d6-dd8b23f31e1b', // aave-v3 AAVE
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'fa740a7c-430b-4521-8890-22b22e601be6', // aave-v3 sUSDC
+        tokenAddress: '0x329c754e060c17542f34bf3287c70bfaad7d288a', // aave-v3 sUSDC
+        poolId: 'fa740a7c-430b-4521-8890-22b22e601be6', // aave-v3 sUSDC
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // aave-v3 LINK
+        tokenAddress: '0x8127ce8a7055e2e99c94aee6e20ffc2bdb3770a8', // aave-v3 LINK
+        poolId: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // aave-v3 LINK
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
     ],
   };
