@@ -10,6 +10,15 @@ const StyledLink = styled(Link)`
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
 `;
+
+const StyledStalePairContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 5px;
+`;
+
 interface StalePairModalProps {
   onCancel: () => void;
   onConfirm: () => void;
@@ -30,20 +39,22 @@ const StalePairModal = ({ onConfirm, open, onCancel }: StalePairModalProps) => (
       },
     ]}
   >
-    <Typography variant="body1" component="span">
-      <FormattedMessage description="stale pair message" defaultMessage="This pair is " />
-    </Typography>
-    <Typography variant="body1" component="span">
-      <StyledLink href="https://docs.mean.finance/concepts/positions#stale-positions" target="_blank">
-        <FormattedMessage description="stale" defaultMessage="stale" />
-      </StyledLink>
-    </Typography>
-    <Typography variant="body1" component="span">
-      <FormattedMessage
-        description="stale pair message"
-        defaultMessage=" for that frequency. Are you sure you want to create a position?"
-      />
-    </Typography>
+    <StyledStalePairContainer>
+      <Typography variant="body1" component="span">
+        <FormattedMessage description="stale pair message" defaultMessage="This pair is " />
+      </Typography>
+      <Typography variant="body1" component="span">
+        <StyledLink href="https://docs.mean.finance/concepts/positions#stale-positions" target="_blank">
+          <FormattedMessage description="stale" defaultMessage="stale" />
+        </StyledLink>
+      </Typography>
+      <Typography variant="body1" component="span">
+        <FormattedMessage
+          description="stale pair message"
+          defaultMessage=" for that frequency. Are you sure you want to create a position?"
+        />
+      </Typography>
+    </StyledStalePairContainer>
   </Modal>
 );
 
