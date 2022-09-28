@@ -67,15 +67,18 @@ const StyledFilledInput = withStyles(() =>
 
 const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInputProps) => {
   const tabIndex = findIndex(PREDEFINED_RANGES, { value });
+  const [setByUser, setSetByUser] = React.useState(false);
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
       onChange(nextValue);
+      setSetByUser(true);
     }
   };
 
   const handleChange = (index: number) => {
     onChange(PREDEFINED_RANGES[index].value);
+    setSetByUser(false);
   };
 
   if (isMinimal) {
@@ -102,7 +105,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
         id={id}
         placeholder="Custom"
         onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-        value={tabIndex === -1 ? value : ''}
+        value={tabIndex === -1 || setByUser ? value : ''}
         fullWidth
         disableUnderline
         type="text"
@@ -113,7 +116,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
           <StyledButton
             color="default"
             variant="outlined"
-            $isSelected={index === tabIndex}
+            $isSelected={index === tabIndex && !setByUser}
             size="small"
             key={index}
             onClick={() => handleChange(index)}
