@@ -110,7 +110,7 @@ const PositionDataControls = ({
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
 
-  const shouldMigrateToYield = fromSupportsYield || toSupportsYield;
+  const shouldMigrateToYield = !!(fromSupportsYield || toSupportsYield);
 
   const shouldShowMigrate = hasSignSupport && shouldMigrateToYield && remainingSwaps.gt(BigNumber.from(0));
 
@@ -169,6 +169,19 @@ const PositionDataControls = ({
         >
           <Typography variant="body2">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />
+          </Typography>
+        </StyledCardFooterButton>
+      )}
+      {isOldVersion && shouldMigrateToYield && !allowsModify && (
+        <StyledCardFooterButton
+          variant="contained"
+          color="migrate"
+          onClick={onMigrateYield}
+          fullWidth
+          disabled={disabled}
+        >
+          <Typography variant="body2">
+            <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
           </Typography>
         </StyledCardFooterButton>
       )}

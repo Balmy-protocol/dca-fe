@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { NetworkStruct, Position, Token, YieldOptions } from 'types';
 import { useHistory } from 'react-router-dom';
-import { NETWORKS, OLD_VERSIONS, POSITION_VERSION_3, POSITION_VERSION_4 } from 'config/constants';
+import { NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -129,8 +129,6 @@ const PositionControls = ({
     );
   }
 
-  const showMenu = position.version === POSITION_VERSION_3 || position.version === POSITION_VERSION_4;
-
   const showSwitchAction = !isOnNetwork;
 
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
@@ -138,85 +136,85 @@ const PositionControls = ({
 
   const shouldShowMigrate = hasSignSupport && remainingSwaps.gt(BigNumber.from(0));
 
-  const shouldMigrateToYield = fromSupportsYield || toSupportsYield;
+  const shouldMigrateToYield = !!(fromSupportsYield || toSupportsYield);
+
+  const canAddFunds = VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
   return (
     <StyledCallToActionContainer>
-      {showMenu && (
-        <>
-          <PositionControlsContainer>
-            <IconButton onClick={handleClick}>
-              <MoreVertIcon />
-            </IconButton>
-          </PositionControlsContainer>
-          <StyledMenu
-            anchorEl={anchorEl}
-            open={open && !isPending}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            {toWithdraw.gt(BigNumber.from(0)) && (
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS);
-                }}
-                disabled={disabled}
-              >
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="withdrawToken"
-                    defaultMessage="Withdraw {token}"
-                    values={{
-                      token:
-                        hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
-                          ? position.to.symbol
-                          : wrappedProtocolToken.symbol,
-                    }}
-                  />
-                </Typography>
-              </MenuItem>
-            )}
-            {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  onWithdraw(position, false);
-                }}
-                disabled={disabled}
-              >
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="withdrawWrapped"
-                    defaultMessage="Withdraw {wrappedProtocolToken}"
-                    values={{
-                      wrappedProtocolToken: wrappedProtocolToken.symbol,
-                    }}
-                  />
-                </Typography>
-              </MenuItem>
-            )}
+      <>
+        <PositionControlsContainer>
+          <IconButton onClick={handleClick}>
+            <MoreVertIcon />
+          </IconButton>
+        </PositionControlsContainer>
+        <StyledMenu
+          anchorEl={anchorEl}
+          open={open && !isPending}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+        >
+          {toWithdraw.gt(BigNumber.from(0)) && (
             <MenuItem
               onClick={() => {
                 handleClose();
-                onViewDetails();
+                onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS);
               }}
               disabled={disabled}
             >
               <Typography variant="body2">
-                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+                <FormattedMessage
+                  description="withdrawToken"
+                  defaultMessage="Withdraw {token}"
+                  values={{
+                    token:
+                      hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                        ? position.to.symbol
+                        : wrappedProtocolToken.symbol,
+                  }}
+                />
               </Typography>
             </MenuItem>
-          </StyledMenu>
-        </>
-      )}
+          )}
+          {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                onWithdraw(position, false);
+              }}
+              disabled={disabled}
+            >
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="withdrawWrapped"
+                  defaultMessage="Withdraw {wrappedProtocolToken}"
+                  values={{
+                    wrappedProtocolToken: wrappedProtocolToken.symbol,
+                  }}
+                />
+              </Typography>
+            </MenuItem>
+          )}
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              onViewDetails();
+            }}
+            disabled={disabled}
+          >
+            <Typography variant="body2">
+              <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+            </Typography>
+          </MenuItem>
+        </StyledMenu>
+      </>
       {showSwitchAction && (
         <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
           <Typography variant="body2">
@@ -225,13 +223,6 @@ const PositionControls = ({
               defaultMessage="Switch to {network}"
               values={{ network: positionNetwork.name }}
             />
-          </Typography>
-        </StyledCardFooterButton>
-      )}
-      {!showSwitchAction && !showMenu && (
-        <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
-          <Typography variant="body2">
-            <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
           </Typography>
         </StyledCardFooterButton>
       )}
@@ -267,7 +258,7 @@ const PositionControls = ({
               </Typography>
             </StyledCardFooterButton>
           )}
-          {remainingSwaps.lte(BigNumber.from(0)) && shouldMigrateToYield && toWithdraw.lte(BigNumber.from(0)) && (
+          {remainingSwaps.lte(BigNumber.from(0)) && shouldMigrateToYield && canAddFunds && (
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
@@ -280,7 +271,7 @@ const PositionControls = ({
               </Typography>
             </StyledCardFooterButton>
           )}
-          {!shouldMigrateToYield && (
+          {!shouldMigrateToYield && canAddFunds && (
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
@@ -290,6 +281,41 @@ const PositionControls = ({
             >
               <Typography variant="body2">
                 <FormattedMessage description="addFunds" defaultMessage="Add funds" />
+              </Typography>
+            </StyledCardFooterButton>
+          )}
+          {shouldMigrateToYield && !canAddFunds && (
+            <StyledCardFooterButton
+              variant="contained"
+              color="migrate"
+              onClick={() => onMigrateYield(position)}
+              fullWidth
+              disabled={disabled}
+            >
+              <Typography variant="body2">
+                <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
+              </Typography>
+            </StyledCardFooterButton>
+          )}
+          {!shouldMigrateToYield && !canAddFunds && (
+            <StyledCardFooterButton
+              variant="contained"
+              color="secondary"
+              onClick={() => onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+              fullWidth
+              disabled={disabled || toWithdraw.lte(BigNumber.from(0))}
+            >
+              <Typography variant="body2">
+                <FormattedMessage
+                  description="withdrawToken"
+                  defaultMessage="Withdraw {token}"
+                  values={{
+                    token:
+                      hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                        ? position.to.symbol
+                        : wrappedProtocolToken.symbol,
+                  }}
+                />
               </Typography>
             </StyledCardFooterButton>
           )}

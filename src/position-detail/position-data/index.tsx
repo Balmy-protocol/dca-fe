@@ -14,7 +14,13 @@ import {
   getTimeFrequencyLabel,
   STALE,
 } from 'utils/parsing';
-import { NETWORKS, POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS } from 'config/constants';
+import {
+  NETWORKS,
+  POSITION_ACTIONS,
+  STABLE_COINS,
+  STRING_SWAP_INTERVALS,
+  VERSIONS_ALLOWED_MODIFY,
+} from 'config/constants';
 import useUsdPrice from 'hooks/useUsdPrice';
 import LinearProgress from '@mui/material/LinearProgress';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -73,6 +79,13 @@ const StyledNetworkLogoContainer = styled.div`
   border: 3px solid #1b1923;
   width: 32px;
   height: 32px;
+`;
+
+const StyledDeprecated = styled.div`
+  color: #cc6d00;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
 `;
 
 const StyledCard = styled(Card)`
@@ -290,6 +303,8 @@ const Details = ({
 
   const executedSwaps = totalSwaps.toNumber() - remainingSwaps.toNumber();
 
+  const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
+
   return (
     <StyledCard>
       {positionNetwork && (
@@ -339,7 +354,7 @@ const Details = ({
             )}
           </StyledProgressWrapper>
           <StyledDetailWrapper>
-            {!isPending && !hasNoFunds && !isStale && (
+            {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
               <StyledFreqLeft>
                 <Typography variant="body2">
                   <FormattedMessage
@@ -369,19 +384,26 @@ const Details = ({
                 </Typography>
               </StyledStale>
             )}
-            {!isPending && hasNoFunds && position.status !== 'TERMINATED' && (
+            {!isPending && hasNoFunds && position.status !== 'TERMINATED' && !isOldVersion && (
               <StyledFinished>
                 <Typography variant="caption">
                   <FormattedMessage description="finishedPosition" defaultMessage="FINISHED" />
                 </Typography>
               </StyledFinished>
             )}
-            {!isPending && !hasNoFunds && position.status !== 'TERMINATED' && isStale && (
+            {!isPending && !hasNoFunds && position.status !== 'TERMINATED' && isStale && !isOldVersion && (
               <StyledStale>
                 <Typography variant="caption">
                   <FormattedMessage description="stale" defaultMessage="STALE" />
                 </Typography>
               </StyledStale>
+            )}
+            {!isPending && isOldVersion && position.status !== 'TERMINATED' && (
+              <StyledDeprecated>
+                <Typography variant="caption">
+                  <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />
+                </Typography>
+              </StyledDeprecated>
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper>
