@@ -202,7 +202,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
           <StyledYieldContainer>
             <StyledYieldTitleContainer>
               <Typography variant="body1">
-                <FormattedMessage description="yieldTitle" defaultMessage="Yield farming" />
+                <FormattedMessage description="yieldTitle" defaultMessage="Generate yield" />
               </Typography>
               <Switch
                 checked={yieldEnabled}
