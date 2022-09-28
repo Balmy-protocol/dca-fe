@@ -21,6 +21,7 @@ import { createStyles } from '@mui/material/styles';
 import useWalletService from 'hooks/useWalletService';
 import { useAppDispatch } from 'state/hooks';
 import { setPosition } from 'state/position-details/actions';
+import { changePositionDetailsTab } from 'state/tabs/actions';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -100,6 +101,7 @@ const PositionControls = ({
 
   const onViewDetails = () => {
     dispatch(setPosition(null));
+    dispatch(changePositionDetailsTab(0));
     history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
 

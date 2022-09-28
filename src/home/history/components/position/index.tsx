@@ -18,6 +18,7 @@ import useUsdPrice from 'hooks/useUsdPrice';
 import find from 'lodash/find';
 import { useAppDispatch } from 'state/hooks';
 import { setPosition } from 'state/position-details/actions';
+import { changePositionDetailsTab } from 'state/tabs/actions';
 
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
@@ -128,6 +129,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
 
   const onViewDetails = () => {
     dispatch(setPosition(null));
+    dispatch(changePositionDetailsTab(0));
     history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
 
