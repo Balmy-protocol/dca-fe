@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { NetworkStruct, Position, Token, YieldOptions } from 'types';
 import { useHistory } from 'react-router-dom';
-import { NETWORKS, OLD_VERSIONS } from 'config/constants';
+import { NETWORKS, OLD_VERSIONS, POSITION_VERSION_3, POSITION_VERSION_4 } from 'config/constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -55,9 +55,9 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
 interface PositionControlsProps {
   position: PositionProp;
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
-  onTerminate: (position: Position) => void;
   onReusePosition: (position: Position) => void;
   onMigrateYield: (position: Position) => void;
+  onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
   network: NetworkStruct;
@@ -68,7 +68,7 @@ const PositionControls = ({
   position,
   onWithdraw,
   onReusePosition,
-  onTerminate,
+  onSuggestMigrateYield,
   onMigrateYield,
   disabled,
   hasSignSupport,
@@ -129,12 +129,9 @@ const PositionControls = ({
     );
   }
 
-  const showMenu =
-    !OLD_VERSIONS.includes(position.version) ||
-    remainingSwaps.gt(BigNumber.from(0)) ||
-    toWithdraw.gt(BigNumber.from(0));
+  const showMenu = position.version === POSITION_VERSION_3 || position.version === POSITION_VERSION_4;
 
-  const showSwitchAction = !isOnNetwork && showMenu;
+  const showSwitchAction = !isOnNetwork;
 
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
@@ -270,29 +267,29 @@ const PositionControls = ({
               </Typography>
             </StyledCardFooterButton>
           )}
-          {/* {shouldShowMigrate && !shouldMigrateToYield && (
+          {remainingSwaps.lte(BigNumber.from(0)) && shouldMigrateToYield && toWithdraw.lte(BigNumber.from(0)) && (
             <StyledCardFooterButton
               variant="contained"
-              color="migrate"
-              onClick={() => onMigrateYield(position)}
+              color="secondary"
+              onClick={() => onSuggestMigrateYield(position)}
               fullWidth
               disabled={disabled}
             >
               <Typography variant="body2">
-                <FormattedMessage description="startSubsidizing" defaultMessage="Start subsidizing" />
+                <FormattedMessage description="addFunds" defaultMessage="Add funds" />
               </Typography>
             </StyledCardFooterButton>
-          )} */}
-          {toWithdraw.gt(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0)) && (
+          )}
+          {!shouldMigrateToYield && (
             <StyledCardFooterButton
               variant="contained"
-              color="error"
-              onClick={() => onTerminate(position)}
+              color="secondary"
+              onClick={() => onReusePosition(position)}
               fullWidth
               disabled={disabled}
             >
               <Typography variant="body2">
-                <FormattedMessage description="terminate" defaultMessage="Terminate" />
+                <FormattedMessage description="addFunds" defaultMessage="Add funds" />
               </Typography>
             </StyledCardFooterButton>
           )}

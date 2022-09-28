@@ -141,9 +141,9 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
 interface ActivePositionProps {
   position: PositionProp;
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
-  onTerminate: (position: Position) => void;
   onReusePosition: (position: Position) => void;
   onMigrateYield: (position: Position) => void;
+  onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
   network: NetworkStruct;
@@ -154,8 +154,8 @@ const ActivePosition = ({
   position,
   onWithdraw,
   onReusePosition,
-  onTerminate,
   onMigrateYield,
+  onSuggestMigrateYield,
   disabled,
   hasSignSupport,
   network,
@@ -419,12 +419,12 @@ const ActivePosition = ({
           position={position}
           onWithdraw={onWithdraw}
           onReusePosition={onReusePosition}
-          onTerminate={onTerminate}
           onMigrateYield={onMigrateYield}
           disabled={disabled}
           hasSignSupport={!!hasSignSupport}
           network={network}
           yieldOptions={yieldOptions}
+          onSuggestMigrateYield={onSuggestMigrateYield}
         />
       </StyledCardContent>
     </StyledCard>
