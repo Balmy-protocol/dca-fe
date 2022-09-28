@@ -9,6 +9,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Popper from '@mui/material/Popper';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 
 const StyledYieldTokenSelectorContainer = styled.div`
   display: flex;
@@ -117,74 +118,80 @@ const YieldTokenSelector = ({
     }
   };
 
+  const handleClickAway = () => {
+    setShowPopper(false);
+  };
+
   const sx = inModal ? { zIndex: 1301 } : {};
   return (
-    <StyledYieldTokenSelectorContainer>
-      <TokenIcon token={token} />
-      <Typography variant="body1">{token.symbol}</Typography>
-      {!isLoading && !availableYieldOptions.length && (
-        <Typography variant="body2">
-          <FormattedMessage
-            description="noYieldAvailable"
-            defaultMessage="This token does not have an available yield platform"
-          />
-        </Typography>
-      )}
-      {isLoading ||
-        (!!availableYieldOptions.length && (
-          <StyledYieldPlatformSelector onClick={handlePopperEl}>
-            <StyledYieldPlatformDescription variant="body2">
-              {isUndefined(yieldSelected) && (
-                <FormattedMessage description="selectYieldPlatform" defaultMessage="Select platform" />
-              )}
-              {yieldSelected && (
-                <FormattedMessage
-                  description="selectedYieldPlatform"
-                  defaultMessage="{platform} (APY {apy}%)"
-                  values={{ platform: yieldSelected.name, apy: yieldSelected.apy.toFixed(0) }}
-                />
-              )}
-              {yieldSelected === null && (
-                <FormattedMessage description="noSelectedYieldPlatform" defaultMessage="No yield" />
-              )}
-              <ArrowDropDownIcon fontSize="inherit" />
-              <Popper
-                id={`yield-${token.address}-popper`}
-                open={showPopper}
-                anchorEl={anchorEl}
-                placement="bottom-start"
-                sx={sx}
-              >
-                <StyledPopperContainer>
-                  {isLoading && <CenteredLoadingIndicator />}
-                  {!isLoading && (
-                    <>
-                      <StyledYieldOption onClick={() => setYieldOption(null)}>
-                        <StyledYieldOptionDescription>
-                          <CancelIcon fontSize="small" color="error" />
-                          <Typography variant="body2">
-                            <FormattedMessage description="noYieldOption" defaultMessage="No yield" />
-                          </Typography>
-                        </StyledYieldOptionDescription>
-                        <StyledYieldOptionApy>-</StyledYieldOptionApy>
-                      </StyledYieldOption>
-                      {availableYieldOptions.map((yieldOption, index) => (
-                        <StyledYieldOption key={index} onClick={() => setYieldOption(yieldOption)}>
+    <ClickAwayListener onClickAway={handleClickAway}>
+      <StyledYieldTokenSelectorContainer>
+        <TokenIcon token={token} />
+        <Typography variant="body1">{token.symbol}</Typography>
+        {!isLoading && !availableYieldOptions.length && (
+          <Typography variant="body2">
+            <FormattedMessage
+              description="noYieldAvailable"
+              defaultMessage="This token does not have an available yield platform"
+            />
+          </Typography>
+        )}
+        {isLoading ||
+          (!!availableYieldOptions.length && (
+            <StyledYieldPlatformSelector onClick={handlePopperEl}>
+              <StyledYieldPlatformDescription variant="body2">
+                {isUndefined(yieldSelected) && (
+                  <FormattedMessage description="selectYieldPlatform" defaultMessage="Select platform" />
+                )}
+                {yieldSelected && (
+                  <FormattedMessage
+                    description="selectedYieldPlatform"
+                    defaultMessage="{platform} (APY {apy}%)"
+                    values={{ platform: yieldSelected.name, apy: yieldSelected.apy.toFixed(0) }}
+                  />
+                )}
+                {yieldSelected === null && (
+                  <FormattedMessage description="noSelectedYieldPlatform" defaultMessage="No yield" />
+                )}
+                <ArrowDropDownIcon fontSize="inherit" />
+                <Popper
+                  id={`yield-${token.address}-popper`}
+                  open={showPopper}
+                  anchorEl={anchorEl}
+                  placement="bottom-start"
+                  sx={sx}
+                >
+                  <StyledPopperContainer>
+                    {isLoading && <CenteredLoadingIndicator />}
+                    {!isLoading && (
+                      <>
+                        <StyledYieldOption onClick={() => setYieldOption(null)}>
                           <StyledYieldOptionDescription>
-                            <TokenIcon size="16px" token={yieldOption.token} />
-                            <Typography variant="body2">{yieldOption.name}</Typography>
+                            <CancelIcon fontSize="small" color="error" />
+                            <Typography variant="body2">
+                              <FormattedMessage description="noYieldOption" defaultMessage="No yield" />
+                            </Typography>
                           </StyledYieldOptionDescription>
-                          <StyledYieldOptionApy>{yieldOption.apy.toFixed(0)}%</StyledYieldOptionApy>
+                          <StyledYieldOptionApy>-</StyledYieldOptionApy>
                         </StyledYieldOption>
-                      ))}
-                    </>
-                  )}
-                </StyledPopperContainer>
-              </Popper>
-            </StyledYieldPlatformDescription>
-          </StyledYieldPlatformSelector>
-        ))}
-    </StyledYieldTokenSelectorContainer>
+                        {availableYieldOptions.map((yieldOption, index) => (
+                          <StyledYieldOption key={index} onClick={() => setYieldOption(yieldOption)}>
+                            <StyledYieldOptionDescription>
+                              <TokenIcon size="16px" token={yieldOption.token} />
+                              <Typography variant="body2">{yieldOption.name}</Typography>
+                            </StyledYieldOptionDescription>
+                            <StyledYieldOptionApy>{yieldOption.apy.toFixed(0)}%</StyledYieldOptionApy>
+                          </StyledYieldOption>
+                        ))}
+                      </>
+                    )}
+                  </StyledPopperContainer>
+                </Popper>
+              </StyledYieldPlatformDescription>
+            </StyledYieldPlatformSelector>
+          ))}
+      </StyledYieldTokenSelectorContainer>
+    </ClickAwayListener>
   );
 };
 export default YieldTokenSelector;
