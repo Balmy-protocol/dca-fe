@@ -493,6 +493,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                   innerRadius={65}
                   paddingAngle={1}
                   outerRadius={75}
+                  cursor="pointer"
                   fill="#8884d8"
                   onMouseOver={(data: { name: string; token: Token; tokens?: string[] }) =>
                     onSelectTokens(data.tokens ? data.tokens : [data.name])

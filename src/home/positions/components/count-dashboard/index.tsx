@@ -248,6 +248,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
               fill="#8884d8"
               onMouseOver={(data: { name: string }) => onSelectChain(Number(data.name))}
               onMouseOut={() => onSelectChain(null)}
+              cursor="pointer"
             >
               {positionsCount.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
