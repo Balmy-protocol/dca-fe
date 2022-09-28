@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE, calculateYield } from 'utils/parsing';
 import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, POSITION_VERSION_2, STRING_SWAP_INTERVALS } from 'config/constants';
+import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
@@ -216,7 +216,7 @@ const ActivePosition = ({
   const isStale =
     calculateStale(pair?.lastExecutedAt || position.pairLastSwappedAt || 0, swapInterval, position.startedAt) === STALE;
 
-  const isOldVersion = position.version === POSITION_VERSION_2;
+  const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
   const foundYieldFrom =
     position.from.underlyingTokens[0] &&
