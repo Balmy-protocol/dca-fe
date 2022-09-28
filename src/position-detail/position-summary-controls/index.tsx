@@ -14,6 +14,7 @@ import Button from 'common/button';
 import SplitButton from 'common/split-button';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { BigNumber } from 'ethers';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -117,23 +118,29 @@ const PositionSummaryControls = ({
             }}
           />
         }
-        disabled={isPending || disabled}
+        disabled={isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))}
         variant="outlined"
         color="transparent"
         options={[
-          {
-            text: (
-              <FormattedMessage
-                description="withdrawWrapped"
-                defaultMessage="Withdraw {wrappedProtocolToken}"
-                values={{
-                  wrappedProtocolToken: wrappedProtocolToken.symbol,
-                }}
-              />
-            ),
-            disabled: isPending || disabled,
-            onClick: () => onWithdraw(false),
-          },
+          ...(BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
+          hasSignSupport &&
+          position.to.address === PROTOCOL_TOKEN_ADDRESS
+            ? [
+                {
+                  text: (
+                    <FormattedMessage
+                      description="withdrawWrapped"
+                      defaultMessage="Withdraw {wrappedProtocolToken}"
+                      values={{
+                        wrappedProtocolToken: wrappedProtocolToken.symbol,
+                      }}
+                    />
+                  ),
+                  disabled: isPending || disabled,
+                  onClick: () => onWithdraw(false),
+                },
+              ]
+            : []),
           {
             text: (
               <FormattedMessage
@@ -142,7 +149,7 @@ const PositionSummaryControls = ({
                 values={{ token: position.from.symbol }}
               />
             ),
-            disabled: isPending || disabled,
+            disabled: isPending || disabled || BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)),
             onClick: onWithdrawFunds,
           },
         ]}

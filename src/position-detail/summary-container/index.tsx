@@ -35,7 +35,8 @@ interface PositionSummaryContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
   swapsData: GetPairSwapsData | undefined;
-  onWithdraw: (useProtocolToken: boolean) => void;
+  onMigrateYield: () => void;
+  onSuggestMigrateYield: () => void;
   onReusePosition: () => void;
   disabled: boolean;
   yieldOptions: YieldOptions;
@@ -48,13 +49,14 @@ const PositionSummaryContainer = ({
   position,
   pendingTransaction,
   swapsData,
-  onWithdraw,
   onReusePosition,
   disabled,
   yieldOptions,
   toWithdrawUnderlying,
   remainingLiquidityUnderlying,
   swappedUnderlying,
+  onMigrateYield,
+  onSuggestMigrateYield,
 }: PositionSummaryContainerProps) => (
   <>
     <Grid container spacing={4} alignItems="flex-start">
@@ -65,13 +67,14 @@ const PositionSummaryContainer = ({
               position={position}
               pair={swapsData}
               pendingTransaction={pendingTransaction}
-              onWithdraw={onWithdraw}
               onReusePosition={onReusePosition}
               disabled={disabled}
               yieldOptions={yieldOptions}
               toWithdrawUnderlying={toWithdrawUnderlying}
               remainingLiquidityUnderlying={remainingLiquidityUnderlying}
               swappedUnderlying={swappedUnderlying}
+              onMigrateYield={onMigrateYield}
+              onSuggestMigrateYield={onSuggestMigrateYield}
             />
           </StyledPaper>
         </Sticky>
