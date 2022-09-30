@@ -342,8 +342,8 @@ export const ORACLE_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0x4b0C54236B86f41C5e5A5dc5d020f832692ff06d',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.polygon.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
-    [NETWORKS.optimism.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
+    [NETWORKS.polygon.chainId]: '0x9e1ca4Cd00ED059C5d34204DCe622549583545d9',
+    [NETWORKS.optimism.chainId]: '0x9e1ca4Cd00ED059C5d34204DCe622549583545d9',
   },
 };
 
