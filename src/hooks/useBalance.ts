@@ -9,37 +9,39 @@ import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
 
 function useBalance(from: Token | undefined | null): [BigNumber | undefined, boolean, string?] {
-  const [isLoading, setIsLoading] = React.useState(false);
   const walletService = useWalletService();
-  const [result, setResult] = React.useState<BigNumber | undefined>(undefined);
-  const [error, setError] = React.useState<string | undefined>(undefined);
+  const [state, setState] = React.useState<{ isLoading: boolean; result?: BigNumber; error?: string }>({
+    isLoading: false,
+    result: undefined,
+    error: undefined,
+  });
+
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = usePrevious(walletService.getAccount());
+  const prevAccount = usePrevious(walletService.getAccount());
+  const account = walletService.getAccount();
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
-  const prevResult = usePrevious(result, false);
+  const prevResult = usePrevious(state.result, false);
 
   React.useEffect(() => {
     async function callPromise() {
       if (from) {
         try {
           const promiseResult = await walletService.getBalance(from.address);
-          setResult(promiseResult);
-          setError(undefined);
+          setState({ isLoading: false, result: promiseResult, error: undefined });
         } catch (e) {
-          setError(e);
+          setState((prevState) => ({ ...prevState, error: e, isLoading: false }));
         }
-        setIsLoading(false);
       }
     }
 
     if (
-      (!isLoading && !result && !error) ||
+      (!state.isLoading && !state.result && !state.error) ||
       !isEqual(prevFrom, from) ||
-      !isEqual(account, walletService.getAccount()) ||
+      !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       (blockNumber &&
         prevBlockNumber &&
@@ -47,29 +49,29 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
         prevBlockNumber !== -1 &&
         !isEqual(prevBlockNumber, blockNumber))
     ) {
-      setIsLoading(true);
-      setResult(undefined);
-      setError(undefined);
+      setState({ isLoading: true, result: undefined, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
   }, [
     from,
-    isLoading,
-    result,
-    error,
+    prevFrom,
+    state.isLoading,
+    state.result,
+    state.error,
     hasPendingTransactions,
-    walletService.getAccount(),
+    prevAccount,
+    account,
     prevBlockNumber,
     blockNumber,
   ]);
 
   if (!from) {
-    return [prevResult || BigNumber.from('0'), false, undefined];
+    return [undefined, false, undefined];
   }
 
-  return [result || prevResult, isLoading, error];
+  return [state.result || prevResult, state.isLoading, state.error];
 }
 
 export default useBalance;

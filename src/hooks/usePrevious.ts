@@ -1,11 +1,11 @@
 import isUndefined from 'lodash/isUndefined';
 import React from 'react';
 
-function usePrevious<T>(value: T, updateOnUndefined = true) {
+function usePrevious<T>(value: T, updateOnUndefined = true, attributeToCheck?: keyof T) {
   const ref = React.useRef<T>();
   React.useEffect(() => {
-    if (isUndefined(value)) {
-      if(updateOnUndefined) {
+    if (isUndefined(value) || (attributeToCheck && isUndefined(value[attributeToCheck]))) {
+      if (updateOnUndefined) {
         ref.current = value;
       }
     } else {

@@ -8,40 +8,44 @@ import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
 
-function useAllowance(
-  from: Token | undefined | null
-): [{ token: Token; allowance: string } | undefined, boolean, string?] {
-  const [isLoading, setIsLoading] = React.useState(false);
+type Allowance = {
+  token: Token;
+  allowance: string | undefined;
+};
+
+type AllowanceResponse = [Allowance, boolean, string?];
+
+const dummyToken: Allowance = { token: EMPTY_TOKEN, allowance: undefined };
+
+function useAllowance(from: Token | undefined | null): AllowanceResponse {
   const walletService = useWalletService();
-  const [result, setResult] = React.useState<{ token: Token; allowance: string } | undefined>(undefined);
-  const [error, setError] = React.useState<string | undefined>(undefined);
+  const [state, setState] = React.useState({ isLoading: false, result: dummyToken, error: undefined });
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = usePrevious(walletService.getAccount());
+  const prevAccount = usePrevious(walletService.getAccount());
+  const account = walletService.getAccount();
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
-  const prevResult = usePrevious(result, false);
+  const prevResult = usePrevious(state.result, false, 'allowance');
 
   React.useEffect(() => {
     async function callPromise() {
       if (from) {
         try {
           const promiseResult = await walletService.getAllowance(from);
-          setResult(promiseResult);
-          setError(undefined);
+          setState((prevState) => ({ ...prevState, result: promiseResult, error: undefined, isLoading: false }));
         } catch (e) {
-          setError(e);
+          setState((prevState) => ({ ...prevState, error: e, isLoading: false }));
         }
-        setIsLoading(false);
       }
     }
 
     if (
-      (!isLoading && !result && !error) ||
+      (!state.isLoading && !state.result && !state.error) ||
       !isEqual(prevFrom, from) ||
-      !isEqual(account, walletService.getAccount()) ||
+      !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       (blockNumber &&
         prevBlockNumber &&
@@ -49,29 +53,29 @@ function useAllowance(
         prevBlockNumber !== -1 &&
         !isEqual(prevBlockNumber, blockNumber))
     ) {
-      setIsLoading(true);
-      setResult(undefined);
-      setError(undefined);
+      setState({ isLoading: true, result: dummyToken, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
   }, [
     from,
-    isLoading,
-    result,
-    error,
+    prevFrom,
+    state.isLoading,
+    state.result,
+    state.error,
     hasPendingTransactions,
-    walletService.getAccount(),
+    prevAccount,
+    account,
     prevBlockNumber,
     blockNumber,
   ]);
 
   if (!from) {
-    return [{ token: from || EMPTY_TOKEN, allowance: '0' }, false, undefined];
+    return [dummyToken, false, undefined];
   }
 
-  return [result || prevResult, isLoading, error];
+  return [state.result.allowance ? state.result : prevResult!, state.isLoading, state.error];
 }
 
 export default useAllowance;

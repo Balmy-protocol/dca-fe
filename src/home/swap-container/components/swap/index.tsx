@@ -198,9 +198,8 @@ const Swap = ({
   const contractService = useContractService();
   const availablePairs = useAvailablePairs();
   const pairService = usePairService();
-  const [balance, isLoadingBalance, balanceErrors] = useBalance(from);
+  const [balance, , balanceErrors] = useBalance(from);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
-
   const [usedTokens] = useUsedTokens();
 
   const existingPair = React.useMemo(() => {
@@ -227,7 +226,7 @@ const Swap = ({
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount());
 
-  const [allowance, isLoadingAllowance, allowanceErrors] = useAllowance(from);
+  const [allowance, , allowanceErrors] = useAllowance(from);
 
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
 
@@ -535,9 +534,7 @@ const Swap = ({
     (from &&
       (!fromValue
         ? true
-        : (!isLoadingAllowance &&
-            allowance &&
-            allowance.allowance &&
+        : (allowance?.allowance &&
             allowance.token.address === from.address &&
             parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
@@ -548,7 +545,7 @@ const Swap = ({
     !fromValue ||
     !frequencyValue ||
     cantFund ||
-    isLoadingBalance ||
+    !balance ||
     balanceErrors ||
     allowanceErrors ||
     !isApproved ||
