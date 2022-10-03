@@ -100,8 +100,8 @@ interface SwapProps {
   isLoadingYieldOptions: boolean;
   fromYield: YieldOption | null | undefined;
   toYield: YieldOption | null | undefined;
-  setFromYield: (newYield: null | YieldOption) => void;
-  setToYield: (newYield: null | YieldOption) => void;
+  setFromYield: (newYield?: null | YieldOption) => void;
+  setToYield: (newYield?: null | YieldOption) => void;
 }
 
 const Swap = ({
@@ -329,6 +329,8 @@ const Swap = ({
 
       setFromValue('');
       setRate('0');
+      setToYield(undefined);
+      setFromYield(undefined);
     } catch (e) {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error creating position', error: { code: e.code, message: e.message, data: e.data } });
