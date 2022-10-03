@@ -512,7 +512,7 @@ const Swap = ({
 
   const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield);
 
-  const shouldDisableButton =
+  const shouldDisableApproveButton =
     !from ||
     !to ||
     !fromValue ||
@@ -521,11 +521,12 @@ const Swap = ({
     !balance ||
     balanceErrors ||
     allowanceErrors ||
-    !isApproved ||
     parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0)) ||
     (shouldEnableYield && fromCanHaveYield && isUndefined(fromYield)) ||
     (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
+
+  const shouldDisableButton = shouldDisableApproveButton || !isApproved;
 
   const ignoreValues = [...(from ? [from.address] : []), ...(to ? [to.address] : [])];
 
@@ -587,7 +588,7 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="primary"
-      disabled={!!isApproved || hasPendingApproval || isLoading}
+      disabled={!!isApproved || hasPendingApproval || isLoading || !!shouldDisableApproveButton}
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
       style={{ pointerEvents: 'all' }}
     >
