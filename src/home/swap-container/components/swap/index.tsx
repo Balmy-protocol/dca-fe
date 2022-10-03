@@ -156,8 +156,8 @@ const Swap = ({
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
-    let tokenA = from.address;
-    let tokenB = to.address;
+    let tokenA = fromYield?.tokenAddress || from.address;
+    let tokenB = toYield?.tokenAddress || to.address;
 
     if (tokenA === PROTOCOL_TOKEN_ADDRESS) {
       tokenA = getWrappedProtocolToken(currentNetwork.chainId).address;
@@ -173,7 +173,7 @@ const Swap = ({
       availablePairs,
       (pair) => pair.token0.address === token0.toLocaleLowerCase() && pair.token1.address === token1.toLocaleLowerCase()
     );
-  }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
+  }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0, fromYield, toYield]);
   const isCreatingPair = useHasPendingPairCreation(from, to);
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
