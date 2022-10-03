@@ -192,7 +192,12 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
       positionState.createdAtTimestamp,
       position.chainId
     );
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigNumber.from(rate));
+    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
+      position.from,
+      BigNumber.from(rate),
+      undefined,
+      position.chainId
+    );
     const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
       BigNumber.from(rate),
