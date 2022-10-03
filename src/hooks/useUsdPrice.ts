@@ -21,7 +21,7 @@ function useUsdPrice(
   const [isLoading, setIsLoading] = React.useState(false);
   const priceService = usePriceService();
   const walletService = useWalletService();
-  const [result, setResult] = React.useState<number | undefined>(undefined);
+  const [result, setResult] = React.useState<BigNumber | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const prevFrom = usePrevious(from);
   const currentNetwork = useCurrentNetwork();
@@ -37,8 +37,7 @@ function useUsdPrice(
             date,
             chainId
           );
-          const multiplied = amount.mul(price);
-          setResult(parseFloat(formatUnits(multiplied, from.decimals + 18)));
+          setResult(price);
           setError(undefined);
         } catch (e) {
           setError(e);
@@ -67,11 +66,13 @@ function useUsdPrice(
       return [parseFloat(formatCurrencyAmount(amount, from, 6)), false, undefined];
     }
 
-    if (amount.lte(BigNumber.from(0))) {
+    if (amount.lte(BigNumber.from(0)) || !result) {
       return [0, false, undefined];
     }
 
-    return [result, isLoading, error];
+    const multiplied = amount.mul(result);
+
+    return [parseFloat(formatUnits(multiplied, from.decimals + 18)), isLoading, error];
   }, [result, from, amount, isLoading, error]);
 }
 
