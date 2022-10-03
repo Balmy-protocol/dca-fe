@@ -192,7 +192,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
               <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep1"
-                  defaultMessage="In order to start generating yield we will need to terminate your current position, and create a new one where you will start generating yield. Your historical data from this position will appear as a terminated position"
+                  defaultMessage="In order to start generating yield we will need to terminate your current position, and create a new one. Your historical data from this position will appear as a terminated position"
                 />
               </Typography>
               {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
