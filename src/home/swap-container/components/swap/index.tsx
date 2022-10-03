@@ -300,6 +300,8 @@ const Swap = ({
         typeData: {
           from,
           to,
+          fromYield: fromYield?.tokenAddress,
+          toYield: toYield?.tokenAddress,
           fromValue,
           frequencyType: frequencyType.toString(),
           frequencyValue,
