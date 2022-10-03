@@ -331,6 +331,7 @@ const Swap = ({
       setRate('0');
       setToYield(undefined);
       setFromYield(undefined);
+      setCreateStep(0);
     } catch (e) {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error creating position', error: { code: e.code, message: e.message, data: e.data } });
