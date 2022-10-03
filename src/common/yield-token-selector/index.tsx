@@ -22,10 +22,9 @@ const StyledYieldTokenSelectorContainer = styled.div`
   gap: 12px;
 `;
 
-const StyledYieldPlatformSelector = styled.div`
+const StyledYieldPlatformSelector = styled.div<{ inModal: boolean }>`
   display: flex;
-  flex: 1;
-  align-self: stretch;
+  ${({ inModal }) => (!inModal ? 'flex: 1;align-self: stretch;' : '')}
   background: rgba(216, 216, 216, 0.1);
   border-radius: 24px;
   border: 1px solid #ffffff1a;
@@ -138,7 +137,7 @@ const YieldTokenSelector = ({
         )}
         {isLoading ||
           (!!availableYieldOptions.length && (
-            <StyledYieldPlatformSelector onClick={handlePopperEl}>
+            <StyledYieldPlatformSelector onClick={handlePopperEl} inModal>
               <StyledYieldPlatformDescription variant="body2">
                 {isUndefined(yieldSelected) && (
                   <FormattedMessage description="selectYieldPlatform" defaultMessage="Select platform" />
