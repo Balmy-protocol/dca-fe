@@ -728,7 +728,7 @@ const Swap = ({
     ButtonToShow = PairNotSupportedButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
-  } else if (createStep === 0) {
+  } else if (!createStep) {
     ButtonToShow = NextStepButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
     ButtonToShow = ApproveTokenButton;
