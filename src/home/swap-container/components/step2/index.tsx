@@ -156,7 +156,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
             </StyledInputContainer>
             {!!usdPrice && (
               <Typography variant="body2" component="span" sx={{ color: '#FFFFFF80' }}>
-                (${(usdPrice * Number(fromValue)).toFixed(2)} USD)
+                (${usdPrice.toFixed(2)} USD)
               </Typography>
             )}
           </StyledSummaryContainer>
