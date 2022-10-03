@@ -127,13 +127,14 @@ const PositionDetailFrame = () => {
   const protocolToken = getProtocolToken(Number(chainId));
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(Number(chainId));
 
-  const position: FullPosition | undefined = data && {
-    ...data.position,
-    chainId: Number(chainId),
-    version: positionVersion,
-    from: getDisplayToken(data.position.from, Number(chainId)),
-    to: getDisplayToken(data.position.to, Number(chainId)),
-  };
+  const position: FullPosition | undefined = data &&
+    data.position && {
+      ...data.position,
+      chainId: Number(chainId),
+      version: positionVersion,
+      from: getDisplayToken(data.position.from, Number(chainId)),
+      to: getDisplayToken(data.position.to, Number(chainId)),
+    };
 
   const pendingTransaction = usePositionHasPendingTransaction(
     (position && fullPositionToMappedPosition(position).id) || ''
