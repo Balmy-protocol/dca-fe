@@ -903,10 +903,29 @@ export default class PositionService {
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
       const newPositionTypeData = typeData as NewPositionTypeData;
       id = `pending-transaction-${transaction.hash}`;
+      const { fromYield, toYield } = newPositionTypeData;
+
+      let fromToUse =
+        newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
+      let toToUse =
+        newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
+
+      if (fromYield) {
+        fromToUse = {
+          ...fromToUse,
+          underlyingTokens: [emptyTokenWithAddress(fromYield)],
+        };
+      }
+      if (toYield) {
+        toToUse = {
+          ...toToUse,
+          underlyingTokens: [emptyTokenWithAddress(toYield)],
+        };
+      }
+
       this.currentPositions[`${id}-v${newPositionTypeData.version}`] = {
-        from:
-          newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from,
-        to: newPositionTypeData.to.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to,
+        from: fromToUse,
+        to: toToUse,
         user: this.walletService.getAccount(),
         chainId: network.chainId,
         positionId: id,

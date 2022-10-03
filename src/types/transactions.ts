@@ -133,6 +133,8 @@ export interface WrapEtherTypeData {
 export interface NewPositionTypeData {
   from: Token;
   to: Token;
+  fromYield?: string;
+  toYield?: string;
   fromValue: string;
   frequencyType: string;
   frequencyValue: string;
