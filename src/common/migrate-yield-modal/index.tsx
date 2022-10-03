@@ -49,7 +49,7 @@ interface MigrateYieldModalProps {
 }
 
 const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps) => {
-  const { from, to, toWithdraw, chainId } = position;
+  const { from, to, toWithdraw, chainId, remainingLiquidity } = position;
   const [fromYield, setFromYield] = React.useState<YieldOption | null | undefined>(undefined);
   const [toYield, setToYield] = React.useState<YieldOption | null | undefined>(undefined);
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(chainId);
@@ -192,7 +192,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
               <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep1"
-                  defaultMessage="We will need to first terminate your position and then open a new one where you will start generating yield. Your historical data from this position will appear as a terminated position"
+                  defaultMessage="In order to start generating yield we will need to terminate your current position, and create a new one where you will start generating yield. Your historical data from this position will appear as a terminated position"
                 />
               </Typography>
               {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
@@ -204,7 +204,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
               <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep3"
-                  defaultMessage="You will get back {toWithdraw} {to} to your wallet."
+                  defaultMessage="By terminating the current position {toWithdraw} {to} will be sent to your wallet."
                   values={{
                     toWithdraw: formatCurrencyAmount(toWithdraw, to),
                     to: to.symbol,
@@ -214,9 +214,10 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
               <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep4"
-                  defaultMessage="All {from} balance will be used to create a new position with the same rate and remaining swaps as your current one."
+                  defaultMessage="The remaining {remainingLiquidity} {from} will be used to create a new position with the same rate and remaining duration as your current one."
                   values={{
                     from: from.symbol,
+                    remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from),
                   }}
                 />
               </Typography>
