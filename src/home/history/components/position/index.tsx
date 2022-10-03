@@ -123,7 +123,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
   }, [chainId]);
 
   const history = useHistory();
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped, undefined, chainId);
   const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
   const dispatch = useAppDispatch();
 
