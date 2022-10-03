@@ -979,7 +979,7 @@ export default class PositionService {
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
     const { id } = typeData;
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
-      delete this.currentPositions[`pending-transaction-${transaction.hash}`];
+      delete this.currentPositions[`pending-transaction-${transaction.hash}-v${LATEST_VERSION}`];
     } else {
       this.currentPositions[id].pendingTransaction = '';
     }
