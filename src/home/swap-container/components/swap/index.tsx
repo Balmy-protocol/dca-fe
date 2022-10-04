@@ -534,7 +534,7 @@ const Swap = ({
     (from &&
       (!fromValue
         ? true
-        : (allowance?.allowance &&
+        : (allowance.allowance &&
             allowance.token.address === from.address &&
             parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
