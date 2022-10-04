@@ -37,7 +37,9 @@ function useAllowance(from: Token | undefined | null): AllowanceResponse {
           const promiseResult = await walletService.getAllowance(from);
           setState((prevState) => ({ ...prevState, result: promiseResult, error: undefined, isLoading: false }));
         } catch (e) {
+          /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
           setState((prevState) => ({ ...prevState, error: e, isLoading: false }));
+          /* eslint-enable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         }
       }
     }
