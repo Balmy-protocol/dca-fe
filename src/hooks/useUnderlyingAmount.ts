@@ -1,6 +1,7 @@
 import React from 'react';
 import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
+import some from 'lodash/some';
 import usePrevious from 'hooks/usePrevious';
 import { BigNumber } from 'ethers';
 import useMeanApiService from './useMeanApiService';
@@ -18,45 +19,46 @@ function useUnderlyingAmount(
 
   React.useEffect(() => {
     async function callPromise() {
-      if (tokens.length) {
-        try {
-          const indexes = tokens.map((tokenObj, index) => ({
+      if (!tokens.length || some(tokens, { token: undefined })) {
+        return;
+      }
+      try {
+        const indexes = tokens.map((tokenObj, index) => ({
+          ...tokenObj,
+          originalIndex: index,
+        }));
+
+        const filteredTokens = indexes
+          .filter<{ token: Token; amount: BigNumber; originalIndex: number }>(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            (tokenObj) => !!tokenObj.token && !!tokenObj.amount && !tokenObj.returnSame
+          )
+          .map((tokenObj, index) => ({
             ...tokenObj,
-            originalIndex: index,
+            sentIndex: index,
           }));
+        const promiseResult = await meanApiService.getUnderlyingTokens(filteredTokens);
+        const newResults: BigNumber[] = [];
 
-          const filteredTokens = indexes
-            .filter<{ token: Token; amount: BigNumber; originalIndex: number }>(
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              (tokenObj) => !!tokenObj.token && !!tokenObj.amount && !tokenObj.returnSame
-            )
-            .map((tokenObj, index) => ({
-              ...tokenObj,
-              sentIndex: index,
-            }));
-          const promiseResult = await meanApiService.getUnderlyingTokens(filteredTokens);
-          const newResults: BigNumber[] = [];
-
-          indexes
-            .filter<{ token: Token; amount: BigNumber; originalIndex: number }>(
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              (tokenObj) => !!tokenObj.token && !!tokenObj.amount && tokenObj.returnSame
-            )
-            .forEach((tokenObj) => {
-              newResults[tokenObj.originalIndex] = tokenObj.amount;
-            });
-
-          promiseResult.forEach((amount, index) => {
-            const { originalIndex } = filteredTokens[index];
-            newResults[originalIndex] = amount;
+        indexes
+          .filter<{ token: Token; amount: BigNumber; originalIndex: number }>(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            (tokenObj) => !!tokenObj.token && !!tokenObj.amount && tokenObj.returnSame
+          )
+          .forEach((tokenObj) => {
+            newResults[tokenObj.originalIndex] = tokenObj.amount;
           });
 
-          setParams({ isLoading: false, result: newResults, error: undefined });
-        } catch (e) {
-          setParams({ isLoading: false, result: [], error: e as string });
-        }
+        promiseResult.forEach((amount, index) => {
+          const { originalIndex } = filteredTokens[index];
+          newResults[originalIndex] = amount;
+        });
+
+        setParams({ isLoading: false, result: newResults, error: undefined });
+      } catch (e) {
+        setParams({ isLoading: false, result: [], error: e as string });
       }
     }
 
