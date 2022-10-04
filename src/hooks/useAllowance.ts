@@ -75,7 +75,7 @@ function useAllowance(from: Token | undefined | null): AllowanceResponse {
     return [dummyToken, false, undefined];
   }
 
-  return [state.result.allowance ? state.result : prevResult!, state.isLoading, state.error];
+  return [state.result.allowance ? state.result : prevResult || dummyToken, state.isLoading, state.error];
 }
 
 export default useAllowance;
