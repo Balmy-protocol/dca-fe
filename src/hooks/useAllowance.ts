@@ -39,6 +39,7 @@ function useAllowance(from: Token | undefined | null, usesYield?: boolean, versi
     async function callPromise() {
       if (from) {
         try {
+          console.log(from, usesYield, version);
           const promiseResult = await walletService.getAllowance(from, usesYield, version);
           setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
@@ -69,6 +70,8 @@ function useAllowance(from: Token | undefined | null, usesYield?: boolean, versi
     isLoading,
     result,
     error,
+    usesYield,
+    version,
     hasPendingTransactions,
     prevAccount,
     account,
