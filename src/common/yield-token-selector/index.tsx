@@ -22,6 +22,14 @@ const StyledYieldTokenSelectorContainer = styled.div`
   gap: 12px;
 `;
 
+const IconContainer = styled.div`
+  display: flex;
+  width: 20px;
+  height: 20px;
+  justify-content: center;
+  align-items: center;
+`;
+
 const StyledYieldPlatformSelector = styled.div<{ inModal: boolean }>`
   display: flex;
   ${({ inModal }) => (!inModal ? 'flex: 1;align-self: stretch;' : '')}
@@ -166,7 +174,9 @@ const YieldTokenSelector = ({
                       <>
                         <StyledYieldOption onClick={() => setYieldOption(null)}>
                           <StyledYieldOptionDescription>
-                            <CancelIcon fontSize="small" color="error" />
+                            <IconContainer>
+                              <CancelIcon fontSize="small" color="error" />
+                            </IconContainer>
                             <Typography variant="body2">
                               <FormattedMessage description="noYieldOption" defaultMessage="No yield" />
                             </Typography>
@@ -176,7 +186,9 @@ const YieldTokenSelector = ({
                         {availableYieldOptions.map((yieldOption, index) => (
                           <StyledYieldOption key={index} onClick={() => setYieldOption(yieldOption)}>
                             <StyledYieldOptionDescription>
-                              <TokenIcon size="16px" token={yieldOption.token} />
+                              <IconContainer>
+                                <TokenIcon size="16px" token={yieldOption.token} />
+                              </IconContainer>
                               <Typography variant="body2">{yieldOption.name}</Typography>
                             </StyledYieldOptionDescription>
                             <StyledYieldOptionApy>{yieldOption.apy.toFixed(0)}%</StyledYieldOptionApy>
