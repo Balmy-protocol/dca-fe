@@ -143,7 +143,7 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
       },
       {
         id: '363e5586-cfee-402c-9b0b-be70366052e8', // aave-v3 DAI
-        tokenAddress: '0x4a29af8683fFc6259BECcfd583134A0D13BE535c', // aave-v3 DAI
+        tokenAddress: '0x4a29af8683ffc6259beccfd583134a0d13be535c', // aave-v3 DAI
         poolId: '363e5586-cfee-402c-9b0b-be70366052e8', // aave-v3 DAI
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
