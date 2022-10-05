@@ -908,7 +908,7 @@ export default class PositionService {
       let fromToUse =
         newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
       let toToUse =
-        newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
+        newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to;
 
       if (fromYield) {
         fromToUse = {
