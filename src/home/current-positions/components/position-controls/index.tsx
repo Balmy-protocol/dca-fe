@@ -169,7 +169,7 @@ const PositionControls = ({
                 handleClose();
                 onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS);
               }}
-              disabled={disabled}
+              disabled={disabled || !isOnNetwork}
             >
               <Typography variant="body2">
                 <FormattedMessage
@@ -191,7 +191,7 @@ const PositionControls = ({
                 handleClose();
                 onWithdraw(position, false);
               }}
-              disabled={disabled}
+              disabled={disabled || !isOnNetwork}
             >
               <Typography variant="body2">
                 <FormattedMessage
