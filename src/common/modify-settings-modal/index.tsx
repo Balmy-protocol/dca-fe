@@ -73,7 +73,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { to, swapInterval, remainingLiquidity, from } = position;
+  const { to, swapInterval, remainingLiquidity, from, version } = position;
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -101,7 +101,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     }
   }
   const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport;
-  const [allowance] = useAllowance(useWrappedProtocolToken ? wrappedProtocolToken : position.from);
+  const fromHasYield = !!position.from.underlyingTokens.length;
+  const [allowance] = useAllowance(
+    useWrappedProtocolToken ? wrappedProtocolToken : position.from,
+    fromHasYield,
+    version
+  );
   const [balance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount());
   const realBalance = balance && balance.add(position.remainingLiquidity);

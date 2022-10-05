@@ -4,13 +4,15 @@ import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { EMPTY_TOKEN } from 'mocks/tokens';
+import { PositionVersions } from 'config';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
 
 function useAllowance(
   from: Token | undefined | null,
-  usesYield?: boolean
+  usesYield?: boolean,
+  version?: PositionVersions
 ): [{ token: Token; allowance: string } | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const walletService = useWalletService();
@@ -29,7 +31,7 @@ function useAllowance(
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await walletService.getAllowance(from, usesYield);
+          const promiseResult = await walletService.getAllowance(from, usesYield, version);
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {
