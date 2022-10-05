@@ -13,7 +13,7 @@ import ERC20ABI from 'abis/erc20.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { NETWORKS } from 'config/constants';
+import { LATEST_VERSION, NETWORKS, PositionVersions } from 'config/constants';
 import { ERC20Contract } from 'types/contracts';
 import ContractService from './contractService';
 
@@ -159,7 +159,7 @@ export default class WalletService {
     return erc20.balanceOf(account);
   }
 
-  async getAllowance(token: Token, shouldCheckCompanion?: boolean) {
+  async getAllowance(token: Token, shouldCheckCompanion?: boolean, positionVersion: PositionVersions = LATEST_VERSION) {
     const account = this.getAccount();
 
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
@@ -167,8 +167,8 @@ export default class WalletService {
     }
 
     const addressToCheck = shouldCheckCompanion
-      ? await this.contractService.getHUBCompanionAddress()
-      : await this.contractService.getHUBAddress();
+      ? await this.contractService.getHUBCompanionAddress(positionVersion)
+      : await this.contractService.getHUBAddress(positionVersion);
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
