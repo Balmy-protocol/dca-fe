@@ -375,7 +375,7 @@ const ActivePosition = ({
             </StyledDetailWrapper>
           )}
           {(foundYieldFrom || foundYieldTo) && (
-            <StyledDetailWrapper alignItems="flex-end" flex spacing>
+            <StyledDetailWrapper alignItems="flex-start" flex spacing>
               {foundYieldFrom && (
                 <CustomChip
                   icon={
