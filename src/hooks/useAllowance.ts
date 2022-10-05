@@ -31,6 +31,7 @@ function useAllowance(
     async function callPromise() {
       if (from) {
         try {
+          console.log(from, usesYield, version);
           const promiseResult = await walletService.getAllowance(from, usesYield, version);
           setResult(promiseResult);
           setError(undefined);
@@ -64,6 +65,8 @@ function useAllowance(
     isLoading,
     result,
     error,
+    usesYield,
+    version,
     hasPendingTransactions,
     walletService.getAccount(),
     prevBlockNumber,

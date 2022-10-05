@@ -108,7 +108,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     version
   );
   const [balance] = useBalance(fromToUse);
-  const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount());
+  const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
   const realBalance = balance && balance.add(position.remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
 
@@ -318,7 +318,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(fromToUse);
+      const result = await walletService.approveToken(fromToUse, fromHasYield, version);
       const hubAddress = await contractService.getHUBAddress(position.version);
       const companionAddress = await contractService.getHUBCompanionAddress(position.version);
 
@@ -326,7 +326,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: fromToUse,
-          addressFor: to.address === PROTOCOL_TOKEN_ADDRESS ? companionAddress : hubAddress,
+          addressFor: to.address === PROTOCOL_TOKEN_ADDRESS || fromHasYield ? companionAddress : hubAddress,
         },
         position,
       });

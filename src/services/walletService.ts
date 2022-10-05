@@ -180,10 +180,14 @@ export default class WalletService {
     };
   }
 
-  async approveToken(token: Token, shouldUseCompanion = false): Promise<TransactionResponse> {
+  async approveToken(
+    token: Token,
+    shouldUseCompanion = false,
+    positionVersion: PositionVersions = LATEST_VERSION
+  ): Promise<TransactionResponse> {
     const addressToApprove = shouldUseCompanion
-      ? await this.contractService.getHUBCompanionAddress()
-      : await this.contractService.getHUBAddress();
+      ? await this.contractService.getHUBCompanionAddress(positionVersion)
+      : await this.contractService.getHUBAddress(positionVersion);
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
