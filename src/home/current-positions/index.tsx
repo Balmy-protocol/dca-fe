@@ -164,7 +164,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     currentPositions.filter(
       ({ toWithdraw, remainingSwaps }) => toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))
     ),
-    ['version', 'positionId'],
+    ['remainingSwaps', 'version', 'positionId'],
     ['desc', 'desc']
   );
   const positionsFinished = orderBy(
