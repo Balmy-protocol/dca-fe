@@ -302,50 +302,53 @@ export default class PositionService {
 
     this.pastPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
-      const protocolToken = getProtocolToken(network);
-      const wrappedProtocolToken = getWrappedProtocolToken(network);
       if (gqlResult.data) {
         return {
           ...acc,
           ...keyBy(
-            gqlResult.data.positions.map((position: PositionResponse) => ({
-              from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-              to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-              user: position.user,
-              swapInterval: BigNumber.from(position.swapInterval.interval),
-              swapped: BigNumber.from(position.totalSwapped),
-              rate: BigNumber.from(position.rate),
-              remainingLiquidity: BigNumber.from(position.remainingLiquidity),
-              remainingSwaps: BigNumber.from(position.remainingSwaps),
-              withdrawn: BigNumber.from(position.totalWithdrawn),
-              toWithdraw: BigNumber.from(position.toWithdraw),
-              totalSwaps: BigNumber.from(position.totalSwaps),
-              toWithdrawUnderlying: null,
-              remainingLiquidityUnderlying: null,
-              depositedRateUnderlying: position.depositedRateUnderlying
-                ? BigNumber.from(position.depositedRateUnderlying)
-                : null,
-              totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
-                ? BigNumber.from(position.totalSwappedUnderlyingAccum)
-                : null,
-              toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
-                ? BigNumber.from(position.toWithdrawUnderlyingAccum)
-                : null,
-              id: `${position.id}-v${version}`,
-              positionId: position.id,
-              status: position.status,
-              startedAt: position.createdAtTimestamp,
-              totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
-              totalDeposited: BigNumber.from(position.totalDeposited),
-              pendingTransaction: '',
-              pairId: position.pair.id,
-              version,
-              chainId: network,
-              pairLastSwappedAt:
-                (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
-                position.createdAtTimestamp,
-              pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
-            })),
+            gqlResult.data.positions.map((position: PositionResponse) => {
+              const fromToUse = getDisplayToken(position.from, network);
+              const toToUse = getDisplayToken(position.to, network);
+
+              return {
+                from: fromToUse,
+                to: toToUse,
+                user: position.user,
+                swapInterval: BigNumber.from(position.swapInterval.interval),
+                swapped: BigNumber.from(position.totalSwapped),
+                rate: BigNumber.from(position.rate),
+                remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+                remainingSwaps: BigNumber.from(position.remainingSwaps),
+                withdrawn: BigNumber.from(position.totalWithdrawn),
+                toWithdraw: BigNumber.from(position.toWithdraw),
+                totalSwaps: BigNumber.from(position.totalSwaps),
+                toWithdrawUnderlying: null,
+                remainingLiquidityUnderlying: null,
+                depositedRateUnderlying: position.depositedRateUnderlying
+                  ? BigNumber.from(position.depositedRateUnderlying)
+                  : null,
+                totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
+                  ? BigNumber.from(position.totalSwappedUnderlyingAccum)
+                  : null,
+                toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
+                  ? BigNumber.from(position.toWithdrawUnderlyingAccum)
+                  : null,
+                id: `${position.id}-v${version}`,
+                positionId: position.id,
+                status: position.status,
+                startedAt: position.createdAtTimestamp,
+                totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
+                totalDeposited: BigNumber.from(position.totalDeposited),
+                pendingTransaction: '',
+                pairId: position.pair.id,
+                version,
+                chainId: network,
+                pairLastSwappedAt:
+                  (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
+                  position.createdAtTimestamp,
+                pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
+              };
+            }),
             'id'
           ),
         };
@@ -648,6 +651,7 @@ export default class PositionService {
   async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : position.to;
 
     if (
       position.to.address !== PROTOCOL_TOKEN_ADDRESS &&
@@ -672,7 +676,7 @@ export default class PositionService {
         position.positionId,
         this.walletService.getAccount(),
         position.version,
-        useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : position.to.address
+        useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address
       );
     }
     let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
@@ -691,7 +695,7 @@ export default class PositionService {
       position.positionId,
       this.walletService.getAccount(),
       position.version,
-      useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : position.to.address,
+      useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address,
       { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
   }
@@ -732,8 +736,12 @@ export default class PositionService {
         this.walletService.getAccount(),
         this.walletService.getAccount(),
         position.version,
-        position.to.address,
-        position.from.address
+        position.from.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
+          ? wrappedProtocolToken.address
+          : position.from.address,
+        position.to.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
+          ? wrappedProtocolToken.address
+          : position.to.address
       );
     }
 
@@ -759,8 +767,12 @@ export default class PositionService {
       this.walletService.getAccount(),
       this.walletService.getAccount(),
       position.version,
-      position.to.address,
-      position.from.address,
+      position.from.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
+        ? wrappedProtocolToken.address
+        : position.from.address,
+      position.to.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
+        ? wrappedProtocolToken.address
+        : position.to.address,
       {
         permissions,
         deadline: deadline.toString(),
