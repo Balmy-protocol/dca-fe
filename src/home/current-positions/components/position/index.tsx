@@ -386,6 +386,18 @@ const ActivePosition = ({
                       tokenBottom={position.from}
                     />
                   }
+                  tooltip
+                  tooltipTitle={
+                    <FormattedMessage
+                      description="generatingYieldAt"
+                      defaultMessage="Generating {token} at {platform} with {apy}% APY"
+                      values={{
+                        token: position.from.symbol,
+                        apy: foundYieldFrom.apy.toFixed(0),
+                        platform: foundYieldFrom.name,
+                      }}
+                    />
+                  }
                 >
                   <Typography variant="body2" fontWeight={500}>
                     APY {foundYieldFrom.apy.toFixed(0)}%
@@ -396,6 +408,18 @@ const ActivePosition = ({
                 <CustomChip
                   icon={
                     <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo.token} tokenBottom={position.to} />
+                  }
+                  tooltip
+                  tooltipTitle={
+                    <FormattedMessage
+                      description="generatingYieldAt"
+                      defaultMessage="Generating {token} at {platform} with {apy}% APY"
+                      values={{
+                        token: position.to.symbol,
+                        apy: foundYieldTo.apy.toFixed(0),
+                        platform: foundYieldTo.name,
+                      }}
+                    />
                   }
                 >
                   <Typography variant="body2" fontWeight={500}>
