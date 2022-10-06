@@ -184,8 +184,8 @@ export default class MeanApiService {
       {
         positionId: id,
         recipient: recipientSwapped,
-        unswappedConvertFrom: tokenFrom,
-        unswappedConvertTo: tokenTo,
+        unswappedConvertTo: tokenFrom,
+        swappedConvertTo: tokenTo,
         hub: hubAddress,
         permissionPermit,
       }
