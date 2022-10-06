@@ -19,9 +19,19 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import ComposedTokenIcon from 'common/composed-token-icon';
 import CustomChip from 'common/custom-chip';
+import { Theme, Tooltip } from '@mui/material';
 import PositionControls from '../position-controls';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
+
+const DarkTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    // backgroundColor: theme.palette.primary.dark,
+    // color: theme.palette.common.white,
+    boxShadow: theme.shadows[1],
+    fontSize: 11,
+  },
+}))(Tooltip);
 
 const BorderLinearProgress = withStyles(() =>
   createStyles({
@@ -431,13 +441,28 @@ const ActivePosition = ({
           )}
         </StyledContentContainer>
         {remainingSwaps.toNumber() > 0 && (
-          <StyledProgressWrapper>
-            <BorderLinearProgress
-              swaps={remainingSwaps.toNumber()}
-              variant="determinate"
-              value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
-            />
-          </StyledProgressWrapper>
+          <DarkTooltip
+            title={
+              <FormattedMessage
+                description="executedSwapsTooltip"
+                defaultMessage="Executed {executedSwaps}/{totalSwaps} swaps"
+                values={{
+                  executedSwaps: position.totalExecutedSwaps.toString(),
+                  totalSwaps: position.totalSwaps.toString(),
+                }}
+              />
+            }
+            arrow
+            placement="top"
+          >
+            <StyledProgressWrapper>
+              <BorderLinearProgress
+                swaps={remainingSwaps.toNumber()}
+                variant="determinate"
+                value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
+              />
+            </StyledProgressWrapper>
+          </DarkTooltip>
         )}
         <PositionControls
           position={position}
