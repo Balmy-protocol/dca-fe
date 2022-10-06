@@ -336,15 +336,15 @@ const Details = ({
               </Typography>
             </StyledBreakdownLeft>
           </StyledCardHeader>
-          <StyledProgressWrapper>
-            {remainingSwaps.toNumber() > 0 && (
+          {remainingSwaps.toNumber() > 0 && (
+            <StyledProgressWrapper>
               <BorderLinearProgress
                 swaps={remainingSwaps.toNumber()}
                 variant="determinate"
                 value={100 * (executedSwaps / totalSwaps.toNumber())}
               />
-            )}
-          </StyledProgressWrapper>
+            </StyledProgressWrapper>
+          )}
           <StyledDetailWrapper>
             {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
               <StyledFreqLeft>
@@ -597,7 +597,21 @@ const Details = ({
                   values={{ from: position.from.symbol }}
                 />
               </Typography>
-              <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={foundYieldFrom.token} />}>
+              <CustomChip
+                icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={foundYieldFrom.token} />}
+                tooltip
+                tooltipTitle={
+                  <FormattedMessage
+                    description="generatingYieldAt"
+                    defaultMessage="Generating {token} at {platform} with {apy}% APY"
+                    values={{
+                      token: position.to.symbol,
+                      apy: foundYieldFrom.apy.toFixed(0),
+                      platform: foundYieldFrom.name,
+                    }}
+                  />
+                }
+              >
                 <Typography variant="body2" fontWeight={500}>
                   APY {foundYieldFrom.apy.toFixed(0)}%
                 </Typography>
@@ -613,7 +627,21 @@ const Details = ({
                   values={{ to: position.to.symbol }}
                 />
               </Typography>
-              <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={foundYieldTo.token} />}>
+              <CustomChip
+                icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={foundYieldTo.token} />}
+                tooltip
+                tooltipTitle={
+                  <FormattedMessage
+                    description="generatingYieldAt"
+                    defaultMessage="Generating {token} at {platform} with {apy}% APY"
+                    values={{
+                      token: position.to.symbol,
+                      apy: foundYieldTo.apy.toFixed(0),
+                      platform: foundYieldTo.name,
+                    }}
+                  />
+                }
+              >
                 <Typography variant="body2" fontWeight={500}>
                   APY {foundYieldTo.apy.toFixed(0)}%
                 </Typography>
