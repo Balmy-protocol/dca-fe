@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import Typography from '@mui/material/Typography';
+import { withStyles } from '@mui/styles';
+import { Theme, Tooltip, TooltipProps } from '@mui/material';
 
 const StyledChipContainer = styled.div`
   display: flex;
@@ -19,12 +21,20 @@ const StyledChildrenContainer = styled.div``;
 
 const StyledExtraTextContainer = styled(Typography)``;
 
-const CustomChip: React.FC<{ icon: React.ReactNode; extraText?: React.ReactNode }> = ({
-  children,
-  icon,
-  extraText,
-}) => (
-  <StyledChipContainer>
+const DarkTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    // backgroundColor: theme.palette.primary.dark,
+    // color: theme.palette.common.white,
+    boxShadow: theme.shadows[1],
+    fontSize: 11,
+  },
+}))(Tooltip);
+
+const CustomChipContent = React.forwardRef<
+  HTMLDivElement,
+  { icon: React.ReactNode; extraText?: React.ReactNode; children: React.ReactNode }
+>(({ children, icon, extraText, ...otherProps }, ref) => (
+  <StyledChipContainer ref={ref} {...otherProps}>
     <StyledIconContainer>{icon}</StyledIconContainer>
     <StyledChildrenContainer>{children}</StyledChildrenContainer>
     {extraText && (
@@ -33,6 +43,25 @@ const CustomChip: React.FC<{ icon: React.ReactNode; extraText?: React.ReactNode 
       </StyledExtraTextContainer>
     )}
   </StyledChipContainer>
-);
+));
+
+const CustomChip: React.FC<{
+  icon: React.ReactNode;
+  extraText?: React.ReactNode;
+  tooltip?: boolean;
+  tooltipTitle?: React.ReactNode;
+  tooltipPlacement?: TooltipProps['placement'];
+}> = ({ children, icon, extraText, tooltip, tooltipTitle, tooltipPlacement }) =>
+  tooltip ? (
+    <DarkTooltip title={tooltipTitle || ''} arrow placement={tooltipPlacement || 'top'}>
+      <CustomChipContent icon={icon} extraText={extraText}>
+        {children}
+      </CustomChipContent>
+    </DarkTooltip>
+  ) : (
+    <CustomChipContent icon={icon} extraText={extraText}>
+      {children}
+    </CustomChipContent>
+  );
 
 export default CustomChip;
