@@ -5,6 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import { ButtonTypes } from 'common/button';
 import { Position } from 'types';
+import { useHistory } from 'react-router-dom';
+import { changeMainTab } from 'state/tabs/actions';
+import { useAppDispatch } from 'hooks/state';
 
 const StyledSuggestMigrateContainer = styled.div`
   display: flex;
@@ -15,18 +18,14 @@ const StyledSuggestMigrateContainer = styled.div`
 interface SuggestMigrateYieldModalProps {
   onCancel: () => void;
   open: boolean;
-  onMigrate: (position: Position) => void;
   onAddFunds: (position: Position) => void;
   position: Position;
 }
 
-const SuggestMigrateYieldModal = ({
-  open,
-  onCancel,
-  onAddFunds,
-  onMigrate,
-  position,
-}: SuggestMigrateYieldModalProps) => {
+const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: SuggestMigrateYieldModalProps) => {
+  const history = useHistory();
+  const dispatch = useAppDispatch();
+
   const handleCancel = () => {
     onCancel();
   };
@@ -51,11 +50,12 @@ const SuggestMigrateYieldModal = ({
       color: 'migrate',
       variant: 'contained',
       label: (
-        <FormattedMessage description="generateYield" defaultMessage="Migrate position and start generating yield" />
+        <FormattedMessage description="generateYield" defaultMessage="Create a position and start generating yield" />
       ),
       onClick: () => {
         onCancel();
-        onMigrate(position);
+        dispatch(changeMainTab(0));
+        history.push(`/create/${position.chainId}/${position.from.address}/${position.to.address}`);
       },
     },
   ];
@@ -73,13 +73,13 @@ const SuggestMigrateYieldModal = ({
         <Typography variant="body1" textAlign="left">
           <FormattedMessage
             description="whyYouShouldMigrate"
-            defaultMessage="The tokens in this position allow generating yield while your positions gets swapped. We suggest migrating your position so it starts generating yield, if you don't want to do this you can still add funds to your current position and not generate yield."
+            defaultMessage="The tokens in this position allow generating yield while your positions gets swapped. We suggest creating a new position so it starts generating yield, if you don't want to do this you can still add funds to your current position and not generate yield."
           />
         </Typography>
         <Typography variant="body1" textAlign="left">
           <FormattedMessage
             description="howItWorksDescriptionStep1"
-            defaultMessage="We will need to first terminate your position and then open a new one where you will start generating yield. Your historical data from this position will appear as a terminated position"
+            defaultMessage="We send you to the create page with the same tokens specified in your position"
           />
         </Typography>
       </StyledSuggestMigrateContainer>

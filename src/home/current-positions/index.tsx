@@ -225,7 +225,6 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       <SuggestMigrateYieldModal
         onCancel={() => setShowSuggestMigrateYieldModal(false)}
         open={showSuggestMigrateYieldModal}
-        onMigrate={onShowMigrateYield}
         onAddFunds={onShowModifyRateSettings}
         position={selectedPosition}
       />

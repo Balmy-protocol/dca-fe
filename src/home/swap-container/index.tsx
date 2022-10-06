@@ -47,7 +47,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
       dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
     }
 
-    if (toParamToken && !to) {
+    if (toParamToken) {
       dispatch(setTo(toParamToken));
     }
   }, [currentNetwork.chainId]);
