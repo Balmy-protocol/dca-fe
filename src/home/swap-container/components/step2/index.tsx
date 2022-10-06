@@ -154,6 +154,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 withBalance={false}
                 token={from}
                 isMinimal
+                maxWidth="210px"
               />
             </StyledInputContainer>
             {!!usdPrice && (
