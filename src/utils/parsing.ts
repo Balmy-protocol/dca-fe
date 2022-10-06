@@ -196,7 +196,7 @@ export const activePositionsPerIntervalToHasToExecute = (activePositionsPerInter
   some(activePositionsPerInterval, (activePositions) => activePositions !== 0);
 
 export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, remainingSwaps: BigNumber) => {
-  const yieldFromGenerated = (remainingLiquidity || remainingLiquidity).sub(rate.mul(remainingSwaps));
+  const yieldFromGenerated = remainingLiquidity.sub(rate.mul(remainingSwaps));
 
   return {
     total: remainingLiquidity,
