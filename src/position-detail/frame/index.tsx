@@ -51,6 +51,7 @@ import useGqlFetchAll from 'hooks/useGqlFetchAll';
 import useYieldOptions from 'hooks/useYieldOptions';
 import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
 import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
+import Link from '@mui/material/Link';
 import { BigNumber } from 'ethers';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
@@ -228,7 +229,8 @@ const PositionDetailFrame = () => {
     setShowNFTModal(true);
   };
 
-  const onBackToPositions = () => {
+  const onBackToPositions = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     dispatch(changeMainTab(1));
     history.push('/positions');
   };
@@ -431,11 +433,14 @@ const PositionDetailFrame = () => {
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <StyledPositionDetailsContainer container>
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
-          <Button variant="text" color="default" onClick={onBackToPositions}>
-            <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
-              <ArrowBackIcon fontSize="inherit" />{' '}
-              <FormattedMessage description="backToPositions" defaultMessage="Back to positions" />
-            </Typography>
+          <Button variant="text" color="default">
+            {/* <Button variant="text" color="default" onClick={onBackToPositions}> */}
+            <Link href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
+              <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
+                <ArrowBackIcon fontSize="inherit" />{' '}
+                <FormattedMessage description="backToPositions" defaultMessage="Back to positions" />
+              </Typography>
+            </Link>
           </Button>
         </Grid>
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>

@@ -99,7 +99,8 @@ const PositionControls = ({
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
 
-  const onViewDetails = () => {
+  const onViewDetails = (event: React.MouseEvent) => {
+    event.preventDefault();
     dispatch(setPosition(null));
     dispatch(changePositionDetailsTab(0));
     history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
@@ -205,15 +206,21 @@ const PositionControls = ({
             </MenuItem>
           )}
           <MenuItem
-            onClick={() => {
+            onClick={(e) => {
               handleClose();
-              onViewDetails();
+              onViewDetails(e);
             }}
             disabled={disabled}
           >
-            <Typography variant="body2">
-              <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
-            </Typography>
+            <Link
+              href={`/${chainId}/positions/${position.version}/${position.positionId}`}
+              underline="none"
+              color="inherit"
+            >
+              <Typography variant="body2">
+                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+              </Typography>
+            </Link>
           </MenuItem>
         </StyledMenu>
       </>
