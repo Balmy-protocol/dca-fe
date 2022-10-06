@@ -31,6 +31,7 @@ import {
   NETWORKS,
   MAX_UINT_32,
   LATEST_VERSION,
+  ONE_WEEK,
 } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -188,6 +189,22 @@ const Swap = ({
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null
   );
 
+  const fromCanHaveYield = !!(
+    from && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(from.address)).length
+  );
+  const toCanHaveYield = !!(
+    to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
+  );
+
+  // only allowed if set for 10 days and at least 10 USD
+  const shouldEnableYield =
+    yieldEnabled &&
+    (fromCanHaveYield || toCanHaveYield) &&
+    !!frequencyValue &&
+    BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK) &&
+    !!usdPrice &&
+    usdPrice >= 10;
+
   React.useEffect(() => {
     if (!from) return;
     setRate(
@@ -239,10 +256,11 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(from, !!fromYield?.tokenAddress);
-      const hubAddress = fromYield?.tokenAddress
-        ? await contractService.getHUBCompanionAddress()
-        : await contractService.getHUBAddress();
+      const result = await walletService.approveToken(from, !!(shouldEnableYield && fromYield?.tokenAddress));
+      const hubAddress =
+        shouldEnableYield && fromYield?.tokenAddress
+          ? await contractService.getHUBCompanionAddress()
+          : await contractService.getHUBAddress();
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
@@ -290,8 +308,8 @@ const Swap = ({
         fromValue,
         frequencyType,
         frequencyValue,
-        fromYield?.tokenAddress,
-        toYield?.tokenAddress
+        shouldEnableYield ? fromYield?.tokenAddress : undefined,
+        shouldEnableYield ? toYield?.tokenAddress : undefined
       );
       const hubAddress = await contractService.getHUBAddress();
       const companionAddress = await contractService.getHUBCompanionAddress();
@@ -301,8 +319,8 @@ const Swap = ({
         typeData: {
           from,
           to,
-          fromYield: fromYield?.tokenAddress,
-          toYield: toYield?.tokenAddress,
+          fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
+          toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
           fromValue,
           frequencyType: frequencyType.toString(),
           frequencyValue,
@@ -507,15 +525,6 @@ const Swap = ({
             allowance.token.address === from.address &&
             parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
-
-  const fromCanHaveYield = !!(
-    from && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(from.address)).length
-  );
-  const toCanHaveYield = !!(
-    to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
-  );
-
-  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield);
 
   const shouldDisableApproveButton =
     !from ||
