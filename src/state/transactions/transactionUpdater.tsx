@@ -139,6 +139,7 @@ export default function Updater(): null {
                   id: ethers.utils.hexValue(receipt.logs[receipt.logs.length - 1].data),
                 };
               }
+
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
                 const parsedLog = await transactionService.parseLog(receipt.logs, currentNetwork.chainId, 'Deposited');
                 extendedTypeData = {
@@ -146,6 +147,7 @@ export default function Updater(): null {
                   id: parsedLog.args.positionId.toString(),
                 };
               }
+
               if (
                 transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION ||
                 transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION_YIELD
@@ -188,24 +190,25 @@ export default function Updater(): null {
                 })
               );
 
-              enqueueSnackbar(
-                buildTransactionMessage({
-                  ...transactions[hash],
-                  typeData: {
-                    ...transactions[hash].typeData,
-                    ...extendedTypeData,
-                  },
-                }),
-                {
-                  variant: 'success',
-                  anchorOrigin: {
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  },
-                  action: () => <EtherscanLink hash={hash} />,
-                  TransitionComponent: Zoom,
-                }
-              );
+              // console.log('does not die before enqueue snackbar');
+              // enqueueSnackbar(
+              //   buildTransactionMessage({
+              //     ...transactions[hash],
+              //     typeData: {
+              //       ...transactions[hash].typeData,
+              //       ...extendedTypeData,
+              //     },
+              //   }),
+              //   {
+              //     variant: 'success',
+              //     anchorOrigin: {
+              //       vertical: 'bottom',
+              //       horizontal: 'right',
+              //     },
+              //     action: () => <EtherscanLink hash={hash} />,
+              //     TransitionComponent: Zoom,
+              //   }
+              // );
 
               // the receipt was fetched before the block, fast forward to that block to trigger balance updates
               if (receipt.blockNumber > lastBlockNumber) {
