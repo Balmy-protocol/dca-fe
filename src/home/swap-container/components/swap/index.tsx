@@ -850,6 +850,7 @@ const Swap = ({
           buttonToShow={ButtonToShow}
           yieldEnabled={shouldEnableYield}
           setYieldEnabled={setYieldEnabled}
+          fromCanHaveYield={fromCanHaveYield}
           yieldOptions={yieldOptions}
           isLoadingYieldOptions={isLoadingYieldOptions}
           fromYield={fromYield}
