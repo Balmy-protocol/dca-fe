@@ -373,6 +373,9 @@ const Details = ({
           <StyledDetailWrapper>
             {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
               <StyledFreqLeft>
+                <Typography variant="body1" color="rgba(255, 255, 255, 0.5)" textTransform="none">
+                  <FormattedMessage description="positionDetailsRemainingTimeTitle" defaultMessage="Time left:" />
+                </Typography>
                 <Typography variant="body2">
                   <FormattedMessage
                     description="days to finish"
@@ -422,6 +425,22 @@ const Details = ({
                 </Typography>
               </StyledDeprecated>
             )}
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="positionDetailsExecutedTitle" defaultMessage="Executed:" />
+            </Typography>
+            <Typography
+              variant="body1"
+              color={executedSwaps ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              sx={{ marginLeft: '5px' }}
+            >
+              <FormattedMessage
+                description="positionDetailsExecuted"
+                defaultMessage="{swaps} swap{plural}"
+                values={{ swaps: executedSwaps, plural: executedSwaps !== 1 ? 's' : '' }}
+              />
+            </Typography>
           </StyledDetailWrapper>
           <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
@@ -571,22 +590,6 @@ const Details = ({
               )}
             </StyledDetailWrapper>
           )}
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="positionDetailsExecutedTitle" defaultMessage="Executed:" />
-            </Typography>
-            <Typography
-              variant="body1"
-              color={executedSwaps ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              <FormattedMessage
-                description="positionDetailsExecuted"
-                defaultMessage="{swaps} swap{plural}"
-                values={{ swaps: executedSwaps, plural: executedSwaps !== 1 ? 's' : '' }}
-              />
-            </Typography>
-          </StyledDetailWrapper>
           {/* <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
