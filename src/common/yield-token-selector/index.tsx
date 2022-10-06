@@ -139,7 +139,7 @@ const YieldTokenSelector = ({
           <Typography variant="body2">
             <FormattedMessage
               description="noYieldAvailable"
-              defaultMessage="This token does not have an available yield platform"
+              defaultMessage="We currently don't support any platform to generate yield with this token"
             />
           </Typography>
         )}
