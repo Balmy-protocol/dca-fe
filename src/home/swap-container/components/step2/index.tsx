@@ -229,6 +229,22 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 />
               </StyledYieldTokensContainer>
             )}
+            {!yieldEnabled && usdPrice && usdPrice < 10 && (
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="disabledByUsdValue"
+                  defaultMessage="You have to invest at least $10 USD to enable this option."
+                />
+              </Typography>
+            )}
+            {!yieldEnabled && usdPrice && usdPrice >= 10 && (
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="disabledByUsdValue"
+                  defaultMessage="You have to set your position to run for at least 1 week to enable this option."
+                />
+              </Typography>
+            )}
             <StyledYieldHelpContainer variant="body1" onClick={() => setHelpExpanded(!isHelpExpanded)}>
               <HelpOutlineOutlinedIcon fontSize="inherit" color="primary" />
               <FormattedMessage description="howItWorks" defaultMessage="How it works" />
