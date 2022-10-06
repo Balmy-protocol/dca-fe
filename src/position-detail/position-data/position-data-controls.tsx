@@ -68,7 +68,7 @@ const PositionDataControls = ({
 
   const isOwner = account && account.toLowerCase() === position.user.toLowerCase();
 
-  if (!isOwner) return null;
+  if (!isOwner || position.status === 'TERMINATED') return null;
 
   if (isPending) {
     return (
