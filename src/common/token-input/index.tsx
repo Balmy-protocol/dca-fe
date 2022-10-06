@@ -13,9 +13,10 @@ import { createStyles, FilledInput } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { formatCurrencyAmount } from 'utils/currency';
 
-const StyledInputContainer = styled.div`
+const StyledInputContainer = styled.div<{ maxWidth?: string }>`
   display: inline-flex;
   margin: 0px 6px;
+  ${({ maxWidth }) => (maxWidth ? `max-width: ${maxWidth};` : '')}
 `;
 
 const StyledTokenInputContainer = styled.div`
@@ -54,6 +55,7 @@ interface TokenInputProps {
   fullWidth?: boolean;
   withMax?: boolean;
   withHalf?: boolean;
+  maxWidth?: string;
 }
 
 const TokenInput = ({
@@ -69,6 +71,7 @@ const TokenInput = ({
   fullWidth,
   withHalf,
   withMax,
+  maxWidth,
 }: TokenInputProps) => {
   const validator = (nextValue: string) => {
     // sanitize value
@@ -111,7 +114,7 @@ const TokenInput = ({
 
   if (isMinimal) {
     return (
-      <StyledInputContainer>
+      <StyledInputContainer maxWidth={maxWidth}>
         <StyledFilledInput
           id={id}
           value={value}
