@@ -197,7 +197,7 @@ const ActivePosition = ({
 
   const { yieldGenerated: yieldFromGenerated, base: remainingLiquidity } = calculateYield(
     remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw),
-    rate,
+    rateToUse,
     remainingSwaps
   );
 
