@@ -178,8 +178,8 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
   icon: <CompareArrowsIcon />,
   content: () => {
     const swapped = positionState.swappedUnderlying || positionState.swapped;
-    const rate = positionState.depositedRateUnderlying || positionState.rate;
-    const yieldFrom = BigNumber.from(positionState.rateUnderlying || rate).sub(rate);
+    const rate = positionState.rateUnderlying || positionState.rate;
+    const yieldFrom = BigNumber.from(rate).sub(rate);
     const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
       position.to,
       BigNumber.from(swapped),
@@ -367,7 +367,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
           </StyledTitleMainText>
           <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
             <Typography variant="body1">
-              {formatCurrencyAmount(BigNumber.from(positionState.rate), position.from)}
+              {formatCurrencyAmount(BigNumber.from(positionState.rateUnderlying || positionState.rate), position.from)}
             </Typography>
           </CustomChip>
         </StyledTimelineWrappedContent>

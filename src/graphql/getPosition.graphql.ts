@@ -140,6 +140,7 @@ const getPosition = gql`
         ... on CreatedAction {
           rate
           remainingSwaps
+          rateUnderlying
           permissions {
             operator
             id
