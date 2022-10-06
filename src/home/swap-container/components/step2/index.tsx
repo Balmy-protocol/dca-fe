@@ -86,6 +86,7 @@ interface SwapSecondStepProps {
   handleRateValueChange: (newValue: string) => void;
   frequencyType: BigNumber;
   frequencyValue: string;
+  fromCanHaveYield: boolean;
   handleFrequencyChange: (newValue: string) => void;
   buttonToShow: React.ReactNode;
   show: boolean;
@@ -124,6 +125,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
     toYield,
     setFromYield,
     setToYield,
+    fromCanHaveYield,
   } = props;
 
   const [isHelpExpanded, setHelpExpanded] = React.useState(false);
@@ -174,7 +176,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 isMinimal
               />
             </StyledInputContainer>
-            {yieldEnabled && (
+            {yieldEnabled && fromCanHaveYield && fromYield !== null && (
               <Typography variant="body1" component="span">
                 <FormattedMessage description="yield detail" defaultMessage="+ yield" />
               </Typography>
