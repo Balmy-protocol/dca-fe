@@ -425,7 +425,6 @@ const PositionDetailFrame = () => {
       <SuggestMigrateYieldModal
         open={showSuggestMigrateYieldModal}
         position={fullPositionToMappedPosition(positionInUse)}
-        onMigrate={() => setShowMigrateYieldModal(true)}
         onAddFunds={onShowModifyRateSettings}
         onCancel={() => setShowSuggestMigrateYieldModal(false)}
       />
