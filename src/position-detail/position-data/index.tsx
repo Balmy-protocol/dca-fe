@@ -31,7 +31,17 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { updateShowBreakdown } from 'state/position-details/actions';
+import { Theme, Tooltip } from '@mui/material';
 import PositionDataControls from './position-data-controls';
+
+const DarkTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    // backgroundColor: theme.palette.primary.dark,
+    // color: theme.palette.common.white,
+    boxShadow: theme.shadows[1],
+    fontSize: 11,
+  },
+}))(Tooltip);
 
 interface DetailsProps {
   position: FullPosition;
@@ -337,13 +347,28 @@ const Details = ({
             </StyledBreakdownLeft>
           </StyledCardHeader>
           {remainingSwaps.toNumber() > 0 && (
-            <StyledProgressWrapper>
-              <BorderLinearProgress
-                swaps={remainingSwaps.toNumber()}
-                variant="determinate"
-                value={100 * (executedSwaps / totalSwaps.toNumber())}
-              />
-            </StyledProgressWrapper>
+            <DarkTooltip
+              title={
+                <FormattedMessage
+                  description="executedSwapsTooltip"
+                  defaultMessage="Executed {executedSwaps}/{totalSwaps} swaps"
+                  values={{
+                    executedSwaps: position.totalExecutedSwaps.toString(),
+                    totalSwaps: position.totalSwaps.toString(),
+                  }}
+                />
+              }
+              arrow
+              placement="top"
+            >
+              <StyledProgressWrapper>
+                <BorderLinearProgress
+                  swaps={remainingSwaps.toNumber()}
+                  variant="determinate"
+                  value={100 * (executedSwaps / totalSwaps.toNumber())}
+                />
+              </StyledProgressWrapper>
+            </DarkTooltip>
           )}
           <StyledDetailWrapper>
             {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
