@@ -40,7 +40,7 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
     {
       color: 'secondary',
       variant: 'contained',
-      label: <FormattedMessage description="addFunds" defaultMessage="Add funds" />,
+      label: <FormattedMessage description="addFundsExisting" defaultMessage="Add funds to existing position" />,
       onClick: () => {
         onCancel();
         onAddFunds(position);
@@ -79,7 +79,7 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
         <Typography variant="body1" textAlign="left">
           <FormattedMessage
             description="howItWorksDescriptionStep1"
-            defaultMessage="We send you to the create page with the same tokens specified in your position"
+            defaultMessage="We will send you to the create page with the same tokens specified in your position"
           />
         </Typography>
       </StyledSuggestMigrateContainer>
