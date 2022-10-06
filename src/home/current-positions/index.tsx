@@ -183,8 +183,11 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setSelectedPosition(position);
     dispatch(
       initializeModifyRateSettings({
-        fromValue: formatUnits(position.remainingLiquidity, position.from.decimals),
-        rate: formatUnits(position.rate, position.from.decimals),
+        fromValue: formatUnits(
+          (position.depositedRateUnderlying || position.rate).mul(position.remainingSwaps),
+          position.from.decimals
+        ),
+        rate: formatUnits(position.depositedRateUnderlying || position.rate, position.from.decimals),
         frequencyValue: position.remainingSwaps.toString(),
         modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0)) ? FULL_DEPOSIT_TYPE : RATE_TYPE,
       })
