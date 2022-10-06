@@ -73,7 +73,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { to, swapInterval, remainingLiquidity, from, version } = position;
+  const { to, swapInterval, from, version, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -87,6 +87,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const currentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [hasSignSupport] = useSupportsSigning();
+  const remainingLiquidity = (depositedRateUnderlying || oldRate).mul(remainingSwaps);
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
 
   let fromToUse = position.from;
@@ -109,7 +110,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   );
   const [balance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
-  const realBalance = balance && balance.add(position.remainingLiquidity);
+  const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
 
   const cantFund =
@@ -120,7 +121,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
     parseUnits(fromValue, fromToUse.decimals).gt(realBalance);
 
-  const isIncreasingPosition = position.remainingLiquidity
+  const isIncreasingPosition = remainingLiquidity
     .sub(parseUnits(fromValue || '0', fromToUse.decimals))
     .lte(BigNumber.from(0));
 
@@ -132,7 +133,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     isIncreasingPosition &&
     !hasPendingApproval &&
     parseUnits(allowance.allowance, fromToUse.decimals).lt(
-      position.remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
+      remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
     );
 
   const handleCancel = () => {
@@ -503,7 +504,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         </Grid>
         <Grid item xs={12}>
           {remainingLiquidity.gt(BigNumber.from(0)) &&
-            !position.remainingLiquidity
+            !remainingLiquidity
               .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
               .eq(BigNumber.from(0)) && (
               <Typography variant="body2">
@@ -514,7 +515,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     values={{
                       from: fromToUse.symbol,
                       addAmmount: formatUnits(
-                        position.remainingLiquidity
+                        remainingLiquidity
                           .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
                           .abs(),
                         fromToUse.decimals
@@ -528,7 +529,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     values={{
                       from: fromToUse.symbol,
                       returnAmmount: formatUnits(
-                        position.remainingLiquidity
+                        remainingLiquidity
                           .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
                           .abs(),
                         fromToUse.decimals

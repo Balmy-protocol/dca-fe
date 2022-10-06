@@ -172,9 +172,7 @@ const PositionDetailFrame = () => {
       },
       {
         token: positionInUse?.from,
-        amount: positionInUse
-          ? BigNumber.from(positionInUse.rate).mul(BigNumber.from(positionInUse.remainingSwaps))
-          : null,
+        amount: positionInUse ? BigNumber.from(positionInUse.remainingLiquidity) : null,
         returnSame: !positionInUse?.from.underlyingTokens.length,
       },
     ]);
@@ -391,10 +389,13 @@ const PositionDetailFrame = () => {
       return;
     }
 
+    const rateToUse = BigNumber.from(positionInUse.depositedRateUnderlying || positionInUse.rate);
+    const remainingLiquidityToUse = rateToUse.mul(BigNumber.from(positionInUse.remainingSwaps));
+
     dispatch(
       initializeModifyRateSettings({
-        fromValue: formatUnits(positionInUse.remainingLiquidity, positionInUse.from.decimals),
-        rate: formatUnits(positionInUse.rate, positionInUse.from.decimals),
+        fromValue: formatUnits(remainingLiquidityToUse, positionInUse.from.decimals),
+        rate: formatUnits(rateToUse, positionInUse.from.decimals),
         frequencyValue: positionInUse.remainingSwaps.toString(),
         modeType: RATE_TYPE,
       })

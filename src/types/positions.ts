@@ -119,7 +119,6 @@ export interface ActionState {
   withdrawn: string;
   permissions: PositionPermission[];
   ratioBToAWithFee: string;
-  depositedRateUnderlying: string;
   swappedUnderlying: string;
   oldRateUnderlying: string;
   withdrawnUnderlying: string;

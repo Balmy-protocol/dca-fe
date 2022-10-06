@@ -786,7 +786,7 @@ export default class PositionService {
 
   async modifyRateAndSwaps(
     position: Position,
-    newRate: string,
+    newRateUnderlying: string,
     newSwaps: string,
     useWrappedProtocolToken: boolean
   ): Promise<TransactionResponse> {
@@ -811,34 +811,37 @@ export default class PositionService {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
-    const newAmount = BigNumber.from(parseUnits(newRate, position.from.decimals)).mul(BigNumber.from(newSwaps));
+    const newAmount = BigNumber.from(parseUnits(newRateUnderlying, position.from.decimals)).mul(
+      BigNumber.from(newSwaps)
+    );
+    const remainingLiquidity = (position.depositedRateUnderlying || position.rate).mul(position.remainingSwaps);
 
     const hasYield = position.from.underlyingTokens.length;
 
     if ((position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) && !hasYield) {
-      if (newAmount.gte(position.remainingLiquidity)) {
+      if (newAmount.gte(remainingLiquidity)) {
         return hubInstance.increasePosition(
           position.positionId,
-          newAmount.sub(position.remainingLiquidity),
+          newAmount.sub(remainingLiquidity),
           BigNumber.from(newSwaps)
         );
       }
 
       return hubInstance.reducePosition(
         position.positionId,
-        position.remainingLiquidity.sub(newAmount),
+        remainingLiquidity.sub(newAmount),
         BigNumber.from(newSwaps),
         this.walletService.getAccount()
       );
     }
 
-    if (newAmount.gte(position.remainingLiquidity)) {
+    if (newAmount.gte(remainingLiquidity)) {
       const companionHasIncrease = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
 
       if (companionHasIncrease) {
         return this.meanApiService.increasePositionUsingOtherToken(
           position.positionId,
-          newAmount.sub(position.remainingLiquidity),
+          newAmount.sub(remainingLiquidity),
           BigNumber.from(newSwaps),
           position.version,
           position.from.address
@@ -853,7 +856,7 @@ export default class PositionService {
 
       return this.meanApiService.increasePositionUsingOtherToken(
         position.positionId,
-        newAmount.sub(position.remainingLiquidity),
+        newAmount.sub(remainingLiquidity),
         BigNumber.from(newSwaps),
         position.version,
         position.from.address,
@@ -873,7 +876,7 @@ export default class PositionService {
     if (companionHasReduce) {
       return this.meanApiService.reducePositionUsingOtherToken(
         position.positionId,
-        position.remainingLiquidity.sub(newAmount),
+        remainingLiquidity.sub(newAmount),
         BigNumber.from(newSwaps),
         this.walletService.getAccount(),
         position.version,
@@ -889,7 +892,7 @@ export default class PositionService {
 
     return this.meanApiService.reducePositionUsingOtherToken(
       position.positionId,
-      position.remainingLiquidity.sub(newAmount),
+      remainingLiquidity.sub(newAmount),
       BigNumber.from(newSwaps),
       this.walletService.getAccount(),
       position.version,

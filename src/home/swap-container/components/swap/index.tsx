@@ -196,14 +196,13 @@ const Swap = ({
     to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
   );
 
+  const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
+  const hasEnoughUsdForYield = !!usdPrice && usdPrice >= 10;
+
   // only allowed if set for 10 days and at least 10 USD
-  const shouldEnableYield =
-    yieldEnabled &&
-    (fromCanHaveYield || toCanHaveYield) &&
-    !!frequencyValue &&
-    BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK) &&
-    !!usdPrice &&
-    usdPrice >= 10;
+  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield);
+  // isAtLeastAWeek &&
+  // hasEnoughUsdForYield;
 
   React.useEffect(() => {
     if (!from) return;
