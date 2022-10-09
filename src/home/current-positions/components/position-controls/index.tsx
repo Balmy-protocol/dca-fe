@@ -22,6 +22,7 @@ import useWalletService from 'hooks/useWalletService';
 import { useAppDispatch } from 'state/hooks';
 import { setPosition } from 'state/position-details/actions';
 import { changePositionDetailsTab } from 'state/tabs/actions';
+import useTokenList from 'hooks/useTokenList';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -98,6 +99,7 @@ const PositionControls = ({
   const dispatch = useAppDispatch();
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
+  const tokenList = useTokenList();
 
   const onViewDetails = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -134,12 +136,16 @@ const PositionControls = ({
 
   const showSwitchAction = !isOnNetwork;
 
+  const fromIsSupportedInNewVersion = !!tokenList[position.from.address];
+  const toIsSupportedInNewVersion = !!tokenList[position.to.address];
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
 
-  const shouldShowMigrate = hasSignSupport && remainingSwaps.gt(BigNumber.from(0));
+  const shouldShowMigrate =
+    hasSignSupport && remainingSwaps.gt(BigNumber.from(0)) && toIsSupportedInNewVersion && fromIsSupportedInNewVersion;
 
-  const shouldMigrateToYield = !!(fromSupportsYield || toSupportsYield);
+  const shouldMigrateToYield =
+    !!(fromSupportsYield || toSupportsYield) && toIsSupportedInNewVersion && fromIsSupportedInNewVersion;
 
   const canAddFunds = VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
