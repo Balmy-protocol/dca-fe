@@ -15,6 +15,7 @@ import useSupportsSigning from 'hooks/useSupportsSigning';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { fullPositionToMappedPosition } from 'utils/parsing';
 import useWeb3Service from 'hooks/useWeb3Service';
+import useTokenList from 'hooks/useTokenList';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -50,6 +51,7 @@ const PositionDataControls = ({
   const network = useCurrentNetwork();
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
+  const tokenList = useTokenList();
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -107,10 +109,13 @@ const PositionDataControls = ({
     );
   }
 
+  const fromIsSupportedInNewVersion = !!tokenList[position.from.address];
+  const toIsSupportedInNewVersion = !!tokenList[position.to.address];
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
 
-  const shouldMigrateToYield = !!(fromSupportsYield || toSupportsYield);
+  const shouldMigrateToYield =
+    !!(fromSupportsYield || toSupportsYield) && fromIsSupportedInNewVersion && toIsSupportedInNewVersion;
 
   const shouldShowMigrate = hasSignSupport && shouldMigrateToYield && remainingSwaps.gt(BigNumber.from(0));
 
