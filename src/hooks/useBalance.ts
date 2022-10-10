@@ -69,6 +69,9 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
     account,
     prevBlockNumber,
     blockNumber,
+    prevFrom,
+    walletService,
+    prevPendingTrans,
   ]);
 
   if (!from) {
