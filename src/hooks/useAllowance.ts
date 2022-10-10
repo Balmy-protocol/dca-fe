@@ -19,7 +19,11 @@ const dummyToken: Allowance = { token: EMPTY_TOKEN, allowance: undefined };
 
 function useAllowance(from: Token | undefined | null): AllowanceResponse {
   const walletService = useWalletService();
-  const [state, setState] = React.useState({ isLoading: false, result: dummyToken, error: undefined });
+  const [{ result, isLoading, error }, setState] = React.useState<{
+    isLoading: boolean;
+    result: Allowance;
+    error?: string;
+  }>({ isLoading: false, result: dummyToken, error: undefined });
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
@@ -28,24 +32,22 @@ function useAllowance(from: Token | undefined | null): AllowanceResponse {
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
-  const prevResult = usePrevious(state.result, false, 'allowance');
+  const prevResult = usePrevious(result, false, 'allowance');
 
   React.useEffect(() => {
     async function callPromise() {
       if (from) {
         try {
           const promiseResult = await walletService.getAllowance(from);
-          setState((prevState) => ({ ...prevState, result: promiseResult, error: undefined, isLoading: false }));
+          setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
-          /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-          setState((prevState) => ({ ...prevState, error: e, isLoading: false }));
-          /* eslint-enable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+          setState({ result: dummyToken, error: e as string, isLoading: false });
         }
       }
     }
 
     if (
-      (!state.isLoading && !state.result && !state.error) ||
+      (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
@@ -63,9 +65,9 @@ function useAllowance(from: Token | undefined | null): AllowanceResponse {
   }, [
     from,
     prevFrom,
-    state.isLoading,
-    state.result,
-    state.error,
+    isLoading,
+    result,
+    error,
     hasPendingTransactions,
     prevAccount,
     account,
@@ -77,7 +79,7 @@ function useAllowance(from: Token | undefined | null): AllowanceResponse {
     return [dummyToken, false, undefined];
   }
 
-  return [state.result.allowance ? state.result : prevResult || dummyToken, state.isLoading, state.error];
+  return [result.allowance ? result : prevResult || dummyToken, isLoading, error];
 }
 
 export default useAllowance;
