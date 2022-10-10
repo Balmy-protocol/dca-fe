@@ -128,6 +128,7 @@ export default function Updater(): null {
     Object.keys(transactions)
       .filter((hash) => shouldCheck(lastBlockNumber, transactions[hash]))
       .forEach((hash) => {
+        console.log('will try to get the receipt');
         const promise = getReceipt(hash);
         promise
           .then(async (receipt) => {
@@ -190,25 +191,24 @@ export default function Updater(): null {
                 })
               );
 
-              // console.log('does not die before enqueue snackbar');
-              // enqueueSnackbar(
-              //   buildTransactionMessage({
-              //     ...transactions[hash],
-              //     typeData: {
-              //       ...transactions[hash].typeData,
-              //       ...extendedTypeData,
-              //     },
-              //   }),
-              //   {
-              //     variant: 'success',
-              //     anchorOrigin: {
-              //       vertical: 'bottom',
-              //       horizontal: 'right',
-              //     },
-              //     action: () => <EtherscanLink hash={hash} />,
-              //     TransitionComponent: Zoom,
-              //   }
-              // );
+              enqueueSnackbar(
+                buildTransactionMessage({
+                  ...transactions[hash],
+                  typeData: {
+                    ...transactions[hash].typeData,
+                    ...extendedTypeData,
+                  },
+                }),
+                {
+                  variant: 'success',
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  },
+                  action: () => <EtherscanLink hash={hash} />,
+                  TransitionComponent: Zoom,
+                }
+              );
 
               // the receipt was fetched before the block, fast forward to that block to trigger balance updates
               if (receipt.blockNumber > lastBlockNumber) {
@@ -218,6 +218,8 @@ export default function Updater(): null {
               // eslint-disable-next-line @typescript-eslint/no-floating-promises
               checkIfTransactionExists(hash);
             }
+
+            console.log('finally returns true');
             return true;
           })
           .catch((error) => {

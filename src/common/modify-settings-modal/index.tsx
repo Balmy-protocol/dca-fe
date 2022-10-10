@@ -73,6 +73,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
+  console.log('1 - gets here');
   const { to, swapInterval, from, version, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
@@ -103,14 +104,15 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   }
   const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport;
   const fromHasYield = !!position.from.underlyingTokens.length;
-  const [allowance] = useAllowance(
-    useWrappedProtocolToken ? wrappedProtocolToken : position.from,
-    fromHasYield,
-    version
-  );
-  const [balance] = useBalance(fromToUse);
+  // const [allowance] = useAllowance(
+  //   useWrappedProtocolToken ? wrappedProtocolToken : position.from,
+  //   fromHasYield,
+  //   version
+  // );
+  // const [balance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
-  const realBalance = balance && balance.add(remainingLiquidity);
+  const realBalance = remainingLiquidity;
+  // const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
 
   const cantFund =
@@ -128,13 +130,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const needsToApprove =
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
     position.user === walletService.getAccount().toLowerCase() &&
-    allowance &&
-    allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
+    // allowance &&
+    // allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
     isIncreasingPosition &&
-    !hasPendingApproval &&
-    parseUnits(allowance.allowance, fromToUse.decimals).lt(
-      remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
-    );
+    !hasPendingApproval;
+  // parseUnits(allowance.allowance, fromToUse.decimals).lt(
+  //   remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
+  // );
 
   const handleCancel = () => {
     onCancel();
@@ -407,6 +409,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     ];
   }
 
+  console.log('In the end gets here');
   return (
     <Modal
       open={open}

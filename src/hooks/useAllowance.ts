@@ -61,15 +61,18 @@ function useAllowance(
     }
   }, [
     from,
+    prevFrom,
     isLoading,
     result,
     error,
     usesYield,
     version,
     hasPendingTransactions,
-    walletService.getAccount(),
+    prevPendingTrans,
     prevBlockNumber,
     blockNumber,
+    account,
+    walletService,
   ]);
 
   if (!from) {

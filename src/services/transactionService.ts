@@ -49,6 +49,8 @@ export default class TransactionService {
   }
 
   async parseLog(logs: Log[], chainId: number, eventToSearch: string) {
+    const hubAddress = await this.contractService.getHUBAddress();
+
     const hubInstance = await this.contractService.getHubInstance();
 
     const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
@@ -56,23 +58,26 @@ export default class TransactionService {
     const hubCompanionAddress = await this.contractService.getHUBCompanionAddress();
 
     const parsedLogs: LogDescription[] = [];
+
     logs.forEach((log) => {
       try {
         let parsedLog;
 
         if (log.address === hubCompanionAddress) {
           parsedLog = hubCompanionInstance.interface.parseLog(log);
-        } else {
+        } else if (log.address === hubAddress) {
           parsedLog = hubInstance.interface.parseLog(log);
         }
 
-        if (parsedLog.name === eventToSearch) {
+        if (parsedLog && parsedLog.name === eventToSearch) {
           parsedLogs.push(parsedLog);
         }
       } catch (e) {
         console.error(e);
       }
     });
+
+    console.log('parsedLogs', parsedLogs.length, parsedLogs[0]);
 
     return parsedLogs[0];
   }
