@@ -88,7 +88,7 @@ interface TimelineProps {
 const MinimalTimeline = ({ items }: TimelineProps) => (
   <StyledTimeline container>
     {items.map((item) => (
-      <StyledTimelineContainer item xs={12}>
+      <StyledTimelineContainer item xs={12} key={item.link}>
         {item.icon ? <StyledTimelineIcon hasIcon>{item.icon}</StyledTimelineIcon> : <StyledTimelineIcon />}
         <StyledTimelineContent>
           <Typography variant="body1">{item.content}</Typography>

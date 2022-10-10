@@ -545,6 +545,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                     }
                   }}
                   sx={{ cursor: 'pointer' }}
+                  key={positionCountLabel.name}
                 >
                   <Grid item xs={1}>
                     <StyledBullet fill={positionCountLabel.fill} />

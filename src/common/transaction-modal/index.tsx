@@ -207,30 +207,39 @@ const TransactionModalProvider: React.FC = ({ children }) => {
   const [errorConfig, setErrorConfig] = React.useState<ErrorConfig>({ content: null });
   const [selectedConfig, setSelectedConfig] = React.useState<'loading' | 'success' | 'error' | 'closed'>('closed');
 
-  const setLoadingConfigContext = (config: LoadingConfig) => {
-    setLoadingConfig({
-      ...defaultLoadingConfig,
-      ...config,
-    });
-    setSelectedConfig('loading');
-  };
-  const setSuccessConfigContext = (config: SuccessConfig) => {
-    setSuccessConfig({
-      ...defaultSuccessConfig,
-      ...config,
-    });
-    setSelectedConfig('success');
-  };
-  const setErrorConfigContext = (config: ErrorConfig) => {
-    setErrorConfig({
-      ...defaultErrorConfig,
-      ...config,
-    });
-    setSelectedConfig('error');
-  };
-  const setClosedConfigContext = () => {
+  const setLoadingConfigContext = React.useCallback(
+    (config: LoadingConfig) => {
+      setLoadingConfig({
+        ...defaultLoadingConfig,
+        ...config,
+      });
+      setSelectedConfig('loading');
+    },
+    [setLoadingConfig, setSelectedConfig]
+  );
+  const setSuccessConfigContext = React.useCallback(
+    (config: SuccessConfig) => {
+      setSuccessConfig({
+        ...defaultSuccessConfig,
+        ...config,
+      });
+      setSelectedConfig('success');
+    },
+    [setSuccessConfig, setSelectedConfig]
+  );
+  const setErrorConfigContext = React.useCallback(
+    (config: ErrorConfig) => {
+      setErrorConfig({
+        ...defaultErrorConfig,
+        ...config,
+      });
+      setSelectedConfig('error');
+    },
+    [setErrorConfig, setSelectedConfig]
+  );
+  const setClosedConfigContext = React.useCallback(() => {
     setSelectedConfig('closed');
-  };
+  }, [setSelectedConfig]);
 
   return (
     <TransactionModalContext.Provider
