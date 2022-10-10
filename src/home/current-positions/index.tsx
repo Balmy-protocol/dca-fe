@@ -3,7 +3,6 @@ import Grid from '@mui/material/Grid';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import useCurrentPositions from 'hooks/useCurrentPositions';
-import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -40,14 +39,6 @@ const StyledGridItem = styled(Grid)`
   display: flex;
 `;
 
-const POSITIONS_PER_ROW = {
-  xs: 1,
-  sm: 2,
-  md: 4,
-  lg: 4,
-  xl: 4,
-};
-
 interface CurrentPositionsProps {
   isLoading: boolean;
 }
@@ -67,17 +58,12 @@ function comparePositions(positionA: Position, positionB: Position) {
 const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const [hasSignSupport] = useSupportsSigning();
   const currentPositions = useCurrentPositions();
-  const currentBreakPoint = useCurrentBreakpoint();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const addTransaction = useTransactionAdder();
   const positionService = usePositionService();
-  const positionsPerRow = POSITIONS_PER_ROW[currentBreakPoint];
-  const positionsToFill =
-    currentPositions.length % positionsPerRow !== 0 ? positionsPerRow - (currentPositions.length % positionsPerRow) : 0;
-  const emptyPositions = [];
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
   const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
@@ -98,9 +84,18 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     return supportedNetwork;
   }, [currentNetwork.chainId]);
 
-  for (let i = 0; i < positionsToFill; i += 1) {
-    emptyPositions.push(i);
-  }
+  const onCancelModifySettingsModal = React.useCallback(
+    () => setShowModifyRateSettingsModal(false),
+    [setShowModifyRateSettingsModal]
+  );
+  const onCancelMigrateYieldModal = React.useCallback(
+    () => setShowMigrateYieldModal(false),
+    [setShowMigrateYieldModal]
+  );
+  const onCancelSuggestMigrateYieldModal = React.useCallback(
+    () => setShowSuggestMigrateYieldModal(false),
+    [setShowSuggestMigrateYieldModal]
+  );
 
   if (isLoading || isLoadingAllChainsYieldOptions) {
     return <CenteredLoadingIndicator size={70} />;
@@ -225,15 +220,15 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       <ModifySettingsModal
         open={showModifyRateSettingsModal}
         position={selectedPosition}
-        onCancel={() => setShowModifyRateSettingsModal(false)}
+        onCancel={onCancelModifySettingsModal}
       />
       <MigrateYieldModal
-        onCancel={() => setShowMigrateYieldModal(false)}
+        onCancel={onCancelMigrateYieldModal}
         open={showMigrateYieldModal}
         position={selectedPosition}
       />
       <SuggestMigrateYieldModal
-        onCancel={() => setShowSuggestMigrateYieldModal(false)}
+        onCancel={onCancelSuggestMigrateYieldModal}
         open={showSuggestMigrateYieldModal}
         onAddFunds={onShowModifyRateSettings}
         position={selectedPosition}
@@ -301,4 +296,5 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     </>
   );
 };
+
 export default CurrentPositions;
