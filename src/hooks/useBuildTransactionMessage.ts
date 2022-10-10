@@ -100,13 +100,15 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.RESET_POSITION: {
           const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
           const resettedPosition = find(positions, { id: resetPositionTypeData.id });
+          const swapInterval = BigNumber.from((resettedPosition as Position).swapInterval);
+
           if (resettedPosition) {
             message = `${resetPositionTypeData.newFunds} ${
               (resettedPosition as Position).from.symbol
             } have been added to your ${(resettedPosition as Position).from.symbol}:${
               (resettedPosition as Position).to.symbol
             } position and it has been set to run for ${getFrequencyLabel(
-              (resettedPosition as Position).swapInterval.toString(),
+              swapInterval.toString(),
               resetPositionTypeData.newSwaps
             )}`;
           }
@@ -128,11 +130,13 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION: {
           const modifySwapsPositionTypeData = tx.typeData as ModifySwapsPositionTypeData;
           const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
+          const swapInterval = BigNumber.from((modifiedPosition as Position).swapInterval);
+
           if (modifiedPosition) {
             message = `Your ${(modifiedPosition as Position).from.symbol}:${
               (modifiedPosition as Position).to.symbol
             } position has now been set to run for ${getFrequencyLabel(
-              (modifiedPosition as Position).swapInterval.toString(),
+              swapInterval.toString(),
               modifySwapsPositionTypeData.newSwaps
             )}`;
           }
@@ -141,19 +145,16 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
           const modifyRateAndSwapsPositionTypeData = tx.typeData as ModifyRateAndSwapsPositionTypeData;
           const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
+          const swapInterval = BigNumber.from((modifiedRatePosition as Position).swapInterval);
+
           if (modifiedRatePosition) {
             message = `Your ${(modifiedRatePosition as Position).from.symbol}:${
               (modifiedRatePosition as Position).to.symbol
             } position has now been set swap ${modifyRateAndSwapsPositionTypeData.newRate} ${
               (modifiedRatePosition as Position).from.symbol
             } ${
-              STRING_SWAP_INTERVALS[
-                (modifiedRatePosition as Position).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-              ].every
-            } for ${getFrequencyLabel(
-              (modifiedRatePosition as Position).swapInterval.toString(),
-              modifyRateAndSwapsPositionTypeData.newSwaps
-            )}`;
+              STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
+            } for ${getFrequencyLabel(swapInterval.toString(), modifyRateAndSwapsPositionTypeData.newSwaps)}`;
           }
           break;
         }
