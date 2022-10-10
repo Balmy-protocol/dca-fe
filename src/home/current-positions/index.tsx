@@ -2,7 +2,6 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import find from 'lodash/find';
 import styled from 'styled-components';
-import orderBy from 'lodash/orderBy';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
@@ -51,6 +50,18 @@ const POSITIONS_PER_ROW = {
 
 interface CurrentPositionsProps {
   isLoading: boolean;
+}
+
+function comparePositions(positionA: Position, positionB: Position) {
+  const isAFinished = positionA.remainingSwaps.lte(BigNumber.from(0));
+  const isBFinished = positionB.remainingSwaps.lte(BigNumber.from(0));
+  if (isAFinished !== isBFinished) {
+    return isAFinished ? 1 : -1;
+  }
+  if (Number(positionA.version) !== Number(positionB.version)) {
+    return Number(positionA.version) > Number(positionB.version) ? -1 : 1;
+  }
+  return positionA.positionId > positionB.positionId ? -1 : 1;
 }
 
 const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
@@ -160,20 +171,16 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     }
   };
 
-  const positionsInProgress = orderBy(
-    currentPositions.filter(
+  const positionsInProgress = currentPositions
+    .filter(
       ({ toWithdraw, remainingSwaps }) => toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))
-    ),
-    ['remainingSwaps', 'version', 'positionId'],
-    ['desc', 'desc']
-  );
-  const positionsFinished = orderBy(
-    currentPositions.filter(
+    )
+    .sort(comparePositions);
+  const positionsFinished = currentPositions
+    .filter(
       ({ toWithdraw, remainingSwaps }) => toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0))
-    ),
-    ['version', 'positionId'],
-    ['desc', 'desc']
-  );
+    )
+    .sort(comparePositions);
 
   const onShowModifyRateSettings = (position: Position) => {
     if (!position) {
