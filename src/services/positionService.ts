@@ -1115,6 +1115,8 @@ export default class PositionService {
         this.currentPositions[withdrawPositionTypeData.id].withdrawn =
           this.currentPositions[withdrawPositionTypeData.id].swapped;
         this.currentPositions[withdrawPositionTypeData.id].toWithdraw = BigNumber.from(0);
+        this.currentPositions[withdrawPositionTypeData.id].toWithdrawUnderlying = BigNumber.from(0);
+        this.currentPositions[withdrawPositionTypeData.id].toWithdrawUnderlyingAccum = BigNumber.from(0);
         break;
       }
       case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
