@@ -10,7 +10,11 @@ import useWalletService from './useWalletService';
 
 function useBalance(from: Token | undefined | null): [BigNumber | undefined, boolean, string?] {
   const walletService = useWalletService();
-  const [state, setState] = React.useState<{ isLoading: boolean; result?: BigNumber; error?: string }>({
+  const [{ isLoading, result, error }, setState] = React.useState<{
+    isLoading: boolean;
+    result?: BigNumber;
+    error?: string;
+  }>({
     isLoading: false,
     result: undefined,
     error: undefined,
@@ -24,7 +28,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
-  const prevResult = usePrevious(state.result, false);
+  const prevResult = usePrevious(result, false);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -33,13 +37,13 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
           const promiseResult = await walletService.getBalance(from.address);
           setState({ isLoading: false, result: promiseResult, error: undefined });
         } catch (e) {
-          setState((prevState) => ({ ...prevState, error: e, isLoading: false }));
+          setState({ result: undefined, error: e as string, isLoading: false });
         }
       }
     }
 
     if (
-      (!state.isLoading && !state.result && !state.error) ||
+      (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
@@ -57,9 +61,9 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
   }, [
     from,
     prevFrom,
-    state.isLoading,
-    state.result,
-    state.error,
+    isLoading,
+    result,
+    error,
     hasPendingTransactions,
     prevAccount,
     account,
@@ -71,7 +75,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
     return [undefined, false, undefined];
   }
 
-  return [state.result || prevResult, state.isLoading, state.error];
+  return [result || prevResult, isLoading, error];
 }
 
 export default useBalance;
