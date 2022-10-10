@@ -95,13 +95,13 @@ const StyledCardTitleHeader = styled.div`
   }
 `;
 
-const StyledDetailWrapper = styled.div<{ alignItems?: string; flex?: boolean; spacing?: boolean }>`
+const StyledDetailWrapper = styled.div<{ alignItems?: string; flex?: boolean; $spacing?: boolean }>`
   margin-bottom: 5px;
   display: flex;
   align-items: ${({ alignItems }) => alignItems || 'center'};
   justify-content: flex-start;
   ${({ flex }) => (flex ? 'flex: 1;' : '')}
-  ${({ spacing }) => (spacing ? 'margin-top: 10px;' : '')}
+  ${({ $spacing }) => ($spacing ? 'margin-top: 10px;' : '')}
   gap: 5px;
   flex-wrap: wrap;
 `;
@@ -375,7 +375,7 @@ const ActivePosition = ({
             )}
           </StyledDetailWrapper>
           {!foundYieldFrom && !foundYieldTo && (
-            <StyledDetailWrapper alignItems="flex-start" spacing>
+            <StyledDetailWrapper alignItems="flex-start" $spacing>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="positionNotGainingInterest"
@@ -385,7 +385,7 @@ const ActivePosition = ({
             </StyledDetailWrapper>
           )}
           {(foundYieldFrom || foundYieldTo) && (
-            <StyledDetailWrapper alignItems="flex-start" flex spacing>
+            <StyledDetailWrapper alignItems="flex-start" flex $spacing>
               {foundYieldFrom && (
                 <CustomChip
                   icon={
