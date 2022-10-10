@@ -288,6 +288,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
               sx={{ cursor: 'pointer' }}
               onMouseOut={() => onSelectChain(null)}
               onMouseOver={() => onSelectChain(positionCountLabel.chain.chainId)}
+              key={positionCountLabel.chain.chainId}
             >
               <Grid item xs={1}>
                 <StyledBullet fill={positionCountLabel.fill} />
