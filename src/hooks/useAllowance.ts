@@ -74,8 +74,10 @@ function useAllowance(from: Token | undefined | null, usesYield?: boolean, versi
     hasPendingTransactions,
     prevAccount,
     account,
+    prevPendingTrans,
     prevBlockNumber,
     blockNumber,
+    walletService,
   ]);
 
   if (!from) {
