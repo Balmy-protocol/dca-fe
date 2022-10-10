@@ -15,6 +15,7 @@ import usePositionService from 'hooks/usePositionService';
 import useYieldOptions from 'hooks/useYieldOptions';
 import YieldTokenSelector from 'common/yield-token-selector';
 import { formatCurrencyAmount } from 'utils/currency';
+import { BigNumber } from 'ethers';
 
 const StyledGrid = styled(Grid)`
   display: flex;
@@ -59,6 +60,12 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
 
   const handleCancel = () => {
     onCancel();
+  };
+
+  const handleClose = () => {
+    handleCancel();
+    setFromYield(undefined);
+    setToYield(undefined);
   };
 
   const handleMigrate = async () => {
@@ -127,6 +134,9 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    } finally {
+      setFromYield(undefined);
+      setToYield(undefined);
     }
   };
 
@@ -151,7 +161,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
   return (
     <Modal
       open={open}
-      onClose={handleCancel}
+      onClose={handleClose}
       showCloseIcon
       maxWidth="sm"
       title={<FormattedMessage description="gainYield title" defaultMessage="Start generating yield" />}
@@ -195,22 +205,18 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
                   defaultMessage="In order to start generating yield we will need to terminate your current position, and create a new one. Your historical data from this position will appear as a terminated position"
                 />
               </Typography>
-              {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
-                <FormattedMessage
-                  description="howItWorksDescriptionStep2"
-                  defaultMessage="For this you will need to sign a message (which is costless) where you will approve our Companion to terminate your position and then submit the migration transaction"
-                />
-              </Typography> */}
-              <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
-                <FormattedMessage
-                  description="howItWorksDescriptionStep3"
-                  defaultMessage="By terminating the current position {toWithdraw} {to} will be sent to your wallet."
-                  values={{
-                    toWithdraw: formatCurrencyAmount(toWithdraw, to),
-                    to: to.symbol,
-                  }}
-                />
-              </Typography>
+              {toWithdraw.gt(BigNumber.from(0)) && (
+                <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
+                  <FormattedMessage
+                    description="howItWorksDescriptionStep3"
+                    defaultMessage="By terminating the current position {toWithdraw} {to} will be sent to your wallet."
+                    values={{
+                      toWithdraw: formatCurrencyAmount(toWithdraw, to),
+                      to: to.symbol,
+                    }}
+                  />
+                </Typography>
+              )}
               <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep4"
