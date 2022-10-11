@@ -479,7 +479,10 @@ const Swap = ({
     setIsLoading(true);
     if (!from || !to) return;
 
-    const oracle = await pairService.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
+    const oracle = await pairService.getPairOracle(
+      { tokenA: fromYield?.tokenAddress || from.address, tokenB: toYield?.tokenAddress || to.address },
+      !!existingPair
+    );
 
     let hasLowLiquidity = oracle === ORACLES.UNISWAP;
 
