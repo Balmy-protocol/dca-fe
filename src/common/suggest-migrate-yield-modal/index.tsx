@@ -73,13 +73,13 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
         <Typography variant="body1" textAlign="left">
           <FormattedMessage
             description="whyYouShouldMigrate"
-            defaultMessage="The tokens in this position allow generating yield while your positions gets swapped. We suggest creating a new position so it starts generating yield, if you don't want to do this you can still add funds to your current position and not generate yield."
+            defaultMessage="One or both of the tokens in this position allow generating yield while your positions gets swapped. We suggest creating a new position so it starts generating yield for you. If you agree, we will send you to the create page with the same tokens specified in your position."
           />
         </Typography>
         <Typography variant="body1" textAlign="left">
           <FormattedMessage
             description="howItWorksDescriptionStep1"
-            defaultMessage="We will send you to the create page with the same tokens specified in your position"
+            defaultMessage="If you don't want to do this, you can still add funds to your current position."
           />
         </Typography>
       </StyledSuggestMigrateContainer>

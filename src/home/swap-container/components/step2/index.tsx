@@ -258,7 +258,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 <Typography variant="body2">
                   <FormattedMessage
                     description="howItWorksDescription"
-                    defaultMessage="Funds will be deposited in your selected platform to generate yield while they wait to be swapped or withdrawn. The safety of the funds will be up to the selected platform, so please do your own research to perform an educated risk/reward assessment."
+                    defaultMessage="Funds will be deposited into your selected platform to generate yield while they wait to be swapped or withdrawn. The safety of the funds will be up to the selected platform, so please do your own research to perform an educated risk/reward assessment."
                   />
                 </Typography>
               </StyledYieldHelpDescriptionContainer>
