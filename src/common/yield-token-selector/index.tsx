@@ -154,7 +154,7 @@ const YieldTokenSelector = ({
                   <FormattedMessage
                     description="selectedYieldPlatform"
                     defaultMessage="{platform} (APY {apy}%)"
-                    values={{ platform: yieldSelected.name, apy: yieldSelected.apy.toFixed(0) }}
+                    values={{ platform: yieldSelected.name, apy: yieldSelected.apy.toFixed(1) }}
                   />
                 )}
                 {yieldSelected === null && (
@@ -191,7 +191,7 @@ const YieldTokenSelector = ({
                               </IconContainer>
                               <Typography variant="body2">{yieldOption.name}</Typography>
                             </StyledYieldOptionDescription>
-                            <StyledYieldOptionApy>{yieldOption.apy.toFixed(0)}%</StyledYieldOptionApy>
+                            <StyledYieldOptionApy>{yieldOption.apy.toFixed(1)}%</StyledYieldOptionApy>
                           </StyledYieldOption>
                         ))}
                       </>

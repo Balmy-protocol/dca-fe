@@ -231,7 +231,7 @@ const LeaderboardFrame = () => {
   const orderedByPositions = orderBy(
     Object.keys(positionsPerUser).map((user) => ({
       name: user,
-      display: `${positionsPerUser[user].toFixed(0)} positions`,
+      display: `${positionsPerUser[user].toFixed(1)} positions`,
       value: positionsPerUser[user],
     })),
     'value',
