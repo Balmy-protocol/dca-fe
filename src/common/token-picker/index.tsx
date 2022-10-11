@@ -133,6 +133,7 @@ interface TokenPickerProps {
   isFrom: boolean;
   usedTokens: string[];
   ignoreValues: string[];
+  otherSelected?: string;
 }
 
 const useListItemStyles = makeStyles(({ palette }) => ({
@@ -201,6 +202,7 @@ const TokenPicker = ({
   onChange,
   ignoreValues,
   usedTokens,
+  otherSelected,
 }: TokenPickerProps) => {
   const tokenList = useTokenList();
   const [search, setSearch] = React.useState('');
@@ -210,6 +212,7 @@ const TokenPicker = ({
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
   const handleOnClose = () => {
     if (shouldShowTokenLists) {
@@ -238,6 +241,7 @@ const TokenPicker = ({
     [usedTokens, ignoreValues, tokenKeysToUse]
   );
 
+  const otherIsProtocol = otherSelected === PROTOCOL_TOKEN_ADDRESS || otherSelected === wrappedProtocolToken.address;
   const memoizedTokenKeys = React.useMemo(() => {
     const filteredTokenKeys = tokenKeysToUse.filter(
       (el) =>
@@ -247,7 +251,8 @@ const TokenPicker = ({
           tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
         !usedTokens.includes(el) &&
         !ignoreValues.includes(el) &&
-        tokenList[el].chainId === currentNetwork.chainId
+        tokenList[el].chainId === currentNetwork.chainId &&
+        (!otherIsProtocol || (otherIsProtocol && el !== wrappedProtocolToken.address && el !== PROTOCOL_TOKEN_ADDRESS))
     );
 
     if (filteredTokenKeys.findIndex((el) => el === getWrappedProtocolToken(currentNetwork.chainId).address) !== -1) {
@@ -261,7 +266,16 @@ const TokenPicker = ({
     }
 
     return filteredTokenKeys;
-  }, [tokenKeys, search, usedTokens, ignoreValues, tokenKeysToUse, availableFrom, currentNetwork.chainId]);
+  }, [
+    tokenKeys,
+    search,
+    usedTokens,
+    ignoreValues,
+    tokenKeysToUse,
+    availableFrom,
+    otherIsProtocol,
+    currentNetwork.chainId,
+  ]);
 
   const itemData = React.useMemo(
     () => ({ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }),
