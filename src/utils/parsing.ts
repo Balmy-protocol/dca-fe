@@ -56,8 +56,6 @@ export const calculateStale: (
 
   const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
 
-  console.log(freqIndex);
-
   if (!hasToExecute[freqIndex]) {
     return NOTHING_TO_EXECUTE;
   }
