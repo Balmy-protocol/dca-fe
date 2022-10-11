@@ -791,6 +791,9 @@ const Swap = ({
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
+        otherSelected={
+          (from && selecting.address === from.address) || selecting.address === 'from' ? to?.address : from?.address
+        }
       />
       <Slide
         direction="right"
