@@ -181,8 +181,6 @@ const Swap = ({
 
   const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
-  console.log(allowance, allowanceErrors, !!fromYield?.tokenAddress);
-
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
 
   const [usdPrice, isLoadingUsdPrice] = useUsdPrice(

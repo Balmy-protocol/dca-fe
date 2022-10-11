@@ -8,13 +8,15 @@ export interface GetNextSwapInfo {
   swapsToPerform: SwapsToPerform[];
 }
 
+export type SwapInfo = [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean];
+
 export type AvailablePair = {
   token0: Token;
   token1: Token;
   lastExecutedAt: number;
   lastCreatedAt: number;
   id: string;
-  swapInfo: boolean;
+  swapInfo: SwapInfo;
   oracle: Oracles;
 };
 
@@ -57,5 +59,5 @@ export interface GetPairSwapsData {
     address: string;
   };
   swaps: PairSwaps[];
-  activePositionsPerInterval: number[];
+  activePositionsPerInterval: [number, number, number, number, number, number, number, number];
 }

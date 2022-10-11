@@ -1,4 +1,5 @@
 import find from 'lodash/find';
+import findIndex from 'lodash/findIndex';
 import {
   Token,
   AvailablePairs,
@@ -7,8 +8,10 @@ import {
   Oracles,
   AvailablePairsGraphqlResponse,
   AvailablePairResponse,
+  SwapInfo,
 } from 'types';
 import { activePositionsPerIntervalToHasToExecute, sortTokens, sortTokensByAddress } from 'utils/parsing';
+import { BigNumber } from 'ethers';
 
 // GQL queries
 import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
@@ -17,7 +20,13 @@ import gqlFetchAll from 'utils/gqlFetchAll';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { ORACLES, PositionVersions, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config/constants';
+import {
+  ORACLES,
+  PositionVersions,
+  LATEST_VERSION,
+  DEFAULT_NETWORK_FOR_VERSION,
+  SWAP_INTERVALS_MAP,
+} from 'config/constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -108,19 +117,39 @@ export default class PairService {
   }
 
   // PAIR METHODS
-  addNewPair(tokenA: Token, tokenB: Token, oracle: Oracles) {
+  addNewPair(tokenA: Token, tokenB: Token, oracle: Oracles, frequencyType: BigNumber) {
     const [token0, token1] = sortTokens(tokenA, tokenB);
 
-    if (this.availablePairExists(token0, token1)) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const swapInfo: SwapInfo = SWAP_INTERVALS_MAP.map(() => false);
+    const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
+
+    swapInfo[freqIndex] = true;
+
+    if (!this.availablePairExists(token0, token1)) {
       this.availablePairs.push({
         token0,
         token1,
         id: `${token0.address}-${token1.address}`,
         lastExecutedAt: 0,
         lastCreatedAt: Math.floor(Date.now() / 1000),
-        swapInfo: true,
+        swapInfo,
         oracle,
       });
+    } else {
+      const pairIndex = findIndex(this.availablePairs, { id: `${token0.address}-${token1.address}` });
+      if (pairIndex === -1) {
+        return;
+      }
+
+      const newSwapInfo = this.availablePairs[pairIndex].swapInfo;
+      newSwapInfo[freqIndex] = true;
+
+      this.availablePairs[pairIndex] = {
+        ...this.availablePairs[pairIndex],
+        swapInfo: newSwapInfo,
+      };
     }
   }
 

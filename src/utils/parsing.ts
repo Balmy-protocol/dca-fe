@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import find from 'lodash/find';
-import some from 'lodash/some';
-import { FullPosition, Position, Token } from 'types';
+import findIndex from 'lodash/findIndex';
+import { FullPosition, Position, SwapInfo, Token } from 'types';
 import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
@@ -38,14 +38,27 @@ export const calculateStale: (
   lastSwapped: number | undefined,
   frequencyType: BigNumber,
   createdAt: number,
-  hasToExecute?: boolean | null
-) => -1 | 0 | 1 | 2 = (lastSwapped = 0, frequencyType: BigNumber, createdAt: number, hasToExecute = true) => {
+  hasToExecute?: SwapInfo | null
+) => -1 | 0 | 1 | 2 = (
+  lastSwapped = 0,
+  frequencyType: BigNumber,
+  createdAt: number,
+  hasToExecute = [true, true, true, true, true, true, true, true]
+) => {
   let isStale = false;
   if (hasToExecute === null) {
     return NO_SWAP_INFORMATION;
   }
 
   if (!hasToExecute) {
+    return NOTHING_TO_EXECUTE;
+  }
+
+  const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
+
+  console.log(freqIndex);
+
+  if (!hasToExecute[freqIndex]) {
     return NOTHING_TO_EXECUTE;
   }
 
@@ -192,8 +205,12 @@ export const usdFormatter = (num: number) => {
   return (num / si[i].value).toFixed(3).replace(rx, '$1') + si[i].symbol;
 };
 
-export const activePositionsPerIntervalToHasToExecute = (activePositionsPerInterval: number[]) =>
-  some(activePositionsPerInterval, (activePositions) => activePositions !== 0);
+export const activePositionsPerIntervalToHasToExecute = (
+  activePositionsPerInterval: [number, number, number, number, number, number, number, number]
+): [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean] =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
 
 export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, remainingSwaps: BigNumber) => {
   const yieldFromGenerated = remainingLiquidity.sub(rate.mul(remainingSwaps));

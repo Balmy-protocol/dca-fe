@@ -1029,7 +1029,12 @@ export default class PositionService {
           };
         }
         delete this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
-        this.pairService.addNewPair(newPositionTypeData.from, newPositionTypeData.to, newPositionTypeData.oracle);
+        this.pairService.addNewPair(
+          newPositionTypeData.from,
+          newPositionTypeData.to,
+          newPositionTypeData.oracle,
+          BigNumber.from(newPositionTypeData.frequencyType)
+        );
         break;
       }
       case TRANSACTION_TYPES.TERMINATE_POSITION: {
