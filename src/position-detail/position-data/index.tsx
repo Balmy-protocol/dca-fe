@@ -616,64 +616,62 @@ const Details = ({
               )}
             </Typography>
           </StyledDetailWrapper> */}
-          {foundYieldFrom && (
+          {(foundYieldFrom || foundYieldTo) && (
             <StyledDetailWrapper>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage
-                  description="positionDetailsYieldFromTitle"
-                  defaultMessage="{from} yield:"
-                  values={{ from: position.from.symbol }}
-                />
+                <FormattedMessage description="positionDetailsYieldsTitle" defaultMessage="Yields:" />
               </Typography>
-              <CustomChip
-                icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={foundYieldFrom.token} />}
-                tooltip
-                tooltipTitle={
-                  <FormattedMessage
-                    description="generatingYieldAt"
-                    defaultMessage="Generating {token} at {platform} with {apy}% APY"
-                    values={{
-                      token: position.to.symbol,
-                      apy: foundYieldFrom.apy.toFixed(1),
-                      platform: foundYieldFrom.name,
-                    }}
-                  />
-                }
-              >
-                <Typography variant="body2" fontWeight={500}>
-                  APY {foundYieldFrom.apy.toFixed(1)}%
-                </Typography>
-              </CustomChip>
-            </StyledDetailWrapper>
-          )}
-          {foundYieldTo && (
-            <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage
-                  description="positionDetailsYieldFromTitle"
-                  defaultMessage="{to} yield:"
-                  values={{ to: position.to.symbol }}
-                />
-              </Typography>
-              <CustomChip
-                icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={foundYieldTo.token} />}
-                tooltip
-                tooltipTitle={
-                  <FormattedMessage
-                    description="generatingYieldAt"
-                    defaultMessage="Generating {token} at {platform} with {apy}% APY"
-                    values={{
-                      token: position.to.symbol,
-                      apy: foundYieldTo.apy.toFixed(1),
-                      platform: foundYieldTo.name,
-                    }}
-                  />
-                }
-              >
-                <Typography variant="body2" fontWeight={500}>
-                  APY {foundYieldTo.apy.toFixed(1)}%
-                </Typography>
-              </CustomChip>
+              {foundYieldFrom && (
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon
+                      isInChip
+                      size="16px"
+                      tokenBottom={position.from}
+                      tokenTop={foundYieldFrom.token}
+                    />
+                  }
+                  tooltip
+                  tooltipTitle={
+                    <FormattedMessage
+                      description="generatingYieldAt"
+                      defaultMessage="Generating {token} at {platform} with {apy}% APY"
+                      values={{
+                        token: position.to.symbol,
+                        apy: foundYieldFrom.apy.toFixed(1),
+                        platform: foundYieldFrom.name,
+                      }}
+                    />
+                  }
+                >
+                  <Typography variant="body2" fontWeight={500}>
+                    APY {foundYieldFrom.apy.toFixed(1)}%
+                  </Typography>
+                </CustomChip>
+              )}
+              {foundYieldTo && (
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} tokenTop={foundYieldTo.token} />
+                  }
+                  tooltip
+                  tooltipTitle={
+                    <FormattedMessage
+                      description="generatingYieldAt"
+                      defaultMessage="Generating {token} at {platform} with {apy}% APY"
+                      values={{
+                        token: position.to.symbol,
+                        apy: foundYieldTo.apy.toFixed(1),
+                        platform: foundYieldTo.name,
+                      }}
+                    />
+                  }
+                >
+                  <Typography variant="body2" fontWeight={500}>
+                    APY {foundYieldTo.apy.toFixed(1)}%
+                  </Typography>
+                </CustomChip>
+              )}
             </StyledDetailWrapper>
           )}
         </StyledContentContainer>
