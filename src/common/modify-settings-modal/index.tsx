@@ -130,6 +130,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     position.user === walletService.getAccount().toLowerCase() &&
     allowance.allowance &&
     allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
+    allowance.token.address === fromToUse.address &&
     isIncreasingPosition &&
     !hasPendingApproval &&
     parseUnits(allowance.allowance, fromToUse.decimals).lt(
@@ -402,7 +403,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwaps,
-        disabled: !!cantFund,
+        disabled: !!cantFund || frequencyValue === '0',
       },
     ];
   }
