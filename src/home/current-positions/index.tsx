@@ -49,10 +49,8 @@ function comparePositions(positionA: Position, positionB: Position) {
   if (isAFinished !== isBFinished) {
     return isAFinished ? 1 : -1;
   }
-  if (Number(positionA.version) !== Number(positionB.version)) {
-    return Number(positionA.version) > Number(positionB.version) ? -1 : 1;
-  }
-  return positionA.positionId > positionB.positionId ? -1 : 1;
+
+  return positionA.startedAt > positionB.startedAt ? -1 : 1;
 }
 
 const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
