@@ -162,7 +162,7 @@ export type AvailablePairResponse = {
   createdAtTimestamp: number;
   status: string; // active, stale
   positions: PositionResponse[];
-  activePositionsPerInterval: number[];
+  activePositionsPerInterval: [number, number, number, number, number, number, number, number];
 };
 
 export interface AvailablePairsGraphqlResponse {
