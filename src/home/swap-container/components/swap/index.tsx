@@ -179,7 +179,9 @@ const Swap = ({
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
 
-  const [allowance, , allowanceErrors] = useAllowance(from);
+  const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
+
+  console.log(allowance, allowanceErrors, !!fromYield?.tokenAddress);
 
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
 
