@@ -326,25 +326,27 @@ const Details = ({
               <TokenIcon token={to} size="27px" />
               <Typography variant="body1">{to.symbol}</Typography>
             </StyledCardTitleHeader>
-            <StyledBreakdownLeft>
-              <Typography variant="body2">
-                <FormGroup row>
-                  <FormControlLabel
-                    labelPlacement="start"
-                    control={
-                      <Switch
-                        checked={showBreakdown}
-                        onChange={() => dispatch(updateShowBreakdown(!showBreakdown))}
-                        name="enableDisableShowBreakdown"
-                        color="primary"
-                      />
-                    }
-                    disableTypography
-                    label="Detailed view:"
-                  />
-                </FormGroup>
-              </Typography>
-            </StyledBreakdownLeft>
+            {(foundYieldFrom || foundYieldTo) && (
+              <StyledBreakdownLeft>
+                <Typography variant="body2">
+                  <FormGroup row>
+                    <FormControlLabel
+                      labelPlacement="start"
+                      control={
+                        <Switch
+                          checked={showBreakdown}
+                          onChange={() => dispatch(updateShowBreakdown(!showBreakdown))}
+                          name="enableDisableShowBreakdown"
+                          color="primary"
+                        />
+                      }
+                      disableTypography
+                      label="Detailed view:"
+                    />
+                  </FormGroup>
+                </Typography>
+              </StyledBreakdownLeft>
+            )}
           </StyledCardHeader>
           {remainingSwaps.toNumber() > 0 && (
             <DarkTooltip
