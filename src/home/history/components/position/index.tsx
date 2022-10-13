@@ -214,13 +214,11 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
         </StyledContentContainer>
         <StyledProgressWrapper />
         <StyledCallToActionContainer>
-          {position.version !== POSITION_VERSION_2 && (
-            <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
-              <Typography variant="body2">
-                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
-              </Typography>
-            </StyledCardFooterButton>
-          )}
+          <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
+            <Typography variant="body2">
+              <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+            </Typography>
+          </StyledCardFooterButton>
         </StyledCallToActionContainer>
       </StyledCardContent>
     </StyledCard>
