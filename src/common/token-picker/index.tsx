@@ -5,7 +5,7 @@ import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@mui/material/Slide';
-import { Token, TokenList } from 'types';
+import { Token, TokenList, YieldOptions } from 'types';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -111,12 +111,18 @@ const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
 const StyledBalanceContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
+`;
+
+const StyledTokenTextContainer = styled.div`
+  display: flex;
 `;
 
 interface RowData {
   tokenList: TokenList;
   tokenKeys: string[];
   onClick: (token: string) => void;
+  yieldOptions: YieldOptions;
 }
 
 interface RowProps {
@@ -134,6 +140,8 @@ interface TokenPickerProps {
   usedTokens: string[];
   ignoreValues: string[];
   otherSelected?: string;
+  yieldOptions: YieldOptions;
+  isLoadingYieldOptions: boolean;
 }
 
 const useListItemStyles = makeStyles(({ palette }) => ({
@@ -157,31 +165,43 @@ const useListItemStyles = makeStyles(({ palette }) => ({
     },
   },
 }));
-const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps) => {
+const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions } }: RowProps) => {
   const classes = useListItemStyles();
+  const token = tokenList[tokenKeys[index]];
 
-  const tokenBalance = useTokenBalance(tokenList[tokenKeys[index]]);
-  const [tokenValue] = useUsdPrice(tokenList[tokenKeys[index]], tokenBalance);
+  const tokenBalance = useTokenBalance(token);
+  const [tokenValue] = useUsdPrice(token, tokenBalance);
+
+  const availableYieldOptions = yieldOptions.filter((yieldOption) =>
+    yieldOption.enabledTokens.includes(token?.address)
+  );
 
   return (
     <StyledListItem classes={classes} onClick={() => onClick(tokenKeys[index])} style={style}>
       <StyledListItemIcon>
-        <TokenIcon size="24px" token={tokenList[tokenKeys[index]]} />
+        <TokenIcon size="24px" token={token} />
       </StyledListItemIcon>
       <ListItemText disableTypography>
-        <span>
+        <StyledTokenTextContainer>
           <Typography variant="body1" component="span" color="#FFFFFF">
-            {tokenList[tokenKeys[index]].name}
+            {token.name}
           </Typography>
           <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)">
-            {` (${tokenList[tokenKeys[index]].symbol})`}
+            {` (${token.symbol})`}
           </Typography>
-        </span>
+        </StyledTokenTextContainer>
+        {!!availableYieldOptions.length && (
+          <StyledTokenTextContainer>
+            <Typography variant="caption" component="span" color="#2CC941">
+              <FormattedMessage description="supportsYield" defaultMessage="Supports yield" />
+            </Typography>
+          </StyledTokenTextContainer>
+        )}
       </ListItemText>
       <StyledBalanceContainer>
         {tokenBalance && (
           <Typography variant="body1" color="#FFFFFF">
-            {formatCurrencyAmount(tokenBalance, tokenList[tokenKeys[index]], 6)}
+            {formatCurrencyAmount(tokenBalance, token, 6)}
           </Typography>
         )}
         {!!tokenValue && (
@@ -203,6 +223,8 @@ const TokenPicker = ({
   ignoreValues,
   usedTokens,
   otherSelected,
+  yieldOptions,
+  isLoadingYieldOptions,
 }: TokenPickerProps) => {
   const tokenList = useTokenList();
   const [search, setSearch] = React.useState('');
@@ -278,7 +300,12 @@ const TokenPicker = ({
   ]);
 
   const itemData = React.useMemo(
-    () => ({ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }),
+    () => ({
+      onClick: handleItemSelected,
+      tokenList,
+      tokenKeys: memoizedTokenKeys,
+      yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
+    }),
     [memoizedTokenKeys, tokenList]
   );
 
