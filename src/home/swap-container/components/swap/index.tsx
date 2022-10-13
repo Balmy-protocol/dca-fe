@@ -791,6 +791,8 @@ const Swap = ({
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
+        yieldOptions={yieldOptions}
+        isLoadingYieldOptions={isLoadingYieldOptions}
         otherSelected={
           (from && selecting.address === from.address) || selecting.address === 'from' ? to?.address : from?.address
         }
