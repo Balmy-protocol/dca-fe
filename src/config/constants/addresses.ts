@@ -544,7 +544,7 @@ export const TOKEN_LISTS = {
 
 export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST', 'jEUR', 'jGBP', 'jCHF'];
 
-export const MEAN_API_URL = 'https://mean-finance-api.herokuapp.com';
+export const MEAN_API_URL = 'https://api.mean.finance';
 
 export const SIGN_VERSION: Record<PositionVersions, string> = {
   [POSITION_VERSION_1]: '1',
