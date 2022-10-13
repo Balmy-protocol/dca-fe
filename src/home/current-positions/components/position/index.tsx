@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE, calculateYield } from 'utils/parsing';
 import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
@@ -20,6 +20,7 @@ import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import ComposedTokenIcon from 'common/composed-token-icon';
 import CustomChip from 'common/custom-chip';
 import { Theme, Tooltip } from '@mui/material';
+import useUsdPrice from 'hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
@@ -211,6 +212,16 @@ const ActivePosition = ({
     remainingSwaps
   );
 
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase, undefined, chainId);
+  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield, undefined, chainId);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity, undefined, chainId);
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(from, yieldFromGenerated, undefined, chainId);
+
+  const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
+  const showToYieldPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToYieldPrice && !!toYieldPrice;
+  const showFromPrice = !STABLE_COINS.includes(from.symbol) && !isLoadingFromPrice && !!fromPrice;
+  const showFromYieldPrice = !STABLE_COINS.includes(from.symbol) && !isLoadingFromYieldPrice && !!fromYieldPrice;
+
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
   const [token0, token1] = sortTokens(
@@ -298,7 +309,20 @@ const ActivePosition = ({
                 }}
               />
             </Typography>
-            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+            <CustomChip
+              tooltip={showFromPrice}
+              tooltipTitle={
+                <FormattedMessage
+                  description="current swapped in position price"
+                  defaultMessage="~ {fromPrice} USD"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    fromPrice: showFromPrice ? fromPrice?.toFixed(2) : 0,
+                  }}
+                />
+              }
+              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+            >
               <Typography variant="body2">
                 {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
               </Typography>
@@ -307,6 +331,17 @@ const ActivePosition = ({
               <>
                 +
                 <CustomChip
+                  tooltip={showFromYieldPrice}
+                  tooltipTitle={
+                    <FormattedMessage
+                      description="current swapped in position price"
+                      defaultMessage="~ {fromPrice} USD"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        fromPrice: showFromYieldPrice ? fromYieldPrice?.toFixed(2) : 0,
+                      }}
+                    />
+                  }
                   icon={
                     <ComposedTokenIcon
                       isInChip
@@ -353,7 +388,20 @@ const ActivePosition = ({
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
             </Typography>
-            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}>
+            <CustomChip
+              tooltip={showToPrice}
+              tooltipTitle={
+                <FormattedMessage
+                  description="current swapped in position price"
+                  defaultMessage="~ {fromPrice} USD"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    fromPrice: showToPrice ? toPrice?.toFixed(2) : 0,
+                  }}
+                />
+              }
+              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
+            >
               <Typography variant="body2">
                 {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
               </Typography>
@@ -365,6 +413,17 @@ const ActivePosition = ({
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography> */}
                 <CustomChip
+                  tooltip={showToYieldPrice}
+                  tooltipTitle={
+                    <FormattedMessage
+                      description="current swapped in position price"
+                      defaultMessage="~ {fromPrice} USD"
+                      values={{
+                        b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                        fromPrice: showToYieldPrice ? toYieldPrice?.toFixed(2) : 0,
+                      }}
+                    />
+                  }
                   icon={
                     <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo?.token} tokenBottom={position.to} />
                   }
