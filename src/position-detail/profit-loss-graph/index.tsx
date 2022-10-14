@@ -367,7 +367,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
               domain={['auto', 'auto']}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(value: string) => parseFloat(Number(value).toFixed(4)).toString()}
+              tickFormatter={(value: string) => parseFloat(Number(value).toFixed(5)).toString()}
               // tickFormatter={(tick: string) => `${tick}%`}
             />
             <Tooltip
