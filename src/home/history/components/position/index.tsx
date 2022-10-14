@@ -12,7 +12,7 @@ import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { useHistory } from 'react-router-dom';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
-import { NETWORKS, STABLE_COINS } from 'config/constants';
+import { NETWORKS } from 'config/constants';
 import { BigNumber } from 'ethers';
 import useUsdPrice from 'hooks/useUsdPrice';
 import find from 'lodash/find';
@@ -124,7 +124,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
 
   const history = useHistory();
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped, undefined, chainId);
-  const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
+  const showToPrice = !isLoadingToPrice && !!toPrice;
   const dispatch = useAppDispatch();
 
   const onViewDetails = () => {
