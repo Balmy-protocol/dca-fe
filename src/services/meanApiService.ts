@@ -56,7 +56,7 @@ export default class MeanApiService {
     yieldFrom: string | undefined,
     yieldTo: string | undefined,
     account: string,
-    permissions: { operator: string; permissions: string[] }[]
+    permissions: { operator: string; permissions: number[] }[]
   ) {
     const singer = this.walletService.getSigner();
     const currentNetwork = await this.walletService.getNetwork();

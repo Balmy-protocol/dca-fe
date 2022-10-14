@@ -124,7 +124,7 @@ export interface HubContract extends DCAHub {
     swaps: BigNumber,
     interval: BigNumber,
     account: string,
-    permissions: { operator: string; permissions: string[] }[]
+    permissions: { operator: string; permissions: number[] }[]
   ) => Promise<TransactionResponse>;
 
   estimateGas: DCAHub['estimateGas'] & {
@@ -135,7 +135,7 @@ export interface HubContract extends DCAHub {
       swaps: BigNumber,
       interval: BigNumber,
       account: string,
-      permissions: { operator: string; permissions: string[] }[]
+      permissions: { operator: string; permissions: number[] }[]
     ) => Promise<BigNumber>;
   };
 }

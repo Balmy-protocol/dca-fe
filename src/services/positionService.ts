@@ -602,12 +602,21 @@ export default class PositionService {
     const swapInterval = frequencyType;
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const companionAddress = await this.contractService.getHUBCompanionAddress();
 
     if (amountOfSwaps.gt(BigNumber.from(MAX_UINT_32))) {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
     if (yieldFrom) {
+      const permissions = yieldTo
+        ? [
+            {
+              operator: companionAddress,
+              permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE],
+            },
+          ]
+        : [{ operator: companionAddress, permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE] }];
       return this.meanApiService.depositUsingYield(
         from.address,
         to.address,
@@ -617,7 +626,7 @@ export default class PositionService {
         yieldFrom,
         yieldTo,
         this.walletService.getAccount(),
-        []
+        permissions
       );
     }
 
@@ -637,6 +646,8 @@ export default class PositionService {
 
     const toToUse = to.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken : to;
 
+    const permissions = yieldTo ? [{ operator: companionAddress, permissions: [PERMISSIONS.WITHDRAW] }] : [];
+
     return hubInstance.deposit(
       from.address,
       yieldTo || toToUse.address,
@@ -644,7 +655,7 @@ export default class PositionService {
       amountOfSwaps,
       swapInterval,
       this.walletService.getAccount(),
-      []
+      permissions
     );
   }
 
