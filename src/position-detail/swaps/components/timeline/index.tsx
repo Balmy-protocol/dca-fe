@@ -217,24 +217,10 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
       position.chainId
     );
 
-    const showToPrices =
-      !STABLE_COINS.includes(position.to.symbol) &&
-      !isLoadingToPrice &&
-      !!toPrice &&
-      !isLoadingToCurrentPrice &&
-      !!toCurrentPrice;
-    const showFromPrices =
-      !STABLE_COINS.includes(position.from.symbol) &&
-      !isLoadingFromPrice &&
-      !!fromPrice &&
-      !isLoadingFromCurrentPrice &&
-      !!fromCurrentPrice;
+    const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
+    const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;
     const showFromYieldPrices =
-      !STABLE_COINS.includes(position.from.symbol) &&
-      !isLoadingFromYieldPrice &&
-      !!fromYieldPrice &&
-      !isLoadingFromYieldCurrentPrice &&
-      !!fromYieldCurrentPrice;
+      !isLoadingFromYieldPrice && !!fromYieldPrice && !isLoadingFromYieldCurrentPrice && !!fromYieldCurrentPrice;
     const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
     const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
     const [showFromYieldCurrentPrice, setShouldShowFromYieldCurrentPrice] = useState(true);
@@ -639,12 +625,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
       position.chainId
     );
 
-    const showPrices =
-      !STABLE_COINS.includes(position.to.symbol) &&
-      !isLoadingToPrice &&
-      !!toPrice &&
-      !isLoadingToCurrentPrice &&
-      !!toCurrentPrice;
+    const showPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
     const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
 
     return (

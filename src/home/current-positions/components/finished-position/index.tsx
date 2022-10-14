@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
 import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { BigNumber } from 'ethers';
@@ -165,7 +165,7 @@ const ActivePosition = ({
   const rateToUse = depositedRateUnderlying || rate;
 
   const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rateToUse, undefined, chainId);
-  const showRatePrice = !STABLE_COINS.includes(from.symbol) && !isLoadingRatePrice && !!ratePrice;
+  const showRatePrice = !isLoadingRatePrice && !!ratePrice;
 
   const pair = find(
     availablePairs,

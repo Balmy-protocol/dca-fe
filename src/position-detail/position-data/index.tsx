@@ -14,7 +14,7 @@ import {
   getTimeFrequencyLabel,
   STALE,
 } from 'utils/parsing';
-import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useUsdPrice from 'hooks/useUsdPrice';
 import LinearProgress from '@mui/material/LinearProgress';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -270,14 +270,12 @@ const Details = ({
   const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield, undefined, chainId);
   const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase, undefined, chainId);
   const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield, undefined, chainId);
-  const showToFullPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToFullPrice && !!toFullPrice;
-  const showToYieldFullPrice =
-    !STABLE_COINS.includes(position.to.symbol) && !isLoadingToYieldFullPrice && !!toYieldFullPrice;
-  const showToPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToPrice && !!toPrice;
-  const showToYieldPrice = !STABLE_COINS.includes(position.to.symbol) && !isLoadingToYieldPrice && !!toYieldPrice;
-  const showFromPrice = !STABLE_COINS.includes(position.from.symbol) && !isLoadingFromPrice && !!fromPrice;
-  const showFromYieldPrice =
-    !STABLE_COINS.includes(position.from.symbol) && !isLoadingFromYieldPrice && !!fromYieldPrice;
+  const showToFullPrice = !isLoadingToFullPrice && !!toFullPrice;
+  const showToYieldFullPrice = !isLoadingToYieldFullPrice && !!toYieldFullPrice;
+  const showToPrice = !isLoadingToPrice && !!toPrice;
+  const showToYieldPrice = !isLoadingToYieldPrice && !!toYieldPrice;
+  const showFromPrice = !isLoadingFromPrice && !!fromPrice;
+  const showFromYieldPrice = !isLoadingFromYieldPrice && !!fromYieldPrice;
 
   const hasNoFunds = BigNumber.from(remainingLiquidity).lte(BigNumber.from(0));
 

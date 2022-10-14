@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE, calculateYield } from 'utils/parsing';
 import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
@@ -218,11 +218,11 @@ const ActivePosition = ({
   const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity, undefined, chainId);
   const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(from, yieldFromGenerated, undefined, chainId);
 
-  const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
-  const showToYieldPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToYieldPrice && !!toYieldPrice;
-  const showRatePrice = !STABLE_COINS.includes(from.symbol) && !isLoadingRatePrice && !!ratePrice;
-  const showFromPrice = !STABLE_COINS.includes(from.symbol) && !isLoadingFromPrice && !!fromPrice;
-  const showFromYieldPrice = !STABLE_COINS.includes(from.symbol) && !isLoadingFromYieldPrice && !!fromYieldPrice;
+  const showToPrice = !isLoadingToPrice && !!toPrice;
+  const showToYieldPrice = !isLoadingToYieldPrice && !!toYieldPrice;
+  const showRatePrice = !isLoadingRatePrice && !!ratePrice;
+  const showFromPrice = !isLoadingFromPrice && !!fromPrice;
+  const showFromYieldPrice = !isLoadingFromYieldPrice && !!fromYieldPrice;
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
