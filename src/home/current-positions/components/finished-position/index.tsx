@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
 import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { BigNumber } from 'ethers';
@@ -16,6 +16,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import ComposedTokenIcon from 'common/composed-token-icon';
 import CustomChip from 'common/custom-chip';
+import useUsdPrice from 'hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 
 const StyledNetworkLogoContainer = styled.div`
@@ -162,6 +163,10 @@ const ActivePosition = ({
     to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to
   );
   const rateToUse = depositedRateUnderlying || rate;
+
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rateToUse, undefined, chainId);
+  const showRatePrice = !STABLE_COINS.includes(from.symbol) && !isLoadingRatePrice && !!ratePrice;
+
   const pair = find(
     availablePairs,
     (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
@@ -244,7 +249,20 @@ const ActivePosition = ({
                 }}
               />
             </Typography>
-            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+            <CustomChip
+              tooltip={showRatePrice}
+              tooltipTitle={
+                <FormattedMessage
+                  description="current swapped in position price"
+                  defaultMessage="~ {fromPrice} USD"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    fromPrice: showRatePrice ? ratePrice?.toFixed(2) : 0,
+                  }}
+                />
+              }
+              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+            >
               <Typography variant="body2">
                 {formatCurrencyAmount(BigNumber.from(rateToUse), position.from, 4)}
               </Typography>
