@@ -13,6 +13,7 @@ import { createStyles } from '@mui/material/styles';
 import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
 import usePrevious from 'hooks/usePrevious';
+import useCurrentPositions from 'hooks/useCurrentPositions';
 import History from '../history';
 import CurrentPositions from '../current-positions';
 import PositionDashboard from './components/dashboard';
@@ -102,6 +103,7 @@ const Positions = () => {
   const account = walletService.getAccount();
   const [isLoading, setIsLoading] = React.useState(false);
   const prevAccount = usePrevious(account);
+  const positions = useCurrentPositions();
 
   React.useEffect(() => {
     const fetchPositions = async () => {
@@ -130,7 +132,9 @@ const Positions = () => {
           />
         </Typography>
       </StyledTitle>
-      <StyledDashboardContainer>{hasLoadedPositions && !isLoading && <PositionDashboard />}</StyledDashboardContainer>
+      {!!positions.length && (
+        <StyledDashboardContainer>{hasLoadedPositions && !isLoading && <PositionDashboard />}</StyledDashboardContainer>
+      )}
       <StyledPositions>
         <StyledTabsContainers>
           <StyledTabs
