@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { withStyles } from '@mui/styles';
 import { Theme, Tooltip, TooltipProps } from '@mui/material';
 
-const StyledChipContainer = styled.div<{ tooltip?: boolean }>`
+const StyledChipContainer = styled.div<{ tooltip?: boolean; pointer?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -14,6 +14,7 @@ const StyledChipContainer = styled.div<{ tooltip?: boolean }>`
   background: rgba(216, 216, 216, 0.1);
   padding: 1px 10px 1px 6px;
   ${({ tooltip }) => (tooltip ? 'cursor: default;' : '')}
+  ${({ pointer }) => (pointer ? 'cursor: pointer;' : '')}
 `;
 
 const StyledIconContainer = styled.div``;
@@ -33,9 +34,15 @@ const DarkTooltip = withStyles((theme: Theme) => ({
 
 const CustomChipContent = React.forwardRef<
   HTMLDivElement,
-  { icon: React.ReactNode; extraText?: React.ReactNode; tooltip?: boolean; children: React.ReactNode }
->(({ children, icon, extraText, tooltip, ...otherProps }, ref) => (
-  <StyledChipContainer ref={ref} {...otherProps} tooltip={tooltip}>
+  {
+    icon: React.ReactNode;
+    extraText?: React.ReactNode;
+    tooltip?: boolean;
+    pointer?: boolean;
+    children: React.ReactNode;
+  }
+>(({ children, icon, extraText, tooltip, pointer, ...otherProps }, ref) => (
+  <StyledChipContainer ref={ref} {...otherProps} tooltip={tooltip} pointer={pointer}>
     <StyledIconContainer>{icon}</StyledIconContainer>
     <StyledChildrenContainer>{children}</StyledChildrenContainer>
     {extraText && (
@@ -49,18 +56,19 @@ const CustomChipContent = React.forwardRef<
 const CustomChip: React.FC<{
   icon: React.ReactNode;
   extraText?: React.ReactNode;
+  pointer?: boolean;
   tooltip?: boolean;
   tooltipTitle?: React.ReactNode;
   tooltipPlacement?: TooltipProps['placement'];
-}> = ({ children, icon, extraText, tooltip, tooltipTitle, tooltipPlacement }) =>
+}> = ({ children, icon, extraText, tooltip, tooltipTitle, tooltipPlacement, pointer }) =>
   tooltip ? (
     <DarkTooltip title={tooltipTitle || ''} arrow placement={tooltipPlacement || 'top'}>
-      <CustomChipContent icon={icon} extraText={extraText} tooltip={tooltip}>
+      <CustomChipContent icon={icon} extraText={extraText} tooltip={tooltip} pointer={pointer}>
         {children}
       </CustomChipContent>
     </DarkTooltip>
   ) : (
-    <CustomChipContent icon={icon} extraText={extraText}>
+    <CustomChipContent icon={icon} extraText={extraText} pointer={pointer}>
       {children}
     </CustomChipContent>
   );
