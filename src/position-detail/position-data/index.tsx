@@ -266,6 +266,7 @@ const Details = ({
     undefined,
     chainId
   );
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(position.from, rate, undefined, chainId);
   const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase, undefined, chainId);
   const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield, undefined, chainId);
   const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase, undefined, chainId);
@@ -274,6 +275,7 @@ const Details = ({
   const showToYieldFullPrice = !isLoadingToYieldFullPrice && !!toYieldFullPrice;
   const showToPrice = !isLoadingToPrice && !!toPrice;
   const showToYieldPrice = !isLoadingToYieldPrice && !!toYieldPrice;
+  const showRatePrice = !isLoadingRatePrice && !!ratePrice;
   const showFromPrice = !isLoadingFromPrice && !!fromPrice;
   const showFromYieldPrice = !isLoadingFromYieldPrice && !!fromYieldPrice;
 
@@ -494,7 +496,10 @@ const Details = ({
                 }}
               />
             </Typography>
-            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+            <CustomChip
+              extraText={showRatePrice && `(${ratePrice.toFixed(2)} USD)`}
+              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+            >
               <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
             </CustomChip>
             <FormattedMessage
