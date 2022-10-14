@@ -59,7 +59,8 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
-                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
+                  values={{ token: position.to.symbol }}
                 />
               </Typography>
             )}
