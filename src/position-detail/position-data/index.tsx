@@ -639,7 +639,7 @@ const Details = ({
                       description="generatingYieldAt"
                       defaultMessage="Generating {token} at {platform} with {apy}% APY"
                       values={{
-                        token: position.to.symbol,
+                        token: position.from.symbol,
                         apy: foundYieldFrom.apy.toFixed(1),
                         platform: foundYieldFrom.name,
                       }}
