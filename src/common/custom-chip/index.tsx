@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { withStyles } from '@mui/styles';
 import { Theme, Tooltip, TooltipProps } from '@mui/material';
 
-const StyledChipContainer = styled.div`
+const StyledChipContainer = styled.div<{ tooltip?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -13,6 +13,7 @@ const StyledChipContainer = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(216, 216, 216, 0.1);
   padding: 1px 10px 1px 6px;
+  ${({ tooltip }) => (tooltip ? 'cursor: default;' : '')}
 `;
 
 const StyledIconContainer = styled.div``;
@@ -32,9 +33,9 @@ const DarkTooltip = withStyles((theme: Theme) => ({
 
 const CustomChipContent = React.forwardRef<
   HTMLDivElement,
-  { icon: React.ReactNode; extraText?: React.ReactNode; children: React.ReactNode }
->(({ children, icon, extraText, ...otherProps }, ref) => (
-  <StyledChipContainer ref={ref} {...otherProps}>
+  { icon: React.ReactNode; extraText?: React.ReactNode; tooltip?: boolean; children: React.ReactNode }
+>(({ children, icon, extraText, tooltip, ...otherProps }, ref) => (
+  <StyledChipContainer ref={ref} {...otherProps} tooltip={tooltip}>
     <StyledIconContainer>{icon}</StyledIconContainer>
     <StyledChildrenContainer>{children}</StyledChildrenContainer>
     {extraText && (
@@ -54,7 +55,7 @@ const CustomChip: React.FC<{
 }> = ({ children, icon, extraText, tooltip, tooltipTitle, tooltipPlacement }) =>
   tooltip ? (
     <DarkTooltip title={tooltipTitle || ''} arrow placement={tooltipPlacement || 'top'}>
-      <CustomChipContent icon={icon} extraText={extraText}>
+      <CustomChipContent icon={icon} extraText={extraText} tooltip={tooltip}>
         {children}
       </CustomChipContent>
     </DarkTooltip>
