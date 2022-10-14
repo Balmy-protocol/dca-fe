@@ -63,7 +63,7 @@ const StyledListItemIcon = styled(ListItemIcon)`
 `;
 
 const StyledListItem = styled(ListItem)`
-  padding-left: 0px;
+  padding-left: 3px;
 `;
 
 const StyledList = styled(List)`
