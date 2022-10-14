@@ -63,7 +63,7 @@ const StyledListItemIcon = styled(ListItemIcon)`
 `;
 
 const StyledListItem = styled(ListItem)`
-  padding-left: 3px;
+  padding-left: 0px;
 `;
 
 const StyledList = styled(List)`
@@ -105,6 +105,7 @@ const StyledBalanceContainer = styled.div`
 
 const StyledTokenTextContainer = styled.div`
   display: flex;
+  gap: 5px;
 `;
 
 interface RowData {
