@@ -2,7 +2,6 @@ import React, { CSSProperties } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
 import remove from 'lodash/remove';
-import uniq from 'lodash/uniq';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@mui/material/Slide';
 import { Token, TokenList, YieldOptions } from 'types';
@@ -20,8 +19,6 @@ import Chip from '@mui/material/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles, withStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import useAvailablePairs from 'hooks/useAvailablePairs';
-import Switch from '@mui/material/Switch';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useTokenList from 'hooks/useTokenList';
 import TokenLists from 'common/token-lists';
@@ -67,14 +64,6 @@ const StyledListItemIcon = styled(ListItemIcon)`
 
 const StyledListItem = styled(ListItem)`
   padding-left: 0px;
-`;
-
-const StyledSwitchGrid = styled(Grid)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: rgba(255, 255, 255, 0.5) !important;
-  flex: 0;
 `;
 
 const StyledList = styled(List)`
@@ -228,11 +217,8 @@ const TokenPicker = ({
 }: TokenPickerProps) => {
   const tokenList = useTokenList();
   const [search, setSearch] = React.useState('');
-  const [isOnlyPairs, setIsOnlyPairs] = React.useState(false);
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
-  let tokenKeysToUse: string[] = [];
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
-  const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
@@ -250,22 +236,14 @@ const TokenPicker = ({
     handleOnClose();
   };
 
-  const uniqTokensFromPairs = React.useMemo(
-    () =>
-      uniq(availablePairs.reduce((accum, current) => [...accum, current.token0.address, current.token1.address], [])),
-    [availablePairs]
-  );
-
-  tokenKeysToUse = !isOnlyPairs ? tokenKeys : uniqTokensFromPairs;
-
   const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
-    [usedTokens, ignoreValues, tokenKeysToUse]
+    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeys.includes(el)),
+    [usedTokens, ignoreValues, tokenKeys]
   );
 
   const otherIsProtocol = otherSelected === PROTOCOL_TOKEN_ADDRESS || otherSelected === wrappedProtocolToken.address;
   const memoizedTokenKeys = React.useMemo(() => {
-    const filteredTokenKeys = tokenKeysToUse.filter(
+    const filteredTokenKeys = tokenKeys.filter(
       (el) =>
         tokenList[el] &&
         (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
@@ -288,16 +266,7 @@ const TokenPicker = ({
     }
 
     return filteredTokenKeys;
-  }, [
-    tokenKeys,
-    search,
-    usedTokens,
-    ignoreValues,
-    tokenKeysToUse,
-    availableFrom,
-    otherIsProtocol,
-    currentNetwork.chainId,
-  ]);
+  }, [tokenKeys, search, usedTokens, ignoreValues, tokenKeys, availableFrom, otherIsProtocol, currentNetwork.chainId]);
 
   const itemData = React.useMemo(
     () => ({
@@ -347,18 +316,6 @@ const TokenPicker = ({
                   margin="none"
                 />
               </StyledGrid>
-              <StyledSwitchGrid item xs={12}>
-                <FormattedMessage
-                  description="createdPairsSwitchToken"
-                  defaultMessage="Only tokens with created pairs"
-                />
-                <Switch
-                  checked={isOnlyPairs}
-                  onChange={() => setIsOnlyPairs(!isOnlyPairs)}
-                  name="isOnlyPairs"
-                  color="primary"
-                />
-              </StyledSwitchGrid>
               {!!memoizedUsedTokens.length && (
                 <>
                   <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
