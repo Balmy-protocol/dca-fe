@@ -105,6 +105,7 @@ const StyledBalanceContainer = styled.div`
 
 const StyledTokenTextContainer = styled.div`
   display: flex;
+  gap: 5px;
 `;
 
 interface RowData {
