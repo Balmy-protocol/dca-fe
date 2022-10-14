@@ -257,6 +257,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
             </StyledTitleMainText>
             <CustomChip
               icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
+              pointer
               extraText={
                 showFromPrices && (
                   <DarkTooltip
@@ -283,6 +284,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                 </Typography>
                 <CustomChip
                   icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
+                  pointer
                   extraText={
                     showFromYieldPrices && (
                       <DarkTooltip
@@ -310,6 +312,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
             <FormattedMessage description="pairSwapDetailsFor" defaultMessage="for" />
             <CustomChip
               icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+              pointer
               extraText={
                 showToPrices && (
                   <DarkTooltip
@@ -635,6 +638,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
             <FormattedMessage description="positionWithdrawn" defaultMessage="Withdraw" />
             <CustomChip
               icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+              pointer
               extraText={
                 showPrices && (
                   <DarkTooltip
