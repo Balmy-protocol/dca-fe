@@ -242,12 +242,14 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/reduce-and-swap`,
+      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/reduce-to-buy`,
       {
         positionId: id,
-        amount: newAmount.toString(),
+        buy: {
+          amount: newAmount.toString(),
+          token: tokenFrom,
+        },
         amountOfSwaps: newSwaps.toNumber(),
-        convertTo: tokenFrom,
         recipient,
         hub: hubAddress,
         permissionPermit,
