@@ -214,11 +214,13 @@ const ActivePosition = ({
 
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase, undefined, chainId);
   const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield, undefined, chainId);
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rateToUse, undefined, chainId);
   const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity, undefined, chainId);
   const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(from, yieldFromGenerated, undefined, chainId);
 
   const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
   const showToYieldPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToYieldPrice && !!toYieldPrice;
+  const showRatePrice = !STABLE_COINS.includes(from.symbol) && !isLoadingRatePrice && !!ratePrice;
   const showFromPrice = !STABLE_COINS.includes(from.symbol) && !isLoadingFromPrice && !!fromPrice;
   const showFromYieldPrice = !STABLE_COINS.includes(from.symbol) && !isLoadingFromYieldPrice && !!fromYieldPrice;
 
@@ -368,7 +370,20 @@ const ActivePosition = ({
                 }}
               />
             </Typography>
-            <CustomChip icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}>
+            <CustomChip
+              tooltip={showRatePrice}
+              tooltipTitle={
+                <FormattedMessage
+                  description="current swapped in position price"
+                  defaultMessage="~ {fromPrice} USD"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    fromPrice: showRatePrice ? ratePrice?.toFixed(2) : 0,
+                  }}
+                />
+              }
+              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+            >
               <Typography variant="body2">
                 {formatCurrencyAmount(BigNumber.from(rateToUse), position.from, 4)}
               </Typography>
