@@ -663,7 +663,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
       </>
     );
   },
-  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
+  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
 });
