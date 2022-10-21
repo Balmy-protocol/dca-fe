@@ -63,7 +63,7 @@ function useUsdPrice(
     }
 
     if (STABLE_COINS.includes(from.symbol)) {
-      return [parseFloat(formatCurrencyAmount(amount, from, 6)), false, undefined];
+      return [parseFloat(formatUnits(amount, from.decimals)), false, undefined];
     }
 
     if (amount.lte(BigNumber.from(0)) || !result) {
