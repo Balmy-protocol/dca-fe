@@ -130,6 +130,7 @@ const getPosition = gql`
           swapped
           rate
           rateUnderlying
+          depositedRateUnderlying
         }
 
         ... on TransferedAction {
