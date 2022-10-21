@@ -73,7 +73,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { to, swapInterval, remainingLiquidity } = position;
+  const { to, swapInterval, from, version, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -87,6 +87,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const currentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [hasSignSupport] = useSupportsSigning();
+  const remainingLiquidity = (depositedRateUnderlying || oldRate).mul(remainingSwaps);
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
 
   let fromToUse = position.from;
@@ -101,10 +102,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     }
   }
   const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport;
-  const [allowance] = useAllowance(useWrappedProtocolToken ? wrappedProtocolToken : position.from);
+  const fromHasYield = !!position.from.underlyingTokens.length;
+  const [allowance] = useAllowance(
+    useWrappedProtocolToken ? wrappedProtocolToken : position.from,
+    fromHasYield,
+    version
+  );
   const [balance] = useBalance(fromToUse);
-  const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount());
-  const realBalance = balance && balance.add(position.remainingLiquidity);
+  const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
+  const realBalance = balance && balance.add(remainingLiquidity);
+  const hasYield = !!from.underlyingTokens.length;
 
   const cantFund =
     fromValue &&
@@ -114,7 +121,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
     parseUnits(fromValue, fromToUse.decimals).gt(realBalance);
 
-  const isIncreasingPosition = position.remainingLiquidity
+  const isIncreasingPosition = remainingLiquidity
     .sub(parseUnits(fromValue || '0', fromToUse.decimals))
     .lte(BigNumber.from(0));
 
@@ -123,10 +130,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     position.user === walletService.getAccount().toLowerCase() &&
     allowance.allowance &&
     allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
+    allowance.token.address === fromToUse.address &&
     isIncreasingPosition &&
     !hasPendingApproval &&
     parseUnits(allowance.allowance, fromToUse.decimals).lt(
-      position.remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
+      remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
     );
 
   const handleCancel = () => {
@@ -219,7 +227,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
       let hasPermission = true;
 
-      if (!useWrappedProtocolToken) {
+      if (!useWrappedProtocolToken || hasYield) {
         hasPermission = await positionService.companionHasPermission(
           position,
           isIncreasingPosition ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
@@ -243,22 +251,25 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 }}
               />
             </Typography>
-            {position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken && !hasPermission && (
-              <Typography variant="body1">
-                {!isIncreasingPosition && (
-                  <FormattedMessage
-                    description="Approve signature companion text decrease"
-                    defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
-                  />
-                )}
-                {isIncreasingPosition && (
-                  <FormattedMessage
-                    description="Approve signature companion text increase"
-                    defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary ETH."
-                  />
-                )}
-              </Typography>
-            )}
+            {((position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken) || hasYield) &&
+              !hasPermission && (
+                <Typography variant="body1">
+                  {!isIncreasingPosition && (
+                    <FormattedMessage
+                      description="Approve signature companion text decrease"
+                      defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you will get your balance back as {token}."
+                      values={{ token: position.from.symbol }}
+                    />
+                  )}
+                  {isIncreasingPosition && (
+                    <FormattedMessage
+                      description="Approve signature companion text increase"
+                      defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary {token}."
+                      values={{ token: position.from.symbol }}
+                    />
+                  )}
+                </Typography>
+              )}
           </>
         ),
       });
@@ -311,7 +322,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(fromToUse);
+      const result = await walletService.approveToken(fromToUse, fromHasYield, version);
       const hubAddress = await contractService.getHUBAddress(position.version);
       const companionAddress = await contractService.getHUBCompanionAddress(position.version);
 
@@ -319,7 +330,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: fromToUse,
-          addressFor: to.address === PROTOCOL_TOKEN_ADDRESS ? companionAddress : hubAddress,
+          addressFor: to.address === PROTOCOL_TOKEN_ADDRESS || fromHasYield ? companionAddress : hubAddress,
         },
         position,
       });
@@ -394,7 +405,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwaps,
-        disabled: !!cantFund,
+        disabled: !!cantFund || frequencyValue === '0',
       },
     ];
   }
@@ -481,9 +492,10 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             <Typography variant="body1" component="span">
               <FormattedMessage
                 description="rate detail"
-                defaultMessage="{frequency} for you for"
+                defaultMessage="{yield}{frequency} for you for"
                 values={{
                   frequency: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
+                  yield: hasYield ? '+ yield ' : '',
                 }}
               />
             </Typography>
@@ -495,7 +507,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         </Grid>
         <Grid item xs={12}>
           {remainingLiquidity.gt(BigNumber.from(0)) &&
-            !position.remainingLiquidity
+            !remainingLiquidity
               .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
               .eq(BigNumber.from(0)) && (
               <Typography variant="body2">
@@ -506,7 +518,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     values={{
                       from: fromToUse.symbol,
                       addAmmount: formatUnits(
-                        position.remainingLiquidity
+                        remainingLiquidity
                           .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
                           .abs(),
                         fromToUse.decimals
@@ -520,7 +532,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     values={{
                       from: fromToUse.symbol,
                       returnAmmount: formatUnits(
-                        position.remainingLiquidity
+                        remainingLiquidity
                           .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
                           .abs(),
                         fromToUse.decimals

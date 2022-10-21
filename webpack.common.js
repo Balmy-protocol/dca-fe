@@ -4,6 +4,7 @@ const tsTransformer = require('@formatjs/ts-transformer');
 const webpack = require('webpack');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 const WebpackBar = require('webpackbar');
+const { mean } = require('lodash');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
 
@@ -66,6 +67,7 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'ts-loader',
         options: {
+          allowTsInNodeModules: true,
           getCustomTransformers() {
             return {
               before: [

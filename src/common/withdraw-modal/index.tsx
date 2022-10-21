@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { PERMISSIONS, POSITION_VERSION_3, TRANSACTION_TYPES } from 'config/constants';
+import { PERMISSIONS, POSITION_VERSION_2, TRANSACTION_TYPES } from 'config/constants';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import usePositionService from 'hooks/usePositionService';
@@ -37,7 +37,7 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
       let hasPermission;
 
       const positionId =
-        position.version === POSITION_VERSION_3 ? position.id : position.id.substring(0, position.id.length - 3);
+        position.version !== POSITION_VERSION_2 ? position.id : position.id.substring(0, position.id.length - 3);
       if (useProtocolToken) {
         hasPermission = await positionService.companionHasPermission(
           { ...position, id: positionId },
@@ -59,7 +59,8 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
-                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
+                  values={{ token: position.to.symbol }}
                 />
               </Typography>
             )}

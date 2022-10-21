@@ -1,17 +1,17 @@
 import find from 'lodash/find';
+import findIndex from 'lodash/findIndex';
 import {
   Token,
   AvailablePairs,
   PoolLiquidityData,
-  GetNextSwapInfo,
   PoolsLiquidityDataGraphqlResponse,
-  SwapsToPerform,
   Oracles,
   AvailablePairsGraphqlResponse,
   AvailablePairResponse,
+  SwapInfo,
 } from 'types';
-import { sortTokens, sortTokensByAddress } from 'utils/parsing';
-import { buildSwapInput } from 'utils/swap';
+import { activePositionsPerIntervalToHasToExecute, sortTokens, sortTokensByAddress } from 'utils/parsing';
+import { BigNumber } from 'ethers';
 
 // GQL queries
 import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
@@ -20,7 +20,13 @@ import gqlFetchAll from 'utils/gqlFetchAll';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { ORACLES, POSITION_VERSION_3, SWAP_INTERVALS_MAP, PositionVersions } from 'config/constants';
+import {
+  ORACLES,
+  PositionVersions,
+  LATEST_VERSION,
+  DEFAULT_NETWORK_FOR_VERSION,
+  SWAP_INTERVALS_MAP,
+} from 'config/constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -68,8 +74,12 @@ export default class PairService {
 
   async fetchAvailablePairs() {
     const network = await this.walletService.getNetwork();
+    const client = (
+      this.apolloClient[LATEST_VERSION][network.chainId] ||
+      this.apolloClient[LATEST_VERSION][DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId]
+    ).getClient();
     const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(
-      this.apolloClient[POSITION_VERSION_3][network.chainId].getClient(),
+      client,
       GET_AVAILABLE_PAIRS,
       {},
       'pairs',
@@ -96,7 +106,7 @@ export default class PairService {
             lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
             id: pair.id,
             lastCreatedAt,
-            swapInfo: pair.nextSwapAvailableAt,
+            swapInfo: activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval),
             oracle: pairOracle,
           };
         })
@@ -107,19 +117,39 @@ export default class PairService {
   }
 
   // PAIR METHODS
-  addNewPair(tokenA: Token, tokenB: Token, oracle: Oracles) {
+  addNewPair(tokenA: Token, tokenB: Token, oracle: Oracles, frequencyType: BigNumber) {
     const [token0, token1] = sortTokens(tokenA, tokenB);
 
-    if (this.availablePairExists(token0, token1)) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const swapInfo: SwapInfo = SWAP_INTERVALS_MAP.map(() => false);
+    const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
+
+    swapInfo[freqIndex] = true;
+
+    if (!this.availablePairExists(token0, token1)) {
       this.availablePairs.push({
         token0,
         token1,
         id: `${token0.address}-${token1.address}`,
         lastExecutedAt: 0,
         lastCreatedAt: Math.floor(Date.now() / 1000),
-        swapInfo: '1',
+        swapInfo,
         oracle,
       });
+    } else {
+      const pairIndex = findIndex(this.availablePairs, { id: `${token0.address}-${token1.address}` });
+      if (pairIndex === -1) {
+        return;
+      }
+
+      const newSwapInfo = this.availablePairs[pairIndex].swapInfo;
+      newSwapInfo[freqIndex] = true;
+
+      this.availablePairs[pairIndex] = {
+        ...this.availablePairs[pairIndex],
+        swapInfo: newSwapInfo,
+      };
     }
   }
 
@@ -143,9 +173,22 @@ export default class PairService {
 
     if (isExistingPair) {
       const oracleInstance = await this.contractService.getOracleInstance();
-      let oracleInUse: Oracles = ORACLES.NONE;
+      const oracleInUse: Oracles = ORACLES.NONE;
       try {
-        oracleInUse = await oracleInstance.oracleInUse(tokenA, tokenB);
+        const oracleInUseAddress = (await oracleInstance.assignedOracle(tokenA, tokenB)).oracle;
+        const chainlinkAddress = await this.contractService.getChainlinkOracleAddress();
+        const isChainlink = oracleInUseAddress === chainlinkAddress;
+
+        if (isChainlink) {
+          return ORACLES.CHAINLINK;
+        }
+
+        const uniswapAddress = await this.contractService.getUniswapOracleAddress();
+        const isUniswap = oracleInUseAddress === uniswapAddress;
+
+        if (isUniswap) {
+          return ORACLES.UNISWAP;
+        }
       } catch (e) {
         console.error('Error fetching oracle in use for existing pair', pair, e);
       }
@@ -174,34 +217,6 @@ export default class PairService {
     return oracleInUse;
   }
 
-  async getNextSwapInfo(pair: { tokenA: string; tokenB: string }): Promise<GetNextSwapInfo> {
-    const [tokenA, tokenB] = sortTokensByAddress(pair.tokenA, pair.tokenB);
-
-    const hubContract = await this.contractService.getHubInstance();
-
-    const { tokens, pairIndexes } = buildSwapInput([{ tokenA, tokenB }], []);
-
-    let swapsToPerform: SwapsToPerform[] = [];
-    try {
-      const nextSwapInfo = await hubContract.getNextSwapInfo(tokens, pairIndexes);
-
-      const { pairs } = nextSwapInfo;
-
-      const [{ intervalsInSwap }] = pairs;
-
-      swapsToPerform = SWAP_INTERVALS_MAP.filter(
-        // eslint-disable-next-line no-bitwise
-        (swapInterval) => swapInterval.key & parseInt(intervalsInSwap, 16)
-      ).map((swapInterval) => ({ interval: swapInterval.value.toNumber() }));
-    } catch {
-      console.error('Error fetching pair', pair);
-    }
-
-    return {
-      swapsToPerform,
-    };
-  }
-
   async getPairLiquidity(token0: Token, token1: Token) {
     let tokenA;
     let tokenB;
@@ -214,7 +229,7 @@ export default class PairService {
       tokenB = token0.address;
     }
     const poolsWithLiquidityResponse = await gqlFetchAll<PoolsLiquidityDataGraphqlResponse>(
-      this.uniClient[POSITION_VERSION_3][currentNetwork.chainId].getClient(),
+      this.uniClient[LATEST_VERSION][currentNetwork.chainId].getClient(),
       GET_PAIR_LIQUIDITY,
       {
         tokenA,

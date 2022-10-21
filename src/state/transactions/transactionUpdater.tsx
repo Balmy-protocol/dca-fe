@@ -139,6 +139,7 @@ export default function Updater(): null {
                   id: ethers.utils.hexValue(receipt.logs[receipt.logs.length - 1].data),
                 };
               }
+
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
                 const parsedLog = await transactionService.parseLog(receipt.logs, currentNetwork.chainId, 'Deposited');
                 extendedTypeData = {
@@ -146,7 +147,11 @@ export default function Updater(): null {
                   id: parsedLog.args.positionId.toString(),
                 };
               }
-              if (transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION) {
+
+              if (
+                transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION ||
+                transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION_YIELD
+              ) {
                 const parsedLog = await transactionService.parseLog(receipt.logs, currentNetwork.chainId, 'Deposited');
 
                 extendedTypeData = {
@@ -212,6 +217,7 @@ export default function Updater(): null {
               // eslint-disable-next-line @typescript-eslint/no-floating-promises
               checkIfTransactionExists(hash);
             }
+
             return true;
           })
           .catch((error) => {

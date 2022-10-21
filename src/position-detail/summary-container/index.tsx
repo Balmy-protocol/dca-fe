@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import PositionSwaps from 'position-detail/swaps';
-import { FullPosition, GetPairSwapsData } from 'types';
+import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
 import Details from 'position-detail/position-data';
 import Sticky from 'react-stickynode';
 import GraphContainer from 'position-detail/graph-container';
+import { BigNumber } from 'ethers';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -34,18 +35,28 @@ interface PositionSummaryContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
   swapsData: GetPairSwapsData | undefined;
-  onWithdraw: (useProtocolToken: boolean) => void;
+  onMigrateYield: () => void;
+  onSuggestMigrateYield: () => void;
   onReusePosition: () => void;
   disabled: boolean;
+  yieldOptions: YieldOptions;
+  toWithdrawUnderlying?: BigNumber | null;
+  remainingLiquidityUnderlying?: BigNumber | null;
+  swappedUnderlying?: BigNumber | null;
 }
 
 const PositionSummaryContainer = ({
   position,
   pendingTransaction,
   swapsData,
-  onWithdraw,
   onReusePosition,
   disabled,
+  yieldOptions,
+  toWithdrawUnderlying,
+  remainingLiquidityUnderlying,
+  swappedUnderlying,
+  onMigrateYield,
+  onSuggestMigrateYield,
 }: PositionSummaryContainerProps) => (
   <>
     <Grid container spacing={4} alignItems="flex-start">
@@ -56,9 +67,14 @@ const PositionSummaryContainer = ({
               position={position}
               pair={swapsData}
               pendingTransaction={pendingTransaction}
-              onWithdraw={onWithdraw}
               onReusePosition={onReusePosition}
               disabled={disabled}
+              yieldOptions={yieldOptions}
+              toWithdrawUnderlying={toWithdrawUnderlying}
+              remainingLiquidityUnderlying={remainingLiquidityUnderlying}
+              swappedUnderlying={swappedUnderlying}
+              onMigrateYield={onMigrateYield}
+              onSuggestMigrateYield={onSuggestMigrateYield}
             />
           </StyledPaper>
         </Sticky>

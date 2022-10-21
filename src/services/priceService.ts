@@ -5,7 +5,7 @@ import { CoinGeckoPriceResponse, Token, TxPriceResponse } from 'types';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { COINGECKO_IDS, DEFILLAMA_IDS, NETWORKS } from 'config/constants';
+import { COINGECKO_IDS, DEFAULT_NETWORK_FOR_VERSION, DEFILLAMA_IDS, LATEST_VERSION, NETWORKS } from 'config/constants';
 import ContractService from './contractService';
 import WalletService from './walletService';
 
@@ -41,7 +41,7 @@ export default class PriceService {
     const network = await this.walletService.getNetwork();
     const price = await this.axiosClient.get<Record<string, { usd: number }>>(
       `https://api.coingecko.com/api/v3/simple/token_price/${
-        COINGECKO_IDS[network.chainId] || COINGECKO_IDS[NETWORKS.optimism.chainId]
+        COINGECKO_IDS[network.chainId] || COINGECKO_IDS[DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId]
       }?contract_addresses=${token.address}&vs_currencies=usd`
     );
 
@@ -87,7 +87,7 @@ export default class PriceService {
 
     const oracleInstance = await this.contractService.getOracleInstance();
 
-    return oracleInstance.quote(fromToUse.address, fromAmount, toToUse.address);
+    return oracleInstance.quote(fromToUse.address, fromAmount, toToUse.address, []);
   }
 
   async getGasPrice() {
@@ -127,6 +127,12 @@ export default class PriceService {
     const oeGasOracle = await this.contractService.getOEGasOracleInstance();
 
     return oeGasOracle.getL1Fee(data);
+  }
+
+  async getTransformerValue(token: string, value: BigNumber) {
+    const transformerRegistryInstance = await this.contractService.getTransformerRegistryInstance(LATEST_VERSION);
+
+    return transformerRegistryInstance.calculateTransformToUnderlying(token, value);
   }
 
   async getEstimatedPairCreation(

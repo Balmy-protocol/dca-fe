@@ -248,6 +248,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
               fill="#8884d8"
               onMouseOver={(data: { name: string }) => onSelectChain(Number(data.name))}
               onMouseOut={() => onSelectChain(null)}
+              cursor="pointer"
             >
               {positionsCount.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
@@ -287,6 +288,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
               sx={{ cursor: 'pointer' }}
               onMouseOut={() => onSelectChain(null)}
               onMouseOver={() => onSelectChain(positionCountLabel.chain.chainId)}
+              key={positionCountLabel.chain.chainId}
             >
               <Grid item xs={1}>
                 <StyledBullet fill={positionCountLabel.fill} />

@@ -1,23 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { DCAHub__factory, DCAPermissionsManager__factory } from '@mean-finance/dca-v2-core/dist';
+import { DCAHubCompanion__factory } from '@mean-finance/dca-v2-periphery/dist';
+import { OracleAggregator__factory } from '@mean-finance/oracles/dist';
+import { TransformerRegistry__factory } from '@mean-finance/transformers/dist';
 import { ethers, Signer } from 'ethers';
 import { Network, getNetwork as getStringNetwork, Provider } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import find from 'lodash/find';
+// import allExportedFromTypechained from '@mean-finance/typechained/lib';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
-import ORACLE_AGGREGATOR_ABI from 'abis/OracleAggregator.json';
-import HUB_COMPANION_ABI from 'abis/HubCompanion.json';
-import HUB_ABI from 'abis/Hub.json';
 import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
-import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
-import MIGRATOR_ABI from 'abis/BetaMigrator.json';
 import OE_GAS_ORACLE_ABI from 'abis/OEGasOracle.json';
 
 // ADDRESSES
 import {
-  MIGRATOR_ADDRESS,
   CHAINLINK_ORACLE_ADDRESS,
   COMPANION_ADDRESS,
   HUB_ADDRESS,
@@ -28,16 +27,10 @@ import {
   PositionVersions,
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
+  TRANSFORMER_REGISTRY_ADDRESS,
+  DEFAULT_NETWORK_FOR_VERSION,
 } from 'config/constants';
-import {
-  BetaMigratorContract,
-  ERC20Contract,
-  HubCompanionContract,
-  HubContract,
-  OEGasOracle,
-  OracleContract,
-  PermissionManagerContract,
-} from 'types';
+import { ERC20Contract, HubContract, OEGasOracle, OracleContract } from 'types';
 
 export default class ContractService {
   client: ethers.providers.Web3Provider;
@@ -119,7 +112,7 @@ export default class ContractService {
       console.error('Failed to getNetwork through metamask');
     }
 
-    return Promise.resolve(NETWORKS.optimism);
+    return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
 
   // ADDRESSES
@@ -138,11 +131,12 @@ export default class ContractService {
     );
   }
 
-  async getMigratorAddress(version?: PositionVersions): Promise<string> {
+  async getTransformerRegistryAddress(version?: PositionVersions): Promise<string> {
     const network = await this.getNetwork();
 
     return (
-      MIGRATOR_ADDRESS[version || LATEST_VERSION][network.chainId] || MIGRATOR_ADDRESS[LATEST_VERSION][network.chainId]
+      TRANSFORMER_REGISTRY_ADDRESS[version || LATEST_VERSION][network.chainId] ||
+      TRANSFORMER_REGISTRY_ADDRESS[LATEST_VERSION][network.chainId]
     );
   }
 
@@ -186,39 +180,42 @@ export default class ContractService {
     const hubAddress = await this.getHUBAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(hubAddress, HUB_ABI.abi, provider) as unknown as HubContract;
+    const hub = DCAHub__factory.connect(hubAddress, provider as Signer);
+
+    (hub as unknown as HubContract).deposit =
+      hub['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'];
+    (hub as unknown as HubContract).estimateGas.deposit =
+      hub.estimateGas['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'];
+
+    return hub as unknown as HubContract;
   }
 
-  async getPermissionManagerInstance(version?: PositionVersions): Promise<PermissionManagerContract> {
+  async getPermissionManagerInstance(version?: PositionVersions) {
     const permissionManagerAddress = await this.getPermissionManagerAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(
-      permissionManagerAddress,
-      PERMISSION_MANAGER_ABI.abi,
-      provider
-    ) as unknown as PermissionManagerContract;
+    return DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
   }
 
-  async getMigratorInstance(version?: PositionVersions): Promise<BetaMigratorContract> {
-    const migratorAddress = await this.getMigratorAddress(version || LATEST_VERSION);
+  async getTransformerRegistryInstance(version?: PositionVersions) {
+    const transformerRegistryAddress = await this.getTransformerRegistryAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(migratorAddress, MIGRATOR_ABI.abi, provider) as unknown as BetaMigratorContract;
+    return TransformerRegistry__factory.connect(transformerRegistryAddress, provider);
   }
 
-  async getHUBCompanionInstance(version?: PositionVersions): Promise<HubCompanionContract> {
+  async getHUBCompanionInstance(version?: PositionVersions) {
     const hubCompanionAddress = await this.getHUBCompanionAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(hubCompanionAddress, HUB_COMPANION_ABI.abi, provider) as unknown as HubCompanionContract;
+    return DCAHubCompanion__factory.connect(hubCompanionAddress, provider);
   }
 
-  async getOracleInstance(version?: PositionVersions): Promise<OracleContract> {
+  async getOracleInstance(version?: PositionVersions) {
     const oracleAddress = await this.getOracleAddress(version || LATEST_VERSION);
     const provider = await this.getProvider();
 
-    return new ethers.Contract(oracleAddress, ORACLE_AGGREGATOR_ABI.abi, provider) as unknown as OracleContract;
+    return OracleAggregator__factory.connect(oracleAddress, provider);
   }
 
   async getChainlinkOracleInstance(version?: PositionVersions): Promise<OracleContract> {

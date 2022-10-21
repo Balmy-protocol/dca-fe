@@ -1,13 +1,14 @@
-import { POSITION_VERSION_3, PositionVersions } from 'config';
+import { PositionVersions, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config';
 import useCurrentNetwork from './useCurrentNetwork';
 import useWeb3Service from './useWeb3Service';
 
-function useDCAGraphql(chainId?: number, version: PositionVersions = POSITION_VERSION_3) {
+function useDCAGraphql(chainId?: number, version: PositionVersions = LATEST_VERSION) {
   const web3Service = useWeb3Service();
   const currentNetwork = useCurrentNetwork();
   const chainIdTouse = chainId || currentNetwork.chainId;
+  const clients = web3Service.getDCAGraphqlClient();
 
-  return web3Service.getDCAGraphqlClient()[version][chainIdTouse].getClient();
+  return (clients[version][chainIdTouse] || clients[version][DEFAULT_NETWORK_FOR_VERSION[version].chainId]).getClient();
 }
 
 export default useDCAGraphql;

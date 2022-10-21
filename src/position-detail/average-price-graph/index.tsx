@@ -112,8 +112,8 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
       (acc, action, index) => {
         const rate =
           position.pair.tokenA.address === tokenFromAverage.address
-            ? BigNumber.from(action.ratePerUnitAToBWithFee)
-            : BigNumber.from(action.ratePerUnitBToAWithFee);
+            ? BigNumber.from(action.ratioAToBWithFee)
+            : BigNumber.from(action.ratioBToAWithFee);
 
         const prevSummed = (acc[index - 1] && acc[index - 1].summed) || BigNumber.from(0);
         acc.push({

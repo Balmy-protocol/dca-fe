@@ -8,13 +8,15 @@ export interface GetNextSwapInfo {
   swapsToPerform: SwapsToPerform[];
 }
 
+export type SwapInfo = [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean];
+
 export type AvailablePair = {
   token0: Token;
   token1: Token;
   lastExecutedAt: number;
   lastCreatedAt: number;
   id: string;
-  swapInfo: string;
+  swapInfo: SwapInfo;
   oracle: Oracles;
 };
 
@@ -33,8 +35,8 @@ export interface PairSwaps {
   id: string;
   executedAtTimestamp: string;
   executedAtBlock: string;
-  ratePerUnitBToAWithFee: string;
-  ratePerUnitAToBWithFee: string;
+  ratioBToAWithFee: string;
+  ratioAToBWithFee: string;
   transaction: {
     id: string;
     hash: string;
@@ -57,5 +59,5 @@ export interface GetPairSwapsData {
     address: string;
   };
   swaps: PairSwaps[];
-  nextSwapAvailableAt: string;
+  activePositionsPerInterval: [number, number, number, number, number, number, number, number];
 }

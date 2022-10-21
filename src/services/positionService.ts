@@ -5,6 +5,7 @@ import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
+import { hexlify } from 'ethers/lib/utils';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import {
   Token,
@@ -27,6 +28,9 @@ import {
   ModifyPermissionsTypeData,
   PositionsGraphqlResponse,
   PositionResponse,
+  WithdrawFundsTypeData,
+  YieldOption,
+  MigratePositionYieldTypeData,
 } from 'types';
 
 // GRAPHQL
@@ -36,24 +40,29 @@ import GET_POSITIONS from 'graphql/getPositions.graphql';
 import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, ETH_COMPANION_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
 import {
   MAX_UINT_32,
   NETWORKS_FOR_MENU,
   PERMISSIONS,
   POSITIONS_VERSIONS,
   POSITION_VERSION_2,
-  POSITION_VERSION_3,
   TRANSACTION_TYPES,
   PositionVersions,
+  LATEST_VERSION,
+  SIGN_VERSION,
+  TOKEN_TYPE_YIELD_BEARING_SHARES,
 } from 'config/constants';
-import { PermissionManagerContract } from 'types/contracts';
+import { PermissionManagerContract, PermissionPermit } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
+import { emptyTokenWithAddress } from 'utils/currency';
+import { getDisplayToken } from 'utils/parsing';
 import gqlFetchAll, { GraphqlResults } from 'utils/gqlFetchAll';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import PairService from './pairService';
+import MeanApiService from './meanApiService';
 
 export default class PositionService {
   modal: SafeAppWeb3Modal;
@@ -70,6 +79,8 @@ export default class PositionService {
 
   pairService: PairService;
 
+  meanApiService: MeanApiService;
+
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
   hasFetchedCurrentPositions: boolean;
@@ -80,11 +91,13 @@ export default class PositionService {
     walletService: WalletService,
     pairService: PairService,
     contractService: ContractService,
+    meanApiService: MeanApiService,
     DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
     this.pairService = pairService;
+    this.meanApiService = meanApiService;
     this.apolloClient = DCASubgraph;
     this.currentPositions = {};
     this.pastPositions = {};
@@ -126,6 +139,9 @@ export default class PositionService {
     POSITIONS_VERSIONS.forEach((version) =>
       NETWORKS_FOR_MENU.forEach((network) => {
         const currentApolloClient = this.apolloClient[version][network];
+        if (!currentApolloClient || !currentApolloClient.getClient()) {
+          return;
+        }
         networksAndVersions.push({ version, network });
         promises.push(
           gqlFetchAll<PositionsGraphqlResponse>(
@@ -148,36 +164,71 @@ export default class PositionService {
       ...this.currentPositions,
     };
 
+    const underlyingsNeededToFetch: {
+      positionId: string;
+      token: Token;
+      amount: BigNumber;
+      attr: 'remainingLiquidityUnderlying' | 'toWithdrawUnderlying';
+    }[] = [];
+
     this.currentPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
-      const protocolToken = getProtocolToken(network);
-      const wrappedProtocolToken = getWrappedProtocolToken(network);
       if (gqlResult.data) {
         return {
           ...acc,
           ...keyBy(
             gqlResult.data.positions.map((position: PositionResponse) => {
               const existingPosition = this.currentPositions[`${position.id}-v${version}`];
+              const fromToUse = getDisplayToken(position.from, network);
+              const toToUse = getDisplayToken(position.to, network);
+
+              if (fromToUse.underlyingTokens.length) {
+                underlyingsNeededToFetch.push({
+                  positionId: `${position.id}-v${version}`,
+                  token: fromToUse,
+                  attr: 'remainingLiquidityUnderlying',
+                  amount: BigNumber.from(position.rate).mul(BigNumber.from(position.remainingSwaps)),
+                });
+              }
+              if (toToUse.underlyingTokens.length) {
+                underlyingsNeededToFetch.push({
+                  positionId: `${position.id}-v${version}`,
+                  token: toToUse,
+                  attr: 'toWithdrawUnderlying',
+                  amount: BigNumber.from(position.toWithdraw),
+                });
+              }
 
               const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
               return {
-                from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-                to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
+                from: fromToUse,
+                to: toToUse,
                 user: position.user,
                 swapInterval: BigNumber.from(position.swapInterval.interval),
                 swapped: BigNumber.from(position.totalSwapped),
-                rate: BigNumber.from(position.current.rate),
-                remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-                remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+                rate: BigNumber.from(position.rate),
+                remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+                remainingSwaps: BigNumber.from(position.remainingSwaps),
                 withdrawn: BigNumber.from(position.totalWithdrawn),
-                toWithdraw: BigNumber.from(position.current.idleSwapped),
+                toWithdraw: BigNumber.from(position.toWithdraw),
                 totalSwaps: BigNumber.from(position.totalSwaps),
+                toWithdrawUnderlying: null,
+                remainingLiquidityUnderlying: null,
+                depositedRateUnderlying: position.depositedRateUnderlying
+                  ? BigNumber.from(position.depositedRateUnderlying)
+                  : null,
+                totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
+                  ? BigNumber.from(position.totalSwappedUnderlyingAccum)
+                  : null,
+                toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
+                  ? BigNumber.from(position.toWithdrawUnderlyingAccum)
+                  : null,
                 id: `${position.id}-v${version}`,
                 positionId: position.id,
                 status: position.status,
                 startedAt: position.createdAtTimestamp,
-                executedSwaps: BigNumber.from(position.executedSwaps),
-                totalDeposits: BigNumber.from(position.totalDeposits),
+                totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
+                totalDeposited: BigNumber.from(position.totalDeposited),
                 pendingTransaction,
                 pairId: position.pair.id,
                 version,
@@ -185,7 +236,7 @@ export default class PositionService {
                 pairLastSwappedAt:
                   (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
                   position.createdAtTimestamp,
-                pairNextSwapAvailableAt: position.pair.nextSwapAvailableAt || '0',
+                pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
               };
             }),
             'id'
@@ -194,6 +245,15 @@ export default class PositionService {
       }
       return acc;
     }, currentPositions);
+
+    const underlyingReponses = await this.meanApiService.getUnderlyingTokens(
+      underlyingsNeededToFetch.map(({ token, amount }) => ({ token, amount }))
+    );
+
+    underlyingReponses.forEach((underlyingResponse, index) => {
+      const position = underlyingsNeededToFetch[index];
+      this.currentPositions[position.positionId][position.attr] = underlyingResponse;
+    });
 
     this.hasFetchedCurrentPositions = true;
   }
@@ -215,6 +275,9 @@ export default class PositionService {
     POSITIONS_VERSIONS.forEach((version) =>
       NETWORKS_FOR_MENU.forEach((network) => {
         const currentApolloClient = this.apolloClient[version][network];
+        if (!currentApolloClient || !currentApolloClient.getClient()) {
+          return;
+        }
         networksAndVersions.push({ version, network });
         promises.push(
           gqlFetchAll<PositionsGraphqlResponse>(
@@ -239,39 +302,53 @@ export default class PositionService {
 
     this.pastPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
-      const protocolToken = getProtocolToken(network);
-      const wrappedProtocolToken = getWrappedProtocolToken(network);
       if (gqlResult.data) {
         return {
           ...acc,
           ...keyBy(
-            gqlResult.data.positions.map((position: PositionResponse) => ({
-              from: position.from.address === wrappedProtocolToken.address ? protocolToken : position.from,
-              to: position.to.address === wrappedProtocolToken.address ? protocolToken : position.to,
-              user: position.user,
-              swapInterval: BigNumber.from(position.swapInterval.interval),
-              swapped: BigNumber.from(position.totalSwapped),
-              rate: BigNumber.from(position.current.rate),
-              remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-              remainingSwaps: BigNumber.from(position.current.remainingSwaps),
-              withdrawn: BigNumber.from(position.totalWithdrawn),
-              toWithdraw: BigNumber.from(position.current.idleSwapped),
-              totalSwaps: BigNumber.from(position.totalSwaps),
-              id: `${position.id}-v${version}`,
-              positionId: position.id,
-              status: position.status,
-              startedAt: position.createdAtTimestamp,
-              executedSwaps: BigNumber.from(position.executedSwaps),
-              totalDeposits: BigNumber.from(position.totalDeposits),
-              pendingTransaction: '',
-              pairId: position.pair.id,
-              version,
-              chainId: network,
-              pairLastSwappedAt:
-                (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
-                position.createdAtTimestamp,
-              pairNextSwapAvailableAt: position.pair.nextSwapAvailableAt || '0',
-            })),
+            gqlResult.data.positions.map((position: PositionResponse) => {
+              const fromToUse = getDisplayToken(position.from, network);
+              const toToUse = getDisplayToken(position.to, network);
+
+              return {
+                from: fromToUse,
+                to: toToUse,
+                user: position.user,
+                swapInterval: BigNumber.from(position.swapInterval.interval),
+                swapped: BigNumber.from(position.totalSwapped),
+                rate: BigNumber.from(position.rate),
+                remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+                remainingSwaps: BigNumber.from(position.remainingSwaps),
+                withdrawn: BigNumber.from(position.totalWithdrawn),
+                toWithdraw: BigNumber.from(position.toWithdraw),
+                totalSwaps: BigNumber.from(position.totalSwaps),
+                toWithdrawUnderlying: null,
+                remainingLiquidityUnderlying: null,
+                depositedRateUnderlying: position.depositedRateUnderlying
+                  ? BigNumber.from(position.depositedRateUnderlying)
+                  : null,
+                totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
+                  ? BigNumber.from(position.totalSwappedUnderlyingAccum)
+                  : null,
+                toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
+                  ? BigNumber.from(position.toWithdrawUnderlyingAccum)
+                  : null,
+                id: `${position.id}-v${version}`,
+                positionId: position.id,
+                status: position.status,
+                startedAt: position.createdAtTimestamp,
+                totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
+                totalDeposited: BigNumber.from(position.totalDeposited),
+                pendingTransaction: '',
+                pairId: position.pair.id,
+                version,
+                chainId: network,
+                pairLastSwappedAt:
+                  (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
+                  position.createdAtTimestamp,
+                pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
+              };
+            }),
             'id'
           ),
         };
@@ -325,7 +402,7 @@ export default class PositionService {
       { name: 'permissions', type: 'uint8[]' },
     ];
 
-    const PermissionPermit = [
+    const PermissionPermits = [
       { name: 'permissions', type: 'PermissionSet[]' },
       { name: 'tokenId', type: 'uint256' },
       { name: 'nonce', type: 'uint256' },
@@ -338,11 +415,11 @@ export default class PositionService {
     const rawSignature = await (signer as VoidSigner)._signTypedData(
       {
         name: signName,
-        version: '1',
+        version: SIGN_VERSION[position.version],
         chainId: currentNetwork.chainId,
         verifyingContract: permissionManagerAddress,
       },
-      { PermissionSet, PermissionPermit },
+      { PermissionSet, PermissionPermit: PermissionPermits },
       { tokenId: positionId, permissions, nonce: nextNonce, deadline: MAX_UINT_256 }
     );
 
@@ -358,35 +435,94 @@ export default class PositionService {
   }
 
   async migratePosition(position: Position): Promise<TransactionResponse> {
-    const permissionManagerV2Address = await this.contractService.getPermissionManagerAddress(POSITION_VERSION_2);
-    const hubAddress = await this.contractService.getHUBAddress();
-    const hubV2Address = await this.contractService.getHUBAddress(POSITION_VERSION_2);
-    const migratorAddress = await this.contractService.getMigratorAddress();
-    const betaMigratorInstance = await this.contractService.getMigratorInstance();
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let permissionsPermit: PermissionPermit | undefined;
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
-    const erc712Name = 'Mean Finance DCA';
+    if (!companionHasPermission) {
+      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+        position,
+        companionAddress,
+        PERMISSIONS.TERMINATE
+      );
+      permissionsPermit = {
+        permissions,
+        deadline: deadline.toString(),
+        v,
+        r: hexlify(r),
+        s: hexlify(s),
+        tokenId: position.positionId,
+      };
+    }
 
-    const generatedSignature = await this.getSignatureForPermission(
-      position,
-      migratorAddress,
-      PERMISSIONS.TERMINATE,
-      permissionManagerV2Address,
-      erc712Name
+    return this.meanApiService.migratePosition(
+      position.positionId,
+      position.from.address,
+      position.to.address,
+      this.walletService.getAccount(),
+      position.version,
+      permissionsPermit
     );
+  }
 
-    return betaMigratorInstance.migrate(hubV2Address, position.positionId, generatedSignature, hubAddress);
+  async migrateYieldPosition(
+    position: Position,
+    fromYield?: YieldOption | null,
+    toYield?: YieldOption | null
+  ): Promise<TransactionResponse> {
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    let permissionsPermit: PermissionPermit | undefined;
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
+    const currentNetwork = await this.walletService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const fromToUse =
+      position.from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.from.address;
+    const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
+
+    if (!companionHasPermission) {
+      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+        position,
+        companionAddress,
+        PERMISSIONS.TERMINATE
+      );
+      permissionsPermit = {
+        permissions,
+        deadline: deadline.toString(),
+        v,
+        r: hexlify(r),
+        s: hexlify(s),
+        tokenId: position.positionId,
+      };
+    }
+
+    return this.meanApiService.migratePosition(
+      position.positionId,
+      fromYield?.tokenAddress || fromToUse,
+      toYield?.tokenAddress || toToUse,
+      this.walletService.getAccount(),
+      position.version,
+      permissionsPermit
+    );
   }
 
   async companionHasPermission(position: Position, permission: number) {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     return permissionManagerInstance.hasPermission(position.positionId, companionAddress, permission);
   }
 
   async companionIsApproved(position: Position): Promise<boolean> {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     try {
       await permissionManagerInstance.ownerOf(position.positionId);
@@ -413,7 +549,11 @@ export default class PositionService {
   }
 
   async approveCompanionForPosition(position: Position): Promise<TransactionResponse> {
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
 
@@ -455,7 +595,9 @@ export default class PositionService {
     to: Token,
     fromValue: string,
     frequencyType: BigNumber,
-    frequencyValue: string
+    frequencyValue: string,
+    yieldFrom?: string,
+    yieldTo?: string
   ): Promise<TransactionResponse> {
     const token = from;
 
@@ -465,24 +607,43 @@ export default class PositionService {
     const swapInterval = frequencyType;
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const companionAddress = await this.contractService.getHUBCompanionAddress();
 
     if (amountOfSwaps.gt(BigNumber.from(MAX_UINT_32))) {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
-    if (from.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase()) {
-      const hubCompanionInstance = await this.contractService.getHUBCompanionInstance();
+    if (yieldFrom) {
+      const permissions = yieldTo
+        ? [
+            {
+              operator: companionAddress,
+              permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE],
+            },
+          ]
+        : [{ operator: companionAddress, permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE] }];
+      return this.meanApiService.depositUsingYield(
+        from.address,
+        to.address,
+        weiValue,
+        amountOfSwaps,
+        swapInterval,
+        yieldFrom,
+        yieldTo,
+        this.walletService.getAccount(),
+        permissions
+      );
+    }
 
-      return hubCompanionInstance.depositUsingProtocolToken(
-        from.address === PROTOCOL_TOKEN_ADDRESS ? ETH_COMPANION_ADDRESS : from.address,
-        to.address === PROTOCOL_TOKEN_ADDRESS ? ETH_COMPANION_ADDRESS : to.address,
+    if (from.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase()) {
+      return this.meanApiService.depositUsingProtocolToken(
+        from.address,
+        yieldTo || to.address,
         weiValue,
         amountOfSwaps,
         swapInterval,
         this.walletService.getAccount(),
-        [],
-        [],
-        from.address === PROTOCOL_TOKEN_ADDRESS ? { value: weiValue } : {}
+        []
       );
     }
 
@@ -490,20 +651,23 @@ export default class PositionService {
 
     const toToUse = to.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken : to;
 
-    return hubInstance['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'](
+    const permissions = yieldTo ? [{ operator: companionAddress, permissions: [PERMISSIONS.WITHDRAW] }] : [];
+
+    return hubInstance.deposit(
       from.address,
-      toToUse.address,
+      yieldTo || toToUse.address,
       weiValue,
       amountOfSwaps,
       swapInterval,
       this.walletService.getAccount(),
-      []
+      permissions
     );
   }
 
   async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : position.to;
 
     if (
       position.to.address !== PROTOCOL_TOKEN_ADDRESS &&
@@ -513,54 +677,48 @@ export default class PositionService {
       throw new Error('Should not call withdraw without it being protocol token');
     }
 
-    if (!useProtocolToken) {
+    const hasYield = position.to.underlyingTokens.length;
+
+    if (!useProtocolToken && !hasYield) {
       const hubInstance = await this.contractService.getHubInstance(position.version);
 
       return hubInstance.withdrawSwapped(position.positionId, this.walletService.getAccount());
     }
 
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
-
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
 
     if (companionHasPermission) {
-      return hubCompanionInstance.withdrawSwappedUsingProtocolToken(
+      return this.meanApiService.withdrawSwappedUsingOtherToken(
         position.positionId,
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version,
+        useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address
       );
+    }
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
     }
 
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
-      await this.contractService.getHUBCompanionAddress(position.version),
+      companionAddress,
       PERMISSIONS.WITHDRAW
     );
 
-    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
-      permissions,
+    return this.meanApiService.withdrawSwappedUsingOtherToken(
       position.positionId,
-      deadline,
-      v,
-      r,
-      s
+      this.walletService.getAccount(),
+      position.version,
+      useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address,
+      { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
-
-    const { data: withdrawData } = await hubCompanionInstance.populateTransaction.withdrawSwappedUsingProtocolToken(
-      position.positionId,
-      this.walletService.getAccount()
-    );
-
-    if (!permissionData || !withdrawData) {
-      throw new Error('Permission or withdraw data cannot be undefined');
-    }
-
-    return hubCompanionInstance.multicall([permissionData, withdrawData]);
   }
 
   async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -572,7 +730,11 @@ export default class PositionService {
       throw new Error('Should not call terminate without it being protocol token');
     }
 
-    if (!useProtocolToken) {
+    const hasYield =
+      (position.from.underlyingTokens.length && position.remainingLiquidity.gt(BigNumber.from(0))) ||
+      (position.to.underlyingTokens.length && position.toWithdraw.gt(BigNumber.from(0)));
+
+    if (!useProtocolToken && !hasYield) {
       const hubInstance = await this.contractService.getHubInstance(position.version);
 
       return hubInstance.terminate(
@@ -585,24 +747,28 @@ export default class PositionService {
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
     if (companionHasPermission) {
-      if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
-        return hubCompanionInstance.terminateUsingProtocolTokenAsTo(
-          position.positionId,
-          this.walletService.getAccount(),
-          this.walletService.getAccount()
-        );
-      }
-      return hubCompanionInstance.terminateUsingProtocolTokenAsFrom(
+      return this.meanApiService.terminateUsingOtherTokens(
         position.positionId,
         this.walletService.getAccount(),
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version,
+        position.from.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
+          ? wrappedProtocolToken.address
+          : position.from.address,
+        position.to.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
+          ? wrappedProtocolToken.address
+          : position.to.address
       );
     }
 
     const permissionManagerAddress = await this.contractService.getPermissionManagerAddress(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
-    const erc712Name = position.version === POSITION_VERSION_3 ? undefined : 'Mean Finance DCA';
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
+
+    const erc712Name = position.version !== POSITION_VERSION_2 ? undefined : 'Mean Finance DCA';
 
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
@@ -612,136 +778,42 @@ export default class PositionService {
       erc712Name
     );
 
-    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
-      permissions,
+    return this.meanApiService.terminateUsingOtherTokens(
       position.positionId,
-      deadline,
-      v,
-      r,
-      s
-    );
-
-    let terminateData;
-    if (position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address) {
-      ({ data: terminateData } = await hubCompanionInstance.populateTransaction.terminateUsingProtocolTokenAsTo(
-        position.positionId,
-        this.walletService.getAccount(),
-        this.walletService.getAccount()
-      ));
-    } else {
-      ({ data: terminateData } = await hubCompanionInstance.populateTransaction.terminateUsingProtocolTokenAsFrom(
-        position.positionId,
-        this.walletService.getAccount(),
-        this.walletService.getAccount()
-      ));
-    }
-
-    if (!permissionData || !terminateData) {
-      throw new Error('Permission or withdraw data cannot be undefined');
-    }
-
-    return hubCompanionInstance.multicall([permissionData, terminateData]);
-  }
-
-  async addFunds(position: Position, newDeposit: string): Promise<TransactionResponse> {
-    const hubInstance = await this.contractService.getHubInstance(position.version);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
-
-    const newRate = parseUnits(newDeposit, position.from.decimals)
-      .add(position.remainingLiquidity)
-      .div(BigNumber.from(position.remainingSwaps));
-
-    const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
-    if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return hubCompanionInstance.increasePositionUsingProtocolToken(
-          position.positionId,
-          newAmount.sub(position.remainingLiquidity),
-          position.remainingSwaps,
-          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
-        );
+      this.walletService.getAccount(),
+      this.walletService.getAccount(),
+      position.version,
+      position.from.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
+        ? wrappedProtocolToken.address
+        : position.from.address,
+      position.to.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
+        ? wrappedProtocolToken.address
+        : position.to.address,
+      {
+        permissions,
+        deadline: deadline.toString(),
+        v,
+        r: hexlify(r),
+        s: hexlify(s),
+        tokenId: position.positionId,
       }
-      return hubInstance.increasePosition(
-        position.positionId,
-        newAmount.sub(position.remainingLiquidity),
-        position.remainingSwaps
-      );
-    }
-
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return hubCompanionInstance.reducePositionUsingProtocolToken(
-        position.positionId,
-        position.remainingLiquidity.sub(newAmount),
-        position.remainingSwaps,
-        this.walletService.getAccount()
-      );
-    }
-
-    return hubInstance.reducePosition(
-      position.positionId,
-      position.remainingLiquidity.sub(newAmount),
-      position.remainingSwaps,
-      this.walletService.getAccount()
-    );
-  }
-
-  async resetPosition(position: Position, newDeposit: string, newSwaps: string): Promise<TransactionResponse> {
-    const hubInstance = await this.contractService.getHubInstance(position.version);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
-
-    if (BigNumber.from(newSwaps).gt(BigNumber.from(MAX_UINT_32))) {
-      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
-    }
-
-    const newRate = parseUnits(newDeposit, position.from.decimals)
-      .add(position.remainingLiquidity)
-      .div(BigNumber.from(newSwaps));
-
-    const newAmount = newRate.mul(BigNumber.from(newSwaps));
-    if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return hubCompanionInstance.increasePositionUsingProtocolToken(
-          position.positionId,
-          newAmount.sub(position.remainingLiquidity),
-          BigNumber.from(newSwaps),
-          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
-        );
-      }
-      return hubInstance.increasePosition(
-        position.positionId,
-        newAmount.sub(position.remainingLiquidity),
-        BigNumber.from(newSwaps)
-      );
-    }
-
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return hubCompanionInstance.reducePositionUsingProtocolToken(
-        position.positionId,
-        position.remainingLiquidity.sub(newAmount),
-        BigNumber.from(newSwaps),
-        this.walletService.getAccount()
-      );
-    }
-
-    return hubInstance.reducePosition(
-      position.positionId,
-      position.remainingLiquidity.sub(newAmount),
-      BigNumber.from(newSwaps),
-      this.walletService.getAccount()
     );
   }
 
   async modifyRateAndSwaps(
     position: Position,
-    newRate: string,
+    newRateUnderlying: string,
     newSwaps: string,
     useWrappedProtocolToken: boolean
   ): Promise<TransactionResponse> {
     const hubInstance = await this.contractService.getHubInstance(position.version);
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+    if (!companionAddress) {
+      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+    }
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -755,34 +827,40 @@ export default class PositionService {
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
-    const newAmount = BigNumber.from(parseUnits(newRate, position.from.decimals)).mul(BigNumber.from(newSwaps));
+    const newAmount = BigNumber.from(parseUnits(newRateUnderlying, position.from.decimals)).mul(
+      BigNumber.from(newSwaps)
+    );
+    const remainingLiquidity = (position.depositedRateUnderlying || position.rate).mul(position.remainingSwaps);
 
-    if (position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) {
-      if (newAmount.gte(position.remainingLiquidity)) {
+    const hasYield = position.from.underlyingTokens.length;
+
+    if ((position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) && !hasYield) {
+      if (newAmount.gte(remainingLiquidity)) {
         return hubInstance.increasePosition(
           position.positionId,
-          newAmount.sub(position.remainingLiquidity),
+          newAmount.sub(remainingLiquidity),
           BigNumber.from(newSwaps)
         );
       }
 
       return hubInstance.reducePosition(
         position.positionId,
-        position.remainingLiquidity.sub(newAmount),
+        remainingLiquidity.sub(newAmount),
         BigNumber.from(newSwaps),
         this.walletService.getAccount()
       );
     }
 
-    if (newAmount.gte(position.remainingLiquidity)) {
+    if (newAmount.gte(remainingLiquidity)) {
       const companionHasIncrease = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
 
       if (companionHasIncrease) {
-        return hubCompanionInstance.increasePositionUsingProtocolToken(
+        return this.meanApiService.increasePositionUsingOtherToken(
           position.positionId,
-          newAmount.sub(position.remainingLiquidity),
+          newAmount.sub(remainingLiquidity),
           BigNumber.from(newSwaps),
-          { value: newAmount.sub(position.remainingLiquidity) }
+          position.version,
+          position.from.address
         );
       }
 
@@ -792,38 +870,33 @@ export default class PositionService {
         PERMISSIONS.INCREASE
       );
 
-      const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
-        permissions,
+      return this.meanApiService.increasePositionUsingOtherToken(
         position.positionId,
-        deadline,
-        v,
-        r,
-        s
+        newAmount.sub(remainingLiquidity),
+        BigNumber.from(newSwaps),
+        position.version,
+        position.from.address,
+        {
+          permissions,
+          deadline: deadline.toString(),
+          v,
+          r: hexlify(r),
+          s: hexlify(s),
+          tokenId: position.positionId,
+        }
       );
-
-      const { data: increaseData } = await hubCompanionInstance.populateTransaction.increasePositionUsingProtocolToken(
-        position.positionId,
-        newAmount.sub(position.remainingLiquidity),
-        BigNumber.from(newSwaps)
-      );
-
-      if (!permissionData || !increaseData) {
-        throw new Error('Permission or increase data cannot be undefined');
-      }
-
-      return hubCompanionInstance.multicall([permissionData, increaseData], {
-        value: newAmount.sub(position.remainingLiquidity),
-      });
     }
 
     const companionHasReduce = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
 
     if (companionHasReduce) {
-      return hubCompanionInstance.reducePositionUsingProtocolToken(
+      return this.meanApiService.reducePositionUsingOtherToken(
         position.positionId,
-        position.remainingLiquidity.sub(newAmount),
+        remainingLiquidity.sub(newAmount),
         BigNumber.from(newSwaps),
-        this.walletService.getAccount()
+        this.walletService.getAccount(),
+        position.version,
+        position.from.address
       );
     }
 
@@ -833,75 +906,14 @@ export default class PositionService {
       PERMISSIONS.REDUCE
     );
 
-    const { data: permissionData } = await hubCompanionInstance.populateTransaction.permissionPermitProxy(
-      permissions,
+    return this.meanApiService.reducePositionUsingOtherToken(
       position.positionId,
-      deadline,
-      v,
-      r,
-      s
-    );
-
-    const { data: reduceData } = await hubCompanionInstance.populateTransaction.reducePositionUsingProtocolToken(
-      position.positionId,
-      position.remainingLiquidity.sub(newAmount),
+      remainingLiquidity.sub(newAmount),
       BigNumber.from(newSwaps),
-      this.walletService.getAccount()
-    );
-
-    if (!permissionData || !reduceData) {
-      throw new Error('Permission or reduce data cannot be undefined');
-    }
-
-    return hubCompanionInstance.multicall([permissionData, reduceData]);
-  }
-
-  async removeFunds(position: Position, ammountToRemove: string): Promise<TransactionResponse> {
-    const hubInstance = await this.contractService.getHubInstance(position.version);
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(position.version);
-
-    const newSwaps = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
-      ? BigNumber.from(0)
-      : position.remainingSwaps;
-
-    const newRate = parseUnits(ammountToRemove, position.from.decimals).eq(position.remainingLiquidity)
-      ? BigNumber.from(0)
-      : position.remainingLiquidity
-          .sub(parseUnits(ammountToRemove, position.from.decimals))
-          .div(BigNumber.from(position.remainingSwaps));
-
-    if (newSwaps.gt(BigNumber.from(MAX_UINT_32))) {
-      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
-    }
-
-    const newAmount = newRate.mul(BigNumber.from(position.remainingSwaps));
-    if (newAmount.gte(position.remainingLiquidity)) {
-      if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-        return hubCompanionInstance.increasePositionUsingProtocolToken(
-          position.positionId,
-          newAmount.sub(position.remainingLiquidity),
-          newSwaps,
-          position.from.address === PROTOCOL_TOKEN_ADDRESS ? { value: newAmount.sub(position.remainingLiquidity) } : {}
-        );
-      }
-
-      return hubInstance.increasePosition(position.positionId, newAmount.sub(position.remainingLiquidity), newSwaps);
-    }
-
-    if (position.from.address === PROTOCOL_TOKEN_ADDRESS) {
-      return hubCompanionInstance.reducePositionUsingProtocolToken(
-        position.positionId,
-        position.remainingLiquidity.sub(newAmount),
-        BigNumber.from(newSwaps),
-        this.walletService.getAccount()
-      );
-    }
-
-    return hubInstance.reducePosition(
-      position.positionId,
-      position.remainingLiquidity.sub(newAmount),
-      BigNumber.from(newSwaps),
-      this.walletService.getAccount()
+      this.walletService.getAccount(),
+      position.version,
+      position.from.address,
+      { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
   }
 
@@ -922,10 +934,29 @@ export default class PositionService {
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
       const newPositionTypeData = typeData as NewPositionTypeData;
       id = `pending-transaction-${transaction.hash}`;
+      const { fromYield, toYield } = newPositionTypeData;
+
+      let fromToUse =
+        newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
+      let toToUse =
+        newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to;
+
+      if (fromYield) {
+        fromToUse = {
+          ...fromToUse,
+          underlyingTokens: [emptyTokenWithAddress(fromYield)],
+        };
+      }
+      if (toYield) {
+        toToUse = {
+          ...toToUse,
+          underlyingTokens: [emptyTokenWithAddress(toYield)],
+        };
+      }
+
       this.currentPositions[`${id}-v${newPositionTypeData.version}`] = {
-        from:
-          newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from,
-        to: newPositionTypeData.to.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to,
+        from: fromToUse,
+        to: toToUse,
         user: this.walletService.getAccount(),
         chainId: network.chainId,
         positionId: id,
@@ -935,17 +966,24 @@ export default class PositionService {
         rate: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
           BigNumber.from(newPositionTypeData.frequencyValue)
         ),
+        depositedRateUnderlying: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
+          BigNumber.from(newPositionTypeData.frequencyValue)
+        ),
+        toWithdrawUnderlying: null,
+        remainingLiquidityUnderlying: null,
+        totalSwappedUnderlyingAccum: BigNumber.from(0),
+        toWithdrawUnderlyingAccum: BigNumber.from(0),
         remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         withdrawn: BigNumber.from(0),
-        executedSwaps: BigNumber.from(0),
+        totalExecutedSwaps: BigNumber.from(0),
         id,
         startedAt: newPositionTypeData.startedAt,
-        totalDeposits: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
+        totalDeposited: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         pendingTransaction: transaction.hash,
         status: 'ACTIVE',
-        version: POSITION_VERSION_3,
+        version: LATEST_VERSION,
         pairLastSwappedAt: newPositionTypeData.startedAt,
         pairNextSwapAvailableAt: newPositionTypeData.startedAt.toString(),
       };
@@ -972,7 +1010,7 @@ export default class PositionService {
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
     const { id } = typeData;
     if (transaction.type === TRANSACTION_TYPES.NEW_POSITION) {
-      delete this.currentPositions[`pending-transaction-${transaction.hash}`];
+      delete this.currentPositions[`pending-transaction-${transaction.hash}-v${LATEST_VERSION}`];
     } else {
       this.currentPositions[id].pendingTransaction = '';
     }
@@ -1007,7 +1045,12 @@ export default class PositionService {
           };
         }
         delete this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
-        this.pairService.addNewPair(newPositionTypeData.from, newPositionTypeData.to, newPositionTypeData.oracle);
+        this.pairService.addNewPair(
+          newPositionTypeData.from,
+          newPositionTypeData.to,
+          newPositionTypeData.oracle,
+          BigNumber.from(newPositionTypeData.frequencyType)
+        );
         break;
       }
       case TRANSACTION_TYPES.TERMINATE_POSITION: {
@@ -1035,13 +1078,56 @@ export default class PositionService {
             toWithdraw: BigNumber.from(0),
             swapped: BigNumber.from(0),
             withdrawn: BigNumber.from(0),
-            executedSwaps: BigNumber.from(0),
+            totalExecutedSwaps: BigNumber.from(0),
             status: 'ACTIVE',
-            version: POSITION_VERSION_3,
+            version: LATEST_VERSION,
             id: migratePositionTypeData.newId,
           };
         }
         delete this.currentPositions[migratePositionTypeData.id];
+        break;
+      }
+      case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
+        const migratePositionYieldTypeData = transaction.typeData as MigratePositionYieldTypeData;
+        this.pastPositions[migratePositionYieldTypeData.id] = {
+          ...this.currentPositions[migratePositionYieldTypeData.id],
+          pendingTransaction: '',
+        };
+        if (migratePositionYieldTypeData.newId) {
+          const newPositionId = `${migratePositionYieldTypeData.newId}-v${LATEST_VERSION}`;
+          this.currentPositions[newPositionId] = {
+            ...this.currentPositions[migratePositionYieldTypeData.id],
+            from: !migratePositionYieldTypeData.fromYield
+              ? this.currentPositions[migratePositionYieldTypeData.id].from
+              : {
+                  ...this.currentPositions[migratePositionYieldTypeData.id].from,
+                  underlyingTokens: [
+                    emptyTokenWithAddress(migratePositionYieldTypeData.fromYield, TOKEN_TYPE_YIELD_BEARING_SHARES),
+                  ],
+                },
+            to: !migratePositionYieldTypeData.toYield
+              ? this.currentPositions[migratePositionYieldTypeData.id].to
+              : {
+                  ...this.currentPositions[migratePositionYieldTypeData.id].to,
+                  underlyingTokens: [
+                    emptyTokenWithAddress(migratePositionYieldTypeData.toYield, TOKEN_TYPE_YIELD_BEARING_SHARES),
+                  ],
+                },
+            depositedRateUnderlying: this.currentPositions[migratePositionYieldTypeData.id].rate,
+            toWithdrawUnderlyingAccum: BigNumber.from(0),
+            totalSwappedUnderlyingAccum: BigNumber.from(0),
+            pendingTransaction: '',
+            toWithdraw: BigNumber.from(0),
+            swapped: BigNumber.from(0),
+            withdrawn: BigNumber.from(0),
+            totalExecutedSwaps: BigNumber.from(0),
+            status: 'ACTIVE',
+            version: LATEST_VERSION,
+            positionId: migratePositionYieldTypeData.newId,
+            id: newPositionId,
+          };
+        }
+        delete this.currentPositions[migratePositionYieldTypeData.id];
         break;
       }
       case TRANSACTION_TYPES.WITHDRAW_POSITION: {
@@ -1050,6 +1136,8 @@ export default class PositionService {
         this.currentPositions[withdrawPositionTypeData.id].withdrawn =
           this.currentPositions[withdrawPositionTypeData.id].swapped;
         this.currentPositions[withdrawPositionTypeData.id].toWithdraw = BigNumber.from(0);
+        this.currentPositions[withdrawPositionTypeData.id].toWithdrawUnderlying = BigNumber.from(0);
+        this.currentPositions[withdrawPositionTypeData.id].toWithdrawUnderlyingAccum = BigNumber.from(0);
         break;
       }
       case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
@@ -1162,6 +1250,22 @@ export default class PositionService {
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity = this.currentPositions[
           modifyRateAndSwapsPositionTypeData.id
         ].rate.mul(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
+        break;
+      }
+      case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+        const withdrawFundsTypeData = transaction.typeData as WithdrawFundsTypeData;
+        this.currentPositions[withdrawFundsTypeData.id].pendingTransaction = '';
+        this.currentPositions[withdrawFundsTypeData.id].rate = BigNumber.from(0);
+        this.currentPositions[withdrawFundsTypeData.id].depositedRateUnderlying = this.currentPositions[
+          withdrawFundsTypeData.id
+        ].depositedRateUnderlying
+          ? BigNumber.from('0')
+          : null;
+        this.currentPositions[withdrawFundsTypeData.id].totalSwaps = this.currentPositions[
+          withdrawFundsTypeData.id
+        ].totalSwaps.sub(this.currentPositions[withdrawFundsTypeData.id].remainingSwaps);
+        this.currentPositions[withdrawFundsTypeData.id].remainingSwaps = BigNumber.from(0);
+        this.currentPositions[withdrawFundsTypeData.id].remainingLiquidity = BigNumber.from(0);
         break;
       }
       case TRANSACTION_TYPES.TRANSFER_POSITION: {

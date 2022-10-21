@@ -5,11 +5,10 @@ const getLeaderboardPositions = gql`
     positions(first: $first, skip: $skip) {
       id
       createdAtTimestamp
-      totalDeposits
+      totalDeposited
       totalSwaps
       totalSwapped
       totalWithdrawn
-      startedAtSwap
       user
       terminatedAtTimestamp
       from {
@@ -17,12 +16,28 @@ const getLeaderboardPositions = gql`
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       to {
         address: id
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       pair {
         id
@@ -31,12 +46,28 @@ const getLeaderboardPositions = gql`
           decimals
           name
           symbol
+          type
+          underlyingTokens {
+            address: id
+            decimals
+            name
+            symbol
+            type
+          }
         }
         tokenB {
           address: id
           decimals
           name
           symbol
+          type
+          underlyingTokens {
+            address: id
+            decimals
+            name
+            symbol
+            type
+          }
         }
       }
       status
@@ -44,43 +75,69 @@ const getLeaderboardPositions = gql`
         id
         interval
       }
-      current {
+      permissions {
         id
-        rate
-        remainingSwaps
-        remainingLiquidity
-        withdrawn
-        idleSwapped
-        permissions {
-          id
-          operator
-          permissions
-        }
+        operator
+        permissions
       }
-      history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc) {
+      rate
+      remainingSwaps
+      remainingLiquidity
+      withdrawn
+      toWithdraw
+      history(orderBy: createdAtTimestamp, orderDirection: asc) {
         id
         action
-        rate
-        oldRate
-        from
-        to
-        remainingSwaps
-        oldRemainingSwaps
-        swapped
-        withdrawn
-        createdAtBlock
-        createdAtTimestamp
-        ratePerUnitAToBWithFee
-        ratePerUnitBToAWithFee
-        permissions {
-          operator
-          id
-          permissions
-        }
         transaction {
           id
           hash
           timestamp
+        }
+        createdAtBlock
+        createdAtTimestamp
+
+        ... on PermissionsModifiedAction {
+          permissions {
+            operator
+            id
+            permissions
+          }
+        }
+
+        ... on ModifiedAction {
+          rate
+          oldRate
+          remainingSwaps
+          oldRemainingSwaps
+          rateUnderlying
+          oldRateUnderlying
+        }
+
+        ... on WithdrewAction {
+          withdrawn
+          withdrawnUnderlying
+        }
+
+        ... on SwappedAction {
+          ratioAToBWithFee
+          ratioBToAWithFee
+          swapped
+          rate
+        }
+
+        ... on TransferedAction {
+          from
+          to
+        }
+
+        ... on CreatedAction {
+          rate
+          remainingSwaps
+          permissions {
+            operator
+            id
+            permissions
+          }
         }
       }
     }

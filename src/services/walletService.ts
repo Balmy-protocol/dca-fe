@@ -13,7 +13,7 @@ import ERC20ABI from 'abis/erc20.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { NETWORKS } from 'config/constants';
+import { LATEST_VERSION, NETWORKS, PositionVersions } from 'config/constants';
 import { ERC20Contract } from 'types/contracts';
 import ContractService from './contractService';
 
@@ -159,14 +159,16 @@ export default class WalletService {
     return erc20.balanceOf(account);
   }
 
-  async getAllowance(token: Token) {
+  async getAllowance(token: Token, shouldCheckCompanion?: boolean, positionVersion: PositionVersions = LATEST_VERSION) {
     const account = this.getAccount();
 
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
     }
 
-    const addressToCheck = await this.contractService.getHUBAddress();
+    const addressToCheck = shouldCheckCompanion
+      ? await this.contractService.getHUBCompanionAddress(positionVersion)
+      : await this.contractService.getHUBAddress(positionVersion);
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
@@ -178,8 +180,14 @@ export default class WalletService {
     };
   }
 
-  async approveToken(token: Token): Promise<TransactionResponse> {
-    const addressToApprove = await this.contractService.getHUBAddress();
+  async approveToken(
+    token: Token,
+    shouldUseCompanion = false,
+    positionVersion: PositionVersions = LATEST_VERSION
+  ): Promise<TransactionResponse> {
+    const addressToApprove = shouldUseCompanion
+      ? await this.contractService.getHUBCompanionAddress(positionVersion)
+      : await this.contractService.getHUBAddress(positionVersion);
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 

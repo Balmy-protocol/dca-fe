@@ -1,3 +1,4 @@
+import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 
@@ -47,30 +48,29 @@ export type PositionResponse = {
   user: string;
   pair: {
     id: string;
-    nextSwapAvailableAt: string;
+    activePositionsPerInterval: number[];
     swaps: {
       id: string;
       executedAtTimestamp: string;
     }[];
   };
   status: string;
-  executedSwaps: BigNumber;
+  totalExecutedSwaps: BigNumber;
   swapInterval: {
     id: string;
     interval: BigNumber;
     description: BigNumber;
   };
-  current: {
-    id: string;
-    rate: BigNumber;
-    remainingSwaps: BigNumber;
-    swapped: BigNumber;
-    withdrawn: BigNumber;
-    remainingLiquidity: BigNumber;
-    idleSwapped: BigNumber;
-  };
+  remainingSwaps: BigNumber;
+  swapped: BigNumber;
+  withdrawn: BigNumber;
+  remainingLiquidity: BigNumber;
+  toWithdraw: BigNumber;
+  depositedRateUnderlying: Nullable<BigNumber>;
+  totalSwappedUnderlyingAccum: Nullable<BigNumber>;
+  toWithdrawUnderlyingAccum: Nullable<BigNumber>;
   rate: BigNumber;
-  totalDeposits: BigNumber;
+  totalDeposited: BigNumber;
   totalSwaps: BigNumber;
   totalSwapped: BigNumber;
   totalWithdrawn: BigNumber;
@@ -162,9 +162,32 @@ export type AvailablePairResponse = {
   createdAtTimestamp: number;
   status: string; // active, stale
   positions: PositionResponse[];
-  nextSwapAvailableAt: string;
+  activePositionsPerInterval: [number, number, number, number, number, number, number, number];
 };
 
 export interface AvailablePairsGraphqlResponse {
   pairs: AvailablePairResponse[];
+}
+
+export interface DefillamaResponse {
+  data: {
+    apy: number;
+    underlyingTokens: string[];
+    pool: string;
+  }[];
+}
+
+export interface MeanFinanceResponse {
+  tx: TransactionRequest;
+}
+
+export interface MeanApiUnderlyingResponse {
+  underlying: {
+    dependent: string;
+    dependentAmount: string;
+    underlying: {
+      underlying: string;
+      underlyingAmount: string;
+    }[];
+  }[];
 }

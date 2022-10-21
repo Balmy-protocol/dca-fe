@@ -3,15 +3,21 @@ import Grid from '@mui/material/Grid';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import useCurrentPositions from 'hooks/useCurrentPositions';
-import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import EmptyPositions from 'common/empty-positions';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
-import { Position } from 'types';
+import { ChainId, Position, YieldOptions } from 'types';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import { FULL_DEPOSIT_TYPE, NETWORKS, PERMISSIONS, RATE_TYPE, TRANSACTION_TYPES } from 'config/constants';
+import {
+  FULL_DEPOSIT_TYPE,
+  NETWORKS,
+  PERMISSIONS,
+  RATE_TYPE,
+  SUPPORTED_NETWORKS,
+  TRANSACTION_TYPES,
+} from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import ModifySettingsModal from 'common/modify-settings-modal';
@@ -23,8 +29,9 @@ import usePositionService from 'hooks/usePositionService';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import TerminateModal from 'common/terminate-modal';
-import MigratePositionModal from 'common/migrate-position-modal';
+import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
+import useYieldOptions from 'hooks/useYieldOptions';
+import MigrateYieldModal from 'common/migrate-yield-modal';
 import ActivePosition from './components/position';
 import FinishedPosition from './components/finished-position';
 
@@ -32,38 +39,42 @@ const StyledGridItem = styled(Grid)`
   display: flex;
 `;
 
-const POSITIONS_PER_ROW = {
-  xs: 1,
-  sm: 2,
-  md: 4,
-  lg: 4,
-  xl: 4,
-};
-
 interface CurrentPositionsProps {
   isLoading: boolean;
+}
+
+function comparePositions(positionA: Position, positionB: Position) {
+  const isAFinished = positionA.remainingSwaps.lte(BigNumber.from(0));
+  const isBFinished = positionB.remainingSwaps.lte(BigNumber.from(0));
+  if (isAFinished !== isBFinished) {
+    return isAFinished ? 1 : -1;
+  }
+
+  return positionA.startedAt > positionB.startedAt ? -1 : 1;
 }
 
 const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const [hasSignSupport] = useSupportsSigning();
   const currentPositions = useCurrentPositions();
-  const currentBreakPoint = useCurrentBreakpoint();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const addTransaction = useTransactionAdder();
   const positionService = usePositionService();
-  const positionsPerRow = POSITIONS_PER_ROW[currentBreakPoint];
-  const positionsToFill =
-    currentPositions.length % positionsPerRow !== 0 ? positionsPerRow - (currentPositions.length % positionsPerRow) : 0;
-  const emptyPositions = [];
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
-  const [showTerminateModal, setShowTerminateModal] = React.useState(false);
-  const [showMigrateModal, setShowMigrateModal] = React.useState(false);
+  const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
+  const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
+  const yieldOptionsByChain: Record<ChainId, YieldOptions> = {};
+  let isLoadingAllChainsYieldOptions = false;
+  SUPPORTED_NETWORKS.forEach((supportedNetwork) => {
+    const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(supportedNetwork);
+    yieldOptionsByChain[supportedNetwork] = yieldOptions || [];
+    isLoadingAllChainsYieldOptions = isLoadingYieldOptions || isLoadingAllChainsYieldOptions;
+  });
 
   const network = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -71,11 +82,20 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     return supportedNetwork;
   }, [currentNetwork.chainId]);
 
-  for (let i = 0; i < positionsToFill; i += 1) {
-    emptyPositions.push(i);
-  }
+  const onCancelModifySettingsModal = React.useCallback(
+    () => setShowModifyRateSettingsModal(false),
+    [setShowModifyRateSettingsModal]
+  );
+  const onCancelMigrateYieldModal = React.useCallback(
+    () => setShowMigrateYieldModal(false),
+    [setShowMigrateYieldModal]
+  );
+  const onCancelSuggestMigrateYieldModal = React.useCallback(
+    () => setShowSuggestMigrateYieldModal(false),
+    [setShowSuggestMigrateYieldModal]
+  );
 
-  if (isLoading) {
+  if (isLoading || isLoadingAllChainsYieldOptions) {
     return <CenteredLoadingIndicator size={70} />;
   }
 
@@ -96,6 +116,9 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address
           ? protocolOrWrappedToken
           : position.to.symbol;
+
+      const hasYield = position.to.underlyingTokens.length;
+
       setModalLoading({
         content: (
           <>
@@ -106,11 +129,12 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                 values={{ toSymbol }}
               />
             </Typography>
-            {useProtocolToken && !hasPermission && (
+            {(!!useProtocolToken || !!hasYield) && !hasPermission && (
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
-                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as ETH."
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
+                  values={{ token: position.to.symbol }}
                 />
               </Typography>
             )}
@@ -141,12 +165,16 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     }
   };
 
-  const positionsInProgress = currentPositions.filter(
-    ({ toWithdraw, remainingSwaps }) => toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))
-  );
-  const positionsFinished = currentPositions.filter(
-    ({ toWithdraw, remainingSwaps }) => toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0))
-  );
+  const positionsInProgress = currentPositions
+    .filter(
+      ({ toWithdraw, remainingSwaps }) => toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))
+    )
+    .sort(comparePositions);
+  const positionsFinished = currentPositions
+    .filter(
+      ({ toWithdraw, remainingSwaps }) => toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0))
+    )
+    .sort(comparePositions);
 
   const onShowModifyRateSettings = (position: Position) => {
     if (!position) {
@@ -156,8 +184,11 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setSelectedPosition(position);
     dispatch(
       initializeModifyRateSettings({
-        fromValue: formatUnits(position.remainingLiquidity, position.from.decimals),
-        rate: formatUnits(position.rate, position.from.decimals),
+        fromValue: formatUnits(
+          (position.depositedRateUnderlying || position.rate).mul(position.remainingSwaps),
+          position.from.decimals
+        ),
+        rate: formatUnits(position.depositedRateUnderlying || position.rate, position.from.decimals),
         frequencyValue: position.remainingSwaps.toString(),
         modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0)) ? FULL_DEPOSIT_TYPE : RATE_TYPE,
       })
@@ -165,22 +196,22 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setShowModifyRateSettingsModal(true);
   };
 
-  const onShowTerminate = (position: Position) => {
+  const onShowMigrateYield = (position: Position) => {
     if (!position) {
       return;
     }
 
     setSelectedPosition(position);
-    setShowTerminateModal(true);
+    setShowMigrateYieldModal(true);
   };
 
-  const onShowMigrate = (position: Position) => {
+  const onSuggestMigrateYieldModal = (position: Position) => {
     if (!position) {
       return;
     }
 
     setSelectedPosition(position);
-    setShowMigrateModal(true);
+    setShowSuggestMigrateYieldModal(true);
   };
 
   return (
@@ -188,16 +219,17 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       <ModifySettingsModal
         open={showModifyRateSettingsModal}
         position={selectedPosition}
-        onCancel={() => setShowModifyRateSettingsModal(false)}
+        onCancel={onCancelModifySettingsModal}
       />
-      <TerminateModal
-        open={showTerminateModal}
+      <MigrateYieldModal
+        onCancel={onCancelMigrateYieldModal}
+        open={showMigrateYieldModal}
         position={selectedPosition}
-        onCancel={() => setShowTerminateModal(false)}
       />
-      <MigratePositionModal
-        onCancel={() => setShowMigrateModal(false)}
-        open={showMigrateModal}
+      <SuggestMigrateYieldModal
+        onCancel={onCancelSuggestMigrateYieldModal}
+        open={showSuggestMigrateYieldModal}
+        onAddFunds={onShowModifyRateSettings}
         position={selectedPosition}
       />
       <Grid container spacing={1}>
@@ -205,7 +237,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
           <>
             <StyledGridItem item xs={12}>
               <Typography variant="body2">
-                <FormattedMessage description="inProgressPositions" defaultMessage="IN PROGRESS" />
+                <FormattedMessage description="inProgressPositions" defaultMessage="ACTIVE" />
               </Typography>
             </StyledGridItem>
             <Grid item xs={12}>
@@ -216,11 +248,13 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       position={position}
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
-                      onTerminate={onShowTerminate}
-                      onMigrate={onShowMigrate}
+                      onMigrateYield={onShowMigrateYield}
+                      onSuggestMigrateYield={onSuggestMigrateYieldModal}
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
                       network={network}
+                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                      yieldOptionsByChain={yieldOptionsByChain}
                     />
                   </StyledGridItem>
                 ))}
@@ -232,7 +266,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
           <>
             <StyledGridItem item xs={12} sx={{ marginTop: '32px' }}>
               <Typography variant="body2">
-                <FormattedMessage description="finishedPositions" defaultMessage="FINISHED" />
+                <FormattedMessage description="donePositions" defaultMessage="DONE" />
               </Typography>
             </StyledGridItem>
             <Grid item xs={12}>
@@ -243,11 +277,13 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       position={position}
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
-                      onTerminate={onShowTerminate}
-                      onMigrate={onShowMigrate}
+                      onMigrateYield={onShowMigrateYield}
                       disabled={!isOnCorrectNetwork}
                       hasSignSupport={!!hasSignSupport}
+                      onSuggestMigrateYield={onSuggestMigrateYieldModal}
                       network={network}
+                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                      yieldOptionsByChain={yieldOptionsByChain}
                     />
                   </StyledGridItem>
                 ))}
@@ -259,4 +295,5 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     </>
   );
 };
+
 export default CurrentPositions;

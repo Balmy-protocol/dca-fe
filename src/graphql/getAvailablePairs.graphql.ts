@@ -9,17 +9,33 @@ const getAvailablePairs = gql`
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       tokenB {
         address: id
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       swaps(first: 1, orderBy: executedAtTimestamp, orderDirection: desc) {
         executedAtTimestamp
       }
-      nextSwapAvailableAt
+      activePositionsPerInterval
       positions(first: 1, orderBy: createdAtTimestamp, orderDirection: asc, where: { status: ACTIVE }) {
         id
         createdAtTimestamp

@@ -11,27 +11,43 @@ const getCurrentPositions = gql`
     ) {
       id
       createdAtTimestamp
-      totalDeposits
+      totalDeposited
       totalSwaps
       totalSwapped
       totalWithdrawn
-      executedSwaps
+      totalExecutedSwaps
       user
       from {
         address: id
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       to {
         address: id
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       pair {
         id
-        nextSwapAvailableAt
+        activePositionsPerInterval
         swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1) {
           id
           executedAtTimestamp
@@ -42,13 +58,14 @@ const getCurrentPositions = gql`
         id
         interval
       }
-      current {
-        id
-        rate
-        remainingSwaps
-        remainingLiquidity
-        idleSwapped
-      }
+      rate
+      depositedRateUnderlying
+      totalSwappedUnderlyingAccum
+      toWithdrawUnderlyingAccum
+      remainingSwaps
+      remainingLiquidity
+      withdrawn
+      toWithdraw
     }
   }
 `;

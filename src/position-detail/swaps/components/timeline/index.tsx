@@ -10,7 +10,6 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import CreatedIcon from '@mui/icons-material/NewReleases';
-import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { ActionState, FullPosition } from 'types';
@@ -18,6 +17,7 @@ import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
 import {
   COMPANION_ADDRESS,
+  LATEST_VERSION,
   POSITION_ACTIONS,
   POSITION_VERSION_3,
   STABLE_COINS,
@@ -34,19 +34,15 @@ import useUsdPrice from 'hooks/useUsdPrice';
 import { withStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import CustomChip from 'common/custom-chip';
+import ComposedTokenIcon from 'common/composed-token-icon';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {
-    // backgroundColor: theme.palette.primary.dark,
-    // color: theme.palette.common.white,
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },
 }))(Tooltip);
-
-const StyledChip = styled(Chip)`
-  margin: 0px 5px;
-`;
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 3px;
@@ -163,45 +159,71 @@ const StyledTitleMainText = styled(Typography)`
   color: rgba(255, 255, 255, 0.5);
 `;
 
+const StyledTimelineWrappedContent = styled(Typography)`
+  display: flex;
+  align-items: center;
+  white-space: break-spaces;
+  gap: 5px;
+  flex-wrap: wrap;
+`;
+
 interface PositionTimelineProps {
   position: FullPosition;
   filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
 }
 
-const buildSwappedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
+const buildSwappedItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <CompareArrowsIcon />,
   content: () => {
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.swapped));
+    const swapped = positionState.swappedUnderlying || positionState.swapped;
+    const rate = positionState.depositedRateUnderlying || positionState.rate;
+    const yieldRate = positionState.rateUnderlying || positionState.depositedRateUnderlying || positionState.rate;
+    const yieldFrom = BigNumber.from(yieldRate).sub(rate);
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(swapped),
+      undefined,
+      position.chainId
+    );
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
-      BigNumber.from(positionState.swapped),
-      positionState.createdAtTimestamp
+      BigNumber.from(swapped),
+      positionState.createdAtTimestamp,
+      position.chainId
     );
     const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(positionState.rate)
+      BigNumber.from(rate),
+      undefined,
+      position.chainId
     );
     const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(positionState.rate),
-      positionState.createdAtTimestamp
+      BigNumber.from(rate),
+      positionState.createdAtTimestamp,
+      position.chainId
+    );
+    const [fromYieldCurrentPrice, isLoadingFromYieldCurrentPrice] = useUsdPrice(
+      position.from,
+      BigNumber.from(yieldFrom),
+      undefined,
+      position.chainId
+    );
+    const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
+      position.from,
+      BigNumber.from(yieldFrom),
+      positionState.createdAtTimestamp,
+      position.chainId
     );
 
-    const showToPrices =
-      !STABLE_COINS.includes(position.to.symbol) &&
-      !isLoadingToPrice &&
-      !!toPrice &&
-      !isLoadingToCurrentPrice &&
-      !!toCurrentPrice;
-    const showFromPrices =
-      !STABLE_COINS.includes(position.from.symbol) &&
-      !isLoadingFromPrice &&
-      !!fromPrice &&
-      !isLoadingFromCurrentPrice &&
-      !!fromCurrentPrice;
+    const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
+    const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;
+    const showFromYieldPrices =
+      !isLoadingFromYieldPrice && !!fromYieldPrice && !isLoadingFromYieldCurrentPrice && !!fromYieldCurrentPrice;
     const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
     const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
-    const wrappedProtocolToken = getWrappedProtocolToken(chainId);
+    const [showFromYieldCurrentPrice, setShouldShowFromYieldCurrentPrice] = useState(true);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
     let tokenFrom = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
     let tokenTo = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
@@ -219,8 +241,8 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
           to: STABLE_COINS.includes(tokenTo.symbol) ? 'USD' : tokenTo.symbol,
           swapRate:
             position.pair.tokenA.address === tokenFrom.address
-              ? formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitAToBWithFee), tokenTo)
-              : formatCurrencyAmount(BigNumber.from(positionState.ratePerUnitBToAWithFee), tokenFrom),
+              ? formatCurrencyAmount(BigNumber.from(positionState.ratioAToBWithFee), tokenTo)
+              : formatCurrencyAmount(BigNumber.from(positionState.ratioBToAWithFee), tokenFrom),
           currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
         }}
       />
@@ -228,76 +250,88 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
     return (
       <>
         <StyledCenteredGrid item xs={12}>
-          <Typography
-            variant="body1"
-            component="p"
-            style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-          >
+          <StyledTimelineWrappedContent variant="body1">
             <StyledTitleMainText variant="body1">
               <FormattedMessage description="pairSwapDetails" defaultMessage="Swapped:" />
             </StyledTitleMainText>
-            {` ${formatCurrencyAmount(BigNumber.from(positionState.rate), position.from)} ${position.from.symbol} `}
-            {showFromPrices && (
-              <DarkTooltip
-                title={
-                  showFromCurrentPrice
-                    ? 'Displaying current value. Click to show value on day of withdrawal'
-                    : 'Estimated value on day of swap'
-                }
-                arrow
-                placement="top"
-              >
-                <StyledChip
-                  onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
-                  variant="outlined"
-                  size="small"
-                  label={
-                    <FormattedMessage
-                      description="pairSwapDetailsFromPrice"
-                      defaultMessage="{fromPrice} USD"
-                      values={{
-                        fromPrice: showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2),
-                      }}
-                    />
+            <CustomChip
+              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
+              pointer
+              extraText={
+                showFromPrices && (
+                  <DarkTooltip
+                    title={
+                      showFromCurrentPrice
+                        ? 'Displaying current value. Click to show value on day of withdrawal'
+                        : 'Estimated value on day of withdrawal'
+                    }
+                    arrow
+                    placement="top"
+                    onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
+                  >
+                    <div>(${showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2)} USD)</div>
+                  </DarkTooltip>
+                )
+              }
+            >
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
+            </CustomChip>
+            {yieldFrom.gt(BigNumber.from(0)) && (
+              <>
+                <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                  <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+                </Typography>
+                <CustomChip
+                  icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
+                  pointer
+                  extraText={
+                    showFromYieldPrices && (
+                      <DarkTooltip
+                        title={
+                          showFromYieldCurrentPrice
+                            ? 'Displaying current value. Click to show value on day of withdrawal'
+                            : 'Estimated value on day of withdrawal'
+                        }
+                        arrow
+                        placement="top"
+                        onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}
+                      >
+                        <div>
+                          (${showFromYieldCurrentPrice ? fromYieldCurrentPrice?.toFixed(2) : fromYieldPrice?.toFixed(2)}{' '}
+                          USD)
+                        </div>
+                      </DarkTooltip>
+                    )
                   }
-                />
-              </DarkTooltip>
+                >
+                  <Typography variant="body1">{formatCurrencyAmount(yieldFrom, position.from, 4)}</Typography>
+                </CustomChip>
+              </>
             )}
-            <FormattedMessage
-              description="pairSwapDetailsFor"
-              defaultMessage="for {result} {to}"
-              values={{
-                result: formatCurrencyAmount(BigNumber.from(positionState.swapped), position.to),
-                to: position.to.symbol,
-              }}
-            />
-            {showToPrices && (
-              <DarkTooltip
-                title={
-                  showToCurrentPrice
-                    ? 'Displaying current value. Click to show value on day of withdrawal'
-                    : 'Estimated value on day of swap'
-                }
-                arrow
-                placement="top"
-              >
-                <StyledChip
-                  onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
-                  variant="outlined"
-                  size="small"
-                  label={
-                    <FormattedMessage
-                      description="pairSwapDetailsToPrice"
-                      defaultMessage="{toPrice} USD"
-                      values={{
-                        toPrice: showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2),
-                      }}
-                    />
-                  }
-                />
-              </DarkTooltip>
-            )}
-          </Typography>
+            <FormattedMessage description="pairSwapDetailsFor" defaultMessage="for" />
+            <CustomChip
+              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+              pointer
+              extraText={
+                showToPrices && (
+                  <DarkTooltip
+                    title={
+                      showToCurrentPrice
+                        ? 'Displaying current value. Click to show value on day of withdrawal'
+                        : 'Estimated value on day of withdrawal'
+                    }
+                    arrow
+                    placement="top"
+                    onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
+                  >
+                    <div>(${showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
+                  </DarkTooltip>
+                )
+              }
+            >
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(swapped), position.to, 4)}</Typography>
+            </CustomChip>
+          </StyledTimelineWrappedContent>
           <Tooltip title={TooltipMessage} arrow placement="top">
             <StyledHelpOutlineIcon fontSize="inherit" />
           </Tooltip>
@@ -308,6 +342,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition, ch
   title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildCreatedItem = (positionState: ActionState, position: FullPosition) => ({
@@ -315,23 +350,16 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
   content: () => (
     <>
       <Grid item xs={12}>
-        <Typography
-          variant="body1"
-          component="p"
-          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-        >
+        <StyledTimelineWrappedContent variant="body1">
           <StyledTitleMainText variant="body1">
-            <FormattedMessage
-              description="positionCreatedRate"
-              defaultMessage="Rate:"
-              values={{
-                rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
-                from: position.from.symbol,
-              }}
-            />
+            <FormattedMessage description="positionCreatedRate" defaultMessage="Rate:" />
           </StyledTitleMainText>
-          {` ${formatCurrencyAmount(BigNumber.from(positionState.rate), position.from)} ${position.from.symbol}`}
-        </Typography>
+          <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+            <Typography variant="body1">
+              {formatCurrencyAmount(BigNumber.from(positionState.rateUnderlying || positionState.rate), position.from)}
+            </Typography>
+          </CustomChip>
+        </StyledTimelineWrappedContent>
       </Grid>
       <Grid item xs={12}>
         <Typography
@@ -350,9 +378,10 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
   title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
-const buildTransferedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
+const buildTransferedItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <CardGiftcardIcon />,
   content: () => (
     <>
@@ -365,7 +394,11 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
           <StyledTitleMainText variant="body1">
             <FormattedMessage description="transferedFrom" defaultMessage="Transfered from:" />
           </StyledTitleMainText>
-          <StyledLink href={buildEtherscanAddress(positionState.from, chainId)} target="_blank" rel="noreferrer">
+          <StyledLink
+            href={buildEtherscanAddress(positionState.from, position.chainId)}
+            target="_blank"
+            rel="noreferrer"
+          >
             <Address address={positionState.from} />
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
@@ -380,7 +413,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
           <StyledTitleMainText variant="body1">
             <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
           </StyledTitleMainText>
-          <StyledLink href={buildEtherscanAddress(positionState.to, chainId)} target="_blank" rel="noreferrer">
+          <StyledLink href={buildEtherscanAddress(positionState.to, position.chainId)} target="_blank" rel="noreferrer">
             <Address address={positionState.to} />
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
           </StyledLink>
@@ -391,6 +424,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition,
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
@@ -402,9 +436,16 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
           <Typography variant="body1">
             {permission.permissions.length ? (
               <>
-                <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
+                <StyledLink
+                  href={buildEtherscanAddress(permission.operator, position.chainId)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {permission.operator.toLowerCase() ===
-                  COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
+                  (
+                    COMPANION_ADDRESS[position.version][position.chainId] ||
+                    COMPANION_ADDRESS[LATEST_VERSION][position.chainId]
+                  ).toLowerCase() ? (
                     'Mean Finance Companion'
                   ) : (
                     <Address address={permission.operator} />
@@ -436,7 +477,11 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                   description="positionPermissionsModified all"
                   defaultMessage="Removed all permissions for"
                 />
-                <StyledLink href={buildEtherscanAddress(permission.operator, chainId)} target="_blank" rel="noreferrer">
+                <StyledLink
+                  href={buildEtherscanAddress(permission.operator, position.chainId)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {permission.operator.toLowerCase() ===
                   COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
                     'Mean Finance Companion'
@@ -455,33 +500,41 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position permissions modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
-  content: () => (
-    <>
-      <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionModifiedRate"
-            defaultMessage="{increaseDecrease} rate from {oldRate} {from} to {rate} {from}"
-            values={{
-              increaseDecrease: BigNumber.from(positionState.oldRate).lt(BigNumber.from(positionState.rate))
-                ? 'Increased'
-                : 'Decreased',
-              rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
-              oldRate: formatCurrencyAmount(BigNumber.from(positionState.oldRate), position.from),
-              from: position.from.symbol,
-            }}
-          />
-        </Typography>
-      </Grid>
-    </>
-  ),
+  content: () => {
+    const rate = positionState.rateUnderlying || positionState.rate;
+    const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
+    return (
+      <>
+        <Grid item xs={12}>
+          <StyledTimelineWrappedContent variant="body1">
+            <FormattedMessage
+              description="positionModifiedRateFrom"
+              defaultMessage="{increaseDecrease} rate from"
+              values={{
+                increaseDecrease: BigNumber.from(oldRate).lt(BigNumber.from(rate)) ? 'Increased' : 'Decreased',
+              }}
+            />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
+            </CustomChip>
+            <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+            </CustomChip>
+          </StyledTimelineWrappedContent>
+        </Grid>
+      </>
+    );
+  },
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Rate Modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -510,119 +563,117 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Changed duration" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
-  content: () => (
-    <>
-      <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionModifiedRate"
-            defaultMessage="{increaseDecrease} rate from {oldRate} {from} to {rate} {from}"
-            values={{
-              increaseDecrease: BigNumber.from(positionState.oldRate).lt(BigNumber.from(positionState.rate))
-                ? 'Increased'
-                : 'Decreased',
-              rate: formatCurrencyAmount(BigNumber.from(positionState.rate), position.from),
-              oldRate: formatCurrencyAmount(BigNumber.from(positionState.oldRate), position.from),
-              from: position.from.symbol,
-            }}
-          />
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
-            values={{
-              increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
-                BigNumber.from(positionState.remainingSwaps)
-              )
-                ? 'Increased'
-                : 'Decreased',
-              frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
-              oldFrequency: getFrequencyLabel(position.swapInterval.interval, positionState.oldRemainingSwaps),
-            }}
-          />
-        </Typography>
-      </Grid>
-    </>
-  ),
-  title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-});
-
-const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <OpenInNewIcon />,
   content: () => {
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(positionState.withdrawn));
-    const [toPrice, isLoadingToPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(positionState.withdrawn),
-      positionState.createdAtTimestamp
-    );
-
-    const showPrices =
-      !STABLE_COINS.includes(position.to.symbol) &&
-      !isLoadingToPrice &&
-      !!toPrice &&
-      !isLoadingToCurrentPrice &&
-      !!toCurrentPrice;
-    const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
-
+    const rate = positionState.rateUnderlying || positionState.rate;
+    const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
     return (
       <>
         <Grid item xs={12}>
-          <Typography variant="body1" style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}>
+          <StyledTimelineWrappedContent variant="body1">
             <FormattedMessage
-              description="positionWithdrawn"
-              defaultMessage="Withdraw {withdraw} {to}"
+              description="positionModifiedRateFrom"
+              defaultMessage="{increaseDecrease} rate from"
               values={{
-                withdraw: formatCurrencyAmount(BigNumber.from(positionState.withdrawn), position.to),
-                to: position.to.symbol,
-                showToPrice: showPrices,
-                toPrice: toPrice?.toFixed(2),
+                increaseDecrease: BigNumber.from(oldRate).lt(BigNumber.from(rate)) ? 'Increased' : 'Decreased',
               }}
             />
-            {showPrices && (
-              <DarkTooltip
-                title={
-                  showCurrentPrice
-                    ? 'Displaying current value. Click to show value on day of withdrawal'
-                    : 'Estimated value on day of withdrawal'
-                }
-                arrow
-                placement="top"
-              >
-                <StyledChip
-                  onClick={() => setShouldShowCurrentPrice(!showCurrentPrice)}
-                  variant="outlined"
-                  size="small"
-                  label={
-                    <FormattedMessage
-                      description="positionWithdrawnPrice"
-                      defaultMessage="{toPrice} USD"
-                      values={{
-                        toPrice: showCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2),
-                      }}
-                    />
-                  }
-                />
-              </DarkTooltip>
-            )}
-            <FormattedMessage description="positionWithdrawnSecond" defaultMessage=" from position" />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
+            </CustomChip>
+            <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+            </CustomChip>
+          </StyledTimelineWrappedContent>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="body1">
+            <FormattedMessage
+              description="positionModifiedSwaps"
+              defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
+              values={{
+                increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
+                  BigNumber.from(positionState.remainingSwaps)
+                )
+                  ? 'Increased'
+                  : 'Decreased',
+                frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
+                oldFrequency: getFrequencyLabel(position.swapInterval.interval, positionState.oldRemainingSwaps),
+              }}
+            />
           </Typography>
         </Grid>
       </>
     );
   },
-  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrawn" />,
+  title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
+});
+
+const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
+  icon: <OpenInNewIcon />,
+  content: () => {
+    const withdrawn = positionState.withdrawnUnderlying || positionState.withdrawn;
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(withdrawn),
+      undefined,
+      position.chainId
+    );
+    const [toPrice, isLoadingToPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(withdrawn),
+      positionState.createdAtTimestamp,
+      position.chainId
+    );
+
+    const showPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
+    const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
+
+    return (
+      <>
+        <Grid item xs={12}>
+          <StyledTimelineWrappedContent variant="body1">
+            <FormattedMessage description="positionWithdrawn" defaultMessage="Withdraw" />
+            <CustomChip
+              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+              pointer
+              extraText={
+                showPrices && (
+                  <DarkTooltip
+                    title={
+                      showCurrentPrice
+                        ? 'Displaying current value. Click to show value on day of withdrawal'
+                        : 'Estimated value on day of withdrawal'
+                    }
+                    arrow
+                    placement="top"
+                    onClick={() => setShouldShowCurrentPrice(!showCurrentPrice)}
+                  >
+                    <div>(${showCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
+                  </DarkTooltip>
+                )
+              }
+            >
+              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(withdrawn), position.to)}</Typography>
+            </CustomChip>
+            <FormattedMessage description="positionWithdrawnSecond" defaultMessage=" from position" />
+          </StyledTimelineWrappedContent>
+        </Grid>
+      </>
+    );
+  },
+  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />,
+  toOrder: parseInt(positionState.createdAtBlock, 10),
+  time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildTerminatedItem = (positionState: ActionState) => ({
@@ -631,6 +682,7 @@ const buildTerminatedItem = (positionState: ActionState) => ({
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Terminated" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const MESSAGE_MAP = {
@@ -683,7 +735,7 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
   return (
     <StyledTimeline container>
       {history.map((historyItem) => (
-        <StyledTimelineContainer item xs={12} key={historyItem.time}>
+        <StyledTimelineContainer item xs={12} key={historyItem.id}>
           <StyledTimelineIcon>{historyItem.icon}</StyledTimelineIcon>
           <StyledTimelineContent>
             <Grid container>

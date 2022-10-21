@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from 'hooks/state';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 import useWeb3Service from 'hooks/useWeb3Service';
-import { HUB_ADDRESS, POSITION_VERSION_3, TRANSACTION_TYPES } from 'config/constants';
+import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION, TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import usePositionService from 'hooks/usePositionService';
@@ -187,11 +187,17 @@ export function isTransactionPending(tx: TransactionDetails): boolean {
 }
 
 // returns whether a token has a pending approval transaction
-export function useHasPendingApproval(token: Token | null, spender: string | undefined): boolean {
+export function useHasPendingApproval(
+  token: Token | null,
+  spender: string | undefined,
+  checkForCompanion = false
+): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
-  const addressToCheck = HUB_ADDRESS[POSITION_VERSION_3][currentNetwork.chainId];
+  const addressToCheck = checkForCompanion
+    ? COMPANION_ADDRESS[LATEST_VERSION][currentNetwork.chainId]
+    : HUB_ADDRESS[LATEST_VERSION][currentNetwork.chainId];
 
   return useMemo(
     () =>
@@ -315,7 +321,7 @@ export function useHasConfirmedApproval(token: Token | null, spender: string | u
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
-  const addressToCheck = HUB_ADDRESS[POSITION_VERSION_3][currentNetwork.chainId];
+  const addressToCheck = HUB_ADDRESS[LATEST_VERSION][currentNetwork.chainId];
   // const blockNumber = useBlockNumber(currentNetwork.chainId);
 
   return useMemo(

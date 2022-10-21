@@ -1,3 +1,9 @@
+type TokenTypeBase = 'BASE';
+type TokenTypeWrapped = 'WRAPPED_PROTOCOL_TOKEN';
+type TokenTypeYieldBearingShares = 'YIELD_BEARING_SHARES';
+
+export type TokenType = TokenTypeBase | TokenTypeWrapped | TokenTypeYieldBearingShares;
+
 export type Token = {
   decimals: number;
   chainId: number;
@@ -5,6 +11,8 @@ export type Token = {
   name: string;
   symbol: string;
   logoURI?: string;
+  type: TokenType;
+  underlyingTokens: Token[];
 };
 
 export type TokenList = Record<string, Token>;

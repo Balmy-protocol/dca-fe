@@ -12,12 +12,13 @@ import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { useHistory } from 'react-router-dom';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
-import { NETWORKS, POSITION_VERSION_3, STABLE_COINS } from 'config/constants';
+import { NETWORKS } from 'config/constants';
 import { BigNumber } from 'ethers';
 import useUsdPrice from 'hooks/useUsdPrice';
 import find from 'lodash/find';
 import { useAppDispatch } from 'state/hooks';
 import { setPosition } from 'state/position-details/actions';
+import { changePositionDetailsTab } from 'state/tabs/actions';
 
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
@@ -113,7 +114,7 @@ interface TerminantedPositionProps {
 }
 
 const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
-  const { from, to, swapInterval, swapped, totalDeposits, executedSwaps, chainId } = position;
+  const { from, to, swapInterval, swapped, totalDeposited, totalExecutedSwaps, chainId } = position;
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -122,12 +123,13 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
   }, [chainId]);
 
   const history = useHistory();
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped);
-  const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped, undefined, chainId);
+  const showToPrice = !isLoadingToPrice && !!toPrice;
   const dispatch = useAppDispatch();
 
   const onViewDetails = () => {
     dispatch(setPosition(null));
+    dispatch(changePositionDetailsTab(0));
     history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
 
@@ -157,7 +159,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
             </Typography>
             <Typography
               variant="body1"
-              color={totalDeposits.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              color={totalDeposited.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
               sx={{ marginLeft: '5px' }}
             >
               <FormattedMessage
@@ -165,7 +167,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
                 defaultMessage="{totalDepositted} {from}"
                 values={{
                   b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  totalDepositted: formatCurrencyAmount(totalDeposits, from, 4),
+                  totalDepositted: formatCurrencyAmount(totalDeposited, from, 4),
                   from: from.symbol,
                 }}
               />
@@ -176,7 +178,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
               <FormattedMessage description="history run for in position" defaultMessage="Run for: " />
             </Typography>
             <Typography variant="body1" color="#FFFFFF" sx={{ marginLeft: '5px' }}>
-              {getFrequencyLabel(swapInterval.toString(), executedSwaps.toString())}
+              {getFrequencyLabel(swapInterval.toString(), totalExecutedSwaps.toString())}
             </Typography>
           </StyledDetailWrapper>
           <StyledDetailWrapper>
@@ -212,13 +214,11 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
         </StyledContentContainer>
         <StyledProgressWrapper />
         <StyledCallToActionContainer>
-          {position.version === POSITION_VERSION_3 && (
-            <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
-              <Typography variant="body2">
-                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
-              </Typography>
-            </StyledCardFooterButton>
-          )}
+          <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
+            <Typography variant="body2">
+              <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
+            </Typography>
+          </StyledCardFooterButton>
         </StyledCallToActionContainer>
       </StyledCardContent>
     </StyledCard>

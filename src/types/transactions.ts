@@ -38,12 +38,20 @@ export type TransactionTypes =
   | 'APPROVE_COMPANION'
   | 'MODIFY_PERMISSIONS'
   | 'MIGRATE_POSITION'
+  | 'MIGRATE_POSITION_YIELD'
+  | 'WITHDRAW_FUNDS'
   | 'RESET_POSITION';
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
 
 export interface WithdrawTypeData {
   id: number | string;
+}
+
+export interface WithdrawFundsTypeData {
+  id: number | string;
+  from: string;
+  removedFunds: string;
 }
 
 export interface TransferTypeData {
@@ -62,6 +70,15 @@ export interface MigratePositionTypeData {
   id: number | string;
   from: string;
   to: string;
+  newId?: string;
+}
+
+export interface MigratePositionYieldTypeData {
+  id: number | string;
+  from: string;
+  to: string;
+  fromYield?: string;
+  toYield?: string;
   newId?: string;
 }
 
@@ -116,6 +133,8 @@ export interface WrapEtherTypeData {
 export interface NewPositionTypeData {
   from: Token;
   to: Token;
+  fromYield?: string;
+  toYield?: string;
   fromValue: string;
   frequencyType: string;
   frequencyValue: string;
@@ -145,6 +164,8 @@ export type TransactionPositionTypeDataOptions =
   | ApproveCompanionTypeData
   | ModifyPermissionsTypeData
   | MigratePositionTypeData
+  | WithdrawFundsTypeData
+  | MigratePositionYieldTypeData
   | TransferTypeData;
 
 export type TransactionTypeDataOptions =
@@ -162,6 +183,8 @@ export type TransactionTypeDataOptions =
   | ApproveCompanionTypeData
   | ModifyPermissionsTypeData
   | MigratePositionTypeData
+  | WithdrawFundsTypeData
+  | MigratePositionYieldTypeData
   | TransferTypeData;
 
 export interface TransactionDetails {

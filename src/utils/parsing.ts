@@ -1,7 +1,9 @@
 import { BigNumber } from 'ethers';
 import find from 'lodash/find';
-import { FullPosition, Position, Token } from 'types';
-import { MAX_BI, POSITION_VERSION_3, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
+import findIndex from 'lodash/findIndex';
+import { FullPosition, Position, SwapInfo, Token } from 'types';
+import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -36,21 +38,25 @@ export const calculateStale: (
   lastSwapped: number | undefined,
   frequencyType: BigNumber,
   createdAt: number,
-  nextSwapInformation: string | number | null
+  hasToExecute?: SwapInfo | null
 ) => -1 | 0 | 1 | 2 = (
   lastSwapped = 0,
   frequencyType: BigNumber,
   createdAt: number,
-  nextSwapInformation: string | number | null
+  hasToExecute = [true, true, true, true, true, true, true, true]
 ) => {
   let isStale = false;
-  if (!nextSwapInformation) {
+  if (hasToExecute === null) {
     return NO_SWAP_INFORMATION;
   }
 
-  const hasToExecute = BigNumber.from(nextSwapInformation).lt(MAX_BI);
-
   if (!hasToExecute) {
+    return NOTHING_TO_EXECUTE;
+  }
+
+  const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
+
+  if (!hasToExecute[freqIndex]) {
     return NOTHING_TO_EXECUTE;
   }
 
@@ -110,6 +116,36 @@ export function getURLFromQuery(query: string) {
   return '';
 }
 
+export const getDisplayToken = (token: Token, chainId?: number) => {
+  const chainIdToUse = chainId || token.chainId;
+  const protocolToken = getProtocolToken(chainIdToUse);
+  const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
+
+  let underlyingToken =
+    !!token.underlyingTokens.length &&
+    token.underlyingTokens[0].address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
+    token.underlyingTokens[0];
+
+  underlyingToken = underlyingToken && {
+    ...underlyingToken,
+    chainId: chainIdToUse,
+    underlyingTokens: [token],
+  };
+
+  if (underlyingToken && underlyingToken.address === wrappedProtocolToken.address) {
+    underlyingToken = {
+      ...protocolToken,
+      chainId: chainIdToUse,
+      underlyingTokens: [token],
+    };
+  }
+
+  const baseToken =
+    token.address === wrappedProtocolToken.address ? protocolToken : { ...token, chainId: chainIdToUse };
+
+  return underlyingToken || baseToken;
+};
+
 export function fullPositionToMappedPosition(position: FullPosition, positionVersion?: string): Position {
   return {
     from: position.from,
@@ -117,20 +153,29 @@ export function fullPositionToMappedPosition(position: FullPosition, positionVer
     user: position.user,
     swapInterval: BigNumber.from(position.swapInterval.interval),
     swapped: BigNumber.from(position.totalSwapped),
-    rate: BigNumber.from(position.current.rate),
-    toWithdraw: BigNumber.from(position.current.idleSwapped),
-    remainingLiquidity: BigNumber.from(position.current.remainingLiquidity),
-    remainingSwaps: BigNumber.from(position.current.remainingSwaps),
+    rate: BigNumber.from(position.rate),
+    toWithdraw: BigNumber.from(position.toWithdraw),
+    remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+    remainingSwaps: BigNumber.from(position.remainingSwaps),
     withdrawn: BigNumber.from(position.totalWithdrawn),
     totalSwaps: BigNumber.from(position.totalSwaps),
-    id: `${position.id}-v${position.version || POSITION_VERSION_3}`,
+    toWithdrawUnderlying: null,
+    remainingLiquidityUnderlying: null,
+    depositedRateUnderlying: position.depositedRateUnderlying ? BigNumber.from(position.depositedRateUnderlying) : null,
+    totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
+      ? BigNumber.from(position.totalSwappedUnderlyingAccum)
+      : null,
+    toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
+      ? BigNumber.from(position.toWithdrawUnderlyingAccum)
+      : null,
+    id: `${position.id}-v${position.version || LATEST_VERSION}`,
     positionId: position.id,
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),
-    totalDeposits: BigNumber.from(position.totalDeposits),
-    executedSwaps: BigNumber.from(position.executedSwaps),
+    totalDeposited: BigNumber.from(position.totalDeposited),
+    totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
     pendingTransaction: '',
-    version: position.version || positionVersion || POSITION_VERSION_3,
+    version: position.version || positionVersion || LATEST_VERSION,
     chainId: position.chainId,
     pairLastSwappedAt: parseInt(position.createdAtTimestamp, 10),
     pairNextSwapAvailableAt: position.createdAtTimestamp,
@@ -156,4 +201,21 @@ export const usdFormatter = (num: number) => {
     }
   }
   return (num / si[i].value).toFixed(3).replace(rx, '$1') + si[i].symbol;
+};
+
+export const activePositionsPerIntervalToHasToExecute = (
+  activePositionsPerInterval: [number, number, number, number, number, number, number, number]
+): [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean] =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
+
+export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, remainingSwaps: BigNumber) => {
+  const yieldFromGenerated = remainingLiquidity.sub(rate.mul(remainingSwaps));
+
+  return {
+    total: remainingLiquidity,
+    yieldGenerated: yieldFromGenerated,
+    base: remainingLiquidity.sub(yieldFromGenerated),
+  };
 };

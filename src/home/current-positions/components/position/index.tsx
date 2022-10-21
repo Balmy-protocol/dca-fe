@@ -3,38 +3,34 @@ import find from 'lodash/find';
 import Card from '@mui/material/Card';
 import LinearProgress from '@mui/material/LinearProgress';
 import CardContent from '@mui/material/CardContent';
-import Button from 'common/button';
 import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
-import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from 'utils/parsing';
-import { NetworkStruct, Position, Token } from 'types';
-import { useHistory } from 'react-router-dom';
-import {
-  NETWORKS,
-  POSITION_VERSION_2,
-  POSITION_VERSION_3,
-  STABLE_COINS,
-  STRING_SWAP_INTERVALS,
-} from 'config/constants';
+import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE, calculateYield } from 'utils/parsing';
+import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
+import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
-import { buildEtherscanTransaction } from 'utils/etherscan';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import Link from '@mui/material/Link';
-import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import ComposedTokenIcon from 'common/composed-token-icon';
+import CustomChip from 'common/custom-chip';
+import { Theme, Tooltip } from '@mui/material';
 import useUsdPrice from 'hooks/useUsdPrice';
-import useWalletService from 'hooks/useWalletService';
-import { useAppDispatch } from 'state/hooks';
-import { setPosition } from 'state/position-details/actions';
+import PositionControls from '../position-controls';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
+
+const DarkTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    boxShadow: theme.shadows[1],
+    fontSize: 11,
+  },
+}))(Tooltip);
 
 const BorderLinearProgress = withStyles(() =>
   createStyles({
@@ -49,10 +45,6 @@ const BorderLinearProgress = withStyles(() =>
     },
   })
 )(StyledSwapsLinearProgress);
-
-const StyledChip = styled(Chip)`
-  margin: 0px 5px;
-`;
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;
@@ -102,19 +94,19 @@ const StyledCardTitleHeader = styled.div`
   }
 `;
 
-const StyledDetailWrapper = styled.div<{ alignItems?: string }>`
+const StyledDetailWrapper = styled.div<{ alignItems?: string; flex?: boolean; $spacing?: boolean }>`
   margin-bottom: 5px;
   display: flex;
   align-items: ${({ alignItems }) => alignItems || 'center'};
   justify-content: flex-start;
+  ${({ flex }) => (flex ? 'flex: 1;' : '')}
+  ${({ $spacing }) => ($spacing ? 'margin-top: 10px;' : '')}
+  gap: 5px;
+  flex-wrap: wrap;
 `;
 
 const StyledProgressWrapper = styled.div`
   margin: 12px 0px;
-`;
-
-const StyledCardFooterButton = styled(Button)`
-  margin-top: 8px;
 `;
 
 const StyledFreqLeft = styled.div`
@@ -150,13 +142,6 @@ const StyledContentContainer = styled.div`
   flex-grow: 1;
 `;
 
-const StyledCallToActionContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-`;
-
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
@@ -165,34 +150,40 @@ interface PositionProp extends Omit<Position, 'from' | 'to'> {
 interface ActivePositionProps {
   position: PositionProp;
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
-  onTerminate: (position: Position) => void;
   onReusePosition: (position: Position) => void;
-  onMigrate: (position: Position) => void;
+  onMigrateYield: (position: Position) => void;
+  onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
   network: NetworkStruct;
+  yieldOptionsByChain: Record<ChainId, YieldOptions>;
 }
 
 const ActivePosition = ({
   position,
   onWithdraw,
   onReusePosition,
-  onTerminate,
-  onMigrate,
+  onMigrateYield,
+  onSuggestMigrateYield,
   disabled,
   hasSignSupport,
   network,
+  yieldOptionsByChain,
 }: ActivePositionProps) => {
   const {
     from,
     to,
     swapInterval,
-    remainingLiquidity,
+    remainingLiquidity: remainingLiquidityRaw,
     remainingSwaps,
     rate,
+    depositedRateUnderlying,
     totalSwaps,
     pendingTransaction,
-    toWithdraw,
+    toWithdraw: rawToWithdraw,
+    toWithdrawUnderlying,
+    remainingLiquidityUnderlying,
+    toWithdrawUnderlyingAccum,
     chainId,
   } = position;
   const positionNetwork = React.useMemo(() => {
@@ -200,14 +191,36 @@ const ActivePosition = ({
     const supportedNetwork = find(NETWORKS, { chainId })!;
     return supportedNetwork;
   }, [chainId]);
+  const yieldOptions = yieldOptionsByChain[chainId];
 
-  const isOnNetwork = network.chainId === positionNetwork.chainId;
   const availablePairs = useAvailablePairs();
-  const protocolToken = getProtocolToken(positionNetwork.chainId);
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw, undefined, chainId);
-  const history = useHistory();
-  const walletService = useWalletService();
-  const dispatch = useAppDispatch();
+
+  const rateToUse = depositedRateUnderlying || rate;
+
+  const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
+  const toWithdrawYield =
+    toWithdrawUnderlyingAccum && toWithdrawUnderlying
+      ? toWithdrawUnderlying.sub(toWithdrawUnderlyingAccum)
+      : BigNumber.from(0);
+  const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
+
+  const { yieldGenerated: yieldFromGenerated, base: remainingLiquidity } = calculateYield(
+    remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw),
+    rateToUse,
+    remainingSwaps
+  );
+
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase, undefined, chainId);
+  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield, undefined, chainId);
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rateToUse, undefined, chainId);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity, undefined, chainId);
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(from, yieldFromGenerated, undefined, chainId);
+
+  const showToPrice = !isLoadingToPrice && !!toPrice;
+  const showToYieldPrice = !isLoadingToYieldPrice && !!toYieldPrice;
+  const showRatePrice = !isLoadingRatePrice && !!ratePrice;
+  const showFromPrice = !isLoadingFromPrice && !!fromPrice;
+  const showFromYieldPrice = !isLoadingFromYieldPrice && !!fromYieldPrice;
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
@@ -219,29 +232,18 @@ const ActivePosition = ({
     availablePairs,
     (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
   );
-  const showToPrice = !STABLE_COINS.includes(to.symbol) && !isLoadingToPrice && !!toPrice;
-
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
   const isStale =
-    calculateStale(
-      pair?.lastExecutedAt || position.pairLastSwappedAt || 0,
-      swapInterval,
-      position.startedAt,
-      pair?.swapInfo || position.pairNextSwapAvailableAt || '1'
-    ) === STALE;
+    calculateStale(pair?.lastExecutedAt || position.pairLastSwappedAt || 0, swapInterval, position.startedAt) === STALE;
 
-  const onViewDetails = () => {
-    dispatch(setPosition(null));
-    history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
-  };
+  const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
-  const onChangeNetwork = () => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId);
-  };
-
-  const isOldVersion = position.version !== POSITION_VERSION_3;
+  const foundYieldFrom =
+    position.from.underlyingTokens[0] &&
+    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
+  const foundYieldTo =
+    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
   return (
     <StyledCard variant="outlined">
@@ -307,228 +309,244 @@ const ActivePosition = ({
                 }}
               />
             </Typography>
-            {/* {showFromPrice && (
-                <StyledChip
-                  variant="outlined"
-                  size="small"
-                  label={
+            <CustomChip
+              tooltip={showFromPrice}
+              tooltipTitle={
+                <FormattedMessage
+                  description="current swapped in position price"
+                  defaultMessage="~ {fromPrice} USD"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    fromPrice: showFromPrice ? fromPrice?.toFixed(2) : 0,
+                  }}
+                />
+              }
+              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+            >
+              <Typography variant="body2">
+                {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
+              </Typography>
+            </CustomChip>
+            {yieldFromGenerated.gt(BigNumber.from(0)) && (
+              <>
+                +
+                <CustomChip
+                  tooltip={showFromYieldPrice}
+                  tooltipTitle={
                     <FormattedMessage
-                      description="current remaining price"
-                      defaultMessage="({toPrice} USD)"
+                      description="current swapped in position price"
+                      defaultMessage="~ {fromPrice} USD"
                       values={{
                         b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                        toPrice: fromPrice?.toFixed(2),
+                        fromPrice: showFromYieldPrice ? fromYieldPrice?.toFixed(2) : 0,
                       }}
                     />
                   }
-                />
-              )} */}
-            <Typography
-              variant="body1"
-              color={remainingLiquidity.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              <FormattedMessage
-                description="current remaining rate"
-                defaultMessage="{remainingLiquidity} {from} ({rate} {from} {frequency})"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  rate: formatCurrencyAmount(rate, from, 4),
-                  frequency:
-                    STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
-                  from: from.symbol,
-                  remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from, 4),
-                }}
-              />
-            </Typography>
+                  icon={
+                    <ComposedTokenIcon
+                      isInChip
+                      size="16px"
+                      tokenTop={foundYieldFrom?.token}
+                      tokenBottom={position.from}
+                    />
+                  }
+                >
+                  <Typography variant="body2">
+                    {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from, 4)}
+                  </Typography>
+                </CustomChip>
+              </>
+            )}
           </StyledDetailWrapper>
           <StyledDetailWrapper alignItems="flex-start">
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="current swapped in position" defaultMessage="To withdraw: " />
+              <FormattedMessage
+                description="current rate remaining"
+                defaultMessage="Rate:"
+                values={{
+                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                }}
+              />
             </Typography>
-            <Typography
-              variant="body1"
-              color={toWithdraw.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
+            <CustomChip
+              tooltip={showRatePrice}
+              tooltipTitle={
+                <FormattedMessage
+                  description="current swapped in position price"
+                  defaultMessage="~ {fromPrice} USD"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    fromPrice: showRatePrice ? ratePrice?.toFixed(2) : 0,
+                  }}
+                />
+              }
+              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              {`${formatCurrencyAmount(toWithdraw, to, 4)} ${to.symbol}`}
+              <Typography variant="body2">
+                {formatCurrencyAmount(BigNumber.from(rateToUse), position.from, 4)}
+              </Typography>
+            </CustomChip>
+            <FormattedMessage
+              description="positionDetailsCurrentRate"
+              defaultMessage="{frequency} {hasYield}"
+              values={{
+                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                hasYield: position.from.underlyingTokens.length ? '+ yield' : '',
+                frequency:
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+              }}
+            />
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
             </Typography>
-            <Typography variant="body1">
-              {showToPrice && (
-                <StyledChip
-                  size="small"
-                  variant="outlined"
-                  label={
+            <CustomChip
+              tooltip={showToPrice}
+              tooltipTitle={
+                <FormattedMessage
+                  description="current swapped in position price"
+                  defaultMessage="~ {fromPrice} USD"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    fromPrice: showToPrice ? toPrice?.toFixed(2) : 0,
+                  }}
+                />
+              }
+              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
+            >
+              <Typography variant="body2">
+                {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
+              </Typography>
+            </CustomChip>
+            {toWithdrawYield.gt(BigNumber.from(0)) && (
+              <>
+                +
+                {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                  <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+                </Typography> */}
+                <CustomChip
+                  tooltip={showToYieldPrice}
+                  tooltipTitle={
                     <FormattedMessage
                       description="current swapped in position price"
-                      defaultMessage="({toPrice} USD)"
+                      defaultMessage="~ {fromPrice} USD"
                       values={{
                         b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                        toPrice: toPrice?.toFixed(2),
+                        fromPrice: showToYieldPrice ? toYieldPrice?.toFixed(2) : 0,
                       }}
                     />
                   }
-                />
-              )}
-            </Typography>
+                  icon={
+                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo?.token} tokenBottom={position.to} />
+                  }
+                >
+                  <Typography variant="body2">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
+                </CustomChip>
+              </>
+            )}
           </StyledDetailWrapper>
+          {!foundYieldFrom && !foundYieldTo && (
+            <StyledDetailWrapper alignItems="flex-start" $spacing>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="positionNotGainingInterest"
+                  defaultMessage="Position not generating yield"
+                />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {(foundYieldFrom || foundYieldTo) && (
+            <StyledDetailWrapper alignItems="flex-start" flex $spacing>
+              {foundYieldFrom && (
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon
+                      isInChip
+                      size="16px"
+                      tokenTop={foundYieldFrom.token}
+                      tokenBottom={position.from}
+                    />
+                  }
+                  tooltip
+                  tooltipTitle={
+                    <FormattedMessage
+                      description="generatingYieldAt"
+                      defaultMessage="Generating {token} at {platform} with {apy}% APY"
+                      values={{
+                        token: position.from.symbol,
+                        apy: foundYieldFrom.apy.toFixed(1),
+                        platform: foundYieldFrom.name,
+                      }}
+                    />
+                  }
+                >
+                  <Typography variant="body2" fontWeight={500}>
+                    APY {foundYieldFrom.apy.toFixed(1)}%
+                  </Typography>
+                </CustomChip>
+              )}
+              {foundYieldTo && (
+                <CustomChip
+                  icon={
+                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo.token} tokenBottom={position.to} />
+                  }
+                  tooltip
+                  tooltipTitle={
+                    <FormattedMessage
+                      description="generatingYieldAt"
+                      defaultMessage="Generating {token} at {platform} with {apy}% APY"
+                      values={{
+                        token: position.to.symbol,
+                        apy: foundYieldTo.apy.toFixed(1),
+                        platform: foundYieldTo.name,
+                      }}
+                    />
+                  }
+                >
+                  <Typography variant="body2" fontWeight={500}>
+                    APY {foundYieldTo.apy.toFixed(1)}%
+                  </Typography>
+                </CustomChip>
+              )}
+            </StyledDetailWrapper>
+          )}
         </StyledContentContainer>
         {remainingSwaps.toNumber() > 0 && (
-          <StyledProgressWrapper>
-            <BorderLinearProgress
-              swaps={remainingSwaps.toNumber()}
-              variant="determinate"
-              value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
-            />
-          </StyledProgressWrapper>
-        )}
-        <StyledCallToActionContainer>
-          <StyledCardFooterButton
-            variant={isPending ? 'contained' : 'outlined'}
-            color={isPending ? 'pending' : 'default'}
-            onClick={() => !isPending && onViewDetails()}
-            fullWidth
+          <DarkTooltip
+            title={
+              <FormattedMessage
+                description="executedSwapsTooltip"
+                defaultMessage="Executed {executedSwaps}/{totalSwaps} swaps"
+                values={{
+                  executedSwaps: position.totalExecutedSwaps.toString(),
+                  totalSwaps: position.totalSwaps.toString(),
+                }}
+              />
+            }
+            arrow
+            placement="top"
           >
-            {isPending ? (
-              <Link
-                href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
-                target="_blank"
-                rel="noreferrer"
-                underline="none"
-                color="inherit"
-              >
-                <Typography variant="body2" component="span">
-                  <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                </Typography>
-                <OpenInNewIcon style={{ fontSize: '1rem' }} />
-              </Link>
-            ) : (
-              <Typography variant="body2">
-                <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
-              </Typography>
-            )}
-          </StyledCardFooterButton>
-          {position.version !== POSITION_VERSION_2 && (
-            <>
-              {(!isOnNetwork || disabled) && (
-                <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
-                  <Typography variant="body2">
-                    <FormattedMessage
-                      description="incorrect network"
-                      defaultMessage="Switch to {network}"
-                      values={{ network: positionNetwork.name }}
-                    />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-              {isOnNetwork && !disabled && (
-                <>
-                  {!isPending &&
-                    toWithdraw.gt(BigNumber.from(0)) &&
-                    hasSignSupport &&
-                    position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-                      <StyledCardFooterButton
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => onWithdraw(position, true)}
-                        fullWidth
-                        disabled={disabled || !isOnNetwork}
-                      >
-                        <Typography variant="body2">
-                          <FormattedMessage
-                            description="withdraw"
-                            defaultMessage="Withdraw {protocolToken}"
-                            values={{ protocolToken: protocolToken.symbol }}
-                          />
-                        </Typography>
-                      </StyledCardFooterButton>
-                    )}
-                  {!isPending && toWithdraw.gt(BigNumber.from(0)) && (
-                    <StyledCardFooterButton
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => onWithdraw(position, false)}
-                      disabled={disabled || !isOnNetwork}
-                      fullWidth
-                    >
-                      <Typography variant="body2">
-                        <FormattedMessage
-                          description="withdraw"
-                          defaultMessage="Withdraw {wrappedProtocolToken}"
-                          values={{
-                            wrappedProtocolToken:
-                              position.to.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport
-                                ? wrappedProtocolToken.symbol
-                                : '',
-                          }}
-                        />
-                      </Typography>
-                    </StyledCardFooterButton>
-                  )}
-                  {!isPending && remainingSwaps.lte(BigNumber.from(0)) && toWithdraw.lte(BigNumber.from(0)) && (
-                    <StyledCardFooterButton
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => onReusePosition(position)}
-                      disabled={disabled || !isOnNetwork}
-                      fullWidth
-                    >
-                      <Typography variant="body2">
-                        <FormattedMessage description="reusePosition" defaultMessage="Reuse position" />
-                      </Typography>
-                    </StyledCardFooterButton>
-                  )}
-                </>
-              )}
-            </>
-          )}
-          {position.version === POSITION_VERSION_2 && (
-            <>
-              {isPending && (
-                <StyledCardFooterButton variant="contained" color="pending" fullWidth>
-                  <Link
-                    href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    underline="none"
-                    color="inherit"
-                  >
-                    <Typography variant="body2" component="span">
-                      <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-                    </Typography>
-                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
-                  </Link>
-                </StyledCardFooterButton>
-              )}
-              {!isPending && hasSignSupport && remainingSwaps.gt(BigNumber.from(0)) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="migrate"
-                  onClick={() => onMigrate(position)}
-                  fullWidth
-                  disabled={disabled || !isOnNetwork}
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage description="migratePosition" defaultMessage="Migrate position" />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-              {!isPending && (toWithdraw.gt(BigNumber.from(0)) || remainingLiquidity.gt(BigNumber.from(0))) && (
-                <StyledCardFooterButton
-                  variant="contained"
-                  color="error"
-                  onClick={() => onTerminate(position)}
-                  fullWidth
-                  disabled={disabled || !isOnNetwork}
-                >
-                  <Typography variant="body2">
-                    <FormattedMessage description="terminate" defaultMessage="Terminate" />
-                  </Typography>
-                </StyledCardFooterButton>
-              )}
-            </>
-          )}
-        </StyledCallToActionContainer>
+            <StyledProgressWrapper>
+              <BorderLinearProgress
+                swaps={remainingSwaps.toNumber()}
+                variant="determinate"
+                value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
+              />
+            </StyledProgressWrapper>
+          </DarkTooltip>
+        )}
+        <PositionControls
+          position={position}
+          onWithdraw={onWithdraw}
+          onReusePosition={onReusePosition}
+          onMigrateYield={onMigrateYield}
+          disabled={disabled}
+          hasSignSupport={!!hasSignSupport}
+          network={network}
+          yieldOptions={yieldOptions}
+          onSuggestMigrateYield={onSuggestMigrateYield}
+        />
       </StyledCardContent>
     </StyledCard>
   );

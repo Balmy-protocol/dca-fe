@@ -8,6 +8,7 @@ export * from './pairs';
 export * from './responses';
 export * from './transactions';
 export * from './contracts';
+export * from './yield';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -41,3 +42,5 @@ export interface NetworkStruct {
   rpc: string[];
   mainColor?: string;
 }
+
+export type ChainId = number;

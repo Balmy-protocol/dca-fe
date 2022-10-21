@@ -19,6 +19,8 @@ import PriceService from './priceService';
 import PositionService from './positionService';
 import PairService from './pairService';
 import WalletService from './walletService';
+import YieldService from './yieldService';
+import MeanApiService from './meanApiService';
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
@@ -47,11 +49,15 @@ export default class Web3Service {
 
   priceService: PriceService;
 
+  yieldService: YieldService;
+
   positionService: PositionService;
 
   pairService: PairService;
 
   walletService: WalletService;
+
+  meanApiService: MeanApiService;
 
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -84,10 +90,13 @@ export default class Web3Service {
     this.transactionService = new TransactionService(client);
     this.walletService = new WalletService(this.contractService, this.axiosClient, client);
     this.pairService = new PairService(this.walletService, this.contractService, this.apolloClient, this.uniClient);
+    this.meanApiService = new MeanApiService(this.walletService, this.contractService, this.axiosClient, client);
+    this.yieldService = new YieldService(this.walletService, this.axiosClient, client);
     this.positionService = new PositionService(
       this.walletService,
       this.pairService,
       this.contractService,
+      this.meanApiService,
       this.apolloClient
     );
     this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
@@ -95,6 +104,10 @@ export default class Web3Service {
 
   getContractService() {
     return this.contractService;
+  }
+
+  getMeanApiService() {
+    return this.meanApiService;
   }
 
   getProviderInfo() {
@@ -115,6 +128,10 @@ export default class Web3Service {
 
   getPriceService() {
     return this.priceService;
+  }
+
+  getYieldService() {
+    return this.yieldService;
   }
 
   getPairService() {

@@ -917,6 +917,7 @@ const manifest = {
   $0XBTC,
   $2GIVE,
   '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9': AAVE,
+  AAVE,
   '0xb98d4c97425d9908e66e53a6fdf673acca0be986': ABT,
   ACT,
   ACTN,

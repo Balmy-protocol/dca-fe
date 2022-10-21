@@ -18,6 +18,8 @@ import {
   ApproveCompanionTypeData,
   ModifyPermissionsTypeData,
   MigratePositionTypeData,
+  WithdrawFundsTypeData,
+  MigratePositionYieldTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -56,6 +58,15 @@ function useBuildTransactionMessages() {
               (terminatedPosition as Position).to.symbol
             } position`;
           }
+          break;
+        }
+        case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+          const withdrawFundsTypeData = tx.typeData as WithdrawFundsTypeData;
+          const withdrawnPosition = find(positions, { id: withdrawFundsTypeData.id });
+
+          message = `Withdrawing your ${withdrawFundsTypeData.from} funds from your ${
+            (withdrawnPosition as Position).from.symbol
+          }:${(withdrawnPosition as Position).to.symbol} position`;
           break;
         }
         case TRANSACTION_TYPES.WITHDRAW_POSITION: {
@@ -146,6 +157,11 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.MIGRATE_POSITION: {
           const transferedTypeData = tx.typeData as MigratePositionTypeData;
           message = `Migrating your ${transferedTypeData.from}:${transferedTypeData.to} position`;
+          break;
+        }
+        case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
+          const transferedTypeData = tx.typeData as MigratePositionYieldTypeData;
+          message = `Making your ${transferedTypeData.from}:${transferedTypeData.to} position start generating yield`;
           break;
         }
         case TRANSACTION_TYPES.APPROVE_COMPANION: {

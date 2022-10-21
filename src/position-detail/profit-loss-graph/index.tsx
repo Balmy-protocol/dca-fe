@@ -85,6 +85,17 @@ type Prices = PriceData[];
 //   isBaseToken: boolean;
 // }
 
+const tickFormatter = (value: string) => {
+  const precisionRegex = new RegExp(/e\+?/);
+  const preciseValue = Number(value).toPrecision(5);
+
+  if (precisionRegex.test(preciseValue)) {
+    return preciseValue;
+  }
+
+  return parseFloat(preciseValue).toString();
+};
+
 const POINT_LIMIT = 30;
 
 const MODIFY_ACTIONS = [
@@ -97,10 +108,10 @@ const CREATED_ACTIONS = [POSITION_ACTIONS.CREATED];
 const ACTIONS_TO_FILTER = [...MODIFY_ACTIONS, ...SWAPPED_ACTIONS, ...CREATED_ACTIONS];
 
 const getFunds = (positionAction: ActionState) => {
-  const { rate, oldRate, remainingSwaps, oldRemainingSwaps } = positionAction;
+  const { rate, oldRate, rateUnderlying, oldRateUnderlying, remainingSwaps, oldRemainingSwaps } = positionAction;
 
-  const previousRate = BigNumber.from(oldRate);
-  const currentRate = BigNumber.from(rate);
+  const previousRate = BigNumber.from(oldRateUnderlying || oldRate);
+  const currentRate = BigNumber.from(rateUnderlying || rate);
   const previousRemainingSwaps = BigNumber.from(oldRemainingSwaps);
   const currentRemainingSwaps = BigNumber.from(remainingSwaps);
   const oldFunds = previousRate.mul(previousRemainingSwaps);
@@ -157,7 +168,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < filteredPositionActions.length; i++) {
           const positionAction = filteredPositionActions[i];
-          const { action, rate } = positionAction;
+          const { action, rate: rawRate, depositedRateUnderlying, rateUnderlying } = positionAction;
+          const rate = depositedRateUnderlying || rateUnderlying || rawRate;
           const currentRate = BigNumber.from(rate || 0);
           const currentRemainingSwaps = BigNumber.from(positionAction.remainingSwaps || 0);
 
@@ -366,6 +378,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
               domain={['auto', 'auto']}
               axisLine={false}
               tickLine={false}
+              tickFormatter={tickFormatter}
               // tickFormatter={(tick: string) => `${tick}%`}
             />
             <Tooltip

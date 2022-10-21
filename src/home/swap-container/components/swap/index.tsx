@@ -2,19 +2,14 @@ import React from 'react';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
-import { Token } from 'types';
+import isUndefined from 'lodash/isUndefined';
+import { Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
+import Slide from '@mui/material/Slide';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
-import TokenButton from 'common/token-button';
-import TokenInput from 'common/token-input';
-import FrequencyInput from 'common/frequency-easy-input';
-import FrequencyTypeInput from 'common/frequency-type-input';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import find from 'lodash/find';
 import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
@@ -25,7 +20,6 @@ import {
   FULL_DEPOSIT_TYPE,
   MINIMUM_LIQUIDITY_USD,
   MODE_TYPES,
-  STRING_SWAP_INTERVALS,
   POSSIBLE_ACTIONS,
   RATE_TYPE,
   SUPPORTED_NETWORKS,
@@ -37,6 +31,7 @@ import {
   NETWORKS,
   MAX_UINT_32,
   LATEST_VERSION,
+  ONE_WEEK,
 } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -56,6 +51,8 @@ import useContractService from 'hooks/useContractService';
 import usePositionService from 'hooks/usePositionService';
 import usePairService from 'hooks/usePairService';
 import useWeb3Service from 'hooks/useWeb3Service';
+import SwapFirstStep from '../step1';
+import SwapSecondStep from '../step2';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -67,12 +64,6 @@ const StyledPaper = styled(Paper)`
   backdrop-filter: blur(6px);
 `;
 
-const StyledContentContainer = styled.div`
-  background-color: #292929;
-  padding: 24px;
-  border-radius: 8px;
-`;
-
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
 `;
@@ -80,65 +71,6 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 const StyledButton = styled(Button)`
   padding: 10px 18px;
   border-radius: 12px;
-  margin-top: 16px;
-`;
-
-const StyledTokensContainer = styled.div`
-  display: flex;
-  gap: 20px;
-  align-items: center;
-`;
-
-const StyledTokenContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 0;
-  gap: 5px;
-`;
-
-const StyledToggleContainer = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-`;
-
-const StyledToggleTokenButton = styled(IconButton)`
-  border: 4px solid #1b1821;
-  background-color: #292929;
-  :hover {
-    background-color: #484848;
-  }
-`;
-
-const StyledRateContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
-const StyledFrequencyContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const StyledFrequencyTypeContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-`;
-
-const StyledFrequencyValueContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
-const StyledSummaryContainer = styled.div``;
-
-const StyledInputContainer = styled.div`
-  margin: 5px 6px;
-  display: inline-flex;
 `;
 
 interface AvailableSwapInterval {
@@ -161,8 +93,16 @@ interface SwapProps {
   setFromValue: (newFromValue: string) => void;
   setFrequencyType: (newFrequencyType: BigNumber) => void;
   setFrequencyValue: (newFrequencyValue: string) => void;
+  setYieldEnabled: (newYieldEnabled: boolean) => void;
   currentNetwork: { chainId: number; name: string };
   availableFrequencies: AvailableSwapInterval[];
+  yieldEnabled: boolean;
+  yieldOptions: YieldOptions;
+  isLoadingYieldOptions: boolean;
+  fromYield: YieldOption | null | undefined;
+  toYield: YieldOption | null | undefined;
+  setFromYield: (newYield?: null | YieldOption) => void;
+  setToYield: (newYield?: null | YieldOption) => void;
 }
 
 const Swap = ({
@@ -179,8 +119,21 @@ const Swap = ({
   frequencyValue,
   currentNetwork,
   availableFrequencies,
+  yieldEnabled,
+  setYieldEnabled,
+  yieldOptions,
+  isLoadingYieldOptions,
+  fromYield,
+  toYield,
+  setFromYield,
+  setToYield,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
+  const containerRef = React.useRef(null);
+  const [createStep, setCreateStep] = React.useState<0 | 1>(0);
+  const [showFirstStep, setShowFirstStep] = React.useState(false);
+  const [showSecondStep, setShowSecondStep] = React.useState(false);
+  const [isRender, setIsRender] = React.useState(true);
   const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
   const [rate, setRate] = React.useState('0');
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
@@ -204,8 +157,8 @@ const Swap = ({
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
-    let tokenA = from.address;
-    let tokenB = to.address;
+    let tokenA = fromYield?.tokenAddress || from.address;
+    let tokenB = toYield?.tokenAddress || to.address;
 
     if (tokenA === PROTOCOL_TOKEN_ADDRESS) {
       tokenA = getWrappedProtocolToken(currentNetwork.chainId).address;
@@ -221,12 +174,12 @@ const Swap = ({
       availablePairs,
       (pair) => pair.token0.address === token0.toLocaleLowerCase() && pair.token1.address === token1.toLocaleLowerCase()
     );
-  }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0]);
+  }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0, fromYield, toYield]);
   const isCreatingPair = useHasPendingPairCreation(from, to);
 
-  const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount());
+  const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
 
-  const [allowance, , allowanceErrors] = useAllowance(from);
+  const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
 
@@ -234,6 +187,20 @@ const Swap = ({
     from,
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null
   );
+
+  const fromCanHaveYield = !!(
+    from && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(from.address)).length
+  );
+  const toCanHaveYield = !!(
+    to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
+  );
+
+  const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
+  const hasEnoughUsdForYield = !!usdPrice && usdPrice >= 10;
+
+  // only allowed if set for 10 days and at least 10 USD
+  const shouldEnableYield =
+    yieldEnabled && (fromCanHaveYield || toCanHaveYield) && isAtLeastAWeek && hasEnoughUsdForYield;
 
   React.useEffect(() => {
     if (!from) return;
@@ -286,8 +253,11 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(from);
-      const hubAddress = await contractService.getHUBAddress();
+      const result = await walletService.approveToken(from, !!(shouldEnableYield && fromYield?.tokenAddress));
+      const hubAddress =
+        shouldEnableYield && fromYield?.tokenAddress
+          ? await contractService.getHUBCompanionAddress()
+          : await contractService.getHUBAddress();
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
@@ -329,7 +299,15 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await positionService.deposit(from, to, fromValue, frequencyType, frequencyValue);
+      const result = await positionService.deposit(
+        from,
+        to,
+        fromValue,
+        frequencyType,
+        frequencyValue,
+        shouldEnableYield ? fromYield?.tokenAddress : undefined,
+        shouldEnableYield ? toYield?.tokenAddress : undefined
+      );
       const hubAddress = await contractService.getHUBAddress();
       const companionAddress = await contractService.getHUBCompanionAddress();
 
@@ -338,6 +316,8 @@ const Swap = ({
         typeData: {
           from,
           to,
+          fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
+          toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
           fromValue,
           frequencyType: frequencyType.toString(),
           frequencyValue,
@@ -364,6 +344,9 @@ const Swap = ({
 
       setFromValue('');
       setRate('0');
+      setToYield(undefined);
+      setFromYield(undefined);
+      setCreateStep(0);
     } catch (e) {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error creating position', error: { code: e.code, message: e.message, data: e.data } });
@@ -495,7 +478,10 @@ const Swap = ({
     setIsLoading(true);
     if (!from || !to) return;
 
-    const oracle = await pairService.getPairOracle({ tokenA: from.address, tokenB: to.address }, !!existingPair);
+    const oracle = await pairService.getPairOracle(
+      { tokenA: fromYield?.tokenAddress || from.address, tokenB: toYield?.tokenAddress || to.address },
+      !!existingPair
+    );
 
     let hasLowLiquidity = oracle === ORACLES.UNISWAP;
 
@@ -539,7 +525,7 @@ const Swap = ({
             parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
 
-  const shouldDisableButton =
+  const shouldDisableApproveButton =
     !from ||
     !to ||
     !fromValue ||
@@ -548,9 +534,12 @@ const Swap = ({
     !balance ||
     balanceErrors ||
     allowanceErrors ||
-    !isApproved ||
     parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
-    BigNumber.from(frequencyValue).lte(BigNumber.from(0));
+    BigNumber.from(frequencyValue).lte(BigNumber.from(0)) ||
+    (shouldEnableYield && fromCanHaveYield && isUndefined(fromYield)) ||
+    (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
+
+  const shouldDisableButton = shouldDisableApproveButton || !isApproved;
 
   const ignoreValues = [...(from ? [from.address] : []), ...(to ? [to.address] : [])];
 
@@ -612,7 +601,7 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="primary"
-      disabled={!!isApproved || hasPendingApproval || isLoading}
+      disabled={!!isApproved || hasPendingApproval || isLoading || !!shouldDisableApproveButton}
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
       style={{ pointerEvents: 'all' }}
     >
@@ -717,6 +706,29 @@ const Swap = ({
     </StyledButton>
   );
 
+  const handleSetStep = (step: 0 | 1) => {
+    if (isRender) {
+      setIsRender(false);
+    }
+
+    setCreateStep(step);
+  };
+
+  const NextStepButton = (
+    <StyledButton
+      size="large"
+      disabled={!from || !to || !fromValue || fromValue === '0' || !frequencyValue || frequencyValue === '0'}
+      color="secondary"
+      variant="contained"
+      fullWidth
+      onClick={() => handleSetStep(1)}
+    >
+      <Typography variant="body1">
+        <FormattedMessage description="continue" defaultMessage="Continue" />
+      </Typography>
+    </StyledButton>
+  );
+
   let ButtonToShow;
 
   if (!web3Service.getAccount()) {
@@ -729,10 +741,12 @@ const Swap = ({
     ButtonToShow = IncorrectNetworkButton;
   } else if (!pairIsSupported && !isLoadingPairIsSupported && from && to) {
     ButtonToShow = PairNotSupportedButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
-    ButtonToShow = ApproveTokenButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
+  } else if (!createStep) {
+    ButtonToShow = NextStepButton;
+  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
+    ButtonToShow = ApproveTokenButton;
   } else if (isCreatingPair) {
     ButtonToShow = CreatingPairButton;
   } else {
@@ -749,7 +763,7 @@ const Swap = ({
       );
 
   return (
-    <StyledPaper variant="outlined">
+    <StyledPaper variant="outlined" ref={containerRef}>
       <CreatePairModal
         open={shouldShowPairModal}
         onCancel={() => setShouldShowPairModal(false)}
@@ -776,126 +790,81 @@ const Swap = ({
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
         usedTokens={usedTokens}
         ignoreValues={ignoreValues}
+        yieldOptions={yieldOptions}
+        isLoadingYieldOptions={isLoadingYieldOptions}
+        otherSelected={
+          (from && selecting.address === from.address) || selecting.address === 'from' ? to?.address : from?.address
+        }
       />
-      <Grid container rowSpacing={2}>
-        <Grid item xs={12}>
-          <StyledContentContainer>
-            <StyledTokensContainer>
-              <StyledTokenContainer>
-                <Typography variant="body1">
-                  <FormattedMessage description="sell" defaultMessage="Sell" />
-                </Typography>
-                <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
-              </StyledTokenContainer>
-              <StyledToggleContainer>
-                <StyledToggleTokenButton onClick={() => toggleFromTo()}>
-                  <SwapHorizIcon />
-                </StyledToggleTokenButton>
-              </StyledToggleContainer>
-              <StyledTokenContainer>
-                <Typography variant="body1">
-                  <FormattedMessage description="receive" defaultMessage="Receive" />
-                </Typography>
-                <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
-              </StyledTokenContainer>
-            </StyledTokensContainer>
-          </StyledContentContainer>
-        </Grid>
-        <Grid item xs={12}>
-          <StyledContentContainer>
-            {/* rate */}
-            <StyledRateContainer>
-              <Typography variant="body1">
-                <FormattedMessage
-                  description="howMuchToSell"
-                  defaultMessage="How much {from} do you want to invest?"
-                  values={{ from: from?.symbol || '' }}
-                />
-              </Typography>
-              <TokenInput
-                id="from-value"
-                error={cantFund ? 'Amount cannot exceed balance' : ''}
-                value={fromValue}
-                onChange={handleFromValueChange}
-                withBalance={!!balance}
-                balance={balance}
-                token={from}
-                withMax
-                withHalf
-                fullWidth
-              />
-            </StyledRateContainer>
-          </StyledContentContainer>
-        </Grid>
-        <Grid item xs={12}>
-          <StyledContentContainer>
-            <StyledFrequencyContainer>
-              <StyledFrequencyTypeContainer>
-                <Typography variant="body1">
-                  <FormattedMessage description="executes" defaultMessage="Executes" />
-                </Typography>
-                <FrequencyTypeInput
-                  options={filteredFrequencies}
-                  selected={frequencyType}
-                  onChange={setFrequencyType}
-                />
-              </StyledFrequencyTypeContainer>
-              <StyledFrequencyValueContainer>
-                <Typography variant="body1">
-                  <FormattedMessage
-                    description="howManyFreq"
-                    defaultMessage="How many {type}?"
-                    values={{
-                      type: STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                        .subject,
-                    }}
-                  />
-                </Typography>
-                <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} />
-              </StyledFrequencyValueContainer>
-            </StyledFrequencyContainer>
-          </StyledContentContainer>
-        </Grid>
-        <Grid item xs={12}>
-          <StyledContentContainer>
-            <StyledSummaryContainer>
-              <Typography variant="body1" component="span">
-                <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
-              </Typography>
-              <StyledInputContainer>
-                <TokenInput
-                  id="rate-value"
-                  value={rate}
-                  onChange={handleRateValueChange}
-                  withBalance={false}
-                  token={from}
-                  isMinimal
-                />
-              </StyledInputContainer>
-              <Typography variant="body1" component="span">
-                <FormattedMessage
-                  description="rate detail"
-                  defaultMessage="{frequency} for you for"
-                  values={{
-                    frequency:
-                      STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
-                  }}
-                />
-              </Typography>
-              <StyledInputContainer>
-                <FrequencyInput
-                  id="frequency-value"
-                  value={frequencyValue}
-                  onChange={handleFrequencyChange}
-                  isMinimal
-                />
-              </StyledInputContainer>
-              {STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].subject}
-            </StyledSummaryContainer>
-            {ButtonToShow}
-          </StyledContentContainer>
-        </Grid>
-      </Grid>
+      <Slide
+        direction="right"
+        appear
+        in={createStep === 0}
+        container={containerRef.current}
+        onEntered={() => setShowFirstStep(true)}
+        onExit={() => {
+          setShowSecondStep(true);
+          setShowFirstStep(false);
+        }}
+        mountOnEnter
+        unmountOnExit
+        timeout={isRender ? 0 : 500}
+        easing="ease-out"
+      >
+        <SwapFirstStep
+          from={from}
+          to={to}
+          fromValue={fromValue}
+          toggleFromTo={toggleFromTo}
+          setFrequencyType={setFrequencyType}
+          frequencyType={frequencyType}
+          frequencyValue={frequencyValue}
+          startSelectingCoin={startSelectingCoin}
+          cantFund={cantFund}
+          handleFromValueChange={handleFromValueChange}
+          balance={balance}
+          frequencies={filteredFrequencies}
+          handleFrequencyChange={handleFrequencyChange}
+          buttonToShow={ButtonToShow}
+          show={showFirstStep}
+        />
+      </Slide>
+      <Slide
+        direction="left"
+        in={createStep === 1}
+        container={containerRef.current}
+        onEntered={() => setShowSecondStep(true)}
+        onExited={() => setShowSecondStep(false)}
+        mountOnEnter
+        unmountOnExit
+        timeout={500}
+        easing="ease-out"
+      >
+        <SwapSecondStep
+          show={showSecondStep}
+          onBack={() => setCreateStep(0)}
+          from={from}
+          to={to}
+          rate={rate}
+          usdPrice={usdPrice}
+          handleRateValueChange={handleRateValueChange}
+          handleFromValueChange={handleFromValueChange}
+          frequencyType={frequencyType}
+          frequencyValue={frequencyValue}
+          fromValue={fromValue}
+          handleFrequencyChange={handleFrequencyChange}
+          buttonToShow={ButtonToShow}
+          yieldEnabled={shouldEnableYield}
+          setYieldEnabled={setYieldEnabled}
+          fromCanHaveYield={fromCanHaveYield}
+          yieldOptions={yieldOptions}
+          isLoadingYieldOptions={isLoadingYieldOptions}
+          fromYield={fromYield}
+          toYield={toYield}
+          setFromYield={setFromYield}
+          setToYield={setToYield}
+        />
+      </Slide>
     </StyledPaper>
   );
 };

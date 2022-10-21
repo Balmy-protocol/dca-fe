@@ -2,10 +2,9 @@ import React, { CSSProperties } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
 import remove from 'lodash/remove';
-import uniq from 'lodash/uniq';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@mui/material/Slide';
-import { Token, TokenList } from 'types';
+import { Token, TokenList, YieldOptions } from 'types';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -20,8 +19,6 @@ import Chip from '@mui/material/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles, withStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import useAvailablePairs from 'hooks/useAvailablePairs';
-import Switch from '@mui/material/Switch';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useTokenList from 'hooks/useTokenList';
 import TokenLists from 'common/token-lists';
@@ -69,14 +66,6 @@ const StyledListItem = styled(ListItem)`
   padding-left: 0px;
 `;
 
-const StyledSwitchGrid = styled(Grid)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: rgba(255, 255, 255, 0.5) !important;
-  flex: 0;
-`;
-
 const StyledList = styled(List)`
   ${({ theme }) => `
     scrollbar-width: thin;
@@ -111,12 +100,19 @@ const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
 const StyledBalanceContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
+`;
+
+const StyledTokenTextContainer = styled.div`
+  display: flex;
+  gap: 5px;
 `;
 
 interface RowData {
   tokenList: TokenList;
   tokenKeys: string[];
   onClick: (token: string) => void;
+  yieldOptions: YieldOptions;
 }
 
 interface RowProps {
@@ -133,6 +129,9 @@ interface TokenPickerProps {
   isFrom: boolean;
   usedTokens: string[];
   ignoreValues: string[];
+  otherSelected?: string;
+  yieldOptions: YieldOptions;
+  isLoadingYieldOptions: boolean;
 }
 
 const useListItemStyles = makeStyles(({ palette }) => ({
@@ -156,31 +155,43 @@ const useListItemStyles = makeStyles(({ palette }) => ({
     },
   },
 }));
-const Row = ({ index, style, data: { onClick, tokenList, tokenKeys } }: RowProps) => {
+const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions } }: RowProps) => {
   const classes = useListItemStyles();
+  const token = tokenList[tokenKeys[index]];
 
-  const tokenBalance = useTokenBalance(tokenList[tokenKeys[index]]);
-  const [tokenValue] = useUsdPrice(tokenList[tokenKeys[index]], tokenBalance);
+  const tokenBalance = useTokenBalance(token);
+  const [tokenValue] = useUsdPrice(token, tokenBalance);
+
+  const availableYieldOptions = yieldOptions.filter((yieldOption) =>
+    yieldOption.enabledTokens.includes(token?.address)
+  );
 
   return (
     <StyledListItem classes={classes} onClick={() => onClick(tokenKeys[index])} style={style}>
       <StyledListItemIcon>
-        <TokenIcon size="24px" token={tokenList[tokenKeys[index]]} />
+        <TokenIcon size="24px" token={token} />
       </StyledListItemIcon>
       <ListItemText disableTypography>
-        <span>
+        <StyledTokenTextContainer>
           <Typography variant="body1" component="span" color="#FFFFFF">
-            {tokenList[tokenKeys[index]].name}
+            {token.name}
           </Typography>
           <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)">
-            {` (${tokenList[tokenKeys[index]].symbol})`}
+            {` (${token.symbol})`}
           </Typography>
-        </span>
+        </StyledTokenTextContainer>
+        {!!availableYieldOptions.length && (
+          <StyledTokenTextContainer>
+            <Typography variant="caption" component="span" color="#2CC941">
+              <FormattedMessage description="supportsYield" defaultMessage="Supports yield" />
+            </Typography>
+          </StyledTokenTextContainer>
+        )}
       </ListItemText>
       <StyledBalanceContainer>
         {tokenBalance && (
           <Typography variant="body1" color="#FFFFFF">
-            {formatCurrencyAmount(tokenBalance, tokenList[tokenKeys[index]], 6)}
+            {formatCurrencyAmount(tokenBalance, token, 6)}
           </Typography>
         )}
         {!!tokenValue && (
@@ -201,15 +212,16 @@ const TokenPicker = ({
   onChange,
   ignoreValues,
   usedTokens,
+  otherSelected,
+  yieldOptions,
+  isLoadingYieldOptions,
 }: TokenPickerProps) => {
   const tokenList = useTokenList();
   const [search, setSearch] = React.useState('');
-  const [isOnlyPairs, setIsOnlyPairs] = React.useState(false);
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
-  let tokenKeysToUse: string[] = [];
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
-  const availablePairs = useAvailablePairs();
   const currentNetwork = useCurrentNetwork();
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
   const handleOnClose = () => {
     if (shouldShowTokenLists) {
@@ -225,21 +237,14 @@ const TokenPicker = ({
     handleOnClose();
   };
 
-  const uniqTokensFromPairs = React.useMemo(
-    () =>
-      uniq(availablePairs.reduce((accum, current) => [...accum, current.token0.address, current.token1.address], [])),
-    [availablePairs]
-  );
-
-  tokenKeysToUse = !isOnlyPairs ? tokenKeys : uniqTokensFromPairs;
-
   const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
-    [usedTokens, ignoreValues, tokenKeysToUse]
+    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeys.includes(el)),
+    [usedTokens, ignoreValues, tokenKeys]
   );
 
+  const otherIsProtocol = otherSelected === PROTOCOL_TOKEN_ADDRESS || otherSelected === wrappedProtocolToken.address;
   const memoizedTokenKeys = React.useMemo(() => {
-    const filteredTokenKeys = tokenKeysToUse.filter(
+    const filteredTokenKeys = tokenKeys.filter(
       (el) =>
         tokenList[el] &&
         (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
@@ -247,7 +252,8 @@ const TokenPicker = ({
           tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
         !usedTokens.includes(el) &&
         !ignoreValues.includes(el) &&
-        tokenList[el].chainId === currentNetwork.chainId
+        tokenList[el].chainId === currentNetwork.chainId &&
+        (!otherIsProtocol || (otherIsProtocol && el !== wrappedProtocolToken.address && el !== PROTOCOL_TOKEN_ADDRESS))
     );
 
     if (filteredTokenKeys.findIndex((el) => el === getWrappedProtocolToken(currentNetwork.chainId).address) !== -1) {
@@ -261,10 +267,15 @@ const TokenPicker = ({
     }
 
     return filteredTokenKeys;
-  }, [tokenKeys, search, usedTokens, ignoreValues, tokenKeysToUse, availableFrom, currentNetwork.chainId]);
+  }, [tokenKeys, search, usedTokens, ignoreValues, tokenKeys, availableFrom, otherIsProtocol, currentNetwork.chainId]);
 
   const itemData = React.useMemo(
-    () => ({ onClick: handleItemSelected, tokenList, tokenKeys: memoizedTokenKeys }),
+    () => ({
+      onClick: handleItemSelected,
+      tokenList,
+      tokenKeys: memoizedTokenKeys,
+      yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
+    }),
     [memoizedTokenKeys, tokenList]
   );
 
@@ -306,18 +317,6 @@ const TokenPicker = ({
                   margin="none"
                 />
               </StyledGrid>
-              <StyledSwitchGrid item xs={12}>
-                <FormattedMessage
-                  description="createdPairsSwitchToken"
-                  defaultMessage="Only tokens with created pairs"
-                />
-                <Switch
-                  checked={isOnlyPairs}
-                  onChange={() => setIsOnlyPairs(!isOnlyPairs)}
-                  name="isOnlyPairs"
-                  color="primary"
-                />
-              </StyledSwitchGrid>
               {!!memoizedUsedTokens.length && (
                 <>
                   <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>

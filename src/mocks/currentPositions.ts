@@ -1,4 +1,4 @@
-import { ONE_DAY, POSITION_VERSION_3 } from 'config/constants';
+import { LATEST_VERSION, ONE_DAY, TOKEN_TYPE_BASE } from 'config/constants';
 import { Position } from 'types';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from './tokens';
@@ -10,6 +10,8 @@ export const EmptyPosition: Position = {
     decimals: 18,
     chainId: 10,
     symbol: 'MEAN',
+    type: TOKEN_TYPE_BASE,
+    underlyingTokens: [],
   },
   to: {
     address: PROTOCOL_TOKEN_ADDRESS,
@@ -17,14 +19,21 @@ export const EmptyPosition: Position = {
     decimals: 18,
     chainId: 10,
     symbol: 'MEAN',
+    type: TOKEN_TYPE_BASE,
+    underlyingTokens: [],
   },
   swapInterval: ONE_DAY,
   user: PROTOCOL_TOKEN_ADDRESS,
   swapped: BigNumber.from(0),
   remainingLiquidity: BigNumber.from(0),
   rate: BigNumber.from(1),
+  depositedRateUnderlying: BigNumber.from(1),
+  totalSwappedUnderlyingAccum: BigNumber.from(1),
+  toWithdrawUnderlyingAccum: BigNumber.from(1),
+  toWithdrawUnderlying: null,
+  remainingLiquidityUnderlying: null,
   remainingSwaps: BigNumber.from(0),
-  totalDeposits: BigNumber.from(0),
+  totalDeposited: BigNumber.from(0),
   withdrawn: BigNumber.from(0),
   totalSwaps: BigNumber.from(0),
   toWithdraw: BigNumber.from(0),
@@ -33,8 +42,8 @@ export const EmptyPosition: Position = {
   startedAt: 0,
   status: 'TERMINATED',
   pendingTransaction: '',
-  executedSwaps: BigNumber.from(0),
-  version: POSITION_VERSION_3,
+  totalExecutedSwaps: BigNumber.from(0),
+  version: LATEST_VERSION,
   chainId: 10,
   pairLastSwappedAt: 0,
   pairNextSwapAvailableAt: '0',

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Permission, PositionPermission } from 'types';
+import { ChainId, Permission, PositionPermission } from 'types';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Typography from '@mui/material/Typography';
@@ -15,7 +15,7 @@ import { buildEtherscanAddress } from 'utils/etherscan';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'hooks/state';
 import { addPermission, removePermission } from 'state/position-permissions/actions';
-import { COMPANION_ADDRESS, POSITION_VERSION_3, STRING_PERMISSIONS } from 'config/constants';
+import { COMPANION_ADDRESS, LATEST_VERSION, PositionVersions, STRING_PERMISSIONS } from 'config/constants';
 import { FormattedMessage } from 'react-intl';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -24,6 +24,8 @@ import Address from 'common/address';
 interface PositionPermissionProps {
   positionPermission: PositionPermission;
   shouldDisable: boolean;
+  positionVersion: PositionVersions;
+  chainId: ChainId;
 }
 
 const hasPermission = (permissions: Permission[], permission: Permission) => permissions.indexOf(permission) !== -1;
@@ -105,10 +107,14 @@ const HelpTexts = {
   ),
 };
 
-const PositionPermissionItem = ({ positionPermission, shouldDisable }: PositionPermissionProps) => {
+const PositionPermissionItem = ({
+  positionPermission,
+  shouldDisable,
+  positionVersion,
+  chainId,
+}: PositionPermissionProps) => {
   const currentNetwork = useCurrentNetwork();
   const dispatch = useAppDispatch();
-  const companionAddress = COMPANION_ADDRESS[POSITION_VERSION_3][currentNetwork.chainId];
 
   const handlePermissionChange = (permission: Permission, newValue: boolean) => {
     if (newValue) {
@@ -131,7 +137,10 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable }: PositionP
                   rel="noreferrer"
                 >
                   <Typography variant="body2" component="span">
-                    {positionPermission.operator.toLowerCase() === companionAddress.toLowerCase() ? (
+                    {positionPermission.operator.toLowerCase() ===
+                    (
+                      COMPANION_ADDRESS[positionVersion][chainId] || COMPANION_ADDRESS[LATEST_VERSION][chainId]
+                    ).toLowerCase() ? (
                       'Mean Finance Companion'
                     ) : (
                       <Address address={positionPermission.operator} />

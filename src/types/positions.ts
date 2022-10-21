@@ -15,6 +15,7 @@ export interface NFTData {
 }
 
 export type Permission = 'INCREASE' | 'REDUCE' | 'WITHDRAW' | 'TERMINATE';
+export type PositionStatus = 'ACTIVE' | 'COMPLETED' | 'TERMINATED';
 export interface PositionPermission {
   id: string;
   operator: string;
@@ -40,12 +41,15 @@ export interface Position {
   swapped: BigNumber; // total de swappeado
   remainingLiquidity: BigNumber;
   remainingSwaps: BigNumber;
-  totalDeposits: BigNumber;
+  totalDeposited: BigNumber;
   withdrawn: BigNumber; // cuanto saque
   totalSwaps: BigNumber; // cuanto puse originalmente
   rate: BigNumber;
   toWithdraw: BigNumber;
-  executedSwaps: BigNumber;
+  totalExecutedSwaps: BigNumber;
+  depositedRateUnderlying: Nullable<BigNumber>;
+  totalSwappedUnderlyingAccum: Nullable<BigNumber>;
+  toWithdrawUnderlyingAccum: Nullable<BigNumber>;
   id: string;
   positionId: string;
   status: string;
@@ -55,19 +59,23 @@ export interface Position {
   chainId: number;
   pairLastSwappedAt: number;
   pairNextSwapAvailableAt: string;
+  yieldFrom?: string;
+  yieldTo?: string;
+  toWithdrawUnderlying: Nullable<BigNumber>;
+  remainingLiquidityUnderlying: Nullable<BigNumber>;
 }
 
 export interface FullPosition {
   from: Token;
   to: Token;
   user: string;
-  totalDeposits: string;
+  totalDeposited: string;
   totalSwaps: string; // cuanto puse originalmente
   id: string;
   positionId: string;
   status: string;
   startedAt: number;
-  executedSwaps: string;
+  totalExecutedSwaps: string;
   pendingTransaction: string;
   version: PositionVersions;
   pair: {
@@ -78,15 +86,23 @@ export interface FullPosition {
   createdAtTimestamp: string;
   totalSwapped: string;
   totalWithdrawn: string;
-  startedAtSwap: string;
   terminatedAtTimestamp: string;
   chainId: number;
+  permissions: PositionPermission[];
   swapInterval: {
     id: string;
     interval: string;
     description: string;
   };
-  current: PositionState;
+  rate: string;
+  remainingSwaps: string;
+  swapped: string;
+  withdrawn: string;
+  remainingLiquidity: string;
+  toWithdraw: string;
+  depositedRateUnderlying: Nullable<string>;
+  totalSwappedUnderlyingAccum: Nullable<string>;
+  toWithdrawUnderlyingAccum: Nullable<string>;
   history: ActionState[];
 }
 
@@ -102,30 +118,15 @@ export interface ActionState {
   swapped: string;
   withdrawn: string;
   permissions: PositionPermission[];
-  ratePerUnitBToAWithFee: string;
-  ratePerUnitAToBWithFee: string;
+  ratioBToAWithFee: string;
+  swappedUnderlying: string;
+  oldRateUnderlying: string;
+  withdrawnUnderlying: string;
+  rateUnderlying: string;
+  depositedRateUnderlying: string;
+  ratioAToBWithFee: string;
   createdAtBlock: string;
   createdAtTimestamp: string;
-  transaction: {
-    id: string;
-    hash: string;
-    timestamp: string;
-  };
-}
-
-export interface PositionState {
-  id: string;
-  startingSwap: string;
-  rate: string;
-  lastSwap: string;
-  remainingSwaps: string;
-  swapped: string;
-  withdrawn: string;
-  remainingLiquidity: string;
-  createdAtBlock: string;
-  createdAtTimestamp: string;
-  idleSwapped: string;
-  permissions: PositionPermission[];
   transaction: {
     id: string;
     hash: string;

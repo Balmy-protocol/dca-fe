@@ -9,21 +9,37 @@ const getPairSwaps = gql`
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       tokenB {
         address: id
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       createdAtTimestamp
-      nextSwapAvailableAt
+      activePositionsPerInterval
       swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1) {
         id
         executedAtTimestamp
         executedAtBlock
-        ratePerUnitBToAWithFee
-        ratePerUnitAToBWithFee
+        ratioBToAWithFee
+        ratioAToBWithFee
         transaction {
           id
           hash

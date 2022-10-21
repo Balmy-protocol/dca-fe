@@ -2,7 +2,20 @@
 import { BigNumber, BigNumberish, BytesLike } from 'ethers';
 import { Contract } from '@ethersproject/contracts';
 import { TransactionResponse } from '@ethersproject/providers';
-import { PairIndex } from 'utils/swap';
+import { DCAHub } from '@mean-finance/dca-v2-core/dist';
+
+export interface PermissionSet {
+  operator: string;
+  permissions: number[];
+}
+export interface PermissionPermit {
+  permissions: PermissionSet[];
+  tokenId: string;
+  deadline: string;
+  v: number | string;
+  r: string;
+  s: string;
+}
 
 export type Oracles = 0 | 1 | 2;
 export class ERC20Contract extends Contract {
@@ -13,21 +26,6 @@ export class ERC20Contract extends Contract {
   allowance: (address: string, contract: string) => Promise<string>;
 
   approve: (address: string, value: BigNumber) => Promise<TransactionResponse>;
-}
-
-interface SwapInfoPairData {
-  intervalsInSwap: string;
-  ratioAToB: BigNumber;
-  ratioBToA: BigNumber;
-  tokenA: string;
-  tokenB: string;
-}
-
-interface SwapInforTokenData {
-  platformFee: BigNumber;
-  reward: BigNumber;
-  toProvide: BigNumber;
-  token: string;
 }
 
 export class OracleContract extends Contract {
@@ -70,7 +68,7 @@ export class HubCompanionContract extends Contract {
     overrides?: { value?: BigNumber }
   ) => Promise<TransactionResponse>;
 
-  withdrawSwappedUsingProtocolToken: (id: string, recipient: string) => Promise<TransactionResponse>;
+  withdrawSwappedUsingOtherToken: (id: string, recipient: string) => Promise<TransactionResponse>;
 
   terminateUsingProtocolTokenAsFrom: (
     id: string,
@@ -117,12 +115,8 @@ export class PermissionManagerContract extends Contract {
 
   nonces: (address: string) => Promise<number>;
 }
-export class HubContract extends Contract {
-  getNextSwapInfo: (
-    tokens: string[],
-    pairIndexes: PairIndex[]
-  ) => Promise<{ pairs: SwapInfoPairData[]; tokens: SwapInforTokenData[] }>;
 
+export interface HubContract extends DCAHub {
   deposit: (
     from: string,
     to: string,
@@ -130,31 +124,20 @@ export class HubContract extends Contract {
     swaps: BigNumber,
     interval: BigNumber,
     account: string,
-    permissions: { operator: string; permissions: string[] }[]
+    permissions: { operator: string; permissions: number[] }[]
   ) => Promise<TransactionResponse>;
 
-  withdrawSwapped: (id: string, recipient: string) => Promise<TransactionResponse>;
-
-  terminate: (id: string, recipientUnswapped: string, recipientSwapped: string) => Promise<TransactionResponse>;
-
-  increasePosition: (id: string, newAmount: BigNumber, newSwaps: BigNumber) => Promise<TransactionResponse>;
-
-  'deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])': (
-    from: string,
-    to: string,
-    totalAmmount: BigNumber,
-    swaps: BigNumber,
-    interval: BigNumber,
-    account: string,
-    permissions: { operator: string; permissions: string[] }[]
-  ) => Promise<TransactionResponse>;
-
-  reducePosition: (
-    id: string,
-    newAmount: BigNumber,
-    newSwaps: BigNumber,
-    recipient: string
-  ) => Promise<TransactionResponse>;
+  estimateGas: DCAHub['estimateGas'] & {
+    deposit: (
+      from: string,
+      to: string,
+      totalAmmount: BigNumber,
+      swaps: BigNumber,
+      interval: BigNumber,
+      account: string,
+      permissions: { operator: string; permissions: number[] }[]
+    ) => Promise<BigNumber>;
+  };
 }
 
 export class OEGasOracle extends Contract {

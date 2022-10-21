@@ -40,6 +40,7 @@ const StyledLink = styled(Link)`
   display: flex;
   align-items: center;
   gap: 4px;
+  cursor: pointer;
 `;
 
 const Footer = () => {

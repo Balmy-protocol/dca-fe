@@ -27,7 +27,7 @@ interface TransferPositionModalProps {
 }
 
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
-const validRegex = RegExp(/^0x[A-Fa-f0-9]*$/);
+const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
 
 const TransferPositionModal = ({ position, open, onCancel }: TransferPositionModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -59,7 +59,12 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       const result = await positionService.transfer(fullPositionToMappedPosition(position), toAddress);
       addTransaction(result, {
         type: TRANSACTION_TYPES.TRANSFER_POSITION,
-        typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol, toAddress },
+        typeData: {
+          id: fullPositionToMappedPosition(position).id,
+          from: position.from.symbol,
+          to: position.to.symbol,
+          toAddress,
+        },
         position: fullPositionToMappedPosition(position),
       });
       setModalSuccess({

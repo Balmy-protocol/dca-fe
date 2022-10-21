@@ -5,12 +5,11 @@ const getPosition = gql`
     position(id: $id) {
       id
       createdAtTimestamp
-      totalDeposits
+      totalDeposited
       totalSwaps
       totalSwapped
       totalWithdrawn
-      startedAtSwap
-      executedSwaps
+      totalExecutedSwaps
       user
       terminatedAtTimestamp
       from {
@@ -18,12 +17,28 @@ const getPosition = gql`
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       to {
         address: id
         decimals
         name
         symbol
+        type
+        underlyingTokens {
+          address: id
+          decimals
+          name
+          symbol
+          type
+        }
       }
       pair {
         id
@@ -32,12 +47,28 @@ const getPosition = gql`
           decimals
           name
           symbol
+          type
+          underlyingTokens {
+            address: id
+            decimals
+            name
+            symbol
+            type
+          }
         }
         tokenB {
           address: id
           decimals
           name
           symbol
+          type
+          underlyingTokens {
+            address: id
+            decimals
+            name
+            symbol
+            type
+          }
         }
       }
       status
@@ -45,43 +76,77 @@ const getPosition = gql`
         id
         interval
       }
-      current {
+      permissions {
         id
-        rate
-        remainingSwaps
-        remainingLiquidity
-        withdrawn
-        idleSwapped
-        permissions {
-          id
-          operator
-          permissions
-        }
+        operator
+        permissions
       }
-      history: actionsHistory(orderBy: createdAtTimestamp, orderDirection: asc, first: $first, skip: $skip) {
+
+      rate
+      depositedRateUnderlying
+      totalSwappedUnderlyingAccum
+      toWithdrawUnderlyingAccum
+      remainingSwaps
+      remainingLiquidity
+      withdrawn
+      toWithdraw
+
+      history(orderBy: createdAtTimestamp, orderDirection: asc, first: $first, skip: $skip) {
         id
         action
-        rate
-        oldRate
-        from
-        to
-        remainingSwaps
-        oldRemainingSwaps
-        swapped
-        withdrawn
-        createdAtBlock
-        createdAtTimestamp
-        ratePerUnitAToBWithFee
-        ratePerUnitBToAWithFee
-        permissions {
-          operator
-          id
-          permissions
-        }
         transaction {
           id
           hash
           timestamp
+        }
+        createdAtBlock
+        createdAtTimestamp
+
+        ... on PermissionsModifiedAction {
+          permissions {
+            operator
+            id
+            permissions
+          }
+        }
+
+        ... on ModifiedAction {
+          rate
+          oldRate
+          remainingSwaps
+          oldRemainingSwaps
+          rateUnderlying
+          oldRateUnderlying
+        }
+
+        ... on WithdrewAction {
+          withdrawn
+          withdrawnUnderlying
+        }
+
+        ... on SwappedAction {
+          ratioAToBWithFee
+          ratioBToAWithFee
+          swapped
+          rate
+          rateUnderlying
+          depositedRateUnderlying
+        }
+
+        ... on TransferedAction {
+          from
+          to
+        }
+
+        ... on CreatedAction {
+          rate
+          remainingSwaps
+          rateUnderlying
+          permissions {
+            operator
+            id
+            permissions
+          }
         }
       }
     }

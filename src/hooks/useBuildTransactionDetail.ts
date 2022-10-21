@@ -18,8 +18,12 @@ import {
   ApproveCompanionTypeData,
   ModifyPermissionsTypeData,
   MigratePositionTypeData,
+  WithdrawFundsTypeData,
+  MigratePositionYieldTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
+import { formatCurrencyAmount } from 'utils/currency';
+import { BigNumber } from 'ethers';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { getFrequencyLabel } from 'utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
@@ -59,6 +63,19 @@ function useBuildTransactionDetail() {
             }
             break;
           }
+          case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+            const withdrawFundsPositionTypeData = tx.typeData as WithdrawFundsTypeData;
+            const withdrawnPosition = tx.position || find(positions, { id: withdrawFundsPositionTypeData.id });
+            if (withdrawnPosition) {
+              message = `Withdraw ${formatCurrencyAmount(
+                BigNumber.from(withdrawFundsPositionTypeData.removedFunds),
+                (withdrawnPosition as Position).from
+              )} ${(withdrawnPosition as Position).from.symbol} funds from your ${
+                (withdrawnPosition as Position).from.symbol
+              }:${(withdrawnPosition as Position).to.symbol} position`;
+            }
+            break;
+          }
           case TRANSACTION_TYPES.WITHDRAW_POSITION: {
             const withdrawPositionTypeData = tx.typeData as WithdrawTypeData;
             const withdrawnPosition = tx.position || find(positions, { id: withdrawPositionTypeData.id });
@@ -94,26 +111,25 @@ function useBuildTransactionDetail() {
           case TRANSACTION_TYPES.RESET_POSITION: {
             const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
             const resettedPosition = tx.position || find(positions, { id: resetPositionTypeData.id });
+            const swapInterval = BigNumber.from((resettedPosition as Position).swapInterval);
             if (resettedPosition) {
               message = `Add ${resetPositionTypeData.newFunds} ${(resettedPosition as Position).from.symbol} to your ${
                 (resettedPosition as Position).from.symbol
               }:${(resettedPosition as Position).to.symbol} position and set it to run for ${
                 resetPositionTypeData.newSwaps
-              } ${getFrequencyLabel(
-                (resettedPosition as Position).swapInterval.toString(),
-                resetPositionTypeData.newSwaps
-              )}`;
+              } ${getFrequencyLabel(swapInterval.toString(), resetPositionTypeData.newSwaps)}`;
             }
             break;
           }
           case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION: {
             const modifySwapsPositionTypeData = tx.typeData as ModifySwapsPositionTypeData;
             const modifiedPosition = tx.position || find(positions, { id: modifySwapsPositionTypeData.id });
+            const swapInterval = BigNumber.from((modifiedPosition as Position).swapInterval);
             if (modifiedPosition) {
               message = `Modify ${(modifiedPosition as Position).from.symbol}:${
                 (modifiedPosition as Position).to.symbol
               } position to run for ${modifySwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
-                (modifiedPosition as Position).swapInterval.toString(),
+                swapInterval.toString(),
                 modifySwapsPositionTypeData.newSwaps
               )}`;
             }
@@ -139,22 +155,24 @@ function useBuildTransactionDetail() {
             message = `Migrate your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position`;
             break;
           }
+          case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
+            const approveCompanionTypeData = tx.typeData as MigratePositionYieldTypeData;
+            message = `Making your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position start generating yield`;
+            break;
+          }
           case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
             const modifyRateAndSwapsPositionTypeData = tx.typeData as ModifyRateAndSwapsPositionTypeData;
             const modifiedRatePosition = tx.position || find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
+            const swapInterval = BigNumber.from((modifiedRatePosition as Position).swapInterval);
+
             if (modifiedRatePosition) {
               message = `Modify ${(modifiedRatePosition as Position).from.symbol}:${
                 (modifiedRatePosition as Position).to.symbol
               } position to swap ${modifyRateAndSwapsPositionTypeData.newRate} ${
                 (modifiedRatePosition as Position).from.symbol
               } ${
-                STRING_SWAP_INTERVALS[
-                  (modifiedRatePosition as Position).swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
-                ].every
-              } for ${getFrequencyLabel(
-                (modifiedRatePosition as Position).swapInterval.toString(),
-                modifyRateAndSwapsPositionTypeData.newSwaps
-              )}`;
+                STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
+              } for ${getFrequencyLabel(swapInterval.toString(), modifyRateAndSwapsPositionTypeData.newSwaps)}`;
             }
             break;
           }
@@ -172,7 +190,7 @@ function useBuildTransactionDetail() {
             break;
         }
       } catch (e) {
-        console.error('Error building transaction detail');
+        console.error('Error building transaction detail', e);
       }
       return message;
     },
