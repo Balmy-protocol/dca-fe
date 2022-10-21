@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import { FullPosition } from 'types';
 import ProfitLossGraph from 'position-detail/profit-loss-graph';
-import AveragePriceGraph from 'position-detail/average-price-graph';
 
 const StyledContainer = styled(Paper)`
   display: flex;
