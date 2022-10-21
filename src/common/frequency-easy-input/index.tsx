@@ -22,7 +22,7 @@ const inputRegex = RegExp(/^[0-9]*$/);
 
 const PREDEFINED_RANGES = [
   {
-    value: '5',
+    value: '7',
   },
   {
     value: '15',

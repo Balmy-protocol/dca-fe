@@ -27,7 +27,7 @@ export interface CreatePositionState {
 const initialState: CreatePositionState = {
   fromValue: '',
   frequencyType: ONE_DAY,
-  frequencyValue: '5',
+  frequencyValue: '7',
   from: null,
   to: null,
   yieldEnabled: true,
