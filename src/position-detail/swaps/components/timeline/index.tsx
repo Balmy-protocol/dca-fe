@@ -342,6 +342,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
   title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildCreatedItem = (positionState: ActionState, position: FullPosition) => ({
@@ -377,6 +378,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
   title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildTransferedItem = (positionState: ActionState, position: FullPosition) => ({
@@ -422,6 +424,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition)
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
@@ -497,6 +500,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position permissions modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
@@ -530,6 +534,7 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Rate Modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -558,6 +563,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Changed duration" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -608,6 +614,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
@@ -666,6 +673,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const buildTerminatedItem = (positionState: ActionState) => ({
@@ -674,6 +682,7 @@ const buildTerminatedItem = (positionState: ActionState) => ({
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Terminated" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
+  id: positionState.id,
 });
 
 const MESSAGE_MAP = {
@@ -726,7 +735,7 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
   return (
     <StyledTimeline container>
       {history.map((historyItem) => (
-        <StyledTimelineContainer item xs={12} key={historyItem.time}>
+        <StyledTimelineContainer item xs={12} key={historyItem.id}>
           <StyledTimelineIcon>{historyItem.icon}</StyledTimelineIcon>
           <StyledTimelineContent>
             <Grid container>
