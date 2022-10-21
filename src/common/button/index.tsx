@@ -46,12 +46,12 @@ const colors = {
 const backgroundColors = {
   primary: {
     light: {
-      default: '#2CC941',
-      hover: '#219130',
+      default: '#007E36',
+      hover: '#00651D',
     },
     dark: {
-      default: '#2CC941',
-      hover: '#219130',
+      default: '#007E36',
+      hover: '#00651D',
     },
   },
   default: {
@@ -149,12 +149,12 @@ const backgroundColors = {
 const borderColors = {
   primary: {
     light: {
-      default: '#2CC941',
-      hover: '#219130',
+      default: '#007E36',
+      hover: '#00651D',
     },
     dark: {
-      default: '#2CC941',
-      hover: '#219130',
+      default: '#007E36',
+      hover: '#00651D',
     },
   },
   default: {
