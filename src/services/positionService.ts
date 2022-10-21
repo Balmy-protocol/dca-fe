@@ -473,6 +473,11 @@ export default class PositionService {
     const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
     let permissionsPermit: PermissionPermit | undefined;
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
+    const currentNetwork = await this.walletService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const fromToUse =
+      position.from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.from.address;
+    const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
 
     if (!companionHasPermission) {
       const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
@@ -492,8 +497,8 @@ export default class PositionService {
 
     return this.meanApiService.migratePosition(
       position.positionId,
-      fromYield?.tokenAddress || position.from.address,
-      toYield?.tokenAddress || position.to.address,
+      fromYield?.tokenAddress || fromToUse,
+      toYield?.tokenAddress || toToUse,
       this.walletService.getAccount(),
       position.version,
       permissionsPermit
