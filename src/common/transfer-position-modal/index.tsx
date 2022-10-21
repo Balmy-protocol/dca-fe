@@ -27,7 +27,7 @@ interface TransferPositionModalProps {
 }
 
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
-const validRegex = RegExp(/^0x[A-Fa-f0-9]*$/);
+const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
 
 const TransferPositionModal = ({ position, open, onCancel }: TransferPositionModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
