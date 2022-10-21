@@ -168,8 +168,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < filteredPositionActions.length; i++) {
           const positionAction = filteredPositionActions[i];
-          const { action, rate: rawRate, rateUnderlying } = positionAction;
-          const rate = rateUnderlying || rawRate;
+          const { action, rate: rawRate, depositedRateUnderlying, rateUnderlying } = positionAction;
+          const rate = depositedRateUnderlying || rateUnderlying || rawRate;
           const currentRate = BigNumber.from(rate || 0);
           const currentRemainingSwaps = BigNumber.from(positionAction.remainingSwaps || 0);
 
