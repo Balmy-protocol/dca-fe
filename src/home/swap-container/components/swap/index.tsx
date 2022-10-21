@@ -199,9 +199,8 @@ const Swap = ({
   const hasEnoughUsdForYield = !!usdPrice && usdPrice >= 10;
 
   // only allowed if set for 10 days and at least 10 USD
-  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield);
-  // isAtLeastAWeek &&
-  // hasEnoughUsdForYield;
+  const shouldEnableYield =
+    yieldEnabled && (fromCanHaveYield || toCanHaveYield) && isAtLeastAWeek && hasEnoughUsdForYield;
 
   React.useEffect(() => {
     if (!from) return;
