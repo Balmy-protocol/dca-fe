@@ -9,12 +9,14 @@ import Button, { CustomButtonProps } from 'common/button';
 
 const StyledButton = styled(Button)``;
 
-const StyledButtonGroup = styled.div`
+const StyledButtonGroup = styled.div<{ fullWidth?: boolean; block?: boolean }>`
   gap: 1px;
   display: flex;
 
+  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
+
   ${StyledButton} {
-    border-radius: 30px;
+    ${({ block }) => !block && 'border-radius: 30px;'}
   }
 
   ${StyledButton}:first-child {
@@ -23,8 +25,8 @@ const StyledButtonGroup = styled.div`
   }
   ${StyledButton}:last-child {
     min-width: 0px;
-    padding-left: 0px;
-    padding-right: 5px;
+    padding-left: ${({ block }) => (block ? '1' : '0')}px;
+    padding-right: ${({ block }) => (block ? '1' : '5')}px;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
   }
@@ -50,9 +52,22 @@ interface SplitButtonProps {
   options: { onClick: () => void; text: React.ReactNode; disabled?: boolean }[];
   variant: CustomButtonProps['variant'];
   color: CustomButtonProps['color'];
+  size?: CustomButtonProps['size'];
+  fullWidth?: boolean;
+  block?: boolean;
 }
 
-const SplitButton = ({ onClick, text, disabled, variant, color, options }: SplitButtonProps) => {
+const SplitButton = ({
+  onClick,
+  text,
+  disabled,
+  variant,
+  color,
+  options,
+  fullWidth,
+  size = 'small',
+  block,
+}: SplitButtonProps) => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
 
@@ -63,13 +78,28 @@ const SplitButton = ({ onClick, text, disabled, variant, color, options }: Split
     setOpen(false);
   };
 
+  const isOptionsButtonDisabled = options.every(({ disabled: isDisabled }) => isDisabled);
+
   return (
     <SplitButtonContainer>
-      <StyledButtonGroup ref={anchorRef}>
-        <StyledButton onClick={onClick} disabled={disabled} color={color} variant={variant} size="small">
+      <StyledButtonGroup ref={anchorRef} fullWidth={fullWidth} block={block}>
+        <StyledButton
+          onClick={onClick}
+          disabled={disabled}
+          color={color}
+          variant={variant}
+          size={size}
+          fullWidth={fullWidth}
+        >
           {text}
         </StyledButton>
-        <StyledButton onClick={handleOpenClose} color={color} variant={variant} size="small">
+        <StyledButton
+          onClick={handleOpenClose}
+          color={color}
+          variant={variant}
+          size={size}
+          disabled={isOptionsButtonDisabled}
+        >
           <ArrowDropDownIcon />
         </StyledButton>
       </StyledButtonGroup>

@@ -40,6 +40,7 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import SplitButton from 'common/split-button';
 import useAllowance from 'hooks/useAllowance';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useCanSupportPair from 'hooks/useCanSupportPair';
@@ -234,7 +235,7 @@ const Swap = ({
     setWhaleMode(!whaleMode);
   };
 
-  const handleApproveToken = async () => {
+  const handleApproveToken = async (amount?: string) => {
     if (!from || !to) return;
     const fromSymbol = from.symbol;
 
@@ -250,7 +251,12 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(from, !!(shouldEnableYield && fromYield?.tokenAddress));
+      const result = await walletService.approveToken(
+        from,
+        !!(shouldEnableYield && fromYield?.tokenAddress),
+        undefined,
+        amount ? parseUnits(amount, from.decimals) : undefined
+      );
       const hubAddress =
         shouldEnableYield && fromYield?.tokenAddress
           ? await contractService.getHUBCompanionAddress()
@@ -351,10 +357,10 @@ const Swap = ({
     }
   };
 
-  const preHandleApprove = () => {
+  const preHandleApprove = (amount?: string) => {
     if (!existingPair) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleApproveToken();
+      handleApproveToken(amount);
       return;
     }
 
@@ -370,7 +376,7 @@ const Swap = ({
       setShouldShowStalePairModal(true);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleApproveToken();
+      handleApproveToken(amount);
     }
   };
 
@@ -463,11 +469,13 @@ const Swap = ({
   const POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: handleSwap,
     approveToken: handleApproveToken,
+    approveTokenExact: () => handleApproveToken(fromValue),
   };
 
   const PRE_POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: preHandleSwap,
     approveToken: preHandleApprove,
+    approveTokenExact: () => preHandleApprove(fromValue),
   };
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -598,18 +606,13 @@ const Swap = ({
     </StyledButton>
   );
 
+  const isApproveTokenDisabled = !!isApproved || hasPendingApproval || isLoading || !!shouldDisableApproveButton;
+
   const ApproveTokenButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      fullWidth
-      color="primary"
-      disabled={!!isApproved || hasPendingApproval || isLoading || !!shouldDisableApproveButton}
+    <SplitButton
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
-      style={{ pointerEvents: 'all' }}
-    >
-      <Typography variant="body1">
-        {hasPendingApproval ? (
+      text={
+        hasPendingApproval ? (
           <FormattedMessage
             description="waiting for approval"
             defaultMessage="Waiting for your {token} to be approved"
@@ -620,17 +623,33 @@ const Swap = ({
         ) : (
           <FormattedMessage
             description="Allow us to use your coin"
-            defaultMessage="Approve {token}"
+            defaultMessage="Approve Max {token}"
             values={{
               token: (from && from.symbol) || '',
             }}
           />
-        )}
-      </Typography>
-      <Tooltip title="You only have to do this once per token" arrow placement="top">
-        <StyledHelpOutlineIcon fontSize="small" />
-      </Tooltip>
-    </StyledButton>
+        )
+      }
+      disabled={isApproveTokenDisabled}
+      variant="contained"
+      color="primary"
+      options={[
+        {
+          text: (
+            <FormattedMessage
+              description="Allow us to use your coin"
+              defaultMessage="Approve {fromValue} {token}"
+              values={{ token: (from && from.symbol) || '', fromValue }}
+            />
+          ),
+          disabled: isApproveTokenDisabled,
+          onClick: () => checkForLowLiquidity(POSSIBLE_ACTIONS.approveTokenExact as keyof typeof POSSIBLE_ACTIONS),
+        },
+      ]}
+      size="large"
+      fullWidth
+      block
+    />
   );
 
   const swapsIsMax = BigNumber.from(frequencyValue || '0').gt(BigNumber.from(MAX_UINT_32));
