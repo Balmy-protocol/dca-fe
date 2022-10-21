@@ -13,7 +13,7 @@ const StyledButtonGroup = styled.div<{ fullWidth?: boolean; block?: boolean }>`
   gap: 1px;
   display: flex;
 
-  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
+  ${({ fullWidth }) => fullWidth && 'width: 100%;'}
 
   ${StyledButton} {
     ${({ block }) => !block && 'border-radius: 30px;'}
