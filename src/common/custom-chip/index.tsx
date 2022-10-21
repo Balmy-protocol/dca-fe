@@ -26,8 +26,6 @@ const StyledExtraTextContainer = styled(Typography)``;
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {
-    // backgroundColor: theme.palette.primary.dark,
-    // color: theme.palette.common.white,
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },

@@ -257,7 +257,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   {!isIncreasingPosition && (
                     <FormattedMessage
                       description="Approve signature companion text decrease"
-                      defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
+                      defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you will get your balance back as {token}."
                       values={{ token: position.from.symbol }}
                     />
                   )}
