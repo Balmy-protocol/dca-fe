@@ -293,7 +293,12 @@ const ActivePosition = ({
               {foundYieldFrom && (
                 <CustomChip
                   icon={
-                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldFrom.token} tokenBottom={position.to} />
+                    <ComposedTokenIcon
+                      isInChip
+                      size="16px"
+                      tokenTop={foundYieldFrom.token}
+                      tokenBottom={position.from}
+                    />
                   }
                   tooltip
                   tooltipTitle={
@@ -316,7 +321,7 @@ const ActivePosition = ({
               {foundYieldTo && (
                 <CustomChip
                   icon={
-                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo.token} tokenBottom={position.from} />
+                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo.token} tokenBottom={position.to} />
                   }
                   tooltip
                   tooltipTitle={
