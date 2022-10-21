@@ -123,6 +123,7 @@ export interface ActionState {
   oldRateUnderlying: string;
   withdrawnUnderlying: string;
   rateUnderlying: string;
+  depositedRateUnderlying: string;
   ratioAToBWithFee: string;
   createdAtBlock: string;
   createdAtTimestamp: string;
