@@ -7,7 +7,6 @@ import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import { STABLE_COINS } from 'config/constants';
-import { formatCurrencyAmount } from 'utils/currency';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
 import useWalletService from './useWalletService';

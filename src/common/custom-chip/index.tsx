@@ -13,6 +13,7 @@ const StyledChipContainer = styled.div<{ tooltip?: boolean; pointer?: boolean }>
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(216, 216, 216, 0.1);
   padding: 1px 10px 1px 6px;
+  cursor: default;
   ${({ tooltip }) => (tooltip ? 'cursor: default;' : '')}
   ${({ pointer }) => (pointer ? 'cursor: pointer;' : '')}
 `;
