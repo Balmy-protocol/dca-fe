@@ -2,8 +2,16 @@ import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
 import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from 'config';
 import { getWrappedProtocolToken } from 'mocks/tokens';
-import { MeanApiUnderlyingResponse, MeanFinanceResponse, PermissionPermit, Token } from 'types';
+import {
+  AllowedPairs,
+  MeanApiUnderlyingResponse,
+  MeanFinanceAllowedPairsResponse,
+  MeanFinanceResponse,
+  PermissionPermit,
+  Token,
+} from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
+import { emptyTokenWithAddress } from 'utils/currency';
 
 // MOCKS
 import ContractService from './contractService';
@@ -292,5 +300,21 @@ export default class MeanApiService {
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
     return singer.sendTransaction(transactionToSend);
+  }
+
+  async getAllowedPairs(): Promise<AllowedPairs> {
+    const currentNetwork = await this.walletService.getNetwork();
+    try {
+      const allowedPairsResponse = await this.axiosClient.get<MeanFinanceAllowedPairsResponse>(
+        `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/config`
+      );
+
+      return allowedPairsResponse.data.supportedPairs.map((allowedPair) => ({
+        tokenA: emptyTokenWithAddress(allowedPair.tokenA),
+        tokenB: emptyTokenWithAddress(allowedPair.tokenB),
+      }));
+    } catch {
+      return [];
+    }
   }
 }

@@ -2,6 +2,7 @@ import React, { CSSProperties } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
 import remove from 'lodash/remove';
+import uniq from 'lodash/uniq';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import Slide from '@mui/material/Slide';
 import { Token, TokenList, YieldOptions } from 'types';
@@ -27,8 +28,18 @@ import { formatCurrencyAmount } from 'utils/currency';
 import FilledInput from '@mui/material/FilledInput';
 import { createStyles } from '@mui/material';
 import useUsdPrice from 'hooks/useUsdPrice';
+import useAllowedPairs from 'hooks/useAllowedPairs';
+import Switch from '@mui/material/Switch';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
+
+const StyledSwitchGrid = styled(Grid)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.5) !important;
+  flex: 0;
+`;
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -129,7 +140,7 @@ interface TokenPickerProps {
   isFrom: boolean;
   usedTokens: string[];
   ignoreValues: string[];
-  otherSelected?: string;
+  otherSelected?: Token | null;
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
 }
@@ -222,6 +233,36 @@ const TokenPicker = ({
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const currentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
+  const allowedPairs = useAllowedPairs();
+  let tokenKeysToUse: string[] = [];
+  const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
+
+  const uniqTokensFromPairs = React.useMemo(
+    () =>
+      uniq(
+        allowedPairs.reduce((accum, current) => {
+          if (current.tokenA.address !== otherToCheck?.address && current.tokenB.address !== otherToCheck?.address) {
+            return accum;
+          }
+          const tokensToAdd = [current.tokenA.address, current.tokenB.address];
+
+          if (
+            current.tokenA.address === wrappedProtocolToken.address ||
+            current.tokenB.address === wrappedProtocolToken.address
+          ) {
+            tokensToAdd.push(PROTOCOL_TOKEN_ADDRESS);
+          }
+
+          return [...accum, ...tokensToAdd];
+        }, [])
+      ),
+    [allowedPairs, otherToCheck]
+  );
+
+  console.log(tokenKeys, uniqTokensFromPairs);
+
+  tokenKeysToUse = isOnlyAllowedPairs && !!otherSelected ? uniqTokensFromPairs : tokenKeys;
 
   const handleOnClose = () => {
     if (shouldShowTokenLists) {
@@ -238,23 +279,27 @@ const TokenPicker = ({
   };
 
   const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeys.includes(el)),
-    [usedTokens, ignoreValues, tokenKeys]
+    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
+    [usedTokens, ignoreValues, tokenKeysToUse]
   );
 
-  const otherIsProtocol = otherSelected === PROTOCOL_TOKEN_ADDRESS || otherSelected === wrappedProtocolToken.address;
+  const otherIsProtocol =
+    otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address;
   const memoizedTokenKeys = React.useMemo(() => {
-    const filteredTokenKeys = tokenKeys.filter(
-      (el) =>
-        tokenList[el] &&
-        (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
-          tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
-          tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
-        !usedTokens.includes(el) &&
-        !ignoreValues.includes(el) &&
-        tokenList[el].chainId === currentNetwork.chainId &&
-        (!otherIsProtocol || (otherIsProtocol && el !== wrappedProtocolToken.address && el !== PROTOCOL_TOKEN_ADDRESS))
-    );
+    const filteredTokenKeys = tokenKeysToUse
+      .filter(
+        (el) =>
+          tokenList[el] &&
+          (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
+            tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
+            tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
+          !usedTokens.includes(el) &&
+          !ignoreValues.includes(el) &&
+          tokenList[el].chainId === currentNetwork.chainId &&
+          (!otherIsProtocol ||
+            (otherIsProtocol && el !== wrappedProtocolToken.address && el !== PROTOCOL_TOKEN_ADDRESS))
+      )
+      .sort();
 
     if (filteredTokenKeys.findIndex((el) => el === getWrappedProtocolToken(currentNetwork.chainId).address) !== -1) {
       remove(filteredTokenKeys, (token) => token === getWrappedProtocolToken(currentNetwork.chainId).address);
@@ -267,7 +312,16 @@ const TokenPicker = ({
     }
 
     return filteredTokenKeys;
-  }, [tokenKeys, search, usedTokens, ignoreValues, tokenKeys, availableFrom, otherIsProtocol, currentNetwork.chainId]);
+  }, [
+    tokenKeysToUse,
+    search,
+    usedTokens,
+    ignoreValues,
+    tokenKeys,
+    availableFrom,
+    otherIsProtocol,
+    currentNetwork.chainId,
+  ]);
 
   const itemData = React.useMemo(
     () => ({
@@ -317,6 +371,21 @@ const TokenPicker = ({
                   margin="none"
                 />
               </StyledGrid>
+              {otherSelected && (
+                <StyledSwitchGrid item xs={12}>
+                  <FormattedMessage
+                    description="createdPairsSwitchToken"
+                    defaultMessage="Only tokens compatible with {token}"
+                    values={{ token: otherSelected?.symbol }}
+                  />
+                  <Switch
+                    checked={isOnlyAllowedPairs}
+                    onChange={() => setIsOnlyAllowedPairs(!isOnlyAllowedPairs)}
+                    name="isOnlyAllowedPairs"
+                    color="primary"
+                  />
+                </StyledSwitchGrid>
+              )}
               {!!memoizedUsedTokens.length && (
                 <>
                   <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>

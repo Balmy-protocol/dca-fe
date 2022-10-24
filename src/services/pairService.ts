@@ -9,6 +9,7 @@ import {
   AvailablePairsGraphqlResponse,
   AvailablePairResponse,
   SwapInfo,
+  AllowedPairs,
 } from 'types';
 import { activePositionsPerIntervalToHasToExecute, sortTokens, sortTokensByAddress } from 'utils/parsing';
 import { BigNumber } from 'ethers';
@@ -31,13 +32,18 @@ import {
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
+import MeanApiService from './meanApiService';
 
 export default class PairService {
   availablePairs: AvailablePairs;
 
+  allowedPairs: AllowedPairs;
+
   contractService: ContractService;
 
   walletService: WalletService;
+
+  meanApiService: MeanApiService;
 
   uniClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
@@ -48,12 +54,15 @@ export default class PairService {
   constructor(
     walletService: WalletService,
     contractService: ContractService,
+    meanApiService: MeanApiService,
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
+    this.meanApiService = meanApiService;
     this.availablePairs = [];
+    this.allowedPairs = [];
     this.hasFetchedAvailablePairs = false;
 
     if (UNISubgraphs) {
@@ -70,6 +79,10 @@ export default class PairService {
 
   getAvailablePairs() {
     return this.availablePairs;
+  }
+
+  getAllowedPairs() {
+    return this.allowedPairs;
   }
 
   async fetchAvailablePairs() {
@@ -112,6 +125,8 @@ export default class PairService {
         })
       );
     }
+
+    this.allowedPairs = await this.meanApiService.getAllowedPairs();
 
     this.hasFetchedAvailablePairs = true;
   }
@@ -265,6 +280,12 @@ export default class PairService {
     const token1 = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenTo;
 
     const [tokenA, tokenB] = sortTokens(token0, token1);
+
+    const foundAllowedPair = find(this.allowedPairs, { tokenA, tokenB });
+
+    if (!foundAllowedPair) {
+      return Promise.resolve(false);
+    }
 
     return oracleInstance.canSupportPair(tokenA.address, tokenB.address);
   }

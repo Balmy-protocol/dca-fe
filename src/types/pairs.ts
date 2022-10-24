@@ -20,6 +20,12 @@ export type AvailablePair = {
   oracle: Oracles;
 };
 
+export type AllowedPair = {
+  tokenA: Token;
+  tokenB: Token;
+};
+
+export type AllowedPairs = AllowedPair[];
 export type AvailablePairs = AvailablePair[];
 
 export interface PairSwapsIntervals {

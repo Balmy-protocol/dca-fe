@@ -792,9 +792,7 @@ const Swap = ({
         ignoreValues={ignoreValues}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
-        otherSelected={
-          (from && selecting.address === from.address) || selecting.address === 'from' ? to?.address : from?.address
-        }
+        otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
       />
       <Slide
         direction="right"
