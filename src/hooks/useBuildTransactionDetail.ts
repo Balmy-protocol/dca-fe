@@ -57,7 +57,7 @@ function useBuildTransactionDetail() {
             const terminatePositionTypeData = tx.typeData as TerminatePositionTypeData;
             const terminatedPosition = tx.position || find(positions, { id: terminatePositionTypeData.id });
             if (terminatedPosition) {
-              message = `Terminate ${(terminatedPosition as Position).from.symbol}:${
+              message = `Burn ${(terminatedPosition as Position).from.symbol}:${
                 (terminatedPosition as Position).to.symbol
               } position`;
             }

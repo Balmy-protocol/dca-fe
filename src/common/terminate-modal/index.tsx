@@ -113,7 +113,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         content: (
           <FormattedMessage
             description="position termination success"
-            defaultMessage="Your {from}/{to} position termination has been succesfully submitted to the blockchain and will be confirmed soon"
+            defaultMessage="Your {from}/{to} position burning has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
               from: fromSymbol,
               to: toSymbol,
@@ -141,7 +141,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       title={
         <FormattedMessage
           description="terminate title"
-          defaultMessage="Terminate {from}/{to} position"
+          defaultMessage="Burn {from}/{to} position"
           values={{ from: fromSymbol, to: toSymbol }}
         />
       }
@@ -149,7 +149,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         {
           color: 'error',
           variant: 'contained',
-          label: <FormattedMessage description="Terminate" defaultMessage="Terminate" />,
+          label: <FormattedMessage description="Burn" defaultMessage="Burn" />,
           onClick: handleTerminate,
         },
       ]}
