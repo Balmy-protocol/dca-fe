@@ -29,6 +29,7 @@ import GraphTooltip from 'common/graph-tooltip';
 interface GraphWidgetProps {
   from: Token | null;
   to: Token | null;
+  withFooter?: boolean;
 }
 
 interface UniMappedPrice {
@@ -154,7 +155,7 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   type: TOKEN_TYPE_BASE,
   underlyingTokens: [],
 };
-const GraphWidget = ({ from, to }: GraphWidgetProps) => {
+const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
   const client = useDCAGraphql();
   const uniClient = useUNIGraphql();
   let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
@@ -292,7 +293,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
     return (
       <StyledPaper variant="outlined" $column>
         <CenteredLoadingIndicator />
-        <GraphFooter />
+        {withFooter && <GraphFooter />}
       </StyledPaper>
     );
   }
@@ -311,7 +312,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
             </Typography>
           </StyledCenteredWrapper>
         </StyledPaper>
-        <GraphFooter />
+        {withFooter && <GraphFooter />}
       </StyledPaper>
     );
   }
@@ -330,7 +331,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
             </Typography>
           </StyledCenteredWrapper>
         </StyledPaper>
-        <GraphFooter />
+        {withFooter && <GraphFooter />}
       </StyledPaper>
     );
   }
@@ -436,7 +437,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
           </ComposedChart>
         </ResponsiveContainer>
       </StyledGraphContainer>
-      <GraphFooter />
+      {withFooter && <GraphFooter />}
     </StyledPaper>
   );
 };
