@@ -7,6 +7,7 @@ import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
 import createPosition from './create-position/reducer';
+import aggregator from './aggregator/reducer';
 import initializer from './initializer/reducer';
 import modifyRateSettings from './modify-rate-settings/reducer';
 import positionDetails from './position-details/reducer';
@@ -86,6 +87,7 @@ const store = configureStore({
     badge,
     tokenLists,
     createPosition,
+    aggregator,
     config,
     tabs,
     positionPermissions,

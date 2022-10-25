@@ -24,6 +24,7 @@ import WalletService from './walletService';
 import YieldService from './yieldService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
+import AggregatorService from './aggregatorService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -61,6 +62,8 @@ export default class Web3Service {
   yieldService: YieldService;
 
   positionService: PositionService;
+
+  aggregatorService: AggregatorService;
 
   pairService: PairService;
 
@@ -122,6 +125,12 @@ export default class Web3Service {
       this.uniClient
     );
     this.yieldService = new YieldService(this.walletService, this.axiosClient, client);
+    this.aggregatorService = new AggregatorService(
+      this.walletService,
+      this.contractService,
+      this.meanApiService,
+      this.apolloClient
+    );
     this.positionService = new PositionService(
       this.walletService,
       this.pairService,
@@ -159,6 +168,10 @@ export default class Web3Service {
 
   getPositionService() {
     return this.positionService;
+  }
+
+  getAggregatorService() {
+    return this.aggregatorService;
   }
 
   getWalletService() {

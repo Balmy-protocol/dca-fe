@@ -118,6 +118,10 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               onClick={() => handleTabChange({ index: 1, url: 'positions' })}
               label={<FormattedMessage description="positions" defaultMessage="Positions" />}
             />
+            <StyledTab
+              onClick={() => handleTabChange({ index: 2, url: 'swap' })}
+              label={<FormattedMessage description="swap" defaultMessage="Swap" />}
+            />
           </StyledTabs>
         </StyledNavbarMainContent>
         <StyledNavbarEndContent>

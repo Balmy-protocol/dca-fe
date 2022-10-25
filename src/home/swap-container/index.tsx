@@ -134,7 +134,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
       </Grid>
       <Hidden mdDown>
         <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
-          <GraphWidget from={from} to={to} />
+          <GraphWidget from={from} to={to} withFooter />
         </Grid>
       </Hidden>
     </Grid>

@@ -6,6 +6,7 @@ import Container from '@mui/material/Container';
 import NavBar from 'common/navbar';
 import AppFooter from 'common/footer';
 import Home from 'home';
+import Aggregator from 'aggregator';
 import FAQ from 'faq';
 import TransactionUpdater from 'state/transactions/transactionUpdater';
 import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
@@ -161,6 +162,9 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                         </Route>
                         <Route path="/create/:chainId?/:from?/:to?">
                           <Home isLoading={isLoading || isLoadingNetwork} />
+                        </Route>
+                        <Route path="/swap/:chainId?/:from?/:to?">
+                          <Aggregator isLoading={isLoading || isLoadingNetwork} />
                         </Route>
                         <Route path="/:chainId?/:from?/:to?">
                           <Home isLoading={isLoading || isLoadingNetwork} />

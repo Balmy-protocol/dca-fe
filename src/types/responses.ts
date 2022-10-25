@@ -196,3 +196,65 @@ export interface MeanApiUnderlyingResponse {
     }[];
   }[];
 }
+
+export type RawSwapOption = {
+  sellAmount: {
+    amount: string;
+    amountInUnits: string;
+    amountInUSD: string;
+  };
+  buyAmount: {
+    amount: string;
+    amountInUnits: string;
+    amountInUSD: string;
+  };
+  maxSellAmount: {
+    amount: string;
+    amountInUnits: string;
+    amountInUSD: string;
+  };
+  minBuyAmount: {
+    amount: string;
+    amountInUnits: string;
+    amountInUSD: string;
+  };
+  gas: {
+    estimatedGas: string;
+    estimatedCost: string;
+    estimatedCostInUnits: string;
+    estimatedCostInUSD: string;
+    gasTokenSymbol: string;
+  };
+  swapper: {
+    allowanceTarget: string;
+    address: string;
+    id: string;
+  };
+  type: string;
+  tx: TransactionRequest;
+};
+
+export type FailedSwapOption = {
+  failed: true;
+  dex: string;
+};
+
+export interface MeanFinanceSwapResponse {
+  swap: {
+    sellToken: {
+      address: string;
+      decimals: number;
+      symbol: string;
+    };
+    buyToken: {
+      address: string;
+      decimals: number;
+      symbol: string;
+    };
+    config: {
+      gasSpeed: string;
+      slippagePercentage: number;
+    };
+    quotes: (RawSwapOption | FailedSwapOption)[];
+  };
+}
