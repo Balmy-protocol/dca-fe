@@ -717,7 +717,7 @@ const Swap = ({
   const NextStepButton = (
     <StyledButton
       size="large"
-      disabled={!from || !to || !fromValue || fromValue === '0' || !frequencyValue || frequencyValue === '0'}
+      disabled={!from || !to || !fromValue || parseFloat(fromValue) === 0 || !frequencyValue || frequencyValue === '0'}
       color="secondary"
       variant="contained"
       fullWidth

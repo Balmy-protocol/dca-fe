@@ -260,8 +260,6 @@ const TokenPicker = ({
     [allowedPairs, otherToCheck]
   );
 
-  console.log(tokenKeys, uniqTokensFromPairs);
-
   tokenKeysToUse = isOnlyAllowedPairs && !!otherSelected ? uniqTokensFromPairs : tokenKeys;
 
   const handleOnClose = () => {

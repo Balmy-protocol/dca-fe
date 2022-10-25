@@ -281,7 +281,10 @@ export default class PairService {
 
     const [tokenA, tokenB] = sortTokens(token0, token1);
 
-    const foundAllowedPair = find(this.allowedPairs, { tokenA, tokenB });
+    const foundAllowedPair = find(
+      this.allowedPairs,
+      (pair) => pair.tokenA.address === tokenA.address && pair.tokenB.address === tokenB.address
+    );
 
     if (!foundAllowedPair) {
       return Promise.resolve(false);
