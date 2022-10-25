@@ -7,6 +7,7 @@ import {
   MeanApiUnderlyingResponse,
   MeanFinanceAllowedPairsResponse,
   MeanFinanceResponse,
+  MeanFinanceSwapResponse,
   PermissionPermit,
   Token,
 } from 'types';
@@ -316,5 +317,22 @@ export default class MeanApiService {
     } catch {
       return [];
     }
+  }
+
+  async getSwapOptions(from: string, to: string, sellAmount?: BigNumber, buyAmount?: BigNumber) {
+    const currentNetwork = await this.walletService.getNetwork();
+    const swapResponses = await this.axiosClient.get<MeanFinanceSwapResponse>(
+      `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/swap`,
+      {
+        params: {
+          sellToken: from,
+          buyToken: to,
+          ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
+          ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
+        },
+      }
+    );
+
+    return swapResponses.data.swap;
   }
 }
