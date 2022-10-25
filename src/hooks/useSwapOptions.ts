@@ -1,0 +1,97 @@
+import React from 'react';
+import { SwapOption, Token } from 'types';
+import isEqual from 'lodash/isEqual';
+import usePrevious from 'hooks/usePrevious';
+import { useHasPendingTransactions } from 'state/transactions/hooks';
+import { parseUnits } from '@ethersproject/units';
+import { useBlockNumber } from 'state/block-number/hooks';
+import useCurrentNetwork from './useCurrentNetwork';
+import useAggregatorService from './useAggregatorService';
+import useWalletService from './useWalletService';
+
+function useSwapOptions(
+  from: Token | undefined | null,
+  to: Token | undefined | null,
+  value?: string,
+  isBuyOrder?: boolean
+): [SwapOption[] | undefined, boolean, string | undefined] {
+  const walletService = useWalletService();
+  const [{ result, isLoading, error }, setState] = React.useState<{
+    isLoading: boolean;
+    result?: SwapOption[];
+    error?: string;
+  }>({ isLoading: false, result: undefined, error: undefined });
+  const hasPendingTransactions = useHasPendingTransactions();
+  const aggregatorService = useAggregatorService();
+  const prevFrom = usePrevious(from);
+  const prevTo = usePrevious(to);
+  const prevValue = usePrevious(value);
+  const prevIsBuyOrder = usePrevious(isBuyOrder);
+  const prevPendingTrans = usePrevious(hasPendingTransactions);
+  const prevAccount = usePrevious(walletService.getAccount());
+  const account = walletService.getAccount();
+  const currentNetwork = useCurrentNetwork();
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const prevBlockNumber = usePrevious(blockNumber);
+  const prevResult = usePrevious(result, false);
+
+  React.useEffect(() => {
+    async function callPromise() {
+      if (from && to && value) {
+        try {
+          const promiseResult = await aggregatorService.getSwapOptions(
+            from,
+            to,
+            isBuyOrder ? undefined : parseUnits(value, from.decimals),
+            isBuyOrder ? parseUnits(value, to.decimals) : undefined
+          );
+          setState({ result: promiseResult, error: undefined, isLoading: false });
+        } catch (e) {
+          setState({ result: undefined, error: e as string, isLoading: false });
+        }
+      }
+    }
+
+    if (
+      (!isLoading && !result && !error) ||
+      !isEqual(prevFrom, from) ||
+      !isEqual(account, prevAccount) ||
+      !isEqual(prevTo, to) ||
+      !isEqual(prevValue, value) ||
+      !isEqual(prevIsBuyOrder, isBuyOrder)
+    ) {
+      if (from && to && value) {
+        setState({ isLoading: true, result: undefined, error: undefined });
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        callPromise();
+      }
+    }
+  }, [
+    from,
+    prevFrom,
+    isLoading,
+    result,
+    error,
+    prevTo,
+    prevIsBuyOrder,
+    prevValue,
+    value,
+    to,
+    isBuyOrder,
+    prevAccount,
+    account,
+    prevPendingTrans,
+    prevBlockNumber,
+    blockNumber,
+    walletService,
+  ]);
+
+  if (!from) {
+    return [undefined, false, undefined];
+  }
+
+  return [result || prevResult, isLoading, error];
+}
+
+export default useSwapOptions;
