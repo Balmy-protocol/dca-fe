@@ -235,7 +235,12 @@ const ActivePosition = ({
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
   const isStale =
-    calculateStale(pair?.lastExecutedAt || position.pairLastSwappedAt || 0, swapInterval, position.startedAt) === STALE;
+    calculateStale(
+      pair?.lastExecutedAt || position.pairLastSwappedAt || 0,
+      swapInterval,
+      position.startedAt,
+      pair?.swapInfo
+    ) === STALE;
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
