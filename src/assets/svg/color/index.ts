@@ -21,6 +21,7 @@ import AMPL from './ampl.svg';
 import ANKR from './ankr.svg';
 import ANT from './ant.svg';
 import APPC from './appc.svg';
+import ARBITRUM from './arbitrum.svg';
 import ARDR from './ardr.svg';
 import ARG from './arg.svg';
 import ARK from './ark.svg';
@@ -937,6 +938,7 @@ const manifest = {
   '0x8290333cef9e6d528dd5618fb97a76f268f3edd4': ANKR,
   '0xa117000000f279d81a1d3cc75430faa017fa5a2e': ANT,
   '0x1a7a8bd9106f2b8d977e08582dc7d24c723ab0db': APPC,
+  ARBITRUM,
   ARDR,
   ARG,
   ARK,
@@ -1075,6 +1077,7 @@ const manifest = {
   '420-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '137-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,
   '80001-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,
+  '42161-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   ETHOS,
   ETN,
   ETP,

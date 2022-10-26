@@ -184,4 +184,48 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         token: emptyTokenWithAddress('AAVE'),
       },
     ],
+    [NETWORKS.arbitrum.chainId]: [
+      {
+        id: '7aab7b0f-01c1-4467-bc0d-77826d870f19', // aave-v3 USDC
+        tokenAddress: '0x2285b7dc4426c29ed488c65c72a9feaadb44c7ae', // aave-v3 USDC
+        poolId: '7aab7b0f-01c1-4467-bc0d-77826d870f19', // aave-v3 USDC
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '43644487-e26c-450c-8bcb-fb10c1e512e0', // aave-v3 LINK
+        tokenAddress: '0x0669cec75e88f721efbe7d78d1783786a2f36bfe', // aave-v3 LINK
+        poolId: '43644487-e26c-450c-8bcb-fb10c1e512e0', // aave-v3 LINK
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'e302de4d-952e-4e18-9749-0a9dc86e98bc', // aave-v3 WETH
+        tokenAddress: '0x4b6e42407db855fb101b9d39e084e36c90a52652', // aave-v3 WETH
+        poolId: 'e302de4d-952e-4e18-9749-0a9dc86e98bc', // aave-v3 WETH
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: 'a8e3d841-2788-4647-ad54-5a36fac451b1', // aave-v3 DAI
+        tokenAddress: '0x30303a134e1850f1eda2e36dad15d052402131a7', // aave-v3 DAI
+        poolId: 'a8e3d841-2788-4647-ad54-5a36fac451b1', // aave-v3 DAI
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '7c5e69a4-2430-4fa2-b7cb-857f79d7d1bf', // aave-v3 WBTC
+        tokenAddress: '0x9ca453e4585d1acde7bd13f7da2294cfaaec4376', // aave-v3 WBTC
+        poolId: '7c5e69a4-2430-4fa2-b7cb-857f79d7d1bf', // aave-v3 WBTC
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+      {
+        id: '3a6cc030-738d-4e19-8a40-e63e9c4d5a6f', // aave-v3 USDT
+        tokenAddress: '0x8fd68006d23df27fc36d3e3eda1fdcc4f0baa8c6', // aave-v3 USDT
+        poolId: '3a6cc030-738d-4e19-8a40-e63e9c4d5a6f', // aave-v3 USDT
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
+    ],
   };

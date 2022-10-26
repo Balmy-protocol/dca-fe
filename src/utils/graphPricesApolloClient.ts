@@ -33,6 +33,7 @@ const clients: Record<PositionVersions, Record<number, GraphqlService>> = {
   [POSITION_VERSION_4]: {
     [NETWORKS.optimism.chainId]: new GraphqlService(UNI_GRAPHQL_URL[POSITION_VERSION_4][NETWORKS.optimism.chainId]),
     [NETWORKS.polygon.chainId]: new GraphqlService(UNI_GRAPHQL_URL[POSITION_VERSION_4][NETWORKS.polygon.chainId]),
+    [NETWORKS.arbitrum.chainId]: new GraphqlService(UNI_GRAPHQL_URL[POSITION_VERSION_4][NETWORKS.arbitrum.chainId]),
     // [NETWORKS.optimismKovan.chainId]: new GraphqlService(
     //   MEAN_GRAPHQL_URL[POSITION_VERSION_3][NETWORKS.optimismKovan.chainId],
     // ),
