@@ -14,7 +14,13 @@ import {
   getTimeFrequencyLabel,
   STALE,
 } from 'utils/parsing';
-import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import {
+  NETWORKS,
+  POSITION_ACTIONS,
+  STABLE_COINS,
+  STRING_SWAP_INTERVALS,
+  VERSIONS_ALLOWED_MODIFY,
+} from 'config/constants';
 import useUsdPrice from 'hooks/useUsdPrice';
 import LinearProgress from '@mui/material/LinearProgress';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -32,6 +38,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { updateShowBreakdown } from 'state/position-details/actions';
 import { Theme, Tooltip } from '@mui/material';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import PositionDataControls from './position-data-controls';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
@@ -227,31 +235,38 @@ const Details = ({
   } = calculateYield(remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw), rate, remainingSwaps);
 
   const isPending = pendingTransaction !== null;
-  // const currentNetwork = useCurrentNetwork();
-  // const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  // const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
-  // let summedPrices = BigNumber.from(0);
-  // let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
-  // let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
-  // tokenFromAverage =
-  //   tokenFromAverage.address === PROTOCOL_TOKEN_ADDRESS
-  //     ? { ...wrappedProtocolToken, symbol: tokenFromAverage.symbol }
-  //     : tokenFromAverage;
-  // tokenToAverage =
-  //   tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
-  //     ? { ...wrappedProtocolToken, symbol: tokenFromAverage.symbol }
-  //     : tokenToAverage;
-  // swappedActions.forEach((action) => {
-  //   const swappedRate =
-  //     position.pair.tokenA.address === tokenFromAverage.address
-  //       ? BigNumber.from(action.ratioAToBWithFee)
-  //       : BigNumber.from(action.ratioBToAWithFee);
+  const currentNetwork = useCurrentNetwork();
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
+  let summedPrices = BigNumber.from(0);
+  let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
+  tokenFromAverage =
+    tokenFromAverage.address === PROTOCOL_TOKEN_ADDRESS
+      ? {
+          ...wrappedProtocolToken,
+          symbol: tokenFromAverage.symbol,
+          underlyingTokens: tokenFromAverage.underlyingTokens,
+        }
+      : tokenFromAverage;
+  tokenToAverage =
+    tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
+      ? { ...wrappedProtocolToken, symbol: tokenToAverage.symbol, underlyingTokens: tokenToAverage.underlyingTokens }
+      : tokenToAverage;
+  swappedActions.forEach((action) => {
+    const swappedRate =
+      position.pair.tokenA.address ===
+      ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
+        tokenFromAverage.address)
+        ? BigNumber.from(action.pairSwap.ratioUnderlyingAToB)
+        : BigNumber.from(action.pairSwap.ratioUnderlyingBToA);
 
-  //   summedPrices = summedPrices.add(swappedRate);
-  // });
-  // const averageBuyPrice = summedPrices.gt(BigNumber.from(0))
-  //   ? summedPrices.div(swappedActions.length)
-  //   : BigNumber.from(0);
+    summedPrices = summedPrices.add(swappedRate);
+  });
+  const averageBuyPrice = summedPrices.gt(BigNumber.from(0))
+    ? summedPrices.div(swappedActions.length)
+    : BigNumber.from(0);
+
   const [fromPrice, isLoadingFromPrice] = useUsdPrice(
     position.from,
     BigNumber.from(remainingLiquidity),
@@ -444,6 +459,32 @@ const Details = ({
           </StyledDetailWrapper>
           <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
+            </Typography>
+            <Typography
+              variant="body1"
+              color={averageBuyPrice.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              sx={{ marginLeft: '5px' }}
+            >
+              {averageBuyPrice.gt(BigNumber.from(0)) ? (
+                <FormattedMessage
+                  description="positionDetailsAverageBuyPrice"
+                  defaultMessage="1 {from} = {currencySymbol}{average} {to}"
+                  values={{
+                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    from: tokenFromAverage.symbol,
+                    to: STABLE_COINS.includes(tokenToAverage.symbol) ? 'USD' : tokenToAverage.symbol,
+                    average: formatCurrencyAmount(averageBuyPrice, tokenToAverage, 4),
+                    currencySymbol: STABLE_COINS.includes(tokenToAverage.symbol) ? '$' : '',
+                  }}
+                />
+              ) : (
+                <FormattedMessage description="positionDetailsAverageBuyPriceNotSwap" defaultMessage="No swaps yet" />
+              )}
+            </Typography>
+          </StyledDetailWrapper>
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
                 description="swappedTo"
                 defaultMessage="Swapped:"
@@ -593,32 +634,6 @@ const Details = ({
               )}
             </StyledDetailWrapper>
           )}
-          {/* <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
-            </Typography>
-            <Typography
-              variant="body1"
-              color={averageBuyPrice.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              {averageBuyPrice.gt(BigNumber.from(0)) ? (
-                <FormattedMessage
-                  description="positionDetailsAverageBuyPrice"
-                  defaultMessage="1 {from} = {currencySymbol}{average} {to}"
-                  values={{
-                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                    from: tokenFromAverage.symbol,
-                    to: STABLE_COINS.includes(tokenToAverage.symbol) ? 'USD' : tokenToAverage.symbol,
-                    average: formatCurrencyAmount(averageBuyPrice, tokenToAverage, 4),
-                    currencySymbol: STABLE_COINS.includes(tokenToAverage.symbol) ? '$' : '',
-                  }}
-                />
-              ) : (
-                <FormattedMessage description="positionDetailsAverageBuyPriceNotSwap" defaultMessage="No swaps yet" />
-              )}
-            </Typography>
-          </StyledDetailWrapper> */}
           {(foundYieldFrom || foundYieldTo) && (
             <StyledDetailWrapper>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">

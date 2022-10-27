@@ -125,8 +125,13 @@ const getPosition = gql`
         }
 
         ... on SwappedAction {
-          ratioAToBWithFee
-          ratioBToAWithFee
+          pairSwap {
+            id
+            ratioUnderlyingAToB
+            ratioUnderlyingBToA
+            ratioUnderlyingAToBWithFee
+            ratioUnderlyingBToAWithFee
+          }
           swapped
           rate
           rateUnderlying

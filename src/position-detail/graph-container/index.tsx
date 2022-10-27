@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import { FullPosition } from 'types';
 import ProfitLossGraph from 'position-detail/profit-loss-graph';
+import AveragePriceGraph from 'position-detail/average-price-graph';
 
 const StyledContainer = styled(Paper)`
   display: flex;
@@ -31,10 +32,10 @@ const GRAPHS = [
     title: <FormattedMessage description="dcaVsLumpSumTitle" defaultMessage="DCA vs Lump sum" />,
     component: ({ position }: GraphContainerProps) => <ProfitLossGraph position={position} />,
   },
-  // {
-  //   title: <FormattedMessage description="averagePriceGraphTitle" defaultMessage="Market price vs DCA price" />,
-  //   component: ({ position }: GraphContainerProps) => <AveragePriceGraph position={position} />,
-  // },
+  {
+    title: <FormattedMessage description="averagePriceGraphTitle" defaultMessage="Market price vs DCA price" />,
+    component: ({ position }: GraphContainerProps) => <AveragePriceGraph position={position} />,
+  },
 ];
 
 const GraphContainer = ({ position }: GraphContainerProps) => {
@@ -47,7 +48,7 @@ const GraphContainer = ({ position }: GraphContainerProps) => {
         <MinimalTabs
           options={[
             { key: 0, label: 'DCA vs Lump sum' },
-            // { key: 1, label: 'Average buy price' },
+            { key: 1, label: 'Average buy price' },
           ]}
           selected={{ key: tabIndex, label: '' }}
           onChange={({ key }) => setTabIndex(key as number)}

@@ -118,13 +118,17 @@ export interface ActionState {
   swapped: string;
   withdrawn: string;
   permissions: PositionPermission[];
-  ratioBToAWithFee: string;
   swappedUnderlying: string;
   oldRateUnderlying: string;
   withdrawnUnderlying: string;
   rateUnderlying: string;
   depositedRateUnderlying: string;
-  ratioAToBWithFee: string;
+  pairSwap: {
+    ratioUnderlyingAToB: string;
+    ratioUnderlyingBToA: string;
+    ratioUnderlyingAToBWithFee: string;
+    ratioUnderlyingBToAWithFee: string;
+  };
   createdAtBlock: string;
   createdAtTimestamp: string;
   transaction: {
