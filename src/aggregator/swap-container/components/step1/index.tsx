@@ -135,20 +135,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
         </StyledContentContainer>
       </Grid>
       <Grid item xs={12}>
-        <StyledContentContainer>
-          {/* rate */}
-          <StyledRateContainer>
-            <Typography variant="body1">
-              <FormattedMessage
-                description="howMuchToSell"
-                defaultMessage="How much {from} do you want to invest?"
-                values={{ from: from?.symbol || '' }}
-              />
-            </Typography>
-          </StyledRateContainer>
-        </StyledContentContainer>
-      </Grid>
-      <Grid item xs={12}>
         <StyledContentContainer>{buttonToShow}</StyledContentContainer>
       </Grid>
     </StyledGrid>
