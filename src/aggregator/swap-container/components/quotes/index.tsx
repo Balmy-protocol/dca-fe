@@ -2,12 +2,8 @@ import Paper from '@mui/material/Paper';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import * as React from 'react';
 import styled from 'styled-components';
-import { SwapOption } from 'types';
+import { SwapOption, Token } from 'types';
 import SwapQuote from '../quote';
-
-const StyledQuotesContainer = styled.div`
-  display: flex;
-`;
 
 const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   padding: 16px;
@@ -25,9 +21,13 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
 interface SwapQuotesProps {
   quotes: SwapOption[];
   isLoading: boolean;
+  from: Token | null;
+  to: Token | null;
+  selectedRoute: SwapOption | null;
+  setRoute: (newRoute: SwapOption) => void;
 }
 
-const SwapQuotes = ({ quotes, isLoading }: SwapQuotesProps) => {
+const SwapQuotes = ({ quotes, isLoading, from, to, selectedRoute, setRoute }: SwapQuotesProps) => {
   if (isLoading) {
     return (
       <StyledPaper>
@@ -38,8 +38,15 @@ const SwapQuotes = ({ quotes, isLoading }: SwapQuotesProps) => {
 
   return (
     <StyledPaper variant="outlined" $column>
-      {quotes.map((quote, index) => (
-        <SwapQuote isFirst={index === 0} quote={quote} key={quote.swapper.id} />
+      {quotes.map((quote) => (
+        <SwapQuote
+          setRoute={setRoute}
+          from={from}
+          to={to}
+          isSelected={quote.swapper.id === selectedRoute?.swapper.id}
+          quote={quote}
+          key={quote.swapper.id}
+        />
       ))}
     </StyledPaper>
   );

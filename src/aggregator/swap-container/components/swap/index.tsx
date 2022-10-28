@@ -346,9 +346,7 @@ const Swap = ({
         ignoreValues={ignoreValues}
         yieldOptions={[]}
         isLoadingYieldOptions={false}
-        otherSelected={
-          (from && selecting.address === from.address) || selecting.address === 'from' ? to?.address : from?.address
-        }
+        otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
       />
       <SwapFirstStep
         from={from}

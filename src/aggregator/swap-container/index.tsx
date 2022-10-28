@@ -5,10 +5,10 @@ import { getProtocolToken } from 'mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from 'config/constants';
-import { Token } from 'types';
+import { SwapOption, Token } from 'types';
 import { useAggregatorState } from 'state/aggregator/hooks';
 import { useAppDispatch } from 'state/hooks';
-import { setFrom, setFromValue, setToValue, setTo } from 'state/aggregator/actions';
+import { setFrom, setFromValue, setToValue, setTo, setSelectedRoute } from 'state/aggregator/actions';
 import useSwapOptions from 'hooks/useSwapOptions';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
@@ -16,7 +16,7 @@ import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
 
 const SwapContainer = () => {
-  const { fromValue, from, to, toValue, isBuyOrder } = useAggregatorState();
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute } = useAggregatorState();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
@@ -36,6 +36,12 @@ const SwapContainer = () => {
       dispatch(setTo(toParamToken));
     }
   }, [currentNetwork.chainId]);
+
+  React.useEffect(() => {
+    if (!isLoadingSwapOptions && swapOptions && swapOptions.length) {
+      dispatch(setSelectedRoute(swapOptions[0]));
+    }
+  }, [isLoadingSwapOptions]);
 
   const onSetFrom = (newFrom: Token, updateMode = false) => {
     // check for decimals
@@ -60,7 +66,10 @@ const SwapContainer = () => {
     }
   };
 
-  console.log(swapOptions);
+  const onSetSelectedRoute = (newRoute: SwapOption) => {
+    dispatch(setSelectedRoute(newRoute));
+  };
+
   return (
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
       <Grid item xs={12} md={5}>
@@ -88,7 +97,14 @@ const SwapContainer = () => {
               <GraphWidget from={from} to={to} withFooter={false} />
             </Grid>
             <Grid item xs={12} sx={{ display: 'flex' }}>
-              <SwapQuotes quotes={swapOptions || []} isLoading={isLoadingSwapOptions} />
+              <SwapQuotes
+                quotes={swapOptions || []}
+                selectedRoute={selectedRoute}
+                setRoute={onSetSelectedRoute}
+                isLoading={isLoadingSwapOptions}
+                from={from}
+                to={to}
+              />
             </Grid>
           </Hidden>
         </Grid>

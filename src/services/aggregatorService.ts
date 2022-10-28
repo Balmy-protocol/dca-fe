@@ -84,28 +84,28 @@ export default class AggregatorService {
         tx,
       }) => ({
         sellAmount: {
-          amount: parseUnits(sellAmountAmount, from.decimals),
+          amount: BigNumber.from(sellAmountAmount),
           amountInUnits: Number(sellAmountAmountInUnits),
           amountInUSD: sellAmountAmountInUsd,
         },
         buyAmount: {
-          amount: parseUnits(buyAmountAmount, to.decimals),
+          amount: BigNumber.from(buyAmountAmount),
           amountInUnits: Number(buyAmountAmountInUnits),
           amountInUSD: buyAmountAmountInUsd,
         },
         maxSellAmount: {
-          amount: parseUnits(maxSellAmountAmount, from.decimals),
+          amount: BigNumber.from(maxSellAmountAmount),
           amountInUnits: Number(maxSellAmountAmountInUnits),
           amountInUSD: maxSellAmountAmountInUsd,
         },
         minBuyAmount: {
-          amount: parseUnits(minBuyAmountAmount, to.decimals),
+          amount: BigNumber.from(minBuyAmountAmount),
           amountInUnits: Number(minBuyAmountAmountInUnits),
           amountInUSD: minBuyAmountAmountInUsd,
         },
         gas: {
-          estimatedGas: parseUnits(estimatedGas),
-          estimatedCost: parseUnits(estimatedCost),
+          estimatedGas: BigNumber.from(estimatedGas),
+          estimatedCost: BigNumber.from(estimatedCost),
           estimatedCostInUnits,
           estimatedCostInUSD,
           gasTokenSymbol,
