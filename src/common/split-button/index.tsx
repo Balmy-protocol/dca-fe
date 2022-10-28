@@ -32,8 +32,9 @@ const StyledButtonGroup = styled.div<{ fullWidth?: boolean; block?: boolean }>`
   }
 `;
 
-const SplitButtonContainer = styled.div`
+const SplitButtonContainer = styled.div<{ fullWidth?: boolean }>`
   display: flex;
+  ${({ fullWidth }) => fullWidth && 'width: 100%;'}
 `;
 
 const StyledMenu = withStyles(() =>
@@ -81,7 +82,7 @@ const SplitButton = ({
   const isOptionsButtonDisabled = options.every(({ disabled: isDisabled }) => isDisabled);
 
   return (
-    <SplitButtonContainer>
+    <SplitButtonContainer fullWidth={fullWidth}>
       <StyledButtonGroup ref={anchorRef} fullWidth={fullWidth} block={block}>
         <StyledButton
           onClick={onClick}
