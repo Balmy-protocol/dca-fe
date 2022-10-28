@@ -75,6 +75,7 @@ interface ModalProps {
     color?: keyof typeof ButtonTypes;
     variant?: 'text' | 'outlined' | 'contained';
   }[];
+  Component?: React.ReactNode;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -86,6 +87,7 @@ const Modal: React.FC<ModalProps> = ({
   showCloseButton,
   actions,
   children,
+  Component,
 }) => {
   const classes = useStyles();
 
@@ -119,19 +121,20 @@ const Modal: React.FC<ModalProps> = ({
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>
           )}
-          {actions?.map((action, index) => (
-            <Button
-              onClick={action.onClick}
-              disabled={action.disabled}
-              variant={action.variant ?? 'contained'}
-              color={action.color ?? 'primary'}
-              size="large"
-              fullWidth
-              key={index}
-            >
-              {action.label}
-            </Button>
-          ))}
+          {Component ||
+            actions?.map((action, index) => (
+              <Button
+                onClick={action.onClick}
+                disabled={action.disabled}
+                variant={action.variant ?? 'contained'}
+                color={action.color ?? 'primary'}
+                size="large"
+                fullWidth
+                key={index}
+              >
+                {action.label}
+              </Button>
+            ))}
         </StyledDialogActions>
       )}
     </StyledDialog>
