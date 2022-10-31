@@ -656,14 +656,14 @@ const Details = ({
                       defaultMessage="Generating {token} at {platform} with {apy}% APY"
                       values={{
                         token: position.from.symbol,
-                        apy: foundYieldFrom.apy.toFixed(1),
+                        apy: parseFloat(foundYieldFrom.apy.toFixed(2)).toString(),
                         platform: foundYieldFrom.name,
                       }}
                     />
                   }
                 >
                   <Typography variant="body2" fontWeight={500}>
-                    APY {foundYieldFrom.apy.toFixed(1)}%
+                    APY {parseFloat(foundYieldFrom.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>
               )}
@@ -679,14 +679,14 @@ const Details = ({
                       defaultMessage="Generating {token} at {platform} with {apy}% APY"
                       values={{
                         token: position.to.symbol,
-                        apy: foundYieldTo.apy.toFixed(1),
+                        apy: parseFloat(foundYieldTo.apy.toFixed(2)).toString(),
                         platform: foundYieldTo.name,
                       }}
                     />
                   }
                 >
                   <Typography variant="body2" fontWeight={500}>
-                    APY {foundYieldTo.apy.toFixed(1)}%
+                    APY {parseFloat(foundYieldTo.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>
               )}
