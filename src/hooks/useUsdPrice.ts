@@ -36,8 +36,12 @@ function useUsdPrice(
             date,
             chainId
           );
-          setResult(price);
-          setError(undefined);
+          if (price) {
+            setResult(price);
+            setError(undefined);
+          } else {
+            setError('Could not find usd price');
+          }
         } catch (e) {
           setError(e);
         }

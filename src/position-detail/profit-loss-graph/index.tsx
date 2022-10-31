@@ -278,6 +278,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   }, [position, isLoadingPrices]);
 
   const noData = prices.length === 0;
+  const hasActions = position.history.length !== 0;
 
   const mappedPrices = prices
     .map((price) => {
@@ -293,6 +294,25 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
       };
     })
     .slice(-POINT_LIMIT);
+
+  if (noData && hasActions) {
+    return (
+      <StyledCenteredWrapper>
+        {isLoadingPrices && <CenteredLoadingIndicator />}
+        {!isLoadingPrices && (
+          <>
+            <EmptyGraph size="100px" />
+            <Typography variant="h6">
+              <FormattedMessage
+                description="No price available"
+                defaultMessage="We could not fetch the price of one of the tokens"
+              />
+            </Typography>
+          </>
+        )}
+      </StyledCenteredWrapper>
+    );
+  }
 
   if (noData) {
     return (
