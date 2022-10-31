@@ -474,7 +474,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
     <StyledCountDashboardContainer container>
       <Grid item xs={12} sx={{ paddingBottom: '10px' }}>
         <Typography variant="body1" sx={{ fontWeight: 500 }}>
-          <FormattedMessage description="generatedDashboard" defaultMessage="Generated" />
+          <FormattedMessage description="generatedDashboard" defaultMessage="Total value" />
         </Typography>
       </Grid>
       {!hasLoadedUSDValues && (
