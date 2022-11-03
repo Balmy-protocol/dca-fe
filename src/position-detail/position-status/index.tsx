@@ -67,7 +67,7 @@ const PositionStatus = ({ position, pair, alignedEnd }: PositionStatusProps) => 
       {isTerminated ? (
         <StyledNoFunds>
           <Typography variant="body1">
-            <FormattedMessage description="terminated" defaultMessage="Terminated" />
+            <FormattedMessage description="terminated" defaultMessage="Burned" />
           </Typography>
         </StyledNoFunds>
       ) : // eslint-disable-next-line no-nested-ternary

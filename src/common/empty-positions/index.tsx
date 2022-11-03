@@ -32,7 +32,7 @@ const EmptyPositions = ({ isClosed }: EmptyPositionsProps) => (
       <FormattedMessage
         description="empty positions"
         defaultMessage="No {status} positions yet."
-        values={{ status: isClosed ? 'terminated' : 'open' }}
+        values={{ status: isClosed ? 'burned' : 'open' }}
       />
     </Typography>
   </StyledCard>

@@ -155,7 +155,7 @@ const Positions = () => {
               sx={{ marginLeft: '32px' }}
               label={
                 <Typography variant="h6">
-                  <FormattedMessage description="terminatedPositions" defaultMessage="Terminated positions" />
+                  <FormattedMessage description="terminatedPositions" defaultMessage="Burned positions" />
                 </Typography>
               }
             />
