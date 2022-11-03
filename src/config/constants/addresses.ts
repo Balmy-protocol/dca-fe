@@ -277,12 +277,7 @@ export const TESTNETS = [
 ];
 
 export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
-export const SUPPORTED_NETWORKS = [
-  NETWORKS.optimismKovan.chainId,
-  NETWORKS.optimism.chainId,
-  NETWORKS.mumbai.chainId,
-  NETWORKS.polygon.chainId,
-];
+export const SUPPORTED_NETWORKS = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
 
 export const COINGECKO_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',
