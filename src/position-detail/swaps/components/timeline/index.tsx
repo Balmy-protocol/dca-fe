@@ -228,9 +228,13 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
     let tokenFrom = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
     let tokenTo = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
     tokenFrom =
-      tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? { ...wrappedProtocolToken, symbol: tokenFrom.symbol } : tokenFrom;
+      tokenFrom.address === PROTOCOL_TOKEN_ADDRESS
+        ? { ...wrappedProtocolToken, symbol: tokenFrom.symbol, underlyingTokens: tokenFrom.underlyingTokens }
+        : tokenFrom;
     tokenTo =
-      tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? { ...wrappedProtocolToken, symbol: tokenFrom.symbol } : tokenTo;
+      tokenTo.address === PROTOCOL_TOKEN_ADDRESS
+        ? { ...wrappedProtocolToken, symbol: tokenTo.symbol, underlyingTokens: tokenTo.underlyingTokens }
+        : tokenTo;
 
     const TooltipMessage = (
       <FormattedMessage
@@ -240,9 +244,10 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
           from: tokenFrom.symbol,
           to: STABLE_COINS.includes(tokenTo.symbol) ? 'USD' : tokenTo.symbol,
           swapRate:
-            position.pair.tokenA.address === tokenFrom.address
-              ? formatCurrencyAmount(BigNumber.from(positionState.ratioAToBWithFee), tokenTo)
-              : formatCurrencyAmount(BigNumber.from(positionState.ratioBToAWithFee), tokenFrom),
+            position.pair.tokenA.address ===
+            ((tokenFrom.underlyingTokens[0] && tokenFrom.underlyingTokens[0].address) || tokenFrom.address)
+              ? formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingAToBWithFee), tokenTo)
+              : formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingBToAWithFee), tokenFrom),
           currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
         }}
       />

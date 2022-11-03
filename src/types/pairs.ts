@@ -35,8 +35,12 @@ export interface PairSwaps {
   id: string;
   executedAtTimestamp: string;
   executedAtBlock: string;
-  ratioBToAWithFee: string;
-  ratioAToBWithFee: string;
+  pairSwap: {
+    ratioUnderlyingAToB: string;
+    ratioUnderlyingBToA: string;
+    ratioUnderlyingAToBWithFee: string;
+    ratioUnderlyingBToAWithFee: string;
+  };
   transaction: {
     id: string;
     hash: string;

@@ -89,11 +89,15 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   tokenFromAverage =
     tokenFromAverage.address === PROTOCOL_TOKEN_ADDRESS
-      ? { ...wrappedProtocolToken, symbol: tokenFromAverage.symbol }
+      ? {
+          ...wrappedProtocolToken,
+          symbol: tokenFromAverage.symbol,
+          underlyingTokens: tokenFromAverage.underlyingTokens,
+        }
       : tokenFromAverage;
   tokenToAverage =
     tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
-      ? { ...wrappedProtocolToken, symbol: tokenFromAverage.symbol }
+      ? { ...wrappedProtocolToken, symbol: tokenToAverage.symbol, underlyingTokens: tokenFromAverage.underlyingTokens }
       : tokenToAverage;
 
   const tokenA: GraphToken = {
@@ -111,9 +115,11 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
     const swappedSummed = swappedActions.reduce<{ summed: BigNumber; current: number; date: number; name: string }[]>(
       (acc, action, index) => {
         const rate =
-          position.pair.tokenA.address === tokenFromAverage.address
-            ? BigNumber.from(action.ratioAToBWithFee)
-            : BigNumber.from(action.ratioBToAWithFee);
+          position.pair.tokenA.address ===
+          ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
+            tokenFromAverage.address)
+            ? BigNumber.from(action.pairSwap.ratioUnderlyingAToB)
+            : BigNumber.from(action.pairSwap.ratioUnderlyingBToA);
 
         const prevSummed = (acc[index - 1] && acc[index - 1].summed) || BigNumber.from(0);
         acc.push({
