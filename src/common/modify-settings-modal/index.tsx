@@ -36,7 +36,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import { ButtonTypes } from 'common/button';
-import SplitButton from 'common/split-button';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
@@ -365,13 +364,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     variant?: 'text' | 'outlined' | 'contained';
   }[] = [];
 
-  let Component;
+  let options;
 
   if (needsToApprove) {
-    Component = (
-      <SplitButton
-        onClick={() => handleApproveToken()}
-        text={
+    actions = [
+      {
+        color: 'primary',
+        variant: 'contained',
+        label: (
           <FormattedMessage
             description="Allow us to use your coin"
             defaultMessage="Approve Max {token}"
@@ -379,28 +379,25 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               token: (from && from.symbol) || '',
             }}
           />
-        }
-        disabled={!!hasPendingApproval}
-        variant="contained"
-        color="primary"
-        options={[
-          {
-            text: (
-              <FormattedMessage
-                description="Allow us to use your coin"
-                defaultMessage="Approve {fromValue} {token}"
-                values={{ token: (from && from.symbol) || '', fromValue }}
-              />
-            ),
-            disabled: !!hasPendingApproval,
-            onClick: () => handleApproveToken(fromValue),
-          },
-        ]}
-        size="large"
-        fullWidth
-        block
-      />
-    );
+        ),
+        onClick: () => handleApproveToken(),
+        disabled: !!hasPendingApproval,
+      },
+    ];
+
+    options = [
+      {
+        text: (
+          <FormattedMessage
+            description="Allow us to use your coin"
+            defaultMessage="Approve {fromValue} {token}"
+            values={{ token: (from && from.symbol) || '', fromValue }}
+          />
+        ),
+        disabled: !!hasPendingApproval,
+        onClick: () => handleApproveToken(fromValue),
+      },
+    ];
   }
 
   if (hasPendingApproval) {
@@ -444,7 +441,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       maxWidth="sm"
       title={<FormattedMessage description="changeDuration title" defaultMessage="Change duration and rate" />}
       actions={actions}
-      Component={Component}
+      splitButtonOptions={options}
     >
       <Grid container direction="column" alignItems="flex-start" spacing={2}>
         <Grid item xs={12}>
