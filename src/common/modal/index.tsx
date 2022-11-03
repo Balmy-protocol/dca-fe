@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button, { ButtonTypes } from 'common/button';
+import SplitButton, { SplitButtonOptions } from 'common/split-button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -75,7 +76,7 @@ interface ModalProps {
     color?: keyof typeof ButtonTypes;
     variant?: 'text' | 'outlined' | 'contained';
   }[];
-  Component?: React.ReactNode;
+  splitButtonOptions?: SplitButtonOptions;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -87,7 +88,7 @@ const Modal: React.FC<ModalProps> = ({
   showCloseButton,
   actions,
   children,
-  Component,
+  splitButtonOptions,
 }) => {
   const classes = useStyles();
 
@@ -121,8 +122,21 @@ const Modal: React.FC<ModalProps> = ({
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>
           )}
-          {Component ||
-            actions?.map((action, index) => (
+          {actions?.map((action, index) =>
+            splitButtonOptions ? (
+              <SplitButton
+                onClick={action.onClick}
+                text={action.label}
+                disabled={action.disabled}
+                variant={action.variant ?? 'contained'}
+                color={action.color ?? 'primary'}
+                options={splitButtonOptions}
+                size="large"
+                fullWidth
+                block
+                key={index}
+              />
+            ) : (
               <Button
                 onClick={action.onClick}
                 disabled={action.disabled}
@@ -134,7 +148,8 @@ const Modal: React.FC<ModalProps> = ({
               >
                 {action.label}
               </Button>
-            ))}
+            )
+          )}
         </StyledDialogActions>
       )}
     </StyledDialog>
