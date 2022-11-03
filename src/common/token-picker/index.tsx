@@ -201,7 +201,7 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions
         </StyledTokenTextContainer>
         {!!availableYieldOptions.length && (
           <StyledTokenTextContainer>
-            <Typography variant="caption" component="span" color="#007E36">
+            <Typography variant="caption" component="span" color="#2CC941">
               <FormattedMessage description="supportsYield" defaultMessage="Supports yield" />
             </Typography>
           </StyledTokenTextContainer>
