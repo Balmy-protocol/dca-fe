@@ -36,6 +36,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import { ButtonTypes } from 'common/button';
+import { SplitButtonOptions } from 'common/split-button';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
@@ -371,9 +372,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     disabled?: boolean;
     color?: keyof typeof ButtonTypes;
     variant?: 'text' | 'outlined' | 'contained';
+    options?: SplitButtonOptions;
   }[] = [];
-
-  let options;
 
   if (needsToApprove) {
     actions = [
@@ -391,20 +391,19 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         ),
         onClick: () => handleApproveToken(),
         disabled: !!hasPendingApproval,
-      },
-    ];
-
-    options = [
-      {
-        text: (
-          <FormattedMessage
-            description="Allow us to use your coin"
-            defaultMessage="Approve {fromValue} {token}"
-            values={{ token: (from && from.symbol) || '', fromValue }}
-          />
-        ),
-        disabled: !!hasPendingApproval,
-        onClick: () => handleApproveToken(fromValue),
+        options: [
+          {
+            text: (
+              <FormattedMessage
+                description="Allow us to use your coin"
+                defaultMessage="Approve {fromValue} {token}"
+                values={{ token: (from && from.symbol) || '', fromValue }}
+              />
+            ),
+            disabled: !!hasPendingApproval,
+            onClick: () => handleApproveToken(fromValue),
+          },
+        ],
       },
     ];
   }
@@ -450,7 +449,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       maxWidth="sm"
       title={<FormattedMessage description="changeDuration title" defaultMessage="Change duration and rate" />}
       actions={actions}
-      splitButtonOptions={options}
     >
       <Grid container direction="column" alignItems="flex-start" spacing={2}>
         <Grid item xs={12}>
