@@ -376,7 +376,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             description="Allow us to use your coin"
             defaultMessage="Approve Max {token}"
             values={{
-              token: (from && from.symbol) || '',
+              token: fromToUse.symbol,
             }}
           />
         ),
@@ -388,7 +388,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               <FormattedMessage
                 description="Allow us to use your coin"
                 defaultMessage="Approve {fromValue} {token}"
-                values={{ token: (from && from.symbol) || '', fromValue }}
+                values={{ token: fromToUse.symbol, fromValue }}
               />
             ),
             disabled: !!hasPendingApproval,
