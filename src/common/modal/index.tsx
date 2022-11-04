@@ -75,8 +75,8 @@ interface ModalProps {
     disabled?: boolean;
     color?: keyof typeof ButtonTypes;
     variant?: 'text' | 'outlined' | 'contained';
+    options?: SplitButtonOptions;
   }[];
-  splitButtonOptions?: SplitButtonOptions;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -88,7 +88,6 @@ const Modal: React.FC<ModalProps> = ({
   showCloseButton,
   actions,
   children,
-  splitButtonOptions,
 }) => {
   const classes = useStyles();
 
@@ -123,14 +122,14 @@ const Modal: React.FC<ModalProps> = ({
             </Button>
           )}
           {actions?.map((action, index) =>
-            splitButtonOptions ? (
+            action.options ? (
               <SplitButton
                 onClick={action.onClick}
                 text={action.label}
                 disabled={action.disabled}
                 variant={action.variant ?? 'contained'}
                 color={action.color ?? 'primary'}
-                options={splitButtonOptions}
+                options={action.options}
                 size="large"
                 fullWidth
                 block
