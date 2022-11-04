@@ -90,6 +90,21 @@ export default class WalletService {
       return ens;
     }
 
+    const currentNetwork = await this.getNetwork();
+
+    if (currentNetwork.chainId === NETWORKS.arbitrum.chainId) {
+      try {
+        const smolDomainInstance = await this.contractService.getSmolDomainInstance();
+
+        ens = await smolDomainInstance.getFirstDefaultDomain(address);
+        // eslint-disable-next-line no-empty
+      } catch {}
+    }
+
+    if (ens) {
+      return ens;
+    }
+
     try {
       const provider = ethers.getDefaultProvider('homestead', {
         infura: '5744aff1d49f4eee923c5f3e5af4cc1c',
