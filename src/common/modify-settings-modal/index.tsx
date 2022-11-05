@@ -31,6 +31,7 @@ import {
 import useBalance from 'hooks/useBalance';
 import { useAppDispatch } from 'state/hooks';
 import { getFrequencyLabel } from 'utils/parsing';
+import { formatCurrencyAmount } from 'utils/currency';
 import useAllowance from 'hooks/useAllowance';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
@@ -122,6 +123,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     usdPrice
   );
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
+  const requiredAllowance = remainingLiquidity
+    .sub(BigNumber.from(frequencyValue).mul(parseUnits(rate, fromToUse.decimals)))
+    .abs();
 
   const cantFund =
     fromValue &&
@@ -337,7 +341,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         fromToUse,
         fromHasYield,
         version,
-        amount ? parseUnits(amount, from.decimals) : undefined
+        amount ? requiredAllowance : undefined
       );
       const hubAddress = await contractService.getHUBAddress(position.version);
       const companionAddress = await contractService.getHUBCompanionAddress(position.version);
@@ -396,8 +400,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             text: (
               <FormattedMessage
                 description="Allow us to use your coin"
-                defaultMessage="Approve {fromValue} {token}"
-                values={{ token: fromToUse.symbol, fromValue }}
+                defaultMessage="Approve {requiredAllowance} {token}"
+                values={{
+                  token: fromToUse.symbol,
+                  requiredAllowance: formatCurrencyAmount(requiredAllowance, fromToUse, 4),
+                }}
               />
             ),
             disabled: !!hasPendingApproval,
