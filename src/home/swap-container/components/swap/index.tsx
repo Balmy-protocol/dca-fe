@@ -73,6 +73,10 @@ const StyledButton = styled(Button)`
   border-radius: 12px;
 `;
 
+const StyledTooltip = styled(Tooltip)`
+  margin-bottom: 2px;
+`;
+
 interface AvailableSwapInterval {
   label: {
     singular: string;
@@ -627,13 +631,22 @@ const Swap = ({
             }}
           />
         ) : (
-          <FormattedMessage
-            description="Allow us to use your coin"
-            defaultMessage="Approve Max {token}"
-            values={{
-              token: (from && from.symbol) || '',
-            }}
-          />
+          <>
+            <FormattedMessage
+              description="Allow us to use your coin"
+              defaultMessage="Approve Max {token}"
+              values={{
+                token: (from && from.symbol) || '',
+              }}
+            />
+            <StyledTooltip
+              title={`You must give the Mean Finance smart contracts permission to use your ${from?.symbol || ''}`}
+              arrow
+              placement="top"
+            >
+              <StyledHelpOutlineIcon fontSize="small" />
+            </StyledTooltip>
+          </>
         )
       }
       disabled={isApproveTokenDisabled}
