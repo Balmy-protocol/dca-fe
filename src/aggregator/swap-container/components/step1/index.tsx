@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
-import { Token } from 'types';
+import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenButton from 'common/token-button';
@@ -9,6 +9,7 @@ import TokenInput from 'common/token-input';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
 import FormHelperText from '@mui/material/FormHelperText';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const StyledGrid = styled(Grid)`
   top: 16px;
@@ -40,10 +41,10 @@ const StyledTokenInputContainer = styled.div`
   gap: 30px;
 `;
 
-const StyledRateContainer = styled.div`
+const StyledLoadingContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  gap: 5px;
 `;
 
 interface SwapFirstStepProps {
@@ -57,6 +58,9 @@ interface SwapFirstStepProps {
   handleToValueChange: (newValue: string) => void;
   balance?: BigNumber;
   buttonToShow: React.ReactNode;
+  selectedRoute: SwapOption | null;
+  isBuyOrder: boolean;
+  isLoadingRoute: boolean;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -71,7 +75,26 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     handleToValueChange,
     balance,
     buttonToShow,
+    selectedRoute,
+    isBuyOrder,
+    isLoadingRoute,
   } = props;
+
+  let fromValueToUse = isBuyOrder && selectedRoute ? selectedRoute.sellAmount.amountInUnits.toString() : fromValue;
+  let toValueToUse = isBuyOrder ? toValue : selectedRoute?.buyAmount.amountInUnits.toString() || '';
+
+  let isLoadingSellOrder = false;
+  let isLoadingBuyOrder = false;
+
+  if (isLoadingRoute) {
+    if (isBuyOrder) {
+      fromValueToUse = '...';
+      isLoadingBuyOrder = true;
+    } else {
+      toValueToUse = '...';
+      isLoadingSellOrder = true;
+    }
+  }
 
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
@@ -99,7 +122,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               <TokenInput
                 id="from-value"
                 error={cantFund ? 'Amount cannot exceed balance' : ''}
-                value={fromValue}
+                value={fromValueToUse}
+                disabled={isLoadingBuyOrder}
                 onChange={handleFromValueChange}
                 withBalance={false}
                 balance={balance}
@@ -109,6 +133,14 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               />
               <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
             </StyledTokenInputContainer>
+            {isLoadingBuyOrder && (
+              <StyledLoadingContainer>
+                <CircularProgress size={20} />
+                <Typography variant="caption">
+                  <FormattedMessage description="loading best price" defaultMessage="Fetching best price.." />
+                </Typography>
+              </StyledLoadingContainer>
+            )}
           </StyledTokensContainer>
         </StyledContentContainer>
       </Grid>
@@ -123,7 +155,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             <StyledTokenInputContainer>
               <TokenInput
                 id="to-value"
-                value={toValue}
+                value={toValueToUse}
+                disabled={isLoadingSellOrder}
                 onChange={handleToValueChange}
                 withBalance={false}
                 token={to}
@@ -131,6 +164,14 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               />
               <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
             </StyledTokenInputContainer>
+            {isLoadingSellOrder && (
+              <StyledLoadingContainer>
+                <CircularProgress size={20} />
+                <Typography variant="caption">
+                  <FormattedMessage description="loading best price" defaultMessage="Fetching best price.." />
+                </Typography>
+              </StyledLoadingContainer>
+            )}
           </StyledTokensContainer>
         </StyledContentContainer>
       </Grid>

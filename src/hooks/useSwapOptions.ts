@@ -1,6 +1,7 @@
 import React from 'react';
 import { SwapOption, Token } from 'types';
 import isEqual from 'lodash/isEqual';
+import debounce from 'lodash/debounce';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
@@ -34,24 +35,34 @@ function useSwapOptions(
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
+  const debouncedCall = React.useCallback(
+    debounce(
+      async (
+        debouncedFrom: Token | null,
+        debouncedTo: Token | null,
+        debouncedValue?: string,
+        debouncedIsBuyOrder?: boolean
+      ) => {
+        if (debouncedFrom && debouncedTo && debouncedValue) {
+          try {
+            const promiseResult = await aggregatorService.getSwapOptions(
+              debouncedFrom,
+              debouncedTo,
+              debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
+              debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined
+            );
+            setState({ result: promiseResult, error: undefined, isLoading: false });
+          } catch (e) {
+            setState({ result: undefined, error: e as string, isLoading: false });
+          }
+        }
+      },
+      500
+    ),
+    [setState]
+  );
 
   React.useEffect(() => {
-    async function callPromise() {
-      if (from && to && value) {
-        try {
-          const promiseResult = await aggregatorService.getSwapOptions(
-            from,
-            to,
-            isBuyOrder ? undefined : parseUnits(value, from.decimals),
-            isBuyOrder ? parseUnits(value, to.decimals) : undefined
-          );
-          setState({ result: promiseResult, error: undefined, isLoading: false });
-        } catch (e) {
-          setState({ result: undefined, error: e as string, isLoading: false });
-        }
-      }
-    }
-
     if (
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
@@ -64,7 +75,8 @@ function useSwapOptions(
         setState({ isLoading: true, result: undefined, error: undefined });
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        callPromise();
+        debouncedCall(from, to, value, isBuyOrder);
+        // callPromise();
       }
     }
   }, [
