@@ -12,10 +12,17 @@ import {
   DEFILLAMA_PROTOCOL_TOKEN_ADDRESS,
   LATEST_VERSION,
   NETWORKS,
+  STABLE_COINS,
 } from 'config/constants';
 import { emptyTokenWithAddress } from 'utils/currency';
 import ContractService from './contractService';
 import WalletService from './walletService';
+
+interface TokenWithBase extends Token {
+  isBaseToken: boolean;
+}
+
+type GraphToken = TokenWithBase;
 
 export default class PriceService {
   axiosClient: AxiosInstance;
@@ -148,6 +155,68 @@ export default class PriceService {
     const transformerRegistryInstance = await this.contractService.getTransformerRegistryInstance(LATEST_VERSION);
 
     return transformerRegistryInstance.calculateTransformToUnderlying(token, value);
+  }
+
+  async getPriceForGraph(from: Token, to: Token, isMonth?: boolean, chainId?: number) {
+    const network = await this.walletService.getNetwork();
+    const chainIdToUse = chainId || network.chainId;
+    const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
+    const span = isMonth ? '30' : '42';
+    const period = isMonth ? '1d' : '4h';
+    const toAddress = to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to.address;
+    const fromAddress = from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address;
+
+    let tokenA: GraphToken = { ...emptyTokenWithAddress(fromAddress), isBaseToken: false };
+    let tokenB: GraphToken = { ...emptyTokenWithAddress(toAddress), isBaseToken: false };
+    if (fromAddress < toAddress) {
+      tokenA = {
+        ...(from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from),
+        symbol: from.symbol,
+        isBaseToken: STABLE_COINS.includes(from.symbol),
+      };
+      tokenB = {
+        ...(to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to),
+        symbol: to.symbol,
+        isBaseToken: STABLE_COINS.includes(to.symbol),
+      };
+    } else {
+      tokenA = {
+        ...(to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to),
+        symbol: to.symbol,
+        isBaseToken: STABLE_COINS.includes(to.symbol),
+      };
+      tokenB = {
+        ...(from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from),
+        symbol: from.symbol,
+        isBaseToken: STABLE_COINS.includes(from.symbol),
+      };
+    }
+
+    const prices = await this.axiosClient.get<{
+      coins: Record<string, { prices: { timestamp: number; price: number }[] }>;
+    }>(
+      `https://coins.llama.fi/chart/${DEFILLAMA_IDS[chainIdToUse]}:${tokenA.address},${DEFILLAMA_IDS[chainIdToUse]}:${tokenB.address}?period=${period}&span=${span}`
+    );
+
+    const {
+      data: { coins },
+    } = prices;
+
+    const tokenAPrices =
+      coins &&
+      coins[`${DEFILLAMA_IDS[chainIdToUse]}:${tokenA.address}`] &&
+      coins[`${DEFILLAMA_IDS[chainIdToUse]}:${tokenA.address}`].prices;
+    const tokenBPrices =
+      coins &&
+      coins[`${DEFILLAMA_IDS[chainIdToUse]}:${tokenB.address}`] &&
+      coins[`${DEFILLAMA_IDS[chainIdToUse]}:${tokenB.address}`].prices;
+
+    const graphData = tokenAPrices.map(({ price, timestamp }, index) => ({
+      timestamp,
+      rate: price / tokenBPrices[index].price,
+    }));
+
+    return graphData;
   }
 
   async getEstimatedPairCreation(
