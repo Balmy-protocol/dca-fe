@@ -35,8 +35,8 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
-  const fromParamToken = useToken(fromParam);
-  const toParamToken = useToken(toParam);
+  const fromParamToken = useToken(fromParam, true);
+  const toParamToken = useToken(toParam, true);
   const history = useHistory();
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions();
 
