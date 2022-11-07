@@ -7,7 +7,9 @@ import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import Button, { CustomButtonProps } from 'common/button';
 
-const StyledButton = styled(Button)``;
+const StyledButton = styled(Button)`
+  white-space: nowrap;
+`;
 
 const StyledButtonGroup = styled.div<{ fullWidth?: boolean; block?: boolean }>`
   gap: 1px;
