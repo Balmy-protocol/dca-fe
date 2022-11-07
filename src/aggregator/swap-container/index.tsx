@@ -88,6 +88,8 @@ const SwapContainer = () => {
             dispatch(setToValue({ value: newToValue, updateMode }))
           }
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
+          selectedRoute={selectedRoute}
+          isLoadingRoute={isLoadingSwapOptions}
         />
       </Grid>
       <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>

@@ -330,6 +330,14 @@ export default class MeanApiService {
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
         },
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+        cache: {
+          maxAge: 0,
+        },
       }
     );
 

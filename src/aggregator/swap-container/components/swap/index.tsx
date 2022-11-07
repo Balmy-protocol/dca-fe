@@ -2,7 +2,7 @@ import React from 'react';
 import { parseUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { Token } from 'types';
+import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
@@ -57,6 +57,8 @@ interface SwapProps {
   setFromValue: (newFromValue: string, updateMode?: boolean) => void;
   setToValue: (newToValue: string, updateMode?: boolean) => void;
   currentNetwork: { chainId: number; name: string };
+  selectedRoute: SwapOption | null;
+  isLoadingRoute: boolean;
 }
 
 const Swap = ({
@@ -69,7 +71,9 @@ const Swap = ({
   setFromValue,
   setToValue,
   isBuyOrder,
+  selectedRoute,
   currentNetwork,
+  isLoadingRoute,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
@@ -359,6 +363,9 @@ const Swap = ({
         handleToValueChange={handleToValueChange}
         balance={balance}
         buttonToShow={ButtonToShow}
+        selectedRoute={selectedRoute}
+        isBuyOrder={isBuyOrder}
+        isLoadingRoute={isLoadingRoute}
       />
     </StyledPaper>
   );
