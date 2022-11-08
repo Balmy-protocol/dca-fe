@@ -89,8 +89,14 @@ export default class Web3Service {
     this.contractService = new ContractService(client);
     this.transactionService = new TransactionService(client);
     this.walletService = new WalletService(this.contractService, this.axiosClient, client);
-    this.pairService = new PairService(this.walletService, this.contractService, this.apolloClient, this.uniClient);
     this.meanApiService = new MeanApiService(this.walletService, this.contractService, this.axiosClient, client);
+    this.pairService = new PairService(
+      this.walletService,
+      this.contractService,
+      this.meanApiService,
+      this.apolloClient,
+      this.uniClient
+    );
     this.yieldService = new YieldService(this.walletService, this.axiosClient, client);
     this.positionService = new PositionService(
       this.walletService,

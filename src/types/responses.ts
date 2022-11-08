@@ -181,6 +181,10 @@ export interface MeanFinanceResponse {
   tx: TransactionRequest;
 }
 
+export interface MeanFinanceAllowedPairsResponse {
+  supportedPairs: { tokenA: string; tokenB: string }[];
+}
+
 export interface MeanApiUnderlyingResponse {
   underlying: {
     dependent: string;

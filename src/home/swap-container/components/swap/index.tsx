@@ -717,7 +717,7 @@ const Swap = ({
   const NextStepButton = (
     <StyledButton
       size="large"
-      disabled={!from || !to || !fromValue || fromValue === '0' || !frequencyValue || frequencyValue === '0'}
+      disabled={!from || !to || !fromValue || parseFloat(fromValue) === 0 || !frequencyValue || frequencyValue === '0'}
       color="secondary"
       variant="contained"
       fullWidth
@@ -792,9 +792,7 @@ const Swap = ({
         ignoreValues={ignoreValues}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
-        otherSelected={
-          (from && selecting.address === from.address) || selecting.address === 'from' ? to?.address : from?.address
-        }
+        otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
       />
       <Slide
         direction="right"
