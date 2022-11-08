@@ -1,9 +1,13 @@
 import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import EmptyRoutes from 'assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import * as React from 'react';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { SwapOption, Token } from 'types';
 import SwapQuote from '../quote';
+import QuoteSorter from '../quote-sorter';
 
 const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   padding: 16px;
@@ -18,6 +22,20 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
 `;
 
+const StyledTitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const StyledCenteredWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+`;
+
 interface SwapQuotesProps {
   quotes: SwapOption[];
   isLoading: boolean;
@@ -25,29 +43,48 @@ interface SwapQuotesProps {
   to: Token | null;
   selectedRoute: SwapOption | null;
   setRoute: (newRoute: SwapOption) => void;
+  setSorting: (newSort: string) => void;
+  sorting: string;
 }
 
-const SwapQuotes = ({ quotes, isLoading, from, to, selectedRoute, setRoute }: SwapQuotesProps) => {
-  if (isLoading) {
+const SwapQuotes = ({ quotes, isLoading, from, to, selectedRoute, setRoute, setSorting, sorting }: SwapQuotesProps) => {
+  if (!quotes.length && !isLoading) {
     return (
-      <StyledPaper>
-        <CenteredLoadingIndicator size={70} />
+      <StyledPaper variant="outlined" $column>
+        <StyledPaper variant="outlined">
+          <StyledCenteredWrapper>
+            <EmptyRoutes size="100px" />
+            <Typography variant="h6">
+              <FormattedMessage description="No route selected" defaultMessage="Fill the form to view route options" />
+            </Typography>
+          </StyledCenteredWrapper>
+        </StyledPaper>
       </StyledPaper>
     );
   }
 
   return (
     <StyledPaper variant="outlined" $column>
-      {quotes.map((quote) => (
-        <SwapQuote
-          setRoute={setRoute}
-          from={from}
-          to={to}
-          isSelected={quote.swapper.id === selectedRoute?.swapper.id}
-          quote={quote}
-          key={quote.swapper.id}
-        />
-      ))}
+      <StyledTitleContainer>
+        <QuoteSorter isLoading={isLoading} setQuoteSorting={setSorting} sorting={sorting} />
+      </StyledTitleContainer>
+      {isLoading && (
+        <StyledCenteredWrapper>
+          <CenteredLoadingIndicator size={40} />
+          <FormattedMessage description="loadingBestRoute" defaultMessage="Fetching the best route for you" />
+        </StyledCenteredWrapper>
+      )}
+      {!isLoading &&
+        quotes.map((quote) => (
+          <SwapQuote
+            setRoute={setRoute}
+            from={from}
+            to={to}
+            isSelected={quote.swapper.id === selectedRoute?.swapper.id}
+            quote={quote}
+            key={quote.swapper.id}
+          />
+        ))}
     </StyledPaper>
   );
 };
