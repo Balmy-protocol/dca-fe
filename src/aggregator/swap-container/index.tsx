@@ -23,7 +23,7 @@ const SwapContainer = () => {
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();
-  const [swapOptions, isLoadingSwapOptions] = useSwapOptions(
+  const [swapOptions, isLoadingSwapOptions, , fetchOptions] = useSwapOptions(
     from,
     to,
     isBuyOrder ? toValue : fromValue,
@@ -118,6 +118,7 @@ const SwapContainer = () => {
                 to={to}
                 setSorting={onSetSorting}
                 sorting={sorting}
+                fetchOptions={fetchOptions}
               />
             </Grid>
           </Hidden>
