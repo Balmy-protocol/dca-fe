@@ -121,8 +121,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
   const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
-  const requiredAllowance = remainingLiquidity
-    .sub(BigNumber.from(frequencyValue).mul(parseUnits(rate, fromToUse.decimals)))
+  const remainingLiquidityDifference = remainingLiquidity
+    .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
     .abs();
 
   const cantFund =
@@ -339,7 +339,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         fromToUse,
         fromHasYield,
         version,
-        isExact ? requiredAllowance : undefined
+        isExact ? remainingLiquidityDifference : undefined
       );
       const hubAddress = await contractService.getHUBAddress(position.version);
       const companionAddress = await contractService.getHUBCompanionAddress(position.version);
@@ -349,7 +349,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         typeData: {
           token: fromToUse,
           addressFor: to.address === PROTOCOL_TOKEN_ADDRESS || fromHasYield ? companionAddress : hubAddress,
-          ...(isExact && { amount: formatCurrencyAmount(requiredAllowance, fromToUse, 4) }),
+          ...(isExact && { amount: formatCurrencyAmount(remainingLiquidityDifference, fromToUse, 4) }),
         },
         position,
       });
@@ -408,10 +408,10 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             text: (
               <FormattedMessage
                 description="Allow us to use your coin"
-                defaultMessage="Approve {requiredAllowance} {token}"
+                defaultMessage="Approve {remainingLiquidityDifference} {token}"
                 values={{
                   token: fromToUse.symbol,
-                  requiredAllowance: formatCurrencyAmount(requiredAllowance, fromToUse, 4),
+                  remainingLiquidityDifference: formatCurrencyAmount(remainingLiquidityDifference, fromToUse, 4),
                 }}
               />
             ),
@@ -562,12 +562,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     defaultMessage="You will need to provide an aditional {addAmmount} {from}"
                     values={{
                       from: fromToUse.symbol,
-                      addAmmount: formatUnits(
-                        remainingLiquidity
-                          .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
-                          .abs(),
-                        fromToUse.decimals
-                      ),
+                      addAmmount: formatUnits(remainingLiquidityDifference, fromToUse.decimals),
                     }}
                   />
                 ) : (
@@ -576,12 +571,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     defaultMessage="We will return {returnAmmount} {from} to you"
                     values={{
                       from: fromToUse.symbol,
-                      returnAmmount: formatUnits(
-                        remainingLiquidity
-                          .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
-                          .abs(),
-                        fromToUse.decimals
-                      ),
+                      returnAmmount: formatUnits(remainingLiquidityDifference, fromToUse.decimals),
                     }}
                   />
                 )}
