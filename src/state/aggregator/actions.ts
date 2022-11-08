@@ -10,3 +10,5 @@ export const setFrom = createAction<Token | null>('aggregator/setFrom');
 export const setTo = createAction<Token | null>('aggregator/setTo');
 
 export const setSelectedRoute = createAction<SwapOption | null>('aggregator/setSelectedRoute');
+
+export const setSorting = createAction<string>('aggregator/setSorting');

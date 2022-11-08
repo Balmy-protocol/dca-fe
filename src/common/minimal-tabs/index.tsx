@@ -68,13 +68,14 @@ interface MinimalSelectProps<T> {
   options: SelectOptionsType<T>;
   onChange: (option: SelectOption<T>) => void;
   selected: SelectOption<T>;
+  disabled?: boolean;
 }
 
 type SelectOptionsType<T> = SelectOption<T>[];
 
 interface SelectOption<T> {
   value?: T;
-  label: string;
+  label: React.ReactNode;
   key: string | number;
 }
 
@@ -85,7 +86,7 @@ interface CustomCurrent {
   offsetHeight: number;
 }
 
-export default function MinimalTabs<T>({ options, selected, onChange }: MinimalSelectProps<T>) {
+export default function MinimalTabs<T>({ options, selected, onChange, disabled }: MinimalSelectProps<T>) {
   const [selectedRef, setSelectedRef] = useState<CustomCurrent | null>(null);
 
   return (
@@ -99,6 +100,7 @@ export default function MinimalTabs<T>({ options, selected, onChange }: MinimalS
             color="inherit"
             $isSelected={selected.key === option.key}
             onClick={() => onChange(option)}
+            disabled={disabled}
           >
             {option.label}
           </StyledTabItem>
