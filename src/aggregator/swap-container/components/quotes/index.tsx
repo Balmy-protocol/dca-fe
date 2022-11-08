@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { SwapOption, Token } from 'types';
 import SwapQuote from '../quote';
+import QuoteRefresher from '../quote-refresher';
 import QuoteSorter from '../quote-sorter';
 
 const StyledPaper = styled(Paper)<{ $column?: boolean }>`
@@ -25,6 +26,7 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
 const StyledTitleContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const StyledCenteredWrapper = styled.div`
@@ -45,9 +47,20 @@ interface SwapQuotesProps {
   setRoute: (newRoute: SwapOption) => void;
   setSorting: (newSort: string) => void;
   sorting: string;
+  fetchOptions: () => void;
 }
 
-const SwapQuotes = ({ quotes, isLoading, from, to, selectedRoute, setRoute, setSorting, sorting }: SwapQuotesProps) => {
+const SwapQuotes = ({
+  quotes,
+  isLoading,
+  from,
+  to,
+  selectedRoute,
+  setRoute,
+  setSorting,
+  sorting,
+  fetchOptions,
+}: SwapQuotesProps) => {
   if (!quotes.length && !isLoading) {
     return (
       <StyledPaper variant="outlined" $column>
@@ -66,6 +79,7 @@ const SwapQuotes = ({ quotes, isLoading, from, to, selectedRoute, setRoute, setS
   return (
     <StyledPaper variant="outlined" $column>
       <StyledTitleContainer>
+        <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} />
         <QuoteSorter isLoading={isLoading} setQuoteSorting={setSorting} sorting={sorting} />
       </StyledTitleContainer>
       {isLoading && (
