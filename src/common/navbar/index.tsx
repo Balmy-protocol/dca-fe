@@ -89,6 +89,9 @@ const NavBar = ({ isLoading }: NavBarProps) => {
     if (location.pathname === '/positions') {
       dispatch(changeMainTab(1));
       history.push(`/positions`);
+    } else if (location.pathname === '/swap') {
+      dispatch(changeMainTab(2));
+      history.push(`/swap`);
     } else if (location.pathname === '/' || location.pathname === '/create') {
       dispatch(changeMainTab(0));
       history.push(`/create`);
