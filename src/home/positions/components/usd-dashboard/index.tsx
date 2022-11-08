@@ -82,6 +82,9 @@ const COLORS = {
   MANA: '#ff2c56',
   miMATIC: '#da3837',
   AAVE: '#2ebac6',
+  MAGIC: '#dd2021',
+  LPT: '#00c673',
+  GMX: '#25c1d2',
 };
 
 const DEFAULT_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
