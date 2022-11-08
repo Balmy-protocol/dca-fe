@@ -91,7 +91,7 @@ const getPosition = gql`
       withdrawn
       toWithdraw
 
-      history(orderBy: createdAtTimestamp, orderDirection: asc, first: $first, skip: $skip) {
+      history(orderBy: createdAtBlock, orderDirection: asc, first: $first, skip: $skip) {
         id
         action
         transaction {
