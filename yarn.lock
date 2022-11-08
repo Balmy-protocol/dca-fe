@@ -56,6 +56,13 @@
     tslib "^2.3.0"
     zen-observable-ts "^1.2.5"
 
+"@arcxmoney/analytics@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@arcxmoney/analytics/-/analytics-1.0.2.tgz#4c812f0dfbe58e58ce032912cb87040a6cf26376"
+  integrity sha512-oDw6Ea7FAGparf3qhKuSzYlw92Q4Py5wD5NW+GxIzq3gnG+A8MHO+stmIbJXf+RWQ+id3KAYWdL0KVY9cpdtGA==
+  dependencies:
+    "@restless/sanitizers" "^0.2.5"
+
 "@babel/code-frame@7.12.11":
   version "7.12.11"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.12.11.tgz#f4ad435aa263db935b8f10f2c552d23fb716a63f"
@@ -2758,6 +2765,11 @@
     redux "^4.1.2"
     redux-thunk "^2.4.1"
     reselect "^4.1.5"
+
+"@restless/sanitizers@^0.2.5":
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/@restless/sanitizers/-/sanitizers-0.2.5.tgz#96a5cfa3edb52abd8fa14e77798738f3a067dbec"
+  integrity sha512-utsOFwv5owNnbj8HijF7uML/AURgUl5YvY4S2gpxQsrp2D1EP/4rQU/HSyYdIQaL89BoZ/5NHveRJrcFyuHo/w==
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"

@@ -5,6 +5,8 @@ import Torus from '@toruslabs/torus-embed';
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
+import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
+import { DUMMY_ARCX_CLIENT } from 'utils/dummy-arcx-client';
 
 // MOCKS
 import { NETWORKS, PositionVersions } from 'config/constants';
@@ -59,6 +61,8 @@ export default class Web3Service {
 
   meanApiService: MeanApiService;
 
+  arcxSdk: ArcxAnalyticsSdk;
+
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -106,6 +110,14 @@ export default class Web3Service {
       this.apolloClient
     );
     this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
+  }
+
+  setArcxClient(newArcxClient: ArcxAnalyticsSdk) {
+    this.arcxSdk = newArcxClient;
+  }
+
+  getArcxClient() {
+    return this.arcxSdk || DUMMY_ARCX_CLIENT;
   }
 
   getContractService() {
@@ -240,6 +252,20 @@ export default class Web3Service {
     // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
 
     this.setAccount(account);
+
+    try {
+      const arcxClient = this.getArcxClient();
+
+      const network = await ethersProvider.getNetwork();
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      arcxClient.connectWallet({
+        chain: network.chainId,
+        account,
+      });
+    } catch (e) {
+      console.error('Error sending connectWallet event to arcx', e);
+    }
   }
 
   async disconnect() {
@@ -298,6 +324,19 @@ export default class Web3Service {
     this.setModal(web3Modal);
 
     const loadedAsSafeApp = await web3Modal.isSafeApp();
+
+    try {
+      if (process.env.ARCX_KEY) {
+        const arcxSDK = await ArcxAnalyticsSdk.init(process.env.ARCX_KEY, {
+          trackPages: true, // default - automatically trigger PAGE event if the url changes after click
+          cacheIdentity: true, // default - caches identity of users in their browser's local storage
+        });
+
+        this.setArcxClient(arcxSDK);
+      }
+    } catch (e) {
+      console.error('Error initializing arcx client');
+    }
 
     try {
       if (web3Modal.cachedProvider || loadedAsSafeApp) {

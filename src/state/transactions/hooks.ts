@@ -21,6 +21,7 @@ import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
+import useArcx from 'hooks/useArcx';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { addTransaction } from './actions';
 
@@ -40,6 +41,7 @@ export function useTransactionAdder(): (
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
+  const arcxClient = useArcx();
 
   return useCallback(
     (
@@ -79,6 +81,19 @@ export function useTransactionAdder(): (
           position: position && { ...position },
         })
       );
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        arcxClient.transaction({
+          chain: currentNetwork.chainId,
+          transactionHash: hash,
+          metadata: {
+            type,
+            position: position && position.positionId,
+          },
+        });
+      } catch (e) {
+        console.error('Error sending transaction event to arcx');
+      }
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction({
         hash,
