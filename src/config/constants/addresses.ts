@@ -466,6 +466,10 @@ export const TRANSFORMER_REGISTRY_ADDRESS: AddressMap<PositionVersions> = {
   },
 };
 
+export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
+  [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
+};
+
 export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
   [POSITION_VERSION_1]: {
     [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-beta-optimism',
