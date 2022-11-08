@@ -318,7 +318,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     }
   };
 
-  const handleApproveToken = async (amount?: string) => {
+  const handleApproveToken = async (isExact?: boolean) => {
     if (!fromToUse) return;
     const fromSymbol = fromToUse.symbol;
 
@@ -339,16 +339,17 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         fromToUse,
         fromHasYield,
         version,
-        amount ? requiredAllowance : undefined
+        isExact ? requiredAllowance : undefined
       );
       const hubAddress = await contractService.getHUBAddress(position.version);
       const companionAddress = await contractService.getHUBCompanionAddress(position.version);
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        type: isExact ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: fromToUse,
           addressFor: to.address === PROTOCOL_TOKEN_ADDRESS || fromHasYield ? companionAddress : hubAddress,
+          ...(isExact && { amount: formatCurrencyAmount(requiredAllowance, fromToUse, 4) }),
         },
         position,
       });
@@ -415,7 +416,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               />
             ),
             disabled: !!hasPendingApproval,
-            onClick: () => handleApproveToken(fromValue),
+            onClick: () => handleApproveToken(true),
           },
         ],
       },

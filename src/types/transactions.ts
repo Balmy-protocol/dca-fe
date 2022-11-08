@@ -26,6 +26,7 @@ export type TransactionTypes =
   | 'NEW_POSITION'
   | 'NEW_PAIR'
   | 'APPROVE_TOKEN'
+  | 'APPROVE_TOKEN_EXACT'
   | 'WRAP_ETHER'
   | 'TERMINATE_POSITION'
   | 'WITHDRAW_POSITION'
@@ -124,6 +125,12 @@ export interface TerminatePositionTypeData {
 export interface ApproveTokenTypeData {
   token: Token;
   addressFor: string;
+}
+
+export interface ApproveTokenExactTypeData {
+  token: Token;
+  addressFor: string;
+  amount: string;
 }
 
 export interface WrapEtherTypeData {
