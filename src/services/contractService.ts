@@ -14,6 +14,7 @@ import ERC20ABI from 'abis/erc20.json';
 import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
 import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
 import OE_GAS_ORACLE_ABI from 'abis/OEGasOracle.json';
+import SMOL_DOMAIN_ABI from 'abis/SmolDomain.json';
 
 // ADDRESSES
 import {
@@ -29,8 +30,9 @@ import {
   OE_GAS_ORACLE_ADDRESS,
   TRANSFORMER_REGISTRY_ADDRESS,
   DEFAULT_NETWORK_FOR_VERSION,
+  SMOL_DOMAIN_ADDRESS,
 } from 'config/constants';
-import { ERC20Contract, HubContract, OEGasOracle, OracleContract } from 'types';
+import { ERC20Contract, HubContract, OEGasOracle, OracleContract, SmolDomainContract } from 'types';
 
 export default class ContractService {
   client: ethers.providers.Web3Provider;
@@ -175,6 +177,12 @@ export default class ContractService {
     );
   }
 
+  async getSmolDomainAddress(): Promise<string> {
+    const network = await this.getNetwork();
+
+    return SMOL_DOMAIN_ADDRESS[network.chainId];
+  }
+
   // CONTRACTS
   async getHubInstance(version?: PositionVersions): Promise<HubContract> {
     const hubAddress = await this.getHUBAddress(version || LATEST_VERSION);
@@ -242,6 +250,13 @@ export default class ContractService {
     const provider = await this.getProvider();
 
     return new ethers.Contract(tokenAddress, ERC20ABI, provider) as unknown as ERC20Contract;
+  }
+
+  async getSmolDomainInstance(): Promise<SmolDomainContract> {
+    const provider = await this.getProvider();
+    const smolDomainAddress = await this.getSmolDomainAddress();
+
+    return new ethers.Contract(smolDomainAddress, SMOL_DOMAIN_ABI, provider) as unknown as SmolDomainContract;
   }
 }
 /* eslint-enable @typescript-eslint/no-unsafe-member-access */

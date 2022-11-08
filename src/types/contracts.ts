@@ -28,6 +28,10 @@ export class ERC20Contract extends Contract {
   approve: (address: string, value: BigNumber) => Promise<TransactionResponse>;
 }
 
+export class SmolDomainContract extends Contract {
+  getFirstDefaultDomain: (address: string) => Promise<string>;
+}
+
 export class OracleContract extends Contract {
   canSupportPair: (tokenA: string, tokenB: string) => Promise<boolean>;
 
