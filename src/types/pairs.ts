@@ -1,4 +1,3 @@
-import { Oracles } from './contracts';
 import { Token } from './tokens';
 
 export interface SwapsToPerform {
@@ -17,7 +16,6 @@ export type AvailablePair = {
   lastCreatedAt: number;
   id: string;
   swapInfo: SwapInfo;
-  oracle: Oracles;
 };
 
 export type AllowedPair = {
