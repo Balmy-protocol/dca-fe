@@ -18,13 +18,11 @@ import StalePairModal from 'common/stale-pair-modal';
 import LowLiquidityModal from 'common/low-liquidity-modal';
 import {
   FULL_DEPOSIT_TYPE,
-  MINIMUM_LIQUIDITY_USD,
   MODE_TYPES,
   POSSIBLE_ACTIONS,
   RATE_TYPE,
   SUPPORTED_NETWORKS,
   TRANSACTION_TYPES,
-  ORACLES,
   WHALE_MODE_FREQUENCIES,
   WHALE_MINIMUM_VALUES,
   TESTNETS,
@@ -49,7 +47,6 @@ import useUsdPrice from 'hooks/useUsdPrice';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import usePositionService from 'hooks/usePositionService';
-import usePairService from 'hooks/usePairService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
@@ -142,7 +139,7 @@ const Swap = ({
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading] = React.useState(false);
   const [whaleMode, setWhaleMode] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
@@ -150,7 +147,7 @@ const Swap = ({
   const positionService = usePositionService();
   const contractService = useContractService();
   const availablePairs = useAvailablePairs();
-  const pairService = usePairService();
+  // const pairService = usePairService();
   const [balance, , balanceErrors] = useBalance(from);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const [usedTokens] = useUsedTokens();
@@ -475,34 +472,40 @@ const Swap = ({
 
   // eslint-disable-next-line @typescript-eslint/require-await
   const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
-    setIsLoading(true);
-    if (!from || !to) return;
-
-    const oracle = await pairService.getPairOracle(
-      { tokenA: fromYield?.tokenAddress || from.address, tokenB: toYield?.tokenAddress || to.address },
-      !!existingPair
-    );
-
-    let hasLowLiquidity = oracle === ORACLES.UNISWAP;
-
-    if (oracle === ORACLES.UNISWAP) {
-      try {
-        const liquidity = await pairService.getPairLiquidity(from, to);
-        hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
-      } catch {
-        hasLowLiquidity = false;
-      }
-    }
-
-    setIsLoading(false);
-
     setCurrentAction(actionToDo);
-    if (hasLowLiquidity) {
-      setShouldShowLowLiquidityModal(true);
-    } else if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
+    if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
     }
+    /**  Disable low liquidity modal for now */
+    // setIsLoading(true);
+    // if (!from || !to) return;
+
+    // const oracle = await pairService.getPairOracle(
+    //   { tokenA: fromYield?.tokenAddress || from.address, tokenB: toYield?.tokenAddress || to.address },
+    //   !!existingPair
+    // );
+
+    // let hasLowLiquidity = oracle === ORACLES.UNISWAP;
+
+    // if (oracle === ORACLES.UNISWAP) {
+    //   try {
+    //     const liquidity = await pairService.getPairLiquidity(from, to);
+    //     hasLowLiquidity = liquidity <= MINIMUM_LIQUIDITY_USD;
+    //   } catch {
+    //     hasLowLiquidity = false;
+    //   }
+    // }
+
+    // setIsLoading(false);
+
+    // setCurrentAction(actionToDo);
+    // if (hasLowLiquidity) {
+    //   setShouldShowLowLiquidityModal(true);
+    // } else if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
+    //   // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    //   PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
+    // }
   };
 
   const closeLowLiquidityModal = () => {
