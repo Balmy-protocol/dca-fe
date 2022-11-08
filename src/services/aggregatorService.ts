@@ -44,12 +44,13 @@ export default class AggregatorService {
     return;
   }
 
-  async getSwapOptions(from: Token, to: Token, sellAmount?: BigNumber, buyAmount?: BigNumber) {
+  async getSwapOptions(from: Token, to: Token, sellAmount?: BigNumber, buyAmount?: BigNumber, sorting?: string) {
     const swapOptionsResponse = await this.meanApiService.getSwapOptions(
       from.address,
       to.address,
       sellAmount,
-      buyAmount
+      buyAmount,
+      sorting
     );
 
     const filteredOptions: RawSwapOption[] = swapOptionsResponse.quotes.filter(
