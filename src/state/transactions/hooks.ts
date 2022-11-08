@@ -221,7 +221,11 @@ export function useHasPendingApproval(
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
-        if (allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN) return false;
+        if (
+          allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN &&
+          allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN_EXACT
+        )
+          return false;
         const tx = allTransactions[hash];
         if (tx.receipt) {
           return false;
@@ -298,6 +302,7 @@ export function usePositionHasPendingTransaction(position: string): string | nul
       if (
         transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
         transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+        transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN_EXACT ||
         transaction.type === TRANSACTION_TYPES.WRAP_ETHER
       )
         return false;
