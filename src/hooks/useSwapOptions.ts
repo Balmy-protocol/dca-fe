@@ -16,7 +16,7 @@ function useSwapOptions(
   value?: string,
   isBuyOrder?: boolean,
   sorting?: string
-): [SwapOption[] | undefined, boolean, string | undefined] {
+): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
   const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -40,12 +40,14 @@ function useSwapOptions(
   const debouncedCall = React.useCallback(
     debounce(
       async (
-        debouncedFrom: Token | null,
-        debouncedTo: Token | null,
+        debouncedFrom?: Token | null,
+        debouncedTo?: Token | null,
         debouncedValue?: string,
         debouncedIsBuyOrder?: boolean
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
+          setState({ isLoading: true, result: undefined, error: undefined });
+
           try {
             const promiseResult = await aggregatorService.getSwapOptions(
               debouncedFrom,
@@ -65,6 +67,11 @@ function useSwapOptions(
     [setState]
   );
 
+  const fetchOptions = React.useCallback(
+    () => debouncedCall(from, to, value, isBuyOrder),
+    [from, to, value, isBuyOrder]
+  );
+
   React.useEffect(() => {
     if (
       (!isLoading && !result && !error) ||
@@ -76,10 +83,8 @@ function useSwapOptions(
       !isEqual(prevSorting, sorting)
     ) {
       if (from && to && value) {
-        setState({ isLoading: true, result: undefined, error: undefined });
-
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        debouncedCall(from, to, value, isBuyOrder);
+        fetchOptions();
         // callPromise();
       }
     }
@@ -103,13 +108,14 @@ function useSwapOptions(
     walletService,
     prevSorting,
     sorting,
+    fetchOptions,
   ]);
 
   if (!from) {
-    return [undefined, false, undefined];
+    return [undefined, false, undefined, fetchOptions];
   }
 
-  return [result || prevResult, isLoading, error];
+  return [result || prevResult, isLoading, error, fetchOptions];
 }
 
 export default useSwapOptions;
