@@ -12,6 +12,7 @@ import {
   NewPairTypeData,
   Position,
   ApproveTokenTypeData,
+  ApproveTokenExactTypeData,
   WrapEtherTypeData,
   ResetPositionTypeData,
   TransferTypeData,
@@ -182,6 +183,11 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.APPROVE_TOKEN: {
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
           message = `Approving your ${tokenApprovalTypeData.token.symbol}`;
+          break;
+        }
+        case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
+          const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
+          message = `Approving ${tokenApprovalExactTypeData.amount} ${tokenApprovalExactTypeData.token.symbol}`;
           break;
         }
         default:

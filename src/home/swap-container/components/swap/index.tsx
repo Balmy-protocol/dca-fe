@@ -274,10 +274,11 @@ const Swap = ({
           ? await contractService.getHUBCompanionAddress()
           : await contractService.getHUBAddress();
       addTransaction(result, {
-        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        type: amount ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: from,
           addressFor: hubAddress,
+          ...(!!amount && { amount }),
         },
       });
       setModalSuccess({
