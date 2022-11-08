@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { SwapOption, Token } from 'types';
-import { setFromValue, setFrom, setTo, setToValue, setSelectedRoute } from './actions';
+import { setFromValue, setFrom, setTo, setToValue, setSelectedRoute, setSorting } from './actions';
 
 export interface AggregatorState {
   fromValue: string;
@@ -9,6 +9,7 @@ export interface AggregatorState {
   to: Token | null;
   isBuyOrder: boolean;
   selectedRoute: SwapOption | null;
+  sorting: string;
 }
 
 const initialState: AggregatorState = {
@@ -18,6 +19,7 @@ const initialState: AggregatorState = {
   to: null,
   isBuyOrder: false,
   selectedRoute: null,
+  sorting: 'most-profit',
 };
 
 export default createReducer(initialState, (builder) =>
@@ -42,5 +44,8 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setSelectedRoute, (state, { payload }) => {
       state.selectedRoute = payload;
+    })
+    .addCase(setSorting, (state, { payload }) => {
+      state.sorting = payload;
     })
 );

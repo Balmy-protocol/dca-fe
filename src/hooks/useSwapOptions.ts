@@ -14,7 +14,8 @@ function useSwapOptions(
   from: Token | undefined | null,
   to: Token | undefined | null,
   value?: string,
-  isBuyOrder?: boolean
+  isBuyOrder?: boolean,
+  sorting?: string
 ): [SwapOption[] | undefined, boolean, string | undefined] {
   const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
@@ -34,6 +35,7 @@ function useSwapOptions(
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
+  const prevSorting = usePrevious(sorting);
   const prevResult = usePrevious(result, false);
   const debouncedCall = React.useCallback(
     debounce(
@@ -49,7 +51,8 @@ function useSwapOptions(
               debouncedFrom,
               debouncedTo,
               debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
-              debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined
+              debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
+              sorting
             );
             setState({ result: promiseResult, error: undefined, isLoading: false });
           } catch (e) {
@@ -69,7 +72,8 @@ function useSwapOptions(
       !isEqual(account, prevAccount) ||
       !isEqual(prevTo, to) ||
       !isEqual(prevValue, value) ||
-      !isEqual(prevIsBuyOrder, isBuyOrder)
+      !isEqual(prevIsBuyOrder, isBuyOrder) ||
+      !isEqual(prevSorting, sorting)
     ) {
       if (from && to && value) {
         setState({ isLoading: true, result: undefined, error: undefined });
@@ -97,6 +101,8 @@ function useSwapOptions(
     prevBlockNumber,
     blockNumber,
     walletService,
+    prevSorting,
+    sorting,
   ]);
 
   if (!from) {
