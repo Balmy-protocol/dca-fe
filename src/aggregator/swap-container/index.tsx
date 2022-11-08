@@ -8,7 +8,7 @@ import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from 'config/constants';
 import { SwapOption, Token } from 'types';
 import { useAggregatorState } from 'state/aggregator/hooks';
 import { useAppDispatch } from 'state/hooks';
-import { setFrom, setFromValue, setToValue, setTo, setSelectedRoute } from 'state/aggregator/actions';
+import { setFrom, setFromValue, setToValue, setTo, setSelectedRoute, setSorting } from 'state/aggregator/actions';
 import useSwapOptions from 'hooks/useSwapOptions';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
@@ -16,14 +16,20 @@ import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
 
 const SwapContainer = () => {
-  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute } = useAggregatorState();
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting } = useAggregatorState();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam);
   const toParamToken = useToken(toParam);
   const history = useHistory();
-  const [swapOptions, isLoadingSwapOptions] = useSwapOptions(from, to, isBuyOrder ? toValue : fromValue, isBuyOrder);
+  const [swapOptions, isLoadingSwapOptions] = useSwapOptions(
+    from,
+    to,
+    isBuyOrder ? toValue : fromValue,
+    isBuyOrder,
+    sorting
+  );
 
   React.useEffect(() => {
     if (fromParamToken) {
@@ -70,6 +76,10 @@ const SwapContainer = () => {
     dispatch(setSelectedRoute(newRoute));
   };
 
+  const onSetSorting = (newSort: string) => {
+    dispatch(setSorting(newSort));
+  };
+
   return (
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
       <Grid item xs={12} md={5}>
@@ -106,6 +116,8 @@ const SwapContainer = () => {
                 isLoading={isLoadingSwapOptions}
                 from={from}
                 to={to}
+                setSorting={onSetSorting}
+                sorting={sorting}
               />
             </Grid>
           </Hidden>

@@ -319,7 +319,13 @@ export default class MeanApiService {
     }
   }
 
-  async getSwapOptions(from: string, to: string, sellAmount?: BigNumber, buyAmount?: BigNumber) {
+  async getSwapOptions(
+    from: string,
+    to: string,
+    sellAmount?: BigNumber,
+    buyAmount?: BigNumber,
+    sortQuotesBy = 'most-profit'
+  ) {
     const currentNetwork = await this.walletService.getNetwork();
     const swapResponses = await this.axiosClient.get<MeanFinanceSwapResponse>(
       `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/swap`,
@@ -327,6 +333,7 @@ export default class MeanApiService {
         params: {
           sellToken: from,
           buyToken: to,
+          sortQuotesBy,
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
         },
