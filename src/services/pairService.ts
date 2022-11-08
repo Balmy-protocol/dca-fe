@@ -10,6 +10,7 @@ import {
   AvailablePairResponse,
   SwapInfo,
   AllowedPairs,
+  AvailablePair,
 } from 'types';
 import { activePositionsPerIntervalToHasToExecute, sortTokens, sortTokensByAddress } from 'utils/parsing';
 import { BigNumber } from 'ethers';
@@ -101,17 +102,11 @@ export default class PairService {
 
     if (availablePairsResponse.data) {
       this.availablePairs = await Promise.all(
-        availablePairsResponse.data.pairs.map(async (pair: AvailablePairResponse) => {
+        availablePairsResponse.data.pairs.map<AvailablePair>((pair: AvailablePairResponse) => {
           const oldestCreatedPosition =
             (pair.positions && pair.positions[0] && pair.positions[0].createdAtTimestamp) || 0;
           const lastCreatedAt =
             oldestCreatedPosition > pair.createdAtTimestamp ? oldestCreatedPosition : pair.createdAtTimestamp;
-          let pairOracle;
-          try {
-            pairOracle = await this.getPairOracle({ tokenA: pair.tokenA.address, tokenB: pair.tokenB.address }, true);
-          } catch {
-            pairOracle = ORACLES.CHAINLINK;
-          }
 
           return {
             token0: pair.tokenA,
@@ -120,7 +115,6 @@ export default class PairService {
             id: pair.id,
             lastCreatedAt,
             swapInfo: activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval),
-            oracle: pairOracle,
           };
         })
       );
@@ -150,7 +144,6 @@ export default class PairService {
         lastExecutedAt: 0,
         lastCreatedAt: Math.floor(Date.now() / 1000),
         swapInfo,
-        oracle,
       });
     } else {
       const pairIndex = findIndex(this.availablePairs, { id: `${token0.address}-${token1.address}` });
