@@ -18,7 +18,7 @@ const StyledYieldTokenSelectorContainer = styled.div`
   border-radius: 4px;
   background-color: #333333;
   align-items: center;
-  padding: 14px 18px;
+  padding: 14px 14px;
   gap: 12px;
 `;
 
