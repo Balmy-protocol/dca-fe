@@ -122,7 +122,13 @@ const SplitButton = ({
         }}
       >
         {options.map(({ onClick: onClickItem, disabled: disabledItem, text: itemText }) => (
-          <MenuItem onClick={onClickItem} disabled={disabledItem}>
+          <MenuItem
+            onClick={() => {
+              onClickItem();
+              handleClose();
+            }}
+            disabled={disabledItem}
+          >
             {itemText}
           </MenuItem>
         ))}
