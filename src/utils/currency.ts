@@ -19,10 +19,21 @@ const toSignificant = (
   const denominator = JSBI.BigInt(decimalScale);
 
   Decimal.set({
-    precision: significantDigits + 1,
-    rounding: Decimal.ROUND_DOWN,
+    precision: 20,
+    rounding: Decimal.ROUND_UP,
   });
-  const quotient = new Decimal(numerator.toString()).div(denominator.toString()).toSignificantDigits(significantDigits);
+
+  const baseNumber = new Decimal(numerator.toString()).div(denominator.toString()).toFixed(0);
+  const nonDecimalPlaces = baseNumber === '0' ? 0 : baseNumber.toString().length;
+
+  Decimal.set({
+    precision: nonDecimalPlaces + significantDigits + 1,
+    rounding: Decimal.ROUND_UP,
+  });
+
+  const quotient = new Decimal(numerator.toString())
+    .div(denominator.toString())
+    .toSignificantDigits(nonDecimalPlaces + significantDigits);
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 
