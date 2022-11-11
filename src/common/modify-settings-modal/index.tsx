@@ -13,8 +13,8 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { BigNumber } from 'ethers';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import TokenInput from 'common/token-input';
+import AllowanceTooltip from 'common/allowance-tooltip';
 import {
   setFrequencyValue,
   setFromValue,
@@ -68,11 +68,6 @@ const StyledSummaryContainer = styled.div`
 const StyledInputContainer = styled.div`
   margin: 5px 6px;
   display: inline-flex;
-`;
-
-const StyledTooltip = styled(Tooltip)`
-  margin-bottom: 2px;
-  margin-left: 5px;
 `;
 
 interface ModifySettingsModalProps {
@@ -386,19 +381,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         label: (
           <>
             <FormattedMessage
-              description="Allow us to use your coin"
-              defaultMessage="Approve Max {token}"
+              description="Allow us to use your coin (modal)"
+              defaultMessage="Approve Max {symbol}"
               values={{
-                token: fromToUse.symbol,
+                symbol: fromToUse.symbol,
               }}
             />
-            <StyledTooltip
-              title={`You must give the Mean Finance smart contracts permission to use your ${fromToUse.symbol}`}
-              arrow
-              placement="top"
-            >
-              <HelpOutlineIcon fontSize="small" />
-            </StyledTooltip>
+            <AllowanceTooltip symbol={fromToUse.symbol} />
           </>
         ),
         onClick: () => handleApproveToken(),

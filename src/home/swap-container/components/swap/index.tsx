@@ -9,6 +9,7 @@ import Slide from '@mui/material/Slide';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
 import Button from 'common/button';
+import AllowanceTooltip from 'common/allowance-tooltip';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
 import useBalance from 'hooks/useBalance';
@@ -69,10 +70,6 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 const StyledButton = styled(Button)`
   padding: 10px 18px;
   border-radius: 12px;
-`;
-
-const StyledTooltip = styled(Tooltip)`
-  margin-bottom: 2px;
 `;
 
 interface AvailableSwapInterval {
@@ -628,19 +625,13 @@ const Swap = ({
         ) : (
           <>
             <FormattedMessage
-              description="Allow us to use your coin"
-              defaultMessage="Approve Max {token}"
+              description="Allow us to use your coin (home)"
+              defaultMessage="Approve Max {symbol}"
               values={{
-                token: (from && from.symbol) || '',
+                symbol: from ? from.symbol : '',
               }}
             />
-            <StyledTooltip
-              title={`You must give the Mean Finance smart contracts permission to use your ${from?.symbol || ''}`}
-              arrow
-              placement="top"
-            >
-              <StyledHelpOutlineIcon fontSize="small" />
-            </StyledTooltip>
+            <AllowanceTooltip symbol={from ? from.symbol : ''} />
           </>
         )
       }
