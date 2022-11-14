@@ -125,13 +125,6 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
       },
-      {
-        id: '6ee54ffc-6ede-45a8-b35f-60aca8cc4176', // aave-v3 agEUR
-        tokenAddress: '0x25ad39beee8ddc8d6503ef84881426b65e52c640', // aave-v3 agEUR
-        poolId: '6ee54ffc-6ede-45a8-b35f-60aca8cc4176', // aave-v3 agEUR
-        name: 'Aave V3',
-        token: emptyTokenWithAddress('AAVE'),
-      },
     ],
     [NETWORKS.optimism.chainId]: [
       {
