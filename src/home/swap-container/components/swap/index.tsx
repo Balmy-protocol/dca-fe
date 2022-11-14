@@ -642,8 +642,8 @@ const Swap = ({
           text: (
             <FormattedMessage
               description="Allow us to use your coin (home exact)"
-              defaultMessage="Approve {fromValue} {token}"
-              values={{ token: (from && from.symbol) || '', fromValue }}
+              defaultMessage="Approve {fromValue} {symbol}"
+              values={{ symbol: (from && from.symbol) || '', fromValue }}
             />
           ),
           disabled: isApproveTokenDisabled,
