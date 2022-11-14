@@ -243,7 +243,7 @@ const Swap = ({
     setWhaleMode(!whaleMode);
   };
 
-  const handleApproveToken = async (amount?: string) => {
+  const handleApproveToken = async (amount?: BigNumber) => {
     if (!from || !to) return;
     const fromSymbol = from.symbol;
 
@@ -263,7 +263,7 @@ const Swap = ({
         from,
         !!(shouldEnableYield && fromYield?.tokenAddress),
         undefined,
-        amount ? parseUnits(amount, from.decimals) : undefined
+        amount
       );
       const hubAddress =
         shouldEnableYield && fromYield?.tokenAddress
@@ -366,7 +366,7 @@ const Swap = ({
     }
   };
 
-  const preHandleApprove = (amount?: string) => {
+  const preHandleApprove = (amount?: BigNumber) => {
     if (!existingPair) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       handleApproveToken(amount);
@@ -478,21 +478,21 @@ const Swap = ({
   const POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: handleSwap,
     approveToken: handleApproveToken,
-    approveTokenExact: () => handleApproveToken(fromValue),
+    approveTokenExact: (amount?: BigNumber) => handleApproveToken(amount),
   };
 
   const PRE_POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: preHandleSwap,
     approveToken: preHandleApprove,
-    approveTokenExact: () => preHandleApprove(fromValue),
+    approveTokenExact: (amount?: BigNumber) => preHandleApprove(amount),
   };
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
+  const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS, amount?: BigNumber) => {
     setCurrentAction(actionToDo);
     if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
+      PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo](amount);
     }
     /**  Disable low liquidity modal for now */
     // setIsLoading(true);
@@ -617,41 +617,14 @@ const Swap = ({
 
   const ApproveTokenButton = (
     <AllowanceSplitButton
-      onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
-      text={
-        hasPendingApproval ? (
-          <FormattedMessage
-            description="waiting for approval"
-            defaultMessage="Waiting for your {token} to be approved"
-            values={{
-              token: (from && from.symbol) || '',
-            }}
-          />
-        ) : (
-          <FormattedMessage
-            description="Allow us to use your coin (home max)"
-            defaultMessage="Approve Max {symbol}"
-            values={{
-              symbol: from ? from.symbol : '',
-            }}
-          />
-        )
+      onMaxApprove={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
+      onApproveExact={(amount) =>
+        checkForLowLiquidity(POSSIBLE_ACTIONS.approveTokenExact as keyof typeof POSSIBLE_ACTIONS, amount)
       }
-      options={[
-        {
-          text: (
-            <FormattedMessage
-              description="Allow us to use your coin (home exact)"
-              defaultMessage="Approve {fromValue} {symbol}"
-              values={{ symbol: (from && from.symbol) || '', fromValue }}
-            />
-          ),
-          disabled: isApproveTokenDisabled,
-          onClick: () => checkForLowLiquidity(POSSIBLE_ACTIONS.approveTokenExact as keyof typeof POSSIBLE_ACTIONS),
-        },
-      ]}
-      symbol={from ? from.symbol : ''}
+      amount={from && (fromValue ? parseUnits(fromValue, from?.decimals) : null)}
       disabled={isApproveTokenDisabled}
+      token={from}
+      tokenYield={fromYield}
     />
   );
 
@@ -798,7 +771,12 @@ const Swap = ({
       />
       <StalePairModal
         open={shouldShowStalePairModal}
-        onConfirm={() => POSSIBLE_ACTIONS_FUNCTIONS[currentAction]()}
+        onConfirm={() => {
+          if (currentAction === POSSIBLE_ACTIONS.approveTokenExact) {
+            return POSSIBLE_ACTIONS_FUNCTIONS[currentAction](parseUnits(fromValue, from?.decimals));
+          }
+          return POSSIBLE_ACTIONS_FUNCTIONS[currentAction]();
+        }}
         onCancel={() => setShouldShowStalePairModal(false)}
       />
       <LowLiquidityModal

@@ -1,4 +1,5 @@
 import { Log } from '@ethersproject/providers';
+import { BigNumber } from 'ethers';
 import { PositionVersions } from 'config';
 import { Oracles } from './contracts';
 import { Position } from './positions';
@@ -130,7 +131,7 @@ export interface ApproveTokenTypeData {
 export interface ApproveTokenExactTypeData {
   token: Token;
   addressFor: string;
-  amount: string;
+  amount: BigNumber;
 }
 
 export interface WrapEtherTypeData {

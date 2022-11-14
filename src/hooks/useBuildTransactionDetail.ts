@@ -188,8 +188,12 @@ function useBuildTransactionDetail() {
             break;
           }
           case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
-            const tokenApprovalTypeData = tx.typeData as ApproveTokenExactTypeData;
-            message = `Approve ${tokenApprovalTypeData.amount} ${tokenApprovalTypeData.token.symbol}`;
+            const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
+            message = `Approve ${formatCurrencyAmount(
+              tokenApprovalExactTypeData.amount,
+              tokenApprovalExactTypeData.token,
+              4
+            )} ${tokenApprovalExactTypeData.token.symbol}`;
             break;
           }
           default:

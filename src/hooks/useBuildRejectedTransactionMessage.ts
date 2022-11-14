@@ -25,6 +25,7 @@ import {
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { getFrequencyLabel } from 'utils/parsing';
+import { formatCurrencyAmount } from 'utils/currency';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
@@ -187,7 +188,11 @@ function useBuildTransactionMessages() {
         }
         case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
           const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
-          message = `Approving ${tokenApprovalExactTypeData.amount} ${tokenApprovalExactTypeData.token.symbol}`;
+          message = `Approving ${formatCurrencyAmount(
+            tokenApprovalExactTypeData.amount,
+            tokenApprovalExactTypeData.token,
+            4
+          )} ${tokenApprovalExactTypeData.token.symbol}`;
           break;
         }
         default:
