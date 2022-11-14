@@ -246,12 +246,13 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
           swapRate:
             position.pair.tokenA.address ===
             ((tokenFrom.underlyingTokens[0] && tokenFrom.underlyingTokens[0].address) || tokenFrom.address)
-              ? formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingAToBWithFee), tokenTo)
-              : formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingBToAWithFee), tokenFrom),
+              ? formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingAToBWithFee), tokenTo, 4)
+              : formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingBToAWithFee), tokenTo, 4),
           currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
         }}
       />
     );
+
     return (
       <>
         <StyledCenteredGrid item xs={12}>

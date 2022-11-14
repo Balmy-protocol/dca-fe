@@ -231,7 +231,9 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             const oldSwappedIfDCA =
               (newPrices[newPrices.length - 1] && newPrices[newPrices.length - 1].swappedIfDCA) || BigNumber.from(0);
             let swappedIfLumpSum = BigNumber.from(oldSwappedIfLumpSum);
-            const swappedIfDCA = BigNumber.from(oldSwappedIfDCA).add(BigNumber.from(positionAction.swapped));
+            const swappedIfDCA = BigNumber.from(oldSwappedIfDCA).add(
+              BigNumber.from(positionAction.swappedUnderlying || positionAction.swapped)
+            );
 
             for (let j = subPositions.length - 1; j >= 0; j -= 1) {
               const { amountLeft, ratePerUnit } = subPositions[j];
