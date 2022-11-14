@@ -18,13 +18,13 @@ import { useTransactionAdder, useHasPendingApproval } from 'state/transactions/h
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import useAllowance from 'hooks/useAllowance';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useUsdPrice from 'hooks/useUsdPrice';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useAggregatorService from 'hooks/useAggregatorService';
+import useSpecificAllowance from 'hooks/useSpecificAllowance';
 import SwapFirstStep from '../step1';
 
 const StyledPaper = styled(Paper)`
@@ -89,9 +89,14 @@ const Swap = ({
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const [usedTokens] = useUsedTokens();
 
-  const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), true);
+  const hasPendingApproval = useHasPendingApproval(
+    from,
+    web3Service.getAccount(),
+    false,
+    selectedRoute?.swapper.allowanceTarget
+  );
 
-  const [allowance, , allowanceErrors] = useAllowance(from, true);
+  const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
   const [usdPrice, isLoadingUsdPrice] = useUsdPrice(
     from,
@@ -99,7 +104,7 @@ const Swap = ({
   );
 
   const handleApproveToken = async () => {
-    if (!from || !to) return;
+    if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
 
     try {
@@ -114,14 +119,13 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(from, true);
-      const hubAddress = await contractService.getHUBCompanionAddress();
+      const result = await walletService.approveSpecificToken(from, selectedRoute.swapper.allowanceTarget);
 
       addTransaction(result, {
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: from,
-          addressFor: hubAddress,
+          addressFor: selectedRoute.swapper.allowanceTarget,
         },
       });
       setModalSuccess({
@@ -205,6 +209,7 @@ const Swap = ({
   const isApproved =
     !from ||
     (from &&
+      selectedRoute &&
       (!fromValue
         ? true
         : (allowance.allowance &&
@@ -218,6 +223,7 @@ const Swap = ({
     !fromValue ||
     cantFund ||
     !balance ||
+    !selectedRoute ||
     balanceErrors ||
     allowanceErrors ||
     parseUnits(fromValue, from.decimals).lte(BigNumber.from(0));
@@ -289,7 +295,7 @@ const Swap = ({
     </StyledButton>
   );
 
-  const StartPositionButton = (
+  const SwapButton = (
     <StyledButton
       size="large"
       variant="contained"
@@ -336,7 +342,7 @@ const Swap = ({
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
     ButtonToShow = ApproveTokenButton;
   } else {
-    ButtonToShow = StartPositionButton;
+    ButtonToShow = SwapButton;
   }
 
   return (
