@@ -10,6 +10,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
 import FormHelperText from '@mui/material/FormHelperText';
 import CircularProgress from '@mui/material/CircularProgress';
+import QuoteData from '../quote-data';
 
 const StyledGrid = styled(Grid)`
   top: 16px;
@@ -27,6 +28,9 @@ const StyledContentContainer = styled.div`
   background-color: #292929;
   padding: 16px;
   border-radius: 8px;
+  gap: 16px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const StyledTokensContainer = styled.div`
@@ -176,7 +180,10 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
         </StyledContentContainer>
       </Grid>
       <Grid item xs={12}>
-        <StyledContentContainer>{buttonToShow}</StyledContentContainer>
+        <StyledContentContainer>
+          <QuoteData quote={selectedRoute} to={to} />
+          {buttonToShow}
+        </StyledContentContainer>
       </Grid>
     </StyledGrid>
   );
