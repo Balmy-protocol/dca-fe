@@ -389,7 +389,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         label: (
           <>
             <FormattedMessage
-              description="Allow us to use your coin (modal)"
+              description="Allow us to use your coin (modal max)"
               defaultMessage="Approve Max {symbol}"
               values={{
                 symbol: fromToUse.symbol,
@@ -404,7 +404,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           {
             text: (
               <FormattedMessage
-                description="Allow us to use your coin"
+                description="Allow us to use your coin (modal exact)"
                 defaultMessage="Approve {remainingLiquidityDifference} {token}"
                 values={{
                   token: fromToUse.symbol,

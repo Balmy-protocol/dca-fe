@@ -629,7 +629,7 @@ const Swap = ({
           />
         ) : (
           <FormattedMessage
-            description="Allow us to use your coin (home)"
+            description="Allow us to use your coin (home max)"
             defaultMessage="Approve Max {symbol}"
             values={{
               symbol: from ? from.symbol : '',
@@ -641,7 +641,7 @@ const Swap = ({
         {
           text: (
             <FormattedMessage
-              description="Allow us to use your coin"
+              description="Allow us to use your coin (home exact)"
               defaultMessage="Approve {fromValue} {token}"
               values={{ token: (from && from.symbol) || '', fromValue }}
             />
