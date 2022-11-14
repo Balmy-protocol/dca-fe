@@ -156,7 +156,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) =
           <DarkChip
             size="small"
             icon={<LocalGasStationIcon fontSize="small" />}
-            label={`${toPrecision(quote.gas.estimatedCostInUnits)} $`}
+            label={`${toPrecision(quote.gas.estimatedCostInUSD)} $`}
           />
         </StyledTitleDataContainer>
       </StyledTitleContainer>
