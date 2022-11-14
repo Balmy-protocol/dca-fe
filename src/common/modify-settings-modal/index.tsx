@@ -396,9 +396,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             text: (
               <FormattedMessage
                 description="Allow us to use your coin (modal exact)"
-                defaultMessage="Approve {remainingLiquidityDifference} {token}"
+                defaultMessage="Approve {remainingLiquidityDifference} {symbol}"
                 values={{
-                  token: fromToUse.symbol,
+                  symbol: fromToUse.symbol,
                   remainingLiquidityDifference: formatCurrencyAmount(remainingLiquidityDifference, fromToUse, 4),
                 }}
               />
