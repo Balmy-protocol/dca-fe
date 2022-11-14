@@ -12,9 +12,8 @@ import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { BigNumber } from 'ethers';
 import Grid from '@mui/material/Grid';
-import Tooltip from '@mui/material/Tooltip';
 import TokenInput from 'common/token-input';
-import AllowanceTooltip from 'common/allowance-tooltip';
+import { AllowanceTooltip } from 'common/allowance-split-button';
 import {
   setFrequencyValue,
   setFromValue,

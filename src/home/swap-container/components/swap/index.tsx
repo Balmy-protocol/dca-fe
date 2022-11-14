@@ -9,7 +9,6 @@ import Slide from '@mui/material/Slide';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/token-picker';
 import Button from 'common/button';
-import AllowanceTooltip from 'common/allowance-tooltip';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
 import useBalance from 'hooks/useBalance';
@@ -17,6 +16,7 @@ import useUsedTokens from 'hooks/useUsedTokens';
 import CreatePairModal from 'common/create-pair-modal';
 import StalePairModal from 'common/stale-pair-modal';
 import LowLiquidityModal from 'common/low-liquidity-modal';
+import AllowanceSplitButton from 'common/allowance-split-button';
 import {
   FULL_DEPOSIT_TYPE,
   MODE_TYPES,
@@ -43,7 +43,6 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import SplitButton from 'common/split-button';
 import useAllowance from 'hooks/useAllowance';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useCanSupportPair from 'hooks/useCanSupportPair';
@@ -617,7 +616,7 @@ const Swap = ({
   const isApproveTokenDisabled = !!isApproved || hasPendingApproval || isLoading || !!shouldDisableApproveButton;
 
   const ApproveTokenButton = (
-    <SplitButton
+    <AllowanceSplitButton
       onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
       text={
         hasPendingApproval ? (
@@ -629,21 +628,15 @@ const Swap = ({
             }}
           />
         ) : (
-          <>
-            <FormattedMessage
-              description="Allow us to use your coin (home)"
-              defaultMessage="Approve Max {symbol}"
-              values={{
-                symbol: from ? from.symbol : '',
-              }}
-            />
-            <AllowanceTooltip symbol={from ? from.symbol : ''} />
-          </>
+          <FormattedMessage
+            description="Allow us to use your coin (home)"
+            defaultMessage="Approve Max {symbol}"
+            values={{
+              symbol: from ? from.symbol : '',
+            }}
+          />
         )
       }
-      disabled={isApproveTokenDisabled}
-      variant="contained"
-      color="primary"
       options={[
         {
           text: (
@@ -657,9 +650,8 @@ const Swap = ({
           onClick: () => checkForLowLiquidity(POSSIBLE_ACTIONS.approveTokenExact as keyof typeof POSSIBLE_ACTIONS),
         },
       ]}
-      size="large"
-      fullWidth
-      block
+      symbol={from ? from.symbol : ''}
+      disabled={isApproveTokenDisabled}
     />
   );
 
