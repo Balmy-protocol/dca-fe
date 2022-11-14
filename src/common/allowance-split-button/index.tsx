@@ -2,12 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import SplitButton from 'common/split-button';
 import { FormattedMessage } from 'react-intl';
-import { Token, YieldOption } from 'types';
+import { Token } from 'types';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import useWeb3Service from 'hooks/useWeb3Service';
 import { BigNumber } from 'ethers';
-import { useHasPendingApproval } from 'state/transactions/hooks';
 import { formatCurrencyAmount } from 'utils/currency';
 
 interface AllowanceSplitButtonProps {
@@ -16,7 +14,7 @@ interface AllowanceSplitButtonProps {
   onApproveExact: (amount: BigNumber) => void;
   token: Token | null;
   amount: BigNumber | null;
-  tokenYield: YieldOption | null | undefined;
+  hasPendingApproval: boolean;
 }
 
 const StyledTooltip = styled(Tooltip)`
@@ -46,9 +44,7 @@ export const AllowanceTooltip = (props: { symbol: string }) => {
 };
 
 const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
-  const { disabled, onMaxApprove, onApproveExact, token, amount, tokenYield } = props;
-  const web3Service = useWeb3Service();
-  const hasPendingApproval = useHasPendingApproval(token, web3Service.getAccount(), !!tokenYield?.tokenAddress);
+  const { disabled, onMaxApprove, onApproveExact, token, amount, hasPendingApproval } = props;
   const symbol = token?.symbol || '';
   return (
     <SplitButton
