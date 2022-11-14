@@ -233,15 +233,19 @@ export default class WalletService {
   }
 
   async getAllowance(token: Token, shouldCheckCompanion?: boolean, positionVersion: PositionVersions = LATEST_VERSION) {
+    const addressToCheck = shouldCheckCompanion
+      ? await this.contractService.getHUBCompanionAddress(positionVersion)
+      : await this.contractService.getHUBAddress(positionVersion);
+
+    return this.getSpecificAllowance(token, addressToCheck);
+  }
+
+  async getSpecificAllowance(token: Token, addressToCheck: string) {
     const account = this.getAccount();
 
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
     }
-
-    const addressToCheck = shouldCheckCompanion
-      ? await this.contractService.getHUBCompanionAddress(positionVersion)
-      : await this.contractService.getHUBAddress(positionVersion);
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
@@ -262,6 +266,10 @@ export default class WalletService {
       ? await this.contractService.getHUBCompanionAddress(positionVersion)
       : await this.contractService.getHUBAddress(positionVersion);
 
+    return this.approveSpecificToken(token, addressToApprove);
+  }
+
+  async approveSpecificToken(token: Token, addressToApprove: string): Promise<TransactionResponse> {
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
     return erc20.approve(addressToApprove, MaxUint256);
