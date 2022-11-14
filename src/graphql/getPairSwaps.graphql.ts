@@ -38,13 +38,10 @@ const getPairSwaps = gql`
         id
         executedAtTimestamp
         executedAtBlock
-        pairSwap {
-          id
-          ratioUnderlyingAToB
-          ratioUnderlyingBToA
-          ratioUnderlyingAToBWithFee
-          ratioUnderlyingBToAWithFee
-        }
+        ratioUnderlyingAToB
+        ratioUnderlyingBToA
+        ratioUnderlyingAToBWithFee
+        ratioUnderlyingBToAWithFee
         transaction {
           id
           hash
