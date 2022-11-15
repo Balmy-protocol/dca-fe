@@ -13,15 +13,12 @@ import useUsedTokens from 'hooks/useUsedTokens';
 import { SUPPORTED_NETWORKS, TRANSACTION_TYPES } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { useTransactionAdder, useHasPendingApproval } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
-import useUsdPrice from 'hooks/useUsdPrice';
 import useWalletService from 'hooks/useWalletService';
-import useContractService from 'hooks/useContractService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useAggregatorService from 'hooks/useAggregatorService';
 import useSpecificAllowance from 'hooks/useSpecificAllowance';
@@ -59,6 +56,7 @@ interface SwapProps {
   currentNetwork: { chainId: number; name: string };
   selectedRoute: SwapOption | null;
   isLoadingRoute: boolean;
+  onResetForm: () => void;
 }
 
 const Swap = ({
@@ -74,17 +72,16 @@ const Swap = ({
   selectedRoute,
   currentNetwork,
   isLoadingRoute,
+  onResetForm,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
-  const [isLoading, setIsLoading] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
-  const contractService = useContractService();
   const [balance, , balanceErrors] = useBalance(from);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const [usedTokens] = useUsedTokens();
@@ -97,11 +94,6 @@ const Swap = ({
   );
 
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
-
-  const [usdPrice, isLoadingUsdPrice] = useUsdPrice(
-    from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null
-  );
 
   const handleApproveToken = async () => {
     if (!from || !to || !selectedRoute) return;
@@ -145,46 +137,52 @@ const Swap = ({
   };
 
   const handleSwap = async () => {
-    if (!from || !to) return;
+    if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
+    const toSymbol = to.symbol;
+    const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4);
+    const toAmount = formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4);
 
     try {
       setModalLoading({
         content: (
           <Typography variant="body1">
             <FormattedMessage
-              description="creating position"
-              defaultMessage="Creating a position to swap {from} to {to}"
-              values={{ from: fromSymbol || '', to: (to && to.symbol) || '' }}
+              description="swap aggregator"
+              defaultMessage="Swapping {fromAmount} {from} for {toAmount} {to} for you"
+              values={{ from: fromSymbol, to: toSymbol, fromAmount, toAmount }}
             />
           </Typography>
         ),
       });
-      // const result = await aggregatorService.swap(from, to, fromValue, isBuyOrder);
 
-      // // addTransaction(result, {
-      // //   type: TRANSACTION_TYPES.NEW_POSITION,
-      // //   typeData: {
-      // //     from,
-      // //     to,
-      // //   },
-      // // });
-      // setModalSuccess({
-      //   hash: result.hash,
-      //   content: (
-      //     <FormattedMessage
-      //       description="success creating position"
-      //       defaultMessage="Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon"
-      //       values={{ from: fromSymbol || '', to: (to && to.symbol) || '' }}
-      //     />
-      //   ),
-      // });
+      const result = await aggregatorService.swap(selectedRoute);
 
-      setFromValue('', false);
-      setToValue('', false);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.SWAP,
+        typeData: {
+          from: fromSymbol,
+          to: toSymbol,
+          amountFrom: fromAmount,
+          amountTo: toAmount,
+        },
+      });
+
+      setModalSuccess({
+        hash: result.hash,
+        content: (
+          <FormattedMessage
+            description="success swapping"
+            defaultMessage="Your transaction to swap {fromAmount} {from} for {toAmount} {to} has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{ from: fromSymbol, to: toSymbol, fromAmount, toAmount }}
+          />
+        ),
+      });
+
+      onResetForm();
     } catch (e) {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({ content: 'Error creating position', error: { code: e.code, message: e.message, data: e.data } });
+      setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   };
@@ -208,6 +206,7 @@ const Swap = ({
 
   const isApproved =
     !from ||
+    !selectedRoute ||
     (from &&
       selectedRoute &&
       (!fromValue
@@ -266,7 +265,7 @@ const Swap = ({
       variant="contained"
       fullWidth
       color="primary"
-      disabled={!!isApproved || hasPendingApproval || isLoading || !!shouldDisableApproveButton}
+      disabled={!!isApproved || hasPendingApproval || !!shouldDisableApproveButton}
       onClick={handleApproveToken}
       style={{ pointerEvents: 'all' }}
     >
@@ -299,17 +298,14 @@ const Swap = ({
     <StyledButton
       size="large"
       variant="contained"
-      disabled={!!shouldDisableButton || isLoading}
+      disabled={!!shouldDisableButton}
       color="secondary"
       fullWidth
-      onClick={() => handleSwap}
+      onClick={handleSwap}
     >
-      {!isLoading && !isLoadingUsdPrice && (
-        <Typography variant="body1">
-          <FormattedMessage description="swap agg" defaultMessage="Swap" />
-        </Typography>
-      )}
-      {(isLoading || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
+      <Typography variant="body1">
+        <FormattedMessage description="swap agg" defaultMessage="Swap" />
+      </Typography>
     </StyledButton>
   );
 
@@ -321,20 +317,12 @@ const Swap = ({
     </StyledButton>
   );
 
-  const LoadingButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
-      <CenteredLoadingIndicator />
-    </StyledButton>
-  );
-
   let ButtonToShow;
 
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
-  } else if (isLoading) {
-    ButtonToShow = LoadingButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
