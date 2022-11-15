@@ -30,6 +30,7 @@ import {
   MAX_UINT_32,
   LATEST_VERSION,
   ONE_WEEK,
+  MINIMUM_USD_DEPOSIT_FOR_YIELD,
 } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -193,7 +194,8 @@ const Swap = ({
   );
 
   const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
-  const hasEnoughUsdForYield = !!usdPrice && usdPrice >= 10;
+  const hasEnoughUsdForYield =
+    !!usdPrice && usdPrice >= (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || MINIMUM_USD_DEPOSIT_FOR_YIELD);
 
   // only allowed if set for 10 days and at least 10 USD
   const shouldEnableYield =
