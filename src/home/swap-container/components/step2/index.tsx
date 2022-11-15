@@ -6,7 +6,11 @@ import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-easy-input';
-import { STRING_SWAP_INTERVALS } from 'config/constants';
+import {
+  DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
+  MINIMUM_USD_DEPOSIT_FOR_YIELD,
+  STRING_SWAP_INTERVALS,
+} from 'config/constants';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Button from 'common/button';
 import { BigNumber } from 'ethers';
@@ -16,6 +20,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import Collapse from '@mui/material/Collapse';
 import YieldTokenSelector from 'common/yield-token-selector';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const StyledGrid = styled(Grid)<{ show: boolean }>`
   ${({ show }) => !show && 'position: absolute;width: auto;'};
@@ -130,6 +135,8 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
 
   const [isHelpExpanded, setHelpExpanded] = React.useState(false);
 
+  const currentNetwork = useCurrentNetwork();
+
   return (
     <StyledGrid show={show} container rowSpacing={2} ref={ref}>
       <Grid item xs={12}>
@@ -236,7 +243,12 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="disabledByUsdValue"
-                  defaultMessage="You have to invest at least $10 USD to enable this option."
+                  // eslint-disable-next-line no-template-curly-in-string
+                  defaultMessage="You have to invest at least ${minimum} USD to enable this option."
+                  values={{
+                    minimum:
+                      MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
+                  }}
                 />
               </Typography>
             )}
