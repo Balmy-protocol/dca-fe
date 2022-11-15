@@ -23,10 +23,12 @@ export interface TransactionReceipt {
 }
 
 export type TransactionTypes =
-  | 'NEW_POSITION'
-  | 'NEW_PAIR'
+  // Common
   | 'APPROVE_TOKEN'
   | 'APPROVE_TOKEN_EXACT'
+  // DCA
+  | 'NEW_POSITION'
+  | 'NEW_PAIR'
   | 'WRAP_ETHER'
   | 'TERMINATE_POSITION'
   | 'WITHDRAW_POSITION'
@@ -41,9 +43,18 @@ export type TransactionTypes =
   | 'MIGRATE_POSITION'
   | 'MIGRATE_POSITION_YIELD'
   | 'WITHDRAW_FUNDS'
-  | 'RESET_POSITION';
+  | 'RESET_POSITION'
+  // AGGREGATOR
+  | 'SWAP';
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
+
+export interface SwapTypeData {
+  from: string;
+  to: string;
+  amountFrom: string;
+  amountTo: string;
+}
 
 export interface WithdrawTypeData {
   id: number | string;
@@ -159,6 +170,8 @@ export interface NewPairTypeData {
   token1: Token;
 }
 
+export type TransactionAggregatorTypeDataOptions = SwapTypeData;
+
 export type TransactionPositionTypeDataOptions =
   | WithdrawTypeData
   | AddFundsTypeData
@@ -192,7 +205,8 @@ export type TransactionTypeDataOptions =
   | MigratePositionTypeData
   | WithdrawFundsTypeData
   | MigratePositionYieldTypeData
-  | TransferTypeData;
+  | TransferTypeData
+  | TransactionAggregatorTypeDataOptions;
 
 export interface TransactionDetails {
   hash: string;
