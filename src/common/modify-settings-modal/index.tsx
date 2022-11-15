@@ -73,7 +73,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { to, swapInterval, from, version, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
+  const { swapInterval, from, version, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -330,7 +330,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         type: TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: fromToUse,
-          addressFor: to.address === PROTOCOL_TOKEN_ADDRESS || fromHasYield ? companionAddress : hubAddress,
+          addressFor: fromHasYield ? companionAddress : hubAddress,
         },
         position,
       });
