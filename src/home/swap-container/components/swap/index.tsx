@@ -624,7 +624,7 @@ const Swap = ({
       amount={from && (fromValue ? parseUnits(fromValue, from?.decimals) : null)}
       disabled={isApproveTokenDisabled}
       token={from}
-      hasPendingApproval={!!hasPendingApproval}
+      tokenYield={fromYield}
     />
   );
 
