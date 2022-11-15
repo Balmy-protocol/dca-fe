@@ -91,7 +91,7 @@ export default class MeanApiService {
     account: string,
     permissions: { operator: string; permissions: number[] }[]
   ) {
-    const singer = this.walletService.getSigner();
+    const signer = this.walletService.getSigner();
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -116,7 +116,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return signer.sendTransaction(transactionToSend);
   }
 
   async depositUsingProtocolToken(
@@ -128,7 +128,7 @@ export default class MeanApiService {
     account: string,
     permissions: { operator: string; permissions: string[] }[]
   ) {
-    const singer = this.walletService.getSigner();
+    const signer = this.walletService.getSigner();
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const hubAddress = await this.contractService.getHUBAddress();
@@ -152,7 +152,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return signer.sendTransaction(transactionToSend);
   }
 
   async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
@@ -181,7 +181,7 @@ export default class MeanApiService {
     convertTo: string,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
+    const signer = this.walletService.getSigner();
 
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
@@ -201,7 +201,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return signer.sendTransaction(transactionToSend);
   }
 
   async terminateUsingOtherTokens(
@@ -213,7 +213,7 @@ export default class MeanApiService {
     tokenTo: string,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
+    const signer = this.walletService.getSigner();
 
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
@@ -234,7 +234,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return signer.sendTransaction(transactionToSend);
   }
 
   async increasePositionUsingOtherToken(
@@ -245,7 +245,7 @@ export default class MeanApiService {
     tokenFrom: string,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
+    const signer = this.walletService.getSigner();
 
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
@@ -265,7 +265,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return signer.sendTransaction(transactionToSend);
   }
 
   async reducePositionUsingOtherToken(
@@ -277,7 +277,7 @@ export default class MeanApiService {
     tokenFrom: string,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
+    const signer = this.walletService.getSigner();
 
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
@@ -301,7 +301,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return signer.sendTransaction(transactionToSend);
   }
 
   async migratePosition(
@@ -312,7 +312,7 @@ export default class MeanApiService {
     positionVersion: PositionVersions,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
+    const signer = this.walletService.getSigner();
 
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
@@ -335,7 +335,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return signer.sendTransaction(transactionToSend);
   }
 
   async getAllowedPairs(): Promise<AllowedPairs> {
