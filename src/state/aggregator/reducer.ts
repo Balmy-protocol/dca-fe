@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { SwapOption, Token } from 'types';
-import { setFromValue, setFrom, setTo, setToValue, setSelectedRoute, setSorting } from './actions';
+import { setFromValue, setFrom, setTo, setToValue, setSelectedRoute, setSorting, resetForm } from './actions';
 
 export interface AggregatorState {
   fromValue: string;
@@ -47,5 +47,11 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setSorting, (state, { payload }) => {
       state.sorting = payload;
+    })
+    .addCase(resetForm, (state) => {
+      state.fromValue = '';
+      state.toValue = '';
+      state.selectedRoute = null;
+      state.sorting = 'most-profit';
     })
 );

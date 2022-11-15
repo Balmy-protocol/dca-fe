@@ -5,11 +5,11 @@ import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 // MOCKS
 import { PositionVersions } from 'config/constants';
 import { RawSwapOption, SwapOption, Token } from 'types';
+import { TransactionRequest } from '@ethersproject/providers';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import MeanApiService from './meanApiService';
-import { parseUnits } from '@ethersproject/units';
 
 export default class AggregatorService {
   modal: SafeAppWeb3Modal;
@@ -40,8 +40,23 @@ export default class AggregatorService {
     return this.signer;
   }
 
-  swap(from: Token, to: Token, value: string, isBuyOrder: boolean) {
-    return;
+  async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
+    const signer = this.walletService.getSigner();
+
+    const gasUsed = await signer.estimateGas(tx);
+
+    return {
+      ...tx,
+      gasLimit: gasUsed.mul(BigNumber.from(130)).div(BigNumber.from(100)), // 30% more
+    };
+  }
+
+  async swap(route: SwapOption) {
+    const singer = this.walletService.getSigner();
+
+    const transactionToSend = await this.addGasLimit(route.tx);
+
+    return singer.sendTransaction(transactionToSend);
   }
 
   async getSwapOptions(from: Token, to: Token, sellAmount?: BigNumber, buyAmount?: BigNumber, sorting?: string) {
