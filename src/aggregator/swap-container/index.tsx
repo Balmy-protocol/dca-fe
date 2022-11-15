@@ -8,7 +8,15 @@ import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from 'config/constants';
 import { SwapOption, Token } from 'types';
 import { useAggregatorState } from 'state/aggregator/hooks';
 import { useAppDispatch } from 'state/hooks';
-import { setFrom, setFromValue, setToValue, setTo, setSelectedRoute, setSorting } from 'state/aggregator/actions';
+import {
+  setFrom,
+  setFromValue,
+  setToValue,
+  setTo,
+  setSelectedRoute,
+  setSorting,
+  resetForm,
+} from 'state/aggregator/actions';
 import useSwapOptions from 'hooks/useSwapOptions';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
@@ -48,6 +56,10 @@ const SwapContainer = () => {
       dispatch(setSelectedRoute(swapOptions[0]));
     }
   }, [isLoadingSwapOptions]);
+
+  const onResetForm = () => {
+    dispatch(resetForm());
+  };
 
   const onSetFrom = (newFrom: Token, updateMode = false) => {
     // check for decimals
@@ -100,6 +112,7 @@ const SwapContainer = () => {
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
           selectedRoute={selectedRoute}
           isLoadingRoute={isLoadingSwapOptions}
+          onResetForm={onResetForm}
         />
       </Grid>
       <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
@@ -110,7 +123,7 @@ const SwapContainer = () => {
             </Grid>
             <Grid item xs={12} sx={{ display: 'flex' }}>
               <SwapQuotes
-                quotes={swapOptions || []}
+                quotes={(selectedRoute && swapOptions) || []}
                 selectedRoute={selectedRoute}
                 setRoute={onSetSelectedRoute}
                 isLoading={isLoadingSwapOptions}
