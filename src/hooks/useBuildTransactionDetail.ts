@@ -20,6 +20,7 @@ import {
   MigratePositionTypeData,
   WithdrawFundsTypeData,
   MigratePositionYieldTypeData,
+  SwapTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { formatCurrencyAmount } from 'utils/currency';
@@ -41,6 +42,12 @@ function useBuildTransactionDetail() {
       let message = 'Transaction confirmed!';
       try {
         switch (tx.type) {
+          case TRANSACTION_TYPES.SWAP: {
+            const swapTypeData = tx.typeData as SwapTypeData;
+
+            message = `Swap ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+            break;
+          }
           case TRANSACTION_TYPES.WRAP_ETHER: {
             const wrapEtherTypeData = tx.typeData as WrapEtherTypeData;
 
