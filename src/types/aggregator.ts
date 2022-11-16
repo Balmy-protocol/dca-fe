@@ -33,6 +33,7 @@ export type SwapOption = {
     allowanceTarget: string;
     address: string;
     id: string;
+    logoURI: string;
   };
   type: string;
   tx: TransactionRequest;
