@@ -915,6 +915,7 @@ import ZRX from './zrx.svg';
 // };
 
 const manifest = {
+  // TOKENS
   $PAC,
   $0XBTC,
   $2GIVE,
