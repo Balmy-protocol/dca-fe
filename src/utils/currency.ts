@@ -77,6 +77,17 @@ export const emptyTokenWithAddress: (address: string, type?: TokenType) => Token
   underlyingTokens: [],
 });
 
+export const emptyTokenWithLogoURI: (logoURI: string) => Token = (logoURI: string) => ({
+  decimals: 18,
+  chainId: 1,
+  address: '0x00000000000000000',
+  name: '',
+  symbol: '',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+  logoURI,
+});
+
 export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) => ({
   decimals: 18,
   chainId: 1,
