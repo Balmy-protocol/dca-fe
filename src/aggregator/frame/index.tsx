@@ -5,6 +5,8 @@ import { useParams } from 'react-router-dom';
 import { SUPPORTED_NETWORKS } from 'config/constants';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useWalletService from 'hooks/useWalletService';
+import { changeMainTab } from 'state/tabs/actions';
+import { useAppDispatch } from 'state/hooks';
 import SwapContainer from '../swap-container';
 
 interface HomeFrameProps {
@@ -15,6 +17,11 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const walletService = useWalletService();
   const currentNetwork = useCurrentNetwork();
   const { chainId } = useParams<{ chainId: string }>();
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    dispatch(changeMainTab(2));
+  }, []);
 
   React.useEffect(() => {
     if (
