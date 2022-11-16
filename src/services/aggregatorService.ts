@@ -95,7 +95,7 @@ export default class AggregatorService {
           amountInUSD: minBuyAmountAmountInUsd,
         },
         gas: { estimatedGas, estimatedCost, estimatedCostInUnits, estimatedCostInUSD, gasTokenSymbol },
-        swapper: { allowanceTarget, address, id },
+        swapper: { allowanceTarget, address, id, logoURI },
         type,
         tx,
       }) => ({
@@ -130,6 +130,7 @@ export default class AggregatorService {
           allowanceTarget,
           address,
           id,
+          logoURI,
         },
         type,
         tx,
