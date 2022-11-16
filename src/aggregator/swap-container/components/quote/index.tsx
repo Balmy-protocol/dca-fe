@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { SwapOption, Token } from 'types';
 import TokenIcon from 'common/token-icon';
 import Typography from '@mui/material/Typography';
-import { formatCurrencyAmount } from 'utils/currency';
+import { emptyTokenWithLogoURI, formatCurrencyAmount } from 'utils/currency';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { withStyles } from '@mui/styles';
@@ -168,7 +168,10 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) =
           </Typography>
         </StyledTokenContainer>
         <StyledDexContainer>
-          <DarkChip icon={<LocalGasStationIcon fontSize="small" />} label={quote.swapper.id} />
+          <DarkChip
+            icon={<TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(quote.swapper.logoURI)} />}
+            label={quote.swapper.id}
+          />
           <StyledDottedLine />
         </StyledDexContainer>
         <StyledTokenContainer>
