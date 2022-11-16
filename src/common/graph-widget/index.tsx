@@ -24,6 +24,18 @@ import EmptyGraph from 'assets/svg/emptyGraph';
 import MinimalTabs from 'common/minimal-tabs';
 import GraphTooltip from 'common/graph-tooltip';
 import useGraphPrice from 'hooks/useGraphPrice';
+import useUsdPrice from 'hooks/useUsdPrice';
+import { parseUnits } from '@ethersproject/units';
+import { withStyles } from '@mui/styles';
+import Chip from '@mui/material/Chip';
+
+const DarkChip = withStyles(() => ({
+  root: {
+    background: '#2e2c35',
+    zIndex: '2',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+  },
+}))(Chip);
 
 interface GraphWidgetProps {
   from: Token | null;
@@ -66,6 +78,7 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   display: flex;
   gap: 24px;
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
+  min-height: 400px;
 `;
 
 const StyledTitleContainer = styled.div`
@@ -93,7 +106,6 @@ const StyledGraphContainer = styled(Paper)`
   width: 100%;
   flex-direction: column;
   background-color: transparent;
-  margin-bottom: 30px;
 
   .recharts-surface {
     overflow: visible;
@@ -122,6 +134,13 @@ const StyledLegendIndicator = styled.div<{ fill: string }>`
   border-radius: 99px;
 `;
 
+const StyledGraphPillsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+`;
+
 const PERIODS = [7, 30];
 
 const EMPTY_GRAPH_TOKEN: TokenWithBase = {
@@ -144,6 +163,8 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
   const [tabIndex, setTabIndex] = React.useState(0);
   const availablePairs = useAvailablePairs();
   const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(from, to, tabIndex === 1);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, parseUnits('1', from?.decimals || 18));
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, parseUnits('1', to?.decimals || 18));
 
   const dateFilter = React.useMemo(
     () => parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),
@@ -237,7 +258,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
     return orderBy([...mappedSwapData, ...mappedDefiLlamaData], ['date'], ['desc']).reverse();
   }, [swapData, defiLlamaData]);
 
-  const isLoading = loadingMeanData;
+  const isLoading = loadingMeanData || isLoadingFromPrice || isLoadingToPrice || isLoadingDefillamaPrices;
   // const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
   const noData = prices.length === 0;
 
@@ -388,6 +409,10 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
             <Legend />
           </ComposedChart>
         </ResponsiveContainer>
+        <StyledGraphPillsContainer>
+          <DarkChip label={`1 ${from.symbol} = $${fromPrice?.toFixed(2) || ''} USD`} />
+          <DarkChip label={`1 ${to.symbol} = $${toPrice?.toFixed(2) || ''} USD`} />
+        </StyledGraphPillsContainer>
       </StyledGraphContainer>
       {withFooter && <GraphFooter />}
     </StyledPaper>

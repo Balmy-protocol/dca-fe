@@ -96,7 +96,7 @@ const SwapQuotes = ({
             to={to}
             isSelected={quote.swapper.id === selectedRoute?.swapper.id}
             quote={quote}
-            key={quote.swapper.id}
+            key={`${from?.symbol || ''}-${to?.symbol || ''}-${quote.swapper.id}`}
           />
         ))}
     </StyledPaper>
