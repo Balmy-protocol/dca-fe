@@ -29,8 +29,8 @@ export const NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: [
-      'https://mainnet.infura.io/v3/${INFURA_API_KEY}',
-      'wss://mainnet.infura.io/ws/v3/${INFURA_API_KEY}',
+      'https://mainnet.infura.io/v3/d729b4ddc49d4ce88d4e23865cb74217',
+      'wss://mainnet.infura.io/ws/v3/d729b4ddc49d4ce88d4e23865cb74217',
       'https://api.mycryptoapi.com/eth',
       'https://cloudflare-eth.com',
     ],
@@ -45,7 +45,10 @@ export const NETWORKS: Record<string, NetworkStruct> = {
       symbol: 'ETH',
       decimals: 18,
     },
-    rpc: ['https://ropsten.infura.io/v3/${INFURA_API_KEY}', 'wss://ropsten.infura.io/ws/v3/${INFURA_API_KEY}'],
+    rpc: [
+      'https://ropsten.infura.io/v3/d729b4ddc49d4ce88d4e23865cb74217',
+      'wss://ropsten.infura.io/ws/v3/d729b4ddc49d4ce88d4e23865cb74217',
+    ],
   },
   rinkeby: {
     chainId: 4,
@@ -57,7 +60,10 @@ export const NETWORKS: Record<string, NetworkStruct> = {
       symbol: 'ETH',
       decimals: 18,
     },
-    rpc: ['https://rinkeby.infura.io/v3/${INFURA_API_KEY}', 'wss://rinkeby.infura.io/ws/v3/${INFURA_API_KEY}'],
+    rpc: [
+      'https://rinkeby.infura.io/v3/d729b4ddc49d4ce88d4e23865cb74217',
+      'wss://rinkeby.infura.io/ws/v3/d729b4ddc49d4ce88d4e23865cb74217',
+    ],
   },
   goerli: {
     chainId: 5,
@@ -69,7 +75,10 @@ export const NETWORKS: Record<string, NetworkStruct> = {
       symbol: 'ETH',
       decimals: 18,
     },
-    rpc: ['https://goerli.infura.io/v3/${INFURA_API_KEY}', 'wss://goerli.infura.io/ws/v3/${INFURA_API_KEY}'],
+    rpc: [
+      'https://goerli.infura.io/v3/d729b4ddc49d4ce88d4e23865cb74217',
+      'wss://goerli.infura.io/ws/v3/d729b4ddc49d4ce88d4e23865cb74217',
+    ],
   },
   kovan: {
     chainId: 42,
@@ -81,7 +90,10 @@ export const NETWORKS: Record<string, NetworkStruct> = {
       symbol: 'ETH',
       decimals: 18,
     },
-    rpc: ['https://kovan.infura.io/v3/${INFURA_API_KEY}', 'wss://kovan.infura.io/ws/v3/${INFURA_API_KEY}'],
+    rpc: [
+      'https://kovan.infura.io/v3/d729b4ddc49d4ce88d4e23865cb74217',
+      'wss://kovan.infura.io/ws/v3/d729b4ddc49d4ce88d4e23865cb74217',
+    ],
   },
   meanfinance: {
     chainId: 31337,
@@ -93,7 +105,10 @@ export const NETWORKS: Record<string, NetworkStruct> = {
       symbol: 'ETH',
       decimals: 18,
     },
-    rpc: ['https://kovan.infura.io/v3/${INFURA_API_KEY}', 'wss://kovan.infura.io/ws/v3/${INFURA_API_KEY}'],
+    rpc: [
+      'https://kovan.infura.io/v3/d729b4ddc49d4ce88d4e23865cb74217',
+      'wss://kovan.infura.io/ws/v3/d729b4ddc49d4ce88d4e23865cb74217',
+    ],
   },
   bsc: {
     chainId: 56,
@@ -282,11 +297,7 @@ export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
 ];
-export const SUPPORTED_NETWORKS = [
-  NETWORKS.optimism.chainId,
-  NETWORKS.polygon.chainId,
-  NETWORKS.arbitrum.chainId,
-];
+export const SUPPORTED_NETWORKS = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId, NETWORKS.arbitrum.chainId];
 
 export const COINGECKO_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',

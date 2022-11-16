@@ -296,7 +296,7 @@ export default class Web3Service {
       walletconnect: {
         package: WalletConnectProvider, // required
         options: {
-          infuraId: '5744aff1d49f4eee923c5f3e5af4cc1c', // required
+          infuraId: 'd729b4ddc49d4ce88d4e23865cb74217', // required
         },
       },
       // frame: {

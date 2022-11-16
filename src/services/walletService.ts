@@ -107,7 +107,7 @@ export default class WalletService {
 
     try {
       const provider = ethers.getDefaultProvider('homestead', {
-        infura: '5744aff1d49f4eee923c5f3e5af4cc1c',
+        infura: 'd729b4ddc49d4ce88d4e23865cb74217',
         etherscan: '4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF',
       });
       ens = await provider.lookupAddress(address);
