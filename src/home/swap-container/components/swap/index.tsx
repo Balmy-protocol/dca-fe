@@ -546,8 +546,6 @@ const Swap = ({
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
 
-  const ignoreValues = [...(from ? [from.address] : []), ...(to ? [to.address] : [])];
-
   const isTestnet = TESTNETS.includes(currentNetwork.chainId);
 
   let shouldShowNotEnoughForWhale =
@@ -794,7 +792,7 @@ const Swap = ({
         isFrom={selecting === from}
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
         usedTokens={usedTokens}
-        ignoreValues={ignoreValues}
+        ignoreValues={[]}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
