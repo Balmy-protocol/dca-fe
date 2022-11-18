@@ -267,8 +267,6 @@ export default class PairService {
 
     const network = await this.walletService.getNetwork();
 
-    const oracleInstance = await this.contractService.getOracleInstance();
-
     const token0 = tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenFrom;
     const token1 = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenTo;
 
@@ -279,10 +277,6 @@ export default class PairService {
       (pair) => pair.tokenA.address === tokenA.address && pair.tokenB.address === tokenB.address
     );
 
-    if (!foundAllowedPair) {
-      return Promise.resolve(false);
-    }
-
-    return oracleInstance.canSupportPair(tokenA.address, tokenB.address);
+    return Promise.resolve(!!foundAllowedPair);
   }
 }
