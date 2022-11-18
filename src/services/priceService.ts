@@ -72,8 +72,15 @@ export default class PriceService {
           price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`] &&
           price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price
       )
-      .map((token) =>
-        parseUnits(price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price.toString(), 18)
+      .reduce<Record<string, BigNumber>>(
+        (acc, token) => ({
+          ...acc,
+          [token.address]: parseUnits(
+            price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price.toString(),
+            18
+          ),
+        }),
+        {}
       );
 
     return tokensPrices;
