@@ -22,8 +22,8 @@ import Collapse from '@mui/material/Collapse';
 import YieldTokenSelector from 'common/yield-token-selector';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
-const StyledGrid = styled(Grid)<{ show: boolean }>`
-  ${({ show }) => !show && 'position: absolute;width: auto;'};
+const StyledGrid = styled(Grid)<{ $show: boolean }>`
+  ${({ $show }) => !$show && 'position: absolute;width: auto;'};
   top: 16px;
   left: 16px;
   right: 16px;
@@ -138,7 +138,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
   const currentNetwork = useCurrentNetwork();
 
   return (
-    <StyledGrid show={show} container rowSpacing={2} ref={ref}>
+    <StyledGrid $show={show} container rowSpacing={2} ref={ref}>
       <Grid item xs={12}>
         <Button variant="text" color="default" onClick={onBack}>
           <Typography variant="h6" component="div" style={{ display: 'flex', alignItems: 'center' }}>

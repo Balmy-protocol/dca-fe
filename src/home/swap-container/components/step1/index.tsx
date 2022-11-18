@@ -14,8 +14,8 @@ import { STRING_SWAP_INTERVALS } from 'config/constants';
 import { emptyTokenWithAddress } from 'utils/currency';
 import { BigNumber } from 'ethers';
 
-const StyledGrid = styled(Grid)<{ show: boolean }>`
-  ${({ show }) => !show && 'position: absolute;width: auto;'};
+const StyledGrid = styled(Grid)<{ $show: boolean }>`
+  ${({ $show }) => !$show && 'position: absolute;width: auto;'};
   top: 16px;
   left: 16px;
   right: 16px;
@@ -125,7 +125,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   } = props;
 
   return (
-    <StyledGrid container rowSpacing={2} show={show} ref={ref}>
+    <StyledGrid container rowSpacing={2} $show={show} ref={ref}>
       <Grid item xs={12}>
         <StyledContentContainer>
           <StyledTokensContainer>
