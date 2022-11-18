@@ -176,13 +176,11 @@ export default class WalletService {
       filteredAddresses.map((address) => {
         const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as unknown as ERC20Contract;
 
-        return erc20.populateTransaction
-          .balanceOf(account)
-          .then((populatedTransaction) => ({
-            target: populatedTransaction.to as string,
-            allowFailure: true,
-            callData: populatedTransaction.data as string,
-          }));
+        return erc20.populateTransaction.balanceOf(account).then((populatedTransaction) => ({
+          target: populatedTransaction.to as string,
+          allowFailure: true,
+          callData: populatedTransaction.data as string,
+        }));
       })
     );
 
@@ -202,17 +200,19 @@ export default class WalletService {
       protocolBalance = await this.signer.getBalance();
     }
 
-    return results.reduce<Record<string, BigNumber>>(
-      (acc, balanceResult, index) => ({
-        ...acc,
-        [filteredAddresses[index]]: BigNumber.from(
-          ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
-        ),
-      }),
-      {
-        ...(hasProtocolToken && protocolBalance ? { [PROTOCOL_TOKEN_ADDRESS]: protocolBalance } : {}),
-      }
-    );
+    return results
+      .filter(({ success }) => !!success)
+      .reduce<Record<string, BigNumber>>(
+        (acc, balanceResult, index) => ({
+          ...acc,
+          [filteredAddresses[index]]: BigNumber.from(
+            ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
+          ),
+        }),
+        {
+          ...(hasProtocolToken && protocolBalance ? { [PROTOCOL_TOKEN_ADDRESS]: protocolBalance } : {}),
+        }
+      );
   }
 
   getBalance(address?: string): Promise<BigNumber> {
