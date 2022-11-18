@@ -10,11 +10,12 @@ import isUndefined from 'lodash/isUndefined';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
+import MULTICALLABI from 'abis/Multicall.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { LATEST_VERSION, NETWORKS, PositionVersions } from 'config/constants';
-import { ERC20Contract } from 'types/contracts';
+import { LATEST_VERSION, MULTICALL_ADDRESS, NETWORKS, PositionVersions } from 'config/constants';
+import { ERC20Contract, MulticallContract } from 'types/contracts';
 import ContractService from './contractService';
 
 export default class WalletService {
@@ -107,7 +108,8 @@ export default class WalletService {
 
     try {
       const provider = ethers.getDefaultProvider('homestead', {
-        infura: '5744aff1d49f4eee923c5f3e5af4cc1c',
+        alchemy: 'iQPOH9BzDH8DDB7yUsVDR5QuotbFA-ZH',
+        infura: 'd729b4ddc49d4ce88d4e23865cb74217',
         etherscan: '4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF',
       });
       ens = await provider.lookupAddress(address);
@@ -161,6 +163,59 @@ export default class WalletService {
         }
       }
     }
+  }
+
+  async getMulticallBalances(addresses?: string[]): Promise<Record<string, BigNumber>> {
+    const account = this.getAccount();
+    const currentNetwork = await this.getNetwork();
+
+    if (!addresses?.length || !account) return Promise.resolve({});
+
+    const ERC20Interface = new Interface(ERC20ABI);
+
+    const filteredAddresses = addresses.filter((address) => address !== PROTOCOL_TOKEN_ADDRESS);
+
+    const balancesCall = await Promise.all(
+      filteredAddresses.map((address) => {
+        const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as unknown as ERC20Contract;
+
+        return erc20.populateTransaction
+          .balanceOf(account)
+          .then((populatedTransaction) => ({
+            target: populatedTransaction.to as string,
+            allowFailure: true,
+            callData: populatedTransaction.data as string,
+          }));
+      })
+    );
+
+    const multicallInstance = new ethers.Contract(
+      MULTICALL_ADDRESS[currentNetwork.chainId],
+      MULTICALLABI,
+      this.client
+    ) as unknown as MulticallContract;
+
+    const results = await multicallInstance.callStatic.aggregate3(balancesCall);
+
+    let protocolBalance: BigNumber | null = null;
+
+    const hasProtocolToken = addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1;
+
+    if (addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1) {
+      protocolBalance = await this.signer.getBalance();
+    }
+
+    return results.reduce<Record<string, BigNumber>>(
+      (acc, balanceResult, index) => ({
+        ...acc,
+        [filteredAddresses[index]]: BigNumber.from(
+          ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
+        ),
+      }),
+      {
+        ...(hasProtocolToken && protocolBalance ? { [PROTOCOL_TOKEN_ADDRESS]: protocolBalance } : {}),
+      }
+    );
   }
 
   getBalance(address?: string): Promise<BigNumber> {

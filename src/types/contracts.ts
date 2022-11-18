@@ -18,6 +18,18 @@ export interface PermissionPermit {
 }
 
 export type Oracles = 0 | 1 | 2;
+export class MulticallContract extends Contract {
+  aggregate3: (
+    calls: { target: string; callData: string; allowFailure: boolean }[]
+  ) => Promise<{ success: boolean; returnData: string }[]>;
+
+  callStatic: {
+    aggregate3: (
+      calls: { target: string; callData: string; allowFailure: boolean }[]
+    ) => Promise<{ success: boolean; returnData: string }[]>;
+  };
+}
+
 export class ERC20Contract extends Contract {
   balanceOf: (address: string) => Promise<BigNumber>;
 

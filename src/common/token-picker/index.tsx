@@ -23,13 +23,14 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useTokenList from 'hooks/useTokenList';
 import TokenLists from 'common/token-lists';
-import useTokenBalance from 'hooks/useTokenBalance';
 import { formatCurrencyAmount } from 'utils/currency';
 import FilledInput from '@mui/material/FilledInput';
 import { createStyles } from '@mui/material';
-import useUsdPrice from 'hooks/useUsdPrice';
 import useAllowedPairs from 'hooks/useAllowedPairs';
 import Switch from '@mui/material/Switch';
+import useMulticallBalances from 'hooks/useMulticallBalances';
+import { BigNumber } from 'ethers';
+import { formatUnits } from '@ethersproject/units';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -124,6 +125,7 @@ interface RowData {
   tokenKeys: string[];
   onClick: (token: string) => void;
   yieldOptions: YieldOptions;
+  tokenBalances: Record<string, { balance: BigNumber; balanceUsd: BigNumber }>;
 }
 
 interface RowProps {
@@ -166,12 +168,18 @@ const useListItemStyles = makeStyles(({ palette }) => ({
     },
   },
 }));
-const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions } }: RowProps) => {
+const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances } }: RowProps) => {
   const classes = useListItemStyles();
   const token = tokenList[tokenKeys[index]];
 
-  const tokenBalance = useTokenBalance(token);
-  const [tokenValue] = useUsdPrice(token, tokenBalance);
+  const tokenBalance =
+    (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0);
+  const tokenValue =
+    (tokenBalances &&
+      tokenBalances[token.address] &&
+      tokenBalances[token.address].balanceUsd &&
+      parseFloat(formatUnits(tokenBalances[token.address].balanceUsd, token.decimals + 18))) ||
+    0;
 
   const availableYieldOptions = yieldOptions.filter((yieldOption) =>
     yieldOption.enabledTokens.includes(token?.address)
@@ -283,7 +291,8 @@ const TokenPicker = ({
 
   const otherIsProtocol =
     otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address;
-  const memoizedTokenKeys = React.useMemo(() => {
+
+  const memoizedUnorderedTokenKeys = React.useMemo(() => {
     const filteredTokenKeys = tokenKeysToUse
       .filter(
         (el) =>
@@ -321,14 +330,36 @@ const TokenPicker = ({
     currentNetwork.chainId,
   ]);
 
+  const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(memoizedUnorderedTokenKeys);
+
+  const memoizedTokenKeys = React.useMemo(
+    () =>
+      memoizedUnorderedTokenKeys.sort((tokenKeyA, tokenKeyB) => {
+        if (!tokenBalances) return tokenKeyA < tokenKeyB ? -1 : 1;
+
+        const tokenABalance =
+          (tokenBalances[tokenKeyA] &&
+            parseFloat(formatUnits(tokenBalances[tokenKeyA].balanceUsd, tokenList[tokenKeyA].decimals + 18))) ||
+          0;
+        const tokenBBalance =
+          (tokenBalances[tokenKeyB] &&
+            parseFloat(formatUnits(tokenBalances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
+          0;
+
+        return tokenABalance > tokenBBalance ? -1 : 1;
+      }),
+    [tokenBalances, memoizedUnorderedTokenKeys, tokenList]
+  );
+
   const itemData = React.useMemo(
     () => ({
       onClick: handleItemSelected,
       tokenList,
       tokenKeys: memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
+      tokenBalances: isLoadingTokenBalances && !tokenBalances ? {} : tokenBalances,
     }),
-    [memoizedTokenKeys, tokenList]
+    [memoizedTokenKeys, tokenList, tokenBalances, yieldOptions]
   );
 
   return (
