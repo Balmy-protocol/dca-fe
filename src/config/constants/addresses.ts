@@ -282,11 +282,7 @@ export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
 ];
-export const SUPPORTED_NETWORKS = [
-  NETWORKS.optimism.chainId,
-  NETWORKS.polygon.chainId,
-  NETWORKS.arbitrum.chainId,
-];
+export const SUPPORTED_NETWORKS = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId, NETWORKS.arbitrum.chainId];
 
 export const COINGECKO_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',
@@ -468,6 +464,12 @@ export const TRANSFORMER_REGISTRY_ADDRESS: AddressMap<PositionVersions> = {
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
+};
+
+export const MULTICALL_ADDRESS: Record<number, string> = {
+  [NETWORKS.optimism.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [NETWORKS.polygon.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [NETWORKS.arbitrum.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
 export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
