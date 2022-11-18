@@ -235,7 +235,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         return;
       }
 
-      const promises: Promise<BigNumber[]>[] = [];
+      const promises: Promise<Record<string, BigNumber>>[] = [];
 
       const tokensSymbols = Object.keys(tokensCountRaw);
 
@@ -269,8 +269,10 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
         const tokenRecords: Record<string, BigNumber> = {};
 
-        result.forEach((usdPrice, usdPriceIndex) => {
-          tokenRecords[tokensPerChain[chainId][usdPriceIndex].address] = usdPrice;
+        chains.forEach((chain) => {
+          tokensPerChain[chain].forEach((token) => {
+            tokenRecords[token.address] = result[token.address];
+          });
         });
 
         newAcc[chainId] = {

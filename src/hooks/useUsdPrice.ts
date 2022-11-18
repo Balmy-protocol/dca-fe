@@ -31,13 +31,10 @@ function useUsdPrice(
     async function callPromise() {
       if (from && !STABLE_COINS.includes(from.symbol) && amount && amount.gt(BigNumber.from(0))) {
         try {
-          const [price] = await priceService.getUsdHistoricPrice(
-            [from.address === protocolToken.address ? wrappedProtocolToken : from],
-            date,
-            chainId
-          );
-          if (price) {
-            setResult(price);
+          const addressToUse = from.address === protocolToken.address ? wrappedProtocolToken : from;
+          const price = await priceService.getUsdHistoricPrice([addressToUse], date, chainId);
+          if (price && price[addressToUse.address]) {
+            setResult(price[addressToUse.address]);
             setError(undefined);
           } else {
             setError('Could not find usd price');

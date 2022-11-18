@@ -175,11 +175,14 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
 
           if (CREATED_ACTIONS.includes(action)) {
             // eslint-disable-next-line no-await-in-loop
-            const [fetchedTokenFromPrice, fetchedTokenToPrice] = await priceService.getUsdHistoricPrice(
+            const fetchedPrices = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
               positionAction.createdAtTimestamp,
               position.chainId
             );
+
+            const fetchedTokenFromPrice = fetchedPrices[position.from.address];
+            const fetchedTokenToPrice = fetchedPrices[position.to.address];
             const deposited = currentRemainingSwaps.mul(currentRate);
 
             const originalRatePerUnitFromToTo = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
@@ -192,11 +195,14 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             const amountAdded = newFunds.sub(oldFunds);
 
             // eslint-disable-next-line no-await-in-loop
-            const [fetchedTokenFromPrice, fetchedTokenToPrice] = await priceService.getUsdHistoricPrice(
+            const fetchedPrices = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
               positionAction.createdAtTimestamp,
               position.chainId
             );
+
+            const fetchedTokenFromPrice = fetchedPrices[position.from.address];
+            const fetchedTokenToPrice = fetchedPrices[position.to.address];
 
             const ratePerUnit = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
 
