@@ -26,20 +26,43 @@ export default function Updater(): null {
     [setState]
   );
 
+  const blockNumberAsyncCallback = useCallback(
+    async (blockNumber: Promise<number>) => {
+      const block = await blockNumber;
+      setState((oldState) => {
+        if (typeof oldState.blockNumber !== 'number') return { blockNumber: block };
+        return { blockNumber: Math.max(block, oldState.blockNumber) };
+      });
+    },
+    [setState]
+  );
+
   // attach/detach listeners
   useEffect(() => {
     if (!walletService.getAccount()) return undefined;
 
     setState({ blockNumber: null });
 
+    const loadedAsSafeApp = transactionService.getLoadedAsSafeApp();
+
     transactionService
       .getBlockNumber()
-      .then(blockNumberCallback)
+      .then((block) => {
+        if (loadedAsSafeApp) {
+          return blockNumberAsyncCallback(Promise.resolve(block));
+        }
+
+        return blockNumberCallback(block);
+      })
       .catch((error) => console.error('Failed to get block number for chainId', error));
 
-    transactionService.onBlock(blockNumberCallback);
+    const interval = transactionService.onBlock(loadedAsSafeApp ? blockNumberAsyncCallback : blockNumberCallback);
     return () => {
-      transactionService.removeOnBlock();
+      if (loadedAsSafeApp) {
+        clearInterval(interval as number);
+      } else {
+        transactionService.removeOnBlock();
+      }
     };
   }, [dispatch, walletService.getAccount(), blockNumberCallback]);
 

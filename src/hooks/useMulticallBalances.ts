@@ -59,6 +59,7 @@ function useMulticallBalances(
 
           setState({ isLoading: false, result: promiseResult, error: undefined });
         } catch (e) {
+          console.error('error fetching balances', e);
           setState({ result: undefined, error: e as string, isLoading: false });
         }
       }

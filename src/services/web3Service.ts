@@ -325,6 +325,8 @@ export default class Web3Service {
 
     const loadedAsSafeApp = await web3Modal.isSafeApp();
 
+    this.transactionService.setLoadedAsSafeApp(loadedAsSafeApp);
+
     try {
       if (process.env.ARCX_KEY) {
         const arcxSDK = await ArcxAnalyticsSdk.init(process.env.ARCX_KEY, {
