@@ -20,11 +20,13 @@ import {
 import useSwapOptions from 'hooks/useSwapOptions';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
+import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting, transferTo } = useAggregatorState();
+  const { slippage, gasSpeed } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
@@ -37,7 +39,9 @@ const SwapContainer = () => {
     isBuyOrder ? toValue : fromValue,
     isBuyOrder,
     sorting,
-    transferTo
+    transferTo,
+    parseFloat(slippage),
+    gasSpeed
   );
 
   React.useEffect(() => {
@@ -115,6 +119,8 @@ const SwapContainer = () => {
           isLoadingRoute={isLoadingSwapOptions}
           onResetForm={onResetForm}
           transferTo={transferTo}
+          slippage={slippage}
+          gasSpeed={gasSpeed}
         />
       </Grid>
       <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
