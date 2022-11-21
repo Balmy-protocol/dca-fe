@@ -141,7 +141,7 @@ const StyledGraphPillsContainer = styled.div`
   margin-top: 30px;
 `;
 
-const PERIODS = [7, 30];
+const PERIODS = [1, 7, 30];
 
 const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   address: '',
@@ -160,9 +160,9 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
   let defiLlamaData: UniMappedPrice[] = [];
   let swapData: GetPairResponseSwapData[] = [];
   let prices: Prices = [];
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const [tabIndex, setTabIndex] = React.useState(1);
   const availablePairs = useAvailablePairs();
-  const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(from, to, tabIndex === 1);
+  const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(from, to, tabIndex);
   const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, parseUnits('1', from?.decimals || 18));
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, parseUnits('1', to?.decimals || 18));
 
@@ -326,8 +326,9 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
             </Typography>
             <MinimalTabs
               options={[
-                { key: 0, label: 'Week' },
-                { key: 1, label: 'Month' },
+                { key: 0, label: 'Day' },
+                { key: 1, label: 'Week' },
+                { key: 2, label: 'Month' },
               ]}
               selected={{ key: tabIndex, label: '' }}
               onChange={({ key }) => setTabIndex(key as number)}
