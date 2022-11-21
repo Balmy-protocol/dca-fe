@@ -14,3 +14,5 @@ export const setSelectedRoute = createAction<SwapOption | null>('aggregator/setS
 export const setSorting = createAction<string>('aggregator/setSorting');
 
 export const resetForm = createAction('aggregator/resetForm');
+
+export const setTransferTo = createAction<string | null>('aggregator/setTransferTo');

@@ -22,6 +22,7 @@ import useWalletService from 'hooks/useWalletService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useAggregatorService from 'hooks/useAggregatorService';
 import useSpecificAllowance from 'hooks/useSpecificAllowance';
+import TransferToModal from 'common/transfer-to-modal';
 import SwapFirstStep from '../step1';
 
 const StyledPaper = styled(Paper)`
@@ -57,6 +58,7 @@ interface SwapProps {
   selectedRoute: SwapOption | null;
   isLoadingRoute: boolean;
   onResetForm: () => void;
+  transferTo: string | null;
 }
 
 const Swap = ({
@@ -73,6 +75,7 @@ const Swap = ({
   currentNetwork,
   isLoadingRoute,
   onResetForm,
+  transferTo,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
@@ -85,6 +88,7 @@ const Swap = ({
   const [balance, , balanceErrors] = useBalance(from);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const [usedTokens] = useUsedTokens();
+  const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
 
   const hasPendingApproval = useHasPendingApproval(
     from,
@@ -334,34 +338,43 @@ const Swap = ({
   }
 
   return (
-    <StyledPaper variant="outlined" ref={containerRef}>
-      <TokenPicker
-        shouldShow={shouldShowPicker}
-        onClose={() => setShouldShowPicker(false)}
-        isFrom={selecting === from}
-        onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
-        usedTokens={usedTokens}
-        ignoreValues={ignoreValues}
-        yieldOptions={[]}
-        isLoadingYieldOptions={false}
-        otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
+    <>
+      <TransferToModal
+        transferTo={transferTo}
+        onCancel={() => setShouldShowTransferModal(false)}
+        open={shouldShowTransferModal}
       />
-      <SwapFirstStep
-        from={from}
-        to={to}
-        fromValue={fromValue}
-        toValue={toValue}
-        startSelectingCoin={startSelectingCoin}
-        cantFund={cantFund}
-        handleFromValueChange={handleFromValueChange}
-        handleToValueChange={handleToValueChange}
-        balance={balance}
-        buttonToShow={ButtonToShow}
-        selectedRoute={selectedRoute}
-        isBuyOrder={isBuyOrder}
-        isLoadingRoute={isLoadingRoute}
-      />
-    </StyledPaper>
+      <StyledPaper variant="outlined" ref={containerRef}>
+        <TokenPicker
+          shouldShow={shouldShowPicker}
+          onClose={() => setShouldShowPicker(false)}
+          isFrom={selecting === from}
+          onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
+          usedTokens={usedTokens}
+          ignoreValues={ignoreValues}
+          yieldOptions={[]}
+          isLoadingYieldOptions={false}
+          otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
+        />
+        <SwapFirstStep
+          from={from}
+          to={to}
+          fromValue={fromValue}
+          toValue={toValue}
+          startSelectingCoin={startSelectingCoin}
+          cantFund={cantFund}
+          handleFromValueChange={handleFromValueChange}
+          handleToValueChange={handleToValueChange}
+          balance={balance}
+          buttonToShow={ButtonToShow}
+          selectedRoute={selectedRoute}
+          isBuyOrder={isBuyOrder}
+          isLoadingRoute={isLoadingRoute}
+          transferTo={transferTo}
+          onOpenTransferTo={() => setShouldShowTransferModal(true)}
+        />
+      </StyledPaper>
+    </>
   );
 };
 export default Swap;
