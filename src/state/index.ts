@@ -8,6 +8,7 @@ import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
 import createPosition from './create-position/reducer';
 import aggregator from './aggregator/reducer';
+import aggregatorSettings from './aggregator-settings/reducer';
 import initializer from './initializer/reducer';
 import modifyRateSettings from './modify-rate-settings/reducer';
 import positionDetails from './position-details/reducer';
@@ -77,7 +78,7 @@ export const setupAxiosClient = () =>
     },
   });
 
-const PERSISTED_STATES: string[] = ['transactions', 'badge', 'positionDetails.showBreakdown'];
+const PERSISTED_STATES: string[] = ['transactions', 'badge', 'positionDetails.showBreakdown', 'aggregatorSettings'];
 
 const store = configureStore({
   reducer: {
@@ -94,6 +95,7 @@ const store = configureStore({
     modifyRateSettings,
     error,
     positionDetails,
+    aggregatorSettings,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient }, serializableCheck: false }).concat([

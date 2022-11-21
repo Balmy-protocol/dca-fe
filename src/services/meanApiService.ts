@@ -13,6 +13,8 @@ import {
 } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
 import { emptyTokenWithAddress } from 'utils/currency';
+import { GasKeys } from 'config/constants/aggregator';
+import isNaN from 'lodash/isNaN';
 
 // MOCKS
 import ContractService from './contractService';
@@ -351,7 +353,9 @@ export default class MeanApiService {
     sellAmount?: BigNumber,
     buyAmount?: BigNumber,
     sortQuotesBy = 'most-profit',
-    recipient?: string | null
+    recipient?: string | null,
+    slippagePercentage?: number,
+    gasSpeed?: GasKeys
   ) {
     const currentNetwork = await this.walletService.getNetwork();
     const swapResponses = await this.axiosClient.get<MeanFinanceSwapResponse>(
@@ -364,6 +368,8 @@ export default class MeanApiService {
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
           ...(recipient ? { recipient } : {}),
+          ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : {}),
+          ...(gasSpeed ? { gasSpeed } : {}),
         },
         headers: {
           'Cache-Control': 'no-cache',

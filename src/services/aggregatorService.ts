@@ -6,6 +6,7 @@ import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import { PositionVersions } from 'config/constants';
 import { RawSwapOption, SwapOption, Token } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
+import { GasKeys } from 'config/constants/aggregator';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -65,7 +66,9 @@ export default class AggregatorService {
     sellAmount?: BigNumber,
     buyAmount?: BigNumber,
     sorting?: string,
-    transferTo?: string | null
+    transferTo?: string | null,
+    slippage?: number,
+    gasSpeed?: GasKeys
   ) {
     const swapOptionsResponse = await this.meanApiService.getSwapOptions(
       from.address,
@@ -73,7 +76,9 @@ export default class AggregatorService {
       sellAmount,
       buyAmount,
       sorting,
-      transferTo
+      transferTo,
+      slippage,
+      gasSpeed
     );
 
     const filteredOptions: RawSwapOption[] = swapOptionsResponse.quotes.filter(
