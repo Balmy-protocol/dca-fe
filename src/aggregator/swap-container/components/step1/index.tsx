@@ -11,6 +11,7 @@ import { BigNumber } from 'ethers';
 import FormHelperText from '@mui/material/FormHelperText';
 import CircularProgress from '@mui/material/CircularProgress';
 import QuoteData from '../quote-data';
+import TransferTo from '../transfer-to';
 
 const StyledGrid = styled(Grid)`
   top: 16px;
@@ -65,6 +66,8 @@ interface SwapFirstStepProps {
   selectedRoute: SwapOption | null;
   isBuyOrder: boolean;
   isLoadingRoute: boolean;
+  transferTo: string | null;
+  onOpenTransferTo: () => void;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -82,6 +85,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     selectedRoute,
     isBuyOrder,
     isLoadingRoute,
+    transferTo,
+    onOpenTransferTo,
   } = props;
 
   let fromValueToUse = isBuyOrder && selectedRoute ? selectedRoute.sellAmount.amountInUnits.toString() : fromValue;
@@ -181,6 +186,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       </Grid>
       <Grid item xs={12}>
         <StyledContentContainer>
+          <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />
           <QuoteData quote={selectedRoute} to={to} />
           {buttonToShow}
         </StyledContentContainer>
