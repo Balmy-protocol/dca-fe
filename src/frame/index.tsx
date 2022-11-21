@@ -17,7 +17,7 @@ import TransactionModalProvider from 'common/transaction-modal';
 import { useAppDispatch } from 'hooks/state';
 import { startFetchingTokenLists } from 'state/token-lists/actions';
 import { SnackbarProvider } from 'notistack';
-import { NETWORKS, SUPPORTED_NETWORKS } from 'config/constants';
+import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import Leaderboard from 'leaderboard';
@@ -101,7 +101,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
             web3Service.setNetwork(networkToSet?.chainId);
           }
         } else {
-          web3Service.setNetwork(NETWORKS.optimism.chainId);
+          web3Service.setNetwork(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId);
         }
       } catch (e) {
         console.error('Found error while trying to set up network');
