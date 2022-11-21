@@ -24,7 +24,7 @@ import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
 
 const SwapContainer = () => {
-  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting } = useAggregatorState();
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting, transferTo } = useAggregatorState();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
@@ -36,7 +36,8 @@ const SwapContainer = () => {
     to,
     isBuyOrder ? toValue : fromValue,
     isBuyOrder,
-    sorting
+    sorting,
+    transferTo
   );
 
   React.useEffect(() => {
@@ -113,6 +114,7 @@ const SwapContainer = () => {
           selectedRoute={selectedRoute}
           isLoadingRoute={isLoadingSwapOptions}
           onResetForm={onResetForm}
+          transferTo={transferTo}
         />
       </Grid>
       <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
