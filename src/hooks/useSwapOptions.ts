@@ -15,7 +15,8 @@ function useSwapOptions(
   to: Token | undefined | null,
   value?: string,
   isBuyOrder?: boolean,
-  sorting?: string
+  sorting?: string,
+  transferTo?: string | null
 ): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
   const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
@@ -36,6 +37,7 @@ function useSwapOptions(
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevSorting = usePrevious(sorting);
+  const prevTransferTo = usePrevious(transferTo);
   const prevResult = usePrevious(result, false);
   const debouncedCall = React.useCallback(
     debounce(
@@ -43,7 +45,9 @@ function useSwapOptions(
         debouncedFrom?: Token | null,
         debouncedTo?: Token | null,
         debouncedValue?: string,
-        debouncedIsBuyOrder?: boolean
+        debouncedIsBuyOrder?: boolean,
+        debouncedSorting?: string,
+        debouncedTransferTo?: string | null
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
           setState({ isLoading: true, result: undefined, error: undefined });
@@ -54,7 +58,8 @@ function useSwapOptions(
               debouncedTo,
               debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
               debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
-              sorting
+              debouncedSorting,
+              debouncedTransferTo
             );
             setState({ result: promiseResult, error: undefined, isLoading: false });
           } catch (e) {
@@ -68,8 +73,8 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(from, to, value, isBuyOrder),
-    [from, to, value, isBuyOrder]
+    () => debouncedCall(from, to, value, isBuyOrder, sorting, transferTo),
+    [from, to, value, isBuyOrder, sorting, transferTo]
   );
 
   React.useEffect(() => {
@@ -80,7 +85,8 @@ function useSwapOptions(
       !isEqual(prevTo, to) ||
       !isEqual(prevValue, value) ||
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
-      !isEqual(prevSorting, sorting)
+      !isEqual(prevSorting, sorting) ||
+      !isEqual(prevTransferTo, transferTo)
     ) {
       if (from && to && value) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -109,6 +115,8 @@ function useSwapOptions(
     prevSorting,
     sorting,
     fetchOptions,
+    prevTransferTo,
+    transferTo,
   ]);
 
   if (!from) {
