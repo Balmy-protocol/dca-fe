@@ -6,10 +6,13 @@ import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenButton from 'common/token-button';
 import TokenInput from 'common/token-input';
-import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
+import { emptyTokenWithAddress } from 'utils/currency';
 import { BigNumber } from 'ethers';
-import FormHelperText from '@mui/material/FormHelperText';
 import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
+import Badge from '@mui/material/Badge';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 
@@ -68,6 +71,9 @@ interface SwapFirstStepProps {
   isLoadingRoute: boolean;
   transferTo: string | null;
   onOpenTransferTo: () => void;
+  onShowSettings: () => void;
+  slippage: string;
+  gasSpeed: GasKeys;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -87,6 +93,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     isLoadingRoute,
     transferTo,
     onOpenTransferTo,
+    onShowSettings,
+    slippage,
+    gasSpeed,
   } = props;
 
   let fromValueToUse = isBuyOrder && selectedRoute ? selectedRoute.sellAmount.amountInUnits.toString() : fromValue;
@@ -105,6 +114,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     }
   }
 
+  const hasNonDefaultSettings =
+    slippage !== DEFAULT_AGGREGATOR_SETTINGS.slippage.toString() || gasSpeed !== DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
+
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
       <Grid item xs={12}>
@@ -114,18 +126,11 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               <Typography variant="body1">
                 <FormattedMessage description="youPay" defaultMessage="You pay" />
               </Typography>
-              {balance && from && (
-                <FormHelperText>
-                  <FormattedMessage
-                    description="in wallet"
-                    defaultMessage="Balance: {balance} {symbol}"
-                    values={{
-                      balance: formatCurrencyAmount(balance, from, 4),
-                      symbol: from.symbol,
-                    }}
-                  />
-                </FormHelperText>
-              )}
+              <Badge color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
+                <IconButton aria-label="settings" size="small" onClick={onShowSettings}>
+                  <SettingsIcon fontSize="inherit" />
+                </IconButton>
+              </Badge>
             </StyledTitleContainer>
             <StyledTokenInputContainer>
               <TokenInput
@@ -134,7 +139,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 value={fromValueToUse}
                 disabled={isLoadingBuyOrder}
                 onChange={handleFromValueChange}
-                withBalance={false}
+                withBalance
                 balance={balance}
                 token={from}
                 withMax
