@@ -5,6 +5,7 @@ import debounce from 'lodash/debounce';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
+import { GasKeys } from 'config/constants/aggregator';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useAggregatorService from './useAggregatorService';
@@ -16,7 +17,9 @@ function useSwapOptions(
   value?: string,
   isBuyOrder?: boolean,
   sorting?: string,
-  transferTo?: string | null
+  transferTo?: string | null,
+  slippage?: number,
+  gasSpeed?: GasKeys
 ): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
   const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
@@ -39,6 +42,8 @@ function useSwapOptions(
   const prevSorting = usePrevious(sorting);
   const prevTransferTo = usePrevious(transferTo);
   const prevResult = usePrevious(result, false);
+  const prevGasSpeed = usePrevious(gasSpeed);
+  const prevSlippage = usePrevious(slippage);
   const debouncedCall = React.useCallback(
     debounce(
       async (
@@ -47,7 +52,9 @@ function useSwapOptions(
         debouncedValue?: string,
         debouncedIsBuyOrder?: boolean,
         debouncedSorting?: string,
-        debouncedTransferTo?: string | null
+        debouncedTransferTo?: string | null,
+        debouncedGasSpeed?: GasKeys,
+        debouncedSlippage?: number
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
           setState({ isLoading: true, result: undefined, error: undefined });
@@ -59,7 +66,9 @@ function useSwapOptions(
               debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
               debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
               debouncedSorting,
-              debouncedTransferTo
+              debouncedTransferTo,
+              debouncedSlippage,
+              debouncedGasSpeed
             );
             setState({ result: promiseResult, error: undefined, isLoading: false });
           } catch (e) {
@@ -73,8 +82,8 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(from, to, value, isBuyOrder, sorting, transferTo),
-    [from, to, value, isBuyOrder, sorting, transferTo]
+    () => debouncedCall(from, to, value, isBuyOrder, sorting, transferTo, gasSpeed, slippage),
+    [from, to, value, isBuyOrder, sorting, transferTo, slippage, gasSpeed]
   );
 
   React.useEffect(() => {
@@ -86,7 +95,9 @@ function useSwapOptions(
       !isEqual(prevValue, value) ||
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
       !isEqual(prevSorting, sorting) ||
-      !isEqual(prevTransferTo, transferTo)
+      !isEqual(prevTransferTo, transferTo) ||
+      !isEqual(prevGasSpeed, gasSpeed) ||
+      !isEqual(prevSlippage, slippage)
     ) {
       if (from && to && value) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -117,6 +128,10 @@ function useSwapOptions(
     fetchOptions,
     prevTransferTo,
     transferTo,
+    slippage,
+    prevSlippage,
+    gasSpeed,
+    prevGasSpeed,
   ]);
 
   if (!from) {
