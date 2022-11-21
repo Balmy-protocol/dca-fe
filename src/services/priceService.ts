@@ -9,6 +9,8 @@ import {
   COINGECKO_IDS,
   DEFAULT_NETWORK_FOR_VERSION,
   DEFILLAMA_IDS,
+  INDEX_TO_PERIOD,
+  INDEX_TO_SPAN,
   LATEST_VERSION,
   NETWORKS,
   STABLE_COINS,
@@ -149,12 +151,12 @@ export default class PriceService {
     return transformerRegistryInstance.calculateTransformToUnderlying(token, value);
   }
 
-  async getPriceForGraph(from: Token, to: Token, isMonth?: boolean, chainId?: number) {
+  async getPriceForGraph(from: Token, to: Token, periodIndex = 0, chainId?: number) {
     const network = await this.walletService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
     const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
-    const span = isMonth ? '30' : '42';
-    const period = isMonth ? '1d' : '4h';
+    const span = INDEX_TO_SPAN[periodIndex];
+    const period = INDEX_TO_PERIOD[periodIndex];
     const toAddress = to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to.address;
     const fromAddress = from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address;
 
