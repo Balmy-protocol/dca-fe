@@ -8,7 +8,7 @@ import usePriceService from './usePriceService';
 function useGraphPrice(
   from: Token | undefined | null,
   to: Token | undefined | null,
-  isMonth = false
+  index = 0
 ): [{ rate: number; timestamp: number }[] | undefined, boolean, string?] {
   const priceService = usePriceService();
   const [{ result, isLoading, error }, setState] = React.useState<{
@@ -18,14 +18,14 @@ function useGraphPrice(
   }>({ isLoading: false, result: undefined, error: undefined });
   const prevFrom = usePrevious(from);
   const prevTo = usePrevious(to);
-  const prevIsMonth = usePrevious(isMonth);
+  const prevIndex = usePrevious(index);
   const prevResult = usePrevious(result, false);
 
   React.useEffect(() => {
     async function callPromise() {
       if (from && to) {
         try {
-          const prices = await priceService.getPriceForGraph(from, to, isMonth);
+          const prices = await priceService.getPriceForGraph(from, to, index);
           setState({ result: prices, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });
@@ -39,14 +39,14 @@ function useGraphPrice(
       (!isLoading && isUndefined(result) && !error) ||
       !isEqual(prevFrom, from) ||
       !isEqual(prevTo, to) ||
-      !isEqual(prevIsMonth, isMonth)
+      !isEqual(prevIndex, index)
     ) {
       setState({ result: undefined, error: undefined, isLoading: true });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, prevFrom, to, prevTo, isLoading, result, error, isMonth, prevIsMonth]);
+  }, [from, prevFrom, to, prevTo, isLoading, result, error, index, prevIndex]);
 
   return [result || prevResult, isLoading, error];
 }
