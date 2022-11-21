@@ -23,7 +23,9 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import useAggregatorService from 'hooks/useAggregatorService';
 import useSpecificAllowance from 'hooks/useSpecificAllowance';
 import TransferToModal from 'common/transfer-to-modal';
+import { GasKeys } from 'config/constants/aggregator';
 import SwapFirstStep from '../step1';
+import SwapSettings from '../swap-settings';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -59,6 +61,8 @@ interface SwapProps {
   isLoadingRoute: boolean;
   onResetForm: () => void;
   transferTo: string | null;
+  slippage: string;
+  gasSpeed: GasKeys;
 }
 
 const Swap = ({
@@ -76,10 +80,13 @@ const Swap = ({
   isLoadingRoute,
   onResetForm,
   transferTo,
+  slippage,
+  gasSpeed,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
+  const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
@@ -345,6 +352,7 @@ const Swap = ({
         open={shouldShowTransferModal}
       />
       <StyledPaper variant="outlined" ref={containerRef}>
+        <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
         <TokenPicker
           shouldShow={shouldShowPicker}
           onClose={() => setShouldShowPicker(false)}
@@ -372,6 +380,9 @@ const Swap = ({
           isLoadingRoute={isLoadingRoute}
           transferTo={transferTo}
           onOpenTransferTo={() => setShouldShowTransferModal(true)}
+          onShowSettings={() => setShouldShowSettings(true)}
+          slippage={slippage}
+          gasSpeed={gasSpeed}
         />
       </StyledPaper>
     </>
