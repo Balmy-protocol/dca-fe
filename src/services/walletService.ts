@@ -123,15 +123,18 @@ export default class WalletService {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: `0x${newChainId.toString(16)}` }],
-      });
-      if (callbackBeforeReload) {
-        callbackBeforeReload();
+      const currentNetwork = await this.getNetwork(true);
+      if (currentNetwork.chainId !== newChainId) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: `0x${newChainId.toString(16)}` }],
+        });
+        if (callbackBeforeReload) {
+          callbackBeforeReload();
+        }
+        window.location.reload();
       }
-      window.location.reload();
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (switchError.code === 4902) {
