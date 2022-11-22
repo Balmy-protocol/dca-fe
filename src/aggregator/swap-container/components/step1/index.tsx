@@ -6,13 +6,16 @@ import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenButton from 'common/token-button';
 import TokenInput from 'common/token-input';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
 import Badge from '@mui/material/Badge';
+import FormHelperText from '@mui/material/FormHelperText';
+import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { formatUnits, parseUnits } from '@ethersproject/units';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 
@@ -26,6 +29,10 @@ const StyledGrid = styled(Grid)`
 const StyledTitleContainer = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const StyledFormHelperText = styled(FormHelperText)`
+  cursor: pointer;
 `;
 
 const StyledContentContainer = styled.div`
@@ -47,11 +54,19 @@ const StyledTokenInputContainer = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 30px;
+  align-items: stretch;
 `;
 
 const StyledLoadingContainer = styled.div`
   display: flex;
   align-items: center;
+  gap: 5px;
+`;
+
+const StyledTokenButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 5px;
 `;
 
@@ -101,6 +116,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   let fromValueToUse = isBuyOrder && selectedRoute ? selectedRoute.sellAmount.amountInUnits.toString() : fromValue;
   let toValueToUse = isBuyOrder ? toValue : selectedRoute?.buyAmount.amountInUnits.toString() || '';
 
+  const fromPrice = selectedRoute?.sellAmount.amountInUSD;
+  const toPrice = selectedRoute?.buyAmount.amountInUSD;
+
   let isLoadingSellOrder = false;
   let isLoadingBuyOrder = false;
 
@@ -113,6 +131,19 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       isLoadingSellOrder = true;
     }
   }
+
+  const onSetMaxBalance = () => {
+    if (balance && from) {
+      if (from.address === PROTOCOL_TOKEN_ADDRESS) {
+        const maxValue = balance.gte(parseUnits('1', from.decimals))
+          ? balance.sub(parseUnits('0.1', from.decimals))
+          : balance;
+        handleFromValueChange(formatUnits(maxValue, from.decimals));
+      } else {
+        handleFromValueChange(formatUnits(balance, from.decimals));
+      }
+    }
+  };
 
   const hasNonDefaultSettings =
     slippage !== DEFAULT_AGGREGATOR_SETTINGS.slippage.toString() || gasSpeed !== DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
@@ -139,13 +170,24 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 value={fromValueToUse}
                 disabled={isLoadingBuyOrder}
                 onChange={handleFromValueChange}
-                withBalance
-                balance={balance}
                 token={from}
-                withMax
                 fullWidth
+                usdValue={parseFloat(fromPrice || '0').toFixed(2)}
               />
-              <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
+              <StyledTokenButtonContainer>
+                {balance && from && (
+                  <StyledFormHelperText onClick={onSetMaxBalance}>
+                    <FormattedMessage
+                      description="in wallet"
+                      defaultMessage="Balance: {balance}"
+                      values={{
+                        balance: formatCurrencyAmount(balance, from, 4),
+                      }}
+                    />
+                  </StyledFormHelperText>
+                )}
+                <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
+              </StyledTokenButtonContainer>
             </StyledTokenInputContainer>
             {isLoadingBuyOrder && (
               <StyledLoadingContainer>
@@ -175,6 +217,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 withBalance={false}
                 token={to}
                 fullWidth
+                usdValue={parseFloat(toPrice || '0').toFixed(2)}
               />
               <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
             </StyledTokenInputContainer>
