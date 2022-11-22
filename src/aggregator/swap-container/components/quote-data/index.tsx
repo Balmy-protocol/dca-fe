@@ -62,7 +62,7 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
       </StyledQuoteDataItem>
       <StyledQuoteDataItem>
         <Typography variant="body2" color="inherit">
-          <FormattedMessage description="quoteDataRate" defaultMessage="Minimum recieved:" />
+          <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
         </Typography>
         <Typography variant="body2" color="inherit">
           {quote?.minBuyAmount.amount && to
