@@ -53,11 +53,11 @@ export default class AggregatorService {
   }
 
   async swap(route: SwapOption) {
-    const singer = this.walletService.getSigner();
+    const signer = this.walletService.getSigner();
 
     const transactionToSend = await this.addGasLimit(route.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return signer.sendTransaction(transactionToSend);
   }
 
   async getSwapOptions(
