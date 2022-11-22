@@ -37,7 +37,12 @@ import {
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { emptyTokenWithAddress, parseUsdPrice } from 'utils/currency';
-import { useTransactionAdder, useHasPendingApproval, useHasPendingPairCreation } from 'state/transactions/hooks';
+import {
+  useTransactionAdder,
+  useHasPendingApproval,
+  useHasPendingPairCreation,
+  useHasConfirmedApproval,
+} from 'state/transactions/hooks';
 import { calculateStale, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
@@ -178,6 +183,7 @@ const Swap = ({
   const isCreatingPair = useHasPendingPairCreation(from, to);
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
+  const hasConfirmedApproval = useHasConfirmedApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
 
   const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
@@ -274,7 +280,7 @@ const Swap = ({
         typeData: {
           token: from,
           addressFor: hubAddress,
-          ...(!!amount && { amount }),
+          ...(!!amount && { amount: amount.toString() }),
         },
       });
       setModalSuccess({
@@ -537,6 +543,7 @@ const Swap = ({
 
   const isApproved =
     !from ||
+    hasConfirmedApproval ||
     (from &&
       (!fromValue
         ? true

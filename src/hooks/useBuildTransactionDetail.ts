@@ -190,7 +190,7 @@ function useBuildTransactionDetail() {
           case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
             const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
             message = `Approve ${formatCurrencyAmount(
-              tokenApprovalExactTypeData.amount,
+              BigNumber.from(tokenApprovalExactTypeData.amount),
               tokenApprovalExactTypeData.token,
               4
             )} ${tokenApprovalExactTypeData.token.symbol}`;

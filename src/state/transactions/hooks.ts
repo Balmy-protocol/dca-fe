@@ -337,12 +337,18 @@ export function usePositionHasTransfered(position: string): string | null {
 }
 
 // returns whether a token has been approved transaction
-export function useHasConfirmedApproval(token: Token | null, spender: string | undefined): boolean {
+export function useHasConfirmedApproval(
+  token: Token | null,
+  spender: string | undefined,
+  checkForCompanion = false
+): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
-  const addressToCheck = HUB_ADDRESS[LATEST_VERSION][currentNetwork.chainId];
-  // const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const addressToCheck = checkForCompanion
+    ? COMPANION_ADDRESS[LATEST_VERSION][currentNetwork.chainId]
+    : HUB_ADDRESS[LATEST_VERSION][currentNetwork.chainId];
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
 
   return useMemo(
     () =>
@@ -351,16 +357,20 @@ export function useHasConfirmedApproval(token: Token | null, spender: string | u
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
-        if (allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN) return false;
+        if (
+          allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN &&
+          allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN_EXACT
+        )
+          return false;
         const tx = allTransactions[hash];
         return (
           tx.receipt &&
           (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress &&
           (<ApproveTokenTypeData>tx.typeData).addressFor === addressToCheck &&
-          // (blockNumber || 0) - (tx.receipt.blockNumber || 0) <= 3 &&
+          (blockNumber || 0) - (tx.receipt.blockNumber || 0) <= 3 &&
           tx.from === spender
         );
       }),
-    [allTransactions, spender, tokenAddress]
+    [allTransactions, spender, tokenAddress, blockNumber, addressToCheck]
   );
 }

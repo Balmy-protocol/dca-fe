@@ -115,6 +115,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   );
   const [balance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
+  const hasConfirmedApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
   const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
   const [usdPrice] = useRawUsdPrice(from);
@@ -141,6 +142,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     .lte(BigNumber.from(0));
 
   const needsToApprove =
+    !hasConfirmedApproval &&
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
     position.user === walletService.getAccount().toLowerCase() &&
     allowance.allowance &&
@@ -148,9 +150,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     allowance.token.address === fromToUse.address &&
     isIncreasingPosition &&
     !hasPendingApproval &&
-    parseUnits(allowance.allowance, fromToUse.decimals).lt(
-      remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
-    );
+    parseUnits(allowance.allowance, fromToUse.decimals).lt(remainingLiquidityDifference);
 
   const handleCancel = () => {
     onCancel();
@@ -352,7 +352,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         typeData: {
           token: fromToUse,
           addressFor: fromHasYield ? companionAddress : hubAddress,
-          ...(isExact && { amount: formatCurrencyAmount(remainingLiquidityDifference, fromToUse, 4) }),
+          ...(isExact && { amount: remainingLiquidityDifference.toString() }),
         },
         position,
       });

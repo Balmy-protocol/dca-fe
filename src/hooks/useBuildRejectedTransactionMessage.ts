@@ -25,6 +25,7 @@ import {
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { getFrequencyLabel } from 'utils/parsing';
+import { BigNumber } from 'ethers/lib/ethers';
 import { formatCurrencyAmount } from 'utils/currency';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
@@ -189,7 +190,7 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
           const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
           message = `Approving ${formatCurrencyAmount(
-            tokenApprovalExactTypeData.amount,
+            BigNumber.from(tokenApprovalExactTypeData.amount),
             tokenApprovalExactTypeData.token,
             4
           )} ${tokenApprovalExactTypeData.token.symbol}`;
