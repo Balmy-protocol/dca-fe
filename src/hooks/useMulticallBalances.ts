@@ -5,7 +5,6 @@ import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress } from 'utils/currency';
 import { useBlockNumber } from 'state/block-number/hooks';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
@@ -34,7 +33,6 @@ function useMulticallBalances(
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -44,18 +42,16 @@ function useMulticallBalances(
 
           const priceResults = await priceService.getUsdHistoricPrice(tokens.map((key) => emptyTokenWithAddress(key)));
 
-          const promiseResult = tokens.reduce((acc, token) => {
-            const addressToUse = token === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : token;
-            return {
+          const promiseResult = tokens.reduce(
+            (acc, token) => ({
               ...acc,
               [token]: {
                 balance: balanceResults[token],
-                balanceUsd: (balanceResults[token] || BigNumber.from(0)).mul(
-                  priceResults[addressToUse] || BigNumber.from(0)
-                ),
+                balanceUsd: (balanceResults[token] || BigNumber.from(0)).mul(priceResults[token] || BigNumber.from(0)),
               },
-            };
-          }, {});
+            }),
+            {}
+          );
 
           setState({ isLoading: false, result: promiseResult, error: undefined });
         } catch (e) {

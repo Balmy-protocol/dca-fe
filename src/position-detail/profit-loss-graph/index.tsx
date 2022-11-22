@@ -13,7 +13,6 @@ import EmptyGraph from 'assets/svg/emptyGraph';
 import usePriceService from 'hooks/usePriceService';
 import { formatUnits } from '@ethersproject/units';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import ProfitLossTooltip from './tooltip';
 
 const StyledContainer = styled(Paper)`
@@ -165,12 +164,6 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         const fromMagnitude = BigNumber.from(10).pow(position.from.decimals);
         const toMagnitude = BigNumber.from(10).pow(position.to.decimals);
         const subPositions: SubPosition[] = [];
-        const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-
-        const fromAddressPrice =
-          position.from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.from.address;
-        const toAddressPrice =
-          position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
 
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < filteredPositionActions.length; i++) {
@@ -188,8 +181,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
               position.chainId
             );
 
-            const fetchedTokenFromPrice = fetchedPrices[fromAddressPrice];
-            const fetchedTokenToPrice = fetchedPrices[toAddressPrice];
+            const fetchedTokenFromPrice = fetchedPrices[position.from.address];
+            const fetchedTokenToPrice = fetchedPrices[position.to.address];
             const deposited = currentRemainingSwaps.mul(currentRate);
 
             const originalRatePerUnitFromToTo = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
@@ -208,8 +201,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
               position.chainId
             );
 
-            const fetchedTokenFromPrice = fetchedPrices[fromAddressPrice];
-            const fetchedTokenToPrice = fetchedPrices[toAddressPrice];
+            const fetchedTokenFromPrice = fetchedPrices[position.from.address];
+            const fetchedTokenToPrice = fetchedPrices[position.to.address];
 
             const ratePerUnit = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
 
