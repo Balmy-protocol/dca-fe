@@ -108,6 +108,12 @@ const StyledDottedLine = styled.div`
   }
 `;
 
+const StyledTokenAmountContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+`;
+
 interface SwapQuotesProps {
   quote: SwapOption;
   isSelected?: boolean;
@@ -163,9 +169,14 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) =
       <StyledRouteContainer>
         <StyledTokenContainer>
           <TokenIcon token={from} />
-          <Typography variant="body1">
-            {`${formatCurrencyAmount(quote.sellAmount.amount, from, 4)} ${from.symbol}`}
-          </Typography>
+          <StyledTokenAmountContainer>
+            <Typography variant="body1">
+              {`${formatCurrencyAmount(quote.sellAmount.amount, from, 4)} ${from.symbol}`}
+            </Typography>
+            <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+              {`$${parseFloat(quote.sellAmount.amountInUSD).toFixed(2)}`}
+            </Typography>
+          </StyledTokenAmountContainer>
         </StyledTokenContainer>
         <StyledDexContainer>
           <DarkChip
@@ -176,9 +187,14 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) =
         </StyledDexContainer>
         <StyledTokenContainer>
           <TokenIcon token={to} />
-          <Typography variant="body1">
-            {`${formatCurrencyAmount(quote.buyAmount.amount, to, 4)} ${to.symbol}`}
-          </Typography>
+          <StyledTokenAmountContainer>
+            <Typography variant="body1">
+              {`${formatCurrencyAmount(quote.buyAmount.amount, to, 4)} ${to.symbol}`}
+            </Typography>
+            <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+              {`$${parseFloat(quote.buyAmount.amountInUSD).toFixed(2)}`}
+            </Typography>
+          </StyledTokenAmountContainer>
         </StyledTokenContainer>
       </StyledRouteContainer>
     </StyledPaper>
