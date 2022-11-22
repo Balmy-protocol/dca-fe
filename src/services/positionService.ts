@@ -921,6 +921,7 @@ export default class PositionService {
     if (
       transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
       transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+      transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN_EXACT ||
       transaction.type === TRANSACTION_TYPES.WRAP_ETHER
     )
       return;
@@ -1004,6 +1005,7 @@ export default class PositionService {
     if (
       transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
       transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+      transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN_EXACT ||
       transaction.type === TRANSACTION_TYPES.WRAP_ETHER
     )
       return;
@@ -1017,7 +1019,10 @@ export default class PositionService {
   }
 
   handleTransaction(transaction: TransactionDetails) {
-    if (transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN) {
+    if (
+      transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
+      transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN_EXACT
+    ) {
       return;
     }
 
