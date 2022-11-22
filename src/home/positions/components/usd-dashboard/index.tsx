@@ -22,7 +22,6 @@ import { emptyTokenWithSymbol, formatCurrencyAmount } from 'utils/currency';
 import { FormattedMessage } from 'react-intl';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { usdFormatter } from 'utils/parsing';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import DashboardPopper from './popper';
 
 const StyledCountDashboardContainer = styled(Grid)`
@@ -272,10 +271,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
         chains.forEach((chain) => {
           tokensPerChain[chain].forEach((token) => {
-            const wrappedProtocolToken = getWrappedProtocolToken(parseInt(chainId, 10));
-            const addressToCheck =
-              token.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : token.address;
-            tokenRecords[token.address] = result[addressToCheck];
+            tokenRecords[token.address] = result[token.address];
           });
         });
 

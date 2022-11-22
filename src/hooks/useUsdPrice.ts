@@ -3,7 +3,6 @@ import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
 import usePrevious from 'hooks/usePrevious';
-import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import { STABLE_COINS } from 'config/constants';
@@ -24,17 +23,14 @@ function useUsdPrice(
   const [error, setError] = React.useState<string | undefined>(undefined);
   const prevFrom = usePrevious(from);
   const currentNetwork = useCurrentNetwork();
-  const wrappedProtocolToken = getWrappedProtocolToken(chainId || currentNetwork.chainId);
-  const protocolToken = getProtocolToken(chainId || currentNetwork.chainId);
 
   React.useEffect(() => {
     async function callPromise() {
       if (from && !STABLE_COINS.includes(from.symbol) && amount && amount.gt(BigNumber.from(0))) {
         try {
-          const addressToUse = from.address === protocolToken.address ? wrappedProtocolToken : from;
-          const price = await priceService.getUsdHistoricPrice([addressToUse], date, chainId);
-          if (price && price[addressToUse.address]) {
-            setResult(price[addressToUse.address]);
+          const price = await priceService.getUsdHistoricPrice([from], date, chainId);
+          if (price && price[from.address]) {
+            setResult(price[from.address]);
             setError(undefined);
           } else {
             setError('Could not find usd price');

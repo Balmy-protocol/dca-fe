@@ -575,4 +575,6 @@ export const SIGN_VERSION: Record<PositionVersions, string> = {
   [POSITION_VERSION_3]: '1',
   [POSITION_VERSION_4]: '2',
 };
+
+export const DEFILLAMA_PROTOCOL_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 /* eslint-enable */

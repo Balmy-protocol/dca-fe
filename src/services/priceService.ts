@@ -5,7 +5,15 @@ import { CoinGeckoPriceResponse, Token, TxPriceResponse } from 'types';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import { COINGECKO_IDS, DEFAULT_NETWORK_FOR_VERSION, DEFILLAMA_IDS, LATEST_VERSION, NETWORKS } from 'config/constants';
+import {
+  COINGECKO_IDS,
+  DEFAULT_NETWORK_FOR_VERSION,
+  DEFILLAMA_IDS,
+  DEFILLAMA_PROTOCOL_TOKEN_ADDRESS,
+  LATEST_VERSION,
+  NETWORKS,
+} from 'config/constants';
+import { emptyTokenWithAddress } from 'utils/currency';
 import ContractService from './contractService';
 import WalletService from './walletService';
 
@@ -53,9 +61,8 @@ export default class PriceService {
   async getUsdHistoricPrice(tokens: Token[], date?: string, chainId?: number) {
     const network = await this.walletService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
-    const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
     const mappedTokens = tokens.map((token) =>
-      token.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : token
+      token.address === PROTOCOL_TOKEN_ADDRESS ? emptyTokenWithAddress(DEFILLAMA_PROTOCOL_TOKEN_ADDRESS) : token
     );
     const price = await this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
       'https://coins.llama.fi/prices',
@@ -72,16 +79,17 @@ export default class PriceService {
           price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`] &&
           price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price
       )
-      .reduce<Record<string, BigNumber>>(
-        (acc, token) => ({
+      .reduce<Record<string, BigNumber>>((acc, token) => {
+        const tokenAddressToUse =
+          token.address === DEFILLAMA_PROTOCOL_TOKEN_ADDRESS ? PROTOCOL_TOKEN_ADDRESS : token.address;
+        return {
           ...acc,
-          [token.address]: parseUnits(
+          [tokenAddressToUse]: parseUnits(
             price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price.toString(),
             18
           ),
-        }),
-        {}
-      );
+        };
+      }, {});
 
     return tokensPrices;
   }
