@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import TokenPicker from 'common/token-picker';
+import TokenPicker from 'common/aggregator-token-picker';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
 import useBalance from 'hooks/useBalance';

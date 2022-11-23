@@ -33,6 +33,12 @@ export class MulticallContract extends Contract {
 export class ERC20Contract extends Contract {
   balanceOf: (address: string) => Promise<BigNumber>;
 
+  name: () => Promise<string>;
+
+  decimals: () => Promise<number>;
+
+  symbol: () => Promise<string>;
+
   deposit: (toDeposit: { value: string }) => Promise<TransactionResponse>;
 
   allowance: (address: string, contract: string) => Promise<string>;

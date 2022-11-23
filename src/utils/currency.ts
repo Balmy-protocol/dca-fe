@@ -146,3 +146,21 @@ export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPri
 
   return needed.mul(tokenUsdMagnitude).div(usdPrice).div(usdMagnitude);
 };
+
+export const toToken: (overrides: {
+  address?: string;
+  type?: TokenType;
+  decimals?: number;
+  chainId?: number;
+  symbol?: string;
+  name?: string;
+  underlyingTokens?: Token[];
+}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type }) => ({
+  decimals: decimals || 18,
+  chainId: chainId || 1,
+  address: address || '',
+  name: name || '',
+  symbol: symbol || '',
+  type: type || TOKEN_TYPE_BASE,
+  underlyingTokens: underlyingTokens || [],
+});

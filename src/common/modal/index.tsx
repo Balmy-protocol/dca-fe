@@ -44,7 +44,7 @@ const StyledDialogActions = styled(DialogActions)`
 `;
 
 const StyledDialog = styled(Dialog)`
-  display: flex;
+  // display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -69,6 +69,7 @@ interface ModalProps {
   showCloseButton?: boolean;
   maxWidth?: Breakpoint;
   title?: React.ReactNode;
+  fullHeight?: boolean;
   actions?: {
     label: React.ReactNode;
     onClick: () => void;
@@ -87,6 +88,7 @@ const Modal: React.FC<ModalProps> = ({
   showCloseIcon,
   showCloseButton,
   actions,
+  fullHeight,
   children,
 }) => {
   const classes = useStyles();
@@ -99,9 +101,18 @@ const Modal: React.FC<ModalProps> = ({
 
   const withTitle = showCloseIcon || !!title;
 
+  const fullHeightProps = (fullHeight && { sx: { height: '90vh' } }) || {};
+
   return (
-    <StyledDialog open={open} fullWidth maxWidth={maxWidth || 'lg'} classes={classes} onClose={handleClose}>
-      <StyledDialogContent withTitle={withTitle}>
+    <StyledDialog
+      open={open}
+      fullWidth
+      maxWidth={maxWidth || 'lg'}
+      classes={classes}
+      onClose={handleClose}
+      PaperProps={fullHeightProps}
+    >
+      <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {withTitle && (
           <StyledDialogTitle>
             <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
@@ -112,7 +123,7 @@ const Modal: React.FC<ModalProps> = ({
             </IconButton>
           </StyledDialogTitle>
         )}
-        {withTitle ? <StyledDialogColumnContent>{children}</StyledDialogColumnContent> : children}
+        {withTitle || !!fullHeight ? <StyledDialogColumnContent>{children}</StyledDialogColumnContent> : children}
       </StyledDialogContent>
       {(showCloseButton || !!actions?.length) && (
         <StyledDialogActions>

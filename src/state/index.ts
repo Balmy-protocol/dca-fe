@@ -110,6 +110,10 @@ const store = configureStore({
       tokenLists: {
         byUrl: getDefaultByUrl(),
         activeLists: ['https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json'],
+        activeAggregatorLists: [
+          'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
+          'tokens.1inch.eth',
+        ],
       },
     },
   }),

@@ -7,6 +7,7 @@ import { formatUnits } from '@ethersproject/units';
 import { GetUsedTokensData, Token } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import isUndefined from 'lodash/isUndefined';
+import { toToken } from 'utils/currency';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
@@ -162,6 +163,65 @@ export default class WalletService {
           ...(hasProtocolToken && protocolBalance ? { [PROTOCOL_TOKEN_ADDRESS]: protocolBalance } : {}),
         }
       );
+  }
+
+  async getCustomToken(address: string): Promise<{ token: Token; balance: BigNumber } | undefined> {
+    const account = this.getAccount();
+    const currentNetwork = await this.getNetwork();
+
+    if (!address || !account) return Promise.resolve(undefined);
+
+    const ERC20Interface = new Interface(ERC20ABI);
+
+    const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as unknown as ERC20Contract;
+
+    const balanceCall = erc20.populateTransaction.balanceOf(account).then((populatedTransaction) => ({
+      target: populatedTransaction.to as string,
+      allowFailure: true,
+      callData: populatedTransaction.data as string,
+    }));
+
+    const decimalsCall = erc20.populateTransaction.decimals().then((populatedTransaction) => ({
+      target: populatedTransaction.to as string,
+      allowFailure: true,
+      callData: populatedTransaction.data as string,
+    }));
+
+    const nameCall = erc20.populateTransaction.name().then((populatedTransaction) => ({
+      target: populatedTransaction.to as string,
+      allowFailure: true,
+      callData: populatedTransaction.data as string,
+    }));
+
+    const symbolCall = erc20.populateTransaction.symbol().then((populatedTransaction) => ({
+      target: populatedTransaction.to as string,
+      allowFailure: true,
+      callData: populatedTransaction.data as string,
+    }));
+
+    const multicallInstance = new ethers.Contract(
+      MULTICALL_ADDRESS[currentNetwork.chainId],
+      MULTICALLABI,
+      this.client
+    ) as unknown as MulticallContract;
+
+    const populatedTransactions = await Promise.all([balanceCall, decimalsCall, nameCall, symbolCall]);
+
+    const [balanceResult, decimalResult, nameResult, symbolResult] = await multicallInstance.callStatic.aggregate3(
+      populatedTransactions
+    );
+
+    const balance = BigNumber.from(
+      ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
+    );
+    const decimals = ethers.utils.defaultAbiCoder.decode(['uint8'], decimalResult.returnData)[0] as number;
+    const name = ethers.utils.defaultAbiCoder.decode(['string'], nameResult.returnData)[0] as string;
+    const symbol = ethers.utils.defaultAbiCoder.decode(['string'], symbolResult.returnData)[0] as string;
+
+    return {
+      token: toToken({ address: address.toLowerCase(), decimals, name, symbol, chainId: currentNetwork.chainId }),
+      balance,
+    };
   }
 
   async getBalance(address?: string): Promise<BigNumber> {
