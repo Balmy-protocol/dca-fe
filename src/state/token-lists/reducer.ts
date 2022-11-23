@@ -1,10 +1,11 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { TokensLists, Token } from 'types';
-import { enableTokenList, fetchGraphTokenList, fetchTokenList } from './actions';
+import { enableAggregatorTokenList, enableTokenList, fetchGraphTokenList, fetchTokenList } from './actions';
 
 export interface TokenListsState {
   byUrl: { [tokenListUrl: string]: TokensLists };
   activeLists: string[];
+  activeAggregatorLists: string[];
   hasLoaded: boolean;
 }
 
@@ -66,6 +67,10 @@ export const getDefaultByUrl = () => ({
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
+  activeAggregatorLists: [
+    'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
+    'tokens.1inch.eth',
+  ],
   byUrl: getDefaultByUrl(),
   hasLoaded: false,
 };
@@ -78,6 +83,14 @@ export default createReducer(initialState, (builder) =>
       }
       if (!enabled && state.activeLists.includes(tokenList)) {
         state.activeLists = state.activeLists.filter((item) => item !== tokenList);
+      }
+    })
+    .addCase(enableAggregatorTokenList, (state, { payload: { tokenList, enabled } }) => {
+      if (enabled && !state.activeAggregatorLists.includes(tokenList)) {
+        state.activeAggregatorLists.push(tokenList);
+      }
+      if (!enabled && state.activeAggregatorLists.includes(tokenList)) {
+        state.activeAggregatorLists = state.activeAggregatorLists.filter((item) => item !== tokenList);
       }
     })
     .addCase(fetchTokenList.pending, (state, { meta: { requestId, arg } }) => {
