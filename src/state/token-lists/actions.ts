@@ -12,6 +12,11 @@ export const enableTokenList = createAction<{
   enabled: boolean;
 }>('tokenLists/enableTokenList');
 
+export const enableAggregatorTokenList = createAction<{
+  tokenList: string;
+  enabled: boolean;
+}>('tokenLists/enableAggregatorTokenList');
+
 export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extra: AxiosInstance }>(
   'tokenLists/fetchTokenLists',
   async (tokenListUrl, { extra: axiosClient }) => {
