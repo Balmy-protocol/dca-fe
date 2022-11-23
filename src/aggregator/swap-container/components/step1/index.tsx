@@ -16,6 +16,7 @@ import Badge from '@mui/material/Badge';
 import FormHelperText from '@mui/material/FormHelperText';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { formatUnits, parseUnits } from '@ethersproject/units';
+import useUsdPrice from 'hooks/useUsdPrice';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 
@@ -116,6 +117,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   let fromValueToUse = isBuyOrder && selectedRoute ? selectedRoute.sellAmount.amountInUnits.toString() : fromValue;
   let toValueToUse = isBuyOrder ? toValue : selectedRoute?.buyAmount.amountInUnits.toString() || '';
 
+  const [fromFetchedPrice] = useUsdPrice(from, parseUnits(fromValueToUse || '0', from?.decimals));
+  const [toFetchedPrice] = useUsdPrice(to, parseUnits(toValueToUse || '0', to?.decimals));
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;
 
@@ -172,7 +175,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 onChange={handleFromValueChange}
                 token={from}
                 fullWidth
-                usdValue={parseFloat(fromPrice || '0').toFixed(2)}
+                usdValue={parseFloat(fromPrice || fromFetchedPrice?.toFixed(2) || '0').toFixed(2)}
               />
               <StyledTokenButtonContainer>
                 {balance && from && (
@@ -217,7 +220,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 withBalance={false}
                 token={to}
                 fullWidth
-                usdValue={parseFloat(toPrice || '0').toFixed(2)}
+                usdValue={parseFloat(toPrice || toFetchedPrice?.toFixed(2) || '0').toFixed(2)}
               />
               <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
             </StyledTokenInputContainer>
