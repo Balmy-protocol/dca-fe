@@ -7,7 +7,7 @@ import { Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import { FormattedMessage } from 'react-intl';
-import TokenPicker from 'common/token-picker';
+import TokenPicker from 'common/dca-token-picker';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';

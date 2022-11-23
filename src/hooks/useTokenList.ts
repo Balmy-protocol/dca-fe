@@ -4,7 +4,7 @@ import reduce from 'lodash/reduce';
 import keyBy from 'lodash/keyBy';
 import { ALLOWED_YIELDS } from 'config/constants';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { useTokensLists } from 'state/token-lists/hooks';
+import { useSavedAggregatorTokenLists, useTokensLists } from 'state/token-lists/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 
 const BLACKLIST = [
@@ -13,10 +13,13 @@ const BLACKLIST = [
   '0x65559aa14915a70190438ef90104769e5e890a00', // OE - ENS
 ];
 
-function useTokenList(filter = true) {
+function useTokenList(isAggregator = false, filter = true) {
   const currentNetwork = useCurrentNetwork();
   const tokensLists = useTokensLists();
-  const savedTokenLists = ['Mean Finance Graph Allowed Tokens'];
+  const savedDCATokenLists = ['Mean Finance Graph Allowed Tokens'];
+  const savedAggregatorTokenLists = useSavedAggregatorTokenLists();
+
+  const savedTokenLists = isAggregator ? savedAggregatorTokenLists : savedDCATokenLists;
   const reducedYieldTokens = React.useMemo(
     () =>
       ALLOWED_YIELDS[currentNetwork.chainId].reduce(
@@ -48,7 +51,7 @@ function useTokenList(filter = true) {
             : acc,
         { [PROTOCOL_TOKEN_ADDRESS]: getProtocolToken(currentNetwork.chainId) }
       ),
-    [currentNetwork.chainId, savedTokenLists, reducedYieldTokens]
+    [currentNetwork.chainId, savedTokenLists, reducedYieldTokens, filter, isAggregator]
   );
 
   return tokenList;
