@@ -91,12 +91,20 @@ export default class PriceService {
       .reduce<Record<string, BigNumber>>((acc, token) => {
         const tokenAddressToUse =
           token.address === DEFILLAMA_PROTOCOL_TOKEN_ADDRESS ? PROTOCOL_TOKEN_ADDRESS : token.address;
-        return {
-          ...acc,
-          [tokenAddressToUse]: parseUnits(
+        let returnedPrice = BigNumber.from(0);
+
+        try {
+          returnedPrice = parseUnits(
             price.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`].price.toString(),
             18
-          ),
+          );
+        } catch (e) {
+          console.error('Error parsing price for', tokenAddressToUse, e);
+        }
+
+        return {
+          ...acc,
+          [tokenAddressToUse]: returnedPrice,
         };
       }, {});
 
