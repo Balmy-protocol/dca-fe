@@ -13,6 +13,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import useWalletService from 'hooks/useWalletService';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -43,6 +44,8 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   const [toAddress, setToAddress] = React.useState(transferTo);
   const [validateCheckbox, setValidateCheckbox] = React.useState(false);
   const currentNetwork = useCurrentNetwork();
+  const walletService = useWalletService();
+  const account = walletService.getAccount();
 
   const validator = (nextValue: string) => {
     // sanitize value
@@ -62,8 +65,20 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
     setToAddress(value);
   };
 
-  const isValid = validRegex.test(toAddress || '');
+  const isValidAddress = validRegex.test(toAddress || '');
+  const isNotSameAddress = toAddress?.toLowerCase() !== account.toLowerCase();
+  const isValid = isValidAddress && isNotSameAddress;
 
+  const hasError = toAddress !== '' && toAddress !== null && !isValid;
+
+  let error = '';
+  if (hasError) {
+    if (!isValidAddress) {
+      error = 'This is not a valid address';
+    } else {
+      error = 'Transfer address cannot be the same as your address';
+    }
+  }
   const onGoToEtherscan = () => {
     const url = buildEtherscanAddress(toAddress || '', currentNetwork.chainId);
     window.open(url, '_blank');
@@ -106,8 +121,8 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
           placeholder="Set the address to transfer to"
           autoComplete="off"
           autoCorrect="off"
-          error={toAddress !== '' && toAddress !== null && !isValid}
-          helperText={toAddress !== '' && toAddress !== null && !isValid ? 'This is not a valid address' : ''}
+          error={hasError}
+          helperText={hasError ? error : ''}
           fullWidth
           type="text"
           margin="normal"
