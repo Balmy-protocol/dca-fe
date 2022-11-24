@@ -42,6 +42,18 @@ function useBuildTransactionDetail() {
       let message = 'Transaction confirmed!';
       try {
         switch (tx.type) {
+          case TRANSACTION_TYPES.WRAP: {
+            const swapTypeData = tx.typeData as SwapTypeData;
+
+            message = `Wrap ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+            break;
+          }
+          case TRANSACTION_TYPES.UNWRAP: {
+            const swapTypeData = tx.typeData as SwapTypeData;
+
+            message = `Unwrap ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+            break;
+          }
           case TRANSACTION_TYPES.SWAP: {
             const swapTypeData = tx.typeData as SwapTypeData;
 

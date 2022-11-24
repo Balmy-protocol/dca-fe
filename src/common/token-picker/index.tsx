@@ -135,6 +135,7 @@ interface TokenPickerProps {
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
   isAggregator?: boolean;
+  showWrappedAndProtocol?: boolean;
 }
 
 const useListItemStyles = makeStyles(({ palette }) => ({
@@ -241,6 +242,7 @@ const TokenPicker = ({
   yieldOptions,
   isLoadingYieldOptions,
   isAggregator,
+  showWrappedAndProtocol,
 }: TokenPickerProps) => {
   const tokenList = useTokenList(isAggregator);
   const [search, setSearch] = React.useState('');
@@ -297,7 +299,8 @@ const TokenPicker = ({
   );
 
   const otherIsProtocol =
-    otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address;
+    !showWrappedAndProtocol &&
+    (otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address);
 
   const memoizedUnorderedTokenKeys = React.useMemo(() => {
     const filteredTokenKeys = tokenKeysToUse
@@ -310,6 +313,7 @@ const TokenPicker = ({
           !usedTokens.includes(el) &&
           !ignoreValues.includes(el) &&
           tokenList[el].chainId === currentNetwork.chainId &&
+          otherSelected?.address !== el &&
           (!otherIsProtocol ||
             (otherIsProtocol && el !== wrappedProtocolToken.address && el !== PROTOCOL_TOKEN_ADDRESS))
       )
