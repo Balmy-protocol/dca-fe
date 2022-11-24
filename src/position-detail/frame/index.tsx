@@ -409,6 +409,8 @@ const PositionDetailFrame = () => {
         open={showTerminateModal}
         position={fullPositionToMappedPosition(positionInUse)}
         onCancel={() => setShowTerminateModal(false)}
+        remainingLiquidityUnderlying={remainingLiquidityUnderlying}
+        toWithdrawUnderlying={toWithdrawUnderlying}
       />
       <ModifySettingsModal
         open={showModifyRateSettingsModal}
