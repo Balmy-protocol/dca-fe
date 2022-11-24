@@ -326,6 +326,7 @@ export default class Web3Service {
     const loadedAsSafeApp = await web3Modal.isSafeApp();
 
     this.transactionService.setLoadedAsSafeApp(loadedAsSafeApp);
+    this.meanApiService.setLoadedAsSafeApp(loadedAsSafeApp);
 
     try {
       if (process.env.ARCX_KEY) {
