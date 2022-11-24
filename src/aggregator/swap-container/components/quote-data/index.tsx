@@ -8,6 +8,8 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { NETWORKS } from 'config';
 import find from 'lodash/find';
 import { capitalizeFirstLetter } from 'utils/parsing';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import Tooltip from '@mui/material/Tooltip';
 
 const StyledQuoteDataContainer = styled.div`
   padding: 16px;
@@ -23,6 +25,12 @@ const StyledQuoteDataContainer = styled.div`
 const StyledQuoteDataItem = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const StyledMinimumContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
 `;
 
 interface QuoteDataProps {
@@ -64,11 +72,25 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
         <Typography variant="body2" color="inherit">
           <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
         </Typography>
-        <Typography variant="body2" color="inherit">
-          {quote?.minBuyAmount.amount && to
-            ? `${formatCurrencyAmount(quote.minBuyAmount.amount, to, 4)} ${to.symbol}`
-            : '-'}
-        </Typography>
+        <StyledMinimumContainer>
+          <Typography variant="body2" color="inherit">
+            {quote?.minBuyAmount.amount && to
+              ? `${formatCurrencyAmount(quote.minBuyAmount.amount, to, 4)} ${to.symbol}`
+              : '-'}
+          </Typography>
+          <Tooltip
+            title={
+              <FormattedMessage
+                description="quoteDataMinimumTooltip"
+                defaultMessage="This is the minimum you will receive based on your slippage settings"
+              />
+            }
+            arrow
+            placement="top"
+          >
+            <HelpOutlineIcon fontSize="small" />
+          </Tooltip>
+        </StyledMinimumContainer>
       </StyledQuoteDataItem>
     </StyledQuoteDataContainer>
   );
