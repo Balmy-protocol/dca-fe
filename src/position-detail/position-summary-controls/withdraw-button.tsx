@@ -9,7 +9,6 @@ import Popper from '@mui/material/Popper';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition } from 'types';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 interface WithdrawButtonProps {
   onClick: (useProtocolToken: boolean) => void;
@@ -20,9 +19,8 @@ interface WithdrawButtonProps {
 const WithdrawButton = ({ onClick, disabled, position }: WithdrawButtonProps) => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
-  const currentNetwork = useCurrentNetwork();
-  const protocolToken = getProtocolToken(currentNetwork.chainId);
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const protocolToken = getProtocolToken(position.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);

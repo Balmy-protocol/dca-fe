@@ -12,7 +12,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import { buildEtherscanAddress } from 'utils/etherscan';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'hooks/state';
 import { addPermission, removePermission } from 'state/position-permissions/actions';
 import { COMPANION_ADDRESS, LATEST_VERSION, PositionVersions, STRING_PERMISSIONS } from 'config/constants';
@@ -113,7 +112,6 @@ const PositionPermissionItem = ({
   positionVersion,
   chainId,
 }: PositionPermissionProps) => {
-  const currentNetwork = useCurrentNetwork();
   const dispatch = useAppDispatch();
 
   const handlePermissionChange = (permission: Permission, newValue: boolean) => {
@@ -132,7 +130,7 @@ const PositionPermissionItem = ({
             <StyledCardTitleHeader>
               <Typography variant="body2">
                 <StyledLink
-                  href={buildEtherscanAddress(positionPermission.operator, currentNetwork.chainId)}
+                  href={buildEtherscanAddress(positionPermission.operator, chainId)}
                   target="_blank"
                   rel="noreferrer"
                 >
