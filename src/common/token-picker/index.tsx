@@ -31,6 +31,7 @@ import { formatUnits } from '@ethersproject/units';
 import Switch from '@mui/material/Switch';
 import useCustomToken from 'hooks/useCustomToken';
 import useAllowedPairs from 'hooks/useAllowedPairs';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -116,6 +117,7 @@ interface RowData {
   yieldOptions: YieldOptions;
   tokenBalances: Record<string, { balance: BigNumber; balanceUsd: BigNumber }>;
   customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
+  isLoadingTokenBalances: boolean;
 }
 
 interface RowProps {
@@ -162,7 +164,7 @@ const useListItemStyles = makeStyles(({ palette }) => ({
 const Row = ({
   index,
   style,
-  data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances, customToken },
+  data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances, customToken, isLoadingTokenBalances },
 }: RowProps) => {
   const classes = useListItemStyles();
   const isCustomToken = !!customToken && tokenKeys[index] === customToken.token.address;
@@ -216,15 +218,20 @@ const Row = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {tokenBalance && (
-          <Typography variant="body1" color="#FFFFFF">
-            {formatCurrencyAmount(tokenBalance, token, 6)}
-          </Typography>
-        )}
-        {!!tokenValue && (
-          <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-            ${tokenValue.toFixed(2)}
-          </Typography>
+        {isLoadingTokenBalances && !Object.keys(tokenBalances).length && <CenteredLoadingIndicator size={10} />}
+        {!isLoadingTokenBalances && Object.keys(tokenBalances).length && (
+          <>
+            {tokenBalance && (
+              <Typography variant="body1" color="#FFFFFF">
+                {formatCurrencyAmount(tokenBalance, token, 6)}
+              </Typography>
+            )}
+            {!!tokenValue && (
+              <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                ${tokenValue.toFixed(2)}
+              </Typography>
+            )}
+          </>
         )}
       </StyledBalanceContainer>
     </StyledListItem>
@@ -278,7 +285,10 @@ const TokenPicker = ({
     [allowedPairs, otherToCheck]
   );
 
-  tokenKeysToUse = isOnlyAllowedPairs && !!otherSelected ? uniqTokensFromPairs : tokenKeys;
+  tokenKeysToUse = React.useMemo(
+    () => (isOnlyAllowedPairs && !!otherSelected ? uniqTokensFromPairs : tokenKeys),
+    [isOnlyAllowedPairs, otherSelected, uniqTokensFromPairs, tokenKeys]
+  );
 
   const handleOnClose = () => {
     if (shouldShowTokenLists) {
@@ -343,7 +353,7 @@ const TokenPicker = ({
     otherSelected,
   ]);
 
-  const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(memoizedUnorderedTokenKeys);
+  const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(tokenKeysToUse);
 
   const [customToken] = useCustomToken(
     search,
@@ -379,8 +389,9 @@ const TokenPicker = ({
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
       tokenBalances: isLoadingTokenBalances && !tokenBalances ? {} : tokenBalances,
       customToken,
+      isLoadingTokenBalances,
     }),
-    [memoizedTokenKeys, tokenList, tokenBalances, yieldOptions, customToken]
+    [memoizedTokenKeys, tokenList, tokenBalances, yieldOptions, customToken, isLoadingTokenBalances]
   );
 
   return (
