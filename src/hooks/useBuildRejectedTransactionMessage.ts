@@ -39,6 +39,18 @@ function useBuildTransactionMessages() {
     (tx: TransactionDetails) => {
       let message = 'Transaction confirmed!';
       switch (tx.type) {
+        case TRANSACTION_TYPES.WRAP: {
+          const swapTypeData = tx.typeData as SwapTypeData;
+
+          message = `Wrapping ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+          break;
+        }
+        case TRANSACTION_TYPES.UNWRAP: {
+          const swapTypeData = tx.typeData as SwapTypeData;
+
+          message = `Unwrapping ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+          break;
+        }
         case TRANSACTION_TYPES.SWAP: {
           const swapTypeData = tx.typeData as SwapTypeData;
 
