@@ -52,6 +52,7 @@ const AggregatorTokenPicker = ({
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         isAggregator
+        showWrappedAndProtocol
       />
     </StyledOverlay>
   </Modal>

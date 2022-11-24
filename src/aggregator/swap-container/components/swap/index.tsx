@@ -16,7 +16,7 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { useTransactionAdder, useHasPendingApproval } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
-import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useWalletService from 'hooks/useWalletService';
 import useWeb3Service from 'hooks/useWeb3Service';
@@ -96,6 +96,7 @@ const Swap = ({
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const [usedTokens] = useUsedTokens();
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
+  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
   const hasPendingApproval = useHasPendingApproval(
     from,
@@ -153,14 +154,23 @@ const Swap = ({
     const toSymbol = to.symbol;
     const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4);
     const toAmount = formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4);
-
     try {
+      const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
+      const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
+
       setModalLoading({
         content: (
           <Typography variant="body1">
+            {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
+            {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
+            {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
+              (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
+              <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
+            )}
+            {` `}
             <FormattedMessage
-              description="swap aggregator"
-              defaultMessage="Swapping {fromAmount} {from} for {toAmount} {to} for you"
+              description="swap aggregator loading title"
+              defaultMessage="{fromAmount} {from} for {toAmount} {to} for you"
               values={{ from: fromSymbol, to: toSymbol, fromAmount, toAmount }}
             />
           </Typography>
@@ -169,8 +179,16 @@ const Swap = ({
 
       const result = await aggregatorService.swap(selectedRoute);
 
+      let transactionType = TRANSACTION_TYPES.SWAP;
+
+      if (isWrap) {
+        transactionType = TRANSACTION_TYPES.WRAP;
+      } else if (isUnwrap) {
+        transactionType = TRANSACTION_TYPES.UNWRAP;
+      }
+
       addTransaction(result, {
-        type: TRANSACTION_TYPES.SWAP,
+        type: transactionType,
         typeData: {
           from: fromSymbol,
           to: toSymbol,
@@ -182,11 +200,26 @@ const Swap = ({
       setModalSuccess({
         hash: result.hash,
         content: (
-          <FormattedMessage
-            description="success swapping"
-            defaultMessage="Your transaction to swap {fromAmount} {from} for {toAmount} {to} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: fromSymbol, to: toSymbol, fromAmount, toAmount }}
-          />
+          <Typography variant="body1">
+            <FormattedMessage description="success swapping step1" defaultMessage="Your transaction to" />
+            {` `}
+            {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
+              <FormattedMessage description="wrap agg success" defaultMessage="Wrapping" />
+            )}
+            {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
+              <FormattedMessage description="unwrap agg success" defaultMessage="Unwrapping" />
+            )}
+            {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
+              (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
+              <FormattedMessage description="swap agg success" defaultMessage="Swapping" />
+            )}
+            {` `}
+            <FormattedMessage
+              description="success swapping step2"
+              defaultMessage="{fromAmount} {from} for {toAmount} {to} has been succesfully submitted to the blockchain and will be confirmed soon"
+              values={{ from: fromSymbol, to: toSymbol, fromAmount, toAmount }}
+            />
+          </Typography>
         ),
       });
 
@@ -239,8 +272,6 @@ const Swap = ({
     parseUnits(fromValue, from.decimals).lte(BigNumber.from(0));
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
-
-  const ignoreValues = [...(from ? [from.address] : []), ...(to ? [to.address] : [])];
 
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error">
@@ -315,7 +346,16 @@ const Swap = ({
       onClick={handleSwap}
     >
       <Typography variant="body1">
-        <FormattedMessage description="swap agg" defaultMessage="Swap" />
+        {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
+          <FormattedMessage description="wrap agg" defaultMessage="Wrap" />
+        )}
+        {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
+          <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
+        )}
+        {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
+          (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
+          <FormattedMessage description="swap agg" defaultMessage="Swap" />
+        )}
       </Typography>
     </StyledButton>
   );
@@ -359,7 +399,7 @@ const Swap = ({
           isFrom={selecting === from}
           onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
           usedTokens={usedTokens}
-          ignoreValues={ignoreValues}
+          ignoreValues={[]}
           yieldOptions={[]}
           isLoadingYieldOptions={false}
           otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
