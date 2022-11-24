@@ -21,6 +21,8 @@ interface TerminateModalProps {
   position: Position;
   onCancel: () => void;
   open: boolean;
+  remainingLiquidityUnderlying?: BigNumber;
+  toWithdrawUnderlying?: BigNumber;
 }
 
 const StyledTerminateContainer = styled.div`
@@ -32,7 +34,13 @@ const StyledTerminateContainer = styled.div`
   gap: 10px;
 `;
 
-const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
+const TerminateModal = ({
+  position,
+  open,
+  onCancel,
+  remainingLiquidityUnderlying,
+  toWithdrawUnderlying,
+}: TerminateModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
@@ -40,6 +48,8 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [useProtocolToken, setUseProtocolToken] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const remainingLiquidity = remainingLiquidityUnderlying || position.remainingLiquidity;
+  const toWithdraw = toWithdrawUnderlying || position.toWithdraw;
   const hasProtocolToken =
     position.from.address === protocolToken.address || position.to.address === protocolToken.address;
   const hasWrappedOrProtocol =
@@ -50,7 +60,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
     position.from.address === protocolToken.address || position.from.address === wrappedProtocolToken.address;
   const protocolIsTo =
     position.to.address === protocolToken.address || position.to.address === wrappedProtocolToken.address;
-  const swappedOrLiquidity = protocolIsFrom ? position.remainingLiquidity : position.toWithdraw;
+  const swappedOrLiquidity = protocolIsFrom ? remainingLiquidity : toWithdraw;
   const [hasSignSupport] = useSupportsSigning();
 
   const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : BigNumber.from(0);
@@ -166,9 +176,9 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
             description="terminate returns"
             defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
             values={{
-              from: formatUnits(position.remainingLiquidity, position.from.decimals),
+              from: formatUnits(remainingLiquidity, position.from.decimals),
               fromSymbol,
-              to: formatUnits(position.toWithdraw, position.to.decimals),
+              to: formatUnits(toWithdraw, position.to.decimals),
               toSymbol,
             }}
           />
