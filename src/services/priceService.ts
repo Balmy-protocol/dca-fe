@@ -221,10 +221,22 @@ export default class PriceService {
       coins[`${DEFILLAMA_IDS[chainIdToUse]}:${tokenB.address}`] &&
       coins[`${DEFILLAMA_IDS[chainIdToUse]}:${tokenB.address}`].prices;
 
-    const graphData = tokenAPrices.map(({ price, timestamp }, index) => ({
-      timestamp,
-      rate: price / tokenBPrices[index].price,
-    }));
+    const tokenAIsBaseToken = STABLE_COINS.includes(tokenA.symbol);
+
+    const graphData = tokenAPrices.reduce<{ timestamp: number; rate: number }[]>((acc, { price, timestamp }, index) => {
+      const tokenBPrice = tokenBPrices[index] && tokenBPrices[index].price;
+      if (!tokenBPrice) {
+        return acc;
+      }
+
+      return [
+        ...acc,
+        {
+          timestamp,
+          rate: tokenAIsBaseToken ? tokenBPrice / price : price / tokenBPrice,
+        },
+      ];
+    }, []);
 
     return graphData;
   }
