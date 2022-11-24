@@ -17,6 +17,11 @@ import { emptyTokenWithAddress } from 'utils/currency';
 import ContractService from './contractService';
 import WalletService from './walletService';
 
+const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
+  slippagePercentage: 0.1, // 0.1%
+  deadline: '48h', // 48hs
+};
+
 export default class MeanApiService {
   axiosClient: AxiosInstance;
 
@@ -25,6 +30,8 @@ export default class MeanApiService {
   contractService: ContractService;
 
   client: ethers.providers.Web3Provider;
+
+  loadedAsSafeApp: boolean;
 
   constructor(
     walletService: WalletService,
@@ -38,10 +45,27 @@ export default class MeanApiService {
     this.walletService = walletService;
     this.axiosClient = axiosClient;
     this.contractService = contractService;
+    this.loadedAsSafeApp = false;
+  }
+
+  getLoadedAsSafeApp() {
+    return this.loadedAsSafeApp;
+  }
+
+  setLoadedAsSafeApp(loadedAsSafeApp: boolean) {
+    this.loadedAsSafeApp = loadedAsSafeApp;
   }
 
   setClient(client: ethers.providers.Web3Provider) {
     this.client = client;
+  }
+
+  getDeadlineSlippageDefault() {
+    if (this.getLoadedAsSafeApp()) {
+      return DEFAULT_SAFE_DEADLINE_SLIPPAGE;
+    }
+
+    return {};
   }
 
   async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
@@ -82,6 +106,7 @@ export default class MeanApiService {
         owner: account,
         hub: hubAddress,
         permissions,
+        ...this.getDeadlineSlippageDefault(),
       }
     );
 
@@ -116,6 +141,7 @@ export default class MeanApiService {
         owner: account,
         hub: hubAddress,
         permissions,
+        ...this.getDeadlineSlippageDefault(),
       }
     );
 
@@ -164,6 +190,7 @@ export default class MeanApiService {
         recipient,
         hub: hubAddress,
         permissionPermit,
+        ...this.getDeadlineSlippageDefault(),
       }
     );
 
@@ -196,6 +223,7 @@ export default class MeanApiService {
         swappedConvertTo: tokenTo,
         hub: hubAddress,
         permissionPermit,
+        ...this.getDeadlineSlippageDefault(),
       }
     );
 
@@ -226,6 +254,7 @@ export default class MeanApiService {
         amountOfSwaps: newSwaps.toNumber(),
         hub: hubAddress,
         permissionPermit,
+        ...this.getDeadlineSlippageDefault(),
       }
     );
 
@@ -261,6 +290,7 @@ export default class MeanApiService {
         recipient,
         hub: hubAddress,
         permissionPermit,
+        ...this.getDeadlineSlippageDefault(),
       }
     );
 
@@ -294,6 +324,7 @@ export default class MeanApiService {
         newFrom,
         newTo,
         permissionPermit,
+        ...this.getDeadlineSlippageDefault(),
       }
     );
 
