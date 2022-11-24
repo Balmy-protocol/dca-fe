@@ -143,6 +143,8 @@ const StyledGraphPillsContainer = styled.div`
 
 const PERIODS = [1, 7, 30];
 
+const INDEX_TO_FORMAT = ['t', 'MMM d t', 'MMM d t'];
+
 const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   address: '',
   symbol: '',
@@ -162,7 +164,6 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
   let prices: Prices = [];
   const [tabIndex, setTabIndex] = React.useState(1);
   const availablePairs = useAvailablePairs();
-  const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(from, to, tabIndex);
   const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, parseUnits('1', from?.decimals || 18));
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, parseUnits('1', to?.decimals || 18));
 
@@ -170,6 +171,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
     () => parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),
     [tabIndex]
   );
+
   const currentNetwork = useCurrentNetwork();
 
   if (to && from) {
@@ -202,6 +204,8 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
       };
     }
   }
+
+  const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(tokenA, tokenB, tabIndex);
 
   const existingPair = React.useMemo(
     () =>
@@ -239,12 +243,13 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
 
   prices = React.useMemo(() => {
     const mappedDefiLlamaData = map(defiLlamaData, ({ date, tokenPrice }) => ({
-      name: DateTime.fromSeconds(parseInt(date, 10)).toFormat('MMM d t'),
+      name: DateTime.fromSeconds(parseInt(date, 10)).toFormat(INDEX_TO_FORMAT[tabIndex]),
       Defillama: parseFloat(tokenPrice),
       date,
     }));
+
     const mappedSwapData = map(swapData, ({ executedAtTimestamp, ratePerUnitAToB, ratePerUnitBToA }) => ({
-      name: DateTime.fromSeconds(parseInt(executedAtTimestamp, 10)).toFormat('MMM d t'),
+      name: DateTime.fromSeconds(parseInt(executedAtTimestamp, 10)).toFormat(INDEX_TO_FORMAT[tabIndex]),
       'Mean Finance':
         parseFloat(
           formatCurrencyAmount(
@@ -256,7 +261,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
     }));
 
     return orderBy([...mappedSwapData, ...mappedDefiLlamaData], ['date'], ['desc']).reverse();
-  }, [swapData, defiLlamaData]);
+  }, [swapData, defiLlamaData, tabIndex]);
 
   const isLoading = loadingMeanData || isLoadingFromPrice || isLoadingToPrice || isLoadingDefillamaPrices;
   // const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
@@ -398,7 +403,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
+              tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1] || ''}`}
             />
             <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false} />
             <Tooltip
