@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
+import Button from 'common/button';
 import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -20,6 +21,11 @@ import useUsdPrice from 'hooks/useUsdPrice';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 
+const StyledButton = styled(Button)`
+  padding: 0;
+  min-width: 10px;
+`;
+
 const StyledGrid = styled(Grid)`
   top: 16px;
   left: 16px;
@@ -34,6 +40,9 @@ const StyledTitleContainer = styled.div`
 
 const StyledFormHelperText = styled(FormHelperText)`
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 `;
 
 const StyledContentContainer = styled.div`
@@ -187,6 +196,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                         balance: formatCurrencyAmount(balance, from, 4),
                       }}
                     />
+                    <StyledButton onClick={onSetMaxBalance} color="secondary" variant="text">
+                      <FormattedMessage description="maxWallet" defaultMessage="Max" />
+                    </StyledButton>
                   </StyledFormHelperText>
                 )}
                 <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
