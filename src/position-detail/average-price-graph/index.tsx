@@ -12,7 +12,6 @@ import { POSITION_ACTIONS, STABLE_COINS } from 'config/constants';
 import GraphTooltip from 'common/graph-tooltip';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import { formatCurrencyAmount } from 'utils/currency';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
 const StyledContainer = styled(Paper)`
@@ -82,8 +81,7 @@ type GraphToken = TokenWithBase;
 
 const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   let prices: Prices = [];
-  const currentNetwork = useCurrentNetwork();
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;

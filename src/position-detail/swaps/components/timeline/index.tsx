@@ -26,7 +26,6 @@ import {
 import { getFrequencyLabel } from 'utils/parsing';
 import { buildEtherscanAddress } from 'utils/etherscan';
 import Link from '@mui/material/Link';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import Address from 'common/address';
@@ -730,11 +729,10 @@ const FILTERS = {
 
 const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
   let history = [];
-  const currentNetwork = useCurrentNetwork();
 
   const mappedPositionHistory = position.history
     .filter((positionState) => FILTERS[filter].includes(positionState.action))
-    .map((positionState) => MESSAGE_MAP[positionState.action](positionState, position, currentNetwork.chainId));
+    .map((positionState) => MESSAGE_MAP[positionState.action](positionState, position, position.chainId));
 
   history = orderBy(mappedPositionHistory, ['toOrder'], ['desc']);
 

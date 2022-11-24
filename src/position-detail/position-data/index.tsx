@@ -38,7 +38,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { updateShowBreakdown } from 'state/position-details/actions';
 import { Theme, Tooltip } from '@mui/material';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import PositionDataControls from './position-data-controls';
 
@@ -235,8 +234,7 @@ const Details = ({
   } = calculateYield(remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw), rate, remainingSwaps);
 
   const isPending = pendingTransaction !== null;
-  const currentNetwork = useCurrentNetwork();
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
   let summedPrices = BigNumber.from(0);
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
