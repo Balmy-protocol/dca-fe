@@ -37,6 +37,8 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
 
   // AGGREGATOR
   SWAP: 'SWAP',
+  WRAP: 'WRAP',
+  UNWRAP: 'UNWRAP',
 };
 
 export const FULL_DEPOSIT_TYPE = 'full_deposit';

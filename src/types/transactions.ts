@@ -45,11 +45,27 @@ export type TransactionTypes =
   | 'WITHDRAW_FUNDS'
   | 'RESET_POSITION'
   // AGGREGATOR
-  | 'SWAP';
+  | 'SWAP'
+  | 'WRAP'
+  | 'UNWRAP';
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
 
 export interface SwapTypeData {
+  from: string;
+  to: string;
+  amountFrom: string;
+  amountTo: string;
+}
+
+export interface WrapTypeData {
+  from: string;
+  to: string;
+  amountFrom: string;
+  amountTo: string;
+}
+
+export interface UnwrapTypeData {
   from: string;
   to: string;
   amountFrom: string;
