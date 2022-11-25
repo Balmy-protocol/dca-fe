@@ -158,7 +158,8 @@ export default class PositionService {
       })
     );
 
-    const results = await Promise.all(promises);
+    const avoidFailure = promises.map((promise) => promise.catch(() => ({ failed: true })));
+    const results = await Promise.all(avoidFailure);
 
     const currentPositions = {
       ...this.currentPositions,
@@ -172,76 +173,78 @@ export default class PositionService {
     }[] = [];
 
     this.currentPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
-      const { network, version } = networksAndVersions[index];
-      if (gqlResult.data) {
-        return {
-          ...acc,
-          ...keyBy(
-            gqlResult.data.positions.map((position: PositionResponse) => {
-              const existingPosition = this.currentPositions[`${position.id}-v${version}`];
-              const fromToUse = getDisplayToken(position.from, network);
-              const toToUse = getDisplayToken(position.to, network);
+      if (!('failed' in gqlResult)) {
+        const { network, version } = networksAndVersions[index];
+        if (gqlResult.data) {
+          return {
+            ...acc,
+            ...keyBy(
+              gqlResult.data.positions.map((position: PositionResponse) => {
+                const existingPosition = this.currentPositions[`${position.id}-v${version}`];
+                const fromToUse = getDisplayToken(position.from, network);
+                const toToUse = getDisplayToken(position.to, network);
 
-              if (fromToUse.underlyingTokens.length) {
-                underlyingsNeededToFetch.push({
-                  positionId: `${position.id}-v${version}`,
-                  token: fromToUse,
-                  attr: 'remainingLiquidityUnderlying',
-                  amount: BigNumber.from(position.rate).mul(BigNumber.from(position.remainingSwaps)),
-                });
-              }
-              if (toToUse.underlyingTokens.length) {
-                underlyingsNeededToFetch.push({
-                  positionId: `${position.id}-v${version}`,
-                  token: toToUse,
-                  attr: 'toWithdrawUnderlying',
-                  amount: BigNumber.from(position.toWithdraw),
-                });
-              }
+                if (fromToUse.underlyingTokens.length) {
+                  underlyingsNeededToFetch.push({
+                    positionId: `${position.id}-v${version}`,
+                    token: fromToUse,
+                    attr: 'remainingLiquidityUnderlying',
+                    amount: BigNumber.from(position.rate).mul(BigNumber.from(position.remainingSwaps)),
+                  });
+                }
+                if (toToUse.underlyingTokens.length) {
+                  underlyingsNeededToFetch.push({
+                    positionId: `${position.id}-v${version}`,
+                    token: toToUse,
+                    attr: 'toWithdrawUnderlying',
+                    amount: BigNumber.from(position.toWithdraw),
+                  });
+                }
 
-              const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
-              return {
-                from: fromToUse,
-                to: toToUse,
-                user: position.user,
-                swapInterval: BigNumber.from(position.swapInterval.interval),
-                swapped: BigNumber.from(position.totalSwapped),
-                rate: BigNumber.from(position.rate),
-                remainingLiquidity: BigNumber.from(position.remainingLiquidity),
-                remainingSwaps: BigNumber.from(position.remainingSwaps),
-                withdrawn: BigNumber.from(position.totalWithdrawn),
-                toWithdraw: BigNumber.from(position.toWithdraw),
-                totalSwaps: BigNumber.from(position.totalSwaps),
-                toWithdrawUnderlying: null,
-                remainingLiquidityUnderlying: null,
-                depositedRateUnderlying: position.depositedRateUnderlying
-                  ? BigNumber.from(position.depositedRateUnderlying)
-                  : null,
-                totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
-                  ? BigNumber.from(position.totalSwappedUnderlyingAccum)
-                  : null,
-                toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
-                  ? BigNumber.from(position.toWithdrawUnderlyingAccum)
-                  : null,
-                id: `${position.id}-v${version}`,
-                positionId: position.id,
-                status: position.status,
-                startedAt: position.createdAtTimestamp,
-                totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
-                totalDeposited: BigNumber.from(position.totalDeposited),
-                pendingTransaction,
-                pairId: position.pair.id,
-                version,
-                chainId: network,
-                pairLastSwappedAt:
-                  (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
-                  position.createdAtTimestamp,
-                pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
-              };
-            }),
-            'id'
-          ),
-        };
+                const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
+                return {
+                  from: fromToUse,
+                  to: toToUse,
+                  user: position.user,
+                  swapInterval: BigNumber.from(position.swapInterval.interval),
+                  swapped: BigNumber.from(position.totalSwapped),
+                  rate: BigNumber.from(position.rate),
+                  remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+                  remainingSwaps: BigNumber.from(position.remainingSwaps),
+                  withdrawn: BigNumber.from(position.totalWithdrawn),
+                  toWithdraw: BigNumber.from(position.toWithdraw),
+                  totalSwaps: BigNumber.from(position.totalSwaps),
+                  toWithdrawUnderlying: null,
+                  remainingLiquidityUnderlying: null,
+                  depositedRateUnderlying: position.depositedRateUnderlying
+                    ? BigNumber.from(position.depositedRateUnderlying)
+                    : null,
+                  totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
+                    ? BigNumber.from(position.totalSwappedUnderlyingAccum)
+                    : null,
+                  toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
+                    ? BigNumber.from(position.toWithdrawUnderlyingAccum)
+                    : null,
+                  id: `${position.id}-v${version}`,
+                  positionId: position.id,
+                  status: position.status,
+                  startedAt: position.createdAtTimestamp,
+                  totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
+                  totalDeposited: BigNumber.from(position.totalDeposited),
+                  pendingTransaction,
+                  pairId: position.pair.id,
+                  version,
+                  chainId: network,
+                  pairLastSwappedAt:
+                    (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
+                    position.createdAtTimestamp,
+                  pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
+                };
+              }),
+              'id'
+            ),
+          };
+        }
       }
       return acc;
     }, currentPositions);
