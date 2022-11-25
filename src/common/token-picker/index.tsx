@@ -10,13 +10,13 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import ListItem from '@mui/material/ListItem';
-import Divider from '@mui/material/Divider';
+// import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Search from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import Chip from '@mui/material/Chip';
+// import Chip from '@mui/material/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles, withStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
@@ -65,9 +65,9 @@ const StyledFilledInput = withStyles(() =>
   })
 )(FilledInput);
 
-const StyledChip = styled(Chip)`
-  margin-right: 5px;
-`;
+// const StyledChip = styled(Chip)`
+//   margin-right: 5px;
+// `;
 
 const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 0px;
@@ -230,6 +230,7 @@ const TokenPicker = ({
   onClose,
   onChange,
   ignoreValues,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   usedTokens,
   otherSelected,
   yieldOptions,
@@ -284,10 +285,10 @@ const TokenPicker = ({
     handleOnClose();
   };
 
-  const memoizedUsedTokens = React.useMemo(
-    () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
-    [usedTokens, ignoreValues, tokenKeysToUse]
-  );
+  // const memoizedUsedTokens = React.useMemo(
+  //   () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
+  //   [usedTokens, ignoreValues, tokenKeysToUse]
+  // );
 
   const otherIsProtocol =
     otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address;
@@ -300,7 +301,7 @@ const TokenPicker = ({
           (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
-          !usedTokens.includes(el) &&
+          // !usedTokens.includes(el) &&
           !ignoreValues.includes(el) &&
           tokenList[el].chainId === currentNetwork.chainId &&
           el !== otherSelected?.address &&
@@ -323,7 +324,7 @@ const TokenPicker = ({
   }, [
     tokenKeysToUse,
     search,
-    usedTokens,
+    // usedTokens,
     ignoreValues,
     tokenKeys,
     availableFrom,
@@ -417,7 +418,7 @@ const TokenPicker = ({
                   />
                 </StyledSwitchGrid>
               )}
-              {!!memoizedUsedTokens.length && (
+              {/* {!!memoizedUsedTokens.length && (
                 <>
                   <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
                     <Typography variant="caption">
@@ -438,7 +439,7 @@ const TokenPicker = ({
                     <Divider />
                   </StyledGrid>
                 </>
-              )}
+              )} */}
               <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
                 <StyledDialogTitle>
                   <Typography variant="body1" fontWeight={600} fontSize="1.2rem">

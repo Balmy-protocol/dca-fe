@@ -6,6 +6,7 @@ export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.optimism.chainId]: 1,
   [NETWORKS.arbitrum.chainId]: 1,
   [NETWORKS.polygon.chainId]: 1,
+  [NETWORKS.mainnet.chainId]: 5,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT = 5;

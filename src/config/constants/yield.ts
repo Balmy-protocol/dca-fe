@@ -4,8 +4,9 @@ import { NETWORKS } from './addresses';
 
 export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
   [NETWORKS.optimism.chainId]: 5,
-  [NETWORKS.arbitrum.chainId]: 5,
-  [NETWORKS.polygon.chainId]: 2.5,
+  [NETWORKS.arbitrum.chainId]: 10,
+  [NETWORKS.polygon.chainId]: 10,
+  [NETWORKS.mainnet.chainId]: 10,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
@@ -236,6 +237,36 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         poolId: '3a6cc030-738d-4e19-8a40-e63e9c4d5a6f', // aave-v3 USDT
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
+      },
+    ],
+    [NETWORKS.mainnet.chainId]: [
+      {
+        id: '61b7623c-9ac2-4a73-a748-8db0b1c8c5bc', // euler USDC
+        tokenAddress: '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // euler USDC
+        poolId: '61b7623c-9ac2-4a73-a748-8db0b1c8c5bc', // euler USDC
+        name: 'Euler',
+        token: emptyTokenWithAddress('EULER'),
+      },
+      {
+        id: '618ddb92-fe0d-41e6-bdbe-e00d2a721055', // euler WETH
+        tokenAddress: '0xd4de9d2fc1607d1df63e1c95ecbfa8d7946f5457', // euler WETH
+        poolId: '618ddb92-fe0d-41e6-bdbe-e00d2a721055', // euler WETH
+        name: 'Euler',
+        token: emptyTokenWithAddress('EULER'),
+      },
+      {
+        id: 'c256de58-4176-49f9-99af-f48226573bb5', // euler DAI
+        tokenAddress: '0xc4113b7605d691e073c162809060b6c5ae402f1e', // euler DAI
+        poolId: 'c256de58-4176-49f9-99af-f48226573bb5', // euler DAI
+        name: 'Euler',
+        token: emptyTokenWithAddress('EULER'),
+      },
+      {
+        id: '62be2bfe-80c8-484c-836b-a5fe97634e92', // euler WBTC
+        tokenAddress: '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // euler WBTC
+        poolId: '62be2bfe-80c8-484c-836b-a5fe97634e92', // euler WBTC
+        name: 'Euler',
+        token: emptyTokenWithAddress('EULER'),
       },
     ],
   };
