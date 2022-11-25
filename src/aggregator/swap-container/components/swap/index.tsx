@@ -23,6 +23,7 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import useAggregatorService from 'hooks/useAggregatorService';
 import useSpecificAllowance from 'hooks/useSpecificAllowance';
 import TransferToModal from 'common/transfer-to-modal';
+import TransactionConfirmation from 'common/transaction-confirmation';
 import { GasKeys } from 'config/constants/aggregator';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -86,9 +87,10 @@ const Swap = ({
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
+  const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
-  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
+  const [setModalSuccess, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
@@ -97,6 +99,7 @@ const Swap = ({
   const [usedTokens] = useUsedTokens();
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const [currentTransaction, setCurrentTransaction] = React.useState('');
 
   const hasPendingApproval = useHasPendingApproval(
     from,
@@ -197,31 +200,9 @@ const Swap = ({
         },
       });
 
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <Typography variant="body1">
-            <FormattedMessage description="success swapping step1" defaultMessage="Your transaction to" />
-            {` `}
-            {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
-              <FormattedMessage description="wrap agg success" defaultMessage="Wrapping" />
-            )}
-            {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
-              <FormattedMessage description="unwrap agg success" defaultMessage="Unwrapping" />
-            )}
-            {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-              (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-              <FormattedMessage description="swap agg success" defaultMessage="Swapping" />
-            )}
-            {` `}
-            <FormattedMessage
-              description="success swapping step2"
-              defaultMessage="{fromAmount} {from} for {toAmount} {to} has been succesfully submitted to the blockchain and will be confirmed soon"
-              values={{ from: fromSymbol, to: toSymbol, fromAmount, toAmount }}
-            />
-          </Typography>
-        ),
-      });
+      setModalClosed({ content: '' });
+      setCurrentTransaction(result.hash);
+      setShouldShowConfirmation(true);
 
       onResetForm();
     } catch (e) {
@@ -393,6 +374,11 @@ const Swap = ({
       />
       <StyledPaper variant="outlined" ref={containerRef}>
         <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
+        <TransactionConfirmation
+          shouldShow={shouldShowConfirmation}
+          transaction={currentTransaction}
+          handleClose={() => setShouldShowConfirmation(false)}
+        />
         <TokenPicker
           shouldShow={shouldShowPicker}
           onClose={() => setShouldShowPicker(false)}
