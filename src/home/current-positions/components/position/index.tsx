@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE, calculateYield } from 'utils/parsing';
-import { ChainId, NetworkStruct, Position, Token, YieldOptions } from 'types';
+import { ChainId, Position, Token, YieldOptions } from 'types';
 import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -155,7 +155,6 @@ interface ActivePositionProps {
   onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
-  network: NetworkStruct;
   yieldOptionsByChain: Record<ChainId, YieldOptions>;
 }
 
@@ -167,7 +166,6 @@ const ActivePosition = ({
   onSuggestMigrateYield,
   disabled,
   hasSignSupport,
-  network,
   yieldOptionsByChain,
 }: ActivePositionProps) => {
   const {
@@ -548,7 +546,6 @@ const ActivePosition = ({
           onMigrateYield={onMigrateYield}
           disabled={disabled}
           hasSignSupport={!!hasSignSupport}
-          network={network}
           yieldOptions={yieldOptions}
           onSuggestMigrateYield={onSuggestMigrateYield}
         />
