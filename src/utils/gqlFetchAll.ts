@@ -6,6 +6,7 @@ import {
   OperationVariables,
   DocumentNode,
   WatchQueryFetchPolicy,
+  ApolloError,
 } from '@apollo/client';
 import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
@@ -14,6 +15,7 @@ import get from 'lodash/get';
 export interface GraphqlResults<T> {
   data: T | undefined;
   loading: boolean;
+  error?: ApolloError;
 }
 
 export default async function gqlFetchAll<T>(
