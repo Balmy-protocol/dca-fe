@@ -4,7 +4,7 @@ import Button from 'common/button';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { NetworkStruct, Position, Token, YieldOptions } from 'types';
+import { Position, Token, YieldOptions } from 'types';
 import { useHistory } from 'react-router-dom';
 import { NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import { BigNumber } from 'ethers';
@@ -23,6 +23,7 @@ import { useAppDispatch } from 'state/hooks';
 import { setPosition } from 'state/position-details/actions';
 import { changePositionDetailsTab } from 'state/tabs/actions';
 import useTokenList from 'hooks/useTokenList';
+import useConnectedNetwork from 'hooks/useConnectedNetwork';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -62,7 +63,6 @@ interface PositionControlsProps {
   onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
-  network: NetworkStruct;
   yieldOptions: YieldOptions;
 }
 
@@ -74,12 +74,12 @@ const PositionControls = ({
   onMigrateYield,
   disabled,
   hasSignSupport,
-  network,
   yieldOptions,
 }: PositionControlsProps) => {
   const { remainingSwaps, pendingTransaction, toWithdraw, chainId } = position;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [connectedNetwork] = useConnectedNetwork();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -93,7 +93,7 @@ const PositionControls = ({
     return supportedNetwork;
   }, [chainId]);
 
-  const isOnNetwork = network.chainId === positionNetwork.chainId;
+  const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
   const history = useHistory();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();

@@ -1,6 +1,5 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
-import find from 'lodash/find';
 import styled from 'styled-components';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import EmptyPositions from 'common/empty-positions';
@@ -10,14 +9,7 @@ import { BigNumber } from 'ethers';
 import { ChainId, Position, YieldOptions } from 'types';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import {
-  FULL_DEPOSIT_TYPE,
-  NETWORKS,
-  PERMISSIONS,
-  RATE_TYPE,
-  SUPPORTED_NETWORKS,
-  TRANSACTION_TYPES,
-} from 'config/constants';
+import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, SUPPORTED_NETWORKS, TRANSACTION_TYPES } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import ModifySettingsModal from 'common/modify-settings-modal';
@@ -26,7 +18,6 @@ import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions
 import { formatUnits } from '@ethersproject/units';
 import { EmptyPosition } from 'mocks/currentPositions';
 import usePositionService from 'hooks/usePositionService';
-import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
@@ -67,7 +58,6 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
-  const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const yieldOptionsByChain: Record<ChainId, YieldOptions> = {};
   let isLoadingAllChainsYieldOptions = false;
   SUPPORTED_NETWORKS.forEach((supportedNetwork) => {
@@ -75,12 +65,6 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     yieldOptionsByChain[supportedNetwork] = yieldOptions || [];
     isLoadingAllChainsYieldOptions = isLoadingYieldOptions || isLoadingAllChainsYieldOptions;
   });
-
-  const network = React.useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const supportedNetwork = find(NETWORKS, { chainId: currentNetwork.chainId })!;
-    return supportedNetwork;
-  }, [currentNetwork.chainId]);
 
   const onCancelModifySettingsModal = React.useCallback(
     () => setShowModifyRateSettingsModal(false),
@@ -250,9 +234,8 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       onReusePosition={onShowModifyRateSettings}
                       onMigrateYield={onShowMigrateYield}
                       onSuggestMigrateYield={onSuggestMigrateYieldModal}
-                      disabled={!isOnCorrectNetwork}
+                      disabled={false}
                       hasSignSupport={!!hasSignSupport}
-                      network={network}
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                       yieldOptionsByChain={yieldOptionsByChain}
                     />
@@ -278,10 +261,9 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
                       onMigrateYield={onShowMigrateYield}
-                      disabled={!isOnCorrectNetwork}
+                      disabled={false}
                       hasSignSupport={!!hasSignSupport}
                       onSuggestMigrateYield={onSuggestMigrateYieldModal}
-                      network={network}
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                       yieldOptionsByChain={yieldOptionsByChain}
                     />

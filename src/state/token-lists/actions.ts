@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
-import { LATEST_VERSION, MEAN_GRAPHQL_URL } from 'config/constants';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, MEAN_GRAPHQL_URL } from 'config/constants';
 import GraphqlService from 'services/graphql';
 import { Token, TokenListResponse, TokensLists } from 'types';
 import gqlFetchAll from 'utils/gqlFetchAll';
@@ -30,9 +30,9 @@ export const fetchGraphTokenList = createAsyncThunk<Token[], undefined, { extra:
       config: { network: { chainId: number; name: string } };
     };
 
-    const dcaClient = new GraphqlService(
-      (network && MEAN_GRAPHQL_URL[LATEST_VERSION][network.chainId]) || MEAN_GRAPHQL_URL[LATEST_VERSION][10]
-    );
+    const chainIdToUse = network?.chainId || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId;
+
+    const dcaClient = new GraphqlService(MEAN_GRAPHQL_URL[LATEST_VERSION][chainIdToUse]);
 
     const tokens = await gqlFetchAll<{ tokens: Token[] }>(dcaClient.getClient(), GET_TOKEN_LIST, {}, 'tokens');
 
@@ -40,7 +40,7 @@ export const fetchGraphTokenList = createAsyncThunk<Token[], undefined, { extra:
       tokens.data?.tokens.map((token) => ({
         ...token,
         address: token.address.toLowerCase(),
-        chainId: network.chainId,
+        chainId: chainIdToUse,
       })) ?? []
     );
   }

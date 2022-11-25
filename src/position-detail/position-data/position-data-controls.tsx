@@ -12,10 +12,10 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
 import useWalletService from 'hooks/useWalletService';
 import useSupportsSigning from 'hooks/useSupportsSigning';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { fullPositionToMappedPosition } from 'utils/parsing';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTokenList from 'hooks/useTokenList';
+import useConnectedNetwork from 'hooks/useConnectedNetwork';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -48,7 +48,7 @@ const PositionDataControls = ({
 }: PositionDataControlsProps) => {
   const { remainingSwaps, chainId } = fullPositionToMappedPosition(position);
   const [hasSignSupport] = useSupportsSigning();
-  const network = useCurrentNetwork();
+  const [network] = useConnectedNetwork();
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
   const tokenList = useTokenList();
@@ -59,7 +59,7 @@ const PositionDataControls = ({
     return supportedNetwork;
   }, [chainId]);
 
-  const isOnNetwork = network.chainId === positionNetwork.chainId;
+  const isOnNetwork = network?.chainId === positionNetwork.chainId;
   const walletService = useWalletService();
   const isPending = !!pendingTransaction;
 
