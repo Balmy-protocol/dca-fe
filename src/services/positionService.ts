@@ -158,7 +158,7 @@ export default class PositionService {
       })
     );
 
-    const results = await Promise.all(promises);
+    const results = await Promise.all(promises.map((promise) => promise.catch(() => ({ data: null, error: true }))));
 
     const currentPositions = {
       ...this.currentPositions,
@@ -173,7 +173,7 @@ export default class PositionService {
 
     this.currentPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
-      if (gqlResult.data) {
+      if (!gqlResult.error && gqlResult.data) {
         return {
           ...acc,
           ...keyBy(
@@ -294,7 +294,7 @@ export default class PositionService {
       })
     );
 
-    const results = await Promise.all(promises);
+    const results = await Promise.all(promises.map((promise) => promise.catch(() => ({ data: null, error: true }))));
 
     const pastPositions = {
       ...this.pastPositions,
@@ -302,7 +302,7 @@ export default class PositionService {
 
     this.pastPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
       const { network, version } = networksAndVersions[index];
-      if (gqlResult.data) {
+      if (!gqlResult.error && gqlResult.data) {
         return {
           ...acc,
           ...keyBy(
