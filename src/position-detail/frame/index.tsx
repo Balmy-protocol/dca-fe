@@ -52,6 +52,7 @@ import useYieldOptions from 'hooks/useYieldOptions';
 import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
 import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
 import Link from '@mui/material/Link';
+import useTotalGasSaved from 'hooks/useTotalGasSaved';
 import { BigNumber } from 'ethers';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
@@ -158,6 +159,7 @@ const PositionDetailFrame = () => {
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const positionInUse = usePositionDetails(position?.id);
+  const [totalGasSaved, isLoadingTotalGasSaved] = useTotalGasSaved(positionInUse);
   const [[toWithdrawUnderlying, swappedUnderlying, remainingLiquidityUnderlying], isLoadingUnderlyings] =
     useUnderlyingAmount([
       {
@@ -207,7 +209,8 @@ const PositionDetailFrame = () => {
     (!position && !positionNotFound) ||
     isLoadingSwaps ||
     isLoadingYieldOptions ||
-    isLoadingUnderlyings
+    isLoadingUnderlyings ||
+    isLoadingTotalGasSaved
   ) {
     return (
       <Grid container>
@@ -499,6 +502,7 @@ const PositionDetailFrame = () => {
               onSuggestMigrateYield={() => setShowSuggestMigrateYieldModal(true)}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               yieldOptions={yieldOptions!}
+              totalGasSaved={totalGasSaved}
             />
           )}
           {tabIndex === 1 && (

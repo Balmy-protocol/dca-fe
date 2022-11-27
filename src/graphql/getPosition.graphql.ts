@@ -98,6 +98,9 @@ const getPosition = gql`
           id
           hash
           timestamp
+          gasPrice
+          l1GasPrice
+          overhead
         }
         createdAtBlock
         createdAtTimestamp

@@ -4,7 +4,7 @@ import { DCAHubCompanion__factory } from '@mean-finance/dca-v2-periphery/dist';
 import { OracleAggregator__factory } from '@mean-finance/oracles/dist';
 import { TransformerRegistry__factory } from '@mean-finance/transformers/dist';
 import { ethers, Signer } from 'ethers';
-import { Network, getNetwork as getStringNetwork, Provider } from '@ethersproject/providers';
+import { Network, getNetwork as getStringNetwork, Provider, AlchemyProvider } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import find from 'lodash/find';
 // import allExportedFromTypechained from '@mean-finance/typechained/lib';
@@ -241,8 +241,13 @@ export default class ContractService {
   }
 
   async getOEGasOracleInstance(): Promise<OEGasOracle> {
-    const provider = await this.getProvider();
+    let provider;
 
+    if (!this.client || !this.signer || this.network.chainId !== NETWORKS.optimism.chainId) {
+      provider = new AlchemyProvider('optimism', 'rMtUNxulZtkQesuF2x8XwydCS_SfsF5U');
+    } else {
+      provider = await this.getProvider();
+    }
     return new ethers.Contract(OE_GAS_ORACLE_ADDRESS, OE_GAS_ORACLE_ABI.abi, provider) as unknown as OEGasOracle;
   }
 
