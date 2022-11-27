@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
 import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from 'config';
-import { getWrappedProtocolToken } from 'mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import {
   AllowedPairs,
   MeanApiUnderlyingResponse,
@@ -93,14 +93,17 @@ export default class MeanApiService {
     const singer = this.walletService.getSigner();
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const fromToUse = from === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from;
+    const toTouse = to === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to;
 
     // Call to api and get transaction
     const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
       {
         takeFromCaller: { token: from, amount: totalAmmount.toString() },
-        from: yieldFrom || from,
-        to: yieldTo || to,
+        from: yieldFrom || fromToUse,
+        to: yieldTo || toTouse,
         amountOfSwaps: swaps.toNumber(),
         swapInterval: interval.toNumber(),
         owner: account,
@@ -128,6 +131,7 @@ export default class MeanApiService {
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const hubAddress = await this.contractService.getHUBAddress();
+    const toTouse = to === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to;
 
     // Call to api and get transaction
     const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
@@ -135,7 +139,7 @@ export default class MeanApiService {
       {
         takeFromCaller: { token: from, amount: totalAmmount.toString() },
         from: wrappedProtocolToken.address,
-        to,
+        to: toTouse,
         amountOfSwaps: swaps.toNumber(),
         swapInterval: interval.toNumber(),
         owner: account,
