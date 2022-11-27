@@ -43,6 +43,7 @@ interface PositionSummaryContainerProps {
   toWithdrawUnderlying?: BigNumber | null;
   remainingLiquidityUnderlying?: BigNumber | null;
   swappedUnderlying?: BigNumber | null;
+  totalGasSaved?: BigNumber;
 }
 
 const PositionSummaryContainer = ({
@@ -57,6 +58,7 @@ const PositionSummaryContainer = ({
   swappedUnderlying,
   onMigrateYield,
   onSuggestMigrateYield,
+  totalGasSaved,
 }: PositionSummaryContainerProps) => (
   <>
     <Grid container spacing={4} alignItems="flex-start">
@@ -75,6 +77,7 @@ const PositionSummaryContainer = ({
               swappedUnderlying={swappedUnderlying}
               onMigrateYield={onMigrateYield}
               onSuggestMigrateYield={onSuggestMigrateYield}
+              totalGasSaved={totalGasSaved}
             />
           </StyledPaper>
         </Sticky>
