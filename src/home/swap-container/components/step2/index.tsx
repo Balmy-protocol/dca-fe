@@ -270,11 +270,14 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                   <FormattedMessage
                     description="disabledByUsdValue"
                     // eslint-disable-next-line no-template-curly-in-string
-                    defaultMessage="You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) to enable this option."
+                    defaultMessage="You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to enable this option."
                     values={{
                       minimum: MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
                       minToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
                       symbol: from.symbol,
+                      frequency:
+                        STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                          .singularTime,
                     }}
                   />
                 </Typography>

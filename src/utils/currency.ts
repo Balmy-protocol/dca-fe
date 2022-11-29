@@ -117,13 +117,21 @@ export const parseUsdPrice = (from?: Token | null, amount?: BigNumber | null, us
 };
 
 export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: BigNumber) => {
-  if (!token || !usdPrice || !usdNeeded) {
+  if (!token || !usdNeeded) {
     return BigNumber.from(0);
   }
 
   const needed = parseUnits(usdNeeded.toString(), 18);
-  const tokenMagnitude = BigNumber.from(10).pow(token.decimals + 18);
+  const tokenUsdMagnitude = BigNumber.from(10).pow(token.decimals + 18);
   const usdMagnitude = BigNumber.from(10).pow(18);
 
-  return needed.mul(tokenMagnitude).div(usdPrice).div(usdMagnitude);
+  if (STABLE_COINS.includes(token.symbol)) {
+    return needed.mul(tokenUsdMagnitude).div(parseUnits('1', 18)).div(usdMagnitude);
+  }
+
+  if (needed.lte(BigNumber.from(0)) || !usdPrice) {
+    return BigNumber.from(0);
+  }
+
+  return needed.mul(tokenUsdMagnitude).div(usdPrice).div(usdMagnitude);
 };
