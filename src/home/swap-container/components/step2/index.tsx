@@ -9,6 +9,7 @@ import FrequencyInput from 'common/frequency-easy-input';
 import {
   DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
   MINIMUM_USD_DEPOSIT_FOR_YIELD,
+  ONE_WEEK,
   STRING_SWAP_INTERVALS,
 } from 'config/constants';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -21,6 +22,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import Collapse from '@mui/material/Collapse';
 import YieldTokenSelector from 'common/yield-token-selector';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { formatCurrencyAmount, usdPriceToToken } from 'utils/currency';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
   ${({ $show }) => !$show && 'position: absolute;width: auto;'};
@@ -98,6 +100,7 @@ interface SwapSecondStepProps {
   onBack: () => void;
   fromValueUsdPrice: number;
   rateUsdPrice: number;
+  usdPrice?: BigNumber;
   yieldEnabled: boolean;
   setYieldEnabled: (newValue: boolean) => void;
   yieldOptions: YieldOptions;
@@ -133,11 +136,20 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
     setFromYield,
     setToYield,
     fromCanHaveYield,
+    usdPrice,
   } = props;
 
   const [isHelpExpanded, setHelpExpanded] = React.useState(false);
 
   const currentNetwork = useCurrentNetwork();
+
+  const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
+
+  const minimumTokensNeeded = usdPriceToToken(
+    from,
+    MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
+    usdPrice
+  );
 
   return (
     <StyledGrid $show={show} container rowSpacing={2} ref={ref}>
@@ -238,27 +250,38 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 />
               </StyledYieldTokensContainer>
             )}
-            {!yieldEnabled && !!fromValueUsdPrice && fromValueUsdPrice < 10 && (
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage
-                  description="disabledByUsdValue"
-                  // eslint-disable-next-line no-template-curly-in-string
-                  defaultMessage="You have to invest at least ${minimum} USD to enable this option."
-                  values={{
-                    minimum:
-                      MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
-                  }}
-                />
-              </Typography>
-            )}
-            {!yieldEnabled && !!fromValueUsdPrice && fromValueUsdPrice >= 10 && (
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage
-                  description="disabledByUsdValue"
-                  defaultMessage="You have to set your position to run for at least 1 week to enable this option."
-                />
-              </Typography>
-            )}
+            {!yieldEnabled &&
+              from &&
+              !!fromValueUsdPrice &&
+              fromValueUsdPrice <
+                (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD) && (
+                <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                  <FormattedMessage
+                    description="disabledByUsdValue"
+                    // eslint-disable-next-line no-template-curly-in-string
+                    defaultMessage="You have to invest at least ${minimum} USD ({minToken} {symbol}) to enable this option."
+                    values={{
+                      minimum:
+                        MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
+                      minToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
+                      symbol: from.symbol,
+                    }}
+                  />
+                </Typography>
+              )}
+            {!yieldEnabled &&
+              from &&
+              !!fromValueUsdPrice &&
+              fromValueUsdPrice >=
+                (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD) &&
+              !isAtLeastAWeek && (
+                <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                  <FormattedMessage
+                    description="disabledByUsdValue"
+                    defaultMessage="You have to set your position to run for at least 1 week to enable this option."
+                  />
+                </Typography>
+              )}
             <StyledYieldHelpContainer variant="body1" onClick={() => setHelpExpanded(!isHelpExpanded)}>
               <HelpOutlineOutlinedIcon fontSize="inherit" color="primary" />
               <FormattedMessage description="howItWorks" defaultMessage="How it works" />
