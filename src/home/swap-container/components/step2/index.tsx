@@ -96,7 +96,8 @@ interface SwapSecondStepProps {
   buttonToShow: React.ReactNode;
   show: boolean;
   onBack: () => void;
-  usdPrice?: number;
+  fromValueUsdPrice: number;
+  rateUsdPrice: number;
   yieldEnabled: boolean;
   setYieldEnabled: (newValue: boolean) => void;
   yieldOptions: YieldOptions;
@@ -121,7 +122,8 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
     buttonToShow,
     show,
     onBack,
-    usdPrice,
+    fromValueUsdPrice,
+    rateUsdPrice,
     yieldEnabled,
     setYieldEnabled,
     yieldOptions,
@@ -162,13 +164,9 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 token={from}
                 isMinimal
                 maxWidth="210px"
+                usdValue={fromValueUsdPrice.toFixed(2)}
               />
             </StyledInputContainer>
-            {!!usdPrice && (
-              <Typography variant="body2" component="span" sx={{ color: '#FFFFFF80' }}>
-                (${usdPrice.toFixed(2)} USD)
-              </Typography>
-            )}
           </StyledSummaryContainer>
           <StyledSummaryContainer>
             <Typography variant="body1" component="span">
@@ -182,6 +180,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 withBalance={false}
                 token={from}
                 isMinimal
+                usdValue={rateUsdPrice.toFixed(2)}
               />
             </StyledInputContainer>
             {yieldEnabled && fromCanHaveYield && fromYield !== null && (
@@ -239,7 +238,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 />
               </StyledYieldTokensContainer>
             )}
-            {!yieldEnabled && !!usdPrice && usdPrice < 10 && (
+            {!yieldEnabled && !!fromValueUsdPrice && fromValueUsdPrice < 10 && (
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="disabledByUsdValue"
@@ -252,7 +251,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 />
               </Typography>
             )}
-            {!yieldEnabled && !!usdPrice && usdPrice >= 10 && (
+            {!yieldEnabled && !!fromValueUsdPrice && fromValueUsdPrice >= 10 && (
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="disabledByUsdValue"

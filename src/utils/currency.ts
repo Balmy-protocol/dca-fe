@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { TOKEN_TYPE_BASE } from 'config';
+import { formatUnits } from '@ethersproject/units';
+import { STABLE_COINS, TOKEN_TYPE_BASE } from 'config';
 import _Decimal from 'decimal.js-light';
 import { BigNumber } from 'ethers';
 import JSBI from 'jsbi';
@@ -96,3 +97,21 @@ export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: nu
   type: TOKEN_TYPE_BASE,
   underlyingTokens: [],
 });
+
+export const parseUsdPrice = (from?: Token | null, amount?: BigNumber | null, usdPrice?: BigNumber) => {
+  if (!from || !amount) {
+    return 0;
+  }
+
+  if (STABLE_COINS.includes(from.symbol)) {
+    return parseFloat(formatUnits(amount, from.decimals));
+  }
+
+  if (amount.lte(BigNumber.from(0)) || !usdPrice) {
+    return 0;
+  }
+
+  const multiplied = amount.mul(usdPrice);
+
+  return parseFloat(formatUnits(multiplied, from.decimals + 18));
+};

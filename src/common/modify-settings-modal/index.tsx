@@ -40,6 +40,8 @@ import useSupportsSigning from 'hooks/useSupportsSigning';
 import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
+import useRawUsdPrice from 'hooks/useUsdRawPrice';
+import { parseUsdPrice } from 'utils/currency';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -112,6 +114,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
   const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
+  const [usdPrice] = useRawUsdPrice(from);
+  const fromValueUsdPrice = parseUsdPrice(
+    from,
+    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
+    usdPrice
+  );
+  const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
 
   const cantFund =
     fromValue &&
@@ -457,6 +466,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               withMax
               withHalf
               fullWidth
+              usdValue={fromValueUsdPrice.toFixed(2)}
             />
           </StyledRateContainer>
         </Grid>
@@ -487,6 +497,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 withBalance={false}
                 token={fromToUse}
                 isMinimal
+                usdValue={rateUsdPrice.toFixed(2)}
               />
             </StyledInputContainer>
             <Typography variant="body1" component="span">
