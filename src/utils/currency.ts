@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits } from '@ethersproject/units';
 import { STABLE_COINS, TOKEN_TYPE_BASE } from 'config';
 import _Decimal from 'decimal.js-light';
 import { BigNumber } from 'ethers';
@@ -114,4 +114,16 @@ export const parseUsdPrice = (from?: Token | null, amount?: BigNumber | null, us
   const multiplied = amount.mul(usdPrice);
 
   return parseFloat(formatUnits(multiplied, from.decimals + 18));
+};
+
+export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: BigNumber) => {
+  if (!token || !usdPrice || !usdNeeded) {
+    return BigNumber.from(0);
+  }
+
+  const needed = parseUnits(usdNeeded.toString(), 18);
+  const tokenMagnitude = BigNumber.from(10).pow(token.decimals + 18);
+  const usdMagnitude = BigNumber.from(10).pow(18);
+
+  return needed.mul(tokenMagnitude).div(usdPrice).div(usdMagnitude);
 };
