@@ -30,9 +30,8 @@ import {
   NETWORKS,
   MAX_UINT_32,
   LATEST_VERSION,
-  ONE_WEEK,
-  MINIMUM_USD_DEPOSIT_FOR_YIELD,
-  DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
+  MINIMUM_USD_RATE_FOR_YIELD,
+  DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
 } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -211,15 +210,12 @@ const Swap = ({
   } catch {}
 
   const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
-  const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
   const hasEnoughUsdForYield =
     !!usdPrice &&
-    fromValueUsdPrice >=
-      (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD);
+    rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
 
   // only allowed if set for 10 days and at least 10 USD
-  const shouldEnableYield =
-    yieldEnabled && (fromCanHaveYield || toCanHaveYield) && isAtLeastAWeek && hasEnoughUsdForYield;
+  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield) && hasEnoughUsdForYield;
 
   React.useEffect(() => {
     if (!from) return;
