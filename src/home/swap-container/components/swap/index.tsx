@@ -34,7 +34,7 @@ import {
 } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { emptyTokenWithAddress, parseUsdPrice } from 'utils/currency';
 import { useTransactionAdder, useHasPendingApproval, useHasPendingPairCreation } from 'state/transactions/hooks';
 import { calculateStale, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -44,10 +44,10 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import useAllowance from 'hooks/useAllowance';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useCanSupportPair from 'hooks/useCanSupportPair';
-import useUsdPrice from 'hooks/useUsdPrice';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import usePositionService from 'hooks/usePositionService';
+import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import useWeb3Service from 'hooks/useWeb3Service';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
@@ -181,10 +181,7 @@ const Swap = ({
 
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
 
-  const [usdPrice, isLoadingUsdPrice] = useUsdPrice(
-    from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null
-  );
+  const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(from);
 
   const fromCanHaveYield = !!(
     from && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(from.address)).length
@@ -193,9 +190,16 @@ const Swap = ({
     to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
   );
 
+  const fromValueUsdPrice = parseUsdPrice(
+    from,
+    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
+    usdPrice
+  );
+  const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
   const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
   const hasEnoughUsdForYield =
-    !!usdPrice && usdPrice >= (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || MINIMUM_USD_DEPOSIT_FOR_YIELD);
+    !!usdPrice &&
+    fromValueUsdPrice >= (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || MINIMUM_USD_DEPOSIT_FOR_YIELD);
 
   // only allowed if set for 10 days and at least 10 USD
   const shouldEnableYield =
@@ -559,7 +563,7 @@ const Swap = ({
     !isLoadingUsdPrice &&
     usdPrice &&
     parseFloat(formatUnits(parseUnits(fromValue, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) *
-      usdPrice <
+      fromValueUsdPrice <
       (WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] || Infinity);
 
   shouldShowNotEnoughForWhale =
@@ -828,6 +832,7 @@ const Swap = ({
           handleFrequencyChange={handleFrequencyChange}
           buttonToShow={ButtonToShow}
           show={showFirstStep}
+          fromValueUsdPrice={fromValueUsdPrice}
         />
       </Slide>
       <Slide
@@ -847,7 +852,8 @@ const Swap = ({
           from={from}
           to={to}
           rate={rate}
-          usdPrice={usdPrice}
+          fromValueUsdPrice={fromValueUsdPrice}
+          rateUsdPrice={rateUsdPrice}
           handleRateValueChange={handleRateValueChange}
           handleFromValueChange={handleFromValueChange}
           frequencyType={frequencyType}

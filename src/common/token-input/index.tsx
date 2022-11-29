@@ -6,18 +6,11 @@ import { FormattedMessage } from 'react-intl';
 import { formatUnits, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import InputAdornment from '@mui/material/InputAdornment';
 import FormHelperText from '@mui/material/FormHelperText';
 import TokenIcon from 'common/token-icon';
-import { createStyles, FilledInput } from '@mui/material';
+import { createStyles, FilledInput, Typography } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { formatCurrencyAmount } from 'utils/currency';
-
-const StyledInputContainer = styled.div<{ maxWidth?: string }>`
-  display: inline-flex;
-  margin: 0px 6px;
-  ${({ maxWidth }) => (maxWidth ? `max-width: ${maxWidth};` : '')}
-`;
 
 const StyledTokenInputContainer = styled.div`
   display: flex;
@@ -33,14 +26,60 @@ const StyledControls = styled.div`
 const StyledFilledInput = withStyles(() =>
   createStyles({
     root: {
-      paddingLeft: '8px',
-      borderRadius: '8px',
+      paddingLeft: '0px',
+      background: 'none !important',
     },
     input: {
       paddingTop: '8px',
+      paddingBottom: '0px',
     },
   })
 )(FilledInput);
+
+const StyledAmountContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+
+const StyledFormControl = styled.div`
+  display: flex;
+  background-color: rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  cursor: text;
+  align-items: center;
+  flex: 1;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.13);
+  }
+`;
+
+const StyledFormControlMinimal = styled.div<{ maxWidth?: string }>`
+  display: inline-flex;
+  margin: 0px 6px;
+  ${({ maxWidth }) => (maxWidth ? `max-width: ${maxWidth};` : '')}
+  background-color: rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  cursor: text;
+  align-items: center;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.13);
+  }
+`;
+
+const StyledTokenIconContainer = styled.div`
+  padding-top: 6px;
+  padding-left: 8px;
+`;
+
+const StyledUsdContainer = styled.div`
+  display: flex;
+  padding-left: 12px;
+`;
 
 interface TokenInputProps {
   id: string;
@@ -56,6 +95,7 @@ interface TokenInputProps {
   withMax?: boolean;
   withHalf?: boolean;
   maxWidth?: string;
+  usdValue?: string;
 }
 
 const TokenInput = ({
@@ -72,7 +112,9 @@ const TokenInput = ({
   withHalf,
   withMax,
   maxWidth,
+  usdValue,
 }: TokenInputProps) => {
+  const inputRef = React.createRef();
   const validator = (nextValue: string) => {
     // sanitize value
     const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${(token && token.decimals) || 18}}$`);
@@ -112,57 +154,82 @@ const TokenInput = ({
     }
   };
 
+  const onFocusInput = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+    (inputRef.current as any).focus();
+  };
+
   if (isMinimal) {
     return (
-      <StyledInputContainer maxWidth={maxWidth}>
-        <StyledFilledInput
-          id={id}
-          value={value}
-          onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-          style={{ width: `calc(${value.length + 1}ch + 55px)` }}
-          type="text"
-          disableUnderline
-          inputProps={{
-            style: { textAlign: 'center' },
-          }}
-          startAdornment={
-            token && (
-              <InputAdornment position="start">
-                <TokenIcon token={token} />
-              </InputAdornment>
-            )
-          }
-        />
-      </StyledInputContainer>
+      <StyledFormControlMinimal onClick={onFocusInput} maxWidth={maxWidth}>
+        {token && (
+          <StyledTokenIconContainer>
+            <TokenIcon token={token} />
+          </StyledTokenIconContainer>
+        )}
+        <StyledAmountContainer>
+          <StyledFilledInput
+            id={id}
+            value={value}
+            onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+            style={{ width: `calc(${value.length + 1}ch + 25px)` }}
+            type="text"
+            disableUnderline
+            inputProps={{
+              style: { paddingTop: usdValue ? '8px' : '0px' },
+            }}
+          />
+          {usdValue && (
+            <StyledUsdContainer>
+              <Typography variant="caption" color="#939494">
+                ${usdValue}
+              </Typography>
+            </StyledUsdContainer>
+          )}
+        </StyledAmountContainer>
+      </StyledFormControlMinimal>
     );
   }
 
   return (
     <StyledTokenInputContainer>
       <StyledControls>
-        <StyledFilledInput
-          id={id}
-          value={value}
-          error={!!error}
-          placeholder="0"
-          inputMode="decimal"
-          autoComplete="off"
-          autoCorrect="off"
-          type="text"
-          margin="none"
-          disabled={disabled}
-          disableUnderline
-          spellCheck="false"
-          fullWidth={fullWidth}
-          onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-          startAdornment={
-            token && (
-              <InputAdornment position="start">
-                <TokenIcon token={token} />
-              </InputAdornment>
-            )
-          }
-        />
+        <StyledFormControl onClick={onFocusInput}>
+          {token && (
+            <StyledTokenIconContainer>
+              <TokenIcon token={token} />
+            </StyledTokenIconContainer>
+          )}
+          <StyledAmountContainer>
+            <StyledFilledInput
+              id={id}
+              value={value}
+              error={!!error}
+              inputRef={inputRef}
+              placeholder="0"
+              inputMode="decimal"
+              autoComplete="off"
+              autoCorrect="off"
+              type="text"
+              margin="none"
+              disabled={disabled}
+              disableUnderline
+              spellCheck="false"
+              fullWidth={fullWidth}
+              onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+              inputProps={{
+                style: { paddingBottom: usdValue ? '0px' : '8px' },
+              }}
+            />
+            {usdValue && (
+              <StyledUsdContainer>
+                <Typography variant="caption" color="#939494">
+                  ${usdValue}
+                </Typography>
+              </StyledUsdContainer>
+            )}
+          </StyledAmountContainer>
+        </StyledFormControl>
 
         {withMax && (
           <Button color="default" variant="outlined" size="small" onClick={handleMaxValue}>

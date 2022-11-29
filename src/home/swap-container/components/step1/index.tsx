@@ -103,6 +103,7 @@ interface SwapFirstStepProps {
   balance?: BigNumber;
   frequencies: AvailableSwapInterval[];
   buttonToShow: React.ReactNode;
+  fromValueUsdPrice: number;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -122,6 +123,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     handleFrequencyChange,
     buttonToShow,
     show,
+    fromValueUsdPrice,
   } = props;
 
   return (
@@ -171,6 +173,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               withMax
               withHalf
               fullWidth
+              usdValue={fromValueUsdPrice.toFixed(2)}
             />
           </StyledRateContainer>
         </StyledContentContainer>
