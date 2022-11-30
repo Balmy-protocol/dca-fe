@@ -39,7 +39,6 @@ function useSwapOptions(
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
-  const prevSorting = usePrevious(sorting);
   const prevTransferTo = usePrevious(transferTo);
   const prevResult = usePrevious(result, false);
   const prevGasSpeed = usePrevious(gasSpeed);
@@ -51,7 +50,6 @@ function useSwapOptions(
         debouncedTo?: Token | null,
         debouncedValue?: string,
         debouncedIsBuyOrder?: boolean,
-        debouncedSorting?: string,
         debouncedTransferTo?: string | null,
         debouncedGasSpeed?: GasKeys,
         debouncedSlippage?: number
@@ -65,11 +63,12 @@ function useSwapOptions(
               debouncedTo,
               debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
               debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
-              debouncedSorting,
+              'most-profit',
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed
             );
+
             setState({ result: promiseResult, error: undefined, isLoading: false });
           } catch (e) {
             setState({ result: undefined, error: e as string, isLoading: false });
@@ -82,8 +81,8 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(from, to, value, isBuyOrder, sorting, transferTo, gasSpeed, slippage),
-    [from, to, value, isBuyOrder, sorting, transferTo, slippage, gasSpeed]
+    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage),
+    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed]
   );
 
   React.useEffect(() => {
@@ -94,7 +93,6 @@ function useSwapOptions(
       !isEqual(prevTo, to) ||
       !isEqual(prevValue, value) ||
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
-      !isEqual(prevSorting, sorting) ||
       !isEqual(prevTransferTo, transferTo) ||
       !isEqual(prevGasSpeed, gasSpeed) ||
       !isEqual(prevSlippage, slippage)
@@ -102,7 +100,6 @@ function useSwapOptions(
       if (from && to && value) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         fetchOptions();
-        // callPromise();
       }
     }
   }, [
@@ -123,8 +120,6 @@ function useSwapOptions(
     prevBlockNumber,
     blockNumber,
     walletService,
-    prevSorting,
-    sorting,
     fetchOptions,
     prevTransferTo,
     transferTo,
@@ -134,11 +129,19 @@ function useSwapOptions(
     prevGasSpeed,
   ]);
 
+  let resultToReturn = result || prevResult;
+
+  if (sorting === 'least-gas' && resultToReturn) {
+    resultToReturn = [...resultToReturn].sort((a, b) => {
+      return a.gas.estimatedCost.lt(b.gas.estimatedCost) ? -1 : 1;
+    });
+  }
+
   if (!from) {
     return [undefined, false, undefined, fetchOptions];
   }
 
-  return [result || prevResult, isLoading, error, fetchOptions];
+  return [resultToReturn, isLoading, error, fetchOptions];
 }
 
 export default useSwapOptions;
