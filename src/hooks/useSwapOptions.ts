@@ -129,16 +129,16 @@ function useSwapOptions(
     prevGasSpeed,
   ]);
 
+  if (!from) {
+    return [undefined, false, undefined, fetchOptions];
+  }
+
   let resultToReturn = result || prevResult;
 
   if (sorting === 'least-gas' && resultToReturn) {
     resultToReturn = [...resultToReturn].sort((a, b) => {
       return a.gas.estimatedCost.lt(b.gas.estimatedCost) ? -1 : 1;
     });
-  }
-
-  if (!from) {
-    return [undefined, false, undefined, fetchOptions];
   }
 
   return [resultToReturn, isLoading, error, fetchOptions];
