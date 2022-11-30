@@ -32,7 +32,7 @@ import {
 import useBalance from 'hooks/useBalance';
 import { useAppDispatch } from 'state/hooks';
 import { getFrequencyLabel } from 'utils/parsing';
-import { formatCurrencyAmount } from 'utils/currency';
+import { formatCurrencyAmount, parseUsdPrice } from 'utils/currency';
 import useAllowance from 'hooks/useAllowance';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
@@ -44,7 +44,6 @@ import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
-import { parseUsdPrice } from 'utils/currency';
 
 const StyledRateContainer = styled.div`
   display: flex;
