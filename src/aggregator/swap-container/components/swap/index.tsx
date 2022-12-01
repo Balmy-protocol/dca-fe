@@ -6,15 +6,20 @@ import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/aggregator-token-picker';
+import findIndex from 'lodash/findIndex';
 import Button from 'common/button';
-import Tooltip from '@mui/material/Tooltip';
 import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
-import { SUPPORTED_NETWORKS, TRANSACTION_TYPES } from 'config/constants';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import {
+  SUPPORTED_NETWORKS,
+  TRANSACTION_ACTION_APPROVE_TOKEN,
+  TRANSACTION_ACTION_SWAP,
+  TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+  TRANSACTION_TYPES,
+} from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
-import { useTransactionAdder, useHasPendingApproval } from 'state/transactions/hooks';
+import { useTransactionAdder } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
@@ -24,6 +29,7 @@ import useAggregatorService from 'hooks/useAggregatorService';
 import useSpecificAllowance from 'hooks/useSpecificAllowance';
 import TransferToModal from 'common/transfer-to-modal';
 import TransactionConfirmation from 'common/transaction-confirmation';
+import TransactionSteps, { TransactionAction as TransactionStep } from 'common/transaction-steps';
 import { GasKeys } from 'config/constants/aggregator';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -36,10 +42,6 @@ const StyledPaper = styled(Paper)`
   flex-grow: 1;
   background-color: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(6px);
-`;
-
-const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
-  margin-left: 10px;
 `;
 
 const StyledButton = styled(Button)`
@@ -89,8 +91,9 @@ const Swap = ({
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
+  const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
-  const [setModalSuccess, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
+  const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
@@ -100,17 +103,11 @@ const Swap = ({
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
-
-  const hasPendingApproval = useHasPendingApproval(
-    from,
-    web3Service.getAccount(),
-    false,
-    selectedRoute?.swapper.allowanceTarget
-  );
+  const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
 
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
-  const handleApproveToken = async () => {
+  const handleApproveToken = async (transactions?: TransactionStep[]) => {
     if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
 
@@ -135,28 +132,43 @@ const Swap = ({
           addressFor: selectedRoute.swapper.allowanceTarget,
         },
       });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="success approving token"
-            defaultMessage="Approving use of {from} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: fromSymbol || '' }}
-          />
-        ),
-      });
+      setModalClosed({ content: '' });
+
+      if (transactions?.length) {
+        const newSteps = [...transactions];
+
+        const approveIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
+
+        if (approveIndex !== -1) {
+          newSteps[approveIndex] = {
+            ...newSteps[approveIndex],
+            done: true,
+            hash: result.hash,
+          };
+
+          const waitIndex = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
+          if (waitIndex !== -1) {
+            newSteps[waitIndex] = {
+              ...newSteps[waitIndex],
+              hash: result.hash,
+            };
+          }
+        }
+
+        setTransactionsToExecute(newSteps);
+      }
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
     }
   };
 
-  const handleSwap = async () => {
+  const handleSwap = async (transactions?: TransactionStep[]) => {
     if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
     const toSymbol = to.symbol;
-    const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4);
-    const toAmount = formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4);
+    const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6);
+    const toAmount = formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4, 6);
     try {
       const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
       const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
@@ -203,6 +215,23 @@ const Swap = ({
       setModalClosed({ content: '' });
       setCurrentTransaction(result.hash);
       setShouldShowConfirmation(true);
+      setShouldShowSteps(false);
+
+      if (transactions?.length) {
+        const newSteps = [...transactions];
+
+        const index = findIndex(transactions, { type: TRANSACTION_ACTION_SWAP });
+
+        if (index !== -1) {
+          newSteps[index] = {
+            ...newSteps[index],
+            hash: result.hash,
+            done: true,
+          };
+
+          setTransactionsToExecute(newSteps);
+        }
+      }
 
       onResetForm();
     } catch (e) {
@@ -210,6 +239,75 @@ const Swap = ({
       setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
+  };
+
+  const handleTransactionEndedForWait = (transactions?: TransactionStep[]) => {
+    if (!transactions?.length) {
+      return;
+    }
+
+    const newSteps = [...transactions];
+
+    const index = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
+
+    if (index !== -1) {
+      newSteps[index] = {
+        ...newSteps[index],
+        done: true,
+        checkForPending: false,
+      };
+
+      setTransactionsToExecute(newSteps);
+    }
+  };
+
+  const handleMultiSteps = () => {
+    if (!from || fromValue === '' || !to) {
+      return;
+    }
+
+    const newSteps: TransactionStep[] = [];
+
+    newSteps.push({
+      hash: '',
+      onAction: handleApproveToken,
+      checkForPending: false,
+      done: false,
+      type: TRANSACTION_ACTION_APPROVE_TOKEN,
+      extraData: {
+        token: from,
+        amount: parseUnits(fromValue, from.decimals),
+      },
+    });
+
+    newSteps.push({
+      hash: '',
+      onAction: handleTransactionEndedForWait,
+      checkForPending: true,
+      done: false,
+      type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+      extraData: {
+        token: from,
+        amount: parseUnits(fromValue, from.decimals),
+      },
+    });
+
+    newSteps.push({
+      hash: '',
+      onAction: handleSwap,
+      checkForPending: true,
+      done: false,
+      type: TRANSACTION_ACTION_SWAP,
+      extraData: {
+        from,
+        to,
+        sellAmount: parseUnits(fromValue, from.decimals),
+        buyAmount: parseUnits(fromValue, from.decimals),
+      },
+    });
+
+    setTransactionsToExecute(newSteps);
+    setShouldShowSteps(true);
   };
 
   const startSelectingCoin = (token: Token) => {
@@ -282,38 +380,18 @@ const Swap = ({
     </StyledButton>
   );
 
-  const ApproveTokenButton = (
+  const ProceedButton = (
     <StyledButton
       size="large"
       variant="contained"
+      disabled={!!shouldDisableApproveButton}
+      color="secondary"
       fullWidth
-      color="primary"
-      disabled={!!isApproved || hasPendingApproval || !!shouldDisableApproveButton}
-      onClick={handleApproveToken}
-      style={{ pointerEvents: 'all' }}
+      onClick={handleMultiSteps}
     >
       <Typography variant="body1">
-        {hasPendingApproval ? (
-          <FormattedMessage
-            description="waiting for approval"
-            defaultMessage="Waiting for your {token} to be approved"
-            values={{
-              token: (from && from.symbol) || '',
-            }}
-          />
-        ) : (
-          <FormattedMessage
-            description="Allow us to use your coin"
-            defaultMessage="Approve {token}"
-            values={{
-              token: (from && from.symbol) || '',
-            }}
-          />
-        )}
+        <FormattedMessage description="proceed agg" defaultMessage="Proceed" />
       </Typography>
-      <Tooltip title="You only have to do this once per token" arrow placement="top">
-        <StyledHelpOutlineIcon fontSize="small" />
-      </Tooltip>
     </StyledButton>
   );
 
@@ -324,7 +402,7 @@ const Swap = ({
       disabled={!!shouldDisableButton}
       color="secondary"
       fullWidth
-      onClick={handleSwap}
+      onClick={() => handleSwap()}
     >
       <Typography variant="body1">
         {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
@@ -360,7 +438,7 @@ const Swap = ({
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
-    ButtonToShow = ApproveTokenButton;
+    ButtonToShow = ProceedButton;
   } else {
     ButtonToShow = SwapButton;
   }
@@ -378,6 +456,11 @@ const Swap = ({
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
           handleClose={() => setShouldShowConfirmation(false)}
+        />
+        <TransactionSteps
+          shouldShow={shouldShowSteps}
+          handleClose={() => setShouldShowSteps(false)}
+          transactions={transactionsToExecute}
         />
         <TokenPicker
           shouldShow={shouldShowPicker}

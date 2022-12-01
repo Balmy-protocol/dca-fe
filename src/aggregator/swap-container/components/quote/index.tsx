@@ -171,7 +171,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) =
           <TokenIcon token={from} />
           <StyledTokenAmountContainer>
             <Typography variant="body1">
-              {`${formatCurrencyAmount(quote.sellAmount.amount, from, 4)} ${from.symbol}`}
+              {`${formatCurrencyAmount(quote.sellAmount.amount, from, 4, 6)} ${from.symbol}`}
             </Typography>
             <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
               {`$${parseFloat(quote.sellAmount.amountInUSD).toFixed(2)}`}
@@ -189,7 +189,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) =
           <TokenIcon token={to} />
           <StyledTokenAmountContainer>
             <Typography variant="body1">
-              {`${formatCurrencyAmount(quote.buyAmount.amount, to, 4)} ${to.symbol}`}
+              {`${formatCurrencyAmount(quote.buyAmount.amount, to, 4, 6)} ${to.symbol}`}
             </Typography>
             <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
               {`$${parseFloat(quote.buyAmount.amountInUSD).toFixed(2)}`}
