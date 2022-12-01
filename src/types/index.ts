@@ -1,5 +1,6 @@
 import type Web3Service from 'services/web3Service';
 import React from 'react';
+import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 
 export * from './tokens';
@@ -45,3 +46,39 @@ export interface NetworkStruct {
 }
 
 export type ChainId = number;
+
+export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
+export type TransactionActionApproveTokenSignType = 'APPROVE_TOKEN_SIGN';
+export type TransactionActionWaitForSignApprovalType = 'WAIT_FOR_SIGN_APPROVAL';
+export type TransactionActionWaitForApprovalType = 'WAIT_FOR_APPROVAL';
+export type TransactionActionSwapType = 'SWAP';
+
+export type TransactionActionType =
+  // Common
+  | TransactionActionApproveTokenType
+  | TransactionActionApproveTokenSignType
+  | TransactionActionWaitForApprovalType
+  | TransactionActionWaitForSignApprovalType
+  | TransactionActionSwapType;
+
+export interface TransactionActionApproveTokenData {
+  token: Token;
+  amount: BigNumber;
+}
+
+export interface TransactionActionWaitForApprovalData {
+  token: Token;
+  amount: BigNumber;
+}
+
+export interface TransactionActionSwapData {
+  from: Token;
+  to: Token;
+  sellAmount: BigNumber;
+  buyAmount: BigNumber;
+}
+
+export type TransactionActionExtraData =
+  | TransactionActionApproveTokenData
+  | TransactionActionWaitForApprovalData
+  | TransactionActionSwapData;

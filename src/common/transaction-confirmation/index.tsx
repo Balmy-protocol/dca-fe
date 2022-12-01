@@ -100,26 +100,40 @@ const TIMES_PER_NETWORK = {
 const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
   const isTransactionPending = getPendingTransaction(transaction);
+  const [success, setSuccess] = React.useState(false);
   const previousTransactionPending = usePrevious(isTransactionPending);
   const currentNetwork = useCurrentNetwork();
   const [timer, setTimer] = React.useState(TIMES_PER_NETWORK[currentNetwork.chainId]);
   const minutes = Math.floor(timer / 60);
   const seconds = timer - minutes * 60;
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     if (timer > 0) {
-      setTimeout(() => setTimer(timer - 1), 1000);
+      timerRef.current = setTimeout(() => setTimer(timer - 1), 1000);
     }
   }, [timer]);
 
   React.useEffect(() => {
-    if (isTransactionPending && !previousTransactionPending) {
+    setSuccess(false);
+    setTimer(TIMES_PER_NETWORK[currentNetwork.chainId]);
+  }, [transaction]);
+
+  React.useEffect(() => {
+    if (!success && isTransactionPending && !previousTransactionPending) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
       setTimer(TIMES_PER_NETWORK[currentNetwork.chainId]);
     }
     if (!isTransactionPending && previousTransactionPending) {
       setTimer(0);
+      setSuccess(true);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
     }
-  }, [isTransactionPending, previousTransactionPending]);
+  }, [isTransactionPending, previousTransactionPending, success, timerRef]);
 
   const onGoToEtherscan = () => {
     const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
@@ -141,7 +155,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: Trans
             </linearGradient>
           </svg>
           <Typography variant="h6">
-            {isTransactionPending ? (
+            {!success ? (
               <FormattedMessage
                 description="transactionConfirmationInProgress"
                 defaultMessage="Transaction in progress"
@@ -162,28 +176,28 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: Trans
           <StyledTopCircularProgress
             size={270}
             variant="determinate"
-            value={(1 - timer / TIMES_PER_NETWORK[currentNetwork.chainId]) * 100}
+            value={!success ? (1 - timer / TIMES_PER_NETWORK[currentNetwork.chainId]) * 100 : 100}
             thickness={4}
             sx={{
               [`& .${circularProgressClasses.circle}`]: {
                 strokeLinecap: 'round',
-                stroke: isTransactionPending ? "url('#progressGradient')" : "url('#successGradient')",
+                stroke: !success ? "url('#progressGradient')" : "url('#successGradient')",
               },
             }}
           />
           <StyledProgressContent>
-            <StyledTypography variant={isTransactionPending && timer === 0 ? 'h4' : 'h2'}>
-              {isTransactionPending && timer > 0 && `${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(-2)}`}
-              {isTransactionPending && timer === 0 && (
+            <StyledTypography variant={!success && isTransactionPending && timer === 0 ? 'h4' : 'h2'}>
+              {!success && isTransactionPending && timer > 0 && `${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(-2)}`}
+              {!success && isTransactionPending && timer === 0 && (
                 <FormattedMessage description="transactionConfirmationProcessing" defaultMessage="Processing" />
               )}
-              {!isTransactionPending && <StyledCheckCircleIcon fontSize="inherit" />}
+              {success && <StyledCheckCircleIcon fontSize="inherit" />}
             </StyledTypography>
           </StyledProgressContent>
         </StyledConfirmationContainer>
         <StyledButonContainer>
           <Button variant="outlined" color="default" fullWidth onClick={onGoToEtherscan} size="large">
-            {isTransactionPending ? (
+            {!success ? (
               <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
             ) : (
               <FormattedMessage description="transactionConfirmationViewReceipt" defaultMessage="View receipt" />

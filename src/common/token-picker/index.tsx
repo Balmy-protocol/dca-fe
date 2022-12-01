@@ -351,7 +351,9 @@ const TokenPicker = ({
     currentNetwork.chainId,
   ]);
 
-  const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(tokenKeysToUse);
+  const rawMemoTokenKeysToUse = React.useMemo(() => tokenKeysToUse.sort(), [tokenKeysToUse]);
+
+  const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(rawMemoTokenKeysToUse);
 
   const [customToken] = useCustomToken(
     search,
