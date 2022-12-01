@@ -83,11 +83,13 @@ import CC from './cc.svg';
 import CDN from './cdn.svg';
 import CDT from './cdt.svg';
 import CHAIN from './chain.svg';
+import CHECK from './check.svg';
 import CHAT from './chat.svg';
 import CHIPS from './chips.svg';
 import CIX from './cix.svg';
 import CLAM from './clam.svg';
 import CLOAK from './cloak.svg';
+import CLOCK from './clock.svg';
 import CMM from './cmm.svg';
 import CMT from './cmt.svg';
 import CND from './cnd.svg';
@@ -1002,10 +1004,12 @@ const manifest = {
   '0x177d39ac676ed1c67a2b268ad7f1e58826e5b0af': CDT,
   '0xc4c2614e694cf534d407ee49f8e44d125e4681c4': CHAIN,
   '0x442bc47357919446eabc18c7211e57a13d983469': CHAT,
+  CHECK,
   CHIPS,
   CIX,
   CLAM,
   CLOAK,
+  CLOCK,
   CMM,
   '0xf85feea2fdd81d51177f6b8f35f0e6734ce45f5f': CMT,
   '0xd4c435f5b09f855c3317c8524cb1f586e42795fa': CND,
