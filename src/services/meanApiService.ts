@@ -368,7 +368,7 @@ export default class MeanApiService {
   ) {
     const currentNetwork = await this.walletService.getNetwork();
     const swapResponses = await this.axiosClient.get<MeanFinanceSwapResponse>(
-      `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/swap`,
+      `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/routes`,
       {
         params: {
           sellToken: from,
