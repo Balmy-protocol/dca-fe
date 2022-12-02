@@ -41,6 +41,8 @@ function useRawUsdPrice(
         } catch (e) {
           setResults({ result: undefined, error: e as string, isLoading: false });
         }
+      } else {
+        setResults({ result: BigNumber.from(0), error: undefined, isLoading: false });
       }
     }
 
