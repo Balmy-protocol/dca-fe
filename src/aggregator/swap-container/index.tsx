@@ -18,6 +18,7 @@ import {
   resetForm,
 } from 'state/aggregator/actions';
 import useSwapOptions from 'hooks/useSwapOptions';
+import useCustomToken from 'hooks/useCustomToken';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
@@ -33,6 +34,8 @@ const SwapContainer = () => {
   const fromParamToken = useToken(fromParam, true, true);
   const toParamToken = useToken(toParam, true, true);
   const history = useHistory();
+  const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
+  const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
   const [swapOptions, isLoadingSwapOptions, , fetchOptions] = useSwapOptions(
     from,
     to,
@@ -47,14 +50,18 @@ const SwapContainer = () => {
   React.useEffect(() => {
     if (fromParamToken) {
       dispatch(setFrom(fromParamToken));
-    } else if (!from) {
+    } else if (fromParamCustomToken && !from) {
+      dispatch(setFrom(fromParamCustomToken.token));
+    } else if (!from && !to && !toParamToken && !toParamCustomToken) {
       dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
     }
 
     if (toParamToken) {
       dispatch(setTo(toParamToken));
+    } else if (toParamCustomToken && !to) {
+      dispatch(setTo(toParamCustomToken.token));
     }
-  }, [currentNetwork.chainId]);
+  }, [currentNetwork.chainId, fromParamCustomToken, toParamCustomToken]);
 
   React.useEffect(() => {
     if (!isLoadingSwapOptions && swapOptions && swapOptions.length) {

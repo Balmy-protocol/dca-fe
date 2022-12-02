@@ -68,16 +68,17 @@ function useCustomToken(
     }
 
     if (
-      (!isLoading && !result && !error) ||
-      !isEqual(prevTokenAddress, tokenAddress) ||
-      !isEqual(prevSkip, skip) ||
-      !isEqual(account, prevAccount) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
+      !skip &&
+      ((!isLoading && !result && !error) ||
+        !isEqual(prevTokenAddress, tokenAddress) ||
+        !isEqual(prevSkip, skip) ||
+        !isEqual(account, prevAccount) ||
+        !isEqual(prevPendingTrans, hasPendingTransactions) ||
+        (blockNumber &&
+          prevBlockNumber &&
+          blockNumber !== -1 &&
+          prevBlockNumber !== -1 &&
+          !isEqual(prevBlockNumber, blockNumber)))
     ) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
