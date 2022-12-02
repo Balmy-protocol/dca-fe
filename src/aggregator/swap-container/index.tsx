@@ -30,8 +30,8 @@ const SwapContainer = () => {
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
-  const fromParamToken = useToken(fromParam);
-  const toParamToken = useToken(toParam);
+  const fromParamToken = useToken(fromParam, true, true);
+  const toParamToken = useToken(toParam, true, true);
   const history = useHistory();
   const [swapOptions, isLoadingSwapOptions, , fetchOptions] = useSwapOptions(
     from,
