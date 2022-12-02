@@ -66,6 +66,7 @@ interface SwapProps {
   transferTo: string | null;
   slippage: string;
   gasSpeed: GasKeys;
+  setRefreshQuotes: (refreshQuotes: boolean) => void;
 }
 
 const Swap = ({
@@ -85,6 +86,7 @@ const Swap = ({
   transferTo,
   slippage,
   gasSpeed,
+  setRefreshQuotes,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
@@ -172,6 +174,7 @@ const Swap = ({
     try {
       const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
       const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
+      setRefreshQuotes(false);
 
       setModalLoading({
         content: (
@@ -233,11 +236,14 @@ const Swap = ({
         }
       }
 
+      setRefreshQuotes(true);
+
       onResetForm();
     } catch (e) {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setRefreshQuotes(true);
     }
   };
 
@@ -307,6 +313,7 @@ const Swap = ({
     });
 
     setTransactionsToExecute(newSteps);
+    setRefreshQuotes(false);
     setShouldShowSteps(true);
   };
 
@@ -323,6 +330,11 @@ const Swap = ({
   const handleToValueChange = (newToValue: string) => {
     if (!to) return;
     setToValue(newToValue, true);
+  };
+
+  const handleBackTransactionSteps = () => {
+    setShouldShowSteps(false);
+    setRefreshQuotes(true);
   };
 
   const cantFund = from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
@@ -348,7 +360,8 @@ const Swap = ({
     !selectedRoute ||
     balanceErrors ||
     allowanceErrors ||
-    parseUnits(fromValue, from.decimals).lte(BigNumber.from(0));
+    parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
+    isLoadingRoute;
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
 
@@ -459,7 +472,7 @@ const Swap = ({
         />
         <TransactionSteps
           shouldShow={shouldShowSteps}
-          handleClose={() => setShouldShowSteps(false)}
+          handleClose={handleBackTransactionSteps}
           transactions={transactionsToExecute}
         />
         <TokenPicker

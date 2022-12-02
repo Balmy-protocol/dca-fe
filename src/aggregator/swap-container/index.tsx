@@ -46,6 +46,7 @@ const SwapContainer = () => {
     parseFloat(slippage),
     gasSpeed
   );
+  const [refreshQuotes, setRefreshQuotes] = React.useState(true);
 
   React.useEffect(() => {
     if (fromParamToken) {
@@ -128,6 +129,7 @@ const SwapContainer = () => {
           transferTo={transferTo}
           slippage={slippage}
           gasSpeed={gasSpeed}
+          setRefreshQuotes={setRefreshQuotes}
         />
       </Grid>
       <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
@@ -147,6 +149,7 @@ const SwapContainer = () => {
                 setSorting={onSetSorting}
                 sorting={sorting}
                 fetchOptions={fetchOptions}
+                refreshQuotes={refreshQuotes}
               />
             </Grid>
           </Hidden>

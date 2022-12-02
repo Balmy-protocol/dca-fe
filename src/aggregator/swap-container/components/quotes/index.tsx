@@ -48,6 +48,7 @@ interface SwapQuotesProps {
   setSorting: (newSort: string) => void;
   sorting: string;
   fetchOptions: () => void;
+  refreshQuotes: boolean;
 }
 
 const SwapQuotes = ({
@@ -60,6 +61,7 @@ const SwapQuotes = ({
   setSorting,
   sorting,
   fetchOptions,
+  refreshQuotes,
 }: SwapQuotesProps) => {
   if (!quotes.length && !isLoading) {
     return (
@@ -79,7 +81,7 @@ const SwapQuotes = ({
   return (
     <StyledPaper variant="outlined" $column>
       <StyledTitleContainer>
-        <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} />
+        <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} disableRefreshQuotes={!refreshQuotes} />
         <QuoteSorter isLoading={isLoading} setQuoteSorting={setSorting} sorting={sorting} />
       </StyledTitleContainer>
       {isLoading && (
