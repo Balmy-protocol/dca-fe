@@ -18,6 +18,7 @@ const StyledToggleTokenButton = styled(IconButton)`
 interface QuoteRefresherProps {
   isLoading: boolean;
   refreshQuotes: () => void;
+  disableRefreshQuotes: boolean;
 }
 
 const TIMER_FOR_RESET = 6000000;
@@ -25,7 +26,7 @@ const TIMER_FOR_RESET = 6000000;
 // TODO RE-ENABLE THIS TO 60 FOR LAUNCH
 // const TIMER_FOR_RESET = 60;
 
-const QuoteRefresher = ({ isLoading, refreshQuotes }: QuoteRefresherProps) => {
+const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
 
   const onRefreshRoute = () => {
@@ -38,7 +39,7 @@ const QuoteRefresher = ({ isLoading, refreshQuotes }: QuoteRefresherProps) => {
       setTimeout(() => setTimer(timer - 1), 1000);
     } else {
       setTimer(TIMER_FOR_RESET);
-      if (!isLoading) {
+      if (!isLoading && !disableRefreshQuotes) {
         refreshQuotes();
       }
     }
@@ -46,10 +47,15 @@ const QuoteRefresher = ({ isLoading, refreshQuotes }: QuoteRefresherProps) => {
 
   return (
     <StyledRefresherContainer>
-      <StyledToggleTokenButton aria-label="close" size="medium" onClick={onRefreshRoute} disabled={isLoading}>
+      <StyledToggleTokenButton
+        aria-label="close"
+        size="medium"
+        onClick={onRefreshRoute}
+        disabled={isLoading || disableRefreshQuotes}
+      >
         <RefreshIcon fontSize="inherit" />
       </StyledToggleTokenButton>
-      {!isLoading && timer !== TIMER_FOR_RESET && (
+      {!isLoading && timer !== TIMER_FOR_RESET && !disableRefreshQuotes && (
         <Typography variant="body1">
           <FormattedMessage
             description="refreshRouteTimer"
