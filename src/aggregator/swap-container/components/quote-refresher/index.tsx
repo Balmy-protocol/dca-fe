@@ -29,16 +29,18 @@ const QuoteRefresher = ({ isLoading, refreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
 
   const onRefreshRoute = () => {
-    refreshQuotes();
     setTimer(TIMER_FOR_RESET);
+    refreshQuotes();
   };
 
   React.useEffect(() => {
     if (timer > 0 && !isLoading) {
       setTimeout(() => setTimer(timer - 1), 1000);
     } else {
-      refreshQuotes();
       setTimer(TIMER_FOR_RESET);
+      if (!isLoading) {
+        refreshQuotes();
+      }
     }
   }, [timer, refreshQuotes, isLoading]);
 
