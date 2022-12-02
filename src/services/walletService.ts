@@ -1,10 +1,11 @@
-import { ethers, Signer, BigNumber } from 'ethers';
+import { ethers, Signer, BigNumber, VoidSigner } from 'ethers';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { Interface } from '@ethersproject/abi';
+import omit from 'lodash/omit';
 import { TransactionResponse, Network } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
 import find from 'lodash/find';
-import { GetUsedTokensData, Token } from 'types';
+import { GetUsedTokensData, PermitType, SignatureData, Token } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import isUndefined from 'lodash/isUndefined';
 import { toToken } from 'utils/currency';
@@ -15,7 +16,8 @@ import MULTICALLABI from 'abis/Multicall.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { LATEST_VERSION, MULTICALL_ADDRESS, NETWORKS, PositionVersions } from 'config/constants';
+import { LATEST_VERSION, MULTICALL_ADDRESS, NETWORKS, PERMIT_DOMAIN_TOKENS, PositionVersions } from 'config/constants';
+import { fromRpcSig } from 'ethereumjs-util';
 import { ERC20Contract, MulticallContract } from 'types/contracts';
 import ContractService from './contractService';
 
@@ -278,6 +280,12 @@ export default class WalletService {
     };
   }
 
+  async tokenHasPermit(address: string): Promise<boolean> {
+    const currentNetwork = await this.getNetwork();
+
+    return !!PERMIT_DOMAIN_TOKENS[currentNetwork.chainId][address.toLowerCase()];
+  }
+
   getBalance(address?: string): Promise<BigNumber> {
     const account = this.getAccount();
 
@@ -314,6 +322,75 @@ export default class WalletService {
     return {
       token,
       allowance: formatUnits(allowance, token.decimals),
+    };
+  }
+
+  async getPermitSignature(token: Token, amount: BigNumber, spender: string): Promise<SignatureData> {
+    const currentNetwork = await this.getNetwork();
+    const owner = this.getAccount();
+    const permitInfo = PERMIT_DOMAIN_TOKENS[currentNetwork.chainId][token.address];
+    const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
+
+    const EIP2612_TYPE = [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ];
+
+    const PERMIT_ALLOWED_TYPE = [
+      { name: 'holder', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'expiry', type: 'uint256' },
+      { name: 'allowed', type: 'bool' },
+    ];
+
+    const allowed = permitInfo.type === PermitType.ALLOWED;
+    const Permit = allowed ? PERMIT_ALLOWED_TYPE : EIP2612_TYPE;
+
+    const erc20 = await this.contractService.getTokenInstance(token.address);
+    console.log('fails on nonces');
+    const nextNonce = allowed
+      ? await erc20.getNonce(await this.signer.getAddress())
+      : await erc20.nonces(await this.signer.getAddress());
+    console.log('does not fails on nonces');
+
+    const values = allowed
+      ? {
+          holder: owner,
+          spender,
+          nonce: nextNonce,
+          expiry: MAX_UINT_256,
+          allowed,
+        }
+      : {
+          owner,
+          spender,
+          value: amount.toString(),
+          nonce: nextNonce,
+          deadline: MAX_UINT_256,
+        };
+
+    console.log(values, Permit);
+    // eslint-disable-next-line no-underscore-dangle
+    const rawSignature = await (this.signer as VoidSigner)._signTypedData(omit(permitInfo, 'type'), { Permit }, values);
+
+    const { v, r, s } = fromRpcSig(rawSignature);
+
+    return {
+      v,
+      r,
+      s,
+      deadline: MAX_UINT_256,
+      nonce: nextNonce,
+      owner: owner || '',
+      spender,
+      chainId: permitInfo.chainId,
+      tokenAddress: token.address,
+      permitType: permitInfo.type,
+      ...(allowed ? { allowed } : { amount: amount.toString() }),
     };
   }
 

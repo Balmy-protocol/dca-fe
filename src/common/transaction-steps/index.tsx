@@ -14,6 +14,8 @@ import {
   TransactionActionSwapType,
   TransactionActionSwapData,
   TransactionActionType,
+  TransactionActionWaitForSignApprovalType,
+  TransactionActionWaitForSignApprovalData,
 } from 'types';
 import {
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
@@ -85,28 +87,35 @@ interface ItemProps {
   isCurrentStep: boolean;
 }
 
-interface TransactionActionApproveToken extends TransactionActionBase {
+export interface TransactionActionApproveToken extends TransactionActionBase {
   type: TransactionActionApproveTokenType;
   extraData: TransactionActionApproveTokenData;
 }
 
 interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, ItemProps {}
 
-interface TransactionActionApproveTokenSign extends TransactionActionBase {
+export interface TransactionActionApproveTokenSign extends TransactionActionBase {
   type: TransactionActionApproveTokenSignType;
   extraData: TransactionActionApproveTokenData;
 }
 
 interface TransactionActionApproveTokenSignProps extends TransactionActionApproveTokenSign, ItemProps {}
 
-interface TransactionActionWaitForApproval extends TransactionActionBase {
+export interface TransactionActionWaitForApproval extends TransactionActionBase {
   type: TransactionActionWaitForApprovalType;
   extraData: TransactionActionWaitForApprovalData;
 }
 
 interface TransactionActionWaitForApprovalProps extends TransactionActionWaitForApproval, ItemProps {}
 
-interface TransactionActionSwap extends TransactionActionBase {
+export interface TransactionActionWaitForSignApproval extends TransactionActionBase {
+  type: TransactionActionWaitForSignApprovalType;
+  extraData: TransactionActionWaitForSignApprovalData;
+}
+
+interface TransactionActionWaitForSignApprovalProps extends TransactionActionWaitForSignApproval, ItemProps {}
+
+export interface TransactionActionSwap extends TransactionActionBase {
   type: TransactionActionSwapType;
   extraData: TransactionActionSwapData;
 }
@@ -117,6 +126,7 @@ export type TransactionAction =
   | TransactionActionApproveToken
   | TransactionActionApproveTokenSign
   | TransactionActionWaitForApproval
+  | TransactionActionWaitForSignApproval
   | TransactionActionSwap;
 type TransactionActions = TransactionAction[];
 
@@ -359,7 +369,7 @@ const buildWaitForSignApprovalItem = ({
   getPendingTransaction,
   transactions,
   isCurrentStep,
-}: TransactionActionWaitForApprovalProps) => ({
+}: TransactionActionWaitForSignApprovalProps) => ({
   content: () => {
     const isPendingTransaction = getPendingTransaction(hash);
     const [icon, setIcon] = React.useState<keyof typeof WaitIcons>(checkForPending ? 'disabled' : 'success');
@@ -433,6 +443,7 @@ type TransactionActionProps =
   | TransactionActionApproveTokenProps
   | TransactionActionApproveTokenSignProps
   | TransactionActionWaitForApprovalProps
+  | TransactionActionWaitForSignApprovalProps
   | TransactionActionSwapProps;
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {

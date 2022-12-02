@@ -1,7 +1,7 @@
 import type Web3Service from 'services/web3Service';
 import React from 'react';
 import { BigNumber } from 'ethers';
-import { Token } from './tokens';
+import { SignatureData, Token } from './tokens';
 
 export * from './tokens';
 export * from './positions';
@@ -71,11 +71,17 @@ export interface TransactionActionWaitForApprovalData {
   amount: BigNumber;
 }
 
+export interface TransactionActionWaitForSignApprovalData {
+  token: Token;
+  amount: BigNumber;
+}
+
 export interface TransactionActionSwapData {
   from: Token;
   to: Token;
   sellAmount: BigNumber;
   buyAmount: BigNumber;
+  signature?: SignatureData;
 }
 
 export type TransactionActionExtraData =

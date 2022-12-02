@@ -44,6 +44,10 @@ export class ERC20Contract extends Contract {
   allowance: (address: string, contract: string) => Promise<string>;
 
   approve: (address: string, value: BigNumber) => Promise<TransactionResponse>;
+
+  nonces: (address: string) => Promise<number>;
+
+  getNonce: (address: string) => Promise<number>;
 }
 
 export class SmolDomainContract extends Contract {

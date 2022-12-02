@@ -462,6 +462,18 @@ export const TRANSFORMER_REGISTRY_ADDRESS: AddressMap<PositionVersions> = {
   },
 };
 
+export const SWAPPER_REGISTRY_ADDRESS: AddressMap<PositionVersions> = {
+  [POSITION_VERSION_1]: {},
+  [POSITION_VERSION_2]: {},
+  [POSITION_VERSION_3]: {},
+  [POSITION_VERSION_4]: {
+    [NETWORKS.polygon.chainId]: '0xca341351FA4D98a3EE7eb688796B796603128d85',
+    [NETWORKS.optimism.chainId]: '0xca341351FA4D98a3EE7eb688796B796603128d85',
+    [NETWORKS.arbitrum.chainId]: '0xca341351FA4D98a3EE7eb688796B796603128d85',
+    [NETWORKS.mainnet.chainId]: '0xca341351FA4D98a3EE7eb688796B796603128d85',
+  },
+};
+
 export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
 };

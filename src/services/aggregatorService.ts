@@ -4,7 +4,7 @@ import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 
 // MOCKS
 import { PositionVersions } from 'config/constants';
-import { RawSwapOption, SwapOption, Token } from 'types';
+import { RawSwapOption, SignatureData, SwapOption, Token } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
 import { GasKeys } from 'config/constants/aggregator';
 import GraphqlService from './graphql';
@@ -58,6 +58,46 @@ export default class AggregatorService {
     const transactionToSend = await this.addGasLimit(route.tx);
 
     return signer.sendTransaction(transactionToSend);
+  }
+
+  async permitAndSwap(quote: SwapOption, signData: SignatureData) {
+    if (!quote.tx.data) {
+      throw new Error('No swap data detected');
+    }
+    const swapProxyInstance = await this.contractService.getSwapProxyInstance();
+
+    const { tokenAddress: token, owner, spender, deadline, v, r, s } = signData;
+
+    // If we have a token permit set, then perform a multicall and override the calldata + value
+    console.log(
+      'token: ',
+      token,
+      'owner: ',
+      owner,
+      'spender: ',
+      spender,
+      'value: ',
+      quote.maxSellAmount.amount.toString(),
+      'deadline: ',
+      deadline,
+      'v: ',
+      v,
+      'r: ',
+      r,
+      's: ',
+      s
+    );
+    const { data: tokenPermitCalldata } = await swapProxyInstance.populateTransaction.permit(
+      token,
+      owner,
+      spender,
+      quote.maxSellAmount.amount,
+      deadline,
+      v,
+      r,
+      s
+    );
+    return swapProxyInstance.multicall([tokenPermitCalldata as string, quote.tx.data]);
   }
 
   async getSwapOptions(

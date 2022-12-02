@@ -2,7 +2,7 @@ import React from 'react';
 import { parseUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { SwapOption, Token } from 'types';
+import { SignatureData, SwapOption, Token, TransactionActionSwapData } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/aggregator-token-picker';
@@ -13,8 +13,10 @@ import useUsedTokens from 'hooks/useUsedTokens';
 import {
   SUPPORTED_NETWORKS,
   TRANSACTION_ACTION_APPROVE_TOKEN,
+  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
   TRANSACTION_ACTION_SWAP,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+  TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL,
   TRANSACTION_TYPES,
 } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -27,9 +29,14 @@ import useWalletService from 'hooks/useWalletService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useAggregatorService from 'hooks/useAggregatorService';
 import useSpecificAllowance from 'hooks/useSpecificAllowance';
+import { TransactionResponse } from '@ethersproject/providers';
 import TransferToModal from 'common/transfer-to-modal';
 import TransactionConfirmation from 'common/transaction-confirmation';
-import TransactionSteps, { TransactionAction as TransactionStep } from 'common/transaction-steps';
+import TransactionSteps, {
+  TransactionAction as TransactionStep,
+  TransactionActionSwap,
+} from 'common/transaction-steps';
+import useSupportsPermit from 'hooks/useSupportsPermit';
 import { GasKeys } from 'config/constants/aggregator';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -107,6 +114,8 @@ const Swap = ({
 
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
+  const [supportsPermit] = useSupportsPermit(from);
+
   const handleApproveToken = async (transactions?: TransactionStep[]) => {
     if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
@@ -163,6 +172,71 @@ const Swap = ({
     }
   };
 
+  const handleSignPermitToken = async (transactions?: TransactionStep[]) => {
+    if (!from || !to || !selectedRoute) return;
+    const fromSymbol = from.symbol;
+
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="body1">
+            <FormattedMessage
+              description="approving token"
+              defaultMessage="Approving use of {from}"
+              values={{ from: fromSymbol || '' }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await walletService.getPermitSignature(
+        from,
+        selectedRoute.maxSellAmount.amount,
+        selectedRoute.swapper.allowanceTarget
+      );
+
+      setModalClosed({ content: '' });
+
+      if (transactions?.length) {
+        const newSteps = [...transactions];
+
+        const approveIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN });
+
+        if (approveIndex !== -1) {
+          newSteps[approveIndex] = {
+            ...newSteps[approveIndex],
+            done: true,
+          };
+
+          const waitIndex = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL });
+          if (waitIndex !== -1) {
+            newSteps[waitIndex] = {
+              ...newSteps[waitIndex],
+              done: true,
+            };
+          }
+
+          const swapIndex = findIndex(transactions, { type: TRANSACTION_ACTION_SWAP });
+          if (swapIndex !== -1) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            (newSteps[swapIndex] as TransactionActionSwap) = {
+              ...newSteps[swapIndex],
+              extraData: {
+                ...newSteps[swapIndex].extraData,
+                signature: result,
+              } as TransactionActionSwapData,
+            };
+          }
+        }
+
+        setTransactionsToExecute(newSteps);
+      }
+    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
+    }
+  };
+
   const handleSwap = async (transactions?: TransactionStep[]) => {
     if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
@@ -192,7 +266,21 @@ const Swap = ({
         ),
       });
 
-      const result = await aggregatorService.swap(selectedRoute);
+      let result: TransactionResponse;
+      let signatureData: SignatureData | undefined;
+      if (transactions?.length) {
+        const index = findIndex(transactions, { type: TRANSACTION_ACTION_SWAP });
+
+        ({ signature: signatureData } = transactions[index].extraData as TransactionActionSwapData);
+      }
+
+      if (signatureData) {
+        console.log('going to use permit and swap');
+        result = await aggregatorService.permitAndSwap(selectedRoute, signatureData);
+      } else {
+        console.log('going to use swap');
+        result = await aggregatorService.swap(selectedRoute);
+      }
 
       let transactionType = TRANSACTION_TYPES.SWAP;
 
@@ -268,29 +356,55 @@ const Swap = ({
 
     const newSteps: TransactionStep[] = [];
 
-    newSteps.push({
-      hash: '',
-      onAction: handleApproveToken,
-      checkForPending: false,
-      done: false,
-      type: TRANSACTION_ACTION_APPROVE_TOKEN,
-      extraData: {
-        token: from,
-        amount: parseUnits(fromValue, from.decimals),
-      },
-    });
+    if (supportsPermit) {
+      newSteps.push({
+        hash: '',
+        onAction: handleSignPermitToken,
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
+        extraData: {
+          token: from,
+          amount: parseUnits(fromValue, from.decimals),
+        },
+      });
 
-    newSteps.push({
-      hash: '',
-      onAction: handleTransactionEndedForWait,
-      checkForPending: true,
-      done: false,
-      type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
-      extraData: {
-        token: from,
-        amount: parseUnits(fromValue, from.decimals),
-      },
-    });
+      newSteps.push({
+        hash: '',
+        onAction: handleTransactionEndedForWait,
+        checkForPending: true,
+        done: false,
+        type: TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL,
+        extraData: {
+          token: from,
+          amount: parseUnits(fromValue, from.decimals),
+        },
+      });
+    } else {
+      newSteps.push({
+        hash: '',
+        onAction: handleApproveToken,
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_APPROVE_TOKEN,
+        extraData: {
+          token: from,
+          amount: parseUnits(fromValue, from.decimals),
+        },
+      });
+
+      newSteps.push({
+        hash: '',
+        onAction: handleTransactionEndedForWait,
+        checkForPending: true,
+        done: false,
+        type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+        extraData: {
+          token: from,
+          amount: parseUnits(fromValue, from.decimals),
+        },
+      });
+    }
 
     newSteps.push({
       hash: '',
@@ -303,11 +417,17 @@ const Swap = ({
         to,
         sellAmount: parseUnits(fromValue, from.decimals),
         buyAmount: parseUnits(fromValue, from.decimals),
+        signature: undefined,
       },
     });
 
     setTransactionsToExecute(newSteps);
     setShouldShowSteps(true);
+  };
+
+  const handleCloseTransactionSteps = () => {
+    setShouldShowSteps(false);
+    setTransactionsToExecute([]);
   };
 
   const startSelectingCoin = (token: Token) => {
@@ -459,7 +579,7 @@ const Swap = ({
         />
         <TransactionSteps
           shouldShow={shouldShowSteps}
-          handleClose={() => setShouldShowSteps(false)}
+          handleClose={handleCloseTransactionSteps}
           transactions={transactionsToExecute}
         />
         <TokenPicker
