@@ -2435,37 +2435,38 @@
   resolved "https://registry.yarnpkg.com/@material-ui/types/-/types-6.0.2.tgz#a6d384196c6e2e130eb2765b62d944c0b1ea1015"
   integrity sha512-/XUca4wUb9pWimLLdM1PE8KS8rTbDEGohSGkGtk3WST7lm23m+8RYv9uOmrvOg/VSsl4bMiOv4t2/LCb+RLbTg==
 
-"@mean-finance/chainlink-registry@2.0.0-rc11":
-  version "2.0.0-rc11"
-  resolved "https://registry.yarnpkg.com/@mean-finance/chainlink-registry/-/chainlink-registry-2.0.0-rc11.tgz#9ffd71efce35c886d9c9541ebd426e59f273992c"
-  integrity sha512-TpoJiWlBNbwsx3hHc4ASBE+ZxJ1e+gky/J7FT3jY/lqZg4PLTiUcgXodSmy/WmO+g+89TQ3L3Zz6spmmMq/KdA==
+"@mean-finance/chainlink-registry@2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@mean-finance/chainlink-registry/-/chainlink-registry-2.1.0.tgz#f11d78a617a9e0e9f2aec6b7b0f6fe2db07b86fe"
+  integrity sha512-cbbmMuuXkxKz/ks48EP50DDV8lSw2WRW4gyszQKjpJOTJPOS2QCzlBmJXU++SJ7AogLDXCSznJlTnXAH/0X2hQ==
   dependencies:
     "@0xged/hardhat-deploy" "0.11.5"
     "@chainlink/contracts" "0.4.2"
-    "@mean-finance/deterministic-factory" "1.5.1"
+    "@mean-finance/deterministic-factory" "1.6.0"
     "@openzeppelin/contracts" "4.7.3"
 
-"@mean-finance/dca-v2-core@3.0.0", "@mean-finance/dca-v2-core@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@mean-finance/dca-v2-core/-/dca-v2-core-3.0.0.tgz#7d1ee9c4044137d052d9dbd4e0771e6fab6a5c08"
-  integrity sha512-NCY67myMiOCd+btnDw3nHSYKlQFxfEO6OPPky/yODUDxfaHFDzIMHZS/19JUOI+ASBd7zm/U2Nro2c1r5Et82Q==
+"@mean-finance/dca-v2-core@3.1.0", "@mean-finance/dca-v2-core@^3.0.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@mean-finance/dca-v2-core/-/dca-v2-core-3.1.0.tgz#81bc89c627bfd2f1ef0cfc384387d1e6cbd4f5c4"
+  integrity sha512-YcsjsfilL+E7jk/s4tCmdDQ7SMsBLIZfZK/ey8Sx7mj2gbUgF614lWSs99n3oRlocjjIAeEgKGL02uPwcqJvVw==
   dependencies:
     "@0xged/hardhat-deploy" "0.11.5"
-    "@mean-finance/deterministic-factory" "1.5.1"
-    "@mean-finance/nft-descriptors" "1.0.0"
-    "@mean-finance/oracles" "2.0.0"
+    "@mean-finance/deterministic-factory" "1.6.0"
+    "@mean-finance/nft-descriptors" "1.1.0"
+    "@mean-finance/oracles" "2.1.0"
     "@openzeppelin/contracts" "4.7.3"
 
 "@mean-finance/dca-v2-periphery@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@mean-finance/dca-v2-periphery/-/dca-v2-periphery-3.0.0.tgz#f06e500acd6195d513c082b5e1f0114171080ba3"
-  integrity sha512-3bKLoscZdA9K0OzRbFyNc91lo+gMN3znRPe2+keafwewiTqr3q4KF6e9/dDOLF+QI3HitK2y9djo+/iwK6uTNA==
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@mean-finance/dca-v2-periphery/-/dca-v2-periphery-3.2.1.tgz#60b6751a367f49ab44afc731824687afe69341e9"
+  integrity sha512-ZsqN2tLLajPoIlOM0YVh+ZREDNFh8Bq+WpXrTvoWC7dSesES5XpnEMzwFVhqZbXnzbae5Z7cJs6QQv2TH5cUsg==
   dependencies:
     "@0xged/hardhat-deploy" "0.11.5"
-    "@mean-finance/dca-v2-core" "3.0.0"
-    "@mean-finance/deterministic-factory" "1.5.1"
-    "@mean-finance/swappers" "1.0.0"
+    "@mean-finance/dca-v2-core" "3.1.0"
+    "@mean-finance/deterministic-factory" "1.6.0"
+    "@mean-finance/swappers" "1.1.0"
     "@openzeppelin/contracts" "4.7.3"
+    keep3r-v2 "1.0.0"
 
 "@mean-finance/deterministic-factory@1.3.1":
   version "1.3.1"
@@ -2475,63 +2476,55 @@
     "@openzeppelin/contracts" "4.6.0"
     "@rari-capital/solmate" "6.2.0"
 
-"@mean-finance/deterministic-factory@1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@mean-finance/deterministic-factory/-/deterministic-factory-1.5.1.tgz#f5fe201c4d1f44df3361426618260752a003e7a5"
-  integrity sha512-21xDSCPv+mEDFcHRU7d1u+V/r8ANCti1pB8eL5B+JHjWjSsvEOvOsaUmSgFZuLmvm9UMV+DRLCucAQ1Iddzc4w==
+"@mean-finance/deterministic-factory@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@mean-finance/deterministic-factory/-/deterministic-factory-1.6.0.tgz#d1778d1b6d44de0695fe0defeb2dd3d4c1a2236e"
+  integrity sha512-Ympjbm+Pq8JwSGXNlknHkIn8sEiuNuG5ap6rh2Co9NQG6kljivdTvq2sm7uZGDHdmWGYnBBb4P590bxbG9XpQQ==
   dependencies:
     "@openzeppelin/contracts" "4.6.0"
     "@rari-capital/solmate" "6.2.0"
 
-"@mean-finance/nft-descriptors@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@mean-finance/nft-descriptors/-/nft-descriptors-1.0.0.tgz#57480d164936cd6a64e473503d55c9026e847573"
-  integrity sha512-F2QTNnDBbv7eHMSnEuXpBzOcYiDvZ+nXVOBQQrRqS00fRgsKpJhFrArOW2ya7P0Eg3elvn/nk2u0xjrHVS40DQ==
+"@mean-finance/nft-descriptors@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@mean-finance/nft-descriptors/-/nft-descriptors-1.1.0.tgz#31b15d765841ecfb93749b7fff9fca6aaedd769e"
+  integrity sha512-rmyL3MBpKun0gfJraWKx048dYu4APXkCIH/mHGD4UhDrp85xUjFOYV+lxiJkjrsuuEs1Rx5c9+d3VGa9FUKf2w==
   dependencies:
-    "@mean-finance/deterministic-factory" "1.5.1"
+    "@0xged/hardhat-deploy" "0.11.5"
+    "@mean-finance/deterministic-factory" "1.6.0"
     "@openzeppelin/contracts" "4.7.3"
     base64-sol "1.0.1"
 
-"@mean-finance/oracles@2.0.0", "@mean-finance/oracles@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@mean-finance/oracles/-/oracles-2.0.0.tgz#661f3b157870c3730b19a112e30138bf6c574ead"
-  integrity sha512-9CRHGpiZs4use+YB8Ba+nbQvh8ynrFb7NRXmrgU2hCL57LfL8CaCaTiqUuNs/ulAaars2dk7DhSj9Mdc6MBAKQ==
+"@mean-finance/oracles@2.1.0", "@mean-finance/oracles@^2.0.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@mean-finance/oracles/-/oracles-2.1.0.tgz#1310d95dc1cca020aa8f5ccbdce7bb2aa39f98b1"
+  integrity sha512-1dhvB+E0L2qMxOoQTCXHz5dxmVTzDJY68+k9Px1qtEbw2RlidKFXbmrmd+sku+UtxzlSrJzYihrzRZHWi+sTcg==
   dependencies:
     "@0xged/hardhat-deploy" "0.11.5"
     "@chainlink/contracts" "0.4.2"
-    "@mean-finance/chainlink-registry" "2.0.0-rc11"
-    "@mean-finance/deterministic-factory" "1.5.1"
-    "@mean-finance/transformers" "1.0.0-rc11"
+    "@mean-finance/chainlink-registry" "2.1.0"
+    "@mean-finance/deterministic-factory" "1.6.0"
+    "@mean-finance/transformers" "1.1.0"
     "@mean-finance/uniswap-v3-oracle" "1.0.0"
     "@openzeppelin/contracts" "4.7.3"
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/swappers@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@mean-finance/swappers/-/swappers-1.0.0.tgz#63c8cd07d9f65194a99da465f72902f763a9e84a"
-  integrity sha512-ir5zVb5sj/GrjMVNWK6TnKbEIE8UWR3LeWGKjOAMlU5vvCsfUZt/aTMa+oZ1qeMF9vIln8yEIalh/fexgBMUxQ==
+"@mean-finance/swappers@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@mean-finance/swappers/-/swappers-1.1.0.tgz#5d4d6f6573113ae833b05af6d85f037be41fc45f"
+  integrity sha512-Yqz/fl3nqcd+GzQc5UUiQzoYmMwirFFtxK99HWHjzUlslApvsuqiyBTyrP+IyFgCrGcQkwi0X1lV9cBZoEBFiQ==
   dependencies:
     "@0xged/hardhat-deploy" "0.11.5"
-    "@mean-finance/deterministic-factory" "1.5.1"
+    "@mean-finance/deterministic-factory" "1.6.0"
     "@openzeppelin/contracts" "4.7.3"
 
-"@mean-finance/transformers@1.0.0-rc11":
-  version "1.0.0-rc11"
-  resolved "https://registry.yarnpkg.com/@mean-finance/transformers/-/transformers-1.0.0-rc11.tgz#89e8b5bd6f2af292f06239d24ad7522ba3404481"
-  integrity sha512-q4uBiJNHPzc8Z0fxFgKPseF9Ca70npeW+sSduLzdQy+aWDNXp1ZHzG74npzPAqsjdO3M7z7J1T0uV5koTL6K5A==
+"@mean-finance/transformers@1.1.0", "@mean-finance/transformers@^1.0.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@mean-finance/transformers/-/transformers-1.1.0.tgz#24544c106d444df8f118e1bbbdd9868953aa17a0"
+  integrity sha512-WL8K+Uvvbo+NYylS8YpLFY5Ok23M5Dzpx38aewfkhFoXyZUQQwLJFTwKmOXcsHtXrSJRjCTkT7XN5PKkOzo3Qg==
   dependencies:
     "@0xged/hardhat-deploy" "0.11.5"
-    "@mean-finance/deterministic-factory" "1.5.1"
-    "@openzeppelin/contracts" "4.7.3"
-
-"@mean-finance/transformers@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@mean-finance/transformers/-/transformers-1.0.0.tgz#6a20ec13bcf93bcbe0db9eaa8b432c3f1286f730"
-  integrity sha512-Z8NNM+9CQ+SvTXPD7lxKlD3GibzSFKmNQAmXh+B324CP6nkm3tqnd8cOYAClVbXM1a9+Ie/jo5VvJkSKfzmQug==
-  dependencies:
-    "@0xged/hardhat-deploy" "0.11.5"
-    "@mean-finance/deterministic-factory" "1.5.1"
+    "@mean-finance/deterministic-factory" "1.6.0"
     "@openzeppelin/contracts" "4.7.3"
 
 "@mean-finance/uniswap-v3-oracle@1.0.0":
@@ -2725,6 +2718,11 @@
   version "3.4.2-solc-0.7"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.4.2-solc-0.7.tgz#38f4dbab672631034076ccdf2f3201fab1726635"
   integrity sha512-W6QmqgkADuFcTLzHL8vVoNBtkwjvQRpYIAom7KiUNoLKghyx3FgH0GBjt8NRvigV1ZmMOBllvE1By1C+bi8WpA==
+
+"@openzeppelin/contracts@4.3.0":
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.0.tgz#345236d4ec73ef381ab4907c6ef66fd55e5dedad"
+  integrity sha512-+uBDl/TrmR0Kch6mq3tuxMex/fK7huR6+fQMae+zJk1K5T+dp0pFl12Hbc+1L6oYMXoyDSBJ8zqhRIntrREDFA==
 
 "@openzeppelin/contracts@4.6.0":
   version "4.6.0"
@@ -8983,6 +8981,13 @@ keccak@^3.0.0, keccak@^3.0.2:
     node-addon-api "^2.0.0"
     node-gyp-build "^4.2.0"
     readable-stream "^3.6.0"
+
+keep3r-v2@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/keep3r-v2/-/keep3r-v2-1.0.0.tgz#14d084473e47c6d4ec56eeb20bcfcac460a43c37"
+  integrity sha512-m/CaOA3YGBmHZcTdUayPthS8lhkqM1VqS67SbvgI08wcfuStrQsAsdzMsvDFbFIabwAoKQpVE3813V6krDUSSw==
+  dependencies:
+    "@openzeppelin/contracts" "4.3.0"
 
 keyvaluestorage-interface@^1.0.0:
   version "1.0.0"
