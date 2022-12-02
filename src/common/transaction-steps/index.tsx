@@ -223,13 +223,7 @@ const buildApproveTokenItem = ({
           )}
           {!isCurrentStep && done && (
             <StyledTransactionStepButtonContainer>
-              <Button
-                variant="contained"
-                color="secondary"
-                fullWidth
-                size="large"
-                onClick={() => onGoToEtherscan(hash)}
-              >
+              <Button variant="outlined" color="default" fullWidth size="large" onClick={() => onGoToEtherscan(hash)}>
                 <FormattedMessage description="viewReceipt" defaultMessage="View receipt" />
               </Button>
             </StyledTransactionStepButtonContainer>
@@ -306,6 +300,7 @@ const buildWaitForApprovalItem = ({
   getPendingTransaction,
   transactions,
   isCurrentStep,
+  done,
 }: TransactionActionWaitForApprovalProps) => ({
   content: () => {
     const isPendingTransaction = getPendingTransaction(hash);
@@ -335,7 +330,7 @@ const buildWaitForApprovalItem = ({
                 values={{ step }}
               />
             )}
-            {hash && checkForPending && !isPendingTransaction && (
+            {((!hash && checkForPending && !isPendingTransaction) || done) && (
               <FormattedMessage
                 description="transationStepWaitApprove"
                 defaultMessage="{step} - The token approval is submitted"
