@@ -4,6 +4,7 @@ import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
 import usePrevious from 'hooks/usePrevious';
 import { BigNumber } from 'ethers';
+import { parseUnits } from '@ethersproject/units';
 import { STABLE_COINS } from 'config/constants';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
@@ -42,7 +43,7 @@ function useRawUsdPrice(
           setResults({ result: undefined, error: e as string, isLoading: false });
         }
       } else {
-        setResults({ result: BigNumber.from(0), error: undefined, isLoading: false });
+        setResults({ result: parseUnits('1', 18), error: undefined, isLoading: false });
       }
     }
 
