@@ -4,7 +4,7 @@ import { AxiosInstance } from 'axios';
 import { DefillamaResponse, YieldOptions } from 'types';
 
 // MOCKS
-import { ALLOWED_YIELDS } from 'config/constants';
+import { ALLOWED_YIELDS, DISABLED_YIELDS } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import WalletService from './walletService';
 
@@ -27,7 +27,7 @@ export default class YieldService {
     this.client = client;
   }
 
-  async getYieldOptions(chainId?: number): Promise<YieldOptions> {
+  async getYieldOptions(chainId?: number, useBlacklist = false): Promise<YieldOptions> {
     const network = await this.walletService.getNetwork();
 
     const chainidTouse = chainId || network.chainId;
@@ -36,7 +36,11 @@ export default class YieldService {
 
     const yields = defillamaYields.data.data;
 
-    const yieldsByChain = ALLOWED_YIELDS[chainidTouse];
+    let yieldsByChain = ALLOWED_YIELDS[chainidTouse];
+
+    if (useBlacklist) {
+      yieldsByChain = yieldsByChain.filter((option) => !DISABLED_YIELDS.includes(option.tokenAddress));
+    }
 
     return yieldsByChain.map((baseYield) => {
       const foundYield = find(yields, { pool: baseYield.poolId });
