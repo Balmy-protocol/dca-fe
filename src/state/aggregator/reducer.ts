@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { SwapOption, Token } from 'types';
+import { SWAP_ROUTES_SORT_OPTIONS } from 'config/constants/aggregator';
 import {
   setFromValue,
   setFrom,
@@ -10,7 +11,6 @@ import {
   resetForm,
   setTransferTo,
 } from './actions';
-import { SWAP_ROUTES_SORT_OPTIONS } from 'config/constants/aggregator';
 
 export interface AggregatorState {
   fromValue: string;
