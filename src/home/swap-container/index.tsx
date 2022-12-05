@@ -38,7 +38,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const fromParamToken = useToken(fromParam, true);
   const toParamToken = useToken(toParam, true);
   const history = useHistory();
-  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions();
+  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
 
   React.useEffect(() => {
     if (fromParamToken) {

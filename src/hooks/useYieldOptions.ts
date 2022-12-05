@@ -7,7 +7,7 @@ import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
 import useYieldService from './useYieldService';
 
-function useYieldOptions(chainId?: number): [YieldOptions | undefined, boolean, string?] {
+function useYieldOptions(chainId?: number, useBlacklist = false): [YieldOptions | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const yieldService = useYieldService();
   const walletService = useWalletService();
@@ -16,12 +16,13 @@ function useYieldOptions(chainId?: number): [YieldOptions | undefined, boolean, 
   const currentNetwork = useCurrentNetwork();
   const chainIdToUse = chainId || currentNetwork.chainId;
   const prevChainId = usePrevious(chainIdToUse);
+  const prevUseBlacklist = usePrevious(useBlacklist);
   const prevResult = usePrevious(result, false);
 
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const options = await yieldService.getYieldOptions(chainIdToUse);
+        const options = await yieldService.getYieldOptions(chainIdToUse, useBlacklist);
         setResult(options);
         setError(undefined);
       } catch (e) {
@@ -31,7 +32,11 @@ function useYieldOptions(chainId?: number): [YieldOptions | undefined, boolean, 
       setIsLoading(false);
     }
 
-    if ((!isLoading && isUndefined(result) && !error) || !isEqual(prevChainId, chainIdToUse)) {
+    if (
+      (!isLoading && isUndefined(result) && !error) ||
+      !isEqual(prevChainId, chainIdToUse) ||
+      !isEqual(prevUseBlacklist, useBlacklist)
+    ) {
       setIsLoading(true);
       setResult(undefined);
       setError(undefined);
@@ -39,7 +44,17 @@ function useYieldOptions(chainId?: number): [YieldOptions | undefined, boolean, 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [isLoading, result, error, walletService.getAccount(), currentNetwork, chainIdToUse, prevChainId]);
+  }, [
+    isLoading,
+    result,
+    error,
+    walletService.getAccount(),
+    currentNetwork,
+    chainIdToUse,
+    prevChainId,
+    useBlacklist,
+    prevUseBlacklist,
+  ]);
 
   return [result || prevResult, isLoading, error];
 }
