@@ -20,6 +20,7 @@ function useUnderlyingAmount(
   React.useEffect(() => {
     async function callPromise() {
       if (!tokens.length || some(tokens, { token: undefined })) {
+        setParams({ isLoading: false, result: [], error: undefined });
         return;
       }
       try {

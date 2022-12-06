@@ -10,7 +10,8 @@ const StyledContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justifycontent: center;
+  justify-content: center;
+  flex: 1;
 `;
 const PositionNotFound = () => {
   const history = useHistory();
