@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Button from 'common/button';
 import { Token } from 'types';
 import { FormattedMessage } from 'react-intl';
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
+import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -11,6 +11,8 @@ import TokenIcon from 'common/token-icon';
 import { createStyles, FilledInput, Typography } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { formatCurrencyAmount } from 'utils/currency';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { MAX_DEDUCTION, MIN_AMOUNT_FOR_MAX_DEDUCTION } from 'config';
 
 const StyledTokenInputContainer = styled.div`
   display: flex;
@@ -115,6 +117,7 @@ const TokenInput = ({
   usdValue,
 }: TokenInputProps) => {
   const inputRef = React.createRef();
+  const currentNetwork = useCurrentNetwork();
   const validator = (nextValue: string) => {
     // sanitize value
     const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${(token && token.decimals) || 18}}$`);
@@ -127,8 +130,8 @@ const TokenInput = ({
   const handleMaxValue = () => {
     if (balance && token) {
       if (token.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue = balance.gte(parseUnits('1', token.decimals))
-          ? balance.sub(parseUnits('0.1', token.decimals))
+        const maxValue = balance.gte(MIN_AMOUNT_FOR_MAX_DEDUCTION[currentNetwork.chainId])
+          ? balance.sub(MAX_DEDUCTION[currentNetwork.chainId])
           : balance;
         onChange(formatUnits(maxValue, token.decimals));
       } else {
@@ -141,8 +144,9 @@ const TokenInput = ({
     if (balance && token) {
       if (token.address === PROTOCOL_TOKEN_ADDRESS) {
         const amounToHalve =
-          balance.lte(parseUnits('1', token.decimals)) && balance.gt(parseUnits('0.01', token.decimals))
-            ? balance.sub(parseUnits('0.01', token.decimals))
+          balance.lte(MIN_AMOUNT_FOR_MAX_DEDUCTION[currentNetwork.chainId]) &&
+          balance.gt(MAX_DEDUCTION[currentNetwork.chainId])
+            ? balance.sub(MAX_DEDUCTION[currentNetwork.chainId])
             : balance;
 
         const halfValue = amounToHalve.div(BigNumber.from(2));
