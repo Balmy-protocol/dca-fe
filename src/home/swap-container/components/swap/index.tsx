@@ -196,7 +196,14 @@ const Swap = ({
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
     usdPrice
   );
-  const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
+  let rateForUsdPrice: BigNumber | null = null;
+
+  try {
+    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
+    // eslint-disable-next-line no-empty
+  } catch {}
+
+  const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
   const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
   const hasEnoughUsdForYield =
     !!usdPrice &&
