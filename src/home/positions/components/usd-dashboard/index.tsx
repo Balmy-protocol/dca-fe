@@ -37,7 +37,7 @@ const StyledCountDashboardContainer = styled(Grid)`
 `;
 
 const StyledButton = styled(Button)`
-  padding: 0px 8px 0px 8px;
+  padding: 0px 8px 2px 0px;
 `;
 
 const StyledBullet = styled.div<{ fill: string }>`
@@ -510,15 +510,20 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         </Grid>
       )}
       {hasLoadedUSDValues && !tokensCount.length && (
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
           <Typography variant="body1">
-            <FormattedMessage description="generatedDashboardNoValuePart1" defaultMessage="Go to" />
+            <FormattedMessage
+              description="generatedDashboardNoValuePart1"
+              defaultMessage="There are no funds currently deposited in Mean Finance"
+            />
+          </Typography>
+          <Typography variant="body1">
             <StyledButton variant="text" color="secondary" onClick={handleGoToCreatePosition}>
               <Typography variant="body1">
-                <FormattedMessage description="generatedDashboardNoValueAction" defaultMessage="create a position" />
+                <FormattedMessage description="generatedDashboardNoValueAction" defaultMessage="Create a position" />
               </Typography>
             </StyledButton>
-            <FormattedMessage description="generatedDashboardNoValuePart2" defaultMessage="and start investing" />
+            <FormattedMessage description="generatedDashboardNoValuePart2" defaultMessage="to start investing now!" />
           </Typography>
         </Grid>
       )}
