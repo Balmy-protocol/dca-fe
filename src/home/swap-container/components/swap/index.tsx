@@ -134,7 +134,6 @@ const Swap = ({
   const [showSecondStep, setShowSecondStep] = React.useState(false);
   const [isRender, setIsRender] = React.useState(true);
   const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
-  const [rate, setRate] = React.useState('0');
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
@@ -196,6 +195,17 @@ const Swap = ({
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
     usdPrice
   );
+
+  const rate =
+    (fromValue &&
+      from &&
+      parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
+      frequencyValue &&
+      BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+      from &&
+      formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
+    '0';
+
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
   const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
   const hasEnoughUsdForYield =
@@ -206,19 +216,6 @@ const Swap = ({
   // only allowed if set for 10 days and at least 10 USD
   const shouldEnableYield =
     yieldEnabled && (fromCanHaveYield || toCanHaveYield) && isAtLeastAWeek && hasEnoughUsdForYield;
-
-  React.useEffect(() => {
-    if (!from) return;
-    setRate(
-      (fromValue &&
-        parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
-        frequencyValue &&
-        BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-        from &&
-        formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
-        '0'
-    );
-  }, [from]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const toggleWhaleMode = () => {
@@ -348,7 +345,6 @@ const Swap = ({
       });
 
       setFromValue('');
-      setRate('0');
       setToYield(undefined);
       setFromYield(undefined);
       setCreateStep(0);
@@ -412,21 +408,11 @@ const Swap = ({
     if (!from) return;
     setModeType(FULL_DEPOSIT_TYPE);
     setFromValue(newFromValue);
-    setRate(
-      (newFromValue &&
-        parseUnits(newFromValue, from.decimals).gt(BigNumber.from(0)) &&
-        frequencyValue &&
-        BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-        from &&
-        formatUnits(parseUnits(newFromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
-        '0'
-    );
   };
 
   const handleRateValueChange = (newRate: string) => {
     if (!from) return;
     setModeType(RATE_TYPE);
-    setRate(newRate);
     setFromValue(
       (newRate &&
         parseUnits(newRate, from.decimals).gt(BigNumber.from(0)) &&
@@ -450,16 +436,6 @@ const Swap = ({
           from &&
           formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(newFrequencyValue)), from.decimals)) ||
           ''
-      );
-    } else {
-      setRate(
-        (fromValue &&
-          parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
-          newFrequencyValue &&
-          BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
-          from &&
-          formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(newFrequencyValue)), from.decimals)) ||
-          '0'
       );
     }
   };
