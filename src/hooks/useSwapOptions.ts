@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
-import { GasKeys } from 'config/constants/aggregator';
+import { GasKeys, SWAP_ROUTES_SORT_OPTIONS } from 'config/constants/aggregator';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useAggregatorService from './useAggregatorService';
@@ -39,7 +39,6 @@ function useSwapOptions(
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
-  const prevSorting = usePrevious(sorting);
   const prevTransferTo = usePrevious(transferTo);
   const prevResult = usePrevious(result, false);
   const prevGasSpeed = usePrevious(gasSpeed);
@@ -51,7 +50,6 @@ function useSwapOptions(
         debouncedTo?: Token | null,
         debouncedValue?: string,
         debouncedIsBuyOrder?: boolean,
-        debouncedSorting?: string,
         debouncedTransferTo?: string | null,
         debouncedGasSpeed?: GasKeys,
         debouncedSlippage?: number
@@ -65,11 +63,12 @@ function useSwapOptions(
               debouncedTo,
               debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
               debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
-              debouncedSorting,
+              SWAP_ROUTES_SORT_OPTIONS.MOST_PROFIT,
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed
             );
+
             setState({ result: promiseResult, error: undefined, isLoading: false });
           } catch (e) {
             setState({ result: undefined, error: e as string, isLoading: false });
@@ -82,8 +81,8 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(from, to, value, isBuyOrder, sorting, transferTo, gasSpeed, slippage),
-    [from, to, value, isBuyOrder, sorting, transferTo, slippage, gasSpeed]
+    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage),
+    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed]
   );
 
   React.useEffect(() => {
@@ -94,7 +93,6 @@ function useSwapOptions(
       !isEqual(prevTo, to) ||
       !isEqual(prevValue, value) ||
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
-      !isEqual(prevSorting, sorting) ||
       !isEqual(prevTransferTo, transferTo) ||
       !isEqual(prevGasSpeed, gasSpeed) ||
       !isEqual(prevSlippage, slippage)
@@ -102,7 +100,6 @@ function useSwapOptions(
       if (from && to && value) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         fetchOptions();
-        // callPromise();
       }
     }
   }, [
@@ -123,8 +120,6 @@ function useSwapOptions(
     prevBlockNumber,
     blockNumber,
     walletService,
-    prevSorting,
-    sorting,
     fetchOptions,
     prevTransferTo,
     transferTo,
@@ -138,7 +133,13 @@ function useSwapOptions(
     return [undefined, false, undefined, fetchOptions];
   }
 
-  return [result || prevResult, isLoading, error, fetchOptions];
+  let resultToReturn = result || prevResult;
+
+  if (sorting === SWAP_ROUTES_SORT_OPTIONS.LEAST_GAS && resultToReturn) {
+    resultToReturn = [...resultToReturn].sort((a, b) => (a.gas.estimatedCost.lt(b.gas.estimatedCost) ? -1 : 1));
+  }
+
+  return [resultToReturn, isLoading, error, fetchOptions];
 }
 
 export default useSwapOptions;

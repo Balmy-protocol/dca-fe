@@ -16,3 +16,8 @@ export const DEFAULT_AGGREGATOR_SETTINGS: { gasSpeed: GasKeys; slippage: number 
   slippage: 0.3,
   gasSpeed: GAS_KEY_AVERAGE,
 };
+
+export const SWAP_ROUTES_SORT_OPTIONS = {
+  MOST_PROFIT: 'most-profit',
+  LEAST_GAS: 'least-gas',
+};
