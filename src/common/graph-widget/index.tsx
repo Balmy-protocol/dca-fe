@@ -28,6 +28,7 @@ import useUsdPrice from 'hooks/useUsdPrice';
 import { parseUnits } from '@ethersproject/units';
 import { withStyles } from '@mui/styles';
 import Chip from '@mui/material/Chip';
+import GraphAggregatorFooter from 'common/graph-aggregator-footer';
 
 const DarkChip = withStyles(() => ({
   root: {
@@ -41,6 +42,7 @@ interface GraphWidgetProps {
   from: Token | null;
   to: Token | null;
   withFooter?: boolean;
+  isAggregator?: boolean;
 }
 
 interface UniMappedPrice {
@@ -67,7 +69,7 @@ interface PriceDefillamaData {
 
 type Prices = (PriceMeanData | PriceDefillamaData)[];
 
-const StyledPaper = styled(Paper)<{ $column?: boolean }>`
+const StyledPaper = styled(Paper)<{ $column?: boolean; $withFooter?: boolean }>`
   padding: 16px;
   position: relative;
   overflow: hidden;
@@ -78,7 +80,7 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   display: flex;
   gap: 24px;
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
-  min-height: 400px;
+  min-height: ${({ $withFooter }) => ($withFooter ? '200px' : '400px')};
 `;
 
 const StyledTitleContainer = styled.div`
@@ -155,7 +157,7 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   type: TOKEN_TYPE_BASE,
   underlyingTokens: [],
 };
-const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
+const GraphWidget = ({ from, to, withFooter, isAggregator }: GraphWidgetProps) => {
   const client = useDCAGraphql();
   let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
   let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
@@ -269,17 +271,17 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
 
   if (isLoading) {
     return (
-      <StyledPaper variant="outlined" $column>
+      <StyledPaper variant="outlined" $column $withFooter={withFooter}>
         <CenteredLoadingIndicator />
-        {withFooter && <GraphFooter />}
+        {withFooter && (isAggregator ? <GraphAggregatorFooter /> : <GraphFooter />)}
       </StyledPaper>
     );
   }
 
   if (!from || !to) {
     return (
-      <StyledPaper variant="outlined" $column>
-        <StyledPaper variant="outlined">
+      <StyledPaper variant="outlined" $column $withFooter={withFooter}>
+        <StyledPaper variant="outlined" $withFooter={withFooter}>
           <StyledCenteredWrapper>
             <EmptyGraph size="100px" />
             <Typography variant="h6">
@@ -290,15 +292,15 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
             </Typography>
           </StyledCenteredWrapper>
         </StyledPaper>
-        {withFooter && <GraphFooter />}
+        {withFooter && (isAggregator ? <GraphAggregatorFooter /> : <GraphFooter />)}
       </StyledPaper>
     );
   }
 
   if (noData) {
     return (
-      <StyledPaper variant="outlined" $column>
-        <StyledPaper variant="outlined">
+      <StyledPaper variant="outlined" $column $withFooter={withFooter}>
+        <StyledPaper variant="outlined" $withFooter={withFooter}>
           <StyledCenteredWrapper>
             <EmptyGraph size="100px" />
             <Typography variant="h6">
@@ -309,7 +311,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
             </Typography>
           </StyledCenteredWrapper>
         </StyledPaper>
-        {withFooter && <GraphFooter />}
+        {withFooter && (isAggregator ? <GraphAggregatorFooter /> : <GraphFooter />)}
       </StyledPaper>
     );
   }
@@ -420,7 +422,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
           <DarkChip label={`1 ${to.symbol} = $${toPrice?.toFixed(2) || ''} USD`} />
         </StyledGraphPillsContainer>
       </StyledGraphContainer>
-      {withFooter && <GraphFooter />}
+      {withFooter && (isAggregator ? <GraphAggregatorFooter /> : <GraphFooter />)}
     </StyledPaper>
   );
 };

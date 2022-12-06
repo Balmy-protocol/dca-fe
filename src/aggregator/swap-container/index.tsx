@@ -136,7 +136,7 @@ const SwapContainer = () => {
         <Grid container spacing={2} alignItems="stretch" justify-content="center">
           <Hidden mdDown>
             <Grid item xs={12} minHeight="320px" sx={{ display: 'flex' }}>
-              <GraphWidget from={from} to={to} withFooter={false} />
+              <GraphWidget from={from} to={to} withFooter={!from || !to} isAggregator />
             </Grid>
             <Grid item xs={12} sx={{ display: 'flex' }}>
               <SwapQuotes
