@@ -92,9 +92,9 @@ interface TransactionConfirmationProps {
 }
 
 const TIMES_PER_NETWORK = {
-  [NETWORKS.arbitrum.chainId]: 60,
-  [NETWORKS.polygon.chainId]: 10,
-  [NETWORKS.optimism.chainId]: 60,
+  [NETWORKS.arbitrum.chainId]: 10,
+  [NETWORKS.polygon.chainId]: 20,
+  [NETWORKS.optimism.chainId]: 10,
 };
 
 const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: TransactionConfirmationProps) => {
