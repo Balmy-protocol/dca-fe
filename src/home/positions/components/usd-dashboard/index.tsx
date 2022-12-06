@@ -4,6 +4,7 @@ import orderBy from 'lodash/orderBy';
 import union from 'lodash/union';
 import intersection from 'lodash/intersection';
 import mergeWith from 'lodash/mergeWith';
+import Button from 'common/button';
 import styled from 'styled-components';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
@@ -22,6 +23,9 @@ import { emptyTokenWithSymbol, formatCurrencyAmount } from 'utils/currency';
 import { FormattedMessage } from 'react-intl';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { usdFormatter } from 'utils/parsing';
+import { useHistory } from 'react-router-dom';
+import { useAppDispatch } from 'hooks/state';
+import { changeMainTab } from 'state/tabs/actions';
 import DashboardPopper from './popper';
 
 const StyledCountDashboardContainer = styled(Grid)`
@@ -30,6 +34,10 @@ const StyledCountDashboardContainer = styled(Grid)`
   .label-top {
     transform: translateY(20px);
   }
+`;
+
+const StyledButton = styled(Button)`
+  padding: 0px 8px 0px 8px;
 `;
 
 const StyledBullet = styled.div<{ fill: string }>`
@@ -151,10 +159,17 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
   const [tokenUSDPrices, setTokenUSDPrices] = React.useState<Record<string, Record<string, BigNumber>>>({});
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [showPopper, setShowPopper] = React.useState(false);
+  const history = useHistory();
+  const dispatch = useAppDispatch();
 
   const handlePopperEl = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     setTimeout(() => setShowPopper(true), 200);
+  };
+
+  const handleGoToCreatePosition = () => {
+    dispatch(changeMainTab(0));
+    history.push(`/create`);
   };
 
   const tokensCountRaw = React.useMemo(
@@ -494,7 +509,20 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
           <CenteredLoadingIndicator />
         </Grid>
       )}
-      {hasLoadedUSDValues && (
+      {hasLoadedUSDValues && !tokensCount.length && (
+        <Grid item xs={12}>
+          <Typography variant="body1">
+            <FormattedMessage description="generatedDashboardNoValuePart1" defaultMessage="Go to" />
+            <StyledButton variant="text" color="secondary" onClick={handleGoToCreatePosition}>
+              <Typography variant="body1">
+                <FormattedMessage description="generatedDashboardNoValueAction" defaultMessage="create a position" />
+              </Typography>
+            </StyledButton>
+            <FormattedMessage description="generatedDashboardNoValuePart2" defaultMessage="and start investing" />
+          </Typography>
+        </Grid>
+      )}
+      {hasLoadedUSDValues && !!tokensCount.length && (
         <>
           <Grid item xs={5}>
             <ResponsiveContainer>
