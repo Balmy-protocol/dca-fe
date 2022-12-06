@@ -101,6 +101,8 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
         } else if (location.pathname.startsWith('/position')) {
           const { positionId, positionVersion } = urlParams;
           history.replace(`/${chainId}/positions/${positionVersion}/${positionId}`);
+        } else if (location.pathname.startsWith('/swap')) {
+          history.replace(`/swap/${chainId}`);
         }
       });
     }
