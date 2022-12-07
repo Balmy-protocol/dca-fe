@@ -11,8 +11,16 @@ import {
   SwapInfo,
   AllowedPairs,
   AvailablePair,
+  LastSwappedAt,
+  NextSwapAvailableAt,
 } from 'types';
-import { activePositionsPerIntervalToHasToExecute, sortTokens, sortTokensByAddress } from 'utils/parsing';
+import { DateTime } from 'luxon';
+import {
+  activePositionsPerIntervalToHasToExecute,
+  calculateNextSwapAvailableAt,
+  sortTokens,
+  sortTokensByAddress,
+} from 'utils/parsing';
 import { BigNumber } from 'ethers';
 
 // GQL queries
@@ -112,6 +120,13 @@ export default class PairService {
             (pair.positions && pair.positions[0] && pair.positions[0].createdAtTimestamp) || 0;
           const lastCreatedAt =
             oldestCreatedPosition > pair.createdAtTimestamp ? oldestCreatedPosition : pair.createdAtTimestamp;
+          const swapInfo = activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval);
+
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const nextSwapAvailableAt: NextSwapAvailableAt = SWAP_INTERVALS_MAP.map((interval) =>
+            calculateNextSwapAvailableAt(interval.value, swapInfo, pair.lastSwappedAt)
+          );
 
           return {
             token0: pair.tokenA,
@@ -119,7 +134,9 @@ export default class PairService {
             lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
             id: pair.id,
             lastCreatedAt,
-            swapInfo: activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval),
+            swapInfo,
+            lastSwappedAt: pair.lastSwappedAt,
+            nextSwapAvailableAt,
           };
         })
       );
@@ -137,9 +154,18 @@ export default class PairService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const swapInfo: SwapInfo = SWAP_INTERVALS_MAP.map(() => false);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const lastSwappedAt: LastSwappedAt = SWAP_INTERVALS_MAP.map(() => 0);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const nextSwapAvailableAt: NextSwapAvailableAt = SWAP_INTERVALS_MAP.map(() => 0);
     const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
 
     swapInfo[freqIndex] = true;
+
+    swapInfo[freqIndex] = true;
+    lastSwappedAt[freqIndex] = DateTime.now().toSeconds();
 
     if (!this.availablePairExists(token0, token1)) {
       this.availablePairs.push({
@@ -149,6 +175,8 @@ export default class PairService {
         lastExecutedAt: 0,
         lastCreatedAt: Math.floor(Date.now() / 1000),
         swapInfo,
+        lastSwappedAt,
+        nextSwapAvailableAt,
       });
     } else {
       const pairIndex = findIndex(this.availablePairs, { id: `${token0.address}-${token1.address}` });

@@ -8,7 +8,8 @@ export interface GetNextSwapInfo {
 }
 
 export type SwapInfo = [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean];
-
+export type LastSwappedAt = [number, number, number, number, number, number, number, number];
+export type NextSwapAvailableAt = [number, number, number, number, number, number, number, number];
 export type AvailablePair = {
   token0: Token;
   token1: Token;
@@ -16,6 +17,8 @@ export type AvailablePair = {
   lastCreatedAt: number;
   id: string;
   swapInfo: SwapInfo;
+  lastSwappedAt: LastSwappedAt;
+  nextSwapAvailableAt: NextSwapAvailableAt;
 };
 
 export type AllowedPair = {
@@ -68,4 +71,5 @@ export interface GetPairSwapsData {
   };
   swaps: PairSwaps[];
   activePositionsPerInterval: [number, number, number, number, number, number, number, number];
+  lastSwappedAt: LastSwappedAt;
 }

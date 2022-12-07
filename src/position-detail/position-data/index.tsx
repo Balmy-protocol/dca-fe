@@ -2,12 +2,14 @@ import React from 'react';
 import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import TokenIcon from 'common/token-icon';
+import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import {
   activePositionsPerIntervalToHasToExecute,
+  calculateNextSwapAvailableAt,
   calculateStale,
   calculateYield,
   fullPositionToMappedPosition,
@@ -300,7 +302,7 @@ const Details = ({
       BigNumber.from(position.swapInterval.interval),
       parseInt(position.createdAtTimestamp, 10) || 0,
       pair?.activePositionsPerInterval
-        ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
+        ? activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval)
         : null
     ) === STALE;
 
@@ -317,6 +319,14 @@ const Details = ({
   const executedSwaps = totalSwaps.toNumber() - remainingSwaps.toNumber();
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
+
+  const nextSwapAvailableAt = calculateNextSwapAvailableAt(
+    BigNumber.from(position.swapInterval.interval),
+    pair?.activePositionsPerInterval
+      ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
+      : [false, false, false, false, false, false, false, false],
+    pair?.lastSwappedAt || [0, 0, 0, 0, 0, 0, 0, 0]
+  );
 
   return (
     <StyledCard>
@@ -455,6 +465,43 @@ const Details = ({
               />
             </Typography>
           </StyledDetailWrapper>
+          {!!nextSwapAvailableAt && (
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage description="positionDetailsNextSwapAtTitle" defaultMessage="Next swap:" />
+              </Typography>
+              {DateTime.now().toSeconds() < DateTime.fromSeconds(nextSwapAvailableAt).toSeconds() && (
+                <DarkTooltip
+                  title={DateTime.fromSeconds(nextSwapAvailableAt).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}
+                  arrow
+                  placement="top"
+                >
+                  <Typography variant="body1" sx={{ marginLeft: '5px' }}>
+                    {DateTime.fromSeconds(nextSwapAvailableAt).toRelative()}
+                  </Typography>
+                </DarkTooltip>
+              )}
+              {DateTime.now().toSeconds() > DateTime.fromSeconds(nextSwapAvailableAt).toSeconds() && (
+                <DarkTooltip
+                  title={
+                    <FormattedMessage
+                      description="positionDetailsNextSwapInProgressTooltip"
+                      defaultMessage="Market Makers should execute your swap anytime now"
+                    />
+                  }
+                  arrow
+                  placement="top"
+                >
+                  <Typography variant="body1" sx={{ marginLeft: '5px' }}>
+                    <FormattedMessage
+                      description="positionDetailsNextSwapInProgress"
+                      defaultMessage="swap in progress"
+                    />
+                  </Typography>
+                </DarkTooltip>
+              )}
+            </StyledDetailWrapper>
+          )}
           <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
