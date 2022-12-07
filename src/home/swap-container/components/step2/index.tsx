@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
-import { Token, YieldOption, YieldOptions } from 'types';
+import isUndefined from 'lodash/isUndefined';
+import { DateTime } from 'luxon';
+import { AvailablePair, Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenInput from 'common/token-input';
@@ -10,6 +12,7 @@ import {
   DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
   MINIMUM_USD_RATE_FOR_YIELD,
   STRING_SWAP_INTERVALS,
+  SWAP_INTERVALS_MAP,
 } from 'config/constants';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Button from 'common/button';
@@ -22,6 +25,7 @@ import Collapse from '@mui/material/Collapse';
 import YieldTokenSelector from 'common/yield-token-selector';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { formatCurrencyAmount, usdPriceToToken } from 'utils/currency';
+import findIndex from 'lodash/findIndex';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
   ${({ $show }) => !$show && 'position: absolute;width: auto;'};
@@ -83,6 +87,11 @@ const StyledYieldTokensContainer = styled.div`
   gap: 8px;
 `;
 
+const StyledNextSwapContainer = styled.div`
+  display: flex;
+  margin-top: 5px;
+`;
+
 interface SwapSecondStepProps {
   from: Token | null;
   to: Token | null;
@@ -108,6 +117,7 @@ interface SwapSecondStepProps {
   toYield: YieldOption | null | undefined;
   setFromYield: (newYield: null | YieldOption) => void;
   setToYield: (newYield: null | YieldOption) => void;
+  existingPair?: AvailablePair;
 }
 
 const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((props, ref) => {
@@ -136,6 +146,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
     setToYield,
     fromCanHaveYield,
     usdPrice,
+    existingPair,
   } = props;
 
   const [isHelpExpanded, setHelpExpanded] = React.useState(false);
@@ -147,6 +158,12 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
     MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
     usdPrice
   );
+
+  const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
+
+  const nextSwapAvailableAt = existingPair?.nextSwapAvailableAt[freqIndex];
+
+  const showNextSwapAvailableAt = !yieldEnabled || (yieldEnabled && !isUndefined(fromYield) && !isUndefined(toYield));
 
   return (
     <StyledGrid $show={show} container rowSpacing={2} ref={ref}>
@@ -287,7 +304,45 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
         </StyledContentContainer>
       </Grid>
       <Grid item xs={12}>
-        <StyledContentContainer>{buttonToShow}</StyledContentContainer>
+        <StyledContentContainer>
+          {buttonToShow}
+          {showNextSwapAvailableAt && !!nextSwapAvailableAt && (
+            <StyledNextSwapContainer>
+              <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="nextSwapCreate"
+                  defaultMessage="Next swap for this position will be executed {nextSwapAvailableAt}."
+                  values={{
+                    nextSwapAvailableAt:
+                      DateTime.fromSeconds(nextSwapAvailableAt) > DateTime.now()
+                        ? `aproximately ${DateTime.fromSeconds(nextSwapAvailableAt).toRelative() || ''}`
+                        : 'soon. Create a position now to be included in the next swap',
+                  }}
+                />
+              </Typography>
+            </StyledNextSwapContainer>
+          )}
+          {showNextSwapAvailableAt && !nextSwapAvailableAt && !existingPair && (
+            <StyledNextSwapContainer>
+              <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="nextSwapCreateNoPair"
+                  defaultMessage="Next swap will be executed within the first hour after the position is created."
+                />
+              </Typography>
+            </StyledNextSwapContainer>
+          )}
+          {showNextSwapAvailableAt && !nextSwapAvailableAt && !!existingPair && (
+            <StyledNextSwapContainer>
+              <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="nextSwapCreateNoPositions"
+                  defaultMessage="Next swap will be executed within the first hour after the position is created."
+                />
+              </Typography>
+            </StyledNextSwapContainer>
+          )}
+        </StyledContentContainer>
       </Grid>
     </StyledGrid>
   );

@@ -914,6 +914,7 @@ const Swap = ({
           setFromYield={setFromYield}
           setToYield={setToYield}
           usdPrice={usdPrice}
+          existingPair={existingPair}
         />
       </Slide>
     </StyledPaper>

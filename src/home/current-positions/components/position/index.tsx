@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
-import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE, calculateYield } from 'utils/parsing';
+import { getTimeFrequencyLabel, calculateStale, STALE, calculateYield, sortTokensByAddress } from 'utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from 'types';
 import { NETWORKS, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
@@ -225,14 +225,26 @@ const ActivePosition = ({
 
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
-  const [token0, token1] = sortTokens(
-    from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from,
-    to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to
-  );
-  const pair = find(
-    availablePairs,
-    (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
-  );
+
+  const pair = React.useMemo(() => {
+    if (!from || !to) return undefined;
+    const tokenA =
+      (from.underlyingTokens[0] && from.underlyingTokens[0].address) ||
+      (from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address);
+    const tokenB =
+      (to.underlyingTokens[0] && to.underlyingTokens[0].address) ||
+      (to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to.address);
+
+    const [pairToken0, pairToken1] = sortTokensByAddress(tokenA, tokenB);
+
+    return find(
+      availablePairs,
+      (currentPair) =>
+        currentPair.token0.address === pairToken0.toLocaleLowerCase() &&
+        currentPair.token1.address === pairToken1.toLocaleLowerCase()
+    );
+  }, [from, to, availablePairs]);
+
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
 
   const isStale =
@@ -484,10 +496,7 @@ const ActivePosition = ({
                   placement="top"
                 >
                   <Typography variant="body1">
-                    <FormattedMessage
-                      description="positionDetailsNextSwapInProgress"
-                      defaultMessage="swap in progress"
-                    />
+                    <FormattedMessage description="positionDetailsNextSwapInProgress" defaultMessage="in progress" />
                   </Typography>
                 </DarkTooltip>
               )}

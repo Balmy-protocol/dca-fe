@@ -465,7 +465,7 @@ const Details = ({
               />
             </Typography>
           </StyledDetailWrapper>
-          {!!nextSwapAvailableAt && (
+          {!!nextSwapAvailableAt && !hasNoFunds && !isOldVersion && (
             <StyledDetailWrapper>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage description="positionDetailsNextSwapAtTitle" defaultMessage="Next swap:" />
@@ -493,10 +493,7 @@ const Details = ({
                   placement="top"
                 >
                   <Typography variant="body1" sx={{ marginLeft: '5px' }}>
-                    <FormattedMessage
-                      description="positionDetailsNextSwapInProgress"
-                      defaultMessage="swap in progress"
-                    />
+                    <FormattedMessage description="positionDetailsNextSwapInProgress" defaultMessage="in progress" />
                   </Typography>
                 </DarkTooltip>
               )}
