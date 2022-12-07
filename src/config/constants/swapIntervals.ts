@@ -74,14 +74,14 @@ const toReadable = (left: number, frequency: number) => {
   const asMinutes = customDuration.as('minutes');
 
   if (asDays >= 1) {
-    return `${asDays} days`;
+    return `${parseFloat(asDays.toFixed(2))} days`;
   }
 
   if (asHours >= 1) {
-    return `${asHours} hours`;
+    return `${parseFloat(asHours.toFixed(2))} hours`;
   }
 
-  return `${asMinutes} minutes`;
+  return `${parseFloat(asMinutes.toFixed(2))} minutes`;
 };
 
 export const STRING_SWAP_INTERVALS = {
