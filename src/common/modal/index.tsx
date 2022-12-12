@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button, { ButtonTypes } from 'common/button';
+import SplitButton, { SplitButtonOptions } from 'common/split-button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -74,6 +75,7 @@ interface ModalProps {
     disabled?: boolean;
     color?: keyof typeof ButtonTypes;
     variant?: 'text' | 'outlined' | 'contained';
+    options?: SplitButtonOptions;
   }[];
 }
 
@@ -119,19 +121,34 @@ const Modal: React.FC<ModalProps> = ({
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>
           )}
-          {actions?.map((action, index) => (
-            <Button
-              onClick={action.onClick}
-              disabled={action.disabled}
-              variant={action.variant ?? 'contained'}
-              color={action.color ?? 'primary'}
-              size="large"
-              fullWidth
-              key={index}
-            >
-              {action.label}
-            </Button>
-          ))}
+          {actions?.map((action, index) =>
+            action.options ? (
+              <SplitButton
+                onClick={action.onClick}
+                text={action.label}
+                disabled={action.disabled}
+                variant={action.variant ?? 'contained'}
+                color={action.color ?? 'primary'}
+                options={action.options}
+                size="large"
+                fullWidth
+                block
+                key={index}
+              />
+            ) : (
+              <Button
+                onClick={action.onClick}
+                disabled={action.disabled}
+                variant={action.variant ?? 'contained'}
+                color={action.color ?? 'primary'}
+                size="large"
+                fullWidth
+                key={index}
+              >
+                {action.label}
+              </Button>
+            )
+          )}
         </StyledDialogActions>
       )}
     </StyledDialog>

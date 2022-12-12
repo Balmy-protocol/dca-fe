@@ -12,6 +12,7 @@ import {
   NewPairTypeData,
   Position,
   ApproveTokenTypeData,
+  ApproveTokenExactTypeData,
   WrapEtherTypeData,
   ResetPositionTypeData,
   TransferTypeData,
@@ -24,6 +25,8 @@ import {
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { getFrequencyLabel } from 'utils/parsing';
+import { BigNumber } from 'ethers/lib/ethers';
+import { formatCurrencyAmount } from 'utils/currency';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
@@ -182,6 +185,15 @@ function useBuildTransactionMessages() {
         case TRANSACTION_TYPES.APPROVE_TOKEN: {
           const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
           message = `Approving your ${tokenApprovalTypeData.token.symbol}`;
+          break;
+        }
+        case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
+          const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
+          message = `Approving ${formatCurrencyAmount(
+            BigNumber.from(tokenApprovalExactTypeData.amount),
+            tokenApprovalExactTypeData.token,
+            4
+          )} ${tokenApprovalExactTypeData.token.symbol}`;
           break;
         }
         default:

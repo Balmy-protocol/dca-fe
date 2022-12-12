@@ -6,6 +6,7 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
   NEW_POSITION: 'NEW_POSITION',
   NEW_PAIR: 'NEW_PAIR',
   APPROVE_TOKEN: 'APPROVE_TOKEN',
+  APPROVE_TOKEN_EXACT: 'APPROVE_TOKEN_EXACT',
   TRANSFER_POSITION: 'TRANSFER_POSITION',
   TERMINATE_POSITION: 'TERMINATE_POSITION',
   APPROVE_COMPANION: 'APPROVE_COMPANION',
@@ -42,6 +43,7 @@ export const MINIMUM_LIQUIDITY_USD = parseFloat('5000');
 export const POSSIBLE_ACTIONS = {
   createPosition: 'createPosition',
   approveToken: 'approveToken',
+  approveTokenExact: 'approveTokenExact',
 };
 
 export const WHALE_MODE_FREQUENCIES = {

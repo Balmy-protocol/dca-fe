@@ -13,6 +13,7 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { BigNumber } from 'ethers';
 import Grid from '@mui/material/Grid';
 import TokenInput from 'common/token-input';
+import { AllowanceTooltip } from 'common/allowance-split-button';
 import {
   setFrequencyValue,
   setFromValue,
@@ -31,17 +32,18 @@ import {
 import useBalance from 'hooks/useBalance';
 import { useAppDispatch } from 'state/hooks';
 import { getFrequencyLabel } from 'utils/parsing';
+import { formatCurrencyAmount, parseUsdPrice } from 'utils/currency';
 import useAllowance from 'hooks/useAllowance';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import { ButtonTypes } from 'common/button';
+import { SplitButtonOptions } from 'common/split-button';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
-import { parseUsdPrice } from 'utils/currency';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -112,6 +114,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   );
   const [balance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
+  const hasConfirmedApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
   const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
   const [usdPrice] = useRawUsdPrice(from);
@@ -121,6 +124,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     usdPrice
   );
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
+  const remainingLiquidityDifference = remainingLiquidity
+    .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
+    .abs();
 
   const cantFund =
     fromValue &&
@@ -135,6 +141,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     .lte(BigNumber.from(0));
 
   const needsToApprove =
+    !hasConfirmedApproval &&
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
     position.user === walletService.getAccount().toLowerCase() &&
     allowance.allowance &&
@@ -142,9 +149,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     allowance.token.address === fromToUse.address &&
     isIncreasingPosition &&
     !hasPendingApproval &&
-    parseUnits(allowance.allowance, fromToUse.decimals).lt(
-      remainingLiquidity.sub(parseUnits(fromValue || '0', fromToUse.decimals)).abs()
-    );
+    parseUnits(allowance.allowance, fromToUse.decimals).lt(remainingLiquidityDifference);
 
   const handleCancel = () => {
     onCancel();
@@ -315,7 +320,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     }
   };
 
-  const handleApproveToken = async () => {
+  const handleApproveToken = async (isExact?: boolean) => {
     if (!fromToUse) return;
     const fromSymbol = fromToUse.symbol;
 
@@ -331,15 +336,22 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(fromToUse, fromHasYield, version);
+
+      const result = await walletService.approveToken(
+        fromToUse,
+        fromHasYield,
+        version,
+        isExact ? remainingLiquidityDifference : undefined
+      );
       const hubAddress = await contractService.getHUBAddress(position.version);
       const companionAddress = await contractService.getHUBCompanionAddress(position.version);
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        type: isExact ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: fromToUse,
           addressFor: fromHasYield ? companionAddress : hubAddress,
+          ...(isExact && { amount: remainingLiquidityDifference.toString() }),
         },
         position,
       });
@@ -365,6 +377,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     disabled?: boolean;
     color?: keyof typeof ButtonTypes;
     variant?: 'text' | 'outlined' | 'contained';
+    options?: SplitButtonOptions;
   }[] = [];
 
   if (needsToApprove) {
@@ -373,16 +386,35 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         color: 'primary',
         variant: 'contained',
         label: (
-          <FormattedMessage
-            description="Allow us to use your coin"
-            defaultMessage="Approve {token}"
-            values={{
-              token: fromToUse.symbol,
-            }}
-          />
+          <>
+            <FormattedMessage
+              description="Allow us to use your coin (modal max)"
+              defaultMessage="Approve Max {symbol}"
+              values={{
+                symbol: fromToUse.symbol,
+              }}
+            />
+            <AllowanceTooltip symbol={fromToUse.symbol} />
+          </>
         ),
-        onClick: handleApproveToken,
+        onClick: () => handleApproveToken(),
         disabled: !!hasPendingApproval,
+        options: [
+          {
+            text: (
+              <FormattedMessage
+                description="Allow us to use your coin (modal exact)"
+                defaultMessage="Approve {remainingLiquidityDifference} {symbol}"
+                values={{
+                  symbol: fromToUse.symbol,
+                  remainingLiquidityDifference: formatCurrencyAmount(remainingLiquidityDifference, fromToUse, 4),
+                }}
+              />
+            ),
+            disabled: !!hasPendingApproval,
+            onClick: () => handleApproveToken(true),
+          },
+        ],
       },
     ];
   }
@@ -528,12 +560,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     defaultMessage="You will need to provide an aditional {addAmmount} {from}"
                     values={{
                       from: fromToUse.symbol,
-                      addAmmount: formatUnits(
-                        remainingLiquidity
-                          .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
-                          .abs(),
-                        fromToUse.decimals
-                      ),
+                      addAmmount: formatUnits(remainingLiquidityDifference, fromToUse.decimals),
                     }}
                   />
                 ) : (
@@ -542,12 +569,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     defaultMessage="We will return {returnAmmount} {from} to you"
                     values={{
                       from: fromToUse.symbol,
-                      returnAmmount: formatUnits(
-                        remainingLiquidity
-                          .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
-                          .abs(),
-                        fromToUse.decimals
-                      ),
+                      returnAmmount: formatUnits(remainingLiquidityDifference, fromToUse.decimals),
                     }}
                   />
                 )}

@@ -7,14 +7,18 @@ import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import Button, { CustomButtonProps } from 'common/button';
 
-const StyledButton = styled(Button)``;
+const StyledButton = styled(Button)`
+  white-space: nowrap;
+`;
 
-const StyledButtonGroup = styled.div`
+const StyledButtonGroup = styled.div<{ fullWidth?: boolean; block?: boolean }>`
   gap: 1px;
   display: flex;
 
+  ${({ fullWidth }) => fullWidth && 'width: 100%;'}
+
   ${StyledButton} {
-    border-radius: 30px;
+    ${({ block }) => !block && 'border-radius: 30px;'}
   }
 
   ${StyledButton}:first-child {
@@ -23,15 +27,16 @@ const StyledButtonGroup = styled.div`
   }
   ${StyledButton}:last-child {
     min-width: 0px;
-    padding-left: 0px;
-    padding-right: 5px;
+    padding-left: ${({ block }) => (block ? '1' : '0')}px;
+    padding-right: ${({ block }) => (block ? '1' : '5')}px;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
   }
 `;
 
-const SplitButtonContainer = styled.div`
+const SplitButtonContainer = styled.div<{ fullWidth?: boolean }>`
   display: flex;
+  ${({ fullWidth }) => fullWidth && 'width: 100%;'}
 `;
 
 const StyledMenu = withStyles(() =>
@@ -43,16 +48,31 @@ const StyledMenu = withStyles(() =>
   })
 )(Menu);
 
+export type SplitButtonOptions = { onClick: () => void; text: React.ReactNode; disabled?: boolean }[];
+
 interface SplitButtonProps {
   onClick: () => void;
   text: React.ReactNode;
   disabled?: boolean;
-  options: { onClick: () => void; text: React.ReactNode; disabled?: boolean }[];
+  options: SplitButtonOptions;
   variant: CustomButtonProps['variant'];
   color: CustomButtonProps['color'];
+  size?: CustomButtonProps['size'];
+  fullWidth?: boolean;
+  block?: boolean;
 }
 
-const SplitButton = ({ onClick, text, disabled, variant, color, options }: SplitButtonProps) => {
+const SplitButton = ({
+  onClick,
+  text,
+  disabled,
+  variant,
+  color,
+  options,
+  fullWidth,
+  size = 'small',
+  block,
+}: SplitButtonProps) => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
 
@@ -63,13 +83,28 @@ const SplitButton = ({ onClick, text, disabled, variant, color, options }: Split
     setOpen(false);
   };
 
+  const isOptionsButtonDisabled = options.every(({ disabled: isDisabled }) => isDisabled);
+
   return (
-    <SplitButtonContainer>
-      <StyledButtonGroup ref={anchorRef}>
-        <StyledButton onClick={onClick} disabled={disabled} color={color} variant={variant} size="small">
+    <SplitButtonContainer fullWidth={fullWidth}>
+      <StyledButtonGroup ref={anchorRef} fullWidth={fullWidth} block={block}>
+        <StyledButton
+          onClick={onClick}
+          disabled={disabled}
+          color={color}
+          variant={variant}
+          size={size}
+          fullWidth={fullWidth}
+        >
           {text}
         </StyledButton>
-        <StyledButton onClick={handleOpenClose} color={color} variant={variant} size="small">
+        <StyledButton
+          onClick={handleOpenClose}
+          color={color}
+          variant={variant}
+          size={size}
+          disabled={isOptionsButtonDisabled}
+        >
           <ArrowDropDownIcon />
         </StyledButton>
       </StyledButtonGroup>
@@ -87,7 +122,13 @@ const SplitButton = ({ onClick, text, disabled, variant, color, options }: Split
         }}
       >
         {options.map(({ onClick: onClickItem, disabled: disabledItem, text: itemText }) => (
-          <MenuItem onClick={onClickItem} disabled={disabledItem}>
+          <MenuItem
+            onClick={() => {
+              onClickItem();
+              handleClose();
+            }}
+            disabled={disabledItem}
+          >
             {itemText}
           </MenuItem>
         ))}

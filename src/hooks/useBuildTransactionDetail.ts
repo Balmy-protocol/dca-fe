@@ -11,6 +11,7 @@ import {
   NewPairTypeData,
   Position,
   ApproveTokenTypeData,
+  ApproveTokenExactTypeData,
   ResetPositionTypeData,
   WrapEtherTypeData,
   ModifyRateAndSwapsPositionTypeData,
@@ -184,6 +185,15 @@ function useBuildTransactionDetail() {
           case TRANSACTION_TYPES.APPROVE_TOKEN: {
             const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
             message = `Approve ${tokenApprovalTypeData.token.symbol}`;
+            break;
+          }
+          case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
+            const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
+            message = `Approve ${formatCurrencyAmount(
+              BigNumber.from(tokenApprovalExactTypeData.amount),
+              tokenApprovalExactTypeData.token,
+              4
+            )} ${tokenApprovalExactTypeData.token.symbol}`;
             break;
           }
           default:

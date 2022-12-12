@@ -16,6 +16,7 @@ import useUsedTokens from 'hooks/useUsedTokens';
 import CreatePairModal from 'common/create-pair-modal';
 import StalePairModal from 'common/stale-pair-modal';
 import LowLiquidityModal from 'common/low-liquidity-modal';
+import AllowanceSplitButton from 'common/allowance-split-button';
 import {
   FULL_DEPOSIT_TYPE,
   MODE_TYPES,
@@ -36,7 +37,12 @@ import {
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { emptyTokenWithAddress, parseUsdPrice } from 'utils/currency';
-import { useTransactionAdder, useHasPendingApproval, useHasPendingPairCreation } from 'state/transactions/hooks';
+import {
+  useTransactionAdder,
+  useHasPendingApproval,
+  useHasPendingPairCreation,
+  useHasConfirmedApproval,
+} from 'state/transactions/hooks';
 import { calculateStale, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
@@ -177,6 +183,7 @@ const Swap = ({
   const isCreatingPair = useHasPendingPairCreation(from, to);
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
+  const hasConfirmedApproval = useHasConfirmedApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
 
   const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
@@ -249,7 +256,7 @@ const Swap = ({
     setWhaleMode(!whaleMode);
   };
 
-  const handleApproveToken = async () => {
+  const handleApproveToken = async (amount?: BigNumber) => {
     if (!from || !to) return;
     const fromSymbol = from.symbol;
 
@@ -265,16 +272,22 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await walletService.approveToken(from, !!(shouldEnableYield && fromYield?.tokenAddress));
+      const result = await walletService.approveToken(
+        from,
+        !!(shouldEnableYield && fromYield?.tokenAddress),
+        undefined,
+        amount
+      );
       const hubAddress =
         shouldEnableYield && fromYield?.tokenAddress
           ? await contractService.getHUBCompanionAddress()
           : await contractService.getHUBAddress();
       addTransaction(result, {
-        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        type: amount ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: from,
           addressFor: hubAddress,
+          ...(!!amount && { amount: amount.toString() }),
         },
       });
       setModalSuccess({
@@ -366,10 +379,10 @@ const Swap = ({
     }
   };
 
-  const preHandleApprove = () => {
+  const preHandleApprove = (amount?: BigNumber) => {
     if (!existingPair) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleApproveToken();
+      handleApproveToken(amount);
       return;
     }
 
@@ -385,7 +398,7 @@ const Swap = ({
       setShouldShowStalePairModal(true);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleApproveToken();
+      handleApproveToken(amount);
     }
   };
 
@@ -478,19 +491,21 @@ const Swap = ({
   const POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: handleSwap,
     approveToken: handleApproveToken,
+    approveTokenExact: (amount?: BigNumber) => handleApproveToken(amount),
   };
 
   const PRE_POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: preHandleSwap,
     approveToken: preHandleApprove,
+    approveTokenExact: (amount?: BigNumber) => preHandleApprove(amount),
   };
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
+  const checkForLowLiquidity = async (actionToDo: keyof typeof POSSIBLE_ACTIONS, amount?: BigNumber) => {
     setCurrentAction(actionToDo);
     if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
+      PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo](amount);
     }
     /**  Disable low liquidity modal for now */
     // setIsLoading(true);
@@ -535,6 +550,7 @@ const Swap = ({
 
   const isApproved =
     !from ||
+    hasConfirmedApproval ||
     (from &&
       (!fromValue
         ? true
@@ -611,39 +627,19 @@ const Swap = ({
     </StyledButton>
   );
 
+  const isApproveTokenDisabled = !!isApproved || hasPendingApproval || isLoading || !!shouldDisableApproveButton;
+
   const ApproveTokenButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      fullWidth
-      color="primary"
-      disabled={!!isApproved || hasPendingApproval || isLoading || !!shouldDisableApproveButton}
-      onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
-      style={{ pointerEvents: 'all' }}
-    >
-      <Typography variant="body1">
-        {hasPendingApproval ? (
-          <FormattedMessage
-            description="waiting for approval"
-            defaultMessage="Waiting for your {token} to be approved"
-            values={{
-              token: (from && from.symbol) || '',
-            }}
-          />
-        ) : (
-          <FormattedMessage
-            description="Allow us to use your coin"
-            defaultMessage="Approve {token}"
-            values={{
-              token: (from && from.symbol) || '',
-            }}
-          />
-        )}
-      </Typography>
-      <Tooltip title="You only have to do this once per token" arrow placement="top">
-        <StyledHelpOutlineIcon fontSize="small" />
-      </Tooltip>
-    </StyledButton>
+    <AllowanceSplitButton
+      onMaxApprove={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
+      onApproveExact={(amount) =>
+        checkForLowLiquidity(POSSIBLE_ACTIONS.approveTokenExact as keyof typeof POSSIBLE_ACTIONS, amount)
+      }
+      amount={from && (fromValue ? parseUnits(fromValue, from?.decimals) : null)}
+      disabled={isApproveTokenDisabled}
+      token={from}
+      tokenYield={fromYield}
+    />
   );
 
   const swapsIsMax = BigNumber.from(frequencyValue || '0').gt(BigNumber.from(MAX_UINT_32));
@@ -789,7 +785,12 @@ const Swap = ({
       />
       <StalePairModal
         open={shouldShowStalePairModal}
-        onConfirm={() => POSSIBLE_ACTIONS_FUNCTIONS[currentAction]()}
+        onConfirm={() => {
+          if (currentAction === POSSIBLE_ACTIONS.approveTokenExact) {
+            return POSSIBLE_ACTIONS_FUNCTIONS[currentAction](parseUnits(fromValue, from?.decimals));
+          }
+          return POSSIBLE_ACTIONS_FUNCTIONS[currentAction]();
+        }}
         onCancel={() => setShouldShowStalePairModal(false)}
       />
       <LowLiquidityModal
