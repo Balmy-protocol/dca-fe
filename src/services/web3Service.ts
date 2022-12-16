@@ -360,7 +360,13 @@ export default class Web3Service {
 
         // extremely recommended by metamask
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        window.ethereum.on('chainChanged', () => window.location.reload());
+        window.ethereum.on('chainChanged', (newChainId: string) => {
+          if (window.location.pathname === '/' || window.location.pathname.startsWith('/create')) {
+            window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
+          }
+
+          window.location.reload();
+        });
       }
     } catch (e) {
       console.error('Avoidable error when initializing metamask events', e);
