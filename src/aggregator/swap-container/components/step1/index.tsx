@@ -11,6 +11,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
 import Badge from '@mui/material/Badge';
@@ -45,13 +46,14 @@ const StyledFormHelperText = styled(FormHelperText)`
   gap: 5px;
 `;
 
-const StyledContentContainer = styled.div`
+const StyledContentContainer = styled.div<{ hasArrow?: boolean }>`
   background-color: #292929;
   padding: 16px;
   border-radius: 8px;
   gap: 16px;
   display: flex;
   flex-direction: column;
+  ${({ hasArrow }) => hasArrow && 'padding-bottom: 30px;'}
 `;
 
 const StyledTokensContainer = styled.div`
@@ -80,6 +82,23 @@ const StyledTokenButtonContainer = styled.div`
   gap: 5px;
 `;
 
+const StyledToggleContainer = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  left: calc(50% - 24px);
+  bottom: -30px;
+`;
+
+const StyledToggleTokenButton = styled(IconButton)`
+  border: 4px solid #1b1821;
+  background-color: #292929;
+  :hover {
+    background-color: #484848;
+  }
+`;
+
 interface SwapFirstStepProps {
   from: Token | null;
   fromValue: string;
@@ -89,6 +108,7 @@ interface SwapFirstStepProps {
   cantFund: boolean | null;
   handleFromValueChange: (newValue: string) => void;
   handleToValueChange: (newValue: string) => void;
+  toggleFromTo: () => void;
   balance?: BigNumber;
   buttonToShow: React.ReactNode;
   selectedRoute: SwapOption | null;
@@ -116,6 +136,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     selectedRoute,
     isBuyOrder,
     isLoadingRoute,
+    toggleFromTo,
     transferTo,
     onOpenTransferTo,
     onShowSettings,
@@ -162,8 +183,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
 
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
-      <Grid item xs={12}>
-        <StyledContentContainer>
+      <Grid item xs={12} sx={{ position: 'relative' }}>
+        <StyledContentContainer hasArrow>
           <StyledTokensContainer>
             <StyledTitleContainer>
               <Typography variant="body1">
@@ -214,8 +235,13 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             )}
           </StyledTokensContainer>
         </StyledContentContainer>
+        <StyledToggleContainer>
+          <StyledToggleTokenButton onClick={toggleFromTo}>
+            <SwapVertIcon />
+          </StyledToggleTokenButton>
+        </StyledToggleContainer>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} sx={{ paddingTop: '8px !important' }}>
         <StyledContentContainer>
           <StyledTokensContainer>
             <StyledTitleContainer>

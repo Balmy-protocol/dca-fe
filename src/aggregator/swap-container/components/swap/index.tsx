@@ -63,6 +63,7 @@ interface SwapProps {
   selectedRoute: SwapOption | null;
   isLoadingRoute: boolean;
   onResetForm: () => void;
+  toggleFromTo: () => void;
   transferTo: string | null;
   slippage: string;
   gasSpeed: GasKeys;
@@ -87,6 +88,7 @@ const Swap = ({
   slippage,
   gasSpeed,
   setRefreshQuotes,
+  toggleFromTo,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
@@ -491,6 +493,7 @@ const Swap = ({
           to={to}
           fromValue={fromValue}
           toValue={toValue}
+          toggleFromTo={toggleFromTo}
           startSelectingCoin={startSelectingCoin}
           cantFund={cantFund}
           handleFromValueChange={handleFromValueChange}

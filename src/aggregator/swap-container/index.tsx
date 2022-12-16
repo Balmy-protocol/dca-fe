@@ -97,6 +97,26 @@ const SwapContainer = () => {
     }
   };
 
+  const toggleFromTo = () => {
+    dispatch(setTo(from));
+
+    // check for decimals
+    if (to && from && to.decimals < from.decimals) {
+      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
+      let newFromValue = fromValue;
+      if (splitValue && splitValue[2] !== '') {
+        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, to.decimals)}`;
+      }
+
+      dispatch(setFromValue({ value: newFromValue, updateMode: isBuyOrder }));
+    }
+    dispatch(setFrom(to));
+
+    if (to) {
+      history.replace(`/create/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
+    }
+  };
+
   const onSetSelectedRoute = (newRoute: SwapOption) => {
     dispatch(setSelectedRoute(newRoute));
   };
@@ -130,6 +150,7 @@ const SwapContainer = () => {
           slippage={slippage}
           gasSpeed={gasSpeed}
           setRefreshQuotes={setRefreshQuotes}
+          toggleFromTo={toggleFromTo}
         />
       </Grid>
       <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
