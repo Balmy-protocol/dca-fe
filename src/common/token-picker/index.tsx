@@ -303,6 +303,7 @@ const TokenPicker = ({
           !usedTokens.includes(el) &&
           !ignoreValues.includes(el) &&
           tokenList[el].chainId === currentNetwork.chainId &&
+          el !== otherSelected?.address &&
           (!otherIsProtocol ||
             (otherIsProtocol && el !== wrappedProtocolToken.address && el !== PROTOCOL_TOKEN_ADDRESS))
       )
@@ -328,6 +329,7 @@ const TokenPicker = ({
     availableFrom,
     otherIsProtocol,
     currentNetwork.chainId,
+    otherSelected,
   ]);
 
   const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(memoizedUnorderedTokenKeys);
