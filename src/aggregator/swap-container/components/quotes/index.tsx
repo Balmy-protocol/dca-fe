@@ -113,7 +113,7 @@ const SwapQuotes = ({
       </StyledTitleContainer>
       {isLoading && (
         <StyledCenteredWrapper>
-          <CenteredLoadingIndicator size={40} />
+          <CenteredLoadingIndicator size={40} noFlex />
           <FormattedMessage description="loadingBestRoute" defaultMessage="Fetching the best route for you" />
         </StyledCenteredWrapper>
       )}
