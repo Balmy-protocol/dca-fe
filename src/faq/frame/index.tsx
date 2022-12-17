@@ -68,7 +68,7 @@ const FAQFrame = () => {
   };
 
   React.useEffect(() => {
-    dispatch(changeMainTab(2));
+    dispatch(changeMainTab(3));
   }, []);
 
   return (
