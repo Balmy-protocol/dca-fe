@@ -355,7 +355,8 @@ export default class MeanApiService {
     sortQuotesBy = SORT_MOST_PROFIT,
     recipient?: string | null,
     slippagePercentage?: number,
-    gasSpeed?: GasKeys
+    gasSpeed?: GasKeys,
+    takerAddress?: string
   ) {
     const currentNetwork = await this.walletService.getNetwork();
     const swapResponses = await this.axiosClient.get<MeanFinanceSwapResponse>(
@@ -365,6 +366,7 @@ export default class MeanApiService {
           sellToken: from,
           buyToken: to,
           sortQuotesBy,
+          ...(takerAddress ? { takerAddress } : {}),
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
           ...(recipient ? { recipient } : {}),

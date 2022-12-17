@@ -68,7 +68,8 @@ export default class AggregatorService {
     sorting?: string,
     transferTo?: string | null,
     slippage?: number,
-    gasSpeed?: GasKeys
+    gasSpeed?: GasKeys,
+    takerAddress?: string
   ) {
     const swapOptionsResponse = await this.meanApiService.getSwapOptions(
       from.address,
@@ -78,7 +79,8 @@ export default class AggregatorService {
       sorting,
       transferTo,
       slippage,
-      gasSpeed
+      gasSpeed,
+      takerAddress
     );
 
     const filteredOptions: RawSwapOption[] = swapOptionsResponse.quotes.filter(

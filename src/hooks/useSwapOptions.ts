@@ -52,7 +52,8 @@ function useSwapOptions(
         debouncedIsBuyOrder?: boolean,
         debouncedTransferTo?: string | null,
         debouncedGasSpeed?: GasKeys,
-        debouncedSlippage?: number
+        debouncedSlippage?: number,
+        debouncedAccount?: string
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
           setState({ isLoading: true, result: undefined, error: undefined });
@@ -66,7 +67,8 @@ function useSwapOptions(
               SORT_MOST_PROFIT,
               debouncedTransferTo,
               debouncedSlippage,
-              debouncedGasSpeed
+              debouncedGasSpeed,
+              debouncedAccount
             );
 
             setState({ result: promiseResult, error: undefined, isLoading: false });
@@ -81,8 +83,8 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage),
-    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed]
+    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage, account),
+    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed, account]
   );
 
   React.useEffect(() => {
