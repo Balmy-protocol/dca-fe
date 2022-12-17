@@ -36,7 +36,7 @@ const SwapContainer = () => {
   const history = useHistory();
   const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
   const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
-  const [swapOptions, isLoadingSwapOptions, , fetchOptions] = useSwapOptions(
+  const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
     to,
     isBuyOrder ? toValue : fromValue,
@@ -170,6 +170,7 @@ const SwapContainer = () => {
                 refreshQuotes={refreshQuotes}
                 isBuyOrder={isBuyOrder}
                 bestQuote={swapOptions?.[0]}
+                swapOptionsError={swapOptionsError}
               />
             </Grid>
           </Hidden>

@@ -3,6 +3,8 @@ import Typography from '@mui/material/Typography';
 import EmptyRoutes from 'assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { SwapSortOptions } from 'config/constants/aggregator';
+import { ALL_SWAP_OPTIONS_FAILED } from 'hooks/useSwapOptions';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -52,6 +54,7 @@ interface SwapQuotesProps {
   refreshQuotes: boolean;
   isBuyOrder: boolean;
   bestQuote?: SwapOption;
+  swapOptionsError?: string;
 }
 
 const SwapQuotes = ({
@@ -67,7 +70,26 @@ const SwapQuotes = ({
   refreshQuotes,
   isBuyOrder,
   bestQuote,
+  swapOptionsError,
 }: SwapQuotesProps) => {
+  if (!quotes.length && !isLoading && swapOptionsError === ALL_SWAP_OPTIONS_FAILED) {
+    return (
+      <StyledPaper variant="outlined" $column>
+        <StyledPaper variant="outlined">
+          <StyledCenteredWrapper>
+            <ErrorOutlineIcon fontSize="large" />
+            <Typography variant="h6">
+              <FormattedMessage
+                description="All routes failed"
+                defaultMessage="We could not fetch a route for your swap"
+              />
+            </Typography>
+          </StyledCenteredWrapper>
+        </StyledPaper>
+      </StyledPaper>
+    );
+  }
+
   if (!quotes.length && !isLoading) {
     return (
       <StyledPaper variant="outlined" $column>

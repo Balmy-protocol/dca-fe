@@ -11,6 +11,8 @@ import useCurrentNetwork from './useCurrentNetwork';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
 
+export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
+
 function useSwapOptions(
   from: Token | undefined | null,
   to: Token | undefined | null,
@@ -71,7 +73,11 @@ function useSwapOptions(
               debouncedAccount
             );
 
-            setState({ result: promiseResult, error: undefined, isLoading: false });
+            if (promiseResult.length) {
+              setState({ result: promiseResult, error: undefined, isLoading: false });
+            } else {
+              setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
+            }
           } catch (e) {
             setState({ result: undefined, error: e as string, isLoading: false });
           }
