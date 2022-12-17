@@ -8,7 +8,9 @@ interface WaveLogoDarkProps {
 
 const WhaveLogoDark = ({ size }: WaveLogoDarkProps) => {
   const realSize = size || '28px';
-  return <SvgIcon component={WaveLogoDark} viewBox="1812.9 1510.96 334.49 158.84" style={{ fontSize: realSize }} />;
+  return (
+    <SvgIcon component={WaveLogoDark} viewBox="0 0 315 140" fill="none" style={{ fontSize: realSize, fill: 'none' }} />
+  );
 };
 
 export default WhaveLogoDark;

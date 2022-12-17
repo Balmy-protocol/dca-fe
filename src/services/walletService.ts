@@ -275,10 +275,10 @@ export default class WalletService {
       ? await this.contractService.getHUBCompanionAddress(positionVersion)
       : await this.contractService.getHUBAddress(positionVersion);
 
-    return this.approveSpecificToken(token, addressToApprove);
+    return this.approveSpecificToken(token, addressToApprove, amount);
   }
 
-  async approveSpecificToken(token: Token, addressToApprove: string): Promise<TransactionResponse> {
+  async approveSpecificToken(token: Token, addressToApprove: string, amount?: BigNumber): Promise<TransactionResponse> {
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
     return erc20.approve(addressToApprove, amount || MaxUint256);
