@@ -13,7 +13,7 @@ import SwapQuote from '../quote';
 import QuoteRefresher from '../quote-refresher';
 import QuoteSorter from '../quote-sorter';
 
-const StyledPaper = styled(Paper)<{ $column?: boolean }>`
+const StyledPaper = styled(Paper)<{ $column?: boolean; $align?: boolean }>`
   padding: 16px;
   position: relative;
   overflow: hidden;
@@ -24,6 +24,7 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   display: flex;
   gap: 24px;
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
+  ${({ $align }) => ($align ? 'align-self: flex-start;' : '')}
 `;
 
 const StyledTitleContainer = styled.div`
@@ -106,7 +107,7 @@ const SwapQuotes = ({
   }
 
   return (
-    <StyledPaper variant="outlined" $column>
+    <StyledPaper variant="outlined" $column $align={!isLoading}>
       <StyledTitleContainer>
         <QuoteSorter isLoading={isLoading} setQuoteSorting={setSorting} sorting={sorting} />
         <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} disableRefreshQuotes={!refreshQuotes} />

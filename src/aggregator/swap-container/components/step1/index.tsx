@@ -5,8 +5,6 @@ import Button from 'common/button';
 import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import TokenButton from 'common/token-button';
-import TokenInput from 'common/token-input';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
 import IconButton from '@mui/material/IconButton';
@@ -21,6 +19,7 @@ import { formatUnits, parseUnits } from '@ethersproject/units';
 import useUsdPrice from 'hooks/useUsdPrice';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
+import AggregatorTokenInput from './aggtokenButton';
 
 const StyledButton = styled(Button)`
   padding: 0;
@@ -57,8 +56,19 @@ const StyledFormHelperText = styled(FormHelperText)`
   gap: 5px;
 `;
 
+const StyledCogContainer = styled.div`
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  border: 3px solid #151515;
+  border-radius: 20px;
+  background: #151515;
+`;
+
 const StyledContentContainer = styled.div<{ hasArrow?: boolean }>`
   background-color: #292929;
+  position: relative;
   padding: 16px;
   border-radius: 8px;
   gap: 16px;
@@ -80,13 +90,6 @@ const StyledTokenInputContainer = styled.div`
   align-items: stretch;
 `;
 
-const StyledTokenButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-`;
-
 const StyledToggleContainer = styled.div`
   flex: 1;
   display: flex;
@@ -94,6 +97,7 @@ const StyledToggleContainer = styled.div`
   position: absolute;
   left: calc(50% - 24px);
   bottom: -30px;
+  z-index: 2;
 `;
 
 const StyledToggleTokenButton = styled(IconButton)`
@@ -190,19 +194,35 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     <StyledGrid container rowSpacing={2} ref={ref}>
       <Grid item xs={12} sx={{ position: 'relative' }}>
         <StyledContentContainer hasArrow>
+          <StyledCogContainer>
+            <Badge color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
+              <IconButton aria-label="settings" size="small" sx={{ padding: '3px' }} onClick={onShowSettings}>
+                <SettingsIcon fontSize="inherit" />
+              </IconButton>
+            </Badge>
+          </StyledCogContainer>
           <StyledTokensContainer>
             <StyledTitleContainer>
               <Typography variant="body1">
                 <FormattedMessage description="youPay" defaultMessage="You pay" />
               </Typography>
-              <Badge color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
-                <IconButton aria-label="settings" size="small" onClick={onShowSettings}>
-                  <SettingsIcon fontSize="inherit" />
-                </IconButton>
-              </Badge>
+              {balance && from && (
+                <StyledFormHelperText onClick={onSetMaxBalance}>
+                  <FormattedMessage
+                    description="in wallet"
+                    defaultMessage="Balance: {balance}"
+                    values={{
+                      balance: formatCurrencyAmount(balance, from, 4),
+                    }}
+                  />
+                  <StyledButton onClick={onSetMaxBalance} color="secondary" variant="text">
+                    <FormattedMessage description="maxWallet" defaultMessage="MAX" />
+                  </StyledButton>
+                </StyledFormHelperText>
+              )}
             </StyledTitleContainer>
             <StyledTokenInputContainer>
-              <TokenInput
+              <AggregatorTokenInput
                 id="from-value"
                 error={cantFund ? 'Amount cannot exceed balance' : ''}
                 value={fromValueToUse}
@@ -211,24 +231,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 token={from}
                 fullWidth
                 usdValue={parseFloat(fromPrice || fromFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                onTokenSelect={() => startSelectingCoin(from || emptyTokenWithAddress('from'))}
               />
-              <StyledTokenButtonContainer>
-                {balance && from && (
-                  <StyledFormHelperText onClick={onSetMaxBalance}>
-                    <FormattedMessage
-                      description="in wallet"
-                      defaultMessage="Balance: {balance}"
-                      values={{
-                        balance: formatCurrencyAmount(balance, from, 4),
-                      }}
-                    />
-                    <StyledButton onClick={onSetMaxBalance} color="secondary" variant="text">
-                      <FormattedMessage description="maxWallet" defaultMessage="Max" />
-                    </StyledButton>
-                  </StyledFormHelperText>
-                )}
-                <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
-              </StyledTokenButtonContainer>
             </StyledTokenInputContainer>
           </StyledTokensContainer>
         </StyledContentContainer>
@@ -247,17 +251,16 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               </Typography>
             </StyledTitleContainer>
             <StyledTokenInputContainer>
-              <TokenInput
+              <AggregatorTokenInput
                 id="to-value"
                 value={toValueToUse}
                 disabled={isLoadingSellOrder}
                 onChange={handleToValueChange}
-                withBalance={false}
                 token={to}
                 fullWidth
                 usdValue={parseFloat(toPrice || toFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                onTokenSelect={() => startSelectingCoin(to || emptyTokenWithAddress('to'))}
               />
-              <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
             </StyledTokenInputContainer>
           </StyledTokensContainer>
         </StyledContentContainer>
