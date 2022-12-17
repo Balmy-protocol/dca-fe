@@ -6,6 +6,7 @@ import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
+import Tooltip from '@mui/material/Tooltip';
 import { BigNumber } from 'ethers';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
@@ -273,7 +274,18 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             {buttonToShow}
             {!transferTo && (
               <StyledIconButton variant="contained" color="secondary" size="small" onClick={onOpenTransferTo}>
-                <SendIcon fontSize="inherit" />
+                <Tooltip
+                  title={
+                    <FormattedMessage
+                      description="tranferToTooltip"
+                      defaultMessage="Swap and transfer to another address"
+                    />
+                  }
+                  arrow
+                  placement="top"
+                >
+                  <SendIcon fontSize="inherit" />
+                </Tooltip>
               </StyledIconButton>
             )}
           </StyledButtonContainer>
