@@ -1,7 +1,7 @@
 import * as React from 'react';
 import MinimalTabs from 'common/minimal-tabs';
 import { FormattedMessage } from 'react-intl';
-import { SWAP_ROUTES_SORT_OPTIONS } from 'config/constants/aggregator';
+import { SORT_LEAST_GAS, SORT_MOST_PROFIT } from 'config/constants/aggregator';
 
 interface QuoteSorterProps {
   isLoading: boolean;
@@ -11,11 +11,11 @@ interface QuoteSorterProps {
 
 const SORT_OPTIONS = [
   {
-    key: SWAP_ROUTES_SORT_OPTIONS.MOST_PROFIT,
+    key: SORT_MOST_PROFIT,
     label: <FormattedMessage description="sortHighReturn" defaultMessage="Highest return" />,
   },
   {
-    key: SWAP_ROUTES_SORT_OPTIONS.LEAST_GAS,
+    key: SORT_LEAST_GAS,
     label: <FormattedMessage description="sortLeastGas" defaultMessage="Least gas" />,
   },
 ];

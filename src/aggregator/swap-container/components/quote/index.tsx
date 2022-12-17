@@ -12,6 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { withStyles } from '@mui/styles';
 import { FormattedMessage } from 'react-intl';
+import { SORT_MOST_PROFIT, SwapSortOptions } from 'config/constants/aggregator';
 
 const DarkChip = withStyles(() => ({
   root: {
@@ -129,6 +130,8 @@ interface SwapQuotesProps {
   to: Token | null;
   setRoute: (newRoute: SwapOption) => void;
   isBuyOrder: boolean;
+  bestQuote?: SwapOption;
+  sorting: SwapSortOptions;
 }
 
 const toPrecision = (value: string) => {
@@ -142,9 +145,17 @@ const toPrecision = (value: string) => {
   return parseFloat(preciseValue).toFixed(3);
 };
 
-const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder }: SwapQuotesProps) => {
+const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuote, sorting }: SwapQuotesProps) => {
   if (!to || !from) {
     return null;
+  }
+
+  let isWorsePrice = false;
+
+  if (isBuyOrder) {
+    isWorsePrice = quote.sellAmount.amount.gt(bestQuote?.sellAmount.amount || 0);
+  } else {
+    isWorsePrice = quote.buyAmount.amount.lt(bestQuote?.buyAmount.amount || 0);
   }
 
   return (
@@ -168,6 +179,30 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder }: SwapQu
           </Typography>
         </StyledTitleDataContainer>
         <StyledTitleDataContainer>
+          {sorting === SORT_MOST_PROFIT && isWorsePrice && (
+            <Chip
+              label={<FormattedMessage description="worsePrice" defaultMessage="Worse price" />}
+              color="error"
+              variant="filled"
+              size="small"
+            />
+          )}
+          {quote.gas.estimatedCost.gt(bestQuote?.gas.estimatedCost || 0) && (
+            <Chip
+              label={<FormattedMessage description="moreGas" defaultMessage="More gas" />}
+              color="error"
+              variant="filled"
+              size="small"
+            />
+          )}
+          {bestQuote?.swapper.id === quote.swapper.id && (
+            <Chip
+              label={<FormattedMessage description="best" defaultMessage="Best" />}
+              color="success"
+              variant="filled"
+              size="small"
+            />
+          )}
           <DarkChip
             size="small"
             icon={<LocalGasStationIcon fontSize="small" />}

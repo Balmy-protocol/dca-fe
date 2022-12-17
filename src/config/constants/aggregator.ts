@@ -17,7 +17,12 @@ export const DEFAULT_AGGREGATOR_SETTINGS: { gasSpeed: GasKeys; slippage: number 
   gasSpeed: GAS_KEY_AVERAGE,
 };
 
-export const SWAP_ROUTES_SORT_OPTIONS = {
-  MOST_PROFIT: 'most-profit',
-  LEAST_GAS: 'least-gas',
+export const SORT_MOST_PROFIT = 'most-profit';
+export const SORT_LEAST_GAS = 'least-gas';
+
+export type SwapSortOptions = typeof SORT_MOST_PROFIT | typeof SORT_LEAST_GAS;
+
+export const SWAP_ROUTES_SORT_OPTIONS: Record<SwapSortOptions, SwapSortOptions> = {
+  [SORT_MOST_PROFIT]: 'most-profit',
+  [SORT_LEAST_GAS]: 'least-gas',
 };

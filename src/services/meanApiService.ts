@@ -13,7 +13,7 @@ import {
 } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
 import { emptyTokenWithAddress } from 'utils/currency';
-import { GasKeys, SWAP_ROUTES_SORT_OPTIONS } from 'config/constants/aggregator';
+import { GasKeys, SORT_MOST_PROFIT } from 'config/constants/aggregator';
 import isNaN from 'lodash/isNaN';
 
 // MOCKS
@@ -352,7 +352,7 @@ export default class MeanApiService {
     to: string,
     sellAmount?: BigNumber,
     buyAmount?: BigNumber,
-    sortQuotesBy = SWAP_ROUTES_SORT_OPTIONS.MOST_PROFIT,
+    sortQuotesBy = SORT_MOST_PROFIT,
     recipient?: string | null,
     slippagePercentage?: number,
     gasSpeed?: GasKeys

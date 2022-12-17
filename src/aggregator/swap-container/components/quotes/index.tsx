@@ -2,6 +2,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import EmptyRoutes from 'assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import { SwapSortOptions } from 'config/constants/aggregator';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -21,7 +22,6 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   display: flex;
   gap: 24px;
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
-  align-self: flex-start;
 `;
 
 const StyledTitleContainer = styled.div`
@@ -47,10 +47,11 @@ interface SwapQuotesProps {
   selectedRoute: SwapOption | null;
   setRoute: (newRoute: SwapOption) => void;
   setSorting: (newSort: string) => void;
-  sorting: string;
+  sorting: SwapSortOptions;
   fetchOptions: () => void;
   refreshQuotes: boolean;
   isBuyOrder: boolean;
+  bestQuote?: SwapOption;
 }
 
 const SwapQuotes = ({
@@ -65,6 +66,7 @@ const SwapQuotes = ({
   fetchOptions,
   refreshQuotes,
   isBuyOrder,
+  bestQuote,
 }: SwapQuotesProps) => {
   if (!quotes.length && !isLoading) {
     return (
@@ -103,6 +105,8 @@ const SwapQuotes = ({
             quote={quote}
             key={`${from?.symbol || ''}-${to?.symbol || ''}-${quote.swapper.id}`}
             isBuyOrder={isBuyOrder}
+            bestQuote={bestQuote}
+            sorting={sorting}
           />
         ))}
     </StyledPaper>

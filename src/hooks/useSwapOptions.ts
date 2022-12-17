@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
-import { GasKeys, SWAP_ROUTES_SORT_OPTIONS } from 'config/constants/aggregator';
+import { GasKeys, SORT_LEAST_GAS, SORT_MOST_PROFIT, SwapSortOptions } from 'config/constants/aggregator';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useAggregatorService from './useAggregatorService';
@@ -16,7 +16,7 @@ function useSwapOptions(
   to: Token | undefined | null,
   value?: string,
   isBuyOrder?: boolean,
-  sorting?: string,
+  sorting?: SwapSortOptions,
   transferTo?: string | null,
   slippage?: number,
   gasSpeed?: GasKeys
@@ -63,7 +63,7 @@ function useSwapOptions(
               debouncedTo,
               debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
               debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
-              SWAP_ROUTES_SORT_OPTIONS.MOST_PROFIT,
+              SORT_MOST_PROFIT,
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed
@@ -135,7 +135,7 @@ function useSwapOptions(
 
   let resultToReturn = result || prevResult;
 
-  if (sorting === SWAP_ROUTES_SORT_OPTIONS.LEAST_GAS && resultToReturn) {
+  if (sorting === SORT_LEAST_GAS && resultToReturn) {
     resultToReturn = [...resultToReturn].sort((a, b) => (a.gas.estimatedCost.lt(b.gas.estimatedCost) ? -1 : 1));
   }
 

@@ -20,6 +20,7 @@ import useSwapOptions from 'hooks/useSwapOptions';
 import useCustomToken from 'hooks/useCustomToken';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
+import { SwapSortOptions } from 'config/constants/aggregator';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
@@ -120,7 +121,7 @@ const SwapContainer = () => {
     dispatch(setSelectedRoute(newRoute));
   };
 
-  const onSetSorting = (newSort: string) => {
+  const onSetSorting = (newSort: SwapSortOptions) => {
     dispatch(setSorting(newSort));
   };
 
@@ -168,6 +169,7 @@ const SwapContainer = () => {
                 fetchOptions={fetchOptions}
                 refreshQuotes={refreshQuotes}
                 isBuyOrder={isBuyOrder}
+                bestQuote={swapOptions?.[0]}
               />
             </Grid>
           </Hidden>
