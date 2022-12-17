@@ -5,6 +5,7 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import styled from 'styled-components';
 import { SwapOption, Token } from 'types';
 import TokenIcon from 'common/token-icon';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Typography from '@mui/material/Typography';
 import { emptyTokenWithLogoURI, formatCurrencyAmount } from 'utils/currency';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -35,6 +36,13 @@ const StyledPaper = styled(Paper)<{ $isSelected?: boolean }>`
   ${({ $isSelected }) => $isSelected && 'border: 2px solid #3076F6;'}
 `;
 
+const StyledNotSupportedContainer = styled.div`
+  display: flex;
+  flex-grow: 1;
+  padding: 8px 16px;
+  gap: 5px;
+`;
+
 const StyledTitleContainer = styled.div`
   display: flex;
   flex-grow: 1;
@@ -50,9 +58,9 @@ const StyledTitleDataContainer = styled.div`
   align-items: center;
 `;
 
-const StyledRouteContainer = styled.div`
+const StyledRouteContainer = styled.div<{ withMessage?: boolean }>`
   display: flex;
-  padding: 16px;
+  padding: ${({ withMessage }) => (withMessage ? '16px 16px 8px 16px' : '16px')};
   align-items: center;
 `;
 
@@ -120,6 +128,7 @@ interface SwapQuotesProps {
   from: Token | null;
   to: Token | null;
   setRoute: (newRoute: SwapOption) => void;
+  isBuyOrder: boolean;
 }
 
 const toPrecision = (value: string) => {
@@ -133,7 +142,7 @@ const toPrecision = (value: string) => {
   return parseFloat(preciseValue).toFixed(3);
 };
 
-const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) => {
+const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder }: SwapQuotesProps) => {
   if (!to || !from) {
     return null;
   }
@@ -166,7 +175,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) =
           />
         </StyledTitleDataContainer>
       </StyledTitleContainer>
-      <StyledRouteContainer>
+      <StyledRouteContainer withMessage={isBuyOrder && quote.type !== 'buy'}>
         <StyledTokenContainer>
           <TokenIcon token={from} />
           <StyledTokenAmountContainer>
@@ -197,6 +206,17 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute }: SwapQuotesProps) =
           </StyledTokenAmountContainer>
         </StyledTokenContainer>
       </StyledRouteContainer>
+      {isBuyOrder && quote.type !== 'buy' && (
+        <StyledNotSupportedContainer>
+          <HelpOutlineIcon fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+          <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+            <FormattedMessage
+              description="aggregatorNotBuyOrder"
+              defaultMessage="The value of the transaction is estimated because this exchange does not support setting amount received."
+            />
+          </Typography>
+        </StyledNotSupportedContainer>
+      )}
     </StyledPaper>
   );
 };

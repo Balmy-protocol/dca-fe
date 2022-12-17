@@ -167,6 +167,7 @@ const SwapContainer = () => {
                 sorting={sorting}
                 fetchOptions={fetchOptions}
                 refreshQuotes={refreshQuotes}
+                isBuyOrder={isBuyOrder}
               />
             </Grid>
           </Hidden>

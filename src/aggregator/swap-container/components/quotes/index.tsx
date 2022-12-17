@@ -50,6 +50,7 @@ interface SwapQuotesProps {
   sorting: string;
   fetchOptions: () => void;
   refreshQuotes: boolean;
+  isBuyOrder: boolean;
 }
 
 const SwapQuotes = ({
@@ -63,6 +64,7 @@ const SwapQuotes = ({
   sorting,
   fetchOptions,
   refreshQuotes,
+  isBuyOrder,
 }: SwapQuotesProps) => {
   if (!quotes.length && !isLoading) {
     return (
@@ -100,6 +102,7 @@ const SwapQuotes = ({
             isSelected={quote.swapper.id === selectedRoute?.swapper.id}
             quote={quote}
             key={`${from?.symbol || ''}-${to?.symbol || ''}-${quote.swapper.id}`}
+            isBuyOrder={isBuyOrder}
           />
         ))}
     </StyledPaper>
