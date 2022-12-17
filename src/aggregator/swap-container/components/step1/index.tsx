@@ -11,6 +11,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/Send';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
@@ -25,6 +26,17 @@ import TransferTo from '../transfer-to';
 const StyledButton = styled(Button)`
   padding: 0;
   min-width: 10px;
+`;
+
+const StyledButtonContainer = styled.div`
+  display: flex;
+  flex: 1;
+  gap: 10px;
+`;
+
+const StyledIconButton = styled(Button)`
+  border-radius: 12px;
+  min-width: 45px;
 `;
 
 const StyledGrid = styled(Grid)`
@@ -275,9 +287,16 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       </Grid>
       <Grid item xs={12}>
         <StyledContentContainer>
-          <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />
+          {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
           <QuoteData quote={selectedRoute} to={to} />
-          {buttonToShow}
+          <StyledButtonContainer>
+            {buttonToShow}
+            {!transferTo && (
+              <StyledIconButton variant="contained" color="secondary" size="small" onClick={onOpenTransferTo}>
+                <SendIcon fontSize="inherit" />
+              </StyledIconButton>
+            )}
+          </StyledButtonContainer>
         </StyledContentContainer>
       </Grid>
     </StyledGrid>
