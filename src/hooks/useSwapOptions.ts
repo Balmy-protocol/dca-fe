@@ -7,6 +7,7 @@ import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
 import { GasKeys, SORT_LEAST_GAS, SORT_MOST_PROFIT, SwapSortOptions } from 'config/constants/aggregator';
 import { useBlockNumber } from 'state/block-number/hooks';
+import { BigNumber } from 'ethers';
 import useCurrentNetwork from './useCurrentNetwork';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
@@ -58,6 +59,14 @@ function useSwapOptions(
         debouncedAccount?: string
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
+          const sellBuyValue = debouncedIsBuyOrder
+            ? parseUnits(debouncedValue, debouncedTo.decimals)
+            : parseUnits(debouncedValue, debouncedFrom.decimals);
+
+          if (sellBuyValue.lte(BigNumber.from(0))) {
+            return;
+          }
+
           setState({ isLoading: true, result: undefined, error: undefined });
 
           try {
