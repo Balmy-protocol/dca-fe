@@ -21,6 +21,7 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   display: flex;
   gap: 24px;
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
+  align-self: flex-start;
 `;
 
 const StyledTitleContainer = styled.div`
