@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
-import GraphWidget from 'common/graph-widget';
 import { getProtocolToken } from 'mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
@@ -156,9 +155,6 @@ const SwapContainer = () => {
       <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
         <Grid container spacing={2} alignItems="stretch" justify-content="center">
           <Hidden mdDown>
-            <Grid item xs={12} minHeight="320px" sx={{ display: 'flex' }}>
-              <GraphWidget from={from} to={to} withFooter={false} />
-            </Grid>
             <Grid item xs={12} sx={{ display: 'flex' }}>
               <SwapQuotes
                 quotes={(selectedRoute && swapOptions) || []}
