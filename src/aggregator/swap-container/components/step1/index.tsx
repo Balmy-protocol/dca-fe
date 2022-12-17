@@ -9,7 +9,6 @@ import TokenButton from 'common/token-button';
 import TokenInput from 'common/token-input';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
-import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
@@ -79,12 +78,6 @@ const StyledTokenInputContainer = styled.div`
   justify-content: space-between;
   gap: 30px;
   align-items: stretch;
-`;
-
-const StyledLoadingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 5px;
 `;
 
 const StyledTokenButtonContainer = styled.div`
@@ -237,14 +230,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
               </StyledTokenButtonContainer>
             </StyledTokenInputContainer>
-            {isLoadingBuyOrder && (
-              <StyledLoadingContainer>
-                <CircularProgress size={20} />
-                <Typography variant="caption">
-                  <FormattedMessage description="loading best price" defaultMessage="Fetching best price.." />
-                </Typography>
-              </StyledLoadingContainer>
-            )}
           </StyledTokensContainer>
         </StyledContentContainer>
         <StyledToggleContainer>
@@ -274,14 +259,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               />
               <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
             </StyledTokenInputContainer>
-            {isLoadingSellOrder && (
-              <StyledLoadingContainer>
-                <CircularProgress size={20} />
-                <Typography variant="caption">
-                  <FormattedMessage description="loading best price" defaultMessage="Fetching best price.." />
-                </Typography>
-              </StyledLoadingContainer>
-            )}
           </StyledTokensContainer>
         </StyledContentContainer>
       </Grid>
