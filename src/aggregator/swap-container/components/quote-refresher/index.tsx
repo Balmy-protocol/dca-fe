@@ -47,14 +47,6 @@ const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: Quot
 
   return (
     <StyledRefresherContainer>
-      <StyledToggleTokenButton
-        aria-label="close"
-        size="medium"
-        onClick={onRefreshRoute}
-        disabled={isLoading || disableRefreshQuotes}
-      >
-        <RefreshIcon fontSize="inherit" />
-      </StyledToggleTokenButton>
       {!isLoading && timer !== TIMER_FOR_RESET && !disableRefreshQuotes && (
         <Typography variant="body1">
           <FormattedMessage
@@ -64,6 +56,14 @@ const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: Quot
           />
         </Typography>
       )}
+      <StyledToggleTokenButton
+        aria-label="close"
+        size="medium"
+        onClick={onRefreshRoute}
+        disabled={isLoading || disableRefreshQuotes}
+      >
+        <RefreshIcon fontSize="inherit" />
+      </StyledToggleTokenButton>
     </StyledRefresherContainer>
   );
 };
