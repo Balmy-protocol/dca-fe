@@ -347,6 +347,25 @@ export default class MeanApiService {
     }
   }
 
+  async getAllowanceTarget() {
+    const currentNetwork = await this.walletService.getNetwork();
+    const allowanceResponse = await this.axiosClient.get<{ allowanceTarget: string }>(
+      `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/allowance-target`,
+      {
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+        cache: {
+          maxAge: 0,
+        },
+      }
+    );
+
+    return allowanceResponse.data.allowanceTarget;
+  }
+
   async getSwapOptions(
     from: string,
     to: string,
@@ -356,7 +375,8 @@ export default class MeanApiService {
     recipient?: string | null,
     slippagePercentage?: number,
     gasSpeed?: GasKeys,
-    takerAddress?: string
+    takerAddress?: string,
+    skipValidation?: boolean
   ) {
     const currentNetwork = await this.walletService.getNetwork();
     const swapResponses = await this.axiosClient.get<MeanFinanceSwapResponse>(
@@ -366,12 +386,13 @@ export default class MeanApiService {
           sellToken: from,
           buyToken: to,
           sortQuotesBy,
-          ...(takerAddress ? { takerAddress } : {}),
+          ...(takerAddress && !skipValidation ? { takerAddress } : {}),
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
           ...(recipient ? { recipient } : {}),
           ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : {}),
           ...(gasSpeed ? { gasSpeed } : {}),
+          ...(skipValidation ? { skipValidation } : {}),
         },
         headers: {
           'Cache-Control': 'no-cache',
