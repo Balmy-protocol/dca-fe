@@ -111,7 +111,7 @@ const Swap = ({
 
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
-  const handleApproveToken = async (transactions?: TransactionStep[]) => {
+  const handleApproveToken = async (transactions?: TransactionStep[], amount?: BigNumber) => {
     if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
 
@@ -127,15 +127,17 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await walletService.approveSpecificToken(from, selectedRoute.swapper.allowanceTarget);
+      const result = await walletService.approveSpecificToken(from, selectedRoute.swapper.allowanceTarget, amount);
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        type: amount ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: from,
           addressFor: selectedRoute.swapper.allowanceTarget,
+          ...(!!amount && { amount: amount.toString() }),
         },
       });
+
       setModalClosed({ content: '' });
 
       if (transactions?.length) {
