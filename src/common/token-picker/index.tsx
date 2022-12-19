@@ -219,7 +219,7 @@ const Row = ({
       </ListItemText>
       <StyledBalanceContainer>
         {isLoadingTokenBalances && !Object.keys(tokenBalances).length && <CenteredLoadingIndicator size={10} />}
-        {!isLoadingTokenBalances && Object.keys(tokenBalances).length && (
+        {!isLoadingTokenBalances && tokenBalances && Object.keys(tokenBalances).length && (
           <>
             {tokenBalance && (
               <Typography variant="body1" color="#FFFFFF">
