@@ -28,6 +28,7 @@ const StyledNavbarWrapper = styled.div`
   top: 0;
   // background: #121212;
   z-index: 90;
+  backdrop-filter: blur(15px);
 `;
 
 const StyledNavbarContainer = styled.div`
