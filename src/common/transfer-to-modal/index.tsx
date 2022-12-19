@@ -98,7 +98,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
       title={<FormattedMessage description="transfer to title" defaultMessage="Transfer swap to another address" />}
       actions={[
         {
-          label: <FormattedMessage description="transfer to selectAddress" defaultMessage="Select address" />,
+          label: <FormattedMessage description="transfer to selectAddress" defaultMessage="Confirm address" />,
           color: 'secondary',
           variant: 'contained',
           disabled: toAddress === '' || (!isValid && toAddress !== '') || !validateCheckbox,
