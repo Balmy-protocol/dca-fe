@@ -405,7 +405,7 @@ const Swap = ({
       onClick={handleMultiSteps}
     >
       <Typography variant="body1">
-        <FormattedMessage description="proceed agg" defaultMessage="Proceed" />
+        <FormattedMessage description="proceed agg" defaultMessage="Continue" />
       </Typography>
     </StyledButton>
   );
