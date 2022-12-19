@@ -154,8 +154,15 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     gasSpeed,
   } = props;
 
-  let fromValueToUse = isBuyOrder && selectedRoute ? selectedRoute.sellAmount.amountInUnits.toString() : fromValue;
-  let toValueToUse = isBuyOrder ? toValue : selectedRoute?.buyAmount.amountInUnits.toString() || '';
+  let fromValueToUse =
+    isBuyOrder && selectedRoute
+      ? (selectedRoute?.sellToken.address === from?.address && selectedRoute.sellAmount.amountInUnits.toString()) || '0'
+      : fromValue;
+  let toValueToUse = isBuyOrder
+    ? toValue
+    : (selectedRoute?.buyToken.address === to?.address && selectedRoute?.buyAmount.amountInUnits.toString()) ||
+      '0' ||
+      '';
 
   const [fromFetchedPrice] = useUsdPrice(from, parseUnits(fromValueToUse || '0', from?.decimals));
   const [toFetchedPrice] = useUsdPrice(to, parseUnits(toValueToUse || '0', to?.decimals));
@@ -269,7 +276,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       <Grid item xs={12}>
         <StyledContentContainer>
           {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
-          <QuoteData quote={selectedRoute} to={to} />
+          <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} to={to} />
           <StyledButtonContainer>
             {buttonToShow}
             {!transferTo && (

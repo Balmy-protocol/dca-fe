@@ -6,7 +6,9 @@ import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import { PositionVersions } from 'config/constants';
 import { RawSwapOption, SwapOption, Token } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
+import { toToken } from 'utils/currency';
 import { parseUnits } from '@ethersproject/units';
+import { getProtocolToken } from 'mocks/tokens';
 import { GasKeys } from 'config/constants/aggregator';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -72,14 +74,23 @@ export default class AggregatorService {
     gasSpeed?: GasKeys,
     takerAddress?: string
   ) {
-    let shouldValidate = false;
+    let shouldValidate = !buyAmount;
 
     if (takerAddress && sellAmount) {
       const preAllowanceTarget = await this.meanApiService.getAllowanceTarget();
       const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
 
-      if (parseUnits(allowance.allowance, from.decimals).gte(sellAmount)) {
-        shouldValidate = true;
+      if (parseUnits(allowance.allowance, from.decimals).lt(sellAmount)) {
+        shouldValidate = false;
+      }
+
+      if (shouldValidate) {
+        // If user does not have the balance do not validate tx
+        const balance = await this.walletService.getBalance(from.address);
+
+        if (balance.lt(sellAmount)) {
+          shouldValidate = false;
+        }
       }
     }
 
@@ -99,6 +110,19 @@ export default class AggregatorService {
     const filteredOptions: RawSwapOption[] = swapOptionsResponse.quotes.filter(
       (option) => !('failed' in option)
     ) as RawSwapOption[];
+
+    const network = await this.walletService.getNetwork();
+
+    const protocolToken = getProtocolToken(network.chainId);
+
+    const sellToken =
+      swapOptionsResponse.sellToken.address === protocolToken.address
+        ? protocolToken
+        : toToken(swapOptionsResponse.sellToken);
+    const buyToken =
+      swapOptionsResponse.buyToken.address === protocolToken.address
+        ? protocolToken
+        : toToken(swapOptionsResponse.buyToken);
 
     return filteredOptions.map<SwapOption>(
       ({
@@ -127,6 +151,8 @@ export default class AggregatorService {
         type,
         tx,
       }) => ({
+        sellToken,
+        buyToken,
         sellAmount: {
           amount: BigNumber.from(sellAmountAmount),
           amountInUnits: Number(sellAmountAmountInUnits),

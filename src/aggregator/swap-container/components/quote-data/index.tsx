@@ -73,7 +73,7 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
         <StyledMinimumContainer>
           <Typography variant="body2" color="inherit">
             {quote?.minBuyAmount.amount && to
-              ? `${formatCurrencyAmount(quote.minBuyAmount.amount, to, 4, 6)} ${to.symbol}`
+              ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
               : '-'}
           </Typography>
           <Tooltip

@@ -1,7 +1,10 @@
 import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import { Token } from './tokens';
 
 export type SwapOption = {
+  sellToken: Token;
+  buyToken: Token;
   sellAmount: {
     amount: BigNumber;
     amountInUnits: number;

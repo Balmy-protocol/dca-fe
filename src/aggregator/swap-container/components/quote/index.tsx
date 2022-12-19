@@ -212,10 +212,10 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
       </StyledTitleContainer>
       <StyledRouteContainer withMessage={isBuyOrder && quote.type !== 'buy'}>
         <StyledTokenContainer>
-          <TokenIcon token={from} />
+          <TokenIcon token={quote.sellToken} />
           <StyledTokenAmountContainer>
             <Typography variant="body1">
-              {`${formatCurrencyAmount(quote.sellAmount.amount, from, 4, 6)} ${from.symbol}`}
+              {`${formatCurrencyAmount(quote.sellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`}
             </Typography>
             <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
               {`$${parseFloat(quote.sellAmount.amountInUSD).toFixed(2)}`}
@@ -230,10 +230,10 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
           <StyledDottedLine />
         </StyledDexContainer>
         <StyledTokenContainer>
-          <TokenIcon token={to} />
+          <TokenIcon token={quote.buyToken} />
           <StyledTokenAmountContainer>
             <Typography variant="body1">
-              {`${formatCurrencyAmount(quote.buyAmount.amount, to, 4, 6)} ${to.symbol}`}
+              {`${formatCurrencyAmount(quote.buyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`}
             </Typography>
             <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
               {`$${parseFloat(quote.buyAmount.amountInUSD).toFixed(2)}`}

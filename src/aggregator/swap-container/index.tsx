@@ -101,7 +101,7 @@ const SwapContainer = () => {
     dispatch(setTo(from));
 
     // check for decimals
-    if (to && from && to.decimals < from.decimals) {
+    if (to && from && to.decimals < from.decimals && !isBuyOrder) {
       const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
       let newFromValue = fromValue;
       if (splitValue && splitValue[2] !== '') {
@@ -109,6 +109,15 @@ const SwapContainer = () => {
       }
 
       dispatch(setFromValue({ value: newFromValue, updateMode: isBuyOrder }));
+    }
+    if (to && from && to.decimals < from.decimals && isBuyOrder) {
+      const splitValue = /^(\d*)\.?(\d*)$/.exec(toValue);
+      let newToValue = toValue;
+      if (splitValue && splitValue[2] !== '') {
+        newToValue = `${splitValue[1]}.${splitValue[2].substring(0, from.decimals)}`;
+      }
+
+      dispatch(setToValue({ value: newToValue, updateMode: isBuyOrder }));
     }
     dispatch(setFrom(to));
 
