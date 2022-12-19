@@ -113,7 +113,7 @@ const SwapContainer = () => {
     dispatch(setFrom(to));
 
     if (to) {
-      history.replace(`/create/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
+      history.replace(`/swap/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
   };
 
