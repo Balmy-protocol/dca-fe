@@ -111,6 +111,17 @@ const Swap = ({
 
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
+  let fromValueToUse =
+    isBuyOrder && selectedRoute
+      ? (selectedRoute?.sellToken.address === from?.address && selectedRoute.sellAmount.amountInUnits.toString()) || '0'
+      : fromValue;
+
+  let toValueToUse = isBuyOrder
+    ? toValue
+    : (selectedRoute?.buyToken.address === to?.address && selectedRoute?.buyAmount.amountInUnits.toString()) ||
+      '0' ||
+      '';
+
   const handleApproveToken = async (transactions?: TransactionStep[], amount?: BigNumber) => {
     if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
@@ -272,7 +283,7 @@ const Swap = ({
   };
 
   const handleMultiSteps = () => {
-    if (!from || fromValue === '' || !to) {
+    if (!from || fromValueToUse === '' || !to) {
       return;
     }
 
@@ -286,7 +297,7 @@ const Swap = ({
       type: TRANSACTION_ACTION_APPROVE_TOKEN,
       extraData: {
         token: from,
-        amount: parseUnits(fromValue, from.decimals),
+        amount: parseUnits(fromValueToUse, from.decimals),
       },
     });
 
@@ -298,7 +309,7 @@ const Swap = ({
       type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
       extraData: {
         token: from,
-        amount: parseUnits(fromValue, from.decimals),
+        amount: parseUnits(fromValueToUse, from.decimals),
       },
     });
 
@@ -311,8 +322,8 @@ const Swap = ({
       extraData: {
         from,
         to,
-        sellAmount: parseUnits(fromValue, from.decimals),
-        buyAmount: parseUnits(fromValue, from.decimals),
+        sellAmount: parseUnits(fromValueToUse, from.decimals),
+        buyAmount: parseUnits(toValueToUse, to.decimals),
       },
     });
 
@@ -341,30 +352,30 @@ const Swap = ({
     setRefreshQuotes(true);
   };
 
-  const cantFund = from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
+  const cantFund = from && !!fromValueToUse && !!balance && parseUnits(fromValueToUse, from.decimals).gt(balance);
 
   const isApproved =
     !from ||
     !selectedRoute ||
     (from &&
       selectedRoute &&
-      (!fromValue
+      (!fromValueToUse
         ? true
         : (allowance.allowance &&
             allowance.token.address === from.address &&
-            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
+            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValueToUse, from.decimals))) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
 
   const shouldDisableApproveButton =
     !from ||
     !to ||
-    !fromValue ||
+    !fromValueToUse ||
     cantFund ||
     !balance ||
     !selectedRoute ||
     balanceErrors ||
     allowanceErrors ||
-    parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
+    parseUnits(fromValueToUse, from.decimals).lte(BigNumber.from(0)) ||
     isLoadingRoute;
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
@@ -493,8 +504,8 @@ const Swap = ({
         <SwapFirstStep
           from={from}
           to={to}
-          fromValue={fromValue}
-          toValue={toValue}
+          fromValue={fromValueToUse}
+          toValue={toValueToUse}
           toggleFromTo={toggleFromTo}
           startSelectingCoin={startSelectingCoin}
           cantFund={cantFund}
