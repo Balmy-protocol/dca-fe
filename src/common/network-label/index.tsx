@@ -14,6 +14,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useWalletService from 'hooks/useWalletService';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
+import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -82,8 +83,13 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const location = useLocation();
   const urlParams = useParams<PositionDetailUrlParams>();
   const history = useHistory();
+  const loadedAsSafeApp = useLoadedAsSafeApp();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    if (loadedAsSafeApp) {
+      return;
+    }
+
     setAnchorEl(event.currentTarget);
     setShouldOpenNetworkMenu(true);
   };

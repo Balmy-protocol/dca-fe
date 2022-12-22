@@ -45,6 +45,8 @@ export default class Web3Service {
 
   providerInfo: { id: string; logo: string; name: string };
 
+  loadedAsSafeApp: boolean;
+
   contractService: ContractService;
 
   transactionService: TransactionService;
@@ -86,6 +88,8 @@ export default class Web3Service {
     if (UNISubgraphs) {
       this.uniClient = UNISubgraphs;
     }
+
+    this.loadedAsSafeApp = false;
 
     this.axiosClient = setupAxiosClient();
 
@@ -184,6 +188,14 @@ export default class Web3Service {
 
     // [TODO] Refactor so there is only one source of truth
     this.walletService.setSigner(signer);
+  }
+
+  getLoadedAsSafeApp() {
+    return this.loadedAsSafeApp;
+  }
+
+  setLoadedAsSafeApp(loadedAsSafeApp: boolean) {
+    this.loadedAsSafeApp = loadedAsSafeApp;
   }
 
   setModal(modal: SafeAppWeb3Modal) {
@@ -327,6 +339,7 @@ export default class Web3Service {
 
     this.transactionService.setLoadedAsSafeApp(loadedAsSafeApp);
     this.meanApiService.setLoadedAsSafeApp(loadedAsSafeApp);
+    this.setLoadedAsSafeApp(loadedAsSafeApp);
 
     try {
       if (process.env.ARCX_KEY) {
