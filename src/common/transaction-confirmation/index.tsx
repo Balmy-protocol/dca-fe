@@ -130,12 +130,14 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: Trans
     if (!isTransactionPending && previousTransactionPending) {
       setTimer(0);
       setSuccess(true);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       confetti({
         particleCount: 100,
         spread: 70,
         angle: 60,
         origin: { x: 0 },
       });
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       confetti({
         particleCount: 100,
         spread: 70,

@@ -150,7 +150,7 @@ function useSwapOptions(
     return [undefined, false, undefined, fetchOptions];
   }
 
-  let resultToReturn = result || prevResult;
+  let resultToReturn = !error ? result || prevResult : undefined;
 
   if (sorting === SORT_LEAST_GAS && resultToReturn) {
     resultToReturn = [...resultToReturn].sort((a, b) => (a.gas.estimatedCost.lt(b.gas.estimatedCost) ? -1 : 1));

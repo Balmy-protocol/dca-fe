@@ -3,7 +3,6 @@ import Typography from '@mui/material/Typography';
 import EmptyRoutes from 'assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { SwapSortOptions } from 'config/constants/aggregator';
-import { ALL_SWAP_OPTIONS_FAILED } from 'hooks/useSwapOptions';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -73,7 +72,7 @@ const SwapQuotes = ({
   bestQuote,
   swapOptionsError,
 }: SwapQuotesProps) => {
-  if (!quotes.length && !isLoading && swapOptionsError === ALL_SWAP_OPTIONS_FAILED) {
+  if (!quotes.length && !isLoading && !!swapOptionsError) {
     return (
       <StyledPaper variant="outlined" $column>
         <StyledPaper variant="outlined">

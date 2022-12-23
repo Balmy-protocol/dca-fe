@@ -111,12 +111,12 @@ const Swap = ({
 
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
-  let fromValueToUse =
+  const fromValueToUse =
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address && selectedRoute.sellAmount.amountInUnits.toString()) || '0'
       : fromValue;
 
-  let toValueToUse = isBuyOrder
+  const toValueToUse = isBuyOrder
     ? toValue
     : (selectedRoute?.buyToken.address === to?.address && selectedRoute?.buyAmount.amountInUnits.toString()) ||
       '0' ||
