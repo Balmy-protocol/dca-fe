@@ -8,7 +8,6 @@ import { parseUnits } from '@ethersproject/units';
 import { STABLE_COINS } from 'config/constants';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
-import useWalletService from './useWalletService';
 import useAccount from './useAccount';
 
 function useRawUsdPrice(
@@ -26,7 +25,6 @@ function useRawUsdPrice(
     error: undefined,
   });
   const priceService = usePriceService();
-  const walletService = useWalletService();
   const prevFrom = usePrevious(from);
   const currentNetwork = useCurrentNetwork();
   const account = useAccount();
