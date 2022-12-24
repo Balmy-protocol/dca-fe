@@ -23,6 +23,7 @@ import PairService from './pairService';
 import WalletService from './walletService';
 import YieldService from './yieldService';
 import MeanApiService from './meanApiService';
+import ProviderService from './providerService';
 
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
@@ -65,6 +66,8 @@ export default class Web3Service {
 
   arcxSdk: ArcxAnalyticsSdk;
 
+  providerService: ProviderService;
+
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -94,14 +97,23 @@ export default class Web3Service {
     this.axiosClient = setupAxiosClient();
 
     // initialize services
-    this.contractService = new ContractService(client);
+    this.providerService = new ProviderService(client);
+    // this.contractService = new ContractService(this.providerService); //
+    this.contractService = new ContractService(client); // pasar a this.provider en vez de client
     this.transactionService = new TransactionService(client);
-    this.walletService = new WalletService(this.contractService, this.axiosClient, client);
-    this.meanApiService = new MeanApiService(this.walletService, this.contractService, this.axiosClient, client);
+    this.walletService = new WalletService(this.contractService, this.axiosClient, this.providerService);
+    this.meanApiService = new MeanApiService(
+      this.walletService,
+      this.contractService,
+      this.axiosClient,
+      this.providerService,
+      client
+    );
     this.pairService = new PairService(
       this.walletService,
       this.contractService,
       this.meanApiService,
+      this.providerService,
       this.apolloClient,
       this.uniClient
     );
@@ -111,7 +123,8 @@ export default class Web3Service {
       this.pairService,
       this.contractService,
       this.meanApiService,
-      this.apolloClient
+      this.apolloClient,
+      this.providerService
     );
     this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
   }
@@ -180,14 +193,14 @@ export default class Web3Service {
     // set client for services
     this.contractService.setClient(client);
     this.transactionService.setClient(client);
-    this.walletService.setClient(client);
+    this.providerService.setProvider(client);
   }
 
   setSigner(signer: Signer) {
     this.signer = signer;
 
     // [TODO] Refactor so there is only one source of truth
-    this.walletService.setSigner(signer);
+    this.providerService.setSigner(signer);
   }
 
   getLoadedAsSafeApp() {
@@ -236,6 +249,7 @@ export default class Web3Service {
     const provider: Provider = suppliedProvider || ((await this.modal?.requestProvider()) as Provider);
 
     this.providerInfo = getProviderInfo(provider);
+    this.providerService.setProviderInfo(getProviderInfo(provider));
     // A Web3Provider wraps a standard Web3 provider, which is
     // what Metamask injects as window.ethereum into each page
     const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider);
@@ -244,6 +258,9 @@ export default class Web3Service {
     // send ether and pay to change state within the blockchain.
     // For this, you need the account signer...
     const signer = ethersProvider.getSigner();
+
+    this.providerService.setProvider(ethersProvider);
+    this.providerService.setSigner(signer);
 
     this.setClient(ethersProvider);
     this.setSigner(signer);
@@ -264,6 +281,8 @@ export default class Web3Service {
     // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
 
     this.setAccount(account);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    this.walletService.setAccount();
 
     try {
       const arcxClient = this.getArcxClient();
@@ -280,40 +299,37 @@ export default class Web3Service {
     }
   }
 
-  async disconnect() {
+  disconnect() {
     this.modal?.clearCachedProvider();
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    if (this.client && (this.client as any).disconnect) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await (this.client as any).disconnect();
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    if (this.client && (this.client as any).close) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      await (this.client as any).close();
-    }
 
     this.setAccount('');
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.walletService.setAccount(null);
 
+    this.providerService.setProvider(new ethers.providers.Web3Provider({}));
     this.setClient(new ethers.providers.Web3Provider({}));
   }
 
   async setUpModal() {
+    const rpc = Object.keys(NETWORKS).reduce((a, name) => {
+      const { chainId, rpc: rpcArray } = NETWORKS[name];
+      const rpcUrl = rpcArray[0];
+      if (chainId !== 1 && rpcUrl) {
+        return {
+          ...a,
+          [chainId]: rpcUrl,
+        };
+      }
+      return a;
+    }, {});
+
     const providerOptions = {
       walletconnect: {
         package: WalletConnectProvider, // required
         options: {
           infuraId: '5744aff1d49f4eee923c5f3e5af4cc1c', // required
-          rpc: {
-            [NETWORKS.polygon.chainId]: NETWORKS.polygon.rpc[0],
-            [NETWORKS.optimism.chainId]: NETWORKS.optimism.rpc[0],
-            [NETWORKS.arbitrum.chainId]: NETWORKS.arbitrum.rpc[0],
-          },
+          rpc,
         },
       },
       // frame: {
@@ -368,28 +384,6 @@ export default class Web3Service {
       console.error('Avoidable error when initializing connect', e);
     }
 
-    try {
-      if (window.ethereum) {
-        // handle metamask account change
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        window.ethereum.on('accountsChanged', () => {
-          window.location.reload();
-        });
-
-        // extremely recommended by metamask
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        window.ethereum.on('chainChanged', (newChainId: string) => {
-          if (window.location.pathname === '/' || window.location.pathname.startsWith('/create')) {
-            window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
-          }
-
-          window.location.reload();
-        });
-      }
-    } catch (e) {
-      console.error('Avoidable error when initializing metamask events', e);
-    }
-
-    // await this.pairService.fetchAvailablePairs();
+    await this.providerService.addEventListeners();
   }
 }
