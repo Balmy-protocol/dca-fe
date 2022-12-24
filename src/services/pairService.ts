@@ -34,11 +34,14 @@ import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import MeanApiService from './meanApiService';
+import ProviderService from './providerService';
 
 export default class PairService {
   availablePairs: AvailablePairs;
 
   allowedPairs: AllowedPairs;
+
+  providerService: ProviderService;
 
   contractService: ContractService;
 
@@ -56,12 +59,14 @@ export default class PairService {
     walletService: WalletService,
     contractService: ContractService,
     meanApiService: MeanApiService,
+    providerService: ProviderService,
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
     this.meanApiService = meanApiService;
+    this.providerService = providerService;
     this.availablePairs = [];
     this.allowedPairs = [];
     this.hasFetchedAvailablePairs = false;
@@ -263,7 +268,7 @@ export default class PairService {
 
   async canSupportPair(tokenFrom: Token, tokenTo: Token) {
     // if they are not connected we show everything as available
-    if (!this.walletService.getClient()) return true;
+    if (!this.providerService.getProvider()) return true;
 
     const network = await this.walletService.getNetwork();
 

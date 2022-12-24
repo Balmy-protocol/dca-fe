@@ -1,9 +1,8 @@
-import { ethers, Signer, BigNumber } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { Interface } from '@ethersproject/abi';
 import { TransactionResponse, Network } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
-import find from 'lodash/find';
 import { GetUsedTokensData, Token } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import isUndefined from 'lodash/isUndefined';
@@ -17,56 +16,31 @@ import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { LATEST_VERSION, MULTICALL_ADDRESS, NETWORKS, PositionVersions } from 'config/constants';
 import { ERC20Contract, MulticallContract } from 'types/contracts';
 import ContractService from './contractService';
+import ProviderService from './providerService';
 
 export default class WalletService {
-  client: ethers.providers.Web3Provider;
-
-  signer: Signer;
-
   network: Network;
 
   account: string | null;
 
   contractService: ContractService;
 
+  providerService: ProviderService;
+
   axiosClient: AxiosInstance;
 
-  constructor(contractService: ContractService, axiosClient: AxiosInstance, client?: ethers.providers.Web3Provider) {
-    if (client) {
-      this.client = client;
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.setAccount();
-    }
-
+  constructor(contractService: ContractService, axiosClient: AxiosInstance, providerService: ProviderService) {
     this.contractService = contractService;
+    this.providerService = providerService;
     this.axiosClient = axiosClient;
   }
 
-  // GETTERS AND SETTERS
-  setClient(client: ethers.providers.Web3Provider) {
-    this.client = client;
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.setAccount();
-  }
-
-  setSigner(signer: Signer) {
-    this.signer = signer;
-  }
-
-  getClient() {
-    return this.client;
-  }
-
   async setAccount(account?: string | null) {
-    this.account = isUndefined(account) ? await this.client.getSigner().getAddress() : account;
+    this.account = isUndefined(account) ? await this.providerService.getAddress() : account;
   }
 
   getAccount() {
     return this.account || '';
-  }
-
-  getSigner() {
-    return this.signer;
   }
 
   getUsedTokens(): Promise<AxiosResponse<GetUsedTokensData> | null> {
@@ -127,41 +101,10 @@ export default class WalletService {
     try {
       const currentNetwork = await this.getNetwork(true);
       if (currentNetwork.chainId !== newChainId) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${newChainId.toString(16)}` }],
-        });
-        if (callbackBeforeReload) {
-          callbackBeforeReload();
-        }
-        window.location.reload();
+        await this.providerService.changeNetwork(newChainId, callbackBeforeReload);
       }
     } catch (switchError) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (switchError.code === 4902) {
-        try {
-          const network = find(NETWORKS, { chainId: newChainId });
-
-          if (network) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: `0x${newChainId.toString(16)}`,
-                  chainName: network.name,
-                  nativeCurrency: network.nativeCurrency,
-                  rpcUrls: network.rpc,
-                },
-              ],
-            });
-            window.location.reload();
-          }
-        } catch (addError) {
-          console.error('Error adding new chain to metamask');
-        }
-      }
+      console.error('Error switching chains', switchError);
     }
   }
 
@@ -175,9 +118,11 @@ export default class WalletService {
 
     const filteredAddresses = addresses.filter((address) => address !== PROTOCOL_TOKEN_ADDRESS);
 
+    const provider = await this.providerService.getProvider();
+
     const balancesCall = await Promise.all(
       filteredAddresses.map((address) => {
-        const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as unknown as ERC20Contract;
+        const erc20 = new ethers.Contract(address, ERC20Interface, provider) as unknown as ERC20Contract;
 
         return erc20.populateTransaction.balanceOf(account).then((populatedTransaction) => ({
           target: populatedTransaction.to as string,
@@ -190,7 +135,7 @@ export default class WalletService {
     const multicallInstance = new ethers.Contract(
       MULTICALL_ADDRESS[currentNetwork.chainId],
       MULTICALLABI,
-      this.client
+      provider
     ) as unknown as MulticallContract;
 
     const results = await multicallInstance.callStatic.aggregate3(balancesCall);
@@ -200,7 +145,7 @@ export default class WalletService {
     const hasProtocolToken = addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1;
 
     if (addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1) {
-      protocolBalance = await this.signer.getBalance();
+      protocolBalance = await this.providerService.getBalance();
     }
 
     return results
@@ -218,16 +163,18 @@ export default class WalletService {
       );
   }
 
-  getBalance(address?: string): Promise<BigNumber> {
+  async getBalance(address?: string): Promise<BigNumber> {
     const account = this.getAccount();
 
     if (!address || !account) return Promise.resolve(BigNumber.from(0));
 
-    if (address === PROTOCOL_TOKEN_ADDRESS) return this.signer.getBalance();
+    if (address === PROTOCOL_TOKEN_ADDRESS) return this.providerService.getBalance();
 
     const ERC20Interface = new Interface(ERC20ABI);
 
-    const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as unknown as ERC20Contract;
+    const provider = await this.providerService.getProvider();
+
+    const erc20 = new ethers.Contract(address, ERC20Interface, provider) as unknown as ERC20Contract;
 
     return erc20.balanceOf(account);
   }

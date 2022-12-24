@@ -63,6 +63,7 @@ import ContractService from './contractService';
 import WalletService from './walletService';
 import PairService from './pairService';
 import MeanApiService from './meanApiService';
+import ProviderService from './providerService';
 
 export default class PositionService {
   modal: SafeAppWeb3Modal;
@@ -74,6 +75,8 @@ export default class PositionService {
   pastPositions: PositionKeyBy;
 
   contractService: ContractService;
+
+  providerService: ProviderService;
 
   walletService: WalletService;
 
@@ -92,12 +95,14 @@ export default class PositionService {
     pairService: PairService,
     contractService: ContractService,
     meanApiService: MeanApiService,
-    DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>
+    DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
+    providerService: ProviderService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
     this.pairService = pairService;
     this.meanApiService = meanApiService;
+    this.providerService = providerService;
     this.apolloClient = DCASubgraph;
     this.currentPositions = {};
     this.pastPositions = {};
@@ -367,7 +372,7 @@ export default class PositionService {
     permissionManagerAddressProvided?: string,
     erc712Name?: string
   ) {
-    const signer = this.walletService.getSigner();
+    const signer = this.providerService.getSigner();
     const { positionId, version } = position;
     const permissionManagerAddress =
       permissionManagerAddressProvided || (await this.contractService.getPermissionManagerAddress(version));

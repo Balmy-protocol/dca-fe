@@ -16,6 +16,7 @@ import { emptyTokenWithAddress } from 'utils/currency';
 // MOCKS
 import ContractService from './contractService';
 import WalletService from './walletService';
+import ProviderService from './providerService';
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
   slippagePercentage: 0.1, // 0.1%
@@ -29,6 +30,8 @@ export default class MeanApiService {
 
   contractService: ContractService;
 
+  providerService: ProviderService;
+
   client: ethers.providers.Web3Provider;
 
   loadedAsSafeApp: boolean;
@@ -37,6 +40,7 @@ export default class MeanApiService {
     walletService: WalletService,
     contractService: ContractService,
     axiosClient: AxiosInstance,
+    providerService: ProviderService,
     client?: ethers.providers.Web3Provider
   ) {
     if (client) {
@@ -45,6 +49,7 @@ export default class MeanApiService {
     this.walletService = walletService;
     this.axiosClient = axiosClient;
     this.contractService = contractService;
+    this.providerService = providerService;
     this.loadedAsSafeApp = false;
   }
 
@@ -69,9 +74,7 @@ export default class MeanApiService {
   }
 
   async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
-    const signer = this.walletService.getSigner();
-
-    const gasUsed = await signer.estimateGas(tx);
+    const gasUsed = await this.providerService.estimateGas(tx);
 
     return {
       ...tx,
@@ -90,7 +93,6 @@ export default class MeanApiService {
     account: string,
     permissions: { operator: string; permissions: number[] }[]
   ) {
-    const singer = this.walletService.getSigner();
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -115,7 +117,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async depositUsingProtocolToken(
@@ -127,7 +129,6 @@ export default class MeanApiService {
     account: string,
     permissions: { operator: string; permissions: string[] }[]
   ) {
-    const singer = this.walletService.getSigner();
     const currentNetwork = await this.walletService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const hubAddress = await this.contractService.getHUBAddress();
@@ -151,7 +152,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
@@ -180,8 +181,6 @@ export default class MeanApiService {
     convertTo: string,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
-
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
@@ -200,7 +199,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async terminateUsingOtherTokens(
@@ -212,8 +211,6 @@ export default class MeanApiService {
     tokenTo: string,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
-
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
@@ -233,7 +230,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async increasePositionUsingOtherToken(
@@ -244,8 +241,6 @@ export default class MeanApiService {
     tokenFrom: string,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
-
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
@@ -264,7 +259,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async reducePositionUsingOtherToken(
@@ -276,8 +271,6 @@ export default class MeanApiService {
     tokenFrom: string,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
-
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
@@ -300,7 +293,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async migratePosition(
@@ -311,8 +304,6 @@ export default class MeanApiService {
     positionVersion: PositionVersions,
     permissionPermit?: PermissionPermit
   ) {
-    const singer = this.walletService.getSigner();
-
     const currentNetwork = await this.walletService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
     const newHubAddress = await this.contractService.getHUBAddress(LATEST_VERSION);
@@ -334,7 +325,7 @@ export default class MeanApiService {
 
     const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
 
-    return singer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async getAllowedPairs(): Promise<AllowedPairs> {
