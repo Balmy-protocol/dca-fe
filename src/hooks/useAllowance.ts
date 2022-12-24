@@ -8,6 +8,7 @@ import { PositionVersions } from 'config';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 type Allowance = {
   token: Token;
@@ -32,8 +33,8 @@ function useAllowance(
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(walletService.getAccount());
-  const account = walletService.getAccount();
+  const account = useAccount();
+  const prevAccount = usePrevious(account);
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);

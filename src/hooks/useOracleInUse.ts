@@ -8,7 +8,7 @@ import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from './useCurrentNetwork';
 import useAvailablePairs from './useAvailablePairs';
 import usePairService from './usePairService';
-import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useOracleInUse(
   from: Token | undefined | null,
@@ -16,7 +16,7 @@ function useOracleInUse(
 ): [Oracles | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const pairService = usePairService();
-  const walletService = useWalletService();
+  const account = useAccount();
   const [result, setResult] = React.useState<Oracles | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const prevFrom = usePrevious(from);
@@ -74,19 +74,7 @@ function useOracleInUse(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [
-    from,
-    to,
-    isLoading,
-    result,
-    error,
-    walletService.getAccount(),
-    currentNetwork,
-    existingPair,
-    prevExistingPair,
-    prevFrom,
-    prevTo,
-  ]);
+  }, [from, to, isLoading, result, error, account, currentNetwork, existingPair, prevExistingPair, prevFrom, prevTo]);
 
   if (!from || !to) {
     return [undefined, false, undefined];

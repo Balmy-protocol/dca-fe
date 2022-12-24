@@ -19,8 +19,8 @@ import { useAppDispatch } from 'state/hooks';
 import AddAddressPermissionModal from 'common/add-address-permission-modal';
 import Paper from '@mui/material/Paper';
 import usePositionService from 'hooks/usePositionService';
-import useWalletService from 'hooks/useWalletService';
 import { fullPositionToMappedPosition } from 'utils/parsing';
+import useAccount from 'hooks/useAccount';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;
@@ -56,8 +56,7 @@ const PositionPermissionsContainer = ({
   const hasModifiedPermissions = useHasModifiedPermissions();
   const modifiedPermissions = useModifiedPermissions();
   const positionService = usePositionService();
-  const walletService = useWalletService();
-  const account = walletService.getAccount();
+  const account = useAccount();
   const [shouldShowAddAddressModal, setShouldShowAddAddressModal] = React.useState(false);
   const dispatch = useAppDispatch();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();

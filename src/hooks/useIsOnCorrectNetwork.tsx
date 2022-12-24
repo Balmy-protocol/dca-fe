@@ -4,6 +4,7 @@ import isUndefined from 'lodash/isUndefined';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePrevious from './usePrevious';
 import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useIsOnCorrectNetwork() {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -11,8 +12,8 @@ function useIsOnCorrectNetwork() {
   const [result, setResult] = React.useState<boolean | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const currentNetwork = useCurrentNetwork();
-  const account = usePrevious(walletService.getAccount());
-  const currentAccount = walletService.getAccount();
+  const currentAccount = useAccount();
+  const account = usePrevious(currentAccount);
   const previousChainId = usePrevious(currentNetwork.chainId);
 
   React.useEffect(() => {

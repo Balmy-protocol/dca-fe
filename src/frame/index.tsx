@@ -28,6 +28,7 @@ import { NetworkStruct } from 'types';
 import useWalletService from 'hooks/useWalletService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import ErrorBoundary from 'common/error-boundary/indext';
+import useAccount from 'hooks/useAccount';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -79,6 +80,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
   const walletService = useWalletService();
   const mode = useThemeMode();
   const web3Service = useWeb3Service();
+  const account = useAccount();
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
 
   const theme = createTheme({
@@ -113,7 +115,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getNetwork();
-  }, []);
+  }, [account]);
 
   const isLoadingNetwork = !currentNetwork || !hasSetNetwork;
 

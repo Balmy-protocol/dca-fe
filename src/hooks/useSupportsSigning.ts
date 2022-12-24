@@ -2,16 +2,15 @@ import React from 'react';
 import isEqual from 'lodash/isEqual';
 import usePrevious from './usePrevious';
 import useWeb3Service from './useWeb3Service';
-import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useSupportsSigning(): [boolean | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const web3Service = useWeb3Service();
-  const walletService = useWalletService();
   const [result, setResult] = React.useState<boolean | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
-  const account = usePrevious(walletService.getAccount());
-  const currentAccount = walletService.getAccount();
+  const currentAccount = useAccount();
+  const account = usePrevious(currentAccount);
 
   React.useEffect(() => {
     async function callPromise() {

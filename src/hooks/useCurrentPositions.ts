@@ -3,12 +3,11 @@ import { Positions } from 'types';
 import { useAllTransactions } from 'state/transactions/hooks';
 import { useHasInitialized } from 'state/initializer/hooks';
 import usePositionService from './usePositionService';
-import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useCurrentPositions() {
   const positionService = usePositionService();
-  const walletService = useWalletService();
-  const account = walletService.getAccount();
+  const account = useAccount();
   const transactions = useAllTransactions();
   const hasFetchedCurrentPositions = positionService.getHasFetchedCurrentPositions();
   const hasInitialized = useHasInitialized();

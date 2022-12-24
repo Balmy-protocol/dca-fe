@@ -5,6 +5,7 @@ import isUndefined from 'lodash/isUndefined';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePrevious from './usePrevious';
 import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useConnectedNetwork(): [NetworkStruct | Network | undefined, boolean, string | undefined] {
   const [{ result, isLoading, error }, setResults] = React.useState<{
@@ -14,8 +15,8 @@ function useConnectedNetwork(): [NetworkStruct | Network | undefined, boolean, s
   }>({ result: undefined, isLoading: false, error: undefined });
   const walletService = useWalletService();
   const currentNetwork = useCurrentNetwork();
-  const account = usePrevious(walletService.getAccount());
-  const currentAccount = walletService.getAccount();
+  const currentAccount = useAccount();
+  const account = usePrevious(currentAccount);
   const prevResult = usePrevious(result, false);
 
   React.useEffect(() => {
