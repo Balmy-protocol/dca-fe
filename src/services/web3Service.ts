@@ -309,6 +309,11 @@ export default class Web3Service {
         package: WalletConnectProvider, // required
         options: {
           infuraId: '5744aff1d49f4eee923c5f3e5af4cc1c', // required
+          rpc: {
+            [NETWORKS.polygon.chainId]: NETWORKS.polygon.rpc[0],
+            [NETWORKS.optimism.chainId]: NETWORKS.optimism.rpc[0],
+            [NETWORKS.arbitrum.chainId]: NETWORKS.arbitrum.rpc[0],
+          },
         },
       },
       // frame: {
