@@ -8,6 +8,7 @@ import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
+import useAccount from './useAccount';
 
 function useMulticallBalances(
   tokens: string[] | undefined | null
@@ -27,8 +28,8 @@ function useMulticallBalances(
   const hasPendingTransactions = useHasPendingTransactions();
   const prevTokens = usePrevious(tokens);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(walletService.getAccount());
-  const account = walletService.getAccount();
+  const account = useAccount();
+  const prevAccount = usePrevious(account);
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);

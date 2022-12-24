@@ -4,20 +4,19 @@ import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { fullPositionToMappedPosition } from 'utils/parsing';
-import useWalletService from './useWalletService';
 import usePositionService from './usePositionService';
+import useAccount from './useAccount';
 
 function useIsCompanionApproved(position: FullPosition | undefined): [boolean | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
-  const walletService = useWalletService();
   const positionService = usePositionService();
   const [result, setResult] = React.useState<boolean | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(position);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = usePrevious(walletService.getAccount());
-  const currentAccount = walletService.getAccount();
+  const currentAccount = useAccount();
+  const account = usePrevious(currentAccount);
 
   React.useEffect(() => {
     async function callPromise() {

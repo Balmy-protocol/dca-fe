@@ -1,5 +1,6 @@
 import { ethers, BigNumber } from 'ethers';
 import { AxiosInstance, AxiosResponse } from 'axios';
+import React from 'react';
 import { Interface } from '@ethersproject/abi';
 import { TransactionResponse, Network } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
@@ -35,8 +36,12 @@ export default class WalletService {
     this.axiosClient = axiosClient;
   }
 
-  async setAccount(account?: string | null) {
+  async setAccount(account?: string | null, setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
     this.account = isUndefined(account) ? await this.providerService.getAddress() : account;
+
+    if (setAccountCallback) {
+      setAccountCallback(this.account || '');
+    }
   }
 
   getAccount() {
@@ -94,10 +99,6 @@ export default class WalletService {
   }
 
   async changeNetwork(newChainId: number, callbackBeforeReload?: () => void): Promise<void> {
-    if (!window.ethereum) {
-      return;
-    }
-
     try {
       const currentNetwork = await this.getNetwork(true);
       if (currentNetwork.chainId !== newChainId) {

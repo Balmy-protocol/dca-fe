@@ -7,8 +7,10 @@ import { BigNumber } from 'ethers';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useBalance(from: Token | undefined | null): [BigNumber | undefined, boolean, string?] {
+  const account = useAccount();
   const walletService = useWalletService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -23,8 +25,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(walletService.getAccount());
-  const account = walletService.getAccount();
+  const prevAccount = usePrevious(account);
   const currentNetwork = useCurrentNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);

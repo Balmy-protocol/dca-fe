@@ -4,13 +4,12 @@ import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import { YieldOptions } from 'types';
 import useCurrentNetwork from './useCurrentNetwork';
-import useWalletService from './useWalletService';
 import useYieldService from './useYieldService';
+import useAccount from './useAccount';
 
 function useYieldOptions(chainId?: number, useBlacklist = false): [YieldOptions | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const yieldService = useYieldService();
-  const walletService = useWalletService();
   const [result, setResult] = React.useState<YieldOptions | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const currentNetwork = useCurrentNetwork();
@@ -18,6 +17,7 @@ function useYieldOptions(chainId?: number, useBlacklist = false): [YieldOptions 
   const prevChainId = usePrevious(chainIdToUse);
   const prevUseBlacklist = usePrevious(useBlacklist);
   const prevResult = usePrevious(result, false);
+  const account = useAccount();
 
   React.useEffect(() => {
     async function callPromise() {
@@ -44,17 +44,7 @@ function useYieldOptions(chainId?: number, useBlacklist = false): [YieldOptions 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [
-    isLoading,
-    result,
-    error,
-    walletService.getAccount(),
-    currentNetwork,
-    chainIdToUse,
-    prevChainId,
-    useBlacklist,
-    prevUseBlacklist,
-  ]);
+  }, [isLoading, result, error, account, currentNetwork, chainIdToUse, prevChainId, useBlacklist, prevUseBlacklist]);
 
   return [result || prevResult, isLoading, error];
 }

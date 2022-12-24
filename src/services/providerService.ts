@@ -53,6 +53,12 @@ export default class ProviderService {
     return this.providerInfo;
   }
 
+  async getNetwork() {
+    const provider = await this.getBaseProvider();
+
+    return provider.getNetwork();
+  }
+
   getProvider(network?: Network) {
     if (this.signer) {
       return this.signer;
@@ -128,6 +134,9 @@ export default class ProviderService {
                 rpcUrls: network.rpc,
               },
             ]);
+            if (callbackBeforeReload) {
+              callbackBeforeReload();
+            }
             window.location.reload();
           }
         } catch (addError) {

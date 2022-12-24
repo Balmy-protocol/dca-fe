@@ -8,7 +8,7 @@ import { parseUnits } from '@ethersproject/units';
 import { STABLE_COINS } from 'config/constants';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
-import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useOracleQuote(
   from: Token | undefined | null,
@@ -16,7 +16,7 @@ function useOracleQuote(
 ): [BigNumber | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const priceService = usePriceService();
-  const walletService = useWalletService();
+  const account = useAccount();
   const [result, setResult] = React.useState<BigNumber | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const prevFrom = usePrevious(from);
@@ -47,7 +47,7 @@ function useOracleQuote(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, to, isLoading, result, error, walletService.getAccount(), currentNetwork]);
+  }, [from, to, isLoading, result, error, account, currentNetwork]);
 
   if (!from || !to) {
     return [undefined, false, undefined];

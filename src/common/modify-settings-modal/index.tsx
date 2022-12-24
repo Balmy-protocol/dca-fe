@@ -44,6 +44,7 @@ import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
+import useAccount from 'hooks/useAccount';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -78,6 +79,7 @@ interface ModifySettingsModalProps {
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
   const { swapInterval, from, version, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
+  const account = useAccount();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -113,8 +115,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     version
   );
   const [balance] = useBalance(fromToUse);
-  const hasPendingApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
-  const hasConfirmedApproval = useHasPendingApproval(fromToUse, walletService.getAccount(), fromHasYield);
+  const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield);
+  const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield);
   const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
   const [usdPrice] = useRawUsdPrice(from);
@@ -143,7 +145,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const needsToApprove =
     !hasConfirmedApproval &&
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
-    position.user === walletService.getAccount().toLowerCase() &&
+    position.user === account.toLowerCase() &&
     allowance.allowance &&
     allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
     allowance.token.address === fromToUse.address &&

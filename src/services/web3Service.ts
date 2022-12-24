@@ -25,6 +25,8 @@ import YieldService from './yieldService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 
+const WALLET_CONNECT_KEY = 'walletconnect';
+
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
 
@@ -47,6 +49,8 @@ export default class Web3Service {
   providerInfo: { id: string; logo: string; name: string };
 
   loadedAsSafeApp: boolean;
+
+  isConnected: boolean;
 
   contractService: ContractService;
 
@@ -217,8 +221,6 @@ export default class Web3Service {
 
   setAccount(account: string) {
     this.account = account;
-
-    this.setAccountCallback(account);
   }
 
   setNetwork(chainId: number) {
@@ -282,7 +284,9 @@ export default class Web3Service {
 
     this.setAccount(account);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.walletService.setAccount();
+    this.walletService.setAccount(undefined, this.setAccountCallback);
+
+    this.setNetwork((await this.providerService.getNetwork()).chainId);
 
     try {
       const arcxClient = this.getArcxClient();
@@ -305,10 +309,11 @@ export default class Web3Service {
     this.setAccount('');
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.walletService.setAccount(null);
+    this.walletService.setAccount(null, this.setAccountCallback);
 
-    this.providerService.setProvider(new ethers.providers.Web3Provider({}));
+    localStorage.removeItem(WALLET_CONNECT_KEY);
     this.setClient(new ethers.providers.Web3Provider({}));
+    this.providerService.setProvider(new ethers.providers.Web3Provider({}));
   }
 
   async setUpModal() {

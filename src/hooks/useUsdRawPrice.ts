@@ -9,6 +9,7 @@ import { STABLE_COINS } from 'config/constants';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
 import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useRawUsdPrice(
   from: Token | undefined | null,
@@ -28,6 +29,7 @@ function useRawUsdPrice(
   const walletService = useWalletService();
   const prevFrom = usePrevious(from);
   const currentNetwork = useCurrentNetwork();
+  const account = useAccount();
 
   React.useEffect(() => {
     async function callPromise() {
@@ -53,7 +55,7 @@ function useRawUsdPrice(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, walletService.getAccount(), currentNetwork, chainId]);
+  }, [from, isLoading, result, error, account, currentNetwork, chainId]);
 
   return [result, isLoading, error];
 }

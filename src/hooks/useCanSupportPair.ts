@@ -5,7 +5,7 @@ import usePrevious from 'hooks/usePrevious';
 import isUndefined from 'lodash/isUndefined';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import usePairService from './usePairService';
-import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 
 function useCanSupportPair(
   from: Token | undefined | null,
@@ -20,8 +20,7 @@ function useCanSupportPair(
   const prevTo = usePrevious(to);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevResult = usePrevious(result, false);
-  const walletService = useWalletService();
-  const account = walletService.getAccount();
+  const account = useAccount();
   const prevAccount = usePrevious(account);
 
   React.useEffect(() => {

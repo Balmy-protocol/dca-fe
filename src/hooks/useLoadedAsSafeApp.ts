@@ -1,10 +1,9 @@
 import React from 'react';
-import useWalletService from './useWalletService';
+import useAccount from './useAccount';
 import useWeb3Service from './useWeb3Service';
 
 function useLoadedAsSafeApp() {
-  const walletService = useWalletService();
-  const account = walletService.getAccount();
+  const account = useAccount();
   const web3Service = useWeb3Service();
 
   const loadedAsSafeApp: boolean = React.useMemo(() => web3Service.getLoadedAsSafeApp(), [account]);
