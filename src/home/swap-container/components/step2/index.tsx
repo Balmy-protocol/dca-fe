@@ -8,9 +8,8 @@ import { FormattedMessage } from 'react-intl';
 import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-easy-input';
 import {
-  DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
-  MINIMUM_USD_DEPOSIT_FOR_YIELD,
-  ONE_WEEK,
+  DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
+  MINIMUM_USD_RATE_FOR_YIELD,
   STRING_SWAP_INTERVALS,
   SWAP_INTERVALS_MAP,
 } from 'config/constants';
@@ -153,11 +152,9 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
 
   const currentNetwork = useCurrentNetwork();
 
-  const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
-
   const minimumTokensNeeded = usdPriceToToken(
     from,
-    MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
+    MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
     usdPrice
   );
 
@@ -266,33 +263,22 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
             )}
             {!yieldEnabled &&
               from &&
-              !!fromValueUsdPrice &&
-              fromValueUsdPrice <
-                (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD) && (
+              !!rateUsdPrice &&
+              rateUsdPrice <
+                (MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD) && (
                 <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                   <FormattedMessage
                     description="disabledByUsdValue"
                     // eslint-disable-next-line no-template-curly-in-string
-                    defaultMessage="You have to invest at least ${minimum} USD ({minToken} {symbol}) to enable this option."
+                    defaultMessage="You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to enable this option."
                     values={{
-                      minimum:
-                        MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
+                      minimum: MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
                       minToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
                       symbol: from.symbol,
+                      frequency:
+                        STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                          .singularTime,
                     }}
-                  />
-                </Typography>
-              )}
-            {!yieldEnabled &&
-              from &&
-              !!fromValueUsdPrice &&
-              fromValueUsdPrice >=
-                (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD) &&
-              !isAtLeastAWeek && (
-                <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                  <FormattedMessage
-                    description="disabledByUsdValue"
-                    defaultMessage="You have to set your position to run for at least 1 week to enable this option."
                   />
                 </Typography>
               )}

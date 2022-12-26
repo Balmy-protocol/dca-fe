@@ -2,13 +2,13 @@ import { YieldOption } from 'types';
 import { emptyTokenWithAddress } from 'utils/currency';
 import { NETWORKS } from './addresses';
 
-export const MINIMUM_USD_DEPOSIT_FOR_YIELD: Record<number, number> = {
+export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
   [NETWORKS.optimism.chainId]: 5,
-  [NETWORKS.arbitrum.chainId]: 10,
-  [NETWORKS.polygon.chainId]: 10,
+  [NETWORKS.arbitrum.chainId]: 5,
+  [NETWORKS.polygon.chainId]: 2.5,
 };
 
-export const DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD = 10;
+export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
 
 export const DISABLED_YIELDS = ['0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11'];
 

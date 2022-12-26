@@ -30,13 +30,15 @@ import {
   NETWORKS,
   MAX_UINT_32,
   LATEST_VERSION,
-  ONE_WEEK,
-  MINIMUM_USD_DEPOSIT_FOR_YIELD,
-  DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD,
+  MINIMUM_USD_RATE_FOR_YIELD,
+  DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
+  MINIMUM_USD_RATE_FOR_DEPOSIT,
+  DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
+  STRING_SWAP_INTERVALS,
 } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { emptyTokenWithAddress, parseUsdPrice } from 'utils/currency';
+import { emptyTokenWithAddress, parseUsdPrice, formatCurrencyAmount, usdPriceToToken } from 'utils/currency';
 import {
   useTransactionAdder,
   useHasPendingApproval,
@@ -46,7 +48,7 @@ import {
 import { calculateStale, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, EMPTY_TOKEN } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import useAllowance from 'hooks/useAllowance';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
@@ -203,23 +205,6 @@ const Swap = ({
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
     usdPrice
   );
-  let rateForUsdPrice: BigNumber | null = null;
-
-  try {
-    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
-    // eslint-disable-next-line no-empty
-  } catch {}
-
-  const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
-  const isAtLeastAWeek = !!frequencyValue && BigNumber.from(frequencyValue).mul(frequencyType).gte(ONE_WEEK);
-  const hasEnoughUsdForYield =
-    !!usdPrice &&
-    fromValueUsdPrice >=
-      (MINIMUM_USD_DEPOSIT_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_DEPOSIT_FOR_YIELD);
-
-  // only allowed if set for 10 days and at least 10 USD
-  const shouldEnableYield =
-    yieldEnabled && (fromCanHaveYield || toCanHaveYield) && isAtLeastAWeek && hasEnoughUsdForYield;
 
   React.useEffect(() => {
     if (!from) return;
@@ -233,6 +218,26 @@ const Swap = ({
         '0'
     );
   }, [from]);
+
+  let rateForUsdPrice: BigNumber | null = null;
+
+  try {
+    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
+    // eslint-disable-next-line no-empty
+  } catch {}
+
+  const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
+
+  const hasEnoughUsdForYield =
+    !!usdPrice &&
+    rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
+
+  const hasEnoughUsdForDeposit =
+    !!usdPrice &&
+    rateUsdPrice >= (MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT);
+
+  // only allowed if set for 10 days and at least 10 USD
+  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield) && hasEnoughUsdForYield;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const toggleWhaleMode = () => {
@@ -643,6 +648,7 @@ const Swap = ({
   );
 
   const swapsIsMax = BigNumber.from(frequencyValue || '0').gt(BigNumber.from(MAX_UINT_32));
+
   const StartPositionButton = (
     <StyledButton
       size="large"
@@ -693,6 +699,31 @@ const Swap = ({
     <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
       <Typography variant="body1">
         <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
+      </Typography>
+    </StyledButton>
+  );
+
+  const minimumTokensNeeded = usdPriceToToken(
+    from,
+    MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
+    usdPrice
+  );
+
+  const NoMinForDepositButton = (
+    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+      <Typography variant="body1">
+        <FormattedMessage
+          description="disabledDepositByUsdValue"
+          // eslint-disable-next-line no-template-curly-in-string
+          defaultMessage="You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to enable this option."
+          values={{
+            minimum: MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || MINIMUM_USD_RATE_FOR_DEPOSIT,
+            minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
+            symbol: from?.symbol || '',
+            frequency:
+              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularTime,
+          }}
+        />
       </Typography>
     </StyledButton>
   );
@@ -757,6 +788,8 @@ const Swap = ({
     ButtonToShow = NoFundsButton;
   } else if (!createStep) {
     ButtonToShow = NextStepButton;
+  } else if (!hasEnoughUsdForDeposit) {
+    ButtonToShow = NoMinForDepositButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
     ButtonToShow = ApproveTokenButton;
   } else if (isCreatingPair) {

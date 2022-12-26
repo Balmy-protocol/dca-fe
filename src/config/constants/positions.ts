@@ -2,6 +2,14 @@ import { Oracles, Permission, PositionActions, PositionStatus, TransactionTypesC
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
 
+export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
+  [NETWORKS.optimism.chainId]: 1,
+  [NETWORKS.arbitrum.chainId]: 1,
+  [NETWORKS.polygon.chainId]: 1,
+};
+
+export const DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT = 5;
+
 export const TRANSACTION_TYPES: TransactionTypesConstant = {
   NEW_POSITION: 'NEW_POSITION',
   NEW_PAIR: 'NEW_PAIR',
