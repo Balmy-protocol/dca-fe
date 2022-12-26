@@ -38,18 +38,13 @@ import {
 } from 'config/constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
-<<<<<<< HEAD
-import { emptyTokenWithAddress, parseUsdPrice } from 'utils/currency';
+import { emptyTokenWithAddress, parseUsdPrice, formatCurrencyAmount, usdPriceToToken } from 'utils/currency';
 import {
   useTransactionAdder,
   useHasPendingApproval,
   useHasPendingPairCreation,
   useHasConfirmedApproval,
 } from 'state/transactions/hooks';
-=======
-import { emptyTokenWithAddress, formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from 'utils/currency';
-import { useTransactionAdder, useHasPendingApproval, useHasPendingPairCreation } from 'state/transactions/hooks';
->>>>>>> 5b7a713 (feat(swap-container): add minimum rate for deposit)
 import { calculateStale, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
@@ -210,20 +205,6 @@ const Swap = ({
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
     usdPrice
   );
-  let rateForUsdPrice: BigNumber | null = null;
-
-  try {
-    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
-    // eslint-disable-next-line no-empty
-  } catch {}
-
-  const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
-  const hasEnoughUsdForYield =
-    !!usdPrice &&
-    rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
-
-  // only allowed if set for 10 days and at least 10 USD
-  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield) && hasEnoughUsdForYield;
 
   React.useEffect(() => {
     if (!from) return;
@@ -238,12 +219,14 @@ const Swap = ({
     );
   }, [from]);
 
-  let rateUsdPrice = 0;
+  let rateForUsdPrice: BigNumber | null = null;
+
   try {
-    rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
-  } catch {
-    rateUsdPrice = 0;
-  }
+    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
+    // eslint-disable-next-line no-empty
+  } catch {}
+
+  const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
 
   const hasEnoughUsdForYield =
     !!usdPrice &&
