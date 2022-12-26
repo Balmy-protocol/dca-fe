@@ -41,6 +41,7 @@ const getAvailablePairs = gql`
         createdAtTimestamp
       }
       createdAtTimestamp
+      lastSwappedAt
     }
   }
 `;
