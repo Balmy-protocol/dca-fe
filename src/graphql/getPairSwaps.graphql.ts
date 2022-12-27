@@ -34,7 +34,6 @@ const getPairSwaps = gql`
       }
       createdAtTimestamp
       activePositionsPerInterval
-      lastSwappedAt
       swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1) {
         id
         executedAtTimestamp

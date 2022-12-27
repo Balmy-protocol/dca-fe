@@ -1,8 +1,6 @@
 import * as React from 'react';
 import find from 'lodash/find';
 import Card from '@mui/material/Card';
-import findIndex from 'lodash/findIndex';
-import { DateTime } from 'luxon';
 import LinearProgress from '@mui/material/LinearProgress';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -11,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE, calculateYield } from 'utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
@@ -209,7 +207,6 @@ const ActivePosition = ({
     rateToUse,
     remainingSwaps
   );
-  const intervalIndex = findIndex(SWAP_INTERVALS_MAP, { value: swapInterval });
 
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase, undefined, chainId);
   const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield, undefined, chainId);
@@ -452,47 +449,6 @@ const ActivePosition = ({
               </>
             )}
           </StyledDetailWrapper>
-          {remainingSwaps.gt(BigNumber.from(0)) && !!pair?.nextSwapAvailableAt[intervalIndex] && (
-            <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage description="positionDetailsNextSwapTitle" defaultMessage="Next swap: " />
-              </Typography>
-              {DateTime.now().toSeconds() <
-                DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toSeconds() && (
-                <DarkTooltip
-                  title={DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toLocaleString(
-                    DateTime.DATETIME_FULL_WITH_SECONDS
-                  )}
-                  arrow
-                  placement="top"
-                >
-                  <Typography variant="body1">
-                    {DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toRelative()}
-                  </Typography>
-                </DarkTooltip>
-              )}
-              {DateTime.now().toSeconds() >
-                DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toSeconds() && (
-                <DarkTooltip
-                  title={
-                    <FormattedMessage
-                      description="positionDetailsNextSwapInProgressTooltip"
-                      defaultMessage="Market Makers should execute your swap anytime now"
-                    />
-                  }
-                  arrow
-                  placement="top"
-                >
-                  <Typography variant="body1">
-                    <FormattedMessage
-                      description="positionDetailsNextSwapInProgress"
-                      defaultMessage="swap in progress"
-                    />
-                  </Typography>
-                </DarkTooltip>
-              )}
-            </StyledDetailWrapper>
-          )}
           {!foundYieldFrom && !foundYieldTo && (
             <StyledDetailWrapper alignItems="flex-start" $spacing>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">

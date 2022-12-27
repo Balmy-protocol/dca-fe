@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
-import { FullPosition, LastSwappedAt, Position, SwapInfo, Token } from 'types';
+import { FullPosition, Position, SwapInfo, Token } from 'types';
 import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
@@ -218,24 +218,4 @@ export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, r
     yieldGenerated: yieldFromGenerated,
     base: remainingLiquidity.sub(yieldFromGenerated),
   };
-};
-
-export const calculateNextSwapAvailableAt = (
-  interval: BigNumber,
-  activePositionsPerInterval: SwapInfo,
-  lastSwappedAt: LastSwappedAt
-) => {
-  const intervalIndex = findIndex(SWAP_INTERVALS_MAP, { value: interval });
-  let nextSwapAvailableAt = 0;
-
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i <= intervalIndex; i++) {
-    if (activePositionsPerInterval[i]) {
-      const nextSwapAvailableAtForInterval = BigNumber.from(lastSwappedAt[i]).div(interval).add(1).mul(interval);
-      if (nextSwapAvailableAtForInterval.gt(nextSwapAvailableAt)) {
-        nextSwapAvailableAt = nextSwapAvailableAtForInterval.toNumber();
-      }
-    }
-  }
-  return nextSwapAvailableAt;
 };
