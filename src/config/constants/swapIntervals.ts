@@ -93,6 +93,7 @@ export const STRING_SWAP_INTERVALS = {
     adverb: 'every 1 minute',
     every: 'every 1 minute',
     subject: 'swaps',
+    singularSubject: 'minute',
   },
   [FIVE_MINUTES.toString()]: {
     singular: '5 minutes (1 swap)',
@@ -102,6 +103,7 @@ export const STRING_SWAP_INTERVALS = {
     adverb: 'every 5 minutes',
     every: 'every 5 minutes',
     subject: 'swaps',
+    singularSubject: '5 minutes',
   },
   [FIFTEEN_MINUTES.toString()]: {
     singular: '15 minutes (1 swap)',
@@ -111,6 +113,7 @@ export const STRING_SWAP_INTERVALS = {
     adverb: 'every 15 minutes',
     every: 'every 15 minutes',
     subject: 'swaps',
+    singularSubject: '15 minutes',
   },
   [THIRTY_MINUTES.toString()]: {
     singular: '30 minutes (1 swap)',
@@ -120,6 +123,7 @@ export const STRING_SWAP_INTERVALS = {
     adverb: 'every 30 minutes',
     every: 'every 30 minutes',
     subject: 'swaps',
+    singularSubject: '30 minutes',
   },
   [ONE_HOUR.toString()]: {
     singular: '1 hour (1 swap)',
@@ -129,6 +133,7 @@ export const STRING_SWAP_INTERVALS = {
     adverb: 'hourly',
     every: 'every hour',
     subject: 'swaps',
+    singularSubject: 'hour',
   },
   [FOUR_HOURS.toString()]: {
     singular: '4 hours (1 swap)',
@@ -138,6 +143,7 @@ export const STRING_SWAP_INTERVALS = {
     adverb: 'every 4 hours',
     every: 'every 4 hours',
     subject: 'swaps',
+    singularSubject: '4 hours',
   },
   [ONE_DAY.toString()]: {
     singular: '1 day (1 swap)',
@@ -147,6 +153,7 @@ export const STRING_SWAP_INTERVALS = {
     every: 'every day',
     adverb: 'daily',
     subject: 'days',
+    singularSubject: 'day',
   },
   [ONE_WEEK.toString()]: {
     singular: '1 week (1 swap)',
@@ -156,5 +163,6 @@ export const STRING_SWAP_INTERVALS = {
     every: 'every week',
     adverb: 'weekly',
     subject: 'weeks',
+    singularSubject: 'week',
   },
 };

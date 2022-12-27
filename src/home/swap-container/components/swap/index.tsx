@@ -715,13 +715,13 @@ const Swap = ({
         <FormattedMessage
           description="disabledDepositByUsdValue"
           // eslint-disable-next-line no-template-curly-in-string
-          defaultMessage="You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to enable this option."
+          defaultMessage="The position must have a minimum rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to be created."
           values={{
             minimum: MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || MINIMUM_USD_RATE_FOR_DEPOSIT,
             minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
             symbol: from?.symbol || '',
             frequency:
-              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularTime,
+              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject,
           }}
         />
       </Typography>

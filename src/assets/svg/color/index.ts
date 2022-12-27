@@ -154,6 +154,7 @@ import ETHOS from './ethos.svg';
 import ETN from './etn.svg';
 import ETP from './etp.svg';
 import EUR from './eur.svg';
+import EULER from './euler.svg';
 import EVX from './evx.svg';
 import EXMO from './exmo.svg';
 import EXP from './exp.svg';
@@ -1081,6 +1082,7 @@ const manifest = {
   ETHOS,
   ETN,
   ETP,
+  EULER,
   EUR,
   '0xf3db5fa2c66b7af3eb0c0b782510816cbe4813b8': EVX,
   EXMO,
