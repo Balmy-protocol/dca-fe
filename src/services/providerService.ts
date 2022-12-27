@@ -55,7 +55,7 @@ export default class ProviderService {
 
   async getNetwork() {
     const provider = await this.getBaseProvider();
-    if (provider.getNetwork) {
+    if (provider?.getNetwork) {
       return provider.getNetwork();
     }
     return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
