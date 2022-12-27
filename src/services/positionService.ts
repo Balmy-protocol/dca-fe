@@ -377,7 +377,7 @@ export default class PositionService {
     const permissionManagerAddress =
       permissionManagerAddressProvided || (await this.contractService.getPermissionManagerAddress(version));
     const signName = erc712Name || 'Mean Finance - DCA Position';
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
 
     const permissionManagerInstance = new ethers.Contract(
@@ -478,7 +478,7 @@ export default class PositionService {
     const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
     let permissionsPermit: PermissionPermit | undefined;
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const fromToUse =
       position.from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.from.address;
@@ -610,7 +610,7 @@ export default class PositionService {
 
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const companionAddress = await this.contractService.getHUBCompanionAddress();
 
@@ -670,7 +670,7 @@ export default class PositionService {
   }
 
   async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : position.to;
 
@@ -722,7 +722,7 @@ export default class PositionService {
   }
 
   async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
     if (
@@ -812,7 +812,7 @@ export default class PositionService {
     useWrappedProtocolToken: boolean
   ): Promise<TransactionResponse> {
     const hubInstance = await this.contractService.getHubInstance(position.version);
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
@@ -933,7 +933,7 @@ export default class PositionService {
 
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
     let { id } = typeData;
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
     const protocolToken = getProtocolToken(network.chainId);
     const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
 

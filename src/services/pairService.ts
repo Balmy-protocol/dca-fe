@@ -100,7 +100,7 @@ export default class PairService {
   }
 
   async fetchAvailablePairs() {
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
     const client = (
       this.apolloClient[LATEST_VERSION][network.chainId] ||
       this.apolloClient[LATEST_VERSION][DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId]
@@ -205,7 +205,7 @@ export default class PairService {
       return ORACLES.CHAINLINK;
     }
 
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const [tokenA, tokenB] = sortTokensByAddress(
       pair.tokenA === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : pair.tokenA,
@@ -261,7 +261,7 @@ export default class PairService {
   async getPairLiquidity(token0: Token, token1: Token) {
     let tokenA;
     let tokenB;
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     if (token0.address < token1.address) {
       tokenA = token0.address;
       tokenB = token1.address;
@@ -298,7 +298,7 @@ export default class PairService {
     // if they are not connected we show everything as available
     if (!this.providerService.getProvider()) return true;
 
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     const token0 = tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenFrom;
     const token1 = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenTo;

@@ -95,10 +95,6 @@ export default class Web3Service {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
     }
-
-    if (client) {
-      this.client = client;
-    }
     if (modal) {
       this.modal = modal;
     }
@@ -116,15 +112,14 @@ export default class Web3Service {
     // initialize services
     this.providerService = new ProviderService(client);
     // this.contractService = new ContractService(this.providerService); //
-    this.contractService = new ContractService(client); // pasar a this.provider en vez de client
-    this.transactionService = new TransactionService(client);
+    this.contractService = new ContractService(this.providerService);
+    this.transactionService = new TransactionService(this.contractService, this.providerService);
     this.walletService = new WalletService(this.contractService, this.axiosClient, this.providerService);
     this.meanApiService = new MeanApiService(
       this.walletService,
       this.contractService,
       this.axiosClient,
-      this.providerService,
-      client
+      this.providerService
     );
     this.pairService = new PairService(
       this.walletService,
@@ -134,7 +129,7 @@ export default class Web3Service {
       this.apolloClient,
       this.uniClient
     );
-    this.yieldService = new YieldService(this.walletService, this.axiosClient, client);
+    this.yieldService = new YieldService(this.walletService, this.providerService, this.axiosClient);
     this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient);
     this.aggregatorService = new AggregatorService(
       this.walletService,
@@ -151,7 +146,12 @@ export default class Web3Service {
       this.apolloClient,
       this.providerService
     );
-    this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
+    this.priceService = new PriceService(
+      this.walletService,
+      this.contractService,
+      this.axiosClient,
+      this.providerService
+    );
     this.errorService = new ErrorService(this.meanApiService);
     this.simulationService = new SimulationService(this.meanApiService, this.providerService);
   }
@@ -204,6 +204,10 @@ export default class Web3Service {
     return this.walletService;
   }
 
+  getProviderService() {
+    return this.providerService;
+  }
+
   getPriceService() {
     return this.priceService;
   }
@@ -230,12 +234,6 @@ export default class Web3Service {
 
   // GETTERS AND SETTERS
   setClient(client: ethers.providers.Web3Provider) {
-    this.client = client;
-
-    // [TODO] Refactor so there is only one source of truth
-    // set client for services
-    this.contractService.setClient(client);
-    this.transactionService.setClient(client);
     this.providerService.setProvider(client);
   }
 

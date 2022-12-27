@@ -3,21 +3,19 @@ import { LogDescription } from '@ethersproject/abi';
 import { Log } from '@ethersproject/providers';
 
 import ContractService from './contractService';
+import ProviderService from './providerService';
 
 export default class TransactionService {
-  client: ethers.providers.Web3Provider;
-
   contractService: ContractService;
+
+  providerService: ProviderService;
 
   loadedAsSafeApp: boolean;
 
-  constructor(client?: ethers.providers.Web3Provider) {
-    if (client) {
-      this.client = client;
-    }
-
+  constructor(contractService: ContractService, providerService: ProviderService) {
     this.loadedAsSafeApp = false;
-    this.contractService = new ContractService();
+    this.providerService = providerService;
+    this.contractService = contractService;
   }
 
   getLoadedAsSafeApp() {
@@ -28,43 +26,38 @@ export default class TransactionService {
     this.loadedAsSafeApp = loadedAsSafeApp;
   }
 
-  // GETTERS AND SETTERS
-  setClient(client: ethers.providers.Web3Provider) {
-    this.client = client;
-    this.contractService.setClient(client);
-  }
-
   // TRANSACTION HANDLING
   getTransactionReceipt(txHash: string) {
-    return this.client.getTransactionReceipt(txHash);
+    return this.providerService.provider.getTransactionReceipt(txHash);
   }
 
   getTransaction(txHash: string) {
-    return this.client.getTransaction(txHash);
+    return this.providerService.provider.getTransaction(txHash);
   }
 
   waitForTransaction(txHash: string) {
-    return this.client.waitForTransaction(txHash);
+    return this.providerService.provider.waitForTransaction(txHash);
   }
 
   getBlockNumber() {
-    return this.client.getBlockNumber();
+    return this.providerService.provider.getBlockNumber();
   }
 
   onBlock(callback: ((blockNumber: Promise<number>) => Promise<void>) | ((blockNumber: number) => void)) {
     if (this.loadedAsSafeApp) {
       return window.setInterval(
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        () => (callback as (blockNumber: Promise<number>) => Promise<void>)(this.client.getBlockNumber()),
+        () =>
+          (callback as (blockNumber: Promise<number>) => Promise<void>)(this.providerService.provider.getBlockNumber()),
         10000
       );
     }
 
-    return this.client.on('block', callback as (blockNumber: number) => void);
+    return this.providerService.provider.on('block', callback as (blockNumber: number) => void);
   }
 
   removeOnBlock() {
-    return this.client.off('block');
+    return this.providerService.provider.off('block');
   }
 
   async parseLog(logs: Log[], chainId: number, eventToSearch: string) {

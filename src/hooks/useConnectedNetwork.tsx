@@ -4,7 +4,7 @@ import { Network, NetworkStruct } from 'types';
 import isUndefined from 'lodash/isUndefined';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePrevious from './usePrevious';
-import useWalletService from './useWalletService';
+import useProviderService from './useProviderService';
 import useAccount from './useAccount';
 
 function useConnectedNetwork(): [NetworkStruct | Network | undefined, boolean, string | undefined] {
@@ -13,7 +13,7 @@ function useConnectedNetwork(): [NetworkStruct | Network | undefined, boolean, s
     isLoading: boolean;
     error: string | undefined;
   }>({ result: undefined, isLoading: false, error: undefined });
-  const walletService = useWalletService();
+  const providerService = useProviderService();
   const currentNetwork = useCurrentNetwork();
   const currentAccount = useAccount();
   const account = usePrevious(currentAccount);
@@ -22,7 +22,7 @@ function useConnectedNetwork(): [NetworkStruct | Network | undefined, boolean, s
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const promiseResult = await walletService.getNetwork(true);
+        const promiseResult = await providerService.getNetwork();
         setResults({ result: promiseResult, isLoading: false, error: undefined });
       } catch (e) {
         setResults({ result: undefined, isLoading: false, error: e as string });

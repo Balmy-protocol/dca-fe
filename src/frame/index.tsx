@@ -29,7 +29,7 @@ import Vector1 from 'assets/svg/vector1.svg';
 import Vector2 from 'assets/svg/vector2.svg';
 import find from 'lodash/find';
 import { NetworkStruct } from 'types';
-import useWalletService from 'hooks/useWalletService';
+import useProviderService from 'hooks/useProviderService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import ErrorBoundary from 'common/error-boundary/indext';
 import useAccount from 'hooks/useAccount';
@@ -101,7 +101,7 @@ const StyledFooterGridContainer = styled(Grid)`
   flex: 0;
 `;
 const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
-  const walletService = useWalletService();
+  const providerService = useProviderService();
   const mode = useThemeMode();
   const web3Service = useWeb3Service();
   const account = useAccount();
@@ -180,7 +180,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
   React.useEffect(() => {
     async function getNetwork() {
       try {
-        const web3Network = await walletService.getNetwork();
+        const web3Network = await providerService.getNetwork();
         const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
         if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
           dispatch(setNetwork(networkToSet as NetworkStruct));

@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
 import { DefillamaResponse, YieldOptions } from 'types';
@@ -7,28 +6,23 @@ import { DefillamaResponse, YieldOptions } from 'types';
 import { ALLOWED_YIELDS, DISABLED_YIELDS } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
 import WalletService from './walletService';
+import ProviderService from './providerService';
 
 export default class YieldService {
   axiosClient: AxiosInstance;
 
+  providerService: ProviderService;
+
   walletService: WalletService;
 
-  client: ethers.providers.Web3Provider;
-
-  constructor(walletService: WalletService, axiosClient: AxiosInstance, client?: ethers.providers.Web3Provider) {
-    if (client) {
-      this.client = client;
-    }
+  constructor(walletService: WalletService, providerService: ProviderService, axiosClient: AxiosInstance) {
     this.walletService = walletService;
+    this.providerService = providerService;
     this.axiosClient = axiosClient;
   }
 
-  setClient(client: ethers.providers.Web3Provider) {
-    this.client = client;
-  }
-
   async getYieldOptions(chainId?: number, useBlacklist = false): Promise<YieldOptions> {
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     const chainidTouse = chainId || network.chainId;
 

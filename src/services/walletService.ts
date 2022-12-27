@@ -68,11 +68,6 @@ export default class WalletService {
     );
   }
 
-  async getNetwork(skipDefaultNetwork = false) {
-    // [TODO] Remove references to walletService.getNetwork()
-    return this.contractService.getNetwork(skipDefaultNetwork);
-  }
-
   async getEns(address: string) {
     let ens = null;
 
@@ -80,7 +75,7 @@ export default class WalletService {
       return ens;
     }
 
-    const currentNetwork = await this.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     if (currentNetwork.chainId === NETWORKS.arbitrum.chainId) {
       try {
@@ -110,7 +105,7 @@ export default class WalletService {
 
   async changeNetwork(newChainId: number, callbackBeforeReload?: () => void): Promise<void> {
     try {
-      const currentNetwork = await this.getNetwork(true);
+      const currentNetwork = await this.providerService.getNetwork();
       if (currentNetwork.chainId !== newChainId) {
         await this.providerService.changeNetwork(newChainId, callbackBeforeReload);
       }
@@ -121,7 +116,7 @@ export default class WalletService {
 
   async getMulticallBalances(addresses?: string[]): Promise<Record<string, BigNumber>> {
     const account = this.getAccount();
-    const currentNetwork = await this.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     if (!addresses?.length || !account) return Promise.resolve({});
 

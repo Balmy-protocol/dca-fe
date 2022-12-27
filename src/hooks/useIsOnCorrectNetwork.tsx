@@ -3,12 +3,12 @@ import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePrevious from './usePrevious';
-import useWalletService from './useWalletService';
+import useProviderService from './useProviderService';
 import useAccount from './useAccount';
 
 function useIsOnCorrectNetwork() {
   const [isLoading, setIsLoading] = React.useState(false);
-  const walletService = useWalletService();
+  const providerService = useProviderService();
   const [result, setResult] = React.useState<boolean | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
   const currentNetwork = useCurrentNetwork();
@@ -19,7 +19,7 @@ function useIsOnCorrectNetwork() {
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const promiseResult = await walletService.getNetwork(true);
+        const promiseResult = await providerService.getNetwork();
         const isSameNetwork = currentNetwork.chainId === promiseResult.chainId;
         setResult(isSameNetwork);
         setError(undefined);

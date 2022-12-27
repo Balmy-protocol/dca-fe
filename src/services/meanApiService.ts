@@ -41,12 +41,8 @@ export default class MeanApiService {
     walletService: WalletService,
     contractService: ContractService,
     axiosClient: AxiosInstance,
-    providerService: ProviderService,
-    client?: ethers.providers.Web3Provider
+    providerService: ProviderService
   ) {
-    if (client) {
-      this.client = client;
-    }
     this.walletService = walletService;
     this.axiosClient = axiosClient;
     this.contractService = contractService;
@@ -60,10 +56,6 @@ export default class MeanApiService {
 
   setLoadedAsSafeApp(loadedAsSafeApp: boolean) {
     this.loadedAsSafeApp = loadedAsSafeApp;
-  }
-
-  setClient(client: ethers.providers.Web3Provider) {
-    this.client = client;
   }
 
   getDeadlineSlippageDefault() {
@@ -94,7 +86,7 @@ export default class MeanApiService {
     account: string,
     permissions: { operator: string; permissions: number[] }[]
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const fromToUse = from === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from;
@@ -131,7 +123,7 @@ export default class MeanApiService {
     account: string,
     permissions: { operator: string; permissions: string[] }[]
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const hubAddress = await this.contractService.getHUBAddress();
     const toTouse = to === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to;
@@ -184,7 +176,7 @@ export default class MeanApiService {
     convertTo: string,
     permissionPermit?: PermissionPermit
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
     // Call to api and get transaction
@@ -215,7 +207,7 @@ export default class MeanApiService {
     tokenTo: string,
     permissionPermit?: PermissionPermit
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
     // Call to api and get transaction
@@ -246,7 +238,7 @@ export default class MeanApiService {
     tokenFrom: string,
     permissionPermit?: PermissionPermit
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
     // Call to api and get transaction
@@ -277,7 +269,7 @@ export default class MeanApiService {
     tokenFrom: string,
     permissionPermit?: PermissionPermit
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
 
     // Call to api and get transaction
@@ -311,7 +303,7 @@ export default class MeanApiService {
     positionVersion: PositionVersions,
     permissionPermit?: PermissionPermit
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress(positionVersion);
     const newHubAddress = await this.contractService.getHUBAddress(LATEST_VERSION);
 
@@ -336,7 +328,7 @@ export default class MeanApiService {
   }
 
   async getAllowedPairs(): Promise<AllowedPairs> {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     try {
       const allowedPairsResponse = await this.axiosClient.get<MeanFinanceAllowedPairsResponse>(
         `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/config`

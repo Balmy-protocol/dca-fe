@@ -4,8 +4,7 @@ import { DCAHubCompanion__factory } from '@mean-finance/dca-v2-periphery/dist';
 import { OracleAggregator__factory } from '@mean-finance/oracles/dist';
 import { TransformerRegistry__factory } from '@mean-finance/transformers/dist';
 import { ethers, Signer } from 'ethers';
-import { Network, getNetwork as getStringNetwork, Provider, AlchemyProvider } from '@ethersproject/providers';
-import detectEthereumProvider from '@metamask/detect-provider';
+import { Network, AlchemyProvider } from '@ethersproject/providers';
 import find from 'lodash/find';
 // import allExportedFromTypechained from '@mean-finance/typechained/lib';
 
@@ -29,10 +28,10 @@ import {
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
   TRANSFORMER_REGISTRY_ADDRESS,
-  DEFAULT_NETWORK_FOR_VERSION,
   SMOL_DOMAIN_ADDRESS,
 } from 'config/constants';
 import { ERC20Contract, HubContract, OEGasOracle, OracleContract, SmolDomainContract } from 'types';
+import ProviderService from './providerService';
 
 export default class ContractService {
   client: ethers.providers.Web3Provider;
@@ -41,22 +40,16 @@ export default class ContractService {
 
   signer: Signer;
 
-  constructor(client?: ethers.providers.Web3Provider, chainId?: number) {
-    if (client) {
-      this.client = client;
-    }
+  providerService: ProviderService;
 
+  constructor(providerService: ProviderService, chainId?: number) {
+    this.providerService = providerService;
     if (chainId) {
       const foundNetwork = find(NETWORKS, { chainId });
       if (foundNetwork) {
         this.network = foundNetwork;
       }
     }
-  }
-
-  setClient(client: ethers.providers.Web3Provider) {
-    this.client = client;
-    this.signer = client.getSigner();
   }
 
   setNetwork(chainId: number) {
@@ -66,66 +59,15 @@ export default class ContractService {
     }
   }
 
-  getProvider() {
-    if (this.signer) {
-      return this.signer;
-    }
-
-    if (this.client) {
-      return this.client;
-    }
-
-    try {
-      return ethers.getDefaultProvider(getStringNetwork(this.network.name), {
-        infura: 'd729b4ddc49d4ce88d4e23865cb74217',
-        etherscan: '4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF',
-      });
-    } catch {
-      return detectEthereumProvider() as Promise<Provider>;
-    }
-  }
-
-  async getNetwork(skipDefaultNetwork = false) {
-    if (!skipDefaultNetwork && this.network) {
-      return this.network;
-    }
-
-    try {
-      if (this.client) {
-        return await this.client.getNetwork();
-      }
-    } catch (e) {
-      console.error('Failed to getNetwork through this.client');
-    }
-
-    try {
-      if (window.ethereum) {
-        if (window.ethereum.isMetaMask) {
-          // eslint-disable-next-line no-underscore-dangle
-          if (window?.ethereum?._state?.initialized || window?.ethereum?._state?.isUnlocked) {
-            // eslint-disable-next-line no-underscore-dangle
-            return await new ethers.providers.Web3Provider(window.ethereum).getNetwork();
-          }
-        } else {
-          return await new ethers.providers.Web3Provider(window.ethereum).getNetwork();
-        }
-      }
-    } catch (e) {
-      console.error('Failed to getNetwork through metamask');
-    }
-
-    return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
-  }
-
   // ADDRESSES
   async getHUBAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     return HUB_ADDRESS[version || LATEST_VERSION][network.chainId] || HUB_ADDRESS[LATEST_VERSION][network.chainId];
   }
 
   async getPermissionManagerAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     return (
       PERMISSION_MANAGER_ADDRESS[version || LATEST_VERSION][network.chainId] ||
@@ -134,7 +76,7 @@ export default class ContractService {
   }
 
   async getTransformerRegistryAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     return (
       TRANSFORMER_REGISTRY_ADDRESS[version || LATEST_VERSION][network.chainId] ||
@@ -143,7 +85,7 @@ export default class ContractService {
   }
 
   async getHUBCompanionAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     return (
       COMPANION_ADDRESS[version || LATEST_VERSION][network.chainId] ||
@@ -152,7 +94,7 @@ export default class ContractService {
   }
 
   async getOracleAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     return (
       ORACLE_ADDRESS[version || LATEST_VERSION][network.chainId] || ORACLE_ADDRESS[LATEST_VERSION][network.chainId]
@@ -160,7 +102,7 @@ export default class ContractService {
   }
 
   async getChainlinkOracleAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     return (
       CHAINLINK_ORACLE_ADDRESS[version || LATEST_VERSION][network.chainId] ||
@@ -169,7 +111,7 @@ export default class ContractService {
   }
 
   async getUniswapOracleAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     return (
       UNISWAP_ORACLE_ADDRESS[version || LATEST_VERSION][network.chainId] ||
@@ -178,7 +120,7 @@ export default class ContractService {
   }
 
   async getSmolDomainAddress(): Promise<string> {
-    const network = await this.getNetwork();
+    const network = await this.providerService.getNetwork();
 
     return SMOL_DOMAIN_ADDRESS[network.chainId];
   }
@@ -186,7 +128,7 @@ export default class ContractService {
   // CONTRACTS
   async getHubInstance(version?: PositionVersions): Promise<HubContract> {
     const hubAddress = await this.getHUBAddress(version || LATEST_VERSION);
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
 
     const hub = DCAHub__factory.connect(hubAddress, provider as Signer);
 
@@ -200,42 +142,42 @@ export default class ContractService {
 
   async getPermissionManagerInstance(version?: PositionVersions) {
     const permissionManagerAddress = await this.getPermissionManagerAddress(version || LATEST_VERSION);
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
 
     return DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
   }
 
   async getTransformerRegistryInstance(version?: PositionVersions) {
     const transformerRegistryAddress = await this.getTransformerRegistryAddress(version || LATEST_VERSION);
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
 
     return TransformerRegistry__factory.connect(transformerRegistryAddress, provider);
   }
 
   async getHUBCompanionInstance(version?: PositionVersions) {
     const hubCompanionAddress = await this.getHUBCompanionAddress(version || LATEST_VERSION);
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
 
     return DCAHubCompanion__factory.connect(hubCompanionAddress, provider);
   }
 
   async getOracleInstance(version?: PositionVersions) {
     const oracleAddress = await this.getOracleAddress(version || LATEST_VERSION);
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
 
     return OracleAggregator__factory.connect(oracleAddress, provider);
   }
 
   async getChainlinkOracleInstance(version?: PositionVersions): Promise<OracleContract> {
     const chainlinkOracleAddress = await this.getChainlinkOracleAddress(version || LATEST_VERSION);
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
 
     return new ethers.Contract(chainlinkOracleAddress, CHAINLINK_ORACLE_ABI.abi, provider) as unknown as OracleContract;
   }
 
   async getUniswapOracleInstance(version?: PositionVersions): Promise<OracleContract> {
     const uniswapOracleAddress = await this.getUniswapOracleAddress(version || LATEST_VERSION);
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
 
     return new ethers.Contract(uniswapOracleAddress, UNISWAP_ORACLE_ABI.abi, provider) as unknown as OracleContract;
   }
@@ -246,19 +188,19 @@ export default class ContractService {
     if (!this.client || !this.signer || this.network.chainId !== NETWORKS.optimism.chainId) {
       provider = new AlchemyProvider('optimism', 'rMtUNxulZtkQesuF2x8XwydCS_SfsF5U');
     } else {
-      provider = await this.getProvider();
+      provider = await this.providerService.getProvider();
     }
     return new ethers.Contract(OE_GAS_ORACLE_ADDRESS, OE_GAS_ORACLE_ABI.abi, provider) as unknown as OEGasOracle;
   }
 
   async getTokenInstance(tokenAddress: string): Promise<ERC20Contract> {
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
 
     return new ethers.Contract(tokenAddress, ERC20ABI, provider) as unknown as ERC20Contract;
   }
 
   async getSmolDomainInstance(): Promise<SmolDomainContract> {
-    const provider = await this.getProvider();
+    const provider = await this.providerService.getProvider();
     const smolDomainAddress = await this.getSmolDomainAddress();
 
     return new ethers.Contract(smolDomainAddress, SMOL_DOMAIN_ABI, provider) as unknown as SmolDomainContract;
