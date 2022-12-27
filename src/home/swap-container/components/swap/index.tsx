@@ -721,7 +721,7 @@ const Swap = ({
             minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
             symbol: from?.symbol || '',
             frequency:
-              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularTime,
+              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject,
           }}
         />
       </Typography>

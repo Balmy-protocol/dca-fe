@@ -263,7 +263,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                       symbol: from.symbol,
                       frequency:
                         STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                          .singularTime,
+                          .singularSubject,
                     }}
                   />
                 </Typography>
