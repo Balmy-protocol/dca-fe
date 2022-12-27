@@ -157,7 +157,7 @@ const PositionDetailFrame = () => {
   const addTransaction = useTransactionAdder();
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
-  const positionInUse = usePositionDetails();
+  const positionInUse = usePositionDetails(position?.id);
   const [[toWithdrawUnderlying, swappedUnderlying, remainingLiquidityUnderlying], isLoadingUnderlyings] =
     useUnderlyingAmount([
       {

@@ -2,6 +2,7 @@ import React from 'react';
 import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import some from 'lodash/some';
+import every from 'lodash/every';
 import usePrevious from 'hooks/usePrevious';
 import { BigNumber } from 'ethers';
 import useMeanApiService from './useMeanApiService';
@@ -70,6 +71,10 @@ function useUnderlyingAmount(
       callPromise();
     }
   }, [isLoading, result, error, tokens, prevTokens]);
+
+  if (every(tokens, { returnSame: true })) {
+    return [tokens.map((tokenObj) => tokenObj.amount || BigNumber.from(0)), isLoading, error];
+  }
 
   return [result, isLoading, error];
 }
