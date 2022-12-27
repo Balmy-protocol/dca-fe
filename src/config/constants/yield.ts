@@ -3,9 +3,9 @@ import { emptyTokenWithAddress } from 'utils/currency';
 import { NETWORKS } from './addresses';
 
 export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
+  [NETWORKS.polygon.chainId]: 2.5,
   [NETWORKS.optimism.chainId]: 5,
-  [NETWORKS.arbitrum.chainId]: 10,
-  [NETWORKS.polygon.chainId]: 10,
+  [NETWORKS.arbitrum.chainId]: 5,
   [NETWORKS.mainnet.chainId]: 10,
 };
 
