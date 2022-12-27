@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber } from 'ethers';
 import findKey from 'lodash/findKey';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import { AxiosInstance, AxiosResponse } from 'axios';
