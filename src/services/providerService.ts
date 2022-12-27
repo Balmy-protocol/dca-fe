@@ -1,6 +1,6 @@
 import { BigNumber, ethers, Signer } from 'ethers';
 import find from 'lodash/find';
-import { NETWORKS } from 'config';
+import { NETWORKS, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config/constants';
 import { getNetwork as getStringNetwork, Provider, Network, TransactionRequest } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
 
@@ -55,8 +55,10 @@ export default class ProviderService {
 
   async getNetwork() {
     const provider = await this.getBaseProvider();
-
-    return provider.getNetwork();
+    if (provider.getNetwork) {
+      return provider.getNetwork();
+    }
+    return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
 
   getProvider(network?: Network) {
@@ -65,6 +67,10 @@ export default class ProviderService {
     }
 
     return this.getBaseProvider(network);
+  }
+
+  getGasPrice() {
+    return this.provider.getGasPrice();
   }
 
   getBaseProvider(network?: Network) {

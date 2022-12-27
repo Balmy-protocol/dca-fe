@@ -21,6 +21,7 @@ import {
 import { emptyTokenWithAddress } from 'utils/currency';
 import ContractService from './contractService';
 import WalletService from './walletService';
+import ProviderService from './providerService';
 
 interface TokenWithBase extends Token {
   isBaseToken: boolean;
@@ -35,29 +36,23 @@ export default class PriceService {
 
   contractService: ContractService;
 
-  client: ethers.providers.Web3Provider;
+  providerService: ProviderService;
 
   constructor(
     walletService: WalletService,
     contractService: ContractService,
     axiosClient: AxiosInstance,
-    client?: ethers.providers.Web3Provider
+    providerService: ProviderService
   ) {
-    if (client) {
-      this.client = client;
-    }
     this.walletService = walletService;
     this.axiosClient = axiosClient;
     this.contractService = contractService;
-  }
-
-  setClient(client: ethers.providers.Web3Provider) {
-    this.client = client;
+    this.providerService = providerService;
   }
 
   // TOKEN METHODS
   async getUsdPrice(token: Token) {
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
     const price = await this.axiosClient.get<Record<string, { usd: number }>>(
       `https://api.coingecko.com/api/v3/simple/token_price/${
         COINGECKO_IDS[network.chainId] || COINGECKO_IDS[DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId]
@@ -70,7 +65,7 @@ export default class PriceService {
   }
 
   async getUsdHistoricPrice(tokens: Token[], date?: string, chainId?: number) {
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
     const defillamaId = DEFILLAMA_IDS[chainIdToUse] || findKey(NETWORKS, { chainId: chainIdToUse });
     if (!tokens.length || !defillamaId) {
@@ -175,7 +170,7 @@ export default class PriceService {
   }
 
   async getTokenQuote(from: Token, to: Token, fromAmount: BigNumber) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const fromToUse = from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from;
     const toToUse = to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to;
@@ -186,13 +181,13 @@ export default class PriceService {
   }
 
   async getGasPrice() {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     if (currentNetwork.chainId !== NETWORKS.optimism.chainId && currentNetwork.chainId !== NETWORKS.polygon.chainId)
       return BigNumber.from(0);
 
     if (currentNetwork.chainId === NETWORKS.optimism.chainId) {
-      return this.client.getGasPrice();
+      return this.providerService.getGasPrice();
     }
 
     if (currentNetwork.chainId === NETWORKS.polygon.chainId) {
@@ -215,7 +210,7 @@ export default class PriceService {
   }
 
   async getL1GasPrice(data: string) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     if (currentNetwork.chainId !== NETWORKS.optimism.chainId) return BigNumber.from(0);
 
@@ -313,7 +308,7 @@ export default class PriceService {
   ) {
     if (!token0 || !token1) return Promise.resolve();
 
-    const chain = await this.walletService.getNetwork();
+    const chain = await this.providerService.getNetwork();
 
     let tokenA = token0;
     let tokenB = token1;
