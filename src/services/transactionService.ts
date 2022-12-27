@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { LogDescription } from '@ethersproject/abi';
 import { Log } from '@ethersproject/providers';
 
