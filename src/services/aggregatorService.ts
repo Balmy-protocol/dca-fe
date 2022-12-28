@@ -14,6 +14,7 @@ import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import MeanApiService from './meanApiService';
+import ProviderService from './providerService';
 
 export default class AggregatorService {
   modal: SafeAppWeb3Modal;
@@ -28,16 +29,20 @@ export default class AggregatorService {
 
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
+  providerService: ProviderService;
+
   constructor(
     walletService: WalletService,
     contractService: ContractService,
     meanApiService: MeanApiService,
-    DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>
+    DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
+    providerService: ProviderService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
     this.meanApiService = meanApiService;
     this.apolloClient = DCASubgraph;
+    this.providerService = providerService;
   }
 
   getSigner() {
@@ -45,9 +50,7 @@ export default class AggregatorService {
   }
 
   async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
-    const signer = this.walletService.getSigner();
-
-    const gasUsed = await signer.estimateGas(tx);
+    const gasUsed = await this.providerService.estimateGas(tx);
 
     return {
       ...tx,
@@ -56,11 +59,9 @@ export default class AggregatorService {
   }
 
   async swap(route: SwapOption) {
-    const signer = this.walletService.getSigner();
-
     const transactionToSend = await this.addGasLimit(route.tx);
 
-    return signer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async getSwapOptions(

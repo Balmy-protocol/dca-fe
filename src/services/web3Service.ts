@@ -129,7 +129,8 @@ export default class Web3Service {
       this.walletService,
       this.contractService,
       this.meanApiService,
-      this.apolloClient
+      this.apolloClient,
+      this.providerService
     );
     this.positionService = new PositionService(
       this.walletService,

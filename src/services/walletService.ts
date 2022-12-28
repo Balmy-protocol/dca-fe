@@ -173,7 +173,9 @@ export default class WalletService {
 
     const ERC20Interface = new Interface(ERC20ABI);
 
-    const erc20 = new ethers.Contract(address, ERC20Interface, this.client) as unknown as ERC20Contract;
+    const provider = await this.providerService.getProvider();
+
+    const erc20 = new ethers.Contract(address, ERC20Interface, provider) as unknown as ERC20Contract;
 
     const balanceCall = erc20.populateTransaction.balanceOf(account).then((populatedTransaction) => ({
       target: populatedTransaction.to as string,
@@ -202,7 +204,7 @@ export default class WalletService {
     const multicallInstance = new ethers.Contract(
       MULTICALL_ADDRESS[currentNetwork.chainId],
       MULTICALLABI,
-      this.client
+      provider
     ) as unknown as MulticallContract;
 
     const populatedTransactions = await Promise.all([balanceCall, decimalsCall, nameCall, symbolCall]);
