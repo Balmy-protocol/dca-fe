@@ -59,7 +59,7 @@ function useBuildTransactionMessages() {
           if (terminatedPosition) {
             message = `Your ${(terminatedPosition as Position).from.symbol}:${
               (terminatedPosition as Position).to.symbol
-            } position has been burned`;
+            } position has been closed`;
           }
           break;
         }

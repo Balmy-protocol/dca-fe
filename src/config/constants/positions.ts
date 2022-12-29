@@ -176,7 +176,7 @@ export const STRING_PERMISSIONS: Record<Permission, string> = {
   INCREASE: 'Increase position',
   REDUCE: 'Reduce position',
   WITHDRAW: 'Withdraw',
-  TERMINATE: 'Burn position',
+  TERMINATE: 'Close position',
 };
 
 const POSITION_STATUS_ACTIVE: PositionStatus = 'ACTIVE';

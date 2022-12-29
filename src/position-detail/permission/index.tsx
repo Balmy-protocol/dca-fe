@@ -101,7 +101,7 @@ const HelpTexts = {
   TERMINATE: (
     <FormattedMessage
       description="terminate permission helptext"
-      defaultMessage="This allows the address to burn your position"
+      defaultMessage="This allows the address to close your position"
     />
   ),
 };

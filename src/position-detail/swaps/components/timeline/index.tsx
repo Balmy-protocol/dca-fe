@@ -684,7 +684,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
 const buildTerminatedItem = (positionState: ActionState) => ({
   icon: <DeleteSweepIcon />,
   content: () => <></>,
-  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Burned" />,
+  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Closed" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
