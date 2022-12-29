@@ -45,7 +45,7 @@ import {
   useHasPendingPairCreation,
   useHasConfirmedApproval,
 } from 'state/transactions/hooks';
-import { calculateStale, STALE } from 'utils/parsing';
+import { calculateStale, getSimilarPair, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, EMPTY_TOKEN } from 'mocks/tokens';
@@ -408,7 +408,11 @@ const Swap = ({
   };
 
   const preHandleSwap = () => {
-    if (!existingPair) {
+    if (!from || !to) {
+      return;
+    }
+    const similarPairExists = getSimilarPair(availablePairs, yieldOptions, from, to);
+    if (!similarPairExists) {
       setShouldShowPairModal(true);
       return;
     }

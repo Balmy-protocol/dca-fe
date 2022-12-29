@@ -1,7 +1,8 @@
 import { BigNumber } from 'ethers';
 import find from 'lodash/find';
+import some from 'lodash/some';
 import findIndex from 'lodash/findIndex';
-import { FullPosition, LastSwappedAt, Position, SwapInfo, Token } from 'types';
+import { FullPosition, LastSwappedAt, Position, SwapInfo, Token, YieldOptions, AvailablePairs } from 'types';
 import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 
@@ -27,6 +28,40 @@ export const sortTokens = (tokenA: Token, tokenB: Token) => {
   }
 
   return [token0, token1];
+};
+
+export const getSimilarPair = (pairs: AvailablePairs, yieldOptions: YieldOptions, tokenA: Token, tokenB: Token) => {
+  const availableYieldOptionsTokenA = yieldOptions.filter((yieldOption) =>
+    yieldOption.enabledTokens.includes(tokenA.address)
+  );
+  const availableYieldOptionsTokenB = yieldOptions.filter((yieldOption) =>
+    yieldOption.enabledTokens.includes(tokenB.address)
+  );
+
+  const possibleToken0 = [
+    ...availableYieldOptionsTokenA.map((yieldOption) => yieldOption.tokenAddress),
+    tokenA.address,
+  ];
+  const possibleToken1 = [
+    ...availableYieldOptionsTokenB.map((yieldOption) => yieldOption.tokenAddress),
+    tokenB.address,
+  ];
+
+  const possiblePairs = possibleToken0.reduce<string[]>((acc, token0) => {
+    const newAcc = [...acc];
+
+    possibleToken1.forEach((token1) => {
+      const [from, to] = sortTokensByAddress(token0, token1);
+      const pair = `${from}-${to}`;
+      if (newAcc.indexOf(pair) === -1) {
+        newAcc.push(pair);
+      }
+    });
+
+    return newAcc;
+  }, []);
+
+  return some(possiblePairs, (possiblePair) => find(pairs, { id: possiblePair }));
 };
 
 export const NO_SWAP_INFORMATION = -1;
