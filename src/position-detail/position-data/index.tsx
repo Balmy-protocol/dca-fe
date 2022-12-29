@@ -413,7 +413,7 @@ const Details = ({
             {!isPending && hasNoFunds && position.status === 'TERMINATED' && (
               <StyledStale>
                 <Typography variant="caption">
-                  <FormattedMessage description="finishedPosition" defaultMessage="BURNED" />
+                  <FormattedMessage description="finishedPosition" defaultMessage="CLOSED" />
                 </Typography>
               </StyledStale>
             )}

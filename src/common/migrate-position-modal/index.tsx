@@ -111,7 +111,7 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
           />
           <FormattedMessage
             description="migrate description"
-            defaultMessage="Your position will be burned here and we will create a new one on"
+            defaultMessage="Your position will be closed here and we will create a new one on"
           />
           <StyledLink href="https://mean.finance" target="_blank">
             {` mean.finance.`}
@@ -119,7 +119,7 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
         </Typography>
         <Typography variant="body1">
           <FormattedMessage
-            description="burned description"
+            description="closed description"
             defaultMessage="All {to} balance will be sent to you and all {from} balance will be used to create a new position with the same rate and remaining swaps."
             values={{
               from: position.from.symbol,
