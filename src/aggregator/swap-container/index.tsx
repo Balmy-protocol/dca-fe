@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import { getProtocolToken } from 'mocks/tokens';
-import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from 'config/constants';
 import { SwapOption, Token } from 'types';

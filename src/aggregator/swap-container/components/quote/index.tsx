@@ -5,7 +5,7 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import styled from 'styled-components';
 import { SwapOption, Token } from 'types';
 import TokenIcon from 'common/token-icon';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import Typography from '@mui/material/Typography';
 import { emptyTokenWithLogoURI, formatCurrencyAmount } from 'utils/currency';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -243,7 +243,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
       </StyledRouteContainer>
       {isBuyOrder && quote.type !== 'buy' && (
         <StyledNotSupportedContainer>
-          <HelpOutlineIcon fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.5)' }} />
+          <ErrorOutlineIcon fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.5)' }} />
           <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
             <FormattedMessage
               description="aggregatorNotBuyOrder"
