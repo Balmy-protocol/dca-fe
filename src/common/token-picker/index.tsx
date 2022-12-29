@@ -32,6 +32,7 @@ import Switch from '@mui/material/Switch';
 import useCustomToken from 'hooks/useCustomToken';
 import useAllowedPairs from 'hooks/useAllowedPairs';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import { useCustomTokens } from 'state/token-lists/hooks';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -113,11 +114,12 @@ const StyledTokenTextContainer = styled.div`
 interface RowData {
   tokenList: TokenList;
   tokenKeys: string[];
-  onClick: (token: Token) => void;
+  onClick: (token: Token, isCustomToken: boolean) => void;
   yieldOptions: YieldOptions;
   tokenBalances: Record<string, { balance: BigNumber; balanceUsd: BigNumber }>;
   customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
   isLoadingTokenBalances: boolean;
+  customTokens: TokenList;
 }
 
 interface RowProps {
@@ -130,6 +132,7 @@ interface TokenPickerProps {
   availableFrom?: string[];
   onChange: SetFromToState;
   onClose: () => void;
+  onAddToken?: (token: Token) => void;
   isFrom: boolean;
   usedTokens: string[];
   ignoreValues: string[];
@@ -164,29 +167,42 @@ const useListItemStyles = makeStyles(({ palette }) => ({
 const Row = ({
   index,
   style,
-  data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances, customToken, isLoadingTokenBalances },
+  data: {
+    onClick,
+    tokenList,
+    tokenKeys,
+    yieldOptions,
+    tokenBalances,
+    customToken,
+    customTokens,
+    isLoadingTokenBalances,
+  },
 }: RowProps) => {
   const classes = useListItemStyles();
-  const isCustomToken = !!customToken && tokenKeys[index] === customToken.token.address;
-  const token = !isCustomToken ? tokenList[tokenKeys[index]] : customToken.token;
+  const isImportedToken = !!customTokens[tokenKeys[index]];
+  const isCustomToken = (!!customToken && tokenKeys[index] === customToken.token.address) || isImportedToken;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const token = !isCustomToken || isImportedToken ? tokenList[tokenKeys[index]] : customToken!.token;
 
-  const tokenBalance = !isCustomToken
-    ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0)
-    : customToken?.balance ?? BigNumber.from(0);
-  const tokenValue = !isCustomToken
-    ? (tokenBalances &&
-        tokenBalances[token.address] &&
-        tokenBalances[token.address].balanceUsd &&
-        parseFloat(formatUnits(tokenBalances[token.address].balanceUsd, token.decimals + 18))) ||
-      0
-    : (customToken?.balanceUsd && parseFloat(formatUnits(customToken?.balanceUsd, token.decimals + 18))) || 0;
+  const tokenBalance =
+    !isCustomToken || isImportedToken
+      ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0)
+      : customToken?.balance ?? BigNumber.from(0);
+  const tokenValue =
+    !isCustomToken || isImportedToken
+      ? (tokenBalances &&
+          tokenBalances[token.address] &&
+          tokenBalances[token.address].balanceUsd &&
+          parseFloat(formatUnits(tokenBalances[token.address].balanceUsd, token.decimals + 18))) ||
+        0
+      : (customToken?.balanceUsd && parseFloat(formatUnits(customToken?.balanceUsd, token.decimals + 18))) || 0;
 
   const availableYieldOptions = yieldOptions.filter((yieldOption) =>
     yieldOption.enabledTokens.includes(token?.address)
   );
 
   return (
-    <StyledListItem classes={classes} onClick={() => onClick(token)} style={style}>
+    <StyledListItem classes={classes} onClick={() => onClick(token, isCustomToken)} style={style}>
       <StyledListItemIcon>
         <TokenIcon size="24px" token={token} />
       </StyledListItemIcon>
@@ -251,6 +267,7 @@ const TokenPicker = ({
   isLoadingYieldOptions,
   isAggregator,
   showWrappedAndProtocol,
+  onAddToken,
 }: TokenPickerProps) => {
   const tokenList = useTokenList(isAggregator);
   const [search, setSearch] = React.useState('');
@@ -261,6 +278,7 @@ const TokenPicker = ({
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
   const allowedPairs = useAllowedPairs();
   let tokenKeysToUse: string[] = [];
+  const customTokens = useCustomTokens();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
 
   const uniqTokensFromPairs = React.useMemo(
@@ -297,11 +315,6 @@ const TokenPicker = ({
       setSearch('');
       onClose();
     }
-  };
-
-  const handleItemSelected = (token: Token) => {
-    onChange(token);
-    handleOnClose();
   };
 
   // const memoizedUsedTokens = React.useMemo(
@@ -383,15 +396,24 @@ const TokenPicker = ({
     [tokenBalances, memoizedUnorderedTokenKeys, tokenList, customToken]
   );
 
-  const itemData = React.useMemo(
+  const handleItemSelected = (token: Token, isCustomToken: boolean) => {
+    onChange(token);
+    if (onAddToken && isCustomToken) {
+      onAddToken(token);
+    }
+    handleOnClose();
+  };
+
+  const itemData: RowData = React.useMemo(
     () => ({
       onClick: handleItemSelected,
       tokenList,
       tokenKeys: memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
-      tokenBalances: isLoadingTokenBalances && !tokenBalances ? {} : tokenBalances,
+      tokenBalances: !isLoadingTokenBalances && tokenBalances ? tokenBalances : {},
       customToken,
       isLoadingTokenBalances,
+      customTokens,
     }),
     [memoizedTokenKeys, tokenList, tokenBalances, yieldOptions, customToken, isLoadingTokenBalances]
   );

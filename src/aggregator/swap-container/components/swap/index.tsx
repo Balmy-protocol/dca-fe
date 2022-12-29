@@ -31,6 +31,8 @@ import TransferToModal from 'common/transfer-to-modal';
 import TransactionConfirmation from 'common/transaction-confirmation';
 import TransactionSteps, { TransactionAction as TransactionStep } from 'common/transaction-steps';
 import { GasKeys } from 'config/constants/aggregator';
+import { useAppDispatch } from 'state/hooks';
+import { addCustomToken } from 'state/token-lists/actions';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
 
@@ -91,6 +93,7 @@ const Swap = ({
   toggleFromTo,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
+  const dispatch = useAppDispatch();
   const containerRef = React.useRef(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
@@ -260,6 +263,10 @@ const Swap = ({
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setRefreshQuotes(true);
     }
+  };
+
+  const addCustomTokenToList = (token: Token) => {
+    dispatch(addCustomToken(token));
   };
 
   const handleTransactionEndedForWait = (transactions?: TransactionStep[]) => {
@@ -500,6 +507,7 @@ const Swap = ({
           yieldOptions={[]}
           isLoadingYieldOptions={false}
           otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
+          onAddToken={addCustomTokenToList}
         />
         <SwapFirstStep
           from={from}
