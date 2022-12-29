@@ -162,27 +162,25 @@ const SwapContainer = () => {
           toggleFromTo={toggleFromTo}
         />
       </Grid>
-      <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
+      <Grid item xs={12} md={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
         <Grid container spacing={2} alignItems="stretch" justify-content="center">
-          <Hidden mdDown>
-            <Grid item xs={12} sx={{ display: 'flex' }}>
-              <SwapQuotes
-                quotes={(selectedRoute && swapOptions) || []}
-                selectedRoute={selectedRoute}
-                setRoute={onSetSelectedRoute}
-                isLoading={isLoadingSwapOptions}
-                from={from}
-                to={to}
-                setSorting={onSetSorting}
-                sorting={sorting}
-                fetchOptions={fetchOptions}
-                refreshQuotes={refreshQuotes}
-                isBuyOrder={isBuyOrder}
-                bestQuote={swapOptions?.[0]}
-                swapOptionsError={swapOptionsError}
-              />
-            </Grid>
-          </Hidden>
+          <Grid item xs={12} sx={{ display: 'flex' }}>
+            <SwapQuotes
+              quotes={(selectedRoute && swapOptions) || []}
+              selectedRoute={selectedRoute}
+              setRoute={onSetSelectedRoute}
+              isLoading={isLoadingSwapOptions}
+              from={from}
+              to={to}
+              setSorting={onSetSorting}
+              sorting={sorting}
+              fetchOptions={fetchOptions}
+              refreshQuotes={refreshQuotes}
+              isBuyOrder={isBuyOrder}
+              bestQuote={swapOptions?.[0]}
+              swapOptionsError={swapOptionsError}
+            />
+          </Grid>
         </Grid>
       </Grid>
     </Grid>
