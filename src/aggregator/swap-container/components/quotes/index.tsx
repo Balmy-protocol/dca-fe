@@ -108,7 +108,7 @@ const SwapQuotes = ({
   return (
     <StyledPaper variant="outlined" $column $align={!isLoading}>
       <StyledTitleContainer>
-        <QuoteSorter isLoading={isLoading} setQuoteSorting={setSorting} sorting={sorting} />
+        <QuoteSorter isLoading={isLoading} setQuoteSorting={setSorting} sorting={sorting} isBuyOrder={isBuyOrder} />
         <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} disableRefreshQuotes={!refreshQuotes} />
       </StyledTitleContainer>
       {isLoading && (

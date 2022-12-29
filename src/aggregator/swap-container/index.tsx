@@ -67,7 +67,7 @@ const SwapContainer = () => {
     if (!isLoadingSwapOptions && swapOptions && swapOptions.length) {
       dispatch(setSelectedRoute(swapOptions[0]));
     }
-  }, [isLoadingSwapOptions]);
+  }, [isLoadingSwapOptions, sorting]);
 
   const onResetForm = () => {
     dispatch(resetForm());

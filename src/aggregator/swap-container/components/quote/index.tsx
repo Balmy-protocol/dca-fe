@@ -12,7 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { withStyles } from '@mui/styles';
 import { FormattedMessage } from 'react-intl';
-import { SORT_MOST_PROFIT, SwapSortOptions } from 'config/constants/aggregator';
+import { SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from 'config/constants/aggregator';
 
 const DarkChip = withStyles(() => ({
   root: {
@@ -191,6 +191,14 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
         </StyledTitleDataContainer>
         <StyledTitleDataContainer>
           {sorting === SORT_MOST_PROFIT && isWorsePrice && (
+            <StatusChip
+              label={<FormattedMessage description="worsePrice" defaultMessage="Worse price" />}
+              color="error"
+              variant="filled"
+              size="small"
+            />
+          )}
+          {sorting === SORT_MOST_RETURN && isWorsePrice && (
             <StatusChip
               label={<FormattedMessage description="worsePrice" defaultMessage="Worse price" />}
               color="error"

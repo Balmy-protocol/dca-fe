@@ -5,7 +5,13 @@ import debounce from 'lodash/debounce';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
-import { GasKeys, SORT_LEAST_GAS, SORT_MOST_PROFIT, SwapSortOptions } from 'config/constants/aggregator';
+import {
+  GasKeys,
+  SORT_LEAST_GAS,
+  SORT_MOST_PROFIT,
+  SORT_MOST_RETURN,
+  SwapSortOptions,
+} from 'config/constants/aggregator';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { BigNumber } from 'ethers';
 import useCurrentNetwork from './useCurrentNetwork';
@@ -154,6 +160,14 @@ function useSwapOptions(
 
   if (sorting === SORT_LEAST_GAS && resultToReturn) {
     resultToReturn = [...resultToReturn].sort((a, b) => (a.gas.estimatedCost.lt(b.gas.estimatedCost) ? -1 : 1));
+  }
+
+  if (sorting === SORT_MOST_RETURN && resultToReturn) {
+    if (isBuyOrder) {
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount.lt(b.sellAmount.amount) ? -1 : 1));
+    } else {
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount.gt(b.buyAmount.amount) ? -1 : 1));
+    }
   }
 
   return [resultToReturn, isLoading, error, fetchOptions];
