@@ -25,6 +25,17 @@ const DarkChip = withStyles(() => ({
   },
 }))(Chip);
 
+const StatusChip = withStyles(() => ({
+  colorSuccess: {
+    background: 'rgba(33, 150, 83, 0.1)',
+    color: '#219653',
+  },
+  colorError: {
+    background: 'rgba(235, 87, 87, 0.1)',
+    color: '#EB5757',
+  },
+}))(Chip);
+
 const StyledPaper = styled(Paper)<{ $isSelected?: boolean }>`
   position: relative;
   overflow: hidden;
@@ -180,7 +191,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
         </StyledTitleDataContainer>
         <StyledTitleDataContainer>
           {sorting === SORT_MOST_PROFIT && isWorsePrice && (
-            <Chip
+            <StatusChip
               label={<FormattedMessage description="worsePrice" defaultMessage="Worse price" />}
               color="error"
               variant="filled"
@@ -188,7 +199,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
             />
           )}
           {quote.gas.estimatedCost.gt(bestQuote?.gas.estimatedCost || 0) && (
-            <Chip
+            <StatusChip
               label={<FormattedMessage description="moreGas" defaultMessage="More gas" />}
               color="error"
               variant="filled"
@@ -196,7 +207,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
             />
           )}
           {bestQuote?.swapper.id === quote.swapper.id && (
-            <Chip
+            <StatusChip
               label={<FormattedMessage description="best" defaultMessage="Best" />}
               color="success"
               variant="filled"
