@@ -167,16 +167,7 @@ const useListItemStyles = makeStyles(({ palette }) => ({
 const Row = ({
   index,
   style,
-  data: {
-    onClick,
-    tokenList,
-    tokenKeys,
-    yieldOptions,
-    tokenBalances,
-    customToken,
-    customTokens,
-    isLoadingTokenBalances,
-  },
+  data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances, customToken, customTokens },
 }: RowProps) => {
   const classes = useListItemStyles();
   const isImportedToken = !!customTokens[tokenKeys[index]];
@@ -234,8 +225,8 @@ const Row = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {isLoadingTokenBalances && !Object.keys(tokenBalances).length && <CenteredLoadingIndicator size={10} />}
-        {!isLoadingTokenBalances && tokenBalances && Object.keys(tokenBalances).length && (
+        {!Object.keys(tokenBalances).length && <CenteredLoadingIndicator size={10} />}
+        {tokenBalances && !!Object.keys(tokenBalances).length && (
           <>
             {tokenBalance && (
               <Typography variant="body1" color="#FFFFFF">
@@ -410,7 +401,8 @@ const TokenPicker = ({
       tokenList,
       tokenKeys: memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
-      tokenBalances: !isLoadingTokenBalances && tokenBalances ? tokenBalances : {},
+      tokenBalances:
+        isLoadingTokenBalances && (!tokenBalances || !Object.keys(tokenBalances).length) ? {} : tokenBalances || {},
       customToken,
       isLoadingTokenBalances,
       customTokens,
