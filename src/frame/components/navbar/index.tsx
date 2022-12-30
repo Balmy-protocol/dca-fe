@@ -37,6 +37,7 @@ import AppBar from '@mui/material/AppBar';
 import ListItemText from '@mui/material/ListItemText';
 import Container from '@mui/material/Container';
 import usePushToHistory from '@hooks/usePushToHistory';
+import ClaimButton from '../claim';
 import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
 import LanguageLabel from '../footer/components/lang-label';
@@ -346,6 +347,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             </StyledNavbarMainContent>
           )}
           <StyledNavbarEndContent small={currentBreakPoint === 'xs'}>
+            <ClaimButton />
             <StyledButtonContainer breakpoint={currentBreakPoint}>
               {/* <NetworkLabel network={currentNetwork} /> */}
               <WalletContext.Consumer>

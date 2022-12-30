@@ -9,10 +9,12 @@ import {
   MeanFinanceAllowedPairsResponse,
   MeanFinanceResponse,
   PermissionPermit,
+  RawCampaigns,
   Token,
   PositionVersions,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
+import { parseUnits } from '@ethersproject/units';
 
 // MOCKS
 import ContractService from './contractService';
@@ -410,5 +412,25 @@ export default class MeanApiService {
       userAccount,
       metadata,
     });
+  }
+
+  getCampaigns(): Promise<RawCampaigns> {
+    const DEFAULT_CLAIMABLE_CAMPAIGNS: RawCampaigns = {
+      137: {
+        welcomeToMean: {
+          name: 'Welcome to mean',
+          expiresOn: '1677524581',
+          proof: undefined,
+          tokens: [
+            {
+              token: PROTOCOL_TOKEN_ADDRESS,
+              amount: parseUnits('2.11', 18).toString(),
+            },
+          ],
+        },
+      },
+    };
+
+    return Promise.resolve(DEFAULT_CLAIMABLE_CAMPAIGNS);
   }
 }

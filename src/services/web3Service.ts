@@ -68,6 +68,7 @@ import ErrorService from './errorService';
 import SimulationService from './simulationService';
 import SafeService from './safeService';
 import EventService from './eventService';
+import CampaignService from './campaignService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -129,6 +130,8 @@ export default class Web3Service {
   simulationService: SimulationService;
 
   safeService: SafeService;
+
+  campaignService: CampaignService;
 
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -197,6 +200,7 @@ export default class Web3Service {
     );
     this.errorService = new ErrorService(this.meanApiService);
     this.simulationService = new SimulationService(this.meanApiService, this.providerService);
+    this.campaignService = new CampaignService(this.meanApiService, this.priceService);
   }
 
   setArcxClient(newArcxClient: ArcxAnalyticsSdk) {
@@ -269,6 +273,10 @@ export default class Web3Service {
 
   getEventService() {
     return this.eventService;
+  }
+
+  getCampaignService() {
+    return this.campaignService;
   }
 
   getModal() {
