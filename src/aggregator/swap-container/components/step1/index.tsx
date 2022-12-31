@@ -164,8 +164,14 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       '0' ||
       '';
 
-  const [fromFetchedPrice] = useUsdPrice(from, parseUnits(fromValueToUse || '0', from?.decimals));
-  const [toFetchedPrice] = useUsdPrice(to, parseUnits(toValueToUse || '0', to?.decimals));
+  const [fromFetchedPrice] = useUsdPrice(
+    from,
+    parseUnits(fromValueToUse || '0', selectedRoute?.sellToken.decimals || from?.decimals)
+  );
+  const [toFetchedPrice] = useUsdPrice(
+    to,
+    parseUnits(toValueToUse || '0', selectedRoute?.buyToken.decimals || to?.decimals)
+  );
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;
 

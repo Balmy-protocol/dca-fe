@@ -359,7 +359,11 @@ const Swap = ({
     setRefreshQuotes(true);
   };
 
-  const cantFund = from && !!fromValueToUse && !!balance && parseUnits(fromValueToUse, from.decimals).gt(balance);
+  const cantFund =
+    from &&
+    !!fromValueToUse &&
+    !!balance &&
+    parseUnits(fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).gt(balance);
 
   const isApproved =
     !from ||
@@ -382,7 +386,7 @@ const Swap = ({
     !selectedRoute ||
     balanceErrors ||
     allowanceErrors ||
-    parseUnits(fromValueToUse, from.decimals).lte(BigNumber.from(0)) ||
+    parseUnits(fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).lte(BigNumber.from(0)) ||
     isLoadingRoute;
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
