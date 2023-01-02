@@ -41,7 +41,7 @@ const AggregatorTokenPicker = ({
   isLoadingYieldOptions,
   onAddToken,
 }: TokenPickerProps) => (
-  <Modal open={shouldShow} onClose={onClose} maxWidth="sm" actions={[]} fullHeight>
+  <Modal open={shouldShow} onClose={onClose} maxWidth="sm" actions={[]} fullHeight keepMounted>
     <StyledOverlay>
       <TokenPicker
         isFrom={isFrom}
