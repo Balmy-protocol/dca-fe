@@ -42,7 +42,7 @@ function useTokenList(isAggregator = false, filter = true) {
                     (token) =>
                       token.chainId === currentNetwork.chainId &&
                       !Object.keys(acc).includes(token.address) &&
-                      !reducedYieldTokens.includes(token.address) &&
+                      (isAggregator || !reducedYieldTokens.includes(token.address)) &&
                       (!filter || !BLACKLIST.includes(token.address))
                   ),
                   'address'
