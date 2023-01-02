@@ -448,7 +448,11 @@ const PositionDetailFrame = () => {
             </Link>
           </Button>
         </Grid>
-        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+        <Grid
+          item
+          xs={12}
+          style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px', flexWrap: 'wrap' }}
+        >
           <StyledTabs
             value={tabIndex}
             onChange={(e, index) => dispatch(changePositionDetailsTab(index))}

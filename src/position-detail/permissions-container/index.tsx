@@ -161,7 +161,7 @@ const PositionPermissionsContainer = ({
             <StyledPaper variant="outlined">
               <Grid container spacing={2}>
                 {Object.values(permissions).map((permission) => (
-                  <Grid item xs={4}>
+                  <Grid item xs={12} md={4}>
                     <PositionPermission
                       positionPermission={permission}
                       shouldDisable={shouldDisable}

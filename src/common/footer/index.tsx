@@ -12,11 +12,12 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import MeanLogo from 'common/mean-logo';
 import { useThemeMode } from 'state/config/hooks';
 import { Typography } from '@mui/material';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
-const StyledFooterContainer = styled.div`
+const StyledFooterContainer = styled.div<{ isSmall: boolean }>`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: ${({ isSmall }) => (isSmall ? 'center' : 'space-between')};
   left: 0;
   right: 0;
   position: absolute;
@@ -45,6 +46,7 @@ const StyledLink = styled(Link)`
 
 const Footer = () => {
   const mode = useThemeMode();
+  const currentBreakPoint = useCurrentBreakpoint();
 
   const history = useHistory();
 
@@ -53,36 +55,40 @@ const Footer = () => {
   };
 
   return (
-    <StyledFooterContainer>
+    <StyledFooterContainer isSmall={currentBreakPoint === 'xs'}>
       <Link href="https://mean.finance">
         <MeanLogo theme={mode} />
       </Link>
-      <StyledFooterMainContent>
-        <StyledLink underline="none" target="_blank" href="https://github.com/Mean-Finance">
-          <GitHubIcon />
-        </StyledLink>
-        <StyledLink underline="none" target="_blank" href="https://twitter.com/mean_fi">
-          <TwitterIcon />
-        </StyledLink>
-        <StyledLink underline="none" target="_blank" href="http://discord.mean.finance">
-          <DiscordIcon size="24px" />
-        </StyledLink>
-      </StyledFooterMainContent>
-      <StyledFooterLinks>
-        <Typography variant="body2">
-          <StyledLink underline="none" target="_blank" href="https://docs.mean.finance">
-            <DescriptionOutlinedIcon fontSize="inherit" />
-            <FormattedMessage description="docs" defaultMessage="Docs" />
-          </StyledLink>
-        </Typography>
+      {currentBreakPoint !== 'xs' && (
+        <>
+          <StyledFooterMainContent>
+            <StyledLink underline="none" target="_blank" href="https://github.com/Mean-Finance">
+              <GitHubIcon />
+            </StyledLink>
+            <StyledLink underline="none" target="_blank" href="https://twitter.com/mean_fi">
+              <TwitterIcon />
+            </StyledLink>
+            <StyledLink underline="none" target="_blank" href="http://discord.mean.finance">
+              <DiscordIcon size="24px" />
+            </StyledLink>
+          </StyledFooterMainContent>
+          <StyledFooterLinks>
+            <Typography variant="body2">
+              <StyledLink underline="none" target="_blank" href="https://docs.mean.finance">
+                <DescriptionOutlinedIcon fontSize="inherit" />
+                <FormattedMessage description="docs" defaultMessage="Docs" />
+              </StyledLink>
+            </Typography>
 
-        <Typography variant="body2">
-          <StyledLink underline="none" onClick={onFaqClick}>
-            <HelpOutlineOutlinedIcon fontSize="inherit" />
-            <FormattedMessage description="faq" defaultMessage="FAQ" />
-          </StyledLink>
-        </Typography>
-      </StyledFooterLinks>
+            <Typography variant="body2">
+              <StyledLink underline="none" onClick={onFaqClick}>
+                <HelpOutlineOutlinedIcon fontSize="inherit" />
+                <FormattedMessage description="faq" defaultMessage="FAQ" />
+              </StyledLink>
+            </Typography>
+          </StyledFooterLinks>
+        </>
+      )}
     </StyledFooterContainer>
   );
 };

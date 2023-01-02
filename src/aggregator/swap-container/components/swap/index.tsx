@@ -400,7 +400,7 @@ const Swap = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={() => web3Service.connect()}>
+    <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={() => web3Service.connect()}>
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
