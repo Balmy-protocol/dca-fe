@@ -27,36 +27,35 @@ export default class TransactionService {
 
   // TRANSACTION HANDLING
   getTransactionReceipt(txHash: string) {
-    return this.providerService.provider.getTransactionReceipt(txHash);
+    return this.providerService.getTransactionReceipt(txHash);
   }
 
   getTransaction(txHash: string) {
-    return this.providerService.provider.getTransaction(txHash);
+    return this.providerService.getTransaction(txHash);
   }
 
   waitForTransaction(txHash: string) {
-    return this.providerService.provider.waitForTransaction(txHash);
+    return this.providerService.waitForTransaction(txHash);
   }
 
   getBlockNumber() {
-    return this.providerService.provider.getBlockNumber();
+    return this.providerService.getBlockNumber();
   }
 
   onBlock(callback: ((blockNumber: Promise<number>) => Promise<void>) | ((blockNumber: number) => void)) {
     if (this.loadedAsSafeApp) {
       return window.setInterval(
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        () =>
-          (callback as (blockNumber: Promise<number>) => Promise<void>)(this.providerService.provider.getBlockNumber()),
+        () => (callback as (blockNumber: Promise<number>) => Promise<void>)(this.providerService.getBlockNumber()),
         10000
       );
     }
 
-    return this.providerService.provider.on('block', callback as (blockNumber: number) => void);
+    return this.providerService.on('block', callback as (blockNumber: number) => void);
   }
 
   removeOnBlock() {
-    return this.providerService.provider.off('block');
+    return this.providerService.off('block');
   }
 
   async parseLog(logs: Log[], chainId: number, eventToSearch: string) {
