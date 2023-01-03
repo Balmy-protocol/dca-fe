@@ -92,6 +92,30 @@ export default class ProviderService {
     }
   }
 
+  getTransactionReceipt(txHash: string) {
+    return this.provider.getTransactionReceipt(txHash);
+  }
+
+  getTransaction(txHash: string) {
+    return this.provider.getTransaction(txHash);
+  }
+
+  waitForTransaction(txHash: string) {
+    return this.provider.waitForTransaction(txHash);
+  }
+
+  getBlockNumber() {
+    return this.provider.getBlockNumber();
+  }
+
+  on(eventName: ethers.providers.EventType, listener: ethers.providers.Listener) {
+    this.provider.on(eventName, listener);
+  }
+
+  off(eventName: ethers.providers.EventType) {
+    return this.provider.off(eventName);
+  }
+
   async addEventListeners() {
     const provider = await this.getBaseProvider();
     const providerInfo = this.getProviderInfo();
