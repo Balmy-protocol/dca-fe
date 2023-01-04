@@ -5,6 +5,7 @@ import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipCont
 import styled from 'styled-components';
 import { Token } from 'types';
 import { formatCurrencyAmount } from 'utils/currency';
+import { capitalizeFirstLetter } from 'utils/parsing';
 
 const StyledPaper = styled.div`
   padding: 16px;
@@ -48,7 +49,7 @@ const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
 
   return (
     <StyledPaper>
-      <Typography variant="body2">{label}</Typography>
+      <Typography variant="body2">{capitalizeFirstLetter(label || '')}</Typography>
       <Typography variant="body1">
         DCA: {formatCurrencyAmount(rawSwappedIfDCA, tokenTo)} {tokenTo.symbol}
       </Typography>
