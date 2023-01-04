@@ -36,6 +36,7 @@ export type SwapOption = {
     allowanceTarget: string;
     address: string;
     id: string;
+    name: string;
     logoURI: string;
   };
   type: string;

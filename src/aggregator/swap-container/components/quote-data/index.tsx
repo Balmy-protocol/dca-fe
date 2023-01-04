@@ -48,7 +48,7 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
           <FormattedMessage description="quoteDataSelectedRoute" defaultMessage="Selected route:" />
         </Typography>
         <Typography variant="body2" color="inherit">
-          {quote?.swapper.id || '-'}
+          {quote?.swapper.name || '-'}
         </Typography>
       </StyledQuoteDataItem>
       <StyledQuoteDataItem>
