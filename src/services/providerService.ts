@@ -88,8 +88,17 @@ export default class ProviderService {
 
   async addEventListeners() {
     const provider = await this.getBaseProvider();
+    const providerInfo = this.getProviderInfo();
     try {
       if (provider) {
+        // ff's fuck metamask
+        if (providerInfo.name === 'MetaMask') {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          window.ethereum.on('accountsChanged', () => {
+            window.location.reload();
+          });
+        }
+
         // handle metamask account change
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         provider.on('accountsChanged', () => {
