@@ -3,7 +3,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
-import { Token } from 'types';
+import { capitalizeFirstLetter } from 'utils/parsing';
 
 const StyledPaper = styled.div`
   padding: 16px;
@@ -43,13 +43,13 @@ const GasSavedTooltip = (props: GasSavedTooltipProps) => {
 
   return (
     <StyledPaper>
-      <Typography variant="body2">{label}</Typography>
+      <Typography variant="body2">{capitalizeFirstLetter(label || '')}</Typography>
       <Typography variant="body1">
         <FormattedMessage
           description="savedProtocolTooltip"
           // eslint-disable-next-line no-template-curly-in-string
-          defaultMessage="${amount} saved"
-          values={{ amount: gasSaved.toString() }}
+          defaultMessage="${amount} USD saved"
+          values={{ amount: gasSaved.toFixed(2) }}
         />
       </Typography>
     </StyledPaper>

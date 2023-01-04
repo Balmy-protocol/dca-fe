@@ -31,12 +31,12 @@ interface GraphContainerProps {
 
 const GRAPHS = [
   {
-    title: <FormattedMessage description="dcaVsLumpSumTitle" defaultMessage="DCA vs Lump sum" />,
-    component: ({ position }: GraphContainerProps) => <ProfitLossGraph position={position} />,
-  },
-  {
     title: <FormattedMessage description="averagePriceGraphTitle" defaultMessage="Market price vs DCA price" />,
     component: ({ position }: GraphContainerProps) => <AveragePriceGraph position={position} />,
+  },
+  {
+    title: <FormattedMessage description="dcaVsLumpSumTitle" defaultMessage="DCA vs Lump sum" />,
+    component: ({ position }: GraphContainerProps) => <ProfitLossGraph position={position} />,
   },
   {
     title: <FormattedMessage description="gasSavedGraphTitle" defaultMessage="Gas saved" />,
@@ -53,8 +53,8 @@ const GraphContainer = ({ position }: GraphContainerProps) => {
         <Typography variant="h6">{GRAPHS[tabIndex].title}</Typography>
         <MinimalTabs
           options={[
-            { key: 0, label: 'DCA vs Lump sum' },
-            { key: 1, label: 'Average buy price' },
+            { key: 0, label: 'Average buy price' },
+            { key: 1, label: 'DCA vs Lump sum' },
             ...(position.chainId === NETWORKS.mainnet.chainId ? [{ key: 2, label: 'Gas saved' }] : []),
           ]}
           selected={{ key: tabIndex, label: '' }}

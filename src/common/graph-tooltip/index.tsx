@@ -45,7 +45,8 @@ const GraphTooltip = (props: GraphTooltipProps) => {
       {payload?.map(({ value, dataKey }) => (
         <Typography variant="body1">
           {dataKey}: 1 {tokenFrom.symbol} = {tokenTo.isBaseToken ? '$' : ''}
-          {value} {tokenTo.isBaseToken ? 'USD' : tokenB.symbol}
+          {tokenTo.isBaseToken ? parseFloat(Number(value).toString() || '0').toFixed(2) : value}{' '}
+          {tokenTo.isBaseToken ? 'USD' : tokenB.symbol}
         </Typography>
       ))}
     </StyledPaper>
