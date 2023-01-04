@@ -18,8 +18,8 @@ export interface PoolsLiquidityDataGraphqlResponse {
 export interface GetPairResponseSwapData {
   id: string;
   executedAtTimestamp: string;
-  ratePerUnitAToB: string;
-  ratePerUnitBToA: string;
+  ratioUnderlyingAToB: string;
+  ratioUnderlyingBToA: string;
 }
 
 export interface GetPairPriceResponseData {

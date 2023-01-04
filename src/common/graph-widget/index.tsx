@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
-import { ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Area, Line, ComposedChart, CartesianGrid } from 'recharts';
+import { ResponsiveContainer, XAxis, YAxis, Legend, Area, Line, ComposedChart, Tooltip } from 'recharts';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
@@ -20,11 +20,10 @@ import useUNIGraphql from 'hooks/useUNIGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { STABLE_COINS, TOKEN_TYPE_BASE } from 'config/constants';
+import { FOUR_HOURS, ONE_DAY, STABLE_COINS, TOKEN_TYPE_BASE } from 'config/constants';
 import GraphFooter from 'common/graph-footer';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import MinimalTabs from 'common/minimal-tabs';
-import GraphTooltip from 'common/graph-tooltip';
 
 interface GraphWidgetProps {
   from: Token | null;
@@ -80,7 +79,6 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
 `;
 
 const StyledTitleContainer = styled.div`
-  margin-bottom: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -133,7 +131,9 @@ const StyledLegendIndicator = styled.div<{ fill: string }>`
   border-radius: 99px;
 `;
 
-const PERIODS = [7, 30];
+const PERIODS = [7, 30, 1];
+
+const GRAPH_FILTER = [ONE_DAY.toString(), ONE_DAY.toString(), FOUR_HOURS.toString()];
 
 const averagePoolPrice = (prices: string[]) => {
   let result = 0;
@@ -162,6 +162,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   let uniData: UniMappedPrice[] = [];
   let swapData: GetPairResponseSwapData[] = [];
   let prices: Prices = [];
+  const [selectedItem, setSelectedItem] = React.useState<{ value?: number }[]>([]);
   const [tabIndex, setTabIndex] = React.useState(0);
   const availablePairs = useAvailablePairs();
   const dateFilter = React.useMemo(
@@ -213,6 +214,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const { loading: loadingMeanData, data: pairData } = useQuery<GetPairPriceResponseData>(getPairPrices, {
     variables: {
       id: existingPair?.id,
+      minInterval: GRAPH_FILTER[tabIndex],
     },
     skip: !existingPair,
     client,
@@ -265,16 +267,16 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
 
   prices = React.useMemo(() => {
     const mappedUniData = map(uniData, ({ date, tokenPrice }) => ({
-      name: DateTime.fromSeconds(parseInt(date, 10)).toFormat('MMM d t'),
+      name: DateTime.fromSeconds(parseInt(date, 10)).toFormat(tabIndex === 2 ? 't' : 'MMM d'),
       Uniswap: parseFloat(tokenPrice),
       date,
     }));
-    const mappedSwapData = map(swapData, ({ executedAtTimestamp, ratePerUnitAToB, ratePerUnitBToA }) => ({
-      name: DateTime.fromSeconds(parseInt(executedAtTimestamp, 10)).toFormat('MMM d t'),
+    const mappedSwapData = map(swapData, ({ executedAtTimestamp, ratioUnderlyingAToB, ratioUnderlyingBToA }) => ({
+      name: DateTime.fromSeconds(parseInt(executedAtTimestamp, 10)).toFormat(tabIndex === 2 ? 't' : 'MMM d'),
       'Mean Finance':
         parseFloat(
           formatCurrencyAmount(
-            BigNumber.from(tokenA.isBaseToken ? ratePerUnitBToA : ratePerUnitAToB),
+            BigNumber.from(tokenA.isBaseToken ? ratioUnderlyingBToA : ratioUnderlyingAToB),
             tokenA.isBaseToken ? tokenA : tokenB
           )
         ) || null,
@@ -287,6 +289,15 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
   const isLoading = loadingPool || loadingMeanData;
   // const isLoading = loadingPool || loadingMeanData || isLoadingOracle;
   const noData = prices.length === 0;
+
+  const selectedItemValue = selectedItem.reduce(
+    (acc, item) => item.value || acc,
+    (prices &&
+      prices.length &&
+      ((prices[prices.length - 1] as PriceUniData).Uniswap ||
+        (prices[prices.length - 1] as PriceMeanData)['Mean Finance'])) ||
+      0
+  );
 
   if (isLoading) {
     return (
@@ -352,6 +363,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
             </Typography>
             <MinimalTabs
               options={[
+                { key: 2, label: 'Day' },
                 { key: 0, label: 'Week' },
                 { key: 1, label: 'Month' },
               ]}
@@ -359,6 +371,19 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
               onChange={({ key }) => setTabIndex(key as number)}
             />
           </StyledTitleContainer>
+          <StyledLegendContainer>
+            <Typography variant="h6">
+              <FormattedMessage
+                description="graph selectedItemValue"
+                defaultMessage="{prefix}{value} {token}"
+                values={{
+                  prefix: tokenA.isBaseToken ? '$' : '',
+                  value: selectedItemValue,
+                  token: tokenA.isBaseToken ? 'USD' : tokenB.symbol,
+                }}
+              />
+            </Typography>
+          </StyledLegendContainer>
           <StyledLegendContainer>
             {!!uniData.length && (
               <StyledLegend>
@@ -383,6 +408,8 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
             data={prices}
             margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
             style={{ overflow: 'visible' }}
+            onMouseMove={({ activePayload }) => activePayload && setSelectedItem(activePayload)}
+            onMouseLeave={() => setSelectedItem([])}
           >
             <defs>
               <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
@@ -390,7 +417,7 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
                 <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
+            {/* <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" /> */}
             {uniData.length && (
               <Area
                 legendType="none"
@@ -423,15 +450,10 @@ const GraphWidget = ({ from, to }: GraphWidgetProps) => {
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
+              // tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
             />
-            <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false} />
-            <Tooltip
-              content={({ payload, label }) => (
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                <GraphTooltip payload={payload} label={label} tokenA={tokenA} tokenB={tokenB} />
-              )}
-            />
+            <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false} hide />
+            <Tooltip content={<></>} />
             <Legend />
           </ComposedChart>
         </ResponsiveContainer>
