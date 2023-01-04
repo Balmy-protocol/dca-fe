@@ -11,10 +11,11 @@ function useGqlFetchAll<T>(
   variables: unknown,
   dataToSearch: string,
   skip = false
-): QueryResult<T> | { data: undefined; loading: boolean } {
-  const [result, setResult] = React.useState<QueryResult<T> | { data: undefined; loading: boolean }>({
+): QueryResult<T> | { data: undefined; loading: boolean; error?: string } {
+  const [result, setResult] = React.useState<QueryResult<T> | { data: undefined; loading: boolean; error?: string }>({
     data: undefined,
     loading: false,
+    error: undefined,
   });
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const prevParameters = usePrevious(variables);
@@ -25,14 +26,19 @@ function useGqlFetchAll<T>(
     async function callPromise() {
       try {
         const gqlResult = await gqlFetchAll<T>(clientToUse, queryToRun, variables, dataToSearch);
-        setResult({ ...gqlResult, loading: false } as never);
+        setResult({ ...gqlResult, loading: false, error: undefined } as never);
       } catch (e) {
+        setResult({ data: undefined, loading: false, error: e as string } as never);
         console.error(e);
       }
     }
 
-    if (client && !skip && ((!result.data && !result.loading) || !isEqual(prevParameters, variables))) {
-      setResult({ data: undefined, loading: true });
+    if (
+      client &&
+      !skip &&
+      ((!result.data && !result.loading && !result.error) || !isEqual(prevParameters, variables))
+    ) {
+      setResult({ data: undefined, loading: true, error: undefined });
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }

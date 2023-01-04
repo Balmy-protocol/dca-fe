@@ -112,6 +112,7 @@ const PositionDetailFrame = () => {
   const {
     loading: isLoading,
     data,
+    error,
     // refetch,
   } = useGqlFetchAll<{ position: FullPosition }>(
     client,
@@ -204,13 +205,14 @@ const PositionDetailFrame = () => {
   const positionNotFound = !position && data && !isLoading;
 
   if (
-    isLoading ||
-    !data ||
-    (!position && !positionNotFound) ||
-    isLoadingSwaps ||
-    isLoadingYieldOptions ||
-    isLoadingUnderlyings ||
-    isLoadingTotalGasSaved
+    !error &&
+    (isLoading ||
+      !data ||
+      (!position && !positionNotFound) ||
+      isLoadingSwaps ||
+      isLoadingYieldOptions ||
+      isLoadingUnderlyings ||
+      isLoadingTotalGasSaved)
   ) {
     return (
       <Grid container>
