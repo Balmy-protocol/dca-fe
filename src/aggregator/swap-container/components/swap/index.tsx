@@ -296,6 +296,11 @@ const Swap = ({
 
     const newSteps: TransactionStep[] = [];
 
+    const amountToApprove =
+      isBuyOrder && selectedRoute
+        ? BigNumber.from(selectedRoute.maxSellAmount.amount)
+        : parseUnits(fromValueToUse, from.decimals);
+
     newSteps.push({
       hash: '',
       onAction: handleApproveToken,
@@ -304,7 +309,7 @@ const Swap = ({
       type: TRANSACTION_ACTION_APPROVE_TOKEN,
       extraData: {
         token: from,
-        amount: parseUnits(fromValueToUse, from.decimals),
+        amount: amountToApprove,
       },
     });
 
@@ -316,7 +321,7 @@ const Swap = ({
       type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
       extraData: {
         token: from,
-        amount: parseUnits(fromValueToUse, from.decimals),
+        amount: amountToApprove,
       },
     });
 
