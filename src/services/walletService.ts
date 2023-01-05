@@ -17,7 +17,7 @@ import MULTICALLABI from 'abis/Multicall.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { LATEST_VERSION, MULTICALL_ADDRESS, NETWORKS, PositionVersions } from 'config/constants';
+import { LATEST_VERSION, MULTICALL_ADDRESS, NETWORKS, NULL_ADDRESS, PositionVersions } from 'config/constants';
 import { ERC20Contract, MulticallContract } from 'types/contracts';
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -274,6 +274,10 @@ export default class WalletService {
     const account = this.getAccount();
 
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
+      return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
+    }
+
+    if (addressToCheck === NULL_ADDRESS) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
     }
 
