@@ -148,6 +148,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
     if (location.pathname === '/positions') {
       dispatch(changeMainTab(0));
       dispatch(changeSubTab(1));
+      setOpenFirstSubtab(true);
       history.push(`/positions`);
     } else if (location.pathname === '/swap') {
       setOpenFirstSubtab(false);
@@ -156,6 +157,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
     } else if (location.pathname === '/' || location.pathname === '/create') {
       dispatch(changeMainTab(0));
       dispatch(changeSubTab(0));
+      setOpenFirstSubtab(true);
       history.push(`/create`);
     }
   }, []);
@@ -164,14 +166,16 @@ const NavBar = ({ isLoading }: NavBarProps) => {
     if (isMainTab) {
       dispatch(changeMainTab(tabValue.index));
       dispatch(changeSubTab(0));
-      history.push(`/${tabValue.url}`);
       setOpenDrawer(false);
+      setOpenFirstSubtab(false);
+      history.push(`/${tabValue.url}`);
     } else {
       setOpenFirstSubtab(!openFirstSubTab);
     }
   };
 
-  const handleSubTabChange = (tabValue: { index: number; url: string }) => {
+  const handleSubTabChange = (tabValue: { index: number; mainIndex: number; url: string }) => {
+    dispatch(changeMainTab(tabValue.index));
     dispatch(changeSubTab(tabValue.index));
     setOpenDrawer(false);
     history.push(`/${tabValue.url}`);
@@ -227,13 +231,19 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             </ListItemButton>
             <Collapse in={openFirstSubTab} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }} onClick={() => handleSubTabChange({ index: 0, url: 'create' })}>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  onClick={() => handleSubTabChange({ index: 0, mainIndex: 0, url: 'create' })}
+                >
                   <ListItemIcon>
                     <AddIcon />
                   </ListItemIcon>
                   <ListItemText primary={<FormattedMessage description="create" defaultMessage="Create" />} />
                 </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }} onClick={() => handleSubTabChange({ index: 1, url: 'positions' })}>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  onClick={() => handleSubTabChange({ index: 1, mainIndex: 0, url: 'positions' })}
+                >
                   <ListItemIcon>
                     <ViewListIcon />
                   </ListItemIcon>
@@ -288,7 +298,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               <WhaveLogoDark size="45px" />
               <StyledTabs
                 breakpoint={currentBreakPoint}
-                TabIndicatorProps={{ style: { bottom: '-10px' } }}
+                TabIndicatorProps={{ style: { bottom: openFirstSubTab ? '0px' : '-10px' } }}
                 value={tabIndex}
               >
                 <StyledTab
@@ -333,14 +343,14 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                 <StyledTabs
                   breakpoint={currentBreakPoint}
                   TabIndicatorProps={{ style: { bottom: '-10px' } }}
-                  value={subTabIndex}
+                  value={tabIndex === 0 ? subTabIndex : 1000}
                 >
                   <StyledTab
-                    onClick={() => handleSubTabChange({ index: 0, url: 'create' })}
+                    onClick={() => handleSubTabChange({ index: 0, mainIndex: 0, url: 'create' })}
                     label={<FormattedMessage description="create" defaultMessage="Create" />}
                   />
                   <StyledTab
-                    onClick={() => handleSubTabChange({ index: 1, url: 'positions' })}
+                    onClick={() => handleSubTabChange({ index: 1, mainIndex: 0, url: 'positions' })}
                     label={<FormattedMessage description="positions" defaultMessage="Positions" />}
                   />
                 </StyledTabs>

@@ -2,6 +2,8 @@ import { ethers, BigNumber } from 'ethers';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import React from 'react';
 import { Interface } from '@ethersproject/abi';
+import mapKeys from 'lodash/mapKeys';
+import mapValues from 'lodash/mapValues';
 import { TransactionResponse, Network } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
 import { GetUsedTokensData, Token } from 'types';
@@ -163,6 +165,24 @@ export default class WalletService {
           ...(hasProtocolToken && protocolBalance ? { [PROTOCOL_TOKEN_ADDRESS]: protocolBalance } : {}),
         }
       );
+  }
+
+  async get1InchBalances(): Promise<Record<string, BigNumber>> {
+    const account = this.getAccount();
+    const currentNetwork = await this.getNetwork();
+
+    if (!account) return Promise.resolve({});
+
+    const inchResponse = await this.axiosClient.get<Record<string, string>>(
+      `https://balances.1inch.io/v1.1/${currentNetwork.chainId}/balances/${account}`
+    );
+
+    const balances = inchResponse.data;
+
+    return mapValues(
+      mapKeys(balances, (value, key) => key.toLowerCase()),
+      (balance) => BigNumber.from(balance)
+    );
   }
 
   async getCustomToken(address: string): Promise<{ token: Token; balance: BigNumber } | undefined> {

@@ -33,6 +33,7 @@ import useCustomToken from 'hooks/useCustomToken';
 import useAllowedPairs from 'hooks/useAllowedPairs';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useCustomTokens } from 'state/token-lists/hooks';
+import use1InchBalances from 'hooks/use1InchBalances';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -270,6 +271,7 @@ const TokenPicker = ({
   const allowedPairs = useAllowedPairs();
   let tokenKeysToUse: string[] = [];
   const customTokens = useCustomTokens();
+  const [inchBalances, isLoadingInchBalances] = use1InchBalances();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
 
   const uniqTokensFromPairs = React.useMemo(
@@ -366,25 +368,33 @@ const TokenPicker = ({
     !isAggregator || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
   );
 
+  const balances = React.useMemo(
+    () => ({
+      ...(inchBalances || {}),
+      ...(tokenBalances || {}),
+    }),
+    [tokenBalances, inchBalances]
+  );
+
   const memoizedTokenKeys = React.useMemo(
     () => [
       ...(customToken ? [customToken.token.address] : []),
       ...memoizedUnorderedTokenKeys.sort((tokenKeyA, tokenKeyB) => {
-        if (!tokenBalances) return tokenKeyA < tokenKeyB ? -1 : 1;
+        if (!balances) return tokenKeyA < tokenKeyB ? -1 : 1;
 
         const tokenABalance =
-          (tokenBalances[tokenKeyA] &&
-            parseFloat(formatUnits(tokenBalances[tokenKeyA].balanceUsd, tokenList[tokenKeyA].decimals + 18))) ||
+          (balances[tokenKeyA] &&
+            parseFloat(formatUnits(balances[tokenKeyA].balanceUsd, tokenList[tokenKeyA].decimals + 18))) ||
           0;
         const tokenBBalance =
-          (tokenBalances[tokenKeyB] &&
-            parseFloat(formatUnits(tokenBalances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
+          (balances[tokenKeyB] &&
+            parseFloat(formatUnits(balances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
           0;
 
         return tokenABalance > tokenBBalance ? -1 : 1;
       }),
     ],
-    [tokenBalances, memoizedUnorderedTokenKeys, tokenList, customToken]
+    [balances, memoizedUnorderedTokenKeys, tokenList, customToken]
   );
 
   const handleItemSelected = (token: Token, isCustomToken: boolean) => {
@@ -395,19 +405,20 @@ const TokenPicker = ({
     handleOnClose();
   };
 
+  const isLoadingBalances = isLoadingInchBalances || isLoadingTokenBalances;
+
   const itemData: RowData = React.useMemo(
     () => ({
       onClick: handleItemSelected,
       tokenList,
       tokenKeys: memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
-      tokenBalances:
-        isLoadingTokenBalances && (!tokenBalances || !Object.keys(tokenBalances).length) ? {} : tokenBalances || {},
+      tokenBalances: isLoadingBalances && (!balances || !Object.keys(balances).length) ? {} : balances || {},
       customToken,
-      isLoadingTokenBalances,
+      isLoadingTokenBalances: isLoadingBalances,
       customTokens,
     }),
-    [memoizedTokenKeys, tokenList, tokenBalances, yieldOptions, customToken, isLoadingTokenBalances]
+    [memoizedTokenKeys, tokenList, balances, yieldOptions, customToken, isLoadingBalances]
   );
 
   return (
