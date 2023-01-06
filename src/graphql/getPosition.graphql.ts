@@ -132,6 +132,7 @@ const getPosition = gql`
         ... on WithdrewAction {
           withdrawn
           withdrawnUnderlying
+          withdrawnUnderlyingAccum
         }
 
         ... on SwappedAction {

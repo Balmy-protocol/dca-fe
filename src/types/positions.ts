@@ -121,6 +121,7 @@ export interface ActionState {
   swappedUnderlying: string;
   oldRateUnderlying: string;
   withdrawnUnderlying: string;
+  withdrawnUnderlyingAccum: string;
   rateUnderlying: string;
   depositedRateUnderlying: string;
   withdrawnSwapped: string;

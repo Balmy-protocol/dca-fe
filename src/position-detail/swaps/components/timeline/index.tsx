@@ -657,7 +657,11 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
 const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <OpenInNewIcon />,
   content: () => {
-    const withdrawn = positionState.withdrawnUnderlying || positionState.withdrawn;
+    const { withdrawnUnderlying, withdrawnUnderlyingAccum, withdrawn: withdrawnBase } = positionState;
+    const yieldAmount = withdrawnUnderlyingAccum
+      ? BigNumber.from(withdrawnUnderlying).sub(BigNumber.from(withdrawnUnderlyingAccum))
+      : null;
+    const withdrawn = withdrawnUnderlyingAccum || withdrawnUnderlying || withdrawnBase;
     const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
       position.to,
       BigNumber.from(withdrawn),
@@ -672,7 +676,27 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
     );
 
     const showPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
+
     const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
+
+    const [toCurrentYieldPrice, isLoadingToCurrentYieldPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(yieldAmount || '0'), // check this syntax
+      undefined,
+      position.chainId
+    );
+
+    const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(yieldAmount || '0'),
+      positionState.createdAtTimestamp,
+      position.chainId
+    );
+
+    const showYieldPrices =
+      !isLoadingToYieldPrice && !!toCurrentPrice && !isLoadingToCurrentYieldPrice && !!toCurrentYieldPrice;
+
+    const [showCurrentYieldPrice, setShouldShowCurrentYieldPrice] = useState(true);
 
     return (
       <>
@@ -701,6 +725,35 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
             >
               <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(withdrawn), position.to)}</Typography>
             </CustomChip>
+            {yieldAmount && (
+              <>
+                <FormattedMessage description="positionWithdrawn" defaultMessage="+ yield" />
+                <CustomChip
+                  icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+                  pointer
+                  extraText={
+                    showYieldPrices && (
+                      <DarkTooltip
+                        title={
+                          showCurrentYieldPrice
+                            ? 'Displaying current value. Click to show value on day of withdrawal'
+                            : 'Estimated value on day of withdrawal'
+                        }
+                        arrow
+                        placement="top"
+                        onClick={() => setShouldShowCurrentYieldPrice(!showCurrentYieldPrice)}
+                      >
+                        <div>
+                          (${showCurrentYieldPrice ? toCurrentYieldPrice?.toFixed(2) : toYieldPrice?.toFixed(2)} USD)
+                        </div>
+                      </DarkTooltip>
+                    )
+                  }
+                >
+                  <Typography variant="body1">{formatCurrencyAmount(yieldAmount, position.to)}</Typography>
+                </CustomChip>
+              </>
+            )}
             <FormattedMessage description="positionWithdrawnSecond" defaultMessage=" from position" />
           </StyledTimelineWrappedContent>
         </Grid>
