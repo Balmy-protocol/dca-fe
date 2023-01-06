@@ -15,7 +15,7 @@ import {
 } from 'state/transactions/hooks';
 import { NetworkStruct, TransactionDetails } from 'types';
 import useBuildTransactionDetail from 'hooks/useBuildTransactionDetail';
-import { clearAllTransactions } from 'state/transactions/actions';
+import { clearAllTransactions, removeTransaction } from 'state/transactions/actions';
 import { useAppDispatch } from 'state/hooks';
 import Link from '@mui/material/Link';
 import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/etherscan';
@@ -109,6 +109,10 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
     onClose();
   };
 
+  const onRemoveTransactionItem = ({ hash, chainId }: { hash: string; chainId: number }) => {
+    dispatch(removeTransaction({ hash, chainId }));
+  };
+
   return (
     <Modal
       open={open}
@@ -161,6 +165,17 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
               content: buildTransactionDetail(transaction),
               link: buildEtherscanTransaction(transaction.hash, transaction.chainId || currentNetwork.chainId),
               isPending: transaction.isPending,
+              id: transaction.hash,
+              contextMenu: [
+                {
+                  label: <FormattedMessage description="ignoretransaction" defaultMessage="Ignore transaction" />,
+                  action: onRemoveTransactionItem,
+                  extraData: {
+                    hash: transaction.hash,
+                    chainId,
+                  },
+                },
+              ],
               icon:
                 (chainId && networks[chainId] && (
                   <TokenIcon size="20px" token={emptyTokenWithAddress(networks[chainId].mainCurrency || '')} />

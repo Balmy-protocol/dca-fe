@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CircularProgress from '@mui/material/CircularProgress';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 const StyledTimeline = styled(Grid)`
   position: relative;
@@ -74,35 +76,84 @@ const StyledTimelineContent = styled.div`
 
 const StyledTimelineLink = styled.div``;
 
+interface TimelineContextMenuItem {
+  label: React.ReactNode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  action: (extraData?: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  extraData?: any;
+}
 interface TimelineItemProps {
   content: React.ReactNode;
   link: string;
   isPending: boolean;
   icon?: React.ReactElement;
+  id?: string;
+  contextMenu?: TimelineContextMenuItem[];
 }
 
 interface TimelineProps {
   items: TimelineItemProps[];
 }
 
-const MinimalTimeline = ({ items }: TimelineProps) => (
-  <StyledTimeline container>
-    {items.map((item) => (
-      <StyledTimelineContainer item xs={12} key={item.link}>
-        {item.icon ? <StyledTimelineIcon hasIcon>{item.icon}</StyledTimelineIcon> : <StyledTimelineIcon />}
-        <StyledTimelineContent>
-          <Typography variant="body1">{item.content}</Typography>
-        </StyledTimelineContent>
-        <StyledTimelineLink>
-          {item.isPending && <CircularProgress size={24} />}
-          {!item.isPending && (
-            <IconButton aria-label="close" onClick={() => window.open(item.link, '_blank')}>
-              <OpenInNewIcon style={{ color: '#3076F6', fontSize: '1.5rem' }} />
-            </IconButton>
-          )}
-        </StyledTimelineLink>
-      </StyledTimelineContainer>
-    ))}
-  </StyledTimeline>
-);
+const MinimalTimeline = ({ items }: TimelineProps) => {
+  const [contextMenu, setContextMenu] = React.useState<{
+    mouseX: number;
+    mouseY: number;
+    item: number;
+  } | null>(null);
+
+  const handleContextMenu = (event: React.MouseEvent, index: number) => {
+    event.preventDefault();
+    setContextMenu(
+      contextMenu === null
+        ? {
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
+            item: index,
+          }
+        : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+          // Other native context menus might behave different.
+          // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+          null
+    );
+  };
+
+  const handleClose = (item: TimelineContextMenuItem) => {
+    setContextMenu(null);
+    item.action(item.extraData);
+  };
+
+  return (
+    <StyledTimeline container>
+      {items.map((item, index) => (
+        <StyledTimelineContainer item xs={12} key={item.link} onContextMenu={(evt) => handleContextMenu(evt, index)}>
+          {item.icon ? <StyledTimelineIcon hasIcon>{item.icon}</StyledTimelineIcon> : <StyledTimelineIcon />}
+          <StyledTimelineContent>
+            <Typography variant="body1">{item.content}</Typography>
+          </StyledTimelineContent>
+          <StyledTimelineLink>
+            {item.isPending && <CircularProgress size={24} />}
+            {!item.isPending && (
+              <IconButton aria-label="close" onClick={() => window.open(item.link, '_blank')}>
+                <OpenInNewIcon style={{ color: '#3076F6', fontSize: '1.5rem' }} />
+              </IconButton>
+            )}
+          </StyledTimelineLink>
+        </StyledTimelineContainer>
+      ))}
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleClose}
+        anchorReference="anchorPosition"
+        anchorPosition={contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
+      >
+        {items[contextMenu?.item || 0] &&
+          items[contextMenu?.item || 0].contextMenu?.map((item) => (
+            <MenuItem onClick={() => handleClose(item)}>{item.label}</MenuItem>
+          ))}
+      </Menu>
+    </StyledTimeline>
+  );
+};
 export default MinimalTimeline;
