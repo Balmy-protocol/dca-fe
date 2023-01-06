@@ -4,11 +4,16 @@ const getPairPrices = gql`
   query getPairPrices($id: ID) {
     pair(id: $id) {
       id
-      swaps(orderBy: executedAtTimestamp, orderDirection: desc) {
+      swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1000) {
         id
         executedAtTimestamp
-        ratePerUnitBToA
-        ratePerUnitAToB
+        ratioBToA
+        ratioAToB
+        pairSwapsIntervals {
+          swapInterval {
+            interval
+          }
+        }
       }
     }
   }
