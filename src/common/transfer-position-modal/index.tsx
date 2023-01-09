@@ -10,6 +10,7 @@ import { TRANSACTION_TYPES } from 'config/constants';
 import TextField from '@mui/material/TextField';
 import usePositionService from 'hooks/usePositionService';
 import { fullPositionToMappedPosition } from 'utils/parsing';
+import useErrorService from 'hooks/useErrorService';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -33,6 +34,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const [toAddress, setToAddress] = React.useState('');
   const positionService = usePositionService();
+  const errorService = useErrorService();
   const addTransaction = useTransactionAdder();
 
   const validator = (nextValue: string) => {
@@ -82,6 +84,16 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error while transfering position', JSON.stringify(e), {
+          position: position.id,
+          to: toAddress,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: 'Error while transfering position',

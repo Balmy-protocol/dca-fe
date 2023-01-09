@@ -343,4 +343,13 @@ export default class MeanApiService {
       return [];
     }
   }
+
+  async logError(error: string, errorMessage: string, extraData?: unknown) {
+    return this.axiosClient.post(`${MEAN_API_URL}/v1/error-reporting`, {
+      error,
+      errorMessage,
+      url: window.location.pathname,
+      extraData,
+    });
+  }
 }

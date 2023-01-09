@@ -24,6 +24,7 @@ import WalletService from './walletService';
 import YieldService from './yieldService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
+import ErrorService from './errorService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -71,6 +72,8 @@ export default class Web3Service {
   arcxSdk: ArcxAnalyticsSdk;
 
   providerService: ProviderService;
+
+  errorService: ErrorService;
 
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -131,6 +134,7 @@ export default class Web3Service {
       this.providerService
     );
     this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
+    this.errorService = new ErrorService(this.meanApiService);
   }
 
   setArcxClient(newArcxClient: ArcxAnalyticsSdk) {
@@ -159,6 +163,10 @@ export default class Web3Service {
 
   getPositionService() {
     return this.positionService;
+  }
+
+  getErrorService() {
+    return this.errorService;
   }
 
   getWalletService() {

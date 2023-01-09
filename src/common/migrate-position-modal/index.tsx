@@ -9,6 +9,7 @@ import { useTransactionAdder } from 'state/transactions/hooks';
 import { TRANSACTION_TYPES } from 'config/constants';
 import Link from '@mui/material/Link';
 import usePositionService from 'hooks/usePositionService';
+import useErrorService from 'hooks/useErrorService';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -32,6 +33,7 @@ interface MigratePositionModalProps {
 const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const positionService = usePositionService();
+  const errorService = useErrorService();
   const addTransaction = useTransactionAdder();
 
   const handleMigrate = async () => {
@@ -71,6 +73,16 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error migrating position', JSON.stringify(e), {
+          from: position.from.address,
+          to: position.to.address,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: 'error while migrating position',

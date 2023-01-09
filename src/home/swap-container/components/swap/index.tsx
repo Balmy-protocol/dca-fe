@@ -58,6 +58,7 @@ import useContractService from 'hooks/useContractService';
 import usePositionService from 'hooks/usePositionService';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import useWeb3Service from 'hooks/useWeb3Service';
+import useErrorService from 'hooks/useErrorService';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
 
@@ -157,6 +158,7 @@ const Swap = ({
   const positionService = usePositionService();
   const contractService = useContractService();
   const availablePairs = useAvailablePairs();
+  const errorService = useErrorService();
   // const pairService = usePairService();
   const [balance, , balanceErrors] = useBalance(from);
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
@@ -306,6 +308,16 @@ const Swap = ({
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error approving token', JSON.stringify(e), {
+          from: from.address,
+          to: to.address,
+          chainId: currentNetwork.chainId,
+        });
+      }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
     }
@@ -378,6 +390,16 @@ const Swap = ({
       setFromYield(undefined);
       setCreateStep(0);
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      // if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      void errorService.logError('Error creating position', JSON.stringify(e), {
+        from: from.address,
+        to: to.address,
+        chainId: currentNetwork.chainId,
+      });
+      // }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error creating position', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

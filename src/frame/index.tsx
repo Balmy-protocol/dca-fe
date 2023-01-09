@@ -145,25 +145,39 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                     <ErrorBoundary error={initializationError}>
                       <Switch>
                         <Route path="/faq">
+                          {/* <RollbarContext context="/faq"> */}
                           <FAQ />
+                          {/* </RollbarContext> */}
                         </Route>
                         <Route path="/positions/:positionId">
+                          {/* <RollbarContext context="/positions/details"> */}
                           <PositionDetail />
+                          {/* </RollbarContext> */}
                         </Route>
                         <Route path="/:chainId/positions/:positionVersion/:positionId">
+                          {/* <RollbarContext context="/positions/details"> */}
                           <PositionDetail />
+                          {/* </RollbarContext> */}
                         </Route>
                         <Route path="/leaderboard">
+                          {/* <RollbarContext context="/leaderboard"> */}
                           <Leaderboard />
+                          {/* </RollbarContext> */}
                         </Route>
                         <Route path="/positions">
+                          {/* <RollbarContext context="/positions"> */}
                           <Home isLoading={isLoading || isLoadingNetwork} />
+                          {/* </RollbarContext> */}
                         </Route>
                         <Route path="/create/:chainId?/:from?/:to?">
+                          {/* <RollbarContext context="/create"> */}
                           <Home isLoading={isLoading || isLoadingNetwork} />
+                          {/* </RollbarContext> */}
                         </Route>
                         <Route path="/:chainId?/:from?/:to?">
+                          {/* <RollbarContext context="/main"> */}
                           <Home isLoading={isLoading || isLoadingNetwork} />
+                          {/* </RollbarContext> */}
                         </Route>
                       </Switch>
                     </ErrorBoundary>

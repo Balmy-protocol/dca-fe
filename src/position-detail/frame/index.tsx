@@ -54,6 +54,7 @@ import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
 import Link from '@mui/material/Link';
 import useTotalGasSaved from 'hooks/useTotalGasSaved';
 import { BigNumber } from 'ethers';
+import useErrorService from 'hooks/useErrorService';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
 
@@ -103,6 +104,7 @@ const PositionDetailFrame = () => {
   const tabIndex = usePositionDetailsTab();
   const dispatch = useAppDispatch();
   const positionService = usePositionService();
+  const errorService = useErrorService();
   const currentNetwork = useCurrentNetwork();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
@@ -299,6 +301,16 @@ const PositionDetailFrame = () => {
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error while withdrawing', JSON.stringify(e), {
+          position: position.id,
+          useProtocolToken,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error while withdrawing', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -380,6 +392,16 @@ const PositionDetailFrame = () => {
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error while withdrawing funds', JSON.stringify(e), {
+          position: position.chainId,
+          useProtocolToken,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: 'Error while withdrawing funds',
