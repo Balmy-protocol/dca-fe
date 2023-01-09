@@ -21,6 +21,7 @@ import Paper from '@mui/material/Paper';
 import usePositionService from 'hooks/usePositionService';
 import { fullPositionToMappedPosition } from 'utils/parsing';
 import useAccount from 'hooks/useAccount';
+import useErrorService from 'hooks/useErrorService';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;
@@ -59,6 +60,7 @@ const PositionPermissionsContainer = ({
   const account = useAccount();
   const [shouldShowAddAddressModal, setShouldShowAddAddressModal] = React.useState(false);
   const dispatch = useAppDispatch();
+  const errorService = useErrorService();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
 
@@ -106,6 +108,16 @@ const PositionPermissionsContainer = ({
       });
       dispatch(submitPermissionChanges());
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error setting permissions', JSON.stringify(e), {
+          position: position.id,
+          permissions,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: 'Error setting permissions',
