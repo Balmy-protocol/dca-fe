@@ -368,7 +368,10 @@ const Swap = ({
     from &&
     !!fromValueToUse &&
     !!balance &&
-    parseUnits(fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).gt(balance);
+    parseUnits(
+      selectedRoute?.maxSellAmount?.amountInUnits.toString() || fromValueToUse,
+      selectedRoute?.sellToken.decimals || from.decimals
+    ).gt(balance);
 
   const isApproved =
     !from ||

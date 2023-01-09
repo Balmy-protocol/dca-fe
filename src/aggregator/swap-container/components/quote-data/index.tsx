@@ -66,6 +66,32 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
             : '-'}
         </Typography>
       </StyledQuoteDataItem>
+      {quote?.maxSellAmount && (
+        <StyledQuoteDataItem>
+          <Typography variant="body2" color="inherit">
+            <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
+          </Typography>
+          <StyledMinimumContainer>
+            <Typography variant="body2" color="inherit">
+              {quote.maxSellAmount.amount
+                ? `${formatCurrencyAmount(quote.maxSellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`
+                : '-'}
+            </Typography>
+            <Tooltip
+              title={
+                <FormattedMessage
+                  description="quoteDataMaximumTooltip"
+                  defaultMessage="This is the maximum you will spend based on your slippage settings"
+                />
+              }
+              arrow
+              placement="top"
+            >
+              <HelpOutlineIcon fontSize="small" />
+            </Tooltip>
+          </StyledMinimumContainer>
+        </StyledQuoteDataItem>
+      )}
       <StyledQuoteDataItem>
         <Typography variant="body2" color="inherit">
           <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
