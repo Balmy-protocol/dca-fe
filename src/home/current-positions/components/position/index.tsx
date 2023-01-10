@@ -16,6 +16,7 @@ import useAvailablePairs from 'hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
@@ -565,6 +566,19 @@ const ActivePosition = ({
                   </Typography>
                 </CustomChip>
               )}
+            </StyledDetailWrapper>
+          )}
+          {((position.from.symbol === 'CRV' && foundYieldFrom) || (position.to.symbol === 'CRV' && foundYieldTo)) && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
+                <FormattedMessage
+                  description="positionCRVNotSupported"
+                  defaultMessage="Unfortunately, the CRV token can no longer be used as collateral on Aave V3. This means that it's not possible to swap this position."
+                />
+              </Typography>
             </StyledDetailWrapper>
           )}
         </StyledContentContainer>
