@@ -54,6 +54,7 @@ import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
 import Link from '@mui/material/Link';
 import useTotalGasSaved from 'hooks/useTotalGasSaved';
 import { BigNumber } from 'ethers';
+import Alert from '@mui/material/Alert';
 import useErrorService from 'hooks/useErrorService';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
@@ -473,6 +474,17 @@ const PositionDetailFrame = () => {
             </Link>
           </Button>
         </Grid>
+        {((position.from.symbol === 'CRV' && position.from.underlyingTokens.length) ||
+          (position.to.symbol === 'CRV' && position.to.underlyingTokens.length)) && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionCRVNotSupported"
+                defaultMessage="Unfortunately, the CRV token can no longer be used as collateral on Aave V3. This means that it's not possible to swap this position. We recommend closing this position."
+              />
+            </Alert>
+          </Grid>
+        )}
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
           <StyledTabs
             value={tabIndex}
