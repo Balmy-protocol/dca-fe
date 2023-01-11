@@ -154,24 +154,24 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   fantom: {
     chainId: 250,
     name: 'Fantom',
-    mainCurrency: '',
+    mainCurrency: '250-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'Fantom',
+      symbol: 'FTM',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://rpcapi.fantom.network', 'https://fantom.blockpi.network/v1/rpc/public'],
   },
   avalanche: {
     chainId: 43114,
     name: 'Avalanche',
-    mainCurrency: '',
+    mainCurrency: '43114-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'Avalanche',
+      symbol: 'AVAX',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://rpc.ankr.com/avalanche', 'https://avalanche.blockpi.network/v1/rpc/public'],
   },
   arbitrum: {
     chainId: 42161,
@@ -188,13 +188,13 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   heco: {
     chainId: 128,
     name: 'Heco',
-    mainCurrency: '',
+    mainCurrency: '128-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'Huobi',
+      symbol: 'HT',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://http-mainnet.hecochain.com'],
   },
   optimism: {
     chainId: 10,
@@ -246,24 +246,24 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   harmony: {
     chainId: 1666600000,
     name: 'Harmony',
-    mainCurrency: '',
+    mainCurrency: '1666600000-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'Harmony',
+      symbol: 'ONE',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://rpc.ankr.com/harmony', 'https://harmony-mainnet.chainstacklabs.com'],
   },
   xdai: {
     chainId: 100,
     name: 'xDAI',
-    mainCurrency: '',
+    mainCurrency: '0x6810e776880c02933d47db1b9fc05908e5386b96',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'xDAI',
+      symbol: 'xDAI',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://rpc.gnosischain.com', 'https://rpc.ankr.com/gnosis'],
   },
 };
 
@@ -284,6 +284,18 @@ export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
   NETWORKS.mainnet.chainId,
 ];
 export const SUPPORTED_NETWORKS = [
+  NETWORKS.mainnet.chainId,
+  NETWORKS.optimism.chainId,
+  NETWORKS.polygon.chainId,
+  NETWORKS.arbitrum.chainId,
+  NETWORKS.bsc.chainId,
+  NETWORKS.fantom.chainId,
+  NETWORKS.avalanche.chainId,
+  NETWORKS.heco.chainId,
+  NETWORKS.xdai.chainId,
+];
+
+export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.mainnet.chainId,
   NETWORKS.optimism.chainId,
   NETWORKS.polygon.chainId,
@@ -310,6 +322,11 @@ export const NETWORKS_FOR_MENU = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.mainnet.chainId,
+  NETWORKS.bsc.chainId,
+  NETWORKS.fantom.chainId,
+  NETWORKS.avalanche.chainId,
+  NETWORKS.heco.chainId,
+  NETWORKS.xdai.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
@@ -318,6 +335,8 @@ export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct
   [POSITION_VERSION_3]: NETWORKS.optimism,
   [POSITION_VERSION_4]: NETWORKS.polygon,
 };
+
+export const DEFAULT_NETWORK_FOR_AGGREGATOR = NETWORKS.mainnet;
 
 export const HUB_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_1]: {

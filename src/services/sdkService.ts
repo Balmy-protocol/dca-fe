@@ -33,15 +33,18 @@ export default class SdkService {
     slippagePercentage?: number,
     gasSpeed?: GasKeys,
     takerAddress?: string,
-    skipValidation?: boolean
+    skipValidation?: boolean,
+    chainId?: number
   ) {
     const currentNetwork = await this.walletService.getNetwork();
+
+    const network = chainId || currentNetwork.chainId;
 
     const responses = await this.sdk.quoteService.getAllQuotes(
       {
         sellToken: from,
         buyToken: to,
-        chainId: currentNetwork.chainId,
+        chainId: network,
         order: buyAmount
           ? {
               type: 'buy',
@@ -66,6 +69,8 @@ export default class SdkService {
         ignoredFailed: false,
       }
     );
+
+    console.log('aggregator responses', responses);
 
     return responses;
   }

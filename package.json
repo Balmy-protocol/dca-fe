@@ -12,7 +12,8 @@
     "test": "jest --config jest.config.ts",
     "prettier": "prettier --write --ignore-unknown ./src",
     "prepare-husky": "husky install",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "extract": "formatjs extract"
   },
   "repository": {
     "type": "git",
@@ -104,7 +105,7 @@
     "@mean-finance/dca-v2-core": "^3.0.0",
     "@mean-finance/dca-v2-periphery": "^3.0.0",
     "@mean-finance/oracles": "^2.0.0",
-    "@mean-finance/sdk": "0.0.4",
+    "@mean-finance/sdk": "0.0.5",
     "@mean-finance/transformers": "^1.0.0",
     "@metamask/detect-provider": "^1.2.0",
     "@mui-treasury/components": "^1.10.1",

@@ -33,6 +33,7 @@ import ATM from './atm.svg';
 import ATOM from './atom.svg';
 import AUDR from './audr.svg';
 import AUTO from './auto.svg';
+import AVAX from './avax.svg';
 import AYWA from './aywa.svg';
 import BAB from './bab.svg';
 import BAL from './bal.svg';
@@ -169,6 +170,7 @@ import FLDC from './fldc.svg';
 import FLO from './flo.svg';
 import FSN from './fsn.svg';
 import FTC from './ftc.svg';
+import FTM from './ftm.svg';
 import FUEL from './fuel.svg';
 import FUN from './fun.svg';
 import GAME from './game.svg';
@@ -516,7 +518,7 @@ import ZRX from './zrx.svg';
 //   BLK,
 //   BLOCK,
 //   BLZ,
-//   BNB,
+// BNB,
 //   BNT,
 //   BNTY,
 //   BOOTY,
@@ -1085,6 +1087,11 @@ const manifest = {
   '137-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,
   '80001-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,
   '42161-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
+  '56-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': BNB,
+  '250-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': FTM,
+  '43114-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': AVAX,
+  '128-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': HT,
+  '100-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': DAI,
   ETHOS,
   ETN,
   ETP,

@@ -24,7 +24,6 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { useTransactionAdder } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useWalletService from 'hooks/useWalletService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useAggregatorService from 'hooks/useAggregatorService';
@@ -35,6 +34,9 @@ import TransactionSteps, { TransactionAction as TransactionStep } from 'common/t
 import { GasKeys } from 'config/constants/aggregator';
 import { useAppDispatch } from 'state/hooks';
 import useSimulationService from 'hooks/useSimulationService';
+import { useHistory } from 'react-router-dom';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { setAggregatorChainId } from 'state/aggregator/actions';
 import { addCustomToken } from 'state/token-lists/actions';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -108,15 +110,22 @@ const Swap = ({
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
   const [balance, , balanceErrors] = useBalance(from);
-  const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const [usedTokens] = useUsedTokens();
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const simulationService = useSimulationService();
+  const history = useHistory();
+  const actualCurrentNetwork = useCurrentNetwork();
 
+  const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
+
+  const handleChangeNetwork = (chainId: number) => {
+    dispatch(setAggregatorChainId(chainId));
+    history.replace(`/swap/${chainId}`);
+  };
 
   const fromValueToUse =
     isBuyOrder && selectedRoute
@@ -468,7 +477,13 @@ const Swap = ({
   );
 
   const IncorrectNetworkButton = (
-    <StyledButton size="large" color="primary" variant="contained" disabled fullWidth>
+    <StyledButton
+      size="large"
+      color="secondary"
+      variant="contained"
+      onClick={() => walletService.changeNetwork(currentNetwork.chainId)}
+      fullWidth
+    >
       <Typography variant="body1">
         <FormattedMessage
           description="incorrect network"
@@ -576,6 +591,7 @@ const Swap = ({
         <SwapFirstStep
           from={from}
           to={to}
+          onChangeNetwork={handleChangeNetwork}
           fromValue={fromValueToUse}
           toValue={toValueToUse}
           toggleFromTo={toggleFromTo}

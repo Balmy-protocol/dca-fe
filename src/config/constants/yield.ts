@@ -13,8 +13,12 @@ export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
 
 export const DISABLED_YIELDS = ['0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11'];
 
+const BASE_YIELDS_PER_CHAIN: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
+  Object.keys(NETWORKS).reduce((acc, key) => ({ ...acc, [NETWORKS[key].chainId]: [] }), {});
+
 export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
   {
+    ...BASE_YIELDS_PER_CHAIN,
     [NETWORKS.polygon.chainId]: [
       {
         id: '37b04faa-95bb-4ccb-9c4e-c70fa167342b', // aave-v3 USDC

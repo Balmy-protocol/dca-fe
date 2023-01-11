@@ -19,7 +19,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import TokenIcon from 'common/token-icon';
 import { makeStyles, withStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import useTokenList from 'hooks/useTokenList';
 import TokenLists from 'common/token-lists';
 import { formatCurrencyAmount } from 'utils/currency';
@@ -265,7 +265,7 @@ const TokenPicker = ({
   const [search, setSearch] = React.useState('');
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
   const allowedPairs = useAllowedPairs();
@@ -274,6 +274,7 @@ const TokenPicker = ({
   const [inchBalances, isLoadingInchBalances] = use1InchBalances();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
 
+  console.log('selected network is', currentNetwork.chainId);
   const uniqTokensFromPairs = React.useMemo(
     () =>
       uniq(

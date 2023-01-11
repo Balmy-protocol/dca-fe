@@ -14,9 +14,9 @@ import {
 } from 'config/constants/aggregator';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { BigNumber } from 'ethers';
-import useCurrentNetwork from './useCurrentNetwork';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
+import useSelectedNetwork from './useSelectedNetwork';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
@@ -45,10 +45,11 @@ function useSwapOptions(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(walletService.getAccount());
   const account = walletService.getAccount();
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevTransferTo = usePrevious(transferTo);
+  const prevNetwork = usePrevious(currentNetwork.chainId);
   const prevResult = usePrevious(result, false);
   const prevGasSpeed = usePrevious(gasSpeed);
   const prevSlippage = usePrevious(slippage);
@@ -62,7 +63,8 @@ function useSwapOptions(
         debouncedTransferTo?: string | null,
         debouncedGasSpeed?: GasKeys,
         debouncedSlippage?: number,
-        debouncedAccount?: string
+        debouncedAccount?: string,
+        debouncedChainId?: number
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
           const sellBuyValue = debouncedIsBuyOrder
@@ -85,7 +87,8 @@ function useSwapOptions(
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed,
-              debouncedAccount
+              debouncedAccount,
+              debouncedChainId
             );
 
             if (promiseResult.length) {
@@ -104,8 +107,8 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage, account),
-    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed, account]
+    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage, account, currentNetwork.chainId),
+    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed, account, currentNetwork.chainId]
   );
 
   React.useEffect(() => {
@@ -118,6 +121,7 @@ function useSwapOptions(
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
       !isEqual(prevTransferTo, transferTo) ||
       !isEqual(prevGasSpeed, gasSpeed) ||
+      !isEqual(prevNetwork, currentNetwork.chainId) ||
       !isEqual(prevSlippage, slippage)
     ) {
       if (from && to && value) {
@@ -150,6 +154,8 @@ function useSwapOptions(
     prevSlippage,
     gasSpeed,
     prevGasSpeed,
+    prevNetwork,
+    currentNetwork.chainId,
   ]);
 
   if (!from) {

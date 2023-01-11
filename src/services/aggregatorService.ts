@@ -73,9 +73,15 @@ export default class AggregatorService {
     transferTo?: string | null,
     slippage?: number,
     gasSpeed?: GasKeys,
-    takerAddress?: string
+    takerAddress?: string,
+    chainId?: number
   ) {
-    let shouldValidate = !buyAmount;
+    const currentNetwork = await this.walletService.getNetwork();
+
+    const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
+    let shouldValidate = !buyAmount && isOnNetwork;
+
+    const network = chainId || currentNetwork.chainId;
 
     if (takerAddress && sellAmount) {
       // const preAllowanceTarget = await this.sdkService.getAllowanceTarget();
@@ -105,14 +111,13 @@ export default class AggregatorService {
       slippage,
       gasSpeed,
       takerAddress,
-      !shouldValidate
+      !shouldValidate,
+      network
     );
 
     const filteredOptions = swapOptionsResponse.filter((option) => !('failed' in option)) as QuoteResponse[];
 
-    const network = await this.walletService.getNetwork();
-
-    const protocolToken = getProtocolToken(network.chainId);
+    const protocolToken = getProtocolToken(network);
 
     const sellToken = from.address === protocolToken.address ? protocolToken : toToken(from);
     const buyToken = to.address === protocolToken.address ? protocolToken : toToken(to);

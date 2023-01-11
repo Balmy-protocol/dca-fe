@@ -6,7 +6,7 @@ import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { EMPTY_TOKEN } from 'mocks/tokens';
 import { PositionVersions } from 'config';
 import { useBlockNumber } from 'state/block-number/hooks';
-import useCurrentNetwork from './useCurrentNetwork';
+import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import useAccount from './useAccount';
 
@@ -35,7 +35,7 @@ function useAllowance(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = useAccount();
   const prevAccount = usePrevious(account);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false, 'allowance');

@@ -11,7 +11,7 @@ import TokenIcon from 'common/token-icon';
 import { createStyles, FilledInput, Typography } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { formatCurrencyAmount } from 'utils/currency';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import { MAX_DEDUCTION, MIN_AMOUNT_FOR_MAX_DEDUCTION } from 'config';
 
 const StyledTokenInputContainer = styled.div`
@@ -117,7 +117,7 @@ const TokenInput = ({
   usdValue,
 }: TokenInputProps) => {
   const inputRef = React.createRef();
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const validator = (nextValue: string) => {
     // sanitize value
     const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${(token && token.decimals) || 18}}$`);

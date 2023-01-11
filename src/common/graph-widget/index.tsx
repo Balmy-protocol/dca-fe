@@ -18,7 +18,7 @@ import { BigNumber } from 'ethers';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import { ONE_DAY, ONE_HOUR, STABLE_COINS, TOKEN_TYPE_BASE } from 'config/constants';
 import GraphFooter from 'common/graph-footer';
 import EmptyGraph from 'assets/svg/emptyGraph';
@@ -175,7 +175,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
     [tabIndex]
   );
 
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
 
   if (to && from) {
     const toAddress =

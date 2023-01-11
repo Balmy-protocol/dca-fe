@@ -5,7 +5,7 @@ import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { useBlockNumber } from 'state/block-number/hooks';
-import useCurrentNetwork from './useCurrentNetwork';
+import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import useAccount from './useAccount';
 
@@ -26,7 +26,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);

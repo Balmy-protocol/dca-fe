@@ -3,7 +3,7 @@ import isUndefined from 'lodash/isUndefined';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import { YieldOptions } from 'types';
-import useCurrentNetwork from './useCurrentNetwork';
+import useSelectedNetwork from './useSelectedNetwork';
 import useYieldService from './useYieldService';
 import useAccount from './useAccount';
 
@@ -12,7 +12,7 @@ function useYieldOptions(chainId?: number, useBlacklist = false): [YieldOptions 
   const yieldService = useYieldService();
   const [result, setResult] = React.useState<YieldOptions | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const chainIdToUse = chainId || currentNetwork.chainId;
   const prevChainId = usePrevious(chainIdToUse);
   const prevUseBlacklist = usePrevious(useBlacklist);

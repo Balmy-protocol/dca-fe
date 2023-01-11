@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Slide from '@mui/material/Slide';
 import findIndex from 'lodash/findIndex';
 import { useIsTransactionPending } from 'state/transactions/hooks';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import {
   TransactionActionApproveTokenType,
@@ -532,7 +532,7 @@ const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) =
 
 const TransactionSteps = ({ shouldShow, handleClose, transactions }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
 
   const onGoToEtherscan = (transaction: string) => {
     const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);

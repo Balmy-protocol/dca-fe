@@ -18,6 +18,11 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import useUsdPrice from 'hooks/useUsdPrice';
+import find from 'lodash/find';
+import TokenIcon from 'common/token-icon';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
+import { NETWORKS, SUPPORTED_NETWORKS } from 'config';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import AggregatorTokenInput from './aggtokenButton';
@@ -110,6 +115,19 @@ const StyledToggleTokenButton = styled(IconButton)`
   }
 `;
 
+const StyledNetworkButtonsContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+const StyledNetworkButton = styled(Button)`
+  min-width: 0px;
+  border-radius: 20px;
+  padding: 9px;
+`;
+
 interface SwapFirstStepProps {
   from: Token | null;
   fromValue: string;
@@ -131,6 +149,7 @@ interface SwapFirstStepProps {
   slippage: string;
   isApproved: boolean;
   gasSpeed: GasKeys;
+  onChangeNetwork: (chainId: number) => void;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -155,6 +174,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     slippage,
     gasSpeed,
     isApproved,
+    onChangeNetwork,
   } = props;
 
   let fromValueToUse =
@@ -167,13 +187,20 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       '0' ||
       '';
 
+  const selectedNetwork = useSelectedNetwork();
+  const currentNetwork = useCurrentNetwork();
+
   const [fromFetchedPrice] = useUsdPrice(
     from,
-    parseUnits(fromValueToUse || '0', selectedRoute?.sellToken.decimals || from?.decimals)
+    parseUnits(fromValueToUse || '0', selectedRoute?.sellToken.decimals || from?.decimals),
+    undefined,
+    selectedNetwork.chainId
   );
   const [toFetchedPrice] = useUsdPrice(
     to,
-    parseUnits(toValueToUse || '0', selectedRoute?.buyToken.decimals || to?.decimals)
+    parseUnits(toValueToUse || '0', selectedRoute?.buyToken.decimals || to?.decimals),
+    undefined,
+    selectedNetwork.chainId
   );
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;
@@ -219,6 +246,40 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
 
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
+      <Grid item xs={12}>
+        <StyledContentContainer>
+          {/* rate */}
+          <StyledTokensContainer>
+            <Typography variant="body1">
+              <FormattedMessage description="supportedNetworks" defaultMessage="Supported networks:" />
+            </Typography>
+            <StyledNetworkButtonsContainer>
+              {SUPPORTED_NETWORKS.map((network) => {
+                const foundNetwork = find(NETWORKS, { chainId: network });
+
+                if (!foundNetwork) {
+                  return null;
+                }
+
+                return (
+                  <Tooltip title={foundNetwork.name} arrow placement="top">
+                    <div>
+                      <StyledNetworkButton
+                        variant="outlined"
+                        color={selectedNetwork.chainId === network ? 'secondary' : 'default'}
+                        size="small"
+                        onClick={() => onChangeNetwork(network)}
+                      >
+                        <TokenIcon size="20px" token={emptyTokenWithAddress(foundNetwork.mainCurrency)} />
+                      </StyledNetworkButton>
+                    </div>
+                  </Tooltip>
+                );
+              })}
+            </StyledNetworkButtonsContainer>
+          </StyledTokensContainer>
+        </StyledContentContainer>
+      </Grid>
       <Grid item xs={12} sx={{ position: 'relative' }}>
         <StyledContentContainer hasArrow>
           <StyledCogContainer>
@@ -233,7 +294,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               <Typography variant="body1">
                 <FormattedMessage description="youPay" defaultMessage="You pay" />
               </Typography>
-              {balance && from && (
+              {balance && from && currentNetwork.chainId === selectedNetwork.chainId && (
                 <StyledFormHelperText onClick={onSetMaxBalance}>
                   <FormattedMessage
                     description="in wallet"

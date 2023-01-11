@@ -1,6 +1,8 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { SwapOption, Token } from 'types';
 import { SORT_MOST_PROFIT, SwapSortOptions } from 'config/constants/aggregator';
+import { DEFAULT_NETWORK_FOR_AGGREGATOR } from 'config';
+import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import {
   setFromValue,
   setFrom,
@@ -10,6 +12,7 @@ import {
   setSorting,
   resetForm,
   setTransferTo,
+  setAggregatorChainId,
 } from './actions';
 
 export interface AggregatorState {
@@ -21,6 +24,7 @@ export interface AggregatorState {
   selectedRoute: SwapOption | null;
   sorting: SwapSortOptions;
   transferTo: null | string;
+  network: number;
 }
 
 const initialState: AggregatorState = {
@@ -32,6 +36,7 @@ const initialState: AggregatorState = {
   selectedRoute: null,
   sorting: SORT_MOST_PROFIT,
   transferTo: null,
+  network: DEFAULT_NETWORK_FOR_AGGREGATOR.chainId,
 };
 
 export default createReducer(initialState, (builder) =>
@@ -62,6 +67,15 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setTransferTo, (state, { payload }) => {
       state.transferTo = payload;
+    })
+    .addCase(setAggregatorChainId, (state, { payload }) => {
+      state.network = payload;
+      state.to = state.to?.address === PROTOCOL_TOKEN_ADDRESS ? getProtocolToken(payload) : null;
+      state.from = state.from?.address === PROTOCOL_TOKEN_ADDRESS ? getProtocolToken(payload) : null;
+      state.fromValue = '';
+      state.toValue = '';
+      state.transferTo = null;
+      state.selectedRoute = null;
     })
     .addCase(resetForm, (state) => {
       state.fromValue = '';

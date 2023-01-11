@@ -4,7 +4,7 @@ import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { formatCurrencyAmount } from 'utils/currency';
 import { FormattedMessage } from 'react-intl';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip';
 import { getProtocolToken } from 'mocks/tokens';
@@ -37,7 +37,7 @@ interface QuoteDataProps {
 }
 
 const QuoteData = ({ quote, to }: QuoteDataProps) => {
-  const network = useCurrentNetwork();
+  const network = useSelectedNetwork();
 
   const protocolToken = getProtocolToken(network.chainId);
 

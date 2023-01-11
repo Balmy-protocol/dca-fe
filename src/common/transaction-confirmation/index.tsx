@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CircularProgress, { circularProgressClasses } from '@mui/material/CircularProgress';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import { NETWORKS } from 'config';
 import usePrevious from 'hooks/usePrevious';
 import { buildEtherscanTransaction } from 'utils/etherscan';
@@ -104,7 +104,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: Trans
   const isTransactionPending = getPendingTransaction(transaction);
   const [success, setSuccess] = React.useState(false);
   const previousTransactionPending = usePrevious(isTransactionPending);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const [timer, setTimer] = React.useState(TIMES_PER_NETWORK[currentNetwork.chainId]);
   const minutes = Math.floor(timer / 60);
   const seconds = timer - minutes * 60;

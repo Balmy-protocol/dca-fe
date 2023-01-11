@@ -9,8 +9,13 @@ import {
   fetchTokenList,
 } from './actions';
 
+export interface TokenListsWithParser extends TokensLists {
+  parser?: (list: TokensLists) => Token[];
+  chainId?: number;
+}
+
 export interface TokenListsState {
-  byUrl: { [tokenListUrl: string]: TokensLists };
+  byUrl: { [tokenListUrl: string]: TokenListsWithParser };
   activeLists: string[];
   activeAggregatorLists: string[];
   hasLoaded: boolean;
@@ -78,12 +83,72 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
   },
+  'https://tokens.1inch.io/v1.1/56': {
+    name: '1Inch BSC',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 56,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
+  'https://tokens.1inch.io/v1.1/250': {
+    name: '1Inch FANTOM',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 250,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
+  'https://tokens.1inch.io/v1.1/43114': {
+    name: '1Inch AVALANCHE',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 43114,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
+  'https://tokens.1inch.io/v1.1/100': {
+    name: '1Inch xDAI',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 100,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
   activeAggregatorLists: [
     'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
     'tokens.1inch.eth',
+    'https://tokens.1inch.io/v1.1/56',
+    'https://tokens.1inch.io/v1.1/250',
+    'https://tokens.1inch.io/v1.1/43114',
+    'https://tokens.1inch.io/v1.1/100',
     'custom-tokens',
   ],
   byUrl: getDefaultByUrl(),
@@ -122,9 +187,20 @@ export default createReducer(initialState, (builder) =>
       state.byUrl[arg].requestId = requestId;
     })
     .addCase(fetchTokenList.fulfilled, (state, { payload, meta: { arg } }) => {
-      const mappedTokens: Token[] = payload.tokens.map<Token>((token) => ({
+      let tokens = [];
+
+      if (state.byUrl[arg].parser) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        tokens = state.byUrl[arg].parser(payload as unknown as TokensLists);
+      } else {
+        tokens = payload.tokens;
+      }
+
+      const mappedTokens: Token[] = tokens.map<Token>((token) => ({
         ...token,
         address: token.address.toLowerCase(),
+        chainId: state.byUrl[arg].chainId || token.chainId,
       }));
 
       state.byUrl[arg] = {
