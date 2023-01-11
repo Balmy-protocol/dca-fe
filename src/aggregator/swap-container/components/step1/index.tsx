@@ -204,6 +204,16 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const hasNonDefaultSettings =
     slippage !== DEFAULT_AGGREGATOR_SETTINGS.slippage.toString() || gasSpeed !== DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
 
+  const priceImpact =
+    selectedRoute &&
+    (
+      Math.round(
+        ((Number(selectedRoute.buyAmount.amountInUSD) - Number(selectedRoute.sellAmount.amountInUSD)) /
+          Number(selectedRoute.buyAmount.amountInUSD)) *
+          100
+      ) / 100
+    ).toFixed(2);
+
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
       <Grid item xs={12} sx={{ position: 'relative' }}>
@@ -274,6 +284,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 fullWidth
                 usdValue={parseFloat(toPrice || toFetchedPrice?.toFixed(2) || '0').toFixed(2)}
                 onTokenSelect={() => startSelectingCoin(to || emptyTokenWithAddress('to'))}
+                impact={priceImpact}
               />
             </StyledTokenInputContainer>
           </StyledTokensContainer>

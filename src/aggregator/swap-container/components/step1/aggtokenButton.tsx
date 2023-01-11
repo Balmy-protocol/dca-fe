@@ -88,6 +88,7 @@ const StyledFormControl = styled.div`
 
 const StyledUsdContainer = styled.div`
   display: flex;
+  gap: 5px;
   padding-left: 12px;
 `;
 
@@ -114,6 +115,7 @@ interface TokenInputProps {
   fullWidth?: boolean;
   usdValue?: string;
   onTokenSelect: () => void;
+  impact?: string | null;
 }
 
 const AggregatorTokenInput = ({
@@ -126,6 +128,7 @@ const AggregatorTokenInput = ({
   fullWidth,
   usdValue,
   onTokenSelect,
+  impact,
 }: TokenInputProps) => {
   const inputRef = React.createRef();
   const validator = (nextValue: string) => {
@@ -192,6 +195,11 @@ const AggregatorTokenInput = ({
                 <Typography variant="body2" color="#939494">
                   ${usdValue}
                 </Typography>
+                {impact && (
+                  <Typography variant="body2" color={Number(impact) < -5 ? '#EB5757' : 'rgba(255, 255, 255, 0.5)'}>
+                    ({impact}%)
+                  </Typography>
+                )}
               </StyledUsdContainer>
             )}
           </StyledSecondPartContainer>

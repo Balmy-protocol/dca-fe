@@ -134,6 +134,11 @@ const StyledTokenAmountContainer = styled.div`
   padding-top: 10px;
 `;
 
+const StyledUsdContainer = styled.div`
+  display: flex;
+  gap: 5px;
+`;
+
 interface SwapQuotesProps {
   quote: SwapOption;
   isSelected?: boolean;
@@ -168,6 +173,16 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
   } else {
     isWorsePrice = quote.buyAmount.amount.lt(bestQuote?.buyAmount.amount || 0);
   }
+
+  const priceImpact =
+    quote &&
+    (
+      Math.round(
+        ((Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) /
+          Number(quote.buyAmount.amountInUSD)) *
+          100
+      ) / 100
+    ).toFixed(2);
 
   return (
     <StyledPaper $isSelected={isSelected} onClick={() => setRoute(quote)}>
@@ -254,9 +269,14 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
             <Typography variant="body1">
               {`${formatCurrencyAmount(quote.buyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`}
             </Typography>
-            <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
-              {`$${parseFloat(quote.buyAmount.amountInUSD).toFixed(2)}`}
-            </Typography>
+            <StyledUsdContainer>
+              <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+                {`$${parseFloat(quote.buyAmount.amountInUSD).toFixed(2)}`}
+              </Typography>
+              <Typography variant="caption" color={Number(priceImpact) < -5 ? '#EB5757' : 'rgba(255, 255, 255, 0.5)'}>
+                {`(${priceImpact}%)`}
+              </Typography>
+            </StyledUsdContainer>
           </StyledTokenAmountContainer>
         </StyledTokenContainer>
       </StyledRouteContainer>
