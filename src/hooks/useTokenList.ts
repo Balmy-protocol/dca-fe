@@ -5,7 +5,7 @@ import keyBy from 'lodash/keyBy';
 import { ALLOWED_YIELDS } from 'config/constants';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { useSavedAggregatorTokenLists, useTokensLists } from 'state/token-lists/hooks';
-import useCurrentNetwork from './useCurrentNetwork';
+import useSelectedNetwork from './useSelectedNetwork';
 
 const BLACKLIST = [
   '0x5fe2b58c013d7601147dcdd68c143a77499f5531',
@@ -15,7 +15,7 @@ const BLACKLIST = [
 ];
 
 function useTokenList(isAggregator = false, filter = true) {
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const tokensLists = useTokensLists();
   const savedDCATokenLists = ['Mean Finance Graph Allowed Tokens'];
   const savedAggregatorTokenLists = useSavedAggregatorTokenLists();

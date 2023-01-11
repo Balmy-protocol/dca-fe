@@ -17,3 +17,5 @@ export const setYieldEnabled = createAction<boolean>('createPosition/setYieldEna
 export const setFromYield = createAction<YieldOption | null | undefined>('createPosition/setFromYield');
 
 export const setToYield = createAction<YieldOption | null | undefined>('createPosition/setToYield');
+
+export const setDCAChainId = createAction<number>('createPosition/setDCAChainId');

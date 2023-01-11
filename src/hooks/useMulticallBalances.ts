@@ -5,7 +5,7 @@ import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress } from 'utils/currency';
 import { useBlockNumber } from 'state/block-number/hooks';
-import useCurrentNetwork from './useCurrentNetwork';
+import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
 import useAccount from './useAccount';
@@ -30,7 +30,7 @@ function useMulticallBalances(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = useAccount();
   const prevAccount = usePrevious(account);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);

@@ -4,7 +4,7 @@ import orderBy from 'lodash/orderBy';
 import GraphWidget from 'common/graph-widget';
 import { getProtocolToken } from 'mocks/tokens';
 import Hidden from '@mui/material/Hidden';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useCurrentNetwork from 'hooks/useSelectedNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, STRING_SWAP_INTERVALS } from 'config/constants';
 import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
 import { BigNumber } from 'ethers';

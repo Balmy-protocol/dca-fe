@@ -17,3 +17,5 @@ export const setSorting = createAction<SwapSortOptions>('aggregator/setSorting')
 export const resetForm = createAction('aggregator/resetForm');
 
 export const setTransferTo = createAction<string | null>('aggregator/setTransferTo');
+
+export const setAggregatorChainId = createAction<number>('aggregator/setChainId');

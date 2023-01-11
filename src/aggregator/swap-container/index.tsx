@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import { getProtocolToken } from 'mocks/tokens';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from 'config/constants';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, NETWORKS } from 'config/constants';
 import { SwapOption, Token } from 'types';
 import { useAggregatorState } from 'state/aggregator/hooks';
 import { useAppDispatch } from 'state/hooks';
@@ -14,6 +14,7 @@ import {
   setSelectedRoute,
   setSorting,
   resetForm,
+  setAggregatorChainId,
 } from 'state/aggregator/actions';
 import useSwapOptions from 'hooks/useSwapOptions';
 import useCustomToken from 'hooks/useCustomToken';
@@ -29,8 +30,8 @@ const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting, transferTo } = useAggregatorState();
   const { slippage, gasSpeed } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
-  const currentNetwork = useCurrentNetwork();
-  const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
+  const currentNetwork = useSelectedNetwork();
+  const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true, true);
   const toParamToken = useToken(toParam, true, true);
   const history = useHistory();
@@ -49,12 +50,16 @@ const SwapContainer = () => {
   const [refreshQuotes, setRefreshQuotes] = React.useState(true);
 
   React.useEffect(() => {
+    dispatch(setAggregatorChainId(Number(chainId || NETWORKS.mainnet.chainId)));
+  }, []);
+
+  React.useEffect(() => {
     if (fromParamToken) {
       dispatch(setFrom(fromParamToken));
     } else if (fromParamCustomToken && !from) {
       dispatch(setFrom(fromParamCustomToken.token));
     } else if (!from && !to && !toParamToken && !toParamCustomToken) {
-      dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
+      dispatch(setFrom(getProtocolToken(Number(chainId || currentNetwork.chainId))));
     }
 
     if (toParamToken) {

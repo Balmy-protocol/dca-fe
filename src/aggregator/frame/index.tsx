@@ -25,17 +25,17 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     dispatch(changeMainTab(2));
   }, []);
 
-  React.useEffect(() => {
-    if (
-      chainId &&
-      SUPPORTED_NETWORKS.includes(parseInt(chainId, 10)) &&
-      currentNetwork.isSet &&
-      chainId !== currentNetwork.chainId.toString()
-    ) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      walletService.changeNetwork(parseInt(chainId, 10));
-    }
-  }, [currentNetwork]);
+  // React.useEffect(() => {
+  //   if (
+  //     chainId &&
+  //     SUPPORTED_NETWORKS.includes(parseInt(chainId, 10)) &&
+  //     currentNetwork.isSet &&
+  //     chainId !== currentNetwork.chainId.toString()
+  //   ) {
+  //     // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  //     walletService.changeNetwork(parseInt(chainId, 10));
+  //   }
+  // }, [currentNetwork]);
 
   return (
     <Grid container spacing={8}>

@@ -3,7 +3,12 @@ import Grid from '@mui/material/Grid';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useSubTab } from 'state/tabs/hooks';
 import { useParams } from 'react-router-dom';
-import { SUPPORTED_NETWORKS } from 'config/constants';
+import {
+  DEFAULT_NETWORK_FOR_VERSION,
+  POSITION_VERSION_4,
+  SUPPORTED_NETWORKS,
+  SUPPORTED_NETWORKS_DCA,
+} from 'config/constants';
 import { GetSwapIntervalsGraphqlResponse } from 'types';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useQuery } from '@apollo/client';
@@ -13,6 +18,7 @@ import useWalletService from 'hooks/useWalletService';
 import usePairService from 'hooks/usePairService';
 import { useAppDispatch } from 'state/hooks';
 import { setError } from 'state/error/actions';
+import { setDCAChainId } from 'state/create-position/actions';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 
@@ -32,6 +38,14 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   // const hasInitiallySetNetwork = React.useState()
 
   React.useEffect(() => {
+    if (SUPPORTED_NETWORKS_DCA.includes(currentNetwork.chainId)) {
+      dispatch(setDCAChainId(currentNetwork.chainId));
+    } else {
+      dispatch(setDCAChainId(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId));
+    }
+  }, [currentNetwork.chainId]);
+
+  React.useEffect(() => {
     if (
       chainId &&
       SUPPORTED_NETWORKS.includes(parseInt(chainId, 10)) &&
@@ -41,7 +55,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       walletService.changeNetwork(parseInt(chainId, 10));
     }
-  }, [currentNetwork]);
+  }, [currentNetwork.isSet, currentNetwork.chainId]);
   React.useEffect(() => {
     const fetchPairs = async () => {
       try {

@@ -23,7 +23,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import Collapse from '@mui/material/Collapse';
 import YieldTokenSelector from 'common/yield-token-selector';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useCurrentNetwork from 'hooks/useSelectedNetwork';
 import { formatCurrencyAmount, usdPriceToToken } from 'utils/currency';
 import findIndex from 'lodash/findIndex';
 

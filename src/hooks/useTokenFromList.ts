@@ -3,10 +3,10 @@ import { Token } from 'types';
 import find from 'lodash/find';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { useTokensLists } from 'state/token-lists/hooks';
-import useCurrentNetwork from './useCurrentNetwork';
+import useSelectedNetwork from './useSelectedNetwork';
 
 function useTokenListUnfiltered(tokenAddress?: string) {
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const tokensLists = useTokensLists();
 
   const tokenList: Token | null = React.useMemo(() => {
