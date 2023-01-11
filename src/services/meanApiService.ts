@@ -7,14 +7,11 @@ import {
   MeanApiUnderlyingResponse,
   MeanFinanceAllowedPairsResponse,
   MeanFinanceResponse,
-  MeanFinanceSwapResponse,
   PermissionPermit,
   Token,
 } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
 import { emptyTokenWithAddress } from 'utils/currency';
-import { GasKeys, SORT_MOST_PROFIT } from 'config/constants/aggregator';
-import isNaN from 'lodash/isNaN';
 
 // MOCKS
 import ContractService from './contractService';
@@ -364,47 +361,5 @@ export default class MeanApiService {
     );
 
     return allowanceResponse.data.allowanceTarget;
-  }
-
-  async getSwapOptions(
-    from: string,
-    to: string,
-    sellAmount?: BigNumber,
-    buyAmount?: BigNumber,
-    sortQuotesBy = SORT_MOST_PROFIT,
-    recipient?: string | null,
-    slippagePercentage?: number,
-    gasSpeed?: GasKeys,
-    takerAddress?: string,
-    skipValidation?: boolean
-  ) {
-    const currentNetwork = await this.walletService.getNetwork();
-    const swapResponses = await this.axiosClient.get<MeanFinanceSwapResponse>(
-      `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/routes`,
-      {
-        params: {
-          sellToken: from,
-          buyToken: to,
-          sortQuotesBy,
-          ...(takerAddress && !skipValidation ? { takerAddress } : {}),
-          ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
-          ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
-          ...(recipient ? { recipient } : {}),
-          ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : {}),
-          ...(gasSpeed ? { gasSpeed } : {}),
-          ...(skipValidation ? { skipValidation } : {}),
-        },
-        headers: {
-          'Cache-Control': 'no-cache',
-          Pragma: 'no-cache',
-          Expires: '0',
-        },
-        cache: {
-          maxAge: 0,
-        },
-      }
-    );
-
-    return swapResponses.data.swap;
   }
 }

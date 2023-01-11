@@ -229,7 +229,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
               size="small"
             />
           )}
-          {bestQuote?.swapper.id === quote.swapper.id && (
+          {bestQuote?.swapper.name === quote.swapper.name && (
             <StatusChip
               label={<FormattedMessage description="best" defaultMessage="Best" />}
               color="success"
@@ -240,7 +240,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
           <DarkChip
             size="small"
             icon={<LocalGasStationIcon fontSize="small" />}
-            label={`${toPrecision(quote.gas.estimatedCostInUSD)} $`}
+            label={`${toPrecision(quote.gas.estimatedCostInUSD.toString())} $`}
           />
         </StyledTitleDataContainer>
       </StyledTitleContainer>
@@ -252,7 +252,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
               {`${formatCurrencyAmount(quote.sellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`}
             </Typography>
             <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
-              {`$${parseFloat(quote.sellAmount.amountInUSD).toFixed(2)}`}
+              {`$${parseFloat(quote.sellAmount.amountInUSD.toString()).toFixed(2)}`}
             </Typography>
           </StyledTokenAmountContainer>
         </StyledTokenContainer>
@@ -271,7 +271,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
             </Typography>
             <StyledUsdContainer>
               <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
-                {`$${parseFloat(quote.buyAmount.amountInUSD).toFixed(2)}`}
+                {`$${parseFloat(quote.buyAmount.amountInUSD.toString()).toFixed(2)}`}
               </Typography>
               <Typography variant="caption" color={Number(priceImpact) < -5 ? '#EB5757' : 'rgba(255, 255, 255, 0.5)'}>
                 {`(${priceImpact}%)`}

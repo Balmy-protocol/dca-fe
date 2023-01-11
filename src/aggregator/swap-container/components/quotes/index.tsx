@@ -123,9 +123,9 @@ const SwapQuotes = ({
             setRoute={setRoute}
             from={from}
             to={to}
-            isSelected={quote.swapper.id === selectedRoute?.swapper.id}
+            isSelected={quote.swapper.name === selectedRoute?.swapper.name}
             quote={quote}
-            key={`${from?.symbol || ''}-${to?.symbol || ''}-${quote.swapper.id}`}
+            key={`${from?.symbol || ''}-${to?.symbol || ''}-${quote.swapper.name}`}
             isBuyOrder={isBuyOrder}
             bestQuote={bestQuote}
             sorting={sorting}

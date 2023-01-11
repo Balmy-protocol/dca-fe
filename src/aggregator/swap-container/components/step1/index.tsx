@@ -254,7 +254,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 onChange={handleFromValueChange}
                 token={from}
                 fullWidth
-                usdValue={parseFloat(fromPrice || fromFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                usdValue={parseFloat(fromPrice?.toString() || fromFetchedPrice?.toFixed(2) || '0').toFixed(2)}
                 onTokenSelect={() => startSelectingCoin(from || emptyTokenWithAddress('from'))}
               />
             </StyledTokenInputContainer>
@@ -282,7 +282,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 onChange={handleToValueChange}
                 token={to}
                 fullWidth
-                usdValue={parseFloat(toPrice || toFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                usdValue={parseFloat(toPrice?.toString() || toFetchedPrice?.toFixed(2) || '0').toFixed(2)}
                 onTokenSelect={() => startSelectingCoin(to || emptyTokenWithAddress('to'))}
                 impact={priceImpact}
               />

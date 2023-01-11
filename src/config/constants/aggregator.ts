@@ -1,15 +1,15 @@
-export const GAS_KEY_SAFE_LOW = 'safeLow';
-export const GAS_KEY_AVERAGE = 'average';
-export const GAS_KEY_FAST = 'fast';
+export const GAS_KEY_SAFE_LOW = 'standard';
+export const GAS_KEY_AVERAGE = 'fast';
+export const GAS_KEY_FAST = 'instant';
 
 export type GasKeys = typeof GAS_KEY_SAFE_LOW | typeof GAS_KEY_AVERAGE | typeof GAS_KEY_FAST;
 
 export const GAS_KEYS: GasKeys[] = [GAS_KEY_SAFE_LOW, GAS_KEY_AVERAGE, GAS_KEY_FAST];
 
 export const GAS_LABELS_BY_KEY: Record<GasKeys, string> = {
-  [GAS_KEY_SAFE_LOW]: 'Low',
-  [GAS_KEY_AVERAGE]: 'Average',
-  [GAS_KEY_FAST]: 'Fast',
+  [GAS_KEY_SAFE_LOW]: 'standard',
+  [GAS_KEY_AVERAGE]: 'fast',
+  [GAS_KEY_FAST]: 'instant',
 };
 
 export const DEFAULT_AGGREGATOR_SETTINGS: { gasSpeed: GasKeys; slippage: number } = {
@@ -17,14 +17,14 @@ export const DEFAULT_AGGREGATOR_SETTINGS: { gasSpeed: GasKeys; slippage: number 
   gasSpeed: GAS_KEY_AVERAGE,
 };
 
-export const SORT_MOST_PROFIT = 'most-profit';
-export const SORT_MOST_RETURN = 'most-return';
+export const SORT_MOST_PROFIT = 'most-swapped-accounting-for-gas';
+export const SORT_MOST_RETURN = 'most-swapped';
 export const SORT_LEAST_GAS = 'least-gas';
 
 export type SwapSortOptions = typeof SORT_MOST_PROFIT | typeof SORT_LEAST_GAS | typeof SORT_MOST_RETURN;
 
 export const SWAP_ROUTES_SORT_OPTIONS: Record<SwapSortOptions, SwapSortOptions> = {
-  [SORT_MOST_PROFIT]: 'most-profit',
+  [SORT_MOST_PROFIT]: 'most-swapped-accounting-for-gas',
   [SORT_LEAST_GAS]: 'least-gas',
-  [SORT_MOST_RETURN]: 'most-return',
+  [SORT_MOST_RETURN]: 'most-swapped',
 };

@@ -4,17 +4,17 @@ import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 
 // MOCKS
 import { PositionVersions } from 'config/constants';
-import { RawSwapOption, SwapOption, Token } from 'types';
+import { SwapOption, Token } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
 import { toToken } from 'utils/currency';
-import { parseUnits } from '@ethersproject/units';
 import { getProtocolToken } from 'mocks/tokens';
-import { GasKeys } from 'config/constants/aggregator';
+import { QuoteResponse } from 'mean-sdk/dist/services/quotes/types';
+import { GasKeys, SwapSortOptions } from 'config/constants/aggregator';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
-import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
+import SdkService from './sdkService';
 
 export default class AggregatorService {
   modal: SafeAppWeb3Modal;
@@ -25,7 +25,7 @@ export default class AggregatorService {
 
   walletService: WalletService;
 
-  meanApiService: MeanApiService;
+  sdkService: SdkService;
 
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
@@ -34,13 +34,13 @@ export default class AggregatorService {
   constructor(
     walletService: WalletService,
     contractService: ContractService,
-    meanApiService: MeanApiService,
+    sdkService: SdkService,
     DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
     providerService: ProviderService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
-    this.meanApiService = meanApiService;
+    this.sdkService = sdkService;
     this.apolloClient = DCASubgraph;
     this.providerService = providerService;
   }
@@ -69,7 +69,7 @@ export default class AggregatorService {
     to: Token,
     sellAmount?: BigNumber,
     buyAmount?: BigNumber,
-    sorting?: string,
+    sorting?: SwapSortOptions,
     transferTo?: string | null,
     slippage?: number,
     gasSpeed?: GasKeys,
@@ -78,12 +78,12 @@ export default class AggregatorService {
     let shouldValidate = !buyAmount;
 
     if (takerAddress && sellAmount) {
-      const preAllowanceTarget = await this.meanApiService.getAllowanceTarget();
-      const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
+      // const preAllowanceTarget = await this.sdkService.getAllowanceTarget();
+      // const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
 
-      if (parseUnits(allowance.allowance, from.decimals).lt(sellAmount)) {
-        shouldValidate = false;
-      }
+      // if (parseUnits(allowance.allowance, from.decimals).lt(sellAmount)) {
+      //   shouldValidate = false;
+      // }
 
       if (shouldValidate) {
         // If user does not have the balance do not validate tx
@@ -95,7 +95,7 @@ export default class AggregatorService {
       }
     }
 
-    const swapOptionsResponse = await this.meanApiService.getSwapOptions(
+    const swapOptionsResponse = await this.sdkService.getSwapOptions(
       from.address,
       to.address,
       sellAmount,
@@ -108,22 +108,14 @@ export default class AggregatorService {
       !shouldValidate
     );
 
-    const filteredOptions: RawSwapOption[] = swapOptionsResponse.quotes.filter(
-      (option) => !('failed' in option)
-    ) as RawSwapOption[];
+    const filteredOptions = swapOptionsResponse.filter((option) => !('failed' in option)) as QuoteResponse[];
 
     const network = await this.walletService.getNetwork();
 
     const protocolToken = getProtocolToken(network.chainId);
 
-    const sellToken =
-      swapOptionsResponse.sellToken.address === protocolToken.address
-        ? protocolToken
-        : toToken(swapOptionsResponse.sellToken);
-    const buyToken =
-      swapOptionsResponse.buyToken.address === protocolToken.address
-        ? protocolToken
-        : toToken(swapOptionsResponse.buyToken);
+    const sellToken = from.address === protocolToken.address ? protocolToken : toToken(from);
+    const buyToken = to.address === protocolToken.address ? protocolToken : toToken(to);
 
     return filteredOptions.map<SwapOption>(
       ({
@@ -148,7 +140,7 @@ export default class AggregatorService {
           amountInUSD: minBuyAmountAmountInUsd,
         },
         gas: { estimatedGas, estimatedCost, estimatedCostInUnits, estimatedCostInUSD, gasTokenSymbol },
-        swapper: { allowanceTarget, address, id, logoURI, name },
+        swapper: { allowanceTarget, address, logoURI, name },
         type,
         tx,
       }) => ({
@@ -157,34 +149,33 @@ export default class AggregatorService {
         sellAmount: {
           amount: BigNumber.from(sellAmountAmount),
           amountInUnits: Number(sellAmountAmountInUnits),
-          amountInUSD: sellAmountAmountInUsd,
+          amountInUSD: sellAmountAmountInUsd || 0,
         },
         buyAmount: {
           amount: BigNumber.from(buyAmountAmount),
           amountInUnits: Number(buyAmountAmountInUnits),
-          amountInUSD: buyAmountAmountInUsd,
+          amountInUSD: buyAmountAmountInUsd || 0,
         },
         maxSellAmount: {
           amount: BigNumber.from(maxSellAmountAmount),
           amountInUnits: Number(maxSellAmountAmountInUnits),
-          amountInUSD: maxSellAmountAmountInUsd,
+          amountInUSD: maxSellAmountAmountInUsd || 0,
         },
         minBuyAmount: {
           amount: BigNumber.from(minBuyAmountAmount),
           amountInUnits: Number(minBuyAmountAmountInUnits),
-          amountInUSD: minBuyAmountAmountInUsd,
+          amountInUSD: minBuyAmountAmountInUsd || 0,
         },
         gas: {
           estimatedGas: BigNumber.from(estimatedGas),
           estimatedCost: BigNumber.from(estimatedCost),
           estimatedCostInUnits,
-          estimatedCostInUSD,
+          estimatedCostInUSD: estimatedCostInUSD || 0,
           gasTokenSymbol,
         },
         swapper: {
           allowanceTarget,
           address,
-          id,
           name,
           logoURI,
         },
