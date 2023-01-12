@@ -10,7 +10,8 @@ function useUsdPrice(
   date?: string,
   chainId?: number
 ): [number | undefined, boolean, string?] {
-  const [result, isLoading, error] = useRawUsdPrice(from, date, chainId);
+  const isValueZero = !!amount && amount.eq(0);
+  const [result, isLoading, error] = useRawUsdPrice(from, date, chainId, isValueZero);
 
   return React.useMemo(
     () => [parseUsdPrice(from, amount, result), isLoading, error],

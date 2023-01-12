@@ -71,7 +71,11 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
         ),
       });
       const result = await positionService.withdraw(position, useProtocolToken);
-      addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id }, position });
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.WITHDRAW_POSITION,
+        typeData: { id: position.id, withdrawnUnderlying: '0' },
+        position,
+      });
       setModalSuccess({
         hash: result.hash,
         content: (

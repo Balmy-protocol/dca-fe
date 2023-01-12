@@ -11,6 +11,7 @@ import {
   ResetPositionTypeData,
   TerminatePositionTypeData,
   TransferTypeData,
+  WithdrawTypeData,
 } from 'types';
 import { setPosition, updatePosition, updateShowBreakdown } from './actions';
 
@@ -70,6 +71,7 @@ export default createReducer(initialState, (builder) =>
             },
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             rateUnderlying: position.rate,
             depositedRateUnderlying: position.rate,
@@ -82,8 +84,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: (transaction.typeData as TerminatePositionTypeData).toWithdraw,
             withdrawnSwappedUnderlying: (transaction.typeData as TerminatePositionTypeData).toWithdraw,
-            withdrawnUnswapped: (transaction.typeData as TerminatePositionTypeData).remainingLiquidity,
-            withdrawnUnswappedUnderlying: (transaction.typeData as TerminatePositionTypeData).remainingLiquidity,
+            withdrawnRemaining: (transaction.typeData as TerminatePositionTypeData).remainingLiquidity,
+            withdrawnRemainingUnderlying: (transaction.typeData as TerminatePositionTypeData).remainingLiquidity,
           });
           position = {
             ...position,
@@ -108,6 +110,7 @@ export default createReducer(initialState, (builder) =>
             withdrawn: position.withdrawn,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             permissions: [],
             rateUnderlying: position.rate,
@@ -127,8 +130,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
           position = {
             ...position,
@@ -153,6 +156,7 @@ export default createReducer(initialState, (builder) =>
             withdrawn: position.withdrawn,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             permissions: [],
             rateUnderlying: position.rate,
@@ -172,8 +176,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
           position = {
             ...position,
@@ -197,7 +201,8 @@ export default createReducer(initialState, (builder) =>
             swapped: '0',
             withdrawn: position.toWithdraw,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.toWithdraw,
+            withdrawnUnderlying: (transaction.typeData as WithdrawTypeData).withdrawnUnderlying || position.toWithdraw,
+            withdrawnUnderlyingAccum: position.toWithdrawUnderlyingAccum,
             swappedUnderlying: '0',
             permissions: [],
             rateUnderlying: position.rate,
@@ -217,13 +222,14 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
           position = {
             ...position,
             totalWithdrawn: BigNumber.from(position.totalWithdrawn).add(BigNumber.from(position.toWithdraw)).toString(),
             toWithdraw: BigNumber.from(0).toString(),
+            toWithdrawUnderlyingAccum: '0',
           };
 
           break;
@@ -244,6 +250,7 @@ export default createReducer(initialState, (builder) =>
             to: position.user,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             remainingSwaps: position.remainingSwaps,
             oldRemainingSwaps: position.remainingSwaps,
@@ -267,8 +274,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
 
           position = {
@@ -304,6 +311,7 @@ export default createReducer(initialState, (builder) =>
             oldRemainingSwaps: position.remainingSwaps,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             swapped: '0',
             withdrawn: position.withdrawn,
@@ -325,8 +333,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
 
           position = {
@@ -374,6 +382,7 @@ export default createReducer(initialState, (builder) =>
             withdrawn: position.withdrawn,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             permissions: [],
             rateUnderlying: newRate,
@@ -393,8 +402,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
 
           position = {
@@ -427,6 +436,7 @@ export default createReducer(initialState, (builder) =>
             oldRemainingSwaps: position.remainingSwaps,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             swapped: '0',
             withdrawn: position.withdrawn,
@@ -448,8 +458,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
 
           position = {
@@ -490,6 +500,7 @@ export default createReducer(initialState, (builder) =>
             oldRemainingSwaps: position.remainingSwaps,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             swapped: '0',
             withdrawn: position.withdrawn,
@@ -511,8 +522,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
 
           position = {
@@ -537,6 +548,7 @@ export default createReducer(initialState, (builder) =>
             oldRemainingSwaps: position.remainingSwaps,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             swapped: '0',
             withdrawn: position.withdrawn,
@@ -558,8 +570,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
 
           position = {
@@ -585,6 +597,7 @@ export default createReducer(initialState, (builder) =>
             oldRemainingSwaps: position.remainingSwaps,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
             withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
             swappedUnderlying: '0',
             swapped: '0',
             withdrawn: position.withdrawn,
@@ -606,8 +619,8 @@ export default createReducer(initialState, (builder) =>
             },
             withdrawnSwapped: '0',
             withdrawnSwappedUnderlying: '0',
-            withdrawnUnswapped: '0',
-            withdrawnUnswappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
           });
 
           position = {

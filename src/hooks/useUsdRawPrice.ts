@@ -13,7 +13,8 @@ import useAccount from './useAccount';
 function useRawUsdPrice(
   from: Token | undefined | null,
   date?: string,
-  chainId?: number
+  chainId?: number,
+  skip = false
 ): [BigNumber | undefined, boolean, string?] {
   const [{ result, isLoading, error }, setResults] = React.useState<{
     result: BigNumber | undefined;
@@ -26,6 +27,7 @@ function useRawUsdPrice(
   });
   const priceService = usePriceService();
   const prevFrom = usePrevious(from);
+  const prevSkip = usePrevious(skip);
   const currentNetwork = useCurrentNetwork();
   const account = useAccount();
 
@@ -47,7 +49,7 @@ function useRawUsdPrice(
       }
     }
 
-    if ((!isLoading && isUndefined(result) && !error) || !isEqual(prevFrom, from)) {
+    if ((!isLoading && isUndefined(result) && !error) || !isEqual(prevFrom, from) || (prevSkip !== skip && !skip)) {
       setResults({ result: undefined, isLoading: true, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises

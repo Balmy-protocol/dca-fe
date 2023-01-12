@@ -79,6 +79,7 @@ export interface UnwrapTypeData {
 
 export interface WithdrawTypeData {
   id: number | string;
+  withdrawnUnderlying: string | null;
 }
 
 export interface WithdrawFundsTypeData {
@@ -171,6 +172,10 @@ export interface WrapEtherTypeData {
   amount: string;
 }
 
+export interface NoOpTypeData {
+  id: string;
+}
+
 export interface NewPositionTypeData {
   from: Token;
   to: Token;
@@ -209,7 +214,8 @@ export type TransactionPositionTypeDataOptions =
   | MigratePositionTypeData
   | WithdrawFundsTypeData
   | MigratePositionYieldTypeData
-  | TransferTypeData;
+  | TransferTypeData
+  | NoOpTypeData;
 
 export type TransactionTypeDataOptions =
   | WithdrawTypeData
@@ -229,7 +235,8 @@ export type TransactionTypeDataOptions =
   | WithdrawFundsTypeData
   | MigratePositionYieldTypeData
   | TransferTypeData
-  | TransactionAggregatorTypeDataOptions;
+  | TransactionAggregatorTypeDataOptions
+  | NoOpTypeData;
 
 export interface TransactionDetails {
   hash: string;

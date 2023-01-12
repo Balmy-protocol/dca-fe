@@ -295,7 +295,10 @@ const PositionDetailFrame = () => {
       const result = await positionService.withdraw(fullPositionToMappedPosition(positionInUse), useProtocolToken);
       addTransaction(result, {
         type: TRANSACTION_TYPES.WITHDRAW_POSITION,
-        typeData: { id: fullPositionToMappedPosition(positionInUse).id },
+        typeData: {
+          id: fullPositionToMappedPosition(positionInUse).id,
+          withdrawnUnderlying: toWithdrawUnderlying.toString(),
+        },
         position: fullPositionToMappedPosition(positionInUse),
       });
       setModalSuccess({

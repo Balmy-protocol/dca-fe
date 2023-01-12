@@ -108,8 +108,8 @@ const getPosition = gql`
         ... on TerminatedAction {
           withdrawnSwapped
           withdrawnSwappedUnderlying
-          withdrawnUnswapped
-          withdrawnUnswappedUnderlying
+          withdrawnRemaining
+          withdrawnRemainingUnderlying
         }
 
         ... on PermissionsModifiedAction {

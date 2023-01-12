@@ -681,7 +681,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
 
     const [toCurrentYieldPrice, isLoadingToCurrentYieldPrice] = useUsdPrice(
       position.to,
-      BigNumber.from(yieldAmount || '0'), // check this syntax
+      BigNumber.from(yieldAmount || '0'),
       undefined,
       position.chainId
     );
@@ -772,7 +772,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
   // content: () => <></>,
   content: () => {
     const withdrawnSwapped = positionState.withdrawnSwappedUnderlying || positionState.withdrawnSwapped;
-    const withdrawnUnswapped = positionState.withdrawnUnswappedUnderlying || positionState.withdrawnUnswapped;
+    const withdrawnRemaining = positionState.withdrawnRemainingUnderlying || positionState.withdrawnRemaining;
 
     const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
       position.to,
@@ -792,13 +792,13 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
 
     const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(withdrawnUnswapped),
+      BigNumber.from(withdrawnRemaining),
       undefined,
       position.chainId
     );
     const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(withdrawnUnswapped),
+      BigNumber.from(withdrawnRemaining),
       positionState.createdAtTimestamp,
       position.chainId
     );
@@ -808,7 +808,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
 
     if (
       BigNumber.from(withdrawnSwapped).lte(BigNumber.from(0)) &&
-      BigNumber.from(withdrawnUnswapped).lte(BigNumber.from(0))
+      BigNumber.from(withdrawnRemaining).lte(BigNumber.from(0))
     ) {
       return <></>;
     }
@@ -846,11 +846,11 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
                 </Typography>
               </CustomChip>
             )}
-            {BigNumber.from(withdrawnUnswapped).gt(BigNumber.from(0)) &&
+            {BigNumber.from(withdrawnRemaining).gt(BigNumber.from(0)) &&
               BigNumber.from(withdrawnSwapped).gt(BigNumber.from(0)) && (
                 <FormattedMessage description="positionTerminatedAnd" defaultMessage=" and " />
               )}
-            {BigNumber.from(withdrawnUnswapped).gt(BigNumber.from(0)) && (
+            {BigNumber.from(withdrawnRemaining).gt(BigNumber.from(0)) && (
               <CustomChip
                 icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
                 pointer
@@ -872,7 +872,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
                 }
               >
                 <Typography variant="body1">
-                  {formatCurrencyAmount(BigNumber.from(withdrawnUnswapped), position.from)}
+                  {formatCurrencyAmount(BigNumber.from(withdrawnRemaining), position.from)}
                 </Typography>
               </CustomChip>
             )}
