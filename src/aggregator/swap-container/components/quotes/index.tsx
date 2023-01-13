@@ -6,11 +6,25 @@ import { SwapSortOptions } from 'config/constants/aggregator';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
+import { withStyles } from '@mui/styles';
+import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
 import { SwapOption, Token } from 'types';
 import SwapQuote from '../quote';
 import QuoteRefresher from '../quote-refresher';
 import QuoteSorter from '../quote-sorter';
+
+const StatusChip = withStyles(() => ({
+  colorSuccess: {
+    background: 'rgba(33, 150, 83, 0.1)',
+    color: '#219653',
+  },
+  colorError: {
+    background: 'rgba(235, 87, 87, 0.1)',
+    color: '#EB5757',
+  },
+}))(Chip);
 
 const StyledPaper = styled(Paper)<{ $column?: boolean; $align?: boolean }>`
   padding: 16px;
@@ -38,6 +52,13 @@ const StyledCenteredWrapper = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  gap: 10px;
+`;
+
+const StyledChipsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
 `;
 
@@ -97,7 +118,39 @@ const SwapQuotes = ({
           <StyledCenteredWrapper>
             <EmptyRoutes size="100px" />
             <Typography variant="h6">
-              <FormattedMessage description="No route selected" defaultMessage="Fill the form to view route options" />
+              <FormattedMessage
+                description="meanFinanceMetaAggregator"
+                defaultMessage="Introducing Mean Finance Meta Aggregator"
+              />
+            </Typography>
+            <StyledChipsContainer>
+              <StatusChip
+                label={<FormattedMessage description="descNoFee" defaultMessage="No extra fees" />}
+                color="primary"
+                variant="outlined"
+                size="small"
+                icon={<CheckCircleOutlineOutlinedIcon />}
+              />
+              <StatusChip
+                label={<FormattedMessage description="descBestPrice" defaultMessage="Best price always" />}
+                color="primary"
+                variant="outlined"
+                size="small"
+                icon={<CheckCircleOutlineOutlinedIcon />}
+              />
+              <StatusChip
+                label={<FormattedMessage description="descGasEstimation" defaultMessage="Gas estimation" />}
+                color="primary"
+                variant="outlined"
+                size="small"
+                icon={<CheckCircleOutlineOutlinedIcon />}
+              />
+            </StyledChipsContainer>
+            <Typography variant="body1" sx={{ textAlign: 'center', padding: '0px 20px' }}>
+              <FormattedMessage
+                description="meanFinanceMetaAggregatorDescription"
+                defaultMessage="We look for the best prices among most of Defi Dex's and Dex Aggregators, so you can always get the best execution price for your trades"
+              />
             </Typography>
           </StyledCenteredWrapper>
         </StyledPaper>

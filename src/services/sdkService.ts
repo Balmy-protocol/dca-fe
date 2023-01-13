@@ -1,5 +1,4 @@
-import { buildSDKWithProvider } from 'mean-sdk/dist/sdk/builders';
-import { Networks } from 'mean-sdk/dist/networks';
+import { buildSDK } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
 import { BaseProvider } from '@ethersproject/providers';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from 'config/constants/aggregator';
@@ -8,7 +7,7 @@ import ProviderService from './providerService';
 import WalletService from './walletService';
 
 export default class SdkService {
-  sdk: ReturnType<typeof buildSDKWithProvider>;
+  sdk: ReturnType<typeof buildSDK>;
 
   walletService: WalletService;
 
@@ -17,16 +16,11 @@ export default class SdkService {
   constructor(walletService: WalletService, providerService: ProviderService) {
     this.walletService = walletService;
     this.providerService = providerService;
-    // if (this.providerService.getBaseProvider()) {
-    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //   // @ts-ignore
-    //   this.sdk = buildSDKWithProvider(this.providerService.getBaseProvider() as BaseProvider);
-    // }
   }
 
   async resetProvider() {
     const provider = (await this.providerService.getBaseProvider()) as BaseProvider;
-    this.sdk = buildSDKWithProvider({ provider });
+    this.sdk = buildSDK({ provider: { source: provider } });
   }
 
   async getSwapOptions(
@@ -43,41 +37,11 @@ export default class SdkService {
   ) {
     const currentNetwork = await this.walletService.getNetwork();
 
-    const network = Networks.byKey(currentNetwork.chainId);
-
-    if (!network) {
-      return Promise.resolve([]);
-    }
-
-    const responsesQuotes = await this.sdk.quoteService.getAllQuotes({
-      sellToken: from,
-      buyToken: to,
-      network,
-      order: buyAmount
-        ? {
-            type: 'buy',
-            buyAmount: buyAmount.toString(),
-          }
-        : {
-            type: 'sell',
-            sellAmount: sellAmount?.toString() || '0',
-          },
-      ...(takerAddress && !skipValidation ? { takerAddress } : { takerAddress: '' }),
-      ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
-      ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
-      ...(recipient ? { recipient } : {}),
-      ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
-      ...(gasSpeed ? { gasSpeed } : {}),
-      ...(skipValidation ? { skipValidation } : {}),
-    });
-
-    console.log('quotes', responsesQuotes);
-
     const responses = await this.sdk.quoteService.getAllQuotes(
       {
         sellToken: from,
         buyToken: to,
-        network,
+        chainId: currentNetwork.chainId,
         order: buyAmount
           ? {
               type: 'buy',
@@ -87,7 +51,7 @@ export default class SdkService {
               type: 'sell',
               sellAmount: sellAmount?.toString() || '0',
             },
-        ...(takerAddress && !skipValidation ? { takerAddress } : { takerAddress: '' }),
+        ...(takerAddress ? { takerAddress } : { takerAddress: '' }),
         ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
         ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
         ...(recipient ? { recipient } : {}),
@@ -103,7 +67,7 @@ export default class SdkService {
       }
     );
 
-    console.log('got a response', responses);
+    console.log('aggregator response', responses);
 
     return responses;
   }

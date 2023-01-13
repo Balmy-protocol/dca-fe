@@ -21,6 +21,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
 import { SwapSortOptions } from 'config/constants/aggregator';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
+import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
 
@@ -183,6 +184,9 @@ const SwapContainer = () => {
             />
           </Grid>
         </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <AggregatorFAQ />
       </Grid>
     </Grid>
   );
