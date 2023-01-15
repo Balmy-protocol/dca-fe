@@ -17,6 +17,7 @@ import { BigNumber } from 'ethers';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import usePositionService from 'hooks/usePositionService';
 import useErrorService from 'hooks/useErrorService';
+import { shouldTrackError } from 'utils/errors';
 
 interface TerminateModalProps {
   position: Position;
@@ -136,7 +137,7 @@ const TerminateModal = ({
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+      if (shouldTrackError(e)) {
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error terminating position', JSON.stringify(e), {
           position: position.id,

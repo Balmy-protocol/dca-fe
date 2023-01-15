@@ -23,6 +23,7 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
 import useErrorService from 'hooks/useErrorService';
 import useYieldOptions from 'hooks/useYieldOptions';
+import { shouldTrackError } from 'utils/errors';
 import MigrateYieldModal from 'common/migrate-yield-modal';
 import ActivePosition from './components/position';
 import FinishedPosition from './components/finished-position';
@@ -147,7 +148,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+      if (shouldTrackError(e)) {
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error while withdrawing', JSON.stringify(e), {
           position: position.id,
