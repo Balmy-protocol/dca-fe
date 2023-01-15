@@ -10,6 +10,7 @@ import { TRANSACTION_TYPES } from 'config/constants';
 import Link from '@mui/material/Link';
 import usePositionService from 'hooks/usePositionService';
 import useErrorService from 'hooks/useErrorService';
+import { shouldTrackError } from 'utils/errors';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -75,7 +76,7 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+      if (shouldTrackError(e)) {
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error migrating position', JSON.stringify(e), {
           from: position.from.address,

@@ -13,3 +13,27 @@ export const TRANSACTION_ERRORS = {
   4900: <FormattedMessage description="all_network_disconnect" defaultMessage="You are disconnected from the net" />,
   4901: <FormattedMessage description="network_disconnect" defaultMessage="You are disconnected from the net" />,
 };
+
+const EXCLUDED_ERROR_CODES = [4001, 'ACTION_REJECTED'];
+const EXCLUDED_ERROR_MESSAGES = [
+  'User canceled',
+  'Failed or Rejected Request',
+  'user rejected transaction',
+  'user rejected signing',
+];
+
+export const shouldTrackError = (error?: { code?: string; message?: string; reason?: string }) => {
+  if (!error) {
+    return true;
+  }
+
+  if (
+    EXCLUDED_ERROR_CODES.includes(error.code || 0) ||
+    EXCLUDED_ERROR_MESSAGES.includes(error.message || '') ||
+    EXCLUDED_ERROR_MESSAGES.includes(error.reason || '')
+  ) {
+    return false;
+  }
+
+  return true;
+};

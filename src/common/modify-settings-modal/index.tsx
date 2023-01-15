@@ -46,6 +46,7 @@ import useContractService from 'hooks/useContractService';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import useAccount from 'hooks/useAccount';
 import useErrorService from 'hooks/useErrorService';
+import { shouldTrackError } from 'utils/errors';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -317,7 +318,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+      if (shouldTrackError(e)) {
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error changin rate and swaps', JSON.stringify(e), {
           position: position.id,
@@ -383,7 +384,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (e && e.code !== 4001 && e.message !== 'Failed or Rejected Request' && e.message !== 'User canceled') {
+      if (shouldTrackError(e)) {
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error approving token', JSON.stringify(e), {
           position: position.id,
