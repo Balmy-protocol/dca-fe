@@ -122,7 +122,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
         const prevSummed = (acc[index - 1] && acc[index - 1].summed) || BigNumber.from(0);
         acc.push({
           summed: prevSummed.add(rate),
-          current: parseFloat(formatCurrencyAmount(rate, tokenToAverage)),
+          current: parseFloat(formatCurrencyAmount(rate, tokenToAverage, 9, 10)),
           date: parseInt(action.createdAtTimestamp, 10),
           name: DateTime.fromSeconds(parseInt(action.createdAtTimestamp, 10)).toFormat('MMM d t'),
         });
