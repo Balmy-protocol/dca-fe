@@ -352,4 +352,11 @@ export default class MeanApiService {
       extraData,
     });
   }
+
+  async logFeedback(action: string, description: string) {
+    return this.axiosClient.post(`${MEAN_API_URL}/v1/log-feedback`, {
+      action,
+      description,
+    });
+  }
 }
