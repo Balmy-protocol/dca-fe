@@ -65,12 +65,11 @@ export default class PriceService {
     const mappedTokens = tokens.map((token) =>
       token.address === PROTOCOL_TOKEN_ADDRESS ? emptyTokenWithAddress(DEFILLAMA_PROTOCOL_TOKEN_ADDRESS) : token
     );
-    const price = await this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
-      'https://coins.llama.fi/prices',
-      {
-        coins: mappedTokens.map((token) => `${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`),
-        ...(date && { timestamp: parseInt(date, 10) }),
-      }
+    const defillamaToknes = mappedTokens.map((token) => `${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`).join(',');
+    const price = await this.axiosClient.get<{ coins: Record<string, { price: number }> }>(
+      date
+        ? `https://coins.llama.fi/prices/historical/${parseInt(date, 10)}/${defillamaToknes}`
+        : `https://coins.llama.fi/prices/current/${defillamaToknes}`
     );
 
     const tokensPrices = mappedTokens
@@ -99,10 +98,13 @@ export default class PriceService {
     const network = await this.walletService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
     const expectedResults: Promise<AxiosResponse<{ coins: Record<string, { price: number }> }>>[] = dates.map((date) =>
-      this.axiosClient.post<{ coins: Record<string, { price: number }> }>('https://coins.llama.fi/prices', {
-        coins: [`${DEFILLAMA_IDS[chainIdToUse]}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`],
-        ...(date && { timestamp: parseInt(date, 10) }),
-      })
+      this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
+        date
+          ? `https://coins.llama.fi/prices/historical/${parseInt(date, 10)}/${
+              DEFILLAMA_IDS[chainIdToUse]
+            }:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`
+          : `https://coins.llama.fi/prices/current/${DEFILLAMA_IDS[chainIdToUse]}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`
+      )
     );
 
     const tokensPrices = await Promise.all(expectedResults);
