@@ -134,13 +134,84 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
 
     const swappedAverages = swappedSummed.map((swappedItem, index) => ({
       ...swappedItem,
-      average: parseFloat(formatCurrencyAmount(swappedItem.summed.div(BigNumber.from(index + 1)), tokenToAverage)),
+      average: parseFloat(
+        formatCurrencyAmount(swappedItem.summed.div(BigNumber.from(index + 1)), tokenToAverage, 9, 10)
+      ),
     }));
 
     return orderBy(swappedAverages, ['date'], ['desc']).reverse();
   }, [position]);
 
+  // const intersect = (x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) => {
+  //   // Check if none of the lines are of length 0
+  //   if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
+  //     return false;
+  //   }
+
+  //   const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+
+  //   // Lines are parallel
+  //   if (denominator === 0) {
+  //     return false;
+  //   }
+
+  //   const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+  //   const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+
+  //   // is the intersection along the segments
+  //   if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+  //     return false;
+  //   }
+
+  //   // Return a object with the x and y coordinates of the intersection
+  //   const x = x1 + ua * (x2 - x1);
+  //   const y = y1 + ua * (y2 - y1);
+
+  //   const line1isHigher = y1 > y3;
+  //   const line1isHigherNext = y2 > y4;
+
+  //   return { x, y, line1isHigher, line1isHigherNext };
+  // }
+
+  // const dataWithRange = prices.map((d) => ({
+  //   ...d,
+  //   range:
+  //     d.average !== undefined && d.current !== undefined
+  //       ? [d.average, d.current]
+  //       : []
+  // }));
+
+  // // need to find intersections as points where we to change fill color
+  // const intersections = prices
+  //   .map((d, i) =>
+  //     intersect(
+  //       i,
+  //       d.average,
+  //       i + 1,
+  //       prices[i + 1]?.average,
+  //       i,
+  //       d.current,
+  //       i + 1,
+  //       prices[i + 1]?.current
+  //     )
+  //   )
+  //   .filter((d) => d && !isNaN(d.x));
+
+  // // filtering out segments without intersections & duplicates (in case end current 2 segments are also
+  // // start of 2 next segments)
+  // const filteredIntersections = intersections.filter(
+  //   (d, i) => i === intersections.length - 1 || (d as { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean }).x !== (intersections[i - 1] as { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean })?.x
+  // ) as { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean }[];
+
   const noData = prices.length === 0;
+
+  // const getIntersectionColor = (_intersection: { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean }, isLast?: boolean) => {
+  //   if (isLast) {
+  //     return _intersection.line1isHigherNext ? "red" : "blue";
+  //   }
+
+  //   return _intersection.line1isHigher ? "red" : "blue";
+  // };
 
   if (noData) {
     return (
@@ -205,6 +276,12 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
               strokeDasharray="5 5"
               dataKey="average"
             />
+            {/* <Area
+              dataKey="range"
+              stroke="#8884d8"
+              strokeWidth={0}
+              fill="url(#areaGradient)"
+            /> */}
             <XAxis
               tickMargin={30}
               minTickGap={30}
@@ -215,6 +292,58 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
               tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
             />
             <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false} />
+            {/* <defs>
+              <linearGradient id="areaGradient">
+                {filteredIntersections.length ? (
+                  filteredIntersections.map((intersection, i) => {
+                    const nextIntersection = filteredIntersections[i + 1];
+
+                    let closeColor = "";
+                    let startColor = "";
+
+                    const isLast = i === filteredIntersections.length - 1;
+
+                    if (isLast) {
+                      closeColor = getIntersectionColor(intersection);
+                      startColor = getIntersectionColor(intersection, true);
+                    } else {
+                      closeColor = getIntersectionColor(intersection);
+                      startColor = getIntersectionColor(nextIntersection);
+                    }
+
+                    const offset =
+                      intersection.x /
+                      (prices.filter(
+                        (d) =>
+                          d.average !== undefined && d.current !== undefined
+                      ).length -
+                        1);
+
+                    return (
+                      <>
+                        <stop
+                          offset={offset}
+                          stopColor={closeColor}
+                          stopOpacity={0.9}
+                        />
+                        <stop
+                          offset={offset}
+                          stopColor={startColor}
+                          stopOpacity={0.9}
+                        />
+                      </>
+                    );
+                  })
+                ) : (
+                  <stop
+                    offset={0}
+                    stopColor={
+                      prices[0].average > prices[0].current ? "red" : "blue"
+                    }
+                  />
+                )}
+              </linearGradient>
+            </defs> */}
             <Tooltip
               content={({ payload, label }) => (
                 <GraphTooltip

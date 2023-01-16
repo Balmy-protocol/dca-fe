@@ -1,7 +1,17 @@
 import React from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
-import { ResponsiveContainer, XAxis, YAxis, Legend, CartesianGrid, Line, ComposedChart, Tooltip } from 'recharts';
+import {
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Legend,
+  CartesianGrid,
+  ComposedChart,
+  Tooltip,
+  Area,
+  ReferenceLine,
+} from 'recharts';
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
@@ -72,6 +82,7 @@ interface PriceData {
   date: number;
   swappedIfLumpSum: BigNumber;
   swappedIfDCA: BigNumber;
+  percentage: BigNumber;
 }
 
 interface SubPosition {
@@ -93,7 +104,7 @@ const tickFormatter = (value: string) => {
     return preciseValue;
   }
 
-  return parseFloat(preciseValue).toString();
+  return `${parseFloat(preciseValue).toString()}%`;
 };
 
 const POINT_LIMIT = 30;
@@ -187,6 +198,14 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
 
             const originalRatePerUnitFromToTo = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
             subPositions.push({ amountLeft: deposited, ratePerUnit: originalRatePerUnitFromToTo });
+
+            newPrices.push({
+              date: parseInt(positionAction.createdAtTimestamp, 10),
+              name: DateTime.fromSeconds(parseInt(positionAction.createdAtTimestamp, 10)).toFormat('MMM d t'),
+              swappedIfLumpSum: BigNumber.from(0),
+              swappedIfDCA: BigNumber.from(0),
+              percentage: BigNumber.from(0),
+            });
           }
 
           if (isIncrease(positionAction)) {
@@ -262,11 +281,14 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
               }
             }
 
+            const percentage = swappedIfDCA.mul(toMagnitude).div(swappedIfLumpSum).div(toMagnitude);
+
             newPrices.push({
               date: parseInt(positionAction.createdAtTimestamp, 10),
               name: DateTime.fromSeconds(parseInt(positionAction.createdAtTimestamp, 10)).toFormat('MMM d t'),
               swappedIfLumpSum,
               swappedIfDCA,
+              percentage,
             });
           }
         }
@@ -293,15 +315,39 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
       const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);
       const swappedIfLumpSum = formatUnits(price.swappedIfLumpSum, position.to.decimals);
 
+      let percentage = 0;
+
+      if (parseFloat(swappedIfLumpSum) > 0) {
+        percentage = (parseFloat(swappedIfDCA) / parseFloat(swappedIfLumpSum) - 1) * 100;
+      }
+
       return {
         ...price,
         swappedIfDCA: parseFloat(swappedIfDCA),
         swappedIfLumpSum: parseFloat(swappedIfLumpSum),
         rawSwappedIfDCA: price.swappedIfDCA,
         rawSwappedIfLumpSum: price.swappedIfLumpSum,
+        percentage,
+        rawPercentage: price.percentage,
       };
     })
     .slice(-POINT_LIMIT);
+
+  const gradientOffset = () => {
+    const dataMax = Math.max(...mappedPrices.map((i) => i.percentage));
+    const dataMin = Math.min(...mappedPrices.map((i) => i.percentage));
+
+    if (dataMax <= 0) {
+      return 0;
+    }
+    if (dataMin >= 0) {
+      return 1;
+    }
+
+    return dataMax / (dataMax - dataMin);
+  };
+
+  const off = gradientOffset();
 
   if (noData && hasActions) {
     return (
@@ -348,13 +394,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
           <StyledLegend>
             <StyledLegendIndicator fill="#DCE2F9" />
             <Typography variant="body2">
-              <FormattedMessage description="swappedIfDca" defaultMessage="DCA" />
-            </Typography>
-          </StyledLegend>
-          <StyledLegend>
-            <StyledLegendIndicator fill="#7C37ED" />
-            <Typography variant="body2">
-              <FormattedMessage description="swappedIfLumpSum" defaultMessage="Lump sum" />
+              <FormattedMessage description="swappedIfDca" defaultMessage="DCA vs Lump Sum Profit %" />
             </Typography>
           </StyledLegend>
         </StyledLegendContainer>
@@ -372,7 +412,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
-            <Line
+            <ReferenceLine y={0} stroke="#7C37ED" strokeDasharray="3 3" />
+            {/* <Line
               connectNulls
               legendType="none"
               type="monotone"
@@ -391,7 +432,30 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
               dot={{ strokeWidth: '3px', stroke: '#7C37ED', fill: '#7C37ED' }}
               strokeDasharray="5 5"
               dataKey="swappedIfLumpSum"
+            /> */}
+            <Area
+              connectNulls
+              legendType="none"
+              type="monotone"
+              strokeWidth="3px"
+              stroke="#DCE2F9"
+              dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
+              strokeDasharray="5 5"
+              dataKey="percentage"
+              fill="url(#splitColor)"
             />
+            <defs>
+              <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
+                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
+                <stop offset={off * 0.05} stopColor="#238636" stopOpacity={1} />
+                <stop offset={off} stopColor="#238636" stopOpacity={0.1} />
+                <stop offset={off} stopColor="#9d3f3f" stopOpacity={0.1} />
+                <stop offset={off * 1.95} stopColor="#9d3f3f" stopOpacity={1} />
+              </linearGradient>
+            </defs>
             <XAxis
               tickMargin={30}
               minTickGap={30}

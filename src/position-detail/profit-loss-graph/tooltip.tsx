@@ -31,6 +31,7 @@ interface ProfitLossTooltipProps {
       swappedIfDCA: number;
       rawSwappedIfLumpSum: BigNumber;
       rawSwappedIfDCA: BigNumber;
+      percentage: number;
     };
   }[];
   tokenTo: Token;
@@ -45,11 +46,14 @@ const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
     return null;
   }
 
-  const { rawSwappedIfLumpSum, rawSwappedIfDCA } = firstPayload?.payload;
+  const { rawSwappedIfLumpSum, rawSwappedIfDCA, percentage } = firstPayload?.payload;
 
   return (
     <StyledPaper>
       <Typography variant="body2">{capitalizeFirstLetter(label || '')}</Typography>
+      <Typography variant="body1">
+        {percentage > 0 ? 'Profit' : 'Loss'}: {percentage.toFixed(2)}%
+      </Typography>
       <Typography variant="body1">
         DCA: {formatCurrencyAmount(rawSwappedIfDCA, tokenTo)} {tokenTo.symbol}
       </Typography>
