@@ -9,7 +9,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import { LATEST_VERSION, POSITION_VERSION_3 } from 'config';
+import { LATEST_VERSION } from 'config';
 import Button from 'common/button';
 import SplitButton from 'common/split-button';
 import useSupportsSigning from 'hooks/useSupportsSigning';
@@ -88,7 +88,7 @@ const PositionSummaryControls = ({
 
   if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
 
-  const showExtendedFunctions = position.version === LATEST_VERSION || position.version === POSITION_VERSION_3;
+  const showExtendedFunctions = position.version === LATEST_VERSION;
 
   return (
     <PositionControlsContainer>
