@@ -29,6 +29,7 @@ import useWalletService from 'hooks/useWalletService';
 import useWeb3Service from 'hooks/useWeb3Service';
 import ErrorBoundary from 'common/error-boundary/indext';
 import useAccount from 'hooks/useAccount';
+import FeedbackCard from 'common/feedback-card';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -133,6 +134,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
             )}
             <Router>
               <NavBar isLoading={isLoading || isLoadingNetwork} />
+              <FeedbackCard />
               <StyledVector1Container>
                 <Vector1 />
               </StyledVector1Container>
