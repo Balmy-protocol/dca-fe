@@ -1,12 +1,20 @@
 import { createReducer } from '@reduxjs/toolkit';
+import find from 'lodash/find';
 import { TokensLists, Token } from 'types';
-import { enableAggregatorTokenList, enableTokenList, fetchGraphTokenList, fetchTokenList } from './actions';
+import {
+  addCustomToken,
+  enableAggregatorTokenList,
+  enableTokenList,
+  fetchGraphTokenList,
+  fetchTokenList,
+} from './actions';
 
 export interface TokenListsState {
   byUrl: { [tokenListUrl: string]: TokensLists };
   activeLists: string[];
   activeAggregatorLists: string[];
   hasLoaded: boolean;
+  customTokens: TokensLists;
 }
 
 export const getDefaultByUrl = () => ({
@@ -18,6 +26,7 @@ export const getDefaultByUrl = () => ({
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
+    fetchable: true,
   },
   'tokens.1inch.eth': {
     name: '1inch',
@@ -27,6 +36,7 @@ export const getDefaultByUrl = () => ({
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
+    fetchable: true,
   },
   'https://www.gemini.com/uniswap/manifest.json': {
     name: 'Gemini Token List',
@@ -36,6 +46,7 @@ export const getDefaultByUrl = () => ({
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
+    fetchable: true,
   },
   'https://gateway.ipfs.io/ipns/tokens.uniswap.org': {
     name: 'Uniswap Default List',
@@ -45,6 +56,7 @@ export const getDefaultByUrl = () => ({
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
+    fetchable: true,
   },
   'https://tokens.coingecko.com/uniswap/all.json': {
     name: 'CoinGecko',
@@ -54,6 +66,7 @@ export const getDefaultByUrl = () => ({
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
+    fetchable: true,
   },
   'https://static.optimism.io/optimism.tokenlist.json': {
     name: 'Optimism',
@@ -63,6 +76,7 @@ export const getDefaultByUrl = () => ({
     version: { major: 0, minor: 0, patch: 0 },
     hasLoaded: false,
     requestId: '',
+    fetchable: true,
   },
 });
 export const initialState: TokenListsState = {
@@ -70,8 +84,19 @@ export const initialState: TokenListsState = {
   activeAggregatorLists: [
     'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
     'tokens.1inch.eth',
+    'custom-tokens',
   ],
   byUrl: getDefaultByUrl(),
+  customTokens: {
+    name: 'custom-tokens',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: true,
+    requestId: '',
+    fetchable: true,
+  },
   hasLoaded: false,
 };
 
@@ -118,6 +143,7 @@ export default createReducer(initialState, (builder) =>
         version: { major: 0, minor: 0, patch: 0 },
         hasLoaded: false,
         requestId,
+        fetchable: false,
       };
     })
     .addCase(fetchGraphTokenList.fulfilled, (state, { payload }) => {
@@ -126,5 +152,15 @@ export default createReducer(initialState, (builder) =>
         tokens: payload,
         hasLoaded: true,
       };
+    })
+    .addCase(addCustomToken, (state, { payload }) => {
+      const foundToken = find(state.customTokens.tokens, { address: payload.address.toLowerCase() });
+
+      if (!foundToken) {
+        state.customTokens.tokens.push({
+          ...payload,
+          address: payload.address.toLowerCase(),
+        });
+      }
     })
 );

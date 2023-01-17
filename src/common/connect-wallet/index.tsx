@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@mui/material/Button';
+import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
 import { Web3Service } from 'types';
 import styled from 'styled-components';
@@ -22,7 +22,7 @@ interface ConnectWalletButtonProps {
 }
 
 const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => (
-  <StyledButton color="primary" onClick={() => web3Service.connect()}>
+  <StyledButton variant="outlined" color="default" onClick={() => web3Service.connect()}>
     <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
   </StyledButton>
 );

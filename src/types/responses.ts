@@ -18,8 +18,13 @@ export interface PoolsLiquidityDataGraphqlResponse {
 export interface GetPairResponseSwapData {
   id: string;
   executedAtTimestamp: string;
-  ratePerUnitAToB: string;
-  ratePerUnitBToA: string;
+  ratioAToB: string;
+  ratioBToA: string;
+  pairSwapsIntervals: {
+    swapInterval: {
+      interval: string;
+    };
+  }[];
 }
 
 export interface GetPairPriceResponseData {
@@ -229,6 +234,7 @@ export type RawSwapOption = {
     allowanceTarget: string;
     address: string;
     id: string;
+    name: string;
     logoURI: string;
   };
   type: string;

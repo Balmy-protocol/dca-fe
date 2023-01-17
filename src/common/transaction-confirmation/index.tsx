@@ -13,6 +13,7 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { NETWORKS } from 'config';
 import usePrevious from 'hooks/usePrevious';
 import { buildEtherscanTransaction } from 'utils/etherscan';
+import confetti from 'canvas-confetti';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -95,6 +96,7 @@ const TIMES_PER_NETWORK = {
   [NETWORKS.arbitrum.chainId]: 10,
   [NETWORKS.polygon.chainId]: 20,
   [NETWORKS.optimism.chainId]: 10,
+  [NETWORKS.mainnet.chainId]: 40,
 };
 
 const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: TransactionConfirmationProps) => {
@@ -129,6 +131,20 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: Trans
     if (!isTransactionPending && previousTransactionPending) {
       setTimer(0);
       setSuccess(true);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        angle: 60,
+        origin: { x: 0 },
+      });
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        angle: 120,
+        origin: { x: 1 },
+      });
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }

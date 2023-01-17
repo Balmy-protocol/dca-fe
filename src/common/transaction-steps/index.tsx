@@ -32,6 +32,8 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import Address from 'common/address';
 import { emptyTokenWithAddress } from 'utils/currency';
 import CircularProgress from '@mui/material/CircularProgress';
+import { BigNumber } from 'ethers';
+import AllowanceSplitButton from 'common/allowance-split-button';
 
 const StyledIconButton = styled(IconButton)`
   margin-right: 5px;
@@ -88,6 +90,8 @@ interface ItemProps {
 interface TransactionActionApproveToken extends TransactionActionBase {
   type: TransactionActionApproveTokenType;
   extraData: TransactionActionApproveTokenData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAction: (transactions: any, amount?: BigNumber) => void;
 }
 
 interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, ItemProps {}
@@ -210,15 +214,14 @@ const buildApproveTokenItem = ({
           </Typography>
           {isCurrentStep && (
             <StyledTransactionStepButtonContainer>
-              <Button
-                variant="contained"
+              <AllowanceSplitButton
+                onMaxApprove={() => onAction(transactions)}
+                onApproveExact={(amount) => onAction(transactions, amount)}
+                amount={extraData.amount}
+                token={extraData.token}
+                tokenYield={null}
                 color="secondary"
-                fullWidth
-                size="large"
-                onClick={() => onAction(transactions)}
-              >
-                <FormattedMessage description="openWallet" defaultMessage="Open wallet" />
-              </Button>
+              />
             </StyledTransactionStepButtonContainer>
           )}
           {!isCurrentStep && done && (

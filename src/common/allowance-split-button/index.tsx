@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import SplitButton from 'common/split-button';
+import { CustomButtonProps } from 'common/button';
 import { Token, YieldOption } from 'types';
 import { FormattedMessage } from 'react-intl';
 import useWeb3Service from 'hooks/useWeb3Service';
@@ -17,6 +18,7 @@ interface AllowanceSplitButtonProps {
   token: Token | null;
   amount: BigNumber | null;
   tokenYield: YieldOption | null | undefined;
+  color?: CustomButtonProps['color'];
 }
 
 const StyledTooltip = styled(Tooltip)`
@@ -46,7 +48,8 @@ export const AllowanceTooltip = (props: { symbol: string }) => {
 };
 
 const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
-  const { disabled, onMaxApprove, onApproveExact, token, tokenYield, amount } = props;
+  const { disabled, onMaxApprove, onApproveExact, token, tokenYield, amount, color: passedColor } = props;
+  const color = passedColor || 'primary';
   const web3Service = useWeb3Service();
   const hasPendingApproval = useHasPendingApproval(token, web3Service.getAccount(), !!tokenYield?.tokenAddress);
   const symbol = token?.symbol || '';
@@ -77,7 +80,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
       }
       disabled={disabled}
       variant="contained"
-      color="primary"
+      color={color}
       options={[
         {
           text: (

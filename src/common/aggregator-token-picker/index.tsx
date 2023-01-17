@@ -25,6 +25,7 @@ interface TokenPickerProps {
   otherSelected?: Token | null;
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
+  onAddToken?: (token: Token) => void;
 }
 
 const AggregatorTokenPicker = ({
@@ -38,8 +39,9 @@ const AggregatorTokenPicker = ({
   otherSelected,
   yieldOptions,
   isLoadingYieldOptions,
+  onAddToken,
 }: TokenPickerProps) => (
-  <Modal open={shouldShow} onClose={onClose} maxWidth="sm" actions={[]} fullHeight>
+  <Modal open={shouldShow} onClose={onClose} maxWidth="sm" actions={[]} fullHeight keepMounted>
     <StyledOverlay>
       <TokenPicker
         isFrom={isFrom}
@@ -51,6 +53,7 @@ const AggregatorTokenPicker = ({
         otherSelected={otherSelected}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
+        onAddToken={onAddToken}
         isAggregator
         showWrappedAndProtocol
       />

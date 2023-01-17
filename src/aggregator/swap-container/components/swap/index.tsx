@@ -31,6 +31,8 @@ import TransferToModal from 'common/transfer-to-modal';
 import TransactionConfirmation from 'common/transaction-confirmation';
 import TransactionSteps, { TransactionAction as TransactionStep } from 'common/transaction-steps';
 import { GasKeys } from 'config/constants/aggregator';
+import { useAppDispatch } from 'state/hooks';
+import { addCustomToken } from 'state/token-lists/actions';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
 
@@ -63,6 +65,7 @@ interface SwapProps {
   selectedRoute: SwapOption | null;
   isLoadingRoute: boolean;
   onResetForm: () => void;
+  toggleFromTo: () => void;
   transferTo: string | null;
   slippage: string;
   gasSpeed: GasKeys;
@@ -87,8 +90,10 @@ const Swap = ({
   slippage,
   gasSpeed,
   setRefreshQuotes,
+  toggleFromTo,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
+  const dispatch = useAppDispatch();
   const containerRef = React.useRef(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
@@ -109,7 +114,18 @@ const Swap = ({
 
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
-  const handleApproveToken = async (transactions?: TransactionStep[]) => {
+  const fromValueToUse =
+    isBuyOrder && selectedRoute
+      ? (selectedRoute?.sellToken.address === from?.address && selectedRoute.sellAmount.amountInUnits.toString()) || '0'
+      : fromValue;
+
+  const toValueToUse = isBuyOrder
+    ? toValue
+    : (selectedRoute?.buyToken.address === to?.address && selectedRoute?.buyAmount.amountInUnits.toString()) ||
+      '0' ||
+      '';
+
+  const handleApproveToken = async (transactions?: TransactionStep[], amount?: BigNumber) => {
     if (!from || !to || !selectedRoute) return;
     const fromSymbol = from.symbol;
 
@@ -125,15 +141,17 @@ const Swap = ({
           </Typography>
         ),
       });
-      const result = await walletService.approveSpecificToken(from, selectedRoute.swapper.allowanceTarget);
+      const result = await walletService.approveSpecificToken(from, selectedRoute.swapper.allowanceTarget, amount);
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        type: amount ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
           token: from,
           addressFor: selectedRoute.swapper.allowanceTarget,
+          ...(!!amount && { amount: amount.toString() }),
         },
       });
+
       setModalClosed({ content: '' });
 
       if (transactions?.length) {
@@ -247,6 +265,10 @@ const Swap = ({
     }
   };
 
+  const addCustomTokenToList = (token: Token) => {
+    dispatch(addCustomToken(token));
+  };
+
   const handleTransactionEndedForWait = (transactions?: TransactionStep[]) => {
     if (!transactions?.length) {
       return;
@@ -268,11 +290,16 @@ const Swap = ({
   };
 
   const handleMultiSteps = () => {
-    if (!from || fromValue === '' || !to) {
+    if (!from || fromValueToUse === '' || !to) {
       return;
     }
 
     const newSteps: TransactionStep[] = [];
+
+    const amountToApprove =
+      isBuyOrder && selectedRoute
+        ? BigNumber.from(selectedRoute.maxSellAmount.amount)
+        : parseUnits(fromValueToUse, from.decimals);
 
     newSteps.push({
       hash: '',
@@ -282,7 +309,7 @@ const Swap = ({
       type: TRANSACTION_ACTION_APPROVE_TOKEN,
       extraData: {
         token: from,
-        amount: parseUnits(fromValue, from.decimals),
+        amount: amountToApprove,
       },
     });
 
@@ -294,7 +321,7 @@ const Swap = ({
       type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
       extraData: {
         token: from,
-        amount: parseUnits(fromValue, from.decimals),
+        amount: amountToApprove,
       },
     });
 
@@ -307,8 +334,8 @@ const Swap = ({
       extraData: {
         from,
         to,
-        sellAmount: parseUnits(fromValue, from.decimals),
-        buyAmount: parseUnits(fromValue, from.decimals),
+        sellAmount: parseUnits(fromValueToUse, from.decimals),
+        buyAmount: parseUnits(toValueToUse, to.decimals),
       },
     });
 
@@ -337,30 +364,37 @@ const Swap = ({
     setRefreshQuotes(true);
   };
 
-  const cantFund = from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
+  const cantFund =
+    from &&
+    !!fromValueToUse &&
+    !!balance &&
+    parseUnits(
+      selectedRoute?.maxSellAmount?.amountInUnits.toString() || fromValueToUse,
+      selectedRoute?.sellToken.decimals || from.decimals
+    ).gt(balance);
 
   const isApproved =
     !from ||
     !selectedRoute ||
     (from &&
       selectedRoute &&
-      (!fromValue
+      (!fromValueToUse
         ? true
         : (allowance.allowance &&
             allowance.token.address === from.address &&
-            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
+            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValueToUse, from.decimals))) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
 
   const shouldDisableApproveButton =
     !from ||
     !to ||
-    !fromValue ||
+    !fromValueToUse ||
     cantFund ||
     !balance ||
     !selectedRoute ||
     balanceErrors ||
     allowanceErrors ||
-    parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
+    parseUnits(fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).lte(BigNumber.from(0)) ||
     isLoadingRoute;
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
@@ -374,7 +408,7 @@ const Swap = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={() => web3Service.connect()}>
+    <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={() => web3Service.connect()}>
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
@@ -403,7 +437,7 @@ const Swap = ({
       onClick={handleMultiSteps}
     >
       <Typography variant="body1">
-        <FormattedMessage description="proceed agg" defaultMessage="Proceed" />
+        <FormattedMessage description="proceed agg" defaultMessage="Continue" />
       </Typography>
     </StyledButton>
   );
@@ -485,12 +519,14 @@ const Swap = ({
           yieldOptions={[]}
           isLoadingYieldOptions={false}
           otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
+          onAddToken={addCustomTokenToList}
         />
         <SwapFirstStep
           from={from}
           to={to}
-          fromValue={fromValue}
-          toValue={toValue}
+          fromValue={fromValueToUse}
+          toValue={toValueToUse}
+          toggleFromTo={toggleFromTo}
           startSelectingCoin={startSelectingCoin}
           cantFund={cantFund}
           handleFromValueChange={handleFromValueChange}

@@ -10,9 +10,11 @@ import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
 import useAccount from './useAccount';
 
-function useMulticallBalances(
-  tokens: string[] | undefined | null
-): [Record<string, { balance: BigNumber; balanceUsd: BigNumber }> | undefined, boolean, string?] {
+function use1InchBalances(): [
+  Record<string, { balance: BigNumber; balanceUsd: BigNumber }> | undefined,
+  boolean,
+  string?
+] {
   const walletService = useWalletService();
   const priceService = usePriceService();
   const [{ isLoading, result, error }, setState] = React.useState<{
@@ -26,7 +28,6 @@ function useMulticallBalances(
   });
 
   const hasPendingTransactions = useHasPendingTransactions();
-  const prevTokens = usePrevious(tokens);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = useAccount();
   const prevAccount = usePrevious(account);
@@ -37,38 +38,35 @@ function useMulticallBalances(
 
   React.useEffect(() => {
     async function callPromise() {
-      if (tokens?.length) {
-        try {
-          const balanceResults = await walletService.getMulticallBalances(tokens);
+      try {
+        const balanceResults = await walletService.get1InchBalances();
 
-          const priceResults = await priceService.getUsdHistoricPrice(
-            tokens
-              .filter((token) => (balanceResults[token] || BigNumber.from(0)).gt(BigNumber.from(0)))
-              .map((key) => emptyTokenWithAddress(key))
-          );
+        const priceResults = await priceService.getUsdHistoricPrice(
+          Object.keys(balanceResults)
+            .filter((key) => balanceResults[key].gt(BigNumber.from(0)))
+            .map((key) => emptyTokenWithAddress(key))
+        );
 
-          const promiseResult = tokens.reduce(
-            (acc, token) => ({
-              ...acc,
-              [token]: {
-                balance: balanceResults[token],
-                balanceUsd: (balanceResults[token] || BigNumber.from(0)).mul(priceResults[token] || BigNumber.from(0)),
-              },
-            }),
-            {}
-          );
+        const promiseResult = Object.keys(balanceResults).reduce(
+          (acc, token) => ({
+            ...acc,
+            [token]: {
+              balance: balanceResults[token],
+              balanceUsd: (balanceResults[token] || BigNumber.from(0)).mul(priceResults[token] || BigNumber.from(0)),
+            },
+          }),
+          {}
+        );
 
-          setState({ isLoading: false, result: promiseResult, error: undefined });
-        } catch (e) {
-          console.error('error fetching balances', e);
-          setState({ result: undefined, error: e as string, isLoading: false });
-        }
+        setState({ isLoading: false, result: promiseResult, error: undefined });
+      } catch (e) {
+        console.error('error fetching balances', e);
+        setState({ result: undefined, error: e as string, isLoading: false });
       }
     }
 
     if (
       (!isLoading && !result && !error) ||
-      !isEqual(prevTokens, tokens) ||
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       (blockNumber &&
@@ -83,8 +81,6 @@ function useMulticallBalances(
       callPromise();
     }
   }, [
-    tokens,
-    prevTokens,
     isLoading,
     result,
     error,
@@ -97,11 +93,7 @@ function useMulticallBalances(
     prevPendingTrans,
   ]);
 
-  if (!tokens?.length) {
-    return [undefined, false, undefined];
-  }
-
   return [result || prevResult, isLoading, error];
 }
 
-export default useMulticallBalances;
+export default use1InchBalances;

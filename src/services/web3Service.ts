@@ -25,6 +25,7 @@ import YieldService from './yieldService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 import AggregatorService from './aggregatorService';
+import SdkService from './sdkService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -74,6 +75,8 @@ export default class Web3Service {
   arcxSdk: ArcxAnalyticsSdk;
 
   providerService: ProviderService;
+
+  sdkService: SdkService;
 
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -125,11 +128,13 @@ export default class Web3Service {
       this.uniClient
     );
     this.yieldService = new YieldService(this.walletService, this.axiosClient, client);
+    this.sdkService = new SdkService(this.walletService, this.providerService);
     this.aggregatorService = new AggregatorService(
       this.walletService,
       this.contractService,
-      this.meanApiService,
-      this.apolloClient
+      this.sdkService,
+      this.apolloClient,
+      this.providerService
     );
     this.positionService = new PositionService(
       this.walletService,
@@ -300,6 +305,8 @@ export default class Web3Service {
     this.walletService.setAccount(undefined, this.setAccountCallback);
 
     this.setNetwork((await this.providerService.getNetwork()).chainId);
+
+    await this.sdkService.resetProvider();
 
     try {
       const arcxClient = this.getArcxClient();

@@ -5,12 +5,12 @@ import Button from 'common/button';
 import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import TokenButton from 'common/token-button';
-import TokenInput from 'common/token-input';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
+import Tooltip from '@mui/material/Tooltip';
 import { BigNumber } from 'ethers';
-import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/Send';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
 import Badge from '@mui/material/Badge';
@@ -20,10 +20,22 @@ import { formatUnits, parseUnits } from '@ethersproject/units';
 import useUsdPrice from 'hooks/useUsdPrice';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
+import AggregatorTokenInput from './aggtokenButton';
 
 const StyledButton = styled(Button)`
   padding: 0;
   min-width: 10px;
+`;
+
+const StyledButtonContainer = styled.div`
+  display: flex;
+  flex: 1;
+  gap: 10px;
+`;
+
+const StyledIconButton = styled(Button)`
+  border-radius: 12px;
+  min-width: 45px;
 `;
 
 const StyledGrid = styled(Grid)`
@@ -45,13 +57,25 @@ const StyledFormHelperText = styled(FormHelperText)`
   gap: 5px;
 `;
 
-const StyledContentContainer = styled.div`
+const StyledCogContainer = styled.div`
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  border: 3px solid #151515;
+  border-radius: 20px;
+  background: #151515;
+`;
+
+const StyledContentContainer = styled.div<{ hasArrow?: boolean }>`
   background-color: #292929;
+  position: relative;
   padding: 16px;
   border-radius: 8px;
   gap: 16px;
   display: flex;
   flex-direction: column;
+  ${({ hasArrow }) => hasArrow && 'padding-bottom: 30px;'}
 `;
 
 const StyledTokensContainer = styled.div`
@@ -67,17 +91,22 @@ const StyledTokenInputContainer = styled.div`
   align-items: stretch;
 `;
 
-const StyledLoadingContainer = styled.div`
+const StyledToggleContainer = styled.div`
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 5px;
+  justify-content: center;
+  position: absolute;
+  left: calc(50% - 24px);
+  bottom: -30px;
+  z-index: 2;
 `;
 
-const StyledTokenButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
+const StyledToggleTokenButton = styled(IconButton)`
+  border: 4px solid #1b1821;
+  background-color: #292929;
+  :hover {
+    background-color: #484848;
+  }
 `;
 
 interface SwapFirstStepProps {
@@ -89,6 +118,7 @@ interface SwapFirstStepProps {
   cantFund: boolean | null;
   handleFromValueChange: (newValue: string) => void;
   handleToValueChange: (newValue: string) => void;
+  toggleFromTo: () => void;
   balance?: BigNumber;
   buttonToShow: React.ReactNode;
   selectedRoute: SwapOption | null;
@@ -116,6 +146,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     selectedRoute,
     isBuyOrder,
     isLoadingRoute,
+    toggleFromTo,
     transferTo,
     onOpenTransferTo,
     onShowSettings,
@@ -123,11 +154,24 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     gasSpeed,
   } = props;
 
-  let fromValueToUse = isBuyOrder && selectedRoute ? selectedRoute.sellAmount.amountInUnits.toString() : fromValue;
-  let toValueToUse = isBuyOrder ? toValue : selectedRoute?.buyAmount.amountInUnits.toString() || '';
+  let fromValueToUse =
+    isBuyOrder && selectedRoute
+      ? (selectedRoute?.sellToken.address === from?.address && selectedRoute.sellAmount.amountInUnits.toString()) || '0'
+      : fromValue;
+  let toValueToUse = isBuyOrder
+    ? toValue
+    : (selectedRoute?.buyToken.address === to?.address && selectedRoute?.buyAmount.amountInUnits.toString()) ||
+      '0' ||
+      '';
 
-  const [fromFetchedPrice] = useUsdPrice(from, parseUnits(fromValueToUse || '0', from?.decimals));
-  const [toFetchedPrice] = useUsdPrice(to, parseUnits(toValueToUse || '0', to?.decimals));
+  const [fromFetchedPrice] = useUsdPrice(
+    from,
+    parseUnits(fromValueToUse || '0', selectedRoute?.sellToken.decimals || from?.decimals)
+  );
+  const [toFetchedPrice] = useUsdPrice(
+    to,
+    parseUnits(toValueToUse || '0', selectedRoute?.buyToken.decimals || to?.decimals)
+  );
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;
 
@@ -160,23 +204,49 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const hasNonDefaultSettings =
     slippage !== DEFAULT_AGGREGATOR_SETTINGS.slippage.toString() || gasSpeed !== DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
 
+  const priceImpact =
+    selectedRoute &&
+    (
+      Math.round(
+        ((Number(selectedRoute.buyAmount.amountInUSD) - Number(selectedRoute.sellAmount.amountInUSD)) /
+          Number(selectedRoute.buyAmount.amountInUSD)) *
+          100
+      ) / 100
+    ).toFixed(2);
+
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
-      <Grid item xs={12}>
-        <StyledContentContainer>
+      <Grid item xs={12} sx={{ position: 'relative' }}>
+        <StyledContentContainer hasArrow>
+          <StyledCogContainer>
+            <Badge color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
+              <IconButton aria-label="settings" size="small" sx={{ padding: '3px' }} onClick={onShowSettings}>
+                <SettingsIcon fontSize="inherit" />
+              </IconButton>
+            </Badge>
+          </StyledCogContainer>
           <StyledTokensContainer>
             <StyledTitleContainer>
               <Typography variant="body1">
                 <FormattedMessage description="youPay" defaultMessage="You pay" />
               </Typography>
-              <Badge color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
-                <IconButton aria-label="settings" size="small" onClick={onShowSettings}>
-                  <SettingsIcon fontSize="inherit" />
-                </IconButton>
-              </Badge>
+              {balance && from && (
+                <StyledFormHelperText onClick={onSetMaxBalance}>
+                  <FormattedMessage
+                    description="in wallet"
+                    defaultMessage="Balance: {balance}"
+                    values={{
+                      balance: formatCurrencyAmount(balance, from, 4),
+                    }}
+                  />
+                  <StyledButton onClick={onSetMaxBalance} color="secondary" variant="text">
+                    <FormattedMessage description="maxWallet" defaultMessage="MAX" />
+                  </StyledButton>
+                </StyledFormHelperText>
+              )}
             </StyledTitleContainer>
             <StyledTokenInputContainer>
-              <TokenInput
+              <AggregatorTokenInput
                 id="from-value"
                 error={cantFund ? 'Amount cannot exceed balance' : ''}
                 value={fromValueToUse}
@@ -184,38 +254,19 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 onChange={handleFromValueChange}
                 token={from}
                 fullWidth
-                usdValue={parseFloat(fromPrice || fromFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                usdValue={parseFloat(fromPrice?.toString() || fromFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                onTokenSelect={() => startSelectingCoin(from || emptyTokenWithAddress('from'))}
               />
-              <StyledTokenButtonContainer>
-                {balance && from && (
-                  <StyledFormHelperText onClick={onSetMaxBalance}>
-                    <FormattedMessage
-                      description="in wallet"
-                      defaultMessage="Balance: {balance}"
-                      values={{
-                        balance: formatCurrencyAmount(balance, from, 4),
-                      }}
-                    />
-                    <StyledButton onClick={onSetMaxBalance} color="secondary" variant="text">
-                      <FormattedMessage description="maxWallet" defaultMessage="Max" />
-                    </StyledButton>
-                  </StyledFormHelperText>
-                )}
-                <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
-              </StyledTokenButtonContainer>
             </StyledTokenInputContainer>
-            {isLoadingBuyOrder && (
-              <StyledLoadingContainer>
-                <CircularProgress size={20} />
-                <Typography variant="caption">
-                  <FormattedMessage description="loading best price" defaultMessage="Fetching best price.." />
-                </Typography>
-              </StyledLoadingContainer>
-            )}
           </StyledTokensContainer>
         </StyledContentContainer>
+        <StyledToggleContainer>
+          <StyledToggleTokenButton onClick={toggleFromTo}>
+            <SwapVertIcon />
+          </StyledToggleTokenButton>
+        </StyledToggleContainer>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} sx={{ paddingTop: '8px !important' }}>
         <StyledContentContainer>
           <StyledTokensContainer>
             <StyledTitleContainer>
@@ -224,34 +275,44 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               </Typography>
             </StyledTitleContainer>
             <StyledTokenInputContainer>
-              <TokenInput
+              <AggregatorTokenInput
                 id="to-value"
                 value={toValueToUse}
                 disabled={isLoadingSellOrder}
                 onChange={handleToValueChange}
-                withBalance={false}
                 token={to}
                 fullWidth
-                usdValue={parseFloat(toPrice || toFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                usdValue={parseFloat(toPrice?.toString() || toFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                onTokenSelect={() => startSelectingCoin(to || emptyTokenWithAddress('to'))}
+                impact={priceImpact}
               />
-              <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
             </StyledTokenInputContainer>
-            {isLoadingSellOrder && (
-              <StyledLoadingContainer>
-                <CircularProgress size={20} />
-                <Typography variant="caption">
-                  <FormattedMessage description="loading best price" defaultMessage="Fetching best price.." />
-                </Typography>
-              </StyledLoadingContainer>
-            )}
           </StyledTokensContainer>
         </StyledContentContainer>
       </Grid>
       <Grid item xs={12}>
         <StyledContentContainer>
-          <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />
-          <QuoteData quote={selectedRoute} to={to} />
-          {buttonToShow}
+          {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
+          <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} to={to} />
+          <StyledButtonContainer>
+            {buttonToShow}
+            {!transferTo && (
+              <StyledIconButton variant="contained" color="secondary" size="small" onClick={onOpenTransferTo}>
+                <Tooltip
+                  title={
+                    <FormattedMessage
+                      description="tranferToTooltip"
+                      defaultMessage="Swap and transfer to another address"
+                    />
+                  }
+                  arrow
+                  placement="top"
+                >
+                  <SendIcon fontSize="inherit" />
+                </Tooltip>
+              </StyledIconButton>
+            )}
+          </StyledButtonContainer>
         </StyledContentContainer>
       </Grid>
     </StyledGrid>

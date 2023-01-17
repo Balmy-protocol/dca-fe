@@ -4,13 +4,17 @@ import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 
 // MOCKS
 import { PositionVersions } from 'config/constants';
-import { RawSwapOption, SwapOption, Token } from 'types';
+import { SwapOption, Token } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
-import { GasKeys } from 'config/constants/aggregator';
+import { toToken } from 'utils/currency';
+import { getProtocolToken } from 'mocks/tokens';
+import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
+import { GasKeys, SwapSortOptions } from 'config/constants/aggregator';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
-import MeanApiService from './meanApiService';
+import ProviderService from './providerService';
+import SdkService from './sdkService';
 
 export default class AggregatorService {
   modal: SafeAppWeb3Modal;
@@ -21,20 +25,24 @@ export default class AggregatorService {
 
   walletService: WalletService;
 
-  meanApiService: MeanApiService;
+  sdkService: SdkService;
 
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
+
+  providerService: ProviderService;
 
   constructor(
     walletService: WalletService,
     contractService: ContractService,
-    meanApiService: MeanApiService,
-    DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>
+    sdkService: SdkService,
+    DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
+    providerService: ProviderService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
-    this.meanApiService = meanApiService;
+    this.sdkService = sdkService;
     this.apolloClient = DCASubgraph;
+    this.providerService = providerService;
   }
 
   getSigner() {
@@ -42,9 +50,7 @@ export default class AggregatorService {
   }
 
   async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
-    const signer = this.walletService.getSigner();
-
-    const gasUsed = await signer.estimateGas(tx);
+    const gasUsed = await this.providerService.estimateGas(tx);
 
     return {
       ...tx,
@@ -53,11 +59,9 @@ export default class AggregatorService {
   }
 
   async swap(route: SwapOption) {
-    const signer = this.walletService.getSigner();
-
     const transactionToSend = await this.addGasLimit(route.tx);
 
-    return signer.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async getSwapOptions(
@@ -65,12 +69,33 @@ export default class AggregatorService {
     to: Token,
     sellAmount?: BigNumber,
     buyAmount?: BigNumber,
-    sorting?: string,
+    sorting?: SwapSortOptions,
     transferTo?: string | null,
     slippage?: number,
-    gasSpeed?: GasKeys
+    gasSpeed?: GasKeys,
+    takerAddress?: string
   ) {
-    const swapOptionsResponse = await this.meanApiService.getSwapOptions(
+    let shouldValidate = !buyAmount;
+
+    if (takerAddress && sellAmount) {
+      // const preAllowanceTarget = await this.sdkService.getAllowanceTarget();
+      // const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
+
+      // if (parseUnits(allowance.allowance, from.decimals).lt(sellAmount)) {
+      //   shouldValidate = false;
+      // }
+
+      if (shouldValidate) {
+        // If user does not have the balance do not validate tx
+        const balance = await this.walletService.getBalance(from.address);
+
+        if (balance.lt(sellAmount)) {
+          shouldValidate = false;
+        }
+      }
+    }
+
+    const swapOptionsResponse = await this.sdkService.getSwapOptions(
       from.address,
       to.address,
       sellAmount,
@@ -78,12 +103,19 @@ export default class AggregatorService {
       sorting,
       transferTo,
       slippage,
-      gasSpeed
+      gasSpeed,
+      takerAddress,
+      !shouldValidate
     );
 
-    const filteredOptions: RawSwapOption[] = swapOptionsResponse.quotes.filter(
-      (option) => !('failed' in option)
-    ) as RawSwapOption[];
+    const filteredOptions = swapOptionsResponse.filter((option) => !('failed' in option)) as QuoteResponse[];
+
+    const network = await this.walletService.getNetwork();
+
+    const protocolToken = getProtocolToken(network.chainId);
+
+    const sellToken = from.address === protocolToken.address ? protocolToken : toToken(from);
+    const buyToken = to.address === protocolToken.address ? protocolToken : toToken(to);
 
     return filteredOptions.map<SwapOption>(
       ({
@@ -108,41 +140,43 @@ export default class AggregatorService {
           amountInUSD: minBuyAmountAmountInUsd,
         },
         gas: { estimatedGas, estimatedCost, estimatedCostInUnits, estimatedCostInUSD, gasTokenSymbol },
-        swapper: { allowanceTarget, address, id, logoURI },
+        swapper: { allowanceTarget, address, logoURI, name },
         type,
         tx,
       }) => ({
+        sellToken,
+        buyToken,
         sellAmount: {
           amount: BigNumber.from(sellAmountAmount),
           amountInUnits: Number(sellAmountAmountInUnits),
-          amountInUSD: sellAmountAmountInUsd,
+          amountInUSD: sellAmountAmountInUsd || 0,
         },
         buyAmount: {
           amount: BigNumber.from(buyAmountAmount),
           amountInUnits: Number(buyAmountAmountInUnits),
-          amountInUSD: buyAmountAmountInUsd,
+          amountInUSD: buyAmountAmountInUsd || 0,
         },
         maxSellAmount: {
           amount: BigNumber.from(maxSellAmountAmount),
           amountInUnits: Number(maxSellAmountAmountInUnits),
-          amountInUSD: maxSellAmountAmountInUsd,
+          amountInUSD: maxSellAmountAmountInUsd || 0,
         },
         minBuyAmount: {
           amount: BigNumber.from(minBuyAmountAmount),
           amountInUnits: Number(minBuyAmountAmountInUnits),
-          amountInUSD: minBuyAmountAmountInUsd,
+          amountInUSD: minBuyAmountAmountInUsd || 0,
         },
         gas: {
           estimatedGas: BigNumber.from(estimatedGas),
           estimatedCost: BigNumber.from(estimatedCost),
           estimatedCostInUnits,
-          estimatedCostInUSD,
+          estimatedCostInUSD: estimatedCostInUSD || 0,
           gasTokenSymbol,
         },
         swapper: {
           allowanceTarget,
           address,
-          id,
+          name,
           logoURI,
         },
         type,

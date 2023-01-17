@@ -78,7 +78,13 @@ export const setupAxiosClient = () =>
     },
   });
 
-const PERSISTED_STATES: string[] = ['transactions', 'badge', 'positionDetails.showBreakdown', 'aggregatorSettings'];
+const PERSISTED_STATES: string[] = [
+  'transactions',
+  'badge',
+  'positionDetails.showBreakdown',
+  'aggregatorSettings',
+  'tokenLists.customTokens',
+];
 
 const store = configureStore({
   reducer: {
@@ -108,12 +114,24 @@ const store = configureStore({
         position: null,
       },
       tokenLists: {
-        byUrl: getDefaultByUrl(),
-        activeLists: ['https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json'],
+        activeLists: ['Mean Finance Graph Allowed Tokens'],
         activeAggregatorLists: [
           'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
           'tokens.1inch.eth',
+          'custom-tokens',
         ],
+        byUrl: getDefaultByUrl(),
+        hasLoaded: false,
+        customTokens: {
+          name: 'custom-tokens',
+          logoURI: '',
+          timestamp: new Date().getTime(),
+          tokens: [],
+          version: { major: 0, minor: 0, patch: 0 },
+          hasLoaded: true,
+          requestId: '',
+          fetchable: true,
+        },
       },
     },
   }),

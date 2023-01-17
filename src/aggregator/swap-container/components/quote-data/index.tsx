@@ -5,11 +5,9 @@ import Typography from '@mui/material/Typography';
 import { formatCurrencyAmount } from 'utils/currency';
 import { FormattedMessage } from 'react-intl';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { NETWORKS } from 'config';
-import find from 'lodash/find';
-import { capitalizeFirstLetter } from 'utils/parsing';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Tooltip from '@mui/material/Tooltip';
+import { getProtocolToken } from 'mocks/tokens';
 
 const StyledQuoteDataContainer = styled.div`
   padding: 16px;
@@ -41,10 +39,17 @@ interface QuoteDataProps {
 const QuoteData = ({ quote, to }: QuoteDataProps) => {
   const network = useCurrentNetwork();
 
-  const networkName = React.useMemo(() => {
-    const supportedNetwork = find(NETWORKS, { chainId: network.chainId });
-    return (supportedNetwork && supportedNetwork.name) || capitalizeFirstLetter(network.name);
-  }, [network]);
+  const protocolToken = getProtocolToken(network.chainId);
+
+  const priceImpact =
+    quote &&
+    (
+      Math.round(
+        ((Number(quote.sellAmount.amountInUSD) - Number(quote.buyAmount.amountInUSD)) /
+          Number(quote.sellAmount.amountInUSD)) *
+          100
+      ) / 100
+    ).toFixed(2);
 
   return (
     <StyledQuoteDataContainer>
@@ -53,21 +58,60 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
           <FormattedMessage description="quoteDataSelectedRoute" defaultMessage="Selected route:" />
         </Typography>
         <Typography variant="body2" color="inherit">
-          {quote?.swapper.id || '-'}
+          {quote?.swapper.name || '-'}
         </Typography>
       </StyledQuoteDataItem>
       <StyledQuoteDataItem>
         <Typography variant="body2" color="inherit">
-          <FormattedMessage
-            description="quoteDataFee"
-            defaultMessage="{network} fee:"
-            values={{ network: networkName }}
-          />
+          <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
         </Typography>
         <Typography variant="body2">
-          {quote?.gas.estimatedCostInUSD ? `$${quote.gas.estimatedCostInUSD}` : '-'}
+          {quote?.gas.estimatedCostInUSD
+            ? `$${quote.gas.estimatedCostInUSD} (${formatCurrencyAmount(
+                quote.gas.estimatedCost,
+                protocolToken,
+                2,
+                2
+              )} ${protocolToken.symbol})`
+            : '-'}
         </Typography>
       </StyledQuoteDataItem>
+      <StyledQuoteDataItem>
+        <Typography variant="body2" color="inherit">
+          <FormattedMessage description="quotePriceImpact" defaultMessage="Price impact:" />
+        </Typography>
+        <StyledMinimumContainer>
+          <Typography variant="body2" color="inherit">
+            {(quote && priceImpact && `${priceImpact}%`) || '-'}
+          </Typography>
+        </StyledMinimumContainer>
+      </StyledQuoteDataItem>
+      {quote?.maxSellAmount && (
+        <StyledQuoteDataItem>
+          <Typography variant="body2" color="inherit">
+            <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
+          </Typography>
+          <StyledMinimumContainer>
+            <Typography variant="body2" color="inherit">
+              {quote.maxSellAmount.amount
+                ? `${formatCurrencyAmount(quote.maxSellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`
+                : '-'}
+            </Typography>
+            <Tooltip
+              title={
+                <FormattedMessage
+                  description="quoteDataMaximumTooltip"
+                  defaultMessage="This is the maximum you will spend based on your slippage settings"
+                />
+              }
+              arrow
+              placement="top"
+            >
+              <HelpOutlineIcon fontSize="small" />
+            </Tooltip>
+          </StyledMinimumContainer>
+        </StyledQuoteDataItem>
+      )}
       <StyledQuoteDataItem>
         <Typography variant="body2" color="inherit">
           <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
@@ -75,7 +119,7 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
         <StyledMinimumContainer>
           <Typography variant="body2" color="inherit">
             {quote?.minBuyAmount.amount && to
-              ? `${formatCurrencyAmount(quote.minBuyAmount.amount, to, 4, 6)} ${to.symbol}`
+              ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
               : '-'}
           </Typography>
           <Tooltip

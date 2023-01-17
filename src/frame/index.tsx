@@ -88,6 +88,9 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
     palette: {
       mode,
     },
+    typography: {
+      fontFamily: 'Lato',
+    },
   });
 
   const dispatch = useAppDispatch();

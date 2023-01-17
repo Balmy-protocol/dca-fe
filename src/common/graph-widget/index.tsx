@@ -1,7 +1,8 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
-import { ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Area, Line, ComposedChart, CartesianGrid } from 'recharts';
+import some from 'lodash/some';
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Area, Line, ComposedChart } from 'recharts';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
@@ -18,11 +19,10 @@ import useDCAGraphql from 'hooks/useDCAGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { STABLE_COINS, TOKEN_TYPE_BASE } from 'config/constants';
+import { ONE_DAY, ONE_HOUR, STABLE_COINS, TOKEN_TYPE_BASE } from 'config/constants';
 import GraphFooter from 'common/graph-footer';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import MinimalTabs from 'common/minimal-tabs';
-import GraphTooltip from 'common/graph-tooltip';
 import useGraphPrice from 'hooks/useGraphPrice';
 import useUsdPrice from 'hooks/useUsdPrice';
 import { parseUnits } from '@ethersproject/units';
@@ -143,7 +143,9 @@ const StyledGraphPillsContainer = styled.div`
 
 const PERIODS = [1, 7, 30];
 
-const INDEX_TO_FORMAT = ['t', 'MMM d t', 'MMM d t'];
+const INDEX_TO_FORMAT = ['t', 'MMM d', 'MMM d'];
+
+const PERIODS_TO_FILTER_FROM = [ONE_HOUR.toString(), ONE_DAY.toString(), ONE_DAY.toString()];
 
 const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   address: '',
@@ -161,6 +163,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
   let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
   let defiLlamaData: UniMappedPrice[] = [];
   let swapData: GetPairResponseSwapData[] = [];
+  const [selectedItem, setSelectedItem] = React.useState<{ value?: number }[]>([]);
   let prices: Prices = [];
   const [tabIndex, setTabIndex] = React.useState(1);
   const availablePairs = useAvailablePairs();
@@ -248,17 +251,24 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
       date,
     }));
 
-    const mappedSwapData = map(swapData, ({ executedAtTimestamp, ratePerUnitAToB, ratePerUnitBToA }) => ({
-      name: DateTime.fromSeconds(parseInt(executedAtTimestamp, 10)).toFormat(INDEX_TO_FORMAT[tabIndex]),
-      'Mean Finance':
-        parseFloat(
-          formatCurrencyAmount(
-            BigNumber.from(tokenA.isBaseToken ? ratePerUnitBToA : ratePerUnitAToB),
-            tokenA.isBaseToken ? tokenA : tokenB
-          )
-        ) || null,
-      date: executedAtTimestamp,
-    }));
+    const mappedSwapData = map(
+      swapData.filter((swap) =>
+        some(swap.pairSwapsIntervals, (interval) =>
+          BigNumber.from(interval.swapInterval.interval).gte(PERIODS_TO_FILTER_FROM[tabIndex])
+        )
+      ),
+      ({ executedAtTimestamp, ratioAToB, ratioBToA }) => ({
+        name: DateTime.fromSeconds(parseInt(executedAtTimestamp, 10)).toFormat(INDEX_TO_FORMAT[tabIndex]),
+        'Mean Finance':
+          parseFloat(
+            formatCurrencyAmount(
+              BigNumber.from(tokenA.isBaseToken ? ratioBToA : ratioAToB),
+              tokenA.isBaseToken ? tokenA : tokenB
+            )
+          ) || null,
+        date: executedAtTimestamp,
+      })
+    );
 
     return orderBy([...mappedSwapData, ...mappedDefiLlamaData], ['date'], ['desc']).reverse();
   }, [swapData, defiLlamaData, tabIndex]);
@@ -314,6 +324,15 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
     );
   }
 
+  const selectedItemValue = selectedItem.reduce(
+    (acc, item) => item.value || acc,
+    (prices &&
+      prices.length &&
+      ((prices[prices.length - 1] as PriceDefillamaData).Defillama ||
+        (prices[prices.length - 1] as PriceMeanData)['Mean Finance'])) ||
+      0
+  );
+
   return (
     <StyledPaper variant="outlined" $column>
       <StyledGraphContainer elevation={0}>
@@ -340,6 +359,19 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
             />
           </StyledTitleContainer>
           <StyledLegendContainer>
+            <Typography variant="h6">
+              <FormattedMessage
+                description="graph selectedItemValue"
+                defaultMessage="{prefix}{value} {token}"
+                values={{
+                  prefix: tokenA.isBaseToken ? '$' : '',
+                  value: selectedItemValue,
+                  token: tokenA.isBaseToken ? 'USD' : tokenB.symbol,
+                }}
+              />
+            </Typography>
+          </StyledLegendContainer>
+          <StyledLegendContainer>
             {!!defiLlamaData.length && (
               <StyledLegend>
                 <StyledLegendIndicator fill="#7C37ED" />
@@ -363,6 +395,8 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
             data={prices}
             margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
             style={{ overflow: 'visible' }}
+            onMouseMove={({ activePayload }) => activePayload && setSelectedItem(activePayload)}
+            onMouseLeave={() => setSelectedItem([])}
           >
             <defs>
               <linearGradient id="colorDefillama" x1="0" y1="0" x2="0" y2="1">
@@ -370,7 +404,6 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
                 <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
             {defiLlamaData.length && (
               <Area
                 legendType="none"
@@ -390,10 +423,10 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
                 connectNulls
                 dataKey="Mean Finance"
                 type="monotone"
-                strokeWidth="3px"
-                stroke="#DCE2F9"
-                dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
-                strokeDasharray="5 5"
+                strokeWidth="2px"
+                stroke="rgba(220, 226, 249, 0.7)"
+                dot={{ strokeWidth: '2px', stroke: 'rgba(220, 226, 249, 0.7)', fill: 'rgba(220, 226, 249, 0.7)' }}
+                strokeDasharray="3 3"
               />
             )}
             <XAxis
@@ -403,15 +436,9 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1] || ''}`}
             />
-            <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false} />
-            <Tooltip
-              content={({ payload, label }) => (
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                <GraphTooltip payload={payload} label={label} tokenA={tokenA} tokenB={tokenB} />
-              )}
-            />
+            <YAxis strokeWidth="0px" domain={['auto', 'auto']} axisLine={false} tickLine={false} hide />
+            <Tooltip content={<></>} />
             <Legend />
           </ComposedChart>
         </ResponsiveContainer>

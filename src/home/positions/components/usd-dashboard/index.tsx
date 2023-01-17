@@ -23,6 +23,7 @@ import { emptyTokenWithSymbol, formatCurrencyAmount } from 'utils/currency';
 import { FormattedMessage } from 'react-intl';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { usdFormatter } from 'utils/parsing';
+import { Hidden } from '@mui/material';
 import { useHistory } from 'react-router-dom';
 import { useAppDispatch } from 'hooks/state';
 import { changeMainTab } from 'state/tabs/actions';
@@ -529,51 +530,53 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
       )}
       {hasLoadedUSDValues && !!tokensCount.length && (
         <>
-          <Grid item xs={5}>
-            <ResponsiveContainer>
-              <PieChart height={150}>
-                <Pie
-                  data={tokensCount}
-                  dataKey="value"
-                  innerRadius={65}
-                  paddingAngle={1}
-                  outerRadius={75}
-                  cursor="pointer"
-                  fill="#8884d8"
-                  onMouseOver={(data: { name: string; token: Token; tokens?: string[] }) =>
-                    onSelectTokens(data.tokens ? data.tokens : [data.name])
-                  }
-                  onMouseOut={() => onSelectTokens(null)}
-                >
-                  {tokensCount.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
-                  ))}
-                  <Label
-                    value={`$${usdFormatter(shownTotalUSDAmount)}`}
-                    position="centerBottom"
-                    fontSize="1.7rem"
-                    fontWeight={400}
-                    offset={-10}
-                    letterSpacing="0.0075em"
-                    color="white"
-                    fill="white"
-                  />
-                  <Label
-                    value="USD"
-                    position="centerTop"
-                    className="label-top"
-                    fontSize="1.10rem"
-                    offset={10}
-                    fontWeight={400}
-                    letterSpacing="0.0075em"
-                    color="#FFFFFF80"
-                    fill="#FFFFFF80"
-                  />
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </Grid>
-          <StyledGrid item xs={7}>
+          <Hidden smDown>
+            <Grid item xs={12} md={5}>
+              <ResponsiveContainer>
+                <PieChart height={150}>
+                  <Pie
+                    data={tokensCount}
+                    dataKey="value"
+                    innerRadius={65}
+                    paddingAngle={1}
+                    outerRadius={75}
+                    cursor="pointer"
+                    fill="#8884d8"
+                    onMouseOver={(data: { name: string; token: Token; tokens?: string[] }) =>
+                      onSelectTokens(data.tokens ? data.tokens : [data.name])
+                    }
+                    onMouseOut={() => onSelectTokens(null)}
+                  >
+                    {tokensCount.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
+                    ))}
+                    <Label
+                      value={`$${usdFormatter(shownTotalUSDAmount)}`}
+                      position="centerBottom"
+                      fontSize="1.7rem"
+                      fontWeight={400}
+                      offset={-10}
+                      letterSpacing="0.0075em"
+                      color="white"
+                      fill="white"
+                    />
+                    <Label
+                      value="USD"
+                      position="centerTop"
+                      className="label-top"
+                      fontSize="1.10rem"
+                      offset={10}
+                      fontWeight={400}
+                      letterSpacing="0.0075em"
+                      color="#FFFFFF80"
+                      fill="#FFFFFF80"
+                    />
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </Grid>
+          </Hidden>
+          <StyledGrid item xs={12} md={7}>
             <StyledLabelContainer>
               {tokensCountLabels.map((positionCountLabel) => (
                 <Grid

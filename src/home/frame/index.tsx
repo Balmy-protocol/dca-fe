@@ -1,7 +1,7 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import { useMainTab } from 'state/tabs/hooks';
+import { useSubTab } from 'state/tabs/hooks';
 import { useParams } from 'react-router-dom';
 import { SUPPORTED_NETWORKS } from 'config/constants';
 import { GetSwapIntervalsGraphqlResponse } from 'types';
@@ -21,7 +21,7 @@ interface HomeFrameProps {
 }
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
-  const tabIndex = useMainTab();
+  const tabIndex = useSubTab();
   const walletService = useWalletService();
   const currentNetwork = useCurrentNetwork();
   const { chainId } = useParams<{ chainId: string }>();

@@ -5,18 +5,27 @@ import debounce from 'lodash/debounce';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
-import { GasKeys, SWAP_ROUTES_SORT_OPTIONS } from 'config/constants/aggregator';
+import {
+  GasKeys,
+  SORT_LEAST_GAS,
+  SORT_MOST_PROFIT,
+  SORT_MOST_RETURN,
+  SwapSortOptions,
+} from 'config/constants/aggregator';
 import { useBlockNumber } from 'state/block-number/hooks';
+import { BigNumber } from 'ethers';
 import useCurrentNetwork from './useCurrentNetwork';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
+
+export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
 function useSwapOptions(
   from: Token | undefined | null,
   to: Token | undefined | null,
   value?: string,
   isBuyOrder?: boolean,
-  sorting?: string,
+  sorting?: SwapSortOptions,
   transferTo?: string | null,
   slippage?: number,
   gasSpeed?: GasKeys
@@ -52,9 +61,18 @@ function useSwapOptions(
         debouncedIsBuyOrder?: boolean,
         debouncedTransferTo?: string | null,
         debouncedGasSpeed?: GasKeys,
-        debouncedSlippage?: number
+        debouncedSlippage?: number,
+        debouncedAccount?: string
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
+          const sellBuyValue = debouncedIsBuyOrder
+            ? parseUnits(debouncedValue, debouncedTo.decimals)
+            : parseUnits(debouncedValue, debouncedFrom.decimals);
+
+          if (sellBuyValue.lte(BigNumber.from(0))) {
+            return;
+          }
+
           setState({ isLoading: true, result: undefined, error: undefined });
 
           try {
@@ -63,13 +81,18 @@ function useSwapOptions(
               debouncedTo,
               debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
               debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
-              SWAP_ROUTES_SORT_OPTIONS.MOST_PROFIT,
+              SORT_MOST_PROFIT,
               debouncedTransferTo,
               debouncedSlippage,
-              debouncedGasSpeed
+              debouncedGasSpeed,
+              debouncedAccount
             );
 
-            setState({ result: promiseResult, error: undefined, isLoading: false });
+            if (promiseResult.length) {
+              setState({ result: promiseResult, error: undefined, isLoading: false });
+            } else {
+              setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
+            }
           } catch (e) {
             setState({ result: undefined, error: e as string, isLoading: false });
           }
@@ -81,8 +104,8 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage),
-    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed]
+    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage, account),
+    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed, account]
   );
 
   React.useEffect(() => {
@@ -133,10 +156,18 @@ function useSwapOptions(
     return [undefined, false, undefined, fetchOptions];
   }
 
-  let resultToReturn = result || prevResult;
+  let resultToReturn = !error ? result || prevResult : undefined;
 
-  if (sorting === SWAP_ROUTES_SORT_OPTIONS.LEAST_GAS && resultToReturn) {
+  if (sorting === SORT_LEAST_GAS && resultToReturn) {
     resultToReturn = [...resultToReturn].sort((a, b) => (a.gas.estimatedCost.lt(b.gas.estimatedCost) ? -1 : 1));
+  }
+
+  if (sorting === SORT_MOST_RETURN && resultToReturn) {
+    if (isBuyOrder) {
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount.lt(b.sellAmount.amount) ? -1 : 1));
+    } else {
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount.gt(b.buyAmount.amount) ? -1 : 1));
+    }
   }
 
   return [resultToReturn, isLoading, error, fetchOptions];

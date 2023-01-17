@@ -15,6 +15,7 @@ import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useWalletService from 'hooks/useWalletService';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,8 +36,8 @@ const StyledMenuItem = styled(Button)`
   text-transform: none;
 `;
 
-const StyledTokenIconContainer = styled.div`
-  margin-right: 5px;
+const StyledTokenIconContainer = styled.div<{ small: boolean }>`
+  margin-right: ${({ small }) => (small ? '0px' : '5px')};
   display: flex;
 `;
 
@@ -54,6 +55,7 @@ const StyledButton = styled(Button)`
   }
   margin-right: 10px;
   padding: 4px 8px;
+  min-width: 0px;
 `;
 interface NetworkLabelProps {
   network: {
@@ -84,6 +86,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const urlParams = useParams<PositionDetailUrlParams>();
   const history = useHistory();
   const loadedAsSafeApp = useLoadedAsSafeApp();
+  const currentBreakPoint = useCurrentBreakpoint();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (loadedAsSafeApp) {
@@ -130,14 +133,14 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
       endIcon={isOnCorrectNetwork ? null : <Warning />}
     >
       {NETWORKS_FOR_MENU.includes(network.chainId) && (
-        <StyledTokenIconContainer>
+        <StyledTokenIconContainer small={currentBreakPoint === 'xs'}>
           <TokenIcon
-            size="20px"
+            size={currentBreakPoint === 'xs' ? '25px' : '20px'}
             token={emptyTokenWithAddress(find(NETWORKS, { chainId: network.chainId })?.mainCurrency || '')}
           />
         </StyledTokenIconContainer>
       )}
-      <Typography variant="body1">{networkName}</Typography>
+      {currentBreakPoint !== 'xs' && <Typography variant="body1">{networkName}</Typography>}
     </StyledButton>
   );
 
@@ -176,7 +179,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
               size="small"
               onClick={() => handleClose(chainId)}
             >
-              <StyledTokenIconContainer>
+              <StyledTokenIconContainer small={false}>
                 <TokenIcon
                   size="20px"
                   token={emptyTokenWithAddress((find(NETWORKS, { chainId }) || { mainCurrency: '' }).mainCurrency)}

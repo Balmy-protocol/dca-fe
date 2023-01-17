@@ -2,21 +2,22 @@ import React from 'react';
 import styled from 'styled-components';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const StyledLoadingIndicatorWrapper = styled.div`
+const StyledLoadingIndicatorWrapper = styled.div<{ noFlex?: boolean }>`
   display: flex;
-  flex: 1;
+  flex: ${({ noFlex }) => (noFlex ? '0' : '1')};
   align-items: center;
   justify-content: center;
 `;
 
 interface CenteredLoadingIndicatorProps {
   size?: number;
+  noFlex?: boolean;
 }
 
 export const DEFAULT_SIZE = 40;
 
-const CenteredLoadingIndicator = ({ size }: CenteredLoadingIndicatorProps) => (
-  <StyledLoadingIndicatorWrapper>
+const CenteredLoadingIndicator = ({ size, noFlex }: CenteredLoadingIndicatorProps) => (
+  <StyledLoadingIndicatorWrapper noFlex={noFlex}>
     <CircularProgress size={size || DEFAULT_SIZE} />
   </StyledLoadingIndicatorWrapper>
 );

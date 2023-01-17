@@ -70,6 +70,7 @@ interface ModalProps {
   maxWidth?: Breakpoint;
   title?: React.ReactNode;
   fullHeight?: boolean;
+  keepMounted?: boolean;
   actions?: {
     label: React.ReactNode;
     onClick: () => void;
@@ -89,6 +90,7 @@ const Modal: React.FC<ModalProps> = ({
   showCloseButton,
   actions,
   fullHeight,
+  keepMounted,
   children,
 }) => {
   const classes = useStyles();
@@ -111,6 +113,7 @@ const Modal: React.FC<ModalProps> = ({
       classes={classes}
       onClose={handleClose}
       PaperProps={fullHeightProps}
+      keepMounted={keepMounted}
     >
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {withTitle && (

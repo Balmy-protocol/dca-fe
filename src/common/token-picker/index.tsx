@@ -32,6 +32,8 @@ import Switch from '@mui/material/Switch';
 import useCustomToken from 'hooks/useCustomToken';
 import useAllowedPairs from 'hooks/useAllowedPairs';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import { useCustomTokens } from 'state/token-lists/hooks';
+import use1InchBalances from 'hooks/use1InchBalances';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -113,11 +115,12 @@ const StyledTokenTextContainer = styled.div`
 interface RowData {
   tokenList: TokenList;
   tokenKeys: string[];
-  onClick: (token: Token) => void;
+  onClick: (token: Token, isCustomToken: boolean) => void;
   yieldOptions: YieldOptions;
   tokenBalances: Record<string, { balance: BigNumber; balanceUsd: BigNumber }>;
   customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
   isLoadingTokenBalances: boolean;
+  customTokens: TokenList;
 }
 
 interface RowProps {
@@ -130,6 +133,7 @@ interface TokenPickerProps {
   availableFrom?: string[];
   onChange: SetFromToState;
   onClose: () => void;
+  onAddToken?: (token: Token) => void;
   isFrom: boolean;
   usedTokens: string[];
   ignoreValues: string[];
@@ -164,29 +168,33 @@ const useListItemStyles = makeStyles(({ palette }) => ({
 const Row = ({
   index,
   style,
-  data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances, customToken, isLoadingTokenBalances },
+  data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances, customToken, customTokens },
 }: RowProps) => {
   const classes = useListItemStyles();
-  const isCustomToken = !!customToken && tokenKeys[index] === customToken.token.address;
-  const token = !isCustomToken ? tokenList[tokenKeys[index]] : customToken.token;
+  const isImportedToken = !!customTokens[tokenKeys[index]];
+  const isCustomToken = (!!customToken && tokenKeys[index] === customToken.token.address) || isImportedToken;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const token = !isCustomToken || isImportedToken ? tokenList[tokenKeys[index]] : customToken!.token;
 
-  const tokenBalance = !isCustomToken
-    ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0)
-    : customToken?.balance ?? BigNumber.from(0);
-  const tokenValue = !isCustomToken
-    ? (tokenBalances &&
-        tokenBalances[token.address] &&
-        tokenBalances[token.address].balanceUsd &&
-        parseFloat(formatUnits(tokenBalances[token.address].balanceUsd, token.decimals + 18))) ||
-      0
-    : (customToken?.balanceUsd && parseFloat(formatUnits(customToken?.balanceUsd, token.decimals + 18))) || 0;
+  const tokenBalance =
+    !isCustomToken || isImportedToken
+      ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0)
+      : customToken?.balance ?? BigNumber.from(0);
+  const tokenValue =
+    !isCustomToken || isImportedToken
+      ? (tokenBalances &&
+          tokenBalances[token.address] &&
+          tokenBalances[token.address].balanceUsd &&
+          parseFloat(formatUnits(tokenBalances[token.address].balanceUsd, token.decimals + 18))) ||
+        0
+      : (customToken?.balanceUsd && parseFloat(formatUnits(customToken?.balanceUsd, token.decimals + 18))) || 0;
 
   const availableYieldOptions = yieldOptions.filter((yieldOption) =>
     yieldOption.enabledTokens.includes(token?.address)
   );
 
   return (
-    <StyledListItem classes={classes} onClick={() => onClick(token)} style={style}>
+    <StyledListItem classes={classes} onClick={() => onClick(token, isCustomToken)} style={style}>
       <StyledListItemIcon>
         <TokenIcon size="24px" token={token} />
       </StyledListItemIcon>
@@ -218,8 +226,8 @@ const Row = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {isLoadingTokenBalances && !Object.keys(tokenBalances).length && <CenteredLoadingIndicator size={10} />}
-        {!isLoadingTokenBalances && Object.keys(tokenBalances).length && (
+        {!Object.keys(tokenBalances).length && <CenteredLoadingIndicator size={10} />}
+        {tokenBalances && !!Object.keys(tokenBalances).length && (
           <>
             {tokenBalance && (
               <Typography variant="body1" color="#FFFFFF">
@@ -251,6 +259,7 @@ const TokenPicker = ({
   isLoadingYieldOptions,
   isAggregator,
   showWrappedAndProtocol,
+  onAddToken,
 }: TokenPickerProps) => {
   const tokenList = useTokenList(isAggregator);
   const [search, setSearch] = React.useState('');
@@ -261,6 +270,8 @@ const TokenPicker = ({
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
   const allowedPairs = useAllowedPairs();
   let tokenKeysToUse: string[] = [];
+  const customTokens = useCustomTokens();
+  const [inchBalances, isLoadingInchBalances] = use1InchBalances();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
 
   const uniqTokensFromPairs = React.useMemo(
@@ -297,11 +308,6 @@ const TokenPicker = ({
       setSearch('');
       onClose();
     }
-  };
-
-  const handleItemSelected = (token: Token) => {
-    onChange(token);
-    handleOnClose();
   };
 
   // const memoizedUsedTokens = React.useMemo(
@@ -362,38 +368,57 @@ const TokenPicker = ({
     !isAggregator || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
   );
 
+  const balances = React.useMemo(
+    () => ({
+      ...(inchBalances || {}),
+      ...(tokenBalances || {}),
+    }),
+    [tokenBalances, inchBalances]
+  );
+
   const memoizedTokenKeys = React.useMemo(
     () => [
       ...(customToken ? [customToken.token.address] : []),
       ...memoizedUnorderedTokenKeys.sort((tokenKeyA, tokenKeyB) => {
-        if (!tokenBalances) return tokenKeyA < tokenKeyB ? -1 : 1;
+        if (!balances) return tokenKeyA < tokenKeyB ? -1 : 1;
 
         const tokenABalance =
-          (tokenBalances[tokenKeyA] &&
-            parseFloat(formatUnits(tokenBalances[tokenKeyA].balanceUsd, tokenList[tokenKeyA].decimals + 18))) ||
+          (balances[tokenKeyA] &&
+            parseFloat(formatUnits(balances[tokenKeyA].balanceUsd, tokenList[tokenKeyA].decimals + 18))) ||
           0;
         const tokenBBalance =
-          (tokenBalances[tokenKeyB] &&
-            parseFloat(formatUnits(tokenBalances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
+          (balances[tokenKeyB] &&
+            parseFloat(formatUnits(balances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
           0;
 
         return tokenABalance > tokenBBalance ? -1 : 1;
       }),
     ],
-    [tokenBalances, memoizedUnorderedTokenKeys, tokenList, customToken]
+    [balances, memoizedUnorderedTokenKeys, tokenList, customToken]
   );
 
-  const itemData = React.useMemo(
+  const handleItemSelected = (token: Token, isCustomToken: boolean) => {
+    onChange(token);
+    if (onAddToken && isCustomToken) {
+      onAddToken(token);
+    }
+    handleOnClose();
+  };
+
+  const isLoadingBalances = isLoadingInchBalances || isLoadingTokenBalances;
+
+  const itemData: RowData = React.useMemo(
     () => ({
       onClick: handleItemSelected,
       tokenList,
       tokenKeys: memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
-      tokenBalances: isLoadingTokenBalances && !tokenBalances ? {} : tokenBalances,
+      tokenBalances: isLoadingBalances && (!balances || !Object.keys(balances).length) ? {} : balances || {},
       customToken,
-      isLoadingTokenBalances,
+      isLoadingTokenBalances: isLoadingBalances,
+      customTokens,
     }),
-    [memoizedTokenKeys, tokenList, tokenBalances, yieldOptions, customToken, isLoadingTokenBalances]
+    [memoizedTokenKeys, tokenList, balances, yieldOptions, customToken, isLoadingBalances]
   );
 
   return (

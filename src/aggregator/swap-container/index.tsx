@@ -1,8 +1,6 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
-import GraphWidget from 'common/graph-widget';
 import { getProtocolToken } from 'mocks/tokens';
-import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from 'config/constants';
 import { SwapOption, Token } from 'types';
@@ -21,7 +19,9 @@ import useSwapOptions from 'hooks/useSwapOptions';
 import useCustomToken from 'hooks/useCustomToken';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
+import { SwapSortOptions } from 'config/constants/aggregator';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
+import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
 
@@ -36,7 +36,7 @@ const SwapContainer = () => {
   const history = useHistory();
   const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
   const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
-  const [swapOptions, isLoadingSwapOptions, , fetchOptions] = useSwapOptions(
+  const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
     to,
     isBuyOrder ? toValue : fromValue,
@@ -68,7 +68,7 @@ const SwapContainer = () => {
     if (!isLoadingSwapOptions && swapOptions && swapOptions.length) {
       dispatch(setSelectedRoute(swapOptions[0]));
     }
-  }, [isLoadingSwapOptions]);
+  }, [isLoadingSwapOptions, sorting]);
 
   const onResetForm = () => {
     dispatch(resetForm());
@@ -97,11 +97,42 @@ const SwapContainer = () => {
     }
   };
 
+  const toggleFromTo = () => {
+    dispatch(setTo(from));
+
+    // check for decimals
+    if (to && from && to.decimals < from.decimals && !isBuyOrder) {
+      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
+      let newFromValue = fromValue;
+      if (splitValue && splitValue[2] !== '') {
+        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, to.decimals)}`;
+      }
+
+      dispatch(setFromValue({ value: newFromValue, updateMode: isBuyOrder }));
+    }
+
+    if (to && from && from.decimals < to.decimals && isBuyOrder) {
+      const splitValue = /^(\d*)\.?(\d*)$/.exec(toValue);
+      let newToValue = toValue;
+      if (splitValue && splitValue[2] !== '') {
+        newToValue = `${splitValue[1]}.${splitValue[2].substring(0, from.decimals)}`;
+      }
+
+      dispatch(setToValue({ value: newToValue, updateMode: isBuyOrder }));
+    }
+
+    dispatch(setFrom(to));
+
+    if (to) {
+      history.replace(`/swap/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
+    }
+  };
+
   const onSetSelectedRoute = (newRoute: SwapOption) => {
     dispatch(setSelectedRoute(newRoute));
   };
 
-  const onSetSorting = (newSort: string) => {
+  const onSetSorting = (newSort: SwapSortOptions) => {
     dispatch(setSorting(newSort));
   };
 
@@ -130,30 +161,32 @@ const SwapContainer = () => {
           slippage={slippage}
           gasSpeed={gasSpeed}
           setRefreshQuotes={setRefreshQuotes}
+          toggleFromTo={toggleFromTo}
         />
       </Grid>
-      <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
+      <Grid item xs={12} md={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
         <Grid container spacing={2} alignItems="stretch" justify-content="center">
-          <Hidden mdDown>
-            <Grid item xs={12} minHeight="320px" sx={{ display: 'flex' }}>
-              <GraphWidget from={from} to={to} withFooter={false} />
-            </Grid>
-            <Grid item xs={12} sx={{ display: 'flex' }}>
-              <SwapQuotes
-                quotes={(selectedRoute && swapOptions) || []}
-                selectedRoute={selectedRoute}
-                setRoute={onSetSelectedRoute}
-                isLoading={isLoadingSwapOptions}
-                from={from}
-                to={to}
-                setSorting={onSetSorting}
-                sorting={sorting}
-                fetchOptions={fetchOptions}
-                refreshQuotes={refreshQuotes}
-              />
-            </Grid>
-          </Hidden>
+          <Grid item xs={12} sx={{ display: 'flex' }}>
+            <SwapQuotes
+              quotes={(selectedRoute && swapOptions) || []}
+              selectedRoute={selectedRoute}
+              setRoute={onSetSelectedRoute}
+              isLoading={isLoadingSwapOptions}
+              from={from}
+              to={to}
+              setSorting={onSetSorting}
+              sorting={sorting}
+              fetchOptions={fetchOptions}
+              refreshQuotes={refreshQuotes}
+              isBuyOrder={isBuyOrder}
+              bestQuote={swapOptions?.[0]}
+              swapOptionsError={swapOptionsError}
+            />
+          </Grid>
         </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <AggregatorFAQ />
       </Grid>
     </Grid>
   );
