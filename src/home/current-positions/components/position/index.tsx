@@ -310,7 +310,7 @@ const ActivePosition = ({
                 </Typography>
               </StyledStale>
             )}
-            {isOldVersion && !hasNoFunds && (
+            {isOldVersion && hasNoFunds && (
               <StyledDeprecated>
                 <Typography variant="caption">
                   <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />
