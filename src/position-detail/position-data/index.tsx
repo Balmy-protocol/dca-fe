@@ -397,7 +397,7 @@ const Details = ({
             </DarkTooltip>
           )}
           <StyledDetailWrapper>
-            {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
+            {!isPending && !hasNoFunds && !isStale && (
               <StyledFreqLeft>
                 <Typography variant="body1" color="rgba(255, 255, 255, 0.5)" textTransform="none">
                   <FormattedMessage description="positionDetailsRemainingTimeTitle" defaultMessage="Time left:" />
@@ -444,7 +444,7 @@ const Details = ({
                 </Typography>
               </StyledStale>
             )}
-            {!isPending && isOldVersion && position.status !== 'TERMINATED' && (
+            {!isPending && isOldVersion && position.status !== 'TERMINATED' && hasNoFunds && (
               <StyledDeprecated>
                 <Typography variant="caption">
                   <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />

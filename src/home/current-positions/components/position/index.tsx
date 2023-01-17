@@ -283,7 +283,7 @@ const ActivePosition = ({
               <TokenIcon token={to} size="27px" />
               <Typography variant="body1">{to.symbol}</Typography>
             </StyledCardTitleHeader>
-            {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
+            {!isPending && !hasNoFunds && !isStale && (
               <StyledFreqLeft>
                 <Typography variant="caption">
                   <FormattedMessage
@@ -310,7 +310,7 @@ const ActivePosition = ({
                 </Typography>
               </StyledStale>
             )}
-            {isOldVersion && (
+            {isOldVersion && !hasNoFunds && (
               <StyledDeprecated>
                 <Typography variant="caption">
                   <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />
