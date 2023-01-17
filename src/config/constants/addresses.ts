@@ -600,4 +600,13 @@ export const SIGN_VERSION: Record<PositionVersions, string> = {
 
 export const DEFILLAMA_PROTOCOL_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export const ZRX_API_ADDRESS: Record<number, string> = {
+  [NETWORKS.mainnet.chainId]: 'https://api.0x.org',
+  [NETWORKS.optimism.chainId]: 'https://optimism.api.0x.org',
+  [NETWORKS.polygon.chainId]: 'https://polygon.api.0x.org',
+  [NETWORKS.bsc.chainId]: 'https://bsc.api.0x.org',
+  [NETWORKS.fantom.chainId]: 'https://fantom.api.0x.org',
+  [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
+};
 /* eslint-enable */

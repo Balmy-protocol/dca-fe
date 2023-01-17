@@ -164,5 +164,7 @@ export interface HubContract extends DCAHub {
 
 export class OEGasOracle extends Contract {
   getL1Fee: (data: string) => Promise<BigNumber>;
+
+  getL1GasUsed: (data: string) => Promise<BigNumber>;
 }
 /* eslint-enable */

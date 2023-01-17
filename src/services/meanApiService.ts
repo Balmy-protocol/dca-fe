@@ -111,6 +111,7 @@ export default class MeanApiService {
         owner: account,
         hub: hubAddress,
         permissions,
+        dex: { only: 'MeanTransformer' },
         ...this.getDeadlineSlippageDefault(),
       }
     );
@@ -146,6 +147,7 @@ export default class MeanApiService {
         owner: account,
         hub: hubAddress,
         permissions,
+        dex: { only: 'MeanTransformer' },
         ...this.getDeadlineSlippageDefault(),
       }
     );
@@ -193,6 +195,7 @@ export default class MeanApiService {
         recipient,
         hub: hubAddress,
         permissionPermit,
+        dex: { only: 'MeanTransformer' },
         ...this.getDeadlineSlippageDefault(),
       }
     );
@@ -224,6 +227,7 @@ export default class MeanApiService {
         swappedConvertTo: tokenTo,
         hub: hubAddress,
         permissionPermit,
+        dex: { only: 'MeanTransformer' },
         ...this.getDeadlineSlippageDefault(),
       }
     );
@@ -253,6 +257,7 @@ export default class MeanApiService {
         amountOfSwaps: newSwaps.toNumber(),
         hub: hubAddress,
         permissionPermit,
+        dex: { only: 'MeanTransformer' },
         ...this.getDeadlineSlippageDefault(),
       }
     );
@@ -285,6 +290,7 @@ export default class MeanApiService {
         },
         amountOfSwaps: newSwaps.toNumber(),
         recipient,
+        dex: { only: 'MeanTransformer' },
         hub: hubAddress,
         permissionPermit,
         ...this.getDeadlineSlippageDefault(),
@@ -361,5 +367,21 @@ export default class MeanApiService {
     );
 
     return allowanceResponse.data.allowanceTarget;
+  }
+
+  async logError(error: string, errorMessage: string, extraData?: unknown) {
+    return this.axiosClient.post(`${MEAN_API_URL}/v1/error-reporting`, {
+      error,
+      errorMessage,
+      url: window.location.pathname,
+      extraData,
+    });
+  }
+
+  async logFeedback(action: string, description: string) {
+    return this.axiosClient.post(`${MEAN_API_URL}/v1/log-feedback`, {
+      action,
+      description,
+    });
   }
 }

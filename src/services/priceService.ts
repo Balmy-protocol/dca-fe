@@ -15,6 +15,7 @@ import {
   LATEST_VERSION,
   NETWORKS,
   STABLE_COINS,
+  ZRX_API_ADDRESS,
 } from 'config/constants';
 import { emptyTokenWithAddress } from 'utils/currency';
 import ContractService from './contractService';
@@ -73,12 +74,11 @@ export default class PriceService {
     const mappedTokens = tokens.map((token) =>
       token.address === PROTOCOL_TOKEN_ADDRESS ? emptyTokenWithAddress(DEFILLAMA_PROTOCOL_TOKEN_ADDRESS) : token
     );
-    const price = await this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
-      'https://coins.llama.fi/prices',
-      {
-        coins: mappedTokens.map((token) => `${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`),
-        ...(date && { timestamp: parseInt(date, 10) }),
-      }
+    const defillamaToknes = mappedTokens.map((token) => `${DEFILLAMA_IDS[chainIdToUse]}:${token.address}`).join(',');
+    const price = await this.axiosClient.get<{ coins: Record<string, { price: number }> }>(
+      date
+        ? `https://coins.llama.fi/prices/historical/${parseInt(date, 10)}/${defillamaToknes}`
+        : `https://coins.llama.fi/prices/current/${defillamaToknes}`
     );
 
     const tokensPrices = mappedTokens
@@ -109,6 +109,62 @@ export default class PriceService {
       }, {});
 
     return tokensPrices;
+  }
+
+  async getProtocolHistoricPrices(dates: string[], chainId?: number) {
+    const network = await this.walletService.getNetwork();
+    const chainIdToUse = chainId || network.chainId;
+    const expectedResults: Promise<AxiosResponse<{ coins: Record<string, { price: number }> }>>[] = dates.map((date) =>
+      this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
+        date
+          ? `https://coins.llama.fi/prices/historical/${parseInt(date, 10)}/${
+              DEFILLAMA_IDS[chainIdToUse]
+            }:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`
+          : `https://coins.llama.fi/prices/current/${DEFILLAMA_IDS[chainIdToUse]}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`
+      )
+    );
+
+    const tokensPrices = await Promise.all(expectedResults);
+
+    return tokensPrices.reduce<Record<string, BigNumber>>((acc, priceResponse, index) => {
+      const dateToUse = dates[index];
+      const price =
+        priceResponse.data.coins[`${DEFILLAMA_IDS[chainIdToUse]}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`].price.toString();
+      return {
+        ...acc,
+        [dateToUse]: parseUnits(price, 18),
+      };
+    }, {});
+  }
+
+  async getZrxGasSwapQuote(from: Token, to: Token, amount: BigNumber, chainId?: number) {
+    const network = await this.walletService.getNetwork();
+    const chainIdToUse = chainId || network.chainId;
+    const api = ZRX_API_ADDRESS[chainIdToUse];
+    const url =
+      `${api}/swap/v1/quote` +
+      `?sellToken=${from.address}` +
+      `&buyToken=${to.address}` +
+      `&skipValidation=true` +
+      `&slippagePercentage=0.03` +
+      `&sellAmount=${amount.toString()}` +
+      `&enableSlippageProtection=false`;
+
+    const response = await this.axiosClient.get<{
+      estimatedGas: string;
+      data: string;
+    }>(url);
+
+    const { estimatedGas, data } = response.data;
+
+    let estimatedOptimismGas: BigNumber | null = null;
+
+    if (chainId === NETWORKS.optimism.chainId) {
+      const oeGasOracle = await this.contractService.getOEGasOracleInstance();
+      estimatedOptimismGas = await oeGasOracle.getL1GasUsed(data);
+    }
+
+    return { estimatedGas, estimatedOptimismGas };
   }
 
   async getTokenQuote(from: Token, to: Token, fromAmount: BigNumber) {

@@ -1,10 +1,8 @@
 import Typography from '@mui/material/Typography';
-import { BigNumber } from 'ethers';
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
-import { Token } from 'types';
-import { formatCurrencyAmount } from 'utils/currency';
 import { capitalizeFirstLetter } from 'utils/parsing';
 
 const StyledPaper = styled.div`
@@ -20,25 +18,20 @@ const StyledPaper = styled.div`
   z-index: 99;
 `;
 
-interface ProfitLossTooltipProps {
+interface GasSavedTooltipProps {
   label?: string;
   payload?: {
     value?: ValueType;
     name?: NameType;
     dataKey?: string | number;
     payload?: {
-      swappedIfLumpSum: number;
-      swappedIfDCA: number;
-      rawSwappedIfLumpSum: BigNumber;
-      rawSwappedIfDCA: BigNumber;
-      percentage: number;
+      gasSaved: number;
     };
   }[];
-  tokenTo: Token;
 }
 
-const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
-  const { payload, label, tokenTo } = props;
+const GasSavedTooltip = (props: GasSavedTooltipProps) => {
+  const { payload, label } = props;
 
   const firstPayload = payload && payload[0];
 
@@ -46,22 +39,21 @@ const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
     return null;
   }
 
-  const { rawSwappedIfLumpSum, rawSwappedIfDCA, percentage } = firstPayload?.payload;
+  const { gasSaved } = firstPayload?.payload;
 
   return (
     <StyledPaper>
       <Typography variant="body2">{capitalizeFirstLetter(label || '')}</Typography>
       <Typography variant="body1">
-        {percentage > 0 ? 'Profit' : 'Loss'}: {percentage.toFixed(2)}%
-      </Typography>
-      <Typography variant="body1">
-        DCA: {formatCurrencyAmount(rawSwappedIfDCA, tokenTo)} {tokenTo.symbol}
-      </Typography>
-      <Typography variant="body1">
-        Lump sum: {formatCurrencyAmount(rawSwappedIfLumpSum, tokenTo)} {tokenTo.symbol}
+        <FormattedMessage
+          description="savedProtocolTooltip"
+          // eslint-disable-next-line no-template-curly-in-string
+          defaultMessage="${amount} USD saved"
+          values={{ amount: gasSaved.toFixed(2) }}
+        />
       </Typography>
     </StyledPaper>
   );
 };
 
-export default React.memo(ProfitLossTooltip);
+export default React.memo(GasSavedTooltip);

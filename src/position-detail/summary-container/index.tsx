@@ -44,6 +44,7 @@ interface PositionSummaryContainerProps {
   toWithdrawUnderlying?: BigNumber | null;
   remainingLiquidityUnderlying?: BigNumber | null;
   swappedUnderlying?: BigNumber | null;
+  totalGasSaved?: BigNumber;
 }
 
 const PositionSummaryContainer = ({
@@ -58,6 +59,7 @@ const PositionSummaryContainer = ({
   swappedUnderlying,
   onMigrateYield,
   onSuggestMigrateYield,
+  totalGasSaved,
 }: PositionSummaryContainerProps) => {
   const currentBreakpoint = useCurrentBreakpoint();
 
@@ -80,6 +82,7 @@ const PositionSummaryContainer = ({
                 swappedUnderlying={swappedUnderlying}
                 onMigrateYield={onMigrateYield}
                 onSuggestMigrateYield={onSuggestMigrateYield}
+                totalGasSaved={totalGasSaved}
               />
             </StyledPaper>
           </Sticky>

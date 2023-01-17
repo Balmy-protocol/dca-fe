@@ -16,6 +16,8 @@ import Checkbox from '@mui/material/Checkbox';
 import { BigNumber } from 'ethers';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import usePositionService from 'hooks/usePositionService';
+import useErrorService from 'hooks/useErrorService';
+import { shouldTrackError } from 'utils/errors';
 
 interface TerminateModalProps {
   position: Position;
@@ -45,6 +47,7 @@ const TerminateModal = ({
   const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
   const currentNetwork = useCurrentNetwork();
+  const errorService = useErrorService();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [useProtocolToken, setUseProtocolToken] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -132,6 +135,15 @@ const TerminateModal = ({
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error terminating position', JSON.stringify(e), {
+          position: position.id,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: 'Error while terminating position',

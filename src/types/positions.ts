@@ -135,6 +135,9 @@ export interface ActionState {
     id: string;
     hash: string;
     timestamp: string;
+    gasPrice?: string;
+    l1GasPrice?: string;
+    overhead?: string;
   };
 }
 

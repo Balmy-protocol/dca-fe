@@ -52,7 +52,11 @@ import useYieldOptions from 'hooks/useYieldOptions';
 import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
 import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
 import Link from '@mui/material/Link';
+import useTotalGasSaved from 'hooks/useTotalGasSaved';
 import { BigNumber } from 'ethers';
+import Alert from '@mui/material/Alert';
+import useErrorService from 'hooks/useErrorService';
+import { shouldTrackError } from 'utils/errors';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
 
@@ -102,6 +106,7 @@ const PositionDetailFrame = () => {
   const tabIndex = usePositionDetailsTab();
   const dispatch = useAppDispatch();
   const positionService = usePositionService();
+  const errorService = useErrorService();
   const currentNetwork = useCurrentNetwork();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
@@ -111,6 +116,7 @@ const PositionDetailFrame = () => {
   const {
     loading: isLoading,
     data,
+    error,
     // refetch,
   } = useGqlFetchAll<{ position: FullPosition }>(
     client,
@@ -158,6 +164,7 @@ const PositionDetailFrame = () => {
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const positionInUse = usePositionDetails(position?.id);
+  const [totalGasSaved, isLoadingTotalGasSaved] = useTotalGasSaved(positionInUse);
   const [[toWithdrawUnderlying, swappedUnderlying, remainingLiquidityUnderlying], isLoadingUnderlyings] =
     useUnderlyingAmount([
       {
@@ -203,12 +210,14 @@ const PositionDetailFrame = () => {
   const positionNotFound = !position && data && !isLoading;
 
   if (
-    isLoading ||
-    !data ||
-    (!position && !positionNotFound) ||
-    isLoadingSwaps ||
-    isLoadingYieldOptions ||
-    isLoadingUnderlyings
+    !error &&
+    (isLoading ||
+      !data ||
+      (!position && !positionNotFound) ||
+      isLoadingSwaps ||
+      isLoadingYieldOptions ||
+      isLoadingUnderlyings ||
+      isLoadingTotalGasSaved)
   ) {
     return (
       <Grid container>
@@ -296,6 +305,16 @@ const PositionDetailFrame = () => {
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error while withdrawing', JSON.stringify(e), {
+          position: position.id,
+          useProtocolToken,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error while withdrawing', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -377,6 +396,16 @@ const PositionDetailFrame = () => {
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error while withdrawing funds', JSON.stringify(e), {
+          position: position.chainId,
+          useProtocolToken,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: 'Error while withdrawing funds',
@@ -448,6 +477,17 @@ const PositionDetailFrame = () => {
             </Link>
           </Button>
         </Grid>
+        {((position.from.symbol === 'CRV' && position.from.underlyingTokens.length) ||
+          (position.to.symbol === 'CRV' && position.to.underlyingTokens.length)) && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionCRVNotSupported"
+                defaultMessage="Unfortunately, the CRV token can no longer be used as collateral on Aave V3. This means that it's not possible to swap this position. We recommend closing this position."
+              />
+            </Alert>
+          </Grid>
+        )}
         <Grid
           item
           xs={12}
@@ -505,6 +545,7 @@ const PositionDetailFrame = () => {
               onSuggestMigrateYield={() => setShowSuggestMigrateYieldModal(true)}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               yieldOptions={yieldOptions!}
+              totalGasSaved={totalGasSaved}
             />
           )}
           {tabIndex === 1 && (

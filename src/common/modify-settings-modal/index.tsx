@@ -45,6 +45,8 @@ import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import useAccount from 'hooks/useAccount';
+import useErrorService from 'hooks/useErrorService';
+import { shouldTrackError } from 'utils/errors';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -109,6 +111,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   }
   const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport;
   const fromHasYield = !!position.from.underlyingTokens.length;
+  const errorService = useErrorService();
   const [allowance] = useAllowance(
     useWrappedProtocolToken ? wrappedProtocolToken : position.from,
     fromHasYield,
@@ -313,6 +316,17 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error changin rate and swaps', JSON.stringify(e), {
+          position: position.id,
+          chainId: position.chainId,
+          rate,
+          swaps: frequencyValue,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: 'Error changing rate and swaps',
@@ -368,6 +382,17 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error approving token', JSON.stringify(e), {
+          position: position.id,
+          token: fromToUse,
+          yield: !!fromHasYield,
+          chainId: position.chainId,
+        });
+      }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
     }

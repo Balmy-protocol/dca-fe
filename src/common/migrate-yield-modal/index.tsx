@@ -16,6 +16,8 @@ import useYieldOptions from 'hooks/useYieldOptions';
 import YieldTokenSelector from 'common/yield-token-selector';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
+import useErrorService from 'hooks/useErrorService';
+import { shouldTrackError } from 'utils/errors';
 
 const StyledGrid = styled(Grid)`
   display: flex;
@@ -57,6 +59,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
+  const errorService = useErrorService();
 
   const handleCancel = () => {
     onCancel();
@@ -128,6 +131,16 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error making new positions start generating yield position', JSON.stringify(e), {
+          from: position.from.address,
+          to: position.to.address,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: 'Error making new positions start generating yield',

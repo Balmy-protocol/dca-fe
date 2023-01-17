@@ -21,7 +21,9 @@ import usePositionService from 'hooks/usePositionService';
 import useSupportsSigning from 'hooks/useSupportsSigning';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
+import useErrorService from 'hooks/useErrorService';
 import useYieldOptions from 'hooks/useYieldOptions';
+import { shouldTrackError } from 'utils/errors';
 import MigrateYieldModal from 'common/migrate-yield-modal';
 import ActivePosition from './components/position';
 import FinishedPosition from './components/finished-position';
@@ -53,6 +55,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const addTransaction = useTransactionAdder();
   const positionService = usePositionService();
+  const errorService = useErrorService();
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
   const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
@@ -143,6 +146,16 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error while withdrawing', JSON.stringify(e), {
+          position: position.id,
+          useProtocolToken,
+          chainId: position.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error while withdrawing', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

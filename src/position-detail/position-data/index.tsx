@@ -39,6 +39,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { updateShowBreakdown } from 'state/position-details/actions';
+import { formatUnits } from '@ethersproject/units';
 import { Theme, Tooltip } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import PositionDataControls from './position-data-controls';
@@ -62,6 +63,7 @@ interface DetailsProps {
   toWithdrawUnderlying?: BigNumber | null;
   remainingLiquidityUnderlying?: BigNumber | null;
   swappedUnderlying?: BigNumber | null;
+  totalGasSaved?: BigNumber;
 }
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
@@ -193,6 +195,7 @@ const Details = ({
   swappedUnderlying,
   onMigrateYield,
   onSuggestMigrateYield,
+  totalGasSaved,
 }: DetailsProps) => {
   const { from, to, swapInterval, remainingLiquidity: remainingLiquidityRaw, chainId } = position;
 
@@ -394,7 +397,7 @@ const Details = ({
             </DarkTooltip>
           )}
           <StyledDetailWrapper>
-            {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
+            {!isPending && !hasNoFunds && !isStale && (
               <StyledFreqLeft>
                 <Typography variant="body1" color="rgba(255, 255, 255, 0.5)" textTransform="none">
                   <FormattedMessage description="positionDetailsRemainingTimeTitle" defaultMessage="Time left:" />
@@ -441,7 +444,7 @@ const Details = ({
                 </Typography>
               </StyledStale>
             )}
-            {!isPending && isOldVersion && position.status !== 'TERMINATED' && (
+            {!isPending && isOldVersion && position.status !== 'TERMINATED' && hasNoFunds && (
               <StyledDeprecated>
                 <Typography variant="caption">
                   <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />
@@ -525,6 +528,27 @@ const Details = ({
               )}
             </Typography>
           </StyledDetailWrapper>
+          {totalGasSaved && positionNetwork?.chainId === NETWORKS.mainnet.chainId && (
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage description="positionDetailsGasSavedPriceTitle" defaultMessage="Total gas saved:" />
+              </Typography>
+              <Typography
+                variant="body1"
+                color={totalGasSaved.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+                sx={{ marginLeft: '5px' }}
+              >
+                <FormattedMessage
+                  description="positionDetailsGasSaved"
+                  // eslint-disable-next-line no-template-curly-in-string
+                  defaultMessage="${gasSaved} USD"
+                  values={{
+                    gasSaved: parseFloat(formatUnits(totalGasSaved, 36)).toFixed(2),
+                  }}
+                />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
           <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage

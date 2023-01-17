@@ -10,6 +10,8 @@ import { PERMISSIONS, POSITION_VERSION_2, TRANSACTION_TYPES } from 'config/const
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import usePositionService from 'hooks/usePositionService';
+import useErrorService from 'hooks/useErrorService';
+import { shouldTrackError } from 'utils/errors';
 
 interface WithdrawModalProps {
   position: Position;
@@ -25,6 +27,7 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const addTransaction = useTransactionAdder();
+  const errorService = useErrorService();
   const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
   const toSymbol =
     position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address
@@ -84,6 +87,16 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
         ),
       });
     } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error while withdrawing', JSON.stringify(e), {
+          position: position.id,
+          useProtocolToken,
+          chainId: currentNetwork.chainId,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error while withdrawing', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
