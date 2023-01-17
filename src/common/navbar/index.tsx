@@ -162,6 +162,10 @@ const NavBar = ({ isLoading }: NavBarProps) => {
     }
   }, []);
 
+  React.useEffect(() => {
+    setOpenFirstSubtab(tabIndex === 0);
+  }, [tabIndex]);
+
   const handleTabChange = (tabValue: { index: number; url: string }, isMainTab = true) => {
     if (isMainTab) {
       dispatch(changeMainTab(tabValue.index));
