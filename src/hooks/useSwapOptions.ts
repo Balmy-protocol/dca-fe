@@ -94,7 +94,6 @@ function useSwapOptions(
               setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
             }
           } catch (e) {
-            console.log('error fetching results', e);
             setState({ result: undefined, error: e as string, isLoading: false });
           }
         }

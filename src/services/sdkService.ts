@@ -67,8 +67,6 @@ export default class SdkService {
       }
     );
 
-    console.log('aggregator response', responses);
-
     return responses;
   }
 }
