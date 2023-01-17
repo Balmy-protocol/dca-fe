@@ -8,7 +8,7 @@ import { SwapOption, Token } from 'types';
 import { TransactionRequest } from '@ethersproject/providers';
 import { toToken } from 'utils/currency';
 import { getProtocolToken } from 'mocks/tokens';
-import { QuoteResponse } from 'mean-sdk/dist/services/quotes/types';
+import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
 import { GasKeys, SwapSortOptions } from 'config/constants/aggregator';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
