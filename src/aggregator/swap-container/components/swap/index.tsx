@@ -2,7 +2,7 @@ import React from 'react';
 import { parseUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { SwapOption, Token } from 'types';
+import { BlowfishResponse, SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/aggregator-token-picker';
@@ -11,10 +11,12 @@ import Button from 'common/button';
 import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
 import {
+  BLOWFISH_ENABLED_CHAINS,
   SUPPORTED_NETWORKS,
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_SWAP,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+  TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
   TRANSACTION_TYPES,
 } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
@@ -32,6 +34,7 @@ import TransactionConfirmation from 'common/transaction-confirmation';
 import TransactionSteps, { TransactionAction as TransactionStep } from 'common/transaction-steps';
 import { GasKeys } from 'config/constants/aggregator';
 import { useAppDispatch } from 'state/hooks';
+import useSimulationService from 'hooks/useSimulationService';
 import { addCustomToken } from 'state/token-lists/actions';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -111,6 +114,7 @@ const Swap = ({
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
+  const simulationService = useSimulationService();
 
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
@@ -269,6 +273,33 @@ const Swap = ({
     dispatch(addCustomToken(token));
   };
 
+  const handleTransactionSimulationWait = (transactions?: TransactionStep[], response?: BlowfishResponse) => {
+    if (!transactions?.length) {
+      return;
+    }
+
+    const newSteps = [...transactions];
+
+    const index = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_SIMULATION });
+
+    if (index !== -1) {
+      newSteps[index] = {
+        ...newSteps[index],
+        done: !!response,
+        failed: !response,
+        checkForPending: false,
+        extraData: {
+          ...newSteps[index].extraData,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          simulation: response,
+        },
+      };
+
+      setTransactionsToExecute(newSteps);
+    }
+  };
+
   const handleTransactionEndedForWait = (transactions?: TransactionStep[]) => {
     if (!transactions?.length) {
       return;
@@ -286,11 +317,18 @@ const Swap = ({
       };
 
       setTransactionsToExecute(newSteps);
+
+      if (newSteps[index + 1] && newSteps[index + 1].type === TRANSACTION_ACTION_WAIT_FOR_SIMULATION && selectedRoute) {
+        const simulatePromise = simulationService.simulateTransaction(selectedRoute.tx, currentNetwork.chainId);
+        simulatePromise
+          .then((blowfishResponse) => blowfishResponse && handleTransactionSimulationWait(newSteps, blowfishResponse))
+          .catch(() => handleTransactionSimulationWait(newSteps));
+      }
     }
   };
 
   const handleMultiSteps = () => {
-    if (!from || fromValueToUse === '' || !to) {
+    if (!from || fromValueToUse === '' || !to || !selectedRoute) {
       return;
     }
 
@@ -324,6 +362,20 @@ const Swap = ({
         amount: amountToApprove,
       },
     });
+
+    if (BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId)) {
+      newSteps.push({
+        hash: '',
+        onAction: handleTransactionSimulationWait,
+        checkForPending: true,
+        done: false,
+        type: TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
+        extraData: {
+          tx: selectedRoute.tx,
+          chainId: currentNetwork.chainId,
+        },
+      });
+    }
 
     newSteps.push({
       hash: '',
@@ -541,6 +593,7 @@ const Swap = ({
           onShowSettings={() => setShouldShowSettings(true)}
           slippage={slippage}
           gasSpeed={gasSpeed}
+          isApproved={isApproved}
         />
       </StyledPaper>
     </>

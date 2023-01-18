@@ -27,6 +27,7 @@ import ProviderService from './providerService';
 import AggregatorService from './aggregatorService';
 import SdkService from './sdkService';
 import ErrorService from './errorService';
+import SimulationService from './simulationService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -80,6 +81,8 @@ export default class Web3Service {
   sdkService: SdkService;
 
   errorService: ErrorService;
+
+  simulationService: SimulationService;
 
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -149,6 +152,7 @@ export default class Web3Service {
     );
     this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
     this.errorService = new ErrorService(this.meanApiService);
+    this.simulationService = new SimulationService(this.meanApiService);
   }
 
   setArcxClient(newArcxClient: ArcxAnalyticsSdk) {
@@ -161,6 +165,10 @@ export default class Web3Service {
 
   getContractService() {
     return this.contractService;
+  }
+
+  getSimulationService() {
+    return this.simulationService;
   }
 
   getMeanApiService() {

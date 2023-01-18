@@ -1,4 +1,4 @@
-import { TransactionRequest } from '@ethersproject/providers';
+import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 
@@ -39,5 +39,5 @@ export type SwapOption = {
     logoURI: string;
   };
   type: string;
-  tx: TransactionRequest;
+  tx: QuoteTx;
 };

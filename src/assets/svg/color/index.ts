@@ -160,6 +160,7 @@ import EULER from './euler.svg';
 import EVX from './evx.svg';
 import EXMO from './exmo.svg';
 import EXP from './exp.svg';
+import FAILED from './failed.svg';
 import FAIR from './fair.svg';
 import FCT from './fct.svg';
 import FIL from './fil.svg';
@@ -1092,6 +1093,7 @@ const manifest = {
   '0xf3db5fa2c66b7af3eb0c0b782510816cbe4813b8': EVX,
   EXMO,
   '0x5330a5805b9db68ebcf5247bbc9097163c1c2442': EXP,
+  FAILED,
   '0x9b20dabcec77f6289113e61893f7beefaeb1990a': FAIR,
   '0xe1bad922f84b198a08292fb600319300ae32471b': FCT,
   FIL,

@@ -182,6 +182,7 @@ const SwapQuotes = ({
             isBuyOrder={isBuyOrder}
             bestQuote={bestQuote}
             sorting={sorting}
+            disabled={!refreshQuotes}
           />
         ))}
     </StyledPaper>

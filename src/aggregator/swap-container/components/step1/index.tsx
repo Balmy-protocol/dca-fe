@@ -21,6 +21,7 @@ import useUsdPrice from 'hooks/useUsdPrice';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import AggregatorTokenInput from './aggtokenButton';
+import QuoteSimulation from '../quote-simulation';
 
 const StyledButton = styled(Button)`
   padding: 0;
@@ -128,6 +129,7 @@ interface SwapFirstStepProps {
   onOpenTransferTo: () => void;
   onShowSettings: () => void;
   slippage: string;
+  isApproved: boolean;
   gasSpeed: GasKeys;
 }
 
@@ -152,6 +154,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     onShowSettings,
     slippage,
     gasSpeed,
+    isApproved,
   } = props;
 
   let fromValueToUse =
@@ -293,6 +296,12 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       <Grid item xs={12}>
         <StyledContentContainer>
           {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
+          <QuoteSimulation
+            tx={selectedRoute?.tx}
+            cantFund={cantFund}
+            isApproved={isApproved}
+            isLoadingRoute={isLoadingRoute}
+          />
           <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} to={to} />
           <StyledButtonContainer>
             {buttonToShow}

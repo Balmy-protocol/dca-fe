@@ -4,6 +4,7 @@ import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from 'config';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import {
   AllowedPairs,
+  BlowfishResponse,
   MeanApiUnderlyingResponse,
   MeanFinanceAllowedPairsResponse,
   MeanFinanceResponse,
@@ -382,6 +383,26 @@ export default class MeanApiService {
     return this.axiosClient.post(`${MEAN_API_URL}/v1/log-feedback`, {
       action,
       description,
+    });
+  }
+
+  async simulateTransaction(
+    txObject: {
+      from: string;
+      to: string;
+      value: string;
+      data: string;
+    },
+    userAccount: string,
+    metadata: {
+      origin: string;
+    },
+    chainId: number
+  ) {
+    return this.axiosClient.post<BlowfishResponse>(`${MEAN_API_URL}/v1/simulate-blowfish-transaction/${chainId}`, {
+      txObject,
+      userAccount,
+      metadata,
     });
   }
 }
