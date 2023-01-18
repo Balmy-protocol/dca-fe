@@ -589,7 +589,7 @@ export const TOKEN_LISTS = {
 
 export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST', 'jEUR', 'jGBP', 'jCHF'];
 
-export const MEAN_API_URL = 'https://api.mean.finance';
+export const MEAN_API_URL = 'http://api.mean.finance';
 
 export const SIGN_VERSION: Record<PositionVersions, string> = {
   [POSITION_VERSION_1]: '1',
@@ -600,6 +600,8 @@ export const SIGN_VERSION: Record<PositionVersions, string> = {
 
 export const DEFILLAMA_PROTOCOL_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export const BLOWFISH_ENABLED_CHAINS = [NETWORKS.mainnet.chainId, NETWORKS.polygon.chainId];
 
 export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.mainnet.chainId]: 'https://api.0x.org',

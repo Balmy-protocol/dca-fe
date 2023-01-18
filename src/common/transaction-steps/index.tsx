@@ -14,6 +14,9 @@ import {
   TransactionActionSwapType,
   TransactionActionSwapData,
   TransactionActionType,
+  TransactionActionWaitForSimulationType,
+  TransactionActionWaitForSimulationData,
+  BlowfishResponse,
 } from 'types';
 import {
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
@@ -21,6 +24,7 @@ import {
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL,
+  TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
 } from 'config';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from 'assets/svg/atom/arrow-left';
@@ -34,6 +38,7 @@ import { emptyTokenWithAddress } from 'utils/currency';
 import CircularProgress from '@mui/material/CircularProgress';
 import { BigNumber } from 'ethers';
 import AllowanceSplitButton from 'common/allowance-split-button';
+import TransactionSimulation from 'common/transaction-simulation';
 
 const StyledIconButton = styled(IconButton)`
   margin-right: 5px;
@@ -76,6 +81,7 @@ interface TransactionActionBase {
   transactions?: any;
   checkForPending?: boolean;
   done?: boolean;
+  failed?: boolean;
 }
 
 interface ItemProps {
@@ -110,6 +116,15 @@ interface TransactionActionWaitForApproval extends TransactionActionBase {
 
 interface TransactionActionWaitForApprovalProps extends TransactionActionWaitForApproval, ItemProps {}
 
+interface TransactionActionWaitForSimulation extends Omit<TransactionActionBase, 'onAction'> {
+  type: TransactionActionWaitForSimulationType;
+  extraData: TransactionActionWaitForSimulationData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAction: (transactions: any, response: BlowfishResponse) => void;
+}
+
+interface TransactionActionWaitForSimulationProps extends TransactionActionWaitForSimulation, ItemProps {}
+
 interface TransactionActionSwap extends TransactionActionBase {
   type: TransactionActionSwapType;
   extraData: TransactionActionSwapData;
@@ -121,6 +136,7 @@ export type TransactionAction =
   | TransactionActionApproveToken
   | TransactionActionApproveTokenSign
   | TransactionActionWaitForApproval
+  | TransactionActionWaitForSimulation
   | TransactionActionSwap;
 type TransactionActions = TransactionAction[];
 
@@ -291,7 +307,78 @@ const WaitIcons = {
   disabled: <TokenIcon token={emptyTokenWithAddress('CLOCK')} size="40px" />,
   pending: <CircularProgress size={40} />,
   success: <TokenIcon token={emptyTokenWithAddress('CHECK')} size="40px" />,
+  failed: <TokenIcon token={emptyTokenWithAddress('FAILED')} size="40px" />,
 };
+
+const buildWaitForSimulationItem = ({
+  checkForPending,
+  step,
+  isLast,
+  isFirst,
+  isCurrentStep,
+  done,
+  extraData,
+  failed,
+}: TransactionActionWaitForSimulationProps) => ({
+  content: () => {
+    const [icon, setIcon] = React.useState<keyof typeof WaitIcons>(
+      // eslint-disable-next-line no-nested-ternary
+      checkForPending ? 'disabled' : failed ? 'failed' : 'success'
+    );
+
+    React.useEffect(() => {
+      if (!extraData.simulation && isCurrentStep) {
+        setIcon('pending');
+      }
+      if (extraData.simulation && isCurrentStep) {
+        setIcon('success');
+      }
+    }, [extraData]);
+
+    return (
+      <>
+        <StyledTransactionStepIcon isLast={isLast} isFirst={isFirst}>
+          <StyledTransactionStepIconContent>{WaitIcons[icon]}</StyledTransactionStepIconContent>
+        </StyledTransactionStepIcon>
+        <StyledTransactionStepContent>
+          <Typography variant="body1">
+            {failed && (
+              <FormattedMessage
+                description="transationStepWaitSimulateFailed"
+                defaultMessage="{step} - Transaction simulation failed"
+                values={{ step }}
+              />
+            )}
+            {checkForPending && !extraData.simulation && isCurrentStep && !failed && (
+              <FormattedMessage
+                description="transationStepWaitSimulatePending"
+                defaultMessage="{step} - The transaction is being simulated"
+                values={{ step }}
+              />
+            )}
+            {checkForPending && !extraData.simulation && !isCurrentStep && !failed && (
+              <FormattedMessage
+                description="transationStepWaitSimulatePending"
+                defaultMessage="{step} - The transaction will be simulated"
+                values={{ step }}
+              />
+            )}
+            {(checkForPending || done) && extraData.simulation && !failed && (
+              <>
+                <FormattedMessage
+                  description="transationStepWaitApprove"
+                  defaultMessage="{step} - Transaction simulated"
+                  values={{ step }}
+                />
+                <TransactionSimulation items={extraData.simulation} />
+              </>
+            )}
+          </Typography>
+        </StyledTransactionStepContent>
+      </>
+    );
+  },
+});
 
 const buildWaitForApprovalItem = ({
   hash,
@@ -431,6 +518,7 @@ type TransactionActionProps =
   | TransactionActionApproveTokenProps
   | TransactionActionApproveTokenSignProps
   | TransactionActionWaitForApprovalProps
+  | TransactionActionWaitForSimulationProps
   | TransactionActionSwapProps;
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
@@ -438,6 +526,7 @@ const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) =
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN]: buildApproveTokenSignItem,
   [TRANSACTION_ACTION_WAIT_FOR_APPROVAL]: buildWaitForApprovalItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL]: buildWaitForSignApprovalItem,
+  [TRANSACTION_ACTION_WAIT_FOR_SIMULATION]: buildWaitForSimulationItem,
   [TRANSACTION_ACTION_SWAP]: buildSwapItem,
 };
 

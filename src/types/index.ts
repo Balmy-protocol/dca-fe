@@ -1,7 +1,9 @@
 import type Web3Service from 'services/web3Service';
 import React from 'react';
+import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
+import { BlowfishResponse } from './responses';
 
 export * from './tokens';
 export * from './positions';
@@ -51,6 +53,7 @@ export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
 export type TransactionActionApproveTokenSignType = 'APPROVE_TOKEN_SIGN';
 export type TransactionActionWaitForSignApprovalType = 'WAIT_FOR_SIGN_APPROVAL';
 export type TransactionActionWaitForApprovalType = 'WAIT_FOR_APPROVAL';
+export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
 
 export type TransactionActionType =
@@ -58,6 +61,7 @@ export type TransactionActionType =
   | TransactionActionApproveTokenType
   | TransactionActionApproveTokenSignType
   | TransactionActionWaitForApprovalType
+  | TransactionActionWaitForSimulationType
   | TransactionActionWaitForSignApprovalType
   | TransactionActionSwapType;
 
@@ -69,6 +73,12 @@ export interface TransactionActionApproveTokenData {
 export interface TransactionActionWaitForApprovalData {
   token: Token;
   amount: BigNumber;
+}
+
+export interface TransactionActionWaitForSimulationData {
+  tx: QuoteTx;
+  chainId: number;
+  simulation?: BlowfishResponse;
 }
 
 export interface TransactionActionSwapData {

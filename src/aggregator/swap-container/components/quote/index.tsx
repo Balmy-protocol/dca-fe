@@ -36,7 +36,7 @@ const StatusChip = withStyles(() => ({
   },
 }))(Chip);
 
-const StyledPaper = styled(Paper)<{ $isSelected?: boolean }>`
+const StyledPaper = styled(Paper)<{ $isSelected?: boolean; $disabled: boolean }>`
   position: relative;
   overflow: hidden;
   border-radius: 8px;
@@ -44,7 +44,7 @@ const StyledPaper = styled(Paper)<{ $isSelected?: boolean }>`
   background-color: #1d1c1c;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
+  ${({ $disabled }) => !$disabled && 'cursor: pointer;'}
   ${({ $isSelected }) => $isSelected && 'border: 2px solid #3076F6;'}
 `;
 
@@ -148,6 +148,7 @@ interface SwapQuotesProps {
   isBuyOrder: boolean;
   bestQuote?: SwapOption;
   sorting: SwapSortOptions;
+  disabled: boolean;
 }
 
 const toPrecision = (value: string) => {
@@ -161,7 +162,17 @@ const toPrecision = (value: string) => {
   return parseFloat(preciseValue).toFixed(3);
 };
 
-const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuote, sorting }: SwapQuotesProps) => {
+const SwapQuote = ({
+  quote,
+  isSelected,
+  from,
+  to,
+  setRoute,
+  isBuyOrder,
+  bestQuote,
+  sorting,
+  disabled,
+}: SwapQuotesProps) => {
   if (!to || !from) {
     return null;
   }
@@ -185,13 +196,13 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
     ).toFixed(2);
 
   return (
-    <StyledPaper $isSelected={isSelected} onClick={() => setRoute(quote)}>
+    <StyledPaper $isSelected={isSelected} onClick={() => !disabled && setRoute(quote)} $disabled={disabled}>
       <StyledTitleContainer>
         <StyledTitleDataContainer>
           {isSelected ? (
             <CheckCircleIcon sx={{ color: '#3076F6' }} fontSize="medium" />
           ) : (
-            <RadioButtonUncheckedIcon fontSize="medium" />
+            !disabled && <RadioButtonUncheckedIcon fontSize="medium" />
           )}
           <Typography
             variant="body1"
@@ -200,7 +211,7 @@ const SwapQuote = ({ quote, isSelected, from, to, setRoute, isBuyOrder, bestQuot
             {isSelected ? (
               <FormattedMessage description="selected" defaultMessage="Selected" />
             ) : (
-              <FormattedMessage description="select" defaultMessage="Select" />
+              !disabled && <FormattedMessage description="select" defaultMessage="Select" />
             )}
           </Typography>
         </StyledTitleDataContainer>

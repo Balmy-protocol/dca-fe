@@ -265,3 +265,32 @@ export interface MeanFinanceSwapResponse {
     quotes: (RawSwapOption | FailedSwapOption)[];
   };
 }
+
+export enum StateChangeKind {
+  ERC20_TRANSFER = 'ERC20_TRANSFER',
+  ERC20_APPROVAL = 'ERC20_APPROVAL',
+  NATIVE_ASSET_TRANSFER = 'NATIVE_ASSET_TRANSFER',
+  ERC721_TRANSFER = 'ERC721_TRANSFER',
+  ERC721_APPROVAL = 'ERC721_APPROVAL',
+  ERC721_APPROVAL_FOR_ALL = 'ERC721_APPROVAL_FOR_ALL',
+  ERC1155_TRANSFER = 'ERC1155_TRANSFER',
+  ERC1155_APPROVAL_FOR_ALL = 'ERC1155_APPROVAL_FOR_ALL',
+}
+
+export interface BlowfishResponse {
+  action: 'BLOCK' | 'WARN' | 'NONE';
+  warnings: {
+    severity: 'CRITICAL' | 'WARNING';
+    message: string;
+  }[];
+  simulationResults: {
+    error?: { humanReadableError: string };
+    expectedStateChanges: {
+      humanReadableDiff: string;
+      rawInfo: {
+        kind: StateChangeKind;
+        data: unknown;
+      };
+    }[];
+  };
+}
