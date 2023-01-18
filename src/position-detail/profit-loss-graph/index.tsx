@@ -310,28 +310,26 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   const noData = prices.length === 0;
   const hasActions = position.history.length !== 0;
 
-  const mappedPrices = prices
-    .map((price) => {
-      const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);
-      const swappedIfLumpSum = formatUnits(price.swappedIfLumpSum, position.to.decimals);
+  const mappedPrices = prices.map((price) => {
+    const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);
+    const swappedIfLumpSum = formatUnits(price.swappedIfLumpSum, position.to.decimals);
 
-      let percentage = 0;
+    let percentage = 0;
 
-      if (parseFloat(swappedIfLumpSum) > 0) {
-        percentage = (parseFloat(swappedIfDCA) / parseFloat(swappedIfLumpSum) - 1) * 100;
-      }
+    if (parseFloat(swappedIfLumpSum) > 0) {
+      percentage = (parseFloat(swappedIfDCA) / parseFloat(swappedIfLumpSum) - 1) * 100;
+    }
 
-      return {
-        ...price,
-        swappedIfDCA: parseFloat(swappedIfDCA),
-        swappedIfLumpSum: parseFloat(swappedIfLumpSum),
-        rawSwappedIfDCA: price.swappedIfDCA,
-        rawSwappedIfLumpSum: price.swappedIfLumpSum,
-        percentage,
-        rawPercentage: price.percentage,
-      };
-    })
-    .slice(-POINT_LIMIT);
+    return {
+      ...price,
+      swappedIfDCA: parseFloat(swappedIfDCA),
+      swappedIfLumpSum: parseFloat(swappedIfLumpSum),
+      rawSwappedIfDCA: price.swappedIfDCA,
+      rawSwappedIfLumpSum: price.swappedIfLumpSum,
+      percentage,
+      rawPercentage: price.percentage,
+    };
+  });
 
   const gradientOffset = () => {
     const dataMax = Math.max(...mappedPrices.map((i) => i.percentage));
@@ -439,7 +437,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
               type="monotone"
               strokeWidth="3px"
               stroke="#DCE2F9"
-              dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
+              dot={mappedPrices.length <= POINT_LIMIT && { strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
               strokeDasharray="5 5"
               dataKey="percentage"
               fill="url(#splitColor)"
