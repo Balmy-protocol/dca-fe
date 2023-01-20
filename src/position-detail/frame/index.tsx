@@ -491,7 +491,7 @@ const PositionDetailFrame = () => {
             <Alert severity="warning">
               <FormattedMessage
                 description="positionLPTNotSupported"
-                defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds are disabled until this situation has reverted."
+                defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
               />
             </Alert>
           </Grid>
