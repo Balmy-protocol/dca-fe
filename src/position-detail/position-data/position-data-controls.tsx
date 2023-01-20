@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, YieldOptions } from 'types';
-import { DISABLED_INCREASE_TOKENS, NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import { TOKEN_BLACKLIST, NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -123,7 +123,7 @@ const PositionDataControls = ({
 
   const allowsModify = VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
-  const disabledIncrease = disabled || DISABLED_INCREASE_TOKENS.includes(position.from.address);
+  const disabledIncrease = disabled || TOKEN_BLACKLIST.includes(position.from.address);
 
   return (
     <StyledCallToActionContainer>
