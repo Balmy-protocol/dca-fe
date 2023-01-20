@@ -486,6 +486,16 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
+        {position.from.symbol === 'LPT' && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionLPTNotSupported"
+                defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
+              />
+            </Alert>
+          </Grid>
+        )}
         <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
           <StyledTabs
             value={tabIndex}
