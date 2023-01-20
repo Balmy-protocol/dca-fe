@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, YieldOptions } from 'types';
-import { NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
+import { DISABLED_INCREASE_TOKENS, NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from 'utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -123,6 +123,8 @@ const PositionDataControls = ({
 
   const allowsModify = VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
+  const disabledIncrease = disabled || DISABLED_INCREASE_TOKENS.includes(position.from.address);
+
   return (
     <StyledCallToActionContainer>
       {!isOldVersion && (
@@ -130,7 +132,7 @@ const PositionDataControls = ({
           variant="contained"
           color="secondary"
           onClick={onReusePosition}
-          disabled={disabled}
+          disabled={disabledIncrease}
           fullWidth
         >
           <Typography variant="body2">
@@ -157,7 +159,7 @@ const PositionDataControls = ({
           color="secondary"
           onClick={onSuggestMigrateYield}
           fullWidth
-          disabled={disabled}
+          disabled={disabledIncrease}
         >
           <Typography variant="body2">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />
@@ -170,7 +172,7 @@ const PositionDataControls = ({
           color="secondary"
           onClick={onReusePosition}
           fullWidth
-          disabled={disabled}
+          disabled={disabledIncrease}
         >
           <Typography variant="body2">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />

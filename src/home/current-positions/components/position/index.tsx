@@ -581,6 +581,19 @@ const ActivePosition = ({
               </Typography>
             </StyledDetailWrapper>
           )}
+          {position.from.symbol === 'LPT' && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
+                <FormattedMessage
+                  description="positionLPTNotSupported"
+                  defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds are disabled until this situation has reverted."
+                />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
         </StyledContentContainer>
         {remainingSwaps.toNumber() > 0 && (
           <DarkTooltip

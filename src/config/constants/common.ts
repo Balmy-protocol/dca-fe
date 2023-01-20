@@ -36,3 +36,7 @@ export const POSITIONS_VERSIONS: PositionVersions[] = [
 export const TOKEN_TYPE_BASE = 'BASE';
 export const TOKEN_TYPE_WRAPPED = 'WRAPPED_PROTOCOL_TOKEN';
 export const TOKEN_TYPE_YIELD_BEARING_SHARES = 'YIELD_BEARING_SHARES';
+
+export const DISABLED_INCREASE_TOKENS = [
+  '0x289ba1701c2f088cf0faf8b3705246331cb8a839', // ARB - LPT
+];
