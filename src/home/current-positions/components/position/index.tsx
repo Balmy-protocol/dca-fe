@@ -589,7 +589,7 @@ const ActivePosition = ({
               <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
                 <FormattedMessage
                   description="positionLPTNotSupported"
-                  defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds are disabled until this situation has reverted."
+                  defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
                 />
               </Typography>
             </StyledDetailWrapper>
