@@ -98,7 +98,7 @@ function useSwapOptions(
           }
         }
       },
-      500
+      750
     ),
     [setState]
   );
