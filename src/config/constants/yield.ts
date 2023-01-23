@@ -79,13 +79,13 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
       },
-      {
-        id: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
-        tokenAddress: '0x1dd5629903441b2dd0d03f76ec7673add920e765', // aave-v3 jEUR
-        poolId: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
-        name: 'Aave V3',
-        token: emptyTokenWithAddress('AAVE'),
-      },
+      // {
+      //   id: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
+      //   tokenAddress: '0x1dd5629903441b2dd0d03f76ec7673add920e765', // aave-v3 jEUR
+      //   poolId: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
+      //   name: 'Aave V3',
+      //   token: emptyTokenWithAddress('AAVE'),
+      // },
       {
         id: '6ee54ffc-6ede-45a8-b35f-60aca8cc4176', // aave-v3 agEUR
         tokenAddress: '0xc0b8d48064b9137858ccc2d6c07b7432aae2aa90', // aave-v3 agEUR

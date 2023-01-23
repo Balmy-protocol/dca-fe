@@ -22,7 +22,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import ComposedTokenIcon from 'common/composed-token-icon';
 import CustomChip from 'common/custom-chip';
-import { Theme, Tooltip } from '@mui/material';
+import { Link, Theme, Tooltip } from '@mui/material';
 import useUsdPrice from 'hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 
@@ -95,6 +95,12 @@ const StyledCardTitleHeader = styled.div`
     margin-left: 4px;
     font-weight: 500;
   }
+`;
+
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
 `;
 
 const StyledDetailWrapper = styled.div<{ alignItems?: string; flex?: boolean; $spacing?: boolean }>`
@@ -591,6 +597,22 @@ const ActivePosition = ({
                   description="positionLPTNotSupported"
                   defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
                 />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {position.from.symbol === 'jEUR' && foundYieldFrom && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
+                <FormattedMessage
+                  description="positionJEURNotSupported"
+                  defaultMessage="Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here"
+                />
+                <StyledLink href="https://app.aave.com/governance/proposal/?proposalId=143" target="_blank">
+                  <FormattedMessage description="here" defaultMessage="here." />
+                </StyledLink>
               </Typography>
             </StyledDetailWrapper>
           )}

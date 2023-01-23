@@ -89,6 +89,12 @@ const StyledTabs = withStyles(() =>
   })
 )(Tabs);
 
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
+
 const StyledPositionDetailsContainer = styled(Grid)`
   align-self: flex-start;
 `;
@@ -493,6 +499,19 @@ const PositionDetailFrame = () => {
                 description="positionLPTNotSupported"
                 defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
               />
+            </Alert>
+          </Grid>
+        )}
+        {position.from.symbol === 'jEUR' && position.from.underlyingTokens.length && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionJEURNotSupported"
+                defaultMessage="Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here"
+              />
+              <StyledLink href="https://app.aave.com/governance/proposal/?proposalId=143" target="_blank">
+                <FormattedMessage description="here" defaultMessage="here." />
+              </StyledLink>
             </Alert>
           </Grid>
         )}
