@@ -41,16 +41,6 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
 
   const protocolToken = getProtocolToken(network.chainId);
 
-  const priceImpact =
-    quote &&
-    (
-      Math.round(
-        ((Number(quote.sellAmount.amountInUSD) - Number(quote.buyAmount.amountInUSD)) /
-          Number(quote.sellAmount.amountInUSD)) *
-          100
-      ) / 100
-    ).toFixed(2);
-
   return (
     <StyledQuoteDataContainer>
       <StyledQuoteDataItem>
@@ -75,16 +65,6 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
               )} ${protocolToken.symbol})`
             : '-'}
         </Typography>
-      </StyledQuoteDataItem>
-      <StyledQuoteDataItem>
-        <Typography variant="body2" color="inherit">
-          <FormattedMessage description="quotePriceImpact" defaultMessage="Price impact:" />
-        </Typography>
-        <StyledMinimumContainer>
-          <Typography variant="body2" color="inherit">
-            {(quote && priceImpact && `${priceImpact}%`) || '-'}
-          </Typography>
-        </StyledMinimumContainer>
       </StyledQuoteDataItem>
       {quote?.maxSellAmount && (
         <StyledQuoteDataItem>
