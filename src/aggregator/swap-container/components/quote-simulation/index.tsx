@@ -45,7 +45,7 @@ const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimu
     cantFund || !isApproved
   );
 
-  if (!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) || cantFund || !isApproved) {
+  if (!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) || cantFund || !isApproved || !tx) {
     return null;
   }
 
