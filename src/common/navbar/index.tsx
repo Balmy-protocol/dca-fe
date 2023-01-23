@@ -198,7 +198,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       {currentBreakPoint === 'xs' && (
         <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
           <StyledAppbarContainer>
-            <WhaveLogoDark size="45px" />
+            <WhaveLogoDark size="45px" onClick={() => handleSubTabChange({ index: 0, mainIndex: 0, url: 'create' })} />
             <StyledTabs
               breakpoint={currentBreakPoint}
               TabIndicatorProps={{ style: { bottom: '-10px' } }}
@@ -299,7 +299,10 @@ const NavBar = ({ isLoading }: NavBarProps) => {
         <StyledNavbarContainer>
           {currentBreakPoint !== 'xs' && (
             <StyledNavbarMainContent>
-              <WhaveLogoDark size="45px" />
+              <WhaveLogoDark
+                size="45px"
+                onClick={() => handleSubTabChange({ index: 0, mainIndex: 0, url: 'create' })}
+              />
               <StyledTabs
                 breakpoint={currentBreakPoint}
                 TabIndicatorProps={{ style: { bottom: openFirstSubTab ? '0px' : '-10px' } }}
