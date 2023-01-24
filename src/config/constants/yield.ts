@@ -11,7 +11,10 @@ export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
 
-export const DISABLED_YIELDS = ['0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11'];
+export const DISABLED_YIELDS = [
+  '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11',
+  '0x1dd5629903441b2dd0d03f76ec7673add920e765',
+];
 
 export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
   {
@@ -79,13 +82,13 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
       },
-      // {
-      //   id: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
-      //   tokenAddress: '0x1dd5629903441b2dd0d03f76ec7673add920e765', // aave-v3 jEUR
-      //   poolId: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
-      //   name: 'Aave V3',
-      //   token: emptyTokenWithAddress('AAVE'),
-      // },
+      {
+        id: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
+        tokenAddress: '0x1dd5629903441b2dd0d03f76ec7673add920e765', // aave-v3 jEUR
+        poolId: 'c6ec5219-e39b-46f2-9ec2-5a61de562957', // aave-v3 jEUR
+        name: 'Aave V3',
+        token: emptyTokenWithAddress('AAVE'),
+      },
       {
         id: '6ee54ffc-6ede-45a8-b35f-60aca8cc4176', // aave-v3 agEUR
         tokenAddress: '0xc0b8d48064b9137858ccc2d6c07b7432aae2aa90', // aave-v3 agEUR

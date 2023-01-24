@@ -149,7 +149,10 @@ const PositionControls = ({
 
   const canAddFunds = VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
-  const disabledIncrease = disabled || TOKEN_BLACKLIST.includes(position.from.address);
+  const disabledIncrease =
+    disabled ||
+    TOKEN_BLACKLIST.includes(position.from.address) ||
+    TOKEN_BLACKLIST.includes(fromSupportsYield?.tokenAddress || '');
 
   return (
     <StyledCallToActionContainer>
