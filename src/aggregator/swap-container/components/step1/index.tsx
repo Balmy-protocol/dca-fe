@@ -23,6 +23,7 @@ import TokenIcon from 'common/token-icon';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config';
+import useAccount from 'hooks/useAccount';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import AggregatorTokenInput from './aggtokenButton';
@@ -177,6 +178,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     onChangeNetwork,
   } = props;
 
+  const account = useAccount();
+
   let fromValueToUse =
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address && selectedRoute.sellAmount.amountInUnits.toString()) || '0'
@@ -312,7 +315,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             <StyledTokenInputContainer>
               <AggregatorTokenInput
                 id="from-value"
-                error={cantFund ? 'Amount cannot exceed balance' : ''}
+                error={cantFund && account ? 'Amount cannot exceed balance' : ''}
                 value={fromValueToUse}
                 disabled={isLoadingBuyOrder}
                 onChange={handleFromValueChange}

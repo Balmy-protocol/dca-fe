@@ -2,7 +2,7 @@ import React from 'react';
 import { parseUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { BlowfishResponse, SwapOption, Token } from 'types';
+import { BlowfishResponse, SwapOption, SwapOptionWithTx, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/aggregator-token-picker';
@@ -36,6 +36,7 @@ import { useAppDispatch } from 'state/hooks';
 import useSimulationService from 'hooks/useSimulationService';
 import { useHistory } from 'react-router-dom';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { setAggregatorChainId } from 'state/aggregator/actions';
 import { addCustomToken } from 'state/token-lists/actions';
 import SwapFirstStep from '../step1';
@@ -197,7 +198,7 @@ const Swap = ({
   };
 
   const handleSwap = async (transactions?: TransactionStep[]) => {
-    if (!from || !to || !selectedRoute) return;
+    if (!from || !to || !selectedRoute || !selectedRoute.tx) return;
     const fromSymbol = from.symbol;
     const toSymbol = to.symbol;
     const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6);
@@ -226,7 +227,7 @@ const Swap = ({
         ),
       });
 
-      const result = await aggregatorService.swap(selectedRoute);
+      const result = await aggregatorService.swap(selectedRoute as SwapOptionWithTx);
 
       let transactionType = TRANSACTION_TYPES.SWAP;
 
@@ -327,7 +328,12 @@ const Swap = ({
 
       setTransactionsToExecute(newSteps);
 
-      if (newSteps[index + 1] && newSteps[index + 1].type === TRANSACTION_ACTION_WAIT_FOR_SIMULATION && selectedRoute) {
+      if (
+        newSteps[index + 1] &&
+        newSteps[index + 1].type === TRANSACTION_ACTION_WAIT_FOR_SIMULATION &&
+        selectedRoute &&
+        selectedRoute.tx
+      ) {
         const simulatePromise = simulationService.simulateTransaction(selectedRoute.tx, currentNetwork.chainId);
         simulatePromise
           .then((blowfishResponse) => blowfishResponse && handleTransactionSimulationWait(newSteps, blowfishResponse))
@@ -372,7 +378,7 @@ const Swap = ({
       },
     });
 
-    if (BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId)) {
+    if (BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && selectedRoute.tx) {
       newSteps.push({
         hash: '',
         onAction: handleTransactionSimulationWait,
@@ -458,7 +464,7 @@ const Swap = ({
     parseUnits(fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).lte(BigNumber.from(0)) ||
     isLoadingRoute;
 
-  const shouldDisableButton = shouldDisableApproveButton || !isApproved;
+  const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx;
 
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error">
@@ -518,18 +524,21 @@ const Swap = ({
       fullWidth
       onClick={() => handleSwap()}
     >
-      <Typography variant="body1">
-        {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
-          <FormattedMessage description="wrap agg" defaultMessage="Wrap" />
-        )}
-        {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
-          <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
-        )}
-        {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-          (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-          <FormattedMessage description="swap agg" defaultMessage="Swap" />
-        )}
-      </Typography>
+      {isLoadingRoute && <CenteredLoadingIndicator />}
+      {!isLoadingRoute && (
+        <Typography variant="body1">
+          {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
+            <FormattedMessage description="wrap agg" defaultMessage="Wrap" />
+          )}
+          {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
+            <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
+          )}
+          {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
+            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
+            <FormattedMessage description="swap agg" defaultMessage="Swap" />
+          )}
+        </Typography>
+      )}
     </StyledButton>
   );
 
