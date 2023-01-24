@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
 import EnMessages from 'config/lang/en_US.json';
+import EsMessages from 'config/lang/es.json';
 import WalletContext from 'common/wallet-context';
 import Web3Service from 'services/web3Service';
 import DCASubgraphs from 'utils/dcaSubgraphApolloClient';
@@ -23,8 +24,10 @@ type AppProps = {
 
 function loadLocaleData(locale: string) {
   switch (locale) {
+    case 'es':
+      return EsMessages;
     default:
-      return EnMessages;
+      return EsMessages;
   }
 }
 
@@ -72,10 +75,12 @@ const App: React.FunctionComponent<AppProps> = ({ locale, messages }: AppProps) 
 
 function bootstrapApplication(locale: string) {
   const messages = loadLocaleData(locale);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   ReactDOM.render(<App locale={locale} messages={messages} />, document.getElementById('root'));
 }
 
-bootstrapApplication('en');
+bootstrapApplication('es');
 
 if (module.hot) {
   module.hot.accept();

@@ -1,0 +1,1758 @@
+{
+  "+NIeZ0": {
+    "defaultMessage": "Lista de Token",
+    "description": "token list"
+  },
+  "+O0pfN": {
+    "defaultMessage": "Aquí",
+    "description": "faqIsMeanFinanceAuditedHere"
+  },
+  "+UA1IX": {
+    "defaultMessage": "No requiere cuenta",
+    "description": "faqWhyShouldIUseMeanFinanceResponsePart3"
+  },
+  "+VGlht": {
+    "defaultMessage": "Esperando la aprobación de su {token}",
+    "description": "waiting for approval"
+  },
+  "+s/1rR": {
+    "defaultMessage": "En billetera: {balance} {symbol}",
+    "description": "in position"
+  },
+  "+tYhzH": {
+    "defaultMessage": "¿Cómo funciona Mean Finance?",
+    "description": "faqHowDoesMeanFinanceWork"
+  },
+  "+uiQ/S": {
+    "defaultMessage": "¿Es seguro Mean Finance Meta Aggregator?",
+    "description": "faqWhatIs"
+  },
+  "//GmlN": {
+    "defaultMessage": "Calcular el momento oportuno en el mercado puede ser muy difícil. \nEl objetivo de realizar DCA es reducir el impacto general de la volatilidad en el precio del activo objetivo; Dado que el precio probablemente variará cada vez que se ejecute uno de los intercambios periódicos, la inversión no está tan sujeta a la volatilidad. DCA tiene como objetivo evitar cometer el error de hacer una inversión de suma global que está mal sincronizada con respecto a la fijación de precios de los activos",
+    "description": "faqWhyShouldIUseMeanFinanceResponsePart1"
+  },
+  "/0oLaV": {
+    "defaultMessage": "Establecer o revocar permisos",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart6"
+  },
+  "/LSdRt": {
+    "defaultMessage": "Los usuarios tienen que pagar tarifas de gas cuando interactúan con sus posiciones. Al mismo tiempo, hay una comisión de protocolo que se cobra en cada intercambio. Esa comisión es actualmente del 0,6%.",
+    "description": "faqDoINeedToPayAnyFeesResponsePart1"
+  },
+  "/gkMmp": {
+    "defaultMessage": "Fondos insuficientes",
+    "description": "insufficient funds"
+  },
+  "/uU6Pg": {
+    "defaultMessage": "El próximo intercambio se ejecutará dentro de la primera hora después de la creación de la posición",
+    "description": "nextSwapCreateNoPair"
+  },
+  "/v9cwm": {
+    "defaultMessage": "{step} - Intercambiar tokens",
+    "description": "transationStepSwapTokens"
+  },
+  "/vWyXL": {
+    "defaultMessage": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción donde envía el {token} necesario.",
+    "description": "Approve signature companion text increase"
+  },
+  "00Lmy0": {
+    "defaultMessage": "Mitad",
+    "description": "half"
+  },
+  "07xzKO": {
+    "defaultMessage": "Aprobar {remainingLiquidityDifference} {symbol}",
+    "description": "Allow us to use your coin (modal exact)"
+  },
+  "0CdUh0": {
+    "defaultMessage": "Creando su posición",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart2"
+  },
+  "0aFe3m": {
+    "defaultMessage": "Transferido desde:",
+    "description": "transferedFrom"
+  },
+  "0dHtRR": {
+    "defaultMessage": "Precio del DCA.",
+    "description": "averageBuyPriceLegend"
+  },
+  "0t0iJb": {
+    "defaultMessage": "Migrando su posición {from}/{to}",
+    "description": "migrating position"
+  },
+  "156xZf": {
+    "defaultMessage": "Gas ahorrado en USD",
+    "description": "gasSavedBullet"
+  },
+  "1HDQ5y": {
+    "defaultMessage": "¿Cuántos {type}?",
+    "description": "howManyFreq"
+  },
+  "1ZfCXS": {
+    "defaultMessage": "Estimación de gas",
+    "description": "descGasEstimation"
+  },
+  "1mv4e2": {
+    "defaultMessage": "No pudimos obtener el precio de uno de los tokens",
+    "description": "No price available"
+  },
+  "2NZFot": {
+    "defaultMessage": "Seleccionar dirección",
+    "description": "transferToSelectAddress"
+  },
+  "2TSf/Q": {
+    "defaultMessage": "No necesita ejecutar sus intercambios usted mismo, ya que Mean Finance incentiva a otros usuarios a ejecutar intercambios para obtener ganancias. Ahora bien, estos incentivos pueden verse afectados por diferentes factores:",
+    "description": "faqWhyIsMyPositionStaleResponsePart1"
+  },
+  "2U1wB2": {
+    "defaultMessage": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción en la que recupera el saldo como {from}.",
+    "description": "Approve signature companion text"
+  },
+  "2l6dgp": {
+    "defaultMessage": "Ver en el explorador",
+    "description": "view on etherscan"
+  },
+  "3Ovbmx": {
+    "defaultMessage": "Próximo intercambio:",
+    "description": "positionDetailsNextSwapAtTitle"
+  },
+  "3fWv7O": {
+    "defaultMessage": "¡Transacción realizada con éxito!",
+    "description": "transactionConfirmationSuccess"
+  },
+  "3oTxXg": {
+    "defaultMessage": "Posición Cerrada",
+    "description": "timelineTypeWithdrawn"
+  },
+  "47ajSH": {
+    "defaultMessage": "Redes compatibles:",
+    "description": "supportedNetworks"
+  },
+  "4IAoDw": {
+    "defaultMessage": "({toPrice} USD)",
+    "description": "current swapped in position price"
+  },
+  "4t/CsS": {
+    "defaultMessage": "Wrapping",
+    "description": "wrap agg loading"
+  },
+  "5B6pOD": {
+    "defaultMessage": "El sentimiento general del cripto mercado",
+    "description": "faqWhyIsMyPositionStaleResponsePart2"
+  },
+  "5CBYQl": {
+    "defaultMessage": "Configuración de sus permisos de posición {from}/{to}",
+    "description": "Modifying your position permissions"
+  },
+  "5LJrd3": {
+    "defaultMessage": "No cobramos comisiones por los intercambios que realice a través de Mean Finance. Obtendrá los mismos precios que si utilizara el Aggregator Dex/Dex específico de su aplicación",
+    "description": "faqWhatIsResponse"
+  },
+  "5TdrSw": {
+    "defaultMessage": "pero en el futuro admitiremos más oráculos on-chain",
+    "description": "faqHowIsThePriceCalculatedForEachSwapResponseSecond"
+  },
+  "5q/G80": {
+    "defaultMessage": "Duración modificada",
+    "description": "timelineTypeModified"
+  },
+  "5rRvoj": {
+    "defaultMessage": "Buscando la mejor ruta para usted",
+    "description": "loadingBestRoute"
+  },
+  "6DIyJZ": {
+    "defaultMessage": "Los Market Makers ejecutarán su intercambio en cualquier momento.",
+    "description": "positionDetailsNextSwapInProgressTooltip"
+  },
+  "6Mir2W": {
+    "defaultMessage": "Balance: {balance}",
+    "description": "in wallet"
+  },
+  "6lcY/P": {
+    "defaultMessage": "¿Cuándo se intercambiará mi posición?",
+    "description": "faqWhenWillMyPositionBeSwapped"
+  },
+  "6tCmX2": {
+    "defaultMessage": "Velocidad de gas:",
+    "description": "advancedAggregatorSettingsGasSpeed"
+  },
+  "6xtKel": {
+    "defaultMessage": "Cerrar posición {from}/{to}",
+    "description": "terminate title"
+  },
+  "7CQ1xI": {
+    "defaultMessage": "Actualmente no ofrecemos ninguna plataforma para generar yield con este token.",
+    "description": "noYieldAvailable"
+  },
+  "7NwTX3": {
+    "defaultMessage": "Migrar posición",
+    "description": "migrate position"
+  },
+  "7S36Rv": {
+    "defaultMessage": "¿Cuánto {from} quieres invertir?",
+    "description": "howMuchToSell"
+  },
+  "7lJ5Ep": {
+    "defaultMessage": "Al terminar la posición actual {toWithdraw} {to} se enviará a su billetera.",
+    "description": "howItWorksDescriptionStep3"
+  },
+  "7oK1Kh": {
+    "defaultMessage": "Cuando un par específico tiene algunos intercambios que no se han ejecutado en bastante tiempo, el par se señala como obsoleto.",
+    "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart5"
+  },
+  "8ZD9RJ": {
+    "defaultMessage": "Wrap",
+    "description": "wrap agg"
+  },
+  "8okGX/": {
+    "defaultMessage": "sólo podrá",
+    "description": "positionPermissionsModified only"
+  },
+  "8uwFtl": {
+    "defaultMessage": "Esta cadena aún no es compatible",
+    "description": "wrong chainId"
+  },
+  "94DkXG": {
+    "defaultMessage": "¿Qué es Mean Finance Meta Aggregator?",
+    "description": "faqWhatIs"
+  },
+  "96zib+": {
+    "defaultMessage": "{increaseDecrease} rate from",
+    "description": "positionModifiedRateFrom"
+  },
+  "9PT4ds": {
+    "defaultMessage": "El {remainingLiquidity} {from} restante se utilizará para crear una nueva posición con la misma tasa y duración restante que la actual.",
+    "description": "howItWorksDescriptionStep4"
+  },
+  "9Rp/uO": {
+    "defaultMessage": "FAQ",
+    "description": "faq"
+  },
+  "9ka/f/": {
+    "defaultMessage": "Aún no hay posiciones de {status}",
+    "description": "empty positions"
+  },
+  "9mxRvL": {
+    "defaultMessage": "Crear una posición y empezar a generar yield",
+    "description": "generateYield"
+  },
+  "9ytfZe": {
+    "defaultMessage": "Continuar",
+    "description": "continue"
+  },
+  "A/jHZp": {
+    "defaultMessage": "Añadir fondos a una posición existente",
+    "description": "addFundsExisting"
+  },
+  "A7a2Lo": {
+    "defaultMessage": "Rate:",
+    "description": "current remaining"
+  },
+  "ALg0aQ": {
+    "defaultMessage": "Intercambiado:",
+    "description": "pairSwapDetails"
+  },
+  "Aa5WQf": {
+    "defaultMessage": "Twitter",
+    "description": "docs"
+  },
+  "Aap/Dp": {
+    "defaultMessage": "Unwrapping",
+    "description": "unwrap agg loading"
+  },
+  "Adg2/y": {
+    "defaultMessage": "Migrar la posición y empezar a generar yield",
+    "description": "generateYield"
+  },
+  "AhEpzv": {
+    "defaultMessage": "Aquí encontrará la lista completa de direcciones que tienen permisos sobre su posición. También puede añadir nuevas direcciones o modificar los permisos de las ya existentes",
+    "description": "AddressessPermissions"
+  },
+  "AiRKI+": {
+    "defaultMessage": "Retiro intercambiado",
+    "description": "withdraw swapped"
+  },
+  "Ak27ll": {
+    "defaultMessage": "{tokenNumber} tokens",
+    "description": "tokenlisttokens"
+  },
+  "Aq2WRe": {
+    "defaultMessage": "Valor total",
+    "description": "generatedDashboard"
+  },
+  "AzL+qV": {
+    "defaultMessage": "Descartar cambios",
+    "description": "discard changes"
+  },
+  "B+lMoB": {
+    "defaultMessage": "Información adicional:",
+    "description": "additional_infromation"
+  },
+  "B2rEXZ": {
+    "defaultMessage": "Aprobando el uso de {from}",
+    "description": "approving token"
+  },
+  "B5YHLB": {
+    "defaultMessage": "{totalDepositted} {from}",
+    "description": "history full deposited"
+  },
+  "B5YYgc": {
+    "defaultMessage": "¿Por qué mi posición está parada?",
+    "description": "faqWhyIsMyPositionStale"
+  },
+  "BElDng": {
+    "defaultMessage": "Este es el máximo que gastarás en función de tus ajustes de deslizamiento",
+    "description": "quoteDataMaximumTooltip"
+  },
+  "BZcZ2I": {
+    "defaultMessage": "Cuando configura una posición, está creando la intención de intercambiar un token por otro. Entonces, algún usuario externo puede venir y ejecutar el intercambio por usted, respetando la frecuencia deseada. Cuando ejecuten su intercambio, se le cobrará una comisión del 0,6% sobre el importe intercambiado. Esta comisión se reparte entre Mean Finance y el canjeador. Como no tiene que ejecutar el intercambio usted mismo, no necesita pagar gas.",
+    "description": "faqHowDoesMeanFinanceWorkResponse"
+  },
+  "Bh1aAA": {
+    "defaultMessage": "Deberá proporcionar un adicional de {addAmmount} {from}",
+    "description": "rate add detail"
+  },
+  "Bq70E5": {
+    "defaultMessage": "Ver en el explorador",
+    "description": "View on etherscan"
+  },
+  "BrtGyj": {
+    "defaultMessage": "{frequency} Para usted por",
+    "description": "rate detail"
+  },
+  "BrtSAY": {
+    "defaultMessage": "Desconectar",
+    "description": "disconnect"
+  },
+  "BsPq9s": {
+    "defaultMessage": "Compite por quién tiene más posiciones en Mean Finance",
+    "description": "leaderboard position"
+  },
+  "Bxzkan": {
+    "defaultMessage": "La popularidad/demanda de los tokens que participan en el intercambio",
+    "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart3"
+  },
+  "ByRaJ4": {
+    "defaultMessage": "Yield de los soportes",
+    "description": "supportsYield"
+  },
+  "C5Zkoh": {
+    "defaultMessage": "Transfiriendo su posición a {toAddress}",
+    "description": "Transfering position"
+  },
+  "C5cDUK": {
+    "defaultMessage": "Restante:",
+    "description": "current remaining"
+  },
+  "CUp6QA": {
+    "defaultMessage": "{type} left",
+    "description": "days to finish"
+  },
+  "CZmJ1O": {
+    "defaultMessage": "Modificar posición",
+    "description": "modifyPosition"
+  },
+  "CioUeM": {
+    "defaultMessage": "Uno o ambos tokens en esta posición permiten generar yield mientras se intercambian sus posiciones. Le sugerimos crear una nueva posición para que empiece a generar yield para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición.",
+    "description": "whyYouShouldMigrate"
+  },
+  "Cxag1C": {
+    "defaultMessage": "Ver sus posiciones",
+    "description": "goBackToPositions"
+  },
+  "DIJWGT": {
+    "defaultMessage": "Esperando la aprobación de su {symbol}",
+    "description": "waiting for approval"
+  },
+  "DPjSTq": {
+    "defaultMessage": "Actualmente no hay fondos depositados en Mean Finance",
+    "description": "generatedDashboardNoValuePart1"
+  },
+  "DZBKeH": {
+    "defaultMessage": "{platform} (APY {apy}%)",
+    "description": "selectedYieldPlatform"
+  },
+  "DaGzbO": {
+    "defaultMessage": "Error desconocido: {message}",
+    "description": "unkown_error"
+  },
+  "DmNbMo": {
+    "defaultMessage": "Feedback",
+    "description": "feedback"
+  },
+  "Do1Kxz": {
+    "defaultMessage": "Transacciones recientes",
+    "description": "recent transactions"
+  },
+  "E6P1+X": {
+    "defaultMessage": "Intercambios",
+    "description": "swaps"
+  },
+  "E9JRmw": {
+    "defaultMessage": "Obtener {wrappedProtocolToken} como {protocolToken} en su lugar",
+    "description": "Terminate get eth"
+  },
+  "EJMVdh": {
+    "defaultMessage": "El cambio de su tasa de posición {from}/{to} para intercambiar {rate} {from} {frequencyType} por {frequencyTypePlural} se ha enviado correctamente a la blockchain y se confirmará en breve",
+    "description": "success modify rate for position"
+  },
+  "ER8GVt": {
+    "defaultMessage": "Su retiro de {toSymbol} de su posición {from}/{to} se ha enviado correctamente a la blockchain y se confirmará en breve",
+    "description": "withdraw from success"
+  },
+  "EY6I2K": {
+    "defaultMessage": "Más gas",
+    "description": "moreGas"
+  },
+  "EeY1Iw": {
+    "defaultMessage": "Ejecutar para:",
+    "description": "history run for in position"
+  },
+  "Eo86hF": {
+    "defaultMessage": "Permisos sobre su posición:",
+    "description": "AddressessPermissions"
+  },
+  "EzTqXK": {
+    "defaultMessage": "Ver permisos",
+    "description": "viewPermissions"
+  },
+  "F5F9dl": {
+    "defaultMessage": "Transferir posición",
+    "description": "transferPosition"
+  },
+  "F7BoEV": {
+    "defaultMessage": "Gas guardado",
+    "description": "gasSavedGraphTitle"
+  },
+  "FW4Fp5": {
+    "defaultMessage": "Obtener {protocolToken} como {wrappedProtocolToken} en su lugar",
+    "description": "Terminate get weth"
+  },
+  "FfyCRZ": {
+    "defaultMessage": "stale",
+    "description": "stale"
+  },
+  "FlMmaB": {
+    "defaultMessage": "Esperando confirmación",
+    "description": "Waiting confirmation"
+  },
+  "FwDtZA": {
+    "defaultMessage": "Posiciones",
+    "description": "positions"
+  },
+  "G0Aml3": {
+    "defaultMessage": "para",
+    "description": "pairSwapDetailsFor"
+  },
+  "G0w2LI": {
+    "defaultMessage": "Docs",
+    "description": "docs"
+  },
+  "G5ZcuX": {
+    "defaultMessage": "Yields:",
+    "description": "positionDetailsYieldsTitle"
+  },
+  "GChBDN": {
+    "defaultMessage": "Cambiar la red a {network}",
+    "description": "incorrect network"
+  },
+  "GFyhCr": {
+    "defaultMessage": "Está desconectado de la red",
+    "description": "network_disconnect"
+  },
+  "GHV69h": {
+    "defaultMessage": "Buscamos los mejores precios entre la mayoría de los Defi Dex’s y Dex Aggregators, para que siempre pueda obtener el mejor precio de ejecución para sus operaciones.",
+    "description": "meanFinanceMetaAggregatorDescription"
+  },
+  "GZ31rF": {
+    "defaultMessage": "Su retiro de fondos de {fromSymbol} de su posición {from}/{to} se ha enviado correctamente al blockchain y se confirmará en breve.",
+    "description": "withdraw from success"
+  },
+  "Ggm1Xe": {
+    "defaultMessage": "Posición Retirada",
+    "description": "timelineTypeWithdrawn"
+  },
+  "GlsY2O": {
+    "defaultMessage": "Es un agregador de DEX Aggregators",
+    "description": "faqWhatIsResponse"
+  },
+  "GoFOv6": {
+    "defaultMessage": "Cambiar su {from}/{to} tasa de posición para intercambiar {rate} {from} {frequencyType} por {frequencyTypePlural}",
+    "description": "Modifying rate for position"
+  },
+  "Gvb3qN": {
+    "defaultMessage": "Los usuarios finales no tienen que pagar comisiones de gas cuando se ejecutan los intercambios",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart6"
+  },
+  "Gzs80Q": {
+    "defaultMessage": "Rate:",
+    "description": "positionCreatedRate"
+  },
+  "H/e6If": {
+    "defaultMessage": "Usted está importando un token personalizado, comercie bajo su propio riesgo.",
+    "description": "customTokenWarning"
+  },
+  "Hbiw7t": {
+    "defaultMessage": "Para más información, consulte nuestro",
+    "description": "faqDoINeedToPayAnyFeesResponsePart3"
+  },
+  "HgPtYX": {
+    "defaultMessage": "Intercambiar",
+    "description": "swapWallet"
+  },
+  "Hnf7Tg": {
+    "defaultMessage": "ACTIVO",
+    "description": "inProgressPositions"
+  },
+  "HsmM3H": {
+    "defaultMessage": "Retirar el resto {token}",
+    "description": "withdraw funds"
+  },
+  "HuMusT": {
+    "defaultMessage": "Retirar fondos",
+    "description": "withdraw funds"
+  },
+  "HxyTxG": {
+    "defaultMessage": "Tiempo restante:",
+    "description": "positionDetailsRemainingTimeTitle"
+  },
+  "HznJD1": {
+    "defaultMessage": "Todo el saldo de {to} se le enviará y todo el saldo de {from} se utilizará para crear una nueva posición con el mismo tipo y los intercambios restantes.",
+    "description": "closed description"
+  },
+  "I0PpAd": {
+    "defaultMessage": "Precio medio de compra:",
+    "description": "positionDetailsAverageBuyPriceTitle"
+  },
+  "ILcAj5": {
+    "defaultMessage": "Cambiar la duración",
+    "description": "change duration"
+  },
+  "IQ0+94": {
+    "defaultMessage": "Seleccionar una opción",
+    "description": "feedbackEmptyOption"
+  },
+  "IhGLAD": {
+    "defaultMessage": "({swaps} SWAP{plural})",
+    "description": "days to finish"
+  },
+  "IkKuzc": {
+    "defaultMessage": "Siempre el mejor precio",
+    "description": "descBestPrice"
+  },
+  "IrR4U4": {
+    "defaultMessage": "Parado",
+    "description": "stale"
+  },
+  "It+xt8": {
+    "defaultMessage": "* No recopilamos más datos que los que ha introducido aquí",
+    "description": "feedbackDisclaimer"
+  },
+  "ItXuIA": {
+    "defaultMessage": "Cambiar la duración y el ritmo",
+    "description": "change rate"
+  },
+  "IuW2wC": {
+    "defaultMessage": "Retirando {toSymbol}",
+    "description": "Withdrawing from"
+  },
+  "J2NpSo": {
+    "defaultMessage": "{step} - Firme la aprobación del token con su billetera",
+    "description": "transationStepApproveSign"
+  },
+  "J4ZbBX": {
+    "defaultMessage": "Sin límites de intercambio",
+    "description": "faqWhyShouldIUseMeanFinanceResponsePart4"
+  },
+  "J9ovKV": {
+    "defaultMessage": "Usted recibe",
+    "description": "You receive"
+  },
+  "Jh14HF": {
+    "defaultMessage": "Esto no se puede deshacer",
+    "description": "transfer warning"
+  },
+  "K/HInO": {
+    "defaultMessage": "Esto permite a la dirección disminuir los fondos y modificar la duración de su posición",
+    "description": "reduce permission helptext"
+  },
+  "KAw6CL": {
+    "defaultMessage": "Mean Finance incentiva a otros usuarios a ejecutar intercambios para obtener ganancias. Ahora bien, estos incentivos pueden verse afectados por distintos factores:",
+    "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart1"
+  },
+  "KK9T66": {
+    "defaultMessage": "Tasa modificada",
+    "description": "timelineTypeModified"
+  },
+  "KKIhxJ": {
+    "defaultMessage": "Establecer para ejecutar para:",
+    "description": "positionCreatedSwaps"
+  },
+  "KTvwXg": {
+    "defaultMessage": "Cerrado",
+    "description": "terminated"
+  },
+  "Kbpl3O": {
+    "defaultMessage": "Seleccionar",
+    "description": "select"
+  },
+  "KmmquQ": {
+    "defaultMessage": "Seleccione un par para ver su historial de precios",
+    "description": "No pair selected"
+  },
+  "KpQxqG": {
+    "defaultMessage": "Cambiaremos {rate} {from} {frequency} por {frequencyPlural} para usted",
+    "description": "rate detail"
+  },
+  "KxGrUy": {
+    "defaultMessage": "Añadir permisos para nueva dirección",
+    "description": "add permission title"
+  },
+  "LFvqJr": {
+    "defaultMessage": "Approve Max {symbol}",
+    "description": "Allow us to use your coin (home max)"
+  },
+  "LJHU2o": {
+    "defaultMessage": "Retiros",
+    "description": "withdraws"
+  },
+  "LLaqNx": {
+    "defaultMessage": "El volumen de los tokens incluidos en el intercambio",
+    "description": "faqWhyIsMyPositionStaleResponsePart4"
+  },
+  "LQR2sQ": {
+    "defaultMessage": "Esto permite a la dirección aumentar los fondos y modificar la duración de su posición",
+    "description": "increase permission helptext"
+  },
+  "LRE2+L": {
+    "defaultMessage": "Abrir billetera",
+    "description": "openWallet"
+  },
+  "LbRNWF": {
+    "defaultMessage": "Migrar {from}/{to} posición",
+    "description": "migrate title"
+  },
+  "LogV+u": {
+    "defaultMessage": "Restablecer valores predeterminados",
+    "description": "advancedAggregatorSettingsRestoreDefaults"
+  },
+  "LqWNDv": {
+    "defaultMessage": "Añadir nueva dirección",
+    "description": "add new address"
+  },
+  "M3Fb8p": {
+    "defaultMessage": "El cierre de su posición {from}/{to} se ha enviado correctamente al blockchain y se confirmará en breve",
+    "description": "position termination success"
+  },
+  "MCA6GY": {
+    "defaultMessage": "{increaseDecrease} duración a ejecutar para {frequency} desde {oldFrequency}",
+    "description": "positionModifiedSwaps"
+  },
+  "MGGubs": {
+    "defaultMessage": "¿Mean Finance cobra alguna comisión por el intercambio?",
+    "description": "faqWhatIs"
+  },
+  "MJey+4": {
+    "defaultMessage": "{step} - Enviar la aprobación de la transacción con su billetera",
+    "description": "transationStepApprove"
+  },
+  "MzzvpH": {
+    "defaultMessage": "Nuevo comercio",
+    "description": "transactionConfirmationNewTrade"
+  },
+  "N4Okjv": {
+    "defaultMessage": "Transacción en progreso",
+    "description": "transactionConfirmationInProgress"
+  },
+  "NPuJa6": {
+    "defaultMessage": "Los contratos de Mean Finance han sido auditados por Pessimistic y PeckShield. Puede leer los informes",
+    "description": "faqIsMeanFinanceAuditedResponse"
+  },
+  "NXDtFv": {
+    "defaultMessage": "Su creación de posición para intercambiar {from} a {to} se ha enviado correctamente al blockchain y se confirmará en breve",
+    "description": "success creating position"
+  },
+  "Nd61ag": {
+    "defaultMessage": "Esto permite a la dirección cerrar su posición",
+    "description": "terminate permission helptext"
+  },
+  "Nh6p/v": {
+    "defaultMessage": "Para retirar:",
+    "description": "positionDetailsToWithdrawTitle"
+  },
+  "Nha1kE": {
+    "defaultMessage": "Transacción pendiente",
+    "description": "pending transaction"
+  },
+  "NlzM0l": {
+    "defaultMessage": "Pegar",
+    "description": "paste"
+  },
+  "NpsctG": {
+    "defaultMessage": "Abrir posiciones",
+    "description": "openPositions"
+  },
+  "NsIFlt": {
+    "defaultMessage": "Ejecutado:",
+    "description": "positionDetailsExecutedTitle"
+  },
+  "NxEUb6": {
+    "defaultMessage": "Configuración de la posición",
+    "description": "position settings"
+  },
+  "O+yqTs": {
+    "defaultMessage": "Ver en el explorador",
+    "description": "transactionConfirmationViewExplorer"
+  },
+  "O75EVP": {
+    "defaultMessage": "{prefix}{value} {token}",
+    "description": "graph selectedItemValue"
+  },
+  "OTyRfW": {
+    "defaultMessage": "Intercambiar y transferir a otra dirección",
+    "description": "tranferToTooltip"
+  },
+  "OalKNY": {
+    "defaultMessage": "Compite por quién tiene el mayor volumen intercambiado fijado en Mean Finance. Esto incluye la liquidez intercambiada en sus posiciones",
+    "description": "leaderboard traded volume"
+  },
+  "OdWJTU": {
+    "defaultMessage": "{frequency} {hasYield}",
+    "description": "positionDetailsCurrentRate"
+  },
+  "Oo1GS9": {
+    "defaultMessage": "Terminando su posición",
+    "description": "Terminating position"
+  },
+  "OqTl06": {
+    "defaultMessage": "Este par no es compatible",
+    "description": "pairNotOnUniswap"
+  },
+  "OttW6a": {
+    "defaultMessage": "Le devolveremos {returnAmmount} {from} a usted",
+    "description": "rate withdraw detail"
+  },
+  "Oz/vZm": {
+    "defaultMessage": "Si no desea hacer esto, aún puede agregar fondos a su posición actual",
+    "description": "howItWorksDescriptionStep1"
+  },
+  "POGYlh": {
+    "defaultMessage": "Permisos de posición modificado",
+    "description": "timelineTypeTransfered"
+  },
+  "PbwFtv": {
+    "defaultMessage": "${amount} USD saved",
+    "description": "savedProtocolTooltip"
+  },
+  "Pmf45s": {
+    "defaultMessage": "Transferir a otra dirección:",
+    "description": "transferToDescription"
+  },
+  "PwFUUt": {
+    "defaultMessage": "Vender",
+    "description": "sell"
+  },
+  "Q5QZCV": {
+    "defaultMessage": "DefiLlama",
+    "description": "defiLlamaLegend"
+  },
+  "QYjgIw": {
+    "defaultMessage": "Actual: {type} sobrante",
+    "description": "current days to finish"
+  },
+  "Qe8t1L": {
+    "defaultMessage": "Conectar billetera",
+    "description": "connect wallet"
+  },
+  "Qej+wD": {
+    "defaultMessage": "¿Qué intentabas hacer?",
+    "description": "feedbackSelect"
+  },
+  "Qes1qB": {
+    "defaultMessage": "DCA vs Lump sum",
+    "description": "dcaVsLumpSumTitle"
+  },
+  "QkC4KE": {
+    "defaultMessage": "Esto se debió a: {name}",
+    "description": "errorEncounteredName"
+  },
+  "RXcwxI": {
+    "defaultMessage": "Mean Finance se basa en oráculos on-chain para determinar el precio en el momento del intercambio. Actualmente Mean Finance utiliza",
+    "description": "faqHowIsThePriceCalculatedForEachSwapResponseFirst"
+  },
+  "RY4HmH": {
+    "defaultMessage": "Cerrar posición",
+    "description": "terminate position"
+  },
+  "RcB3pW": {
+    "defaultMessage": "La aprobación del uso de {from} se ha enviado correctamente al blockchain y se confirmará en breve.",
+    "description": "success approving token"
+  },
+  "Rgfl8x": {
+    "defaultMessage": "Recomendado",
+    "description": "sortHighReturn"
+  },
+  "Rm2Mnc": {
+    "defaultMessage": "Intercambiar",
+    "description": "swap"
+  },
+  "Roq4rz": {
+    "defaultMessage": "Retirar {token}",
+    "description": "withdrawToken"
+  },
+  "RyEoxs": {
+    "defaultMessage": "Configuración de la billetera",
+    "description": "walletSettings"
+  },
+  "S2QomY": {
+    "defaultMessage": "Aquí verá los detalles de sus posiciones abiertas y podrá ver más detalles sobre ellas. Sólo podrá interactuar con ellas si está en la red correcta",
+    "description": "positions description"
+  },
+  "S2dFpy": {
+    "defaultMessage": "COPY ERROR LOG",
+    "description": "errorEncounteredButtonCopyLog"
+  },
+  "S4SLAq": {
+    "defaultMessage": "Dado que los intercambios son ejecutados por usuarios externos, éstos pueden decidir cuándo ejecutarlos. Por ejemplo, supongamos que ha creado una posición con intercambios diarios. Esto significa que desde las 00 AM UTC hasta las 23:59 PM UTC, su posición sólo puede ejecutarse una vez. Una vez ejecutada, no se puede volver a ejecutar hasta las 00 AM del día siguiente. Lo mismo ocurre con otras frecuencias, como la semanal o la mensual.",
+    "description": "faqWhenWillMyPositionBeSwappedResponse"
+  },
+  "SBun7c": {
+    "defaultMessage": "Actualización de rutas en {timer}s",
+    "description": "refreshRouteTimer"
+  },
+  "SNN905": {
+    "defaultMessage": "Para más información, consulte nuestra",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart7"
+  },
+  "SNxage": {
+    "defaultMessage": "Empezar a generar yield",
+    "description": "gainYield title"
+  },
+  "SVDYlT": {
+    "defaultMessage": "Discord",
+    "description": "discord"
+  },
+  "SwiTok": {
+    "defaultMessage": "Retirar saldo de su posición",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart4"
+  },
+  "TdURzq": {
+    "defaultMessage": "En progreso",
+    "description": "positionDetailsNextSwapInProgress"
+  },
+  "Ti+ws9": {
+    "defaultMessage": "¿Qué significa que un par esté parado?",
+    "description": "faqWhatDoesItMeanForAPairToBeStale"
+  },
+  "UHHRwl": {
+    "defaultMessage": "Agregar dirección",
+    "description": "Add address"
+  },
+  "UhD0bk": {
+    "defaultMessage": "Confirmar esta transacción en su billetera",
+    "description": "Confirm in wallet"
+  },
+  "Umk6mn": {
+    "defaultMessage": "Ver NFT",
+    "description": "view nft"
+  },
+  "UpJRc6": {
+    "defaultMessage": "Ver resumen",
+    "description": "viewSummary"
+  },
+  "Ur4hZi": {
+    "defaultMessage": "Este es el mínimo que recibirás en función de tu configuración de deslizamiento",
+    "description": "quoteDataMinimumTooltip"
+  },
+  "V314M5": {
+    "defaultMessage": "El promedio de costo en dólares es una herramienta que el inversor puede utilizar para acumular ahorros y riqueza a largo plazo, neutralizando al mismo tiempo la volatilidad a corto plazo del mercado.{br} Las compras se producen independientemente del precio del activo y a intervalos regulares. En efecto, esta estrategia elimina gran parte del trabajo minucioso de intentar cronometrar el mercado para realizar compras de activos a los mejores precios.",
+    "description": "whatIsDcaAnswer"
+  },
+  "VaWvMp": {
+    "defaultMessage": "Ruta seleccionada:",
+    "description": "quoteDataSelectedRoute"
+  },
+  "VdhnM+": {
+    "defaultMessage": "Intercambiado:",
+    "description": "swappedTo"
+  },
+  "VlRJuN": {
+    "defaultMessage": "Ordenar las rutas según la mejor relación entre el precio y el costo del gas",
+    "description": "sortHighReturnHelp"
+  },
+  "Vm9A8k": {
+    "defaultMessage": "Depositado:",
+    "description": "history deposited"
+  },
+  "VoFvlu": {
+    "defaultMessage": "Ejecuta",
+    "description": "executes"
+  },
+  "VuiHqN": {
+    "defaultMessage": "1 {from} = {currencySymbol}{swapRate} {to}",
+    "description": "pairSwapDetails"
+  },
+  "W6JmVw": {
+    "defaultMessage": "Parece que encontramos un error que no pudimos solucionar",
+    "description": "errorEncountered"
+  },
+  "WJbxRJ": {
+    "defaultMessage": "Puedes empezar a generar yield",
+    "description": "startGainYield title"
+  },
+  "WaK61o": {
+    "defaultMessage": "El sentimiento general del cripto mercado",
+    "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart2"
+  },
+  "WetLa9": {
+    "defaultMessage": "Aún no hay intercambios",
+    "description": "positionDetailsAverageBuyPriceNotSwap"
+  },
+  "Wq6AJT": {
+    "defaultMessage": "Mínimo recibido:",
+    "description": "quoteDataRate"
+  },
+  "X/B1lK": {
+    "defaultMessage": "Háganos saber que ha encontrado este error, sería útil copiar el registro de errores con el botón de abajo y pegarlo en el mensaje",
+    "description": "errorEncounteredDiscordPart1"
+  },
+  "X1oKY8": {
+    "defaultMessage": "Approve Max {symbol}",
+    "description": "Allow us to use your coin (modal max)"
+  },
+  "X2tycj": {
+    "defaultMessage": "Generando {token} en {platform} con {apy}% APY",
+    "description": "generatingYieldAt"
+  },
+  "XI+HWn": {
+    "defaultMessage": "Máximo gastado:",
+    "description": "quoteDataMaxSent"
+  },
+  "XOwvOZ": {
+    "defaultMessage": "Está migrando una posición de una versión obsoleta de Mean Finance a la más reciente",
+    "description": "migrate description primary"
+  },
+  "XbrtpH": {
+    "defaultMessage": "Todo",
+    "description": "all"
+  },
+  "XmYRql": {
+    "defaultMessage": "Los fondos se depositarán en la plataforma seleccionada para genenerar yield mientras esperan a ser intercambiados o retirados. La seguridad de los fondos dependerá de la plataforma seleccionada, por lo que le aconsejamos que investigue por su cuenta para realizar una evaluación informada de la relación riesgo/rentabilidad",
+    "description": "howItWorksDescription"
+  },
+  "Xq/LIk": {
+    "defaultMessage": "HECHO",
+    "description": "finishedPosition"
+  },
+  "XrLrtm": {
+    "defaultMessage": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción en la que recupera el saldo como {token}.",
+    "description": "Approve signature companion text"
+  },
+  "XtV8h8": {
+    "defaultMessage": "Aprobar token",
+    "description": "lowLiqApproveToken"
+  },
+  "Y9R08Z": {
+    "defaultMessage": "Ignorar transacción",
+    "description": "ignoretransaction"
+  },
+  "YFISNq": {
+    "defaultMessage": "Ver recibo",
+    "description": "transactionConfirmationViewReceipt"
+  },
+  "YRoLhe": {
+    "defaultMessage": "Esto transferirá su posición, su NTF y toda la liquidez almacenada en la posición a la nueva dirección",
+    "description": "transfer sub description"
+  },
+  "YVAdRx": {
+    "defaultMessage": "Ordenar las rutas por donde tenga que gastar menos tokens",
+    "description": "sortMostReturnBuyOrderHelp"
+  },
+  "YWW6wc": {
+    "defaultMessage": "Oooops",
+    "description": "errorEncounteredOops"
+  },
+  "YhEuCJ": {
+    "defaultMessage": "Retirar",
+    "description": "Withdraw"
+  },
+  "YhkTRN": {
+    "defaultMessage": "CERRADO",
+    "description": "finishedPosition"
+  },
+  "YjbSf2": {
+    "defaultMessage": "La posición debe tener una tarifa mínima de ${minimum} USD ({minToken} {symbol}) por {frequency} para ser creada",
+    "description": "disabledDepositByUsdValue"
+  },
+  "YmpFX8": {
+    "defaultMessage": "Sus posiciones",
+    "description": "positions title"
+  },
+  "YpaT9e": {
+    "defaultMessage": "Compite por ver quién tiene más valor total fijado en Mean Finance. Esto incluye tanto la liquidez intercambiada como la no intercambiada en sus posiciones.",
+    "description": "leaderboard total value locked"
+  },
+  "ZATHUb": {
+    "defaultMessage": "Ir a posición",
+    "description": "goToPosition"
+  },
+  "ZAcmjS": {
+    "defaultMessage": "Cambiar a {network}",
+    "description": "incorrect network"
+  },
+  "ZBW4xA": {
+    "defaultMessage": "¿Está Mean Finance auditado?",
+    "description": "faqIsMeanFinanceAudited"
+  },
+  "ZCPyG3": {
+    "defaultMessage": "Método incompatible",
+    "description": "unsupported_method"
+  },
+  "ZDwrbF": {
+    "defaultMessage": "Mejor",
+    "description": "best"
+  },
+  "ZDyEAS": {
+    "defaultMessage": "Su transferencia de posición {from}/{to} a {toAddress} se ha enviado correctamente al blockchain y se confirmará en breve",
+    "description": "position transfer success"
+  },
+  "ZIFOHu": {
+    "defaultMessage": "Posición transferida",
+    "description": "timelineTypeTransfered"
+  },
+  "ZO613Q": {
+    "defaultMessage": "Posición modificada",
+    "description": "timelineTypeModified"
+  },
+  "ZRhYby": {
+    "defaultMessage": "¿Por qué debería usar Mean Finance?",
+    "description": "faqWhyShouldIUseMeanFinance"
+  },
+  "ZaT+DW": {
+    "defaultMessage": "{yield}{frequency} para usted para",
+    "description": "rate detail"
+  },
+  "Zw7FaX": {
+    "defaultMessage": "Sólo puede depositar con un valor mínimo de {value} USD",
+    "description": "notenoughwhale"
+  },
+  "Zy/Hiu": {
+    "defaultMessage": "Billetera:",
+    "description": "wallet"
+  },
+  "a+Yvwn": {
+    "defaultMessage": "Modificar su posición",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart3"
+  },
+  "aBc6K3": {
+    "defaultMessage": "Los intercambios ya no se van a ejecutar, no podrás hacer nuevas modificaciones en esta posición",
+    "description": "terminate description"
+  },
+  "aEQUw9": {
+    "defaultMessage": "Sección de yields",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart8"
+  },
+  "aPrJJm": {
+    "defaultMessage": "Se han eliminado todos los permisos para",
+    "description": "positionPermissionsModified all"
+  },
+  "agFL3X": {
+    "defaultMessage": "Crear",
+    "description": "create"
+  },
+  "amTVUS": {
+    "defaultMessage": "Creando una posición para intercambiar {from} a {to}",
+    "description": "creating position"
+  },
+  "an/BOU": {
+    "defaultMessage": "Usted paga",
+    "description": "youPay"
+  },
+  "aoHWJU": {
+    "defaultMessage": "En posición: {balance} {symbol}",
+    "description": "in position"
+  },
+  "b6x2Rx": {
+    "defaultMessage": "Posición creada",
+    "description": "timelineTypeCreated"
+  },
+  "b9AGHu": {
+    "defaultMessage": "Atrás",
+    "description": "goBack"
+  },
+  "bIgRS1": {
+    "defaultMessage": "Aún no hay datos disponibles sobre esta posición",
+    "description": "No data available"
+  },
+  "bM1Gn3": {
+    "defaultMessage": "${gasSaved} USD",
+    "description": "positionDetailsGasSaved"
+  },
+  "bZG2wW": {
+    "defaultMessage": "Crear posición",
+    "description": "Create pair submit"
+  },
+  "bdyKpA": {
+    "defaultMessage": "Cronología",
+    "description": "timeline"
+  },
+  "bjS3bz": {
+    "defaultMessage": "Leer sobre el oráculo de precios",
+    "description": "low liquidity link"
+  },
+  "c73eqf": {
+    "defaultMessage": "Error detectado",
+    "description": "Operation erro"
+  },
+  "c9qXGP": {
+    "defaultMessage": "La migración de su posición {from}/{to} se ha enviado correctamente al blockchain y se confrimará en breve",
+    "description": "migrating position success"
+  },
+  "cDcRwD": {
+    "defaultMessage": "Transferido a:",
+    "description": "transferedTo"
+  },
+  "cESB9o": {
+    "defaultMessage": "¡Transacción enviada!",
+    "description": "Operation successfull"
+  },
+  "cwqjrt": {
+    "defaultMessage": "Agregar fondos",
+    "description": "addFunds"
+  },
+  "czPp3R": {
+    "defaultMessage": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción en la que recupera el saldo como {token}.",
+    "description": "Approve signature companion text decrease"
+  },
+  "d2mT2I": {
+    "defaultMessage": "Su posición se cerrará aquí y crearemos una nueva en",
+    "description": "migrate description"
+  },
+  "dHuWI1": {
+    "defaultMessage": "Debe dar permiso a los contratos inteligentes de Mean Finance para usar su {symbol}",
+    "description": "Allowance Tooltip"
+  },
+  "dMaFCd": {
+    "defaultMessage": "Restante:",
+    "description": "positionDetailsRemainingFundsTitle"
+  },
+  "dNa4HH": {
+    "defaultMessage": "Presentando Mean Finance Meta Aggregator",
+    "description": "meanFinanceMetaAggregator"
+  },
+  "dSDGZh": {
+    "defaultMessage": "Retirar fondos {fromSymbol}",
+    "description": "Withdrawing funds from"
+  },
+  "di6jKR": {
+    "defaultMessage": "Está desconectado de la red",
+    "description": "all_network_disconnect"
+  },
+  "e1vYrA": {
+    "defaultMessage": "No hay yield",
+    "description": "noSelectedYieldPlatform"
+  },
+  "e2q+Fu": {
+    "defaultMessage": "Frecuencia:",
+    "description": "current remaining"
+  },
+  "eiCVwX": {
+    "defaultMessage": "No pudimos encontrar una ruta para su intercambio",
+    "description": "All routes failed"
+  },
+  "enTSiQ": {
+    "defaultMessage": "Gestionar lista y tokens",
+    "description": "manageListAndTokens"
+  },
+  "f++zf9": {
+    "defaultMessage": "Posición terminada",
+    "description": "no funds"
+  },
+  "f2UpW9": {
+    "defaultMessage": "Peor precio",
+    "description": "worsePrice"
+  },
+  "f42vtq": {
+    "defaultMessage": "Impacto en el precio:",
+    "description": "quotePriceImpact"
+  },
+  "f8zceY": {
+    "defaultMessage": "¿Cómo funciona?",
+    "description": "howItWorks"
+  },
+  "fAutJH": {
+    "defaultMessage": "Ejecutado {executedSwaps}/{totalSwaps} intercambios",
+    "description": "executedSwapsTooltip"
+  },
+  "fJcP5V": {
+    "defaultMessage": "Enviar comentario",
+    "description": "feedbackButton"
+  },
+  "fi6uGQ": {
+    "defaultMessage": "Esta posición no parece estar indexada todavía",
+    "description": "positionNotFoundTitle"
+  },
+  "frLdYT": {
+    "defaultMessage": "Próximo intercambio:",
+    "description": "positionDetailsNextSwapTitle"
+  },
+  "ftX4Ln": {
+    "defaultMessage": "La configuración de sus permisos de posición {from}/{to} se ha enviado correctamente al blockchain y se confirmará en breve",
+    "description": "success modify permission for position"
+  },
+  "gIl4Bi": {
+    "defaultMessage": "¿Está seguro que quiere retirar {ammount} {to}?",
+    "description": "Withdraw warning"
+  },
+  "gVbrRz": {
+    "defaultMessage": "Ver recibo",
+    "description": "viewReceipt"
+  },
+  "gWebsb": {
+    "defaultMessage": "Establecer a qué dirección quiere dar permiso",
+    "description": "add permission description"
+  },
+  "gZSAHC": {
+    "defaultMessage": "Menos gastado",
+    "description": "sortMostReturnBuyOrder"
+  },
+  "gblaCK": {
+    "defaultMessage": "Configuración avanzada",
+    "description": "advancedAggregatorSettings"
+  },
+  "gjyuVH": {
+    "defaultMessage": "Sólo tokens compatibles con {token}",
+    "description": "createdPairsSwitchToken"
+  },
+  "gqaG8I": {
+    "defaultMessage": "Retirar el depósito",
+    "description": "withdraw funds"
+  },
+  "gqiFWl": {
+    "defaultMessage": "Intercambiado:",
+    "description": "history swapped in position"
+  },
+  "h5NicW": {
+    "defaultMessage": "Intercambio ejecutado",
+    "description": "timelineTypeSwap"
+  },
+  "hEvpJE": {
+    "defaultMessage": "Ordene las rutas por donde puede recibir más tokens",
+    "description": "sortMostReturnSellOrderHelp"
+  },
+  "hUTWyY": {
+    "defaultMessage": "Esto permite a la dirección retirar su liquidez intercambiada de su posición",
+    "description": "withdraw permission helptext"
+  },
+  "haoCMr": {
+    "defaultMessage": "Canculando el costo de creación de esta posición",
+    "description": "calculate pair cost"
+  },
+  "hmyz7z": {
+    "defaultMessage": "Esto no se puede deshacer",
+    "description": "migrate warning"
+  },
+  "huUVCB": {
+    "defaultMessage": "Eres la primera persona que crea una posición para este par de tokens. Debido a esto, el costo del gas va a ser mayor que el de una creación de posición normal. Esto, sin embargo, será una operación de una sola vez. ¿Está seguro de que desea crear la posición {from}/{to}?",
+    "description": "create pair question"
+  },
+  "i1xngQ": {
+    "defaultMessage": "1 {from} = {currencySymbol}{average} {to}",
+    "description": "positionDetailsAverageBuyPrice"
+  },
+  "iUehtc": {
+    "defaultMessage": "Intercambiaremos",
+    "description": "rate detail"
+  },
+  "iY28lu": {
+    "defaultMessage": "¿Tengo que pagar alguna tarifa?",
+    "description": "faqDoINeedToPayAnyFees"
+  },
+  "iZzIMa": {
+    "defaultMessage": "DEPRECATED",
+    "description": "deprecated"
+  },
+  "iaCRAO": {
+    "defaultMessage": "Volver a la aplicación",
+    "description": "backToApp"
+  },
+  "iaKvlj": {
+    "defaultMessage": "Ordenar las rutas por el menor gasto de gas",
+    "description": "sortLeastGasHelp"
+  },
+  "ibMYRL": {
+    "defaultMessage": "Confirmo que la dirección anterior es correcta",
+    "description": "transferToValidateCheckboxLabel"
+  },
+  "ioNoF4": {
+    "defaultMessage": "Cambiar la duración y el ritmo",
+    "description": "changeDuration title"
+  },
+  "jKP6bq": {
+    "defaultMessage": "¿Cuándo tengo que pagar las tarifas de gas?",
+    "description": "faqWhenDoINeedToPayGasFees"
+  },
+  "jPhXzy": {
+    "defaultMessage": "El valor de la transacción es estimado, ya que este intercambio no permite configurar el importe recibido",
+    "description": "aggregatorNotBuyOrder"
+  },
+  "jPjwIW": {
+    "defaultMessage": "Poca liquidez en el par",
+    "description": "low liquidity title"
+  },
+  "jQqW/8": {
+    "defaultMessage": "Continuar",
+    "description": "proceed agg"
+  },
+  "jbb8PB": {
+    "defaultMessage": "Y configurar qué permisos establecer para esta dirección",
+    "description": "add permission checkbox description"
+  },
+  "k7+HKZ": {
+    "defaultMessage": "Precio del mercado vs precio DCA",
+    "description": "averagePriceGraphTitle"
+  },
+  "k7UbIH": {
+    "defaultMessage": "Conectado con {provider}",
+    "description": "connected with"
+  },
+  "k9QmN/": {
+    "defaultMessage": "FINALIZADO",
+    "description": "finishedPosition"
+  },
+  "kNNrdH": {
+    "defaultMessage": "Mean Finance es el protocolo DCA más avanzado. Te permite configurar acciones como “Intercambiar 10 USDC por WBTC cada día, durante 30 días”. Puedes crear estas acciones entre casi todos los tokens ERC20, con la frecuencia que elijas. Estos intercambios de token se producirán independientemente del precio del activo y a intervalos regulares, reduciendo el impacto de volatilidad en tu inversión.",
+    "description": "faqWhatIsMeanFinanceResponse"
+  },
+  "kS1Q7P": {
+    "defaultMessage": "Desde la posición",
+    "description": "positionWithdrawnSecond"
+  },
+  "kY2alH": {
+    "defaultMessage": "Guardar",
+    "description": "save"
+  },
+  "kfIFAy": {
+    "defaultMessage": "Confirmar dirección",
+    "description": "transfer to selectAddress"
+  },
+  "kksiFn": {
+    "defaultMessage": "Tu posición",
+    "description": "positionPermissionsModified your position"
+  },
+  "kqwGga": {
+    "defaultMessage": "El próximo intercambio se ejecutará en la primera hora después de la creación de la posición",
+    "description": "nextSwapCreateNoPositions"
+  },
+  "l4VKpl": {
+    "defaultMessage": "El volumen de tokens incluidas en el intercambio",
+    "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart4"
+  },
+  "lBsNBG": {
+    "defaultMessage": "Seleccionar plataforma",
+    "description": "selectYieldPlatform"
+  },
+  "lJRhFc": {
+    "defaultMessage": "Le devolveremos {fromValue} y dejaremos de intercambiar esta posición",
+    "description": "rate detail"
+  },
+  "lQ1Iy9": {
+    "defaultMessage": "Crear posición para {from}/{to}",
+    "description": "First deposit"
+  },
+  "lltepo": {
+    "defaultMessage": "STALE",
+    "description": "stale"
+  },
+  "lnpkd2": {
+    "defaultMessage": "Retirar {to}",
+    "description": "withdraw swapped"
+  },
+  "lsm/sD": {
+    "defaultMessage": "Usted vende",
+    "description": "You sell"
+  },
+  "m3YpJM": {
+    "defaultMessage": "¿Cómo se calcula el precio de cada intercambio?",
+    "description": "faqHowIsThePriceCalculatedForEachSwap"
+  },
+  "mljOZT": {
+    "defaultMessage": "No hay datos disponibles sobre este par",
+    "description": "No data available"
+  },
+  "mpwFVf": {
+    "defaultMessage": "Haciendo que su posición {from}/{to} empiece a generar yield",
+    "description": "Migrating your position"
+  },
+  "msqsvt": {
+    "defaultMessage": "y",
+    "description": "faqHowIsThePriceCalculatedForEachSwapResponseAnd"
+  },
+  "mu45Z3": {
+    "defaultMessage": "Deslizamiento:",
+    "description": "advancedAggregatorSettingsSlippage"
+  },
+  "mxbJsT": {
+    "defaultMessage": "Retirar {wrappedProtocolToken}",
+    "description": "withdrawWrapped"
+  },
+  "mz7RzW": {
+    "defaultMessage": "#ERROR!",
+    "description": "add permission add more addresses"
+  },
+  "n47KZD": {
+    "defaultMessage": "Transferir el intercambio a otra dirección",
+    "description": "transfer to title"
+  },
+  "nNo2x5": {
+    "defaultMessage": "Gas total ahorrado:",
+    "description": "positionDetailsGasSavedPriceTitle"
+  },
+  "nNqjn5": {
+    "defaultMessage": "¡Para empezar a invertir ya!",
+    "description": "generatedDashboardNoValuePart2"
+  },
+  "nRsZv4": {
+    "defaultMessage": "Crear una posición",
+    "description": "generatedDashboardNoValueAction"
+  },
+  "nWm9Qa": {
+    "defaultMessage": "Invertir",
+    "description": "invest"
+  },
+  "ne8FlW": {
+    "defaultMessage": "Lamentablemente, el token CRV ya no puede utilizarse como garantía en Aave v3. Esto significa que no es posible intercambiar esta posición",
+    "description": "positionCRVNotSupported"
+  },
+  "o0WR6j": {
+    "defaultMessage": "Creando este par",
+    "description": "creating pair"
+  },
+  "oGIpAl": {
+    "defaultMessage": "#NAME?",
+    "description": "yield detail"
+  },
+  "ocCMPR": {
+    "defaultMessage": "Generar yield",
+    "description": "yieldTitle"
+  },
+  "on7qPn": {
+    "defaultMessage": "{fromAmount} {from} para {toAmount} {to} para usted",
+    "description": "swap aggregator loading title"
+  },
+  "ooodz5": {
+    "defaultMessage": "Todos los intercambios se ejecutan directamente a cada contrato Dex/Dex Aggregator. Esto significa que si alguno de los aggregators que utilizas hace un airdrop en el futuro, todos los intercambios realizados en Mean Finance te harían elegible para su airdrop.",
+    "description": "faqWhatIsResponse"
+  },
+  "owBuje": {
+    "defaultMessage": "Intercambiar",
+    "description": "swap agg"
+  },
+  "p3Xa0W": {
+    "defaultMessage": "Establezca a quién desea transferir su posición",
+    "description": "transfer description"
+  },
+  "pAy7CA": {
+    "defaultMessage": "Github",
+    "description": "github"
+  },
+  "pBVKIR": {
+    "defaultMessage": "Tiene que invertir al menos una tarifa de ${minimum} USD ({minToken} {symbol}) por {frequency} para habilitar esta opción",
+    "description": "disabledByUsdValue"
+  },
+  "pMZxIC": {
+    "defaultMessage": "HECHO",
+    "description": "donePositions"
+  },
+  "pVaAUz": {
+    "defaultMessage": "La posición no está generando yield",
+    "description": "positionNotGainingInterest"
+  },
+  "pWI5/m": {
+    "defaultMessage": "No hay yield",
+    "description": "noYieldOption"
+  },
+  "pc75Ig": {
+    "defaultMessage": "Visite nuestro",
+    "description": "errorEncounteredDiscordPart1"
+  },
+  "pgGJ91": {
+    "defaultMessage": "Recibir",
+    "description": "receive"
+  },
+  "pjRvxz": {
+    "defaultMessage": "Lamentablemente, el token CRV ya no puede utilizarse como garantía en Aave v3. Esto significa que no es posible intercambiar esta posición. Recomendamos cerrar esta posición",
+    "description": "positionCRVNotSupported"
+  },
+  "pwMHax": {
+    "defaultMessage": "Por lo tanto, podría ocurrir que su intercambio no se ejecutara con la frecuencia especificada. Si esto ocurriera con su posición, recuerde que sólo se cobran tarifas por los intercambios, por lo que su saldo no se verá afectado",
+    "description": "faqWhyIsMyPositionStaleResponsePart5"
+  },
+  "q2gF9r": {
+    "defaultMessage": "Utilizas los contratos inteligents del Dex/Dex Aggregator con el que vas a intercambiar, eso significa que obtienes la misma seguridad que si utilizaras el Dex/Dex Aggregator específico de su aplicación",
+    "description": "faqWhatIsResponse"
+  },
+  "q7gy3F": {
+    "defaultMessage": "Ver en el explorador de cadena",
+    "description": "view on chain explorer"
+  },
+  "qC950V": {
+    "defaultMessage": "Mean Finance te permitirá realizar DCA de forma descentralizada y sin gas. Esto significa que:",
+    "description": "faqWhyShouldIUseMeanFinanceResponsePart2"
+  },
+  "qCw/BH": {
+    "defaultMessage": "¿Se ha olvidado de su posición? Estas son las direcciones que tienen más valor para retirar entre sus posiciones",
+    "description": "leaderboard forgot"
+  },
+  "qHy8j2": {
+    "defaultMessage": "Volver a crear posición",
+    "description": "backToSwap"
+  },
+  "qQYnqF": {
+    "defaultMessage": "El TRUE DCAOR es aquel cuya posición se ha establecdo para ejecutarse durante más tiempo",
+    "description": "leaderbord truedcaor"
+  },
+  "qTiaEE": {
+    "defaultMessage": "Si acaba de crear la posición, espere unos minutos y vuelva a intentarlo",
+    "description": "positionNotFoundDescription"
+  },
+  "qaVSQ/": {
+    "defaultMessage": "Precio del mercado",
+    "description": "currentPriceLegend"
+  },
+  "qbwUnh": {
+    "defaultMessage": "Modificaciones",
+    "description": "modifications"
+  },
+  "r0L/01": {
+    "defaultMessage": "Retirar {toSymbol} de {from}/{to} posición",
+    "description": "withdraw title"
+  },
+  "r3H6D4": {
+    "defaultMessage": "No está autorizado para realizar esta operación",
+    "description": "unauthorized_transaction"
+  },
+  "rEo0yG": {
+    "defaultMessage": "MAX",
+    "description": "maxWallet"
+  },
+  "rKNAVd": {
+    "defaultMessage": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion . Luego, tendrá que enviar la transacción en la que migra la posición",
+    "description": "Approve signature companion text migrate"
+  },
+  "reRP6P": {
+    "defaultMessage": "{swaps} swap{plural}",
+    "description": "positionDetailsExecuted"
+  },
+  "rxgILP": {
+    "defaultMessage": "¿Qué es Mean Finance?",
+    "description": "faqWhatIsMeanFinance"
+  },
+  "s5i7V0": {
+    "defaultMessage": "La cantidad de intercambios no puede ser superior a {MAX_UINT_32}",
+    "description": "swapsCannotBeMax"
+  },
+  "s7Q4TB": {
+    "defaultMessage": "Terminando su posición",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart5"
+  },
+  "sCqMd/": {
+    "defaultMessage": "DCA vs Lump Sum Profit %",
+    "description": "swappedIfDca"
+  },
+  "sMTz8x": {
+    "defaultMessage": "Posiciones en curso",
+    "description": "onGoingPositionsDashboard"
+  },
+  "sajNR4": {
+    "defaultMessage": "~ {fromPrice} USD",
+    "description": "current swapped in position price"
+  },
+  "sjxuA4": {
+    "defaultMessage": "Menos gas",
+    "description": "sortLeastGas"
+  },
+  "t0oI3L": {
+    "defaultMessage": "Volverás {from} {fromSymbol} and {to} {toSymbol}",
+    "description": "terminate returns"
+  },
+  "t2bZTZ": {
+    "defaultMessage": "Crear posición de todas formas",
+    "description": "lowLiqCreatePosition"
+  },
+  "tAHtfP": {
+    "defaultMessage": "para esa frecuencia. ¿Está seguro de que desea crear una posición?",
+    "description": "stale pair message"
+  },
+  "tKrt0Y": {
+    "defaultMessage": "Hacer que su posición {from}/{to} comience a generar yield se envió con éxito al blockchain y será confirmada en breve",
+    "description": "success migrating your position"
+  },
+  "tSkT/G": {
+    "defaultMessage": "El próximo intercambio para esta posición se ejecutará {nextSwapAvailableAt}.",
+    "description": "nextSwapCreate"
+  },
+  "tX40vS": {
+    "defaultMessage": "Los usuarios sólo tienen que pagar gas cuando interactúan con las posiciones. Esto incluye:",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart1"
+  },
+  "taCH+c": {
+    "defaultMessage": "Transferir",
+    "description": "Transfer"
+  },
+  "tqUUG8": {
+    "defaultMessage": "Para empezar a generar yield, tendremos que cerrar su posición actual y crear una nueva. Los datos históricos de esta posición aparecerán como una posición cerrada",
+    "description": "howItWorksDescriptionStep1"
+  },
+  "twerhs": {
+    "defaultMessage": "Max",
+    "description": "max"
+  },
+  "u/XTL7": {
+    "defaultMessage": "Crear posición",
+    "description": "create position"
+  },
+  "u19uie": {
+    "defaultMessage": "Unwrap",
+    "description": "unwrap agg"
+  },
+  "uRlu53": {
+    "defaultMessage": "{step} - Se está confirmando la aprobación del token",
+    "description": "transationStepWaitApprove"
+  },
+  "uZWTRx": {
+    "defaultMessage": "¿Cómo podemos mejorarlo?",
+    "description": "feedbackInput"
+  },
+  "vNNVGj": {
+    "defaultMessage": "Por ejemplo, supongamos que ha creado una posición que intercambia 2000 USDC por ETH cada día. Supongamos también que, cuando se ejecuta el intercambio, 2000 USDC = 1 ETH. En lugar de obtener 1 ETH, estaría obteniendo 1 ETH - 0,6% = 0,994 ETH. Ese 0,6% se dividirá entre Mean Finance y el usuario que realmente ejecutó ese intercambio.",
+    "description": "faqDoINeedToPayAnyFeesResponsePart2"
+  },
+  "vVsvjq": {
+    "defaultMessage": "Retirar como {to}",
+    "description": "withdraw swapped as"
+  },
+  "vXfC3z": {
+    "defaultMessage": "Usted ha rechazado la transacción",
+    "description": "rejected_transaction"
+  },
+  "vlDLmo": {
+    "defaultMessage": "Usted invertirá",
+    "description": "invest detail"
+  },
+  "vmGAxP": {
+    "defaultMessage": "Usted recibe",
+    "description": "youReceive"
+  },
+  "vqkOyW": {
+    "defaultMessage": "Most received",
+    "description": "sortMostReturnSellOrder"
+  },
+  "vy3jnS": {
+    "defaultMessage": "Transferir posición {from}/{to}",
+    "description": "transfer title"
+  },
+  "wEwpFI": {
+    "defaultMessage": "Crear posición",
+    "description": "Create position submit"
+  },
+  "wJOLei": {
+    "defaultMessage": "Intercambiando",
+    "description": "swap agg loading"
+  },
+  "wY55VA": {
+    "defaultMessage": "Sin comisiones por depósitos o retiros",
+    "description": "faqWhyShouldIUseMeanFinanceResponsePart5"
+  },
+  "wZ9OAC": {
+    "defaultMessage": "La popularidad/demanda de los tokens incluido en el intercambio",
+    "description": "faqWhyIsMyPositionStaleResponsePart3"
+  },
+  "wzEneQ": {
+    "defaultMessage": "Cerrar",
+    "description": "Close"
+  },
+  "x0hPUt": {
+    "defaultMessage": "a",
+    "description": "positionModifiedRateTo"
+  },
+  "xTAANF": {
+    "defaultMessage": "Este par es",
+    "description": "stale pair message"
+  },
+  "xTu77D": {
+    "defaultMessage": "Procesando",
+    "description": "transactionConfirmationProcessing"
+  },
+  "xqGD8L": {
+    "defaultMessage": "Empezar a generar yield",
+    "description": "startEarningYield"
+  },
+  "xu/Gut": {
+    "defaultMessage": "Posiciones cerradas",
+    "description": "terminatedPositions"
+  },
+  "xurFDH": {
+    "defaultMessage": "Mean Finance",
+    "description": "meanFinanceLegend"
+  },
+  "xybHU6": {
+    "defaultMessage": "Esto no se puede deshacer",
+    "description": "terminate warning"
+  },
+  "y2BvnY": {
+    "defaultMessage": "¿Qué es DCA?",
+    "description": "whatIsDca"
+  },
+  "yVecas": {
+    "defaultMessage": "índice:",
+    "description": "current rate remaining"
+  },
+  "yhA8mK": {
+    "defaultMessage": "#NAME?",
+    "description": "plusYield"
+  },
+  "z43qzX": {
+    "defaultMessage": "Conectar billetera",
+    "description": "Connect wallet"
+  },
+  "zNOHJl": {
+    "defaultMessage": "{step} - Se envió la aprobación del token",
+    "description": "transationStepWaitApprove"
+  },
+  "zTt+tt": {
+    "defaultMessage": "Seleccionado",
+    "description": "selected"
+  },
+  "zfveEm": {
+    "defaultMessage": "{from}/{to}",
+    "description": "graph description"
+  },
+  "zi0gLX": {
+    "defaultMessage": "Sin comisiones adicionales",
+    "description": "descNoFee"
+  },
+  "zlapVJ": {
+    "defaultMessage": "Costo de la transacción:",
+    "description": "quoteDataFee"
+  },
+  "zpPKoQ": {
+    "defaultMessage": "Retirar",
+    "description": "positionWithdrawn"
+  },
+  "zpSepL": {
+    "defaultMessage": "Aprobar {amount} {symbol}",
+    "description": "Allow us to use your coin (home exact)"
+  },
+  "zr2gP1": {
+    "defaultMessage": "Volver a posiciones",
+    "description": "backToPositions"
+  },
+  "zwn/c2": {
+    "defaultMessage": "Debido al bajo volumen es posible que el oráculo de precios para este par no sea confiable o preciso, lo que significa que los intercambios podrían no ejecutarse o ejecutarse con precios incorrectos. Proceda con precaución o pruebe con otro par",
+    "description": "low liquidity message"
+  },
+  "zx0Lgo": {
+    "defaultMessage": "¿Seré elegible para airdrops usando Mean Finance Meta Aggregator?",
+    "description": "faqWhatIs"
+  }
+}
