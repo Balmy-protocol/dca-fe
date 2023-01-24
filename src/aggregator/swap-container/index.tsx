@@ -21,6 +21,7 @@ import useCustomToken from 'hooks/useCustomToken';
 import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
 import { SwapSortOptions } from 'config/constants/aggregator';
+import useSwapOption from 'hooks/useSwapOption';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
@@ -47,6 +48,8 @@ const SwapContainer = () => {
     parseFloat(slippage),
     gasSpeed
   );
+  const [swapOption, isLoadingSwapOption] = useSwapOption(selectedRoute, transferTo, parseFloat(slippage), gasSpeed);
+
   const [refreshQuotes, setRefreshQuotes] = React.useState(true);
 
   React.useEffect(() => {
@@ -70,10 +73,14 @@ const SwapContainer = () => {
   }, [currentNetwork.chainId, fromParamCustomToken, toParamCustomToken]);
 
   React.useEffect(() => {
-    if (!isLoadingSwapOptions && swapOptions && swapOptions.length) {
+    if (!isLoadingSwapOptions && swapOptions && swapOptions.length && !swapOption) {
       dispatch(setSelectedRoute(swapOptions[0]));
     }
-  }, [isLoadingSwapOptions, sorting]);
+
+    if (!isLoadingSwapOption && swapOption && swapOption.id !== selectedRoute?.id) {
+      dispatch(setSelectedRoute(swapOption));
+    }
+  }, [isLoadingSwapOptions, swapOption, isLoadingSwapOption, sorting]);
 
   const onResetForm = () => {
     dispatch(resetForm());
@@ -160,7 +167,7 @@ const SwapContainer = () => {
           }
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
           selectedRoute={selectedRoute}
-          isLoadingRoute={isLoadingSwapOptions}
+          isLoadingRoute={isLoadingSwapOptions || isLoadingSwapOption}
           onResetForm={onResetForm}
           transferTo={transferTo}
           slippage={slippage}

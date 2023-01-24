@@ -274,7 +274,6 @@ const TokenPicker = ({
   const [inchBalances, isLoadingInchBalances] = use1InchBalances();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
 
-  console.log('selected network is', currentNetwork.chainId);
   const uniqTokensFromPairs = React.useMemo(
     () =>
       uniq(

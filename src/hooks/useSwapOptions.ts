@@ -43,7 +43,7 @@ function useSwapOptions(
   const prevValue = usePrevious(value);
   const prevIsBuyOrder = usePrevious(isBuyOrder);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(walletService.getAccount());
+  // const prevAccount = usePrevious(walletService.getAccount());
   const account = walletService.getAccount();
   const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
@@ -115,7 +115,7 @@ function useSwapOptions(
     if (
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
-      !isEqual(account, prevAccount) ||
+      // !isEqual(account, prevAccount) ||
       !isEqual(prevTo, to) ||
       !isEqual(prevValue, value) ||
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
@@ -141,7 +141,7 @@ function useSwapOptions(
     value,
     to,
     isBuyOrder,
-    prevAccount,
+    // prevAccount,
     account,
     prevPendingTrans,
     prevBlockNumber,
