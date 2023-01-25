@@ -187,12 +187,10 @@ const SwapQuote = ({
 
   const priceImpact =
     quote &&
-    (
-      Math.round(
-        ((Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) /
-          Number(quote.buyAmount.amountInUSD)) *
-          100
-      ) / 100
+    Math.round(
+      ((Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) /
+        Number(quote.buyAmount.amountInUSD)) *
+        100
     ).toFixed(2);
 
   return (
