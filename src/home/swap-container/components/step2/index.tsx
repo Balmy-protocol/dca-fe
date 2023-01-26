@@ -5,7 +5,7 @@ import isUndefined from 'lodash/isUndefined';
 import { DateTime } from 'luxon';
 import { AvailablePair, Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-easy-input';
 import {
@@ -165,6 +165,8 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
 
   const showNextSwapAvailableAt = !yieldEnabled || (yieldEnabled && !isUndefined(fromYield) && !isUndefined(toYield));
 
+  const intl = useIntl();
+
   return (
     <StyledGrid $show={show} container rowSpacing={2} ref={ref}>
       <Grid item xs={12}>
@@ -219,15 +221,18 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 description="rate detail"
                 defaultMessage="{frequency} for you for"
                 values={{
-                  frequency:
-                    STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
+                  frequency: intl.formatMessage(
+                    STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].every
+                  ),
                 }}
               />
             </Typography>
             <StyledInputContainer>
               <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} isMinimal />
             </StyledInputContainer>
-            {STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].subject}
+            {intl.formatMessage(
+              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
+            )}
           </StyledSummaryContainer>
         </StyledContentContainer>
       </Grid>
@@ -278,9 +283,10 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                       minimum: MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
                       minToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
                       symbol: from.symbol,
-                      frequency:
+                      frequency: intl.formatMessage(
                         STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                          .singularSubject,
+                          .singularSubject
+                      ),
                     }}
                   />
                 </Typography>

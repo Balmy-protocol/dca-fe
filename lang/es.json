@@ -344,7 +344,7 @@
     "description": "current remaining"
   },
   "CUp6QA": {
-    "defaultMessage": "{type} left",
+    "defaultMessage": "{type} restantes",
     "description": "days to finish"
   },
   "CZmJ1O": {
@@ -420,7 +420,7 @@
     "description": "transferPosition"
   },
   "F7BoEV": {
-    "defaultMessage": "Gas guardado",
+    "defaultMessage": "Gas ahorrado",
     "description": "gasSavedGraphTitle"
   },
   "FW4Fp5": {
@@ -1754,5 +1754,289 @@
   "zx0Lgo": {
     "defaultMessage": "¿Seré elegible para airdrops usando Mean Finance Meta Aggregator?",
     "description": "faqWhatIs"
+  },
+  "+IzX5q": {
+    "defaultMessage": "{readable}",
+    "description": "oneHourPluralTime"
+  },
+  "+Q63Eo": {
+    "defaultMessage": "La liquides de Livepeer en Arbitrum bajo considerablemente, por esto agregar fondos esta deshabilitado hasta que esta situacion se revierta.",
+    "description": "positionLPTNotSupported"
+  },
+  "+a8ibZ": {
+    "defaultMessage": "{readable} ({left} swaps)",
+    "description": "fiveMinutesPlural"
+  },
+  "+zKE+F": {
+    "defaultMessage": "1 hora",
+    "description": "oneHourSingularTime"
+  },
+  "07ZWiK": {
+    "defaultMessage": "hora",
+    "description": "oneHourSingularSubject"
+  },
+  "0dZuXG": {
+    "defaultMessage": "{readable}",
+    "description": "fiveMinutesPluralTime"
+  },
+  "0jTBFS": {
+    "defaultMessage": "cada 30 minutos",
+    "description": "thirtyMinutesEvery"
+  },
+  "0tTtPb": {
+    "defaultMessage": "1 semana (1 swap)",
+    "description": "oneWeekSingular"
+  },
+  "4jGULT": {
+    "defaultMessage": "dias",
+    "description": "oneDaySubject"
+  },
+  "5biMGi": {
+    "defaultMessage": "{readable} ({left} swaps)",
+    "description": "oneDayPlural"
+  },
+  "63iR05": {
+    "defaultMessage": "15 minutos",
+    "description": "fifteenMinutesSingularTime"
+  },
+  "8nVUyg": {
+    "defaultMessage": "minuto",
+    "description": "oneMinuteSingularSubject"
+  },
+  "B5AfY/": {
+    "defaultMessage": "{readable} ({left} swaps)",
+    "description": "oneMinutePlural"
+  },
+  "BWP9H/": {
+    "defaultMessage": "Uniswap",
+    "description": "uniswapLegend"
+  },
+  "CCmahn": {
+    "defaultMessage": "{readable} ({left} swaps)",
+    "description": "oneWeekPlural"
+  },
+  "Cnxwym": {
+    "defaultMessage": "15 minutos",
+    "description": "fifteenMinutesSingularSubject"
+  },
+  "DCQQov": {
+    "defaultMessage": "cada hora",
+    "description": "oneHourAdverb"
+  },
+  "DHaqgV": {
+    "defaultMessage": "cada 4 horas",
+    "description": "fourHoursAdverb"
+  },
+  "EOwwL1": {
+    "defaultMessage": "cada hora",
+    "description": "oneHourEvery"
+  },
+  "EVgPpp": {
+    "defaultMessage": "{readable} ({left} swaps)",
+    "description": "fifteenMinutesPlural"
+  },
+  "EWsGHv": {
+    "defaultMessage": "30 minutos",
+    "description": "thirtyMinutesSingularTime"
+  },
+  "EzesrO": {
+    "defaultMessage": "{readable} ({left} swaps)",
+    "description": "thirtyMinutesPlural"
+  },
+  "GIOkAT": {
+    "defaultMessage": "4 horas (1 swap)",
+    "description": "fourHoursSingular"
+  },
+  "GZNskB": {
+    "defaultMessage": "1 dia (1 swap)",
+    "description": "oneDaySingular"
+  },
+  "KASP2B": {
+    "defaultMessage": "cada 15 minutos",
+    "description": "fifteenMinutesEvery"
+  },
+  "KiN4dM": {
+    "defaultMessage": "swaps",
+    "description": "fiveMinutesSubject"
+  },
+  "KyAEIB": {
+    "defaultMessage": "1 semana",
+    "description": "oneWeekSingularTime"
+  },
+  "OPn8Nq": {
+    "defaultMessage": "{readable}",
+    "description": "thirtyMinutesPluralTime"
+  },
+  "OoEgv4": {
+    "defaultMessage": "swaps",
+    "description": "oneMinuteSubject"
+  },
+  "PxOAUe": {
+    "defaultMessage": "cada 30 minutos",
+    "description": "thiertyMinutesAdverb"
+  },
+  "Q35rqD": {
+    "defaultMessage": "5 minutos (1 swap)",
+    "description": "fiveMinutesSingular"
+  },
+  "QDVx7K": {
+    "defaultMessage": "Dados los ultimos desarrollos, Aaave pauso el prestamo y deposit de $jEUR. Como resultado, aumentar la posicion ah sido deshabilitado. Leer mas aqui",
+    "description": "positionJEURNotSupported"
+  },
+  "QrYw4z": {
+    "defaultMessage": "5 minutos",
+    "description": "fiveMinutesSingularSubject"
+  },
+  "RK1KtY": {
+    "defaultMessage": "{readable}",
+    "description": "oneMinutePluralTime"
+  },
+  "RknjsQ": {
+    "defaultMessage": "cada 4 horas",
+    "description": "fourHoursEvery"
+  },
+  "TGj1j/": {
+    "defaultMessage": "5 minutos",
+    "description": "fiveMinutesSingularTime"
+  },
+  "Tq773V": {
+    "defaultMessage": "{readable}",
+    "description": "oneDayPluralTime"
+  },
+  "WFZFMN": {
+    "defaultMessage": "cada 15 minutos",
+    "description": "fifteenMinutesAdverb"
+  },
+  "Yl6vl8": {
+    "defaultMessage": "swaps",
+    "description": "fourHoursSubject"
+  },
+  "Zsuz+g": {
+    "defaultMessage": "cada 1 minuto",
+    "description": "oneMinuteAdverb"
+  },
+  "bCOphI": {
+    "defaultMessage": "swaps",
+    "description": "thirtyMinutesSubject"
+  },
+  "d1oHnW": {
+    "defaultMessage": "{readable}",
+    "description": "oneWeekPluralTime"
+  },
+  "dINFAP": {
+    "defaultMessage": "1 dia",
+    "description": "oneDaySingularTime"
+  },
+  "dPkxyg": {
+    "defaultMessage": "swaps",
+    "description": "fifteenMinutesSubject"
+  },
+  "fohpme": {
+    "defaultMessage": "cada 1 minuto",
+    "description": "oneMinuteEvery"
+  },
+  "gQEJk+": {
+    "defaultMessage": "swaps",
+    "description": "oneHourSubject"
+  },
+  "gtB9V2": {
+    "defaultMessage": "30 minutos",
+    "description": "thirtyMinutesSingularSubject"
+  },
+  "isJmoe": {
+    "defaultMessage": "semana",
+    "description": "oneWeekSingularSubject"
+  },
+  "m4HBLn": {
+    "defaultMessage": "4 horas",
+    "description": "fourHoursSingularTime"
+  },
+  "nFFzXV": {
+    "defaultMessage": "15 minutos (1 swap)",
+    "description": "fifteenMinutesSingular"
+  },
+  "nV5R/e": {
+    "defaultMessage": "dia",
+    "description": "oneDaySingularSubject"
+  },
+  "naApNE": {
+    "defaultMessage": "30 minutos (1 swap)",
+    "description": "thirtyMinutesSingular"
+  },
+  "rjATQZ": {
+    "defaultMessage": "diariamente",
+    "description": "oneDayAdverb"
+  },
+  "ruGk7y": {
+    "defaultMessage": "cada 5 minutos",
+    "description": "fiveMinutesAdverb"
+  },
+  "rxZhd8": {
+    "defaultMessage": "cada semana",
+    "description": "oneWeekEvery"
+  },
+  "s+p6X2": {
+    "defaultMessage": "cada 5 minutos",
+    "description": "fiveMinutesEvery"
+  },
+  "sGTW0U": {
+    "defaultMessage": "{readable}",
+    "description": "fifteenMinutesPluralTime"
+  },
+  "tHbIgJ": {
+    "defaultMessage": "semanalmente",
+    "description": "oneWeekAdverb"
+  },
+  "tiJ3Vs": {
+    "defaultMessage": "1 minuto (1 swap)",
+    "description": "oneMinuteSingular"
+  },
+  "v1SP5g": {
+    "defaultMessage": "4 horas",
+    "description": "fourHoursSingularSubject"
+  },
+  "vw/vGQ": {
+    "defaultMessage": "1 minuto",
+    "description": "oneMinuteSingularTime"
+  },
+  "wH5c58": {
+    "defaultMessage": "aqui.",
+    "description": "here"
+  },
+  "xxuJDG": {
+    "defaultMessage": "semanas",
+    "description": "oneWeekSubject"
+  },
+  "yoTCFN": {
+    "defaultMessage": "{readable} ({left} swaps)",
+    "description": "fourHoursPlural"
+  },
+  "z/57ga": {
+    "defaultMessage": "{readable}",
+    "description": "fourHoursPluralTime"
+  },
+  "zG7r/G": {
+    "defaultMessage": "{readable} ({left} swaps)",
+    "description": "oneHourPlural"
+  },
+  "zSo0el": {
+    "defaultMessage": "cada dia",
+    "description": "oneDayEvery"
+  },
+  "zuU6Ai": {
+    "defaultMessage": "1 hora (1 swap)",
+    "description": "oneHourSingular"
+  },
+  "eyJz83": {
+    "defaultMessage": "Precio promedio",
+    "description": "positionDetailsAverageBuyPriceOption"
+  },
+  "8rEEmK": {
+    "defaultMessage": "DCA vs Lump sum",
+    "description": "positionDetailsProfitLossOption"
+  },
+  "NHDjvA": {
+    "defaultMessage": "Gas ahorrado",
+    "description": "positionDetailsGasSavedOption"
   }
 }

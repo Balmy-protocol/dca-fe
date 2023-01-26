@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import { Position } from 'types';
 import TokenInput from 'common/token-input';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import IconButton from '@mui/material/IconButton';
 import Button from 'common/button';
 import Typography from '@mui/material/Typography';
@@ -40,6 +40,7 @@ interface RemoveFundsSettingsProps {
 
 const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSettingsProps) => {
   const [fromValue, setFromValue] = React.useState('');
+  const intl = useIntl();
 
   const newRate = position.remainingSwaps.eq(BigNumber.from(0))
     ? BigNumber.from(0)
@@ -48,7 +49,7 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
         .div(BigNumber.from(position.remainingSwaps));
   const hasError = fromValue && parseUnits(fromValue, position.from.decimals).gt(position.remainingLiquidity);
   const shouldDisable = fromValue && parseUnits(fromValue, position.from.decimals).lte(BigNumber.from(0));
-  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), position.remainingSwaps.toString());
+  const frequencyType = getFrequencyLabel(intl, position.swapInterval.toString(), position.remainingSwaps.toString());
 
   return (
     <>
@@ -98,8 +99,9 @@ const RemoveFundsSettings = ({ position, onWithdraw, onClose }: RemoveFundsSetti
               values={{
                 from: position.from.symbol,
                 rate: formatUnits(newRate, position.from.decimals),
-                frequency:
-                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+                frequency: intl.formatMessage(
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
+                ),
                 frequencyPlural: frequencyType,
                 ammountOfSwaps: position.remainingSwaps.toString(),
               }}

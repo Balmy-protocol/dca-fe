@@ -10,6 +10,7 @@ import UNISubgraphs from 'utils/graphPricesApolloClient';
 import { Provider } from 'react-redux';
 import store, { axiosClient } from 'state';
 import { Theme } from '@mui/material/styles';
+import { Settings } from 'luxon';
 import LanguageContext from 'common/language-context';
 import { SupportedLanguages } from 'config/constants/lang';
 import MainApp from './frame';
@@ -20,17 +21,14 @@ declare module '@mui/styles/defaultTheme' {
 }
 
 type AppProps = {
-  messages: Record<string, string>;
   locale: SupportedLanguages;
 };
 
 function loadLocaleData(locale: SupportedLanguages) {
   switch (locale) {
     case 'es':
-      console.log('loads es messages');
       return EsMessages;
     default:
-      console.log('loads en messages');
       return EnMessages;
   }
 }
@@ -64,7 +62,10 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
     <LanguageContext.Provider
       value={{
         language: selectedLocale,
-        onChangeLanguage: setSelectedLocale,
+        onChangeLanguage: (newLocale: SupportedLanguages) => {
+          setSelectedLocale(newLocale);
+          Settings.defaultLocale = newLocale;
+        },
       }}
     >
       <WalletContext.Provider

@@ -4,7 +4,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Button from 'common/button';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { Position, Token } from 'types';
 import Chip from '@mui/material/Chip';
@@ -116,6 +116,7 @@ interface TerminantedPositionProps {
 const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
   const { from, to, swapInterval, swapped, totalDeposited, totalExecutedSwaps, chainId } = position;
 
+  const intl = useIntl();
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const supportedNetwork = find(NETWORKS, { chainId })!;
@@ -178,7 +179,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
               <FormattedMessage description="history run for in position" defaultMessage="Run for: " />
             </Typography>
             <Typography variant="body1" color="#FFFFFF" sx={{ marginLeft: '5px' }}>
-              {getFrequencyLabel(swapInterval.toString(), totalExecutedSwaps.toString())}
+              {getFrequencyLabel(intl, swapInterval.toString(), totalExecutedSwaps.toString())}
             </Typography>
           </StyledDetailWrapper>
           <StyledDetailWrapper>

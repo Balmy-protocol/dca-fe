@@ -3,8 +3,9 @@ import find from 'lodash/find';
 import some from 'lodash/some';
 import findIndex from 'lodash/findIndex';
 import { FullPosition, LastSwappedAt, Position, SwapInfo, Token, YieldOptions, AvailablePairs } from 'types';
-import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from 'config/constants';
+import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, toReadable } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { IntlShape } from 'react-intl';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -125,19 +126,21 @@ export const calculateStaleSwaps = (lastSwapped: number, frequencyType: BigNumbe
   return today.sub(nextSwapAvailable);
 };
 
-export const getFrequencyLabel = (frenquencyType: string, frequencyValue?: string) =>
+export const getFrequencyLabel = (intl: IntlShape, frenquencyType: string, frequencyValue?: string) =>
   frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
-    ? STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singular
-    : STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].plural(
-        parseInt(frequencyValue || '0', 10)
-      );
+    ? intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singular)
+    : intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].plural, {
+        readable: toReadable(parseInt(frequencyValue || '0', 10), Number(frenquencyType), intl),
+        left: parseInt(frequencyValue || '0', 10),
+      });
 
-export const getTimeFrequencyLabel = (frenquencyType: string, frequencyValue?: string) =>
+export const getTimeFrequencyLabel = (intl: IntlShape, frenquencyType: string, frequencyValue?: string) =>
   frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
-    ? STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singularTime
-    : STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].pluralTime(
-        parseInt(frequencyValue || '0', 10)
-      );
+    ? intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singularTime)
+    : intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].pluralTime, {
+        readable: toReadable(parseInt(frequencyValue || '0', 10), Number(frenquencyType), intl),
+        left: parseInt(frequencyValue || '0', 10),
+      });
 
 export const capitalizeFirstLetter = (toCap: string) => toCap.charAt(0).toUpperCase() + toCap.slice(1);
 

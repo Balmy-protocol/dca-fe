@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Position } from 'types';
 import FrequencyInput from 'common/frequency-input';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import IconButton from '@mui/material/IconButton';
 import Button from 'common/button';
 import Typography from '@mui/material/Typography';
@@ -37,7 +37,8 @@ interface ModifySwapsSettingsProps {
 
 const modifySwapsSettings = ({ position, onModifySwaps, onClose }: ModifySwapsSettingsProps) => {
   const [frequencyValue, setFrequencyValue] = React.useState(position.remainingSwaps.toString());
-  const frequencyType = getFrequencyLabel(position.swapInterval.toString(), frequencyValue);
+  const intl = useIntl();
+  const frequencyType = getFrequencyLabel(intl, position.swapInterval.toString(), frequencyValue);
   const hasError = frequencyValue && BigNumber.from(frequencyValue).lte(BigNumber.from(0));
 
   return (

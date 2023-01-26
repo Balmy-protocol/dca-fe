@@ -74,7 +74,7 @@ type SelectOptionsType<T> = SelectOption<T>[];
 
 interface SelectOption<T> {
   value?: T;
-  label: string;
+  label: React.ReactNode;
   key: string | number;
 }
 

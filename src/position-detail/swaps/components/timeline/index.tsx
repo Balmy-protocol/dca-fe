@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
 import Grid from '@mui/material/Grid';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -352,34 +352,41 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
 
 const buildCreatedItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <CreatedIcon />,
-  content: () => (
-    <>
-      <Grid item xs={12}>
-        <StyledTimelineWrappedContent variant="body1">
-          <StyledTitleMainText variant="body1">
-            <FormattedMessage description="positionCreatedRate" defaultMessage="Rate:" />
-          </StyledTitleMainText>
-          <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-            <Typography variant="body1">
-              {formatCurrencyAmount(BigNumber.from(positionState.rateUnderlying || positionState.rate), position.from)}
-            </Typography>
-          </CustomChip>
-        </StyledTimelineWrappedContent>
-      </Grid>
-      <Grid item xs={12}>
-        <Typography
-          variant="body1"
-          component="p"
-          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-        >
-          <StyledTitleMainText variant="body1">
-            <FormattedMessage description="positionCreatedSwaps" defaultMessage="Set to run for:" />
-          </StyledTitleMainText>
-          {` ${getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps)}`}
-        </Typography>
-      </Grid>
-    </>
-  ),
+  content: () => {
+    const intl = useIntl();
+
+    return (
+      <>
+        <Grid item xs={12}>
+          <StyledTimelineWrappedContent variant="body1">
+            <StyledTitleMainText variant="body1">
+              <FormattedMessage description="positionCreatedRate" defaultMessage="Rate:" />
+            </StyledTitleMainText>
+            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+              <Typography variant="body1">
+                {formatCurrencyAmount(
+                  BigNumber.from(positionState.rateUnderlying || positionState.rate),
+                  position.from
+                )}
+              </Typography>
+            </CustomChip>
+          </StyledTimelineWrappedContent>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography
+            variant="body1"
+            component="p"
+            style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
+          >
+            <StyledTitleMainText variant="body1">
+              <FormattedMessage description="positionCreatedSwaps" defaultMessage="Set to run for:" />
+            </StyledTitleMainText>
+            {` ${getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps)}`}
+          </Typography>
+        </Grid>
+      </>
+    );
+  },
   title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
@@ -544,27 +551,30 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
 
 const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <SettingsIcon />,
-  content: () => (
-    <>
-      <Grid item xs={12}>
-        <Typography variant="body1">
-          <FormattedMessage
-            description="positionModifiedSwaps"
-            defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
-            values={{
-              increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
-                BigNumber.from(positionState.remainingSwaps)
-              )
-                ? 'Increased'
-                : 'Decreased',
-              frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
-              oldFrequency: getFrequencyLabel(position.swapInterval.interval, positionState.oldRemainingSwaps),
-            }}
-          />
-        </Typography>
-      </Grid>
-    </>
-  ),
+  content: () => {
+    const intl = useIntl();
+    return (
+      <>
+        <Grid item xs={12}>
+          <Typography variant="body1">
+            <FormattedMessage
+              description="positionModifiedSwaps"
+              defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
+              values={{
+                increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
+                  BigNumber.from(positionState.remainingSwaps)
+                )
+                  ? 'Increased'
+                  : 'Decreased',
+                frequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps),
+                oldFrequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.oldRemainingSwaps),
+              }}
+            />
+          </Typography>
+        </Grid>
+      </>
+    );
+  },
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Changed duration" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
@@ -576,6 +586,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
   content: () => {
     const rate = positionState.rateUnderlying || positionState.rate;
     const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
+    const intl = useIntl();
     return (
       <>
         <Grid item xs={12}>
@@ -607,8 +618,8 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
                 )
                   ? 'Increased'
                   : 'Decreased',
-                frequency: getFrequencyLabel(position.swapInterval.interval, positionState.remainingSwaps),
-                oldFrequency: getFrequencyLabel(position.swapInterval.interval, positionState.oldRemainingSwaps),
+                frequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps),
+                oldFrequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.oldRemainingSwaps),
               }}
             />
           </Typography>

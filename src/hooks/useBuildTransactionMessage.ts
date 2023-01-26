@@ -26,6 +26,7 @@ import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
+import { useIntl } from 'react-intl';
 import { getFrequencyLabel } from 'utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
@@ -34,6 +35,7 @@ function useBuildTransactionMessages() {
   const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
+  const intl = useIntl();
 
   const positions = React.useMemo(() => [...pastPositions, ...currentPositions], [currentPositions, pastPositions]);
 
@@ -109,6 +111,7 @@ function useBuildTransactionMessages() {
             } have been added to your ${(resettedPosition as Position).from.symbol}:${
               (resettedPosition as Position).to.symbol
             } position and it has been set to run for ${getFrequencyLabel(
+              intl,
               swapInterval.toString(),
               resetPositionTypeData.newSwaps
             )}`;
@@ -137,6 +140,7 @@ function useBuildTransactionMessages() {
             message = `Your ${(modifiedPosition as Position).from.symbol}:${
               (modifiedPosition as Position).to.symbol
             } position has now been set to run for ${getFrequencyLabel(
+              intl,
               swapInterval.toString(),
               modifySwapsPositionTypeData.newSwaps
             )}`;
@@ -153,9 +157,9 @@ function useBuildTransactionMessages() {
               (modifiedRatePosition as Position).to.symbol
             } position has now been set swap ${modifyRateAndSwapsPositionTypeData.newRate} ${
               (modifiedRatePosition as Position).from.symbol
-            } ${
+            } ${intl.formatMessage(
               STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
-            } for ${getFrequencyLabel(swapInterval.toString(), modifyRateAndSwapsPositionTypeData.newSwaps)}`;
+            )} for ${getFrequencyLabel(intl, swapInterval.toString(), modifyRateAndSwapsPositionTypeData.newSwaps)}`;
           }
           break;
         }

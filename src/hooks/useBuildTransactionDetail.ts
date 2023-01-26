@@ -25,6 +25,7 @@ import {
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
+import { useIntl } from 'react-intl';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { getFrequencyLabel } from 'utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
@@ -34,6 +35,7 @@ function useBuildTransactionDetail() {
   const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
+  const intl = useIntl();
 
   const positions = React.useMemo(() => [...pastPositions, ...currentPositions], [currentPositions, pastPositions]);
 
@@ -118,7 +120,7 @@ function useBuildTransactionDetail() {
                 (resettedPosition as Position).from.symbol
               }:${(resettedPosition as Position).to.symbol} position and set it to run for ${
                 resetPositionTypeData.newSwaps
-              } ${getFrequencyLabel(swapInterval.toString(), resetPositionTypeData.newSwaps)}`;
+              } ${getFrequencyLabel(intl, swapInterval.toString(), resetPositionTypeData.newSwaps)}`;
             }
             break;
           }
@@ -130,6 +132,7 @@ function useBuildTransactionDetail() {
               message = `Modify ${(modifiedPosition as Position).from.symbol}:${
                 (modifiedPosition as Position).to.symbol
               } position to run for ${modifySwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
+                intl,
                 swapInterval.toString(),
                 modifySwapsPositionTypeData.newSwaps
               )}`;
@@ -171,9 +174,9 @@ function useBuildTransactionDetail() {
                 (modifiedRatePosition as Position).to.symbol
               } position to swap ${modifyRateAndSwapsPositionTypeData.newRate} ${
                 (modifiedRatePosition as Position).from.symbol
-              } ${
+              } ${intl.formatMessage(
                 STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
-              } for ${getFrequencyLabel(swapInterval.toString(), modifyRateAndSwapsPositionTypeData.newSwaps)}`;
+              )} for ${getFrequencyLabel(intl, swapInterval.toString(), modifyRateAndSwapsPositionTypeData.newSwaps)}`;
             }
             break;
           }

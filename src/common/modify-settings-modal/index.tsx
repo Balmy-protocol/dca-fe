@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import Modal from 'common/modal';
 import { Position } from 'types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useHasPendingApproval, useTransactionAdder } from 'state/transactions/hooks';
@@ -93,6 +93,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const contractService = useContractService();
   const addTransaction = useTransactionAdder();
   const currentNetwork = useCurrentNetwork();
+  const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [hasSignSupport] = useSupportsSigning();
   const remainingLiquidity = (depositedRateUnderlying || oldRate).mul(remainingSwaps);
@@ -265,8 +266,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   to: position.to.symbol,
                   rate,
                   frequency: frequencyValue,
-                  frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
-                  frequencyTypePlural: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
+                  frequencyType: intl.formatMessage(STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb),
+                  frequencyTypePlural: getFrequencyLabel(intl, position.swapInterval.toString(), frequencyValue),
                 }}
               />
             </Typography>
@@ -309,8 +310,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               to: position.to.symbol,
               rate,
               frequency: frequencyValue,
-              frequencyType: STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb,
-              frequencyTypePlural: getFrequencyLabel(position.swapInterval.toString(), frequencyValue),
+              frequencyType: intl.formatMessage(STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb),
+              frequencyTypePlural: getFrequencyLabel(intl, position.swapInterval.toString(), frequencyValue),
             }}
           />
         ),
@@ -536,7 +537,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 description="howManyFreq"
                 defaultMessage="How many {type}?"
                 values={{
-                  type: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject,
+                  type: intl.formatMessage(
+                    STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
+                  ),
                 }}
               />
             </Typography>
@@ -564,7 +567,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 description="rate detail"
                 defaultMessage="{yield}{frequency} for you for"
                 values={{
-                  frequency: STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every,
+                  frequency: intl.formatMessage(
+                    STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
+                  ),
                   yield: hasYield ? '+ yield ' : '',
                 }}
               />
@@ -572,7 +577,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             <StyledInputContainer>
               <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} isMinimal />
             </StyledInputContainer>
-            {STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject}
+            {intl.formatMessage(
+              STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
+            )}
           </StyledSummaryContainer>
         </Grid>
         <Grid item xs={12}>

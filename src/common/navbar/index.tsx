@@ -13,7 +13,6 @@ import { changeMainTab } from 'state/tabs/actions';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
-import LanguageLabel from 'common/lang-label';
 import { useHistory, useLocation } from 'react-router-dom';
 import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
@@ -123,7 +122,6 @@ const NavBar = ({ isLoading }: NavBarProps) => {
         </StyledNavbarMainContent>
         <StyledNavbarEndContent>
           <StyledButtonContainer breakpoint={currentBreakPoint}>
-            <LanguageLabel />
             <NetworkLabel network={currentNetwork} />
             <WalletContext.Consumer>
               {({ web3Service }) =>

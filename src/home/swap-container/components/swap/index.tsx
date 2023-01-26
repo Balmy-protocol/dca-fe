@@ -6,7 +6,7 @@ import isUndefined from 'lodash/isUndefined';
 import { Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import TokenPicker from 'common/token-picker';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
@@ -158,6 +158,7 @@ const Swap = ({
   const walletService = useWalletService();
   const positionService = usePositionService();
   const contractService = useContractService();
+  const intl = useIntl();
   const availablePairs = useAvailablePairs();
   const errorService = useErrorService();
   // const pairService = usePairService();
@@ -746,8 +747,9 @@ const Swap = ({
             minimum: MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || MINIMUM_USD_RATE_FOR_DEPOSIT,
             minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
             symbol: from?.symbol || '',
-            frequency:
-              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject,
+            frequency: intl.formatMessage(
+              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject
+            ),
           }}
         />
       </Typography>
