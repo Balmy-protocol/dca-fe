@@ -26,6 +26,7 @@ import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting, transferTo } = useAggregatorState();
@@ -36,6 +37,7 @@ const SwapContainer = () => {
   const fromParamToken = useToken(fromParam, true, true);
   const toParamToken = useToken(toParam, true, true);
   const history = useHistory();
+  const actualCurrentNetwork = useCurrentNetwork();
   const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
   const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
@@ -53,7 +55,7 @@ const SwapContainer = () => {
   const [refreshQuotes, setRefreshQuotes] = React.useState(true);
 
   React.useEffect(() => {
-    dispatch(setAggregatorChainId(Number(chainId || NETWORKS.mainnet.chainId)));
+    dispatch(setAggregatorChainId(Number(actualCurrentNetwork.chainId || chainId || NETWORKS.mainnet.chainId)));
   }, []);
 
   React.useEffect(() => {
@@ -62,7 +64,7 @@ const SwapContainer = () => {
     } else if (fromParamCustomToken && !from) {
       dispatch(setFrom(fromParamCustomToken.token));
     } else if (!from && !to && !toParamToken && !toParamCustomToken) {
-      dispatch(setFrom(getProtocolToken(Number(chainId || currentNetwork.chainId))));
+      dispatch(setFrom(getProtocolToken(Number(actualCurrentNetwork.chainId || chainId || currentNetwork.chainId))));
     }
 
     if (toParamToken) {

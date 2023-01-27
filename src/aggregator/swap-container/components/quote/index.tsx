@@ -187,13 +187,18 @@ const SwapQuote = ({
 
   const priceImpact =
     quote &&
-    Math.round(
-      (((Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) /
-        Number(quote.buyAmount.amountInUSD)) *
-        10000) /
-        100
+    (
+      Math.round(
+        ((Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) /
+          Number(quote.buyAmount.amountInUSD)) *
+          10000
+      ) / 100
     ).toFixed(2);
 
+  console.log(
+    quote.swapper.name,
+    (Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) / Number(quote.buyAmount.amountInUSD)
+  );
   return (
     <StyledPaper $isSelected={isSelected} onClick={() => !disabled && setRoute(quote)} $disabled={disabled}>
       <StyledTitleContainer>
