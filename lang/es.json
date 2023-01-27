@@ -4,7 +4,7 @@
     "description": "token list"
   },
   "+O0pfN": {
-    "defaultMessage": "Aquí",
+    "defaultMessage": "aquí",
     "description": "faqIsMeanFinanceAuditedHere"
   },
   "+UA1IX": {
@@ -84,7 +84,7 @@
     "description": "gasSavedBullet"
   },
   "1HDQ5y": {
-    "defaultMessage": "¿Cuántos {type}?",
+    "defaultMessage": "Cantidad de {type}",
     "description": "howManyFreq"
   },
   "1ZfCXS": {
@@ -196,7 +196,7 @@
     "description": "howItWorksDescriptionStep3"
   },
   "7oK1Kh": {
-    "defaultMessage": "Cuando un par específico tiene algunos intercambios que no se han ejecutado en bastante tiempo, el par se señala como obsoleto.",
+    "defaultMessage": "Cuando un par específico tiene algunos intercambios que no se han ejecutado en bastante tiempo, el par se señala como parado.",
     "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart5"
   },
   "8ZD9RJ": {
@@ -304,7 +304,7 @@
     "description": "quoteDataMaximumTooltip"
   },
   "BZcZ2I": {
-    "defaultMessage": "Cuando configura una posición, está creando la intención de intercambiar un token por otro. Entonces, algún usuario externo puede venir y ejecutar el intercambio por usted, respetando la frecuencia deseada. Cuando ejecuten su intercambio, se le cobrará una comisión del 0,6% sobre el importe intercambiado. Esta comisión se reparte entre Mean Finance y el canjeador. Como no tiene que ejecutar el intercambio usted mismo, no necesita pagar gas.",
+    "defaultMessage": "Cuando configura una posición, está creando la intención de intercambiar un token por otro. Entonces, algún usuario externo puede venir y ejecutar el intercambio por usted, respetando la frecuencia deseada. Cuando ejecuten su intercambio, se le cobrará una comisión del 0,6% sobre el importe intercambiado. Esta comisión se reparte entre Mean Finance y el operador. Como no tiene que ejecutar el intercambio usted mismo, no necesita pagar gas.",
     "description": "faqHowDoesMeanFinanceWorkResponse"
   },
   "Bh1aAA": {
@@ -1048,7 +1048,7 @@
     "description": "terminate description"
   },
   "aEQUw9": {
-    "defaultMessage": "Sección de retornos",
+    "defaultMessage": "sección de retornos",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart8"
   },
   "aPrJJm": {
@@ -2286,5 +2286,37 @@
   "vQABrE": {
     "defaultMessage": "Vista detallada",
     "description": "detailedView"
+  },
+  "4/vG7I": {
+    "defaultMessage": "Transferir una posición",
+    "description": "feedbackOptionTransferPosition"
+  },
+  "6Ldaay": {
+    "defaultMessage": "Otro",
+    "description": "feedbackOptionOther"
+  },
+  "7nNkhI": {
+    "defaultMessage": "Retirar de una posición",
+    "description": "feedbackOptionWithdrawPosition"
+  },
+  "g5MiM3": {
+    "defaultMessage": "Modificar una posición",
+    "description": "feedbackOptionModifyPosition"
+  },
+  "l5M7uf": {
+    "defaultMessage": "Crear una posición",
+    "description": "feedbackOptionCreatePosition"
+  },
+  "x0ln0H": {
+    "defaultMessage": "Ver mi posición",
+    "description": "feedbackOptionViewPosition"
+  },
+  "xf12eg": {
+    "defaultMessage": "Cerrar una posición",
+    "description": "feedbackOptionClosePosition"
+  },
+  "UCfz8b": {
+    "defaultMessage": "Contamos como podemos mejorar esto para ti",
+    "description": "feedbackTextFieldPlaceholder"
   }
 }

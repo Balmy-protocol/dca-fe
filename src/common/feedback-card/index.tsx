@@ -5,7 +5,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Button from 'common/button';
 import { FormControl, InputLabel, MenuItem, Select, Slide, TextField, Typography } from '@mui/material';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useMeanApiService from 'hooks/useMeanApiService';
 
 const StyledFeedbackCardContainer = styled.div`
@@ -50,31 +50,52 @@ const StyledFormContainer = styled.div`
 const ACTIONS = [
   {
     value: 0,
-    label: 'Creating a position',
+    label: defineMessage({
+      description: 'feedbackOptionCreatePosition',
+      defaultMessage: 'Creating a position',
+    }),
   },
   {
     value: 1,
-    label: 'Modify a position',
+    label: defineMessage({
+      description: 'feedbackOptionModifyPosition',
+      defaultMessage: 'Modify a position',
+    }),
   },
   {
     value: 2,
-    label: 'Withdraw from a position',
+    label: defineMessage({
+      description: 'feedbackOptionWithdrawPosition',
+      defaultMessage: 'Withdraw from a position',
+    }),
   },
   {
     value: 3,
-    label: 'Close a position',
+    label: defineMessage({
+      description: 'feedbackOptionClosePosition',
+      defaultMessage: 'Close a position',
+    }),
   },
   {
     value: 4,
-    label: 'Transfer a position',
+    label: defineMessage({
+      description: 'feedbackOptionTransferPosition',
+      defaultMessage: 'Transfer a position',
+    }),
   },
   {
     value: 5,
-    label: 'View my position',
+    label: defineMessage({
+      description: 'feedbackOptionViewPosition',
+      defaultMessage: 'View my position',
+    }),
   },
   {
     value: 6,
-    label: 'Other',
+    label: defineMessage({
+      description: 'feedbackOptionOther',
+      defaultMessage: 'Other',
+    }),
   },
 ];
 
@@ -82,6 +103,7 @@ const FeedbackCard = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [description, setDescription] = React.useState<string | undefined>(undefined);
   const [action, setAction] = React.useState<number | undefined>(undefined);
+  const intl = useIntl();
 
   const meanApiService = useMeanApiService();
 
@@ -91,7 +113,7 @@ const FeedbackCard = () => {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    meanApiService.logFeedback(ACTIONS[action].label, description);
+    meanApiService.logFeedback(intl.formatMessage(ACTIONS[action].label), description);
 
     setDescription(undefined);
     setAction(undefined);
@@ -126,7 +148,7 @@ const FeedbackCard = () => {
                 onChange={(event) => setAction(event.target.value as number)}
               >
                 {ACTIONS.map((actionOption) => (
-                  <MenuItem value={actionOption.value}>{actionOption.label}</MenuItem>
+                  <MenuItem value={actionOption.value}>{intl.formatMessage(actionOption.label)}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -135,7 +157,12 @@ const FeedbackCard = () => {
             </Typography>
             <TextField
               id="filled-textarea"
-              placeholder="Tell us how we can improve this for you"
+              placeholder={intl.formatMessage(
+                defineMessage({
+                  description: 'feedbackTextFieldPlaceholder',
+                  defaultMessage: 'Tell us how we can improve this for you',
+                })
+              )}
               multiline
               variant="filled"
               rows={4}

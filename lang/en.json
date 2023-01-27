@@ -151,6 +151,10 @@
     "defaultMessage": "Position Closed",
     "description": "timelineTypeWithdrawn"
   },
+  "4/vG7I": {
+    "defaultMessage": "Transfer a position",
+    "description": "feedbackOptionTransferPosition"
+  },
   "4IAoDw": {
     "defaultMessage": "({toPrice} USD)",
     "description": "current swapped in position price"
@@ -199,6 +203,10 @@
     "defaultMessage": "Market Makers should execute your swap anytime now",
     "description": "positionDetailsNextSwapInProgressTooltip"
   },
+  "6Ldaay": {
+    "defaultMessage": "Other",
+    "description": "feedbackOptionOther"
+  },
   "6lcY/P": {
     "defaultMessage": "When will my position be swapped?",
     "description": "faqWhenWillMyPositionBeSwapped"
@@ -230,6 +238,10 @@
   "7lJ5Ep": {
     "defaultMessage": "By terminating the current position {toWithdraw} {to} will be sent to your wallet.",
     "description": "howItWorksDescriptionStep3"
+  },
+  "7nNkhI": {
+    "defaultMessage": "Withdraw from a position",
+    "description": "feedbackOptionWithdrawPosition"
   },
   "7oK1Kh": {
     "defaultMessage": "When a specific pair has some swaps that haven’t been executed in quite some time, the pair is signaled as stale.",
@@ -963,6 +975,10 @@
     "defaultMessage": "{readable}",
     "description": "oneDayPluralTime"
   },
+  "UCfz8b": {
+    "defaultMessage": "Tell us how we can improve this for you",
+    "description": "feedbackTextFieldPlaceholder"
+  },
   "UHHRwl": {
     "defaultMessage": "Add address",
     "description": "Add address"
@@ -1339,6 +1355,10 @@
     "defaultMessage": "Setting your {from}/{to} position permissions has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "success modify permission for position"
   },
+  "g5MiM3": {
+    "defaultMessage": "Modify a position",
+    "description": "feedbackOptionModifyPosition"
+  },
   "gIl4Bi": {
     "defaultMessage": "Are you sure you want to withdraw {ammount} {to}?",
     "description": "Withdraw warning"
@@ -1494,6 +1514,10 @@
   "l4VKpl": {
     "defaultMessage": "The volume of the tokens involved in the swap",
     "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart4"
+  },
+  "l5M7uf": {
+    "defaultMessage": "Creating a position",
+    "description": "feedbackOptionCreatePosition"
   },
   "lBsNBG": {
     "defaultMessage": "Select platform",
@@ -1859,6 +1883,10 @@
     "defaultMessage": "to",
     "description": "positionModifiedRateTo"
   },
+  "x0ln0H": {
+    "defaultMessage": "View my position",
+    "description": "feedbackOptionViewPosition"
+  },
   "x2ydb5": {
     "defaultMessage": "Transfer {from}:{to} position to {address}",
     "description": "transactionDetailsTransfer"
@@ -1866,6 +1894,10 @@
   "xTAANF": {
     "defaultMessage": "This pair is",
     "description": "stale pair message"
+  },
+  "xf12eg": {
+    "defaultMessage": "Close a position",
+    "description": "feedbackOptionClosePosition"
   },
   "xqGD8L": {
     "defaultMessage": "Start generating yield",
