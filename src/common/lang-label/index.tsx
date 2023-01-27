@@ -5,11 +5,11 @@ import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
-import TokenIcon from 'common/token-icon';
-import useSelectedLanguage from 'hooks/useSelectedLanguage';
 import useChangeLanguage from 'hooks/useChangeLanguage';
-import { emptyTokenWithAddress } from 'utils/currency';
 import { SupportedLanguages, SUPPORTED_LANGUAGES_STRING } from 'config/constants/lang';
+import { useSelectedLocale } from 'state/config/hooks';
+import { useAppDispatch } from 'state/hooks';
+import { setSelectedLocale } from 'state/config/actions';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,11 +30,6 @@ const StyledMenuItem = styled(Button)`
   text-transform: none;
 `;
 
-const StyledTokenIconContainer = styled.div`
-  margin-right: 5px;
-  display: flex;
-`;
-
 const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
@@ -51,8 +46,13 @@ const LanguageLabel = () => {
   const popoverClasses = usePopoverStyles();
   const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const selectedLanguage = useSelectedLanguage();
+  const selectedLanguage = useSelectedLocale();
+  const dispatch = useAppDispatch();
   const changeLanguage = useChangeLanguage();
+
+  React.useEffect(() => {
+    changeLanguage(selectedLanguage);
+  }, [selectedLanguage]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -64,7 +64,7 @@ const LanguageLabel = () => {
     setShouldOpenNetworkMenu(false);
 
     if (newLang) {
-      changeLanguage(newLang as SupportedLanguages);
+      dispatch(setSelectedLocale(newLang as SupportedLanguages));
     }
   };
 
