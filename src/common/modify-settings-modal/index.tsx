@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import Modal from 'common/modal';
 import { Position } from 'types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useHasPendingApproval, useTransactionAdder } from 'state/transactions/hooks';
@@ -516,7 +516,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                       color="primary"
                     />
                   }
-                  label={`Use ${wrappedProtocolToken.symbol}`}
+                  label={
+                    <FormattedMessage
+                      description="useWrappedToken"
+                      defaultMessage="Use {token}"
+                      values={{ token: wrappedProtocolToken.symbol }}
+                    />
+                  }
                 />
               </FormGroup>
             )}
@@ -575,7 +581,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   frequency: intl.formatMessage(
                     STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
                   ),
-                  yield: hasYield ? '+ yield ' : '',
+                  yield: hasYield
+                    ? intl.formatMessage(
+                        defineMessage({
+                          defaultMessage: '+ yield',
+                          description: 'plusYield',
+                        })
+                      )
+                    : '',
                 }}
               />
             </Typography>

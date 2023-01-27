@@ -36,7 +36,7 @@
     "description": "faqWhenDoINeedToPayGasFeesResponsePart6"
   },
   "/LSdRt": {
-    "defaultMessage": "Los usuarios tienen que pagar tarifas de gas cuando interactúan con sus posiciones. Al mismo tiempo, hay una comisión de protocolo que se cobra en cada intercambio. Esa comisión es actualmente del 0,6%.",
+    "defaultMessage": "Los usuarios tienen que pagar tarifas de gas cuando interactúan con sus posiciónes. Al mismo tiempo, hay una comisión de protocolo que se cobra en cada intercambio. Esa comisión es actualmente del 0,6%.",
     "description": "faqDoINeedToPayAnyFeesResponsePart1"
   },
   "/gkMmp": {
@@ -228,7 +228,7 @@
     "description": "faq"
   },
   "9ka/f/": {
-    "defaultMessage": "Aún no hay posiciones de {status}",
+    "defaultMessage": "Aún no hay posiciónes de {status}",
     "description": "empty positions"
   },
   "9mxRvL": {
@@ -324,7 +324,7 @@
     "description": "disconnect"
   },
   "BsPq9s": {
-    "defaultMessage": "Compite por quién tiene más posiciones en Mean Finance",
+    "defaultMessage": "Compite por quién tiene más posiciónes en Mean Finance",
     "description": "leaderboard position"
   },
   "Bxzkan": {
@@ -352,11 +352,11 @@
     "description": "modifyPosition"
   },
   "CioUeM": {
-    "defaultMessage": "Uno o ambos tokens en esta posición permiten generar retornos mientras se intercambian sus posiciones. Le sugerimos crear una nueva posición para que empiece a generar retornos para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición.",
+    "defaultMessage": "Uno o ambos tokens en esta posición permiten generar retornos mientras se intercambian sus posiciónes. Le sugerimos crear una nueva posición para que empiece a generar retornos para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición.",
     "description": "whyYouShouldMigrate"
   },
   "Cxag1C": {
-    "defaultMessage": "Ver sus posiciones",
+    "defaultMessage": "Ver sus posiciónes",
     "description": "goBackToPositions"
   },
   "DIJWGT": {
@@ -476,7 +476,7 @@
     "description": "faqWhatIsResponse"
   },
   "GoFOv6": {
-    "defaultMessage": "Cambiar su {from}/{to} tasa de posición para intercambiar {rate} {from} {frequencyType} por {frequencyTypePlural}",
+    "defaultMessage": "Cambiar la frequencia de su posición {from}/{to} para intercambiar {rate} {from} {frequencyType} por {frequencyTypePlural}",
     "description": "Modifying rate for position"
   },
   "Gvb3qN": {
@@ -484,7 +484,7 @@
     "description": "faqWhenDoINeedToPayGasFeesResponsePart6"
   },
   "Gzs80Q": {
-    "defaultMessage": "Rate:",
+    "defaultMessage": "Frequencia:",
     "description": "positionCreatedRate"
   },
   "H/e6If": {
@@ -504,7 +504,7 @@
     "description": "inProgressPositions"
   },
   "HsmM3H": {
-    "defaultMessage": "Retirar el resto {token}",
+    "defaultMessage": "Retirar el {token} restante",
     "description": "withdraw funds"
   },
   "HuMusT": {
@@ -712,7 +712,7 @@
     "description": "tranferToTooltip"
   },
   "OalKNY": {
-    "defaultMessage": "Compite por quién tiene el mayor volumen intercambiado fijado en Mean Finance. Esto incluye la liquidez intercambiada en sus posiciones",
+    "defaultMessage": "Compite por quién tiene el mayor volumen intercambiado fijado en Mean Finance. Esto incluye la liquidez intercambiada en sus posiciónes",
     "description": "leaderboard traded volume"
   },
   "OdWJTU": {
@@ -804,7 +804,7 @@
     "description": "walletSettings"
   },
   "S2QomY": {
-    "defaultMessage": "Aquí verá los detalles de sus posiciones abiertas y podrá ver más detalles sobre ellas. Sólo podrá interactuar con ellas si está en la red correcta",
+    "defaultMessage": "Aquí verá los detalles de sus posiciónes abiertas y podrá ver más detalles sobre ellas. Sólo podrá interactuar con ellas si está en la red correcta",
     "description": "positions description"
   },
   "S2dFpy": {
@@ -984,11 +984,11 @@
     "description": "disabledDepositByUsdValue"
   },
   "YmpFX8": {
-    "defaultMessage": "Tus posiciones",
+    "defaultMessage": "Tus posiciónes",
     "description": "positions title"
   },
   "YpaT9e": {
-    "defaultMessage": "Compite por ver quién tiene más valor total fijado en Mean Finance. Esto incluye tanto la liquidez intercambiada como la no intercambiada en sus posiciones.",
+    "defaultMessage": "Compite por ver quién tiene más valor total fijado en Mean Finance. Esto incluye tanto la liquidez intercambiada como la no intercambiada en sus posiciónes.",
     "description": "leaderboard total value locked"
   },
   "ZATHUb": {
@@ -1028,7 +1028,7 @@
     "description": "faqWhyShouldIUseMeanFinance"
   },
   "ZaT+DW": {
-    "defaultMessage": "{yield}{frequency} para usted para",
+    "defaultMessage": "{yield}{frequency} para usted por",
     "description": "rate detail"
   },
   "Zw7FaX": {
@@ -1240,7 +1240,7 @@
     "description": "sortMostReturnSellOrderHelp"
   },
   "hUTWyY": {
-    "defaultMessage": "Esto permite a la dirección retirar su liquidez intercambiada de su posición",
+    "defaultMessage": "Esto permite a la dirección retirar la liquidez intercambiada de su posición",
     "description": "withdraw permission helptext"
   },
   "haoCMr": {
@@ -1396,7 +1396,7 @@
     "description": "withdrawWrapped"
   },
   "mz7RzW": {
-    "defaultMessage": "Agregar direccion",
+    "defaultMessage": "Agregar dirección",
     "description": "add permission add more addresses"
   },
   "n47KZD": {
@@ -1460,7 +1460,7 @@
     "description": "disabledByUsdValue"
   },
   "pMZxIC": {
-    "defaultMessage": "HECHO",
+    "defaultMessage": "TERMINADA",
     "description": "donePositions"
   },
   "pVaAUz": {
@@ -1500,7 +1500,7 @@
     "description": "faqWhyShouldIUseMeanFinanceResponsePart2"
   },
   "qCw/BH": {
-    "defaultMessage": "¿Se ha olvidado de su posición? Estas son las direcciones que tienen más valor para retirar entre sus posiciones",
+    "defaultMessage": "¿Se ha olvidado de su posición? Estas son las direcciones que tienen más valor para retirar entre sus posiciónes",
     "description": "leaderboard forgot"
   },
   "qHy8j2": {
@@ -1592,7 +1592,7 @@
     "description": "nextSwapCreate"
   },
   "tX40vS": {
-    "defaultMessage": "Los usuarios sólo tienen que pagar gas cuando interactúan con las posiciones. Esto incluye:",
+    "defaultMessage": "Los usuarios sólo tienen que pagar gas cuando interactúan con las posiciónes. Esto incluye:",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart1"
   },
   "taCH+c": {
@@ -1704,7 +1704,7 @@
     "description": "whatIsDca"
   },
   "yVecas": {
-    "defaultMessage": "frequencia:",
+    "defaultMessage": "Frequencia:",
     "description": "current rate remaining"
   },
   "yhA8mK": {
@@ -1744,7 +1744,7 @@
     "description": "Allow us to use your coin (home exact)"
   },
   "zr2gP1": {
-    "defaultMessage": "Volver a posiciones",
+    "defaultMessage": "Volver a posiciónes",
     "description": "backToPositions"
   },
   "zwn/c2": {
@@ -1880,7 +1880,7 @@
     "description": "fiveMinutesSingular"
   },
   "QDVx7K": {
-    "defaultMessage": "Dados los ultimos desarrollos, Aaave pauso el prestamo y deposit de $jEUR. Como resultado, aumentar la posicion ah sido deshabilitado. Leer mas aqui",
+    "defaultMessage": "Dados los ultimos desarrollos, Aaave pauso el prestamo y deposit de $jEUR. Como resultado, aumentar la posición ah sido deshabilitado. Leer mas aqui",
     "description": "positionJEURNotSupported"
   },
   "QrYw4z": {
@@ -2040,23 +2040,23 @@
     "description": "positionDetailsGasSavedOption"
   },
   "/ePQOu": {
-    "defaultMessage": "Nuestro Hub Companion fue aprobado para modificar tu {from}:{to} posicion",
+    "defaultMessage": "Nuestro Hub Companion fue aprobado para modificar tu posición {from}:{to}",
     "description": "transactionMessagesApproveCompanion"
   },
   "/wtb0w": {
-    "defaultMessage": "Modificar tu {from}:{to} posicion para ejecutarse por {swaps} {frequency}",
+    "defaultMessage": "Modificar tu posición {from}:{to} para ejecutarse por {swaps} {frequency}",
     "description": "transactionDetailsModifySwaps"
   },
   "1c3wKa": {
-    "defaultMessage": "Tu {from}:{to} posicion fue migrada",
+    "defaultMessage": "Tu posición {from}:{to} fue migrada",
     "description": "transactionMessagesMigrate"
   },
   "5H+bme": {
-    "defaultMessage": "Transaccion confirmada!",
+    "defaultMessage": "Transacción confirmada!",
     "description": "transactionMessagesConfirmed"
   },
   "5ncl7Y": {
-    "defaultMessage": "Migrar tu {from}:{to} posicion",
+    "defaultMessage": "Migrar tu posición {from}:{to}",
     "description": "transactionDetailsMigrate"
   },
   "7YJRiI": {
@@ -2064,23 +2064,23 @@
     "description": "transactionDetailsApproveToken"
   },
   "7fX0fL": {
-    "defaultMessage": "Retirar {amount} {from} fondos de tu {from}:{to} posicion",
+    "defaultMessage": "Retirar {amount} {from} fondos de tu posición {from}:{to}",
     "description": "transactionDetailsWithdrawFunds"
   },
   "9NqfNn": {
-    "defaultMessage": "Tu {from}:{to} posicion ahora va a intercambiar {rate} {freq} por {swaps}",
+    "defaultMessage": "Tu posición {from}:{to} ahora va a intercambiar {rate} {freq} por {swaps}",
     "description": "transactionMessagesModifyRateAndSwaps"
   },
   "CEv5tx": {
-    "defaultMessage": "{amount} {from} han sido agregados a tu {from}:{to} posicion",
+    "defaultMessage": "{amount} {from} han sido agregados a tu posición {from}:{to}",
     "description": "transactionMessagesAddFunds"
   },
   "EKvo9E": {
-    "defaultMessage": "Quitar {amount} {from} de la {from}:{to} posicion",
+    "defaultMessage": "Quitar {amount} {from} de la posición {from}:{to}",
     "description": "transactionDetailsRemoveFunds"
   },
   "Gg22iu": {
-    "defaultMessage": "Crear el {from}:{to} par",
+    "defaultMessage": "Crear el par {from}:{to}",
     "description": "transactionDetailsNewPair"
   },
   "IEFMij": {
@@ -2088,35 +2088,35 @@
     "description": "networkLabelWarning"
   },
   "IiX/g2": {
-    "defaultMessage": "Tu nueva {from}:{to} posicion fue creada",
+    "defaultMessage": "Tu nueva posición {from}:{to} fue creada",
     "description": "transactionMessagesNewPosition"
   },
   "J8hDoy": {
-    "defaultMessage": "Definir tu {from}:{to} posicion permisos",
+    "defaultMessage": "Definir tu posición {from}:{to} permisos",
     "description": "transactionDetailsModifyPermissions"
   },
   "JJ1fcj": {
-    "defaultMessage": "Transaccion confirmada!",
+    "defaultMessage": "Transacción confirmada!",
     "description": "transactionDetailsConfirmed"
   },
   "JOH6+p": {
-    "defaultMessage": "Retirar de tu {from}:{to} posicion",
+    "defaultMessage": "Retirar de tu posición {from}:{to}",
     "description": "transactionDetailsWithdraw"
   },
   "LQAOnp": {
-    "defaultMessage": "Los permisos de tu {from}:{to} posicion ahora estan definidos",
+    "defaultMessage": "Los permisos de tu posición {from}:{to} ahora estan definidos",
     "description": "transactionMessagesModifyPermissions"
   },
   "NSmm8H": {
-    "defaultMessage": "Agregar {amount} {from} a la {from}:{to} posicion",
+    "defaultMessage": "Agregar {amount} {from} a la posición {from}:{to}",
     "description": "transactionDetailsAddFunds"
   },
   "OTXQIc": {
-    "defaultMessage": "{amount} {from} fueron agregados a tu {from}:{to} posicion y va a ejecutarse por {swaps} {frequency}",
+    "defaultMessage": "{amount} {from} fueron agregados a tu posición {from}:{to} y va a ejecutarse por {swaps} {frequency}",
     "description": "transactionMessagesReset"
   },
   "PYOWcC": {
-    "defaultMessage": "Tu {from}:{to} posicion fue transferida a {address}",
+    "defaultMessage": "Tu posición {from}:{to} fue transferida a {address}",
     "description": "transactionMessagesTransfer"
   },
   "Q1G3hW": {
@@ -2124,15 +2124,15 @@
     "description": "transferToModalPlaceholder"
   },
   "QpkEk9": {
-    "defaultMessage": "Retiraste {amount} {from} fondos de tu {from}:{to} posicion",
+    "defaultMessage": "Retiraste {amount} {from} fondos de tu posición {from}:{to}",
     "description": "transactionMessagesWithdrawFunds"
   },
   "RCUD56": {
-    "defaultMessage": "Tu {from}:{to} posicion ahora esta generando retornos",
+    "defaultMessage": "Tu posición {from}:{to} ahora esta generando retornos",
     "description": "transactionMessagesMigrate"
   },
   "TC32uH": {
-    "defaultMessage": "Agregar {amount} {from} a tu {from}:{to} posicion y va a ejecutarse por {swaps} {frequency}",
+    "defaultMessage": "Agregar {amount} {from} a tu posición {from}:{to} y va a ejecutarse por {swaps} {frequency}",
     "description": "transactionDetailsReset"
   },
   "UJ3vcm": {
@@ -2140,11 +2140,11 @@
     "description": "freqEasyInputCustom"
   },
   "ZWFiru": {
-    "defaultMessage": "Tu {from}:{to} posicion fue cerrada",
+    "defaultMessage": "Tu posición {from}:{to} fue cerrada",
     "description": "transactionMessagesTerminate"
   },
   "ZaSmdn": {
-    "defaultMessage": "Cerrar tu {from}:{to} posicion",
+    "defaultMessage": "Cerrar tu posición {from}:{to}",
     "description": "transactionDetailsTerminate"
   },
   "b0Bg0T": {
@@ -2156,15 +2156,15 @@
     "description": "countDashboardPositions"
   },
   "c91iH2": {
-    "defaultMessage": "Modificar tu {from}:{to} posicion para intercambiar {rate} {freq} por {swaps}",
+    "defaultMessage": "Modificar tu posición {from}:{to} para intercambiar {rate} {freq} por {swaps}",
     "description": "transactionDetailsModifyRateAndSwaps"
   },
   "cA3qXj": {
-    "defaultMessage": "Approvar nuestro Hub Companion para modificar tu {from}:{to} posicion",
+    "defaultMessage": "Approvar nuestro Hub Companion para modificar tu posición {from}:{to}",
     "description": "transactionDetailsApproveCompanion"
   },
   "h96679": {
-    "defaultMessage": "Poner la address a la que quieres darle permisos",
+    "defaultMessage": "Poner la dirección a la que quieres darle permisos",
     "description": "addAddressPermisionModalPlaceholder"
   },
   "iWNnCB": {
@@ -2172,7 +2172,7 @@
     "description": "transactionMessagesWrap"
   },
   "jL8UGU": {
-    "defaultMessage": "Crear la {from}:{to} posicion",
+    "defaultMessage": "Crear la posición {from}:{to}",
     "description": "transactionDetailsNewPosition"
   },
   "jXIz7M": {
@@ -2184,7 +2184,7 @@
     "description": "transactionMessagesApproveTokenExact"
   },
   "ks0oAr": {
-    "defaultMessage": "Hacer que tu {from}:{to} posicion empieze a generar yield",
+    "defaultMessage": "Hacer que tu posición {from}:{to} empieze a generar retornos",
     "description": "transactionDetailsMigrate"
   },
   "kuWbwN": {
@@ -2192,11 +2192,11 @@
     "description": "transactionDetailsWrap"
   },
   "qQeTLj": {
-    "defaultMessage": "{amount} {from} fueron removidos de tu {from}:{to} posicion",
+    "defaultMessage": "{amount} {from} fueron removidos de tu posición {from}:{to}",
     "description": "transactionMessagesRemoveFunds"
   },
   "r7l7zf": {
-    "defaultMessage": "Retiraste de tu {from}:{to} posicion",
+    "defaultMessage": "Retiraste de tu posición {from}:{to}",
     "description": "transactionMessagesWithdraw"
   },
   "rLp2yg": {
@@ -2208,7 +2208,7 @@
     "description": "transactionDetailsApproveTokenExact"
   },
   "tdhen+": {
-    "defaultMessage": "Tu {from}:{to} posicion ahora se va a ejecutar por {swaps} {frequency}",
+    "defaultMessage": "Tu posición {from}:{to} ahora se va a ejecutar por {swaps} {frequency}",
     "description": "transactionMessagesModifySwaps"
   },
   "v/LxnW": {
@@ -2216,15 +2216,15 @@
     "description": "nextSwapCreateTime"
   },
   "x2ydb5": {
-    "defaultMessage": "Transferir tu {from}:{to} posicion a {address}",
+    "defaultMessage": "Transferir tu posición {from}:{to} a {address}",
     "description": "transactionDetailsTransfer"
   },
   "NQzhfq": {
-    "defaultMessage": "Aumentar posicion",
+    "defaultMessage": "Aumentar posición",
     "description": "permissionsIncreasePermission"
   },
   "th+wsU": {
-    "defaultMessage": "Reducir posicion",
+    "defaultMessage": "Reducir posición",
     "description": "permissionsReducePermission"
   },
   "OlMOmp": {
@@ -2232,11 +2232,11 @@
     "description": "permissionsWithdrawPermission"
   },
   "+vAQ2s": {
-    "defaultMessage": "Cerrar posicion",
+    "defaultMessage": "Cerrar posición",
     "description": "permissionsClosePermission"
   },
   "4Y/d8a": {
-    "defaultMessage": "Error creando posicion",
+    "defaultMessage": "Error creando posición",
     "description": "modalErrorCreatingPosition"
   },
   "CNGClN": {
@@ -2244,7 +2244,7 @@
     "description": "modalErrorApprovingToken"
   },
   "GLQaI9": {
-    "defaultMessage": "Error cerrando posicion",
+    "defaultMessage": "Error cerrando posición",
     "description": "modalErrorTerminate"
   },
   "WszPax": {
@@ -2252,7 +2252,7 @@
     "description": "modalErrorWithdraw"
   },
   "aT7Itp": {
-    "defaultMessage": "Error generando que la posicion genere retornos",
+    "defaultMessage": "Error generando que la posición genere retornos",
     "description": "modalErrorMigratingYieldPosition"
   },
   "e91MXw": {
@@ -2260,11 +2260,11 @@
     "description": "modalErrorWithdrawFunds"
   },
   "jJcSKd": {
-    "defaultMessage": "Error migrando la posicion",
+    "defaultMessage": "Error migrando la posición",
     "description": "modalErrorMigratingPosition"
   },
   "qodglE": {
-    "defaultMessage": "Error transfiriendo la posicion",
+    "defaultMessage": "Error transfiriendo la posición",
     "description": "modalErrorTransferPosition"
   },
   "r+KI3m": {
@@ -2278,5 +2278,13 @@
   "yuK53B": {
     "defaultMessage": "Error definiendo permisos",
     "description": "modalErrorPermissions"
+  },
+  "Vz0lLC": {
+    "defaultMessage": "Usar {token}",
+    "description": "useWrappedToken"
+  },
+  "vQABrE": {
+    "defaultMessage": "Vista detallada",
+    "description": "detailedView"
   }
 }

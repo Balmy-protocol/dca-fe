@@ -3,7 +3,7 @@ import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import TokenIcon from 'common/token-icon';
 import { DateTime } from 'luxon';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
@@ -366,7 +366,7 @@ const Details = ({
                         />
                       }
                       disableTypography
-                      label="Detailed view:"
+                      label={<FormattedMessage description="detailedView" defaultMessage="Detailed view" />}
                     />
                   </FormGroup>
                 </Typography>
@@ -613,7 +613,14 @@ const Details = ({
               defaultMessage="{frequency} {hasYield}"
               values={{
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                hasYield: position.from.underlyingTokens.length ? '+ yield' : '',
+                hasYield: position.from.underlyingTokens.length
+                  ? intl.formatMessage(
+                      defineMessage({
+                        defaultMessage: '+ yield',
+                        description: 'plusYield',
+                      })
+                    )
+                  : '',
                 frequency: intl.formatMessage(
                   STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every
                 ),

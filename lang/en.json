@@ -1003,6 +1003,10 @@
     "defaultMessage": "1 {from} = {currencySymbol}{swapRate} {to}",
     "description": "pairSwapDetails"
   },
+  "Vz0lLC": {
+    "defaultMessage": "Use {token}",
+    "description": "useWrappedToken"
+  },
   "W6JmVw": {
     "defaultMessage": "Seems like we encountered an error we could not handle",
     "description": "errorEncountered"
@@ -1798,6 +1802,10 @@
   "vNNVGj": {
     "defaultMessage": "For example, let’s assume that you’ve created a position that swaps 2000 USDC for ETH each day. Let’s also assume that, when the swap is executed, 2000 USDC = 1 ETH. Instead of getting 1 ETH, you would be getting 1 ETH - 0.6% = 0.994 ETH. That 0.6% will be split between Mean Finance and the user who actually executed the swap.",
     "description": "faqDoINeedToPayAnyFeesResponsePart2"
+  },
+  "vQABrE": {
+    "defaultMessage": "Detailed view",
+    "description": "detailedView"
   },
   "vVsvjq": {
     "defaultMessage": "Withdraw as {to}",

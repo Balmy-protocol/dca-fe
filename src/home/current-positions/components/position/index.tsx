@@ -7,7 +7,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, calculateStale, STALE, calculateYield, sortTokensByAddress } from 'utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from 'types';
@@ -417,7 +417,14 @@ const ActivePosition = ({
               defaultMessage="{frequency} {hasYield}"
               values={{
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                hasYield: position.from.underlyingTokens.length ? '+ yield' : '',
+                hasYield: position.from.underlyingTokens.length
+                  ? intl.formatMessage(
+                      defineMessage({
+                        defaultMessage: '+ yield',
+                        description: 'plusYield',
+                      })
+                    )
+                  : '',
                 frequency: intl.formatMessage(
                   STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
                 ),
