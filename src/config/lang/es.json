@@ -14,7 +14,7 @@
   "+O0pfN": [
     {
       "type": 0,
-      "value": "Aquí"
+      "value": "aquí"
     }
   ],
   "+Q63Eo": [
@@ -298,15 +298,11 @@
   "1HDQ5y": [
     {
       "type": 0,
-      "value": "¿Cuántos "
+      "value": "Cantidad de "
     },
     {
       "type": 1,
       "value": "type"
-    },
-    {
-      "type": 0,
-      "value": "?"
     }
   ],
   "1ZfCXS": [
@@ -391,6 +387,12 @@
     {
       "type": 0,
       "value": "Posición Cerrada"
+    }
+  ],
+  "4/vG7I": [
+    {
+      "type": 0,
+      "value": "Transferir una posición"
     }
   ],
   "47ajSH": [
@@ -533,6 +535,12 @@
       "value": "Los creadores de mercado ejecutarán su intercambio en cualquier momento."
     }
   ],
+  "6Ldaay": [
+    {
+      "type": 0,
+      "value": "Otro"
+    }
+  ],
   "6Mir2W": [
     {
       "type": 0,
@@ -665,10 +673,16 @@
       "value": " se enviará a su billetera."
     }
   ],
+  "7nNkhI": [
+    {
+      "type": 0,
+      "value": "Retirar de una posición"
+    }
+  ],
   "7oK1Kh": [
     {
       "type": 0,
-      "value": "Cuando un par específico tiene algunos intercambios que no se han ejecutado en bastante tiempo, el par se señala como obsoleto."
+      "value": "Cuando un par específico tiene algunos intercambios que no se han ejecutado en bastante tiempo, el par se señala como parado."
     }
   ],
   "8ZD9RJ": [
@@ -948,7 +962,7 @@
   "BZcZ2I": [
     {
       "type": 0,
-      "value": "Cuando configura una posición, está creando la intención de intercambiar un token por otro. Entonces, algún usuario externo puede venir y ejecutar el intercambio por usted, respetando la frecuencia deseada. Cuando ejecuten su intercambio, se le cobrará una comisión del 0,6% sobre el importe intercambiado. Esta comisión se reparte entre Mean Finance y el canjeador. Como no tiene que ejecutar el intercambio usted mismo, no necesita pagar gas."
+      "value": "Cuando configura una posición, está creando la intención de intercambiar un token por otro. Entonces, algún usuario externo puede venir y ejecutar el intercambio por usted, respetando la frecuencia deseada. Cuando ejecuten su intercambio, se le cobrará una comisión del 0,6% sobre el importe intercambiado. Esta comisión se reparte entre Mean Finance y el operador. Como no tiene que ejecutar el intercambio usted mismo, no necesita pagar gas."
     }
   ],
   "Bh1aAA": [
@@ -2803,6 +2817,12 @@
       "value": "readable"
     }
   ],
+  "UCfz8b": [
+    {
+      "type": 0,
+      "value": "Contamos como podemos mejorar esto para ti"
+    }
+  ],
   "UHHRwl": [
     {
       "type": 0,
@@ -3336,7 +3356,7 @@
   "aEQUw9": [
     {
       "type": 0,
-      "value": "Sección de retornos"
+      "value": "sección de retornos"
     }
   ],
   "aPrJJm": [
@@ -3793,6 +3813,12 @@
       "value": " se ha enviado correctamente al blockchain y se confirmará en breve"
     }
   ],
+  "g5MiM3": [
+    {
+      "type": 0,
+      "value": "Modificar una posición"
+    }
+  ],
   "gIl4Bi": [
     {
       "type": 0,
@@ -4203,6 +4229,12 @@
     {
       "type": 0,
       "value": "El volumen de tokens incluidas en el intercambio"
+    }
+  ],
+  "l5M7uf": [
+    {
+      "type": 0,
+      "value": "Crear una posición"
     }
   ],
   "lBsNBG": [
@@ -5151,6 +5183,12 @@
       "value": "a"
     }
   ],
+  "x0ln0H": [
+    {
+      "type": 0,
+      "value": "Ver mi posición"
+    }
+  ],
   "x2ydb5": [
     {
       "type": 0,
@@ -5187,6 +5225,12 @@
     {
       "type": 0,
       "value": "Procesando"
+    }
+  ],
+  "xf12eg": [
+    {
+      "type": 0,
+      "value": "Cerrar una posición"
     }
   ],
   "xqGD8L": [
