@@ -441,74 +441,77 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition)
 
 const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
   icon: <FingerprintIcon />,
-  content: () => (
-    <>
-      <Grid item xs={12}>
-        {positionState.permissions.map((permission) => (
-          <Typography variant="body1">
-            {permission.permissions.length ? (
-              <>
-                <StyledLink
-                  href={buildEtherscanAddress(permission.operator, position.chainId)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {permission.operator.toLowerCase() ===
-                  (
-                    COMPANION_ADDRESS[position.version][position.chainId] ||
-                    COMPANION_ADDRESS[LATEST_VERSION][position.chainId]
-                  ).toLowerCase() ? (
-                    'Mean Finance Companion'
-                  ) : (
-                    <Address address={permission.operator} />
+  content: () => {
+    const intl = useIntl();
+    return (
+      <>
+        <Grid item xs={12}>
+          {positionState.permissions.map((permission) => (
+            <Typography variant="body1">
+              {permission.permissions.length ? (
+                <>
+                  <StyledLink
+                    href={buildEtherscanAddress(permission.operator, position.chainId)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {permission.operator.toLowerCase() ===
+                    (
+                      COMPANION_ADDRESS[position.version][position.chainId] ||
+                      COMPANION_ADDRESS[LATEST_VERSION][position.chainId]
+                    ).toLowerCase() ? (
+                      'Mean Finance Companion'
+                    ) : (
+                      <Address address={permission.operator} />
+                    )}
+                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
+                  </StyledLink>
+                  <FormattedMessage
+                    description="positionPermissionsModified only"
+                    defaultMessage="will only be able to"
+                  />
+                  {permission.permissions.map(
+                    (permissionString, index) =>
+                      ` ${
+                        index === permission.permissions.length - 1 && permission.permissions.length > 1 ? 'and ' : ''
+                      }${intl.formatMessage(STRING_PERMISSIONS[permissionString]).toLowerCase()}${
+                        index !== permission.permissions.length - 1 && index !== permission.permissions.length - 2
+                          ? ','
+                          : ''
+                      } `
                   )}
-                  <OpenInNewIcon style={{ fontSize: '1rem' }} />
-                </StyledLink>
-                <FormattedMessage
-                  description="positionPermissionsModified only"
-                  defaultMessage="will only be able to"
-                />
-                {permission.permissions.map(
-                  (permissionString, index) =>
-                    ` ${
-                      index === permission.permissions.length - 1 && permission.permissions.length > 1 ? 'and ' : ''
-                    }${STRING_PERMISSIONS[permissionString].toLowerCase()}${
-                      index !== permission.permissions.length - 1 && index !== permission.permissions.length - 2
-                        ? ','
-                        : ''
-                    } `
-                )}
-                <FormattedMessage
-                  description="positionPermissionsModified your position"
-                  defaultMessage="your position"
-                />
-              </>
-            ) : (
-              <>
-                <FormattedMessage
-                  description="positionPermissionsModified all"
-                  defaultMessage="Removed all permissions for"
-                />
-                <StyledLink
-                  href={buildEtherscanAddress(permission.operator, position.chainId)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {permission.operator.toLowerCase() ===
-                  COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
-                    'Mean Finance Companion'
-                  ) : (
-                    <Address address={permission.operator} />
-                  )}
-                  <OpenInNewIcon style={{ fontSize: '1rem' }} />
-                </StyledLink>
-              </>
-            )}
-          </Typography>
-        ))}
-      </Grid>
-    </>
-  ),
+                  <FormattedMessage
+                    description="positionPermissionsModified your position"
+                    defaultMessage="your position"
+                  />
+                </>
+              ) : (
+                <>
+                  <FormattedMessage
+                    description="positionPermissionsModified all"
+                    defaultMessage="Removed all permissions for"
+                  />
+                  <StyledLink
+                    href={buildEtherscanAddress(permission.operator, position.chainId)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {permission.operator.toLowerCase() ===
+                    COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
+                      'Mean Finance Companion'
+                    ) : (
+                      <Address address={permission.operator} />
+                    )}
+                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
+                  </StyledLink>
+                </>
+              )}
+            </Typography>
+          ))}
+        </Grid>
+      </>
+    );
+  },
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position permissions modified" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),

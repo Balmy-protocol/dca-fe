@@ -35,6 +35,10 @@
     "defaultMessage": "How does Mean Finance work?",
     "description": "faqHowDoesMeanFinanceWork"
   },
+  "+vAQ2s": {
+    "defaultMessage": "Close position",
+    "description": "permissionsClosePermission"
+  },
   "+zKE+F": {
     "defaultMessage": "1 hour",
     "description": "oneHourSingularTime"
@@ -735,6 +739,10 @@
     "defaultMessage": "Mean Finance contracts have been audited by Pessimistic and PeckShield. You can read the reports",
     "description": "faqIsMeanFinanceAuditedResponse"
   },
+  "NQzhfq": {
+    "defaultMessage": "Increase position",
+    "description": "permissionsIncreasePermission"
+  },
   "NSmm8H": {
     "defaultMessage": "Add {amount} {from} to the {from}:{to} position",
     "description": "transactionDetailsAddFunds"
@@ -782,6 +790,10 @@
   "OdWJTU": {
     "defaultMessage": "{frequency} {hasYield}",
     "description": "positionDetailsCurrentRate"
+  },
+  "OlMOmp": {
+    "defaultMessage": "Withdraw",
+    "description": "permissionsWithdrawPermission"
   },
   "Oo1GS9": {
     "defaultMessage": "Terminating your position",
@@ -1718,6 +1730,10 @@
   "tdhen+": {
     "defaultMessage": "Your {from}:{to} position has now been set to run for {swaps} {frequency}",
     "description": "transactionMessagesModifySwaps"
+  },
+  "th+wsU": {
+    "defaultMessage": "Reduce position",
+    "description": "permissionsReducePermission"
   },
   "tiJ3Vs": {
     "defaultMessage": "1 minute (1 swap)",

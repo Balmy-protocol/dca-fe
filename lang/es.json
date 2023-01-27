@@ -2218,5 +2218,21 @@
   "x2ydb5": {
     "defaultMessage": "Transferir tu {from}:{to} posicion a {address}",
     "description": "transactionDetailsTransfer"
+  },
+  "NQzhfq": {
+    "defaultMessage": "Aumentar posicion",
+    "description": "permissionsIncreasePermission"
+  },
+  "th+wsU": {
+    "defaultMessage": "Reducir posicion",
+    "description": "permissionsReducePermission"
+  },
+  "OlMOmp": {
+    "defaultMessage": "Retirar",
+    "description": "permissionsWithdrawPermission"
+  },
+  "+vAQ2s": {
+    "defaultMessage": "Cerrar posicion",
+    "description": "permissionsClosePermission"
   }
 }

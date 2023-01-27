@@ -205,7 +205,11 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
                         name={stringPermissionKey}
                       />
                     }
-                    label={<Typography variant="body2">{STRING_PERMISSIONS[stringPermissionKey]}</Typography>}
+                    label={
+                      <Typography variant="body2">
+                        {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
+                      </Typography>
+                    }
                   />
                 </StyledGrid>
               ))}

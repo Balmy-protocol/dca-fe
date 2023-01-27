@@ -87,6 +87,12 @@
       "value": "¿Es seguro Mean Finance Meta Aggregator?"
     }
   ],
+  "+vAQ2s": [
+    {
+      "type": 0,
+      "value": "Cerrar posicion"
+    }
+  ],
   "+zKE+F": [
     {
       "type": 0,
@@ -2157,6 +2163,12 @@
       "value": "Los contratos de Mean Finance han sido auditados por Pessimistic y PeckShield. Puede leer los informes"
     }
   ],
+  "NQzhfq": [
+    {
+      "type": 0,
+      "value": "Aumentar posicion"
+    }
+  ],
   "NSmm8H": [
     {
       "type": 0,
@@ -2359,6 +2371,12 @@
     {
       "type": 1,
       "value": "hasYield"
+    }
+  ],
+  "OlMOmp": [
+    {
+      "type": 0,
+      "value": "Retirar"
     }
   ],
   "Oo1GS9": [
@@ -4929,6 +4947,12 @@
     {
       "type": 1,
       "value": "frequency"
+    }
+  ],
+  "th+wsU": [
+    {
+      "type": 0,
+      "value": "Reducir posicion"
     }
   ],
   "tiJ3Vs": [
