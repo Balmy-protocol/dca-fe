@@ -321,7 +321,10 @@ const Swap = ({
         });
       }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
+      setModalError({
+        content: <FormattedMessage description="modalErrorApprove" defaultMessage="Error approving token" />,
+        error: { code: e.code, message: e.message, data: e.data },
+      });
     }
   };
 
@@ -402,7 +405,10 @@ const Swap = ({
         });
       }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({ content: 'Error creating position', error: { code: e.code, message: e.message, data: e.data } });
+      setModalError({
+        content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
+        error: { code: e.code, message: e.message, data: e.data },
+      });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   };

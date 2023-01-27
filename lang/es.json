@@ -1348,7 +1348,7 @@
     "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart4"
   },
   "lBsNBG": {
-    "defaultMessage": "Seleccionar plataforma",
+    "defaultMessage": "Elegir retornos",
     "description": "selectYieldPlatform"
   },
   "lJRhFc": {
@@ -1456,7 +1456,7 @@
     "description": "github"
   },
   "pBVKIR": {
-    "defaultMessage": "Tiene que invertir al menos una tarifa de ${minimum} USD ({minToken} {symbol}) por {frequency} para habilitar esta opción",
+    "defaultMessage": "Tiene que invertir al menos una frequencia de ${minimum} USD ({minToken} {symbol}) por {frequency} para habilitar esta opción.",
     "description": "disabledByUsdValue"
   },
   "pMZxIC": {
@@ -2234,5 +2234,49 @@
   "+vAQ2s": {
     "defaultMessage": "Cerrar posicion",
     "description": "permissionsClosePermission"
+  },
+  "4Y/d8a": {
+    "defaultMessage": "Error creando posicion",
+    "description": "modalErrorCreatingPosition"
+  },
+  "CNGClN": {
+    "defaultMessage": "Error aprovando token",
+    "description": "modalErrorApprovingToken"
+  },
+  "GLQaI9": {
+    "defaultMessage": "Error cerrando posicion",
+    "description": "modalErrorTerminate"
+  },
+  "WszPax": {
+    "defaultMessage": "Error retirando",
+    "description": "modalErrorWithdraw"
+  },
+  "aT7Itp": {
+    "defaultMessage": "Error generando que la posicion genere retornos",
+    "description": "modalErrorMigratingYieldPosition"
+  },
+  "e91MXw": {
+    "defaultMessage": "Error retirando funds",
+    "description": "modalErrorWithdrawFunds"
+  },
+  "jJcSKd": {
+    "defaultMessage": "Error migrando la posicion",
+    "description": "modalErrorMigratingPosition"
+  },
+  "qodglE": {
+    "defaultMessage": "Error transfiriendo la posicion",
+    "description": "modalErrorTransferPosition"
+  },
+  "r+KI3m": {
+    "defaultMessage": "Error cambiando la frequencia y duracion",
+    "description": "modalErrorChangeRateAndSwaps"
+  },
+  "wnvvrB": {
+    "defaultMessage": "Error aprobando token",
+    "description": "modalErrorApprove"
+  },
+  "yuK53B": {
+    "defaultMessage": "Error definiendo permisos",
+    "description": "modalErrorPermissions"
   }
 }

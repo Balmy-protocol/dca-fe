@@ -330,7 +330,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
-        content: 'Error changing rate and swaps',
+        content: (
+          <FormattedMessage description="modalErrorChangeRateAndSwaps" defaultMessage="Error changing rate and swaps" />
+        ),
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -395,7 +397,10 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         });
       }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
+      setModalError({
+        content: <FormattedMessage description="modalErrorApprovingToken" defaultMessage="Error approving token" />,
+        error: { code: e.code, message: e.message, data: e.data },
+      });
     }
   };
 

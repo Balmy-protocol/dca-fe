@@ -317,13 +317,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
               <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="nextSwapCreate"
-                  defaultMessage="Next swap for this position will be executed {nextSwapAvailableAt}."
-                  values={{
-                    nextSwapAvailableAt:
-                      DateTime.fromSeconds(nextSwapAvailableAt) > DateTime.now()
-                        ? `aproximately ${DateTime.fromSeconds(nextSwapAvailableAt).toRelative() || ''}`
-                        : 'soon. Create a position now to be included in the next swap',
-                  }}
+                  defaultMessage="Next swap for this position will be executed."
                 />
                 {DateTime.fromSeconds(nextSwapAvailableAt) > DateTime.now() && (
                   <FormattedMessage
@@ -337,7 +331,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 {DateTime.fromSeconds(nextSwapAvailableAt) < DateTime.now() && (
                   <FormattedMessage
                     description="nextSwapCreateSoon"
-                    defaultMessage="soon. Create a position now to be included in the next swap"
+                    defaultMessage="soon. Create a position now to be included in the next swap."
                   />
                 )}
               </Typography>

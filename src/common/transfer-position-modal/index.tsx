@@ -98,7 +98,12 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
-        content: 'Error while transfering position',
+        content: (
+          <FormattedMessage
+            description="modalErrorTransferPosition"
+            defaultMessage="Error while transfering position"
+          />
+        ),
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

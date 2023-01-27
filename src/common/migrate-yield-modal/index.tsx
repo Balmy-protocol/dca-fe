@@ -143,7 +143,12 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
       }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
-        content: 'Error making new positions start generating yield',
+        content: (
+          <FormattedMessage
+            description="modalErrorMigratingYieldPosition"
+            defaultMessage="Error making new position start generating yield"
+          />
+        ),
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

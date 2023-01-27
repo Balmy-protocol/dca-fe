@@ -155,6 +155,10 @@
     "defaultMessage": "({toPrice} USD)",
     "description": "current swapped in position price"
   },
+  "4Y/d8a": {
+    "defaultMessage": "Error creating position",
+    "description": "modalErrorCreatingPosition"
+  },
   "4jGULT": {
     "defaultMessage": "days",
     "description": "oneDaySubject"
@@ -383,6 +387,10 @@
     "defaultMessage": "{amount} {from} have been added to your {from}:{to} position",
     "description": "transactionMessagesAddFunds"
   },
+  "CNGClN": {
+    "defaultMessage": "Error approving token",
+    "description": "modalErrorApprovingToken"
+  },
   "CUp6QA": {
     "defaultMessage": "{type} left",
     "description": "days to finish"
@@ -530,6 +538,10 @@
   "GIOkAT": {
     "defaultMessage": "4 hours (1 swap)",
     "description": "fourHoursSingular"
+  },
+  "GLQaI9": {
+    "defaultMessage": "Error terminating position",
+    "description": "modalErrorTerminate"
   },
   "GZ31rF": {
     "defaultMessage": "Your withdrawal of funds of {fromSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon",
@@ -1011,6 +1023,10 @@
     "defaultMessage": "No swaps yet",
     "description": "positionDetailsAverageBuyPriceNotSwap"
   },
+  "WszPax": {
+    "defaultMessage": "Error while withdrawing",
+    "description": "modalErrorWithdraw"
+  },
   "X/B1lK": {
     "defaultMessage": "let us know you encountered this error, it would be helpful to copy the error log with the button below and paste that in the message",
     "description": "errorEncounteredDiscordPart1"
@@ -1151,6 +1167,10 @@
     "defaultMessage": "Removed all permissions for",
     "description": "positionPermissionsModified all"
   },
+  "aT7Itp": {
+    "defaultMessage": "Error making new position start generating yield",
+    "description": "modalErrorMigratingYieldPosition"
+  },
   "agFL3X": {
     "defaultMessage": "Create",
     "description": "create"
@@ -1270,6 +1290,10 @@
   "e2q+Fu": {
     "defaultMessage": "Frequency:",
     "description": "current remaining"
+  },
+  "e91MXw": {
+    "defaultMessage": "Error while withdrawing funds",
+    "description": "modalErrorWithdrawFunds"
   },
   "enTSiQ": {
     "defaultMessage": "Manage list & tokens",
@@ -1395,6 +1419,10 @@
     "defaultMessage": "week",
     "description": "oneWeekSingularSubject"
   },
+  "jJcSKd": {
+    "defaultMessage": "error while migrating position",
+    "description": "modalErrorMigratingPosition"
+  },
   "jKP6bq": {
     "defaultMessage": "When do I need to pay gas fees?",
     "description": "faqWhenDoINeedToPayGasFees"
@@ -1474,6 +1502,10 @@
   "lQ1Iy9": {
     "defaultMessage": "Create position for {from}/{to}",
     "description": "First deposit"
+  },
+  "lY6Jyd": {
+    "defaultMessage": "Next swap for this position will be executed.",
+    "description": "nextSwapCreate"
   },
   "lltepo": {
     "defaultMessage": "STALE",
@@ -1623,6 +1655,14 @@
     "defaultMessage": "Modifications",
     "description": "modifications"
   },
+  "qodglE": {
+    "defaultMessage": "Error while transfering position",
+    "description": "modalErrorTransferPosition"
+  },
+  "r+KI3m": {
+    "defaultMessage": "Error changing rate and swaps",
+    "description": "modalErrorChangeRateAndSwaps"
+  },
   "r0L/01": {
     "defaultMessage": "Withdraw {toSymbol} from {from}/{to} position",
     "description": "withdraw title"
@@ -1638,10 +1678,6 @@
   "rKNAVd": {
     "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you migrate the position.",
     "description": "Approve signature companion text migrate"
-  },
-  "rLp2yg": {
-    "defaultMessage": "soon. Create a position now to be included in the next swap",
-    "description": "nextSwapCreateSoon"
   },
   "reRP6P": {
     "defaultMessage": "{swaps} swap{plural}",
@@ -1715,10 +1751,6 @@
     "defaultMessage": "Making your {from}/{to} position start generating yield has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "success migrating your position"
   },
-  "tSkT/G": {
-    "defaultMessage": "Next swap for this position will be executed {nextSwapAvailableAt}.",
-    "description": "nextSwapCreate"
-  },
   "tX40vS": {
     "defaultMessage": "Users need to pay gas only when they interact with the positions. This includes:",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart1"
@@ -1775,6 +1807,10 @@
     "defaultMessage": "You rejected the transaction",
     "description": "rejected_transaction"
   },
+  "vYf+z8": {
+    "defaultMessage": "soon. Create a position now to be included in the next swap.",
+    "description": "nextSwapCreateSoon"
+  },
   "vlDLmo": {
     "defaultMessage": "You'll invest",
     "description": "invest detail"
@@ -1802,6 +1838,10 @@
   "wZ9OAC": {
     "defaultMessage": "The popularity/demand of the tokens involved in the swap",
     "description": "faqWhyIsMyPositionStaleResponsePart3"
+  },
+  "wnvvrB": {
+    "defaultMessage": "Error approving token",
+    "description": "modalErrorApprove"
   },
   "wzEneQ": {
     "defaultMessage": "Close",
@@ -1854,6 +1894,10 @@
   "yoTCFN": {
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "fourHoursPlural"
+  },
+  "yuK53B": {
+    "defaultMessage": "Error setting permissions",
+    "description": "modalErrorPermissions"
   },
   "z/57ga": {
     "defaultMessage": "{readable}",
