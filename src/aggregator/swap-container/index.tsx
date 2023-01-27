@@ -15,6 +15,7 @@ import {
   setSorting,
   resetForm,
   setAggregatorChainId,
+  toggleFromTo,
 } from 'state/aggregator/actions';
 import useSwapOptions from 'hooks/useSwapOptions';
 import useCustomToken from 'hooks/useCustomToken';
@@ -22,11 +23,11 @@ import { useHistory, useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
 import { SwapSortOptions } from 'config/constants/aggregator';
 import useSwapOption from 'hooks/useSwapOption';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting, transferTo } = useAggregatorState();
@@ -111,31 +112,36 @@ const SwapContainer = () => {
     }
   };
 
-  const toggleFromTo = () => {
-    dispatch(setTo(from));
+  const onToggleFromTo = () => {
+    // dispatch(setTo(from));
 
-    // check for decimals
-    if (to && from && to.decimals < from.decimals && !isBuyOrder) {
-      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
-      let newFromValue = fromValue;
-      if (splitValue && splitValue[2] !== '') {
-        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, to.decimals)}`;
-      }
+    // const oldFromValue = fromValue;
+    // const oldToValue = toValue;
+    // // check for decimals
+    // if (to && from && to.decimals < from.decimals && !isBuyOrder) {
+    //   const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
+    //   let newFromValue = fromValue;
+    //   if (splitValue && splitValue[2] !== '') {
+    //     newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, to.decimals)}`;
+    //   }
 
-      dispatch(setFromValue({ value: newFromValue, updateMode: isBuyOrder }));
-    }
+    //   dispatch(setFromValue({ value: oldToValue, updateMode: isBuyOrder }));
+    // }
 
-    if (to && from && from.decimals < to.decimals && isBuyOrder) {
-      const splitValue = /^(\d*)\.?(\d*)$/.exec(toValue);
-      let newToValue = toValue;
-      if (splitValue && splitValue[2] !== '') {
-        newToValue = `${splitValue[1]}.${splitValue[2].substring(0, from.decimals)}`;
-      }
+    // if (to && from && from.decimals < to.decimals && isBuyOrder) {
+    //   const splitValue = /^(\d*)\.?(\d*)$/.exec(toValue);
+    //   let newToValue = toValue;
+    //   if (splitValue && splitValue[2] !== '') {
+    //     newToValue = `${splitValue[1]}.${splitValue[2].substring(0, from.decimals)}`;
+    //   }
 
-      dispatch(setToValue({ value: newToValue, updateMode: isBuyOrder }));
-    }
+    //   dispatch(setToValue({ value: oldFromValue, updateMode: isBuyOrder }));
+    // }
 
-    dispatch(setFrom(to));
+    // dispatch(setFrom(to));
+
+    dispatch(setSelectedRoute(null));
+    dispatch(toggleFromTo());
 
     if (to) {
       history.replace(`/swap/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
@@ -175,7 +181,7 @@ const SwapContainer = () => {
           slippage={slippage}
           gasSpeed={gasSpeed}
           setRefreshQuotes={setRefreshQuotes}
-          toggleFromTo={toggleFromTo}
+          toggleFromTo={onToggleFromTo}
         />
       </Grid>
       <Grid item xs={12} md={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
