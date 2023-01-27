@@ -13,6 +13,7 @@ import {
   resetForm,
   setTransferTo,
   setAggregatorChainId,
+  toggleFromTo,
 } from './actions';
 
 export interface AggregatorState {
@@ -67,6 +68,17 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setTransferTo, (state, { payload }) => {
       state.transferTo = payload;
+    })
+    .addCase(toggleFromTo, (state) => {
+      const oldFromValue = state.fromValue;
+      state.fromValue = state.toValue;
+      state.toValue = oldFromValue;
+
+      const oldFrom = state.from;
+      state.from = state.to;
+      state.to = oldFrom;
+
+      state.isBuyOrder = !state.isBuyOrder;
     })
     .addCase(setAggregatorChainId, (state, { payload }) => {
       state.network = payload;
