@@ -195,10 +195,6 @@ const SwapQuote = ({
       ) / 100
     ).toFixed(2);
 
-  console.log(
-    quote.swapper.name,
-    (Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) / Number(quote.buyAmount.amountInUSD)
-  );
   return (
     <StyledPaper $isSelected={isSelected} onClick={() => !disabled && setRoute(quote)} $disabled={disabled}>
       <StyledTitleContainer>

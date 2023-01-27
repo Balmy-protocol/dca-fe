@@ -208,16 +208,11 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;
 
-  let isLoadingSellOrder = false;
-  let isLoadingBuyOrder = false;
-
   if (isLoadingRoute) {
     if (isBuyOrder) {
       fromValueToUse = '...';
-      isLoadingBuyOrder = true;
     } else {
       toValueToUse = '...';
-      isLoadingSellOrder = true;
     }
   }
 
@@ -317,7 +312,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 id="from-value"
                 error={cantFund && account ? 'Amount cannot exceed balance' : ''}
                 value={fromValueToUse}
-                disabled={isLoadingBuyOrder}
+                disabled={isLoadingRoute}
                 onChange={handleFromValueChange}
                 token={from}
                 fullWidth
@@ -345,7 +340,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               <AggregatorTokenInput
                 id="to-value"
                 value={toValueToUse}
-                disabled={isLoadingSellOrder}
+                disabled={isLoadingRoute}
                 onChange={handleToValueChange}
                 token={to}
                 fullWidth
