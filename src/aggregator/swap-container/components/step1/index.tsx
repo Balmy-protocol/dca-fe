@@ -23,12 +23,12 @@ import TokenIcon from 'common/token-icon';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import { NETWORKS, SUPPORTED_NETWORKS } from 'config';
+import { Chains } from '@mean-finance/sdk';
 import useAccount from 'hooks/useAccount';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import AggregatorTokenInput from './aggtokenButton';
 import QuoteSimulation from '../quote-simulation';
-import { Chains } from '@mean-finance/sdk';
 
 const StyledButton = styled(Button)`
   padding: 0;
