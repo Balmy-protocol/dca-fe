@@ -28,6 +28,7 @@ import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import AggregatorTokenInput from './aggtokenButton';
 import QuoteSimulation from '../quote-simulation';
+import { Chains } from '@mean-finance/sdk';
 
 const StyledButton = styled(Button)`
   padding: 0;
@@ -253,14 +254,15 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             </Typography>
             <StyledNetworkButtonsContainer>
               {SUPPORTED_NETWORKS.map((network) => {
+                const foundSdkNetwork = find(Chains.getAllChains(), { chainId: network });
                 const foundNetwork = find(NETWORKS, { chainId: network });
 
-                if (!foundNetwork) {
+                if (!foundNetwork || !foundSdkNetwork) {
                   return null;
                 }
 
                 return (
-                  <Tooltip title={foundNetwork.name} arrow placement="top">
+                  <Tooltip title={foundSdkNetwork.name} arrow placement="top">
                     <div>
                       <StyledNetworkButton
                         variant="outlined"
