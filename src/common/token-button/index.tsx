@@ -4,6 +4,7 @@ import { Token } from 'types';
 import styled from 'styled-components';
 import TokenIcon from 'common/token-icon';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { FormattedMessage } from 'react-intl';
 
 interface TokenButtonProps {
   token?: Token | null;
@@ -25,7 +26,7 @@ const Swap = ({ token, onClick }: TokenButtonProps) => (
     endIcon={<KeyboardArrowDownIcon fontSize="small" />}
     onClick={onClick}
   >
-    {token ? token.symbol : 'Select'}
+    {token ? token.symbol : <FormattedMessage description="select" defaultMessage="Select" />}
   </StyledButton>
 );
 export default Swap;

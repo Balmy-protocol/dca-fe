@@ -1,3 +1,4 @@
+import { defineMessage, MessageDescriptor } from 'react-intl';
 import { Oracles, Permission, PositionActions, PositionStatus, TransactionTypesConstant } from 'types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
@@ -172,11 +173,11 @@ export const PERMISSIONS = {
   TERMINATE: 3,
 };
 
-export const STRING_PERMISSIONS: Record<Permission, string> = {
-  INCREASE: 'Increase position',
-  REDUCE: 'Reduce position',
-  WITHDRAW: 'Withdraw',
-  TERMINATE: 'Close position',
+export const STRING_PERMISSIONS: Record<Permission, MessageDescriptor> = {
+  INCREASE: defineMessage({ defaultMessage: 'Increase position', description: 'permissionsIncreasePermission' }),
+  REDUCE: defineMessage({ defaultMessage: 'Reduce position', description: 'permissionsReducePermission' }),
+  WITHDRAW: defineMessage({ defaultMessage: 'Withdraw', description: 'permissionsWithdrawPermission' }),
+  TERMINATE: defineMessage({ defaultMessage: 'Close position', description: 'permissionsClosePermission' }),
 };
 
 const POSITION_STATUS_ACTIVE: PositionStatus = 'ACTIVE';

@@ -7,7 +7,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, calculateStale, STALE, calculateYield, sortTokensByAddress } from 'utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from 'types';
@@ -203,6 +203,7 @@ const ActivePosition = ({
   const availablePairs = useAvailablePairs();
 
   const rateToUse = depositedRateUnderlying || rate;
+  const intl = useIntl();
 
   const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
   const toWithdrawYield =
@@ -296,7 +297,7 @@ const ActivePosition = ({
                     description="days to finish"
                     defaultMessage="{type} left"
                     values={{
-                      type: getTimeFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
+                      type: getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString()),
                     }}
                   />
                 </Typography>
@@ -416,9 +417,17 @@ const ActivePosition = ({
               defaultMessage="{frequency} {hasYield}"
               values={{
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                hasYield: position.from.underlyingTokens.length ? '+ yield' : '',
-                frequency:
-                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+                hasYield: position.from.underlyingTokens.length
+                  ? intl.formatMessage(
+                      defineMessage({
+                        defaultMessage: '+ yield',
+                        description: 'plusYield',
+                      })
+                    )
+                  : '',
+                frequency: intl.formatMessage(
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
+                ),
               }}
             />
           </StyledDetailWrapper>

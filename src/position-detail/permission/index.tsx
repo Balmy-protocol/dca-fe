@@ -15,7 +15,7 @@ import { buildEtherscanAddress } from 'utils/etherscan';
 import { useAppDispatch } from 'hooks/state';
 import { addPermission, removePermission } from 'state/position-permissions/actions';
 import { COMPANION_ADDRESS, LATEST_VERSION, PositionVersions, STRING_PERMISSIONS } from 'config/constants';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Address from 'common/address';
@@ -113,6 +113,7 @@ const PositionPermissionItem = ({
   chainId,
 }: PositionPermissionProps) => {
   const dispatch = useAppDispatch();
+  const intl = useIntl();
 
   const handlePermissionChange = (permission: Permission, newValue: boolean) => {
     if (newValue) {
@@ -167,7 +168,7 @@ const PositionPermissionItem = ({
                   label={
                     <>
                       <Typography variant="body2" component={StyledLabel}>
-                        {STRING_PERMISSIONS[stringPermissionKey]}
+                        {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
                         <Tooltip title={HelpTexts[stringPermissionKey]} arrow placement="top">
                           <StyledHelpOutlineIcon fontSize="small" />
                         </Tooltip>

@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers/lib/ethers';
 import { Duration } from 'luxon';
+import { defineMessage, IntlShape } from 'react-intl';
 
 export const ONE_MINUTE = BigNumber.from(60);
 export const FIVE_MINUTES = ONE_MINUTE.mul(BigNumber.from(5));
@@ -67,102 +68,298 @@ export const SWAP_INTERVALS_MAP = [
   },
 ];
 
-const toReadable = (left: number, frequency: number) => {
+export const STRING_SWAP_INTERVALS = {
+  [ONE_MINUTE.toString()]: {
+    singular: defineMessage({
+      description: 'oneMinuteSingular',
+      defaultMessage: '1 minute (1 swap)',
+    }),
+    singularTime: defineMessage({
+      description: 'oneMinuteSingularTime',
+      defaultMessage: '1 minute',
+    }),
+    plural: defineMessage({
+      description: 'oneMinutePlural',
+      defaultMessage: '{readable} ({left} swaps)',
+    }),
+    pluralTime: defineMessage({
+      description: 'oneMinutePluralTime',
+      defaultMessage: '{readable}',
+    }),
+    adverb: defineMessage({
+      description: 'oneMinuteAdverb',
+      defaultMessage: 'every 1 minute',
+    }),
+    every: defineMessage({
+      description: 'oneMinuteEvery',
+      defaultMessage: 'every 1 minute',
+    }),
+    subject: defineMessage({
+      description: 'oneMinuteSubject',
+      defaultMessage: 'swaps',
+    }),
+    singularSubject: defineMessage({
+      description: 'oneMinuteSingularSubject',
+      defaultMessage: 'minute',
+    }),
+  },
+  [FIVE_MINUTES.toString()]: {
+    singular: defineMessage({
+      description: 'fiveMinutesSingular',
+      defaultMessage: '5 minutes (1 swap)',
+    }),
+    singularTime: defineMessage({
+      description: 'fiveMinutesSingularTime',
+      defaultMessage: '5 minutes',
+    }),
+    plural: defineMessage({
+      description: 'fiveMinutesPlural',
+      defaultMessage: '{readable} ({left} swaps)',
+    }),
+    pluralTime: defineMessage({
+      description: 'fiveMinutesPluralTime',
+      defaultMessage: '{readable}',
+    }),
+    adverb: defineMessage({
+      description: 'fiveMinutesAdverb',
+      defaultMessage: 'every 5 minutes',
+    }),
+    every: defineMessage({
+      description: 'fiveMinutesEvery',
+      defaultMessage: 'every 5 minutes',
+    }),
+    subject: defineMessage({
+      description: 'fiveMinutesSubject',
+      defaultMessage: 'swaps',
+    }),
+    singularSubject: defineMessage({
+      description: 'fiveMinutesSingularSubject',
+      defaultMessage: '5 minutes',
+    }),
+  },
+  [FIFTEEN_MINUTES.toString()]: {
+    singular: defineMessage({
+      description: 'fifteenMinutesSingular',
+      defaultMessage: '15 minutes (1 swap)',
+    }),
+    singularTime: defineMessage({
+      description: 'fifteenMinutesSingularTime',
+      defaultMessage: '15 minutes',
+    }),
+    plural: defineMessage({
+      description: 'fifteenMinutesPlural',
+      defaultMessage: '{readable} ({left} swaps)',
+    }),
+    pluralTime: defineMessage({
+      description: 'fifteenMinutesPluralTime',
+      defaultMessage: '{readable}',
+    }),
+    adverb: defineMessage({
+      description: 'fifteenMinutesAdverb',
+      defaultMessage: 'every 15 minutes',
+    }),
+    every: defineMessage({
+      description: 'fifteenMinutesEvery',
+      defaultMessage: 'every 15 minutes',
+    }),
+    subject: defineMessage({
+      description: 'fifteenMinutesSubject',
+      defaultMessage: 'swaps',
+    }),
+    singularSubject: defineMessage({
+      description: 'fifteenMinutesSingularSubject',
+      defaultMessage: '15 minutes',
+    }),
+  },
+  [THIRTY_MINUTES.toString()]: {
+    singular: defineMessage({
+      description: 'thirtyMinutesSingular',
+      defaultMessage: '30 minutes (1 swap)',
+    }),
+    singularTime: defineMessage({
+      description: 'thirtyMinutesSingularTime',
+      defaultMessage: '30 minutes',
+    }),
+    plural: defineMessage({
+      description: 'thirtyMinutesPlural',
+      defaultMessage: '{readable} ({left} swaps)',
+    }),
+    pluralTime: defineMessage({
+      description: 'thirtyMinutesPluralTime',
+      defaultMessage: '{readable}',
+    }),
+    adverb: defineMessage({
+      description: 'thiertyMinutesAdverb',
+      defaultMessage: 'every 30 minutes',
+    }),
+    every: defineMessage({
+      description: 'thirtyMinutesEvery',
+      defaultMessage: 'every 30 minutes',
+    }),
+    subject: defineMessage({
+      description: 'thirtyMinutesSubject',
+      defaultMessage: 'swaps',
+    }),
+    singularSubject: defineMessage({
+      description: 'thirtyMinutesSingularSubject',
+      defaultMessage: '30 minutes',
+    }),
+  },
+  [ONE_HOUR.toString()]: {
+    singular: defineMessage({
+      description: 'oneHourSingular',
+      defaultMessage: '1 hour (1 swap)',
+    }),
+    singularTime: defineMessage({
+      description: 'oneHourSingularTime',
+      defaultMessage: '1 hour',
+    }),
+    plural: defineMessage({
+      description: 'oneHourPlural',
+      defaultMessage: '{readable} ({left} swaps)',
+    }),
+    pluralTime: defineMessage({
+      description: 'oneHourPluralTime',
+      defaultMessage: '{readable}',
+    }),
+    adverb: defineMessage({
+      description: 'oneHourAdverb',
+      defaultMessage: 'hourly',
+    }),
+    every: defineMessage({
+      description: 'oneHourEvery',
+      defaultMessage: 'every hour',
+    }),
+    subject: defineMessage({
+      description: 'oneHourSubject',
+      defaultMessage: 'swaps',
+    }),
+    singularSubject: defineMessage({
+      description: 'oneHourSingularSubject',
+      defaultMessage: 'hour',
+    }),
+  },
+  [FOUR_HOURS.toString()]: {
+    singular: defineMessage({
+      description: 'fourHoursSingular',
+      defaultMessage: '4 hours (1 swap)',
+    }),
+    singularTime: defineMessage({
+      description: 'fourHoursSingularTime',
+      defaultMessage: '4 hours',
+    }),
+    plural: defineMessage({
+      description: 'fourHoursPlural',
+      defaultMessage: '{readable} ({left} swaps)',
+    }),
+    pluralTime: defineMessage({
+      description: 'fourHoursPluralTime',
+      defaultMessage: '{readable}',
+    }),
+    adverb: defineMessage({
+      description: 'fourHoursAdverb',
+      defaultMessage: 'every 4 hours',
+    }),
+    every: defineMessage({
+      description: 'fourHoursEvery',
+      defaultMessage: 'every 4 hours',
+    }),
+    subject: defineMessage({
+      description: 'fourHoursSubject',
+      defaultMessage: 'swaps',
+    }),
+    singularSubject: defineMessage({
+      description: 'fourHoursSingularSubject',
+      defaultMessage: '4 hours',
+    }),
+  },
+  [ONE_DAY.toString()]: {
+    singular: defineMessage({
+      description: 'oneDaySingular',
+      defaultMessage: '1 day (1 swap)',
+    }),
+    singularTime: defineMessage({
+      description: 'oneDaySingularTime',
+      defaultMessage: '1 day',
+    }),
+    plural: defineMessage({
+      description: 'oneDayPlural',
+      defaultMessage: '{readable} ({left} swaps)',
+    }),
+    pluralTime: defineMessage({
+      description: 'oneDayPluralTime',
+      defaultMessage: '{readable}',
+    }),
+    adverb: defineMessage({
+      description: 'oneDayAdverb',
+      defaultMessage: 'daily',
+    }),
+    every: defineMessage({
+      description: 'oneDayEvery',
+      defaultMessage: 'every day',
+    }),
+    subject: defineMessage({
+      description: 'oneDaySubject',
+      defaultMessage: 'days',
+    }),
+    singularSubject: defineMessage({
+      description: 'oneDaySingularSubject',
+      defaultMessage: 'day',
+    }),
+  },
+  [ONE_WEEK.toString()]: {
+    singular: defineMessage({
+      description: 'oneWeekSingular',
+      defaultMessage: '1 week (1 swap)',
+    }),
+    singularTime: defineMessage({
+      description: 'oneWeekSingularTime',
+      defaultMessage: '1 week',
+    }),
+    plural: defineMessage({
+      description: 'oneWeekPlural',
+      defaultMessage: '{readable} ({left} swaps)',
+    }),
+    pluralTime: defineMessage({
+      description: 'oneWeekPluralTime',
+      defaultMessage: '{readable}',
+    }),
+    adverb: defineMessage({
+      description: 'oneWeekAdverb',
+      defaultMessage: 'weekly',
+    }),
+    every: defineMessage({
+      description: 'oneWeekEvery',
+      defaultMessage: 'every week',
+    }),
+    subject: defineMessage({
+      description: 'oneWeekSubject',
+      defaultMessage: 'weeks',
+    }),
+    singularSubject: defineMessage({
+      description: 'oneWeekSingularSubject',
+      defaultMessage: 'week',
+    }),
+  },
+};
+
+export const toReadable = (left: number, frequency: number, intl: IntlShape) => {
   const customDuration = Duration.fromMillis(frequency * 1000 * left);
   const asDays = customDuration.as('days');
   const asHours = customDuration.as('hours');
   const asMinutes = customDuration.as('minutes');
 
   if (asDays >= 1) {
-    return `${parseFloat(asDays.toFixed(2))} days`;
+    return `${parseFloat(asDays.toFixed(2))} ${intl.formatMessage(STRING_SWAP_INTERVALS[ONE_DAY.toString()].subject)}`;
   }
 
   if (asHours >= 1) {
-    return `${parseFloat(asHours.toFixed(2))} hours`;
+    return `${parseFloat(asHours.toFixed(2))} ${intl.formatMessage(
+      STRING_SWAP_INTERVALS[ONE_HOUR.toString()].subject
+    )}`;
   }
 
-  return `${parseFloat(asMinutes.toFixed(2))} minutes`;
-};
-
-export const STRING_SWAP_INTERVALS = {
-  [ONE_MINUTE.toString()]: {
-    singular: '1 minute (1 swap)',
-    singularTime: '1 minute',
-    plural: (left: number) => `${toReadable(left, ONE_MINUTE.toNumber())} (${left} swaps)`,
-    pluralTime: (left: number) => `${toReadable(left, ONE_MINUTE.toNumber())}`,
-    adverb: 'every 1 minute',
-    every: 'every 1 minute',
-    subject: 'swaps',
-    singularSubject: 'minute',
-  },
-  [FIVE_MINUTES.toString()]: {
-    singular: '5 minutes (1 swap)',
-    singularTime: '5 minutes',
-    plural: (left: number) => `${toReadable(left, FIVE_MINUTES.toNumber())} (${left} swaps)`,
-    pluralTime: (left: number) => `${toReadable(left, FIVE_MINUTES.toNumber())}`,
-    adverb: 'every 5 minutes',
-    every: 'every 5 minutes',
-    subject: 'swaps',
-    singularSubject: '5 minutes',
-  },
-  [FIFTEEN_MINUTES.toString()]: {
-    singular: '15 minutes (1 swap)',
-    singularTime: '15 minutes',
-    plural: (left: number) => `${toReadable(left, FIFTEEN_MINUTES.toNumber())} (${left} swaps)`,
-    pluralTime: (left: number) => `${toReadable(left, FIFTEEN_MINUTES.toNumber())}`,
-    adverb: 'every 15 minutes',
-    every: 'every 15 minutes',
-    subject: 'swaps',
-    singularSubject: '15 minutes',
-  },
-  [THIRTY_MINUTES.toString()]: {
-    singular: '30 minutes (1 swap)',
-    singularTime: '30 minutes',
-    plural: (left: number) => `${toReadable(left, THIRTY_MINUTES.toNumber())} (${left} swaps)`,
-    pluralTime: (left: number) => `${toReadable(left, THIRTY_MINUTES.toNumber())}`,
-    adverb: 'every 30 minutes',
-    every: 'every 30 minutes',
-    subject: 'swaps',
-    singularSubject: '30 minutes',
-  },
-  [ONE_HOUR.toString()]: {
-    singular: '1 hour (1 swap)',
-    singularTime: '1 hour',
-    plural: (left: number) => `${toReadable(left, ONE_HOUR.toNumber())} (${left} swaps)`,
-    pluralTime: (left: number) => `${toReadable(left, ONE_HOUR.toNumber())}`,
-    adverb: 'hourly',
-    every: 'every hour',
-    subject: 'swaps',
-    singularSubject: 'hour',
-  },
-  [FOUR_HOURS.toString()]: {
-    singular: '4 hours (1 swap)',
-    singularTime: '4 hours',
-    plural: (left: number) => `${toReadable(left, FOUR_HOURS.toNumber())} (${left} swaps)`,
-    pluralTime: (left: number) => `${toReadable(left, FOUR_HOURS.toNumber())}`,
-    adverb: 'every 4 hours',
-    every: 'every 4 hours',
-    subject: 'swaps',
-    singularSubject: '4 hours',
-  },
-  [ONE_DAY.toString()]: {
-    singular: '1 day (1 swap)',
-    singularTime: '1 day',
-    plural: (left: number) => `${toReadable(left, ONE_DAY.toNumber())} (${left} swaps)`,
-    pluralTime: (left: number) => `${toReadable(left, ONE_DAY.toNumber())}`,
-    every: 'every day',
-    adverb: 'daily',
-    subject: 'days',
-    singularSubject: 'day',
-  },
-  [ONE_WEEK.toString()]: {
-    singular: '1 week (1 swap)',
-    singularTime: '1 week',
-    plural: (left: number) => `${toReadable(left, ONE_WEEK.toNumber())} (${left} swaps)`,
-    pluralTime: (left: number) => `${toReadable(left, ONE_WEEK.toNumber())}`,
-    every: 'every week',
-    adverb: 'weekly',
-    subject: 'weeks',
-    singularSubject: 'week',
-  },
+  return `${parseFloat(asMinutes.toFixed(2))} ${intl.formatMessage(
+    STRING_SWAP_INTERVALS[ONE_MINUTE.toString()].singularSubject
+  )}`;
 };

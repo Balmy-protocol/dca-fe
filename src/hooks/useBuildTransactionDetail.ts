@@ -25,7 +25,9 @@ import {
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { formatCurrencyAmount } from 'utils/currency';
 import { BigNumber } from 'ethers';
+import { defineMessage, useIntl } from 'react-intl';
 import useAvailablePairs from 'hooks/useAvailablePairs';
+import { getWrappedProtocolToken } from 'mocks/tokens';
 import { getFrequencyLabel } from 'utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
@@ -34,33 +36,64 @@ function useBuildTransactionDetail() {
   const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
+  const intl = useIntl();
 
   const positions = React.useMemo(() => [...pastPositions, ...currentPositions], [currentPositions, pastPositions]);
 
   return React.useCallback(
     (tx: TransactionDetails) => {
-      let message = 'Transaction confirmed!';
+      let message = intl.formatMessage(
+        defineMessage({
+          description: 'transactionDetailsConfirmed',
+          defaultMessage: 'Transaction confirmed!',
+        })
+      );
       try {
         switch (tx.type) {
           case TRANSACTION_TYPES.WRAP_ETHER: {
             const wrapEtherTypeData = tx.typeData as WrapEtherTypeData;
 
-            message = `${wrapEtherTypeData.amount} wrapped to getWrappedProtocolToken`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsWrap',
+                defaultMessage: '{amount} wrapped to {token}',
+              }),
+              {
+                amount: wrapEtherTypeData.amount,
+                token: getWrappedProtocolToken(tx.chainId).symbol,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.NEW_POSITION: {
             const newPositionTypeData = tx.typeData as NewPositionTypeData;
 
-            message = `Create ${newPositionTypeData.from.symbol}:${newPositionTypeData.to.symbol} position`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsNewPosition',
+                defaultMessage: 'Create {from}:{to} position',
+              }),
+              {
+                from: newPositionTypeData.from.symbol,
+                to: newPositionTypeData.to.symbol,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.TERMINATE_POSITION: {
             const terminatePositionTypeData = tx.typeData as TerminatePositionTypeData;
             const terminatedPosition = tx.position || find(positions, { id: terminatePositionTypeData.id });
             if (terminatedPosition) {
-              message = `Close ${(terminatedPosition as Position).from.symbol}:${
-                (terminatedPosition as Position).to.symbol
-              } position`;
+              message = intl.formatMessage(
+                defineMessage({
+                  description: 'transactionDetailsTerminate',
+                  defaultMessage: 'Close {from}:{to} position',
+                }),
+                {
+                  from: (terminatedPosition as Position).from.symbol,
+                  to: (terminatedPosition as Position).to.symbol,
+                }
+              );
             }
             break;
           }
@@ -68,12 +101,20 @@ function useBuildTransactionDetail() {
             const withdrawFundsPositionTypeData = tx.typeData as WithdrawFundsTypeData;
             const withdrawnPosition = tx.position || find(positions, { id: withdrawFundsPositionTypeData.id });
             if (withdrawnPosition) {
-              message = `Withdraw ${formatCurrencyAmount(
-                BigNumber.from(withdrawFundsPositionTypeData.removedFunds),
-                (withdrawnPosition as Position).from
-              )} ${(withdrawnPosition as Position).from.symbol} funds from your ${
-                (withdrawnPosition as Position).from.symbol
-              }:${(withdrawnPosition as Position).to.symbol} position`;
+              message = intl.formatMessage(
+                defineMessage({
+                  description: 'transactionDetailsWithdrawFunds',
+                  defaultMessage: 'Withdraw {amount} {from} funds from your {from}:{to} position',
+                }),
+                {
+                  from: (withdrawnPosition as Position).from.symbol,
+                  to: (withdrawnPosition as Position).to.symbol,
+                  amount: formatCurrencyAmount(
+                    BigNumber.from(withdrawFundsPositionTypeData.removedFunds),
+                    (withdrawnPosition as Position).from
+                  ),
+                }
+              );
             }
             break;
           }
@@ -81,9 +122,16 @@ function useBuildTransactionDetail() {
             const withdrawPositionTypeData = tx.typeData as WithdrawTypeData;
             const withdrawnPosition = tx.position || find(positions, { id: withdrawPositionTypeData.id });
             if (withdrawnPosition) {
-              message = `Withdraw from ${(withdrawnPosition as Position).from.symbol}:${
-                (withdrawnPosition as Position).to.symbol
-              } position`;
+              message = intl.formatMessage(
+                defineMessage({
+                  description: 'transactionDetailsWithdraw',
+                  defaultMessage: 'Withdraw from {from}:{to} position',
+                }),
+                {
+                  from: (withdrawnPosition as Position).from.symbol,
+                  to: (withdrawnPosition as Position).to.symbol,
+                }
+              );
             }
             break;
           }
@@ -91,9 +139,17 @@ function useBuildTransactionDetail() {
             const addFundsTypeData = tx.typeData as AddFundsTypeData;
             const fundedPosition = tx.position || find(positions, { id: addFundsTypeData.id });
             if (fundedPosition) {
-              message = `Add ${addFundsTypeData.newFunds} ${(fundedPosition as Position).from.symbol} to the ${
-                (fundedPosition as Position).from.symbol
-              }:${(fundedPosition as Position).to.symbol} position`;
+              message = intl.formatMessage(
+                defineMessage({
+                  description: 'transactionDetailsAddFunds',
+                  defaultMessage: 'Add {amount} {from} to the {from}:{to} position',
+                }),
+                {
+                  from: (fundedPosition as Position).from.symbol,
+                  to: (fundedPosition as Position).to.symbol,
+                  amount: addFundsTypeData.newFunds,
+                }
+              );
             }
             break;
           }
@@ -101,11 +157,17 @@ function useBuildTransactionDetail() {
             const removeFundsTypeData = tx.typeData as RemoveFundsTypeData;
             const removeFundedPosition = tx.position || find(positions, { id: removeFundsTypeData.id });
             if (removeFundedPosition) {
-              message = `Remove ${removeFundsTypeData.ammountToRemove} ${
-                (removeFundedPosition as Position).from.symbol
-              } from the ${(removeFundedPosition as Position).from.symbol}:${
-                (removeFundedPosition as Position).to.symbol
-              } position`;
+              message = intl.formatMessage(
+                defineMessage({
+                  description: 'transactionDetailsRemoveFunds',
+                  defaultMessage: 'Remove {amount} {from} from the {from}:{to} position',
+                }),
+                {
+                  from: (removeFundedPosition as Position).from.symbol,
+                  to: (removeFundedPosition as Position).to.symbol,
+                  amount: removeFundsTypeData.ammountToRemove,
+                }
+              );
             }
             break;
           }
@@ -114,11 +176,20 @@ function useBuildTransactionDetail() {
             const resettedPosition = tx.position || find(positions, { id: resetPositionTypeData.id });
             const swapInterval = BigNumber.from((resettedPosition as Position).swapInterval);
             if (resettedPosition) {
-              message = `Add ${resetPositionTypeData.newFunds} ${(resettedPosition as Position).from.symbol} to your ${
-                (resettedPosition as Position).from.symbol
-              }:${(resettedPosition as Position).to.symbol} position and set it to run for ${
-                resetPositionTypeData.newSwaps
-              } ${getFrequencyLabel(swapInterval.toString(), resetPositionTypeData.newSwaps)}`;
+              message = intl.formatMessage(
+                defineMessage({
+                  description: 'transactionDetailsReset',
+                  defaultMessage:
+                    'Add {amount} {from} to your {from}:{to} position and set it to run for {swaps} {frequency}',
+                }),
+                {
+                  from: (resettedPosition as Position).from.symbol,
+                  to: (resettedPosition as Position).to.symbol,
+                  amount: resetPositionTypeData.newFunds,
+                  swaps: resetPositionTypeData.newSwaps,
+                  frequency: getFrequencyLabel(intl, swapInterval.toString(), resetPositionTypeData.newSwaps),
+                }
+              );
             }
             break;
           }
@@ -127,38 +198,90 @@ function useBuildTransactionDetail() {
             const modifiedPosition = tx.position || find(positions, { id: modifySwapsPositionTypeData.id });
             const swapInterval = BigNumber.from((modifiedPosition as Position).swapInterval);
             if (modifiedPosition) {
-              message = `Modify ${(modifiedPosition as Position).from.symbol}:${
-                (modifiedPosition as Position).to.symbol
-              } position to run for ${modifySwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
-                swapInterval.toString(),
-                modifySwapsPositionTypeData.newSwaps
-              )}`;
+              message = intl.formatMessage(
+                defineMessage({
+                  description: 'transactionDetailsModifySwaps',
+                  defaultMessage: 'Modify {from}:{to} position to run for {swaps} {frequency}',
+                }),
+                {
+                  from: (modifiedPosition as Position).from.symbol,
+                  to: (modifiedPosition as Position).to.symbol,
+                  swaps: modifySwapsPositionTypeData.newSwaps,
+                  frequency: getFrequencyLabel(intl, swapInterval.toString(), modifySwapsPositionTypeData.newSwaps),
+                }
+              );
             }
             break;
           }
           case TRANSACTION_TYPES.TRANSFER_POSITION: {
             const transferedTypeData = tx.typeData as TransferTypeData;
-            message = `Transfer ${transferedTypeData.from}:${transferedTypeData.to} position to ${transferedTypeData.toAddress}`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsTransfer',
+                defaultMessage: 'Transfer {from}:{to} position to {address}',
+              }),
+              {
+                from: transferedTypeData.from,
+                to: transferedTypeData.to,
+                address: transferedTypeData.toAddress,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.MODIFY_PERMISSIONS: {
             const transferedTypeData = tx.typeData as ModifyPermissionsTypeData;
-            message = `Set your ${transferedTypeData.from}:${transferedTypeData.to} position permissions`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsModifyPermissions',
+                defaultMessage: 'Set your {from}:{to} position permissions',
+              }),
+              {
+                from: transferedTypeData.from,
+                to: transferedTypeData.to,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.APPROVE_COMPANION: {
             const approveCompanionTypeData = tx.typeData as ApproveCompanionTypeData;
-            message = `Approving Hub Companion to modify your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsApproveCompanion',
+                defaultMessage: 'Approving Hub Companion to modify your {from}:{to} position',
+              }),
+              {
+                from: approveCompanionTypeData.from,
+                to: approveCompanionTypeData.to,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.MIGRATE_POSITION: {
             const approveCompanionTypeData = tx.typeData as MigratePositionTypeData;
-            message = `Migrate your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsMigrate',
+                defaultMessage: 'Migrate your {from}:{to} position',
+              }),
+              {
+                from: approveCompanionTypeData.from,
+                to: approveCompanionTypeData.to,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
             const approveCompanionTypeData = tx.typeData as MigratePositionYieldTypeData;
-            message = `Making your ${approveCompanionTypeData.from}:${approveCompanionTypeData.to} position start generating yield`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsMigrate',
+                defaultMessage: 'Making your {from}:{to} position start generating yield',
+              }),
+              {
+                from: approveCompanionTypeData.from,
+                to: approveCompanionTypeData.to,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
@@ -167,33 +290,67 @@ function useBuildTransactionDetail() {
             const swapInterval = BigNumber.from((modifiedRatePosition as Position).swapInterval);
 
             if (modifiedRatePosition) {
-              message = `Modify ${(modifiedRatePosition as Position).from.symbol}:${
-                (modifiedRatePosition as Position).to.symbol
-              } position to swap ${modifyRateAndSwapsPositionTypeData.newRate} ${
-                (modifiedRatePosition as Position).from.symbol
-              } ${
-                STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
-              } for ${getFrequencyLabel(swapInterval.toString(), modifyRateAndSwapsPositionTypeData.newSwaps)}`;
+              message = intl.formatMessage(
+                defineMessage({
+                  description: 'transactionDetailsModifyRateAndSwaps',
+                  defaultMessage: 'Modify {from}:{to} position to swap {rate} {freq} for {swaps}',
+                }),
+                {
+                  from: (modifiedRatePosition as Position).from.symbol,
+                  to: (modifiedRatePosition as Position).to.symbol,
+                  rate: modifyRateAndSwapsPositionTypeData.newRate,
+                  freq: intl.formatMessage(
+                    STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
+                  ),
+                  swaps: getFrequencyLabel(intl, swapInterval.toString(), modifyRateAndSwapsPositionTypeData.newSwaps),
+                }
+              );
             }
             break;
           }
           case TRANSACTION_TYPES.NEW_PAIR: {
             const newPairTypeData = tx.typeData as NewPairTypeData;
-            message = `Create ${newPairTypeData.token0.symbol}:${newPairTypeData.token1.symbol} pair`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsNewPair',
+                defaultMessage: 'Create {from}:{to} pair',
+              }),
+              {
+                from: newPairTypeData.token0.symbol,
+                to: newPairTypeData.token1.symbol,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.APPROVE_TOKEN: {
             const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
-            message = `Approve ${tokenApprovalTypeData.token.symbol}`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsApproveToken',
+                defaultMessage: 'Approve {from}',
+              }),
+              {
+                from: tokenApprovalTypeData.token.symbol,
+              }
+            );
             break;
           }
           case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
             const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
-            message = `Approve ${formatCurrencyAmount(
-              BigNumber.from(tokenApprovalExactTypeData.amount),
-              tokenApprovalExactTypeData.token,
-              4
-            )} ${tokenApprovalExactTypeData.token.symbol}`;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsApproveTokenExact',
+                defaultMessage: 'Approve {amount} {from}',
+              }),
+              {
+                from: tokenApprovalExactTypeData.token.symbol,
+                amount: formatCurrencyAmount(
+                  BigNumber.from(tokenApprovalExactTypeData.amount),
+                  tokenApprovalExactTypeData.token,
+                  4
+                ),
+              }
+            );
             break;
           }
           default:

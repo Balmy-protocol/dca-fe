@@ -12,6 +12,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import MeanLogo from 'common/mean-logo';
 import { useThemeMode } from 'state/config/hooks';
 import { Typography } from '@mui/material';
+import LanguageLabel from 'common/lang-label';
 
 const StyledFooterContainer = styled.div`
   display: flex;
@@ -33,6 +34,7 @@ const StyledFooterMainContent = styled.div`
 const StyledFooterLinks = styled.div`
   display: flex;
   gap: 32px;
+  align-items: center;
 `;
 
 const StyledLink = styled(Link)`
@@ -82,6 +84,8 @@ const Footer = () => {
             <FormattedMessage description="faq" defaultMessage="FAQ" />
           </StyledLink>
         </Typography>
+
+        <LanguageLabel />
       </StyledFooterLinks>
     </StyledFooterContainer>
   );

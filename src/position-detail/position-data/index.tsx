@@ -3,7 +3,7 @@ import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import TokenIcon from 'common/token-icon';
 import { DateTime } from 'luxon';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
@@ -266,6 +266,7 @@ const Details = ({
 
     summedPrices = summedPrices.add(swappedRate);
   });
+  const intl = useIntl();
   const averageBuyPrice = summedPrices.gt(BigNumber.from(0))
     ? summedPrices.div(swappedActions.length)
     : BigNumber.from(0);
@@ -365,7 +366,7 @@ const Details = ({
                         />
                       }
                       disableTypography
-                      label="Detailed view:"
+                      label={<FormattedMessage description="detailedView" defaultMessage="Detailed view" />}
                     />
                   </FormGroup>
                 </Typography>
@@ -407,7 +408,7 @@ const Details = ({
                     description="days to finish"
                     defaultMessage="{type} left"
                     values={{
-                      type: getTimeFrequencyLabel(swapInterval.interval, remainingSwaps.toString()),
+                      type: getTimeFrequencyLabel(intl, swapInterval.interval, remainingSwaps.toString()),
                     }}
                   />
                 </Typography>
@@ -612,9 +613,17 @@ const Details = ({
               defaultMessage="{frequency} {hasYield}"
               values={{
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                hasYield: position.from.underlyingTokens.length ? '+ yield' : '',
-                frequency:
-                  STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every,
+                hasYield: position.from.underlyingTokens.length
+                  ? intl.formatMessage(
+                      defineMessage({
+                        defaultMessage: '+ yield',
+                        description: 'plusYield',
+                      })
+                    )
+                  : '',
+                frequency: intl.formatMessage(
+                  STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every
+                ),
               }}
             />
           </StyledDetailWrapper>

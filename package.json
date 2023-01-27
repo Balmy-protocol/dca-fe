@@ -12,7 +12,9 @@
     "test": "jest --config jest.config.ts",
     "prettier": "prettier --write --ignore-unknown ./src",
     "prepare-husky": "husky install",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "extract": "formatjs extract",
+    "compile": "formatjs compile"
   },
   "repository": {
     "type": "git",

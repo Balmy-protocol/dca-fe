@@ -21,6 +21,7 @@ import {
   setYieldEnabled,
 } from 'state/create-position/actions';
 import { useHistory, useParams } from 'react-router-dom';
+import { useIntl } from 'react-intl';
 import useYieldOptions from 'hooks/useYieldOptions';
 import useToken from 'hooks/useToken';
 import Swap from './components/swap';
@@ -33,6 +34,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield } =
     useCreatePositionState();
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true);
@@ -125,7 +127,15 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
                 [(swapInterval) => parseInt(swapInterval.interval, 10)],
                 ['asc']
               ).map((swapInterval) => ({
-                label: STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS],
+                label: {
+                  singular: intl.formatMessage(
+                    STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                      .singular
+                  ),
+                  adverb: intl.formatMessage(
+                    STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
+                  ),
+                },
                 value: BigNumber.from(swapInterval.interval),
               }))) ||
             []

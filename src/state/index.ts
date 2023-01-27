@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
 import { setupCache, setup } from 'axios-cache-adapter';
 import axios from 'axios';
+import { SupportedLanguages } from 'config/constants/lang';
 
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
@@ -16,7 +17,7 @@ import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 import error from './error/reducer';
 
-const LATEST_VERSION = '1.0.3';
+const LATEST_VERSION = '1.0.4';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
 const TRANSACTION_VERSION_KEY = 'transactions_version';
 const TRANSACTION_KEY = 'redux_localstorage_simple_transactions';
@@ -76,7 +77,7 @@ export const setupAxiosClient = () =>
     },
   });
 
-const PERSISTED_STATES: string[] = ['transactions', 'badge', 'positionDetails.showBreakdown'];
+const PERSISTED_STATES: string[] = ['transactions', 'badge', 'positionDetails.showBreakdown', 'config.selectedLocale'];
 
 const store = configureStore({
   reducer: {
@@ -100,6 +101,11 @@ const store = configureStore({
   preloadedState: load({
     states: PERSISTED_STATES,
     preloadedState: {
+      config: {
+        network: undefined,
+        theme: 'dark',
+        selectedLocale: SupportedLanguages.english,
+      },
       positionDetails: {
         position: null,
       },
