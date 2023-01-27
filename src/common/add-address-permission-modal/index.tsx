@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from 'common/modal';
 import Button from 'common/button';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import { useAppDispatch } from 'hooks/state';
 import { Permission } from 'types';
@@ -75,6 +75,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
   const [toAddresses, setToAddresses] = React.useState(['']);
   const [permissions, setPermissions] = React.useState<Permission[]>([]);
   const dispatch = useAppDispatch();
+  const intl = useIntl();
 
   React.useEffect(() => {
     if (!open) {
@@ -150,7 +151,12 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
               <StyledFilledInput
                 id="toAddress"
                 value={address}
-                placeholder="Set the address to transfer to"
+                placeholder={intl.formatMessage(
+                  defineMessage({
+                    defaultMessage: 'Set the address you want to give permissions to',
+                    description: 'addAddressPermisionModalPlaceholder',
+                  })
+                )}
                 autoComplete="off"
                 autoCorrect="off"
                 fullWidth

@@ -160,7 +160,7 @@
     "description": "loadingBestRoute"
   },
   "6DIyJZ": {
-    "defaultMessage": "Los Market Makers ejecutarán su intercambio en cualquier momento.",
+    "defaultMessage": "Los creadores de mercado ejecutarán su intercambio en cualquier momento.",
     "description": "positionDetailsNextSwapInProgressTooltip"
   },
   "6Mir2W": {
@@ -180,7 +180,7 @@
     "description": "terminate title"
   },
   "7CQ1xI": {
-    "defaultMessage": "Actualmente no ofrecemos ninguna plataforma para generar yield con este token.",
+    "defaultMessage": "Actualmente no ofrecemos ninguna plataforma para generar retornos con este token.",
     "description": "noYieldAvailable"
   },
   "7NwTX3": {
@@ -232,7 +232,7 @@
     "description": "empty positions"
   },
   "9mxRvL": {
-    "defaultMessage": "Crear una posición y empezar a generar yield",
+    "defaultMessage": "Crear una posición y empezar a generar retornos",
     "description": "generateYield"
   },
   "9ytfZe": {
@@ -244,7 +244,7 @@
     "description": "addFundsExisting"
   },
   "A7a2Lo": {
-    "defaultMessage": "Rate:",
+    "defaultMessage": "Frequencia:",
     "description": "current remaining"
   },
   "ALg0aQ": {
@@ -260,7 +260,7 @@
     "description": "unwrap agg loading"
   },
   "Adg2/y": {
-    "defaultMessage": "Migrar la posición y empezar a generar yield",
+    "defaultMessage": "Migrar la posición y empezar a generar retornos",
     "description": "generateYield"
   },
   "AhEpzv": {
@@ -316,7 +316,7 @@
     "description": "View on etherscan"
   },
   "BrtGyj": {
-    "defaultMessage": "{frequency} Para usted por",
+    "defaultMessage": "{frequency} para usted por",
     "description": "rate detail"
   },
   "BrtSAY": {
@@ -332,7 +332,7 @@
     "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart3"
   },
   "ByRaJ4": {
-    "defaultMessage": "Yield de los soportes",
+    "defaultMessage": "Soporta generar retornos",
     "description": "supportsYield"
   },
   "C5Zkoh": {
@@ -352,7 +352,7 @@
     "description": "modifyPosition"
   },
   "CioUeM": {
-    "defaultMessage": "Uno o ambos tokens en esta posición permiten generar yield mientras se intercambian sus posiciones. Le sugerimos crear una nueva posición para que empiece a generar yield para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición.",
+    "defaultMessage": "Uno o ambos tokens en esta posición permiten generar retornos mientras se intercambian sus posiciones. Le sugerimos crear una nueva posición para que empiece a generar retornos para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición.",
     "description": "whyYouShouldMigrate"
   },
   "Cxag1C": {
@@ -440,7 +440,7 @@
     "description": "positions"
   },
   "G0Aml3": {
-    "defaultMessage": "para",
+    "defaultMessage": "por",
     "description": "pairSwapDetailsFor"
   },
   "G0w2LI": {
@@ -448,7 +448,7 @@
     "description": "docs"
   },
   "G5ZcuX": {
-    "defaultMessage": "Yields:",
+    "defaultMessage": "Retornos:",
     "description": "positionDetailsYieldsTitle"
   },
   "GChBDN": {
@@ -548,7 +548,7 @@
     "description": "feedbackDisclaimer"
   },
   "ItXuIA": {
-    "defaultMessage": "Cambiar la duración y el ritmo",
+    "defaultMessage": "Cambiar la duración y la frequencia",
     "description": "change rate"
   },
   "IuW2wC": {
@@ -584,7 +584,7 @@
     "description": "timelineTypeModified"
   },
   "KKIhxJ": {
-    "defaultMessage": "Establecer para ejecutar para:",
+    "defaultMessage": "Fijado para operar durante:",
     "description": "positionCreatedSwaps"
   },
   "KTvwXg": {
@@ -688,7 +688,7 @@
     "description": "paste"
   },
   "NpsctG": {
-    "defaultMessage": "Abrir posiciones",
+    "defaultMessage": "Posiciones abiertas",
     "description": "openPositions"
   },
   "NsIFlt": {
@@ -824,7 +824,7 @@
     "description": "faqWhenDoINeedToPayGasFeesResponsePart7"
   },
   "SNxage": {
-    "defaultMessage": "Empezar a generar yield",
+    "defaultMessage": "Empezar a generar retornos",
     "description": "gainYield title"
   },
   "SVDYlT": {
@@ -896,7 +896,7 @@
     "description": "errorEncountered"
   },
   "WJbxRJ": {
-    "defaultMessage": "Puedes empezar a generar yield",
+    "defaultMessage": "Puedes empezar a generar retornos",
     "description": "startGainYield title"
   },
   "WaK61o": {
@@ -936,11 +936,11 @@
     "description": "all"
   },
   "XmYRql": {
-    "defaultMessage": "Los fondos se depositarán en la plataforma seleccionada para genenerar yield mientras esperan a ser intercambiados o retirados. La seguridad de los fondos dependerá de la plataforma seleccionada, por lo que le aconsejamos que investigue por su cuenta para realizar una evaluación informada de la relación riesgo/rentabilidad",
+    "defaultMessage": "Los fondos se depositarán en la plataforma seleccionada para genenerar retornos mientras esperan a ser cambiados o retirados. La seguridad de los fondos dependerá de la plataforma seleccionada, por lo que le aconsejamos que investigue por su cuenta para realizar una evaluación informada de la relación riesgo/rentabilidad",
     "description": "howItWorksDescription"
   },
   "Xq/LIk": {
-    "defaultMessage": "HECHO",
+    "defaultMessage": "COMPLETADA",
     "description": "finishedPosition"
   },
   "XrLrtm": {
@@ -984,7 +984,7 @@
     "description": "disabledDepositByUsdValue"
   },
   "YmpFX8": {
-    "defaultMessage": "Sus posiciones",
+    "defaultMessage": "Tus posiciones",
     "description": "positions title"
   },
   "YpaT9e": {
@@ -1048,7 +1048,7 @@
     "description": "terminate description"
   },
   "aEQUw9": {
-    "defaultMessage": "Sección de yields",
+    "defaultMessage": "Sección de retornos",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart8"
   },
   "aPrJJm": {
@@ -1148,7 +1148,7 @@
     "description": "all_network_disconnect"
   },
   "e1vYrA": {
-    "defaultMessage": "No hay yield",
+    "defaultMessage": "Sin retornos",
     "description": "noSelectedYieldPlatform"
   },
   "e2q+Fu": {
@@ -1228,7 +1228,7 @@
     "description": "withdraw funds"
   },
   "gqiFWl": {
-    "defaultMessage": "Intercambiado:",
+    "defaultMessage": "Se ejecuto por:",
     "description": "history swapped in position"
   },
   "h5NicW": {
@@ -1260,7 +1260,7 @@
     "description": "positionDetailsAverageBuyPrice"
   },
   "iUehtc": {
-    "defaultMessage": "Intercambiaremos",
+    "defaultMessage": "Cambiaremos",
     "description": "rate detail"
   },
   "iY28lu": {
@@ -1368,7 +1368,7 @@
     "description": "withdraw swapped"
   },
   "lsm/sD": {
-    "defaultMessage": "Usted vende",
+    "defaultMessage": "Vendes",
     "description": "You sell"
   },
   "m3YpJM": {
@@ -1380,7 +1380,7 @@
     "description": "No data available"
   },
   "mpwFVf": {
-    "defaultMessage": "Haciendo que su posición {from}/{to} empiece a generar yield",
+    "defaultMessage": "Haciendo que su posición {from}/{to} empiece a generar retornos",
     "description": "Migrating your position"
   },
   "msqsvt": {
@@ -1428,11 +1428,11 @@
     "description": "creating pair"
   },
   "oGIpAl": {
-    "defaultMessage": "#NAME?",
+    "defaultMessage": "+ retornos generados",
     "description": "yield detail"
   },
   "ocCMPR": {
-    "defaultMessage": "Generar yield",
+    "defaultMessage": "Generar retornos",
     "description": "yieldTitle"
   },
   "on7qPn": {
@@ -1464,11 +1464,11 @@
     "description": "donePositions"
   },
   "pVaAUz": {
-    "defaultMessage": "La posición no está generando yield",
+    "defaultMessage": "La posición no está generando retornos",
     "description": "positionNotGainingInterest"
   },
   "pWI5/m": {
-    "defaultMessage": "No hay yield",
+    "defaultMessage": "Sin retornos",
     "description": "noYieldOption"
   },
   "pc75Ig": {
@@ -1540,7 +1540,7 @@
     "description": "Approve signature companion text migrate"
   },
   "reRP6P": {
-    "defaultMessage": "{swaps} swap{plural}",
+    "defaultMessage": "{swaps} intercambios{plural}",
     "description": "positionDetailsExecuted"
   },
   "rxgILP": {
@@ -1584,7 +1584,7 @@
     "description": "stale pair message"
   },
   "tKrt0Y": {
-    "defaultMessage": "Hacer que su posición {from}/{to} comience a generar yield se envió con éxito al blockchain y será confirmada en breve",
+    "defaultMessage": "Hacer que su posición {from}/{to} comience a generar retornos se envió con éxito al blockchain y será confirmada en breve",
     "description": "success migrating your position"
   },
   "tSkT/G": {
@@ -1600,7 +1600,7 @@
     "description": "Transfer"
   },
   "tqUUG8": {
-    "defaultMessage": "Para empezar a generar yield, tendremos que cerrar su posición actual y crear una nueva. Los datos históricos de esta posición aparecerán como una posición cerrada",
+    "defaultMessage": "Para empezar a generar retornos, tendremos que cerrar su posición actual y crear una nueva. Los datos históricos de esta posición aparecerán como una posición cerrada",
     "description": "howItWorksDescriptionStep1"
   },
   "twerhs": {
@@ -1636,11 +1636,11 @@
     "description": "rejected_transaction"
   },
   "vlDLmo": {
-    "defaultMessage": "Usted invertirá",
+    "defaultMessage": "Invertirá",
     "description": "invest detail"
   },
   "vmGAxP": {
-    "defaultMessage": "Usted recibe",
+    "defaultMessage": "Recibes",
     "description": "youReceive"
   },
   "vqkOyW": {
@@ -1684,7 +1684,7 @@
     "description": "transactionConfirmationProcessing"
   },
   "xqGD8L": {
-    "defaultMessage": "Empezar a generar yield",
+    "defaultMessage": "Empezar a generar retornos",
     "description": "startEarningYield"
   },
   "xu/Gut": {
@@ -1704,11 +1704,11 @@
     "description": "whatIsDca"
   },
   "yVecas": {
-    "defaultMessage": "índice:",
+    "defaultMessage": "frequencia:",
     "description": "current rate remaining"
   },
   "yhA8mK": {
-    "defaultMessage": "#NAME?",
+    "defaultMessage": "+ retornos",
     "description": "plusYield"
   },
   "z43qzX": {
@@ -1764,7 +1764,7 @@
     "description": "positionLPTNotSupported"
   },
   "+a8ibZ": {
-    "defaultMessage": "{readable} ({left} swaps)",
+    "defaultMessage": "{readable} ({left} intercambios)",
     "description": "fiveMinutesPlural"
   },
   "+zKE+F": {
@@ -1784,15 +1784,15 @@
     "description": "thirtyMinutesEvery"
   },
   "0tTtPb": {
-    "defaultMessage": "1 semana (1 swap)",
+    "defaultMessage": "1 semana (1 intercambio)",
     "description": "oneWeekSingular"
   },
   "4jGULT": {
-    "defaultMessage": "dias",
+    "defaultMessage": "días",
     "description": "oneDaySubject"
   },
   "5biMGi": {
-    "defaultMessage": "{readable} ({left} swaps)",
+    "defaultMessage": "{readable} ({left} intercambios)",
     "description": "oneDayPlural"
   },
   "63iR05": {
@@ -1804,7 +1804,7 @@
     "description": "oneMinuteSingularSubject"
   },
   "B5AfY/": {
-    "defaultMessage": "{readable} ({left} swaps)",
+    "defaultMessage": "{readable} ({left} intercambios)",
     "description": "oneMinutePlural"
   },
   "BWP9H/": {
@@ -1812,7 +1812,7 @@
     "description": "uniswapLegend"
   },
   "CCmahn": {
-    "defaultMessage": "{readable} ({left} swaps)",
+    "defaultMessage": "{readable} ({left} intercambios)",
     "description": "oneWeekPlural"
   },
   "Cnxwym": {
@@ -1832,7 +1832,7 @@
     "description": "oneHourEvery"
   },
   "EVgPpp": {
-    "defaultMessage": "{readable} ({left} swaps)",
+    "defaultMessage": "{readable} ({left} intercambios)",
     "description": "fifteenMinutesPlural"
   },
   "EWsGHv": {
@@ -1840,15 +1840,15 @@
     "description": "thirtyMinutesSingularTime"
   },
   "EzesrO": {
-    "defaultMessage": "{readable} ({left} swaps)",
+    "defaultMessage": "{readable} ({left} intercambios)",
     "description": "thirtyMinutesPlural"
   },
   "GIOkAT": {
-    "defaultMessage": "4 horas (1 swap)",
+    "defaultMessage": "4 horas (1 intercambio)",
     "description": "fourHoursSingular"
   },
   "GZNskB": {
-    "defaultMessage": "1 dia (1 swap)",
+    "defaultMessage": "1 día (1 intercambio)",
     "description": "oneDaySingular"
   },
   "KASP2B": {
@@ -1856,7 +1856,7 @@
     "description": "fifteenMinutesEvery"
   },
   "KiN4dM": {
-    "defaultMessage": "swaps",
+    "defaultMessage": "intercambios",
     "description": "fiveMinutesSubject"
   },
   "KyAEIB": {
@@ -1868,7 +1868,7 @@
     "description": "thirtyMinutesPluralTime"
   },
   "OoEgv4": {
-    "defaultMessage": "swaps",
+    "defaultMessage": "intercambios",
     "description": "oneMinuteSubject"
   },
   "PxOAUe": {
@@ -1876,7 +1876,7 @@
     "description": "thiertyMinutesAdverb"
   },
   "Q35rqD": {
-    "defaultMessage": "5 minutos (1 swap)",
+    "defaultMessage": "5 minutos (1 intercambio)",
     "description": "fiveMinutesSingular"
   },
   "QDVx7K": {
@@ -1908,7 +1908,7 @@
     "description": "fifteenMinutesAdverb"
   },
   "Yl6vl8": {
-    "defaultMessage": "swaps",
+    "defaultMessage": "intercambios",
     "description": "fourHoursSubject"
   },
   "Zsuz+g": {
@@ -1916,7 +1916,7 @@
     "description": "oneMinuteAdverb"
   },
   "bCOphI": {
-    "defaultMessage": "swaps",
+    "defaultMessage": "intercambios",
     "description": "thirtyMinutesSubject"
   },
   "d1oHnW": {
@@ -1924,11 +1924,11 @@
     "description": "oneWeekPluralTime"
   },
   "dINFAP": {
-    "defaultMessage": "1 dia",
+    "defaultMessage": "1 día",
     "description": "oneDaySingularTime"
   },
   "dPkxyg": {
-    "defaultMessage": "swaps",
+    "defaultMessage": "intercambios",
     "description": "fifteenMinutesSubject"
   },
   "fohpme": {
@@ -1936,7 +1936,7 @@
     "description": "oneMinuteEvery"
   },
   "gQEJk+": {
-    "defaultMessage": "swaps",
+    "defaultMessage": "intercambios",
     "description": "oneHourSubject"
   },
   "gtB9V2": {
@@ -1952,15 +1952,15 @@
     "description": "fourHoursSingularTime"
   },
   "nFFzXV": {
-    "defaultMessage": "15 minutos (1 swap)",
+    "defaultMessage": "15 minutos (1 intercambio)",
     "description": "fifteenMinutesSingular"
   },
   "nV5R/e": {
-    "defaultMessage": "dia",
+    "defaultMessage": "día",
     "description": "oneDaySingularSubject"
   },
   "naApNE": {
-    "defaultMessage": "30 minutos (1 swap)",
+    "defaultMessage": "30 minutos (1 intercambio)",
     "description": "thirtyMinutesSingular"
   },
   "rjATQZ": {
@@ -1988,7 +1988,7 @@
     "description": "oneWeekAdverb"
   },
   "tiJ3Vs": {
-    "defaultMessage": "1 minuto (1 swap)",
+    "defaultMessage": "1 minuto (1 intercambio)",
     "description": "oneMinuteSingular"
   },
   "v1SP5g": {
@@ -2008,7 +2008,7 @@
     "description": "oneWeekSubject"
   },
   "yoTCFN": {
-    "defaultMessage": "{readable} ({left} swaps)",
+    "defaultMessage": "{readable} ({left} intercambios)",
     "description": "fourHoursPlural"
   },
   "z/57ga": {
@@ -2016,15 +2016,15 @@
     "description": "fourHoursPluralTime"
   },
   "zG7r/G": {
-    "defaultMessage": "{readable} ({left} swaps)",
+    "defaultMessage": "{readable} ({left} intercambios)",
     "description": "oneHourPlural"
   },
   "zSo0el": {
-    "defaultMessage": "cada dia",
+    "defaultMessage": "cada día",
     "description": "oneDayEvery"
   },
   "zuU6Ai": {
-    "defaultMessage": "1 hora (1 swap)",
+    "defaultMessage": "1 hora (1 intercambio)",
     "description": "oneHourSingular"
   },
   "eyJz83": {
@@ -2038,5 +2038,185 @@
   "NHDjvA": {
     "defaultMessage": "Gas ahorrado",
     "description": "positionDetailsGasSavedOption"
+  },
+  "/ePQOu": {
+    "defaultMessage": "Nuestro Hub Companion fue aprobado para modificar tu {from}:{to} posicion",
+    "description": "transactionMessagesApproveCompanion"
+  },
+  "/wtb0w": {
+    "defaultMessage": "Modificar tu {from}:{to} posicion para ejecutarse por {swaps} {frequency}",
+    "description": "transactionDetailsModifySwaps"
+  },
+  "1c3wKa": {
+    "defaultMessage": "Tu {from}:{to} posicion fue migrada",
+    "description": "transactionMessagesMigrate"
+  },
+  "5H+bme": {
+    "defaultMessage": "Transaccion confirmada!",
+    "description": "transactionMessagesConfirmed"
+  },
+  "5ncl7Y": {
+    "defaultMessage": "Migrar tu {from}:{to} posicion",
+    "description": "transactionDetailsMigrate"
+  },
+  "7YJRiI": {
+    "defaultMessage": "Aprobar {from}",
+    "description": "transactionDetailsApproveToken"
+  },
+  "7fX0fL": {
+    "defaultMessage": "Retirar {amount} {from} fondos de tu {from}:{to} posicion",
+    "description": "transactionDetailsWithdrawFunds"
+  },
+  "9NqfNn": {
+    "defaultMessage": "Tu {from}:{to} posicion ahora va a intercambiar {rate} {freq} por {swaps}",
+    "description": "transactionMessagesModifyRateAndSwaps"
+  },
+  "CEv5tx": {
+    "defaultMessage": "{amount} {from} han sido agregados a tu {from}:{to} posicion",
+    "description": "transactionMessagesAddFunds"
+  },
+  "EKvo9E": {
+    "defaultMessage": "Quitar {amount} {from} de la {from}:{to} posicion",
+    "description": "transactionDetailsRemoveFunds"
+  },
+  "Gg22iu": {
+    "defaultMessage": "Crear el {from}:{to} par",
+    "description": "transactionDetailsNewPair"
+  },
+  "IEFMij": {
+    "defaultMessage": "No estas conectado a esta red",
+    "description": "networkLabelWarning"
+  },
+  "IiX/g2": {
+    "defaultMessage": "Tu nueva {from}:{to} posicion fue creada",
+    "description": "transactionMessagesNewPosition"
+  },
+  "J8hDoy": {
+    "defaultMessage": "Definir tu {from}:{to} posicion permisos",
+    "description": "transactionDetailsModifyPermissions"
+  },
+  "JJ1fcj": {
+    "defaultMessage": "Transaccion confirmada!",
+    "description": "transactionDetailsConfirmed"
+  },
+  "JOH6+p": {
+    "defaultMessage": "Retirar de tu {from}:{to} posicion",
+    "description": "transactionDetailsWithdraw"
+  },
+  "LQAOnp": {
+    "defaultMessage": "Los permisos de tu {from}:{to} posicion ahora estan definidos",
+    "description": "transactionMessagesModifyPermissions"
+  },
+  "NSmm8H": {
+    "defaultMessage": "Agregar {amount} {from} a la {from}:{to} posicion",
+    "description": "transactionDetailsAddFunds"
+  },
+  "OTXQIc": {
+    "defaultMessage": "{amount} {from} fueron agregados a tu {from}:{to} posicion y va a ejecutarse por {swaps} {frequency}",
+    "description": "transactionMessagesReset"
+  },
+  "PYOWcC": {
+    "defaultMessage": "Tu {from}:{to} posicion fue transferida a {address}",
+    "description": "transactionMessagesTransfer"
+  },
+  "Q1G3hW": {
+    "defaultMessage": "Poner la direccion a transferir",
+    "description": "transferToModalPlaceholder"
+  },
+  "QpkEk9": {
+    "defaultMessage": "Retiraste {amount} {from} fondos de tu {from}:{to} posicion",
+    "description": "transactionMessagesWithdrawFunds"
+  },
+  "RCUD56": {
+    "defaultMessage": "Tu {from}:{to} posicion ahora esta generando retornos",
+    "description": "transactionMessagesMigrate"
+  },
+  "TC32uH": {
+    "defaultMessage": "Agregar {amount} {from} a tu {from}:{to} posicion y va a ejecutarse por {swaps} {frequency}",
+    "description": "transactionDetailsReset"
+  },
+  "UJ3vcm": {
+    "defaultMessage": "Personalizar",
+    "description": "freqEasyInputCustom"
+  },
+  "ZWFiru": {
+    "defaultMessage": "Tu {from}:{to} posicion fue cerrada",
+    "description": "transactionMessagesTerminate"
+  },
+  "ZaSmdn": {
+    "defaultMessage": "Cerrar tu {from}:{to} posicion",
+    "description": "transactionDetailsTerminate"
+  },
+  "b0Bg0T": {
+    "defaultMessage": "El par {from}:{to} fue creado",
+    "description": "transactionMessagesNewPair"
+  },
+  "c5GoNs": {
+    "defaultMessage": "Posiciones",
+    "description": "countDashboardPositions"
+  },
+  "c91iH2": {
+    "defaultMessage": "Modificar tu {from}:{to} posicion para intercambiar {rate} {freq} por {swaps}",
+    "description": "transactionDetailsModifyRateAndSwaps"
+  },
+  "cA3qXj": {
+    "defaultMessage": "Approvar nuestro Hub Companion para modificar tu {from}:{to} posicion",
+    "description": "transactionDetailsApproveCompanion"
+  },
+  "h96679": {
+    "defaultMessage": "Poner la address a la que quieres darle permisos",
+    "description": "addAddressPermisionModalPlaceholder"
+  },
+  "iWNnCB": {
+    "defaultMessage": "{amount} wrapped a {token}",
+    "description": "transactionMessagesWrap"
+  },
+  "jL8UGU": {
+    "defaultMessage": "Crear la {from}:{to} posicion",
+    "description": "transactionDetailsNewPosition"
+  },
+  "jXIz7M": {
+    "defaultMessage": "{from} ahora esta listo para usarse",
+    "description": "transactionMessagesApproveToken"
+  },
+  "jb9Uav": {
+    "defaultMessage": "Ahora estas listo para usar {amount} {from}",
+    "description": "transactionMessagesApproveTokenExact"
+  },
+  "ks0oAr": {
+    "defaultMessage": "Hacer que tu {from}:{to} posicion empieze a generar yield",
+    "description": "transactionDetailsMigrate"
+  },
+  "kuWbwN": {
+    "defaultMessage": "{amount} wrapped a {token}",
+    "description": "transactionDetailsWrap"
+  },
+  "qQeTLj": {
+    "defaultMessage": "{amount} {from} fueron removidos de tu {from}:{to} posicion",
+    "description": "transactionMessagesRemoveFunds"
+  },
+  "r7l7zf": {
+    "defaultMessage": "Retiraste de tu {from}:{to} posicion",
+    "description": "transactionMessagesWithdraw"
+  },
+  "rLp2yg": {
+    "defaultMessage": "proximamente. Crea una position ahora para ser incluido en el proximo intercambio",
+    "description": "nextSwapCreateSoon"
+  },
+  "tAzRkq": {
+    "defaultMessage": "Aprobar {amount} {from}",
+    "description": "transactionDetailsApproveTokenExact"
+  },
+  "tdhen+": {
+    "defaultMessage": "Tu {from}:{to} posicion ahora se va a ejecutar por {swaps} {frequency}",
+    "description": "transactionMessagesModifySwaps"
+  },
+  "v/LxnW": {
+    "defaultMessage": "aproximadamente {nextSwapAvailableAt}.",
+    "description": "nextSwapCreateTime"
+  },
+  "x2ydb5": {
+    "defaultMessage": "Transferir tu {from}:{to} posicion a {address}",
+    "description": "transactionDetailsTransfer"
   }
 }

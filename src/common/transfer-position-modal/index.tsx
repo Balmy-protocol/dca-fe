@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from 'common/modal';
 import { FullPosition } from 'types';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
@@ -37,6 +37,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
   const positionService = usePositionService();
   const errorService = useErrorService();
   const addTransaction = useTransactionAdder();
+  const intl = useIntl();
 
   const validator = (nextValue: string) => {
     // sanitize value
@@ -146,7 +147,9 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
         <TextField
           id="toAddress"
           value={toAddress}
-          placeholder="Set the address to transfer to"
+          placeholder={intl.formatMessage(
+            defineMessage({ defaultMessage: 'Set the address to transfer', description: 'transferToModalPlaceholder' })
+          )}
           autoComplete="off"
           autoCorrect="off"
           error={toAddress !== '' && !isValid}

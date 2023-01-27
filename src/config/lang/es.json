@@ -54,7 +54,7 @@
     },
     {
       "type": 0,
-      "value": " swaps)"
+      "value": " intercambios)"
     }
   ],
   "+s/1rR": [
@@ -111,6 +111,28 @@
       "value": "Los usuarios tienen que pagar tarifas de gas cuando interactúan con sus posiciones. Al mismo tiempo, hay una comisión de protocolo que se cobra en cada intercambio. Esa comisión es actualmente del 0,6%."
     }
   ],
+  "/ePQOu": [
+    {
+      "type": 0,
+      "value": "Nuestro Hub Companion fue aprobado para modificar tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
+    }
+  ],
   "/gkMmp": [
     {
       "type": 0,
@@ -145,6 +167,40 @@
     {
       "type": 0,
       "value": " necesario."
+    }
+  ],
+  "/wtb0w": [
+    {
+      "type": 0,
+      "value": "Modificar tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion para ejecutarse por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
     }
   ],
   "00Lmy0": [
@@ -228,7 +284,7 @@
   "0tTtPb": [
     {
       "type": 0,
-      "value": "1 semana (1 swap)"
+      "value": "1 semana (1 intercambio)"
     }
   ],
   "156xZf": [
@@ -255,6 +311,28 @@
     {
       "type": 0,
       "value": "Estimación de gas"
+    }
+  ],
+  "1c3wKa": [
+    {
+      "type": 0,
+      "value": "Tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion fue migrada"
     }
   ],
   "1mv4e2": [
@@ -336,7 +414,7 @@
   "4jGULT": [
     {
       "type": 0,
-      "value": "dias"
+      "value": "días"
     }
   ],
   "4t/CsS": [
@@ -369,6 +447,12 @@
       "value": "to"
     }
   ],
+  "5H+bme": [
+    {
+      "type": 0,
+      "value": "Transaccion confirmada!"
+    }
+  ],
   "5LJrd3": [
     {
       "type": 0,
@@ -396,7 +480,29 @@
     },
     {
       "type": 0,
-      "value": " swaps)"
+      "value": " intercambios)"
+    }
+  ],
+  "5ncl7Y": [
+    {
+      "type": 0,
+      "value": "Migrar tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
     }
   ],
   "5q/G80": [
@@ -420,7 +526,7 @@
   "6DIyJZ": [
     {
       "type": 0,
-      "value": "Los Market Makers ejecutarán su intercambio en cualquier momento."
+      "value": "Los creadores de mercado ejecutarán su intercambio en cualquier momento."
     }
   ],
   "6Mir2W": [
@@ -466,7 +572,7 @@
   "7CQ1xI": [
     {
       "type": 0,
-      "value": "Actualmente no ofrecemos ninguna plataforma para generar yield con este token."
+      "value": "Actualmente no ofrecemos ninguna plataforma para generar retornos con este token."
     }
   ],
   "7NwTX3": [
@@ -487,6 +593,54 @@
     {
       "type": 0,
       "value": " quieres invertir?"
+    }
+  ],
+  "7YJRiI": [
+    {
+      "type": 0,
+      "value": "Aprobar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "7fX0fL": [
+    {
+      "type": 0,
+      "value": "Retirar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " fondos de tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
     }
   ],
   "7lJ5Ep": [
@@ -563,6 +717,48 @@
       "value": " rate from"
     }
   ],
+  "9NqfNn": [
+    {
+      "type": 0,
+      "value": "Tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion ahora va a intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "freq"
+    },
+    {
+      "type": 0,
+      "value": " por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    }
+  ],
   "9PT4ds": [
     {
       "type": 0,
@@ -604,7 +800,7 @@
   "9mxRvL": [
     {
       "type": 0,
-      "value": "Crear una posición y empezar a generar yield"
+      "value": "Crear una posición y empezar a generar retornos"
     }
   ],
   "9ytfZe": [
@@ -622,7 +818,7 @@
   "A7a2Lo": [
     {
       "type": 0,
-      "value": "Rate:"
+      "value": "Frequencia:"
     }
   ],
   "ALg0aQ": [
@@ -646,7 +842,7 @@
   "Adg2/y": [
     {
       "type": 0,
-      "value": "Migrar la posición y empezar a generar yield"
+      "value": "Migrar la posición y empezar a generar retornos"
     }
   ],
   "AhEpzv": [
@@ -714,7 +910,7 @@
     },
     {
       "type": 0,
-      "value": " swaps)"
+      "value": " intercambios)"
     }
   ],
   "B5YHLB": [
@@ -786,7 +982,7 @@
     },
     {
       "type": 0,
-      "value": " Para usted por"
+      "value": " para usted por"
     }
   ],
   "BrtSAY": [
@@ -810,7 +1006,7 @@
   "ByRaJ4": [
     {
       "type": 0,
-      "value": "Yield de los soportes"
+      "value": "Soporta generar retornos"
     }
   ],
   "C5Zkoh": [
@@ -844,7 +1040,41 @@
     },
     {
       "type": 0,
-      "value": " swaps)"
+      "value": " intercambios)"
+    }
+  ],
+  "CEv5tx": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " han sido agregados a tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
     }
   ],
   "CUp6QA": [
@@ -866,7 +1096,7 @@
   "CioUeM": [
     {
       "type": 0,
-      "value": "Uno o ambos tokens en esta posición permiten generar yield mientras se intercambian sus posiciones. Le sugerimos crear una nueva posición para que empiece a generar yield para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición."
+      "value": "Uno o ambos tokens en esta posición permiten generar retornos mientras se intercambian sus posiciones. Le sugerimos crear una nueva posición para que empiece a generar retornos para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición."
     }
   ],
   "Cnxwym": [
@@ -1031,6 +1261,44 @@
       "value": " se ha enviado correctamente a la blockchain y se confirmará en breve"
     }
   ],
+  "EKvo9E": [
+    {
+      "type": 0,
+      "value": "Quitar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " de la "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
+    }
+  ],
   "EOwwL1": [
     {
       "type": 0,
@@ -1082,7 +1350,7 @@
     },
     {
       "type": 0,
-      "value": " swaps)"
+      "value": " intercambios)"
     }
   ],
   "EWsGHv": [
@@ -1130,7 +1398,7 @@
     },
     {
       "type": 0,
-      "value": " swaps)"
+      "value": " intercambios)"
     }
   ],
   "F5F9dl": [
@@ -1188,7 +1456,7 @@
   "G0Aml3": [
     {
       "type": 0,
-      "value": "para"
+      "value": "por"
     }
   ],
   "G0w2LI": [
@@ -1200,7 +1468,7 @@
   "G5ZcuX": [
     {
       "type": 0,
-      "value": "Yields:"
+      "value": "Retornos:"
     }
   ],
   "GChBDN": [
@@ -1228,7 +1496,7 @@
   "GIOkAT": [
     {
       "type": 0,
-      "value": "4 horas (1 swap)"
+      "value": "4 horas (1 intercambio)"
     }
   ],
   "GZ31rF": [
@@ -1264,7 +1532,29 @@
   "GZNskB": [
     {
       "type": 0,
-      "value": "1 dia (1 swap)"
+      "value": "1 día (1 intercambio)"
+    }
+  ],
+  "Gg22iu": [
+    {
+      "type": 0,
+      "value": "Crear el "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " par"
     }
   ],
   "Ggm1Xe": [
@@ -1415,6 +1705,12 @@
       "value": "Precio medio de compra:"
     }
   ],
+  "IEFMij": [
+    {
+      "type": 0,
+      "value": "No estas conectado a esta red"
+    }
+  ],
   "ILcAj5": [
     {
       "type": 0,
@@ -1449,6 +1745,28 @@
       "value": ")"
     }
   ],
+  "IiX/g2": [
+    {
+      "type": 0,
+      "value": "Tu nueva "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion fue creada"
+    }
+  ],
   "IkKuzc": [
     {
       "type": 0,
@@ -1470,7 +1788,7 @@
   "ItXuIA": [
     {
       "type": 0,
-      "value": "Cambiar la duración y el ritmo"
+      "value": "Cambiar la duración y la frequencia"
     }
   ],
   "IuW2wC": [
@@ -1499,10 +1817,60 @@
       "value": "Sin límites de intercambio"
     }
   ],
+  "J8hDoy": [
+    {
+      "type": 0,
+      "value": "Definir tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion permisos"
+    }
+  ],
   "J9ovKV": [
     {
       "type": 0,
       "value": "Usted recibe"
+    }
+  ],
+  "JJ1fcj": [
+    {
+      "type": 0,
+      "value": "Transaccion confirmada!"
+    }
+  ],
+  "JOH6+p": [
+    {
+      "type": 0,
+      "value": "Retirar de tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
     }
   ],
   "Jh14HF": [
@@ -1538,7 +1906,7 @@
   "KKIhxJ": [
     {
       "type": 0,
-      "value": "Establecer para ejecutar para:"
+      "value": "Fijado para operar durante:"
     }
   ],
   "KTvwXg": [
@@ -1556,7 +1924,7 @@
   "KiN4dM": [
     {
       "type": 0,
-      "value": "swaps"
+      "value": "intercambios"
     }
   ],
   "KmmquQ": [
@@ -1635,6 +2003,28 @@
     {
       "type": 0,
       "value": "El volumen de los tokens incluidos en el intercambio"
+    }
+  ],
+  "LQAOnp": [
+    {
+      "type": 0,
+      "value": "Los permisos de tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion ahora estan definidos"
     }
   ],
   "LQR2sQ": [
@@ -1767,6 +2157,44 @@
       "value": "Los contratos de Mean Finance han sido auditados por Pessimistic y PeckShield. Puede leer los informes"
     }
   ],
+  "NSmm8H": [
+    {
+      "type": 0,
+      "value": "Agregar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " a la "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
+    }
+  ],
   "NXDtFv": [
     {
       "type": 0,
@@ -1816,7 +2244,7 @@
   "NpsctG": [
     {
       "type": 0,
-      "value": "Abrir posiciones"
+      "value": "Posiciones abiertas"
     }
   ],
   "NsIFlt": [
@@ -1861,6 +2289,52 @@
       "value": "readable"
     }
   ],
+  "OTXQIc": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " fueron agregados a tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion y va a ejecutarse por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    }
+  ],
   "OTyRfW": [
     {
       "type": 0,
@@ -1896,7 +2370,7 @@
   "OoEgv4": [
     {
       "type": 0,
-      "value": "swaps"
+      "value": "intercambios"
     }
   ],
   "OqTl06": [
@@ -1939,6 +2413,32 @@
       "value": "Permisos de posición modificado"
     }
   ],
+  "PYOWcC": [
+    {
+      "type": 0,
+      "value": "Tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion fue transferida a "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
   "PbwFtv": [
     {
       "type": 0,
@@ -1971,10 +2471,16 @@
       "value": "cada 30 minutos"
     }
   ],
+  "Q1G3hW": [
+    {
+      "type": 0,
+      "value": "Poner la direccion a transferir"
+    }
+  ],
   "Q35rqD": [
     {
       "type": 0,
-      "value": "5 minutos (1 swap)"
+      "value": "5 minutos (1 intercambio)"
     }
   ],
   "Q5QZCV": [
@@ -2031,10 +2537,70 @@
       "value": "name"
     }
   ],
+  "QpkEk9": [
+    {
+      "type": 0,
+      "value": "Retiraste "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " fondos de tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
+    }
+  ],
   "QrYw4z": [
     {
       "type": 0,
       "value": "5 minutos"
+    }
+  ],
+  "RCUD56": [
+    {
+      "type": 0,
+      "value": "Tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion ahora esta generando retornos"
     }
   ],
   "RK1KtY": [
@@ -2144,7 +2710,7 @@
   "SNxage": [
     {
       "type": 0,
-      "value": "Empezar a generar yield"
+      "value": "Empezar a generar retornos"
     }
   ],
   "SVDYlT": [
@@ -2157,6 +2723,56 @@
     {
       "type": 0,
       "value": "Retirar saldo de su posición"
+    }
+  ],
+  "TC32uH": [
+    {
+      "type": 0,
+      "value": "Agregar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " a tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion y va a ejecutarse por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
     }
   ],
   "TGj1j/": [
@@ -2187,6 +2803,12 @@
     {
       "type": 0,
       "value": "Agregar dirección"
+    }
+  ],
+  "UJ3vcm": [
+    {
+      "type": 0,
+      "value": "Personalizar"
     }
   ],
   "UhD0bk": [
@@ -2302,7 +2924,7 @@
   "WJbxRJ": [
     {
       "type": 0,
-      "value": "Puedes empezar a generar yield"
+      "value": "Puedes empezar a generar retornos"
     }
   ],
   "WaK61o": [
@@ -2390,13 +3012,13 @@
   "XmYRql": [
     {
       "type": 0,
-      "value": "Los fondos se depositarán en la plataforma seleccionada para genenerar yield mientras esperan a ser intercambiados o retirados. La seguridad de los fondos dependerá de la plataforma seleccionada, por lo que le aconsejamos que investigue por su cuenta para realizar una evaluación informada de la relación riesgo/rentabilidad"
+      "value": "Los fondos se depositarán en la plataforma seleccionada para genenerar retornos mientras esperan a ser cambiados o retirados. La seguridad de los fondos dependerá de la plataforma seleccionada, por lo que le aconsejamos que investigue por su cuenta para realizar una evaluación informada de la relación riesgo/rentabilidad"
     }
   ],
   "Xq/LIk": [
     {
       "type": 0,
-      "value": "HECHO"
+      "value": "COMPLETADA"
     }
   ],
   "XrLrtm": [
@@ -2502,13 +3124,13 @@
   "Yl6vl8": [
     {
       "type": 0,
-      "value": "swaps"
+      "value": "intercambios"
     }
   ],
   "YmpFX8": [
     {
       "type": 0,
-      "value": "Sus posiciones"
+      "value": "Tus posiciones"
     }
   ],
   "YpaT9e": [
@@ -2599,6 +3221,50 @@
       "value": "¿Por qué debería usar Mean Finance?"
     }
   ],
+  "ZWFiru": [
+    {
+      "type": 0,
+      "value": "Tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion fue cerrada"
+    }
+  ],
+  "ZaSmdn": [
+    {
+      "type": 0,
+      "value": "Cerrar tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
+    }
+  ],
   "ZaT+DW": [
     {
       "type": 1,
@@ -2654,7 +3320,7 @@
   "aEQUw9": [
     {
       "type": 0,
-      "value": "Sección de yields"
+      "value": "Sección de retornos"
     }
   ],
   "aPrJJm": [
@@ -2711,6 +3377,28 @@
       "value": "symbol"
     }
   ],
+  "b0Bg0T": [
+    {
+      "type": 0,
+      "value": "El par "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " fue creado"
+    }
+  ],
   "b6x2Rx": [
     {
       "type": 0,
@@ -2726,7 +3414,7 @@
   "bCOphI": [
     {
       "type": 0,
-      "value": "swaps"
+      "value": "intercambios"
     }
   ],
   "bIgRS1": [
@@ -2767,10 +3455,58 @@
       "value": "Leer sobre el oráculo de precios"
     }
   ],
+  "c5GoNs": [
+    {
+      "type": 0,
+      "value": "Posiciones"
+    }
+  ],
   "c73eqf": [
     {
       "type": 0,
       "value": "Error detectado"
+    }
+  ],
+  "c91iH2": [
+    {
+      "type": 0,
+      "value": "Modificar tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion para intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "freq"
+    },
+    {
+      "type": 0,
+      "value": " por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
     }
   ],
   "c9qXGP": [
@@ -2793,6 +3529,28 @@
     {
       "type": 0,
       "value": " se ha enviado correctamente al blockchain y se confrimará en breve"
+    }
+  ],
+  "cA3qXj": [
+    {
+      "type": 0,
+      "value": "Approvar nuestro Hub Companion para modificar tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
     }
   ],
   "cDcRwD": [
@@ -2852,7 +3610,7 @@
   "dINFAP": [
     {
       "type": 0,
-      "value": "1 dia"
+      "value": "1 día"
     }
   ],
   "dMaFCd": [
@@ -2870,7 +3628,7 @@
   "dPkxyg": [
     {
       "type": 0,
-      "value": "swaps"
+      "value": "intercambios"
     }
   ],
   "dSDGZh": [
@@ -2892,7 +3650,7 @@
   "e1vYrA": [
     {
       "type": 0,
-      "value": "No hay yield"
+      "value": "Sin retornos"
     }
   ],
   "e2q+Fu": [
@@ -3036,7 +3794,7 @@
   "gQEJk+": [
     {
       "type": 0,
-      "value": "swaps"
+      "value": "intercambios"
     }
   ],
   "gVbrRz": [
@@ -3082,7 +3840,7 @@
   "gqiFWl": [
     {
       "type": 0,
-      "value": "Intercambiado:"
+      "value": "Se ejecuto por:"
     }
   ],
   "gtB9V2": [
@@ -3095,6 +3853,12 @@
     {
       "type": 0,
       "value": "Intercambio ejecutado"
+    }
+  ],
+  "h96679": [
+    {
+      "type": 0,
+      "value": "Poner la address a la que quieres darle permisos"
     }
   ],
   "hEvpJE": [
@@ -3176,7 +3940,21 @@
   "iUehtc": [
     {
       "type": 0,
-      "value": "Intercambiaremos"
+      "value": "Cambiaremos"
+    }
+  ],
+  "iWNnCB": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " wrapped a "
+    },
+    {
+      "type": 1,
+      "value": "token"
     }
   ],
   "iY28lu": [
@@ -3227,6 +4005,28 @@
       "value": "¿Cuándo tengo que pagar las tarifas de gas?"
     }
   ],
+  "jL8UGU": [
+    {
+      "type": 0,
+      "value": "Crear la "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
+    }
+  ],
   "jPhXzy": [
     {
       "type": 0,
@@ -3243,6 +4043,34 @@
     {
       "type": 0,
       "value": "Continuar"
+    }
+  ],
+  "jXIz7M": [
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " ahora esta listo para usarse"
+    }
+  ],
+  "jb9Uav": [
+    {
+      "type": 0,
+      "value": "Ahora estas listo para usar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
     }
   ],
   "jbb8PB": [
@@ -3309,6 +4137,42 @@
       "value": "El próximo intercambio se ejecutará en la primera hora después de la creación de la posición"
     }
   ],
+  "ks0oAr": [
+    {
+      "type": 0,
+      "value": "Hacer que tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion empieze a generar yield"
+    }
+  ],
+  "kuWbwN": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " wrapped a "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
   "l4VKpl": [
     {
       "type": 0,
@@ -3372,7 +4236,7 @@
   "lsm/sD": [
     {
       "type": 0,
-      "value": "Usted vende"
+      "value": "Vendes"
     }
   ],
   "m3YpJM": [
@@ -3412,7 +4276,7 @@
     },
     {
       "type": 0,
-      "value": " empiece a generar yield"
+      "value": " empiece a generar retornos"
     }
   ],
   "msqsvt": [
@@ -3452,7 +4316,7 @@
   "nFFzXV": [
     {
       "type": 0,
-      "value": "15 minutos (1 swap)"
+      "value": "15 minutos (1 intercambio)"
     }
   ],
   "nNo2x5": [
@@ -3476,7 +4340,7 @@
   "nV5R/e": [
     {
       "type": 0,
-      "value": "dia"
+      "value": "día"
     }
   ],
   "nWm9Qa": [
@@ -3488,7 +4352,7 @@
   "naApNE": [
     {
       "type": 0,
-      "value": "30 minutos (1 swap)"
+      "value": "30 minutos (1 intercambio)"
     }
   ],
   "ne8FlW": [
@@ -3506,13 +4370,13 @@
   "oGIpAl": [
     {
       "type": 0,
-      "value": "#NAME?"
+      "value": "+ retornos generados"
     }
   ],
   "ocCMPR": [
     {
       "type": 0,
-      "value": "Generar yield"
+      "value": "Generar retornos"
     }
   ],
   "on7qPn": [
@@ -3620,13 +4484,13 @@
   "pVaAUz": [
     {
       "type": 0,
-      "value": "La posición no está generando yield"
+      "value": "La posición no está generando retornos"
     }
   ],
   "pWI5/m": [
     {
       "type": 0,
-      "value": "No hay yield"
+      "value": "Sin retornos"
     }
   ],
   "pc75Ig": [
@@ -3689,6 +4553,40 @@
       "value": "El TRUE DCAOR es aquel cuya posición se ha establecdo para ejecutarse durante más tiempo"
     }
   ],
+  "qQeTLj": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " fueron removidos de tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
+    }
+  ],
   "qTiaEE": [
     {
       "type": 0,
@@ -3743,6 +4641,28 @@
       "value": "No está autorizado para realizar esta operación"
     }
   ],
+  "r7l7zf": [
+    {
+      "type": 0,
+      "value": "Retiraste de tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion"
+    }
+  ],
   "rEo0yG": [
     {
       "type": 0,
@@ -3755,6 +4675,12 @@
       "value": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion . Luego, tendrá que enviar la transacción en la que migra la posición"
     }
   ],
+  "rLp2yg": [
+    {
+      "type": 0,
+      "value": "proximamente. Crea una position ahora para ser incluido en el proximo intercambio"
+    }
+  ],
   "reRP6P": [
     {
       "type": 1,
@@ -3762,7 +4688,7 @@
     },
     {
       "type": 0,
-      "value": " swap"
+      "value": " intercambios"
     },
     {
       "type": 1,
@@ -3899,6 +4825,24 @@
       "value": "para esa frecuencia. ¿Está seguro de que desea crear una posición?"
     }
   ],
+  "tAzRkq": [
+    {
+      "type": 0,
+      "value": "Aprobar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
   "tHbIgJ": [
     {
       "type": 0,
@@ -3924,7 +4868,7 @@
     },
     {
       "type": 0,
-      "value": " comience a generar yield se envió con éxito al blockchain y será confirmada en breve"
+      "value": " comience a generar retornos se envió con éxito al blockchain y será confirmada en breve"
     }
   ],
   "tSkT/G": [
@@ -3953,16 +4897,50 @@
       "value": "Transferir"
     }
   ],
+  "tdhen+": [
+    {
+      "type": 0,
+      "value": "Tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion ahora se va a ejecutar por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    }
+  ],
   "tiJ3Vs": [
     {
       "type": 0,
-      "value": "1 minuto (1 swap)"
+      "value": "1 minuto (1 intercambio)"
     }
   ],
   "tqUUG8": [
     {
       "type": 0,
-      "value": "Para empezar a generar yield, tendremos que cerrar su posición actual y crear una nueva. Los datos históricos de esta posición aparecerán como una posición cerrada"
+      "value": "Para empezar a generar retornos, tendremos que cerrar su posición actual y crear una nueva. Los datos históricos de esta posición aparecerán como una posición cerrada"
     }
   ],
   "twerhs": [
@@ -3999,6 +4977,20 @@
       "value": "¿Cómo podemos mejorarlo?"
     }
   ],
+  "v/LxnW": [
+    {
+      "type": 0,
+      "value": "aproximadamente "
+    },
+    {
+      "type": 1,
+      "value": "nextSwapAvailableAt"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
   "v1SP5g": [
     {
       "type": 0,
@@ -4030,13 +5022,13 @@
   "vlDLmo": [
     {
       "type": 0,
-      "value": "Usted invertirá"
+      "value": "Invertirá"
     }
   ],
   "vmGAxP": [
     {
       "type": 0,
-      "value": "Usted recibe"
+      "value": "Recibes"
     }
   ],
   "vqkOyW": [
@@ -4111,6 +5103,32 @@
       "value": "a"
     }
   ],
+  "x2ydb5": [
+    {
+      "type": 0,
+      "value": "Transferir tu "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posicion a "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
   "xTAANF": [
     {
       "type": 0,
@@ -4126,7 +5144,7 @@
   "xqGD8L": [
     {
       "type": 0,
-      "value": "Empezar a generar yield"
+      "value": "Empezar a generar retornos"
     }
   ],
   "xu/Gut": [
@@ -4162,13 +5180,13 @@
   "yVecas": [
     {
       "type": 0,
-      "value": "índice:"
+      "value": "frequencia:"
     }
   ],
   "yhA8mK": [
     {
       "type": 0,
-      "value": "#NAME?"
+      "value": "+ retornos"
     }
   ],
   "yoTCFN": [
@@ -4186,7 +5204,7 @@
     },
     {
       "type": 0,
-      "value": " swaps)"
+      "value": " intercambios)"
     }
   ],
   "z/57ga": [
@@ -4216,7 +5234,7 @@
     },
     {
       "type": 0,
-      "value": " swaps)"
+      "value": " intercambios)"
     }
   ],
   "zNOHJl": [
@@ -4232,7 +5250,7 @@
   "zSo0el": [
     {
       "type": 0,
-      "value": "cada dia"
+      "value": "cada día"
     }
   ],
   "zTt+tt": [
@@ -4300,7 +5318,7 @@
   "zuU6Ai": [
     {
       "type": 0,
-      "value": "1 hora (1 swap)"
+      "value": "1 hora (1 intercambio)"
     }
   ],
   "zwn/c2": [
