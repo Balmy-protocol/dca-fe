@@ -396,9 +396,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           chainId: position.chainId,
         });
       }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       setModalError({
         content: <FormattedMessage description="modalErrorApprovingToken" defaultMessage="Error approving token" />,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         error: { code: e.code, message: e.message, data: e.data },
       });
     }

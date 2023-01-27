@@ -90,7 +90,7 @@
   "+vAQ2s": [
     {
       "type": 0,
-      "value": "Cerrar posicion"
+      "value": "Cerrar posición"
     }
   ],
   "+zKE+F": [
@@ -114,13 +114,13 @@
   "/LSdRt": [
     {
       "type": 0,
-      "value": "Los usuarios tienen que pagar tarifas de gas cuando interactúan con sus posiciones. Al mismo tiempo, hay una comisión de protocolo que se cobra en cada intercambio. Esa comisión es actualmente del 0,6%."
+      "value": "Los usuarios tienen que pagar tarifas de gas cuando interactúan con sus posiciónes. Al mismo tiempo, hay una comisión de protocolo que se cobra en cada intercambio. Esa comisión es actualmente del 0,6%."
     }
   ],
   "/ePQOu": [
     {
       "type": 0,
-      "value": "Nuestro Hub Companion fue aprobado para modificar tu "
+      "value": "Nuestro Hub Companion fue aprobado para modificar tu posición "
     },
     {
       "type": 1,
@@ -133,10 +133,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "/gkMmp": [
@@ -178,7 +174,7 @@
   "/wtb0w": [
     {
       "type": 0,
-      "value": "Modificar tu "
+      "value": "Modificar tu posición "
     },
     {
       "type": 1,
@@ -194,7 +190,7 @@
     },
     {
       "type": 0,
-      "value": " posicion para ejecutarse por "
+      "value": " para ejecutarse por "
     },
     {
       "type": 1,
@@ -322,7 +318,7 @@
   "1c3wKa": [
     {
       "type": 0,
-      "value": "Tu "
+      "value": "Tu posición "
     },
     {
       "type": 1,
@@ -338,7 +334,7 @@
     },
     {
       "type": 0,
-      "value": " posicion fue migrada"
+      "value": " fue migrada"
     }
   ],
   "1mv4e2": [
@@ -417,6 +413,12 @@
       "value": " USD)"
     }
   ],
+  "4Y/d8a": [
+    {
+      "type": 0,
+      "value": "Error creando posición"
+    }
+  ],
   "4jGULT": [
     {
       "type": 0,
@@ -456,7 +458,7 @@
   "5H+bme": [
     {
       "type": 0,
-      "value": "Transaccion confirmada!"
+      "value": "Transacción confirmada!"
     }
   ],
   "5LJrd3": [
@@ -492,7 +494,7 @@
   "5ncl7Y": [
     {
       "type": 0,
-      "value": "Migrar tu "
+      "value": "Migrar tu posición "
     },
     {
       "type": 1,
@@ -505,10 +507,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "5q/G80": [
@@ -630,7 +628,7 @@
     },
     {
       "type": 0,
-      "value": " fondos de tu "
+      "value": " fondos de tu posición "
     },
     {
       "type": 1,
@@ -643,10 +641,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "7lJ5Ep": [
@@ -726,7 +720,7 @@
   "9NqfNn": [
     {
       "type": 0,
-      "value": "Tu "
+      "value": "Tu posición "
     },
     {
       "type": 1,
@@ -742,7 +736,7 @@
     },
     {
       "type": 0,
-      "value": " posicion ahora va a intercambiar "
+      "value": " ahora va a intercambiar "
     },
     {
       "type": 1,
@@ -796,7 +790,7 @@
   "9ka/f/": [
     {
       "type": 0,
-      "value": "Aún no hay posiciones de "
+      "value": "Aún no hay posiciónes de "
     },
     {
       "type": 1,
@@ -1000,7 +994,7 @@
   "BsPq9s": [
     {
       "type": 0,
-      "value": "Compite por quién tiene más posiciones en Mean Finance"
+      "value": "Compite por quién tiene más posiciónes en Mean Finance"
     }
   ],
   "Bxzkan": [
@@ -1064,7 +1058,7 @@
     },
     {
       "type": 0,
-      "value": " han sido agregados a tu "
+      "value": " han sido agregados a tu posición "
     },
     {
       "type": 1,
@@ -1077,10 +1071,12 @@
     {
       "type": 1,
       "value": "to"
-    },
+    }
+  ],
+  "CNGClN": [
     {
       "type": 0,
-      "value": " posicion"
+      "value": "Error aprovando token"
     }
   ],
   "CUp6QA": [
@@ -1102,7 +1098,7 @@
   "CioUeM": [
     {
       "type": 0,
-      "value": "Uno o ambos tokens en esta posición permiten generar retornos mientras se intercambian sus posiciones. Le sugerimos crear una nueva posición para que empiece a generar retornos para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición."
+      "value": "Uno o ambos tokens en esta posición permiten generar retornos mientras se intercambian sus posiciónes. Le sugerimos crear una nueva posición para que empiece a generar retornos para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición."
     }
   ],
   "Cnxwym": [
@@ -1114,7 +1110,7 @@
   "Cxag1C": [
     {
       "type": 0,
-      "value": "Ver sus posiciones"
+      "value": "Ver sus posiciónes"
     }
   ],
   "DCQQov": [
@@ -1286,7 +1282,7 @@
     },
     {
       "type": 0,
-      "value": " de la "
+      "value": " de la posición "
     },
     {
       "type": 1,
@@ -1299,10 +1295,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "EOwwL1": [
@@ -1505,6 +1497,12 @@
       "value": "4 horas (1 intercambio)"
     }
   ],
+  "GLQaI9": [
+    {
+      "type": 0,
+      "value": "Error cerrando posición"
+    }
+  ],
   "GZ31rF": [
     {
       "type": 0,
@@ -1544,7 +1542,7 @@
   "Gg22iu": [
     {
       "type": 0,
-      "value": "Crear el "
+      "value": "Crear el par "
     },
     {
       "type": 1,
@@ -1557,10 +1555,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " par"
     }
   ],
   "Ggm1Xe": [
@@ -1578,7 +1572,7 @@
   "GoFOv6": [
     {
       "type": 0,
-      "value": "Cambiar su "
+      "value": "Cambiar la frequencia de su posición "
     },
     {
       "type": 1,
@@ -1594,7 +1588,7 @@
     },
     {
       "type": 0,
-      "value": " tasa de posición para intercambiar "
+      "value": " para intercambiar "
     },
     {
       "type": 1,
@@ -1634,7 +1628,7 @@
   "Gzs80Q": [
     {
       "type": 0,
-      "value": "Rate:"
+      "value": "Frequencia:"
     }
   ],
   "H/e6If": [
@@ -1664,11 +1658,15 @@
   "HsmM3H": [
     {
       "type": 0,
-      "value": "Retirar el resto "
+      "value": "Retirar el "
     },
     {
       "type": 1,
       "value": "token"
+    },
+    {
+      "type": 0,
+      "value": " restante"
     }
   ],
   "HuMusT": [
@@ -1754,7 +1752,7 @@
   "IiX/g2": [
     {
       "type": 0,
-      "value": "Tu nueva "
+      "value": "Tu nueva posición "
     },
     {
       "type": 1,
@@ -1770,7 +1768,7 @@
     },
     {
       "type": 0,
-      "value": " posicion fue creada"
+      "value": " fue creada"
     }
   ],
   "IkKuzc": [
@@ -1826,7 +1824,7 @@
   "J8hDoy": [
     {
       "type": 0,
-      "value": "Definir tu "
+      "value": "Definir tu posición "
     },
     {
       "type": 1,
@@ -1842,7 +1840,7 @@
     },
     {
       "type": 0,
-      "value": " posicion permisos"
+      "value": " permisos"
     }
   ],
   "J9ovKV": [
@@ -1854,13 +1852,13 @@
   "JJ1fcj": [
     {
       "type": 0,
-      "value": "Transaccion confirmada!"
+      "value": "Transacción confirmada!"
     }
   ],
   "JOH6+p": [
     {
       "type": 0,
-      "value": "Retirar de tu "
+      "value": "Retirar de tu posición "
     },
     {
       "type": 1,
@@ -1873,16 +1871,12 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "Jh14HF": [
     {
       "type": 0,
-      "value": "Esto no se puede deshacer"
+      "value": "Esta acción una vez hecha, será irreversible."
     }
   ],
   "K/HInO": [
@@ -2014,7 +2008,7 @@
   "LQAOnp": [
     {
       "type": 0,
-      "value": "Los permisos de tu "
+      "value": "Los permisos de tu posición "
     },
     {
       "type": 1,
@@ -2030,7 +2024,7 @@
     },
     {
       "type": 0,
-      "value": " posicion ahora estan definidos"
+      "value": " ahora estan definidos"
     }
   ],
   "LQR2sQ": [
@@ -2166,7 +2160,7 @@
   "NQzhfq": [
     {
       "type": 0,
-      "value": "Aumentar posicion"
+      "value": "Aumentar posición"
     }
   ],
   "NSmm8H": [
@@ -2188,7 +2182,7 @@
     },
     {
       "type": 0,
-      "value": " a la "
+      "value": " a la posición "
     },
     {
       "type": 1,
@@ -2201,10 +2195,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "NXDtFv": [
@@ -2316,7 +2306,7 @@
     },
     {
       "type": 0,
-      "value": " fueron agregados a tu "
+      "value": " fueron agregados a tu posición "
     },
     {
       "type": 1,
@@ -2332,7 +2322,7 @@
     },
     {
       "type": 0,
-      "value": " posicion y va a ejecutarse por "
+      "value": " y va a ejecutarse por "
     },
     {
       "type": 1,
@@ -2356,7 +2346,7 @@
   "OalKNY": [
     {
       "type": 0,
-      "value": "Compite por quién tiene el mayor volumen intercambiado fijado en Mean Finance. Esto incluye la liquidez intercambiada en sus posiciones"
+      "value": "Compite por quién tiene el mayor volumen intercambiado fijado en Mean Finance. Esto incluye la liquidez intercambiada en sus posiciónes"
     }
   ],
   "OdWJTU": [
@@ -2434,7 +2424,7 @@
   "PYOWcC": [
     {
       "type": 0,
-      "value": "Tu "
+      "value": "Tu posición "
     },
     {
       "type": 1,
@@ -2450,7 +2440,7 @@
     },
     {
       "type": 0,
-      "value": " posicion fue transferida a "
+      "value": " fue transferida a "
     },
     {
       "type": 1,
@@ -2492,7 +2482,7 @@
   "Q1G3hW": [
     {
       "type": 0,
-      "value": "Poner la direccion a transferir"
+      "value": "Poner la direccion del destinatario"
     }
   ],
   "Q35rqD": [
@@ -2510,7 +2500,7 @@
   "QDVx7K": [
     {
       "type": 0,
-      "value": "Dados los ultimos desarrollos, Aaave pauso el prestamo y deposit de $jEUR. Como resultado, aumentar la posicion ah sido deshabilitado. Leer mas aqui"
+      "value": "Dados los ultimos desarrollos, Aaave pauso el prestamo y deposit de $jEUR. Como resultado, aumentar la posición ah sido deshabilitado. Leer mas aqui"
     }
   ],
   "QYjgIw": [
@@ -2574,7 +2564,7 @@
     },
     {
       "type": 0,
-      "value": " fondos de tu "
+      "value": " fondos de tu posición "
     },
     {
       "type": 1,
@@ -2587,10 +2577,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "QrYw4z": [
@@ -2602,7 +2588,7 @@
   "RCUD56": [
     {
       "type": 0,
-      "value": "Tu "
+      "value": "Tu posición "
     },
     {
       "type": 1,
@@ -2618,7 +2604,7 @@
     },
     {
       "type": 0,
-      "value": " posicion ahora esta generando retornos"
+      "value": " ahora esta generando retornos"
     }
   ],
   "RK1KtY": [
@@ -2690,7 +2676,7 @@
   "S2QomY": [
     {
       "type": 0,
-      "value": "Aquí verá los detalles de sus posiciones abiertas y podrá ver más detalles sobre ellas. Sólo podrá interactuar con ellas si está en la red correcta"
+      "value": "Aquí verá los detalles de sus posiciónes abiertas y podrá ver más detalles sobre ellas. Sólo podrá interactuar con ellas si está en la red correcta"
     }
   ],
   "S2dFpy": [
@@ -2762,7 +2748,7 @@
     },
     {
       "type": 0,
-      "value": " a tu "
+      "value": " a tu posición "
     },
     {
       "type": 1,
@@ -2778,7 +2764,7 @@
     },
     {
       "type": 0,
-      "value": " posicion y va a ejecutarse por "
+      "value": " y va a ejecutarse por "
     },
     {
       "type": 1,
@@ -2927,6 +2913,16 @@
       "value": "to"
     }
   ],
+  "Vz0lLC": [
+    {
+      "type": 0,
+      "value": "Usar "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
   "W6JmVw": [
     {
       "type": 0,
@@ -2961,6 +2957,12 @@
     {
       "type": 0,
       "value": "Mínimo recibido:"
+    }
+  ],
+  "WszPax": [
+    {
+      "type": 0,
+      "value": "Error retirando"
     }
   ],
   "X/B1lK": [
@@ -3074,7 +3076,7 @@
   "YRoLhe": [
     {
       "type": 0,
-      "value": "Esto transferirá su posición, su NTF y toda la liquidez almacenada en la posición a la nueva dirección"
+      "value": "Esto transferirá su posición, su NFT y toda la liquidez almacenada en la posición a la nueva dirección"
     }
   ],
   "YVAdRx": [
@@ -3148,13 +3150,13 @@
   "YmpFX8": [
     {
       "type": 0,
-      "value": "Tus posiciones"
+      "value": "Tus posiciónes"
     }
   ],
   "YpaT9e": [
     {
       "type": 0,
-      "value": "Compite por ver quién tiene más valor total fijado en Mean Finance. Esto incluye tanto la liquidez intercambiada como la no intercambiada en sus posiciones."
+      "value": "Compite por ver quién tiene más valor total fijado en Mean Finance. Esto incluye tanto la liquidez intercambiada como la no intercambiada en sus posiciónes."
     }
   ],
   "ZATHUb": [
@@ -3242,7 +3244,7 @@
   "ZWFiru": [
     {
       "type": 0,
-      "value": "Tu "
+      "value": "Tu posición "
     },
     {
       "type": 1,
@@ -3258,13 +3260,13 @@
     },
     {
       "type": 0,
-      "value": " posicion fue cerrada"
+      "value": " fue cerrada"
     }
   ],
   "ZaSmdn": [
     {
       "type": 0,
-      "value": "Cerrar tu "
+      "value": "Cerrar tu posición "
     },
     {
       "type": 1,
@@ -3277,10 +3279,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "ZaT+DW": [
@@ -3294,7 +3292,7 @@
     },
     {
       "type": 0,
-      "value": " para usted para"
+      "value": " para usted por"
     }
   ],
   "Zsuz+g": [
@@ -3345,6 +3343,12 @@
     {
       "type": 0,
       "value": "Se han eliminado todos los permisos para"
+    }
+  ],
+  "aT7Itp": [
+    {
+      "type": 0,
+      "value": "Error generando que la posición genere retornos"
     }
   ],
   "agFL3X": [
@@ -3488,7 +3492,7 @@
   "c91iH2": [
     {
       "type": 0,
-      "value": "Modificar tu "
+      "value": "Modificar tu posición "
     },
     {
       "type": 1,
@@ -3504,7 +3508,7 @@
     },
     {
       "type": 0,
-      "value": " posicion para intercambiar "
+      "value": " para intercambiar "
     },
     {
       "type": 1,
@@ -3552,7 +3556,7 @@
   "cA3qXj": [
     {
       "type": 0,
-      "value": "Approvar nuestro Hub Companion para modificar tu "
+      "value": "Approvar nuestro Hub Companion para modificar tu posición "
     },
     {
       "type": 1,
@@ -3565,10 +3569,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "cDcRwD": [
@@ -3675,6 +3675,12 @@
     {
       "type": 0,
       "value": "Frecuencia:"
+    }
+  ],
+  "e91MXw": [
+    {
+      "type": 0,
+      "value": "Error retirando funds"
     }
   ],
   "eiCVwX": [
@@ -3876,7 +3882,7 @@
   "h96679": [
     {
       "type": 0,
-      "value": "Poner la address a la que quieres darle permisos"
+      "value": "Poner la dirección a la que quieres darle permisos"
     }
   ],
   "hEvpJE": [
@@ -3888,7 +3894,7 @@
   "hUTWyY": [
     {
       "type": 0,
-      "value": "Esto permite a la dirección retirar su liquidez intercambiada de su posición"
+      "value": "Esto permite a la dirección retirar la liquidez intercambiada de su posición"
     }
   ],
   "haoCMr": [
@@ -4017,6 +4023,12 @@
       "value": "semana"
     }
   ],
+  "jJcSKd": [
+    {
+      "type": 0,
+      "value": "Error migrando la posición"
+    }
+  ],
   "jKP6bq": [
     {
       "type": 0,
@@ -4026,7 +4038,7 @@
   "jL8UGU": [
     {
       "type": 0,
-      "value": "Crear la "
+      "value": "Crear la posición "
     },
     {
       "type": 1,
@@ -4039,10 +4051,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "jPhXzy": [
@@ -4158,7 +4166,7 @@
   "ks0oAr": [
     {
       "type": 0,
-      "value": "Hacer que tu "
+      "value": "Hacer que tu posición "
     },
     {
       "type": 1,
@@ -4174,7 +4182,7 @@
     },
     {
       "type": 0,
-      "value": " posicion empieze a generar yield"
+      "value": " empieze a generar retornos"
     }
   ],
   "kuWbwN": [
@@ -4200,7 +4208,7 @@
   "lBsNBG": [
     {
       "type": 0,
-      "value": "Seleccionar plataforma"
+      "value": "Elegir retornos"
     }
   ],
   "lJRhFc": [
@@ -4322,7 +4330,7 @@
   "mz7RzW": [
     {
       "type": 0,
-      "value": "Agregar direccion"
+      "value": "Agregar dirección"
     }
   ],
   "n47KZD": [
@@ -4458,7 +4466,7 @@
   "pBVKIR": [
     {
       "type": 0,
-      "value": "Tiene que invertir al menos una tarifa de $"
+      "value": "Tiene que invertir al menos una frequencia de $"
     },
     {
       "type": 1,
@@ -4490,13 +4498,13 @@
     },
     {
       "type": 0,
-      "value": " para habilitar esta opción"
+      "value": " para habilitar esta opción."
     }
   ],
   "pMZxIC": [
     {
       "type": 0,
-      "value": "HECHO"
+      "value": "TERMINADA"
     }
   ],
   "pVaAUz": [
@@ -4556,7 +4564,7 @@
   "qCw/BH": [
     {
       "type": 0,
-      "value": "¿Se ha olvidado de su posición? Estas son las direcciones que tienen más valor para retirar entre sus posiciones"
+      "value": "¿Se ha olvidado de su posición? Estas son las direcciones que tienen más valor para retirar entre sus posiciónes"
     }
   ],
   "qHy8j2": [
@@ -4586,7 +4594,7 @@
     },
     {
       "type": 0,
-      "value": " fueron removidos de tu "
+      "value": " fueron removidos de tu posición "
     },
     {
       "type": 1,
@@ -4599,10 +4607,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "qTiaEE": [
@@ -4621,6 +4625,18 @@
     {
       "type": 0,
       "value": "Modificaciones"
+    }
+  ],
+  "qodglE": [
+    {
+      "type": 0,
+      "value": "Error transfiriendo la posición"
+    }
+  ],
+  "r+KI3m": [
+    {
+      "type": 0,
+      "value": "Error cambiando la frequencia y duracion"
     }
   ],
   "r0L/01": [
@@ -4662,7 +4678,7 @@
   "r7l7zf": [
     {
       "type": 0,
-      "value": "Retiraste de tu "
+      "value": "Retiraste de tu posición "
     },
     {
       "type": 1,
@@ -4675,10 +4691,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " posicion"
     }
   ],
   "rEo0yG": [
@@ -4906,7 +4918,7 @@
   "tX40vS": [
     {
       "type": 0,
-      "value": "Los usuarios sólo tienen que pagar gas cuando interactúan con las posiciones. Esto incluye:"
+      "value": "Los usuarios sólo tienen que pagar gas cuando interactúan con las posiciónes. Esto incluye:"
     }
   ],
   "taCH+c": [
@@ -4918,7 +4930,7 @@
   "tdhen+": [
     {
       "type": 0,
-      "value": "Tu "
+      "value": "Tu posición "
     },
     {
       "type": 1,
@@ -4934,7 +4946,7 @@
     },
     {
       "type": 0,
-      "value": " posicion ahora se va a ejecutar por "
+      "value": " ahora se va a ejecutar por "
     },
     {
       "type": 1,
@@ -4952,7 +4964,7 @@
   "th+wsU": [
     {
       "type": 0,
-      "value": "Reducir posicion"
+      "value": "Reducir posición"
     }
   ],
   "tiJ3Vs": [
@@ -5025,6 +5037,12 @@
     {
       "type": 0,
       "value": "Por ejemplo, supongamos que ha creado una posición que intercambia 2000 USDC por ETH cada día. Supongamos también que, cuando se ejecuta el intercambio, 2000 USDC = 1 ETH. En lugar de obtener 1 ETH, estaría obteniendo 1 ETH - 0,6% = 0,994 ETH. Ese 0,6% se dividirá entre Mean Finance y el usuario que realmente ejecutó ese intercambio."
+    }
+  ],
+  "vQABrE": [
+    {
+      "type": 0,
+      "value": "Vista detallada"
     }
   ],
   "vVsvjq": [
@@ -5115,6 +5133,12 @@
       "value": "La popularidad/demanda de los tokens incluido en el intercambio"
     }
   ],
+  "wnvvrB": [
+    {
+      "type": 0,
+      "value": "Error aprobando token"
+    }
+  ],
   "wzEneQ": [
     {
       "type": 0,
@@ -5130,7 +5154,7 @@
   "x2ydb5": [
     {
       "type": 0,
-      "value": "Transferir tu "
+      "value": "Transferir tu posición "
     },
     {
       "type": 1,
@@ -5146,7 +5170,7 @@
     },
     {
       "type": 0,
-      "value": " posicion a "
+      "value": " a "
     },
     {
       "type": 1,
@@ -5204,7 +5228,7 @@
   "yVecas": [
     {
       "type": 0,
-      "value": "frequencia:"
+      "value": "Frequencia:"
     }
   ],
   "yhA8mK": [
@@ -5229,6 +5253,12 @@
     {
       "type": 0,
       "value": " intercambios)"
+    }
+  ],
+  "yuK53B": [
+    {
+      "type": 0,
+      "value": "Error definiendo permisos"
     }
   ],
   "z/57ga": [
@@ -5336,7 +5366,7 @@
   "zr2gP1": [
     {
       "type": 0,
-      "value": "Volver a posiciones"
+      "value": "Volver a posiciónes"
     }
   ],
   "zuU6Ai": [

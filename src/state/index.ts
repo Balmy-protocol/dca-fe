@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
 import { setupCache, setup } from 'axios-cache-adapter';
 import axios from 'axios';
+import { SupportedLanguages } from 'config/constants/lang';
 
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
@@ -15,7 +16,6 @@ import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 import error from './error/reducer';
-import { SupportedLanguages } from 'config/constants/lang';
 
 const LATEST_VERSION = '1.0.4';
 const LATEST_TRANSACTION_VERSION = '1.0.0';

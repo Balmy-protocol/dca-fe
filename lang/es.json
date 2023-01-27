@@ -568,7 +568,7 @@
     "description": "You receive"
   },
   "Jh14HF": {
-    "defaultMessage": "Esto no se puede deshacer",
+    "defaultMessage": "Esta acción una vez hecha, será irreversible.",
     "description": "transfer warning"
   },
   "K/HInO": {
@@ -960,7 +960,7 @@
     "description": "transactionConfirmationViewReceipt"
   },
   "YRoLhe": {
-    "defaultMessage": "Esto transferirá su posición, su NTF y toda la liquidez almacenada en la posición a la nueva dirección",
+    "defaultMessage": "Esto transferirá su posición, su NFT y toda la liquidez almacenada en la posición a la nueva dirección",
     "description": "transfer sub description"
   },
   "YVAdRx": {
@@ -2120,7 +2120,7 @@
     "description": "transactionMessagesTransfer"
   },
   "Q1G3hW": {
-    "defaultMessage": "Poner la direccion a transferir",
+    "defaultMessage": "Poner la direccion del destinatario",
     "description": "transferToModalPlaceholder"
   },
   "QpkEk9": {
