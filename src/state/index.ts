@@ -15,6 +15,7 @@ import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 import error from './error/reducer';
+import { SupportedLanguages } from 'config/constants/lang';
 
 const LATEST_VERSION = '1.0.4';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
@@ -103,6 +104,7 @@ const store = configureStore({
       config: {
         network: undefined,
         theme: 'dark',
+        selectedLocale: SupportedLanguages.english,
       },
       positionDetails: {
         position: null,
