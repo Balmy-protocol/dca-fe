@@ -113,33 +113,6 @@ const SwapContainer = () => {
   };
 
   const onToggleFromTo = () => {
-    // dispatch(setTo(from));
-
-    // const oldFromValue = fromValue;
-    // const oldToValue = toValue;
-    // // check for decimals
-    // if (to && from && to.decimals < from.decimals && !isBuyOrder) {
-    //   const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
-    //   let newFromValue = fromValue;
-    //   if (splitValue && splitValue[2] !== '') {
-    //     newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, to.decimals)}`;
-    //   }
-
-    //   dispatch(setFromValue({ value: oldToValue, updateMode: isBuyOrder }));
-    // }
-
-    // if (to && from && from.decimals < to.decimals && isBuyOrder) {
-    //   const splitValue = /^(\d*)\.?(\d*)$/.exec(toValue);
-    //   let newToValue = toValue;
-    //   if (splitValue && splitValue[2] !== '') {
-    //     newToValue = `${splitValue[1]}.${splitValue[2].substring(0, from.decimals)}`;
-    //   }
-
-    //   dispatch(setToValue({ value: oldFromValue, updateMode: isBuyOrder }));
-    // }
-
-    // dispatch(setFrom(to));
-
     dispatch(setSelectedRoute(null));
     dispatch(toggleFromTo());
 
