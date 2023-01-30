@@ -122,6 +122,7 @@ const store = configureStore({
           'https://tokens.1inch.io/v1.1/250',
           'https://tokens.1inch.io/v1.1/43114',
           'https://tokens.1inch.io/v1.1/100',
+          'https://tokens.1inch.io/v1.1/42161',
           'custom-tokens',
         ],
         byUrl: getDefaultByUrl(),

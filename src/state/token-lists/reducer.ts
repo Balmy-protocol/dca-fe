@@ -139,6 +139,20 @@ export const getDefaultByUrl = () => ({
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
+  'https://tokens.1inch.io/v1.1/42161': {
+    name: '1Inch Arbitrum',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 42161,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
@@ -148,6 +162,7 @@ export const initialState: TokenListsState = {
     'https://tokens.1inch.io/v1.1/56',
     'https://tokens.1inch.io/v1.1/250',
     'https://tokens.1inch.io/v1.1/43114',
+    'https://tokens.1inch.io/v1.1/42161',
     'https://tokens.1inch.io/v1.1/100',
     'custom-tokens',
   ],
