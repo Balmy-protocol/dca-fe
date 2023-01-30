@@ -215,13 +215,6 @@ const SwapQuotes = ({
                   icon={<CheckCircleOutlineOutlinedIcon />}
                 />
                 <StatusChip
-                  label={<FormattedMessage description="descGasEstimation" defaultMessage="Gas estimation" />}
-                  color="primary"
-                  variant="outlined"
-                  size="small"
-                  icon={<CheckCircleOutlineOutlinedIcon />}
-                />
-                <StatusChip
                   label={<FormattedMessage description="descSwapAndTransfer" defaultMessage="Swap and transfer" />}
                   color="primary"
                   variant="outlined"
