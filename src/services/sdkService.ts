@@ -61,6 +61,7 @@ export default class SdkService {
       ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
       ...(gasSpeed ? { gasSpeed } : {}),
       ...(skipValidation ? { skipValidation } : {}),
+      ...(isBuyOrder ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
     });
   }
 
@@ -99,6 +100,7 @@ export default class SdkService {
                 type: 'sell',
                 sellAmount: sellAmount?.toString() || '0',
               },
+          ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
           ...(recipient ? { recipient } : {}),
@@ -130,6 +132,7 @@ export default class SdkService {
                 sellAmount: sellAmount?.toString() || '0',
               },
           takerAddress,
+          ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
           ...(recipient ? { recipient } : {}),
