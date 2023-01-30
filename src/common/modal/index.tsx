@@ -71,6 +71,7 @@ interface ModalProps {
   title?: React.ReactNode;
   fullHeight?: boolean;
   keepMounted?: boolean;
+  closeOnBackdrop?: boolean;
   actions?: {
     label: React.ReactNode;
     onClick: () => void;
@@ -92,11 +93,12 @@ const Modal: React.FC<ModalProps> = ({
   fullHeight,
   keepMounted,
   children,
+  closeOnBackdrop,
 }) => {
   const classes = useStyles();
 
   const handleClose = () => {
-    if (onClose && (showCloseButton || showCloseIcon)) {
+    if (onClose && (showCloseButton || showCloseIcon || closeOnBackdrop)) {
       onClose();
     }
   };
