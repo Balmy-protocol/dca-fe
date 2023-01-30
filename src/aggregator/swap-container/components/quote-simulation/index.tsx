@@ -2,13 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
 import useSimulateTransaction from 'hooks/useSimulateTransaction';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Typography from '@mui/material/Typography';
 import BlowfishLogo from 'assets/logo/powered_by_blowfish';
 import { BLOWFISH_ENABLED_CHAINS } from 'config';
 import { FormattedMessage } from 'react-intl';
 import TransactionSimulation from 'common/transaction-simulation';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 
 const StyledTransactionSimulationContainer = styled.div`
   padding: 16px;
@@ -38,14 +38,14 @@ interface QuoteSimulationProps {
 }
 
 const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimulationProps) => {
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const [transactionSimulation, isLoadingTransactionSimulation, transactionSimulationError] = useSimulateTransaction(
     tx,
     currentNetwork.chainId,
     cantFund || !isApproved
   );
 
-  if (!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) || cantFund || !isApproved || !tx) {
+  if (cantFund || !isApproved || !tx) {
     return null;
   }
 
@@ -59,7 +59,10 @@ const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimu
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
           <Typography variant="body1">
-            <FormattedMessage description="blowfishSimulationError" defaultMessage="Transaction will fail" />
+            <FormattedMessage
+              description="blowfishSimulationError"
+              defaultMessage="Transaction will fail. We recommend choosing another route"
+            />
           </Typography>
         </>
       )}
@@ -68,12 +71,24 @@ const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimu
           <Typography variant="h6">
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
-          <TransactionSimulation items={transactionSimulation} />
+          {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && (
+            <TransactionSimulation items={transactionSimulation} />
+          )}
+          {!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && (
+            <Typography variant="body1">
+              <FormattedMessage
+                description="normalSimulationSuccess"
+                defaultMessage="Transaction will be successfull"
+              />
+            </Typography>
+          )}
         </StyledSimulation>
       )}
-      <StyledBlowfishContainer>
-        <BlowfishLogo />
-      </StyledBlowfishContainer>
+      {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && (
+        <StyledBlowfishContainer>
+          <BlowfishLogo />
+        </StyledBlowfishContainer>
+      )}
     </StyledTransactionSimulationContainer>
   );
 };

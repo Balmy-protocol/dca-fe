@@ -152,7 +152,7 @@ export default class Web3Service {
     );
     this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
     this.errorService = new ErrorService(this.meanApiService);
-    this.simulationService = new SimulationService(this.meanApiService);
+    this.simulationService = new SimulationService(this.meanApiService, this.providerService);
   }
 
   setArcxClient(newArcxClient: ArcxAnalyticsSdk) {
