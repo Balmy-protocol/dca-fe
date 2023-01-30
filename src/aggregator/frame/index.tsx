@@ -1,10 +1,6 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import { useParams } from 'react-router-dom';
-import { SUPPORTED_NETWORKS } from 'config/constants';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import useWalletService from 'hooks/useWalletService';
 import { changeMainTab } from 'state/tabs/actions';
 import { useAppDispatch } from 'state/hooks';
 import { useIsLoadingAggregatorTokenLists } from 'state/token-lists/hooks';
@@ -15,27 +11,12 @@ interface HomeFrameProps {
 }
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
-  const walletService = useWalletService();
-  const currentNetwork = useCurrentNetwork();
-  const { chainId } = useParams<{ chainId: string }>();
   const dispatch = useAppDispatch();
   const isLoadingLists = useIsLoadingAggregatorTokenLists();
 
   React.useEffect(() => {
     dispatch(changeMainTab(2));
   }, []);
-
-  // React.useEffect(() => {
-  //   if (
-  //     chainId &&
-  //     SUPPORTED_NETWORKS.includes(parseInt(chainId, 10)) &&
-  //     currentNetwork.isSet &&
-  //     chainId !== currentNetwork.chainId.toString()
-  //   ) {
-  //     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  //     walletService.changeNetwork(parseInt(chainId, 10));
-  //   }
-  // }, [currentNetwork]);
 
   return (
     <Grid container spacing={8}>
