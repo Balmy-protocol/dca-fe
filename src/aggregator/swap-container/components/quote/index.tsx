@@ -12,7 +12,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { withStyles } from '@mui/styles';
 import { FormattedMessage } from 'react-intl';
+import { parseUnits } from '@ethersproject/units';
 import { SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from 'config/constants/aggregator';
+import useSpecificAllowance from 'hooks/useSpecificAllowance';
+import { MAX_BI } from 'config';
+import { BigNumber } from 'ethers';
 
 const DarkChip = withStyles(() => ({
   root: {
@@ -179,6 +183,11 @@ const SwapQuote = ({
 
   let isWorsePrice = false;
 
+  const [allowance] = useSpecificAllowance(quote.sellToken, quote.swapper.allowanceTarget);
+
+  const parsedAllowance = allowance.allowance && parseUnits(allowance.allowance || '0', quote.sellToken.decimals);
+  const isApproved = (parsedAllowance || MAX_BI).gte(BigNumber.from(quote.maxSellAmount.amount));
+
   if (isBuyOrder) {
     isWorsePrice = quote.sellAmount.amount.gt(bestQuote?.sellAmount.amount || 0);
   } else {
@@ -216,6 +225,14 @@ const SwapQuote = ({
           </Typography>
         </StyledTitleDataContainer>
         <StyledTitleDataContainer>
+          {!isApproved && (
+            <StatusChip
+              label={<FormattedMessage description="needsApproval" defaultMessage="Needs approval" />}
+              color="default"
+              variant="outlined"
+              size="small"
+            />
+          )}
           {sorting === SORT_MOST_PROFIT && isWorsePrice && (
             <StatusChip
               label={<FormattedMessage description="worsePrice" defaultMessage="Worse price" />}
