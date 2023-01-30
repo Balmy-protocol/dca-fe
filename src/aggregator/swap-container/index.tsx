@@ -31,7 +31,7 @@ import SwapQuotes from './components/quotes';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting, transferTo } = useAggregatorState();
-  const { slippage, gasSpeed } = useAggregatorSettingsState();
+  const { slippage, gasSpeed, disabledDexes } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
@@ -49,7 +49,8 @@ const SwapContainer = () => {
     sorting,
     transferTo,
     parseFloat(slippage),
-    gasSpeed
+    gasSpeed,
+    disabledDexes
   );
   const [swapOption, isLoadingSwapOption] = useSwapOption(selectedRoute, transferTo, parseFloat(slippage), gasSpeed);
 

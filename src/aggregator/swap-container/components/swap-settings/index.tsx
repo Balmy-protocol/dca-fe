@@ -9,10 +9,17 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 import { useAppDispatch } from 'state/hooks';
-import { setGasSpeed, setSlippage, restoreDefaults } from 'state/aggregator-settings/actions';
+import { setGasSpeed, setSlippage, restoreDefaults, setDisabledDexes } from 'state/aggregator-settings/actions';
 import SlippageInput from 'common/slippage-input';
 import GasSelector from 'common/gas-selector';
 import { GasKeys } from 'config/constants/aggregator';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import useSdkDexes from 'hooks/useSdkSources';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Collapse from '@mui/material/Collapse';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -30,11 +37,14 @@ const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
   margin-top: ${(props) => props.customSpacing || 0}px;
 `;
 
-const StyledSettingContainer = styled.div`
+const StyledSettingContainer = styled.div<{ columns?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+  ${(props) => (props.columns ? 'justify-content: center;' : 'justify-content: space-between;')}
+  ${(props) => (props.columns ? 'align-items: flex-start;' : 'align-items: center;')}
+  ${(props) => (props.columns ? 'flex-direction: column;' : '')}
 `;
 
 interface SwapSettingsProps {
@@ -43,8 +53,10 @@ interface SwapSettingsProps {
 }
 
 const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
-  const { slippage, gasSpeed } = useAggregatorSettingsState();
+  const { slippage, gasSpeed, disabledDexes } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
+  const dexes = useSdkDexes();
+  const [showDexes, setShowDexes] = React.useState(false);
 
   const onSlippageChange = (newSlippage: string) => {
     dispatch(setSlippage(newSlippage));
@@ -55,6 +67,18 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
 
   const onRestoreDefaults = () => {
     dispatch(restoreDefaults());
+  };
+
+  const handleToggleDex = (checked: boolean, id: string) => {
+    const newDisabledDexes = [...disabledDexes];
+
+    if (newDisabledDexes.includes(id)) {
+      newDisabledDexes.splice(newDisabledDexes.indexOf(id), 1);
+    } else {
+      newDisabledDexes.push(id);
+    }
+
+    dispatch(setDisabledDexes(newDisabledDexes));
   };
 
   return (
@@ -88,6 +112,37 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
                 <FormattedMessage description="advancedAggregatorSettingsGasSpeed" defaultMessage="Gas speed:" />
               </Typography>
               <GasSelector selected={gasSpeed} onChange={onGasSpeedChange} />
+            </StyledSettingContainer>
+          </StyledGrid>
+          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
+            <StyledSettingContainer columns>
+              <Typography
+                variant="body1"
+                onClick={() => setShowDexes(!showDexes)}
+                sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              >
+                <FormattedMessage
+                  description="advancedAggregatorSettingsEnabledSources"
+                  defaultMessage="Enabled sources ({enabled})"
+                  values={{ enabled: Object.keys(dexes).length - disabledDexes.length }}
+                />
+                {showDexes ? <ExpandLessIcon fontSize="medium" /> : <ExpandMoreIcon fontSize="medium" />}
+              </Typography>
+              <Collapse in={showDexes}>
+                {Object.keys(dexes).map((dexKey) => (
+                  <FormGroup key={dexKey}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          onChange={(evt) => handleToggleDex(evt.target.checked, dexKey)}
+                          checked={!disabledDexes.includes(dexKey)}
+                        />
+                      }
+                      label={dexes[dexKey].name}
+                    />
+                  </FormGroup>
+                ))}
+              </Collapse>
             </StyledSettingContainer>
           </StyledGrid>
           <StyledGrid

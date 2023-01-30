@@ -75,7 +75,8 @@ export default class SdkService {
     gasSpeed?: GasKeys,
     takerAddress?: string,
     skipValidation?: boolean,
-    chainId?: number
+    chainId?: number,
+    disabledDexes?: string[]
   ) {
     const currentNetwork = await this.walletService.getNetwork();
 
@@ -104,6 +105,7 @@ export default class SdkService {
           ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
           ...(gasSpeed ? { gasSpeed } : {}),
           ...(skipValidation ? { skipValidation } : {}),
+          ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
         },
         {
           sort: {
@@ -134,6 +136,7 @@ export default class SdkService {
           ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
           ...(gasSpeed ? { gasSpeed } : {}),
           ...(skipValidation ? { skipValidation } : {}),
+          ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
         },
         {
           sort: {

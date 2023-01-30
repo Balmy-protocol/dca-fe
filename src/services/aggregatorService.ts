@@ -75,7 +75,8 @@ export default class AggregatorService {
     slippage?: number,
     gasSpeed?: GasKeys,
     takerAddress?: string,
-    chainId?: number
+    chainId?: number,
+    disabledDexes?: string[]
   ) {
     const currentNetwork = await this.walletService.getNetwork();
 
@@ -113,7 +114,8 @@ export default class AggregatorService {
       gasSpeed,
       takerAddress,
       !shouldValidate,
-      network
+      network,
+      disabledDexes
     );
 
     const filteredOptions = swapOptionsResponse.filter((option) => !('failed' in option)) as QuoteResponse[];
