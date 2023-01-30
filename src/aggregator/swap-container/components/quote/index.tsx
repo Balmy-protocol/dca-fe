@@ -199,7 +199,7 @@ const SwapQuote = ({
     (
       Math.round(
         ((Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) /
-          Number(quote.buyAmount.amountInUSD)) *
+          Number(quote.sellAmount.amountInUSD)) *
           10000
       ) / 100
     ).toFixed(2);

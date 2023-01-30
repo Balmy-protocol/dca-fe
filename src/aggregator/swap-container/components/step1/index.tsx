@@ -238,7 +238,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     (
       Math.round(
         ((Number(selectedRoute.buyAmount.amountInUSD) - Number(selectedRoute.sellAmount.amountInUSD)) /
-          Number(selectedRoute.buyAmount.amountInUSD)) *
+          Number(selectedRoute.sellAmount.amountInUSD)) *
           10000
       ) / 100
     ).toFixed(2);
