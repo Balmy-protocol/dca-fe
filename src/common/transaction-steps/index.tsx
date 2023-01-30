@@ -333,6 +333,9 @@ const buildWaitForSimulationItem = ({
       if (extraData.simulation && isCurrentStep) {
         setIcon('success');
       }
+      if (failed && isCurrentStep) {
+        setIcon('failed');
+      }
     }, [extraData]);
 
     return (
