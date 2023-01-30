@@ -28,7 +28,8 @@ function useSwapOptions(
   sorting?: SwapSortOptions,
   transferTo?: string | null,
   slippage?: number,
-  gasSpeed?: GasKeys
+  gasSpeed?: GasKeys,
+  disabledDexes?: string[]
 ): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
   const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
@@ -53,6 +54,7 @@ function useSwapOptions(
   const prevResult = usePrevious(result, false);
   const prevGasSpeed = usePrevious(gasSpeed);
   const prevSlippage = usePrevious(slippage);
+  const prevDisabledDexes = usePrevious(disabledDexes);
   const debouncedCall = React.useCallback(
     debounce(
       async (
@@ -64,7 +66,8 @@ function useSwapOptions(
         debouncedGasSpeed?: GasKeys,
         debouncedSlippage?: number,
         debouncedAccount?: string,
-        debouncedChainId?: number
+        debouncedChainId?: number,
+        debouncedDisabledDexes?: string[]
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
           const sellBuyValue = debouncedIsBuyOrder
@@ -88,7 +91,8 @@ function useSwapOptions(
               debouncedSlippage,
               debouncedGasSpeed,
               debouncedAccount,
-              debouncedChainId
+              debouncedChainId,
+              debouncedDisabledDexes
             );
 
             if (promiseResult.length) {
@@ -107,8 +111,20 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(from, to, value, isBuyOrder, transferTo, gasSpeed, slippage, account, currentNetwork.chainId),
-    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed, account, currentNetwork.chainId]
+    () =>
+      debouncedCall(
+        from,
+        to,
+        value,
+        isBuyOrder,
+        transferTo,
+        gasSpeed,
+        slippage,
+        account,
+        currentNetwork.chainId,
+        disabledDexes
+      ),
+    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed, account, currentNetwork.chainId, disabledDexes]
   );
 
   React.useEffect(() => {
@@ -122,6 +138,7 @@ function useSwapOptions(
       !isEqual(prevTransferTo, transferTo) ||
       !isEqual(prevGasSpeed, gasSpeed) ||
       !isEqual(prevNetwork, currentNetwork.chainId) ||
+      !isEqual(prevDisabledDexes, disabledDexes) ||
       !isEqual(prevSlippage, slippage)
     ) {
       if (from && to && value) {
@@ -141,6 +158,8 @@ function useSwapOptions(
     value,
     to,
     isBuyOrder,
+    prevDisabledDexes,
+    disabledDexes,
     // prevAccount,
     account,
     prevPendingTrans,

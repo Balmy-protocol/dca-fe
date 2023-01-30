@@ -201,6 +201,13 @@ export default createReducer(initialState, (builder) =>
     .addCase(fetchTokenList.pending, (state, { meta: { requestId, arg } }) => {
       state.byUrl[arg].requestId = requestId;
     })
+    .addCase(fetchTokenList.rejected, (state, { meta: { arg } }) => {
+      state.byUrl[arg] = {
+        ...state.byUrl[arg],
+        tokens: [],
+        hasLoaded: true,
+      };
+    })
     .addCase(fetchTokenList.fulfilled, (state, { payload, meta: { arg } }) => {
       let tokens = [];
 
