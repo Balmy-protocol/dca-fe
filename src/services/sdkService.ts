@@ -3,7 +3,8 @@ import isNaN from 'lodash/isNaN';
 import { BaseProvider } from '@ethersproject/providers';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from 'config/constants/aggregator';
 import { BigNumber } from 'ethers';
-import { SwapOption } from 'types';
+import { SwapOption, Token } from 'types';
+import { toToken } from 'utils/currency';
 import ProviderService from './providerService';
 import WalletService from './walletService';
 
@@ -148,5 +149,28 @@ export default class SdkService {
 
   getSupportedDexes() {
     return this.sdk.quoteService.supportedSources();
+  }
+
+  async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: BigNumber } | undefined> {
+    const currentNetwork = await this.walletService.getNetwork();
+
+    if (chainId === currentNetwork.chainId) {
+      return this.walletService.getCustomToken(address);
+    }
+
+    const tokenResponse = await this.sdk.tokenService.getTokens([{ addresses: [address], chainId }]);
+
+    const token = tokenResponse[chainId][address];
+
+    if (!token) {
+      return undefined;
+    }
+
+    const tokenData = toToken({ ...token, chainId });
+
+    return {
+      token: tokenData,
+      balance: BigNumber.from(0),
+    };
   }
 }

@@ -9,12 +9,14 @@ import { useBlockNumber } from 'state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
+import useSdkService from './useSdkService';
 
 function useCustomToken(
   tokenAddress?: string | null,
   skip?: boolean
 ): [{ token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined, boolean, string?] {
   const walletService = useWalletService();
+  const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
     result?: { token: Token; balance: BigNumber; balanceUsd: BigNumber };
@@ -41,7 +43,7 @@ function useCustomToken(
     async function callPromise() {
       if (tokenAddress) {
         try {
-          const balanceResult = await walletService.getCustomToken(tokenAddress);
+          const balanceResult = await sdkService.getCustomToken(tokenAddress, currentNetwork.chainId);
 
           if (balanceResult) {
             const priceResults = await priceService.getUsdHistoricPrice([emptyTokenWithAddress(tokenAddress)]);
