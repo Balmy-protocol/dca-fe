@@ -284,6 +284,7 @@ const Swap = ({
   };
 
   const handleTransactionSimulationWait = (transactions?: TransactionStep[], response?: BlowfishResponse) => {
+    console.log('transaction simulation ended', response);
     if (!transactions?.length) {
       return;
     }
@@ -295,7 +296,7 @@ const Swap = ({
     if (index !== -1) {
       newSteps[index] = {
         ...newSteps[index],
-        done: !!response,
+        done: true,
         failed: !response,
         checkForPending: false,
         extraData: {
