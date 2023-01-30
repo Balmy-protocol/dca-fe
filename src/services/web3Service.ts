@@ -167,6 +167,10 @@ export default class Web3Service {
     return this.contractService;
   }
 
+  getSdkService() {
+    return this.sdkService;
+  }
+
   getSimulationService() {
     return this.simulationService;
   }

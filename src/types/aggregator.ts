@@ -1,4 +1,4 @@
-import { AvailableSources, QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 
@@ -37,7 +37,7 @@ export type SwapOption = {
     allowanceTarget: string;
     name: string;
     logoURI: string;
-    id: AvailableSources;
+    id: string;
   };
   type: string;
   tx?: QuoteTx;

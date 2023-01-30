@@ -8,8 +8,13 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import { withStyles } from '@mui/styles';
+import { SourceMetadata } from '@mean-finance/sdk/dist/services/quotes/types';
+import compact from 'lodash/compact';
 import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
+import TokenIcon from 'common/token-icon';
+import { emptyTokenWithLogoURI } from 'utils/currency';
+import useSdkDexes from 'hooks/useSdkSources';
 import { SwapOption, Token } from 'types';
 import SwapQuote from '../quote';
 import QuoteRefresher from '../quote-refresher';
@@ -60,7 +65,20 @@ const StyledChipsContainer = styled.div`
   align-items: center;
   justify-content: center;
   gap: 10px;
+  flex-wrap: wrap;
+  flex-direction: column;
 `;
+
+const StyledChipsGroup = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+`;
+
+interface SourceMetadataWithId extends SourceMetadata {
+  id: string;
+}
 
 interface SwapQuotesProps {
   quotes: SwapOption[];
@@ -93,6 +111,45 @@ const SwapQuotes = ({
   bestQuote,
   swapOptionsError,
 }: SwapQuotesProps) => {
+  const dexes = useSdkDexes();
+  const dexesKeys = Object.keys(dexes);
+  const mappedDexes = dexesKeys.reduce<SourceMetadataWithId[][]>((acc, dexKey, index) => {
+    const newAcc = [...acc];
+
+    if (index % 3 === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const nextDex =
+        dexes[dexesKeys[index + 1]] && dexesKeys[index + 1]
+          ? {
+              ...dexes[dexesKeys[index + 1]],
+              id: dexesKeys[index + 1],
+            }
+          : null;
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const nextDexThird =
+        dexes[dexesKeys[index + 2]] && dexesKeys[index + 2]
+          ? {
+              ...dexes[dexesKeys[index + 2]],
+              id: dexesKeys[index + 2],
+            }
+          : null;
+
+      const group = compact([
+        {
+          ...dexes[dexKey],
+          id: dexKey,
+        },
+        nextDex,
+        nextDexThird,
+      ]);
+
+      newAcc.push(group);
+    }
+
+    return newAcc;
+  }, []);
+
   if (!quotes.length && !isLoading && !!swapOptionsError) {
     return (
       <StyledPaper variant="outlined" $column>
@@ -116,42 +173,88 @@ const SwapQuotes = ({
       <StyledPaper variant="outlined" $column>
         <StyledPaper variant="outlined">
           <StyledCenteredWrapper>
-            <EmptyRoutes size="100px" />
-            <Typography variant="h6">
+            <EmptyRoutes size="150px" />
+            <Typography variant="h5">
               <FormattedMessage
                 description="meanFinanceMetaAggregator"
-                defaultMessage="Introducing Mean Finance Meta Aggregator"
+                defaultMessage="Introducing Mean Finance's Meta Aggregator"
               />
             </Typography>
             <StyledChipsContainer>
-              <StatusChip
-                label={<FormattedMessage description="descNoFee" defaultMessage="No extra fees" />}
-                color="primary"
-                variant="outlined"
-                size="small"
-                icon={<CheckCircleOutlineOutlinedIcon />}
-              />
-              <StatusChip
-                label={<FormattedMessage description="descBestPrice" defaultMessage="Best price always" />}
-                color="primary"
-                variant="outlined"
-                size="small"
-                icon={<CheckCircleOutlineOutlinedIcon />}
-              />
-              <StatusChip
-                label={<FormattedMessage description="descGasEstimation" defaultMessage="Gas estimation" />}
-                color="primary"
-                variant="outlined"
-                size="small"
-                icon={<CheckCircleOutlineOutlinedIcon />}
-              />
+              <StyledChipsGroup>
+                <StatusChip
+                  label={<FormattedMessage description="descNoFee" defaultMessage="No extra fees" />}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  icon={<CheckCircleOutlineOutlinedIcon />}
+                />
+                <StatusChip
+                  label={<FormattedMessage description="descBestPrice" defaultMessage="Best price always" />}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  icon={<CheckCircleOutlineOutlinedIcon />}
+                />
+                <StatusChip
+                  label={<FormattedMessage description="descBuyOrders" defaultMessage="Buy orders" />}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  icon={<CheckCircleOutlineOutlinedIcon />}
+                />
+              </StyledChipsGroup>
+              <StyledChipsGroup>
+                <StatusChip
+                  label={
+                    <FormattedMessage description="descTransactionSimulation" defaultMessage="Transaction simulation" />
+                  }
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  icon={<CheckCircleOutlineOutlinedIcon />}
+                />
+                <StatusChip
+                  label={<FormattedMessage description="descGasEstimation" defaultMessage="Gas estimation" />}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  icon={<CheckCircleOutlineOutlinedIcon />}
+                />
+                <StatusChip
+                  label={<FormattedMessage description="descSwapAndTransfer" defaultMessage="Swap and transfer" />}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  icon={<CheckCircleOutlineOutlinedIcon />}
+                />
+              </StyledChipsGroup>
             </StyledChipsContainer>
             <Typography variant="body1" sx={{ textAlign: 'center', padding: '0px 20px' }}>
               <FormattedMessage
                 description="meanFinanceMetaAggregatorDescription"
-                defaultMessage="We look for the best prices among most of Defi Dex's and Dex Aggregators, so you can always get the best execution price for your trades"
+                defaultMessage="We find the best prices across all of DeFi so you don't have to. You can now make sure you are getting the best deal possible"
               />
             </Typography>
+            <Typography variant="body2" sx={{ textAlign: 'center', padding: '0px 20px' }}>
+              <FormattedMessage description="meanFinanceMetaAggregatorSupporting" defaultMessage="Supporting:" />
+            </Typography>
+            <StyledChipsContainer>
+              {mappedDexes.map((dexGroup, index) => (
+                <StyledChipsGroup key={index}>
+                  {dexGroup.map((dex) => (
+                    <StatusChip
+                      label={dex.name}
+                      color="secondary"
+                      variant="outlined"
+                      size="small"
+                      icon={<TokenIcon isInChip size="18px" token={emptyTokenWithLogoURI(dex.logoURI)} />}
+                      key={dex.id}
+                    />
+                  ))}
+                </StyledChipsGroup>
+              ))}
+            </StyledChipsContainer>
           </StyledCenteredWrapper>
         </StyledPaper>
       </StyledPaper>

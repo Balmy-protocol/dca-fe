@@ -145,4 +145,8 @@ export default class SdkService {
 
     return responses;
   }
+
+  getSupportedDexes() {
+    return this.sdk.quoteService.supportedSources();
+  }
 }
