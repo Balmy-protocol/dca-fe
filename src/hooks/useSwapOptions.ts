@@ -177,7 +177,7 @@ function useSwapOptions(
     currentNetwork.chainId,
   ]);
 
-  if (!from) {
+  if (!from || !value) {
     return [undefined, false, undefined, fetchOptions];
   }
 
