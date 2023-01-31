@@ -5,12 +5,13 @@ import Button from 'common/button';
 import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount, toToken } from 'utils/currency';
 import Tooltip from '@mui/material/Tooltip';
 import { BigNumber } from 'ethers';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
+import { MenuItem, Select } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
 import Badge from '@mui/material/Badge';
@@ -22,7 +23,7 @@ import find from 'lodash/find';
 import TokenIcon from 'common/token-icon';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import { NETWORKS, SUPPORTED_NETWORKS } from 'config';
+import { getGhTokenListLogoUrl, NETWORKS } from 'config';
 import { Chains } from '@mean-finance/sdk';
 import useAccount from 'hooks/useAccount';
 import QuoteData from '../quote-data';
@@ -122,12 +123,6 @@ const StyledNetworkButtonsContainer = styled.div`
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
-`;
-
-const StyledNetworkButton = styled(Button)`
-  min-width: 0px;
-  border-radius: 20px;
-  padding: 9px;
 `;
 
 interface SwapFirstStepProps {
@@ -253,29 +248,48 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               <FormattedMessage description="supportedNetworks" defaultMessage="Choose network:" />
             </Typography>
             <StyledNetworkButtonsContainer>
-              {SUPPORTED_NETWORKS.map((network) => {
-                const foundSdkNetwork = find(Chains.getAllChains(), { chainId: network });
-                const foundNetwork = find(NETWORKS, { chainId: network });
+              <Select
+                id="choose-network"
+                value={selectedNetwork.chainId}
+                onChange={(evt) => onChangeNetwork(Number(evt.target.value))}
+                size="small"
+                SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
+              >
+                {Chains.getAllChains().map((network) => {
+                  const foundSdkNetwork = find(Chains.getAllChains(), { chainId: network.chainId });
+                  const foundNetwork = find(NETWORKS, { chainId: network.chainId });
 
-                if (!foundNetwork || !foundSdkNetwork) {
-                  return null;
-                }
+                  if (!foundSdkNetwork) {
+                    return null;
+                  }
 
-                return (
-                  <Tooltip title={foundSdkNetwork.name} arrow placement="top">
-                    <div>
-                      <StyledNetworkButton
-                        variant="outlined"
-                        color={selectedNetwork.chainId === network ? 'secondary' : 'default'}
-                        size="small"
-                        onClick={() => onChangeNetwork(network)}
-                      >
-                        <TokenIcon size="20px" token={emptyTokenWithAddress(foundNetwork.mainCurrency)} />
-                      </StyledNetworkButton>
-                    </div>
-                  </Tooltip>
-                );
-              })}
+                  return (
+                    <MenuItem sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={network.chainId}>
+                      <TokenIcon
+                        size="20px"
+                        token={toToken({
+                          address: foundNetwork?.mainCurrency || foundSdkNetwork.wToken,
+                          chainId: network.chainId,
+                          logoURI: getGhTokenListLogoUrl(network.chainId, PROTOCOL_TOKEN_ADDRESS),
+                        })}
+                      />
+                      {foundSdkNetwork.name}
+                    </MenuItem>
+                    // <Tooltip title={foundSdkNetwork.name} arrow placement="top">
+                    //   <div>
+                    //     <StyledNetworkButton
+                    //       variant="outlined"
+                    //       color={selectedNetwork.chainId === network.chainId ? 'secondary' : 'default'}
+                    //       size="small"
+                    //       onClick={() => onChangeNetwork(network.chainId)}
+                    //     >
+                    //       <TokenIcon size="20px" token={emptyTokenWithAddress(foundNetwork?.mainCurrency || foundSdkNetwork.wToken)} />
+                    //     </StyledNetworkButton>
+                    //   </div>
+                    // </Tooltip>
+                  );
+                })}
+              </Select>
             </StyledNetworkButtonsContainer>
           </StyledTokensContainer>
         </StyledContentContainer>

@@ -12,7 +12,6 @@ import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
 import {
   BLOWFISH_ENABLED_CHAINS,
-  SUPPORTED_NETWORKS,
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_SWAP,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
@@ -468,14 +467,6 @@ const Swap = ({
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx;
 
-  const NotConnectedButton = (
-    <StyledButton size="large" variant="contained" fullWidth color="error">
-      <Typography variant="body1">
-        <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
-      </Typography>
-    </StyledButton>
-  );
-
   const NoWalletButton = (
     <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={() => web3Service.connect()}>
       <Typography variant="body1">
@@ -556,8 +547,6 @@ const Swap = ({
 
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
-  } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
-    ButtonToShow = NotConnectedButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
