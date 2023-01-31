@@ -91,22 +91,15 @@ const SwapContainer = () => {
   };
 
   const onSetFrom = (newFrom: Token, updateMode = false) => {
-    // check for decimals
-    if (from && newFrom.decimals < from.decimals) {
-      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
-      let newFromValue = fromValue;
-      if (splitValue && splitValue[2] !== '') {
-        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, newFrom.decimals)}`;
-      }
-
-      dispatch(setFromValue({ value: newFromValue, updateMode }));
-    }
-
+    dispatch(setSelectedRoute(null));
+    dispatch(setFromValue({ value: '', updateMode }));
     dispatch(setFrom(newFrom));
     history.replace(`/swap/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
   };
 
-  const onSetTo = (newTo: Token) => {
+  const onSetTo = (newTo: Token, updateMode = false) => {
+    dispatch(setSelectedRoute(null));
+    dispatch(setToValue({ value: '', updateMode }));
     dispatch(setTo(newTo));
     if (from) {
       history.replace(`/swap/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
