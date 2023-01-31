@@ -277,6 +277,20 @@ export enum StateChangeKind {
   ERC1155_APPROVAL_FOR_ALL = 'ERC1155_APPROVAL_FOR_ALL',
 }
 
+export interface BlowfishReponseData {
+  amount: {
+    before: string;
+    after: string;
+  };
+  asset?: {
+    address: string;
+    decimals: number;
+    symbol: string;
+  };
+  contract?: {
+    address: string;
+  };
+}
 export interface BlowfishResponse {
   action: 'BLOCK' | 'WARN' | 'NONE';
   warnings: {
@@ -289,7 +303,7 @@ export interface BlowfishResponse {
       humanReadableDiff: string;
       rawInfo: {
         kind: StateChangeKind;
-        data: unknown;
+        data: BlowfishReponseData;
       };
     }[];
   };

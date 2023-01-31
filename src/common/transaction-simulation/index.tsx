@@ -1,8 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import SendIcon from '@mui/icons-material/Send';
-import { BlowfishResponse, StateChangeKind } from 'types';
+import { BlowfishReponseData, BlowfishResponse, StateChangeKind } from 'types';
 import Typography from '@mui/material/Typography';
+import { BigNumber } from 'ethers';
+import { emptyTokenWithAddress } from 'utils/currency';
+import TokenIcon from 'common/token-icon';
 
 const StyledTransactionSimulationsContainer = styled.div`
   display: flex;
@@ -53,38 +55,36 @@ const StyledTransactionSimulationContent = styled.div`
   padding-bottom: 10px;
 `;
 
-const TYPE_ICONS: Record<StateChangeKind, React.ReactElement> = {
-  [StateChangeKind.ERC20_TRANSFER]: <SendIcon />,
-  [StateChangeKind.ERC1155_APPROVAL_FOR_ALL]: <SendIcon />,
-  [StateChangeKind.ERC1155_TRANSFER]: <SendIcon />,
-  [StateChangeKind.ERC20_APPROVAL]: <SendIcon />,
-  [StateChangeKind.ERC721_APPROVAL]: <SendIcon />,
-  [StateChangeKind.ERC721_APPROVAL_FOR_ALL]: <SendIcon />,
-  [StateChangeKind.ERC721_TRANSFER]: <SendIcon />,
-  [StateChangeKind.NATIVE_ASSET_TRANSFER]: <SendIcon />,
-};
-
 interface ItemProps {
   isLast: boolean;
   isFirst: boolean;
   humanReadableDiff: string;
   rawInfo: {
     kind: StateChangeKind;
-    data: unknown;
+    data: BlowfishReponseData;
   };
 }
 
-const buildItem = ({ isLast, isFirst, humanReadableDiff, rawInfo: { kind } }: ItemProps) => ({
-  content: () => (
-    <>
-      <StyledTransactionSimulationIcon isLast={isLast} isFirst={isFirst}>
-        <StyledTransactionSimulationIconContent>{TYPE_ICONS[kind]}</StyledTransactionSimulationIconContent>
-      </StyledTransactionSimulationIcon>
-      <StyledTransactionSimulationContent>
-        <Typography variant="body1">{humanReadableDiff}</Typography>
-      </StyledTransactionSimulationContent>
-    </>
-  ),
+const buildItem = ({ isLast, isFirst, humanReadableDiff, rawInfo: { data } }: ItemProps) => ({
+  content: () => {
+    const diff = BigNumber.from(data.amount.after).sub(BigNumber.from(data.amount.before));
+    const isSubstracting = diff.lte(BigNumber.from(0));
+    const token = emptyTokenWithAddress(data.asset?.address || data.contract?.address || '');
+    return (
+      <>
+        <StyledTransactionSimulationIcon isLast={isLast} isFirst={isFirst}>
+          <StyledTransactionSimulationIconContent>
+            <TokenIcon token={token} />
+          </StyledTransactionSimulationIconContent>
+        </StyledTransactionSimulationIcon>
+        <StyledTransactionSimulationContent>
+          <Typography variant="body1" color={isSubstracting ? '#EB5757' : '#219653'}>
+            {humanReadableDiff}
+          </Typography>
+        </StyledTransactionSimulationContent>
+      </>
+    );
+  },
 });
 
 interface TransactionSimulationProps {
@@ -114,6 +114,7 @@ const TransactionSimulation = ({ items }: TransactionSimulationProps) => (
           isLast,
           ...simulation,
         });
+
         return (
           <StyledTransactionSimulation key={index}>
             <item.content />
