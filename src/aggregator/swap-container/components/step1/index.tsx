@@ -250,7 +250,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
           {/* rate */}
           <StyledTokensContainer>
             <Typography variant="body1">
-              <FormattedMessage description="supportedNetworks" defaultMessage="Supported networks:" />
+              <FormattedMessage description="supportedNetworks" defaultMessage="Choose network:" />
             </Typography>
             <StyledNetworkButtonsContainer>
               {SUPPORTED_NETWORKS.map((network) => {
