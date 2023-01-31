@@ -34,6 +34,7 @@ import useAllowedPairs from 'hooks/useAllowedPairs';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useCustomTokens } from 'state/token-lists/hooks';
 import use1InchBalances from 'hooks/use1InchBalances';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -168,7 +169,16 @@ const useListItemStyles = makeStyles(({ palette }) => ({
 const Row = ({
   index,
   style,
-  data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances, customToken, customTokens },
+  data: {
+    onClick,
+    tokenList,
+    tokenKeys,
+    yieldOptions,
+    tokenBalances,
+    customToken,
+    customTokens,
+    isLoadingTokenBalances,
+  },
 }: RowProps) => {
   const classes = useListItemStyles();
   const isImportedToken = !!customTokens[tokenKeys[index]];
@@ -226,7 +236,7 @@ const Row = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {!Object.keys(tokenBalances).length && <CenteredLoadingIndicator size={10} />}
+        {!Object.keys(tokenBalances).length && isLoadingTokenBalances && <CenteredLoadingIndicator size={10} />}
         {tokenBalances && !!Object.keys(tokenBalances).length && (
           <>
             {tokenBalance && (
@@ -266,6 +276,7 @@ const TokenPicker = ({
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const currentNetwork = useSelectedNetwork();
+  const actualCurrentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
   const allowedPairs = useAllowedPairs();
@@ -413,12 +424,25 @@ const TokenPicker = ({
       tokenList,
       tokenKeys: memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
-      tokenBalances: isLoadingBalances && (!balances || !Object.keys(balances).length) ? {} : balances || {},
+      tokenBalances:
+        (isLoadingBalances && (!balances || !Object.keys(balances).length)) ||
+        currentNetwork.chainId !== actualCurrentNetwork.chainId
+          ? {}
+          : balances || {},
       customToken,
       isLoadingTokenBalances: isLoadingBalances,
       customTokens,
     }),
-    [memoizedTokenKeys, tokenList, balances, yieldOptions, customToken, isLoadingBalances]
+    [
+      memoizedTokenKeys,
+      tokenList,
+      balances,
+      yieldOptions,
+      customToken,
+      isLoadingBalances,
+      currentNetwork.chainId,
+      actualCurrentNetwork.chainId,
+    ]
   );
 
   return (
