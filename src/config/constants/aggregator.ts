@@ -12,9 +12,10 @@ export const GAS_LABELS_BY_KEY: Record<GasKeys, string> = {
   [GAS_KEY_FAST]: 'instant',
 };
 
-export const DEFAULT_AGGREGATOR_SETTINGS: { gasSpeed: GasKeys; slippage: number } = {
+export const DEFAULT_AGGREGATOR_SETTINGS: { gasSpeed: GasKeys; slippage: number; disabledDexes: string[] } = {
   slippage: 0.3,
   gasSpeed: GAS_KEY_AVERAGE,
+  disabledDexes: [],
 };
 
 export const SORT_MOST_PROFIT = 'most-swapped-accounting-for-gas';
