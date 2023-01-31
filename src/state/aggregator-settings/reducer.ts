@@ -11,7 +11,7 @@ export interface AggregatorSettingsState {
 const initialState: AggregatorSettingsState = {
   gasSpeed: DEFAULT_AGGREGATOR_SETTINGS.gasSpeed,
   slippage: DEFAULT_AGGREGATOR_SETTINGS.slippage.toString(),
-  disabledDexes: [],
+  disabledDexes: DEFAULT_AGGREGATOR_SETTINGS.disabledDexes,
 };
 
 export default createReducer(initialState, (builder) =>
@@ -28,5 +28,6 @@ export default createReducer(initialState, (builder) =>
     .addCase(restoreDefaults, (state) => {
       state.gasSpeed = DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
       state.slippage = DEFAULT_AGGREGATOR_SETTINGS.slippage.toString();
+      state.disabledDexes = DEFAULT_AGGREGATOR_SETTINGS.disabledDexes;
     })
 );
