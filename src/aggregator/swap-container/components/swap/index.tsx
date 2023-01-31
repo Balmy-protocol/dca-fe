@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
 import { BlowfishResponse, SwapOption, SwapOptionWithTx, Token } from 'types';
@@ -431,14 +431,16 @@ const Swap = ({
     setRefreshQuotes(true);
   };
 
+  const formattedUnits =
+    selectedRoute?.maxSellAmount.amount &&
+    formatUnits(selectedRoute.maxSellAmount.amount, selectedRoute.sellToken.decimals);
+
   const cantFund =
     from &&
+    isOnCorrectNetwork &&
     !!fromValueToUse &&
     !!balance &&
-    parseUnits(
-      selectedRoute?.maxSellAmount?.amountInUnits.toString() || fromValueToUse,
-      selectedRoute?.sellToken.decimals || from.decimals
-    ).gt(balance);
+    parseUnits(formattedUnits || fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).gt(balance);
 
   const isApproved =
     !from ||
