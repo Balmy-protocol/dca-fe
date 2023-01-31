@@ -57,7 +57,7 @@ const SwapContainer = () => {
   const [refreshQuotes, setRefreshQuotes] = React.useState(true);
 
   React.useEffect(() => {
-    dispatch(setAggregatorChainId(Number(actualCurrentNetwork.chainId || chainId || NETWORKS.mainnet.chainId)));
+    dispatch(setAggregatorChainId(Number(chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId)));
   }, []);
 
   React.useEffect(() => {

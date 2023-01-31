@@ -155,7 +155,8 @@ export const toToken: (overrides: {
   symbol?: string;
   name?: string;
   underlyingTokens?: Token[];
-}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type }) => ({
+  logoURI?: string;
+}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI }) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
   address: address || '',
@@ -163,4 +164,5 @@ export const toToken: (overrides: {
   symbol: symbol || '',
   type: type || TOKEN_TYPE_BASE,
   underlyingTokens: underlyingTokens || [],
+  logoURI,
 });

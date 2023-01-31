@@ -1,6 +1,9 @@
 /* eslint-disable no-template-curly-in-string */
 
+import { Chains } from '@mean-finance/sdk';
 import { NetworkStruct } from 'types';
+import findKey from 'lodash/findKey';
+import { Chain } from '@mean-finance/sdk/dist/types';
 import {
   POSITION_VERSION_2,
   POSITION_VERSION_3,
@@ -17,7 +20,7 @@ type AddressMap<K extends PositionVersions> = {
 };
 // type AddressMap<PositionVersions> = Record<PositionVersions, Record<number, string>>
 
-export const NETWORKS: Record<string, NetworkStruct> = {
+export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   mainnet: {
     chainId: 1,
     name: 'Ethereum',
@@ -266,6 +269,36 @@ export const NETWORKS: Record<string, NetworkStruct> = {
     rpc: ['https://rpc.gnosischain.com', 'https://rpc.ankr.com/gnosis'],
   },
 };
+
+const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, currencySymbol, wToken }: Chain) => ({
+  chainId,
+  name,
+  mainCurrency: `${chainId}-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`,
+  nativeCurrency: {
+    name: currencySymbol,
+    symbol: currencySymbol,
+    decimals: 18,
+  },
+  wToken,
+  rpc: publicRPCs ? [...publicRPCs] : [],
+});
+
+export const NETWORKS: Record<string, NetworkStruct> = Chains.getAllChains().reduce(
+  (acc, sdkNetwork) => {
+    const foundNetworkKey = findKey(RAW_NETWORKS, { chainId: sdkNetwork.chainId });
+
+    return {
+      ...acc,
+      [foundNetworkKey || sdkNetwork.ids[0]]: {
+        ...sdkNetworkToNetworkStruct(sdkNetwork),
+        ...(foundNetworkKey ? RAW_NETWORKS[foundNetworkKey] : {}),
+      },
+    };
+  },
+  {
+    ...RAW_NETWORKS,
+  }
+);
 
 export const TESTNETS = [
   NETWORKS.ropsten.chainId,
@@ -630,4 +663,7 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.fantom.chainId]: 'https://fantom.api.0x.org',
   [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
 };
+
+export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
+  `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
 /* eslint-enable */

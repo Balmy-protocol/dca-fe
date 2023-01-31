@@ -45,6 +45,7 @@ export interface NetworkStruct {
   nativeCurrency: Partial<Token>;
   rpc: string[];
   mainColor?: string;
+  wToken?: string;
 }
 
 export type ChainId = number;
