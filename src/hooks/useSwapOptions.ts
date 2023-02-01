@@ -44,7 +44,6 @@ function useSwapOptions(
   const prevValue = usePrevious(value);
   const prevIsBuyOrder = usePrevious(isBuyOrder);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  // const prevAccount = usePrevious(walletService.getAccount());
   const account = walletService.getAccount();
   const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
