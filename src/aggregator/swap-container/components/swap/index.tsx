@@ -37,6 +37,7 @@ import { useHistory } from 'react-router-dom';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { setAggregatorChainId } from 'state/aggregator/actions';
+import useMeanApiService from 'hooks/useMeanApiService';
 import { addCustomToken } from 'state/token-lists/actions';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -100,6 +101,7 @@ const Swap = ({
   const web3Service = useWeb3Service();
   const dispatch = useAppDispatch();
   const containerRef = React.useRef(null);
+  const meanApiService = useMeanApiService();
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
@@ -227,6 +229,25 @@ const Swap = ({
       });
 
       const result = await aggregatorService.swap(selectedRoute as SwapOptionWithTx);
+
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        meanApiService.trackEvent('Swap on aggregator', {
+          swapper: selectedRoute.swapper.id,
+          chainId: currentNetwork.chainId,
+          from: selectedRoute.sellToken.address,
+          fromSymbol: selectedRoute.sellToken.symbol,
+          to: selectedRoute.buyToken.address,
+          toSymbol: selectedRoute.buyToken.symbol,
+          buyAmount: selectedRoute.buyAmount.amountInUnits,
+          sellAmount: selectedRoute.sellAmount.amountInUnits,
+          buyAmountUsd: selectedRoute.buyAmount.amountInUSD,
+          sellAmountUsd: selectedRoute.sellAmount.amountInUSD,
+          type: selectedRoute.type,
+        });
+      } catch (e) {
+        console.error('Error tracking through mixpanel', e);
+      }
 
       let transactionType = TRANSACTION_TYPES.SWAP;
 
