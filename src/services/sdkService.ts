@@ -157,6 +157,10 @@ export default class SdkService {
     return this.sdk.quoteService.supportedSources();
   }
 
+  getSupportedChains() {
+    return this.sdk.quoteService.supportedChains();
+  }
+
   async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: BigNumber } | undefined> {
     const currentNetwork = await this.walletService.getNetwork();
 
