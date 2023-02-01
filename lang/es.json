@@ -1044,7 +1044,7 @@
     "description": "faqWhenDoINeedToPayGasFeesResponsePart3"
   },
   "aBc6K3": {
-    "defaultMessage": "Los intercambios ya no se van a ejecutar, no podrás hacer nuevas modificaciones en esta posición",
+    "defaultMessage": "Los intercambios ya no se van a ejecutar, no podrás hacer nuevas modificaciones en esta posición y el NFT se quemara.",
     "description": "terminate description"
   },
   "aEQUw9": {
