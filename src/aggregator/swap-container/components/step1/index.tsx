@@ -23,8 +23,9 @@ import find from 'lodash/find';
 import TokenIcon from 'common/token-icon';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import { getGhTokenListLogoUrl, NETWORKS } from 'config';
+import { getGhTokenListLogoUrl, NETWORKS, REMOVED_AGG_CHAINS } from 'config';
 import { Chains } from '@mean-finance/sdk';
+import useSdkChains from 'hooks/useSdkChains';
 import useAccount from 'hooks/useAccount';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
@@ -201,6 +202,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     undefined,
     selectedNetwork.chainId
   );
+  const supportedChains = useSdkChains();
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;
 
@@ -255,40 +257,42 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 size="small"
                 SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
               >
-                {Chains.getAllChains().map((network) => {
-                  const foundSdkNetwork = find(Chains.getAllChains(), { chainId: network.chainId });
-                  const foundNetwork = find(NETWORKS, { chainId: network.chainId });
+                {supportedChains
+                  .filter((chain) => !REMOVED_AGG_CHAINS.includes(chain))
+                  .map((networkId) => {
+                    const foundSdkNetwork = find(Chains.getAllChains(), { chainId: networkId });
+                    const foundNetwork = find(NETWORKS, { chainId: networkId });
 
-                  if (!foundSdkNetwork) {
-                    return null;
-                  }
+                    if (!foundSdkNetwork) {
+                      return null;
+                    }
 
-                  return (
-                    <MenuItem sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={network.chainId}>
-                      <TokenIcon
-                        size="20px"
-                        token={toToken({
-                          address: foundNetwork?.mainCurrency || foundSdkNetwork.wToken,
-                          chainId: network.chainId,
-                          logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
-                        })}
-                      />
-                      {foundSdkNetwork.name}
-                    </MenuItem>
-                    // <Tooltip title={foundSdkNetwork.name} arrow placement="top">
-                    //   <div>
-                    //     <StyledNetworkButton
-                    //       variant="outlined"
-                    //       color={selectedNetwork.chainId === network.chainId ? 'secondary' : 'default'}
-                    //       size="small"
-                    //       onClick={() => onChangeNetwork(network.chainId)}
-                    //     >
-                    //       <TokenIcon size="20px" token={emptyTokenWithAddress(foundNetwork?.mainCurrency || foundSdkNetwork.wToken)} />
-                    //     </StyledNetworkButton>
-                    //   </div>
-                    // </Tooltip>
-                  );
-                })}
+                    return (
+                      <MenuItem sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={networkId}>
+                        <TokenIcon
+                          size="20px"
+                          token={toToken({
+                            address: foundNetwork?.mainCurrency || foundSdkNetwork.wToken,
+                            chainId: networkId,
+                            logoURI: getGhTokenListLogoUrl(networkId, 'logo'),
+                          })}
+                        />
+                        {foundSdkNetwork.name}
+                      </MenuItem>
+                      // <Tooltip title={foundSdkNetwork.name} arrow placement="top">
+                      //   <div>
+                      //     <StyledNetworkButton
+                      //       variant="outlined"
+                      //       color={selectedNetwork.chainId === network.chainId ? 'secondary' : 'default'}
+                      //       size="small"
+                      //       onClick={() => onChangeNetwork(network.chainId)}
+                      //     >
+                      //       <TokenIcon size="20px" token={emptyTokenWithAddress(foundNetwork?.mainCurrency || foundSdkNetwork.wToken)} />
+                      //     </StyledNetworkButton>
+                      //   </div>
+                      // </Tooltip>
+                    );
+                  })}
               </Select>
             </StyledNetworkButtonsContainer>
           </StyledTokensContainer>
