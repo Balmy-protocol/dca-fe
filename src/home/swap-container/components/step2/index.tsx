@@ -102,6 +102,7 @@ interface SwapSecondStepProps {
   frequencyType: BigNumber;
   frequencyValue: string;
   fromCanHaveYield: boolean;
+  toCanHaveYield: boolean;
   handleFrequencyChange: (newValue: string) => void;
   buttonToShow: React.ReactNode;
   show: boolean;
@@ -147,6 +148,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
     fromCanHaveYield,
     usdPrice,
     existingPair,
+    toCanHaveYield,
   } = props;
 
   const [isHelpExpanded, setHelpExpanded] = React.useState(false);
@@ -269,8 +271,18 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
                 />
               </StyledYieldTokensContainer>
             )}
+            {!yieldEnabled && !fromCanHaveYield && !toCanHaveYield && (
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage
+                  description="disabledByNoOption"
+                  // eslint-disable-next-line no-template-curly-in-string
+                  defaultMessage="None of the tokens you have selected support yield platforms."
+                />
+              </Typography>
+            )}
             {!yieldEnabled &&
               from &&
+              fromCanHaveYield &&
               !!rateUsdPrice &&
               rateUsdPrice <
                 (MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD) && (
