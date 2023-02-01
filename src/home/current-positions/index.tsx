@@ -23,6 +23,7 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import SuggestMigrateYieldModal from 'common/suggest-migrate-yield-modal';
 import useErrorService from 'hooks/useErrorService';
 import useYieldOptions from 'hooks/useYieldOptions';
+import TerminateModal from 'common/terminate-modal';
 import { shouldTrackError } from 'utils/errors';
 import MigrateYieldModal from 'common/migrate-yield-modal';
 import ActivePosition from './components/position';
@@ -57,6 +58,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const positionService = usePositionService();
   const errorService = useErrorService();
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
+  const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
   const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
@@ -81,6 +83,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     () => setShowSuggestMigrateYieldModal(false),
     [setShowSuggestMigrateYieldModal]
   );
+  const onCancelTerminateModal = React.useCallback(() => setShowTerminateModal(false), [setShowTerminateModal]);
 
   if (isLoading || isLoadingAllChainsYieldOptions) {
     return <CenteredLoadingIndicator size={70} />;
@@ -196,6 +199,15 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setShowModifyRateSettingsModal(true);
   };
 
+  const onShowTerminate = (position: Position) => {
+    if (!position) {
+      return;
+    }
+
+    setSelectedPosition(position);
+    setShowTerminateModal(true);
+  };
+
   const onShowMigrateYield = (position: Position) => {
     if (!position) {
       return;
@@ -221,6 +233,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         position={selectedPosition}
         onCancel={onCancelModifySettingsModal}
       />
+      <TerminateModal open={showTerminateModal} position={selectedPosition} onCancel={onCancelTerminateModal} />
       <MigrateYieldModal
         onCancel={onCancelMigrateYieldModal}
         open={showMigrateYieldModal}
@@ -248,6 +261,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       position={position}
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
+                      onTerminate={onShowTerminate}
                       onMigrateYield={onShowMigrateYield}
                       onSuggestMigrateYield={onSuggestMigrateYieldModal}
                       disabled={false}
@@ -277,6 +291,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                       onWithdraw={onWithdraw}
                       onReusePosition={onShowModifyRateSettings}
                       onMigrateYield={onShowMigrateYield}
+                      onTerminate={onShowTerminate}
                       disabled={false}
                       hasSignSupport={!!hasSignSupport}
                       onSuggestMigrateYield={onSuggestMigrateYieldModal}

@@ -61,6 +61,7 @@ interface PositionControlsProps {
   onReusePosition: (position: Position) => void;
   onMigrateYield: (position: Position) => void;
   onSuggestMigrateYield: (position: Position) => void;
+  onTerminate: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
   yieldOptions: YieldOptions;
@@ -72,6 +73,7 @@ const PositionControls = ({
   onReusePosition,
   onSuggestMigrateYield,
   onMigrateYield,
+  onTerminate,
   disabled,
   hasSignSupport,
   yieldOptions,
@@ -232,6 +234,16 @@ const PositionControls = ({
                 <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
               </Typography>
             </Link>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              onTerminate(position);
+            }}
+            disabled={disabled || !isOnNetwork}
+            style={{ color: '#FF5359' }}
+          >
+            <FormattedMessage description="terminate position" defaultMessage="Close position" />
           </MenuItem>
         </StyledMenu>
       </>
