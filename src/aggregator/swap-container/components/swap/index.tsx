@@ -235,6 +235,7 @@ const Swap = ({
         meanApiService.trackEvent('Swap on aggregator', {
           swapper: selectedRoute.swapper.id,
           chainId: currentNetwork.chainId,
+          chainName: currentNetwork.name,
           from: selectedRoute.sellToken.address,
           fromSymbol: selectedRoute.sellToken.symbol,
           to: selectedRoute.buyToken.address,
