@@ -242,8 +242,15 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
 
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
-      <Grid item xs={12}>
+      <Grid item xs={12} sx={{ position: 'relative' }}>
         <StyledContentContainer>
+          <StyledCogContainer>
+            <Badge color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
+              <IconButton aria-label="settings" size="small" sx={{ padding: '3px' }} onClick={onShowSettings}>
+                <SettingsIcon fontSize="inherit" />
+              </IconButton>
+            </Badge>
+          </StyledCogContainer>
           {/* rate */}
           <StyledTokensContainer>
             <Typography variant="body1">
@@ -301,13 +308,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       </Grid>
       <Grid item xs={12} sx={{ position: 'relative' }}>
         <StyledContentContainer hasArrow>
-          <StyledCogContainer>
-            <Badge color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
-              <IconButton aria-label="settings" size="small" sx={{ padding: '3px' }} onClick={onShowSettings}>
-                <SettingsIcon fontSize="inherit" />
-              </IconButton>
-            </Badge>
-          </StyledCogContainer>
           <StyledTokensContainer>
             <StyledTitleContainer>
               <Typography variant="body1">
