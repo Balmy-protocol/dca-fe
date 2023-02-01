@@ -10,7 +10,8 @@ import {
 } from './actions';
 
 export interface TokenListsWithParser extends TokensLists {
-  parser?: (list: TokensLists) => Token[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  parser?: (list: any) => Token[];
   chainId?: number;
 }
 
@@ -213,6 +214,20 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+  },
+  'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1': {
+    name: 'Kyberswap oasis',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 128,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: { data: { tokens: TokensLists } }) => Object.values(list as Record<string, Token>),
   },
   'https://tokens.1inch.io/v1.1/128': {
     name: '1Inch Huobi',
@@ -435,6 +450,7 @@ export const initialState: TokenListsState = {
     'https://tokens.1inch.io/v1.1/43114',
     'https://tokens.1inch.io/v1.1/42161',
     'https://tokens.1inch.io/v1.1/100',
+    'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
     'https://swap.crodex.app/tokens.json',
     'https://token-list.sushi.com/',
     'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wagyu/src/config/constants/tokenLists/pancake-default.tokenlist.json',
