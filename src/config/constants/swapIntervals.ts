@@ -350,16 +350,18 @@ export const toReadable = (left: number, frequency: number, intl: IntlShape) => 
   const asMinutes = customDuration.as('minutes');
 
   if (asDays >= 1) {
-    return `${parseFloat(asDays.toFixed(2))} ${intl.formatMessage(STRING_SWAP_INTERVALS[ONE_DAY.toString()].subject)}`;
+    return `${parseFloat(asDays.toFixed(2))} ${intl.formatMessage(
+      defineMessage({ description: 'days', defaultMessage: 'days' })
+    )}`;
   }
 
   if (asHours >= 1) {
     return `${parseFloat(asHours.toFixed(2))} ${intl.formatMessage(
-      STRING_SWAP_INTERVALS[ONE_HOUR.toString()].subject
+      defineMessage({ description: 'hours', defaultMessage: 'hours' })
     )}`;
   }
 
   return `${parseFloat(asMinutes.toFixed(2))} ${intl.formatMessage(
-    STRING_SWAP_INTERVALS[ONE_MINUTE.toString()].singularSubject
+    defineMessage({ description: 'minutes', defaultMessage: 'minutes' })
   )}`;
 };

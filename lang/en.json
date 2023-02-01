@@ -1935,6 +1935,10 @@
     "defaultMessage": "30 minutes (1 swap)",
     "description": "thirtyMinutesSingular"
   },
+  "naFo7E": {
+    "defaultMessage": "days",
+    "description": "days"
+  },
   "ne8FlW": {
     "defaultMessage": "Unfortunately, the CRV token can no longer be used as collateral on Aave V3. This means that it's not possible to swap this position.",
     "description": "positionCRVNotSupported"
@@ -2215,6 +2219,10 @@
     "defaultMessage": "You are having exactly the same experience as if you would have used the different aggregators directly. We haven't built any smart contracts on top of theirs, so there is no added risk. At the same time, we offer transaction simulations on some networks.",
     "description": "faqIsSafeResponse"
   },
+  "v1SUII": {
+    "defaultMessage": "minutes",
+    "description": "minutes"
+  },
   "vNNVGj": {
     "defaultMessage": "For example, let’s assume that you’ve created a position that swaps 2000 USDC for ETH each day. Let’s also assume that, when the swap is executed, 2000 USDC = 1 ETH. Instead of getting 1 ETH, you would be getting 1 ETH - 0.6% = 0.994 ETH. That 0.6% will be split between Mean Finance and the user who actually executed the swap.",
     "description": "faqDoINeedToPayAnyFeesResponsePart2"
@@ -2354,6 +2362,10 @@
   "yuK53B": {
     "defaultMessage": "Error setting permissions",
     "description": "modalErrorPermissions"
+  },
+  "yw4rkM": {
+    "defaultMessage": "hours",
+    "description": "hours"
   },
   "z/57ga": {
     "defaultMessage": "{readable}",
