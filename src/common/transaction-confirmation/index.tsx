@@ -99,13 +99,15 @@ const TIMES_PER_NETWORK = {
   [NETWORKS.mainnet.chainId]: 40,
 };
 
+const DEFAULT_TIME_PER_NETWORK = 30;
+
 const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
   const isTransactionPending = getPendingTransaction(transaction);
   const [success, setSuccess] = React.useState(false);
   const previousTransactionPending = usePrevious(isTransactionPending);
   const currentNetwork = useSelectedNetwork();
-  const [timer, setTimer] = React.useState(TIMES_PER_NETWORK[currentNetwork.chainId]);
+  const [timer, setTimer] = React.useState(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
   const minutes = Math.floor(timer / 60);
   const seconds = timer - minutes * 60;
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -118,7 +120,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: Trans
 
   React.useEffect(() => {
     setSuccess(false);
-    setTimer(TIMES_PER_NETWORK[currentNetwork.chainId]);
+    setTimer(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
   }, [transaction]);
 
   React.useEffect(() => {
@@ -126,7 +128,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: Trans
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
-      setTimer(TIMES_PER_NETWORK[currentNetwork.chainId]);
+      setTimer(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
     }
     if (!isTransactionPending && previousTransactionPending) {
       setTimer(0);
@@ -192,7 +194,11 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction }: Trans
           <StyledTopCircularProgress
             size={270}
             variant="determinate"
-            value={!success ? (1 - timer / TIMES_PER_NETWORK[currentNetwork.chainId]) * 100 : 100}
+            value={
+              !success
+                ? (1 - timer / (TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK)) * 100
+                : 100
+            }
             thickness={4}
             sx={{
               [`& .${circularProgressClasses.circle}`]: {
