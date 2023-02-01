@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import { FullPosition, GetPairSwapsData } from 'types';
 import { activePositionsPerIntervalToHasToExecute, calculateStale, getFrequencyLabel, STALE } from 'utils/parsing';
@@ -47,6 +47,7 @@ interface PositionStatusProps {
 }
 
 const PositionStatus = ({ position, pair, alignedEnd }: PositionStatusProps) => {
+  const intl = useIntl();
   if (!pair) return null;
   const lastExecutedAt = (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || '0';
 
@@ -90,7 +91,7 @@ const PositionStatus = ({ position, pair, alignedEnd }: PositionStatusProps) => 
               description="days to finish"
               defaultMessage="{type} left"
               values={{
-                type: getFrequencyLabel(position.swapInterval.interval, position.remainingSwaps),
+                type: getFrequencyLabel(intl, position.swapInterval.interval, position.remainingSwaps),
               }}
             />
           </Typography>

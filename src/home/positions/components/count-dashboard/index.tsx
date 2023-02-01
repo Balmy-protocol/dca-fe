@@ -12,7 +12,7 @@ import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { Hidden, Typography } from '@mui/material';
 import { BigNumber } from 'ethers';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 const StyledTypography = styled(Typography)<{ disabled: boolean }>`
   ${({ disabled }) => disabled && 'color: rgba(255, 255, 255, 0.5);'}
@@ -88,6 +88,7 @@ type PositionCountRaw = Record<string, ChainCounter>;
 
 const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountDashboardProps) => {
   const positions = useCurrentPositions();
+  const intl = useIntl();
 
   const positionsCountRaw = React.useMemo(() => {
     const reducedPositions = positions.reduce<PositionCountRaw>((acc, position) => {
@@ -266,7 +267,9 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
                   fill="white"
                 />
                 <Label
-                  value="Positions"
+                  value={intl.formatMessage(
+                    defineMessage({ description: 'countDashboardPositions', defaultMessage: 'Positions' })
+                  )}
                   position="centerTop"
                   className="label-top"
                   fontSize="1.10rem"

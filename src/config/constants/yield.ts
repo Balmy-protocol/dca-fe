@@ -11,7 +11,10 @@ export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
 
-export const DISABLED_YIELDS = ['0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11'];
+export const DISABLED_YIELDS = [
+  '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11',
+  '0x1dd5629903441b2dd0d03f76ec7673add920e765',
+];
 
 const BASE_YIELDS_PER_CHAIN: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
   Object.keys(NETWORKS).reduce((acc, key) => ({ ...acc, [NETWORKS[key].chainId]: [] }), {});

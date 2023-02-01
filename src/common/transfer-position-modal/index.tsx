@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from 'common/modal';
 import { FullPosition } from 'types';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
@@ -37,6 +37,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
   const positionService = usePositionService();
   const errorService = useErrorService();
   const addTransaction = useTransactionAdder();
+  const intl = useIntl();
 
   const validator = (nextValue: string) => {
     // sanitize value
@@ -97,7 +98,12 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
-        content: 'Error while transfering position',
+        content: (
+          <FormattedMessage
+            description="modalErrorTransferPosition"
+            defaultMessage="Error while transfering position"
+          />
+        ),
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -146,7 +152,9 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
         <TextField
           id="toAddress"
           value={toAddress}
-          placeholder="Set the address to transfer to"
+          placeholder={intl.formatMessage(
+            defineMessage({ defaultMessage: 'Set the address to transfer', description: 'transferToModalPlaceholder' })
+          )}
           autoComplete="off"
           autoCorrect="off"
           error={toAddress !== '' && !isValid}

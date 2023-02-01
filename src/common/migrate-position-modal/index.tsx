@@ -86,7 +86,9 @@ const MigratePositionModal = ({ position, open, onCancel }: MigratePositionModal
       }
       /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
-        content: 'error while migrating position',
+        content: (
+          <FormattedMessage description="modalErrorMigratingPosition" defaultMessage="error while migrating position" />
+        ),
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

@@ -8,6 +8,8 @@ import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/dca-token-picker';
+import { FormattedMessage, useIntl } from 'react-intl';
+import TokenPicker from 'common/token-picker';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
@@ -159,6 +161,7 @@ const Swap = ({
   const walletService = useWalletService();
   const positionService = usePositionService();
   const contractService = useContractService();
+  const intl = useIntl();
   const availablePairs = useAvailablePairs();
   const errorService = useErrorService();
   // const pairService = usePairService();
@@ -322,8 +325,11 @@ const Swap = ({
           chainId: currentNetwork.chainId,
         });
       }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
+      setModalError({
+        content: <FormattedMessage description="modalErrorApprove" defaultMessage="Error approving token" />,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        error: { code: e.code, message: e.message, data: e.data },
+      });
     }
   };
 
@@ -403,8 +409,11 @@ const Swap = ({
           chainId: currentNetwork.chainId,
         });
       }
-      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({ content: 'Error creating position', error: { code: e.code, message: e.message, data: e.data } });
+      setModalError({
+        content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
+        /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+        error: { code: e.code, message: e.message, data: e.data },
+      });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   };
@@ -756,8 +765,9 @@ const Swap = ({
             minimum: MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || MINIMUM_USD_RATE_FOR_DEPOSIT,
             minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
             symbol: from?.symbol || '',
-            frequency:
-              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject,
+            frequency: intl.formatMessage(
+              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject
+            ),
           }}
         />
       </Typography>

@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
 import { setupCache, setup } from 'axios-cache-adapter';
 import axios from 'axios';
+import { SupportedLanguages } from 'config/constants/lang';
 
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
@@ -84,6 +85,7 @@ const PERSISTED_STATES: string[] = [
   'positionDetails.showBreakdown',
   'aggregatorSettings',
   'tokenLists.customTokens',
+  'config.selectedLocale',
 ];
 
 const store = configureStore({
@@ -110,6 +112,11 @@ const store = configureStore({
   preloadedState: load({
     states: PERSISTED_STATES,
     preloadedState: {
+      config: {
+        network: undefined,
+        theme: 'dark',
+        selectedLocale: SupportedLanguages.english,
+      },
       positionDetails: {
         position: null,
       },

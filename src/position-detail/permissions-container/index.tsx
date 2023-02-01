@@ -121,7 +121,7 @@ const PositionPermissionsContainer = ({
       }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
-        content: 'Error setting permissions',
+        content: <FormattedMessage description="modalErrorPermissions" defaultMessage="Error setting permissions" />,
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

@@ -13,6 +13,7 @@ import MeanLogo from 'common/mean-logo';
 import { useThemeMode } from 'state/config/hooks';
 import { Typography } from '@mui/material';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+import LanguageLabel from 'common/lang-label';
 
 const StyledFooterContainer = styled.div<{ isSmall: boolean }>`
   display: flex;
@@ -34,6 +35,7 @@ const StyledFooterMainContent = styled.div`
 const StyledFooterLinks = styled.div`
   display: flex;
   gap: 32px;
+  align-items: center;
 `;
 
 const StyledLink = styled(Link)`
@@ -86,6 +88,8 @@ const Footer = () => {
                 <FormattedMessage description="faq" defaultMessage="FAQ" />
               </StyledLink>
             </Typography>
+
+            <LanguageLabel />
           </StyledFooterLinks>
         </>
       )}

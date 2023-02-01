@@ -23,6 +23,7 @@ import { useHistory, useLocation, useParams } from 'react-router-dom';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import usdSdkChains from 'hooks/useSdkChains';
+import { FormattedMessage } from 'react-intl';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -76,7 +77,14 @@ function capitalizeFirstLetter(toCap: string) {
 }
 
 const Warning = () => (
-  <Tooltip title="You are not connected to this network" open arrow placement="bottom">
+  <Tooltip
+    title={
+      <FormattedMessage description="networkLabelWarning" defaultMessage="You are not connected to this network" />
+    }
+    open
+    arrow
+    placement="bottom"
+  >
     <StyledWarningIcon />
   </Tooltip>
 );

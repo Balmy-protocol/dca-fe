@@ -2,6 +2,7 @@ import React from 'react';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import { STRING_SWAP_INTERVALS } from 'config/constants';
+import { useIntl } from 'react-intl';
 
 interface FrequencyInputProps {
   id: string;
@@ -15,7 +16,8 @@ interface FrequencyInputProps {
 const inputRegex = RegExp(/^[0-9]*$/);
 
 const FrequencyInput = ({ id, label, onChange, value, disabled, error }: FrequencyInputProps) => {
-  const frequencyType = STRING_SWAP_INTERVALS[label as keyof typeof STRING_SWAP_INTERVALS].subject;
+  const intl = useIntl();
+  const frequencyType = intl.formatMessage(STRING_SWAP_INTERVALS[label as keyof typeof STRING_SWAP_INTERVALS].subject);
 
   const validator = (nextValue: string) => {
     // sanitize value

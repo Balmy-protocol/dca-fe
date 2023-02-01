@@ -6,6 +6,7 @@ import FilledInput from '@mui/material/FilledInput';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import Button from 'common/button';
+import { defineMessage, useIntl } from 'react-intl';
 
 interface FrequencyEasyInputProps {
   id: string;
@@ -68,6 +69,7 @@ const StyledFilledInput = withStyles(() =>
 const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInputProps) => {
   const tabIndex = findIndex(PREDEFINED_RANGES, { value });
   const [setByUser, setSetByUser] = React.useState(false);
+  const intl = useIntl();
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
@@ -86,7 +88,9 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
       <StyledInputContainer>
         <StyledFilledInput
           id={id}
-          placeholder="Custom"
+          placeholder={intl.formatMessage(
+            defineMessage({ defaultMessage: 'custom', description: 'freqEasyInputCustom' })
+          )}
           onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
           style={{ width: `calc(${value.length + 1}ch + 29px)` }}
           value={value}
@@ -103,7 +107,9 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
     <StyledFrequencyInputContainer>
       <StyledFilledInput
         id={id}
-        placeholder="Custom"
+        placeholder={intl.formatMessage(
+          defineMessage({ defaultMessage: 'custom', description: 'freqEasyInputCustom' })
+        )}
         onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
         value={tabIndex === -1 || setByUser ? value : ''}
         fullWidth

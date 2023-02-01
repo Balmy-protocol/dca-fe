@@ -53,9 +53,29 @@ const GraphContainer = ({ position }: GraphContainerProps) => {
         <Typography variant="h6">{GRAPHS[tabIndex].title}</Typography>
         <MinimalTabs
           options={[
-            { key: 0, label: 'Average buy price' },
-            { key: 1, label: 'DCA vs Lump sum' },
-            ...(position.chainId === NETWORKS.mainnet.chainId ? [{ key: 2, label: 'Gas saved' }] : []),
+            {
+              key: 0,
+              label: (
+                <FormattedMessage
+                  description="positionDetailsAverageBuyPriceOption"
+                  defaultMessage="Average buy price"
+                />
+              ),
+            },
+            {
+              key: 1,
+              label: (
+                <FormattedMessage description="positionDetailsProfitLossOption" defaultMessage="DCA vs Lump sum" />
+              ),
+            },
+            ...(position.chainId === NETWORKS.mainnet.chainId
+              ? [
+                  {
+                    key: 2,
+                    label: <FormattedMessage description="positionDetailsGasSavedOption" defaultMessage="Gas saved" />,
+                  },
+                ]
+              : []),
           ]}
           selected={{ key: tabIndex, label: '' }}
           onChange={({ key }) => setTabIndex(key as number)}

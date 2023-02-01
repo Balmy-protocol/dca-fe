@@ -7,7 +7,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from 'common/token-icon';
 import { getTimeFrequencyLabel, calculateStale, STALE, calculateYield, sortTokensByAddress } from 'utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from 'types';
@@ -22,7 +22,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import ComposedTokenIcon from 'common/composed-token-icon';
 import CustomChip from 'common/custom-chip';
-import { Theme, Tooltip } from '@mui/material';
+import { Link, Theme, Tooltip } from '@mui/material';
 import useUsdPrice from 'hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 
@@ -95,6 +95,12 @@ const StyledCardTitleHeader = styled.div`
     margin-left: 4px;
     font-weight: 500;
   }
+`;
+
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
 `;
 
 const StyledDetailWrapper = styled.div<{ alignItems?: string; flex?: boolean; $spacing?: boolean }>`
@@ -197,6 +203,7 @@ const ActivePosition = ({
   const availablePairs = useAvailablePairs();
 
   const rateToUse = depositedRateUnderlying || rate;
+  const intl = useIntl();
 
   const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
   const toWithdrawYield =
@@ -290,7 +297,7 @@ const ActivePosition = ({
                     description="days to finish"
                     defaultMessage="{type} left"
                     values={{
-                      type: getTimeFrequencyLabel(swapInterval.toString(), remainingSwaps.toString()),
+                      type: getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString()),
                     }}
                   />
                 </Typography>
@@ -410,9 +417,17 @@ const ActivePosition = ({
               defaultMessage="{frequency} {hasYield}"
               values={{
                 b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                hasYield: position.from.underlyingTokens.length ? '+ yield' : '',
-                frequency:
-                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb,
+                hasYield: position.from.underlyingTokens.length
+                  ? intl.formatMessage(
+                      defineMessage({
+                        defaultMessage: '+ yield',
+                        description: 'plusYield',
+                      })
+                    )
+                  : '',
+                frequency: intl.formatMessage(
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
+                ),
               }}
             />
           </StyledDetailWrapper>
@@ -578,6 +593,48 @@ const ActivePosition = ({
                   description="positionCRVNotSupported"
                   defaultMessage="Unfortunately, the CRV token can no longer be used as collateral on Aave V3. This means that it's not possible to swap this position."
                 />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {(position.from.symbol === 'UNIDX' || position.to.symbol === 'UNIDX') && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
+                <FormattedMessage
+                  description="positionUNIDXNotSupported"
+                  defaultMessage="$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
+                />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {position.from.symbol === 'LPT' && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
+                <FormattedMessage
+                  description="positionLPTNotSupported"
+                  defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
+                />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {position.from.symbol === 'jEUR' && foundYieldFrom && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
+                <FormattedMessage
+                  description="positionJEURNotSupported"
+                  defaultMessage="Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here"
+                />
+                <StyledLink href="https://app.aave.com/governance/proposal/?proposalId=143" target="_blank">
+                  <FormattedMessage description="here" defaultMessage="here." />
+                </StyledLink>
               </Typography>
             </StyledDetailWrapper>
           )}

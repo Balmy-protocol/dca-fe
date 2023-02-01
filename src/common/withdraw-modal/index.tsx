@@ -98,7 +98,10 @@ const WithdrawModal = ({ position, open, onCancel, useProtocolToken }: WithdrawM
         });
       }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({ content: 'Error while withdrawing', error: { code: e.code, message: e.message, data: e.data } });
+      setModalError({
+        content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
+        error: { code: e.code, message: e.message, data: e.data },
+      });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   };

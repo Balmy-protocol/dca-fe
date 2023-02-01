@@ -13,7 +13,8 @@
     "prettier": "prettier --write --ignore-unknown ./src",
     "prepare-husky": "husky install",
     "prepare": "husky install",
-    "extract": "formatjs extract"
+    "extract": "formatjs extract",
+    "compile": "formatjs compile"
   },
   "repository": {
     "type": "git",

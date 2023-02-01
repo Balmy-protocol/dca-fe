@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import Button from 'common/button';
 import { Token } from 'types';
 import Typography from '@mui/material/Typography';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import TokenButton from 'common/token-button';
 import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-easy-input';
@@ -145,6 +145,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   } = props;
 
   const currentNetwork = useCurrentNetwork();
+  const intl = useIntl();
 
   return (
     <StyledGrid container rowSpacing={2} $show={show} ref={ref}>
@@ -243,7 +244,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                   description="howManyFreq"
                   defaultMessage="How many {type}?"
                   values={{
-                    type: STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].subject,
+                    type: intl.formatMessage(
+                      STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
+                    ),
                   }}
                 />
               </Typography>
