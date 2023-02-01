@@ -161,6 +161,7 @@ interface ActivePositionProps {
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
   onReusePosition: (position: Position) => void;
   onMigrateYield: (position: Position) => void;
+  onTerminate: (position: Position) => void;
   onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
@@ -175,6 +176,7 @@ const ActivePosition = ({
   onSuggestMigrateYield,
   disabled,
   hasSignSupport,
+  onTerminate,
   yieldOptionsByChain,
 }: ActivePositionProps) => {
   const {
@@ -665,6 +667,7 @@ const ActivePosition = ({
         )}
         <PositionControls
           position={position}
+          onTerminate={onTerminate}
           onWithdraw={onWithdraw}
           onReusePosition={onReusePosition}
           onMigrateYield={onMigrateYield}
