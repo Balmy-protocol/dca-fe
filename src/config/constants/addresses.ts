@@ -355,11 +355,6 @@ export const NETWORKS_FOR_MENU = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.mainnet.chainId,
-  NETWORKS.bsc.chainId,
-  NETWORKS.fantom.chainId,
-  NETWORKS.avalanche.chainId,
-  NETWORKS.heco.chainId,
-  NETWORKS.xdai.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {

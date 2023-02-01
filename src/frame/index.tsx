@@ -31,6 +31,7 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import ErrorBoundary from 'common/error-boundary/indext';
 import useAccount from 'hooks/useAccount';
 import FeedbackCard from 'common/feedback-card';
+import usdSdkChains from 'hooks/useSdkChains';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -84,6 +85,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
   const web3Service = useWeb3Service();
   const account = useAccount();
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
+  const aggSupportedNetworks = usdSdkChains();
 
   const theme = createTheme({
     palette: {
@@ -102,7 +104,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
       try {
         const web3Network = await walletService.getNetwork();
         const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
-        if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
+        if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
           dispatch(setNetwork(networkToSet as NetworkStruct));
           if (networkToSet) {
             web3Service.setNetwork(networkToSet?.chainId);
