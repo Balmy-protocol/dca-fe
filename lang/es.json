@@ -2482,5 +2482,17 @@
   "pwNot7": {
     "defaultMessage": "Ninguno de los tokens que seleccionaste soportan generar retornos.",
     "description": "disabledByNoOption"
+  },
+  "yw4rkM": {
+    "defaultMessage": "horas",
+    "description": "hours"
+  },
+  "v1SUII": {
+    "defaultMessage": "minutos",
+    "description": "minutes"
+  },
+  "naFo7E": {
+    "defaultMessage": "días",
+    "description": "days"
   }
 }

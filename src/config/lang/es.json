@@ -4731,6 +4731,12 @@
       "value": "30 minutos (1 intercambio)"
     }
   ],
+  "naFo7E": [
+    {
+      "type": 0,
+      "value": "días"
+    }
+  ],
   "ne8FlW": [
     {
       "type": 0,
@@ -5419,6 +5425,12 @@
       "value": "Estarás teniendo exactamente la misma experiencia que tendrías al usar el agregador directamente. No construimos ningún contrato inteligente sobre ellos así que no hay riesgo agregado. Al mismo tiempo, ofrecemos simulación de transacciones en algunas redes."
     }
   ],
+  "v1SUII": [
+    {
+      "type": 0,
+      "value": "minutos"
+    }
+  ],
   "vNNVGj": [
     {
       "type": 0,
@@ -5669,6 +5681,12 @@
     {
       "type": 0,
       "value": "Error definiendo permisos"
+    }
+  ],
+  "yw4rkM": [
+    {
+      "type": 0,
+      "value": "horas"
     }
   ],
   "z/57ga": [
