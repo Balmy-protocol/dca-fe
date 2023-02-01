@@ -604,7 +604,7 @@ const ActivePosition = ({
               <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
                 <FormattedMessage
                   description="positionUNIDXNotSupported"
-                  defaultMessage="$UNIDX liquidity has beeon moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
+                  defaultMessage="$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
                 />
               </Typography>
             </StyledDetailWrapper>

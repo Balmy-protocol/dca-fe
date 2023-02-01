@@ -512,7 +512,7 @@ const PositionDetailFrame = () => {
             <Alert severity="warning">
               <FormattedMessage
                 description="positionUNIDXNotSupported"
-                defaultMessage="$UNIDX liquidity has beeon moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
+                defaultMessage="$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
               />
             </Alert>
           </Grid>
