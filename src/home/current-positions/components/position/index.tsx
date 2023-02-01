@@ -596,6 +596,19 @@ const ActivePosition = ({
               </Typography>
             </StyledDetailWrapper>
           )}
+          {(position.from.symbol === 'UNIDX' || position.to.symbol === 'UNIDX') && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
+                <FormattedMessage
+                  description="positionUNIDXNotSupported"
+                  defaultMessage="$UNIDX liquidity has beeon moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
+                />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
           {position.from.symbol === 'LPT' && (
             <StyledDetailWrapper alignItems="flex-start">
               <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
