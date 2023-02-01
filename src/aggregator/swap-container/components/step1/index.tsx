@@ -270,7 +270,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                         token={toToken({
                           address: foundNetwork?.mainCurrency || foundSdkNetwork.wToken,
                           chainId: network.chainId,
-                          logoURI: getGhTokenListLogoUrl(network.chainId, PROTOCOL_TOKEN_ADDRESS),
+                          logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
                         })}
                       />
                       {foundSdkNetwork.name}

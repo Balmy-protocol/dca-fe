@@ -66,7 +66,7 @@ const SwapContainer = () => {
     } else if (fromParamCustomToken && !from) {
       dispatch(setFrom(fromParamCustomToken.token));
     } else if (!from && !to && !toParamToken && !toParamCustomToken) {
-      dispatch(setFrom(getProtocolToken(Number(actualCurrentNetwork.chainId || chainId || currentNetwork.chainId))));
+      dispatch(setFrom(getProtocolToken(Number(chainId || actualCurrentNetwork.chainId || currentNetwork.chainId))));
     }
 
     if (toParamToken) {
