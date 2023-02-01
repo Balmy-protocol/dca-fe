@@ -216,6 +216,20 @@ export const getDefaultByUrl = () => ({
     fetchable: true,
   },
   'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1': {
+    name: 'Kyberswap aurora',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 1313161554,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: { data: { tokens: Token[] } }) => list.data.tokens,
+  },
+  'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1': {
     name: 'Kyberswap oasis',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -224,136 +238,10 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
-    chainId: 128,
+    chainId: 42262,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    parser: (list: { data: { tokens: TokensLists } }) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/128': {
-    name: '1Inch Huobi',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 128,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/66': {
-    name: '1Inch Okc',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 66,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/1285': {
-    name: '1Inch Moonriver',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 1285,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/1284': {
-    name: '1Inch Moonbeam',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 1284,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/122': {
-    name: '1Inch Fuse',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 122,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/106': {
-    name: '1Inch Velas',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 106,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/25': {
-    name: '1Inch Cronos',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 25,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/288': {
-    name: '1Inch Boba',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 288,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/58': {
-    name: '1Inch Ontology',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 58,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+    parser: (list: { data: { tokens: Token[] } }) => list.data.tokens,
   },
   'https://tokens.1inch.io/v1.1/8217': {
     name: '1Inch Klaytn',
@@ -383,62 +271,6 @@ export const getDefaultByUrl = () => ({
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
-  'https://tokens.1inch.io/v1.1/592': {
-    name: '1Inch Astar',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 592,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/1666600000': {
-    name: '1Inch Harmony',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 1666600000,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/199': {
-    name: '1Inch Bittorrent',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 199,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
-  'https://tokens.1inch.io/v1.1/42262': {
-    name: '1Inch Oasis',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 42262,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
@@ -453,25 +285,13 @@ export const initialState: TokenListsState = {
     'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
     'https://swap.crodex.app/tokens.json',
     'https://token-list.sushi.com/',
+    'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
     'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wagyu/src/config/constants/tokenLists/pancake-default.tokenlist.json',
     'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
     'https://extendedtokens.uniswap.org',
     'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
-    'https://tokens.1inch.io/v1.1/128',
-    'https://tokens.1inch.io/v1.1/66',
-    'https://tokens.1inch.io/v1.1/1285',
-    'https://tokens.1inch.io/v1.1/1284',
-    'https://tokens.1inch.io/v1.1/122',
-    'https://tokens.1inch.io/v1.1/106',
-    'https://tokens.1inch.io/v1.1/25',
-    'https://tokens.1inch.io/v1.1/288',
-    'https://tokens.1inch.io/v1.1/58',
     'https://tokens.1inch.io/v1.1/8217',
     'https://tokens.1inch.io/v1.1/1313161554',
-    'https://tokens.1inch.io/v1.1/592',
-    'https://tokens.1inch.io/v1.1/1666600000',
-    'https://tokens.1inch.io/v1.1/199',
-    'https://tokens.1inch.io/v1.1/42262',
     'custom-tokens',
   ],
   byUrl: getDefaultByUrl(),
