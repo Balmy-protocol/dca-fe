@@ -507,6 +507,16 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
+        {(position.from.symbol === 'UNIDX' || position.to.symbol === 'UNIDX') && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionUNIDXNotSupported"
+                defaultMessage="$UNIDX liquidity has beeon moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
+              />
+            </Alert>
+          </Grid>
+        )}
         {position.from.symbol === 'jEUR' && position.from.underlyingTokens.length && (
           <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
             <Alert severity="warning">
