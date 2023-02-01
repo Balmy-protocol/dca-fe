@@ -2007,6 +2007,10 @@
     "defaultMessage": "View on chain explorer",
     "description": "view on chain explorer"
   },
+  "pwNot7": {
+    "defaultMessage": "None of the tokens you have selected support yield platforms.",
+    "description": "disabledByNoOption"
+  },
   "qC950V": {
     "defaultMessage": "Mean Finance will allow you to perform DCA, in a gasless and decentralized fashion. This means:",
     "description": "faqWhyShouldIUseMeanFinanceResponsePart2"

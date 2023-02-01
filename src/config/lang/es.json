@@ -4899,6 +4899,12 @@
       "value": "No cobramos ningún tipo de comisión. Estas recibiendo exactamente los mismos precios que si hubieses interactuado con el agregador directamente."
     }
   ],
+  "pwNot7": [
+    {
+      "type": 0,
+      "value": "Ninguno de los tokens que seleccionaste soportan generar retornos."
+    }
+  ],
   "q2gF9r": [
     {
       "type": 0,

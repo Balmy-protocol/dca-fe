@@ -952,6 +952,7 @@ const Swap = ({
           yieldEnabled={shouldEnableYield}
           setYieldEnabled={setYieldEnabled}
           fromCanHaveYield={fromCanHaveYield}
+          toCanHaveYield={toCanHaveYield}
           yieldOptions={yieldOptions}
           isLoadingYieldOptions={isLoadingYieldOptions}
           fromYield={fromYield}
