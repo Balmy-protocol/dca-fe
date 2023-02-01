@@ -48,26 +48,59 @@ const AggregatorFAQ = () => (
     <Accordion disableGutters>
       <AccordionSummary>
         <Typography>
-          <FormattedMessage description="faqWhatIs" defaultMessage="What is Mean Finance Meta Aggregator?" />
-        </Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Typography>
-          <FormattedMessage description="faqWhatIsResponse" defaultMessage="It's an aggregator of DEX Aggregators" />
-        </Typography>
-      </AccordionDetails>
-    </Accordion>
-    <Accordion disableGutters>
-      <AccordionSummary>
-        <Typography>
-          <FormattedMessage description="faqWhatIs" defaultMessage="Does Mean Finance charge a fee for a swap?" />
+          <FormattedMessage description="faqWhatIs" defaultMessage="What is Mean Finance's Meta Aggregator?" />
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Typography>
           <FormattedMessage
             description="faqWhatIsResponse"
-            defaultMessage="We take 0 fees from any swap that you make through Mean Finance. You will get all the same prices as you would using the specific Dex/Dex Aggregator from their application."
+            defaultMessage="You’ve probably heard many DEXes or aggregators claim that they offer the best prices. Well, now you can be sure. We will query all of them at the same time so you don’t have to, and you will be able to choose the one that best fits your needs"
+          />
+        </Typography>
+      </AccordionDetails>
+    </Accordion>
+    <Accordion disableGutters>
+      <AccordionSummary>
+        <Typography>
+          <FormattedMessage description="faqWhatIs" defaultMessage="Do you take any fees?" />
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Typography>
+          <FormattedMessage
+            description="faqWhatIsResponse"
+            defaultMessage="We don’t take any fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly"
+          />
+        </Typography>
+      </AccordionDetails>
+    </Accordion>
+    <Accordion disableGutters>
+      <AccordionSummary>
+        <Typography>
+          <FormattedMessage description="faqWhatIs" defaultMessage="Is it safe?" />
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Typography>
+          <FormattedMessage
+            description="faqWhatIsResponse"
+            defaultMessage="You are having exactly the same experience as if you would have used the different aggregators directly. We haven’t built any smart contracts on top of theirs, so there is no added risk. At the same time, we offer transaction simulations on some networks."
+          />
+        </Typography>
+      </AccordionDetails>
+    </Accordion>
+    <Accordion disableGutters>
+      <AccordionSummary>
+        <Typography>
+          <FormattedMessage description="faqWhatIs" defaultMessage="What is transaction simulation?" />
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Typography>
+          <FormattedMessage
+            description="faqWhatIsResponse"
+            defaultMessage="All swaps are executed directly to each Dex/Dex Aggregator contract. This means that if any of the aggregators you use does an airdrop in the future, all swaps made Mean Finance would make you eligible for their airdrop."
           />
         </Typography>
       </AccordionDetails>
@@ -86,21 +119,6 @@ const AggregatorFAQ = () => (
           <FormattedMessage
             description="faqWhatIsResponse"
             defaultMessage="All swaps are executed directly to each Dex/Dex Aggregator contract. This means that if any of the aggregators you use does an airdrop in the future, all swaps made Mean Finance would make you eligible for their airdrop."
-          />
-        </Typography>
-      </AccordionDetails>
-    </Accordion>
-    <Accordion disableGutters>
-      <AccordionSummary>
-        <Typography>
-          <FormattedMessage description="faqWhatIs" defaultMessage="How safe is Mean Finance Meta Aggregator?" />
-        </Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Typography>
-          <FormattedMessage
-            description="faqWhatIsResponse"
-            defaultMessage="You use the smart contracts of the Dex/Dex Aggregator that you are going to swap with, that means you get the same security you would as using the specific Dex/Dex Aggregator from their application."
           />
         </Typography>
       </AccordionDetails>
