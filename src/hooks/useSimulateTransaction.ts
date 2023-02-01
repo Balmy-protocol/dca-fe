@@ -19,8 +19,8 @@ function useSimulateTransaction(
     result?: BlowfishResponse;
     error?: string;
   }>({ isLoading: false, result: undefined, error: undefined });
-  const txData = tx?.data.toString();
-  const prevTxData = usePrevious(tx?.data.toString());
+  const txData = (tx && tx.data && tx.data.toString()) || null;
+  const prevTxData = usePrevious(txData);
   const prevResult = usePrevious(result);
 
   const debouncedCall = React.useCallback(
