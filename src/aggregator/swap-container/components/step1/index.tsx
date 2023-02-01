@@ -252,6 +252,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             <StyledNetworkButtonsContainer>
               <Select
                 id="choose-network"
+                fullWidth
                 value={selectedNetwork.chainId}
                 onChange={(evt) => onChangeNetwork(Number(evt.target.value))}
                 size="small"
