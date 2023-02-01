@@ -180,7 +180,7 @@ const TerminateModal = ({
         <Typography variant="body1">
           <FormattedMessage
             description="terminate description"
-            defaultMessage="Swaps are no longer going to be executed, you won't be able to make any new modifications to this position."
+            defaultMessage="Swaps are no longer going to be executed, you won't be able to make any new modifications to this position and the NFT will be burned."
           />
         </Typography>
         <Typography variant="body1">
