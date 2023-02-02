@@ -78,10 +78,13 @@ class MeanFinanceAPISourceList implements IQuoteSourceList {
   }
 
   getQuotes(): Promise<QuoteResponse | FailedQuote>[] {
+    console.log('calling get quotes');
+
     throw new Error('Not implemented');
   }
 
   getAllQuotes(request: SourceListRequest): Promise<(QuoteResponse | FailedQuote)[]> {
+    console.log('calling get all quotes');
     return this.fetchAPI(request);
   }
 
@@ -100,7 +103,7 @@ class MeanFinanceAPISourceList implements IQuoteSourceList {
     estimateBuyOrdersWithSellOnlySources,
   }: SourceListRequest): Promise<(QuoteResponse | FailedQuote)[]> {
     let url =
-      `https://api.mean.finance/swap/newtorks/${chainId}/quotes` +
+      `https://api.mean.finance/v1/swap/networks/${chainId}/quotes` +
       `?includedSources=${sourceIds.join(',')}` +
       `&sellToken=${sellToken}` +
       `&buyToken=${buyToken}` +
@@ -127,6 +130,8 @@ class MeanFinanceAPISourceList implements IQuoteSourceList {
     if (estimateBuyOrdersWithSellOnlySources) {
       url += `&estimateBuyOrdersWithSellOnlySources`;
     }
+
+    console.log('calling the api');
 
     const results = await this.axiosClient.get<ApiQuoteResponse>(url);
 
@@ -258,7 +263,38 @@ export default class SdkService {
 
   async resetProvider() {
     const provider = (await this.providerService.getBaseProvider()) as BaseProvider;
-    this.sdk = buildSDK({ provider: { source: { type: 'ethers', instance: provider } } });
+    this.sdk = buildSDK({
+      provider: {
+        source: {
+          type: 'ethers',
+          instance: provider,
+        },
+      },
+      quotes: {
+        sourceList: {
+          type: 'overridable-source-list',
+          lists: {
+            default: {
+              type: 'default',
+            },
+            overrides: {
+              uniswap: {
+                type: 'custom',
+                instance: this.ApiSourceList,
+              },
+              odos: {
+                type: 'custom',
+                instance: this.ApiSourceList,
+              },
+              firebird: {
+                type: 'custom',
+                instance: this.ApiSourceList,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async getSwapOption(
