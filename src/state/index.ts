@@ -131,6 +131,7 @@ const store = configureStore({
           'https://tokens.1inch.io/v1.1/42161',
           'https://swap.crodex.app/tokens.json',
           'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
+          'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
           'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
           'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wagyu/src/config/constants/tokenLists/pancake-default.tokenlist.json',
           'https://token-list.sushi.com/',

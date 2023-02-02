@@ -257,6 +257,20 @@ export const getDefaultByUrl = () => ({
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
+  'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json': {
+    name: 'Cronos cronaswap',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 25,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: Token[]) => list,
+  },
   'https://tokens.1inch.io/v1.1/1313161554': {
     name: '1Inch Aurora',
     logoURI: '',
@@ -292,6 +306,7 @@ export const initialState: TokenListsState = {
     'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
     'https://tokens.1inch.io/v1.1/8217',
     'https://tokens.1inch.io/v1.1/1313161554',
+    'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
     'custom-tokens',
   ],
   byUrl: getDefaultByUrl(),
