@@ -78,13 +78,10 @@ class MeanFinanceAPISourceList implements IQuoteSourceList {
   }
 
   getQuotes(): Promise<QuoteResponse | FailedQuote>[] {
-    console.log('calling get quotes');
-
     throw new Error('Not implemented');
   }
 
   getAllQuotes(request: SourceListRequest): Promise<(QuoteResponse | FailedQuote)[]> {
-    console.log('calling get all quotes');
     return this.fetchAPI(request);
   }
 
@@ -130,8 +127,6 @@ class MeanFinanceAPISourceList implements IQuoteSourceList {
     if (estimateBuyOrdersWithSellOnlySources) {
       url += `&estimateBuyOrdersWithSellOnlySources`;
     }
-
-    console.log('calling the api');
 
     const results = await this.axiosClient.get<ApiQuoteResponse>(url);
 
