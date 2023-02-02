@@ -259,7 +259,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   },
   xdai: {
     chainId: 100,
-    name: 'xDAI',
+    name: 'Gnosis Chain',
     mainCurrency: '0x6810e776880c02933d47db1b9fc05908e5386b96',
     nativeCurrency: {
       name: 'xDAI',
@@ -621,6 +621,28 @@ export const DEFILLAMA_IDS = {
   [NETWORKS.polygon.chainId]: 'polygon',
   [NETWORKS.optimism.chainId]: 'optimism',
   [NETWORKS.mumbai.chainId]: 'mumbai',
+  [NETWORKS.moonbeam.chainId]: 'moonbeam',
+  [NETWORKS.xdai.chainId]: 'gnosis',
+  [Chains.ETHEREUM.chainId]: 'ethereum',
+  [Chains.BNB_CHAIN.chainId]: 'bsc',
+  [Chains.POLYGON.chainId]: 'polygon',
+  [Chains.AVALANCHE.chainId]: 'avax',
+  [Chains.FANTOM.chainId]: 'fantom',
+  [Chains.GNOSIS.chainId]: 'xdai',
+  [Chains.HECO.chainId]: 'heco',
+  [Chains.ARBITRUM.chainId]: 'arbitrum',
+  [Chains.OPTIMISM.chainId]: 'optimism',
+  [Chains.CELO.chainId]: 'celo',
+  [Chains.CRONOS.chainId]: 'cronos',
+  [Chains.BOBA.chainId]: 'boba',
+  [Chains.MOONRIVER.chainId]: 'moonriver',
+  [Chains.OKC.chainId]: 'okexchain',
+  [Chains.ONTOLOGY.chainId]: 'ontology',
+  [Chains.KLAYTN.chainId]: 'klaytn',
+  [Chains.AURORA.chainId]: 'aurora',
+  [Chains.HARMONY_SHARD_0.chainId]: 'harmony',
+  [Chains.MOONBEAM.chainId]: 'moonbeam',
+  [Chains.VELAS.chainId]: 'velas',
 };
 
 export const TOKEN_LISTS = {

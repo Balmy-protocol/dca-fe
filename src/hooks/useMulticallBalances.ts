@@ -41,11 +41,17 @@ function useMulticallBalances(
         try {
           const balanceResults = await walletService.getMulticallBalances(tokens);
 
-          const priceResults = await priceService.getUsdHistoricPrice(
-            tokens
-              .filter((token) => (balanceResults[token] || BigNumber.from(0)).gt(BigNumber.from(0)))
-              .map((key) => emptyTokenWithAddress(key))
-          );
+          let priceResults: Record<string, BigNumber> = {};
+
+          try {
+            priceResults = await priceService.getUsdHistoricPrice(
+              tokens
+                .filter((token) => (balanceResults[token] || BigNumber.from(0)).gt(BigNumber.from(0)))
+                .map((key) => emptyTokenWithAddress(key))
+            );
+          } catch (e) {
+            console.error('Error fetching prices from defillama', e);
+          }
 
           const promiseResult = tokens.reduce(
             (acc, token) => ({
