@@ -18,8 +18,13 @@ export interface PoolsLiquidityDataGraphqlResponse {
 export interface GetPairResponseSwapData {
   id: string;
   executedAtTimestamp: string;
-  ratePerUnitAToB: string;
-  ratePerUnitBToA: string;
+  ratioAToB: string;
+  ratioBToA: string;
+  pairSwapsIntervals: {
+    swapInterval: {
+      interval: string;
+    };
+  }[];
 }
 
 export interface GetPairPriceResponseData {
@@ -195,4 +200,111 @@ export interface MeanApiUnderlyingResponse {
       underlyingAmount: string;
     }[];
   }[];
+}
+
+export type RawSwapOption = {
+  sellAmount: {
+    amount: string;
+    amountInUnits: string;
+    amountInUSD: string;
+  };
+  buyAmount: {
+    amount: string;
+    amountInUnits: string;
+    amountInUSD: string;
+  };
+  maxSellAmount: {
+    amount: string;
+    amountInUnits: string;
+    amountInUSD: string;
+  };
+  minBuyAmount: {
+    amount: string;
+    amountInUnits: string;
+    amountInUSD: string;
+  };
+  gas: {
+    estimatedGas: string;
+    estimatedCost: string;
+    estimatedCostInUnits: string;
+    estimatedCostInUSD: string;
+    gasTokenSymbol: string;
+  };
+  swapper: {
+    allowanceTarget: string;
+    address: string;
+    id: string;
+    name: string;
+    logoURI: string;
+  };
+  type: string;
+  tx: TransactionRequest;
+};
+
+export type FailedSwapOption = {
+  failed: true;
+  dex: string;
+};
+
+export interface MeanFinanceSwapResponse {
+  swap: {
+    sellToken: {
+      address: string;
+      decimals: number;
+      symbol: string;
+    };
+    buyToken: {
+      address: string;
+      decimals: number;
+      symbol: string;
+    };
+    config: {
+      gasSpeed: string;
+      slippagePercentage: number;
+    };
+    quotes: (RawSwapOption | FailedSwapOption)[];
+  };
+}
+
+export enum StateChangeKind {
+  ERC20_TRANSFER = 'ERC20_TRANSFER',
+  ERC20_APPROVAL = 'ERC20_APPROVAL',
+  NATIVE_ASSET_TRANSFER = 'NATIVE_ASSET_TRANSFER',
+  ERC721_TRANSFER = 'ERC721_TRANSFER',
+  ERC721_APPROVAL = 'ERC721_APPROVAL',
+  ERC721_APPROVAL_FOR_ALL = 'ERC721_APPROVAL_FOR_ALL',
+  ERC1155_TRANSFER = 'ERC1155_TRANSFER',
+  ERC1155_APPROVAL_FOR_ALL = 'ERC1155_APPROVAL_FOR_ALL',
+}
+
+export interface BlowfishReponseData {
+  amount: {
+    before: string;
+    after: string;
+  };
+  asset?: {
+    address: string;
+    decimals: number;
+    symbol: string;
+  };
+  contract?: {
+    address: string;
+  };
+}
+export interface BlowfishResponse {
+  action: 'BLOCK' | 'WARN' | 'NONE';
+  warnings: {
+    severity: 'CRITICAL' | 'WARNING';
+    message: string;
+  }[];
+  simulationResults: {
+    error?: { humanReadableError: string };
+    expectedStateChanges: {
+      humanReadableDiff: string;
+      rawInfo: {
+        kind: StateChangeKind;
+        data: BlowfishReponseData;
+      };
+    }[];
+  };
 }

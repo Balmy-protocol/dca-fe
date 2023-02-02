@@ -16,8 +16,12 @@ export const DISABLED_YIELDS = [
   '0x1dd5629903441b2dd0d03f76ec7673add920e765',
 ];
 
+const BASE_YIELDS_PER_CHAIN: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
+  Object.keys(NETWORKS).reduce((acc, key) => ({ ...acc, [NETWORKS[key].chainId]: [] }), {});
+
 export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
   {
+    ...BASE_YIELDS_PER_CHAIN,
     [NETWORKS.polygon.chainId]: [
       {
         id: '37b04faa-95bb-4ccb-9c4e-c70fa167342b', // aave-v3 USDC

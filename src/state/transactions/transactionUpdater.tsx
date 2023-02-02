@@ -78,12 +78,13 @@ export default function Updater(): null {
       return transactionService.getTransaction(hash).then((tx: ethers.providers.TransactionResponse) => {
         if (!tx) {
           if (transactions[hash].retries > 2) {
-            positionService.handleTransactionRejection({
-              ...transactions[hash],
-              typeData: {
-                ...transactions[hash].typeData,
-              },
-            });
+            if (transactions[hash].type)
+              positionService.handleTransactionRejection({
+                ...transactions[hash],
+                typeData: {
+                  ...transactions[hash].typeData,
+                },
+              });
             dispatch(removeTransaction({ hash, chainId: currentNetwork.chainId }));
             enqueueSnackbar(
               buildRejectedTransactionMessage({

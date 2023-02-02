@@ -5,8 +5,7 @@ import MeanLogoDark from 'assets/logo/dark_logo.svg';
 interface MeanLogoProps {
   theme: 'light' | 'dark';
 }
-const MeanLogo = ({ theme }: MeanLogoProps) =>
-  theme === 'light' ? <MeanLogoLight /> : <MeanLogoDark style={{ fill: 'rgb(255,255,255)' }} />;
+const MeanLogo = ({ theme }: MeanLogoProps) => (theme === 'light' ? <MeanLogoLight /> : <MeanLogoDark />);
 // <img
 //   alt="mean finance"
 //   style={{ width: '200px' }}

@@ -3,18 +3,26 @@ import styled from 'styled-components';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
-import { NETWORKS, NETWORKS_FOR_MENU, PositionVersions, SUPPORTED_NETWORKS } from 'config/constants';
+import {
+  getGhTokenListLogoUrl,
+  NETWORKS,
+  NETWORKS_FOR_MENU,
+  PositionVersions,
+  SUPPORTED_NETWORKS,
+} from 'config/constants';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
 import TokenIcon from 'common/token-icon';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { emptyTokenWithAddress, toToken } from 'utils/currency';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useWalletService from 'hooks/useWalletService';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+import usdSdkChains from 'hooks/useSdkChains';
 import { FormattedMessage } from 'react-intl';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
@@ -36,8 +44,8 @@ const StyledMenuItem = styled(Button)`
   text-transform: none;
 `;
 
-const StyledTokenIconContainer = styled.div`
-  margin-right: 5px;
+const StyledTokenIconContainer = styled.div<{ small: boolean }>`
+  margin-right: ${({ small }) => (small ? '0px' : '5px')};
   display: flex;
 `;
 
@@ -55,6 +63,7 @@ const StyledButton = styled(Button)`
   }
   margin-right: 10px;
   padding: 4px 8px;
+  min-width: 0px;
 `;
 interface NetworkLabelProps {
   network: {
@@ -92,7 +101,10 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const urlParams = useParams<PositionDetailUrlParams>();
   const history = useHistory();
   const loadedAsSafeApp = useLoadedAsSafeApp();
+  const currentBreakPoint = useCurrentBreakpoint();
+  const aggSupportedNetworks = usdSdkChains();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (loadedAsSafeApp) {
       return;
@@ -115,6 +127,8 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
         } else if (location.pathname.startsWith('/position')) {
           const { positionId, positionVersion } = urlParams;
           history.replace(`/${chainId}/positions/${positionVersion}/${positionId}`);
+        } else if (location.pathname.startsWith('/swap')) {
+          history.replace(`/swap/${chainId}`);
         }
       });
     }
@@ -125,35 +139,40 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
     return (supportedNetwork && supportedNetwork.name) || capitalizeFirstLetter(network.name);
   }, [network]);
 
+  const foundNetwork = find(NETWORKS, { chainId: network.chainId });
   const buttonToRender = (
     <StyledButton
       aria-controls="customized-menu"
       aria-haspopup="true"
       color="transparent"
       variant="outlined"
-      onClick={handleClick}
-      style={{ maxWidth: '220px', textTransform: 'none' }}
+      style={{ maxWidth: '220px', textTransform: 'none', cursor: 'default' }}
       endIcon={isOnCorrectNetwork ? null : <Warning />}
     >
-      {NETWORKS_FOR_MENU.includes(network.chainId) && (
-        <StyledTokenIconContainer>
+      {(NETWORKS_FOR_MENU.includes(network.chainId) || aggSupportedNetworks.includes(network.chainId)) && (
+        <StyledTokenIconContainer small={currentBreakPoint === 'xs'}>
           <TokenIcon
-            size="20px"
-            token={emptyTokenWithAddress(find(NETWORKS, { chainId: network.chainId })?.mainCurrency || '')}
+            size={currentBreakPoint === 'xs' ? '25px' : '20px'}
+            token={toToken({
+              address: foundNetwork?.mainCurrency || '',
+              chainId: network.chainId,
+              logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
+            })}
           />
         </StyledTokenIconContainer>
       )}
-      <Typography variant="body1">{networkName}</Typography>
+      {currentBreakPoint !== 'xs' && <Typography variant="body1">{networkName}</Typography>}
     </StyledButton>
   );
 
-  const componentToRender = SUPPORTED_NETWORKS.includes(network.chainId) ? (
-    buttonToRender
-  ) : (
-    <Tooltip title="We do not support this network. You are seeing data from Optimism" arrow placement="top">
-      {buttonToRender}
-    </Tooltip>
-  );
+  const componentToRender =
+    SUPPORTED_NETWORKS.includes(network.chainId) || aggSupportedNetworks.includes(network.chainId) ? (
+      buttonToRender
+    ) : (
+      <Tooltip title="We do not support this network. You are seeing data from Optimism" arrow placement="top">
+        {buttonToRender}
+      </Tooltip>
+    );
 
   return (
     <>
@@ -182,7 +201,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
               size="small"
               onClick={() => handleClose(chainId)}
             >
-              <StyledTokenIconContainer>
+              <StyledTokenIconContainer small={false}>
                 <TokenIcon
                   size="20px"
                   token={emptyTokenWithAddress((find(NETWORKS, { chainId }) || { mainCurrency: '' }).mainCurrency)}

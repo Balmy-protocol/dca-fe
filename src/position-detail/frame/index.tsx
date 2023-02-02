@@ -19,7 +19,7 @@ import PositionNotFound from 'position-detail/position-not-found';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAppDispatch } from 'state/hooks';
-import { changeMainTab, changePositionDetailsTab } from 'state/tabs/actions';
+import { changeMainTab, changePositionDetailsTab, changeSubTab } from 'state/tabs/actions';
 import { usePositionDetailsTab } from 'state/tabs/hooks';
 import PositionPermissionsContainer from 'position-detail/permissions-container';
 import { setPermissions } from 'state/position-permissions/actions';
@@ -191,7 +191,8 @@ const PositionDetailFrame = () => {
     ]);
 
   React.useEffect(() => {
-    dispatch(changeMainTab(1));
+    dispatch(changeMainTab(0));
+    dispatch(changeSubTab(1));
   }, []);
 
   React.useEffect(() => {
@@ -244,7 +245,8 @@ const PositionDetailFrame = () => {
 
   const onBackToPositions = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    dispatch(changeMainTab(1));
+    dispatch(changeMainTab(0));
+    dispatch(changeSubTab(1));
     history.push('/positions');
   };
 
@@ -530,7 +532,11 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
-        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+        <Grid
+          item
+          xs={12}
+          style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px', flexWrap: 'wrap' }}
+        >
           <StyledTabs
             value={tabIndex}
             onChange={(e, index) => dispatch(changePositionDetailsTab(index))}

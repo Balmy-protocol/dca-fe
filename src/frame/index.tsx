@@ -6,6 +6,7 @@ import Container from '@mui/material/Container';
 import NavBar from 'common/navbar';
 import AppFooter from 'common/footer';
 import Home from 'home';
+import Aggregator from 'aggregator';
 import FAQ from 'faq';
 import TransactionUpdater from 'state/transactions/transactionUpdater';
 import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
@@ -30,6 +31,8 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import ErrorBoundary from 'common/error-boundary/indext';
 import useAccount from 'hooks/useAccount';
 import FeedbackCard from 'common/feedback-card';
+import usdSdkChains from 'hooks/useSdkChains';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -54,10 +57,11 @@ interface AppFrameProps {
   initializationError: Error | null;
 }
 
-const StyledGridContainer = styled(Grid)`
+const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  ${({ isSmall }) => isSmall && 'margin-bottom: 40px !important;'}
 `;
 
 const StyledAppGridContainer = styled(Grid)`
@@ -83,10 +87,15 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
   const web3Service = useWeb3Service();
   const account = useAccount();
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
+  const aggSupportedNetworks = usdSdkChains();
+  const currentBreakPoint = useCurrentBreakpoint();
 
   const theme = createTheme({
     palette: {
       mode,
+    },
+    typography: {
+      fontFamily: 'Lato',
     },
   });
 
@@ -98,7 +107,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
       try {
         const web3Network = await walletService.getNetwork();
         const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
-        if (SUPPORTED_NETWORKS.includes(web3Network.chainId)) {
+        if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
           dispatch(setNetwork(networkToSet as NetworkStruct));
           if (networkToSet) {
             web3Service.setNetwork(networkToSet?.chainId);
@@ -142,7 +151,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                 <Vector2 />
               </StyledVector2Container>
               <StyledContainer>
-                <StyledGridContainer container direction="row">
+                <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
                   <StyledAppGridContainer item xs={12}>
                     <ErrorBoundary error={initializationError}>
                       <Switch>
@@ -175,6 +184,9 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                           {/* <RollbarContext context="/create"> */}
                           <Home isLoading={isLoading || isLoadingNetwork} />
                           {/* </RollbarContext> */}
+                        </Route>
+                        <Route path="/swap/:chainId?/:from?/:to?">
+                          <Aggregator isLoading={isLoading || isLoadingNetwork} />
                         </Route>
                         <Route path="/:chainId?/:from?/:to?">
                           {/* <RollbarContext context="/main"> */}

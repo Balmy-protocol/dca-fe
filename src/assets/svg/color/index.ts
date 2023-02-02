@@ -33,6 +33,7 @@ import ATM from './atm.svg';
 import ATOM from './atom.svg';
 import AUDR from './audr.svg';
 import AUTO from './auto.svg';
+import AVAX from './avax.svg';
 import AYWA from './aywa.svg';
 import BAB from './bab.svg';
 import BAL from './bal.svg';
@@ -83,11 +84,13 @@ import CC from './cc.svg';
 import CDN from './cdn.svg';
 import CDT from './cdt.svg';
 import CHAIN from './chain.svg';
+import CHECK from './check.svg';
 import CHAT from './chat.svg';
 import CHIPS from './chips.svg';
 import CIX from './cix.svg';
 import CLAM from './clam.svg';
 import CLOAK from './cloak.svg';
+import CLOCK from './clock.svg';
 import CMM from './cmm.svg';
 import CMT from './cmt.svg';
 import CND from './cnd.svg';
@@ -158,6 +161,7 @@ import EULER from './euler.svg';
 import EVX from './evx.svg';
 import EXMO from './exmo.svg';
 import EXP from './exp.svg';
+import FAILED from './failed.svg';
 import FAIR from './fair.svg';
 import FCT from './fct.svg';
 import FIL from './fil.svg';
@@ -166,6 +170,7 @@ import FLDC from './fldc.svg';
 import FLO from './flo.svg';
 import FSN from './fsn.svg';
 import FTC from './ftc.svg';
+import FTM from './ftm.svg';
 import FUEL from './fuel.svg';
 import FUN from './fun.svg';
 import GAME from './game.svg';
@@ -513,7 +518,7 @@ import ZRX from './zrx.svg';
 //   BLK,
 //   BLOCK,
 //   BLZ,
-//   BNB,
+// BNB,
 //   BNT,
 //   BNTY,
 //   BOOTY,
@@ -915,6 +920,7 @@ import ZRX from './zrx.svg';
 // };
 
 const manifest = {
+  // TOKENS
   $PAC,
   $0XBTC,
   $2GIVE,
@@ -1002,10 +1008,12 @@ const manifest = {
   '0x177d39ac676ed1c67a2b268ad7f1e58826e5b0af': CDT,
   '0xc4c2614e694cf534d407ee49f8e44d125e4681c4': CHAIN,
   '0x442bc47357919446eabc18c7211e57a13d983469': CHAT,
+  CHECK,
   CHIPS,
   CIX,
   CLAM,
   CLOAK,
+  CLOCK,
   CMM,
   '0xf85feea2fdd81d51177f6b8f35f0e6734ce45f5f': CMT,
   '0xd4c435f5b09f855c3317c8524cb1f586e42795fa': CND,
@@ -1079,6 +1087,11 @@ const manifest = {
   '137-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,
   '80001-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,
   '42161-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
+  '56-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': BNB,
+  '250-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': FTM,
+  '43114-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': AVAX,
+  '128-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': HT,
+  '100-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': DAI,
   ETHOS,
   ETN,
   ETP,
@@ -1087,6 +1100,7 @@ const manifest = {
   '0xf3db5fa2c66b7af3eb0c0b782510816cbe4813b8': EVX,
   EXMO,
   '0x5330a5805b9db68ebcf5247bbc9097163c1c2442': EXP,
+  FAILED,
   '0x9b20dabcec77f6289113e61893f7beefaeb1990a': FAIR,
   '0xe1bad922f84b198a08292fb600319300ae32471b': FCT,
   FIL,

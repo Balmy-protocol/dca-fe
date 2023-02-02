@@ -8,6 +8,8 @@ import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
 import createPosition from './create-position/reducer';
+import aggregator from './aggregator/reducer';
+import aggregatorSettings from './aggregator-settings/reducer';
 import initializer from './initializer/reducer';
 import modifyRateSettings from './modify-rate-settings/reducer';
 import positionDetails from './position-details/reducer';
@@ -77,7 +79,14 @@ export const setupAxiosClient = () =>
     },
   });
 
-const PERSISTED_STATES: string[] = ['transactions', 'badge', 'positionDetails.showBreakdown', 'config.selectedLocale'];
+const PERSISTED_STATES: string[] = [
+  'transactions',
+  'badge',
+  'positionDetails.showBreakdown',
+  'aggregatorSettings',
+  'tokenLists.customTokens',
+  'config.selectedLocale',
+];
 
 const store = configureStore({
   reducer: {
@@ -87,12 +96,14 @@ const store = configureStore({
     badge,
     tokenLists,
     createPosition,
+    aggregator,
     config,
     tabs,
     positionPermissions,
     modifyRateSettings,
     error,
     positionDetails,
+    aggregatorSettings,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient }, serializableCheck: false }).concat([
@@ -110,8 +121,40 @@ const store = configureStore({
         position: null,
       },
       tokenLists: {
+        activeLists: ['Mean Finance Graph Allowed Tokens'],
+        activeAggregatorLists: [
+          'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
+          'tokens.1inch.eth',
+          'https://tokens.1inch.io/v1.1/56',
+          'https://tokens.1inch.io/v1.1/250',
+          'https://tokens.1inch.io/v1.1/43114',
+          'https://tokens.1inch.io/v1.1/42161',
+          'https://swap.crodex.app/tokens.json',
+          'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
+          'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
+          'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
+          'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wagyu/src/config/constants/tokenLists/pancake-default.tokenlist.json',
+          'https://token-list.sushi.com/',
+          'https://tokens.1inch.io/v1.1/100',
+          'https://extendedtokens.uniswap.org',
+          'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
+          'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
+          'https://tokens.1inch.io/v1.1/8217',
+          'https://tokens.1inch.io/v1.1/1313161554',
+          'custom-tokens',
+        ],
         byUrl: getDefaultByUrl(),
-        activeLists: ['https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json'],
+        hasLoaded: false,
+        customTokens: {
+          name: 'custom-tokens',
+          logoURI: '',
+          timestamp: new Date().getTime(),
+          tokens: [],
+          version: { major: 0, minor: 0, patch: 0 },
+          hasLoaded: true,
+          requestId: '',
+          fetchable: true,
+        },
       },
     },
   }),

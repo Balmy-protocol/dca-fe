@@ -8,6 +8,7 @@ import Details from 'position-detail/position-data';
 import Sticky from 'react-stickynode';
 import GraphContainer from 'position-detail/graph-container';
 import { BigNumber } from 'ethers';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -59,45 +60,50 @@ const PositionSummaryContainer = ({
   onMigrateYield,
   onSuggestMigrateYield,
   totalGasSaved,
-}: PositionSummaryContainerProps) => (
-  <>
-    <Grid container spacing={4} alignItems="flex-start">
-      <StyledFlexGridItem item xs={12} md={5}>
-        <Sticky enabled top={95}>
-          <StyledPaper variant="outlined">
-            <Details
-              position={position}
-              pair={swapsData}
-              pendingTransaction={pendingTransaction}
-              onReusePosition={onReusePosition}
-              disabled={disabled}
-              yieldOptions={yieldOptions}
-              toWithdrawUnderlying={toWithdrawUnderlying}
-              remainingLiquidityUnderlying={remainingLiquidityUnderlying}
-              swappedUnderlying={swappedUnderlying}
-              onMigrateYield={onMigrateYield}
-              onSuggestMigrateYield={onSuggestMigrateYield}
-              totalGasSaved={totalGasSaved}
-            />
-          </StyledPaper>
-        </Sticky>
-      </StyledFlexGridItem>
-      <Grid item xs={12} md={7}>
-        <Grid container direction="column" spacing={3}>
-          <Grid item xs={12}>
+}: PositionSummaryContainerProps) => {
+  const currentBreakpoint = useCurrentBreakpoint();
+
+  const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
+  return (
+    <>
+      <Grid container spacing={4} alignItems="flex-start">
+        <StyledFlexGridItem item xs={12} md={5}>
+          <Sticky enabled={!isDownMd} top={95}>
             <StyledPaper variant="outlined">
-              <GraphContainer position={position} />
+              <Details
+                position={position}
+                pair={swapsData}
+                pendingTransaction={pendingTransaction}
+                onReusePosition={onReusePosition}
+                disabled={disabled}
+                yieldOptions={yieldOptions}
+                toWithdrawUnderlying={toWithdrawUnderlying}
+                remainingLiquidityUnderlying={remainingLiquidityUnderlying}
+                swappedUnderlying={swappedUnderlying}
+                onMigrateYield={onMigrateYield}
+                onSuggestMigrateYield={onSuggestMigrateYield}
+                totalGasSaved={totalGasSaved}
+              />
             </StyledPaper>
-          </Grid>
-          <Grid item xs={12}>
-            <StyledPaper variant="outlined">
-              <PositionSwaps position={position} />
-            </StyledPaper>
+          </Sticky>
+        </StyledFlexGridItem>
+        <Grid item xs={12} md={7}>
+          <Grid container direction="column" spacing={3}>
+            <Grid item xs={12}>
+              <StyledPaper variant="outlined">
+                <GraphContainer position={position} />
+              </StyledPaper>
+            </Grid>
+            <Grid item xs={12}>
+              <StyledPaper variant="outlined">
+                <PositionSwaps position={position} />
+              </StyledPaper>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
-  </>
-);
+    </>
+  );
+};
 
 export default PositionSummaryContainer;

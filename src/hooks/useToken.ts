@@ -1,8 +1,8 @@
 import find from 'lodash/find';
 import useTokenList from './useTokenList';
 
-function useToken(tokenAddress: string, checkForSymbol = false) {
-  const tokenList = useTokenList();
+function useToken(tokenAddress: string, checkForSymbol = false, isAggregator = false) {
+  const tokenList = useTokenList(isAggregator);
 
   if (!tokenAddress) {
     return undefined;

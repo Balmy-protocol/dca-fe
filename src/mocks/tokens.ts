@@ -1,5 +1,7 @@
-import { NETWORKS, TOKEN_TYPE_BASE, TOKEN_TYPE_WRAPPED } from 'config/constants';
+import { getGhTokenListLogoUrl, NETWORKS, TOKEN_TYPE_BASE, TOKEN_TYPE_WRAPPED } from 'config/constants';
+import find from 'lodash/find';
 import { Token } from 'types';
+import { toToken } from 'utils/currency';
 
 const DAI_ADDRESSES = {
   [NETWORKS.mainnet.chainId]: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -84,6 +86,56 @@ export const ETH = (chainId: number): Token => ({
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
 });
 
+export const BNB = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'BNB',
+  symbol: 'BNB',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+});
+
+export const FTM = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Fantom',
+  symbol: 'FTM',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+});
+
+export const AVAX = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Avalanche',
+  symbol: 'AVAX',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+});
+
+export const HT = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Huobi',
+  symbol: 'HT',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+});
+
+export const XDAI = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'xDAI',
+  symbol: 'xDAI',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+});
+
 export const MATIC = (chainId: number): Token => ({
   chainId,
   decimals: 18,
@@ -124,6 +176,11 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.optimism.chainId]: ETH,
   [NETWORKS.optimismGoerli.chainId]: ETH,
   [NETWORKS.arbitrum.chainId]: ETH,
+  [NETWORKS.bsc.chainId]: BNB,
+  [NETWORKS.fantom.chainId]: FTM,
+  [NETWORKS.avalanche.chainId]: AVAX,
+  [NETWORKS.heco.chainId]: HT,
+  [NETWORKS.xdai.chainId]: XDAI,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
@@ -140,12 +197,48 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.arbitrum.chainId]: WETH,
 };
 
-export const getProtocolToken = (chainId: number) =>
-  (PROTOCOL_TOKEN[chainId] && PROTOCOL_TOKEN[chainId](chainId)) ||
-  PROTOCOL_TOKEN[NETWORKS.mainnet.chainId](NETWORKS.mainnet.chainId);
-export const getWrappedProtocolToken = (chainId: number) =>
-  (WRAPPED_PROTOCOL_TOKEN[chainId] && WRAPPED_PROTOCOL_TOKEN[chainId](chainId)) ||
-  WRAPPED_PROTOCOL_TOKEN[NETWORKS.mainnet.chainId](NETWORKS.mainnet.chainId);
+export const getProtocolToken = (chainId: number) => {
+  const supportedToken = PROTOCOL_TOKEN[chainId] && PROTOCOL_TOKEN[chainId](chainId);
+
+  if (supportedToken) {
+    return supportedToken;
+  }
+
+  const foundNetwork = find(NETWORKS, { chainId });
+
+  if (foundNetwork) {
+    return toToken({
+      ...foundNetwork.nativeCurrency,
+      chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+      logoURI: getGhTokenListLogoUrl(chainId, PROTOCOL_TOKEN_ADDRESS),
+    });
+  }
+
+  return PROTOCOL_TOKEN[NETWORKS.mainnet.chainId](NETWORKS.mainnet.chainId);
+};
+
+export const getWrappedProtocolToken = (chainId: number) => {
+  const supportedToken = WRAPPED_PROTOCOL_TOKEN[chainId] && WRAPPED_PROTOCOL_TOKEN[chainId](chainId);
+
+  if (supportedToken) {
+    return supportedToken;
+  }
+
+  const foundNetwork = find(NETWORKS, { chainId });
+
+  if (foundNetwork) {
+    return toToken({
+      address: foundNetwork.wToken,
+      name: `Wrapped ${foundNetwork.nativeCurrency.name || ''}`,
+      symbol: `W${foundNetwork.nativeCurrency.symbol || ''}`,
+      chainId,
+      logoURI: getGhTokenListLogoUrl(chainId, PROTOCOL_TOKEN_ADDRESS),
+    });
+  }
+
+  return WRAPPED_PROTOCOL_TOKEN[NETWORKS.mainnet.chainId](NETWORKS.mainnet.chainId);
+};
 
 const UNI_ADDRESSES = {
   [NETWORKS.mainnet.chainId]: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',

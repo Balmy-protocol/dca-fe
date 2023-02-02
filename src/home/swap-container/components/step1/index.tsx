@@ -10,9 +10,14 @@ import FrequencyInput from 'common/frequency-easy-input';
 import FrequencyTypeInput from 'common/frequency-type-input';
 import IconButton from '@mui/material/IconButton';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { STRING_SWAP_INTERVALS } from 'config/constants';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { getGhTokenListLogoUrl, NETWORKS, STRING_SWAP_INTERVALS, SUPPORTED_NETWORKS_DCA } from 'config/constants';
+import { emptyTokenWithAddress, toToken } from 'utils/currency';
 import { BigNumber } from 'ethers';
+import { find } from 'lodash';
+import TokenIcon from 'common/token-icon';
+import useCurrentNetwork from 'hooks/useSelectedNetwork';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
   ${({ $show }) => !$show && 'position: absolute;width: auto;'};
@@ -79,6 +84,12 @@ const StyledFrequencyValueContainer = styled.div`
   gap: 10px;
 `;
 
+const StyledNetworkButtonsContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
 interface AvailableSwapInterval {
   label: {
     singular: string;
@@ -104,6 +115,7 @@ interface SwapFirstStepProps {
   frequencies: AvailableSwapInterval[];
   buttonToShow: React.ReactNode;
   fromValueUsdPrice: number;
+  onChangeNetwork: (chainId: number) => void;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -124,12 +136,56 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     buttonToShow,
     show,
     fromValueUsdPrice,
+    onChangeNetwork,
   } = props;
 
+  const currentNetwork = useCurrentNetwork();
   const intl = useIntl();
 
   return (
     <StyledGrid container rowSpacing={2} $show={show} ref={ref}>
+      <Grid item xs={12}>
+        <StyledContentContainer>
+          {/* rate */}
+          <StyledRateContainer>
+            <Typography variant="body1">
+              <FormattedMessage description="supportedNetworks" defaultMessage="Choose network:" />
+            </Typography>
+            <StyledNetworkButtonsContainer>
+              <Select
+                id="choose-network"
+                fullWidth
+                value={currentNetwork.chainId}
+                onChange={(evt) => onChangeNetwork(Number(evt.target.value))}
+                size="small"
+                SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
+              >
+                {SUPPORTED_NETWORKS_DCA.map((network) => {
+                  const foundNetwork = find(NETWORKS, { chainId: network });
+
+                  if (!foundNetwork) {
+                    return null;
+                  }
+
+                  return (
+                    <MenuItem sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={network}>
+                      <TokenIcon
+                        size="20px"
+                        token={toToken({
+                          address: foundNetwork?.mainCurrency,
+                          chainId: network,
+                          logoURI: getGhTokenListLogoUrl(network, 'logo'),
+                        })}
+                      />
+                      {foundNetwork.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </StyledNetworkButtonsContainer>
+          </StyledRateContainer>
+        </StyledContentContainer>
+      </Grid>
       <Grid item xs={12}>
         <StyledContentContainer>
           <StyledTokensContainer>

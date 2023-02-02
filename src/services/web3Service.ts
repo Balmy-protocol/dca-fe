@@ -5,6 +5,7 @@ import Torus from '@toruslabs/torus-embed';
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
+import { Chains } from '@mean-finance/sdk';
 import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
 import { DUMMY_ARCX_CLIENT } from 'utils/dummy-arcx-client';
 
@@ -24,7 +25,10 @@ import WalletService from './walletService';
 import YieldService from './yieldService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
+import AggregatorService from './aggregatorService';
+import SdkService from './sdkService';
 import ErrorService from './errorService';
+import SimulationService from './simulationService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -63,6 +67,8 @@ export default class Web3Service {
 
   positionService: PositionService;
 
+  aggregatorService: AggregatorService;
+
   pairService: PairService;
 
   walletService: WalletService;
@@ -73,7 +79,11 @@ export default class Web3Service {
 
   providerService: ProviderService;
 
+  sdkService: SdkService;
+
   errorService: ErrorService;
+
+  simulationService: SimulationService;
 
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -125,6 +135,14 @@ export default class Web3Service {
       this.uniClient
     );
     this.yieldService = new YieldService(this.walletService, this.axiosClient, client);
+    this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient);
+    this.aggregatorService = new AggregatorService(
+      this.walletService,
+      this.contractService,
+      this.sdkService,
+      this.apolloClient,
+      this.providerService
+    );
     this.positionService = new PositionService(
       this.walletService,
       this.pairService,
@@ -135,6 +153,7 @@ export default class Web3Service {
     );
     this.priceService = new PriceService(this.walletService, this.contractService, this.axiosClient, client);
     this.errorService = new ErrorService(this.meanApiService);
+    this.simulationService = new SimulationService(this.meanApiService, this.providerService);
   }
 
   setArcxClient(newArcxClient: ArcxAnalyticsSdk) {
@@ -147,6 +166,14 @@ export default class Web3Service {
 
   getContractService() {
     return this.contractService;
+  }
+
+  getSdkService() {
+    return this.sdkService;
+  }
+
+  getSimulationService() {
+    return this.simulationService;
   }
 
   getMeanApiService() {
@@ -163,6 +190,10 @@ export default class Web3Service {
 
   getPositionService() {
     return this.positionService;
+  }
+
+  getAggregatorService() {
+    return this.aggregatorService;
   }
 
   getErrorService() {
@@ -296,6 +327,8 @@ export default class Web3Service {
 
     this.setNetwork((await this.providerService.getNetwork()).chainId);
 
+    await this.sdkService.resetProvider();
+
     try {
       const arcxClient = this.getArcxClient();
 
@@ -325,9 +358,9 @@ export default class Web3Service {
   }
 
   async setUpModal() {
-    const rpc = Object.keys(NETWORKS).reduce((a, name) => {
-      const { chainId, rpc: rpcArray } = NETWORKS[name];
-      const rpcUrl = rpcArray[0];
+    const rpc = Chains.getAllChains().reduce((a, network) => {
+      const { chainId, publicRPCs: rpcArray } = network;
+      const rpcUrl = rpcArray && rpcArray[0];
       if (chainId !== 1 && rpcUrl) {
         return {
           ...a,

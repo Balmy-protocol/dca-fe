@@ -6,8 +6,8 @@ import isUndefined from 'lodash/isUndefined';
 import { Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
+import TokenPicker from 'common/dca-token-picker';
 import { FormattedMessage, useIntl } from 'react-intl';
-import TokenPicker from 'common/token-picker';
 import Button from 'common/button';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
@@ -53,6 +53,7 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import useAllowance from 'hooks/useAllowance';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useCanSupportPair from 'hooks/useCanSupportPair';
+import { useHistory } from 'react-router-dom';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import usePositionService from 'hooks/usePositionService';
@@ -196,6 +197,8 @@ const Swap = ({
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
 
   const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(from);
+
+  const history = useHistory();
 
   const fromCanHaveYield = !!(
     from && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(from.address)).length
@@ -611,6 +614,13 @@ const Swap = ({
     (shouldEnableYield && fromCanHaveYield && isUndefined(fromYield)) ||
     (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
 
+  const handleChangeNetwork = (chainId: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    walletService.changeNetwork(chainId, () => {
+      history.replace(`/create/${chainId}`);
+    });
+  };
+
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
 
   const isTestnet = TESTNETS.includes(currentNetwork.chainId);
@@ -910,6 +920,7 @@ const Swap = ({
           buttonToShow={ButtonToShow}
           show={showFirstStep}
           fromValueUsdPrice={fromValueUsdPrice}
+          onChangeNetwork={handleChangeNetwork}
         />
       </Slide>
       <Slide

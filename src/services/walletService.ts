@@ -2,11 +2,14 @@ import { ethers, BigNumber } from 'ethers';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import React from 'react';
 import { Interface } from '@ethersproject/abi';
+import mapKeys from 'lodash/mapKeys';
+import mapValues from 'lodash/mapValues';
 import { TransactionResponse, Network } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
 import { GetUsedTokensData, Token } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import isUndefined from 'lodash/isUndefined';
+import { toToken } from 'utils/currency';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
@@ -14,7 +17,14 @@ import MULTICALLABI from 'abis/Multicall.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { LATEST_VERSION, MULTICALL_ADDRESS, NETWORKS, PositionVersions } from 'config/constants';
+import {
+  LATEST_VERSION,
+  MULTICALL_ADDRESS,
+  MULTICALL_DEFAULT_ADDRESS,
+  NETWORKS,
+  NULL_ADDRESS,
+  PositionVersions,
+} from 'config/constants';
 import { ERC20Contract, MulticallContract } from 'types/contracts';
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -134,7 +144,7 @@ export default class WalletService {
     );
 
     const multicallInstance = new ethers.Contract(
-      MULTICALL_ADDRESS[currentNetwork.chainId],
+      MULTICALL_ADDRESS[currentNetwork.chainId] || MULTICALL_DEFAULT_ADDRESS,
       MULTICALLABI,
       provider
     ) as unknown as MulticallContract;
@@ -164,6 +174,85 @@ export default class WalletService {
       );
   }
 
+  async get1InchBalances(): Promise<Record<string, BigNumber>> {
+    const account = this.getAccount();
+    const currentNetwork = await this.getNetwork();
+
+    if (!account) return Promise.resolve({});
+
+    const inchResponse = await this.axiosClient.get<Record<string, string>>(
+      `https://balances.1inch.io/v1.1/${currentNetwork.chainId}/balances/${account}`
+    );
+
+    const balances = inchResponse.data;
+
+    return mapValues(
+      mapKeys(balances, (value, key) => key.toLowerCase()),
+      (balance) => BigNumber.from(balance)
+    );
+  }
+
+  async getCustomToken(address: string): Promise<{ token: Token; balance: BigNumber } | undefined> {
+    const account = this.getAccount();
+    const currentNetwork = await this.getNetwork();
+
+    if (!address || !account) return Promise.resolve(undefined);
+
+    const ERC20Interface = new Interface(ERC20ABI);
+
+    const provider = await this.providerService.getProvider();
+
+    const erc20 = new ethers.Contract(address, ERC20Interface, provider) as unknown as ERC20Contract;
+
+    const balanceCall = erc20.populateTransaction.balanceOf(account).then((populatedTransaction) => ({
+      target: populatedTransaction.to as string,
+      allowFailure: true,
+      callData: populatedTransaction.data as string,
+    }));
+
+    const decimalsCall = erc20.populateTransaction.decimals().then((populatedTransaction) => ({
+      target: populatedTransaction.to as string,
+      allowFailure: true,
+      callData: populatedTransaction.data as string,
+    }));
+
+    const nameCall = erc20.populateTransaction.name().then((populatedTransaction) => ({
+      target: populatedTransaction.to as string,
+      allowFailure: true,
+      callData: populatedTransaction.data as string,
+    }));
+
+    const symbolCall = erc20.populateTransaction.symbol().then((populatedTransaction) => ({
+      target: populatedTransaction.to as string,
+      allowFailure: true,
+      callData: populatedTransaction.data as string,
+    }));
+
+    const multicallInstance = new ethers.Contract(
+      MULTICALL_ADDRESS[currentNetwork.chainId] || MULTICALL_DEFAULT_ADDRESS,
+      MULTICALLABI,
+      provider
+    ) as unknown as MulticallContract;
+
+    const populatedTransactions = await Promise.all([balanceCall, decimalsCall, nameCall, symbolCall]);
+
+    const [balanceResult, decimalResult, nameResult, symbolResult] = await multicallInstance.callStatic.aggregate3(
+      populatedTransactions
+    );
+
+    const balance = BigNumber.from(
+      ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
+    );
+    const decimals = ethers.utils.defaultAbiCoder.decode(['uint8'], decimalResult.returnData)[0] as number;
+    const name = ethers.utils.defaultAbiCoder.decode(['string'], nameResult.returnData)[0] as string;
+    const symbol = ethers.utils.defaultAbiCoder.decode(['string'], symbolResult.returnData)[0] as string;
+
+    return {
+      token: toToken({ address: address.toLowerCase(), decimals, name, symbol, chainId: currentNetwork.chainId }),
+      balance,
+    };
+  }
+
   async getBalance(address?: string): Promise<BigNumber> {
     const account = this.getAccount();
 
@@ -181,15 +270,23 @@ export default class WalletService {
   }
 
   async getAllowance(token: Token, shouldCheckCompanion?: boolean, positionVersion: PositionVersions = LATEST_VERSION) {
+    const addressToCheck = shouldCheckCompanion
+      ? await this.contractService.getHUBCompanionAddress(positionVersion)
+      : await this.contractService.getHUBAddress(positionVersion);
+
+    return this.getSpecificAllowance(token, addressToCheck);
+  }
+
+  async getSpecificAllowance(token: Token, addressToCheck: string) {
     const account = this.getAccount();
 
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
     }
 
-    const addressToCheck = shouldCheckCompanion
-      ? await this.contractService.getHUBCompanionAddress(positionVersion)
-      : await this.contractService.getHUBAddress(positionVersion);
+    if (addressToCheck === NULL_ADDRESS) {
+      return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
+    }
 
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
@@ -211,6 +308,10 @@ export default class WalletService {
       ? await this.contractService.getHUBCompanionAddress(positionVersion)
       : await this.contractService.getHUBAddress(positionVersion);
 
+    return this.approveSpecificToken(token, addressToApprove, amount);
+  }
+
+  async approveSpecificToken(token: Token, addressToApprove: string, amount?: BigNumber): Promise<TransactionResponse> {
     const erc20 = await this.contractService.getTokenInstance(token.address);
 
     return erc20.approve(addressToApprove, amount || MaxUint256);

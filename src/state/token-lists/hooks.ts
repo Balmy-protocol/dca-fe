@@ -1,12 +1,31 @@
 import { useAppSelector } from 'hooks/state';
+import keyBy from 'lodash/keyBy';
+import React from 'react';
+import some from 'lodash/some';
+import { TokenList, TokensLists } from 'types';
 
-// returns all the transactions for the current chain
 export function useSavedTokenLists() {
-  const tokenList = useAppSelector((state) => state.tokenLists.activeLists);
-
-  return tokenList;
+  return useAppSelector((state) => state.tokenLists.activeLists);
 }
 
-export function useTokensLists() {
-  return useAppSelector((state) => state.tokenLists.byUrl);
+export function useSavedAggregatorTokenLists() {
+  return useAppSelector((state) => state.tokenLists.activeAggregatorLists);
+}
+
+export function useTokensLists(): { [tokenListUrl: string]: TokensLists } {
+  return useAppSelector((state) => ({ ...state.tokenLists.byUrl, 'custom-tokens': state.tokenLists.customTokens }));
+}
+
+export function useCustomTokens(): TokenList {
+  return useAppSelector((state) => keyBy(state.tokenLists.customTokens.tokens, 'address'));
+}
+
+export function useIsLoadingAggregatorTokenLists() {
+  const aggregatorTokenLists = useSavedAggregatorTokenLists();
+  const tokenLists = useTokensLists();
+
+  return React.useMemo(
+    () => some(aggregatorTokenLists, (list) => !tokenLists[list].hasLoaded),
+    [aggregatorTokenLists, tokenLists]
+  );
 }

@@ -85,7 +85,7 @@ interface TimelineContextMenuItem {
 }
 interface TimelineItemProps {
   content: React.ReactNode;
-  link: string;
+  link?: string;
   isPending: boolean;
   icon?: React.ReactElement;
   id?: string;
@@ -134,7 +134,7 @@ const MinimalTimeline = ({ items }: TimelineProps) => {
           </StyledTimelineContent>
           <StyledTimelineLink>
             {item.isPending && <CircularProgress size={24} />}
-            {!item.isPending && (
+            {!item.isPending && item.link && (
               <IconButton aria-label="close" onClick={() => window.open(item.link, '_blank')}>
                 <OpenInNewIcon style={{ color: '#3076F6', fontSize: '1.5rem' }} />
               </IconButton>

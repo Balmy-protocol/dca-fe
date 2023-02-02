@@ -10,7 +10,7 @@ import { NETWORKS } from 'config';
 import LinearProgress from '@mui/material/LinearProgress';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
-import { Typography } from '@mui/material';
+import { Hidden, Typography } from '@mui/material';
 import { BigNumber } from 'ethers';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
@@ -237,52 +237,54 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
           <FormattedMessage description="onGoingPositionsDashboard" defaultMessage="Ongoing positions" />
         </Typography>
       </Grid>
-      <Grid item xs={5}>
-        <ResponsiveContainer>
-          <PieChart height={150}>
-            <Pie
-              data={positionsCount}
-              dataKey="value"
-              innerRadius={65}
-              paddingAngle={1}
-              outerRadius={75}
-              fill="#8884d8"
-              onMouseOver={(data: { name: string }) => onSelectChain(Number(data.name))}
-              onMouseOut={() => onSelectChain(null)}
-              cursor="pointer"
-            >
-              {positionsCount.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
-              ))}
+      <Hidden smDown>
+        <Grid item xs={12} md={5}>
+          <ResponsiveContainer>
+            <PieChart height={150}>
+              <Pie
+                data={positionsCount}
+                dataKey="value"
+                innerRadius={65}
+                paddingAngle={1}
+                outerRadius={75}
+                fill="#8884d8"
+                onMouseOver={(data: { name: string }) => onSelectChain(Number(data.name))}
+                onMouseOut={() => onSelectChain(null)}
+                cursor="pointer"
+              >
+                {positionsCount.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
+                ))}
 
-              <Label
-                value={shownTotalPositions}
-                position="centerBottom"
-                fontSize="2.125rem"
-                fontWeight={400}
-                offset={-10}
-                letterSpacing="0.0075em"
-                color="white"
-                fill="white"
-              />
-              <Label
-                value={intl.formatMessage(
-                  defineMessage({ description: 'countDashboardPositions', defaultMessage: 'Positions' })
-                )}
-                position="centerTop"
-                className="label-top"
-                fontSize="1.10rem"
-                offset={10}
-                fontWeight={400}
-                letterSpacing="0.0075em"
-                color="#FFFFFF80"
-                fill="#FFFFFF80"
-              />
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-      </Grid>
-      <StyledGrid item xs={7}>
+                <Label
+                  value={shownTotalPositions}
+                  position="centerBottom"
+                  fontSize="2.125rem"
+                  fontWeight={400}
+                  offset={-10}
+                  letterSpacing="0.0075em"
+                  color="white"
+                  fill="white"
+                />
+                <Label
+                  value={intl.formatMessage(
+                    defineMessage({ description: 'countDashboardPositions', defaultMessage: 'Positions' })
+                  )}
+                  position="centerTop"
+                  className="label-top"
+                  fontSize="1.10rem"
+                  offset={10}
+                  fontWeight={400}
+                  letterSpacing="0.0075em"
+                  color="#FFFFFF80"
+                  fill="#FFFFFF80"
+                />
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </Grid>
+      </Hidden>
+      <StyledGrid item xs={12} md={7}>
         <StyledLabelContainer>
           {positionsCountLabels.map((positionCountLabel) => (
             <Grid

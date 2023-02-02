@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { ONE_DAY } from 'config/constants';
+import { DEFAULT_NETWORK_FOR_VERSION, ONE_DAY, POSITION_VERSION_4 } from 'config/constants';
 import { BigNumber } from 'ethers';
 import { Token, YieldOption } from 'types';
 import {
@@ -11,6 +11,7 @@ import {
   setYieldEnabled,
   setFromYield,
   setToYield,
+  setDCAChainId,
 } from './actions';
 
 export interface CreatePositionState {
@@ -22,6 +23,7 @@ export interface CreatePositionState {
   yieldEnabled: boolean;
   fromYield: YieldOption | null | undefined;
   toYield: YieldOption | null | undefined;
+  chainId: number;
 }
 
 const initialState: CreatePositionState = {
@@ -33,6 +35,7 @@ const initialState: CreatePositionState = {
   yieldEnabled: true,
   fromYield: undefined,
   toYield: undefined,
+  chainId: DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId,
 };
 
 export default createReducer(initialState, (builder) =>
@@ -62,5 +65,16 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setToYield, (state, { payload }) => {
       state.toYield = payload;
+    })
+    .addCase(setDCAChainId, (state, { payload }) => {
+      state.chainId = payload;
+      state.fromValue = '';
+      state.frequencyType = ONE_DAY;
+      state.frequencyValue = '7';
+      state.from = null;
+      state.to = null;
+      state.yieldEnabled = true;
+      state.fromYield = undefined;
+      state.toYield = undefined;
     })
 );

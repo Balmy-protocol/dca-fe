@@ -78,6 +78,17 @@ export const emptyTokenWithAddress: (address: string, type?: TokenType) => Token
   underlyingTokens: [],
 });
 
+export const emptyTokenWithLogoURI: (logoURI: string) => Token = (logoURI: string) => ({
+  decimals: 18,
+  chainId: 1,
+  address: '0x00000000000000000',
+  name: '',
+  symbol: '',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+  logoURI,
+});
+
 export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) => ({
   decimals: 18,
   chainId: 1,
@@ -135,3 +146,23 @@ export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPri
 
   return needed.mul(tokenUsdMagnitude).div(usdPrice).div(usdMagnitude);
 };
+
+export const toToken: (overrides: {
+  address?: string;
+  type?: TokenType;
+  decimals?: number;
+  chainId?: number;
+  symbol?: string;
+  name?: string;
+  underlyingTokens?: Token[];
+  logoURI?: string;
+}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI }) => ({
+  decimals: decimals || 18,
+  chainId: chainId || 1,
+  address: address || '',
+  name: name || '',
+  symbol: symbol || '',
+  type: type || TOKEN_TYPE_BASE,
+  underlyingTokens: underlyingTokens || [],
+  logoURI,
+});

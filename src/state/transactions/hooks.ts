@@ -205,14 +205,16 @@ export function isTransactionPending(tx: TransactionDetails): boolean {
 export function useHasPendingApproval(
   token: Token | null,
   spender: string | undefined,
-  checkForCompanion = false
+  checkForCompanion = false,
+  addressToCheckOverride?: string
 ): boolean {
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
-  const addressToCheck = checkForCompanion
+  const dcaContract = checkForCompanion
     ? COMPANION_ADDRESS[LATEST_VERSION][currentNetwork.chainId]
     : HUB_ADDRESS[LATEST_VERSION][currentNetwork.chainId];
+  const addressToCheck = addressToCheckOverride || dcaContract;
 
   return useMemo(
     () =>
@@ -236,7 +238,7 @@ export function useHasPendingApproval(
           tx.from === spender
         );
       }),
-    [allTransactions, spender, tokenAddress]
+    [allTransactions, spender, tokenAddress, addressToCheck]
   );
 }
 

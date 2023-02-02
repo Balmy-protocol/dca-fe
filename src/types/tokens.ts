@@ -25,6 +25,7 @@ export interface TokensLists {
   version: Version;
   hasLoaded: boolean;
   requestId: string;
+  fetchable: boolean;
 }
 
 export interface TokenListToken {

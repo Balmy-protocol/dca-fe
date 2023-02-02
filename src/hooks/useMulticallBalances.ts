@@ -5,7 +5,7 @@ import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress } from 'utils/currency';
 import { useBlockNumber } from 'state/block-number/hooks';
-import useCurrentNetwork from './useCurrentNetwork';
+import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
 import useAccount from './useAccount';
@@ -30,7 +30,7 @@ function useMulticallBalances(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = useAccount();
   const prevAccount = usePrevious(account);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
@@ -41,7 +41,17 @@ function useMulticallBalances(
         try {
           const balanceResults = await walletService.getMulticallBalances(tokens);
 
-          const priceResults = await priceService.getUsdHistoricPrice(tokens.map((key) => emptyTokenWithAddress(key)));
+          let priceResults: Record<string, BigNumber> = {};
+
+          try {
+            priceResults = await priceService.getUsdHistoricPrice(
+              tokens
+                .filter((token) => (balanceResults[token] || BigNumber.from(0)).gt(BigNumber.from(0)))
+                .map((key) => emptyTokenWithAddress(key))
+            );
+          } catch (e) {
+            console.error('Error fetching prices from defillama', e);
+          }
 
           const promiseResult = tokens.reduce(
             (acc, token) => ({

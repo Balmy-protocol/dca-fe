@@ -1,6 +1,9 @@
 /* eslint-disable no-template-curly-in-string */
 
+import { Chains } from '@mean-finance/sdk';
 import { NetworkStruct } from 'types';
+import findKey from 'lodash/findKey';
+import { Chain } from '@mean-finance/sdk/dist/types';
 import {
   POSITION_VERSION_2,
   POSITION_VERSION_3,
@@ -17,7 +20,7 @@ type AddressMap<K extends PositionVersions> = {
 };
 // type AddressMap<PositionVersions> = Record<PositionVersions, Record<number, string>>
 
-export const NETWORKS: Record<string, NetworkStruct> = {
+export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   mainnet: {
     chainId: 1,
     name: 'Ethereum',
@@ -154,24 +157,24 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   fantom: {
     chainId: 250,
     name: 'Fantom',
-    mainCurrency: '',
+    mainCurrency: '250-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'Fantom',
+      symbol: 'FTM',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://rpcapi.fantom.network', 'https://fantom.blockpi.network/v1/rpc/public'],
   },
   avalanche: {
     chainId: 43114,
     name: 'Avalanche',
-    mainCurrency: '',
+    mainCurrency: '43114-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'Avalanche',
+      symbol: 'AVAX',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://rpc.ankr.com/avalanche', 'https://avalanche.blockpi.network/v1/rpc/public'],
   },
   arbitrum: {
     chainId: 42161,
@@ -188,13 +191,13 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   heco: {
     chainId: 128,
     name: 'Heco',
-    mainCurrency: '',
+    mainCurrency: '128-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'Huobi',
+      symbol: 'HT',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://http-mainnet.hecochain.com'],
   },
   optimism: {
     chainId: 10,
@@ -234,38 +237,68 @@ export const NETWORKS: Record<string, NetworkStruct> = {
   },
   okex: {
     chainId: 66,
-    name: 'OKEx',
+    name: 'OKC',
     mainCurrency: '',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'OKT',
+      symbol: 'OKT',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://exchainrpc.okex.org'],
   },
   harmony: {
     chainId: 1666600000,
     name: 'Harmony',
-    mainCurrency: '',
+    mainCurrency: '1666600000-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'Harmony',
+      symbol: 'ONE',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://rpc.ankr.com/harmony', 'https://harmony-mainnet.chainstacklabs.com'],
   },
   xdai: {
     chainId: 100,
-    name: 'xDAI',
-    mainCurrency: '',
+    name: 'Gnosis Chain',
+    mainCurrency: '0x6810e776880c02933d47db1b9fc05908e5386b96',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'xDAI',
+      symbol: 'xDAI',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://rpc.gnosischain.com', 'https://rpc.ankr.com/gnosis'],
   },
 };
+
+const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, currencySymbol, wToken }: Chain) => ({
+  chainId,
+  name,
+  mainCurrency: `${chainId}-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`,
+  nativeCurrency: {
+    name: currencySymbol,
+    symbol: currencySymbol,
+    decimals: 18,
+  },
+  wToken,
+  rpc: publicRPCs ? [...publicRPCs] : [],
+});
+
+export const NETWORKS: Record<string, NetworkStruct> = Chains.getAllChains().reduce(
+  (acc, sdkNetwork) => {
+    const foundNetworkKey = findKey(RAW_NETWORKS, { chainId: sdkNetwork.chainId });
+
+    return {
+      ...acc,
+      [foundNetworkKey || sdkNetwork.ids[0]]: {
+        ...sdkNetworkToNetworkStruct(sdkNetwork),
+        ...(foundNetworkKey ? RAW_NETWORKS[foundNetworkKey] : {}),
+      },
+    };
+  },
+  {
+    ...RAW_NETWORKS,
+  }
+);
 
 export const TESTNETS = [
   NETWORKS.ropsten.chainId,
@@ -284,6 +317,18 @@ export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
   NETWORKS.mainnet.chainId,
 ];
 export const SUPPORTED_NETWORKS = [
+  NETWORKS.mainnet.chainId,
+  NETWORKS.optimism.chainId,
+  NETWORKS.polygon.chainId,
+  NETWORKS.arbitrum.chainId,
+  NETWORKS.bsc.chainId,
+  NETWORKS.fantom.chainId,
+  NETWORKS.avalanche.chainId,
+  NETWORKS.heco.chainId,
+  NETWORKS.xdai.chainId,
+];
+
+export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.mainnet.chainId,
   NETWORKS.optimism.chainId,
   NETWORKS.polygon.chainId,
@@ -318,6 +363,8 @@ export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct
   [POSITION_VERSION_3]: NETWORKS.optimism,
   [POSITION_VERSION_4]: NETWORKS.polygon,
 };
+
+export const DEFAULT_NETWORK_FOR_AGGREGATOR = NETWORKS.mainnet;
 
 export const HUB_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_1]: {
@@ -485,6 +532,8 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
 };
 
+export const MULTICALL_DEFAULT_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
+
 export const MULTICALL_ADDRESS: Record<number, string> = {
   [NETWORKS.optimism.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.polygon.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
@@ -538,27 +587,33 @@ export const CHAINLINK_GRAPHQL_URL = {
 
 export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';
 
-export const EXPLORER_URL = {
-  [NETWORKS.mainnet.chainId]: 'https://etherscan.io/',
-  [NETWORKS.ropsten.chainId]: 'https://ropsten.etherscan.io/',
-  [NETWORKS.rinkeby.chainId]: 'https://rinkeby.etherscan.io/',
-  [NETWORKS.goerli.chainId]: 'https://goerli.etherscan.io/',
-  [NETWORKS.kovan.chainId]: 'https://kovan.etherscan.io/',
-  [NETWORKS.meanfinance.chainId]: 'https://etherscan.io/',
-  [NETWORKS.bsc.chainId]: 'https://bscscan.com',
-  [NETWORKS.polygon.chainId]: 'https://polygonscan.com/',
-  [NETWORKS.mumbai.chainId]: 'https://mumbai.polygonscan.com/',
-  [NETWORKS.fantom.chainId]: 'https://ftmscan.com/',
-  [NETWORKS.avalanche.chainId]: 'https://cchain.explorer.avax.network/',
-  [NETWORKS.arbitrum.chainId]: 'https://arbiscan.io/',
-  [NETWORKS.heco.chainId]: 'https://scan.hecochain.com/',
-  [NETWORKS.optimism.chainId]: 'https://optimistic.etherscan.io/',
-  [NETWORKS.optimismKovan.chainId]: 'https://kovan-optimistic.etherscan.io/',
-  [NETWORKS.optimismGoerli.chainId]: 'https://goerli-optimistic.etherscan.io/',
-  [NETWORKS.okex.chainId]: 'https://www.oklink.com/okexchain/',
-  [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
-  [NETWORKS.xdai.chainId]: 'https://blockscout.com/xdai/mainnet/',
-};
+export const EXPLORER_URL = Chains.getAllChains().reduce<Record<number, string>>(
+  (acc, network) => ({
+    ...acc,
+    [network.chainId]: network.explorer,
+  }),
+  {
+    [NETWORKS.mainnet.chainId]: 'https://etherscan.io/',
+    [NETWORKS.ropsten.chainId]: 'https://ropsten.etherscan.io/',
+    [NETWORKS.rinkeby.chainId]: 'https://rinkeby.etherscan.io/',
+    [NETWORKS.goerli.chainId]: 'https://goerli.etherscan.io/',
+    [NETWORKS.kovan.chainId]: 'https://kovan.etherscan.io/',
+    [NETWORKS.meanfinance.chainId]: 'https://etherscan.io/',
+    [NETWORKS.bsc.chainId]: 'https://bscscan.com',
+    [NETWORKS.polygon.chainId]: 'https://polygonscan.com/',
+    [NETWORKS.mumbai.chainId]: 'https://mumbai.polygonscan.com/',
+    [NETWORKS.fantom.chainId]: 'https://ftmscan.com/',
+    [NETWORKS.avalanche.chainId]: 'https://cchain.explorer.avax.network/',
+    [NETWORKS.arbitrum.chainId]: 'https://arbiscan.io/',
+    [NETWORKS.heco.chainId]: 'https://scan.hecochain.com/',
+    [NETWORKS.optimism.chainId]: 'https://optimistic.etherscan.io/',
+    [NETWORKS.optimismKovan.chainId]: 'https://kovan-optimistic.etherscan.io/',
+    [NETWORKS.optimismGoerli.chainId]: 'https://goerli-optimistic.etherscan.io/',
+    [NETWORKS.okex.chainId]: 'https://www.oklink.com/okexchain/',
+    [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
+    [NETWORKS.xdai.chainId]: 'https://blockscout.com/xdai/mainnet/',
+  }
+);
 
 export const DEFILLAMA_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',
@@ -566,6 +621,28 @@ export const DEFILLAMA_IDS = {
   [NETWORKS.polygon.chainId]: 'polygon',
   [NETWORKS.optimism.chainId]: 'optimism',
   [NETWORKS.mumbai.chainId]: 'mumbai',
+  [NETWORKS.moonbeam.chainId]: 'moonbeam',
+  [NETWORKS.xdai.chainId]: 'gnosis',
+  [Chains.ETHEREUM.chainId]: 'ethereum',
+  [Chains.BNB_CHAIN.chainId]: 'bsc',
+  [Chains.POLYGON.chainId]: 'polygon',
+  [Chains.AVALANCHE.chainId]: 'avax',
+  [Chains.FANTOM.chainId]: 'fantom',
+  [Chains.GNOSIS.chainId]: 'xdai',
+  [Chains.HECO.chainId]: 'heco',
+  [Chains.ARBITRUM.chainId]: 'arbitrum',
+  [Chains.OPTIMISM.chainId]: 'optimism',
+  [Chains.CELO.chainId]: 'celo',
+  [Chains.CRONOS.chainId]: 'cronos',
+  [Chains.BOBA.chainId]: 'boba',
+  [Chains.MOONRIVER.chainId]: 'moonriver',
+  [Chains.OKC.chainId]: 'okexchain',
+  [Chains.ONTOLOGY.chainId]: 'ontology',
+  [Chains.KLAYTN.chainId]: 'klaytn',
+  [Chains.AURORA.chainId]: 'aurora',
+  [Chains.HARMONY_SHARD_0.chainId]: 'harmony',
+  [Chains.MOONBEAM.chainId]: 'moonbeam',
+  [Chains.VELAS.chainId]: 'velas',
 };
 
 export const TOKEN_LISTS = {
@@ -599,6 +676,9 @@ export const SIGN_VERSION: Record<PositionVersions, string> = {
 };
 
 export const DEFILLAMA_PROTOCOL_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
+export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export const BLOWFISH_ENABLED_CHAINS = [NETWORKS.mainnet.chainId, NETWORKS.polygon.chainId];
 
 export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.mainnet.chainId]: 'https://api.0x.org',
@@ -608,4 +688,9 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.fantom.chainId]: 'https://fantom.api.0x.org',
   [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
 };
+
+export const REMOVED_AGG_CHAINS = [58];
+
+export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
+  `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
 /* eslint-enable */

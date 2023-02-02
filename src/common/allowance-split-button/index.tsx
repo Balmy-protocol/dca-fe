@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import SplitButton from 'common/split-button';
+import { CustomButtonProps } from 'common/button';
 import { Token, YieldOption } from 'types';
 import { FormattedMessage } from 'react-intl';
 import useWeb3Service from 'hooks/useWeb3Service';
@@ -17,6 +18,8 @@ interface AllowanceSplitButtonProps {
   token: Token | null;
   amount: BigNumber | null;
   tokenYield: YieldOption | null | undefined;
+  target?: string;
+  color?: CustomButtonProps['color'];
 }
 
 const StyledTooltip = styled(Tooltip)`
@@ -24,16 +27,17 @@ const StyledTooltip = styled(Tooltip)`
   margin-left: 5px;
 `;
 
-export const AllowanceTooltip = (props: { symbol: string }) => {
-  const { symbol } = props;
+export const AllowanceTooltip = (props: { symbol: string; target?: string }) => {
+  const { symbol, target } = props;
   return (
     <StyledTooltip
       title={
         <FormattedMessage
           description="Allowance Tooltip"
-          defaultMessage="You must give the Mean Finance smart contracts permission to use your {symbol}"
+          defaultMessage="You must give the {target} smart contracts permission to use your {symbol}"
           values={{
             symbol,
+            target: target || 'Mean Finance',
           }}
         />
       }
@@ -46,7 +50,8 @@ export const AllowanceTooltip = (props: { symbol: string }) => {
 };
 
 const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
-  const { disabled, onMaxApprove, onApproveExact, token, tokenYield, amount } = props;
+  const { disabled, onMaxApprove, onApproveExact, token, tokenYield, amount, color: passedColor, target } = props;
+  const color = passedColor || 'primary';
   const web3Service = useWeb3Service();
   const hasPendingApproval = useHasPendingApproval(token, web3Service.getAccount(), !!tokenYield?.tokenAddress);
   const symbol = token?.symbol || '';
@@ -72,12 +77,12 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
               }}
             />
           )}
-          {!hasPendingApproval && <AllowanceTooltip symbol={symbol} />}
+          {!hasPendingApproval && <AllowanceTooltip target={target} symbol={symbol} />}
         </>
       }
       disabled={disabled}
       variant="contained"
-      color="primary"
+      color={color}
       options={[
         {
           text: (

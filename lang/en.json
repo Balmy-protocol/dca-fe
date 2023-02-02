@@ -67,6 +67,10 @@
     "defaultMessage": "Next swap will be executed within the first hour after the position is created.",
     "description": "nextSwapCreateNoPair"
   },
+  "/v9cwm": {
+    "defaultMessage": "{step} - Swap tokens",
+    "description": "transationStepSwapTokens"
+  },
   "/vWyXL": {
     "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary {token}.",
     "description": "Approve signature companion text increase"
@@ -115,6 +119,10 @@
     "defaultMessage": "1 week (1 swap)",
     "description": "oneWeekSingular"
   },
+  "0zC9ex": {
+    "defaultMessage": "Transaction simulation",
+    "description": "descTransactionSimulation"
+  },
   "156xZf": {
     "defaultMessage": "Gas saved in USD",
     "description": "gasSavedBullet"
@@ -123,6 +131,10 @@
     "defaultMessage": "How many {type}?",
     "description": "howManyFreq"
   },
+  "1W/BMl": {
+    "defaultMessage": "{step} - Transaction simulated",
+    "description": "transationStepWaitApprove"
+  },
   "1c3wKa": {
     "defaultMessage": "Your {from}:{to} position has been migrated",
     "description": "transactionMessagesMigrate"
@@ -130,6 +142,14 @@
   "1mv4e2": {
     "defaultMessage": "We could not fetch the price of one of the tokens",
     "description": "No price available"
+  },
+  "27/rlO": {
+    "defaultMessage": "Do you take any fees?",
+    "description": "faqFees"
+  },
+  "2NZFot": {
+    "defaultMessage": "Select address",
+    "description": "transferToSelectAddress"
   },
   "2TSf/Q": {
     "defaultMessage": "You don’t need to execute your swaps by yourself since Mean Finance incentivizes other users to execute swaps, for a profit. Now, these incentives can be affected by different factors:",
@@ -147,6 +167,10 @@
     "defaultMessage": "Next swap:",
     "description": "positionDetailsNextSwapAtTitle"
   },
+  "3fWv7O": {
+    "defaultMessage": "Transaction succesfull!",
+    "description": "transactionConfirmationSuccess"
+  },
   "3oTxXg": {
     "defaultMessage": "Position Closed",
     "description": "timelineTypeWithdrawn"
@@ -163,9 +187,21 @@
     "defaultMessage": "Error creating position",
     "description": "modalErrorCreatingPosition"
   },
+  "4ZHdrV": {
+    "defaultMessage": "We find the best prices across all of DeFi so you don't have to. You can now make sure you are getting the best deal possible",
+    "description": "meanFinanceMetaAggregatorDescription"
+  },
   "4jGULT": {
     "defaultMessage": "days",
     "description": "oneDaySubject"
+  },
+  "4t/CsS": {
+    "defaultMessage": "Wrapping",
+    "description": "wrap agg loading"
+  },
+  "4u19xh": {
+    "defaultMessage": "{step} - The transaction will be simulated",
+    "description": "transationStepWaitSimulatePending"
   },
   "5B6pOD": {
     "defaultMessage": "The general sentiment of the crypto market",
@@ -174,6 +210,10 @@
   "5CBYQl": {
     "defaultMessage": "Setting your {from}/{to} position permissions",
     "description": "Modifying your position permissions"
+  },
+  "5DbBUx": {
+    "defaultMessage": "What is transaction simulation?",
+    "description": "faqWhatIsTransactionSimulation"
   },
   "5H+bme": {
     "defaultMessage": "Transaction confirmed!",
@@ -195,6 +235,10 @@
     "defaultMessage": "Changed duration",
     "description": "timelineTypeModified"
   },
+  "5rRvoj": {
+    "defaultMessage": "Fetching the best route for you",
+    "description": "loadingBestRoute"
+  },
   "63iR05": {
     "defaultMessage": "15 minutes",
     "description": "fifteenMinutesSingularTime"
@@ -207,9 +251,17 @@
     "defaultMessage": "Other",
     "description": "feedbackOptionOther"
   },
+  "6Mir2W": {
+    "defaultMessage": "Balance: {balance}",
+    "description": "in wallet"
+  },
   "6lcY/P": {
     "defaultMessage": "When will my position be swapped?",
     "description": "faqWhenWillMyPositionBeSwapped"
+  },
+  "6tCmX2": {
+    "defaultMessage": "Gas speed:",
+    "description": "advancedAggregatorSettingsGasSpeed"
   },
   "6xtKel": {
     "defaultMessage": "Close {from}/{to} position",
@@ -246,6 +298,10 @@
   "7oK1Kh": {
     "defaultMessage": "When a specific pair has some swaps that haven’t been executed in quite some time, the pair is signaled as stale.",
     "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart5"
+  },
+  "8ZD9RJ": {
+    "defaultMessage": "Wrap",
+    "description": "wrap agg"
   },
   "8nVUyg": {
     "defaultMessage": "minute",
@@ -287,6 +343,10 @@
     "defaultMessage": "Create a position and start generating yield",
     "description": "generateYield"
   },
+  "9p6I3v": {
+    "defaultMessage": "Please help us improve by sharing your feedback on the Feedback tab, or pinging us on Discord (https://discord.com/channels/871887207202455584/871887788637839401)",
+    "description": "faqHavingIssuesResponse"
+  },
   "9ytfZe": {
     "defaultMessage": "Continue",
     "description": "continue"
@@ -302,6 +362,14 @@
   "ALg0aQ": {
     "defaultMessage": "Swapped:",
     "description": "pairSwapDetails"
+  },
+  "Aa5WQf": {
+    "defaultMessage": "Twitter",
+    "description": "docs"
+  },
+  "Aap/Dp": {
+    "defaultMessage": "Unwrapping",
+    "description": "unwrap agg loading"
   },
   "Adg2/y": {
     "defaultMessage": "Migrate position and start generating yield",
@@ -335,6 +403,10 @@
     "defaultMessage": "Approving use of {from}",
     "description": "approving token"
   },
+  "B4rVMp": {
+    "defaultMessage": "Introducing Mean Finance's Meta Aggregator",
+    "description": "meanFinanceMetaAggregator"
+  },
   "B5AfY/": {
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "oneMinutePlural"
@@ -347,9 +419,9 @@
     "defaultMessage": "Why is my position stale?",
     "description": "faqWhyIsMyPositionStale"
   },
-  "BWP9H/": {
-    "defaultMessage": "Uniswap",
-    "description": "uniswapLegend"
+  "BElDng": {
+    "defaultMessage": "This is the maximum you will spend based on your slippage settings",
+    "description": "quoteDataMaximumTooltip"
   },
   "BZcZ2I": {
     "defaultMessage": "When you set up a position, you are creating an intention to swap one token for the other. Then, some external user can come and execute the swap for you, honoring the desired frequency of course. When they execute your swap, you are charged a 0.6% fee on the amount that was swapped. This fee is then split between Mean Finance and the swapper. Since you don’t have to execute the swap by yourself, you don’t need to pay any gas.",
@@ -439,6 +511,10 @@
     "defaultMessage": "There are no funds currently deposited in Mean Finance",
     "description": "generatedDashboardNoValuePart1"
   },
+  "DRsp33": {
+    "defaultMessage": "Enabled sources ({enabled})",
+    "description": "advancedAggregatorSettingsEnabledSources"
+  },
   "DZBKeH": {
     "defaultMessage": "{platform} (APY {apy}%)",
     "description": "selectedYieldPlatform"
@@ -487,9 +563,17 @@
     "defaultMessage": "30 minutes",
     "description": "thirtyMinutesSingularTime"
   },
+  "EY6I2K": {
+    "defaultMessage": "More gas",
+    "description": "moreGas"
+  },
   "EeY1Iw": {
     "defaultMessage": "Run for:",
     "description": "history run for in position"
+  },
+  "EgufjG": {
+    "defaultMessage": "Buy orders",
+    "description": "descBuyOrders"
   },
   "Eo86hF": {
     "defaultMessage": "Permissions on your position:",
@@ -583,9 +667,21 @@
     "defaultMessage": "Rate:",
     "description": "positionCreatedRate"
   },
+  "H/e6If": {
+    "defaultMessage": "This is a custom token you are importing, trade at your own risk.",
+    "description": "customTokenWarning"
+  },
   "Hbiw7t": {
     "defaultMessage": "For more information, feel free to check our",
     "description": "faqDoINeedToPayAnyFeesResponsePart3"
+  },
+  "HgPtYX": {
+    "defaultMessage": "Swap",
+    "description": "swapWallet"
+  },
+  "HgrJpp": {
+    "defaultMessage": "Swap and transfer",
+    "description": "descSwapAndTransfer"
   },
   "Hnf7Tg": {
     "defaultMessage": "ACTIVE",
@@ -611,6 +707,10 @@
     "defaultMessage": "Average buy price:",
     "description": "positionDetailsAverageBuyPriceTitle"
   },
+  "I1BY0j": {
+    "defaultMessage": "What are buy orders?",
+    "description": "faqWhatIsBuyOrders"
+  },
   "IEFMij": {
     "defaultMessage": "You are not connected to this network",
     "description": "networkLabelWarning"
@@ -631,6 +731,10 @@
     "defaultMessage": "Your new {from}:{to} position has been created",
     "description": "transactionMessagesNewPosition"
   },
+  "IkKuzc": {
+    "defaultMessage": "Best price always",
+    "description": "descBestPrice"
+  },
   "IrR4U4": {
     "defaultMessage": "Stale",
     "description": "stale"
@@ -646,6 +750,10 @@
   "IuW2wC": {
     "defaultMessage": "Withdrawing {toSymbol}",
     "description": "Withdrawing from"
+  },
+  "J2NpSo": {
+    "defaultMessage": "{step} - Sign the token approval with your wallet",
+    "description": "transationStepApproveSign"
   },
   "J4ZbBX": {
     "defaultMessage": "No trading limits",
@@ -670,6 +778,10 @@
   "Jh14HF": {
     "defaultMessage": "This cannot be undone.",
     "description": "transfer warning"
+  },
+  "JjGezL": {
+    "defaultMessage": "Supporting:",
+    "description": "meanFinanceMetaAggregatorSupporting"
   },
   "K/HInO": {
     "defaultMessage": "This allows the address to decrease the funds and modify the duration of your position",
@@ -739,9 +851,17 @@
     "defaultMessage": "This allows the address to increase the funds and modify the duration of your position",
     "description": "increase permission helptext"
   },
+  "LRE2+L": {
+    "defaultMessage": "Open wallet",
+    "description": "openWallet"
+  },
   "LbRNWF": {
     "defaultMessage": "Migrate {from}/{to} position",
     "description": "migrate title"
+  },
+  "LogV+u": {
+    "defaultMessage": "Restore defaults",
+    "description": "advancedAggregatorSettingsRestoreDefaults"
   },
   "LqWNDv": {
     "defaultMessage": "Add new address",
@@ -754,6 +874,22 @@
   "MCA6GY": {
     "defaultMessage": "{increaseDecrease} duration to run for {frequency} from {oldFrequency}",
     "description": "positionModifiedSwaps"
+  },
+  "MJey+4": {
+    "defaultMessage": "{step} - Submit the transaction approval with your wallet",
+    "description": "transationStepApprove"
+  },
+  "Mcj/iy": {
+    "defaultMessage": "Transaction will be successfull",
+    "description": "normalSimulationSuccess"
+  },
+  "MzzvpH": {
+    "defaultMessage": "New trade",
+    "description": "transactionConfirmationNewTrade"
+  },
+  "N4Okjv": {
+    "defaultMessage": "Transaction in progress",
+    "description": "transactionConfirmationInProgress"
   },
   "NHDjvA": {
     "defaultMessage": "Gas saved",
@@ -787,6 +923,10 @@
     "defaultMessage": "Pending transaction",
     "description": "pending transaction"
   },
+  "NlzM0l": {
+    "defaultMessage": "Paste",
+    "description": "paste"
+  },
   "NpsctG": {
     "defaultMessage": "Open positions",
     "description": "openPositions"
@@ -799,6 +939,14 @@
     "defaultMessage": "Position settings",
     "description": "position settings"
   },
+  "O+yqTs": {
+    "defaultMessage": "View in explorer",
+    "description": "transactionConfirmationViewExplorer"
+  },
+  "O75EVP": {
+    "defaultMessage": "{prefix}{value} {token}",
+    "description": "graph selectedItemValue"
+  },
   "OPn8Nq": {
     "defaultMessage": "{readable}",
     "description": "thirtyMinutesPluralTime"
@@ -806,6 +954,10 @@
   "OTXQIc": {
     "defaultMessage": "{amount} {from} have been added to your {from}:{to} position and it has been set to run for {swaps} {frequency}",
     "description": "transactionMessagesReset"
+  },
+  "OTyRfW": {
+    "defaultMessage": "Swap and transfer to another address",
+    "description": "tranferToTooltip"
   },
   "OalKNY": {
     "defaultMessage": "Compete on who has the most traded volume locked on Mean Finance. This includes swapped liquidity on your positions",
@@ -851,6 +1003,10 @@
     "defaultMessage": "${amount} USD saved",
     "description": "savedProtocolTooltip"
   },
+  "Pmf45s": {
+    "defaultMessage": "Transfer to another address:",
+    "description": "transferToDescription"
+  },
   "PwFUUt": {
     "defaultMessage": "Sell",
     "description": "sell"
@@ -866,6 +1022,10 @@
   "Q35rqD": {
     "defaultMessage": "5 minutes (1 swap)",
     "description": "fiveMinutesSingular"
+  },
+  "Q5QZCV": {
+    "defaultMessage": "DefiLlama",
+    "description": "defiLlamaLegend"
   },
   "QDVx7K": {
     "defaultMessage": "Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here",
@@ -919,9 +1079,17 @@
     "defaultMessage": "Approving use of {from} has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "success approving token"
   },
+  "Rgfl8x": {
+    "defaultMessage": "Recommended",
+    "description": "sortHighReturn"
+  },
   "RknjsQ": {
     "defaultMessage": "every 4 hours",
     "description": "fourHoursEvery"
+  },
+  "Rm2Mnc": {
+    "defaultMessage": "Swap",
+    "description": "swap"
   },
   "Roq4rz": {
     "defaultMessage": "Withdraw {token}",
@@ -930,6 +1098,10 @@
   "RyEoxs": {
     "defaultMessage": "Wallet settings",
     "description": "walletSettings"
+  },
+  "S0PtrE": {
+    "defaultMessage": "Needs approval",
+    "description": "needsApproval"
   },
   "S2QomY": {
     "defaultMessage": "Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network.",
@@ -943,6 +1115,10 @@
     "defaultMessage": "Since swaps are executed by external users, they can decide when to execute them. For example, let’s assume that you had created a position with daily swaps. This means that from 00 AM UTC to 11.59 PM UTC, your position can only be executed once. Once it is executed, it can't be executed again until 00 AM of the following day. The same happens with other frequencies, such as weekly or monthly.",
     "description": "faqWhenWillMyPositionBeSwappedResponse"
   },
+  "SBun7c": {
+    "defaultMessage": "Refreshing routes in {timer}s",
+    "description": "refreshRouteTimer"
+  },
   "SNN905": {
     "defaultMessage": "For more information, feel free to check our",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart7"
@@ -950,6 +1126,10 @@
   "SNxage": {
     "defaultMessage": "Start generating yield",
     "description": "gainYield title"
+  },
+  "SVDYlT": {
+    "defaultMessage": "Discord",
+    "description": "discord"
   },
   "SwiTok": {
     "defaultMessage": "Withdrawing balance from their position",
@@ -975,6 +1155,10 @@
     "defaultMessage": "{readable}",
     "description": "oneDayPluralTime"
   },
+  "U8Gqi0": {
+    "defaultMessage": "Sometimes you want to swap some tokens and then send it to another address. It can be annoying to execute two different transactions.{br}{br}With our Meta Aggregator, you can do it all in one transaction!",
+    "description": "faqWhatIsSwapAndTransferResponse"
+  },
   "UCfz8b": {
     "defaultMessage": "Tell us how we can improve this for you",
     "description": "feedbackTextFieldPlaceholder"
@@ -991,6 +1175,10 @@
     "defaultMessage": "Confirm this transaction in your wallet",
     "description": "Confirm in wallet"
   },
+  "UmgvZJ": {
+    "defaultMessage": "$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available",
+    "description": "positionUNIDXNotSupported"
+  },
   "Umk6mn": {
     "defaultMessage": "View NFT",
     "description": "view nft"
@@ -999,13 +1187,25 @@
     "defaultMessage": "View summary",
     "description": "viewSummary"
   },
+  "Ur4hZi": {
+    "defaultMessage": "This is the minimum you will receive based on your slippage settings",
+    "description": "quoteDataMinimumTooltip"
+  },
   "V314M5": {
     "defaultMessage": "Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period while neutralizing the short-term volatility in the market.{br}The purchases occur regardless of the asset's price and at regular intervals. In effect, this strategy removes much of the detailed work of attempting to time the market in order to make purchases of assets at the best prices.",
     "description": "whatIsDcaAnswer"
   },
+  "VaWvMp": {
+    "defaultMessage": "Selected route:",
+    "description": "quoteDataSelectedRoute"
+  },
   "VdhnM+": {
     "defaultMessage": "Swapped:",
     "description": "swappedTo"
+  },
+  "VlRJuN": {
+    "defaultMessage": "Sort routes by the best relation between price and gas cost",
+    "description": "sortHighReturnHelp"
   },
   "Vm9A8k": {
     "defaultMessage": "Deposited:",
@@ -1043,6 +1243,10 @@
     "defaultMessage": "No swaps yet",
     "description": "positionDetailsAverageBuyPriceNotSwap"
   },
+  "Wq6AJT": {
+    "defaultMessage": "Minimum received:",
+    "description": "quoteDataRate"
+  },
   "WszPax": {
     "defaultMessage": "Error while withdrawing",
     "description": "modalErrorWithdraw"
@@ -1058,6 +1262,10 @@
   "X2tycj": {
     "defaultMessage": "Generating {token} at {platform} with {apy}% APY",
     "description": "generatingYieldAt"
+  },
+  "XI+HWn": {
+    "defaultMessage": "Maximum spent:",
+    "description": "quoteDataMaxSent"
   },
   "XOwvOZ": {
     "defaultMessage": "You are migrating a position from a deprecated version of Mean Finance to the newest one.",
@@ -1087,9 +1295,17 @@
     "defaultMessage": "Ignore transaction",
     "description": "ignoretransaction"
   },
+  "YFISNq": {
+    "defaultMessage": "View receipt",
+    "description": "transactionConfirmationViewReceipt"
+  },
   "YRoLhe": {
     "defaultMessage": "This will transfer your position, your NFT and all the liquidity stored in the position to the new address.",
     "description": "transfer sub description"
+  },
+  "YVAdRx": {
+    "defaultMessage": "Sort routes by where you have to spend less tokens",
+    "description": "sortMostReturnBuyOrderHelp"
   },
   "YWW6wc": {
     "defaultMessage": "Oooops",
@@ -1135,6 +1351,10 @@
     "defaultMessage": "Unsupported method",
     "description": "unsupported_method"
   },
+  "ZDwrbF": {
+    "defaultMessage": "Best",
+    "description": "best"
+  },
   "ZDyEAS": {
     "defaultMessage": "Your {from}/{to} position transfer to {toAddress} has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "position transfer success"
@@ -1143,9 +1363,17 @@
     "defaultMessage": "Position Transfered",
     "description": "timelineTypeTransfered"
   },
+  "ZK0zNi": {
+    "defaultMessage": "{step} - The transaction is being simulated",
+    "description": "transationStepWaitSimulatePending"
+  },
   "ZO613Q": {
     "defaultMessage": "Position Modified",
     "description": "timelineTypeModified"
+  },
+  "ZQb/dg": {
+    "defaultMessage": "Choose network:",
+    "description": "supportedNetworks"
   },
   "ZRhYby": {
     "defaultMessage": "Why should I use Mean Finance?",
@@ -1170,6 +1398,10 @@
   "Zw7FaX": {
     "defaultMessage": "You can only deposit with a minimum value of {value} USD",
     "description": "notenoughwhale"
+  },
+  "Zy/Hiu": {
+    "defaultMessage": "Wallet:",
+    "description": "wallet"
   },
   "a+Yvwn": {
     "defaultMessage": "Modifying their position",
@@ -1199,6 +1431,10 @@
     "defaultMessage": "Creating a position to swap {from} to {to}",
     "description": "creating position"
   },
+  "an/BOU": {
+    "defaultMessage": "You pay",
+    "description": "youPay"
+  },
   "aoHWJU": {
     "defaultMessage": "In position: {balance} {symbol}",
     "description": "in position"
@@ -1210,6 +1446,10 @@
   "b6x2Rx": {
     "defaultMessage": "Position Created",
     "description": "timelineTypeCreated"
+  },
+  "b9AGHu": {
+    "defaultMessage": "Back",
+    "description": "goBack"
   },
   "bCOphI": {
     "defaultMessage": "swaps",
@@ -1315,6 +1555,18 @@
     "defaultMessage": "Error while withdrawing funds",
     "description": "modalErrorWithdrawFunds"
   },
+  "eI4dm9": {
+    "defaultMessage": "Sometimes you don't want to sell tokens, but you want to buy exactly a certain amount. For example, instead of selling 1000 USDC for ETH, you might instead want to buy 1 ETH with USDC.{br}{br}Most aggregators don't offer this feature, so we will show you those who do, and try to estimate a “buy order” on those who don't",
+    "description": "faqWhatIsBuyOrdersResponse"
+  },
+  "eQUdcX": {
+    "defaultMessage": "{step} - Transaction simulation failed",
+    "description": "transationStepWaitSimulateFailed"
+  },
+  "eiCVwX": {
+    "defaultMessage": "We could not fetch a route for your swap",
+    "description": "All routes failed"
+  },
   "enTSiQ": {
     "defaultMessage": "Manage list & tokens",
     "description": "manageListAndTokens"
@@ -1326,6 +1578,10 @@
   "f++zf9": {
     "defaultMessage": "Position finished",
     "description": "no funds"
+  },
+  "f2UpW9": {
+    "defaultMessage": "Worse price",
+    "description": "worsePrice"
   },
   "f8zceY": {
     "defaultMessage": "How it works",
@@ -1367,13 +1623,29 @@
     "defaultMessage": "swaps",
     "description": "oneHourSubject"
   },
+  "gVbrRz": {
+    "defaultMessage": "View receipt",
+    "description": "viewReceipt"
+  },
   "gWebsb": {
     "defaultMessage": "Set to what address you want to give permissions to",
     "description": "add permission description"
   },
+  "gZSAHC": {
+    "defaultMessage": "Least spent",
+    "description": "sortMostReturnBuyOrder"
+  },
+  "gblaCK": {
+    "defaultMessage": "Advanced settings",
+    "description": "advancedAggregatorSettings"
+  },
   "gjyuVH": {
     "defaultMessage": "Only tokens compatible with {token}",
     "description": "createdPairsSwitchToken"
+  },
+  "gm52Lx": {
+    "defaultMessage": "You've probably heard many DEXes or aggregators claim that they offer the best prices. Well, now you can be sure. We will query all of them at the same time so you don't have to, and you will be able to choose the one that best fits your needs",
+    "description": "faqWhatIsResponse"
   },
   "gqaG8I": {
     "defaultMessage": "Withdraw deposited",
@@ -1395,9 +1667,21 @@
     "defaultMessage": "Set the address you want to give permissions to",
     "description": "addAddressPermisionModalPlaceholder"
   },
+  "hEJQ3q": {
+    "defaultMessage": "What is Mean Finance's Meta Aggregator?",
+    "description": "faqWhatIs"
+  },
+  "hEvpJE": {
+    "defaultMessage": "Sort routes by where you can receive more tokens",
+    "description": "sortMostReturnSellOrderHelp"
+  },
   "hUTWyY": {
     "defaultMessage": "This allows the address to withdraw your swapped liquidity from your position",
     "description": "withdraw permission helptext"
+  },
+  "hZOkep": {
+    "defaultMessage": "Aggregators sometimes fail or give you less than they said they would. This of course sucks!{br}{br}Well when you are using Mean's Meta Aggregator, we will simulate your transactions to make sure it doesn't fail when you submit it. And, at the same time, we will show you the how your balances will change so that can be 100% sure that you'll get what you expect!{br}{br}The balance changes are currently available only on:{br}{br}- Ethereum{br}{br}- Polygon{br}{br}We will be adding more soon",
+    "description": "faqWhatIsTransactionSimulationResponse"
   },
   "haoCMr": {
     "defaultMessage": "Calculating the cost of creating this position",
@@ -1435,6 +1719,14 @@
     "defaultMessage": "Back to app",
     "description": "backToApp"
   },
+  "iaKvlj": {
+    "defaultMessage": "Sort routes by least gas spent",
+    "description": "sortLeastGasHelp"
+  },
+  "ibMYRL": {
+    "defaultMessage": "I confirm that the direction above is correct",
+    "description": "transferToValidateCheckboxLabel"
+  },
   "ioNoF4": {
     "defaultMessage": "Change duration and rate",
     "description": "changeDuration title"
@@ -1455,9 +1747,17 @@
     "defaultMessage": "Create {from}:{to} position",
     "description": "transactionDetailsNewPosition"
   },
+  "jPhXzy": {
+    "defaultMessage": "The value of the transaction is estimated because this exchange does not support setting amount received.",
+    "description": "aggregatorNotBuyOrder"
+  },
   "jPjwIW": {
     "defaultMessage": "Low liquidity on pair",
     "description": "low liquidity title"
+  },
+  "jQqW/8": {
+    "defaultMessage": "Continue",
+    "description": "proceed agg"
   },
   "jXIz7M": {
     "defaultMessage": "{from} is now ready to be used",
@@ -1494,6 +1794,10 @@
   "kY2alH": {
     "defaultMessage": "Save",
     "description": "save"
+  },
+  "kfIFAy": {
+    "defaultMessage": "Confirm address",
+    "description": "transfer to selectAddress"
   },
   "kksiFn": {
     "defaultMessage": "your position",
@@ -1555,6 +1859,10 @@
     "defaultMessage": "4 hours",
     "description": "fourHoursSingularTime"
   },
+  "mhGi8/": {
+    "defaultMessage": "What is swap and transfer?",
+    "description": "faqWhatIsSwapAndTransfer"
+  },
   "mljOZT": {
     "defaultMessage": "There is no data available about this pair",
     "description": "No data available"
@@ -1567,6 +1875,10 @@
     "defaultMessage": "and",
     "description": "faqHowIsThePriceCalculatedForEachSwapResponseAnd"
   },
+  "mu45Z3": {
+    "defaultMessage": "Slippage:",
+    "description": "advancedAggregatorSettingsSlippage"
+  },
   "mxbJsT": {
     "defaultMessage": "Withdraw {wrappedProtocolToken}",
     "description": "withdrawWrapped"
@@ -1574,6 +1886,10 @@
   "mz7RzW": {
     "defaultMessage": "+ Add another wallet",
     "description": "add permission add more addresses"
+  },
+  "n47KZD": {
+    "defaultMessage": "Transfer swap to another address",
+    "description": "transfer to title"
   },
   "nFFzXV": {
     "defaultMessage": "15 minutes (1 swap)",
@@ -1595,6 +1911,10 @@
     "defaultMessage": "day",
     "description": "oneDaySingularSubject"
   },
+  "nWm9Qa": {
+    "defaultMessage": "Invest",
+    "description": "invest"
+  },
   "naApNE": {
     "defaultMessage": "30 minutes (1 swap)",
     "description": "thirtyMinutesSingular"
@@ -1615,9 +1935,21 @@
     "defaultMessage": "Generate yield",
     "description": "yieldTitle"
   },
+  "on7qPn": {
+    "defaultMessage": "{fromAmount} {from} for {toAmount} {to} for you",
+    "description": "swap aggregator loading title"
+  },
+  "owBuje": {
+    "defaultMessage": "Swap",
+    "description": "swap agg"
+  },
   "p3Xa0W": {
     "defaultMessage": "Set to whom you want to transfer your position to",
     "description": "transfer description"
+  },
+  "pAy7CA": {
+    "defaultMessage": "Github",
+    "description": "github"
   },
   "pBVKIR": {
     "defaultMessage": "You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to enable this option.",
@@ -1651,13 +1983,29 @@
     "defaultMessage": "So it could happen that your swap is not executed within your specified frequency. If this were to happen to your position, remember that fees are only charged on swaps, so your balance will remain unaffected.",
     "description": "faqWhyIsMyPositionStaleResponsePart5"
   },
+  "q0I3lm": {
+    "defaultMessage": "We don't take any fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly",
+    "description": "faqFeesResponse"
+  },
+  "q7gy3F": {
+    "defaultMessage": "View on chain explorer",
+    "description": "view on chain explorer"
+  },
   "qC950V": {
     "defaultMessage": "Mean Finance will allow you to perform DCA, in a gasless and decentralized fashion. This means:",
     "description": "faqWhyShouldIUseMeanFinanceResponsePart2"
   },
+  "qCNGJT": {
+    "defaultMessage": "Transaction simulation",
+    "description": "blowfishSimulationTitle"
+  },
   "qCw/BH": {
     "defaultMessage": "Did you forget about your position? This are the addresses that have the most value to withdraw between their positions",
     "description": "leaderboard forgot"
+  },
+  "qD/8eI": {
+    "defaultMessage": "Is it safe?",
+    "description": "faqIsSafe"
   },
   "qHy8j2": {
     "defaultMessage": "Back to create position",
@@ -1702,6 +2050,10 @@
   "r7l7zf": {
     "defaultMessage": "You have withdrawn from your {from}:{to} position",
     "description": "transactionMessagesWithdraw"
+  },
+  "rEo0yG": {
+    "defaultMessage": "MAX",
+    "description": "maxWallet"
   },
   "rKNAVd": {
     "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you migrate the position.",
@@ -1754,6 +2106,10 @@
   "sajNR4": {
     "defaultMessage": "~ {fromPrice} USD",
     "description": "current swapped in position price"
+  },
+  "sjxuA4": {
+    "defaultMessage": "Least gas",
+    "description": "sortLeastGas"
   },
   "t0oI3L": {
     "defaultMessage": "You will get back {from} {fromSymbol} and {to} {toSymbol}",
@@ -1811,6 +2167,14 @@
     "defaultMessage": "Create position",
     "description": "create position"
   },
+  "u19uie": {
+    "defaultMessage": "Unwrap",
+    "description": "unwrap agg"
+  },
+  "uRlu53": {
+    "defaultMessage": "{step} - The token approval is being confirmed",
+    "description": "transationStepWaitApprove"
+  },
   "uZWTRx": {
     "defaultMessage": "How can we improve it?",
     "description": "feedbackInput"
@@ -1822,6 +2186,10 @@
   "v1SP5g": {
     "defaultMessage": "4 hours",
     "description": "fourHoursSingularSubject"
+  },
+  "vHie/I": {
+    "defaultMessage": "You are having exactly the same experience as if you would have used the different aggregators directly. We haven't built any smart contracts on top of theirs, so there is no added risk. At the same time, we offer transaction simulations on some networks.",
+    "description": "faqIsSafeResponse"
   },
   "vNNVGj": {
     "defaultMessage": "For example, let’s assume that you’ve created a position that swaps 2000 USDC for ETH each day. Let’s also assume that, when the swap is executed, 2000 USDC = 1 ETH. Instead of getting 1 ETH, you would be getting 1 ETH - 0.6% = 0.994 ETH. That 0.6% will be split between Mean Finance and the user who actually executed the swap.",
@@ -1847,6 +2215,14 @@
     "defaultMessage": "You'll invest",
     "description": "invest detail"
   },
+  "vmGAxP": {
+    "defaultMessage": "You receive",
+    "description": "youReceive"
+  },
+  "vqkOyW": {
+    "defaultMessage": "Most received",
+    "description": "sortMostReturnSellOrder"
+  },
   "vw/vGQ": {
     "defaultMessage": "1 minute",
     "description": "oneMinuteSingularTime"
@@ -1862,6 +2238,10 @@
   "wH5c58": {
     "defaultMessage": "here.",
     "description": "here"
+  },
+  "wJOLei": {
+    "defaultMessage": "Swapping",
+    "description": "swap agg loading"
   },
   "wY55VA": {
     "defaultMessage": "No deposit or withdrawal fees",
@@ -1891,9 +2271,17 @@
     "defaultMessage": "Transfer {from}:{to} position to {address}",
     "description": "transactionDetailsTransfer"
   },
+  "xRD2R7": {
+    "defaultMessage": "Transaction will fail. We recommend choosing another route",
+    "description": "blowfishSimulationError"
+  },
   "xTAANF": {
     "defaultMessage": "This pair is",
     "description": "stale pair message"
+  },
+  "xTu77D": {
+    "defaultMessage": "Processing",
+    "description": "transactionConfirmationProcessing"
   },
   "xf12eg": {
     "defaultMessage": "Close a position",
@@ -1935,6 +2323,10 @@
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "fourHoursPlural"
   },
+  "yokaKf": {
+    "defaultMessage": "I'm having issues, what can I do?",
+    "description": "faqHavingIssues"
+  },
   "yuK53B": {
     "defaultMessage": "Error setting permissions",
     "description": "modalErrorPermissions"
@@ -1951,13 +2343,29 @@
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "oneHourPlural"
   },
+  "zNOHJl": {
+    "defaultMessage": "{step} - The token approval is submitted",
+    "description": "transationStepWaitApprove"
+  },
   "zSo0el": {
     "defaultMessage": "every day",
     "description": "oneDayEvery"
   },
+  "zTt+tt": {
+    "defaultMessage": "Selected",
+    "description": "selected"
+  },
   "zfveEm": {
     "defaultMessage": "{from}/{to}",
     "description": "graph description"
+  },
+  "zi0gLX": {
+    "defaultMessage": "No extra fees",
+    "description": "descNoFee"
+  },
+  "zlapVJ": {
+    "defaultMessage": "Transaction cost:",
+    "description": "quoteDataFee"
   },
   "zpPKoQ": {
     "defaultMessage": "Withdraw",

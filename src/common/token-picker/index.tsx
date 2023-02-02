@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import Slide from '@mui/material/Slide';
 import { Token, TokenList, YieldOptions } from 'types';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -20,17 +19,22 @@ import CloseIcon from '@mui/icons-material/Close';
 import TokenIcon from 'common/token-icon';
 import { makeStyles, withStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import useTokenList from 'hooks/useTokenList';
 import TokenLists from 'common/token-lists';
 import { formatCurrencyAmount } from 'utils/currency';
 import FilledInput from '@mui/material/FilledInput';
 import { createStyles } from '@mui/material';
-import useAllowedPairs from 'hooks/useAllowedPairs';
-import Switch from '@mui/material/Switch';
 import useMulticallBalances from 'hooks/useMulticallBalances';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
+import Switch from '@mui/material/Switch';
+import useCustomToken from 'hooks/useCustomToken';
+import useAllowedPairs from 'hooks/useAllowedPairs';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import { useCustomTokens } from 'state/token-lists/hooks';
+import use1InchBalances from 'hooks/use1InchBalances';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -40,18 +44,6 @@ const StyledSwitchGrid = styled(Grid)`
   align-items: center;
   color: rgba(255, 255, 255, 0.5) !important;
   flex: 0;
-`;
-
-const StyledOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  background-color: #1b1b1c;
-  padding: 24px;
-  display: flex;
 `;
 
 const StyledFilledInput = withStyles(() =>
@@ -72,6 +64,7 @@ const StyledFilledInput = withStyles(() =>
 const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 0px;
   margin-right: 7px;
+  cursor: pointer;
 `;
 
 const StyledListItem = styled(ListItem)`
@@ -123,9 +116,12 @@ const StyledTokenTextContainer = styled.div`
 interface RowData {
   tokenList: TokenList;
   tokenKeys: string[];
-  onClick: (token: string) => void;
+  onClick: (token: Token, isCustomToken: boolean) => void;
   yieldOptions: YieldOptions;
   tokenBalances: Record<string, { balance: BigNumber; balanceUsd: BigNumber }>;
+  customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
+  isLoadingTokenBalances: boolean;
+  customTokens: TokenList;
 }
 
 interface RowProps {
@@ -135,16 +131,18 @@ interface RowProps {
 }
 
 interface TokenPickerProps {
-  shouldShow: boolean;
   availableFrom?: string[];
   onChange: SetFromToState;
   onClose: () => void;
+  onAddToken?: (token: Token) => void;
   isFrom: boolean;
   usedTokens: string[];
   ignoreValues: string[];
   otherSelected?: Token | null;
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
+  isAggregator?: boolean;
+  showWrappedAndProtocol?: boolean;
 }
 
 const useListItemStyles = makeStyles(({ palette }) => ({
@@ -168,25 +166,45 @@ const useListItemStyles = makeStyles(({ palette }) => ({
     },
   },
 }));
-const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions, tokenBalances } }: RowProps) => {
+const Row = ({
+  index,
+  style,
+  data: {
+    onClick,
+    tokenList,
+    tokenKeys,
+    yieldOptions,
+    tokenBalances,
+    customToken,
+    customTokens,
+    isLoadingTokenBalances,
+  },
+}: RowProps) => {
   const classes = useListItemStyles();
-  const token = tokenList[tokenKeys[index]];
+  const isImportedToken = !!customTokens[tokenKeys[index]];
+  const isCustomToken = (!!customToken && tokenKeys[index] === customToken.token.address) || isImportedToken;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const token = !isCustomToken || isImportedToken ? tokenList[tokenKeys[index]] : customToken!.token;
 
   const tokenBalance =
-    (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0);
+    !isCustomToken || isImportedToken
+      ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0)
+      : customToken?.balance ?? BigNumber.from(0);
   const tokenValue =
-    (tokenBalances &&
-      tokenBalances[token.address] &&
-      tokenBalances[token.address].balanceUsd &&
-      parseFloat(formatUnits(tokenBalances[token.address].balanceUsd, token.decimals + 18))) ||
-    0;
+    !isCustomToken || isImportedToken
+      ? (tokenBalances &&
+          tokenBalances[token.address] &&
+          tokenBalances[token.address].balanceUsd &&
+          parseFloat(formatUnits(tokenBalances[token.address].balanceUsd, token.decimals + 18))) ||
+        0
+      : (customToken?.balanceUsd && parseFloat(formatUnits(customToken?.balanceUsd, token.decimals + 18))) || 0;
 
   const availableYieldOptions = yieldOptions.filter((yieldOption) =>
     yieldOption.enabledTokens.includes(token?.address)
   );
 
   return (
-    <StyledListItem classes={classes} onClick={() => onClick(tokenKeys[index])} style={style}>
+    <StyledListItem classes={classes} onClick={() => onClick(token, isCustomToken)} style={style}>
       <StyledListItemIcon>
         <TokenIcon size="24px" token={token} />
       </StyledListItemIcon>
@@ -199,6 +217,16 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions
             {` (${token.symbol})`}
           </Typography>
         </StyledTokenTextContainer>
+        {!!isCustomToken && (
+          <StyledTokenTextContainer>
+            <Typography variant="caption" component="span" color="rgb(245, 124, 0)">
+              <FormattedMessage
+                description="customTokenWarning"
+                defaultMessage="This is a custom token you are importing, trade at your own risk."
+              />
+            </Typography>
+          </StyledTokenTextContainer>
+        )}
         {!!availableYieldOptions.length && (
           <StyledTokenTextContainer>
             <Typography variant="caption" component="span" color="#2CC941">
@@ -208,15 +236,20 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {tokenBalance && (
-          <Typography variant="body1" color="#FFFFFF">
-            {formatCurrencyAmount(tokenBalance, token, 6)}
-          </Typography>
-        )}
-        {!!tokenValue && (
-          <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-            ${tokenValue.toFixed(2)}
-          </Typography>
+        {!Object.keys(tokenBalances).length && isLoadingTokenBalances && <CenteredLoadingIndicator size={10} />}
+        {tokenBalances && !!Object.keys(tokenBalances).length && (
+          <>
+            {tokenBalance && (
+              <Typography variant="body1" color="#FFFFFF">
+                {formatCurrencyAmount(tokenBalance, token, 6)}
+              </Typography>
+            )}
+            {!!tokenValue && (
+              <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                ${tokenValue.toFixed(2)}
+              </Typography>
+            )}
+          </>
         )}
       </StyledBalanceContainer>
     </StyledListItem>
@@ -224,7 +257,6 @@ const Row = ({ index, style, data: { onClick, tokenList, tokenKeys, yieldOptions
 };
 
 const TokenPicker = ({
-  shouldShow,
   isFrom,
   availableFrom = [],
   onClose,
@@ -235,16 +267,22 @@ const TokenPicker = ({
   otherSelected,
   yieldOptions,
   isLoadingYieldOptions,
+  isAggregator,
+  showWrappedAndProtocol,
+  onAddToken,
 }: TokenPickerProps) => {
-  const tokenList = useTokenList();
+  const tokenList = useTokenList(isAggregator);
   const [search, setSearch] = React.useState('');
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
-  const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
+  const actualCurrentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
   const allowedPairs = useAllowedPairs();
   let tokenKeysToUse: string[] = [];
+  const customTokens = useCustomTokens();
+  const [inchBalances, isLoadingInchBalances] = use1InchBalances();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
 
   const uniqTokensFromPairs = React.useMemo(
@@ -269,7 +307,10 @@ const TokenPicker = ({
     [allowedPairs, otherToCheck]
   );
 
-  tokenKeysToUse = isOnlyAllowedPairs && !!otherSelected ? uniqTokensFromPairs : tokenKeys;
+  tokenKeysToUse = React.useMemo(
+    () => (isOnlyAllowedPairs && !!otherSelected ? uniqTokensFromPairs : tokenKeys),
+    [isOnlyAllowedPairs, otherSelected, uniqTokensFromPairs, tokenKeys]
+  );
 
   const handleOnClose = () => {
     if (shouldShowTokenLists) {
@@ -280,18 +321,14 @@ const TokenPicker = ({
     }
   };
 
-  const handleItemSelected = (item: string) => {
-    onChange(tokenList[item]);
-    handleOnClose();
-  };
-
   // const memoizedUsedTokens = React.useMemo(
   //   () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
   //   [usedTokens, ignoreValues, tokenKeysToUse]
   // );
 
   const otherIsProtocol =
-    otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address;
+    !showWrappedAndProtocol &&
+    (otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address);
 
   const memoizedUnorderedTokenKeys = React.useMemo(() => {
     const filteredTokenKeys = tokenKeysToUse
@@ -333,143 +370,162 @@ const TokenPicker = ({
     otherSelected,
   ]);
 
-  const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(memoizedUnorderedTokenKeys);
+  const rawMemoTokenKeysToUse = React.useMemo(() => tokenKeysToUse.sort(), [tokenKeysToUse]);
+
+  const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(rawMemoTokenKeysToUse);
+
+  const [customToken] = useCustomToken(
+    search,
+    !isAggregator || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
+  );
+
+  const balances = React.useMemo(
+    () => ({
+      ...(inchBalances || {}),
+      ...(tokenBalances || {}),
+    }),
+    [tokenBalances, inchBalances]
+  );
 
   const memoizedTokenKeys = React.useMemo(
-    () =>
-      memoizedUnorderedTokenKeys.sort((tokenKeyA, tokenKeyB) => {
-        if (!tokenBalances) return tokenKeyA < tokenKeyB ? -1 : 1;
+    () => [
+      ...(customToken ? [customToken.token.address] : []),
+      ...memoizedUnorderedTokenKeys.sort((tokenKeyA, tokenKeyB) => {
+        if (!balances) return tokenKeyA < tokenKeyB ? -1 : 1;
 
         const tokenABalance =
-          (tokenBalances[tokenKeyA] &&
-            parseFloat(formatUnits(tokenBalances[tokenKeyA].balanceUsd, tokenList[tokenKeyA].decimals + 18))) ||
+          (balances[tokenKeyA] &&
+            parseFloat(formatUnits(balances[tokenKeyA].balanceUsd, tokenList[tokenKeyA].decimals + 18))) ||
           0;
         const tokenBBalance =
-          (tokenBalances[tokenKeyB] &&
-            parseFloat(formatUnits(tokenBalances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
+          (balances[tokenKeyB] &&
+            parseFloat(formatUnits(balances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
           0;
 
         return tokenABalance > tokenBBalance ? -1 : 1;
       }),
-    [tokenBalances, memoizedUnorderedTokenKeys, tokenList]
+    ],
+    [balances, memoizedUnorderedTokenKeys, tokenList, customToken]
   );
 
-  const itemData = React.useMemo(
+  const handleItemSelected = (token: Token, isCustomToken: boolean) => {
+    onChange(token);
+    if (onAddToken && isCustomToken) {
+      onAddToken(token);
+    }
+    handleOnClose();
+  };
+
+  const isLoadingBalances = isLoadingInchBalances || isLoadingTokenBalances;
+
+  const itemData: RowData = React.useMemo(
     () => ({
       onClick: handleItemSelected,
       tokenList,
       tokenKeys: memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
-      tokenBalances: isLoadingTokenBalances && !tokenBalances ? {} : tokenBalances,
+      tokenBalances:
+        (isLoadingBalances && (!balances || !Object.keys(balances).length)) ||
+        currentNetwork.chainId !== actualCurrentNetwork.chainId
+          ? {}
+          : balances || {},
+      customToken,
+      isLoadingTokenBalances: isLoadingBalances,
+      customTokens,
     }),
-    [memoizedTokenKeys, tokenList, tokenBalances, yieldOptions]
+    [
+      memoizedTokenKeys,
+      tokenList,
+      balances,
+      yieldOptions,
+      customToken,
+      isLoadingBalances,
+      currentNetwork.chainId,
+      actualCurrentNetwork.chainId,
+    ]
   );
 
   return (
-    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
-      <StyledOverlay>
-        <IconButton
-          aria-label="close"
-          size="small"
-          onClick={handleOnClose}
-          style={{ position: 'absolute', top: '24px', right: '32px' }}
-        >
-          <CloseIcon fontSize="inherit" />
-        </IconButton>
-        <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
-          {shouldShowTokenLists ? (
-            <TokenLists />
-          ) : (
-            <>
-              <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-                <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
-                  {isFrom ? (
-                    <FormattedMessage description="You sell" defaultMessage="You sell" />
-                  ) : (
-                    <FormattedMessage description="You receive" defaultMessage="You receive" />
-                  )}
-                </Typography>
-              </Grid>
-              <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
-                <StyledFilledInput
-                  placeholder="Search your token"
-                  onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-                    setSearch(evt.currentTarget.value)
-                  }
-                  fullWidth
-                  disableUnderline
-                  endAdornment={<Search />}
-                  type="text"
-                  margin="none"
+    <>
+      <IconButton
+        aria-label="close"
+        size="small"
+        onClick={handleOnClose}
+        style={{ position: 'absolute', top: '24px', right: '32px' }}
+      >
+        <CloseIcon fontSize="inherit" />
+      </IconButton>
+      <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
+        {shouldShowTokenLists ? (
+          <TokenLists isAggregator />
+        ) : (
+          <>
+            <Grid item xs={12} style={{ flexBasis: 'auto' }}>
+              <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+                {isFrom ? (
+                  <FormattedMessage description="You sell" defaultMessage="You sell" />
+                ) : (
+                  <FormattedMessage description="You receive" defaultMessage="You receive" />
+                )}
+              </Typography>
+            </Grid>
+            <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
+              <StyledFilledInput
+                placeholder="Search your token"
+                onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
+                  setSearch(evt.currentTarget.value)
+                }
+                fullWidth
+                disableUnderline
+                endAdornment={<Search />}
+                type="text"
+                margin="none"
+              />
+            </StyledGrid>
+            {otherSelected && !isAggregator && (
+              <StyledSwitchGrid item xs={12}>
+                <FormattedMessage
+                  description="createdPairsSwitchToken"
+                  defaultMessage="Only tokens compatible with {token}"
+                  values={{ token: otherSelected?.symbol }}
                 />
-              </StyledGrid>
-              {otherSelected && (
-                <StyledSwitchGrid item xs={12}>
-                  <FormattedMessage
-                    description="createdPairsSwitchToken"
-                    defaultMessage="Only tokens compatible with {token}"
-                    values={{ token: otherSelected?.symbol }}
-                  />
-                  <Switch
-                    checked={isOnlyAllowedPairs}
-                    onChange={() => setIsOnlyAllowedPairs(!isOnlyAllowedPairs)}
-                    name="isOnlyAllowedPairs"
-                    color="primary"
-                  />
-                </StyledSwitchGrid>
-              )}
-              {/* {!!memoizedUsedTokens.length && (
-                <>
-                  <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
-                    <Typography variant="caption">
-                      <FormattedMessage description="your tokens" defaultMessage="Tokens in your wallet" />
-                    </Typography>
-                  </StyledGrid>
-                  <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-                    {memoizedUsedTokens.map((token) => (
-                      <StyledChip
-                        icon={<TokenIcon size="24px" token={tokenList[token]} isInChip />}
-                        label={tokenList[token].symbol}
-                        onClick={() => handleItemSelected(token)}
-                        key={tokenList[token].address}
-                      />
-                    ))}
-                  </Grid>
-                  <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
-                    <Divider />
-                  </StyledGrid>
-                </>
-              )} */}
-              <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
-                <StyledDialogTitle>
-                  <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
-                    <FormattedMessage description="token list" defaultMessage="Token list" />
-                  </Typography>
-                  {/* <IconButton aria-label="close" onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}>
-                    <StyledTuneIcon />
-                  </IconButton> */}
-                </StyledDialogTitle>
-              </StyledGrid>
-              <StyledGrid item xs={12} style={{ flexGrow: 1 }}>
-                <AutoSizer>
-                  {({ height, width }) => (
-                    <StyledList
-                      height={height}
-                      itemCount={memoizedTokenKeys.length}
-                      itemSize={52}
-                      width={width}
-                      itemData={itemData}
-                    >
-                      {Row}
-                    </StyledList>
-                  )}
-                </AutoSizer>
-              </StyledGrid>
-            </>
-          )}
-        </Grid>
-      </StyledOverlay>
-    </Slide>
+                <Switch
+                  checked={isOnlyAllowedPairs}
+                  onChange={() => setIsOnlyAllowedPairs(!isOnlyAllowedPairs)}
+                  name="isOnlyAllowedPairs"
+                  color="primary"
+                />
+              </StyledSwitchGrid>
+            )}
+            <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
+              <StyledDialogTitle>
+                <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+                  <FormattedMessage description="token list" defaultMessage="Token list" />
+                </Typography>
+                {/* <IconButton aria-label="close" onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}>
+                  <StyledTuneIcon />
+                </IconButton> */}
+              </StyledDialogTitle>
+            </StyledGrid>
+            <StyledGrid item xs={12} style={{ flexGrow: 1 }}>
+              <AutoSizer>
+                {({ height, width }) => (
+                  <StyledList
+                    height={height}
+                    itemCount={memoizedTokenKeys.length}
+                    itemSize={52}
+                    width={width}
+                    itemData={itemData}
+                  >
+                    {Row}
+                  </StyledList>
+                )}
+              </AutoSizer>
+            </StyledGrid>
+          </>
+        )}
+      </Grid>
+    </>
   );
 };
 

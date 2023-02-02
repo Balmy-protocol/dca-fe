@@ -12,6 +12,13 @@ export const enableTokenList = createAction<{
   enabled: boolean;
 }>('tokenLists/enableTokenList');
 
+export const enableAggregatorTokenList = createAction<{
+  tokenList: string;
+  enabled: boolean;
+}>('tokenLists/enableAggregatorTokenList');
+
+export const addCustomToken = createAction<Token>('tokenLists/addCustomToken');
+
 export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extra: AxiosInstance }>(
   'tokenLists/fetchTokenLists',
   async (tokenListUrl, { extra: axiosClient }) => {
@@ -54,7 +61,7 @@ export const startFetchingTokenLists = createAsyncThunk(
     };
 
     Object.keys(state.tokenLists.byUrl)
-      .filter((listUrl) => listUrl !== 'Mean Finance Graph Allowed Tokens')
+      .filter((listUrl) => state.tokenLists.byUrl[listUrl].fetchable)
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       .forEach((listUrl) => dispatch(fetchTokenList(listUrl)));
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

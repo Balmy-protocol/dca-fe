@@ -15,6 +15,14 @@ const StyledButton = styled(Button)`
   border-radius: 50px;
   padding: 4px 8px;
   align-self: flex-start;
+
+  .MuiButton-endIcon {
+    margin: 0;
+  }
+  .MuiButton-startIcon {
+    margin: 0;
+    margin-right: 4px;
+  }
 `;
 
 const Swap = ({ token, onClick }: TokenButtonProps) => (

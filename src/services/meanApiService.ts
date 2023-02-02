@@ -4,6 +4,7 @@ import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from 'config';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import {
   AllowedPairs,
+  BlowfishResponse,
   MeanApiUnderlyingResponse,
   MeanFinanceAllowedPairsResponse,
   MeanFinanceResponse,
@@ -350,6 +351,25 @@ export default class MeanApiService {
     }
   }
 
+  async getAllowanceTarget() {
+    const currentNetwork = await this.walletService.getNetwork();
+    const allowanceResponse = await this.axiosClient.get<{ allowanceTarget: string }>(
+      `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/allowance-target`,
+      {
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+        cache: {
+          maxAge: 0,
+        },
+      }
+    );
+
+    return allowanceResponse.data.allowanceTarget;
+  }
+
   async logError(error: string, errorMessage: string, extraData?: unknown) {
     return this.axiosClient.post(`${MEAN_API_URL}/v1/error-reporting`, {
       error,
@@ -363,6 +383,35 @@ export default class MeanApiService {
     return this.axiosClient.post(`${MEAN_API_URL}/v1/log-feedback`, {
       action,
       description,
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async trackEvent(action: string, extraData: any) {
+    return this.axiosClient.post(`${MEAN_API_URL}/v1/mixpanel-track`, {
+      action,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      extraData,
+    });
+  }
+
+  async simulateTransaction(
+    txObject: {
+      from: string;
+      to: string;
+      value: string;
+      data: string;
+    },
+    userAccount: string,
+    metadata: {
+      origin: string;
+    },
+    chainId: number
+  ) {
+    return this.axiosClient.post<BlowfishResponse>(`${MEAN_API_URL}/v1/simulate-blowfish-transaction/${chainId}`, {
+      txObject,
+      userAccount,
+      metadata,
     });
   }
 }

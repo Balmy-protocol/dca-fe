@@ -4,13 +4,16 @@ import reduce from 'lodash/reduce';
 import keyBy from 'lodash/keyBy';
 import { ALLOWED_YIELDS, TOKEN_BLACKLIST } from 'config/constants';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { useTokensLists } from 'state/token-lists/hooks';
-import useCurrentNetwork from './useCurrentNetwork';
+import { useSavedAggregatorTokenLists, useTokensLists } from 'state/token-lists/hooks';
+import useSelectedNetwork from './useSelectedNetwork';
 
-function useTokenList(filter = true) {
-  const currentNetwork = useCurrentNetwork();
+function useTokenList(isAggregator = false, filter = true) {
+  const currentNetwork = useSelectedNetwork();
   const tokensLists = useTokensLists();
-  const savedTokenLists = ['Mean Finance Graph Allowed Tokens'];
+  const savedDCATokenLists = ['Mean Finance Graph Allowed Tokens'];
+  const savedAggregatorTokenLists = useSavedAggregatorTokenLists();
+
+  const savedTokenLists = isAggregator ? savedAggregatorTokenLists : savedDCATokenLists;
   const reducedYieldTokens = React.useMemo(
     () =>
       ALLOWED_YIELDS[currentNetwork.chainId].reduce(
@@ -33,7 +36,7 @@ function useTokenList(filter = true) {
                     (token) =>
                       token.chainId === currentNetwork.chainId &&
                       !Object.keys(acc).includes(token.address) &&
-                      !reducedYieldTokens.includes(token.address) &&
+                      (isAggregator || !reducedYieldTokens.includes(token.address)) &&
                       (!filter || !TOKEN_BLACKLIST.includes(token.address))
                   ),
                   'address'
@@ -42,7 +45,7 @@ function useTokenList(filter = true) {
             : acc,
         { [PROTOCOL_TOKEN_ADDRESS]: getProtocolToken(currentNetwork.chainId) }
       ),
-    [currentNetwork.chainId, savedTokenLists, reducedYieldTokens]
+    [currentNetwork.chainId, savedTokenLists, reducedYieldTokens, filter, isAggregator]
   );
 
   return tokenList;

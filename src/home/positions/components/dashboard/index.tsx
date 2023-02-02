@@ -23,7 +23,7 @@ const PositionDashboard = () => {
 
   return (
     <Grid container spacing={4}>
-      <Grid item xs={5}>
+      <Grid item xs={12} md={5}>
         <StyledPaper variant="outlined">
           <CountDashboard
             selectedChain={selectedChain}
@@ -32,7 +32,7 @@ const PositionDashboard = () => {
           />
         </StyledPaper>
       </Grid>
-      <Grid item xs={5}>
+      <Grid item xs={12} md={5}>
         <StyledPaper variant="outlined">
           <UsdDashboard
             selectedTokens={selectedTokens}
