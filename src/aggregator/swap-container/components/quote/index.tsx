@@ -1,6 +1,7 @@
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import isNaN from 'lodash/isNaN';
+import isFinite from 'lodash/isFinite';
 import * as React from 'react';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import styled from 'styled-components';
@@ -303,7 +304,7 @@ const SwapQuote = ({
               <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
                 {`$${parseFloat(quote.buyAmount.amountInUSD.toString()).toFixed(2)}`}
               </Typography>
-              {!isNaN(priceImpact) && (
+              {!isNaN(priceImpact) && isFinite(priceImpact) && (
                 <Typography variant="caption" color={Number(priceImpact) < -5 ? '#EB5757' : 'rgba(255, 255, 255, 0.5)'}>
                   {`(${priceImpact}%)`}
                 </Typography>

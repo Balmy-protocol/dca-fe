@@ -2,6 +2,7 @@ import React from 'react';
 import Button from 'common/button';
 import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
+import isFinite from 'lodash/isFinite';
 import { Token } from 'types';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -196,7 +197,7 @@ const AggregatorTokenInput = ({
                 <Typography variant="body2" color="#939494">
                   ${usdValue}
                 </Typography>
-                {impact && !isNaN(impact) && (
+                {impact && !isNaN(impact) && isFinite(impact) && (
                   <Typography variant="body2" color={Number(impact) < -5 ? '#EB5757' : 'rgba(255, 255, 255, 0.5)'}>
                     ({impact}%)
                   </Typography>
