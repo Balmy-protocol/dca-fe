@@ -237,14 +237,14 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   },
   okex: {
     chainId: 66,
-    name: 'OKEx',
+    name: 'OKC',
     mainCurrency: '',
     nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
+      name: 'OKT',
+      symbol: 'OKT',
       decimals: 18,
     },
-    rpc: [],
+    rpc: ['https://exchainrpc.okex.org'],
   },
   harmony: {
     chainId: 1666600000,
