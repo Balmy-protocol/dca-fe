@@ -1,7 +1,6 @@
 import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
-import find from 'lodash/find';
 import Button from 'common/button';
 import Typography from '@mui/material/Typography';
 import Modal from 'common/modal';
@@ -22,9 +21,9 @@ import { buildEtherscanTransaction, buildEtherscanAddress } from 'utils/ethersca
 import useWeb3Service from 'hooks/useWeb3Service';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import MinimalTimeline from 'common/minimal-timeline';
-import { NETWORKS, NETWORKS_FOR_MENU } from 'config';
+import { getGhTokenListLogoUrl, NETWORKS } from 'config';
 import TokenIcon from 'common/token-icon';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { toToken } from 'utils/currency';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -78,9 +77,9 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
   const networks = React.useMemo(
     () =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      NETWORKS_FOR_MENU.reduce<Record<number, NetworkStruct>>(
+      Object.keys(NETWORKS).reduce<Record<number, NetworkStruct>>(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        (acc, chainId) => ({ ...acc, [chainId]: find(NETWORKS, { chainId })! }),
+        (acc, chainId) => ({ ...acc, [chainId]: NETWORKS[chainId] }),
         {}
       ),
     []
@@ -178,7 +177,14 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
               ],
               icon:
                 (chainId && networks[chainId] && (
-                  <TokenIcon size="20px" token={emptyTokenWithAddress(networks[chainId].mainCurrency || '')} />
+                  <TokenIcon
+                    size="20px"
+                    token={toToken({
+                      address: networks[chainId].mainCurrency,
+                      chainId,
+                      logoURI: getGhTokenListLogoUrl(chainId, 'logo'),
+                    })}
+                  />
                 )) ||
                 undefined,
             };
