@@ -261,8 +261,8 @@ export default class SdkService {
     this.sdk = buildSDK({
       provider: {
         source: {
-          type: 'ethers',
-          instance: provider,
+          type: 'only-first-provider-that-supports-chain',
+          sources: [{ type: 'ethers', instance: provider }, { type: 'public-rpcs' }],
         },
       },
       quotes: {
