@@ -81,10 +81,7 @@ const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimu
           {!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && (
             <Typography variant="body1" color="#219653" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
               <TokenIcon token={emptyTokenWithAddress('CHECK')} size="28px" />
-              <FormattedMessage
-                description="normalSimulationSuccess"
-                defaultMessage="Transaction will be successfull"
-              />
+              <FormattedMessage description="normalSimulationSuccess" defaultMessage="Transaction will be successful" />
             </Typography>
           )}
         </StyledSimulation>
