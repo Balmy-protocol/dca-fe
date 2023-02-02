@@ -135,7 +135,7 @@ export default class Web3Service {
       this.uniClient
     );
     this.yieldService = new YieldService(this.walletService, this.axiosClient, client);
-    this.sdkService = new SdkService(this.walletService, this.providerService);
+    this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient);
     this.aggregatorService = new AggregatorService(
       this.walletService,
       this.contractService,
