@@ -160,6 +160,35 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 placeholder={intl.formatMessage(
                   defineMessage({ defaultMessage: 'Choose network', description: 'supportedNetworks' })
                 )}
+                renderValue={(selected) => {
+                  if (!SUPPORTED_NETWORKS_DCA.includes(selected)) {
+                    return (
+                      <em>
+                        <FormattedMessage description="supportedNetworks" defaultMessage="Select network" />
+                      </em>
+                    );
+                  }
+
+                  const foundNetwork = find(NETWORKS, { chainId: selected });
+
+                  if (!foundNetwork) {
+                    return null;
+                  }
+
+                  return (
+                    <>
+                      <TokenIcon
+                        size="20px"
+                        token={toToken({
+                          address: foundNetwork?.mainCurrency,
+                          chainId: selected,
+                          logoURI: getGhTokenListLogoUrl(selected, 'logo'),
+                        })}
+                      />
+                      {foundNetwork.name}
+                    </>
+                  );
+                }}
                 size="small"
                 SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
               >
