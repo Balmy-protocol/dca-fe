@@ -306,9 +306,19 @@ const SwapQuote = ({
               <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
                 {`$${parseFloat(quote.buyAmount.amountInUSD.toString()).toFixed(2)}`}
               </Typography>
-              {!isNaN(priceImpact) && isFinite(priceImpact) && priceImpact && (
-                <Typography variant="caption" color={Number(priceImpact) < -5 ? '#EB5757' : 'rgba(255, 255, 255, 0.5)'}>
-                  {`(${priceImpact}%)`}
+              {!isNaN(priceImpact) && isFinite(Number(priceImpact)) && priceImpact && (
+                // eslint-disable-next-line no-nested-ternary
+                <Typography
+                  variant="caption"
+                  color={
+                    Number(priceImpact) < -5
+                      ? '#EB5757'
+                      : Number(priceImpact) > 0
+                      ? '#219653'
+                      : 'rgba(255, 255, 255, 0.5)'
+                  }
+                >
+                  {`(${Number(priceImpact) > 0 ? '+' : ''}${priceImpact}%)`}
                 </Typography>
               )}
             </StyledUsdContainer>
