@@ -10,6 +10,8 @@ import { FormattedMessage } from 'react-intl';
 import TransactionSimulation from 'common/transaction-simulation';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import TokenIcon from 'common/token-icon';
+import { emptyTokenWithAddress } from 'utils/currency';
 
 const StyledTransactionSimulationContainer = styled.div`
   padding: 16px;
@@ -77,7 +79,8 @@ const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimu
             <TransactionSimulation items={transactionSimulation} />
           )}
           {!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && (
-            <Typography variant="body1">
+            <Typography variant="body1" color="#219653" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+              <TokenIcon token={emptyTokenWithAddress('CHECK')} size="28px" />
               <FormattedMessage
                 description="normalSimulationSuccess"
                 defaultMessage="Transaction will be successfull"
