@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import { Token } from 'types';
 import Typography from '@mui/material/Typography';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenButton from 'common/token-button';
 import TokenInput from 'common/token-input';
 import FrequencyInput from 'common/frequency-easy-input';
@@ -15,7 +15,7 @@ import { emptyTokenWithAddress, toToken } from 'utils/currency';
 import { BigNumber } from 'ethers';
 import { find } from 'lodash';
 import TokenIcon from 'common/token-icon';
-import useCurrentNetwork from 'hooks/useSelectedNetwork';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
@@ -157,6 +157,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 fullWidth
                 value={currentNetwork.chainId}
                 onChange={(evt) => onChangeNetwork(Number(evt.target.value))}
+                placeholder={intl.formatMessage(
+                  defineMessage({ defaultMessage: 'Choose network', description: 'supportedNetworks' })
+                )}
                 size="small"
                 SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
               >
