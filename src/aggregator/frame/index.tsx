@@ -1,10 +1,16 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
+import styled from 'styled-components';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { changeMainTab } from 'state/tabs/actions';
 import { useAppDispatch } from 'state/hooks';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import { useIsLoadingAggregatorTokenLists } from 'state/token-lists/hooks';
 import SwapContainer from '../swap-container';
+
+const StyledGrid = styled(Grid)<{ isSmall?: boolean }>`
+  ${({ isSmall }) => isSmall && 'padding-top: 28px !important;'}
+`;
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -12,6 +18,7 @@ interface HomeFrameProps {
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const dispatch = useAppDispatch();
+  const currentBreakPoint = useCurrentBreakpoint();
   const isLoadingLists = useIsLoadingAggregatorTokenLists();
 
   React.useEffect(() => {
@@ -21,13 +28,13 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   return (
     <Grid container spacing={8}>
       {isLoading || isLoadingLists ? (
-        <Grid item xs={12} style={{ display: 'flex' }}>
+        <StyledGrid item xs={12} style={{ display: 'flex' }} isSmall={currentBreakPoint === 'xs'}>
           <CenteredLoadingIndicator size={70} />
-        </Grid>
+        </StyledGrid>
       ) : (
-        <Grid item xs={12} style={{ display: 'flex' }}>
+        <StyledGrid item xs={12} style={{ display: 'flex' }} isSmall={currentBreakPoint === 'xs'}>
           <SwapContainer />
-        </Grid>
+        </StyledGrid>
       )}
     </Grid>
   );

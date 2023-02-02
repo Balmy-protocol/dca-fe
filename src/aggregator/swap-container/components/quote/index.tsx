@@ -68,10 +68,11 @@ const StyledTitleContainer = styled.div`
   align-items: center;
 `;
 
-const StyledTitleDataContainer = styled.div`
+const StyledTitleDataContainer = styled.div<{ $end?: boolean }>`
   display: flex;
   gap: 4px;
   align-items: center;
+  ${({ $end }) => $end && 'flex-wrap: wrap;justify-content: flex-end;'}
 `;
 
 const StyledRouteContainer = styled.div<{ withMessage?: boolean }>`
@@ -224,7 +225,7 @@ const SwapQuote = ({
             )}
           </Typography>
         </StyledTitleDataContainer>
-        <StyledTitleDataContainer>
+        <StyledTitleDataContainer $end>
           {!isApproved && (
             <StatusChip
               label={<FormattedMessage description="needsApproval" defaultMessage="Needs approval" />}

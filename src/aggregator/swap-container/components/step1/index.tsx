@@ -181,11 +181,14 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
 
   let fromValueToUse =
     isBuyOrder && selectedRoute
-      ? (selectedRoute?.sellToken.address === from?.address && selectedRoute.sellAmount.amountInUnits.toString()) || '0'
+      ? (selectedRoute?.sellToken.address === from?.address &&
+          formatUnits(selectedRoute.sellAmount.amount, selectedRoute.sellToken.decimals)) ||
+        '0'
       : fromValue;
   let toValueToUse = isBuyOrder
     ? toValue
-    : (selectedRoute?.buyToken.address === to?.address && selectedRoute?.buyAmount.amountInUnits.toString()) ||
+    : (selectedRoute?.buyToken.address === to?.address &&
+        formatUnits(selectedRoute?.buyAmount.amount || '0', selectedRoute?.buyToken.decimals)) ||
       '0' ||
       '';
 

@@ -71,6 +71,7 @@ const StyledChipsContainer = styled.div`
 
 const StyledChipsGroup = styled.div`
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 10px;

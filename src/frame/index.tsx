@@ -32,6 +32,7 @@ import ErrorBoundary from 'common/error-boundary/indext';
 import useAccount from 'hooks/useAccount';
 import FeedbackCard from 'common/feedback-card';
 import usdSdkChains from 'hooks/useSdkChains';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -56,10 +57,11 @@ interface AppFrameProps {
   initializationError: Error | null;
 }
 
-const StyledGridContainer = styled(Grid)`
+const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  ${({ isSmall }) => isSmall && 'margin-bottom: 40px !important;'}
 `;
 
 const StyledAppGridContainer = styled(Grid)`
@@ -86,6 +88,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
   const account = useAccount();
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
   const aggSupportedNetworks = usdSdkChains();
+  const currentBreakPoint = useCurrentBreakpoint();
 
   const theme = createTheme({
     palette: {
@@ -148,7 +151,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                 <Vector2 />
               </StyledVector2Container>
               <StyledContainer>
-                <StyledGridContainer container direction="row">
+                <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
                   <StyledAppGridContainer item xs={12}>
                     <ErrorBoundary error={initializationError}>
                       <Switch>
