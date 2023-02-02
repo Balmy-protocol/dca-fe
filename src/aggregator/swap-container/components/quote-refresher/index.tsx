@@ -21,10 +21,7 @@ interface QuoteRefresherProps {
   disableRefreshQuotes: boolean;
 }
 
-const TIMER_FOR_RESET = 6000000;
-
-// TODO RE-ENABLE THIS TO 60 FOR LAUNCH
-// const TIMER_FOR_RESET = 60;
+const TIMER_FOR_RESET = 60;
 
 const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
