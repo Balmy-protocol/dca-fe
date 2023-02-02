@@ -239,6 +239,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
 
   const priceImpact =
     selectedRoute &&
+    !!selectedRoute.buyAmount.amountInUSD &&
+    !!selectedRoute.sellAmount.amountInUSD &&
     (
       Math.round(
         ((Number(selectedRoute.buyAmount.amountInUSD) - Number(selectedRoute.sellAmount.amountInUSD)) /

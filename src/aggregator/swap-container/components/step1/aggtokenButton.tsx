@@ -117,7 +117,7 @@ interface TokenInputProps {
   fullWidth?: boolean;
   usdValue?: string;
   onTokenSelect: () => void;
-  impact?: string | null;
+  impact?: string | null | boolean;
 }
 
 const AggregatorTokenInput = ({

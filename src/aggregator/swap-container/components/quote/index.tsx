@@ -199,6 +199,8 @@ const SwapQuote = ({
 
   const priceImpact =
     quote &&
+    !!quote.buyAmount.amountInUSD &&
+    !!quote.sellAmount.amountInUSD &&
     (
       Math.round(
         ((Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) /
@@ -304,7 +306,7 @@ const SwapQuote = ({
               <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
                 {`$${parseFloat(quote.buyAmount.amountInUSD.toString()).toFixed(2)}`}
               </Typography>
-              {!isNaN(priceImpact) && isFinite(priceImpact) && (
+              {!isNaN(priceImpact) && isFinite(priceImpact) && priceImpact && (
                 <Typography variant="caption" color={Number(priceImpact) < -5 ? '#EB5757' : 'rgba(255, 255, 255, 0.5)'}>
                   {`(${priceImpact}%)`}
                 </Typography>
