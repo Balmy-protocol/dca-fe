@@ -235,6 +235,7 @@ const buildApproveTokenItem = ({
                 onApproveExact={(amount) => onAction(transactions, amount)}
                 amount={extraData.amount}
                 token={extraData.token}
+                target={extraData.swapper}
                 tokenYield={null}
                 color="secondary"
               />

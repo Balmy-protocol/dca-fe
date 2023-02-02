@@ -17,7 +17,14 @@ import MULTICALLABI from 'abis/Multicall.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import { LATEST_VERSION, MULTICALL_ADDRESS, NETWORKS, NULL_ADDRESS, PositionVersions } from 'config/constants';
+import {
+  LATEST_VERSION,
+  MULTICALL_ADDRESS,
+  MULTICALL_DEFAULT_ADDRESS,
+  NETWORKS,
+  NULL_ADDRESS,
+  PositionVersions,
+} from 'config/constants';
 import { ERC20Contract, MulticallContract } from 'types/contracts';
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -137,7 +144,7 @@ export default class WalletService {
     );
 
     const multicallInstance = new ethers.Contract(
-      MULTICALL_ADDRESS[currentNetwork.chainId],
+      MULTICALL_ADDRESS[currentNetwork.chainId] || MULTICALL_DEFAULT_ADDRESS,
       MULTICALLABI,
       provider
     ) as unknown as MulticallContract;
@@ -222,7 +229,7 @@ export default class WalletService {
     }));
 
     const multicallInstance = new ethers.Contract(
-      MULTICALL_ADDRESS[currentNetwork.chainId],
+      MULTICALL_ADDRESS[currentNetwork.chainId] || MULTICALL_DEFAULT_ADDRESS,
       MULTICALLABI,
       provider
     ) as unknown as MulticallContract;

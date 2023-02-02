@@ -147,6 +147,7 @@ const SwapContainer = () => {
           transferTo={transferTo}
           slippage={slippage}
           gasSpeed={gasSpeed}
+          disabledDexes={disabledDexes}
           setRefreshQuotes={setRefreshQuotes}
           toggleFromTo={onToggleFromTo}
         />

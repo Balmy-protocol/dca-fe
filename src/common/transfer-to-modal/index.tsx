@@ -156,7 +156,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
             label={
               <FormattedMessage
                 description="transferToValidateCheckboxLabel"
-                defaultMessage="I confirm that the direction above is correct"
+                defaultMessage="I confirm that the address above is correct"
               />
             }
           />

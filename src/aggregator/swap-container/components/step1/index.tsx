@@ -146,6 +146,7 @@ interface SwapFirstStepProps {
   onShowSettings: () => void;
   slippage: string;
   isApproved: boolean;
+  disabledDexes: string[];
   gasSpeed: GasKeys;
   onChangeNetwork: (chainId: number) => void;
 }
@@ -171,6 +172,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     onShowSettings,
     slippage,
     gasSpeed,
+    disabledDexes,
     isApproved,
     onChangeNetwork,
   } = props;
@@ -228,7 +230,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   };
 
   const hasNonDefaultSettings =
-    slippage !== DEFAULT_AGGREGATOR_SETTINGS.slippage.toString() || gasSpeed !== DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
+    slippage !== DEFAULT_AGGREGATOR_SETTINGS.slippage.toString() ||
+    gasSpeed !== DEFAULT_AGGREGATOR_SETTINGS.gasSpeed ||
+    !!disabledDexes.length;
 
   const priceImpact =
     selectedRoute &&

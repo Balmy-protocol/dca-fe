@@ -9,6 +9,7 @@ import { BLOWFISH_ENABLED_CHAINS } from 'config';
 import { FormattedMessage } from 'react-intl';
 import TransactionSimulation from 'common/transaction-simulation';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const StyledTransactionSimulationContainer = styled.div`
   padding: 16px;
@@ -39,13 +40,14 @@ interface QuoteSimulationProps {
 
 const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimulationProps) => {
   const currentNetwork = useSelectedNetwork();
+  const actualCurrentNetwork = useCurrentNetwork();
   const [transactionSimulation, isLoadingTransactionSimulation, transactionSimulationError] = useSimulateTransaction(
     tx,
     currentNetwork.chainId,
-    cantFund || !isApproved
+    cantFund || !isApproved || currentNetwork.chainId !== actualCurrentNetwork.chainId
   );
 
-  if (cantFund || !isApproved || !tx) {
+  if (cantFund || !isApproved || !tx || currentNetwork.chainId !== actualCurrentNetwork.chainId) {
     return null;
   }
 

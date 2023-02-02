@@ -66,7 +66,7 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
   const [setByUser, setSetByUser] = React.useState(false);
   const validator = (nextValue: string) => {
     // sanitize value
-    if (inputRegex.test(nextValue.replace(/[*+?^${}()|[\]\\]/g, '\\$&'))) {
+    if (inputRegex.test(nextValue.replace(/[*+?^${}()|[\]\\]/g, '\\$&')) || !nextValue) {
       onChange(nextValue);
       setSetByUser(true);
     }

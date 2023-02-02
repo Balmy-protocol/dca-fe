@@ -75,6 +75,7 @@ interface SwapProps {
   transferTo: string | null;
   slippage: string;
   gasSpeed: GasKeys;
+  disabledDexes: string[];
   setRefreshQuotes: (refreshQuotes: boolean) => void;
 }
 
@@ -95,6 +96,7 @@ const Swap = ({
   transferTo,
   slippage,
   gasSpeed,
+  disabledDexes,
   setRefreshQuotes,
   toggleFromTo,
 }: SwapProps) => {
@@ -384,6 +386,7 @@ const Swap = ({
       extraData: {
         token: from,
         amount: amountToApprove,
+        swapper: selectedRoute.swapper.name,
       },
     });
 
@@ -613,6 +616,7 @@ const Swap = ({
         <SwapFirstStep
           from={from}
           to={to}
+          disabledDexes={disabledDexes}
           onChangeNetwork={handleChangeNetwork}
           fromValue={fromValueToUse}
           toValue={toValueToUse}

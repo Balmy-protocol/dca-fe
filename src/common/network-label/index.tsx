@@ -104,6 +104,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
   const aggSupportedNetworks = usdSdkChains();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (loadedAsSafeApp) {
       return;
@@ -145,8 +146,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
       aria-haspopup="true"
       color="transparent"
       variant="outlined"
-      onClick={handleClick}
-      style={{ maxWidth: '220px', textTransform: 'none' }}
+      style={{ maxWidth: '220px', textTransform: 'none', cursor: 'default' }}
       endIcon={isOnCorrectNetwork ? null : <Warning />}
     >
       {(NETWORKS_FOR_MENU.includes(network.chainId) || aggSupportedNetworks.includes(network.chainId)) && (

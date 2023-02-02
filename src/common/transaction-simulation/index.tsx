@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import { BlowfishReponseData, BlowfishResponse, StateChangeKind } from 'types';
 import Typography from '@mui/material/Typography';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { toToken } from 'utils/currency';
 import TokenIcon from 'common/token-icon';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 
 const StyledTransactionSimulationsContainer = styled.div`
   display: flex;
@@ -58,6 +59,7 @@ const StyledTransactionSimulationContent = styled.div`
 interface ItemProps {
   isLast: boolean;
   isFirst: boolean;
+  chainId: number;
   humanReadableDiff: string;
   rawInfo: {
     kind: StateChangeKind;
@@ -65,11 +67,11 @@ interface ItemProps {
   };
 }
 
-const buildItem = ({ isLast, isFirst, humanReadableDiff, rawInfo: { data } }: ItemProps) => ({
+const buildItem = ({ isLast, isFirst, chainId, humanReadableDiff, rawInfo: { data } }: ItemProps) => ({
   content: () => {
     const diff = BigNumber.from(data.amount.after).sub(BigNumber.from(data.amount.before));
     const isSubstracting = diff.lte(BigNumber.from(0));
-    const token = emptyTokenWithAddress(data.asset?.address || data.contract?.address || '');
+    const token = toToken({ address: data.asset?.address || data.contract?.address || '', chainId });
     return (
       <>
         <StyledTransactionSimulationIcon isLast={isLast} isFirst={isFirst}>
@@ -102,27 +104,31 @@ const ITEMS_MAP: Record<StateChangeKind, (props: ItemProps) => { content: () => 
   [StateChangeKind.NATIVE_ASSET_TRANSFER]: buildItem,
 };
 
-const TransactionSimulation = ({ items }: TransactionSimulationProps) => (
-  <StyledTransactionSimulationsContainer>
-    <StyledTransactionSimulations>
-      {items.simulationResults.expectedStateChanges.map((simulation, index) => {
-        const isFirst = index === 0;
-        const isLast = index + 1 === items.simulationResults.expectedStateChanges.length;
+const TransactionSimulation = ({ items }: TransactionSimulationProps) => {
+  const selectedNetwork = useSelectedNetwork();
+  return (
+    <StyledTransactionSimulationsContainer>
+      <StyledTransactionSimulations>
+        {items.simulationResults.expectedStateChanges.map((simulation, index) => {
+          const isFirst = index === 0;
+          const isLast = index + 1 === items.simulationResults.expectedStateChanges.length;
 
-        const item = ITEMS_MAP[simulation.rawInfo.kind]({
-          isFirst,
-          isLast,
-          ...simulation,
-        });
+          const item = ITEMS_MAP[simulation.rawInfo.kind]({
+            isFirst,
+            isLast,
+            chainId: selectedNetwork.chainId,
+            ...simulation,
+          });
 
-        return (
-          <StyledTransactionSimulation key={index}>
-            <item.content />
-          </StyledTransactionSimulation>
-        );
-      })}
-    </StyledTransactionSimulations>
-  </StyledTransactionSimulationsContainer>
-);
+          return (
+            <StyledTransactionSimulation key={index}>
+              <item.content />
+            </StyledTransactionSimulation>
+          );
+        })}
+      </StyledTransactionSimulations>
+    </StyledTransactionSimulationsContainer>
+  );
+};
 
 export default TransactionSimulation;

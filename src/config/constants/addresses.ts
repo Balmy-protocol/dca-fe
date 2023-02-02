@@ -532,6 +532,8 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
 };
 
+export const MULTICALL_DEFAULT_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
+
 export const MULTICALL_ADDRESS: Record<number, string> = {
   [NETWORKS.optimism.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.polygon.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
@@ -585,27 +587,33 @@ export const CHAINLINK_GRAPHQL_URL = {
 
 export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';
 
-export const EXPLORER_URL = {
-  [NETWORKS.mainnet.chainId]: 'https://etherscan.io/',
-  [NETWORKS.ropsten.chainId]: 'https://ropsten.etherscan.io/',
-  [NETWORKS.rinkeby.chainId]: 'https://rinkeby.etherscan.io/',
-  [NETWORKS.goerli.chainId]: 'https://goerli.etherscan.io/',
-  [NETWORKS.kovan.chainId]: 'https://kovan.etherscan.io/',
-  [NETWORKS.meanfinance.chainId]: 'https://etherscan.io/',
-  [NETWORKS.bsc.chainId]: 'https://bscscan.com',
-  [NETWORKS.polygon.chainId]: 'https://polygonscan.com/',
-  [NETWORKS.mumbai.chainId]: 'https://mumbai.polygonscan.com/',
-  [NETWORKS.fantom.chainId]: 'https://ftmscan.com/',
-  [NETWORKS.avalanche.chainId]: 'https://cchain.explorer.avax.network/',
-  [NETWORKS.arbitrum.chainId]: 'https://arbiscan.io/',
-  [NETWORKS.heco.chainId]: 'https://scan.hecochain.com/',
-  [NETWORKS.optimism.chainId]: 'https://optimistic.etherscan.io/',
-  [NETWORKS.optimismKovan.chainId]: 'https://kovan-optimistic.etherscan.io/',
-  [NETWORKS.optimismGoerli.chainId]: 'https://goerli-optimistic.etherscan.io/',
-  [NETWORKS.okex.chainId]: 'https://www.oklink.com/okexchain/',
-  [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
-  [NETWORKS.xdai.chainId]: 'https://blockscout.com/xdai/mainnet/',
-};
+export const EXPLORER_URL = Chains.getAllChains().reduce<Record<number, string>>(
+  (acc, network) => ({
+    ...acc,
+    [network.chainId]: network.explorer,
+  }),
+  {
+    [NETWORKS.mainnet.chainId]: 'https://etherscan.io/',
+    [NETWORKS.ropsten.chainId]: 'https://ropsten.etherscan.io/',
+    [NETWORKS.rinkeby.chainId]: 'https://rinkeby.etherscan.io/',
+    [NETWORKS.goerli.chainId]: 'https://goerli.etherscan.io/',
+    [NETWORKS.kovan.chainId]: 'https://kovan.etherscan.io/',
+    [NETWORKS.meanfinance.chainId]: 'https://etherscan.io/',
+    [NETWORKS.bsc.chainId]: 'https://bscscan.com',
+    [NETWORKS.polygon.chainId]: 'https://polygonscan.com/',
+    [NETWORKS.mumbai.chainId]: 'https://mumbai.polygonscan.com/',
+    [NETWORKS.fantom.chainId]: 'https://ftmscan.com/',
+    [NETWORKS.avalanche.chainId]: 'https://cchain.explorer.avax.network/',
+    [NETWORKS.arbitrum.chainId]: 'https://arbiscan.io/',
+    [NETWORKS.heco.chainId]: 'https://scan.hecochain.com/',
+    [NETWORKS.optimism.chainId]: 'https://optimistic.etherscan.io/',
+    [NETWORKS.optimismKovan.chainId]: 'https://kovan-optimistic.etherscan.io/',
+    [NETWORKS.optimismGoerli.chainId]: 'https://goerli-optimistic.etherscan.io/',
+    [NETWORKS.okex.chainId]: 'https://www.oklink.com/okexchain/',
+    [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
+    [NETWORKS.xdai.chainId]: 'https://blockscout.com/xdai/mainnet/',
+  }
+);
 
 export const DEFILLAMA_IDS = {
   [NETWORKS.mainnet.chainId]: 'ethereum',

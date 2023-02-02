@@ -2553,10 +2553,10 @@
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/sdk@0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.11.tgz#cda7520aa5b080588a2752b73cd3a4340f1770a8"
-  integrity sha512-hcCNSnp5PuaR043HV10dnZmF2xTGAB5i22dSQdS8ztyhI++v9o8tRnNSdn6D2skvJvwOXgLzWp5FN9Gk/D4mbw==
+"@mean-finance/sdk@0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.12.tgz#5dcf4f20f37092f33751b9e1f689db1a70fa610a"
+  integrity sha512-UsDxLQz0i6jqZO0lzbf476q5PG7WVu59KJJ9lBjds+A1MX36A32UqsaDfb6FztDR+CFn9f2pzT/Y8/UeLrpAkA==
   dependencies:
     cross-fetch "3.1.5"
     ethers "5.7.2"

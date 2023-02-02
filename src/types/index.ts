@@ -69,6 +69,7 @@ export type TransactionActionType =
 export interface TransactionActionApproveTokenData {
   token: Token;
   amount: BigNumber;
+  swapper: string;
 }
 
 export interface TransactionActionWaitForApprovalData {
