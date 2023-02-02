@@ -100,7 +100,7 @@ export default class PriceService {
         let returnedPrice = BigNumber.from(0);
 
         try {
-          returnedPrice = parseUnits(price.data.coins[`${defillamaId}:${token.address}`].price.toFixed(20), 18);
+          returnedPrice = parseUnits(price.data.coins[`${defillamaId}:${token.address}`].price.toFixed(18), 18);
         } catch (e) {
           console.error('Error parsing price for', tokenAddressToUse, e);
         }
