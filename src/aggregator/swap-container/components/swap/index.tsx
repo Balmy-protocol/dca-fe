@@ -38,6 +38,8 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { setAggregatorChainId } from 'state/aggregator/actions';
 import useMeanApiService from 'hooks/useMeanApiService';
+import { shouldTrackError } from 'utils/errors';
+import useErrorService from 'hooks/useErrorService';
 import { addCustomToken } from 'state/token-lists/actions';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -107,6 +109,7 @@ const Swap = ({
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
+  const errorService = useErrorService();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
@@ -298,6 +301,18 @@ const Swap = ({
 
       onResetForm();
     } catch (e) {
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error swapping', JSON.stringify(e), {
+          swapper: selectedRoute.swapper.id,
+          chainId: currentNetwork.chainId,
+          from: selectedRoute.sellToken.address,
+          to: selectedRoute.buyToken.address,
+          buyAmount: selectedRoute.buyAmount.amountInUnits,
+          sellAmount: selectedRoute.sellAmount.amountInUnits,
+          type: selectedRoute.type,
+        });
+      }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
