@@ -643,7 +643,6 @@ const Swap = ({
           ignoreValues={[]}
           yieldOptions={[]}
           isLoadingYieldOptions={false}
-          otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
           onAddToken={addCustomTokenToList}
         />
         <SwapFirstStep
