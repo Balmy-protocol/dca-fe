@@ -13,6 +13,9 @@ export interface TransactionReceipt {
   logsBloom: string;
   blockHash: string;
   transactionHash: string;
+  gasUsed: string;
+  effectiveGasPrice: string;
+  cumulativeGasUsed: string;
   logs: Array<Log>;
   blockNumber: number;
   confirmations: number;
@@ -56,6 +59,7 @@ export interface SwapTypeData {
   to: string;
   amountFrom: string;
   amountTo: string;
+  balanceBefore: string | null;
 }
 
 export interface WrapTypeData {

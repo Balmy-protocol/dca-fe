@@ -236,6 +236,12 @@ const Swap = ({
         ),
       });
 
+      let balanceBefore: BigNumber | null = null;
+
+      if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
+        balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS);
+      }
+
       const result = await aggregatorService.swap(selectedRoute as SwapOptionWithTx);
 
       try {
@@ -273,6 +279,7 @@ const Swap = ({
           to: toSymbol,
           amountFrom: fromAmount,
           amountTo: toAmount,
+          balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
         },
       });
 
@@ -610,6 +617,8 @@ const Swap = ({
       <StyledPaper variant="outlined" ref={containerRef}>
         <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
         <TransactionConfirmation
+          to={to}
+          from={from}
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
           handleClose={() => setShouldShowConfirmation(false)}
