@@ -164,16 +164,16 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
   },
-  'https://extendedtokens.uniswap.org': {
-    name: 'Uniswap extended',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-  },
+  // 'https://extendedtokens.uniswap.org': {
+  //   name: 'Uniswap extended',
+  //   logoURI: '',
+  //   timestamp: new Date().getTime(),
+  //   tokens: [],
+  //   version: { major: 0, minor: 0, patch: 0 },
+  //   hasLoaded: false,
+  //   requestId: '',
+  //   fetchable: true,
+  // },
   'https://swap.crodex.app/tokens.json': {
     name: 'Cronos',
     logoURI: '',
@@ -302,7 +302,7 @@ export const initialState: TokenListsState = {
     'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
     'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wagyu/src/config/constants/tokenLists/pancake-default.tokenlist.json',
     'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
-    'https://extendedtokens.uniswap.org',
+    // 'https://extendedtokens.uniswap.org',
     'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
     'https://tokens.1inch.io/v1.1/8217',
     'https://tokens.1inch.io/v1.1/1313161554',
@@ -354,26 +354,35 @@ export default createReducer(initialState, (builder) =>
     .addCase(fetchTokenList.fulfilled, (state, { payload, meta: { arg } }) => {
       let tokens = [];
 
-      if (state.byUrl[arg].parser) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        tokens = state.byUrl[arg].parser(payload as unknown as TokensLists);
-      } else {
-        tokens = payload.tokens;
+      try {
+        if (state.byUrl[arg].parser) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          tokens = state.byUrl[arg].parser(payload as unknown as TokensLists);
+        } else {
+          tokens = payload.tokens;
+        }
+
+        const mappedTokens: Token[] = tokens.map<Token>((token) => ({
+          ...token,
+          address: token.address.toLowerCase(),
+          chainId: state.byUrl[arg].chainId || token.chainId,
+        }));
+
+        state.byUrl[arg] = {
+          ...state.byUrl[arg],
+          ...payload,
+          tokens: mappedTokens,
+          hasLoaded: true,
+        };
+      } catch {
+        state.byUrl[arg] = {
+          ...state.byUrl[arg],
+          ...payload,
+          tokens: [],
+          hasLoaded: true,
+        };
       }
-
-      const mappedTokens: Token[] = tokens.map<Token>((token) => ({
-        ...token,
-        address: token.address.toLowerCase(),
-        chainId: state.byUrl[arg].chainId || token.chainId,
-      }));
-
-      state.byUrl[arg] = {
-        ...state.byUrl[arg],
-        ...payload,
-        tokens: mappedTokens,
-        hasLoaded: true,
-      };
     })
     .addCase(fetchGraphTokenList.pending, (state, { meta: { requestId } }) => {
       state.byUrl['Mean Finance Graph Allowed Tokens'] = {

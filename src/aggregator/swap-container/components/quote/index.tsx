@@ -307,10 +307,10 @@ const SwapQuote = ({
                 {`$${parseFloat(quote.buyAmount.amountInUSD.toString()).toFixed(2)}`}
               </Typography>
               {!isNaN(priceImpact) && isFinite(Number(priceImpact)) && priceImpact && (
-                // eslint-disable-next-line no-nested-ternary
                 <Typography
                   variant="caption"
                   color={
+                    // eslint-disable-next-line no-nested-ternary
                     Number(priceImpact) < -5
                       ? '#EB5757'
                       : Number(priceImpact) > 0
