@@ -1,13 +1,15 @@
 /* eslint-disable no-await-in-loop */
-import { BigNumber, Signer } from 'ethers';
+import { BigNumber, Signer, utils } from 'ethers';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import { v4 as uuidv4 } from 'uuid';
 
 // MOCKS
 import { PositionVersions } from 'config/constants';
 import { SwapOption, SwapOptionWithTx, Token } from 'types';
-import { TransactionRequest } from '@ethersproject/providers';
+import { TransactionReceipt, TransactionRequest } from '@ethersproject/providers';
 import { toToken } from 'utils/currency';
+import { Interface } from '@ethersproject/abi';
+import ERC20ABI from 'abis/erc20.json';
 import { getProtocolToken } from 'mocks/tokens';
 import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
 import { GasKeys, SwapSortOptions } from 'config/constants/aggregator';
@@ -304,6 +306,62 @@ export default class AggregatorService {
       type,
       tx,
     };
+  }
+
+  findTransferValue(
+    txReceipt: TransactionReceipt,
+    tokenAddress: string,
+    {
+      from,
+      notFrom,
+      to,
+      notTo,
+    }: {
+      from?: { address: string };
+      notFrom?: { address: string };
+      to?: { address: string };
+      notTo?: { address: string }[];
+    }
+  ) {
+    const logs = this.findLogs(
+      txReceipt,
+      new Interface(ERC20ABI),
+      'Transfer',
+      (log) =>
+        (!from || log.args.from === from.address) &&
+        (!to || log.args.to === to.address) &&
+        (!notFrom || log.args.from !== notFrom.address) &&
+        (!notTo || !notTo.some(({ address }) => address === log.args.to)),
+      tokenAddress
+    );
+    return logs.map((log) => BigNumber.from(log.args.value));
+  }
+
+  findLogs(
+    txReceipt: TransactionReceipt,
+    contractInterface: utils.Interface,
+    eventTopic: string,
+    extraFilter?: (_: utils.LogDescription) => boolean,
+    byAddress?: string
+  ): utils.LogDescription[] {
+    const result: utils.LogDescription[] = [];
+    const { logs } = txReceipt;
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < logs.length; i++) {
+      // eslint-disable-next-line no-plusplus
+      for (let x = 0; x < logs[i].topics.length; x++) {
+        if (
+          (!byAddress || logs[i].address.toLowerCase() === byAddress.toLowerCase()) &&
+          logs[i].topics[x] === contractInterface.getEventTopic(eventTopic)
+        ) {
+          const parsedLog = contractInterface.parseLog(logs[i]);
+          if (!extraFilter || extraFilter(parsedLog)) {
+            result.push(parsedLog);
+          }
+        }
+      }
+    }
+    return result;
   }
 }
 

@@ -39,6 +39,12 @@
       "value": "token"
     }
   ],
+  "+Y16Gv": [
+    {
+      "type": 0,
+      "value": "Poner la direccion del destinatario"
+    }
+  ],
   "+a8ibZ": [
     {
       "type": 1,
@@ -292,7 +298,7 @@
   "0zC9ex": [
     {
       "type": 0,
-      "value": "Simulacion de la transaccion"
+      "value": "Simulado de la transacción"
     }
   ],
   "156xZf": [
@@ -358,7 +364,7 @@
   "27/rlO": [
     {
       "type": 0,
-      "value": "¿Cobran alguna comision?"
+      "value": "¿Cobran alguna comisión?"
     }
   ],
   "2NZFot": [
@@ -446,13 +452,31 @@
   "4ZHdrV": [
     {
       "type": 0,
-      "value": "Encontramos los mejores precios a travez de todo Defi para que vos no lo tengas que hacer. Ahora podes estar seguro que estas recibiendo el mejor precio posible"
+      "value": "Encontramos los mejores precios a través de todo DeFi para que vos no lo tengas que hacer. Ahora podes estar seguro que estas recibiendo el mejor precio posible."
     }
   ],
   "4jGULT": [
     {
       "type": 0,
       "value": "días"
+    }
+  ],
+  "4oJ0MN": [
+    {
+      "type": 0,
+      "value": "Tiene que darle a los Contratos Inteligentes de "
+    },
+    {
+      "type": 1,
+      "value": "target"
+    },
+    {
+      "type": 0,
+      "value": " permiso para usar tus "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
     }
   ],
   "4t/CsS": [
@@ -468,7 +492,7 @@
     },
     {
       "type": 0,
-      "value": " - La transaccion va a ser simulada"
+      "value": " - La transacción va a ser simulada"
     }
   ],
   "5B6pOD": [
@@ -498,7 +522,7 @@
   "5DbBUx": [
     {
       "type": 0,
-      "value": "¿Que es la simulacion de transacciones?"
+      "value": "¿Qué es la simulación de transacciones?"
     }
   ],
   "5H+bme": [
@@ -864,7 +888,7 @@
   "9p6I3v": [
     {
       "type": 0,
-      "value": "Por favor ayudanos a mejorar compartiendo tu feedback en la tab de Feedback, o pingeanos en Discord (https://discord.com/channels/871887207202455584/871887788637839401)"
+      "value": "Por favor ayúdanos a mejorar compartiendo tu feedback en la tab de Feedback, o manda un mensaje en Discord"
     }
   ],
   "9ytfZe": [
@@ -1456,7 +1480,7 @@
   "EgufjG": [
     {
       "type": 0,
-      "value": "Ordenes de compra"
+      "value": "Órdenes de compra"
     }
   ],
   "Eo86hF": [
@@ -1591,6 +1615,18 @@
     {
       "type": 0,
       "value": "Error cerrando posición"
+    }
+  ],
+  "GNIJT2": [
+    {
+      "type": 0,
+      "value": "Elija una red"
+    }
+  ],
+  "GQtu7+": [
+    {
+      "type": 0,
+      "value": "Costo de la transacción:"
     }
   ],
   "GZ31rF": [
@@ -1808,7 +1844,7 @@
   "I1BY0j": [
     {
       "type": 0,
-      "value": "¿Que son las ordenes de compra?"
+      "value": "¿Qué son las órdenes de compra?"
     }
   ],
   "IEFMij": [
@@ -2094,7 +2130,7 @@
   "LFvqJr": [
     {
       "type": 0,
-      "value": "Approve Max "
+      "value": "Aprobar Máximo "
     },
     {
       "type": 1,
@@ -2244,13 +2280,13 @@
   "Mcj/iy": [
     {
       "type": 0,
-      "value": "La transaccion va a ser exitosa"
+      "value": "La transacción va a ser exitosa"
     }
   ],
   "MzzvpH": [
     {
       "type": 0,
-      "value": "Nuevo comercio"
+      "value": "Nuevo intercambio"
     }
   ],
   "N4Okjv": [
@@ -2718,7 +2754,7 @@
     },
     {
       "type": 0,
-      "value": " ahora esta generando retornos"
+      "value": " ahora está generando retornos"
     }
   ],
   "RK1KtY": [
@@ -2790,7 +2826,7 @@
   "S0PtrE": [
     {
       "type": 0,
-      "value": "Necesita aprobacion"
+      "value": "Necesita aprobación"
     }
   ],
   "S2QomY": [
@@ -2926,7 +2962,7 @@
   "U8Gqi0": [
     {
       "type": 0,
-      "value": "A veces queres intercambiar un token y enviarselo a otra direccion. Puede ser molesto ejecutar dos transacciones diferentes."
+      "value": "A veces queres intercambiar un token y enviárselo a otra dirección. Puede ser molesto ejecutar dos transacciones diferentes."
     },
     {
       "type": 1,
@@ -2938,7 +2974,7 @@
     },
     {
       "type": 0,
-      "value": "Con nuestro Meta Aggregator podes hacerlo todo en una sola transaccion!"
+      "value": "Con nuestro Meta Aggregator podes hacerlo todo en una sola transacción en los proveedores soportados."
     }
   ],
   "UCfz8b": [
@@ -3386,7 +3422,7 @@
     },
     {
       "type": 0,
-      "value": " - La transaccion esta siendo simulada"
+      "value": " - La transacción esta siendo simulada"
     }
   ],
   "ZO613Q": [
@@ -3465,6 +3501,12 @@
     {
       "type": 0,
       "value": "cada 1 minuto"
+    }
+  ],
+  "ZuW4JN": [
+    {
+      "type": 0,
+      "value": "La transacción va a ser exitosa"
     }
   ],
   "Zw7FaX": [
@@ -3831,6 +3873,12 @@
       "value": "Está desconectado de la red"
     }
   ],
+  "e0pQqu": [
+    {
+      "type": 0,
+      "value": "Transacción exitosa!"
+    }
+  ],
   "e1vYrA": [
     {
       "type": 0,
@@ -3852,7 +3900,7 @@
   "eI4dm9": [
     {
       "type": 0,
-      "value": "A veces no queres vender tokens, pero queres comprar una cantidad exacta. Por ejemplo, en vez de vender 1000 USDC por ETH, quizas queres comprar 1 ETH con USDC."
+      "value": "Algunas veces no queres vender tokens y queres comprar una cantidad exacta. Por ejemplo: en vez de vender 1000 USDC por ETH, queres comprar 1 ETH con USDC."
     },
     {
       "type": 1,
@@ -3864,7 +3912,7 @@
     },
     {
       "type": 0,
-      "value": "La mayoria de los agregadores no ofrecen esta funcionalidad, asi que nosotros te mostramos los que si la ofrecen, e intentamos estimar una orden de compra en los que no la ofrecen"
+      "value": "La mayoría de los agregadores no ofrecen esta funcionalidad, así que nosotros te mostramos los que si la ofrecen, e intentamos estimar una orden de compra en los que no la ofrecen."
     }
   ],
   "eQUdcX": [
@@ -3945,6 +3993,12 @@
     {
       "type": 0,
       "value": "Enviar comentario"
+    }
+  ],
+  "fatFLN": [
+    {
+      "type": 0,
+      "value": "Confirmo que la dirección anterior es correcta"
     }
   ],
   "fi6uGQ": [
@@ -4058,7 +4112,7 @@
   "gm52Lx": [
     {
       "type": 0,
-      "value": "Probablemente escuchaste sobre varios DEXes o agregadores diciendo que ofrecen el mejor precio. Bueno, ahora podes estar seguro. Vamos a pedirle a todos al mismo tiempo asi vos no tenes que hacerlo, y vas a poder elegir el que mejor se ajuste a tus necesidades"
+      "value": "Probablemente escuchaste sobre varios DEXes o agregadores diciendo que ofrecen el mejor precio. Bueno, ahora podes estar seguro. Vamos a pedirle a todos al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades."
     }
   ],
   "gqaG8I": [
@@ -4094,7 +4148,7 @@
   "hEJQ3q": [
     {
       "type": 0,
-      "value": "¿Que es el Meta Aggregator de Mean Finance?"
+      "value": "¿Qué es el Meta Aggregator de Mean Finance?"
     }
   ],
   "hEvpJE": [
@@ -4112,7 +4166,7 @@
   "hZOkep": [
     {
       "type": 0,
-      "value": "Los aggregadores a veces fallan o te dan menos de lo que dijeron que te iban a dar. Esto es una cagada!"
+      "value": "Los agregadores a veces fallan o dan menos de lo que se comprometieron a dar. Pésima experiencia, ¿verdad?"
     },
     {
       "type": 1,
@@ -4124,7 +4178,7 @@
     },
     {
       "type": 0,
-      "value": "Ahora estas usando el Meta Aggregator de Mean Finance, vamos a simular tu transaccion para que estes seguro que no va a fallar cuando la mandes. Y, al mismo tiempo, te mostraremos como va a cambiar tu balance asi podes estar 100% seguro de lo que vas a recibir!"
+      "value": "Ahora estas usando el Meta Agregador de Mean Finance, vamos a simular tu transacción para que estes seguro que no va a fallar cuando la mandes. Y, al mismo tiempo, te mostraremos como va a cambiar tu balance así podes estar 100% seguro de lo que vas a recibir."
     },
     {
       "type": 1,
@@ -4136,7 +4190,7 @@
     },
     {
       "type": 0,
-      "value": "Mostrar los cambios de balance esta solamente disponibles en:"
+      "value": "Mostrar los cambios en el balance balance está solamente disponibles en:"
     },
     {
       "type": 1,
@@ -4172,7 +4226,7 @@
     },
     {
       "type": 0,
-      "value": "Estaremos agregando mas pronto!"
+      "value": "¡Estaremos agregando más pronto!"
     }
   ],
   "haoCMr": [
@@ -4301,6 +4355,12 @@
       "value": "semana"
     }
   ],
+  "iyoNsc": [
+    {
+      "type": 0,
+      "value": "Elija una red"
+    }
+  ],
   "jJcSKd": [
     {
       "type": 0,
@@ -4356,7 +4416,7 @@
     },
     {
       "type": 0,
-      "value": " ahora esta listo para usarse"
+      "value": " ahora está listo para usarse"
     }
   ],
   "jb9Uav": [
@@ -4564,7 +4624,7 @@
   "mhGi8/": [
     {
       "type": 0,
-      "value": "¿Que es intercambiar y transferir?"
+      "value": "¿Qué es intercambiar y transferir?"
     }
   ],
   "mljOZT": [
@@ -4836,7 +4896,7 @@
   "q0I3lm": [
     {
       "type": 0,
-      "value": "No cobramos ningun tipo de comision. Estas recibiendo exactamente los mismos precios como si hubieses interactuado con el aggregador directamente"
+      "value": "No cobramos ningún tipo de comisión. Estas recibiendo exactamente los mismos precios que si hubieses interactuado con el agregador directamente."
     }
   ],
   "q2gF9r": [
@@ -4860,7 +4920,7 @@
   "qCNGJT": [
     {
       "type": 0,
-      "value": "Simulacion de la transaccion"
+      "value": "Simulación de la transacción"
     }
   ],
   "qCw/BH": [
@@ -4921,6 +4981,12 @@
     {
       "type": 0,
       "value": "Si acaba de crear la posición, espere unos minutos y vuelva a intentarlo"
+    }
+  ],
+  "qTkbKq": [
+    {
+      "type": 0,
+      "value": "Intercambio confirmado"
     }
   ],
   "qaVSQ/": [
@@ -5344,7 +5410,7 @@
   "vHie/I": [
     {
       "type": 0,
-      "value": "Estas teniendo exactamente la misma experience que si hubieses usado el aggregador directamente. No construimos ningun Contrato Inteligente sobre ellos asi que no hay riesgo agregado. Al mismo tiempo, ofrecemos simulacion de transacciones en algunas redes."
+      "value": "Estarás teniendo exactamente la misma experiencia que tendrías al usar el agregador directamente. No construimos ningún contrato inteligente sobre ellos así que no hay riesgo agregado. Al mismo tiempo, ofrecemos simulación de transacciones en algunas redes."
     }
   ],
   "vNNVGj": [
@@ -5390,7 +5456,7 @@
   "vqkOyW": [
     {
       "type": 0,
-      "value": "Most received"
+      "value": "Más recibido"
     }
   ],
   "vw/vGQ": [
@@ -5500,7 +5566,7 @@
   "xRD2R7": [
     {
       "type": 0,
-      "value": "La transaccion va a fallar. Recomendamos elegir otra ruta"
+      "value": "La transacción va a fallar. Recomendamos elegir otra ruta"
     }
   ],
   "xTAANF": [
@@ -5590,7 +5656,7 @@
   "yokaKf": [
     {
       "type": 0,
-      "value": "Estoy teniendo problemas ¿Que puedo hacer?"
+      "value": "Estoy teniendo problemas ¿Qué puedo hacer?"
     }
   ],
   "yuK53B": [

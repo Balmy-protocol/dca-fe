@@ -171,10 +171,6 @@
     "defaultMessage": "Next swap:",
     "description": "positionDetailsNextSwapAtTitle"
   },
-  "3fWv7O": {
-    "defaultMessage": "Transaction succesfull!",
-    "description": "transactionConfirmationSuccess"
-  },
   "3oTxXg": {
     "defaultMessage": "Position Closed",
     "description": "timelineTypeWithdrawn"
@@ -350,10 +346,6 @@
   "9mxRvL": {
     "defaultMessage": "Create a position and start generating yield",
     "description": "generateYield"
-  },
-  "9p6I3v": {
-    "defaultMessage": "Please help us improve by sharing your feedback on the Feedback tab, or pinging us on Discord (https://discord.com/channels/871887207202455584/871887788637839401)",
-    "description": "faqHavingIssuesResponse"
   },
   "9ytfZe": {
     "defaultMessage": "Continue",
@@ -723,6 +715,10 @@
     "defaultMessage": "What are buy orders?",
     "description": "faqWhatIsBuyOrders"
   },
+  "I86dBA": {
+    "defaultMessage": "Transaction cost:",
+    "description": "transactionConfirmationBalanceChangesGasUsed"
+  },
   "IEFMij": {
     "defaultMessage": "You are not connected to this network",
     "description": "networkLabelWarning"
@@ -950,6 +946,10 @@
   "O+yqTs": {
     "defaultMessage": "View in explorer",
     "description": "transactionConfirmationViewExplorer"
+  },
+  "O45uNV": {
+    "defaultMessage": "Please help us improve by sharing your feedback on the Feedback tab, or pinging us on Discord",
+    "description": "faqHavingIssuesResponse"
   },
   "O75EVP": {
     "defaultMessage": "{prefix}{value} {token}",
@@ -1551,6 +1551,10 @@
     "defaultMessage": "You are disconnected from the net",
     "description": "all_network_disconnect"
   },
+  "e0pQqu": {
+    "defaultMessage": "Transaction succesful!",
+    "description": "transactionConfirmationSuccess"
+  },
   "e1vYrA": {
     "defaultMessage": "No yield",
     "description": "noSelectedYieldPlatform"
@@ -2034,6 +2038,10 @@
   "qTiaEE": {
     "defaultMessage": "If you have just created the position, wait a few minutes and try again.",
     "description": "positionNotFoundDescription"
+  },
+  "qTkbKq": {
+    "defaultMessage": "Trade confirmed",
+    "description": "transactionConfirmationBalanceChanges"
   },
   "qaVSQ/": {
     "defaultMessage": "Market price",

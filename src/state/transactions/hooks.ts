@@ -113,6 +113,17 @@ export function useTransactionAdder(): (
   );
 }
 
+export function useTransaction(txHash?: string) {
+  const state = useAppSelector((appState) => appState.transactions);
+  const currentNetwork = useCurrentNetwork();
+
+  if (!txHash) {
+    return null;
+  }
+
+  return state[currentNetwork.chainId][txHash];
+}
+
 // returns all the transactions for the current chain
 export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((appState) => appState.transactions);

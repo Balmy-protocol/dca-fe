@@ -2466,5 +2466,17 @@
   "+Y16Gv": {
     "defaultMessage": "Poner la direccion del destinatario",
     "description": "transferToSwapModalPlaceholder"
+  },
+  "GQtu7+": {
+    "defaultMessage": "Costo de la transacción:",
+    "description": "transactionConfirmationBalanceChangesGasUsed"
+  },
+  "e0pQqu": {
+    "defaultMessage": "Transacción exitosa!",
+    "description": "transactionConfirmationSuccess"
+  },
+  "qTkbKq": {
+    "defaultMessage": "Intercambio confirmado",
+    "description": "transactionConfirmationBalanceChanges"
   }
 }
