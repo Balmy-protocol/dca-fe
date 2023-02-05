@@ -65,4 +65,5 @@ export const TOKEN_BLACKLIST = [
   '0x289ba1701c2f088cf0faf8b3705246331cb8a839', // ARBI - LPT. Disabled due to liquidity decrease
   '0x1dd5629903441b2dd0d03f76ec7673add920e765', // POLY - jEUR. Disabled due to aave not supporting anymore
   '0x5d47baba0d66083c52009271faf3f50dcc01023c', // OP - UNIDEX. Disabled due to liquidity moved to velodrome
+  '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // OP - WTF optimism
 ];
