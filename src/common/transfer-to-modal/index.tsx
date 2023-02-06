@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from 'common/modal';
 import Button from 'common/button';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { useAppDispatch } from 'state/hooks';
@@ -46,6 +46,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   const currentNetwork = useCurrentNetwork();
   const walletService = useWalletService();
   const account = walletService.getAccount();
+  const intl = useIntl();
 
   const validator = (nextValue: string) => {
     // sanitize value
@@ -118,7 +119,12 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
         <TextField
           id="toAddress"
           value={toAddress}
-          placeholder="Set the address to transfer to"
+          placeholder={intl.formatMessage(
+            defineMessage({
+              defaultMessage: 'Set the address to transfer to',
+              description: 'transferToSwapModalPlaceholder',
+            })
+          )}
           autoComplete="off"
           autoCorrect="off"
           error={hasError}

@@ -9,6 +9,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { createStyles, FilledInput, Typography } from '@mui/material';
 import { withStyles, makeStyles } from '@mui/styles';
 import TokenIcon from 'common/token-icon';
+import { FormattedMessage } from 'react-intl';
 
 const StyledTokenInputContainer = styled.div`
   display: flex;
@@ -162,7 +163,7 @@ const AggregatorTokenInput = ({
                 onClick={onTokenSelect}
                 classes={useButtonStyles()}
               >
-                {token ? token.symbol : 'Select'}
+                {token ? token.symbol : <FormattedMessage description="select" defaultMessage="Select" />}
               </StyledButton>
             </StyledSelectorContainer>
             <StyledAmountContainer>

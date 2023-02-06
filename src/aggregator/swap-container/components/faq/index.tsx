@@ -6,12 +6,19 @@ import Typography from '@mui/material/Typography';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import { Link } from '@mui/material';
 
 const StyledFAQContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
   margin-top: 50px;
+`;
+
+const StyledLink = styled(Link)`
+  ${({ theme }) => `
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
 `;
 
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
@@ -160,8 +167,11 @@ const AggregatorFAQ = () => (
         <Typography>
           <FormattedMessage
             description="faqHavingIssuesResponse"
-            defaultMessage="Please help us improve by sharing your feedback on the Feedback tab, or pinging us on Discord (https://discord.com/channels/871887207202455584/871887788637839401)"
+            defaultMessage="Please help us improve by sharing your feedback on the Feedback tab, or pinging us on Discord"
           />
+          <StyledLink href="https://discord.com/channels/871887207202455584/871887788637839401" target="_blank">
+            <FormattedMessage description="here" defaultMessage="here." />
+          </StyledLink>
         </Typography>
       </AccordionDetails>
     </Accordion>
