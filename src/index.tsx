@@ -14,6 +14,7 @@ import { Settings } from 'luxon';
 import LanguageContext from 'common/language-context';
 import { SupportedLanguages } from 'config/constants/lang';
 import MainApp from './frame';
+import './index.css';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
