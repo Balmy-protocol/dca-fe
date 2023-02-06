@@ -23,6 +23,10 @@
     "defaultMessage": "Waiting for your {token} to be approved",
     "description": "waiting for approval"
   },
+  "+Y16Gv": {
+    "defaultMessage": "Set the address to transfer to",
+    "description": "transferToSwapModalPlaceholder"
+  },
   "+a8ibZ": {
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "fiveMinutesPlural"
@@ -194,6 +198,10 @@
   "4jGULT": {
     "defaultMessage": "days",
     "description": "oneDaySubject"
+  },
+  "4oJ0MN": {
+    "defaultMessage": "You must give the {target} smart contracts permission to use your {symbol}",
+    "description": "Allowance Tooltip"
   },
   "4t/CsS": {
     "defaultMessage": "Wrapping",
@@ -639,6 +647,10 @@
     "defaultMessage": "Error terminating position",
     "description": "modalErrorTerminate"
   },
+  "GNIJT2": {
+    "defaultMessage": "Select network",
+    "description": "supportedNetworks"
+  },
   "GZ31rF": {
     "defaultMessage": "Your withdrawal of funds of {fromSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "withdraw from success"
@@ -878,10 +890,6 @@
   "MJey+4": {
     "defaultMessage": "{step} - Submit the transaction approval with your wallet",
     "description": "transationStepApprove"
-  },
-  "Mcj/iy": {
-    "defaultMessage": "Transaction will be successfull",
-    "description": "normalSimulationSuccess"
   },
   "MzzvpH": {
     "defaultMessage": "New trade",
@@ -1395,6 +1403,10 @@
     "defaultMessage": "every 1 minute",
     "description": "oneMinuteAdverb"
   },
+  "ZuW4JN": {
+    "defaultMessage": "Transaction will be successful",
+    "description": "normalSimulationSuccess"
+  },
   "Zw7FaX": {
     "defaultMessage": "You can only deposit with a minimum value of {value} USD",
     "description": "notenoughwhale"
@@ -1519,10 +1531,6 @@
     "defaultMessage": "Your position will be closed here and we will create a new one on",
     "description": "migrate description"
   },
-  "dHuWI1": {
-    "defaultMessage": "You must give the Mean Finance smart contracts permission to use your {symbol}",
-    "description": "Allowance Tooltip"
-  },
   "dINFAP": {
     "defaultMessage": "1 day",
     "description": "oneDaySingularTime"
@@ -1594,6 +1602,10 @@
   "fJcP5V": {
     "defaultMessage": "Submit feedback",
     "description": "feedbackButton"
+  },
+  "fatFLN": {
+    "defaultMessage": "I confirm that the address above is correct",
+    "description": "transferToValidateCheckboxLabel"
   },
   "fi6uGQ": {
     "defaultMessage": "This position does not appear to be indexed yet",
@@ -1723,10 +1735,6 @@
     "defaultMessage": "Sort routes by least gas spent",
     "description": "sortLeastGasHelp"
   },
-  "ibMYRL": {
-    "defaultMessage": "I confirm that the direction above is correct",
-    "description": "transferToValidateCheckboxLabel"
-  },
   "ioNoF4": {
     "defaultMessage": "Change duration and rate",
     "description": "changeDuration title"
@@ -1734,6 +1742,10 @@
   "isJmoe": {
     "defaultMessage": "week",
     "description": "oneWeekSingularSubject"
+  },
+  "iyoNsc": {
+    "defaultMessage": "Choose network",
+    "description": "supportedNetworks"
   },
   "jJcSKd": {
     "defaultMessage": "error while migrating position",
