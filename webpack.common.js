@@ -63,6 +63,21 @@ module.exports = {
         options: { presets: ['@babel/env'] },
       },
       {
+        test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+        use: {
+          loader: 'url-loader',
+          options: {
+            // Limit at 50k. Above that it emits separate files
+            limit: 50000,
+            // url-loader sets mimetype if it's passed.
+            // Without this it derives it from the file extension
+            mimetype: 'application/font-woff',
+            // Output below fonts directory
+            name: 'fonts/[name].[ext]',
+          },
+        },
+      },
+      {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
         loader: 'ts-loader',
@@ -83,18 +98,6 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
-      },
-      {
-        test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'fonts/',
-            },
-          },
-        ],
       },
     ],
   },

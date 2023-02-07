@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
@@ -33,6 +35,22 @@ import useAccount from 'hooks/useAccount';
 import FeedbackCard from 'common/feedback-card';
 import usdSdkChains from 'hooks/useSdkChains';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+
+// FONTS
+// import Lato300EOT from 'lato-v32-latin-300.eot';
+// import Lato300TTF from 'lato-v32-latin-300.ttf';
+// import Lato300WOFF from 'lato-v32-latin-300.woff';
+// import Lato300WOFF2 from 'lato-v32-latin-300.woff2';
+
+// import Lato700EOT from 'lato-v32-latin-700.eot';
+// import Lato700WOFF from 'lato-v32-latin-700.woff';
+// import Lato700TTF from 'lato-v32-latin-700.ttf';
+// import Lato700WOFF2 from 'lato-v32-latin-700.woff2';
+
+// import Lato400EOT from 'lato-v32-latin-regular.eot';
+// import Lato400TTF from 'lato-v32-latin-regular.ttf';
+// import Lato400WOFF from 'lato-v32-latin-regular.woff';
+// import Lato400WOFF2 from 'lato-v32-latin-regular.woff2';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -95,7 +113,50 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
       mode,
     },
     typography: {
-      fontFamily: 'Lato',
+      fontFamily: 'Lato, Roboto, Arial',
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: `
+          @font-face {
+            font-display: swap;
+            font-family: 'Lato';
+            font-style: normal;
+            font-weight: 300;
+            src: url('../fonts/lato-v23-latin-300.eot'); /* IE9 Compat Modes */
+            src: url('../fonts/lato-v23-latin-300.eot?#iefix') format('embedded-opentype'),
+              /* IE6-IE8 */ url('../fonts/lato-v23-latin-300.woff2') format('woff2'),
+              /* Super Modern Browsers */ url('../fonts/lato-v23-latin-300.woff') format('woff'),
+              /* Modern Browsers */ url('../fonts/lato-v23-latin-300.ttf') format('truetype'),
+              /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-300.svg#Lato') format('svg'); /* Legacy iOS */
+          }
+          /* lato-regular - latin */
+          @font-face {
+            font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+            font-family: 'Lato';
+            font-style: normal;
+            font-weight: 400;
+            src: url('../fonts/lato-v23-latin-regular.eot'); /* IE9 Compat Modes */
+            src: url('../fonts/lato-v23-latin-regular.eot?#iefix') format('embedded-opentype'),
+              /* IE6-IE8 */ url('../fonts/lato-v23-latin-regular.woff2') format('woff2'),
+              /* Super Modern Browsers */ url('../fonts/lato-v23-latin-regular.woff') format('woff'),
+              /* Modern Browsers */ url('../fonts/lato-v23-latin-regular.ttf') format('truetype'),
+              /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
+          }
+          /* lato-700 - latin */
+          @font-face {
+            font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+            font-family: 'Lato';
+            font-style: normal;
+            font-weight: 700;
+            src: url('../fonts/lato-v23-latin-700.eot'); /* IE9 Compat Modes */
+            src: url('../fonts/lato-v23-latin-700.eot?#iefix') format('embedded-opentype'),
+              /* IE6-IE8 */ url('../fonts/lato-v23-latin-700.woff2') format('woff2'),
+              /* Super Modern Browsers */ url('../fonts/lato-v23-latin-700.woff') format('woff'),
+              /* Modern Browsers */ url('../fonts/lato-v23-latin-700.ttf') format('truetype'),
+              /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-700.svg#Lato') format('svg'); /* Legacy iOS */
+        `,
+      },
     },
   });
 

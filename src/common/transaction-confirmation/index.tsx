@@ -256,7 +256,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
     }
   }
 
-  const showingBalances = !!gotTo && !!sentFrom && !gasUsed;
+  const showingBalances = !!gotTo && !!sentFrom && !!gasUsed;
 
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
@@ -279,7 +279,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                 defaultMessage="Transaction in progress"
               />
             ) : (
-              <FormattedMessage description="transactionConfirmationSuccess" defaultMessage="Transaction succesful!" />
+              <FormattedMessage description="transactionConfirmationBalanceChanges" defaultMessage="Trade confirmed" />
             )}
           </Typography>
         </StyledTitleContainer>
@@ -319,9 +319,6 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
         </StyledConfirmationContainer>
         {from && to && (sentFrom || gotTo) && (
           <StyledBalanceChangesContainer>
-            <Typography variant="h6">
-              <FormattedMessage description="transactionConfirmationBalanceChanges" defaultMessage="Trade confirmed" />
-            </Typography>
             {sentFrom && from && (
               <StyledBalanceChange>
                 <StyledBalanceChangeToken>
