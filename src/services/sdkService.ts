@@ -171,31 +171,31 @@ class MeanFinanceAPISourceList implements IQuoteSourceList {
         sellToken: quoteSellToken,
         buyToken: quoteBuyToken,
         sellAmount: {
-          amount: BigNumber.from(sellAmountAmount),
-          amountInUnits: sellAmountAmountInUnits,
-          amountInUSD: sellAmountAmountInUsd,
+          amount: sellAmountAmount,
+          amountInUnits: sellAmountAmountInUnits.toString(),
+          amountInUSD: sellAmountAmountInUsd.toString(),
         },
         buyAmount: {
-          amount: BigNumber.from(buyAmountAmount),
-          amountInUnits: buyAmountAmountInUnits,
-          amountInUSD: buyAmountAmountInUsd,
+          amount: buyAmountAmount,
+          amountInUnits: buyAmountAmountInUnits.toString(),
+          amountInUSD: buyAmountAmountInUsd.toString(),
         },
         maxSellAmount: {
-          amount: BigNumber.from(maxSellAmountAmount),
-          amountInUnits: maxSellAmountAmountInUnits,
-          amountInUSD: maxSellAmountAmountInUsd,
+          amount: maxSellAmountAmount,
+          amountInUnits: maxSellAmountAmountInUnits.toString(),
+          amountInUSD: maxSellAmountAmountInUsd.toString(),
         },
         minBuyAmount: {
-          amount: BigNumber.from(minBuyAmountAmount),
-          amountInUnits: minBuyAmountAmountInUnits,
-          amountInUSD: minBuyAmountAmountInUsd,
+          amount: minBuyAmountAmount,
+          amountInUnits: minBuyAmountAmountInUnits.toString(),
+          amountInUSD: minBuyAmountAmountInUsd.toString(),
         },
         gas: {
-          estimatedGas: BigNumber.from(estimatedGas),
-          estimatedCost: BigNumber.from(estimatedCost),
-          estimatedCostInUnits,
+          estimatedGas,
+          estimatedCost,
+          estimatedCostInUnits: estimatedCostInUnits.toString(),
           gasTokenSymbol,
-          estimatedCostInUSD,
+          estimatedCostInUSD: estimatedCostInUSD.toString(),
         },
         recipient: quoteRecipient,
         source: {
@@ -236,20 +236,15 @@ export default class SdkService {
             default: {
               type: 'default',
             },
-            overrides: {
-              uniswap: {
-                type: 'custom',
-                instance: this.ApiSourceList,
+            overrides: [
+              {
+                list: {
+                  type: 'custom',
+                  instance: this.ApiSourceList,
+                },
+                sourceIds: ['uniswap', 'odos', 'firebird'],
               },
-              odos: {
-                type: 'custom',
-                instance: this.ApiSourceList,
-              },
-              firebird: {
-                type: 'custom',
-                instance: this.ApiSourceList,
-              },
-            },
+            ],
           },
         },
       },
@@ -272,20 +267,15 @@ export default class SdkService {
             default: {
               type: 'default',
             },
-            overrides: {
-              uniswap: {
-                type: 'custom',
-                instance: this.ApiSourceList,
+            overrides: [
+              {
+                list: {
+                  type: 'custom',
+                  instance: this.ApiSourceList,
+                },
+                sourceIds: ['uniswap', 'odos', 'firebird'],
               },
-              odos: {
-                type: 'custom',
-                instance: this.ApiSourceList,
-              },
-              firebird: {
-                type: 'custom',
-                instance: this.ApiSourceList,
-              },
-            },
+            ],
           },
         },
       },
@@ -434,7 +424,7 @@ export default class SdkService {
       return this.walletService.getCustomToken(address);
     }
 
-    const tokenResponse = await this.sdk.tokenService.getTokens([{ addresses: [address], chainId }]);
+    const tokenResponse = await this.sdk.tokenService.getTokens({ addresses: [{ addresses: [address], chainId }] });
 
     const token = tokenResponse[chainId][address];
 
