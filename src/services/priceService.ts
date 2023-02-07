@@ -122,7 +122,7 @@ export default class PriceService {
       return {};
     }
     const expectedResults: Promise<AxiosResponse<{ coins: Record<string, { price: number }> }>>[] = dates.map((date) =>
-      this.axiosClient.post<{ coins: Record<string, { price: number }> }>(
+      this.axiosClient.get<{ coins: Record<string, { price: number }> }>(
         date
           ? `https://coins.llama.fi/prices/historical/${parseInt(
               date,
