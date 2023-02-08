@@ -36,7 +36,7 @@ export const POSITIONS_VERSIONS: PositionVersions[] = [
 
 export const TOKEN_TYPE_BASE = 'BASE';
 export const TOKEN_TYPE_WRAPPED = 'WRAPPED_PROTOCOL_TOKEN';
-export const TOKEN_TYPE_YIELD_BEARING_SHARES = 'YIELD_BEARING_SHARES';
+export const TOKEN_TYPE_YIELD_BEARING_SHARES = 'YIELD_BEARING_SHARE';
 
 export const INDEX_TO_SPAN = [24, 42, 30];
 
