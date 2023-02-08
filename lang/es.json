@@ -2494,5 +2494,69 @@
   "naFo7E": {
     "defaultMessage": "días",
     "description": "days"
+  },
+  "2iKKX6": {
+    "defaultMessage": "Retirar y cerrar posición",
+    "description": "terminate position"
+  },
+  "6VIxBc": {
+    "defaultMessage": "El próximo intercambio para esta posicion sera ejecutado",
+    "description": "nextSwapCreate"
+  },
+  "AqqLuk": {
+    "defaultMessage": "Total depositado:",
+    "description": "jmxnUserCompTotalDeposited"
+  },
+  "CdFs0C": {
+    "defaultMessage": "Los intercambios ya no se van a ejecutar, no vas a poder hacer modificaciones a esta posicion y el NFT se quemará.",
+    "description": "terminate description"
+  },
+  "FMbBaD": {
+    "defaultMessage": "Invirtiendo en:",
+    "description": "jmxnUserCompInvestingIn"
+  },
+  "Gcz9a9": {
+    "defaultMessage": "Competencia de jMXN",
+    "description": "jmxnUserCompTitle"
+  },
+  "NcWBc1": {
+    "defaultMessage": "Empeza a invertir con jMXN y gana premios increibles!",
+    "description": "jmxnUserCompTitleDesc"
+  },
+  "O22yuw": {
+    "defaultMessage": "{yield} {frequency} para ti por",
+    "description": "rate detail"
+  },
+  "RWQPRO": {
+    "defaultMessage": "Total ganado:",
+    "description": "total earned"
+  },
+  "VBCnJk": {
+    "defaultMessage": "Posiciones:",
+    "description": "jmxnUserCompPositions"
+  },
+  "VZcHUA": {
+    "defaultMessage": "Ver posiciones",
+    "description": "jmxnUserCompViewPositions"
+  },
+  "YhPAsu": {
+    "defaultMessage": "Total ganado:",
+    "description": "jmxnUserCompTotalEarned"
+  },
+  "bBX0k1": {
+    "defaultMessage": "Ganado por token:",
+    "description": "jmxnUserCompEarnedInToken"
+  },
+  "pH36vJ": {
+    "defaultMessage": "Crea una posición y empeza a competir",
+    "description": "jmxnUserCompTitleCallToAction"
+  },
+  "uHCFsv": {
+    "defaultMessage": "aproximadamente {nextSwapAvailableAt}.",
+    "description": "nextSwapCreateTime"
+  },
+  "znN7fQ": {
+    "defaultMessage": "Nunca ejecutado",
+    "description": "history never run for in position"
   }
 }

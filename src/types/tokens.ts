@@ -1,6 +1,6 @@
 type TokenTypeBase = 'BASE';
 type TokenTypeWrapped = 'WRAPPED_PROTOCOL_TOKEN';
-type TokenTypeYieldBearingShares = 'YIELD_BEARING_SHARES';
+type TokenTypeYieldBearingShares = 'YIELD_BEARING_SHARE';
 
 export type TokenType = TokenTypeBase | TokenTypeWrapped | TokenTypeYieldBearingShares;
 

@@ -163,6 +163,10 @@
     "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}.",
     "description": "Approve signature companion text"
   },
+  "2iKKX6": {
+    "defaultMessage": "Withdraw and close position",
+    "description": "terminate position"
+  },
   "2l6dgp": {
     "defaultMessage": "View on explorer",
     "description": "view on etherscan"
@@ -174,6 +178,10 @@
   "3oTxXg": {
     "defaultMessage": "Position Closed",
     "description": "timelineTypeWithdrawn"
+  },
+  "3sYjkn": {
+    "defaultMessage": "You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to add funds to this position.",
+    "description": "disabledByUsdValueModify"
   },
   "4/vG7I": {
     "defaultMessage": "Transfer a position",
@@ -258,6 +266,10 @@
   "6Mir2W": {
     "defaultMessage": "Balance: {balance}",
     "description": "in wallet"
+  },
+  "6VIxBc": {
+    "defaultMessage": "Next swap for this position will be executed",
+    "description": "nextSwapCreate"
   },
   "6lcY/P": {
     "defaultMessage": "When will my position be swapped?",
@@ -391,6 +403,10 @@
     "defaultMessage": "Total value",
     "description": "generatedDashboard"
   },
+  "AqqLuk": {
+    "defaultMessage": "Total deposited:",
+    "description": "jmxnUserCompTotalDeposited"
+  },
   "AzL+qV": {
     "defaultMessage": "Discard changes",
     "description": "discard changes"
@@ -482,6 +498,10 @@
   "CZmJ1O": {
     "defaultMessage": "Modify position",
     "description": "modifyPosition"
+  },
+  "CdFs0C": {
+    "defaultMessage": "Swaps are no longer going to be executed, you won't be able to make any new modifications to this position and the NFT will be burned.",
+    "description": "terminate description"
   },
   "CioUeM": {
     "defaultMessage": "One or both of the tokens in this position allow generating yield while your positions gets swapped. We suggest creating a new position so it starts generating yield for you. If you agree, we will send you to the create page with the same tokens specified in your position.",
@@ -595,6 +615,10 @@
     "defaultMessage": "Gas saved",
     "description": "gasSavedGraphTitle"
   },
+  "FMbBaD": {
+    "defaultMessage": "Investing in:",
+    "description": "jmxnUserCompInvestingIn"
+  },
   "FW4Fp5": {
     "defaultMessage": "Get {protocolToken} as {wrappedProtocolToken} instead",
     "description": "Terminate get weth"
@@ -650,6 +674,10 @@
   "GZNskB": {
     "defaultMessage": "1 day (1 swap)",
     "description": "oneDaySingular"
+  },
+  "Gcz9a9": {
+    "defaultMessage": "jMXN Competition",
+    "description": "jmxnUserCompTitle"
   },
   "Gg22iu": {
     "defaultMessage": "Create {from}:{to} pair",
@@ -915,6 +943,10 @@
     "defaultMessage": "Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "success creating position"
   },
+  "NcWBc1": {
+    "defaultMessage": "Start investing with JMXN and win amazing prices!",
+    "description": "jmxnUserCompTitleDesc"
+  },
   "Nd61ag": {
     "defaultMessage": "This allows the address to close your position",
     "description": "terminate permission helptext"
@@ -946,6 +978,10 @@
   "O+yqTs": {
     "defaultMessage": "View in explorer",
     "description": "transactionConfirmationViewExplorer"
+  },
+  "O22yuw": {
+    "defaultMessage": "{yield} {frequency} for you for",
+    "description": "rate detail"
   },
   "O45uNV": {
     "defaultMessage": "Please help us improve by sharing your feedback on the Feedback tab, or pinging us on Discord",
@@ -1075,13 +1111,13 @@
     "defaultMessage": "{readable}",
     "description": "oneMinutePluralTime"
   },
+  "RWQPRO": {
+    "defaultMessage": "Total earned:",
+    "description": "total earned"
+  },
   "RXcwxI": {
     "defaultMessage": "Mean Finance relies on on-chain oracles to determine the price at the moment of the swap. Right now Mean Finance uses",
     "description": "faqHowIsThePriceCalculatedForEachSwapResponseFirst"
-  },
-  "RY4HmH": {
-    "defaultMessage": "Close position",
-    "description": "terminate position"
   },
   "RcB3pW": {
     "defaultMessage": "Approving use of {from} has been succesfully submitted to the blockchain and will be confirmed soon",
@@ -1203,6 +1239,14 @@
     "defaultMessage": "Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period while neutralizing the short-term volatility in the market.{br}The purchases occur regardless of the asset's price and at regular intervals. In effect, this strategy removes much of the detailed work of attempting to time the market in order to make purchases of assets at the best prices.",
     "description": "whatIsDcaAnswer"
   },
+  "VBCnJk": {
+    "defaultMessage": "Positions:",
+    "description": "jmxnUserCompPositions"
+  },
+  "VZcHUA": {
+    "defaultMessage": "View positons",
+    "description": "jmxnUserCompViewPositions"
+  },
   "VaWvMp": {
     "defaultMessage": "Selected route:",
     "description": "quoteDataSelectedRoute"
@@ -1323,6 +1367,10 @@
     "defaultMessage": "Withdraw",
     "description": "Withdraw"
   },
+  "YhPAsu": {
+    "defaultMessage": "Total earned:",
+    "description": "jmxnUserCompTotalEarned"
+  },
   "YhkTRN": {
     "defaultMessage": "CLOSED",
     "description": "finishedPosition"
@@ -1395,10 +1443,6 @@
     "defaultMessage": "Close {from}:{to} position",
     "description": "transactionDetailsTerminate"
   },
-  "ZaT+DW": {
-    "defaultMessage": "{yield}{frequency} for you for",
-    "description": "rate detail"
-  },
   "Zsuz+g": {
     "defaultMessage": "every 1 minute",
     "description": "oneMinuteAdverb"
@@ -1418,10 +1462,6 @@
   "a+Yvwn": {
     "defaultMessage": "Modifying their position",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart3"
-  },
-  "aBc6K3": {
-    "defaultMessage": "Swaps are no longer going to be executed, you won't be able to make any new modifications to this position.",
-    "description": "terminate description"
   },
   "aEQUw9": {
     "defaultMessage": "fees section.",
@@ -1462,6 +1502,10 @@
   "b9AGHu": {
     "defaultMessage": "Back",
     "description": "goBack"
+  },
+  "bBX0k1": {
+    "defaultMessage": "Earned by token:",
+    "description": "jmxnUserCompEarnedInToken"
   },
   "bCOphI": {
     "defaultMessage": "swaps",
@@ -1550,10 +1594,6 @@
   "di6jKR": {
     "defaultMessage": "You are disconnected from the net",
     "description": "all_network_disconnect"
-  },
-  "e0pQqu": {
-    "defaultMessage": "Transaction succesful!",
-    "description": "transactionConfirmationSuccess"
   },
   "e1vYrA": {
     "defaultMessage": "No yield",
@@ -1851,10 +1891,6 @@
     "defaultMessage": "Create position for {from}/{to}",
     "description": "First deposit"
   },
-  "lY6Jyd": {
-    "defaultMessage": "Next swap for this position will be executed.",
-    "description": "nextSwapCreate"
-  },
   "lltepo": {
     "defaultMessage": "STALE",
     "description": "stale"
@@ -1975,6 +2011,10 @@
     "defaultMessage": "You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to enable this option.",
     "description": "disabledByUsdValue"
   },
+  "pH36vJ": {
+    "defaultMessage": "Create position and start competing",
+    "description": "jmxnUserCompTitleCallToAction"
+  },
   "pMZxIC": {
     "defaultMessage": "DONE",
     "description": "donePositions"
@@ -2003,6 +2043,10 @@
     "defaultMessage": "So it could happen that your swap is not executed within your specified frequency. If this were to happen to your position, remember that fees are only charged on swaps, so your balance will remain unaffected.",
     "description": "faqWhyIsMyPositionStaleResponsePart5"
   },
+  "pwNot7": {
+    "defaultMessage": "None of the tokens you have selected support yield platforms.",
+    "description": "disabledByNoOption"
+  },
   "q0I3lm": {
     "defaultMessage": "We don't take any fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly",
     "description": "faqFeesResponse"
@@ -2010,10 +2054,6 @@
   "q7gy3F": {
     "defaultMessage": "View on chain explorer",
     "description": "view on chain explorer"
-  },
-  "pwNot7": {
-    "defaultMessage": "None of the tokens you have selected support yield platforms.",
-    "description": "disabledByNoOption"
   },
   "qC950V": {
     "defaultMessage": "Mean Finance will allow you to perform DCA, in a gasless and decentralized fashion. This means:",
@@ -2199,6 +2239,10 @@
     "defaultMessage": "Unwrap",
     "description": "unwrap agg"
   },
+  "uHCFsv": {
+    "defaultMessage": "approximately {nextSwapAvailableAt}.",
+    "description": "nextSwapCreateTime"
+  },
   "uRlu53": {
     "defaultMessage": "{step} - The token approval is being confirmed",
     "description": "transationStepWaitApprove"
@@ -2207,21 +2251,17 @@
     "defaultMessage": "How can we improve it?",
     "description": "feedbackInput"
   },
-  "v/LxnW": {
-    "defaultMessage": "aproximately {nextSwapAvailableAt}.",
-    "description": "nextSwapCreateTime"
-  },
   "v1SP5g": {
     "defaultMessage": "4 hours",
     "description": "fourHoursSingularSubject"
   },
-  "vHie/I": {
-    "defaultMessage": "You are having exactly the same experience as if you would have used the different aggregators directly. We haven't built any smart contracts on top of theirs, so there is no added risk. At the same time, we offer transaction simulations on some networks.",
-    "description": "faqIsSafeResponse"
-  },
   "v1SUII": {
     "defaultMessage": "minutes",
     "description": "minutes"
+  },
+  "vHie/I": {
+    "defaultMessage": "You are having exactly the same experience as if you would have used the different aggregators directly. We haven't built any smart contracts on top of theirs, so there is no added risk. At the same time, we offer transaction simulations on some networks.",
+    "description": "faqIsSafeResponse"
   },
   "vNNVGj": {
     "defaultMessage": "For example, let’s assume that you’ve created a position that swaps 2000 USDC for ETH each day. Let’s also assume that, when the swap is executed, 2000 USDC = 1 ETH. Instead of getting 1 ETH, you would be getting 1 ETH - 0.6% = 0.994 ETH. That 0.6% will be split between Mean Finance and the user who actually executed the swap.",
@@ -2402,6 +2442,10 @@
   "zlapVJ": {
     "defaultMessage": "Transaction cost:",
     "description": "quoteDataFee"
+  },
+  "znN7fQ": {
+    "defaultMessage": "Never executed",
+    "description": "history never run for in position"
   },
   "zpPKoQ": {
     "defaultMessage": "Withdraw",
