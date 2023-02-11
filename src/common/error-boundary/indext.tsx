@@ -118,7 +118,39 @@ class ErrorBoundary extends Component<Props, State> {
     } = this.props;
 
     const actuallyHasError = hasError || hasErrorProp || !!error;
+
     if (actuallyHasError) {
+      const location = window.location.pathname;
+      let errorAction = 'Other';
+      const swapPageRegex = /swap(?:\/(\w*))?(?:\/(\w*))?(?:\/(\w*))?/;
+      const createPageRegex = /create(?:\/(\w*))?(?:\/(\w*))?(?:\/(\w*))?/;
+      const positionPageRegex = /(\d+)\/positions\/(\d+)\/(\d+)/;
+
+      if (location.startsWith('/swap')) {
+        errorAction = 'Aggregator page';
+        const params = swapPageRegex.exec(location) || [];
+        const chainId = params[1];
+        const from = params[2];
+        const to = params[3];
+
+        errorAction = `${errorAction} - ${chainId} - ${from} - ${to}`;
+      }
+      if (location.startsWith('/create')) {
+        errorAction = 'Create page';
+        const params = createPageRegex.exec(location) || [];
+
+        const chainId = params[1];
+        const from = params[2];
+        const to = params[3];
+
+        errorAction = `${errorAction} - ${chainId} - ${from} - ${to}`;
+      }
+      if (location.startsWith('/positions')) {
+        errorAction = 'Positions list page';
+      }
+      if (positionPageRegex.test(location)) {
+        errorAction = 'Positions details page';
+      }
       const errorMessageToShow = errorMessage || errorMessageProp || (error && error.message);
       const errorNameToShow = errorName || errorNameProp || (error && error.name) || 'Unkown Error';
       const errorStackToShow =
@@ -164,6 +196,7 @@ class ErrorBoundary extends Component<Props, State> {
             onClick={() =>
               this.copyTextToClipboard(
                 `\`\`\`${JSON.stringify({
+                  errorAction,
                   errorName: errorNameToShow,
                   errorMessage: errorMessageToShow,
                   errorStackTrace: errorStackToShow,
