@@ -240,6 +240,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
       sentFrom = BigNumber.from(balanceBefore).sub(balanceAfter.add(gasUsed));
     }
     if (to.address !== PROTOCOL_TOKEN_ADDRESS) {
+      const { transferTo } = transactionReceipt.typeData as SwapTypeData;
       gotTo =
         aggregatorService.findTransferValue(
           {
@@ -249,7 +250,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
             effectiveGasPrice: BigNumber.from(transactionReceipt.receipt.effectiveGasPrice),
           },
           to.address || '',
-          { to: { address: walletService.getAccount() } }
+          { to: { address: transferTo || walletService.getAccount() } }
         )[0] || null;
     } else if (balanceAfter && balanceBefore) {
       gotTo = balanceAfter.sub(BigNumber.from(balanceBefore)).add(gasUsed);

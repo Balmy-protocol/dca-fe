@@ -6,6 +6,7 @@ export type SwapOption = {
   id: string;
   sellToken: Token;
   buyToken: Token;
+  transferTo?: string | null;
   sellAmount: {
     amount: BigNumber;
     amountInUnits: string;

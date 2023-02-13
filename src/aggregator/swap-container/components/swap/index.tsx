@@ -281,6 +281,7 @@ const Swap = ({
           amountFrom: fromAmount,
           amountTo: toAmount,
           balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
+          transferTo,
         },
       });
 

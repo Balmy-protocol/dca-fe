@@ -60,6 +60,7 @@ export interface SwapTypeData {
   amountFrom: string;
   amountTo: string;
   balanceBefore: string | null;
+  transferTo?: string | null;
 }
 
 export interface WrapTypeData {
