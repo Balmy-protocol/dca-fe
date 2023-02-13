@@ -143,6 +143,19 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
               /* Modern Browsers */ url('../fonts/lato-v23-latin-regular.ttf') format('truetype'),
               /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
           }
+          /* lato-regular - 500 - latin */
+          @font-face {
+            font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+            font-family: 'Lato';
+            font-style: normal;
+            font-weight: 500;
+            src: url('../fonts/lato-v23-latin-regular.eot'); /* IE9 Compat Modes */
+            src: url('../fonts/lato-v23-latin-regular.eot?#iefix') format('embedded-opentype'),
+              /* IE6-IE8 */ url('../fonts/lato-v23-latin-regular.woff2') format('woff2'),
+              /* Super Modern Browsers */ url('../fonts/lato-v23-latin-regular.woff') format('woff'),
+              /* Modern Browsers */ url('../fonts/lato-v23-latin-regular.ttf') format('truetype'),
+              /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
+          }
           /* lato-700 - latin */
           @font-face {
             font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
