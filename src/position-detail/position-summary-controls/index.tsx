@@ -201,7 +201,7 @@ const PositionSummaryControls = ({
             disabled={isPending || disabled}
             style={{ color: '#FF5359' }}
           >
-            <FormattedMessage description="terminate position" defaultMessage="Close position" />
+            <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
           </MenuItem>
         </StyledMenu>
       </PositionControlsMenuContainer>

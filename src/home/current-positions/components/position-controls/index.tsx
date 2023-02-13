@@ -250,7 +250,7 @@ const PositionControls = ({
             disabled={disabled || !isOnNetwork}
             style={{ color: '#FF5359' }}
           >
-            <FormattedMessage description="terminate position" defaultMessage="Close position" />
+            <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
           </MenuItem>
         </StyledMenu>
       </>
