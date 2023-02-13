@@ -96,8 +96,7 @@ const StyledUsdContainer = styled.div`
 `;
 
 const typographyStyles = {
-  fontFamily: 'Lato',
-  fontWeight: '500',
+  fontWeight: '400',
   fontSize: '1.25rem',
   lineHeight: '1.6',
 };
