@@ -147,7 +147,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
   }, [position, isLoadingPrices]);
 
   const noData = prices.length === 0;
-  const hasActions = position.history.length !== 0;
+  const hasActions = position.history.filter((action) => action.action === POSITION_ACTIONS.SWAPPED).length !== 0;
 
   const mappedPrices = prices
     .reduce<Prices>(
