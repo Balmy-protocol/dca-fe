@@ -69,11 +69,12 @@ class MeanFinanceAPISourceList implements IQuoteSourceList {
   }
 
   supportedSources(): Record<SourceId, SourceMetadata> {
-    const { uniswap, odos, firebird } = SOURCES_METADATA;
+    const { uniswap, odos, firebird, rango } = SOURCES_METADATA;
     return {
       uniswap,
       odos,
       firebird,
+      rango,
     };
   }
 
@@ -242,7 +243,7 @@ export default class SdkService {
                   type: 'custom',
                   instance: this.ApiSourceList,
                 },
-                sourceIds: ['uniswap', 'odos', 'firebird'],
+                sourceIds: ['uniswap', 'odos', 'firebird', 'rango'],
               },
             ],
           },
@@ -273,7 +274,7 @@ export default class SdkService {
                   type: 'custom',
                   instance: this.ApiSourceList,
                 },
-                sourceIds: ['uniswap', 'odos', 'firebird'],
+                sourceIds: ['uniswap', 'odos', 'firebird', 'rango'],
               },
             ],
           },
