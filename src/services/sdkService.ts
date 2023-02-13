@@ -121,6 +121,8 @@ class MeanFinanceAPISourceList implements IQuoteSourceList {
     }
     if (quoteTimeout) {
       url += `&quoteTimeout=${quoteTimeout}`;
+    } else {
+      url += `&quoteTimeout=5s`;
     }
     if (txValidFor) {
       url += `&txValidFor=${txValidFor}`;
