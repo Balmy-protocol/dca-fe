@@ -66,4 +66,12 @@ export const TOKEN_BLACKLIST = [
   '0x1dd5629903441b2dd0d03f76ec7673add920e765', // POLY - jEUR. Disabled due to aave not supporting anymore
   '0x5d47baba0d66083c52009271faf3f50dcc01023c', // OP - UNIDEX. Disabled due to liquidity moved to velodrome
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // OP - WTF optimism
+  // TODO: Remove this once we check beefy works correctly
+  '0x1a55d9164417856ad31df3705bbc263c380e56b1', // ARBI - GNS Beefy wrapper
+  '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03', // ARBI - GMX Beefy wrapper
+  '0xf0cbbfad265a0e7c7e4fd2e1e6027a8dfa25676b', // OP - WBTC Beefy wrapper
+  '0x72b25ce2f946c95a2194f5ac3322443d0057bc94', // OP - DAI Beefy wrapper
+  '0x185d3a08140efaeb3c6bf173e751afb0bcb0d0c6', // OP - USDC Beefy wrapper
+  '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12', // POLY - GNS optimism Beefy wrapper
+  '0xaab6af05e12faae0a5d9597c79588846f0df15b8', // POLY - MVX optimism Beefy wrapper
 ];

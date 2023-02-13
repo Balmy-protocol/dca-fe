@@ -143,6 +143,20 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
       },
+      // {
+      //   id: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
+      //   tokenAddress: '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12', // beefy GNS
+      //   poolId: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
+      //   name: 'Beefy',
+      //   token: emptyTokenWithAddress('BEEFY'),
+      // },
+      // {
+      //   id: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // beefy MVX TODO: MISSING IN DEFILLAMA
+      //   tokenAddress: '0xaab6af05e12faae0a5d9597c79588846f0df15b8', // beefy MVX
+      //   poolId: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // beefy MVX
+      //   name: 'Beefy',
+      //   token: emptyTokenWithAddress('AAVE'),
+      // },
     ],
     [NETWORKS.optimism.chainId]: [
       {
@@ -201,6 +215,27 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
       },
+      // {
+      //   id: 'e5f45aa7-437e-4c35-8beb-9012bab859c5', // beefy WBTC
+      //   tokenAddress: '0xf0cbbfad265a0e7c7e4fd2e1e6027a8dfa25676b', // beefy WBTC
+      //   poolId: 'e5f45aa7-437e-4c35-8beb-9012bab859c5', // beefy WBTC
+      //   name: 'Beefy',
+      //   token: emptyTokenWithAddress('BEEFY'),
+      // },
+      // {
+      //   id: '248c7b16-a0dc-46a6-a0c0-5d38017e2f86', // beefy DAI
+      //   tokenAddress: '0x72b25ce2f946c95a2194f5ac3322443d0057bc94', // beefy DAI
+      //   poolId: '248c7b16-a0dc-46a6-a0c0-5d38017e2f86', // beefy DAI
+      //   name: 'Beefy',
+      //   token: emptyTokenWithAddress('BEEFY'),
+      // },
+      // {
+      //   id: '09a8f967-f675-4bd2-a3e8-98b43fe20382', // beefy USDC
+      //   tokenAddress: '0x185d3a08140efaeb3c6bf173e751afb0bcb0d0c6', // beefy USDC
+      //   poolId: '09a8f967-f675-4bd2-a3e8-98b43fe20382', // beefy USDC
+      //   name: 'Beefy',
+      //   token: emptyTokenWithAddress('BEEFY'),
+      // },
     ],
     [NETWORKS.arbitrum.chainId]: [
       {
@@ -245,6 +280,20 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
       },
+      // {
+      //   id: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
+      //   tokenAddress: '0x1a55d9164417856ad31df3705bbc263c380e56b1', // beefy GNS
+      //   poolId: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
+      //   name: 'Beefy',
+      //   token: emptyTokenWithAddress('BEEFY'),
+      // },
+      // {
+      //   id: '3a6cc030-738d-4e19-8a40-e63e9c4d5a6f', // beefy GMX TODO: MISSING IN DEFILLAMA
+      //   tokenAddress: '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03', // beefy GMX
+      //   poolId: '3a6cc030-738d-4e19-8a40-e63e9c4d5a6f', // beefy GMX
+      //   name: 'Beefy',
+      //   token: emptyTokenWithAddress('BEEFY'),
+      // },
     ],
     [NETWORKS.mainnet.chainId]: [
       {
