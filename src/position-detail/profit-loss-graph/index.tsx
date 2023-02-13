@@ -308,7 +308,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   }, [position, isLoadingPrices]);
 
   const noData = prices.length === 0;
-  const hasActions = position.history.length !== 0;
+  const hasActions = position.history.filter((action) => SWAPPED_ACTIONS.includes(action.action)).length !== 0;
 
   const mappedPrices = prices.map((price) => {
     const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);
