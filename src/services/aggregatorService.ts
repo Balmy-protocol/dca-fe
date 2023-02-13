@@ -10,6 +10,7 @@ import { TransactionReceipt, TransactionRequest } from '@ethersproject/providers
 import { toToken } from 'utils/currency';
 import { Interface } from '@ethersproject/abi';
 import ERC20ABI from 'abis/erc20.json';
+import WRAPPEDABI from 'abis/weth.json';
 import { getProtocolToken } from 'mocks/tokens';
 import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
 import { GasKeys, SwapSortOptions } from 'config/constants/aggregator';
@@ -155,6 +156,7 @@ export default class AggregatorService {
         tx,
       }) => ({
         id: uuidv4(),
+        transferTo,
         sellToken,
         buyToken,
         sellAmount: {
@@ -270,6 +272,7 @@ export default class AggregatorService {
       id: uuidv4(),
       sellToken,
       buyToken,
+      transferTo,
       sellAmount: {
         amount: BigNumber.from(sellAmountAmount),
         amountInUnits: sellAmountAmountInUnits,
@@ -334,7 +337,26 @@ export default class AggregatorService {
         (!notTo || !notTo.some(({ address }) => address === log.args.to)),
       tokenAddress
     );
-    return logs.map((log) => BigNumber.from(log.args.value));
+    const wrappedWithdrawLogs = this.findLogs(
+      txReceipt,
+      new Interface(WRAPPEDABI),
+      'Withdrawal',
+      (log) =>
+        (!to || log.args.dst === to.address) && (!notTo || !notTo.some(({ address }) => address === log.args.dst)),
+      tokenAddress
+    );
+    const wrappedDepositLogs = this.findLogs(
+      txReceipt,
+      new Interface(WRAPPEDABI),
+      'Deposit',
+      (log) =>
+        (!to || log.args.dst === to.address) && (!notTo || !notTo.some(({ address }) => address === log.args.dst)),
+      tokenAddress
+    );
+
+    const fullLogs = [...logs, ...wrappedDepositLogs, ...wrappedWithdrawLogs];
+
+    return fullLogs.map((log) => BigNumber.from(log.args.value || log.args.wad || 0));
   }
 
   findLogs(
