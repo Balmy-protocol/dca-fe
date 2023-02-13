@@ -329,12 +329,12 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
               <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="nextSwapCreate"
-                  defaultMessage="Next swap for this position will be executed."
+                  defaultMessage="Next swap for this position will be executed "
                 />
                 {DateTime.fromSeconds(nextSwapAvailableAt) > DateTime.now() && (
                   <FormattedMessage
                     description="nextSwapCreateTime"
-                    defaultMessage="aproximately {nextSwapAvailableAt}."
+                    defaultMessage="approximately {nextSwapAvailableAt}."
                     values={{
                       nextSwapAvailableAt: DateTime.fromSeconds(nextSwapAvailableAt).toRelative() || '',
                     }}
