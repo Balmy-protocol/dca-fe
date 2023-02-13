@@ -174,14 +174,23 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
               />
             </Typography>
           </StyledDetailWrapper>
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="history run for in position" defaultMessage="Run for: " />
-            </Typography>
-            <Typography variant="body1" color="#FFFFFF" sx={{ marginLeft: '5px' }}>
-              {getFrequencyLabel(intl, swapInterval.toString(), totalExecutedSwaps.toString())}
-            </Typography>
-          </StyledDetailWrapper>
+          {totalExecutedSwaps.gt(BigNumber.from(0)) && (
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage description="history run for in position" defaultMessage="Run for: " />
+              </Typography>
+              <Typography variant="body1" color="#FFFFFF" sx={{ marginLeft: '5px' }}>
+                {getFrequencyLabel(intl, swapInterval.toString(), totalExecutedSwaps.toString())}
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {totalExecutedSwaps.lte(BigNumber.from(0)) && (
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage description="history never run for in position" defaultMessage="Never executed" />
+              </Typography>
+            </StyledDetailWrapper>
+          )}
           <StyledDetailWrapper>
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="history swapped in position" defaultMessage="Swapped: " />
