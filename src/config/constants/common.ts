@@ -75,3 +75,8 @@ export const TOKEN_BLACKLIST = [
   '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12', // POLY - GNS optimism Beefy wrapper
   '0xaab6af05e12faae0a5d9597c79588846f0df15b8', // POLY - MVX optimism Beefy wrapper
 ];
+
+export const DISABLED_ONLY_MODIFY_TOKENS = [
+  '0xbd1fe73e1f12bd2bc237de9b626f056f21f86427',
+  '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722',
+];

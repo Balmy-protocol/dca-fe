@@ -5,7 +5,13 @@ import GraphWidget from 'common/graph-widget';
 import { getProtocolToken } from 'mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useSelectedNetwork';
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, STRING_SWAP_INTERVALS } from 'config/constants';
+import {
+  DEFAULT_NETWORK_FOR_VERSION,
+  LATEST_VERSION,
+  ONE_DAY,
+  shouldEnableFrequency,
+  STRING_SWAP_INTERVALS,
+} from 'config/constants';
 import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from 'state/create-position/hooks';
@@ -54,6 +60,23 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
     }
   }, [currentNetwork.chainId]);
 
+  const availableFrequencies =
+    (swapIntervalsData &&
+      orderBy(swapIntervalsData.swapIntervals, [(swapInterval) => parseInt(swapInterval.interval, 10)], ['asc'])
+        .filter((swapInterval) => shouldEnableFrequency(swapInterval.interval, from?.address, to?.address))
+        .map((swapInterval) => ({
+          label: {
+            singular: intl.formatMessage(
+              STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS].singular
+            ),
+            adverb: intl.formatMessage(
+              STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
+            ),
+          },
+          value: BigNumber.from(swapInterval.interval),
+        }))) ||
+    [];
+
   const onSetFrom = (newFrom: Token) => {
     // check for decimals
     if (from && newFrom.decimals < from.decimals) {
@@ -67,10 +90,18 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
     }
 
     dispatch(setFrom(newFrom));
+
+    if (!shouldEnableFrequency(frequencyType.toString(), newFrom.address, to?.address)) {
+      dispatch(setFrequencyType(ONE_DAY));
+    }
+
     history.replace(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
   };
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
+    if (!shouldEnableFrequency(frequencyType.toString(), from?.address, newTo.address)) {
+      dispatch(setFrequencyType(ONE_DAY));
+    }
     if (from) {
       history.replace(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
@@ -120,26 +151,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
           toYield={toYield}
           setFromYield={(newYield) => dispatch(setFromYield(newYield))}
           setToYield={(newYield) => dispatch(setToYield(newYield))}
-          availableFrequencies={
-            (swapIntervalsData &&
-              orderBy(
-                swapIntervalsData.swapIntervals,
-                [(swapInterval) => parseInt(swapInterval.interval, 10)],
-                ['asc']
-              ).map((swapInterval) => ({
-                label: {
-                  singular: intl.formatMessage(
-                    STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                      .singular
-                  ),
-                  adverb: intl.formatMessage(
-                    STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
-                  ),
-                },
-                value: BigNumber.from(swapInterval.interval),
-              }))) ||
-            []
-          }
+          availableFrequencies={availableFrequencies}
         />
       </Grid>
       <Hidden mdDown>

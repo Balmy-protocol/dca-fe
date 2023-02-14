@@ -9,7 +9,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import { TOKEN_BLACKLIST, LATEST_VERSION } from 'config';
+import { TOKEN_BLACKLIST, LATEST_VERSION, shouldEnableFrequency } from 'config';
 import Button from 'common/button';
 import SplitButton from 'common/split-button';
 import useSupportsSigning from 'hooks/useSupportsSigning';
@@ -88,7 +88,10 @@ const PositionSummaryControls = ({
 
   if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
 
-  const showExtendedFunctions = position.version === LATEST_VERSION && !TOKEN_BLACKLIST.includes(position.from.address);
+  const showExtendedFunctions =
+    position.version === LATEST_VERSION &&
+    !TOKEN_BLACKLIST.includes(position.from.address) &&
+    shouldEnableFrequency(position.swapInterval.interval, position.from.address, position.to.address);
 
   return (
     <PositionControlsContainer>
