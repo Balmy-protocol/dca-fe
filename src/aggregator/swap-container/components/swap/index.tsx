@@ -119,6 +119,7 @@ const Swap = ({
   const [balance, , balanceErrors] = useBalance(from);
   const [usedTokens] = useUsedTokens();
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
+  const [transactionWillFail, setTransactionWillFail] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
@@ -515,7 +516,7 @@ const Swap = ({
     parseUnits(fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).lte(BigNumber.from(0)) ||
     isLoadingRoute;
 
-  const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx;
+  const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx || transactionWillFail;
 
   const NoWalletButton = (
     <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={() => web3Service.connect()}>
@@ -643,6 +644,7 @@ const Swap = ({
         <SwapFirstStep
           from={from}
           to={to}
+          setTransactionWillFail={setTransactionWillFail}
           disabledDexes={disabledDexes}
           onChangeNetwork={handleChangeNetwork}
           fromValue={fromValueToUse}
