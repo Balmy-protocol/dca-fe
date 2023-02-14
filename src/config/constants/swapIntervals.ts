@@ -365,3 +365,30 @@ export const toReadable = (left: number, frequency: number, intl: IntlShape) => 
     defineMessage({ description: 'minutes', defaultMessage: 'minutes' })
   )}`;
 };
+
+export const DISABLED_FREQUENCIES_BY_TOKEN: Record<string, string[]> = {
+  '0xbd1fe73e1f12bd2bc237de9b626f056f21f86427': [FOUR_HOURS.toString()],
+  '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722': [FOUR_HOURS.toString()],
+};
+
+export const shouldEnableFrequency = (frequency: string, fromAddress?: string, toAddress?: string) => {
+  const filteredTokens = Object.keys(DISABLED_FREQUENCIES_BY_TOKEN);
+
+  if (!filteredTokens.includes(fromAddress || '') && !filteredTokens.includes(toAddress || '')) {
+    return true;
+  }
+
+  if (
+    fromAddress &&
+    filteredTokens.includes(fromAddress) &&
+    DISABLED_FREQUENCIES_BY_TOKEN[fromAddress].includes(frequency)
+  ) {
+    return false;
+  }
+
+  if (toAddress && filteredTokens.includes(toAddress) && DISABLED_FREQUENCIES_BY_TOKEN[toAddress].includes(frequency)) {
+    return false;
+  }
+
+  return true;
+};
