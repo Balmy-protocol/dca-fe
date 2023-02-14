@@ -147,6 +147,7 @@ interface SwapFirstStepProps {
   slippage: string;
   isApproved: boolean;
   disabledDexes: string[];
+  setTransactionWillFail: (transactionWillFail: boolean) => void;
   gasSpeed: GasKeys;
   onChangeNetwork: (chainId: number) => void;
 }
@@ -175,6 +176,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     disabledDexes,
     isApproved,
     onChangeNetwork,
+    setTransactionWillFail,
   } = props;
 
   const account = useAccount();
@@ -390,6 +392,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             cantFund={cantFund}
             isApproved={isApproved}
             isLoadingRoute={isLoadingRoute}
+            setTransactionWillFail={setTransactionWillFail}
           />
           <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} to={to} />
           <StyledButtonContainer>

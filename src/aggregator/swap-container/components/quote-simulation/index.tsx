@@ -38,9 +38,16 @@ interface QuoteSimulationProps {
   cantFund: boolean | null;
   isApproved: boolean;
   isLoadingRoute: boolean;
+  setTransactionWillFail: (willFail: boolean) => void;
 }
 
-const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimulationProps) => {
+const QuoteSimulation = ({
+  tx,
+  cantFund,
+  isApproved,
+  isLoadingRoute,
+  setTransactionWillFail,
+}: QuoteSimulationProps) => {
   const currentNetwork = useSelectedNetwork();
   const actualCurrentNetwork = useCurrentNetwork();
   const [transactionSimulation, isLoadingTransactionSimulation, transactionSimulationError] = useSimulateTransaction(
@@ -48,6 +55,14 @@ const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimu
     currentNetwork.chainId,
     cantFund || !isApproved || currentNetwork.chainId !== actualCurrentNetwork.chainId
   );
+
+  React.useEffect(() => {
+    if (!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && transactionSimulationError) {
+      setTransactionWillFail(true);
+    } else {
+      setTransactionWillFail(false);
+    }
+  }, [currentNetwork.chainId, transactionSimulationError]);
 
   if (cantFund || !isApproved || !tx || currentNetwork.chainId !== actualCurrentNetwork.chainId) {
     return null;
@@ -62,7 +77,8 @@ const QuoteSimulation = ({ tx, cantFund, isApproved, isLoadingRoute }: QuoteSimu
           <Typography variant="h6">
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
-          <Typography variant="body1">
+          <Typography variant="body1" color="#EB5757" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+            <TokenIcon token={emptyTokenWithAddress('FAILED')} size="28px" />
             <FormattedMessage
               description="blowfishSimulationError"
               defaultMessage="Transaction will fail. We recommend choosing another route"
