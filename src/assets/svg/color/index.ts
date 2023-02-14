@@ -50,6 +50,7 @@ import BCO from './bco.svg';
 import BCPT from './bcpt.svg';
 import BDL from './bdl.svg';
 import BEAM from './beam.svg';
+import BEEFY from './beefy.svg';
 import BELA from './bela.svg';
 import BIX from './bix.svg';
 import BLCN from './blcn.svg';
@@ -973,6 +974,7 @@ const manifest = {
   '0x1c4481750daa5ff521a2a7490d9981ed46465dbd': BCPT,
   BDL,
   '0xcd9b72f6e971026ea8609d2918c7bd02e1653945': BEAM,
+  BEEFY,
   BELA,
   '0x009c43b42aefac590c719e971020575974122803': BIX,
   BLCN,
