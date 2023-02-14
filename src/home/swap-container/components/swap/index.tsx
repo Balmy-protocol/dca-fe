@@ -883,7 +883,11 @@ const Swap = ({
         isFrom={selecting === from}
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
         usedTokens={usedTokens}
-        ignoreValues={[]}
+        ignoreValues={
+          selecting === from
+            ? []
+            : ['0xbd1fe73e1f12bd2bc237de9b626f056f21f86427', '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722']
+        } // Ignore jmxn and jbrl
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
