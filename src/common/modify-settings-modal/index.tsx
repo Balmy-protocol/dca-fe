@@ -576,7 +576,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             <Typography variant="body1" component="span">
               <FormattedMessage
                 description="rate detail"
-                defaultMessage="{yield}{frequency} for you for"
+                defaultMessage="{yield} {frequency} for you for"
                 values={{
                   frequency: intl.formatMessage(
                     STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
