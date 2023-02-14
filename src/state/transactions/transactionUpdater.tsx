@@ -185,9 +185,9 @@ export default function Updater(): null {
                   receipt: {
                     ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
                     chainId: currentNetwork.chainId,
-                    gasUsed: receipt.gasUsed.toString(),
-                    cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
-                    effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+                    gasUsed: (receipt.gasUsed || 0).toString(),
+                    cumulativeGasUsed: (receipt.cumulativeGasUsed || 0).toString(),
+                    effectiveGasPrice: (receipt.effectiveGasPrice || 0).toString(),
                   },
                   extendedTypeData,
                   chainId: currentNetwork.chainId,
