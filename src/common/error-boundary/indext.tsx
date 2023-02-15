@@ -8,7 +8,9 @@ import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import SickIcon from '@mui/icons-material/Sick';
 import Button from 'common/button';
+import WalletContext from 'common/wallet-context';
 import Link from '@mui/material/Link';
+import { Web3Service } from 'types';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -72,6 +74,11 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises, react/destructuring-assignment, @typescript-eslint/no-unsafe-member-access
+      (this.context.web3Service as Web3Service).getErrorService().logError('Uncaught error', error.message, errorInfo);
+      // eslint-disable-next-line no-empty
+    } catch {}
   }
 
   fallbackCopyTextToClipboard(text: string) {
@@ -231,5 +238,6 @@ const mapDispatchToProps = (dispatch: AppDispatch) => ({
   dismissError: () => dispatch(setError(null)),
 });
 
+ErrorBoundary.contextType = WalletContext;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default withRouter<any, any>(connect(mapStateToProps, mapDispatchToProps)(ErrorBoundary));
