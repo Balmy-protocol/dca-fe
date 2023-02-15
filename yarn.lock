@@ -2553,7 +2553,7 @@
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/sdk@^0.0.26":
+"@mean-finance/sdk@0.0.26":
   version "0.0.26"
   resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.26.tgz#dad6a9e30636ab2c67786b55e31775c5e8945bf6"
   integrity sha512-NNM0XKtbooPyHGHUvzVwo0Mz9B+YI2VzLlaL162eYx3TgF6iSm7bQlokgKCuBv2ycTKwFVaIgqx8GPmJqTArWg==
