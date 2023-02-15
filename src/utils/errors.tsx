@@ -12,6 +12,9 @@ export const TRANSACTION_ERRORS = {
   4200: <FormattedMessage description="unsupported_method" defaultMessage="Unsupported method" />,
   4900: <FormattedMessage description="all_network_disconnect" defaultMessage="You are disconnected from the net" />,
   4901: <FormattedMessage description="network_disconnect" defaultMessage="You are disconnected from the net" />,
+  ACTION_REJECTED: (
+    <FormattedMessage description="rejected_transaction" defaultMessage="You rejected the transaction" />
+  ),
 };
 
 const EXCLUDED_ERROR_CODES = [4001, 'ACTION_REJECTED'];
