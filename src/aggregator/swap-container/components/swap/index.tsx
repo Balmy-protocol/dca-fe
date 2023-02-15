@@ -2,7 +2,8 @@ import React from 'react';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { BlowfishResponse, SwapOption, SwapOptionWithTx, Token } from 'types';
+import find from 'lodash/find';
+import { BlowfishResponse, NetworkStruct, SwapOption, SwapOptionWithTx, Token } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import TokenPicker from 'common/aggregator-token-picker';
@@ -12,6 +13,7 @@ import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
 import {
   BLOWFISH_ENABLED_CHAINS,
+  NETWORKS,
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_SWAP,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
@@ -40,6 +42,7 @@ import useMeanApiService from 'hooks/useMeanApiService';
 import { shouldTrackError } from 'utils/errors';
 import useErrorService from 'hooks/useErrorService';
 import useReplaceHistory from 'hooks/useReplaceHistory';
+import { setNetwork } from 'state/config/actions';
 import { addCustomToken } from 'state/token-lists/actions';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
@@ -134,8 +137,28 @@ const Swap = ({
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
 
   const handleChangeNetwork = (chainId: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    walletService.changeNetworkAutomatically(chainId, () => {
+      const networkToSet = find(NETWORKS, { chainId });
+      dispatch(setNetwork(networkToSet as NetworkStruct));
+      if (networkToSet) {
+        web3Service.setNetwork(networkToSet?.chainId);
+      }
+    });
     dispatch(setAggregatorChainId(chainId));
     replaceHistory(`/swap/${chainId}`);
+  };
+
+  const onChangeNetwork = (chainId: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    walletService.changeNetwork(chainId, () => {
+      const networkToSet = find(NETWORKS, { chainId });
+      replaceHistory(`/swap/${chainId}`);
+      dispatch(setNetwork(networkToSet as NetworkStruct));
+      if (networkToSet) {
+        web3Service.setNetwork(networkToSet?.chainId);
+      }
+    });
   };
 
   const fromValueToUse =
@@ -653,7 +676,13 @@ const Swap = ({
   const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx || transactionWillFail;
 
   const NoWalletButton = (
-    <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={() => web3Service.connect()}>
+    <StyledButton
+      size="large"
+      color="default"
+      variant="outlined"
+      fullWidth
+      onClick={() => web3Service.connect(undefined, currentNetwork.chainId)}
+    >
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
@@ -665,7 +694,7 @@ const Swap = ({
       size="large"
       color="secondary"
       variant="contained"
-      onClick={() => walletService.changeNetwork(currentNetwork.chainId)}
+      onClick={() => onChangeNetwork(currentNetwork.chainId)}
       fullWidth
     >
       <Typography variant="body1">

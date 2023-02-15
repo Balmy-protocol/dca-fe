@@ -107,7 +107,18 @@ export default class WalletService {
     try {
       const currentNetwork = await this.providerService.getNetwork();
       if (currentNetwork.chainId !== newChainId) {
-        await this.providerService.changeNetwork(newChainId, callbackBeforeReload);
+        await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, callbackBeforeReload, true);
+      }
+    } catch (switchError) {
+      console.error('Error switching chains', switchError);
+    }
+  }
+
+  async changeNetworkAutomatically(newChainId: number, callbackBeforeReload?: () => void): Promise<void> {
+    try {
+      const currentNetwork = await this.providerService.getNetwork();
+      if (currentNetwork.chainId !== newChainId) {
+        await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, callbackBeforeReload, false);
       }
     } catch (switchError) {
       console.error('Error switching chains', switchError);

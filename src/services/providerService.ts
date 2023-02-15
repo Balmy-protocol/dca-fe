@@ -1,8 +1,9 @@
 import { BigNumber, ethers, Signer } from 'ethers';
 import find from 'lodash/find';
-import { NETWORKS, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config/constants';
+import { AUTOMATIC_CHAIN_CHANGING_WALLETS, NETWORKS, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config';
 import { getNetwork as getStringNetwork, Provider, Network, TransactionRequest } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
+import { getProviderInfo } from 'web3modal';
 
 interface ProviderWithChainId extends Provider {
   chainId: string;
@@ -29,8 +30,22 @@ export default class ProviderService {
     this.signer = signer;
   }
 
-  setProviderInfo(providerInfo: { id: string; logo: string; name: string }) {
-    this.providerInfo = providerInfo;
+  setProviderInfo(provider: Provider) {
+    this.providerInfo = getProviderInfo(provider);
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (this.providerInfo.id === 'walletconnect' && provider.wc && provider.wc.peerMeta) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        this.providerInfo.name = provider.wc.peerMeta.name;
+      }
+    } catch {
+      console.error('Failed to set providerInfo name for wc');
+    }
   }
 
   async estimateGas(tx: TransactionRequest): Promise<BigNumber> {
@@ -141,6 +156,7 @@ export default class ProviderService {
   async addEventListeners() {
     const provider = await this.getBaseProvider();
     const providerInfo = this.getProviderInfo();
+
     try {
       if (provider) {
         // ff's fuck metamask
@@ -172,7 +188,9 @@ export default class ProviderService {
             window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
           }
 
-          window.location.reload();
+          if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
+            window.location.reload();
+          }
         });
       }
     } catch (e) {
@@ -181,12 +199,16 @@ export default class ProviderService {
   }
 
   async changeNetwork(newChainId: number, callbackBeforeReload?: () => void) {
+    const providerInfo = this.getProviderInfo();
+
     try {
       await this.provider.send('wallet_switchEthereumChain', [{ chainId: `0x${newChainId.toString(16)}` }]);
       if (callbackBeforeReload) {
         callbackBeforeReload();
       }
-      window.location.reload();
+      if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
+        window.location.reload();
+      }
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (switchError.code === 4902 || switchError.message === 'Chain does not exist') {
@@ -207,12 +229,28 @@ export default class ProviderService {
             if (callbackBeforeReload) {
               callbackBeforeReload();
             }
-            window.location.reload();
+            if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
+              window.location.reload();
+            }
           }
         } catch (addError) {
           console.error('Error adding new chain to metamask');
         }
       }
     }
+  }
+
+  async attempToAutomaticallyChangeNetwork(
+    newChainId: number,
+    callbackBeforeReload?: () => void,
+    forceChangeNetwork?: boolean
+  ) {
+    const providerInfo = this.getProviderInfo();
+
+    if (AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name) || forceChangeNetwork) {
+      return this.changeNetwork(newChainId, callbackBeforeReload);
+    }
+
+    return Promise.resolve();
   }
 }

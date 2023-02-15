@@ -3,7 +3,7 @@ import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
 import isUndefined from 'lodash/isUndefined';
-import { Token, YieldOption, YieldOptions } from 'types';
+import { NetworkStruct, Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import TokenPicker from 'common/dca-token-picker';
@@ -62,6 +62,8 @@ import { shouldTrackError } from 'utils/errors';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
+import { useAppDispatch } from 'state/hooks';
+import { setNetwork } from 'state/config/actions';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
 
@@ -160,6 +162,7 @@ const Swap = ({
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const positionService = usePositionService();
+  const dispatch = useAppDispatch();
   const contractService = useContractService();
   const intl = useIntl();
   const availablePairs = useAvailablePairs();
@@ -725,7 +728,12 @@ const Swap = ({
   const onChangeNetwork = (chainId: number) => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     walletService.changeNetwork(chainId, () => {
+      const networkToSet = find(NETWORKS, { chainId });
       replaceHistory(`/create/${chainId}`);
+      dispatch(setNetwork(networkToSet as NetworkStruct));
+      if (networkToSet) {
+        web3Service.setNetwork(networkToSet?.chainId);
+      }
     });
   };
 
@@ -764,7 +772,13 @@ const Swap = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={() => web3Service.connect()}>
+    <StyledButton
+      size="large"
+      color="primary"
+      variant="contained"
+      fullWidth
+      onClick={() => web3Service.connect(undefined, currentNetwork.chainId)}
+    >
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
