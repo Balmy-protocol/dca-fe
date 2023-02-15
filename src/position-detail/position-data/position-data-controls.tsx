@@ -4,7 +4,7 @@ import Button from 'common/button';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition, YieldOptions } from 'types';
+import { FullPosition, NetworkStruct, YieldOptions } from 'types';
 import {
   TOKEN_BLACKLIST,
   NETWORKS,
@@ -22,6 +22,8 @@ import { fullPositionToMappedPosition } from 'utils/parsing';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTokenList from 'hooks/useTokenList';
 import useConnectedNetwork from 'hooks/useConnectedNetwork';
+import { setNetwork } from 'state/config/actions';
+import { useAppDispatch } from 'state/hooks';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -58,6 +60,7 @@ const PositionDataControls = ({
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
   const tokenList = useTokenList();
+  const dispatch = useAppDispatch();
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -71,7 +74,13 @@ const PositionDataControls = ({
 
   const onChangeNetwork = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId);
+    walletService.changeNetwork(chainId, () => {
+      const networkToSet = find(NETWORKS, { chainId });
+      dispatch(setNetwork(networkToSet as NetworkStruct));
+      if (networkToSet) {
+        web3Service.setNetwork(networkToSet?.chainId);
+      }
+    });
   };
 
   const isOwner = account && account.toLowerCase() === position.user.toLowerCase();

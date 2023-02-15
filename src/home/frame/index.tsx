@@ -4,11 +4,12 @@ import find from 'lodash/find';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useSubTab } from 'state/tabs/hooks';
 import { useParams } from 'react-router-dom';
-import { DEFAULT_NETWORK_FOR_VERSION, POSITION_VERSION_4, SUPPORTED_NETWORKS_DCA } from 'config/constants';
-import { GetSwapIntervalsGraphqlResponse } from 'types';
+import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NETWORKS_DCA } from 'config/constants';
+import { GetSwapIntervalsGraphqlResponse, NetworkStruct } from 'types';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useQuery } from '@apollo/client';
 import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
+import { setNetwork } from 'state/config/actions';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import usePairService from 'hooks/usePairService';
 import { useAppDispatch } from 'state/hooks';
@@ -17,6 +18,8 @@ import useErrorService from 'hooks/useErrorService';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import useSdkMappedChains from 'hooks/useMappedSdkChains';
+import useWalletService from 'hooks/useWalletService';
+import useWeb3Service from 'hooks/useWeb3Service';
 import { fetchGraphTokenList } from 'state/token-lists/actions';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
@@ -31,13 +34,15 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const { chainId } = useParams<{ chainId: string }>();
   const client = useDCAGraphql();
   const pairService = usePairService();
+  const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const errorService = useErrorService();
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
   const selectedNetwork = useSelectedNetwork();
-  // const hasInitiallySetNetwork = React.useState();
   const sdkMappedNetworks = useSdkMappedChains();
+  const web3Service = useWeb3Service();
+  // const hasInitiallySetNetwork = React.useState()
 
   React.useEffect(() => {
     const chainIdToUse = Number(chainId);
@@ -77,6 +82,14 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
 
   const handleChangeNetwork = (newChainId: number) => {
     if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      walletService.changeNetworkAutomatically(newChainId, () => {
+        const networkToSet = find(NETWORKS, { chainId: newChainId });
+        dispatch(setNetwork(networkToSet as NetworkStruct));
+        if (networkToSet) {
+          web3Service.setNetwork(networkToSet?.chainId);
+        }
+      });
       replaceHistory(`/create/${newChainId}`);
       dispatch(setDCAChainId(newChainId));
       setHasLoadedPairs(false);

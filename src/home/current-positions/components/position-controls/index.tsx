@@ -4,7 +4,7 @@ import Button from 'common/button';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { Position, Token, YieldOptions } from 'types';
+import { NetworkStruct, Position, Token, YieldOptions } from 'types';
 import {
   TOKEN_BLACKLIST,
   NETWORKS,
@@ -29,8 +29,10 @@ import { useAppDispatch } from 'state/hooks';
 import { setPosition } from 'state/position-details/actions';
 import { changePositionDetailsTab } from 'state/tabs/actions';
 import useTokenList from 'hooks/useTokenList';
-import useConnectedNetwork from 'hooks/useConnectedNetwork';
 import usePushToHistory from 'hooks/usePushToHistory';
+import { setNetwork } from 'state/config/actions';
+import useWeb3Service from 'hooks/useWeb3Service';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -88,7 +90,8 @@ const PositionControls = ({
   const { remainingSwaps, pendingTransaction, toWithdraw, chainId } = position;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const [connectedNetwork] = useConnectedNetwork();
+  const web3Service = useWeb3Service();
+  const connectedNetwork = useCurrentNetwork();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -119,7 +122,13 @@ const PositionControls = ({
 
   const onChangeNetwork = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId);
+    walletService.changeNetwork(chainId, () => {
+      const networkToSet = find(NETWORKS, { chainId });
+      dispatch(setNetwork(networkToSet as NetworkStruct));
+      if (networkToSet) {
+        web3Service.setNetwork(networkToSet?.chainId);
+      }
+    });
   };
 
   if (isPending) {

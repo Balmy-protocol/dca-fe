@@ -117,7 +117,7 @@ export function useTransaction(txHash?: string) {
   const state = useAppSelector((appState) => appState.transactions);
   const currentNetwork = useCurrentNetwork();
 
-  if (!txHash) {
+  if (!txHash || !state[currentNetwork.chainId]) {
     return null;
   }
 

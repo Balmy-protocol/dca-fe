@@ -12,7 +12,6 @@ import { DUMMY_ARCX_CLIENT } from 'utils/dummy-arcx-client';
 // MOCKS
 import { NETWORKS, PositionVersions } from 'config/constants';
 
-import { getProviderInfo } from 'web3modal';
 import { setupAxiosClient } from 'state';
 import GraphqlService from './graphql';
 import injectedConnector from './InjectedConnector';
@@ -51,8 +50,6 @@ export default class Web3Service {
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
 
   axiosClient: AxiosInstance;
-
-  providerInfo: { id: string; logo: string; name: string };
 
   loadedAsSafeApp: boolean;
 
@@ -185,7 +182,7 @@ export default class Web3Service {
   }
 
   getProviderInfo() {
-    return this.providerInfo;
+    return this.providerService.getProviderInfo();
   }
 
   getTransactionService() {
@@ -288,14 +285,13 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect(suppliedProvider?: Provider) {
+  async connect(suppliedProvider?: Provider, chainId?: number) {
     const provider: Provider = suppliedProvider || ((await this.modal?.requestProvider()) as Provider);
 
-    this.providerInfo = getProviderInfo(provider);
-    this.providerService.setProviderInfo(getProviderInfo(provider));
+    this.providerService.setProviderInfo(provider);
     // A Web3Provider wraps a standard Web3 provider, which is
     // what Metamask injects as window.ethereum into each page
-    const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider);
+    const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider, 'any');
 
     // The Metamask plugin also allows signing transactions to
     // send ether and pay to change state within the blockchain.
@@ -325,9 +321,19 @@ export default class Web3Service {
 
     this.setAccount(account);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.walletService.setAccount(undefined, this.setAccountCallback);
 
-    this.setNetwork((await this.providerService.getNetwork()).chainId);
+    try {
+      if (chainId) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        await this.walletService.changeNetworkAutomatically(chainId, () => this.setNetwork(chainId));
+      } else {
+        this.setNetwork((await this.providerService.getNetwork()).chainId);
+      }
+    } catch (e) {
+      console.error('Error changing network');
+    }
+
+    await this.walletService.setAccount(undefined, this.setAccountCallback);
 
     await this.sdkService.resetProvider();
 

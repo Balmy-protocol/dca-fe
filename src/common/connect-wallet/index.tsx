@@ -3,6 +3,7 @@ import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
 import { Web3Service } from 'types';
 import styled from 'styled-components';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -21,10 +22,17 @@ interface ConnectWalletButtonProps {
   web3Service: Web3Service;
 }
 
-const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => (
-  <StyledButton variant="outlined" color="default" onClick={() => web3Service.connect()}>
-    <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
-  </StyledButton>
-);
+const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => {
+  const selectedNetwork = useSelectedNetwork();
+  return (
+    <StyledButton
+      variant="outlined"
+      color="default"
+      onClick={() => web3Service.connect(undefined, selectedNetwork.chainId)}
+    >
+      <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
+    </StyledButton>
+  );
+};
 
 export default ConnectWalletButton;
