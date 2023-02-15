@@ -3,6 +3,7 @@ import { save, load } from 'redux-localstorage-simple';
 import { setupCache, setup } from 'axios-cache-adapter';
 import axios from 'axios';
 import { SupportedLanguages } from 'config/constants/lang';
+import { DEFAULT_AGGREGATOR_SETTINGS } from 'config/constants/aggregator';
 
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
@@ -19,7 +20,7 @@ import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 import error from './error/reducer';
 
-const LATEST_VERSION = '1.0.4';
+const LATEST_VERSION = '1.0.5';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
 const TRANSACTION_VERSION_KEY = 'transactions_version';
 const TRANSACTION_KEY = 'redux_localstorage_simple_transactions';
@@ -112,6 +113,14 @@ const store = configureStore({
   preloadedState: load({
     states: PERSISTED_STATES,
     preloadedState: {
+      aggregatorSettings: {
+        gasSpeed: DEFAULT_AGGREGATOR_SETTINGS.gasSpeed,
+        slippage: DEFAULT_AGGREGATOR_SETTINGS.slippage.toString(),
+        disabledDexes: DEFAULT_AGGREGATOR_SETTINGS.disabledDexes,
+        showTransactionCost: DEFAULT_AGGREGATOR_SETTINGS.showTransactionCost,
+        confettiParticleCount: DEFAULT_AGGREGATOR_SETTINGS.confetti,
+        sorting: DEFAULT_AGGREGATOR_SETTINGS.sorting,
+      },
       config: {
         network: undefined,
         theme: 'dark',

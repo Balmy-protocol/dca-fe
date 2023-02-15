@@ -9,8 +9,15 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 import { useAppDispatch } from 'state/hooks';
-import { setGasSpeed, setSlippage, restoreDefaults, setDisabledDexes } from 'state/aggregator-settings/actions';
+import {
+  setGasSpeed,
+  setSlippage,
+  restoreDefaults,
+  setDisabledDexes,
+  setConfetti,
+} from 'state/aggregator-settings/actions';
 import SlippageInput from 'common/slippage-input';
+import ConfettiInput from 'common/confetti-input';
 import GasSelector from 'common/gas-selector';
 import { GasKeys } from 'config/constants/aggregator';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -53,7 +60,7 @@ interface SwapSettingsProps {
 }
 
 const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
-  const { slippage, gasSpeed, disabledDexes } = useAggregatorSettingsState();
+  const { slippage, gasSpeed, disabledDexes, confettiParticleCount } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const dexes = useSdkDexes();
   const [showDexes, setShowDexes] = React.useState(false);
@@ -63,6 +70,9 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
   };
   const onGasSpeedChange = (newGasSpeed: GasKeys) => {
     dispatch(setGasSpeed(newGasSpeed));
+  };
+  const onConfettiChange = (newConfettiParticleCount: number) => {
+    dispatch(setConfetti(newConfettiParticleCount));
   };
 
   const onRestoreDefaults = () => {
@@ -112,6 +122,18 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
                 <FormattedMessage description="advancedAggregatorSettingsGasSpeed" defaultMessage="Gas speed:" />
               </Typography>
               <GasSelector selected={gasSpeed} onChange={onGasSpeedChange} />
+            </StyledSettingContainer>
+          </StyledGrid>
+          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
+            <StyledSettingContainer>
+              <Typography variant="body1">
+                <FormattedMessage description="advancedAggregatorSettingsConfetti" defaultMessage="Confetti count:" />
+              </Typography>
+              <ConfettiInput
+                value={confettiParticleCount}
+                id="confetti-particle-count-input"
+                onChange={onConfettiChange}
+              />
             </StyledSettingContainer>
           </StyledGrid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>

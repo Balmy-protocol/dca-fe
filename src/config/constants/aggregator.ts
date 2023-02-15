@@ -12,12 +12,6 @@ export const GAS_LABELS_BY_KEY: Record<GasKeys, string> = {
   [GAS_KEY_FAST]: 'instant',
 };
 
-export const DEFAULT_AGGREGATOR_SETTINGS: { gasSpeed: GasKeys; slippage: number; disabledDexes: string[] } = {
-  slippage: 0.3,
-  gasSpeed: GAS_KEY_AVERAGE,
-  disabledDexes: [],
-};
-
 export const SORT_MOST_PROFIT = 'most-swapped-accounting-for-gas';
 export const SORT_MOST_RETURN = 'most-swapped';
 export const SORT_LEAST_GAS = 'least-gas';
@@ -28,4 +22,20 @@ export const SWAP_ROUTES_SORT_OPTIONS: Record<SwapSortOptions, SwapSortOptions> 
   [SORT_MOST_PROFIT]: 'most-swapped-accounting-for-gas',
   [SORT_LEAST_GAS]: 'least-gas',
   [SORT_MOST_RETURN]: 'most-swapped',
+};
+
+export const DEFAULT_AGGREGATOR_SETTINGS: {
+  gasSpeed: GasKeys;
+  slippage: number;
+  disabledDexes: string[];
+  showTransactionCost: boolean;
+  confetti: number;
+  sorting: SwapSortOptions;
+} = {
+  slippage: 0.3,
+  gasSpeed: GAS_KEY_AVERAGE,
+  disabledDexes: [],
+  showTransactionCost: true,
+  confetti: 100,
+  sorting: SORT_MOST_RETURN,
 };

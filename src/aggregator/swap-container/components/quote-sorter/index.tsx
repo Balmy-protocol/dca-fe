@@ -42,16 +42,6 @@ interface QuoteSorterProps {
 }
 
 const SORT_OPTIONS = (isBuyOrder: boolean) => [
-  {
-    key: SORT_MOST_PROFIT,
-    label: <FormattedMessage description="sortHighReturn" defaultMessage="Recommended" />,
-    help: (
-      <FormattedMessage
-        description="sortHighReturnHelp"
-        defaultMessage="Sort routes by the best relation between price and gas cost"
-      />
-    ),
-  },
   ...(isBuyOrder
     ? [
         {
@@ -68,7 +58,7 @@ const SORT_OPTIONS = (isBuyOrder: boolean) => [
     : [
         {
           key: SORT_MOST_RETURN,
-          label: <FormattedMessage description="sortMostReturnSellOrder" defaultMessage="Most received" />,
+          label: <FormattedMessage description="sortMostReturnSellOrder" defaultMessage="Most received tokens" />,
           help: (
             <FormattedMessage
               description="sortMostReturnSellOrderHelp"
@@ -77,6 +67,16 @@ const SORT_OPTIONS = (isBuyOrder: boolean) => [
           ),
         },
       ]),
+  {
+    key: SORT_MOST_PROFIT,
+    label: <FormattedMessage description="sortHighReturn" defaultMessage="Gas cost considered" />,
+    help: (
+      <FormattedMessage
+        description="sortHighReturnHelp"
+        defaultMessage="Sort routes by the best relation between price and gas cost"
+      />
+    ),
+  },
   {
     key: SORT_LEAST_GAS,
     label: <FormattedMessage description="sortLeastGas" defaultMessage="Least gas" />,
@@ -91,7 +91,9 @@ const QuoteSorter = ({ isLoading, setQuoteSorting, sorting, isBuyOrder }: QuoteS
     setAnchorEl(event.currentTarget);
   };
   const handleClose = (key: string) => {
-    setQuoteSorting(key);
+    if (key && typeof key === 'string') {
+      setQuoteSorting(key);
+    }
     setAnchorEl(null);
   };
   const selectedOption = find(SORT_OPTIONS(isBuyOrder), { key: sorting });

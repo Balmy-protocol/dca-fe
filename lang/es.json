@@ -788,7 +788,7 @@
     "description": "success approving token"
   },
   "Rgfl8x": {
-    "defaultMessage": "Recomendado",
+    "defaultMessage": "Costo de gas considerado",
     "description": "sortHighReturn"
   },
   "Rm2Mnc": {
@@ -2570,5 +2570,101 @@
   "ZBiobz": {
     "defaultMessage": "Rendimiento:",
     "description": "jmxnUserCompTotalProfi"
+  },
+  "1uma6Q": {
+    "defaultMessage": "Discord de Euler.",
+    "description": "Euler's Discord."
+  },
+  "3IslZU": {
+    "defaultMessage": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro",
+    "description": "positionEulerHack1"
+  },
+  "BjSXQD": {
+    "defaultMessage": "y",
+    "description": "positionEulerHack2"
+  },
+  "FYVhW/": {
+    "defaultMessage": "Cerrando su posición",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart5"
+  },
+  "Kq/AiW": {
+    "defaultMessage": "Pegar dirección del portapapeles",
+    "description": "tokenPickerPasteAddress"
+  },
+  "OHZobw": {
+    "defaultMessage": "y",
+    "description": "positionTerminatedAnd"
+  },
+  "P/MnGd": {
+    "defaultMessage": "Debido a la grieta de seguridad de Euler, el protocolo Angle ah sido pausado. Como consequencia, los oraculos y los intercambios no pueden operar confiablemente y han sido pausados.",
+    "description": "positionagEURNotSupported"
+  },
+  "QC2PNc": {
+    "defaultMessage": "Cerrando tu posición",
+    "description": "Terminating position"
+  },
+  "Si3cOF": {
+    "defaultMessage": "Mayor cantidad de tokens recibidos",
+    "description": "sortMostReturnSellOrder"
+  },
+  "YGZ1lp": {
+    "defaultMessage": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro",
+    "description": "positionEulerHack1"
+  },
+  "aPLZ1u": {
+    "defaultMessage": "Retirado:",
+    "description": "positionTerminated"
+  },
+  "bQUS8A": {
+    "defaultMessage": "Cantidad de confetti:",
+    "description": "advancedAggregatorSettingsConfetti"
+  },
+  "cmiLaP": {
+    "defaultMessage": "Precio de compra promedio",
+    "description": "averageBuyPriceLegend"
+  },
+  "d9VBkP": {
+    "defaultMessage": "Custom",
+    "description": "freqEasyInputCustom"
+  },
+  "gQubrG": {
+    "defaultMessage": "Intercambios",
+    "description": "swapPriceGraphTitle"
+  },
+  "nAoD6G": {
+    "defaultMessage": "Precio de compra promedio",
+    "description": "averagePriceGraphTitle"
+  },
+  "p0sB2R": {
+    "defaultMessage": "No agregamos ningun tipo de comision extra. Estas recibiendo extactamente los mismos precios como si hubieses interactuado con el Aggregador directamente. {br}{br} Algunos agregadores soportan compartir su fee con los referidos, pero esto no es ningun cargo extra para ti{br}{br}Para clarificar, los agregadores no estan priorizados de ninguna manera, podes elegir como ordenar los resultados por ti mismo.",
+    "description": "faqFeesResponse"
+  },
+  "ttC5dQ": {
+    "defaultMessage": "Invertir (DCA)",
+    "description": "invest"
+  },
+  "uV7tE7": {
+    "defaultMessage": "Costo de Gas considerado",
+    "description": "sortHighReturn"
+  },
+  "vedPfb": {
+    "defaultMessage": "Intercambio",
+    "description": "swapPriceLegend"
+  },
+  "vmZ52D": {
+    "defaultMessage": "Precio de mercado",
+    "description": "marketPriceLegend"
+  },
+  "wHKSsk": {
+    "defaultMessage": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro",
+    "description": "positionEulerHack1"
+  },
+  "xIIhB5": {
+    "defaultMessage": "+ retornos generados",
+    "description": "positionWithdrawn"
+  },
+  "yyT6co": {
+    "defaultMessage": "Luego de costo de transacción:",
+    "description": "aggregatorAfterTransaction"
   }
 }

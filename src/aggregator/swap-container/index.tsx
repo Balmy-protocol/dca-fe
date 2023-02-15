@@ -12,11 +12,11 @@ import {
   setToValue,
   setTo,
   setSelectedRoute,
-  setSorting,
   resetForm,
   setAggregatorChainId,
   toggleFromTo,
 } from 'state/aggregator/actions';
+import { setSorting } from 'state/aggregator-settings/actions';
 import useSwapOptions from 'hooks/useSwapOptions';
 import useCustomToken from 'hooks/useCustomToken';
 import { useParams } from 'react-router-dom';
@@ -31,8 +31,8 @@ import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
 
 const SwapContainer = () => {
-  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, sorting, transferTo } = useAggregatorState();
-  const { slippage, gasSpeed, disabledDexes } = useAggregatorSettingsState();
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
+  const { slippage, gasSpeed, disabledDexes, sorting } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
