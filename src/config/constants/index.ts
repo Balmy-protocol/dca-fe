@@ -5,3 +5,4 @@ export * from './positions';
 export * from './yield';
 export * from './currency';
 export * from './flags';
+export * from './wallets';
