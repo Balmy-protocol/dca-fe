@@ -384,7 +384,11 @@ const Swap = ({
         selectedRoute &&
         selectedRoute.tx
       ) {
-        const simulatePromise = simulationService.simulateTransaction(selectedRoute.tx, currentNetwork.chainId);
+        const simulatePromise = simulationService.simulateTransaction(
+          selectedRoute.tx,
+          currentNetwork.chainId,
+          !!transferTo
+        );
         simulatePromise
           .then((blowfishResponse) => blowfishResponse && handleTransactionSimulationWait(newSteps, blowfishResponse))
           .catch(() => handleTransactionSimulationWait(newSteps));

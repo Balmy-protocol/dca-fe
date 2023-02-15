@@ -28,8 +28,12 @@ export default class SimulationService {
     };
   }
 
-  async simulateTransaction(txData: QuoteTx, chainId: number): Promise<BlowfishResponse> {
-    if (!BLOWFISH_ENABLED_CHAINS.includes(chainId)) {
+  async simulateTransaction(
+    txData: QuoteTx,
+    chainId: number,
+    forceProviderSimulation?: boolean
+  ): Promise<BlowfishResponse> {
+    if (!BLOWFISH_ENABLED_CHAINS.includes(chainId) || forceProviderSimulation) {
       return this.simulateGasPriceTransaction(txData);
     }
 

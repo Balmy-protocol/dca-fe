@@ -39,6 +39,7 @@ interface QuoteSimulationProps {
   isApproved: boolean;
   isLoadingRoute: boolean;
   setTransactionWillFail: (willFail: boolean) => void;
+  forceProviderSimulation: boolean;
 }
 
 const QuoteSimulation = ({
@@ -47,13 +48,15 @@ const QuoteSimulation = ({
   isApproved,
   isLoadingRoute,
   setTransactionWillFail,
+  forceProviderSimulation,
 }: QuoteSimulationProps) => {
   const currentNetwork = useSelectedNetwork();
   const actualCurrentNetwork = useCurrentNetwork();
   const [transactionSimulation, isLoadingTransactionSimulation, transactionSimulationError] = useSimulateTransaction(
     tx,
     currentNetwork.chainId,
-    cantFund || !isApproved || currentNetwork.chainId !== actualCurrentNetwork.chainId
+    cantFund || !isApproved || currentNetwork.chainId !== actualCurrentNetwork.chainId,
+    forceProviderSimulation
   );
 
   React.useEffect(() => {
@@ -91,10 +94,10 @@ const QuoteSimulation = ({
           <Typography variant="h6">
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
-          {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && (
+          {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && !forceProviderSimulation && (
             <TransactionSimulation items={transactionSimulation} />
           )}
-          {!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && (
+          {(!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) || forceProviderSimulation) && (
             <Typography variant="body1" color="#219653" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
               <TokenIcon token={emptyTokenWithAddress('CHECK')} size="28px" />
               <FormattedMessage description="normalSimulationSuccess" defaultMessage="Transaction will be successful" />
@@ -102,7 +105,7 @@ const QuoteSimulation = ({
           )}
         </StyledSimulation>
       )}
-      {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && (
+      {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && !forceProviderSimulation && (
         <StyledBlowfishContainer>
           <BlowfishLogo />
         </StyledBlowfishContainer>

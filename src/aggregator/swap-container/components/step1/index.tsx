@@ -393,6 +393,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             isApproved={isApproved}
             isLoadingRoute={isLoadingRoute}
             setTransactionWillFail={setTransactionWillFail}
+            forceProviderSimulation={!!transferTo}
           />
           <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} to={to} />
           <StyledButtonContainer>
