@@ -19,6 +19,7 @@ import { SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from 'config/cons
 import useSpecificAllowance from 'hooks/useSpecificAllowance';
 import { MAX_BI } from 'config';
 import { BigNumber } from 'ethers';
+import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 
 const DarkChip = withStyles(() => ({
   root: {
@@ -71,6 +72,14 @@ const StyledNotSupportedContainer = styled.div`
   gap: 5px;
 `;
 
+const StyledTransactionCostContainer = styled.div`
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+  padding: 8px 16px;
+  gap: 5px;
+`;
+
 const StyledTitleContainer = styled.div`
   display: flex;
   flex-grow: 1;
@@ -89,7 +98,7 @@ const StyledTitleDataContainer = styled.div<{ $end?: boolean }>`
 
 const StyledRouteContainer = styled.div<{ withMessage?: boolean }>`
   display: flex;
-  padding: ${({ withMessage }) => (withMessage ? '16px 16px 8px 16px' : '16px')};
+  padding: ${({ withMessage }) => (withMessage ? '16px 16px 0px 16px' : '16px')};
   align-items: center;
 `;
 
@@ -190,6 +199,8 @@ const SwapQuote = ({
   sorting,
   disabled,
 }: SwapQuotesProps) => {
+  const { showTransactionCost: showTransactionCostConfig } = useAggregatorSettingsState();
+
   if (!to || !from) {
     return null;
   }
@@ -216,6 +227,25 @@ const SwapQuote = ({
         ((Number(quote.buyAmount.amountInUSD) - Number(quote.sellAmount.amountInUSD)) /
           Number(quote.sellAmount.amountInUSD)) *
           10000
+      ) / 100
+    ).toFixed(2);
+
+  const showTransactionCost = showTransactionCostConfig && sorting === SORT_MOST_PROFIT;
+
+  const buyAfterTxCost =
+    quote &&
+    showTransactionCost &&
+    !!quote.buyAmount.amountInUSD &&
+    !!quote.gas.estimatedCostInUSD &&
+    Math.round((quote.buyAmount.amountInUSD - quote.gas.estimatedCostInUSD) * 100) / 100;
+
+  const priceImpactAfterTxCost =
+    showTransactionCost &&
+    !!quote.sellAmount.amountInUSD &&
+    !!buyAfterTxCost &&
+    (
+      Math.round(
+        ((buyAfterTxCost - Number(quote.sellAmount.amountInUSD)) / Number(quote.sellAmount.amountInUSD)) * 10000
       ) / 100
     ).toFixed(2);
 
@@ -288,7 +318,9 @@ const SwapQuote = ({
           />
         </StyledTitleDataContainer>
       </StyledTitleContainer>
-      <StyledRouteContainer withMessage={isBuyOrder && quote.type !== 'buy'}>
+      <StyledRouteContainer
+        withMessage={(isBuyOrder && quote.type !== 'buy') || (!!buyAfterTxCost && showTransactionCost)}
+      >
         <StyledTokenContainer>
           <TokenIcon token={quote.sellToken} />
           <StyledTokenAmountContainer>
@@ -336,6 +368,33 @@ const SwapQuote = ({
           </StyledTokenAmountContainer>
         </StyledTokenContainer>
       </StyledRouteContainer>
+      {buyAfterTxCost && showTransactionCost && (
+        <StyledTransactionCostContainer>
+          <StyledUsdContainer>
+            <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="aggregatorAfterTransaction" defaultMessage="After transaction cost:" />
+            </Typography>
+            <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+              {`$${buyAfterTxCost.toFixed(2)}`}
+            </Typography>
+            {!isNaN(priceImpactAfterTxCost) && isFinite(Number(priceImpactAfterTxCost)) && priceImpactAfterTxCost && (
+              <Typography
+                variant="caption"
+                color={
+                  // eslint-disable-next-line no-nested-ternary
+                  Number(priceImpactAfterTxCost) < -5
+                    ? '#EB5757'
+                    : Number(priceImpactAfterTxCost) > 0
+                    ? '#219653'
+                    : 'rgba(255, 255, 255, 0.5)'
+                }
+              >
+                {`(${Number(priceImpactAfterTxCost) > 0 ? '+' : ''}${priceImpactAfterTxCost}%)`}
+              </Typography>
+            )}
+          </StyledUsdContainer>
+        </StyledTransactionCostContainer>
+      )}
       {isBuyOrder && quote.type !== 'buy' && (
         <StyledNotSupportedContainer>
           <ErrorOutlineIcon fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.5)' }} />

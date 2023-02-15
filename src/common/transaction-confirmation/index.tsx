@@ -24,6 +24,7 @@ import { formatUnits } from '@ethersproject/units';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import { parseUsdPrice } from 'utils/currency';
+import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
 
 const StyledOverlay = styled.div<{ showingBalances: boolean }>`
   position: absolute;
@@ -143,6 +144,7 @@ const TIMES_PER_NETWORK = {
 const DEFAULT_TIME_PER_NETWORK = 30;
 
 const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, from }: TransactionConfirmationProps) => {
+  const { confettiParticleCount } = useAggregatorSettingsState();
   const getPendingTransaction = useIsTransactionPending();
   const walletService = useWalletService();
   const isTransactionPending = getPendingTransaction(transaction);
@@ -184,14 +186,14 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
       setSuccess(true);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       confetti({
-        particleCount: 100,
+        particleCount: confettiParticleCount,
         spread: 70,
         angle: 60,
         origin: { x: 0 },
       });
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       confetti({
-        particleCount: 100,
+        particleCount: confettiParticleCount,
         spread: 70,
         angle: 120,
         origin: { x: 1 },

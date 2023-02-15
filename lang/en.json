@@ -103,10 +103,6 @@
     "defaultMessage": "Transfered from:",
     "description": "transferedFrom"
   },
-  "0dHtRR": {
-    "defaultMessage": "DCA price",
-    "description": "averageBuyPriceLegend"
-  },
   "0dZuXG": {
     "defaultMessage": "{readable}",
     "description": "fiveMinutesPluralTime"
@@ -147,6 +143,10 @@
     "defaultMessage": "We could not fetch the price of one of the tokens",
     "description": "No price available"
   },
+  "1uma6Q": {
+    "defaultMessage": "Euler's Discord.",
+    "description": "Euler's Discord."
+  },
   "27/rlO": {
     "defaultMessage": "Do you take any fees?",
     "description": "faqFees"
@@ -170,6 +170,10 @@
   "2l6dgp": {
     "defaultMessage": "View on explorer",
     "description": "view on etherscan"
+  },
+  "3IslZU": {
+    "defaultMessage": "Euler has frozen the contracts after the hack, so modifying positions is not possible at the moment. Stay updated on the situation by joining our",
+    "description": "positionEulerHack1"
   },
   "3Ovbmx": {
     "defaultMessage": "Next swap:",
@@ -327,10 +331,6 @@
     "defaultMessage": "will only be able to",
     "description": "positionPermissionsModified only"
   },
-  "8rEEmK": {
-    "defaultMessage": "DCA vs Lump sum",
-    "description": "positionDetailsProfitLossOption"
-  },
   "8uwFtl": {
     "defaultMessage": "We do not support this chain yet",
     "description": "wrong chainId"
@@ -446,6 +446,10 @@
   "Bh1aAA": {
     "defaultMessage": "You will need to provide an aditional {addAmmount} {from}",
     "description": "rate add detail"
+  },
+  "BjSXQD": {
+    "defaultMessage": "and",
+    "description": "positionEulerHack2"
   },
   "Bq70E5": {
     "defaultMessage": "View on explorer",
@@ -622,6 +626,10 @@
   "FW4Fp5": {
     "defaultMessage": "Get {protocolToken} as {wrappedProtocolToken} instead",
     "description": "Terminate get weth"
+  },
+  "FYVhW/": {
+    "defaultMessage": "Closing their position",
+    "description": "faqWhenDoINeedToPayGasFeesResponsePart5"
   },
   "FfyCRZ": {
     "defaultMessage": "stale",
@@ -859,6 +867,10 @@
     "defaultMessage": "We'll swap {rate} {from} {frequency} for {frequencyPlural} for you",
     "description": "rate detail"
   },
+  "Kq/AiW": {
+    "defaultMessage": "Paste address from clipboard",
+    "description": "tokenPickerPasteAddress"
+  },
   "KxGrUy": {
     "defaultMessage": "Add permissions for new address",
     "description": "add permission title"
@@ -922,10 +934,6 @@
   "N4Okjv": {
     "defaultMessage": "Transaction in progress",
     "description": "transactionConfirmationInProgress"
-  },
-  "NHDjvA": {
-    "defaultMessage": "Gas saved",
-    "description": "positionDetailsGasSavedOption"
   },
   "NPuJa6": {
     "defaultMessage": "Mean Finance contracts have been audited by Pessimistic and PeckShield. You can read the reports",
@@ -991,6 +999,10 @@
     "defaultMessage": "{prefix}{value} {token}",
     "description": "graph selectedItemValue"
   },
+  "OHZobw": {
+    "defaultMessage": "and",
+    "description": "positionTerminatedAnd"
+  },
   "OPn8Nq": {
     "defaultMessage": "{readable}",
     "description": "thirtyMinutesPluralTime"
@@ -1015,10 +1027,6 @@
     "defaultMessage": "Withdraw",
     "description": "permissionsWithdrawPermission"
   },
-  "Oo1GS9": {
-    "defaultMessage": "Terminating your position",
-    "description": "Terminating position"
-  },
   "OoEgv4": {
     "defaultMessage": "swaps",
     "description": "oneMinuteSubject"
@@ -1034,6 +1042,10 @@
   "Oz/vZm": {
     "defaultMessage": "If you don't want to do this, you can still add funds to your current position.",
     "description": "howItWorksDescriptionStep1"
+  },
+  "P/MnGd": {
+    "defaultMessage": "Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted.",
+    "description": "positionagEURNotSupported"
   },
   "POGYlh": {
     "defaultMessage": "Position permissions modified",
@@ -1070,6 +1082,10 @@
   "Q5QZCV": {
     "defaultMessage": "DefiLlama",
     "description": "defiLlamaLegend"
+  },
+  "QC2PNc": {
+    "defaultMessage": "Closing your position",
+    "description": "Terminating position"
   },
   "QDVx7K": {
     "defaultMessage": "Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here",
@@ -1123,10 +1139,6 @@
     "defaultMessage": "Approving use of {from} has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "success approving token"
   },
-  "Rgfl8x": {
-    "defaultMessage": "Recommended",
-    "description": "sortHighReturn"
-  },
   "RknjsQ": {
     "defaultMessage": "every 4 hours",
     "description": "fourHoursEvery"
@@ -1175,6 +1187,10 @@
     "defaultMessage": "Discord",
     "description": "discord"
   },
+  "Si3cOF": {
+    "defaultMessage": "Most received tokens",
+    "description": "sortMostReturnSellOrder"
+  },
   "SwiTok": {
     "defaultMessage": "Withdrawing balance from their position",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart4"
@@ -1210,10 +1226,6 @@
   "UHHRwl": {
     "defaultMessage": "Add address",
     "description": "Add address"
-  },
-  "UJ3vcm": {
-    "defaultMessage": "custom",
-    "description": "freqEasyInputCustom"
   },
   "UhD0bk": {
     "defaultMessage": "Confirm this transaction in your wallet",
@@ -1351,6 +1363,10 @@
     "defaultMessage": "View receipt",
     "description": "transactionConfirmationViewReceipt"
   },
+  "YGZ1lp": {
+    "defaultMessage": "Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. Stay updated on the situation by joining our",
+    "description": "positionEulerHack1"
+  },
   "YRoLhe": {
     "defaultMessage": "This will transfer your position, your NFT and all the liquidity stored in the position to the new address.",
     "description": "transfer sub description"
@@ -1471,6 +1487,10 @@
     "defaultMessage": "fees section.",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart8"
   },
+  "aPLZ1u": {
+    "defaultMessage": "Withdrawn:",
+    "description": "positionTerminated"
+  },
   "aPrJJm": {
     "defaultMessage": "Removed all permissions for",
     "description": "positionPermissionsModified all"
@@ -1523,6 +1543,10 @@
     "defaultMessage": "${gasSaved} USD",
     "description": "positionDetailsGasSaved"
   },
+  "bQUS8A": {
+    "defaultMessage": "Confetti count:",
+    "description": "advancedAggregatorSettingsConfetti"
+  },
   "bZG2wW": {
     "defaultMessage": "Create position",
     "description": "Create pair submit"
@@ -1563,6 +1587,10 @@
     "defaultMessage": "Transaction sent!",
     "description": "Operation successfull"
   },
+  "cmiLaP": {
+    "defaultMessage": "Average buy price",
+    "description": "averageBuyPriceLegend"
+  },
   "cwqjrt": {
     "defaultMessage": "Add funds",
     "description": "addFunds"
@@ -1578,6 +1606,10 @@
   "d2mT2I": {
     "defaultMessage": "Your position will be closed here and we will create a new one on",
     "description": "migrate description"
+  },
+  "d9VBkP": {
+    "defaultMessage": "Custom",
+    "description": "freqEasyInputCustom"
   },
   "dINFAP": {
     "defaultMessage": "1 day",
@@ -1627,9 +1659,9 @@
     "defaultMessage": "Manage list & tokens",
     "description": "manageListAndTokens"
   },
-  "eyJz83": {
-    "defaultMessage": "Average buy price",
-    "description": "positionDetailsAverageBuyPriceOption"
+  "ezierc": {
+    "defaultMessage": "Discord",
+    "description": "Discord"
   },
   "f++zf9": {
     "defaultMessage": "Position finished",
@@ -1682,6 +1714,10 @@
   "gQEJk+": {
     "defaultMessage": "swaps",
     "description": "oneHourSubject"
+  },
+  "gQubrG": {
+    "defaultMessage": "Swaps",
+    "description": "swapPriceGraphTitle"
   },
   "gVbrRz": {
     "defaultMessage": "View receipt",
@@ -1831,10 +1867,6 @@
     "defaultMessage": "And set what permissions to set for this address",
     "description": "add permission checkbox description"
   },
-  "k7+HKZ": {
-    "defaultMessage": "Market price vs DCA price",
-    "description": "averagePriceGraphTitle"
-  },
   "k7UbIH": {
     "defaultMessage": "Connected with {provider}",
     "description": "connected with"
@@ -1947,6 +1979,10 @@
     "defaultMessage": "Transfer swap to another address",
     "description": "transfer to title"
   },
+  "nAoD6G": {
+    "defaultMessage": "Average buy price",
+    "description": "averagePriceGraphTitle"
+  },
   "nFFzXV": {
     "defaultMessage": "15 minutes (1 swap)",
     "description": "fifteenMinutesSingular"
@@ -2003,6 +2039,10 @@
     "defaultMessage": "Swap",
     "description": "swap agg"
   },
+  "p0sB2R": {
+    "defaultMessage": "We don't add any extra fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly.{br}{br}Some aggregators support revenue sharing so we might get some part of their fee, but this is no extra charge to you.{br}{br}To clarify, these aggregators are not prioritized in any way, you can choose how to sort the results by yourself.",
+    "description": "faqFeesResponse"
+  },
   "p3Xa0W": {
     "defaultMessage": "Set to whom you want to transfer your position to",
     "description": "transfer description"
@@ -2051,10 +2091,6 @@
     "defaultMessage": "None of the tokens you have selected support yield platforms.",
     "description": "disabledByNoOption"
   },
-  "q0I3lm": {
-    "defaultMessage": "We don't take any fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly",
-    "description": "faqFeesResponse"
-  },
   "q7gy3F": {
     "defaultMessage": "View on chain explorer",
     "description": "view on chain explorer"
@@ -2094,10 +2130,6 @@
   "qTkbKq": {
     "defaultMessage": "Trade confirmed",
     "description": "transactionConfirmationBalanceChanges"
-  },
-  "qaVSQ/": {
-    "defaultMessage": "Market price",
-    "description": "currentPriceLegend"
   },
   "qbwUnh": {
     "defaultMessage": "Modifications",
@@ -2162,10 +2194,6 @@
   "s5i7V0": {
     "defaultMessage": "Amount of swaps cannot be higher than {MAX_UINT_32}",
     "description": "swapsCannotBeMax"
-  },
-  "s7Q4TB": {
-    "defaultMessage": "Terminating their position",
-    "description": "faqWhenDoINeedToPayGasFeesResponsePart5"
   },
   "sCqMd/": {
     "defaultMessage": "DCA vs Lump Sum Profit %",
@@ -2239,6 +2267,10 @@
     "defaultMessage": "In order to start generating yield we will need to close your current position and create a new one. Your historical data from this position will appear as a closed position",
     "description": "howItWorksDescriptionStep1"
   },
+  "ttC5dQ": {
+    "defaultMessage": "Invest (DCA)",
+    "description": "invest"
+  },
   "twerhs": {
     "defaultMessage": "Max",
     "description": "max"
@@ -2258,6 +2290,10 @@
   "uRlu53": {
     "defaultMessage": "{step} - The token approval is being confirmed",
     "description": "transationStepWaitApprove"
+  },
+  "uV7tE7": {
+    "defaultMessage": "Gas cost considered",
+    "description": "sortHighReturn"
   },
   "uZWTRx": {
     "defaultMessage": "How can we improve it?",
@@ -2295,6 +2331,10 @@
     "defaultMessage": "soon. Create a position now to be included in the next swap.",
     "description": "nextSwapCreateSoon"
   },
+  "vedPfb": {
+    "defaultMessage": "Swap",
+    "description": "swapPriceLegend"
+  },
   "vlDLmo": {
     "defaultMessage": "You'll invest",
     "description": "invest detail"
@@ -2303,9 +2343,9 @@
     "defaultMessage": "You receive",
     "description": "youReceive"
   },
-  "vqkOyW": {
-    "defaultMessage": "Most received",
-    "description": "sortMostReturnSellOrder"
+  "vmZ52D": {
+    "defaultMessage": "Market price",
+    "description": "marketPriceLegend"
   },
   "vw/vGQ": {
     "defaultMessage": "1 minute",
@@ -2322,6 +2362,10 @@
   "wH5c58": {
     "defaultMessage": "here.",
     "description": "here"
+  },
+  "wHKSsk": {
+    "defaultMessage": "Euler has frozen the contracts after the hack, so withdraw is not possible at the moment. Stay updated on the situation by joining our",
+    "description": "positionEulerHack1"
   },
   "wJOLei": {
     "defaultMessage": "Swapping",
@@ -2354,6 +2398,10 @@
   "x2ydb5": {
     "defaultMessage": "Transfer {from}:{to} position to {address}",
     "description": "transactionDetailsTransfer"
+  },
+  "xIIhB5": {
+    "defaultMessage": "+ yield",
+    "description": "positionWithdrawn"
   },
   "xRD2R7": {
     "defaultMessage": "Transaction will fail. We recommend choosing another route",
@@ -2418,6 +2466,10 @@
   "yw4rkM": {
     "defaultMessage": "hours",
     "description": "hours"
+  },
+  "yyT6co": {
+    "defaultMessage": "After transaction cost:",
+    "description": "aggregatorAfterTransaction"
   },
   "z/57ga": {
     "defaultMessage": "{readable}",
