@@ -7,7 +7,17 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from 'hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useHasPendingApproval, useTransactionAdder } from 'state/transactions/hooks';
-import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, STRING_SWAP_INTERVALS, TRANSACTION_TYPES } from 'config/constants';
+import {
+  DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
+  DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
+  FULL_DEPOSIT_TYPE,
+  MINIMUM_USD_RATE_FOR_DEPOSIT,
+  MINIMUM_USD_RATE_FOR_YIELD,
+  PERMISSIONS,
+  RATE_TYPE,
+  STRING_SWAP_INTERVALS,
+  TRANSACTION_TYPES,
+} from 'config/constants';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { BigNumber } from 'ethers';
@@ -32,7 +42,7 @@ import {
 import useBalance from 'hooks/useBalance';
 import { useAppDispatch } from 'state/hooks';
 import { getFrequencyLabel } from 'utils/parsing';
-import { formatCurrencyAmount, parseUsdPrice } from 'utils/currency';
+import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from 'utils/currency';
 import useAllowance from 'hooks/useAllowance';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
@@ -112,6 +122,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   }
   const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport;
   const fromHasYield = !!position.from.underlyingTokens.length;
+  const toHasYield = !!position.to.underlyingTokens.length;
   const errorService = useErrorService();
   const [allowance] = useAllowance(
     useWrappedProtocolToken ? wrappedProtocolToken : position.from,
@@ -404,6 +415,18 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     }
   };
 
+  const minimumToUse =
+    fromHasYield || toHasYield
+      ? MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD
+      : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT;
+
+  const hasEnoughUsdForModify = !!usdPrice && rateUsdPrice >= minimumToUse;
+
+  const shouldDisableByUsd =
+    rate !== '' && parseUnits(rate, from?.decimals).gt(BigNumber.from(0)) && !hasEnoughUsdForModify;
+
+  const minimumTokensNeeded = usdPriceToToken(from, minimumToUse, usdPrice);
+
   let actions: {
     label: React.ReactNode;
     onClick: () => void;
@@ -431,7 +454,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </>
         ),
         onClick: () => handleApproveToken(),
-        disabled: !!hasPendingApproval,
+        disabled: !!hasPendingApproval || shouldDisableByUsd,
         options: [
           {
             text: (
@@ -444,7 +467,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 }}
               />
             ),
-            disabled: !!hasPendingApproval,
+            disabled: !!hasPendingApproval || shouldDisableByUsd,
             onClick: () => handleApproveToken(true),
           },
         ],
@@ -479,7 +502,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwaps,
-        disabled: !!cantFund || frequencyValue === '0',
+        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
       },
     ];
   }
@@ -628,6 +651,28 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               </Typography>
             )}
         </Grid>
+        {shouldDisableByUsd && (
+          <Grid item xs={12}>
+            <StyledSummaryContainer>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)" sx={{ textAlign: 'left' }}>
+                <FormattedMessage
+                  description="disabledByUsdValueModify"
+                  // eslint-disable-next-line no-template-curly-in-string
+                  defaultMessage="You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to add funds to this position."
+                  values={{
+                    minimum: minimumToUse,
+                    minToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
+                    symbol: from.symbol,
+                    frequency: intl.formatMessage(
+                      STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                        .singularSubject
+                    ),
+                  }}
+                />
+              </Typography>
+            </StyledSummaryContainer>
+          </Grid>
+        )}
       </Grid>
     </Modal>
   );
