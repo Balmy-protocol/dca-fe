@@ -137,7 +137,7 @@ export default class ProviderService {
       window.location.reload();
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (switchError.code === 4902) {
+      if (switchError.code === 4902 || switchError.message === 'Chain does not exist') {
         try {
           const network = find(NETWORKS, { chainId: newChainId });
 
@@ -151,6 +151,7 @@ export default class ProviderService {
                 rpcUrls: network.rpc,
               },
             ]);
+            await this.provider.send('wallet_switchEthereumChain', [{ chainId: `0x${newChainId.toString(16)}` }]);
             if (callbackBeforeReload) {
               callbackBeforeReload();
             }
