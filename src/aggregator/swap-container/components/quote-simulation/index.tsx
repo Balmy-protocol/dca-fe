@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTx } from '@mean-finance/sdk/services/quotes/types';
 import useSimulateTransaction from 'hooks/useSimulateTransaction';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Typography from '@mui/material/Typography';

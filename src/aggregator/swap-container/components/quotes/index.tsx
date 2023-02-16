@@ -8,7 +8,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import { withStyles } from '@mui/styles';
-import { SourceMetadata } from '@mean-finance/sdk/dist/services/quotes/types';
+import { SourceMetadata } from '@mean-finance/sdk/services/quotes/types';
 import compact from 'lodash/compact';
 import Chip from '@mui/material/Chip';
 import styled from 'styled-components';

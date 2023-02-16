@@ -3,7 +3,7 @@ import isEqual from 'lodash/isEqual';
 import { BlowfishResponse } from 'types';
 import debounce from 'lodash/debounce';
 import usePrevious from 'hooks/usePrevious';
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTx } from '@mean-finance/sdk/services/quotes/types';
 import useSimulationService from './useSimulationService';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';

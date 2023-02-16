@@ -1,4 +1,4 @@
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTx } from '@mean-finance/sdk/services/quotes/types';
 import { BLOWFISH_ENABLED_CHAINS } from 'config';
 import { BlowfishResponse } from 'types';
 

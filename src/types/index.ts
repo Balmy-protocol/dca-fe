@@ -1,6 +1,6 @@
 import type Web3Service from 'services/web3Service';
 import React from 'react';
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTx } from '@mean-finance/sdk/services/quotes/types';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';

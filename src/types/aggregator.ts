@@ -1,4 +1,4 @@
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTx } from '@mean-finance/sdk/services/quotes/types';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 

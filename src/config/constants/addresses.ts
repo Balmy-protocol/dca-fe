@@ -3,7 +3,7 @@
 import { Chains, getAllChains } from '@mean-finance/sdk';
 import { NetworkStruct } from 'types';
 import findKey from 'lodash/findKey';
-import { Chain } from '@mean-finance/sdk/dist/types';
+import { Chain } from '@mean-finance/sdk/types';
 import {
   POSITION_VERSION_2,
   POSITION_VERSION_3,
