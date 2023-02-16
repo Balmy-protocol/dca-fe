@@ -413,6 +413,7 @@ const TokenPicker = ({
     if (onAddToken && isCustomToken) {
       onAddToken(token);
     }
+    setSearch('');
     handleOnClose();
   };
 
@@ -472,6 +473,7 @@ const TokenPicker = ({
             <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
               <StyledFilledInput
                 placeholder="Search your token"
+                value={search}
                 onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
                   setSearch(evt.currentTarget.value)
                 }
