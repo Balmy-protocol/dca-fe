@@ -1,6 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 
-import { Chains } from '@mean-finance/sdk';
+import { Chains, getAllChains } from '@mean-finance/sdk';
 import { NetworkStruct } from 'types';
 import findKey from 'lodash/findKey';
 import { Chain } from '@mean-finance/sdk/dist/types';
@@ -283,7 +283,7 @@ const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, currencySymbol, 
   rpc: publicRPCs ? [...publicRPCs] : [],
 });
 
-export const NETWORKS: Record<string, NetworkStruct> = Chains.getAllChains().reduce(
+export const NETWORKS: Record<string, NetworkStruct> = getAllChains().reduce(
   (acc, sdkNetwork) => {
     const foundNetworkKey = findKey(RAW_NETWORKS, { chainId: sdkNetwork.chainId });
 
@@ -587,7 +587,7 @@ export const CHAINLINK_GRAPHQL_URL = {
 
 export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';
 
-export const EXPLORER_URL = Chains.getAllChains().reduce<Record<number, string>>(
+export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
   (acc, network) => ({
     ...acc,
     [network.chainId]: network.explorer,

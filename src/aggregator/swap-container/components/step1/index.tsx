@@ -24,7 +24,7 @@ import TokenIcon from 'common/token-icon';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import { getGhTokenListLogoUrl, NETWORKS, REMOVED_AGG_CHAINS } from 'config';
-import { Chains } from '@mean-finance/sdk';
+import { getAllChains } from '@mean-finance/sdk';
 import useSdkChains from 'hooks/useSdkChains';
 import useAccount from 'hooks/useAccount';
 import QuoteData from '../quote-data';
@@ -279,7 +279,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 {supportedChains
                   .filter((chain) => !REMOVED_AGG_CHAINS.includes(chain))
                   .map((networkId) => {
-                    const foundSdkNetwork = find(Chains.getAllChains(), { chainId: networkId });
+                    const foundSdkNetwork = find(getAllChains(), { chainId: networkId });
                     const foundNetwork = find(NETWORKS, { chainId: networkId });
 
                     if (!foundSdkNetwork) {
