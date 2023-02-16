@@ -7,7 +7,7 @@ import { useQuery } from '@apollo/client';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import getPosition from 'graphql/getPosition.graphql';
 import useDCAGraphql from 'hooks/useDCAGraphql';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { FullPosition, GetPairSwapsData, NFTData } from 'types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -57,6 +57,7 @@ import { BigNumber } from 'ethers';
 import Alert from '@mui/material/Alert';
 import useErrorService from 'hooks/useErrorService';
 import { shouldTrackError } from 'utils/errors';
+import usePushToHistory from 'hooks/usePushToHistory';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
 
@@ -108,7 +109,7 @@ const PositionDetailFrame = () => {
     positionVersion: PositionVersions;
   }>();
   const client = useDCAGraphql(Number(chainId), positionVersion);
-  const history = useHistory();
+  const pushToHistory = usePushToHistory();
   const tabIndex = usePositionDetailsTab();
   const dispatch = useAppDispatch();
   const positionService = usePositionService();
@@ -247,7 +248,7 @@ const PositionDetailFrame = () => {
     event.preventDefault();
     dispatch(changeMainTab(0));
     dispatch(changeSubTab(1));
-    history.push('/positions');
+    pushToHistory('/positions');
   };
 
   const onWithdraw = async (useProtocolToken = false) => {

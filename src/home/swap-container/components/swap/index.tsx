@@ -53,7 +53,6 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import useAllowance from 'hooks/useAllowance';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useCanSupportPair from 'hooks/useCanSupportPair';
-import { useHistory } from 'react-router-dom';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
 import usePositionService from 'hooks/usePositionService';
@@ -61,6 +60,7 @@ import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useErrorService from 'hooks/useErrorService';
 import { shouldTrackError } from 'utils/errors';
+import useReplaceHistory from 'hooks/useReplaceHistory';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
 
@@ -198,7 +198,7 @@ const Swap = ({
 
   const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(from);
 
-  const history = useHistory();
+  const replaceHistory = useReplaceHistory();
 
   const fromCanHaveYield = !!(
     from && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(from.address)).length
@@ -617,7 +617,7 @@ const Swap = ({
   const handleChangeNetwork = (chainId: number) => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     walletService.changeNetwork(chainId, () => {
-      history.replace(`/create/${chainId}`);
+      replaceHistory(`/create/${chainId}`);
     });
   };
 

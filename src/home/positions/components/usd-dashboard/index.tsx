@@ -24,7 +24,7 @@ import { FormattedMessage } from 'react-intl';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { usdFormatter } from 'utils/parsing';
 import { Hidden } from '@mui/material';
-import { useHistory } from 'react-router-dom';
+import usePushToHistory from 'hooks/usePushToHistory';
 import { useAppDispatch } from 'hooks/state';
 import { changeMainTab } from 'state/tabs/actions';
 import DashboardPopper from './popper';
@@ -160,7 +160,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
   const [tokenUSDPrices, setTokenUSDPrices] = React.useState<Record<string, Record<string, BigNumber>>>({});
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [showPopper, setShowPopper] = React.useState(false);
-  const history = useHistory();
+  const pushToHistory = usePushToHistory();
   const dispatch = useAppDispatch();
 
   const handlePopperEl = (event: React.MouseEvent<HTMLElement>) => {
@@ -170,7 +170,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
   const handleGoToCreatePosition = () => {
     dispatch(changeMainTab(0));
-    history.push(`/create`);
+    pushToHistory(`/create`);
   };
 
   const tokensCountRaw = React.useMemo(

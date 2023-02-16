@@ -5,9 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import { ButtonTypes } from 'common/button';
 import { Position } from 'types';
-import { useHistory } from 'react-router-dom';
 import { changeMainTab, changeSubTab } from 'state/tabs/actions';
 import { useAppDispatch } from 'hooks/state';
+import usePushToHistory from 'hooks/usePushToHistory';
 
 const StyledSuggestMigrateContainer = styled.div`
   display: flex;
@@ -23,7 +23,7 @@ interface SuggestMigrateYieldModalProps {
 }
 
 const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: SuggestMigrateYieldModalProps) => {
-  const history = useHistory();
+  const pushToHistory = usePushToHistory();
   const dispatch = useAppDispatch();
 
   const handleCancel = () => {
@@ -56,7 +56,7 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
         onCancel();
         dispatch(changeMainTab(0));
         dispatch(changeSubTab(0));
-        history.push(`/create/${position.chainId}/${position.from.address}/${position.to.address}`);
+        pushToHistory(`/create/${position.chainId}/${position.from.address}/${position.to.address}`);
       },
     },
   ];

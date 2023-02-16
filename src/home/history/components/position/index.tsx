@@ -10,7 +10,6 @@ import { Position, Token } from 'types';
 import Chip from '@mui/material/Chip';
 import { getFrequencyLabel } from 'utils/parsing';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
-import { useHistory } from 'react-router-dom';
 import { emptyTokenWithAddress, formatCurrencyAmount } from 'utils/currency';
 import { NETWORKS } from 'config/constants';
 import { BigNumber } from 'ethers';
@@ -19,6 +18,7 @@ import find from 'lodash/find';
 import { useAppDispatch } from 'state/hooks';
 import { setPosition } from 'state/position-details/actions';
 import { changePositionDetailsTab } from 'state/tabs/actions';
+import usePushToHistory from 'hooks/usePushToHistory';
 
 const StyledChip = styled(Chip)`
   margin: 0px 5px;
@@ -123,7 +123,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
     return supportedNetwork;
   }, [chainId]);
 
-  const history = useHistory();
+  const pushToHistory = usePushToHistory();
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped, undefined, chainId);
   const showToPrice = !isLoadingToPrice && !!toPrice;
   const dispatch = useAppDispatch();
@@ -131,7 +131,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
   const onViewDetails = () => {
     dispatch(setPosition(null));
     dispatch(changePositionDetailsTab(0));
-    history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
+    pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
 
   return (
