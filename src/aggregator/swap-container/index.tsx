@@ -19,12 +19,13 @@ import {
 } from 'state/aggregator/actions';
 import useSwapOptions from 'hooks/useSwapOptions';
 import useCustomToken from 'hooks/useCustomToken';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useToken from 'hooks/useToken';
 import { SwapSortOptions } from 'config/constants/aggregator';
 import useSwapOption from 'hooks/useSwapOption';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
+import useReplaceHistory from 'hooks/useReplaceHistory';
 import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
 import SwapQuotes from './components/quotes';
@@ -37,7 +38,7 @@ const SwapContainer = () => {
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true, true);
   const toParamToken = useToken(toParam, true, true);
-  const history = useHistory();
+  const replaceHistory = useReplaceHistory();
   const actualCurrentNetwork = useCurrentNetwork();
   const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
   const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
@@ -94,7 +95,7 @@ const SwapContainer = () => {
     dispatch(setSelectedRoute(null));
     dispatch(setFromValue({ value: '', updateMode }));
     dispatch(setFrom(newFrom));
-    history.replace(`/swap/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    replaceHistory(`/swap/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
   };
 
   const onSetTo = (newTo: Token, updateMode = false) => {
@@ -102,7 +103,7 @@ const SwapContainer = () => {
     dispatch(setToValue({ value: '', updateMode }));
     dispatch(setTo(newTo));
     if (from) {
-      history.replace(`/swap/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
+      replaceHistory(`/swap/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
   };
 
@@ -111,7 +112,7 @@ const SwapContainer = () => {
     dispatch(toggleFromTo());
 
     if (to) {
-      history.replace(`/swap/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
+      replaceHistory(`/swap/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
   };
 

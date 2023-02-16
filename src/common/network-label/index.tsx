@@ -19,11 +19,12 @@ import { emptyTokenWithAddress, toToken } from 'utils/currency';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useWalletService from 'hooks/useWalletService';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import usdSdkChains from 'hooks/useSdkChains';
 import { FormattedMessage } from 'react-intl';
+import useReplaceHistory from 'hooks/useReplaceHistory';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -99,7 +100,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const location = useLocation();
   const urlParams = useParams<PositionDetailUrlParams>();
-  const history = useHistory();
+  const replaceHistory = useReplaceHistory();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const currentBreakPoint = useCurrentBreakpoint();
   const aggSupportedNetworks = usdSdkChains();
@@ -121,14 +122,14 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       walletService.changeNetwork(chainId, () => {
         if (location.pathname.startsWith('/positions')) {
-          history.replace('/positions');
+          replaceHistory('/positions');
         } else if (location.pathname === '/' || location.pathname.startsWith('/create')) {
-          history.replace(`/create/${chainId}`);
+          replaceHistory(`/create/${chainId}`);
         } else if (location.pathname.startsWith('/position')) {
           const { positionId, positionVersion } = urlParams;
-          history.replace(`/${chainId}/positions/${positionVersion}/${positionId}`);
+          replaceHistory(`/${chainId}/positions/${positionVersion}/${positionId}`);
         } else if (location.pathname.startsWith('/swap')) {
-          history.replace(`/swap/${chainId}`);
+          replaceHistory(`/swap/${chainId}`);
         }
       });
     }

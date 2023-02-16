@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { Position, Token, YieldOptions } from 'types';
-import { useHistory } from 'react-router-dom';
 import {
   TOKEN_BLACKLIST,
   NETWORKS,
@@ -30,6 +29,7 @@ import { setPosition } from 'state/position-details/actions';
 import { changePositionDetailsTab } from 'state/tabs/actions';
 import useTokenList from 'hooks/useTokenList';
 import useConnectedNetwork from 'hooks/useConnectedNetwork';
+import usePushToHistory from 'hooks/usePushToHistory';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -102,7 +102,7 @@ const PositionControls = ({
   }, [chainId]);
 
   const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
-  const history = useHistory();
+  const pushToHistory = usePushToHistory();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const isPending = !!pendingTransaction;
@@ -113,7 +113,7 @@ const PositionControls = ({
     event.preventDefault();
     dispatch(setPosition(null));
     dispatch(changePositionDetailsTab(0));
-    history.push(`/${chainId}/positions/${position.version}/${position.positionId}`);
+    pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
 
   const onChangeNetwork = () => {

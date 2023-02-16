@@ -26,9 +26,10 @@ import {
   setToYield,
   setYieldEnabled,
 } from 'state/create-position/actions';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import useYieldOptions from 'hooks/useYieldOptions';
+import useReplaceHistory from 'hooks/useReplaceHistory';
 import useToken from 'hooks/useToken';
 import Swap from './components/swap';
 
@@ -45,7 +46,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true);
   const toParamToken = useToken(toParam, true);
-  const history = useHistory();
+  const replaceHistory = useReplaceHistory();
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
 
   React.useEffect(() => {
@@ -95,7 +96,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
       dispatch(setFrequencyType(ONE_DAY));
     }
 
-    history.replace(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    replaceHistory(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
   };
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
@@ -103,7 +104,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
       dispatch(setFrequencyType(ONE_DAY));
     }
     if (from) {
-      history.replace(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
+      replaceHistory(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
   };
 
@@ -123,7 +124,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
     dispatch(setFrom(to));
 
     if (to) {
-      history.replace(`/create/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
+      replaceHistory(`/create/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
   };
 

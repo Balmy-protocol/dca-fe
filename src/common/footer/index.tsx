@@ -1,6 +1,5 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useHistory } from 'react-router-dom';
 
 import Link from '@mui/material/Link';
 import styled from 'styled-components';
@@ -14,6 +13,7 @@ import { useThemeMode } from 'state/config/hooks';
 import { Typography } from '@mui/material';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import LanguageLabel from 'common/lang-label';
+import usePushToHistory from 'hooks/usePushToHistory';
 
 const StyledFooterContainer = styled.div<{ isSmall: boolean }>`
   display: flex;
@@ -50,10 +50,10 @@ const Footer = () => {
   const mode = useThemeMode();
   const currentBreakPoint = useCurrentBreakpoint();
 
-  const history = useHistory();
+  const pushToHistory = usePushToHistory();
 
   const onFaqClick = () => {
-    history.push('/faq');
+    pushToHistory('/faq');
   };
 
   return (

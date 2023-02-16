@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import { useHistory } from 'react-router-dom';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
+import usePushToHistory from 'hooks/usePushToHistory';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -14,7 +14,7 @@ const StyledContainer = styled.div`
   flex: 1;
 `;
 const PositionNotFound = () => {
-  const history = useHistory();
+  const pushToHistory = usePushToHistory();
 
   return (
     <StyledContainer>
@@ -36,7 +36,7 @@ const PositionNotFound = () => {
         />
       </Typography>
 
-      <Button variant="contained" color="secondary" onClick={() => history.push('/')} style={{ marginTop: '10px' }}>
+      <Button variant="contained" color="secondary" onClick={() => pushToHistory('/')} style={{ marginTop: '10px' }}>
         <Typography variant="body1">
           <FormattedMessage description="goBackToPositions" defaultMessage="View your positions" />
         </Typography>

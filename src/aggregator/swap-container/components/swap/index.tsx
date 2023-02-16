@@ -33,13 +33,13 @@ import TransactionSteps, { TransactionAction as TransactionStep } from 'common/t
 import { GasKeys } from 'config/constants/aggregator';
 import { useAppDispatch } from 'state/hooks';
 import useSimulationService from 'hooks/useSimulationService';
-import { useHistory } from 'react-router-dom';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { setAggregatorChainId } from 'state/aggregator/actions';
 import useMeanApiService from 'hooks/useMeanApiService';
 import { shouldTrackError } from 'utils/errors';
 import useErrorService from 'hooks/useErrorService';
+import useReplaceHistory from 'hooks/useReplaceHistory';
 import { addCustomToken } from 'state/token-lists/actions';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -124,7 +124,7 @@ const Swap = ({
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const simulationService = useSimulationService();
-  const history = useHistory();
+  const replaceHistory = useReplaceHistory();
   const actualCurrentNetwork = useCurrentNetwork();
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
@@ -132,7 +132,7 @@ const Swap = ({
 
   const handleChangeNetwork = (chainId: number) => {
     dispatch(setAggregatorChainId(chainId));
-    history.replace(`/swap/${chainId}`);
+    replaceHistory(`/swap/${chainId}`);
   };
 
   const fromValueToUse =
