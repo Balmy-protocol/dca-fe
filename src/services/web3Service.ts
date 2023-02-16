@@ -5,7 +5,7 @@ import Torus from '@toruslabs/torus-embed';
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
-import { Chains } from '@mean-finance/sdk';
+import { getAllChains } from '@mean-finance/sdk';
 import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
 import { DUMMY_ARCX_CLIENT } from 'utils/dummy-arcx-client';
 
@@ -358,7 +358,7 @@ export default class Web3Service {
   }
 
   async setUpModal() {
-    const rpc = Chains.getAllChains().reduce((a, network) => {
+    const rpc = getAllChains().reduce((a, network) => {
       const { chainId, publicRPCs: rpcArray } = network;
       const rpcUrl = rpcArray && rpcArray[0];
       if (chainId !== 1 && rpcUrl) {
