@@ -84,6 +84,34 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
   },
+  'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json': {
+    name: 'Canto list',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 7700,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
+  'https://raw.githubusercontent.com/evmoswap/default-token-list/main/assets/tokens/evmos.json': {
+    name: 'EVMOS list',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 9001,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
   'https://tokens.1inch.io/v1.1/56': {
     name: '1Inch BSC',
     logoURI: '',
@@ -313,6 +341,8 @@ export const initialState: TokenListsState = {
     'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wagyu/src/config/constants/tokenLists/pancake-default.tokenlist.json',
     'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
     'https://raw.githubusercontent.com/BeamSwap/beamswap-tokenlist/main/tokenlist.json',
+    'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json',
+    'https://raw.githubusercontent.com/evmoswap/default-token-list/main/assets/tokens/evmos.json',
     // 'https://extendedtokens.uniswap.org',
     'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
     'https://tokens.1inch.io/v1.1/8217',
@@ -374,11 +404,13 @@ export default createReducer(initialState, (builder) =>
           tokens = payload.tokens;
         }
 
-        const mappedTokens: Token[] = tokens.map<Token>((token) => ({
-          ...token,
-          address: token.address.toLowerCase(),
-          chainId: state.byUrl[arg].chainId || token.chainId,
-        }));
+        const mappedTokens: Token[] = tokens
+          .filter((token) => !!token.address)
+          .map<Token>((token) => ({
+            ...token,
+            address: token.address.toLowerCase(),
+            chainId: state.byUrl[arg].chainId || token.chainId,
+          }));
 
         state.byUrl[arg] = {
           ...state.byUrl[arg],
