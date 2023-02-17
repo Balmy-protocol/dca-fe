@@ -28,7 +28,7 @@ import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import Collapse from '@mui/material/Collapse';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import List from '@mui/material/List';
@@ -36,6 +36,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import AppBar from '@mui/material/AppBar';
 import ListItemText from '@mui/material/ListItemText';
+import usePushToHistory from 'hooks/usePushToHistory';
 import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
 
@@ -136,11 +137,11 @@ interface NavBarProps {
 const NavBar = ({ isLoading }: NavBarProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
   const currentNetwork = useCurrentNetwork();
-  const history = useHistory();
   const tabIndex = useMainTab();
   const subTabIndex = useSubTab();
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const pushToHistory = usePushToHistory();
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const [openFirstSubTab, setOpenFirstSubtab] = React.useState(tabIndex === 0);
 
@@ -149,16 +150,16 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       dispatch(changeMainTab(0));
       dispatch(changeSubTab(1));
       setOpenFirstSubtab(true);
-      history.push(`/positions`);
+      pushToHistory('/positions');
     } else if (location.pathname === '/swap') {
       setOpenFirstSubtab(false);
       dispatch(changeMainTab(2));
-      history.push(`/swap`);
+      pushToHistory('/swap');
     } else if (location.pathname === '/' || location.pathname === '/create') {
       dispatch(changeMainTab(0));
       dispatch(changeSubTab(0));
       setOpenFirstSubtab(true);
-      history.push(`/create`);
+      pushToHistory('/create');
     }
   }, []);
 
@@ -172,7 +173,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       dispatch(changeSubTab(0));
       setOpenDrawer(false);
       setOpenFirstSubtab(false);
-      history.push(`/${tabValue.url}`);
+      pushToHistory(`/${tabValue.url}`);
     } else {
       setOpenFirstSubtab(!openFirstSubTab);
     }
@@ -182,11 +183,11 @@ const NavBar = ({ isLoading }: NavBarProps) => {
     dispatch(changeMainTab(tabValue.index));
     dispatch(changeSubTab(tabValue.index));
     setOpenDrawer(false);
-    history.push(`/${tabValue.url}`);
+    pushToHistory(`/${tabValue.url}`);
   };
 
   const onFaqClick = () => {
-    history.push('/faq');
+    pushToHistory('/faq');
   };
 
   const openExternalLink = (url: string) => {

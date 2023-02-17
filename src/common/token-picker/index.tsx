@@ -186,6 +186,10 @@ const Row = ({
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const token = !isCustomToken || isImportedToken ? tokenList[tokenKeys[index]] : customToken!.token;
 
+  if (!token) {
+    return null;
+  }
+
   const tokenBalance =
     !isCustomToken || isImportedToken
       ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0)
