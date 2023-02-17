@@ -137,6 +137,8 @@ const store = configureStore({
           'https://token-list.sushi.com/',
           'https://tokens.1inch.io/v1.1/100',
           'https://raw.githubusercontent.com/BeamSwap/beamswap-tokenlist/main/tokenlist.json',
+          'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json',
+          'https://raw.githubusercontent.com/evmoswap/default-token-list/main/assets/tokens/evmos.json',
           // 'https://extendedtokens.uniswap.org',
           'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
