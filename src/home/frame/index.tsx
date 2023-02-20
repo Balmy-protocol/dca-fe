@@ -91,7 +91,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
         <Alert severity="warning">
           <FormattedMessage
             description="polygonSubgraphBroken"
-            defaultMessage="Sorry, we're currently performing maintenance on our Polygon subgraph. As a result, you won't be able to create or view your Polygon positions until the subgraph is back online. Rest assured that your funds are safe, and this is just a temporary interface issue. We apologize for any inconvenience caused and will work to resolve the issue as quickly as possible. Thank you for your patience."
+            defaultMessage="We're currently performing maintenance on our Polygon subgraph. As a result, you won't be able to create or view your Polygon positions until the subgraph is back online. Rest assured that your funds are safe, and this is just a temporary interface issue. We apologize for any inconvenience caused and will work to resolve the issue as quickly as possible. Thank you for your patience."
           />
         </Alert>
       </Grid>
