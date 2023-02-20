@@ -19,8 +19,6 @@ import usePairService from 'hooks/usePairService';
 import { useAppDispatch } from 'state/hooks';
 import { setDCAChainId } from 'state/create-position/actions';
 import useErrorService from 'hooks/useErrorService';
-import { FormattedMessage } from 'react-intl';
-import Alert from '@mui/material/Alert';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 

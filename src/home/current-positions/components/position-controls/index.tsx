@@ -161,7 +161,12 @@ const PositionControls = ({
     disabled ||
     TOKEN_BLACKLIST.includes(position.from.address) ||
     TOKEN_BLACKLIST.includes(fromSupportsYield?.tokenAddress || '') ||
-    !shouldEnableFrequency(position.swapInterval.toString(), position.from.address, position.to.address);
+    !shouldEnableFrequency(
+      position.swapInterval.toString(),
+      position.from.address,
+      position.to.address,
+      position.chainId
+    );
 
   return (
     <StyledCallToActionContainer>

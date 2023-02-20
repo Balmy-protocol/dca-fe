@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/lib/ethers';
 import { Duration } from 'luxon';
 import { defineMessage, IntlShape } from 'react-intl';
+import { NETWORKS } from './addresses';
 
 export const ONE_MINUTE = BigNumber.from(60);
 export const FIVE_MINUTES = ONE_MINUTE.mul(BigNumber.from(5));
@@ -371,11 +372,33 @@ export const DISABLED_FREQUENCIES_BY_TOKEN: Record<string, string[]> = {
   '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722': [FOUR_HOURS.toString()],
 };
 
-export const shouldEnableFrequency = (frequency: string, fromAddress?: string, toAddress?: string) => {
-  const filteredTokens = Object.keys(DISABLED_FREQUENCIES_BY_TOKEN);
+export const DISABLED_FREQUENCIES_BY_CHAIN: Record<number, string[]> = {
+  [NETWORKS.polygon.chainId]: [FOUR_HOURS.toString()],
+};
 
-  if (!filteredTokens.includes(fromAddress || '') && !filteredTokens.includes(toAddress || '')) {
+export const shouldEnableFrequency = (
+  frequency: string,
+  fromAddress?: string,
+  toAddress?: string,
+  chainId?: number
+) => {
+  const filteredTokens = Object.keys(DISABLED_FREQUENCIES_BY_TOKEN);
+  const filteredChains = Object.keys(DISABLED_FREQUENCIES_BY_CHAIN);
+
+  if (
+    !filteredTokens.includes(fromAddress || '') &&
+    !filteredTokens.includes(toAddress || '') &&
+    !filteredChains.includes(chainId?.toString() || '')
+  ) {
     return true;
+  }
+
+  if (
+    chainId &&
+    filteredChains.includes(chainId.toString()) &&
+    DISABLED_FREQUENCIES_BY_CHAIN[chainId].includes(frequency)
+  ) {
+    return false;
   }
 
   if (
