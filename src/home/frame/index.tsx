@@ -21,6 +21,7 @@ import { setError } from 'state/error/actions';
 import { setDCAChainId } from 'state/create-position/actions';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
+import useErrorService from 'hooks/useErrorService';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -34,6 +35,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const client = useDCAGraphql();
   const pairService = usePairService();
   const dispatch = useAppDispatch();
+  const errorService = useErrorService();
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
   // const hasInitiallySetNetwork = React.useState()
 
@@ -61,7 +63,9 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       try {
         await pairService.fetchAvailablePairs();
       } catch (e) {
-        dispatch(setError({ error: e as Error }));
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        errorService.logError('Error fetching pairs', JSON.stringify(e), {});
+        // dispatch(setError({ error: e as Error }));
       }
       setHasLoadedPairs(true);
     };
