@@ -91,7 +91,7 @@ const PositionSummaryControls = ({
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&
     !TOKEN_BLACKLIST.includes(position.from.address) &&
-    shouldEnableFrequency(position.swapInterval.interval, position.from.address, position.to.address);
+    shouldEnableFrequency(position.swapInterval.interval, position.from.address, position.to.address, position.chainId);
 
   return (
     <PositionControlsContainer>

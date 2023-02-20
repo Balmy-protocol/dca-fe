@@ -64,7 +64,9 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   const availableFrequencies =
     (swapIntervalsData &&
       orderBy(swapIntervalsData.swapIntervals, [(swapInterval) => parseInt(swapInterval.interval, 10)], ['asc'])
-        .filter((swapInterval) => shouldEnableFrequency(swapInterval.interval, from?.address, to?.address))
+        .filter((swapInterval) =>
+          shouldEnableFrequency(swapInterval.interval, from?.address, to?.address, currentNetwork.chainId)
+        )
         .map((swapInterval) => ({
           label: {
             singular: intl.formatMessage(
@@ -92,7 +94,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
 
     dispatch(setFrom(newFrom));
 
-    if (!shouldEnableFrequency(frequencyType.toString(), newFrom.address, to?.address)) {
+    if (!shouldEnableFrequency(frequencyType.toString(), newFrom.address, to?.address, currentNetwork.chainId)) {
       dispatch(setFrequencyType(ONE_DAY));
     }
 
@@ -100,7 +102,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
   };
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
-    if (!shouldEnableFrequency(frequencyType.toString(), from?.address, newTo.address)) {
+    if (!shouldEnableFrequency(frequencyType.toString(), from?.address, newTo.address, currentNetwork.chainId)) {
       dispatch(setFrequencyType(ONE_DAY));
     }
     if (from) {
