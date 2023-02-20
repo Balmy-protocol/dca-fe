@@ -17,11 +17,12 @@ import useDCAGraphql from 'hooks/useDCAGraphql';
 import useWalletService from 'hooks/useWalletService';
 import usePairService from 'hooks/usePairService';
 import { useAppDispatch } from 'state/hooks';
-import { setError } from 'state/error/actions';
 import { setDCAChainId } from 'state/create-position/actions';
+import useErrorService from 'hooks/useErrorService';
+import { FormattedMessage } from 'react-intl';
+import Alert from '@mui/material/Alert';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
-import useErrorService from 'hooks/useErrorService';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -65,7 +66,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       } catch (e) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         errorService.logError('Error fetching pairs', JSON.stringify(e), {});
-        // dispatch(setError({ error: e as Error }));
       }
       setHasLoadedPairs(true);
     };
@@ -86,7 +86,15 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const isLoadingIntervals = isLoading || isLoadingSwapIntervals || !hasLoadedPairs;
 
   return (
-    <Grid container spacing={8}>
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <Alert severity="warning">
+          <FormattedMessage
+            description="polygonSubgraphBroken"
+            defaultMessage="Sorry, we're currently performing maintenance on our Polygon subgraph. As a result, you won't be able to create or view your Polygon positions until the subgraph is back online. Rest assured that your funds are safe, and this is just a temporary interface issue. We apologize for any inconvenience caused and will work to resolve the issue as quickly as possible. Thank you for your patience."
+          />
+        </Alert>
+      </Grid>
       {isLoadingIntervals ? (
         <Grid item xs={12} style={{ display: 'flex' }}>
           <CenteredLoadingIndicator size={70} />
