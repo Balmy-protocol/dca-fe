@@ -290,9 +290,9 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
       //   token: emptyTokenWithAddress('BEEFY'),
       // },
       // {
-      //   id: '3a6cc030-738d-4e19-8a40-e63e9c4d5a6f', // beefy GMX TODO: MISSING IN DEFILLAMA
+      //   id: 'ba935cb2-a371-4f2b-9bd3-9881a995d68f', // beefy GMX
       //   tokenAddress: '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03', // beefy GMX
-      //   poolId: '3a6cc030-738d-4e19-8a40-e63e9c4d5a6f', // beefy GMX
+      //   poolId: 'ba935cb2-a371-4f2b-9bd3-9881a995d68f', // beefy GMX
       //   name: 'Beefy',
       //   token: emptyTokenWithAddress('BEEFY'),
       // },
