@@ -7,6 +7,7 @@ const getCurrentPositions = gql`
         from: "0xbd1fe73e1f12bd2bc237de9b626f056f21f86427"
         createdAtTimestamp_gte: $createdAtStart
         createdAtTimestamp_lte: $createdAtStop
+        status_in: [ACTIVE, COMPLETED]
       }
       first: $first
       skip: $skip
