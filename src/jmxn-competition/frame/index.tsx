@@ -20,6 +20,7 @@ import { FormattedMessage } from 'react-intl';
 import useYieldOptions from 'hooks/useYieldOptions';
 import { useHistory } from 'react-router-dom';
 import { changeMainTab } from 'state/tabs/actions';
+import { formatUnits } from '@ethersproject/units';
 import { useAppDispatch } from 'state/hooks';
 import LeaderboardSummary from '../leaderboard';
 import getPositions from '../graphql/getPositions.graphql';
@@ -32,6 +33,8 @@ interface UserCompPositions {
   user: string;
   generatedUsd: number;
   totalDepositedUsd: number;
+  totalUsedUsd: number;
+  totalUsed: BigNumber;
   totalDeposited: BigNumber;
   generated: { token: Token; amount: BigNumber }[];
   positions: FullPosition[];
@@ -202,6 +205,14 @@ const HomeFrame = () => {
               BigNumber.from(0)
             );
 
+            const totalUsed = totalDeposited.sub(
+              userPositions.reduce(
+                (totalRemainingLiqAcc, position) =>
+                  totalRemainingLiqAcc.add(BigNumber.from(position.remainingLiquidity)),
+                BigNumber.from(0)
+              )
+            );
+
             const generated = Object.values(
               userPositions.reduce<Record<string, { token: Token; amount: BigNumber }>>((generatedAcc, position) => {
                 const newGeneratedAcc = {
@@ -212,8 +223,10 @@ const HomeFrame = () => {
 
                 let generatedByPosition = BigNumber.from(0);
 
-                if (position.to.type === 'YIELD_BEARING_SHARE' && underlyingRates[position.to.address]) {
-                  generatedByPosition = BigNumber.from(position.totalSwapped).mul(underlyingRates[position.to.address]);
+                if (position.to.type === 'YIELD_BEARING_SHARE' && underlyingRates[displayedToken.address]) {
+                  generatedByPosition = BigNumber.from(position.totalSwapped).mul(
+                    underlyingRates[displayedToken.address]
+                  );
                 } else {
                   generatedByPosition = BigNumber.from(position.totalSwapped);
                 }
@@ -247,14 +260,8 @@ const HomeFrame = () => {
                   0
                 )) ||
               0;
-            const totalDepositedUsd =
-              (prices &&
-                parseUsdPrice(
-                  toToken({ address: JMXN_ADDRESS, chainId: NETWORKS.polygon.chainId }),
-                  totalDeposited,
-                  prices[JMXN_ADDRESS]
-                )) ||
-              0;
+            const totalDepositedUsd = parseFloat(formatUnits(totalDeposited, JMXN_TOKEN.decimals));
+            const totalUsedUsd = parseFloat(formatUnits(totalUsed, JMXN_TOKEN.decimals));
 
             newAcc[user] = {
               user,
@@ -262,6 +269,8 @@ const HomeFrame = () => {
               totalDepositedUsd,
               generated,
               generatedUsd,
+              totalUsed,
+              totalUsedUsd,
               positions: userPositions,
             };
 
