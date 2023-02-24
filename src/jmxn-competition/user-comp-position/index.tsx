@@ -123,7 +123,9 @@ interface UserCompPositionProps {
     user: string;
     generatedUsd: number;
     totalDepositedUsd: number;
+    totalUsedUsd: number;
     totalDeposited: BigNumber;
+    totalUsed: BigNumber;
     generated: { token: Token; amount: BigNumber }[];
     positions: FullPosition[];
   };
@@ -147,6 +149,8 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
     dispatch(changePositionDetailsTab(0));
     history.push(`/${NETWORKS.polygon.chainId}/positions/${POSITION_VERSION_4}/${positionId}`);
   };
+
+  const profit = (userPosition.generatedUsd / userPosition.totalUsedUsd - 1) * 100;
 
   return (
     <StyledCard variant="outlined">
@@ -198,6 +202,22 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
               </Typography>
               <Typography variant="body1" sx={{ marginLeft: '5px' }}>
                 {userPosition.positions.length}
+              </Typography>
+            </StyledDetailWrapper>
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage description="jmxnUserCompTotalUsed" defaultMessage="Used funds:" />
+              </Typography>
+              <Typography variant="body1" sx={{ marginLeft: '5px' }}>
+                {formatCurrencyAmount(BigNumber.from(userPosition.totalUsed), JMXN_TOKEN, 4)} MXN
+              </Typography>
+            </StyledDetailWrapper>
+            <StyledDetailWrapper>
+              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+                <FormattedMessage description="jmxnUserCompTotalProfi" defaultMessage="Profit:" />
+              </Typography>
+              <Typography variant="body1" sx={{ marginLeft: '5px' }}>
+                {profit.toFixed(2)}%
               </Typography>
             </StyledDetailWrapper>
           </StyledMainData>

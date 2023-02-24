@@ -8,6 +8,8 @@ interface LeaderboardSummaryProps {
   userPositions: {
     user: string;
     generatedUsd: number;
+    totalUsed: BigNumber;
+    totalUsedUsd: number;
     totalDepositedUsd: number;
     totalDeposited: BigNumber;
     generated: { token: Token; amount: BigNumber }[];
