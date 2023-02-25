@@ -1403,6 +1403,10 @@
     "defaultMessage": "Is Mean Finance audited?",
     "description": "faqIsMeanFinanceAudited"
   },
+  "ZBiobz": {
+    "defaultMessage": "Profit:",
+    "description": "jmxnUserCompTotalProfi"
+  },
   "ZCPyG3": {
     "defaultMessage": "Unsupported method",
     "description": "unsupported_method"
@@ -2123,6 +2127,10 @@
     "defaultMessage": "MAX",
     "description": "maxWallet"
   },
+  "rJAtmd": {
+    "defaultMessage": "Used funds:",
+    "description": "jmxnUserCompTotalUsed"
+  },
   "rKNAVd": {
     "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you migrate the position.",
     "description": "Approve signature companion text migrate"
@@ -2186,6 +2194,10 @@
   "t2bZTZ": {
     "defaultMessage": "Create position anyway",
     "description": "lowLiqCreatePosition"
+  },
+  "t2lqGa": {
+    "defaultMessage": "Withdraw and close position",
+    "description": "ClosePosition"
   },
   "tAHtfP": {
     "defaultMessage": "for that frequency. Are you sure you want to create a position?",

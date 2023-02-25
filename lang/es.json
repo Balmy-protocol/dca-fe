@@ -2558,5 +2558,17 @@
   "znN7fQ": {
     "defaultMessage": "Nunca ejecutado",
     "description": "history never run for in position"
+  },
+  "t2lqGa": {
+    "defaultMessage": "Retirar y cerrar posición",
+    "description": "ClosePosition"
+  },
+  "rJAtmd": {
+    "defaultMessage": "Fondos usados:",
+    "description": "jmxnUserCompTotalUsed"
+  },
+  "ZBiobz": {
+    "defaultMessage": "Rendimiento:",
+    "description": "jmxnUserCompTotalProfi"
   }
 }

@@ -171,7 +171,7 @@ const TerminateModal = ({
         {
           color: 'error',
           variant: 'contained',
-          label: <FormattedMessage description="Close" defaultMessage="Close" />,
+          label: <FormattedMessage description="ClosePosition" defaultMessage="Withdraw and close position" />,
           onClick: handleTerminate,
         },
       ]}

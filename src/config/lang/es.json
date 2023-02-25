@@ -393,6 +393,12 @@
       "value": "."
     }
   ],
+  "2iKKX6": [
+    {
+      "type": 0,
+      "value": "Retirar y cerrar posición"
+    }
+  ],
   "2l6dgp": [
     {
       "type": 0,
@@ -617,6 +623,12 @@
     {
       "type": 1,
       "value": "balance"
+    }
+  ],
+  "6VIxBc": [
+    {
+      "type": 0,
+      "value": "El próximo intercambio para esta posicion sera ejecutado"
     }
   ],
   "6lcY/P": [
@@ -961,6 +973,12 @@
       "value": "Valor total"
     }
   ],
+  "AqqLuk": [
+    {
+      "type": 0,
+      "value": "Total depositado:"
+    }
+  ],
   "AzL+qV": [
     {
       "type": 0,
@@ -1187,6 +1205,12 @@
     {
       "type": 0,
       "value": "Modificar posición"
+    }
+  ],
+  "CdFs0C": [
+    {
+      "type": 0,
+      "value": "Los intercambios ya no se van a ejecutar, no vas a poder hacer modificaciones a esta posicion y el NFT se quemará."
     }
   ],
   "CioUeM": [
@@ -1525,6 +1549,12 @@
       "value": "Gas ahorrado"
     }
   ],
+  "FMbBaD": [
+    {
+      "type": 0,
+      "value": "Invirtiendo en:"
+    }
+  ],
   "FW4Fp5": [
     {
       "type": 0,
@@ -1663,6 +1693,12 @@
     {
       "type": 0,
       "value": "1 día (1 intercambio)"
+    }
+  ],
+  "Gcz9a9": [
+    {
+      "type": 0,
+      "value": "Competencia de jMXN"
     }
   ],
   "Gg22iu": [
@@ -2369,6 +2405,12 @@
       "value": " se ha enviado correctamente al blockchain y se confirmará en breve"
     }
   ],
+  "NcWBc1": [
+    {
+      "type": 0,
+      "value": "Empeza a invertir con jMXN y gana premios increibles!"
+    }
+  ],
   "Nd61ag": [
     {
       "type": 0,
@@ -2415,6 +2457,24 @@
     {
       "type": 0,
       "value": "Ver en el explorador"
+    }
+  ],
+  "O22yuw": [
+    {
+      "type": 1,
+      "value": "yield"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " para ti por"
     }
   ],
   "O75EVP": [
@@ -2763,6 +2823,12 @@
       "value": "readable"
     }
   ],
+  "RWQPRO": [
+    {
+      "type": 0,
+      "value": "Total ganado:"
+    }
+  ],
   "RXcwxI": [
     {
       "type": 0,
@@ -3039,6 +3105,18 @@
       "value": " Las compras se producen independientemente del precio del activo y a intervalos regulares. En efecto, esta estrategia elimina gran parte del trabajo minucioso de intentar cronometrar el mercado para realizar compras de activos a los mejores precios."
     }
   ],
+  "VBCnJk": [
+    {
+      "type": 0,
+      "value": "Posiciones:"
+    }
+  ],
+  "VZcHUA": [
+    {
+      "type": 0,
+      "value": "Ver posiciones"
+    }
+  ],
   "VaWvMp": [
     {
       "type": 0,
@@ -3283,6 +3361,12 @@
       "value": "Retirar"
     }
   ],
+  "YhPAsu": [
+    {
+      "type": 0,
+      "value": "Total ganado:"
+    }
+  ],
   "YhkTRN": [
     {
       "type": 0,
@@ -3365,6 +3449,12 @@
     {
       "type": 0,
       "value": "¿Está Mean Finance auditado?"
+    }
+  ],
+  "ZBiobz": [
+    {
+      "type": 0,
+      "value": "Rendimiento:"
     }
   ],
   "ZCPyG3": [
@@ -3639,6 +3729,12 @@
     {
       "type": 0,
       "value": "Atrás"
+    }
+  ],
+  "bBX0k1": [
+    {
+      "type": 0,
+      "value": "Ganado por token:"
     }
   ],
   "bCOphI": [
@@ -4857,6 +4953,12 @@
       "value": " para habilitar esta opción."
     }
   ],
+  "pH36vJ": [
+    {
+      "type": 0,
+      "value": "Crea una posición y empeza a competir"
+    }
+  ],
   "pMZxIC": [
     {
       "type": 0,
@@ -4899,16 +5001,16 @@
       "value": "Por lo tanto, podría ocurrir que su intercambio no se ejecutara con la frecuencia especificada. Si esto ocurriera con su posición, recuerde que sólo se cobran tarifas por los intercambios, por lo que su saldo no se verá afectado"
     }
   ],
-  "q0I3lm": [
-    {
-      "type": 0,
-      "value": "No cobramos ningún tipo de comisión. Estas recibiendo exactamente los mismos precios que si hubieses interactuado con el agregador directamente."
-    }
-  ],
   "pwNot7": [
     {
       "type": 0,
       "value": "Ninguno de los tokens que seleccionaste soportan generar retornos."
+    }
+  ],
+  "q0I3lm": [
+    {
+      "type": 0,
+      "value": "No cobramos ningún tipo de comisión. Estas recibiendo exactamente los mismos precios que si hubieses interactuado con el agregador directamente."
     }
   ],
   "q2gF9r": [
@@ -5085,6 +5187,12 @@
       "value": "MAX"
     }
   ],
+  "rJAtmd": [
+    {
+      "type": 0,
+      "value": "Fondos usados:"
+    }
+  ],
   "rKNAVd": [
     {
       "type": 0,
@@ -5235,6 +5343,12 @@
       "value": "Crear posición de todas formas"
     }
   ],
+  "t2lqGa": [
+    {
+      "type": 0,
+      "value": "Retirar y cerrar posición"
+    }
+  ],
   "tAHtfP": [
     {
       "type": 0,
@@ -5383,6 +5497,20 @@
       "value": "Unwrap"
     }
   ],
+  "uHCFsv": [
+    {
+      "type": 0,
+      "value": "aproximadamente "
+    },
+    {
+      "type": 1,
+      "value": "nextSwapAvailableAt"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
   "uRlu53": [
     {
       "type": 1,
@@ -5419,16 +5547,16 @@
       "value": "4 horas"
     }
   ],
-  "vHie/I": [
-    {
-      "type": 0,
-      "value": "Estarás teniendo exactamente la misma experiencia que tendrías al usar el agregador directamente. No construimos ningún contrato inteligente sobre ellos así que no hay riesgo agregado. Al mismo tiempo, ofrecemos simulación de transacciones en algunas redes."
-    }
-  ],
   "v1SUII": [
     {
       "type": 0,
       "value": "minutos"
+    }
+  ],
+  "vHie/I": [
+    {
+      "type": 0,
+      "value": "Estarás teniendo exactamente la misma experiencia que tendrías al usar el agregador directamente. No construimos ningún contrato inteligente sobre ellos así que no hay riesgo agregado. Al mismo tiempo, ofrecemos simulación de transacciones en algunas redes."
     }
   ],
   "vNNVGj": [
@@ -5765,6 +5893,12 @@
     {
       "type": 0,
       "value": "Costo de la transacción:"
+    }
+  ],
+  "znN7fQ": [
+    {
+      "type": 0,
+      "value": "Nunca ejecutado"
     }
   ],
   "zpPKoQ": [
