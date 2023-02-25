@@ -171,7 +171,7 @@ export default class WalletService {
 
   async get1InchBalances(): Promise<Record<string, BigNumber>> {
     const account = this.getAccount();
-    const currentNetwork = await this.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     if (!account) return Promise.resolve({});
 
@@ -189,7 +189,7 @@ export default class WalletService {
 
   async getCustomToken(address: string): Promise<{ token: Token; balance: BigNumber } | undefined> {
     const account = this.getAccount();
-    const currentNetwork = await this.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     if (!address || !account) return Promise.resolve(undefined);
 

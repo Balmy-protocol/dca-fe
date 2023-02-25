@@ -81,7 +81,7 @@ export default class AggregatorService {
     chainId?: number,
     disabledDexes?: string[]
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
     let shouldValidate = !buyAmount && isOnNetwork;
@@ -206,7 +206,7 @@ export default class AggregatorService {
     gasSpeed?: GasKeys,
     chainId?: number
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     const isBuyOrder = quote.type === 'buy';
 
