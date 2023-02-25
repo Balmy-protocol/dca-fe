@@ -69,7 +69,7 @@ export default class SdkService {
     gasSpeed?: GasKeys,
     skipValidation?: boolean
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     const network = chainId || currentNetwork.chainId;
 
@@ -114,7 +114,7 @@ export default class SdkService {
     chainId?: number,
     disabledDexes?: string[]
   ) {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     const network = chainId || currentNetwork.chainId;
 
@@ -199,7 +199,7 @@ export default class SdkService {
   }
 
   async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: BigNumber } | undefined> {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
 
     if (chainId === currentNetwork.chainId) {
       return this.walletService.getCustomToken(address);

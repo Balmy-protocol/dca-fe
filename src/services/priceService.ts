@@ -110,7 +110,7 @@ export default class PriceService {
   }
 
   async getProtocolHistoricPrices(dates: string[], chainId?: number) {
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
     const defillamaId = DEFILLAMA_IDS[chainIdToUse] || findKey(NETWORKS, { chainId: chainIdToUse });
     if (!defillamaId) {
@@ -140,7 +140,7 @@ export default class PriceService {
   }
 
   async getZrxGasSwapQuote(from: Token, to: Token, amount: BigNumber, chainId?: number) {
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
     const api = ZRX_API_ADDRESS[chainIdToUse];
     const url =
@@ -226,7 +226,7 @@ export default class PriceService {
   }
 
   async getPriceForGraph(from: Token, to: Token, periodIndex = 0, chainId?: number) {
-    const network = await this.walletService.getNetwork();
+    const network = await this.providerService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
     const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
     const span = INDEX_TO_SPAN[periodIndex];

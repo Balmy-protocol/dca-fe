@@ -16,7 +16,6 @@ import { emptyTokenWithAddress } from 'utils/currency';
 
 // MOCKS
 import ContractService from './contractService';
-import WalletService from './walletService';
 import ProviderService from './providerService';
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
@@ -27,8 +26,6 @@ const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
 export default class MeanApiService {
   axiosClient: AxiosInstance;
 
-  walletService: WalletService;
-
   contractService: ContractService;
 
   providerService: ProviderService;
@@ -37,13 +34,7 @@ export default class MeanApiService {
 
   loadedAsSafeApp: boolean;
 
-  constructor(
-    walletService: WalletService,
-    contractService: ContractService,
-    axiosClient: AxiosInstance,
-    providerService: ProviderService
-  ) {
-    this.walletService = walletService;
+  constructor(contractService: ContractService, axiosClient: AxiosInstance, providerService: ProviderService) {
     this.axiosClient = axiosClient;
     this.contractService = contractService;
     this.providerService = providerService;
@@ -344,7 +335,7 @@ export default class MeanApiService {
   }
 
   async getAllowanceTarget() {
-    const currentNetwork = await this.walletService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork();
     const allowanceResponse = await this.axiosClient.get<{ allowanceTarget: string }>(
       `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/allowance-target`,
       {
