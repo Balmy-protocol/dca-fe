@@ -15,16 +15,19 @@ import ListItemText from '@mui/material/ListItemText';
 import Search from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
 // import Chip from '@mui/material/Chip';
 import TokenIcon from 'common/token-icon';
 import { makeStyles, withStyles } from '@mui/styles';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import useTokenList from 'hooks/useTokenList';
 import TokenLists from 'common/token-lists';
 import { formatCurrencyAmount } from 'utils/currency';
 import FilledInput from '@mui/material/FilledInput';
-import { createStyles } from '@mui/material';
+import { createStyles, Tooltip } from '@mui/material';
 import useMulticallBalances from 'hooks/useMulticallBalances';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
@@ -64,6 +67,10 @@ const StyledFilledInput = withStyles(() =>
 const StyledListItemIcon = styled(ListItemIcon)`
   min-width: 0px;
   margin-right: 7px;
+  cursor: pointer;
+`;
+
+const StyledPasteIcon = styled(ContentPasteIcon)`
   cursor: pointer;
 `;
 
@@ -111,6 +118,17 @@ const StyledBalanceContainer = styled.div`
 const StyledTokenTextContainer = styled.div`
   display: flex;
   gap: 5px;
+  align-items: center;
+`;
+
+const StyledEndAdormentContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const StyledCopyIcon = styled(ContentCopyIcon)`
+  cursor: pointer;
 `;
 
 interface RowData {
@@ -132,6 +150,7 @@ interface RowProps {
 
 interface TokenPickerProps {
   availableFrom?: string[];
+  isOpen?: boolean;
   onChange: SetFromToState;
   onClose: () => void;
   onAddToken?: (token: Token) => void;
@@ -207,6 +226,45 @@ const Row = ({
     yieldOption.enabledTokens.includes(token?.address)
   );
 
+  const fallbackCopyTextToClipboard = (text: string) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      console.error('Fallback: Oops, unable to copy', err);
+    }
+
+    document.body.removeChild(textArea);
+  };
+
+  const copyTextToClipboard = (text: string) => {
+    if (!navigator.clipboard) {
+      fallbackCopyTextToClipboard(text);
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    navigator.clipboard.writeText(text);
+  };
+
+  const onCopyAddress = (evt: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    evt.stopPropagation();
+    if (token) {
+      copyTextToClipboard(token.address);
+    }
+  };
+
   return (
     <StyledListItem classes={classes} onClick={() => onClick(token, isCustomToken)} style={style}>
       <StyledListItemIcon>
@@ -219,6 +277,11 @@ const Row = ({
           </Typography>
           <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)">
             {` (${token.symbol})`}
+          </Typography>
+          <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)" sx={{ display: 'flex' }}>
+            <Tooltip title={token.address} arrow placement="top">
+              <StyledCopyIcon fontSize="inherit" onClick={onCopyAddress} />
+            </Tooltip>
           </Typography>
         </StyledTokenTextContainer>
         {!!isCustomToken && (
@@ -266,6 +329,7 @@ const TokenPicker = ({
   onClose,
   onChange,
   ignoreValues,
+  isOpen,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   usedTokens,
   otherSelected,
@@ -276,6 +340,7 @@ const TokenPicker = ({
   onAddToken,
 }: TokenPickerProps) => {
   const tokenList = useTokenList(isAggregator);
+  const searchInputRef = React.useRef<HTMLElement>();
   const [search, setSearch] = React.useState('');
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
@@ -288,6 +353,12 @@ const TokenPicker = ({
   const customTokens = useCustomTokens();
   const [inchBalances, isLoadingInchBalances] = use1InchBalances();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
+
+  React.useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isOpen]);
 
   const uniqTokensFromPairs = React.useMemo(
     () =>
@@ -421,6 +492,12 @@ const TokenPicker = ({
     handleOnClose();
   };
 
+  const onPasteAddress = async () => {
+    const value = await navigator.clipboard.readText();
+
+    setSearch(value);
+  };
+
   const isLoadingBalances = isLoadingInchBalances || isLoadingTokenBalances;
 
   const itemData: RowData = React.useMemo(
@@ -476,14 +553,31 @@ const TokenPicker = ({
             </Grid>
             <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
               <StyledFilledInput
-                placeholder="Search your token"
+                placeholder="Search your token by symbol, name or address"
                 value={search}
                 onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
                   setSearch(evt.currentTarget.value)
                 }
                 fullWidth
+                inputRef={searchInputRef}
                 disableUnderline
-                endAdornment={<Search />}
+                endAdornment={
+                  <StyledEndAdormentContainer>
+                    <Tooltip
+                      title={
+                        <FormattedMessage
+                          description="tokenPickerPasteAddress"
+                          defaultMessage="Paste address from clipboard"
+                        />
+                      }
+                      arrow
+                      placement="top"
+                    >
+                      <StyledPasteIcon onClick={onPasteAddress} />
+                    </Tooltip>
+                    <Search />
+                  </StyledEndAdormentContainer>
+                }
                 type="text"
                 margin="none"
               />

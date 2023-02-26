@@ -44,6 +44,7 @@ const AggregatorTokenPicker = ({
   <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" actions={[]} fullHeight keepMounted>
     <StyledOverlay>
       <TokenPicker
+        isOpen={shouldShow}
         isFrom={isFrom}
         availableFrom={availableFrom}
         onClose={onClose}
