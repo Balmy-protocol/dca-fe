@@ -22,7 +22,7 @@ interface LeaderboardSummaryProps {
 const LeaderboardSummary = ({ userPositions, prices, yieldOptions }: LeaderboardSummaryProps) => (
   <Grid container spacing={4} alignItems="flex-start">
     {userPositions.map((userPosition, index) => (
-      <Grid item xs={12}>
+      <Grid item xs={12} key={userPosition.user}>
         <UserCompPosition
           userPosition={userPosition}
           prices={prices}
