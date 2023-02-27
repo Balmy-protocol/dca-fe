@@ -59,6 +59,8 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 };
 
 export const TOKEN_BLACKLIST = [
+  '0x5f98805a4e8be255a32880fdec7f6728c6568ba0', // ETH - LUSD
+  '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD Euler wrapper
   '0x5fe2b58c013d7601147dcdd68c143a77499f5531', // POLY - GRT
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // POLY - SNX
   '0x65559aa14915a70190438ef90104769e5e890a00', // OE - ENS
