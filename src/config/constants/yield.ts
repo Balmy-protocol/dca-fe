@@ -14,8 +14,6 @@ export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
 export const DISABLED_YIELDS = [
   '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11', // POLYGON - CRV
   '0x1dd5629903441b2dd0d03f76ec7673add920e765', // POLYGON - jEUR
-  '0x0669cec75e88f721efbe7d78d1783786a2f36bfe', // ARBITRUM - LINK
-  '0x4b6e42407db855fb101b9d39e084e36c90a52652', // ARBITRUM - WETH
 ];
 
 const BASE_YIELDS_PER_CHAIN: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
