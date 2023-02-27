@@ -511,9 +511,9 @@ const TokenPicker = ({
         currentNetwork.chainId !== actualCurrentNetwork.chainId
           ? {}
           : balances || {},
-      customToken,
+      customToken: isAggregator ? customToken : undefined,
       isLoadingTokenBalances: isLoadingBalances,
-      customTokens,
+      customTokens: isAggregator ? customTokens : {},
     }),
     [
       memoizedTokenKeys,
