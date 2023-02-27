@@ -324,5 +324,12 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Euler',
         token: emptyTokenWithAddress('EULER'),
       },
+      {
+        id: '72f85156-068d-44e6-8c4d-94845370daef', // euler LUSD
+        tokenAddress: '0xb95e6eee428902c234855990e18a632fa34407dc', // euler LUSD
+        poolId: '72f85156-068d-44e6-8c4d-94845370daef', // euler LUSD
+        name: 'Euler',
+        token: emptyTokenWithAddress('EULER'),
+      },
     ],
   };

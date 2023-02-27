@@ -59,19 +59,6 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 };
 
 export const TOKEN_BLACKLIST = [
-  '0x35ddc863400689f7aa4deca7986c40b0559333fa', // OP - WETH Sonne wrapper
-  '0x2719dbf6f9f516e255b84f4d0ae85dadd4f25e57', // OP - WETH Sonne wrapper v2
-  '0xfe6ea7e386f2037cf7c1a919d44759166fe1850e', // OP - DAI Sonne wrapper
-  '0x4510886228f34e176b4c8d5c0357215d38e65250', // OP - USDC Sonne wrapper
-  '0x36a84baa8d3e526ab6d8e1b7f6a87cbf695d8220', // OP - USDT Sonne wrapper
-  '0xe16688eff6bb4d75fa93219f214fd593d21ea2a5', // OP - OP Sonne wrapper
-  '0x59d751e2076b9f71b82fb69efad6efa5c1a0c838', // OP - SUSD Sonne wrapper
-  '0xedcc43bef1a96bf61f4a05bb0358453c8e79dc5e', // OP - SNX Sonne wrapper
-  '0x8748bffc32d4b755a8760eed04ca086932661cea', // OP - WBTC Sonne wrapper
-  '0xadb926811802ef40a99f7a49ac70de6facb1667a', // OP - LUSD Sonne wrapper
-  '0x600f8e217d3b32c951090fc3d00bd3a13a82c2cc', // OP - wstETH Sonne wrapper
-  '0x5f98805a4e8be255a32880fdec7f6728c6568ba0', // ETH - LUSD
-  '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD Euler wrapper
   '0x5fe2b58c013d7601147dcdd68c143a77499f5531', // POLY - GRT
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // POLY - SNX
   '0x65559aa14915a70190438ef90104769e5e890a00', // OE - ENS
