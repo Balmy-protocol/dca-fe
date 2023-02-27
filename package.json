@@ -109,7 +109,7 @@
     "@mean-finance/dca-v2-core": "^3.1.5",
     "@mean-finance/dca-v2-periphery": "^3.3.0",
     "@mean-finance/oracles": "^2.1.4",
-    "@mean-finance/sdk": "0.0.32",
+    "@mean-finance/sdk": "0.0.36",
     "@mean-finance/transformers": "^1.0.0",
     "@metamask/detect-provider": "^1.2.0",
     "@mui-treasury/components": "^1.10.1",
