@@ -166,7 +166,7 @@ export type AvailablePairResponse = {
   swaps: AvailablePairSwap[];
   createdAtTimestamp: number;
   status: string; // active, stale
-  positions: PositionResponse[];
+  oldestActivePositionCreatedAt: number;
   activePositionsPerInterval: [number, number, number, number, number, number, number, number];
   lastSwappedAt: [number, number, number, number, number, number, number, number];
 };
