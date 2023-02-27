@@ -24,7 +24,7 @@ export default async function gqlFetchAll<T>(
   variables: any,
   dataToSearch: string,
   fetchPolicy: WatchQueryFetchPolicy = 'cache-and-network',
-  offset = 0,
+  id = '',
   limit = 1000,
   query: ObservableQuery<any, OperationVariables> | null = null
 ): Promise<GraphqlResults<T>> {
@@ -32,7 +32,7 @@ export default async function gqlFetchAll<T>(
     const newResults = await query.fetchMore({
       variables: {
         first: limit,
-        skip: offset,
+        lastId: id,
       },
       updateQuery: (prevResults, options) => {
         let updatedQueryResults = cloneDeep(prevResults);
@@ -47,10 +47,21 @@ export default async function gqlFetchAll<T>(
     });
 
     if (get(newResults.data, dataToSearch) && get(newResults.data, dataToSearch).length === limit) {
-      return gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, query);
+      return gqlFetchAll(
+        client,
+        queryToRun,
+        variables,
+        dataToSearch,
+        fetchPolicy,
+        get(newResults.data, dataToSearch)[get(newResults.data, dataToSearch).length - 1].id,
+        limit,
+        query
+      );
     }
 
-    return query.result();
+    const results = await query.result();
+
+    return results;
   }
 
   const newQuery = client.watchQuery({
@@ -59,14 +70,23 @@ export default async function gqlFetchAll<T>(
     variables: {
       ...variables,
       first: limit,
-      skip: 0,
+      lastId: '',
     },
   });
 
   const results = await newQuery.result();
 
   if (get(results.data, dataToSearch) && get(results.data, dataToSearch).length === limit) {
-    return gqlFetchAll(client, queryToRun, variables, dataToSearch, fetchPolicy, offset + limit, limit, newQuery);
+    return gqlFetchAll(
+      client,
+      queryToRun,
+      variables,
+      dataToSearch,
+      fetchPolicy,
+      get(results.data, dataToSearch)[get(results.data, dataToSearch).length - 1].id,
+      limit,
+      newQuery
+    );
   }
 
   return results;

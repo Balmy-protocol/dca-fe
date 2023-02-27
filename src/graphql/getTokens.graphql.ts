@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getTokens = gql`
-  query getTokens($first: Int, $skip: Int) {
-    tokens(first: $first, skip: $skip) {
+  query getTokens($first: Int, $lastId: String) {
+    tokens(first: $first, where: { id_gt: $lastId }) {
       address: id
       name
       symbol

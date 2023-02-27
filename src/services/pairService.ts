@@ -116,8 +116,7 @@ export default class PairService {
     if (availablePairsResponse.data) {
       this.availablePairs = await Promise.all(
         availablePairsResponse.data.pairs.map<AvailablePair>((pair: AvailablePairResponse) => {
-          const oldestCreatedPosition =
-            (pair.positions && pair.positions[0] && pair.positions[0].createdAtTimestamp) || 0;
+          const oldestCreatedPosition = pair.oldestActivePositionCreatedAt;
           const lastCreatedAt =
             oldestCreatedPosition > pair.createdAtTimestamp ? oldestCreatedPosition : pair.createdAtTimestamp;
           const swapInfo = activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval);
