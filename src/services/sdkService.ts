@@ -11,7 +11,7 @@ import ProviderService from './providerService';
 import WalletService from './walletService';
 
 export default class SdkService {
-  sdk: ReturnType<typeof buildSDK>;
+  sdk: ReturnType<typeof buildSDK<{}>>;
 
   walletService: WalletService;
 
