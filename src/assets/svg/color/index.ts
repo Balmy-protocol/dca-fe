@@ -375,6 +375,7 @@ import STX from './stx.svg';
 import SUB from './sub.svg';
 import SUMO from './sumo.svg';
 import SUSHI from './sushi.svg';
+import SONNE from './sonne.svg';
 import SYS from './sys.svg';
 import TAAS from './taas.svg';
 import TAU from './tau.svg';
@@ -1368,6 +1369,7 @@ const manifest = {
   XAS,
   XBC,
   '0x28dee01d53fed0edf5f6e310bf8ef9311513ae40': XBP,
+  SONNE,
   XBY,
   XCP,
   XDN,

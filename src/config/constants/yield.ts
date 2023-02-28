@@ -215,6 +215,76 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         name: 'Aave V3',
         token: emptyTokenWithAddress('AAVE'),
       },
+      {
+        id: 'c34ed51f-3a16-4124-9501-94b36c1bad9d', // Sonne USDC
+        tokenAddress: '0x4510886228f34e176b4c8d5c0357215d38e65250', // Sonne USDC
+        poolId: 'c34ed51f-3a16-4124-9501-94b36c1bad9d', // Sonne USDC
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: '3846eb20-0dd8-433a-9840-ed113420fec2', // Sonne WETH
+        tokenAddress: '0x35ddc863400689f7aa4deca7986c40b0559333fa', // Sonne WETH
+        poolId: '3846eb20-0dd8-433a-9840-ed113420fec2', // Sonne WETH
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: '4e2bef65-8fcc-4b7a-a48e-db16770981a1', // Sonne DAI
+        tokenAddress: '0xfe6ea7e386f2037cf7c1a919d44759166fe1850e', // Sonne DAI
+        poolId: '4e2bef65-8fcc-4b7a-a48e-db16770981a1', // Sonne DAI
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: '5fae807c-8386-4832-9df0-6de05f74374b', // Sonne WBTC
+        tokenAddress: '0x8748bffc32d4b755a8760eed04ca086932661cea', // Sonne WBTC
+        poolId: '5fae807c-8386-4832-9df0-6de05f74374b', // Sonne WBTC
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: '0196f69f-f690-41c4-aa09-1001ef2f3145', // Sonne USDT
+        tokenAddress: '0x36a84baa8d3e526ab6d8e1b7f6a87cbf695d8220', // Sonne USDT
+        poolId: '0196f69f-f690-41c4-aa09-1001ef2f3145', // Sonne USDT
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: 'https://defillama.com/yields/pool/173ba0e8-d88f-43f4-9339-0e23a35a4cb0', // Sonne sUSD
+        tokenAddress: '0x59d751e2076b9f71b82fb69efad6efa5c1a0c838', // Sonne sUSD
+        poolId: 'https://defillama.com/yields/pool/173ba0e8-d88f-43f4-9339-0e23a35a4cb0', // Sonne sUSD
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: 'dc9995a3-dcb1-470b-82ef-bd152b8cad08', // Sonne OP
+        tokenAddress: '0xe16688eff6bb4d75fa93219f214fd593d21ea2a5', // Sonne OP
+        poolId: 'dc9995a3-dcb1-470b-82ef-bd152b8cad08', // Sonne OP
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: '3b8d22da-cd9b-4ec5-951d-379e85fac52b', // Sonne SNX
+        tokenAddress: '0xedcc43bef1a96bf61f4a05bb0358453c8e79dc5e', // Sonne SNX
+        poolId: '3b8d22da-cd9b-4ec5-951d-379e85fac52b', // Sonne SNX
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: '288a4d89-62fa-4f26-9134-6686b7f15932', // Sonne LUSD
+        tokenAddress: '0xadb926811802ef40a99f7a49ac70de6facb1667a', // Sonne LUSD
+        poolId: '288a4d89-62fa-4f26-9134-6686b7f15932', // Sonne LUSD
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
+      {
+        id: 'ef88396f-130e-477d-b9af-e568e296a5a7', // Sonne wstETH
+        tokenAddress: '0x600f8e217d3b32c951090fc3d00bd3a13a82c2cc', // Sonne wstETH
+        poolId: 'ef88396f-130e-477d-b9af-e568e296a5a7', // Sonne wstETH
+        name: 'Sonne',
+        token: emptyTokenWithAddress('SONNE'),
+      },
       // {
       //   id: 'e5f45aa7-437e-4c35-8beb-9012bab859c5', // beefy WBTC
       //   tokenAddress: '0xf0cbbfad265a0e7c7e4fd2e1e6027a8dfa25676b', // beefy WBTC
