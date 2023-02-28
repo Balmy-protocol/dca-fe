@@ -251,7 +251,7 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
         token: emptyTokenWithAddress('SONNE'),
       },
       {
-        id: 'https://defillama.com/yields/pool/173ba0e8-d88f-43f4-9339-0e23a35a4cb0', // Sonne sUSD
+        id: '173ba0e8-d88f-43f4-9339-0e23a35a4cb0', // Sonne sUSD
         tokenAddress: '0x59d751e2076b9f71b82fb69efad6efa5c1a0c838', // Sonne sUSD
         poolId: 'https://defillama.com/yields/pool/173ba0e8-d88f-43f4-9339-0e23a35a4cb0', // Sonne sUSD
         name: 'Sonne',
