@@ -53,9 +53,14 @@ function useUnderlyingAmount(
             newResults[tokenObj.originalIndex] = tokenObj.amount;
           });
 
-        promiseResult.forEach((amount, index) => {
-          const { originalIndex } = filteredTokens[index];
-          newResults[originalIndex] = amount;
+        filteredTokens.forEach(({ originalIndex, token, amount }) => {
+          const individualResult =
+            promiseResult[`${token.chainId}-${token.underlyingTokens[0].address}-${amount.toString()}`];
+          if (individualResult) {
+            newResults[originalIndex] = BigNumber.from(individualResult.underlyingAmount);
+          } else {
+            console.warn('Could not fetch underlying for', token.address, amount.toString());
+          }
         });
 
         setParams({ isLoading: false, result: newResults, error: undefined });

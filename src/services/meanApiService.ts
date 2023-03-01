@@ -146,7 +146,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const underlyingResponse = await this.axiosClient.post<MeanApiUnderlyingResponse>(
-      `${MEAN_API_URL}/v1/transforms/to-underlying`,
+      `${MEAN_API_URL}/v2/transforms/to-underlying`,
       {
         tokens: tokensToUse.map((tokenObj) => ({
           dependent: `${tokenObj.token.chainId}:${tokenObj.token.underlyingTokens[0].address.toString()}`,
@@ -155,9 +155,7 @@ export default class MeanApiService {
       }
     );
 
-    return underlyingResponse.data.underlying.map((dependantResponse) =>
-      BigNumber.from(dependantResponse.underlying[0].underlyingAmount)
-    );
+    return underlyingResponse.data.underlying;
   }
 
   async withdrawSwappedUsingOtherToken(

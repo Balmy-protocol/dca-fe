@@ -192,14 +192,13 @@ export interface MeanFinanceAllowedPairsResponse {
 }
 
 export interface MeanApiUnderlyingResponse {
-  underlying: {
-    dependent: string;
-    dependentAmount: string;
-    underlying: {
+  underlying: Record<
+    string,
+    {
       underlying: string;
       underlyingAmount: string;
-    }[];
-  }[];
+    }
+  >;
 }
 
 export type RawSwapOption = {
