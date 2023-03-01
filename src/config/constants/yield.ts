@@ -224,7 +224,7 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
       },
       {
         id: '3846eb20-0dd8-433a-9840-ed113420fec2', // Sonne WETH
-        tokenAddress: '0x35ddc863400689f7aa4deca7986c40b0559333fa', // Sonne WETH
+        tokenAddress: '0x2719dbf6f9f516e255b84f4d0ae85dadd4f25e57', // Sonne WETH
         poolId: '3846eb20-0dd8-433a-9840-ed113420fec2', // Sonne WETH
         name: 'Sonne',
         token: emptyTokenWithAddress('SONNE'),
