@@ -60,6 +60,7 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 
 export const TOKEN_BLACKLIST = [
   '0x35ddc863400689f7aa4deca7986c40b0559333fa', // OP - WETH Sonne wrapper
+  '0x2719dbf6f9f516e255b84f4d0ae85dadd4f25e57', // OP - WETH Sonne wrapper v2
   '0xfe6ea7e386f2037cf7c1a919d44759166fe1850e', // OP - DAI Sonne wrapper
   '0x4510886228f34e176b4c8d5c0357215d38e65250', // OP - USDC Sonne wrapper
   '0x36a84baa8d3e526ab6d8e1b7f6a87cbf695d8220', // OP - USDT Sonne wrapper
