@@ -871,7 +871,9 @@ export default class PositionService {
           newAmount.sub(remainingLiquidity),
           BigNumber.from(newSwaps),
           position.version,
-          position.from.address
+          position.from.address === PROTOCOL_TOKEN_ADDRESS && useWrappedProtocolToken
+            ? wrappedProtocolToken.address
+            : position.from.address
         );
       }
 
@@ -886,7 +888,9 @@ export default class PositionService {
         newAmount.sub(remainingLiquidity),
         BigNumber.from(newSwaps),
         position.version,
-        position.from.address,
+        position.from.address === PROTOCOL_TOKEN_ADDRESS && useWrappedProtocolToken
+          ? wrappedProtocolToken.address
+          : position.from.address,
         {
           permissions,
           deadline: deadline.toString(),
@@ -907,7 +911,9 @@ export default class PositionService {
         BigNumber.from(newSwaps),
         this.walletService.getAccount(),
         position.version,
-        position.from.address
+        position.from.address === PROTOCOL_TOKEN_ADDRESS && useWrappedProtocolToken
+          ? wrappedProtocolToken.address
+          : position.from.address
       );
     }
 
@@ -923,7 +929,9 @@ export default class PositionService {
       BigNumber.from(newSwaps),
       this.walletService.getAccount(),
       position.version,
-      position.from.address,
+      position.from.address === PROTOCOL_TOKEN_ADDRESS && useWrappedProtocolToken
+        ? wrappedProtocolToken.address
+        : position.from.address,
       { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
   }
