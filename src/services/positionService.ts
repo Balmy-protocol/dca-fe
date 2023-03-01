@@ -255,9 +255,15 @@ export default class PositionService {
       underlyingsNeededToFetch.map(({ token, amount }) => ({ token, amount }))
     );
 
-    underlyingReponses.forEach((underlyingResponse, index) => {
+    underlyingsNeededToFetch.forEach(({ token, amount }, index) => {
       const position = underlyingsNeededToFetch[index];
-      this.currentPositions[position.positionId][position.attr] = underlyingResponse;
+      const underlyingResponse =
+        underlyingReponses[`${token.chainId}-${token.underlyingTokens[0].address}-${amount.toString()}`];
+      if (underlyingResponse) {
+        this.currentPositions[position.positionId][position.attr] = BigNumber.from(underlyingResponse.underlyingAmount);
+      } else {
+        console.warn('Could not fetch underlying for', token.address, amount.toString());
+      }
     });
 
     this.hasFetchedCurrentPositions = true;
