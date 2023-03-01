@@ -213,7 +213,7 @@ export default class SdkService {
       return undefined;
     }
 
-    const tokenData = toToken({ ...token, chainId });
+    const tokenData = toToken({ ...token, address, chainId });
 
     return {
       token: tokenData,
