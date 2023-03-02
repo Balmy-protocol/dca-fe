@@ -9,6 +9,7 @@ import {
   ModifySwapsPositionTypeData,
   RemoveFundsTypeData,
   ResetPositionTypeData,
+  TerminatePositionTypeData,
   TransferTypeData,
 } from 'types';
 import { setPosition, updatePosition, updateShowBreakdown } from './actions';
@@ -79,6 +80,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: (transaction.typeData as TerminatePositionTypeData).toWithdraw,
+            withdrawnSwappedUnderlying: (transaction.typeData as TerminatePositionTypeData).toWithdraw,
+            withdrawnUnswapped: (transaction.typeData as TerminatePositionTypeData).remainingLiquidity,
+            withdrawnUnswappedUnderlying: (transaction.typeData as TerminatePositionTypeData).remainingLiquidity,
           });
           position = {
             ...position,
@@ -120,6 +125,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
           position = {
             ...position,
@@ -161,6 +170,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
           position = {
             ...position,
@@ -202,6 +215,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
           position = {
             ...position,
@@ -248,6 +265,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
 
           position = {
@@ -302,6 +323,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
 
           position = {
@@ -366,6 +391,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
 
           position = {
@@ -417,6 +446,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
 
           position = {
@@ -476,6 +509,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
 
           position = {
@@ -519,6 +556,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
 
           position = {
@@ -563,6 +604,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnUnswapped: '0',
+            withdrawnUnswappedUnderlying: '0',
           });
 
           position = {

@@ -105,6 +105,13 @@ const getPosition = gql`
         createdAtBlock
         createdAtTimestamp
 
+        ... on TerminatedAction {
+          withdrawnSwapped
+          withdrawnSwappedUnderlying
+          withdrawnUnswapped
+          withdrawnUnswappedUnderlying
+        }
+
         ... on PermissionsModifiedAction {
           permissions {
             operator

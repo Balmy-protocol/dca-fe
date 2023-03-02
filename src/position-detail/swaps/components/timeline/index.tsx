@@ -714,9 +714,120 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
   hash: positionState.transaction.hash,
 });
 
-const buildTerminatedItem = (positionState: ActionState) => ({
+const buildTerminatedItem = (positionState: ActionState, position: FullPosition) => ({
   icon: <DeleteSweepIcon />,
-  content: () => <></>,
+  // content: () => <></>,
+  content: () => {
+    const withdrawnSwapped = positionState.withdrawnSwappedUnderlying || positionState.withdrawnSwapped;
+    const withdrawnUnswapped = positionState.withdrawnUnswappedUnderlying || positionState.withdrawnUnswapped;
+
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(withdrawnSwapped),
+      undefined,
+      position.chainId
+    );
+    const [toPrice, isLoadingToPrice] = useUsdPrice(
+      position.to,
+      BigNumber.from(withdrawnSwapped),
+      positionState.createdAtTimestamp,
+      position.chainId
+    );
+
+    const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
+    const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
+
+    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
+      position.from,
+      BigNumber.from(withdrawnUnswapped),
+      undefined,
+      position.chainId
+    );
+    const [fromPrice, isLoadingFromPrice] = useUsdPrice(
+      position.from,
+      BigNumber.from(withdrawnUnswapped),
+      positionState.createdAtTimestamp,
+      position.chainId
+    );
+
+    const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;
+    const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
+
+    if (
+      BigNumber.from(withdrawnSwapped).lte(BigNumber.from(0)) &&
+      BigNumber.from(withdrawnUnswapped).lte(BigNumber.from(0))
+    ) {
+      return <></>;
+    }
+
+    return (
+      <>
+        <Grid item xs={12}>
+          <StyledTimelineWrappedContent variant="body1">
+            <StyledTitleMainText variant="body1">
+              <FormattedMessage description="positionTerminated" defaultMessage="Withdrawn:" />
+            </StyledTitleMainText>
+            {BigNumber.from(withdrawnSwapped).gt(BigNumber.from(0)) && (
+              <CustomChip
+                icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+                pointer
+                extraText={
+                  showToPrices && (
+                    <DarkTooltip
+                      title={
+                        showToCurrentPrice
+                          ? 'Displaying current value. Click to show value on day of withdrawal'
+                          : 'Estimated value on day of withdrawal'
+                      }
+                      arrow
+                      placement="top"
+                      onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
+                    >
+                      <div>(${showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
+                    </DarkTooltip>
+                  )
+                }
+              >
+                <Typography variant="body1">
+                  {formatCurrencyAmount(BigNumber.from(withdrawnSwapped), position.to)}
+                </Typography>
+              </CustomChip>
+            )}
+            {BigNumber.from(withdrawnUnswapped).gt(BigNumber.from(0)) &&
+              BigNumber.from(withdrawnSwapped).gt(BigNumber.from(0)) && (
+                <FormattedMessage description="positionTerminatedAnd" defaultMessage=" and " />
+              )}
+            {BigNumber.from(withdrawnUnswapped).gt(BigNumber.from(0)) && (
+              <CustomChip
+                icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
+                pointer
+                extraText={
+                  showFromPrices && (
+                    <DarkTooltip
+                      title={
+                        showFromCurrentPrice
+                          ? 'Displaying current value. Click to show value on day of withdrawal'
+                          : 'Estimated value on day of withdrawal'
+                      }
+                      arrow
+                      placement="top"
+                      onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
+                    >
+                      <div>(${showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2)} USD)</div>
+                    </DarkTooltip>
+                  )
+                }
+              >
+                <Typography variant="body1">
+                  {formatCurrencyAmount(BigNumber.from(withdrawnUnswapped), position.from)}
+                </Typography>
+              </CustomChip>
+            )}
+          </StyledTimelineWrappedContent>
+        </Grid>
+      </>
+    );
+  },
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Closed" />,
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
