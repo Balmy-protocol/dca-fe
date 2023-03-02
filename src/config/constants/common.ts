@@ -66,6 +66,16 @@ export const TOKEN_BLACKLIST = [
   '0x1dd5629903441b2dd0d03f76ec7673add920e765', // POLY - jEUR. Disabled due to aave not supporting anymore
   '0x5d47baba0d66083c52009271faf3f50dcc01023c', // OP - UNIDEX. Disabled due to liquidity moved to velodrome
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // OP - WTF optimism
+  '0x2719dbf6f9f516e255b84f4d0ae85dadd4f25e57', // WETH - Sone
+  '0xec5993c902d25f43ede0a796dffb202d1d3ae535', // USDC - Sone
+  '0xdb412643e22ab8d2d70a4eb1fcab685eb1557532', // USDT - Sone
+  '0xd874e814bc4c5aec377af63cc6813bc1c2840d8a', // DAI - Sone
+  '0xf96fe010716976e6c0a38eccaf6136df0294726d', // OP - Sone
+  '0xa6e3150bdc939e2e5b6bf8f7cb657fd9500a1fc3', // sUSD - Sone
+  '0xe3033ee37c14f83ac7765eca84360ae79b1b567e', // SNX - Sone
+  '0x81a6eabb22a0a76097c4c5b7b003af1dc9c876b6', // WBTC - Sone
+  '0xd0532fc413868abaa09d429de2388a9f155919d5', // LUSD - Sone
+  '0xc8bad65d5ffb33b1b26db5edb1e976fa8e248155', // wstETH - Sone
   // TODO: Remove this once we check beefy works correctly
   '0x1a55d9164417856ad31df3705bbc263c380e56b1', // ARBI - GNS Beefy wrapper
   '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03', // ARBI - GMX Beefy wrapper
