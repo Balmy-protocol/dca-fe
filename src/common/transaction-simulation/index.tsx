@@ -113,28 +113,29 @@ const SHOWN_TYPES = [
 
 const TransactionSimulation = ({ items }: TransactionSimulationProps) => {
   const selectedNetwork = useSelectedNetwork();
+  const filteredSimulations = items.simulationResults.expectedStateChanges.filter((simulation) =>
+    SHOWN_TYPES.includes(simulation.rawInfo.kind)
+  );
   return (
     <StyledTransactionSimulationsContainer>
       <StyledTransactionSimulations>
-        {items.simulationResults.expectedStateChanges
-          .filter((simulation) => SHOWN_TYPES.includes(simulation.rawInfo.kind))
-          .map((simulation, index) => {
-            const isFirst = index === 0;
-            const isLast = index + 1 === items.simulationResults.expectedStateChanges.length;
+        {filteredSimulations.map((simulation, index) => {
+          const isFirst = index === 0;
+          const isLast = index + 1 === filteredSimulations.length;
 
-            const item = ITEMS_MAP[simulation.rawInfo.kind]({
-              isFirst,
-              isLast,
-              chainId: selectedNetwork.chainId,
-              ...simulation,
-            });
+          const item = ITEMS_MAP[simulation.rawInfo.kind]({
+            isFirst,
+            isLast,
+            chainId: selectedNetwork.chainId,
+            ...simulation,
+          });
 
-            return (
-              <StyledTransactionSimulation key={index}>
-                <item.content />
-              </StyledTransactionSimulation>
-            );
-          })}
+          return (
+            <StyledTransactionSimulation key={index}>
+              <item.content />
+            </StyledTransactionSimulation>
+          );
+        })}
       </StyledTransactionSimulations>
     </StyledTransactionSimulationsContainer>
   );
