@@ -104,28 +104,37 @@ const ITEMS_MAP: Record<StateChangeKind, (props: ItemProps) => { content: () => 
   [StateChangeKind.NATIVE_ASSET_TRANSFER]: buildItem,
 };
 
+const SHOWN_TYPES = [
+  StateChangeKind.ERC20_TRANSFER,
+  StateChangeKind.ERC1155_TRANSFER,
+  StateChangeKind.ERC721_TRANSFER,
+  StateChangeKind.NATIVE_ASSET_TRANSFER,
+];
+
 const TransactionSimulation = ({ items }: TransactionSimulationProps) => {
   const selectedNetwork = useSelectedNetwork();
   return (
     <StyledTransactionSimulationsContainer>
       <StyledTransactionSimulations>
-        {items.simulationResults.expectedStateChanges.map((simulation, index) => {
-          const isFirst = index === 0;
-          const isLast = index + 1 === items.simulationResults.expectedStateChanges.length;
+        {items.simulationResults.expectedStateChanges
+          .filter((simulation) => SHOWN_TYPES.includes(simulation.rawInfo.kind))
+          .map((simulation, index) => {
+            const isFirst = index === 0;
+            const isLast = index + 1 === items.simulationResults.expectedStateChanges.length;
 
-          const item = ITEMS_MAP[simulation.rawInfo.kind]({
-            isFirst,
-            isLast,
-            chainId: selectedNetwork.chainId,
-            ...simulation,
-          });
+            const item = ITEMS_MAP[simulation.rawInfo.kind]({
+              isFirst,
+              isLast,
+              chainId: selectedNetwork.chainId,
+              ...simulation,
+            });
 
-          return (
-            <StyledTransactionSimulation key={index}>
-              <item.content />
-            </StyledTransactionSimulation>
-          );
-        })}
+            return (
+              <StyledTransactionSimulation key={index}>
+                <item.content />
+              </StyledTransactionSimulation>
+            );
+          })}
       </StyledTransactionSimulations>
     </StyledTransactionSimulationsContainer>
   );
