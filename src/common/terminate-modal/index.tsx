@@ -120,7 +120,15 @@ const TerminateModal = ({
       });
 
       const result = await positionService.terminate(position, terminateWithUnwrap);
-      addTransaction(result, { type: TRANSACTION_TYPES.TERMINATE_POSITION, typeData: { id: position.id }, position });
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.TERMINATE_POSITION,
+        typeData: {
+          id: position.id,
+          remainingLiquidity: remainingLiquidity.toString(),
+          toWithdraw: toWithdraw.toString(),
+        },
+        position,
+      });
       setModalSuccess({
         hash: result.hash,
         content: (

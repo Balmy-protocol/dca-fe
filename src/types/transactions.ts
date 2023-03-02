@@ -152,6 +152,8 @@ export interface ModifyRateAndSwapsPositionTypeData {
 }
 export interface TerminatePositionTypeData {
   id: number | string;
+  toWithdraw: string;
+  remainingLiquidity: string;
 }
 
 export interface ApproveTokenTypeData {
