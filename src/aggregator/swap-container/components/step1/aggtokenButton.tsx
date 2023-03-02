@@ -202,7 +202,7 @@ const AggregatorTokenInput = ({
                     variant="body2"
                     color={
                       // eslint-disable-next-line no-nested-ternary
-                      Number(impact) < -5 ? '#EB5757' : Number(impact) > 0 ? '#219653' : 'rgba(255, 255, 255, 0.5)'
+                      Number(impact) < -2.5 ? '#EB5757' : Number(impact) > 0 ? '#219653' : 'rgba(255, 255, 255, 0.5)'
                     }
                   >
                     ({Number(impact) > 0 ? '+' : ''}

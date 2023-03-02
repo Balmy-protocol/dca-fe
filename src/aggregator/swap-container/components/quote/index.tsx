@@ -311,7 +311,7 @@ const SwapQuote = ({
                   variant="caption"
                   color={
                     // eslint-disable-next-line no-nested-ternary
-                    Number(priceImpact) < -5
+                    Number(priceImpact) < -2.5
                       ? '#EB5757'
                       : Number(priceImpact) > 0
                       ? '#219653'
