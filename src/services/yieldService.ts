@@ -39,7 +39,7 @@ export default class YieldService {
     return yieldsByChain.map((baseYield) => {
       const foundYield = find(yields, { pool: baseYield.poolId });
 
-      let enabledTokens = foundYield?.underlyingTokens || [];
+      let enabledTokens = foundYield?.underlyingTokens.map((token) => token.toLowerCase()) || [];
 
       const wrappedProtocolToken = getWrappedProtocolToken(chainidTouse);
 
