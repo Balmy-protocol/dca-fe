@@ -178,6 +178,7 @@ export interface AvailablePairsGraphqlResponse {
 export interface DefillamaResponse {
   data: {
     apy: number;
+    apyBase: number;
     underlyingTokens: string[];
     pool: string;
   }[];

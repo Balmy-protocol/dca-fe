@@ -51,7 +51,7 @@ export default class YieldService {
 
       return {
         ...baseYield,
-        apy: foundYield?.apy || 0,
+        apy: foundYield?.apyBase || foundYield?.apy || 0,
         enabledTokens,
       };
     });
