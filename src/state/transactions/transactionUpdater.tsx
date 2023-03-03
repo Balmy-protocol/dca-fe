@@ -132,7 +132,7 @@ export default function Updater(): null {
         const promise = getReceipt(hash);
         promise
           .then(async (receipt) => {
-            if (receipt && !transactions[hash].receipt) {
+            if (receipt && !transactions[hash].receipt && receipt.status !== 0) {
               let extendedTypeData = {};
 
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_PAIR) {
@@ -217,9 +217,37 @@ export default function Updater(): null {
               if (receipt.blockNumber > lastBlockNumber) {
                 dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber, chainId: currentNetwork.chainId }));
               }
-            } else {
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              checkIfTransactionExists(hash);
+            } else if (receipt && !transactions[hash].receipt && receipt?.status === 0) {
+              if (receipt?.status === 0) {
+                if (transactions[hash].type) {
+                  positionService.handleTransactionRejection({
+                    ...transactions[hash],
+                    typeData: {
+                      ...transactions[hash].typeData,
+                    },
+                  });
+                }
+                dispatch(removeTransaction({ hash, chainId: transactions[hash].chainId }));
+                enqueueSnackbar(
+                  buildRejectedTransactionMessage({
+                    ...transactions[hash],
+                    typeData: {
+                      ...transactions[hash].typeData,
+                    },
+                  }),
+                  {
+                    variant: 'error',
+                    anchorOrigin: {
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    },
+                    TransitionComponent: Zoom,
+                  }
+                );
+              } else {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                checkIfTransactionExists(hash);
+              }
             }
 
             return true;
