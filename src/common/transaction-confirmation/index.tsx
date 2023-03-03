@@ -355,8 +355,8 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                 </StyledAmountContainer>
               </StyledBalanceChange>
             )}
-            {gasUsed && gotTo && <Divider />}
-            {gasUsed && (
+            {gasUsed && gasUsed.gt(BigNumber.from(0)) && gotTo && <Divider />}
+            {gasUsed && gasUsed.gt(BigNumber.from(0)) && (
               <StyledBalanceChange>
                 <StyledBalanceChangeToken>
                   <FormattedMessage
