@@ -114,6 +114,11 @@ const StyledToggleContainer = styled.div`
 const StyledToggleTokenButton = styled(IconButton)`
   border: 4px solid #1b1821;
   background-color: #292929;
+
+  :disabled {
+    background-color: #292929;
+  }
+
   :hover {
     background-color: #484848;
   }
@@ -333,7 +338,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                       balance: formatCurrencyAmount(balance, from, 4),
                     }}
                   />
-                  <StyledButton onClick={onSetMaxBalance} color="secondary" variant="text">
+                  <StyledButton onClick={onSetMaxBalance} disabled={isLoadingRoute} color="secondary" variant="text">
                     <FormattedMessage description="maxWallet" defaultMessage="MAX" />
                   </StyledButton>
                 </StyledFormHelperText>
@@ -355,7 +360,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
           </StyledTokensContainer>
         </StyledContentContainer>
         <StyledToggleContainer>
-          <StyledToggleTokenButton onClick={toggleFromTo}>
+          <StyledToggleTokenButton onClick={toggleFromTo} disabled={isLoadingRoute}>
             <SwapVertIcon />
           </StyledToggleTokenButton>
         </StyledToggleContainer>
