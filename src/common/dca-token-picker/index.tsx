@@ -1,22 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-import Slide from '@mui/material/Slide';
+import Modal from 'common/modal';
 import { Token, YieldOptions } from 'types';
 import TokenPicker from 'common/token-picker';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
 const StyledOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
   background-color: #1b1b1c;
-  padding: 24px;
   display: flex;
+  align-self: stretch;
+  flex: 1;
+  text-align: start;
 `;
+
 interface TokenPickerProps {
   shouldShow: boolean;
   availableFrom?: string[];
@@ -42,7 +39,7 @@ const DcaTokenPicker = ({
   yieldOptions,
   isLoadingYieldOptions,
 }: TokenPickerProps) => (
-  <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
+  <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" actions={[]} fullHeight keepMounted>
     <StyledOverlay>
       <TokenPicker
         isFrom={isFrom}
@@ -54,9 +51,10 @@ const DcaTokenPicker = ({
         otherSelected={otherSelected}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
+        isOpen={shouldShow}
       />
     </StyledOverlay>
-  </Slide>
+  </Modal>
 );
 
 export default DcaTokenPicker;
