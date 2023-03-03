@@ -208,7 +208,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             >
               <StyledTab
                 onClick={() => handleTabChange({ index: 0, url: 'create' })}
-                label={<FormattedMessage description="invest" defaultMessage="Invest" />}
+                label={<FormattedMessage description="invest" defaultMessage="Invest (DCA)" />}
                 value={1000}
                 sx={{ ...(tabIndex === 0 ? { color: '#90caf9' } : {}) }}
               />
