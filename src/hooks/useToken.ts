@@ -1,4 +1,4 @@
-import find from 'lodash/find';
+import findIndex from 'lodash/findIndex';
 import useTokenList from './useTokenList';
 
 function useToken(tokenAddress: string, checkForSymbol = false, isAggregator = false) {
@@ -14,9 +14,12 @@ function useToken(tokenAddress: string, checkForSymbol = false, isAggregator = f
     return foundToken;
   }
 
-  const values = Object.values(tokenList);
+  const tokenValues = Object.values(tokenList);
+  const values = tokenValues.map((token) => ({ ...token, symbol: token.symbol.toLowerCase() }));
 
-  return find(values, { symbol: tokenAddress.toUpperCase() });
+  const index = findIndex(values, { symbol: tokenAddress.toLowerCase() });
+
+  return tokenValues[index];
 }
 
 export default useToken;
