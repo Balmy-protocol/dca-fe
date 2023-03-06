@@ -283,22 +283,24 @@ const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, currencySymbol, 
   rpc: publicRPCs ? [...publicRPCs] : [],
 });
 
-export const NETWORKS: Record<string, NetworkStruct> = getAllChains().reduce(
-  (acc, sdkNetwork) => {
-    const foundNetworkKey = findKey(RAW_NETWORKS, { chainId: sdkNetwork.chainId });
+export const NETWORKS: Record<string, NetworkStruct> = getAllChains()
+  .filter((chain) => !chain.testnet)
+  .reduce(
+    (acc, sdkNetwork) => {
+      const foundNetworkKey = findKey(RAW_NETWORKS, { chainId: sdkNetwork.chainId });
 
-    return {
-      ...acc,
-      [foundNetworkKey || sdkNetwork.ids[0]]: {
-        ...sdkNetworkToNetworkStruct(sdkNetwork),
-        ...(foundNetworkKey ? RAW_NETWORKS[foundNetworkKey] : {}),
-      },
-    };
-  },
-  {
-    ...RAW_NETWORKS,
-  }
-);
+      return {
+        ...acc,
+        [foundNetworkKey || sdkNetwork.ids[0]]: {
+          ...sdkNetworkToNetworkStruct(sdkNetwork),
+          ...(foundNetworkKey ? RAW_NETWORKS[foundNetworkKey] : {}),
+        },
+      };
+    },
+    {
+      ...RAW_NETWORKS,
+    }
+  );
 
 export const TESTNETS = [
   NETWORKS.ropsten.chainId,
