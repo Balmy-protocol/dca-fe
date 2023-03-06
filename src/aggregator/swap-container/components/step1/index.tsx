@@ -279,7 +279,10 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 {supportedChains
                   .filter((chain) => !REMOVED_AGG_CHAINS.includes(chain))
                   .map((networkId) => {
-                    const foundSdkNetwork = find(getAllChains(), { chainId: networkId });
+                    const foundSdkNetwork = find(
+                      getAllChains().filter((chain) => !chain.testnet),
+                      { chainId: networkId }
+                    );
                     const foundNetwork = find(NETWORKS, { chainId: networkId });
 
                     if (!foundSdkNetwork) {
