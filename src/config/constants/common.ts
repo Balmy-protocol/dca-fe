@@ -76,6 +76,7 @@ export const TOKEN_BLACKLIST = [
   '0x81a6eabb22a0a76097c4c5b7b003af1dc9c876b6', // OP - WBTC Sone
   '0xd0532fc413868abaa09d429de2388a9f155919d5', // OP - LUSD Sone
   '0xc8bad65d5ffb33b1b26db5edb1e976fa8e248155', // OP - wstETH Sone
+  '0x2760e46d9bb43dafcbecaad1f64b93207f9f0ed7', // POLY - MVX
   // TODO: Remove this once we check beefy works correctly
   '0x1a55d9164417856ad31df3705bbc263c380e56b1', // ARBI - GNS Beefy wrapper
   '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03', // ARBI - GMX Beefy wrapper
