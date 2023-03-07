@@ -1,5 +1,6 @@
 import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
 import { BLOWFISH_ENABLED_CHAINS } from 'config';
+import { BigNumber } from 'ethers';
 import { BlowfishResponse } from 'types';
 
 // MOCKS
@@ -41,7 +42,7 @@ export default class SimulationService {
       {
         from: txData.from,
         to: txData.to,
-        value: txData.value?.toString() || '0',
+        value: BigNumber.from(txData.value || '0').toString(),
         data: txData.data.toString(),
       },
       txData.from,
