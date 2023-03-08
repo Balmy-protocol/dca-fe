@@ -1,5 +1,7 @@
 import React from 'react';
 import { BigNumber } from 'ethers';
+import map from 'lodash/map';
+import findIndex from 'lodash/findIndex';
 import styled from 'styled-components';
 import { Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Line, ComposedChart } from 'recharts';
 import Paper from '@mui/material/Paper';
@@ -8,11 +10,19 @@ import Typography from '@mui/material/Typography';
 import { FullPosition, Token } from 'types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { POSITION_ACTIONS, STABLE_COINS } from 'config/constants';
+import {
+  FREQUENCY_TO_FORMAT,
+  FREQUENCY_TO_MULTIPLIER,
+  FREQUENCY_TO_PERIOD,
+  POSITION_ACTIONS,
+  STABLE_COINS,
+} from 'config/constants';
 import GraphTooltip from 'common/graph-tooltip';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import { formatCurrencyAmount } from 'utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import usePriceService from 'hooks/usePriceService';
+import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 
 const StyledContainer = styled(Paper)`
   display: flex;
@@ -68,8 +78,8 @@ interface AveragePriceGraphProps {
 interface PriceData {
   name: string;
   date: number;
-  average: number;
-  market: number;
+  swap?: number;
+  Defillama?: number;
 }
 
 type Prices = PriceData[];
@@ -81,9 +91,11 @@ interface TokenWithBase extends Token {
 type GraphToken = TokenWithBase;
 
 const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
-  let prices: Prices = [];
+  const [prices, setPrices] = React.useState<Prices>([]);
+  const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
+  const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-
+  const priceService = usePriceService();
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   tokenFromAverage =
@@ -108,110 +120,80 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
     isBaseToken: STABLE_COINS.includes(tokenToAverage.symbol),
   };
 
-  prices = React.useMemo(() => {
-    const swappedActions = position.history.filter((state) => state.action === POSITION_ACTIONS.SWAPPED);
+  React.useEffect(() => {
+    const fetchTokenRate = async () => {
+      if (!position) {
+        return;
+      }
+      try {
+        const swappedActions = orderBy(
+          position.history.filter((state) => state.action === POSITION_ACTIONS.SWAPPED),
+          ['createdAtTimestamp'],
+          ['desc']
+        );
+        // const createAction = position.history.filter((state) => state.action === POSITION_ACTIONS.CREATED);
 
-    const swappedSummed = swappedActions.reduce<{ summed: BigNumber; market: number; date: number; name: string }[]>(
-      (acc, action, index) => {
-        const rate =
-          position.pair.tokenA.address ===
-          ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
-            tokenFromAverage.address)
-            ? BigNumber.from(action.pairSwap.ratioUnderlyingAToB)
-            : BigNumber.from(action.pairSwap.ratioUnderlyingBToA);
+        // console.log(swappedActions.length, FREQUENCY_TO_MULTIPLIER[position.swapInterval.interval], swappedActions.length * FREQUENCY_TO_MULTIPLIER[position.swapInterval.interval], FREQUENCY_TO_PERIOD[position.swapInterval.interval], createAction[0].createdAtTimestamp)
+        const defillamaPrices = await priceService.getPriceForGraph(
+          tokenA,
+          tokenB,
+          0,
+          position.chainId,
+          swappedActions.length * FREQUENCY_TO_MULTIPLIER[position.swapInterval.interval],
+          FREQUENCY_TO_PERIOD[position.swapInterval.interval],
+          swappedActions[0].createdAtTimestamp
+        );
 
-        const prevSummed = (acc[index - 1] && acc[index - 1].summed) || BigNumber.from(0);
-        acc.push({
-          summed: prevSummed.add(rate),
-          market: parseFloat(formatCurrencyAmount(rate, tokenToAverage, 9, 10)),
-          date: parseInt(action.createdAtTimestamp, 10),
-          name: DateTime.fromSeconds(parseInt(action.createdAtTimestamp, 10)).toFormat('MMM d t'),
-        });
+        const defiLlamaData =
+          defillamaPrices.map(({ rate, timestamp }) => ({
+            date: timestamp.toString(),
+            tokenPrice: rate.toString(),
+          })) || [];
 
-        return acc;
-      },
-      []
-    );
+        const mappedDefiLlamaData = map(defiLlamaData, ({ date, tokenPrice }) => ({
+          name: DateTime.fromSeconds(parseInt(date, 10)).toFormat(FREQUENCY_TO_FORMAT[position.swapInterval.interval]),
+          market: parseFloat(tokenPrice),
+          date: parseInt(date, 10),
+        }));
 
-    const swappedAverages = swappedSummed.map((swappedItem, index) => ({
-      ...swappedItem,
-      average: parseFloat(
-        formatCurrencyAmount(swappedItem.summed.div(BigNumber.from(index + 1)), tokenToAverage, 9, 10)
-      ),
-    }));
+        const swapData = swappedActions.reduce<{ swap: number; date: number; name: string }[]>((acc, action) => {
+          const rate =
+            position.pair.tokenA.address ===
+            ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
+              tokenFromAverage.address)
+              ? BigNumber.from(action.pairSwap.ratioUnderlyingAToB)
+              : BigNumber.from(action.pairSwap.ratioUnderlyingBToA);
 
-    return orderBy(swappedAverages, ['date'], ['desc']).reverse();
-  }, [position]);
+          acc.push({
+            swap: parseFloat(formatCurrencyAmount(rate, tokenToAverage, 9, 10)),
+            date: parseInt(action.createdAtTimestamp, 10),
+            name: DateTime.fromSeconds(parseInt(action.createdAtTimestamp, 10)).toFormat('MMM d t'),
+          });
 
-  const averageBuyPrice = (prices[prices.length - 1] && prices[prices.length - 1].average) || 0;
+          return acc;
+        }, []);
 
-  prices = React.useMemo(
-    () => prices.map((price) => ({ ...price, average: averageBuyPrice })),
-    [prices, averageBuyPrice]
-  );
+        const mergedMap = orderBy([...mappedDefiLlamaData, ...swapData], ['date'], ['desc']).reverse();
 
-  // const intersect = (x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) => {
-  //   // Check if none of the lines are of length 0
-  //   if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
-  //     return false;
-  //   }
+        const index = findIndex(mergedMap, (item) => !!(item as { swap: number }).swap);
 
-  //   const denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+        setPrices(mergedMap.slice(index - 1));
+      } finally {
+        setIsLoadingPrices(false);
+        setHasLoadedPrices(true);
+      }
+    };
 
-  //   // Lines are parallel
-  //   if (denominator === 0) {
-  //     return false;
-  //   }
-
-  //   const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
-  //   const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
-
-  //   // is the intersection along the segments
-  //   if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
-  //     return false;
-  //   }
-
-  //   // Return a object with the x and y coordinates of the intersection
-  //   const x = x1 + ua * (x2 - x1);
-  //   const y = y1 + ua * (y2 - y1);
-
-  //   const line1isHigher = y1 > y3;
-  //   const line1isHigherNext = y2 > y4;
-
-  //   return { x, y, line1isHigher, line1isHigherNext };
-  // }
-
-  // const dataWithRange = prices.map((d) => ({
-  //   ...d,
-  //   range:
-  //     d.average !== undefined && d.market !== undefined
-  //       ? [d.average, d.market]
-  //       : []
-  // }));
-
-  // // need to find intersections as points where we to change fill color
-  // const intersections = prices
-  //   .map((d, i) =>
-  //     intersect(
-  //       i,
-  //       d.average,
-  //       i + 1,
-  //       prices[i + 1]?.average,
-  //       i,
-  //       d.market,
-  //       i + 1,
-  //       prices[i + 1]?.market
-  //     )
-  //   )
-  //   .filter((d) => d && !isNaN(d.x));
-
-  // // filtering out segments without intersections & duplicates (in case end market 2 segments are also
-  // // start of 2 next segments)
-  // const filteredIntersections = intersections.filter(
-  //   (d, i) => i === intersections.length - 1 || (d as { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean }).x !== (intersections[i - 1] as { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean })?.x
-  // ) as { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean }[];
+    if (prices.length === 0 && !isLoadingPrices && !hasLoadedPrices) {
+      setIsLoadingPrices(true);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
+      fetchTokenRate();
+    }
+  }, [position, isLoadingPrices]);
+  // const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(tokenA, tokenB, tabIndex);
 
   const noData = prices.length === 0;
+  const hasActions = position.history.filter((state) => state.action === POSITION_ACTIONS.SWAPPED).length !== 0;
 
   // const getIntersectionColor = (_intersection: { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean }, isLast?: boolean) => {
   //   if (isLast) {
@@ -221,16 +203,40 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   //   return _intersection.line1isHigher ? "red" : "blue";
   // };
 
+  if (noData && hasActions) {
+    return (
+      <StyledCenteredWrapper>
+        {isLoadingPrices && <CenteredLoadingIndicator />}
+        {!isLoadingPrices && (
+          <>
+            <EmptyGraph size="100px" />
+            <Typography variant="h6">
+              <FormattedMessage
+                description="No price available"
+                defaultMessage="We could not fetch the price of one of the tokens"
+              />
+            </Typography>
+          </>
+        )}
+      </StyledCenteredWrapper>
+    );
+  }
+
   if (noData) {
     return (
       <StyledCenteredWrapper>
-        <EmptyGraph size="100px" />
-        <Typography variant="h6">
-          <FormattedMessage
-            description="No data available"
-            defaultMessage="There is no data available about this position yet"
-          />
-        </Typography>
+        {isLoadingPrices && <CenteredLoadingIndicator />}
+        {!isLoadingPrices && (
+          <>
+            <EmptyGraph size="100px" />
+            <Typography variant="h6">
+              <FormattedMessage
+                description="No data available"
+                defaultMessage="There is no data available about this position yet"
+              />
+            </Typography>
+          </>
+        )}
       </StyledCenteredWrapper>
     );
   }
@@ -264,10 +270,9 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
               type="monotone"
               strokeWidth="3px"
               stroke="#DCE2F9"
-              dot={false}
-              activeDot={false}
+              dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
               strokeDasharray="5 5"
-              dataKey="average"
+              dataKey="swap"
             />
             {/* <Area
               dataKey="range"
@@ -368,7 +373,7 @@ export const Legends = () => (
       <StyledLegend>
         <StyledLegendIndicator fill="#DCE2F9" />
         <Typography variant="body2">
-          <FormattedMessage description="averageBuyPriceLegend" defaultMessage="Average buy price" />
+          <FormattedMessage description="swapPriceLegend" defaultMessage="Swap" />
         </Typography>
       </StyledLegend>
     </StyledLegendContainer>

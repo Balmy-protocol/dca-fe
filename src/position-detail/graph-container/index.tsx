@@ -1,14 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import Paper from '@mui/material/Paper';
-import MinimalTabs from 'common/minimal-tabs';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
 import { FullPosition } from 'types';
-import ProfitLossGraph from 'position-detail/profit-loss-graph';
-import AveragePriceGraph from 'position-detail/average-price-graph';
-import GasSavedGraph from 'position-detail/gas-saved-graph';
+import ProfitLossGraph, { Legends as ProfitLossLegends } from 'position-detail/profit-loss-graph';
+import AveragePriceGraph, { Legends as AveragePriceLegends } from 'position-detail/average-price-graph';
+import GasSavedGraph, { Legends as GasSavedLegends } from 'position-detail/gas-saved-graph';
+import SwapPriceGraph, { Legends as SwapPriceLegends } from 'position-detail/swap-price-graph';
 import { NETWORKS } from 'config';
+import GraphSelector from './graph-selector';
 
 const StyledContainer = styled(Paper)`
   display: flex;
@@ -21,6 +21,7 @@ const StyledContainer = styled(Paper)`
 const StyledHeader = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 
   margin-bottom: 15px;
 `;
@@ -31,16 +32,29 @@ interface GraphContainerProps {
 
 const GRAPHS = [
   {
-    title: <FormattedMessage description="averagePriceGraphTitle" defaultMessage="Market price vs DCA price" />,
+    key: 0,
+    title: <FormattedMessage description="averagePriceGraphTitle" defaultMessage="Average buy price" />,
     component: ({ position }: GraphContainerProps) => <AveragePriceGraph position={position} />,
+    legend: <AveragePriceLegends />,
   },
   {
+    key: 1,
     title: <FormattedMessage description="dcaVsLumpSumTitle" defaultMessage="DCA vs Lump sum" />,
     component: ({ position }: GraphContainerProps) => <ProfitLossGraph position={position} />,
+    legend: <ProfitLossLegends />,
   },
   {
+    key: 2,
+    title: <FormattedMessage description="swapPriceGraphTitle" defaultMessage="Swaps" />,
+    component: ({ position }: GraphContainerProps) => <SwapPriceGraph position={position} />,
+    legend: <SwapPriceLegends />,
+  },
+  {
+    key: 3,
     title: <FormattedMessage description="gasSavedGraphTitle" defaultMessage="Gas saved" />,
     component: ({ position }: GraphContainerProps) => <GasSavedGraph position={position} />,
+    legend: <GasSavedLegends />,
+    enabledChains: [NETWORKS.mainnet.chainId],
   },
 ];
 
@@ -50,35 +64,11 @@ const GraphContainer = ({ position }: GraphContainerProps) => {
   return (
     <StyledContainer elevation={0}>
       <StyledHeader>
-        <Typography variant="h6">{GRAPHS[tabIndex].title}</Typography>
-        <MinimalTabs
-          options={[
-            {
-              key: 0,
-              label: (
-                <FormattedMessage
-                  description="positionDetailsAverageBuyPriceOption"
-                  defaultMessage="Average buy price"
-                />
-              ),
-            },
-            {
-              key: 1,
-              label: (
-                <FormattedMessage description="positionDetailsProfitLossOption" defaultMessage="DCA vs Lump sum" />
-              ),
-            },
-            ...(position.chainId === NETWORKS.mainnet.chainId
-              ? [
-                  {
-                    key: 2,
-                    label: <FormattedMessage description="positionDetailsGasSavedOption" defaultMessage="Gas saved" />,
-                  },
-                ]
-              : []),
-          ]}
-          selected={{ key: tabIndex, label: '' }}
-          onChange={({ key }) => setTabIndex(key as number)}
+        {GRAPHS[tabIndex].legend}
+        <GraphSelector
+          options={GRAPHS.filter((graph) => !graph.enabledChains || graph.enabledChains.includes(position.chainId))}
+          selected={tabIndex}
+          setGraph={setTabIndex}
         />
       </StyledHeader>
       {GRAPHS[tabIndex].component({ position })}

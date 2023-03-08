@@ -415,3 +415,36 @@ export const shouldEnableFrequency = (
 
   return true;
 };
+
+export const FREQUENCY_TO_PERIOD = {
+  [ONE_MINUTE.toString()]: '1m',
+  [FIVE_MINUTES.toString()]: '1m',
+  [FIFTEEN_MINUTES.toString()]: '5m',
+  [THIRTY_MINUTES.toString()]: '15m',
+  [ONE_HOUR.toString()]: '30m',
+  [FOUR_HOURS.toString()]: '1h',
+  [ONE_DAY.toString()]: '4h',
+  [ONE_WEEK.toString()]: '1d',
+};
+
+export const FREQUENCY_TO_MULTIPLIER = {
+  [ONE_MINUTE.toString()]: 1,
+  [FIVE_MINUTES.toString()]: 5,
+  [FIFTEEN_MINUTES.toString()]: 2,
+  [THIRTY_MINUTES.toString()]: 2,
+  [ONE_HOUR.toString()]: 2,
+  [FOUR_HOURS.toString()]: 4,
+  [ONE_DAY.toString()]: 6,
+  [ONE_WEEK.toString()]: 7,
+};
+
+export const FREQUENCY_TO_FORMAT = {
+  [ONE_MINUTE.toString()]: 't',
+  [FIVE_MINUTES.toString()]: 't',
+  [FIFTEEN_MINUTES.toString()]: 't',
+  [THIRTY_MINUTES.toString()]: 't',
+  [ONE_HOUR.toString()]: 't',
+  [FOUR_HOURS.toString()]: 't',
+  [ONE_DAY.toString()]: 'MMM d t',
+  [ONE_WEEK.toString()]: 'MMM d t',
+};
