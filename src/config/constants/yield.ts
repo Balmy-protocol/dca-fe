@@ -403,7 +403,7 @@ export const ALLOWED_YIELDS: Record<number, Pick<YieldOption, 'id' | 'poolId' | 
       },
       {
         id: '1e31049a-403b-4029-a662-4342e70c20b8', // euler wstETH
-        tokenAddress: '0xb95e6eee428902c234855990e18a632fa34407dc', // euler wstETH
+        tokenAddress: '0x7C6D161b367Ec0605260628c37B8dd778446256b', // euler wstETH
         poolId: '1e31049a-403b-4029-a662-4342e70c20b8', // euler wstETH
         name: 'Euler',
         token: emptyTokenWithAddress('EULER'),
