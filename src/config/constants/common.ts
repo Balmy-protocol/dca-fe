@@ -59,6 +59,7 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 };
 
 export const TOKEN_BLACKLIST = [
+  '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0', // ETH - WSTETH. Disabled until we test it.
   '0x5fe2b58c013d7601147dcdd68c143a77499f5531', // POLY - GRT
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // POLY - SNX
   '0x65559aa14915a70190438ef90104769e5e890a00', // OE - ENS
