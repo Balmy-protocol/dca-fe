@@ -11,7 +11,8 @@ import { BigNumber } from 'ethers';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
-import { MenuItem, Select } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import { InputAdornment, ListSubheader, MenuItem, Select, TextField } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
 import Badge from '@mui/material/Badge';
@@ -181,6 +182,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
 
   const account = useAccount();
 
+  const [chainSearch, setChainSearch] = React.useState('');
+  const chainSearchRef = React.useRef<HTMLDivElement>();
+
   let fromValueToUse =
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address &&
@@ -251,6 +255,33 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       ) / 100
     ).toFixed(2);
 
+  const mappedNetworks = React.useMemo(
+    () =>
+      supportedChains
+        .map((networkId) => {
+          const foundSdkNetwork = find(
+            getAllChains().filter((chain) => !chain.testnet),
+            { chainId: networkId }
+          );
+          const foundNetwork = find(NETWORKS, { chainId: networkId });
+
+          if (!foundSdkNetwork) {
+            return null;
+          }
+
+          return {
+            ...foundSdkNetwork,
+            ...(foundNetwork || {}),
+          };
+        })
+        .filter(
+          (network) =>
+            !REMOVED_AGG_CHAINS.includes(network?.chainId || -1) &&
+            network?.name.toLowerCase().includes(chainSearch.toLowerCase())
+        ),
+    [supportedChains]
+  );
+
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
       <Grid item xs={12} sx={{ position: 'relative' }}>
@@ -272,49 +303,66 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 id="choose-network"
                 fullWidth
                 value={selectedNetwork.chainId}
-                onChange={(evt) => onChangeNetwork(Number(evt.target.value))}
+                onChange={(evt) => {
+                  onChangeNetwork(Number(evt.target.value));
+                  setChainSearch('');
+                }}
+                onClose={() => setChainSearch('')}
                 size="small"
                 SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
+                MenuProps={{
+                  autoFocus: false,
+                  TransitionProps: { onEntered: () => chainSearchRef.current?.focus() },
+                  transformOrigin: {
+                    horizontal: 'center',
+                    vertical: 'top',
+                  },
+                }}
               >
-                {supportedChains
-                  .filter((chain) => !REMOVED_AGG_CHAINS.includes(chain))
-                  .map((networkId) => {
-                    const foundSdkNetwork = find(
-                      getAllChains().filter((chain) => !chain.testnet),
-                      { chainId: networkId }
-                    );
-                    const foundNetwork = find(NETWORKS, { chainId: networkId });
+                <ListSubheader sx={{ backgroundColor: '#1e1e1e' }}>
+                  <TextField
+                    size="small"
+                    // Autofocus on textfield
+                    autoFocus
+                    placeholder="Type to search..."
+                    fullWidth
+                    value={chainSearch}
+                    inputRef={chainSearchRef}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                    onChange={(e) => setChainSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key !== 'Escape') {
+                        // Prevents autoselecting item while typing (default Select behaviour)
+                        e.stopPropagation();
+                      }
+                    }}
+                  />
+                </ListSubheader>
+                {mappedNetworks.map((network) => {
+                  if (!network) {
+                    return null;
+                  }
 
-                    if (!foundSdkNetwork) {
-                      return null;
-                    }
-
-                    return (
-                      <MenuItem sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={networkId}>
-                        <TokenIcon
-                          size="20px"
-                          token={toToken({
-                            address: foundNetwork?.mainCurrency || foundSdkNetwork.wToken,
-                            chainId: networkId,
-                            logoURI: getGhTokenListLogoUrl(networkId, 'logo'),
-                          })}
-                        />
-                        {foundSdkNetwork.name}
-                      </MenuItem>
-                      // <Tooltip title={foundSdkNetwork.name} arrow placement="top">
-                      //   <div>
-                      //     <StyledNetworkButton
-                      //       variant="outlined"
-                      //       color={selectedNetwork.chainId === network.chainId ? 'secondary' : 'default'}
-                      //       size="small"
-                      //       onClick={() => onChangeNetwork(network.chainId)}
-                      //     >
-                      //       <TokenIcon size="20px" token={emptyTokenWithAddress(foundNetwork?.mainCurrency || foundSdkNetwork.wToken)} />
-                      //     </StyledNetworkButton>
-                      //   </div>
-                      // </Tooltip>
-                    );
-                  })}
+                  return (
+                    <MenuItem sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={network.chainId}>
+                      <TokenIcon
+                        size="20px"
+                        token={toToken({
+                          address: network.mainCurrency || network.wToken,
+                          chainId: network.chainId,
+                          logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
+                        })}
+                      />
+                      {network.name}
+                    </MenuItem>
+                  );
+                })}
               </Select>
             </StyledNetworkButtonsContainer>
           </StyledTokensContainer>
