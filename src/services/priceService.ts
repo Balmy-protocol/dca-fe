@@ -225,12 +225,20 @@ export default class PriceService {
     return transformerRegistryInstance.calculateTransformToUnderlying(token, value);
   }
 
-  async getPriceForGraph(from: Token, to: Token, periodIndex = 0, chainId?: number) {
+  async getPriceForGraph(
+    from: Token,
+    to: Token,
+    periodIndex = 0,
+    chainId?: number,
+    tentativeSpan?: number,
+    tentativePeriod?: string,
+    end?: string
+  ) {
     const network = await this.providerService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
     const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
-    const span = INDEX_TO_SPAN[periodIndex];
-    const period = INDEX_TO_PERIOD[periodIndex];
+    const span = tentativeSpan || INDEX_TO_SPAN[periodIndex];
+    const period = tentativePeriod || INDEX_TO_PERIOD[periodIndex];
     const toAddress = to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to.address;
     const fromAddress = from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address;
 
@@ -267,7 +275,9 @@ export default class PriceService {
     const prices = await this.axiosClient.get<{
       coins: Record<string, { prices: { timestamp: number; price: number }[] }>;
     }>(
-      `https://coins.llama.fi/chart/${defillamaId}:${tokenA.address},${defillamaId}:${tokenB.address}?period=${period}&span=${span}`
+      `https://coins.llama.fi/chart/${defillamaId}:${tokenA.address},${defillamaId}:${
+        tokenB.address
+      }?period=${period}&span=${span}${(end && `&end=${end}`) || ''}`
     );
 
     const {

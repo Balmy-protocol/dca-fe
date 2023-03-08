@@ -58,7 +58,6 @@ const StyledLegendContainer = styled.div`
 const StyledHeader = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
 `;
 
 const StyledLegend = styled.div`
@@ -387,16 +386,6 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
 
   return (
     <StyledContainer elevation={0}>
-      <StyledHeader>
-        <StyledLegendContainer>
-          <StyledLegend>
-            <StyledLegendIndicator fill="#DCE2F9" />
-            <Typography variant="body2">
-              <FormattedMessage description="swappedIfDca" defaultMessage="DCA vs Lump Sum Profit %" />
-            </Typography>
-          </StyledLegend>
-        </StyledLegendContainer>
-      </StyledHeader>
       <StyledGraphContainer>
         <ResponsiveContainer height={200}>
           <ComposedChart
@@ -488,4 +477,18 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
     </StyledContainer>
   );
 };
+
+export const Legends = () => (
+  <StyledHeader>
+    <StyledLegendContainer>
+      <StyledLegend>
+        <StyledLegendIndicator fill="#DCE2F9" />
+        <Typography variant="body2">
+          <FormattedMessage description="swappedIfDca" defaultMessage="DCA vs Lump Sum Profit %" />
+        </Typography>
+      </StyledLegend>
+    </StyledLegendContainer>
+  </StyledHeader>
+);
+
 export default ProfitLossGraph;

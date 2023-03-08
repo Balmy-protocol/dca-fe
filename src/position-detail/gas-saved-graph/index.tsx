@@ -48,7 +48,6 @@ const StyledLegendContainer = styled.div`
 const StyledHeader = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
 `;
 
 const StyledLegend = styled.div`
@@ -203,16 +202,6 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
 
   return (
     <StyledContainer elevation={0}>
-      <StyledHeader>
-        <StyledLegendContainer>
-          <StyledLegend>
-            <StyledLegendIndicator fill="#DCE2F9" />
-            <Typography variant="body2">
-              <FormattedMessage description="gasSavedBullet" defaultMessage="Gas saved in USD" />
-            </Typography>
-          </StyledLegend>
-        </StyledLegendContainer>
-      </StyledHeader>
       <StyledGraphContainer>
         <ResponsiveContainer height={200}>
           <ComposedChart
@@ -269,4 +258,18 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
     </StyledContainer>
   );
 };
+
+export const Legends = () => (
+  <StyledHeader>
+    <StyledLegendContainer>
+      <StyledLegend>
+        <StyledLegendIndicator fill="#DCE2F9" />
+        <Typography variant="body2">
+          <FormattedMessage description="gasSavedBullet" defaultMessage="Gas saved in USD" />
+        </Typography>
+      </StyledLegend>
+    </StyledLegendContainer>
+  </StyledHeader>
+);
+
 export default GasSavedGraph;

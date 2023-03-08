@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import capitalize from 'lodash/capitalize';
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
@@ -41,7 +42,7 @@ const GraphTooltip = (props: GraphTooltipProps) => {
 
   return (
     <StyledPaper>
-      <Typography variant="body2">{label}</Typography>
+      <Typography variant="body2">{capitalize(label)}</Typography>
       {payload?.map(({ value, dataKey }) => (
         <Typography variant="body1">
           {dataKey}: 1 {tokenFrom.symbol} = {tokenTo.isBaseToken ? '$' : ''}
