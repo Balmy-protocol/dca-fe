@@ -89,7 +89,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
         <StyledFilledInput
           id={id}
           placeholder={intl.formatMessage(
-            defineMessage({ defaultMessage: 'custom', description: 'freqEasyInputCustom' })
+            defineMessage({ defaultMessage: 'Custom', description: 'freqEasyInputCustom' })
           )}
           onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
           style={{ width: `calc(${value.length + 1}ch + 29px)` }}
@@ -108,7 +108,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
       <StyledFilledInput
         id={id}
         placeholder={intl.formatMessage(
-          defineMessage({ defaultMessage: 'custom', description: 'freqEasyInputCustom' })
+          defineMessage({ defaultMessage: 'Custom', description: 'freqEasyInputCustom' })
         )}
         onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
         value={tabIndex === -1 || setByUser ? value : ''}
