@@ -48,11 +48,11 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   font-size: 15px;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}
-  margin: 0px 5px;
+  margin: ${({ $isFirst }) => ($isFirst ? '0px 5px 0px 0px' : '0px 5px')};
 `;
 
 const StyledTimeline = styled(Grid)`
@@ -446,7 +446,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
     return (
       <>
         <Grid item xs={12}>
-          {positionState.permissions.map((permission) => (
+          {positionState.permissions.map((permission, index) => (
             <Typography variant="body1">
               {permission.permissions.length ? (
                 <>
@@ -454,6 +454,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                     href={buildEtherscanAddress(permission.operator, position.chainId)}
                     target="_blank"
                     rel="noreferrer"
+                    $isFirst={index === 0}
                   >
                     {permission.operator.toLowerCase() ===
                     (
@@ -471,11 +472,14 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                     defaultMessage="will only be able to"
                   />
                   {permission.permissions.map(
-                    (permissionString, index) =>
+                    (permissionString, permissionIndex) =>
                       ` ${
-                        index === permission.permissions.length - 1 && permission.permissions.length > 1 ? 'and ' : ''
+                        permissionIndex === permission.permissions.length - 1 && permission.permissions.length > 1
+                          ? 'and '
+                          : ''
                       }${intl.formatMessage(STRING_PERMISSIONS[permissionString]).toLowerCase()}${
-                        index !== permission.permissions.length - 1 && index !== permission.permissions.length - 2
+                        permissionIndex !== permission.permissions.length - 1 &&
+                        permissionIndex !== permission.permissions.length - 2
                           ? ','
                           : ''
                       } `
