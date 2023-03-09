@@ -629,10 +629,15 @@ export default class PositionService {
         ? [
             {
               operator: companionAddress,
-              permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE],
+              permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE],
             },
           ]
-        : [{ operator: companionAddress, permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE] }];
+        : [
+            {
+              operator: companionAddress,
+              permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE],
+            },
+          ];
       return this.meanApiService.depositUsingYield(
         from.address,
         to.address,
@@ -662,7 +667,9 @@ export default class PositionService {
 
     const toToUse = to.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken : to;
 
-    const permissions = yieldTo ? [{ operator: companionAddress, permissions: [PERMISSIONS.WITHDRAW] }] : [];
+    const permissions = yieldTo
+      ? [{ operator: companionAddress, permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE] }]
+      : [];
 
     return hubInstance.deposit(
       from.address,
