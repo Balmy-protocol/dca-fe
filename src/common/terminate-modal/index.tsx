@@ -104,7 +104,7 @@ const TerminateModal = ({
         content: (
           <>
             <Typography variant="body1">
-              <FormattedMessage description="Terminating position" defaultMessage="Terminating your position" />
+              <FormattedMessage description="Terminating position" defaultMessage="Closing your position" />
             </Typography>
             {hasWrappedOrProtocol && terminateWithUnwrap && !hasPermission && (
               <Typography variant="body1">
