@@ -197,7 +197,14 @@ const Details = ({
   onSuggestMigrateYield,
   totalGasSaved,
 }: DetailsProps) => {
-  const { from, to, swapInterval, remainingLiquidity: remainingLiquidityRaw, chainId } = position;
+  const {
+    from,
+    to,
+    swapInterval,
+    remainingLiquidity: remainingLiquidityRaw,
+    chainId,
+    totalWithdrawnUnderlying,
+  } = position;
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -225,10 +232,14 @@ const Details = ({
       : BigNumber.from(0);
   const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
 
-  const swapped = swappedUnderlying || rawSwapped;
+  const swapped =
+    (totalWithdrawnUnderlying &&
+      toWithdrawUnderlying &&
+      BigNumber.from(totalWithdrawnUnderlying).add(BigNumber.from(toWithdrawUnderlying))) ||
+    rawSwapped;
   const swappedYield =
-    totalSwappedUnderlyingAccum && swappedUnderlying
-      ? swappedUnderlying.sub(totalSwappedUnderlyingAccum)
+    totalSwappedUnderlyingAccum && totalWithdrawnUnderlying
+      ? swapped.sub(totalSwappedUnderlyingAccum)
       : BigNumber.from(0);
   const swappedBase = swapped.sub(swappedYield);
 
