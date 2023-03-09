@@ -103,6 +103,7 @@ export interface FullPosition {
   depositedRateUnderlying: Nullable<string>;
   totalSwappedUnderlyingAccum: Nullable<string>;
   toWithdrawUnderlyingAccum: Nullable<string>;
+  totalWithdrawnUnderlying: Nullable<string>;
   history: ActionState[];
 }
 
