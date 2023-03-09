@@ -107,6 +107,15 @@ const PositionSummaryControls = ({
   const disabledWithdrawFunds =
     disabled || DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && fromSupportsYield?.tokenAddress) || '');
 
+  const shouldShowWithdrawWrappedToken =
+    BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
+    hasSignSupport &&
+    position.to.address === PROTOCOL_TOKEN_ADDRESS;
+  const shouldDisableArrow =
+    isPending ||
+    disabled ||
+    (!shouldShowWithdrawWrappedToken && BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)));
+
   return (
     <PositionControlsContainer>
       {showExtendedFunctions && (
@@ -121,9 +130,14 @@ const PositionSummaryControls = ({
         </StyledButton>
       )}
 
-      <SplitButton
-        onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
-        text={
+      {shouldDisableArrow && (
+        <StyledButton
+          variant="outlined"
+          color="transparent"
+          size="small"
+          disabled={disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))}
+          onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+        >
           <FormattedMessage
             description="withdrawToken"
             defaultMessage="Withdraw {token}"
@@ -134,49 +148,65 @@ const PositionSummaryControls = ({
                   : wrappedProtocolToken.symbol,
             }}
           />
-        }
-        disabled={
-          disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
-        }
-        variant="outlined"
-        color="transparent"
-        options={[
-          ...(BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
-          hasSignSupport &&
-          position.to.address === PROTOCOL_TOKEN_ADDRESS
-            ? [
-                {
-                  text: (
-                    <FormattedMessage
-                      description="withdrawWrapped"
-                      defaultMessage="Withdraw {wrappedProtocolToken}"
-                      values={{
-                        wrappedProtocolToken: wrappedProtocolToken.symbol,
-                      }}
-                    />
-                  ),
-                  disabled: disabledWithdraw || isPending || disabled,
-                  onClick: () => onWithdraw(false),
-                },
-              ]
-            : []),
-          {
-            text: (
-              <FormattedMessage
-                description="withdraw funds"
-                defaultMessage="Withdraw remaining {token}"
-                values={{ token: position.from.symbol }}
-              />
-            ),
-            disabled:
-              disabledWithdrawFunds ||
-              isPending ||
-              disabled ||
-              BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)),
-            onClick: onWithdrawFunds,
-          },
-        ]}
-      />
+        </StyledButton>
+      )}
+
+      {!shouldDisableArrow && (
+        <SplitButton
+          onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+          text={
+            <FormattedMessage
+              description="withdrawToken"
+              defaultMessage="Withdraw {token}"
+              values={{
+                token:
+                  hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                    ? position.to.symbol
+                    : wrappedProtocolToken.symbol,
+              }}
+            />
+          }
+          disabled={
+            disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
+          }
+          variant="outlined"
+          color="transparent"
+          options={[
+            ...(shouldShowWithdrawWrappedToken
+              ? [
+                  {
+                    text: (
+                      <FormattedMessage
+                        description="withdrawWrapped"
+                        defaultMessage="Withdraw {wrappedProtocolToken}"
+                        values={{
+                          wrappedProtocolToken: wrappedProtocolToken.symbol,
+                        }}
+                      />
+                    ),
+                    disabled: disabledWithdraw || isPending || disabled,
+                    onClick: () => onWithdraw(false),
+                  },
+                ]
+              : []),
+            {
+              text: (
+                <FormattedMessage
+                  description="withdraw funds"
+                  defaultMessage="Withdraw remaining {token}"
+                  values={{ token: position.from.symbol }}
+                />
+              ),
+              disabled:
+                disabledWithdrawFunds ||
+                isPending ||
+                disabled ||
+                BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)),
+              onClick: onWithdrawFunds,
+            },
+          ]}
+        />
+      )}
 
       <PositionControlsMenuContainer>
         <IconButton onClick={handleClick} disabled={isPending}>
