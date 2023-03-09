@@ -252,7 +252,7 @@ const FAQFrame = () => {
                   <Typography variant="body1">
                     <FormattedMessage
                       description="faqWhenDoINeedToPayGasFeesResponsePart5"
-                      defaultMessage="Terminating their position"
+                      defaultMessage="Closing their position"
                     />
                   </Typography>
                 </li>
