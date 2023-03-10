@@ -442,7 +442,7 @@ export default createReducer(initialState, (builder) =>
     .addCase(fetchGraphTokenList.fulfilled, (state, { payload }) => {
       state.byUrl['Mean Finance Graph Allowed Tokens'] = {
         ...state.byUrl['Mean Finance Graph Allowed Tokens'],
-        tokens: payload,
+        tokens: [...state.byUrl['Mean Finance Graph Allowed Tokens'].tokens, ...payload],
         hasLoaded: true,
       };
     })

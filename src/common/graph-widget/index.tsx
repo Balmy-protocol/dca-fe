@@ -158,7 +158,6 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   underlyingTokens: [],
 };
 const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
-  const client = useDCAGraphql();
   let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
   let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
   let defiLlamaData: UniMappedPrice[] = [];
@@ -167,15 +166,25 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
   let prices: Prices = [];
   const [tabIndex, setTabIndex] = React.useState(1);
   const availablePairs = useAvailablePairs();
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, parseUnits('1', from?.decimals || 18));
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, parseUnits('1', to?.decimals || 18));
+  const currentNetwork = useSelectedNetwork();
+  const client = useDCAGraphql(currentNetwork.chainId);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
+    from,
+    parseUnits('1', from?.decimals || 18),
+    undefined,
+    currentNetwork.chainId
+  );
+  const [toPrice, isLoadingToPrice] = useUsdPrice(
+    to,
+    parseUnits('1', to?.decimals || 18),
+    undefined,
+    currentNetwork.chainId
+  );
 
   const dateFilter = React.useMemo(
     () => parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),
     [tabIndex]
   );
-
-  const currentNetwork = useSelectedNetwork();
 
   if (to && from) {
     const toAddress =
@@ -208,7 +217,7 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
     }
   }
 
-  const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(tokenA, tokenB, tabIndex);
+  const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(tokenA, tokenB, tabIndex, currentNetwork.chainId);
 
   const existingPair = React.useMemo(
     () =>
@@ -263,7 +272,9 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
           parseFloat(
             formatCurrencyAmount(
               BigNumber.from(tokenA.isBaseToken ? ratioBToA : ratioAToB),
-              tokenA.isBaseToken ? tokenA : tokenB
+              tokenA.isBaseToken ? tokenA : tokenB,
+              10,
+              10
             )
           ) || null,
         date: executedAtTimestamp,
