@@ -13,7 +13,6 @@ import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
 import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
-import CreatePairModal from 'common/create-pair-modal';
 import StalePairModal from 'common/stale-pair-modal';
 import LowLiquidityModal from 'common/low-liquidity-modal';
 import AllowanceSplitButton from 'common/allowance-split-button';
@@ -45,7 +44,7 @@ import {
   useHasPendingPairCreation,
   useHasConfirmedApproval,
 } from 'state/transactions/hooks';
-import { calculateStale, getSimilarPair, STALE } from 'utils/parsing';
+import { calculateStale, STALE } from 'utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, EMPTY_TOKEN } from 'mocks/tokens';
@@ -148,7 +147,6 @@ const Swap = ({
   const [rate, setRate] = React.useState('0');
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
-  const [shouldShowPairModal, setShouldShowPairModal] = React.useState(false);
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [shouldShowLowLiquidityModal, setShouldShowLowLiquidityModal] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
@@ -333,7 +331,6 @@ const Swap = ({
 
   const handleSwap = async () => {
     if (!from || !to) return;
-    setShouldShowPairModal(false);
     setShouldShowStalePairModal(false);
     const fromSymbol = from.symbol;
 
@@ -441,11 +438,6 @@ const Swap = ({
 
   const preHandleSwap = () => {
     if (!from || !to) {
-      return;
-    }
-    const similarPairExists = getSimilarPair(availablePairs, yieldOptions, from, to);
-    if (!similarPairExists) {
-      setShouldShowPairModal(true);
       return;
     }
     const isStale =
@@ -853,13 +845,6 @@ const Swap = ({
 
   return (
     <StyledPaper variant="outlined" ref={containerRef}>
-      <CreatePairModal
-        open={shouldShowPairModal}
-        onCancel={() => setShouldShowPairModal(false)}
-        from={from}
-        to={to}
-        onCreatePair={handleSwap}
-      />
       <StalePairModal
         open={shouldShowStalePairModal}
         onConfirm={() => {
