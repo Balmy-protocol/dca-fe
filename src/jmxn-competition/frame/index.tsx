@@ -253,8 +253,7 @@ const HomeFrame = () => {
                         parseUsdPrice(
                           token,
                           amount,
-                          prices[token.address].mul(BigNumber.from(10).pow(18)).div(jmxnInUsd),
-                          false
+                          prices[token.address].mul(BigNumber.from(10).pow(18)).div(jmxnInUsd)
                         )
                       : generatedUsdAcc,
                   0

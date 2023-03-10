@@ -50,7 +50,6 @@ import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, EMPTY_TOKEN } from 'mocks/tokens';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import useAllowance from 'hooks/useAllowance';
-import useIsOnCorrectNetwork from 'hooks/useIsOnCorrectNetwork';
 import useCanSupportPair from 'hooks/useCanSupportPair';
 import useWalletService from 'hooks/useWalletService';
 import useContractService from 'hooks/useContractService';
@@ -58,6 +57,7 @@ import usePositionService from 'hooks/usePositionService';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useErrorService from 'hooks/useErrorService';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { shouldTrackError } from 'utils/errors';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import SwapFirstStep from '../step1';
@@ -112,6 +112,7 @@ interface SwapProps {
   toYield: YieldOption | null | undefined;
   setFromYield: (newYield?: null | YieldOption) => void;
   setToYield: (newYield?: null | YieldOption) => void;
+  handleChangeNetwork: (newChainId: number) => void;
 }
 
 const Swap = ({
@@ -136,6 +137,7 @@ const Swap = ({
   toYield,
   setFromYield,
   setToYield,
+  handleChangeNetwork,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
@@ -162,7 +164,8 @@ const Swap = ({
   const errorService = useErrorService();
   // const pairService = usePairService();
   const [balance, , balanceErrors] = useBalance(from);
-  const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
+  const actualCurrentNetwork = useCurrentNetwork();
+  const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [usedTokens] = useUsedTokens();
 
   const existingPair = React.useMemo(() => {
@@ -606,7 +609,7 @@ const Swap = ({
     (shouldEnableYield && fromCanHaveYield && isUndefined(fromYield)) ||
     (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
 
-  const handleChangeNetwork = (chainId: number) => {
+  const onChangeNetwork = (chainId: number) => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     walletService.changeNetwork(chainId, () => {
       replaceHistory(`/create/${chainId}`);
@@ -656,7 +659,13 @@ const Swap = ({
   );
 
   const IncorrectNetworkButton = (
-    <StyledButton size="large" color="primary" variant="contained" disabled fullWidth>
+    <StyledButton
+      size="large"
+      color="secondary"
+      variant="contained"
+      onClick={() => onChangeNetwork(currentNetwork.chainId)}
+      fullWidth
+    >
       <Typography variant="body1">
         <FormattedMessage
           description="incorrect network"

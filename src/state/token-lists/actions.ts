@@ -28,16 +28,16 @@ export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extr
   }
 );
 
-export const fetchGraphTokenList = createAsyncThunk<Token[], undefined, { extra: AxiosInstance }>(
+export const fetchGraphTokenList = createAsyncThunk<Token[], number | undefined, { extra: AxiosInstance }>(
   'tokenLists/fetchGraphTokenList',
-  async (garbage, { getState }) => {
+  async (passedChainId, { getState }) => {
     const {
       config: { network },
     } = getState() as {
       config: { network: { chainId: number; name: string } };
     };
 
-    const chainIdToUse = network?.chainId || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId;
+    const chainIdToUse = passedChainId || network?.chainId || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId;
 
     const dcaClient = new GraphqlService(MEAN_GRAPHQL_URL[LATEST_VERSION][chainIdToUse]);
 

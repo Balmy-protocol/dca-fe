@@ -99,10 +99,11 @@ export default class PairService {
     return this.allowedPairs;
   }
 
-  async fetchAvailablePairs() {
+  async fetchAvailablePairs(chainId?: number) {
     const network = await this.providerService.getNetwork();
+    const chainIdToUse = chainId || network.chainId;
     const client = (
-      this.apolloClient[LATEST_VERSION][network.chainId] ||
+      this.apolloClient[LATEST_VERSION][chainIdToUse] ||
       this.apolloClient[LATEST_VERSION][DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId]
     ).getClient();
     const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(

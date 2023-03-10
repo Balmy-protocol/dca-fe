@@ -18,6 +18,7 @@ import {
   STABLE_COINS,
   ZRX_API_ADDRESS,
 } from 'config/constants';
+import { DateTime } from 'luxon';
 import { emptyTokenWithAddress } from 'utils/currency';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -232,7 +233,7 @@ export default class PriceService {
     chainId?: number,
     tentativeSpan?: number,
     tentativePeriod?: string,
-    end?: string
+    tentativeEnd?: string
   ) {
     const network = await this.providerService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
@@ -241,6 +242,7 @@ export default class PriceService {
     const period = tentativePeriod || INDEX_TO_PERIOD[periodIndex];
     const toAddress = to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to.address;
     const fromAddress = from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address;
+    const end = tentativeEnd || DateTime.now().toSeconds();
 
     let tokenA: GraphToken = { ...emptyTokenWithAddress(fromAddress), isBaseToken: false };
     let tokenB: GraphToken = { ...emptyTokenWithAddress(toAddress), isBaseToken: false };

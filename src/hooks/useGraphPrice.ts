@@ -8,7 +8,8 @@ import usePriceService from './usePriceService';
 function useGraphPrice(
   from: Token | undefined | null,
   to: Token | undefined | null,
-  index = 0
+  index = 0,
+  chainId?: number
 ): [{ rate: number; timestamp: number }[] | undefined, boolean, string?] {
   const priceService = usePriceService();
   const [{ result, isLoading, error }, setState] = React.useState<{
@@ -18,6 +19,7 @@ function useGraphPrice(
   }>({ isLoading: false, result: undefined, error: undefined });
   const prevFrom = usePrevious(from);
   const prevTo = usePrevious(to);
+  const prevChainId = usePrevious(chainId);
   const prevIndex = usePrevious(index);
   const prevResult = usePrevious(result, false);
 
@@ -25,7 +27,7 @@ function useGraphPrice(
     async function callPromise() {
       if (from && to) {
         try {
-          const prices = await priceService.getPriceForGraph(from, to, index);
+          const prices = await priceService.getPriceForGraph(from, to, index, chainId);
           setState({ result: prices, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });
@@ -39,6 +41,7 @@ function useGraphPrice(
       (!isLoading && isUndefined(result) && !error) ||
       !isEqual(prevFrom, from) ||
       !isEqual(prevTo, to) ||
+      !isEqual(prevChainId, chainId) ||
       !isEqual(prevIndex, index)
     ) {
       setState({ result: undefined, error: undefined, isLoading: true });
@@ -46,7 +49,7 @@ function useGraphPrice(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, prevFrom, to, prevTo, isLoading, result, error, index, prevIndex]);
+  }, [from, prevFrom, to, prevTo, isLoading, result, error, index, prevIndex, prevChainId, chainId]);
 
   return [result || prevResult, isLoading, error];
 }

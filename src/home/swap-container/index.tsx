@@ -35,9 +35,10 @@ import Swap from './components/swap';
 
 interface SwapContainerProps {
   swapIntervalsData?: GetSwapIntervalsGraphqlResponse;
+  handleChangeNetwork: (chainId: number) => void;
 }
 
-const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
+const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainerProps) => {
   const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield } =
     useCreatePositionState();
   const dispatch = useAppDispatch();
@@ -155,6 +156,7 @@ const SwapContainer = ({ swapIntervalsData }: SwapContainerProps) => {
           setFromYield={(newYield) => dispatch(setFromYield(newYield))}
           setToYield={(newYield) => dispatch(setToYield(newYield))}
           availableFrequencies={availableFrequencies}
+          handleChangeNetwork={handleChangeNetwork}
         />
       </Grid>
       <Hidden mdDown>

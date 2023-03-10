@@ -15,9 +15,11 @@ import { emptyTokenWithAddress, toToken } from 'utils/currency';
 import { BigNumber } from 'ethers';
 import { find } from 'lodash';
 import TokenIcon from 'common/token-icon';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+// import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+// import useWalletService from 'hooks/useWalletService';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
   ${({ $show }) => !$show && 'position: absolute;width: auto;'};
@@ -139,7 +141,10 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     onChangeNetwork,
   } = props;
 
-  const currentNetwork = useCurrentNetwork();
+  // const walletService = useWalletService();
+  // const account = walletService.getAccount();
+  // const currentNetwork = useCurrentNetwork();
+  const currentNetwork = useSelectedNetwork();
   const intl = useIntl();
 
   return (

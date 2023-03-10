@@ -4,6 +4,10 @@ import { NETWORKS, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config/co
 import { getNetwork as getStringNetwork, Provider, Network, TransactionRequest } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
 
+interface ProviderWithChainId extends Provider {
+  chainId: string;
+}
+
 export default class ProviderService {
   provider: ethers.providers.Web3Provider;
 
@@ -56,7 +60,11 @@ export default class ProviderService {
   async getNetwork() {
     const provider = await this.getBaseProvider();
     if (provider?.getNetwork) {
-      return provider.getNetwork();
+      return provider?.getNetwork();
+    }
+
+    if ((provider as ProviderWithChainId)?.chainId) {
+      return Promise.resolve({ chainId: parseInt((provider as ProviderWithChainId)?.chainId, 16) });
     }
     return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
