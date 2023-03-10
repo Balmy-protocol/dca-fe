@@ -54,6 +54,16 @@ const StyledPaper = styled(Paper)<{ $isSelected?: boolean; $disabled: boolean }>
   ${({ $isSelected }) => $isSelected && 'border: 2px solid #3076F6;'}
 `;
 
+const StyledOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+`;
+
 const StyledNotSupportedContainer = styled.div`
   display: flex;
   flex-grow: 1;
@@ -211,6 +221,7 @@ const SwapQuote = ({
 
   return (
     <StyledPaper $isSelected={isSelected} onClick={() => !disabled && setRoute(quote)} $disabled={disabled}>
+      {disabled && !isSelected && <StyledOverlay />}
       <StyledTitleContainer>
         <StyledTitleDataContainer>
           {isSelected ? (
