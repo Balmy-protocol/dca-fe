@@ -200,8 +200,9 @@ export default class SdkService {
 
   async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: BigNumber } | undefined> {
     const currentNetwork = await this.providerService.getNetwork();
+    const account = this.walletService.getAccount();
 
-    if (chainId === currentNetwork.chainId) {
+    if (chainId === currentNetwork.chainId && !!account) {
       return this.walletService.getCustomToken(address);
     }
 
