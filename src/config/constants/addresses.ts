@@ -666,7 +666,7 @@ export const TOKEN_LISTS = {
   },
 };
 
-export const STABLE_COINS = [];
+export const STABLE_COINS: string[] = [];
 
 export const MEAN_API_URL = 'https://api.mean.finance';
 
