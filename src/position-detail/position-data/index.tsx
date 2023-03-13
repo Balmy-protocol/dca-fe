@@ -316,8 +316,8 @@ const Details = ({
   const foundYieldTo =
     position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
-  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdrawUnderlying;
-  const swappedToShow = showBreakdown ? swappedBase : swappedUnderlying;
+  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdrawUnderlying || toWithdrawBase;
+  const swappedToShow = showBreakdown ? swappedBase : swappedUnderlying || swappedBase;
   const remainingLiquidityToShow = showBreakdown ? remainingLiquidity : totalRemainingLiquidity;
 
   const executedSwaps = totalSwaps.toNumber() - remainingSwaps.toNumber();
