@@ -39,20 +39,24 @@ export default class YieldService {
     return yieldsByChain.map((baseYield) => {
       const foundYield = find(yields, { pool: baseYield.poolId });
 
-      let enabledTokens = foundYield?.underlyingTokens.map((token) => token.toLowerCase()) || [];
+      const enabledTokens = foundYield?.underlyingTokens.map((token) => token.toLowerCase()) || [];
+
+      const forcedEnabledTokens = baseYield.forcedUnderlyings || [];
 
       const wrappedProtocolToken = getWrappedProtocolToken(chainidTouse);
 
       const protocolToken = getProtocolToken(chainidTouse);
 
-      if (enabledTokens.includes(wrappedProtocolToken.address)) {
-        enabledTokens = [...enabledTokens, protocolToken.address];
+      let finalEnabledTokens = [...enabledTokens, ...forcedEnabledTokens];
+
+      if (finalEnabledTokens.includes(wrappedProtocolToken.address)) {
+        finalEnabledTokens = [...finalEnabledTokens, protocolToken.address];
       }
 
       return {
         ...baseYield,
         apy: foundYield?.apyBase || foundYield?.apy || 0,
-        enabledTokens,
+        enabledTokens: finalEnabledTokens,
       };
     });
   }

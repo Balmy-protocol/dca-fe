@@ -118,6 +118,8 @@ const PositionDataControls = ({
   const fromIsSupportedInNewVersion = !!tokenList[position.from.address];
   const toIsSupportedInNewVersion = !!tokenList[position.to.address];
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
+  const fromHasYield = !!position.from.underlyingTokens.length;
+  const toHasYield = !!position.to.underlyingTokens.length;
   const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
 
   const shouldMigrateToYield =
@@ -132,6 +134,8 @@ const PositionDataControls = ({
   const disabledIncrease =
     disabled ||
     TOKEN_BLACKLIST.includes(position.from.address) ||
+    TOKEN_BLACKLIST.includes((fromHasYield && fromSupportsYield?.tokenAddress) || '') ||
+    TOKEN_BLACKLIST.includes((toHasYield && toSupportsYield?.tokenAddress) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.interval,
       position.from.address,

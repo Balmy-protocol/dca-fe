@@ -11,6 +11,7 @@ import {
   OLD_VERSIONS,
   VERSIONS_ALLOWED_MODIFY,
   shouldEnableFrequency,
+  DISABLED_YIELD_WITHDRAWS,
 } from 'config/constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from 'utils/etherscan';
@@ -149,6 +150,9 @@ const PositionControls = ({
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
 
+  const fromHasYield = !!position.from.underlyingTokens.length;
+  const toHasYield = !!position.to.underlyingTokens.length;
+
   const shouldShowMigrate =
     hasSignSupport && remainingSwaps.gt(BigNumber.from(0)) && toIsSupportedInNewVersion && fromIsSupportedInNewVersion;
 
@@ -160,13 +164,16 @@ const PositionControls = ({
   const disabledIncrease =
     disabled ||
     TOKEN_BLACKLIST.includes(position.from.address) ||
-    TOKEN_BLACKLIST.includes(fromSupportsYield?.tokenAddress || '') ||
+    TOKEN_BLACKLIST.includes((fromHasYield && fromSupportsYield?.tokenAddress) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),
       position.from.address,
       position.to.address,
       position.chainId
     );
+
+  const disabledWithdraw =
+    disabled || DISABLED_YIELD_WITHDRAWS.includes((toHasYield && toSupportsYield?.tokenAddress) || '');
 
   return (
     <StyledCallToActionContainer>
@@ -195,7 +202,7 @@ const PositionControls = ({
                 handleClose();
                 onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS);
               }}
-              disabled={disabled || !isOnNetwork}
+              disabled={disabled || !isOnNetwork || disabledWithdraw}
             >
               <Typography variant="body2">
                 <FormattedMessage
@@ -217,7 +224,7 @@ const PositionControls = ({
                 handleClose();
                 onWithdraw(position, false);
               }}
-              disabled={disabled || !isOnNetwork}
+              disabled={disabled || !isOnNetwork || disabledWithdraw}
             >
               <Typography variant="body2">
                 <FormattedMessage
@@ -252,7 +259,7 @@ const PositionControls = ({
               handleClose();
               onTerminate(position);
             }}
-            disabled={disabled || !isOnNetwork}
+            disabled={disabled || !isOnNetwork || disabledWithdraw}
             style={{ color: '#FF5359' }}
           >
             <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />

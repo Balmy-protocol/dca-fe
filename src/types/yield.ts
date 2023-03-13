@@ -8,6 +8,7 @@ export interface YieldOption {
   enabledTokens: string[];
   token: Token;
   tokenAddress: string;
+  forcedUnderlyings?: string[];
 }
 
 export type YieldOptions = YieldOption[];

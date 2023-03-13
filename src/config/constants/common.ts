@@ -59,7 +59,6 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 };
 
 export const TOKEN_BLACKLIST = [
-  '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0', // ETH - WSTETH. Disabled until we test it.
   '0x5fe2b58c013d7601147dcdd68c143a77499f5531', // POLY - GRT
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // POLY - SNX
   '0x65559aa14915a70190438ef90104769e5e890a00', // OE - ENS
@@ -76,4 +75,22 @@ export const TOKEN_BLACKLIST = [
   '0x185d3a08140efaeb3c6bf173e751afb0bcb0d0c6', // OP - USDC Beefy wrapper
   '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12', // POLY - GNS optimism Beefy wrapper
   '0xaab6af05e12faae0a5d9597c79588846f0df15b8', // POLY - MVX optimism Beefy wrapper
+
+  '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // ETH - USDC. Euler. Disabled due to hack.
+  '0xd4de9d2fc1607d1df63e1c95ecbfa8d7946f5457', // ETH - WETH. Euler. Disabled due to hack.
+  '0xc4113b7605d691e073c162809060b6c5ae402f1e', // ETH - DAI. Euler. Disabled due to hack.
+  '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
+  '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
+  '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
+  '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0', // ETH - WSTETH. Disabled until we test it.
+];
+
+export const DISABLED_YIELD_WITHDRAWS = [
+  '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // ETH - USDC. Euler. Disabled due to hack.
+  '0xd4de9d2fc1607d1df63e1c95ecbfa8d7946f5457', // ETH - WETH. Euler. Disabled due to hack.
+  '0xc4113b7605d691e073c162809060b6c5ae402f1e', // ETH - DAI. Euler. Disabled due to hack.
+  '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
+  '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
+  '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
+  '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0', // ETH - WSTETH. Disabled until we test it.
 ];

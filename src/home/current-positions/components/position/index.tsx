@@ -98,6 +98,7 @@ const StyledCardTitleHeader = styled.div`
 `;
 
 const StyledLink = styled(Link)`
+  margin: 0px 5px;
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
@@ -636,6 +637,26 @@ const ActivePosition = ({
                 />
                 <StyledLink href="https://app.aave.com/governance/proposal/?proposalId=143" target="_blank">
                   <FormattedMessage description="here" defaultMessage="here." />
+                </StyledLink>
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {(position.from.underlyingTokens.length || position.to.underlyingTokens.length) && position.chainId === 1 && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1', flexWrap: 'wrap' }}>
+                <FormattedMessage
+                  description="positionEulerHack1"
+                  defaultMessage="Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. Stay updated on the situation by joining our"
+                />
+                <StyledLink href="https://discord.mean.finance" target="_blank">
+                  <FormattedMessage description="Discord" defaultMessage="Discord" />
+                </StyledLink>
+                <FormattedMessage description="positionEulerHack2" defaultMessage="and" />
+                <StyledLink href="https://discord.gg/CdG97VSYGk" target="_blank">
+                  <FormattedMessage description="Euler's Discord." defaultMessage="Euler's Discord." />
                 </StyledLink>
               </Typography>
             </StyledDetailWrapper>
