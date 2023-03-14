@@ -39,6 +39,13 @@ export const ALLOWED_YIELDS: Record<
       token: emptyTokenWithAddress('AAVE'),
     },
     {
+      id: '6369a2df-838f-4392-a73b-4c2b2898d537', // aave-v3 stMATIC
+      tokenAddress: '0xd01eaff32ca784b07e04776f605cdcb39221b017', // aave-v3 stMATIC
+      poolId: '6369a2df-838f-4392-a73b-4c2b2898d537', // aave-v3 stMATIC
+      name: 'Aave V3',
+      token: emptyTokenWithAddress('AAVE'),
+    },
+    {
       id: '2b9bf1c6-a018-4e93-a32f-7cf6ccd311fc', // aave-v3 WETH
       tokenAddress: '0xa7a7ffe0520e90491e58c9c77f78d7cfc32d019e', // aave-v3 WETH
       poolId: '2b9bf1c6-a018-4e93-a32f-7cf6ccd311fc', // aave-v3 WETH
