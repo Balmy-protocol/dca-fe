@@ -20,7 +20,6 @@ export const DISABLED_YIELDS = [
   '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
-  '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0', // ETH - WSTETH. Disabled until we test it.
 ].map((a) => a.toLowerCase());
 
 const BASE_YIELDS_PER_CHAIN: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
@@ -417,7 +416,7 @@ export const ALLOWED_YIELDS: Record<
     },
     {
       id: '1e31049a-403b-4029-a662-4342e70c20b8', // euler wstETH
-      tokenAddress: '0x7C6D161b367Ec0605260628c37B8dd778446256b', // euler wstETH
+      tokenAddress: '0x7c6d161b367ec0605260628c37b8dd778446256b', // euler wstETH
       poolId: '1e31049a-403b-4029-a662-4342e70c20b8', // euler wstETH
       name: 'Euler',
       token: emptyTokenWithAddress('EULER'),
