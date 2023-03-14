@@ -534,6 +534,17 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
+        {position.from.symbol === 'agEUR' ||
+          (position.to.symbol === 'agEUR' && (
+            <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+              <Alert severity="warning">
+                <FormattedMessage
+                  description="positionagEURNotSupported"
+                  defaultMessage="Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted."
+                />
+              </Alert>
+            </Grid>
+          ))}
         {!!position.from.underlyingTokens.length && position.chainId === 1 && (
           <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
             <Alert severity="warning">

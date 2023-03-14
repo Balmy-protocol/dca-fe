@@ -641,6 +641,20 @@ const ActivePosition = ({
               </Typography>
             </StyledDetailWrapper>
           )}
+          {position.from.symbol === 'agEUR' ||
+            (position.to.symbol === 'agEUR' && (
+              <StyledDetailWrapper alignItems="flex-start">
+                <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                  <ErrorOutlineIcon fontSize="inherit" />
+                </Typography>
+                <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
+                  <FormattedMessage
+                    description="positionagEURNotSupported"
+                    defaultMessage="Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted."
+                  />
+                </Typography>
+              </StyledDetailWrapper>
+            ))}
           {(position.from.underlyingTokens.length || position.to.underlyingTokens.length) && position.chainId === 1 && (
             <StyledDetailWrapper alignItems="flex-start">
               <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
