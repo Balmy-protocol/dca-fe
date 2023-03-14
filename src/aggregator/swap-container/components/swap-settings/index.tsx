@@ -27,6 +27,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -65,12 +66,15 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
   const dispatch = useAppDispatch();
   const dexes = useSdkDexes();
   const [showDexes, setShowDexes] = React.useState(false);
+  const trackEvent = useTrackEvent();
 
   const onSlippageChange = (newSlippage: string) => {
     dispatch(setSlippage(newSlippage));
+    trackEvent('Aggregator - Set slippage', { slippage: newSlippage });
   };
   const onGasSpeedChange = (newGasSpeed: GasKeys) => {
     dispatch(setGasSpeed(newGasSpeed));
+    trackEvent('Aggregator - Set gas speed', { gasSpeed: newGasSpeed });
   };
   const onConfettiChange = (newConfettiParticleCount: number) => {
     dispatch(setConfetti(newConfettiParticleCount));
@@ -78,6 +82,7 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
 
   const onRestoreDefaults = () => {
     dispatch(restoreDefaults());
+    trackEvent('Aggregator - Set default settings');
   };
 
   const handleToggleDex = (checked: boolean, id: string) => {
@@ -85,8 +90,10 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
 
     if (newDisabledDexes.includes(id)) {
       newDisabledDexes.splice(newDisabledDexes.indexOf(id), 1);
+      trackEvent('Aggregator - Disable dex', { source: id });
     } else {
       newDisabledDexes.push(id);
+      trackEvent('Aggregator - Enable dex', { source: id });
     }
 
     dispatch(setDisabledDexes(newDisabledDexes));

@@ -66,6 +66,7 @@ import SdkService from './sdkService';
 import ErrorService from './errorService';
 import SimulationService from './simulationService';
 import SafeService from './safeService';
+import EventService from './eventService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -122,6 +123,8 @@ export default class Web3Service {
 
   errorService: ErrorService;
 
+  eventService: EventService;
+
   simulationService: SimulationService;
 
   safeService: SafeService;
@@ -156,6 +159,7 @@ export default class Web3Service {
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.axiosClient, this.providerService);
     this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
+    this.eventService = new EventService(this.meanApiService, this.providerService);
     this.pairService = new PairService(
       this.walletService,
       this.contractService,
@@ -260,6 +264,10 @@ export default class Web3Service {
 
   getPairService() {
     return this.pairService;
+  }
+
+  getEventService() {
+    return this.eventService;
   }
 
   getModal() {

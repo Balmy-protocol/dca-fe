@@ -18,6 +18,7 @@ import useSupportsSigning from 'hooks/useSupportsSigning';
 import usePositionService from 'hooks/usePositionService';
 import useErrorService from 'hooks/useErrorService';
 import { shouldTrackError } from 'utils/errors';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 interface TerminateModalProps {
   position: Position;
@@ -67,6 +68,7 @@ const TerminateModal = ({
     position.to.address === protocolToken.address || position.to.address === wrappedProtocolToken.address;
   const swappedOrLiquidity = protocolIsFrom ? remainingLiquidity : toWithdraw;
   const [hasSignSupport] = useSupportsSigning();
+  const trackEvent = useTrackEvent();
 
   const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : BigNumber.from(0);
   let fromSymbol = position.from.symbol;
@@ -101,6 +103,8 @@ const TerminateModal = ({
       }
 
       terminateWithUnwrap = terminateWithUnwrap && !!hasSignSupport;
+
+      trackEvent('DCA - Terminate position submitting', { terminateWithUnwrap });
 
       setModalLoading({
         content: (
@@ -144,10 +148,12 @@ const TerminateModal = ({
           />
         ),
       });
+      trackEvent('DCA - Terminate position submitted', { terminateWithUnwrap });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Terminate position error');
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error terminating position', JSON.stringify(e), {
           position: position.id,

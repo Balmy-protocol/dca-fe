@@ -14,6 +14,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import useWalletService from 'hooks/useWalletService';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -47,6 +48,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   const walletService = useWalletService();
   const account = walletService.getAccount();
   const intl = useIntl();
+  const trackEvent = useTrackEvent();
 
   const validator = (nextValue: string) => {
     // sanitize value
@@ -58,6 +60,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   const handleTransfer = () => {
     dispatch(setTransferTo(toAddress));
     onCancel();
+    trackEvent('Aggregator - Set transfer to');
   };
 
   const onPasteAddress = async () => {
