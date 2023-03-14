@@ -133,7 +133,11 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       });
 
       const result = await positionService.withdraw(position, useProtocolToken);
-      addTransaction(result, { type: TRANSACTION_TYPES.WITHDRAW_POSITION, typeData: { id: position.id }, position });
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.WITHDRAW_POSITION,
+        typeData: { id: position.id, withdrawnUnderlying: position.toWithdrawUnderlying?.toString() },
+        position,
+      });
       setModalSuccess({
         hash: result.hash,
         content: (
