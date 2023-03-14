@@ -12,6 +12,7 @@ import usePositionService from 'hooks/usePositionService';
 import { fullPositionToMappedPosition } from 'utils/parsing';
 import useErrorService from 'hooks/useErrorService';
 import { shouldTrackError } from 'utils/errors';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -38,6 +39,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
   const errorService = useErrorService();
   const addTransaction = useTransactionAdder();
   const intl = useIntl();
+  const trackEvent = useTrackEvent();
 
   const validator = (nextValue: string) => {
     // sanitize value
@@ -60,6 +62,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
           </Typography>
         ),
       });
+      trackEvent('DCA - Transfer position submitting');
       const result = await positionService.transfer(fullPositionToMappedPosition(position), toAddress);
       addTransaction(result, {
         type: TRANSACTION_TYPES.TRANSFER_POSITION,
@@ -85,10 +88,12 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
           />
         ),
       });
+      trackEvent('DCA - Transfer position submitted');
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Transfer position error');
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error while transfering position', JSON.stringify(e), {
           position: position.id,

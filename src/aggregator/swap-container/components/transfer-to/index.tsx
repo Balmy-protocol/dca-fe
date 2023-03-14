@@ -8,6 +8,7 @@ import { setTransferTo } from 'state/aggregator/actions';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 const StyledTransferToContainer = styled.div`
   display: flex;
@@ -47,9 +48,11 @@ interface TransferToProps {
 
 const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
   const dispatch = useAppDispatch();
+  const trackEvent = useTrackEvent();
 
   const onRemoveAddress = () => {
     dispatch(setTransferTo(null));
+    trackEvent('Aggregator - Cancel transfer to');
   };
 
   return (

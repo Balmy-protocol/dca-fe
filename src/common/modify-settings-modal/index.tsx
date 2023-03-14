@@ -60,6 +60,7 @@ import useErrorService from 'hooks/useErrorService';
 import { shouldTrackError } from 'utils/errors';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -139,6 +140,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
   const [usdPrice] = useRawUsdPrice(from);
+  const trackEvent = useTrackEvent();
   const fromValueUsdPrice = parseUsdPrice(
     from,
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
@@ -274,6 +276,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         );
       }
 
+      trackEvent('DCA - Modify position submitting', { isIncreasingPosition, useWrappedProtocolToken });
       setModalLoading({
         content: (
           <>
@@ -336,10 +339,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           />
         ),
       });
+      trackEvent('DCA - Modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Modify position error', { isIncreasingPosition, useWrappedProtocolToken });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error changin rate and swaps', JSON.stringify(e), {
           position: position.id,
@@ -389,12 +394,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </>
         ),
       });
+      trackEvent('DCA - Safe modify position submitting', { isIncreasingPosition, useWrappedProtocolToken });
       const result = await positionService.approveAndModifyRateAndSwapsSafe(
         position,
         rate,
         frequencyValue,
         useWrappedProtocolToken
       );
+      trackEvent('DCA - Safe modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -427,6 +434,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Safe modify position error', { isIncreasingPosition, useWrappedProtocolToken });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error changin rate and swaps', JSON.stringify(e), {
           position: position.id,
@@ -465,12 +473,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         ),
       });
 
+      trackEvent('DCA - Modify position approve submitting', { isIncreasingPosition, useWrappedProtocolToken });
       const result = await walletService.approveToken(
         fromToUse,
         fromHasYield,
         version,
         isExact ? remainingLiquidityDifference : undefined
       );
+
       const hubAddress = await contractService.getHUBAddress(position.version);
       const companionAddress = await contractService.getHUBCompanionAddress(position.version);
 
@@ -493,10 +503,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           />
         ),
       });
+      trackEvent('DCA - Modify position approve submitted', { isIncreasingPosition, useWrappedProtocolToken });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Modify position approve error', { isIncreasingPosition, useWrappedProtocolToken });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error approving token', JSON.stringify(e), {
           position: position.id,

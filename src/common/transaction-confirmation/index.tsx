@@ -25,6 +25,7 @@ import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import { parseUsdPrice } from 'utils/currency';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 const StyledOverlay = styled.div<{ showingBalances: boolean }>`
   position: absolute;
@@ -162,6 +163,12 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
   const [toPrice] = useRawUsdPrice(to);
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [protocolPrice] = useRawUsdPrice(protocolToken);
+  const trackEvent = useTrackEvent();
+
+  const handleNewTrade = () => {
+    trackEvent('Aggregator - New trade');
+    handleClose();
+  };
 
   React.useEffect(() => {
     if (timer > 0 && shouldShow) {
@@ -214,6 +221,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
   const onGoToEtherscan = () => {
     const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
     window.open(url, '_blank');
+    trackEvent('Aggregator - View transaction details');
   };
 
   let sentFrom: BigNumber | null = null;
@@ -388,7 +396,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
               <FormattedMessage description="transactionConfirmationViewReceipt" defaultMessage="View receipt" />
             )}
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleClose} fullWidth size="large">
+          <Button variant="contained" color="secondary" onClick={handleNewTrade} fullWidth size="large">
             <FormattedMessage description="transactionConfirmationNewTrade" defaultMessage="New trade" />
           </Button>
         </StyledButonContainer>

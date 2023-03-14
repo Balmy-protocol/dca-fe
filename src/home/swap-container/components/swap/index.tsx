@@ -59,6 +59,7 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import useErrorService from 'hooks/useErrorService';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { shouldTrackError } from 'utils/errors';
+import useTrackEvent from 'hooks/useTrackEvent';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
@@ -169,6 +170,7 @@ const Swap = ({
   const intl = useIntl();
   const availablePairs = useAvailablePairs();
   const errorService = useErrorService();
+  const trackEvent = useTrackEvent();
   // const pairService = usePairService();
   const [balance, , balanceErrors] = useBalance(from);
   const actualCurrentNetwork = useCurrentNetwork();
@@ -293,6 +295,7 @@ const Swap = ({
           </Typography>
         ),
       });
+      trackEvent('DCA - Approve token submitting');
       const result = await walletService.approveToken(
         from,
         !!(shouldEnableYield && fromYield?.tokenAddress),
@@ -303,6 +306,7 @@ const Swap = ({
         shouldEnableYield && fromYield?.tokenAddress
           ? await contractService.getHUBCompanionAddress()
           : await contractService.getHUBAddress();
+      trackEvent('DCA - Approve token submitted');
       addTransaction(result, {
         type: amount ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
         typeData: {
@@ -325,6 +329,7 @@ const Swap = ({
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Approve token error');
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error approving token', JSON.stringify(e), {
           from: from.address,
@@ -357,6 +362,7 @@ const Swap = ({
           </Typography>
         ),
       });
+      trackEvent('DCA - Create position submitting');
       const result = await positionService.deposit(
         from,
         to,
@@ -366,6 +372,7 @@ const Swap = ({
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined
       );
+      trackEvent('DCA - Create position submitted');
       const hubAddress = await contractService.getHUBAddress();
       const companionAddress = await contractService.getHUBCompanionAddress();
 
@@ -408,6 +415,7 @@ const Swap = ({
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Create position error');
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error creating position', JSON.stringify(e), {
           from: from.address,
@@ -441,6 +449,7 @@ const Swap = ({
           </Typography>
         ),
       });
+      trackEvent('DCA - Safe approve and create position submitting');
       const result = await positionService.approveAndDepositSafe(
         from,
         to,
@@ -450,6 +459,7 @@ const Swap = ({
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined
       );
+      trackEvent('DCA - Safe approve and create position submitted');
       const hubAddress = await contractService.getHUBAddress();
       const companionAddress = await contractService.getHUBCompanionAddress();
 
@@ -496,6 +506,7 @@ const Swap = ({
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Safe approve and create position error');
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error creating position', JSON.stringify(e), {
           from: from.address,
@@ -578,6 +589,10 @@ const Swap = ({
   const startSelectingCoin = (token: Token) => {
     setSelecting(token);
     setShouldShowPicker(true);
+    trackEvent('DCA - start selecting coin', {
+      selected: token.address,
+      is: selecting.address === from?.address ? 'from' : 'to',
+    });
   };
 
   const handleFromValueChange = (newFromValue: string) => {
@@ -608,6 +623,7 @@ const Swap = ({
         formatUnits(parseUnits(newRate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
         ''
     );
+    trackEvent('DCA - Set rate step 2');
   };
 
   const handleFrequencyChange = (newFrequencyValue: string) => {
@@ -660,6 +676,14 @@ const Swap = ({
     if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo](amount);
+
+      if (actionToDo === 'approveToken') {
+        trackEvent('DCA - Approve full token amount', { fromAddress: from?.address, toAddress: to?.address });
+      } else if (actionToDo === 'approveTokenExact') {
+        trackEvent('DCA - Approve exact token amount', { fromAddress: from?.address, toAddress: to?.address });
+      } else if (actionToDo === 'createPosition') {
+        trackEvent('DCA - Create position', { fromAddress: from?.address, toAddress: to?.address });
+      }
     }
     /**  Disable low liquidity modal for now */
     // setIsLoading(true);
@@ -737,6 +761,7 @@ const Swap = ({
         web3Service.setNetwork(networkToSet?.chainId);
       }
     });
+    trackEvent('DCA - Change network', { chainId });
   };
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
@@ -969,6 +994,11 @@ const Swap = ({
     }
 
     setCreateStep(step);
+    if (step === 1) {
+      trackEvent('DCA - Continue to step 2', { fromAddress: from?.address, toAddress: to?.address });
+    } else {
+      trackEvent('DCA - Go back to step 1', { fromAddress: from?.address, toAddress: to?.address });
+    }
   };
 
   const NextStepButton = (

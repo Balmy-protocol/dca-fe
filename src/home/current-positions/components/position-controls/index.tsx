@@ -33,6 +33,7 @@ import usePushToHistory from 'hooks/usePushToHistory';
 import { setNetwork } from 'state/config/actions';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -112,15 +113,19 @@ const PositionControls = ({
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
   const tokenList = useTokenList();
+  const trackEvent = useTrackEvent();
 
   const onViewDetails = (event: React.MouseEvent) => {
     event.preventDefault();
     dispatch(setPosition(null));
     dispatch(changePositionDetailsTab(0));
+    handleClose();
     pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
+    trackEvent('DCA - Position List - View details');
   };
 
   const onChangeNetwork = () => {
+    trackEvent('DCA - Position List - Change network', { chainId });
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     walletService.changeNetwork(chainId, () => {
       const networkToSet = find(NETWORKS, { chainId });
@@ -129,6 +134,36 @@ const PositionControls = ({
         web3Service.setNetwork(networkToSet?.chainId);
       }
     });
+  };
+
+  const handleOnWithdraw = (useProtocolToken: boolean) => {
+    handleClose();
+    onWithdraw(position, useProtocolToken);
+    trackEvent('DCA - Position List - Withdraw', { useProtocolToken });
+  };
+
+  const handleReusePosition = () => {
+    handleClose();
+    onReusePosition(position);
+    trackEvent('DCA - Position List - Add funds');
+  };
+
+  const handleSuggestMigrateYield = () => {
+    handleClose();
+    onSuggestMigrateYield(position);
+    trackEvent('DCA - Position List - Suggest migrate yield');
+  };
+
+  const handleMigrateYield = () => {
+    handleClose();
+    onMigrateYield(position);
+    trackEvent('DCA - Position List - Migrate yield');
+  };
+
+  const handleTerminate = () => {
+    handleClose();
+    onTerminate(position);
+    trackEvent('DCA - Position List - Terminate');
   };
 
   if (isPending) {
@@ -207,10 +242,7 @@ const PositionControls = ({
         >
           {toWithdraw.gt(BigNumber.from(0)) && (
             <MenuItem
-              onClick={() => {
-                handleClose();
-                onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS);
-              }}
+              onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               disabled={disabled || !isOnNetwork || disabledWithdraw}
             >
               <Typography variant="body2">
@@ -228,13 +260,7 @@ const PositionControls = ({
             </MenuItem>
           )}
           {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                onWithdraw(position, false);
-              }}
-              disabled={disabled || !isOnNetwork || disabledWithdraw}
-            >
+            <MenuItem onClick={() => handleOnWithdraw(false)} disabled={disabled || !isOnNetwork || disabledWithdraw}>
               <Typography variant="body2">
                 <FormattedMessage
                   description="withdrawWrapped"
@@ -246,13 +272,7 @@ const PositionControls = ({
               </Typography>
             </MenuItem>
           )}
-          <MenuItem
-            onClick={(e) => {
-              handleClose();
-              onViewDetails(e);
-            }}
-            disabled={disabled}
-          >
+          <MenuItem onClick={onViewDetails} disabled={disabled}>
             <Link
               href={`/${chainId}/positions/${position.version}/${position.positionId}`}
               underline="none"
@@ -263,14 +283,7 @@ const PositionControls = ({
               </Typography>
             </Link>
           </MenuItem>
-          <MenuItem
-            onClick={() => {
-              handleClose();
-              onTerminate(position);
-            }}
-            disabled={disabled || !isOnNetwork || disabledWithdraw}
-            style={{ color: '#FF5359' }}
-          >
+          <MenuItem onClick={handleTerminate} disabled={disabled || !isOnNetwork || disabledWithdraw} style={{ color: '#FF5359' }}>
             <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
           </MenuItem>
         </StyledMenu>
@@ -292,7 +305,7 @@ const PositionControls = ({
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
-              onClick={() => onReusePosition(position)}
+              onClick={handleReusePosition}
               disabled={disabledIncrease}
               fullWidth
             >
@@ -309,7 +322,7 @@ const PositionControls = ({
             <StyledCardFooterButton
               variant="contained"
               color="migrate"
-              onClick={() => onMigrateYield(position)}
+              onClick={handleMigrateYield}
               fullWidth
               disabled={disabled}
             >
@@ -322,7 +335,7 @@ const PositionControls = ({
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
-              onClick={() => onSuggestMigrateYield(position)}
+              onClick={handleSuggestMigrateYield}
               fullWidth
               disabled={disabled}
             >
@@ -335,7 +348,7 @@ const PositionControls = ({
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
-              onClick={() => onReusePosition(position)}
+              onClick={handleReusePosition}
               fullWidth
               disabled={disabled}
             >
@@ -348,7 +361,7 @@ const PositionControls = ({
             <StyledCardFooterButton
               variant="contained"
               color="migrate"
-              onClick={() => onMigrateYield(position)}
+              onClick={handleMigrateYield}
               fullWidth
               disabled={disabled}
             >
@@ -361,7 +374,7 @@ const PositionControls = ({
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
-              onClick={() => onWithdraw(position, hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+              onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               fullWidth
               disabled={disabled || toWithdraw.lte(BigNumber.from(0))}
             >

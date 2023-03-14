@@ -58,6 +58,7 @@ import { BigNumber } from 'ethers';
 import Alert from '@mui/material/Alert';
 import useErrorService from 'hooks/useErrorService';
 import { shouldTrackError } from 'utils/errors';
+import useTrackEvent from 'hooks/useTrackEvent';
 import usePushToHistory from 'hooks/usePushToHistory';
 import PositionControls from '../position-summary-controls';
 import PositionSummaryContainer from '../summary-container';
@@ -119,6 +120,7 @@ const PositionDetailFrame = () => {
   const currentNetwork = useCurrentNetwork();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
+  const trackEvent = useTrackEvent();
 
   const shouldShowChangeNetwork = Number(chainId) !== currentNetwork.chainId || !isOnCorrectNetwork;
 
@@ -198,6 +200,7 @@ const PositionDetailFrame = () => {
   React.useEffect(() => {
     dispatch(changeMainTab(0));
     dispatch(changeSubTab(1));
+    trackEvent('DCA - Visit position detail page', { chainId });
   }, []);
 
   React.useEffect(() => {
@@ -246,6 +249,7 @@ const PositionDetailFrame = () => {
     const tokenNFT = await positionService.getTokenNFT(fullPositionToMappedPosition(positionInUse));
     setNFTData(tokenNFT);
     setShowNFTModal(true);
+    trackEvent('DCA - Position Details - View NFT');
   };
 
   const onBackToPositions = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -253,6 +257,7 @@ const PositionDetailFrame = () => {
     dispatch(changeMainTab(0));
     dispatch(changeSubTab(1));
     pushToHistory('/positions');
+    trackEvent('DCA - Go back to positions');
   };
 
   const onWithdraw = async (useProtocolToken = false) => {
@@ -295,6 +300,8 @@ const PositionDetailFrame = () => {
           </>
         ),
       });
+      trackEvent('DCA - Position details - Withdraw submitting', { chainId, useProtocolToken });
+
       const result = await positionService.withdraw(fullPositionToMappedPosition(positionInUse), useProtocolToken);
       addTransaction(result, {
         type: TRANSACTION_TYPES.WITHDRAW_POSITION,
@@ -318,10 +325,12 @@ const PositionDetailFrame = () => {
           />
         ),
       });
+      trackEvent('DCA - Position details - Withdraw submitted', { chainId, useProtocolToken });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Position details - Withdraw error', { chainId, useProtocolToken });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error while withdrawing', JSON.stringify(e), {
           position: position.id,
@@ -383,6 +392,8 @@ const PositionDetailFrame = () => {
           </>
         ),
       });
+      trackEvent('DCA - Position details - Withdraw funds submitting', { chainId, useProtocolToken });
+
       const result = await positionService.modifyRateAndSwaps(
         fullPositionToMappedPosition(positionInUse),
         '0',
@@ -412,10 +423,12 @@ const PositionDetailFrame = () => {
           />
         ),
       });
+      trackEvent('DCA - Position details - Withdraw funds submitted', { chainId, useProtocolToken });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (shouldTrackError(e)) {
+        trackEvent('DCA - Position details - Withdraw funds error', { chainId, useProtocolToken });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error while withdrawing funds', JSON.stringify(e), {
           position: position.chainId,
@@ -450,9 +463,29 @@ const PositionDetailFrame = () => {
         modeType: RATE_TYPE,
       })
     );
+    trackEvent('DCA - Position details - Show add funds modal');
     setShowModifyRateSettingsModal(true);
   };
 
+  const handleShowTerminateModal = () => {
+    setShowTerminateModal(true);
+    trackEvent('DCA - Position details - Show terminate modal');
+  };
+
+  const handleShowTransferModal = () => {
+    setShowTransferModal(true);
+    trackEvent('DCA - Position details - Show transfer modal');
+  };
+
+  const handleShowSuggestMigrateModal = () => {
+    setShowSuggestMigrateYieldModal(true);
+    trackEvent('DCA - Position details - Show suggest migrate modal');
+  };
+
+  const handleShowMigrateModal = () => {
+    setShowMigrateYieldModal(true);
+    trackEvent('DCA - Position details - Show migrate modal');
+  };
   return (
     <>
       <TerminateModal
@@ -615,9 +648,9 @@ const PositionDetailFrame = () => {
           </StyledTabs>
           {positionInUse.status !== 'TERMINATED' && (
             <PositionControls
-              onTerminate={() => setShowTerminateModal(true)}
+              onTerminate={handleShowTerminateModal}
               onModifyRate={onShowModifyRateSettings}
-              onTransfer={() => setShowTransferModal(true)}
+              onTransfer={handleShowTransferModal}
               onViewNFT={handleViewNFT}
               position={positionInUse}
               pendingTransaction={pendingTransaction}
@@ -638,8 +671,8 @@ const PositionDetailFrame = () => {
               remainingLiquidityUnderlying={remainingLiquidityUnderlying}
               onReusePosition={onShowModifyRateSettings}
               disabled={shouldShowChangeNetwork}
-              onMigrateYield={() => setShowMigrateYieldModal(true)}
-              onSuggestMigrateYield={() => setShowSuggestMigrateYieldModal(true)}
+              onMigrateYield={handleShowMigrateModal}
+              onSuggestMigrateYield={handleShowSuggestMigrateModal}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               yieldOptions={yieldOptions!}
               totalGasSaved={totalGasSaved}

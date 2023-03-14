@@ -12,7 +12,7 @@ import {
   shouldEnableFrequency,
   STRING_SWAP_INTERVALS,
 } from 'config/constants';
-import { GetSwapIntervalsGraphqlResponse, Token } from 'types';
+import { GetSwapIntervalsGraphqlResponse, Token, YieldOption } from 'types';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from 'state/create-position/hooks';
 import { useAppDispatch } from 'state/hooks';
@@ -30,6 +30,7 @@ import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import useYieldOptions from 'hooks/useYieldOptions';
 import useReplaceHistory from 'hooks/useReplaceHistory';
+import useTrackEvent from 'hooks/useTrackEvent';
 import useToken from 'hooks/useToken';
 import Swap from './components/swap';
 
@@ -48,6 +49,7 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
   const fromParamToken = useToken(fromParam, true);
   const toParamToken = useToken(toParam, true);
   const replaceHistory = useReplaceHistory();
+  const trackEvent = useTrackEvent();
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
 
   React.useEffect(() => {
@@ -100,6 +102,7 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
     }
 
     replaceHistory(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    trackEvent('DCA - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
   };
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
@@ -109,6 +112,7 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
     if (from) {
       replaceHistory(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
+    trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };
 
   const toggleFromTo = () => {
@@ -129,6 +133,28 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
     if (to) {
       replaceHistory(`/create/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
+    trackEvent('DCA - Toggle from/to', { fromAddress: from?.address, toAddress: to?.address });
+  };
+
+  const onSetFrequencyType = (newFrequencyType: BigNumber) => {
+    dispatch(setFrequencyType(newFrequencyType));
+    trackEvent('DCA - Set frequency type', {});
+  };
+  const onSetFrequencyValue = (newFrequencyValue: string) => {
+    dispatch(setFrequencyValue(newFrequencyValue));
+    trackEvent('DCA - Set frequency value', {});
+  };
+  const onSetYieldEnabled = (newYieldEnabled: boolean) => {
+    dispatch(setYieldEnabled(newYieldEnabled));
+    trackEvent('DCA - Set yield enabled', {});
+  };
+  const onSetFromYield = (newYield?: YieldOption | null) => {
+    dispatch(setFromYield(newYield));
+    trackEvent('DCA - Set yield from', {});
+  };
+  const onSetToYield = (newYield?: YieldOption | null) => {
+    dispatch(setToYield(newYield));
+    trackEvent('DCA - Set yield to', {});
   };
 
   return (
@@ -141,9 +167,9 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
           setTo={onSetTo}
           frequencyType={frequencyType}
           frequencyValue={frequencyValue}
-          setFrequencyType={(newFrequencyType) => dispatch(setFrequencyType(newFrequencyType))}
-          setFrequencyValue={(newFrequencyValue) => dispatch(setFrequencyValue(newFrequencyValue))}
-          setYieldEnabled={(newYieldEnabled) => dispatch(setYieldEnabled(newYieldEnabled))}
+          setFrequencyType={onSetFrequencyType}
+          setFrequencyValue={onSetFrequencyValue}
+          setYieldEnabled={onSetYieldEnabled}
           fromValue={fromValue}
           setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
@@ -153,8 +179,8 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
           isLoadingYieldOptions={isLoadingYieldOptions}
           fromYield={fromYield}
           toYield={toYield}
-          setFromYield={(newYield) => dispatch(setFromYield(newYield))}
-          setToYield={(newYield) => dispatch(setToYield(newYield))}
+          setFromYield={onSetFromYield}
+          setToYield={onSetToYield}
           availableFrequencies={availableFrequencies}
           handleChangeNetwork={handleChangeNetwork}
         />

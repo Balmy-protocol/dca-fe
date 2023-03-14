@@ -5,6 +5,7 @@ import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { changeMainTab } from 'state/tabs/actions';
 import { useAppDispatch } from 'state/hooks';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+import useTrackEvent from 'hooks/useTrackEvent';
 import { useIsLoadingAggregatorTokenLists } from 'state/token-lists/hooks';
 import SwapContainer from '../swap-container';
 
@@ -20,9 +21,11 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const dispatch = useAppDispatch();
   const currentBreakPoint = useCurrentBreakpoint();
   const isLoadingLists = useIsLoadingAggregatorTokenLists();
+  const trackEvent = useTrackEvent();
 
   React.useEffect(() => {
     dispatch(changeMainTab(2));
+    trackEvent('Aggregator - Visit swap page');
   }, []);
 
   return (

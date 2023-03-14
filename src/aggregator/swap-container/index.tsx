@@ -7,6 +7,7 @@ import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, NETWORKS, REMOVED_AGG_CHAI
 import { SwapOption, Token } from 'types';
 import { useAggregatorState } from 'state/aggregator/hooks';
 import { useAppDispatch } from 'state/hooks';
+import useTrackEvent from 'hooks/useTrackEvent';
 import {
   setFrom,
   setFromValue,
@@ -45,6 +46,7 @@ const SwapContainer = () => {
   const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
   const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
   const sdkMappedNetworks = useSdkMappedChains();
+  const trackEvent = useTrackEvent();
 
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
@@ -111,6 +113,7 @@ const SwapContainer = () => {
     dispatch(setFromValue({ value: '', updateMode }));
     dispatch(setFrom(newFrom));
     replaceHistory(`/swap/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    trackEvent('Aggregator - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
   };
 
   const onSetTo = (newTo: Token, updateMode = false) => {
@@ -120,6 +123,7 @@ const SwapContainer = () => {
     if (from) {
       replaceHistory(`/swap/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
+    trackEvent('Aggregator - Set to', { fromAddress: newTo?.address, toAddress: from?.address });
   };
 
   const onToggleFromTo = () => {
@@ -129,14 +133,34 @@ const SwapContainer = () => {
     if (to) {
       replaceHistory(`/swap/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
+    trackEvent('Aggregator - Toggle from/to', { fromAddress: from?.address, toAddress: to?.address });
   };
 
   const onSetSelectedRoute = (newRoute: SwapOption) => {
     dispatch(setSelectedRoute(newRoute));
+    trackEvent('Aggregator - Change selected route', {
+      fromSource: selectedRoute?.swapper.id,
+      toSource: newRoute.swapper.id,
+    });
   };
 
   const onSetSorting = (newSort: SwapSortOptions) => {
     dispatch(setSorting(newSort));
+    trackEvent('Aggregator - Change selected sorting', { sort: newSort });
+  };
+
+  const onSetFromValue = (newFromValue: string, updateMode = false) => {
+    dispatch(setFromValue({ value: newFromValue, updateMode }));
+    if (updateMode && isBuyOrder) {
+      trackEvent('Aggregator - Set sell order');
+    }
+  };
+
+  const onSetToValue = (newToValue: string, updateMode = false) => {
+    dispatch(setToValue({ value: newToValue, updateMode }));
+    if (updateMode && !isBuyOrder) {
+      trackEvent('Aggregator - Set buy order');
+    }
   };
 
   return (
@@ -150,12 +174,8 @@ const SwapContainer = () => {
           isBuyOrder={isBuyOrder}
           fromValue={fromValue}
           toValue={toValue}
-          setFromValue={(newFromValue: string, updateMode = false) =>
-            dispatch(setFromValue({ value: newFromValue, updateMode }))
-          }
-          setToValue={(newToValue: string, updateMode = false) =>
-            dispatch(setToValue({ value: newToValue, updateMode }))
-          }
+          setFromValue={onSetFromValue}
+          setToValue={onSetToValue}
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
           selectedRoute={selectedRoute}
           isLoadingRoute={isLoadingSwapOptions || isLoadingSwapOption}

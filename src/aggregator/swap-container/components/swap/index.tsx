@@ -46,6 +46,7 @@ import { setNetwork } from 'state/config/actions';
 import { addCustomToken } from 'state/token-lists/actions';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
+import useTrackEvent from 'hooks/useTrackEvent';
 import { TransactionResponse } from '@ethersproject/providers';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -134,6 +135,7 @@ const Swap = ({
   const replaceHistory = useReplaceHistory();
   const actualCurrentNetwork = useCurrentNetwork();
   const loadedAsSafeApp = useLoadedAsSafeApp();
+  const trackEvent = useTrackEvent();
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
@@ -149,6 +151,7 @@ const Swap = ({
     });
     dispatch(setAggregatorChainId(chainId));
     replaceHistory(`/swap/${chainId}`);
+    trackEvent('Aggregator - Change displayed network');
   };
 
   const onChangeNetwork = (chainId: number) => {
@@ -193,7 +196,15 @@ const Swap = ({
           </Typography>
         ),
       });
+      trackEvent('Aggregator - Approve token submitting', {
+        source: selectedRoute.swapper.id,
+        fromSteps: !!transactions?.length,
+      });
       const result = await walletService.approveSpecificToken(from, selectedRoute.swapper.allowanceTarget, amount);
+      trackEvent('Aggregator - Approve token submitted', {
+        source: selectedRoute.swapper.id,
+        fromSteps: !!transactions?.length,
+      });
 
       addTransaction(result, {
         type: amount ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
@@ -230,6 +241,23 @@ const Swap = ({
         setTransactionsToExecute(newSteps);
       }
     } catch (e) {
+      if (shouldTrackError(e)) {
+        trackEvent('Aggregator - Approve token error', {
+          source: selectedRoute.swapper.id,
+          fromSteps: !!transactions?.length,
+        });
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error approving aggregator', JSON.stringify(e), {
+          swapper: selectedRoute.swapper.id,
+          chainId: currentNetwork.chainId,
+          from: selectedRoute.sellToken.address,
+          to: selectedRoute.buyToken.address,
+          buyAmount: selectedRoute.buyAmount.amountInUnits,
+          sellAmount: selectedRoute.sellAmount.amountInUnits,
+          type: selectedRoute.type,
+        });
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
     }
@@ -271,7 +299,15 @@ const Swap = ({
         balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS);
       }
 
+      trackEvent('Aggregator - Swap submitting', {
+        source: selectedRoute.swapper.id,
+        fromSteps: !!transactions?.length,
+      });
       const result = await aggregatorService.swap(selectedRoute as SwapOptionWithTx);
+      trackEvent('Aggregator - Swap submitted', {
+        source: selectedRoute.swapper.id,
+        fromSteps: !!transactions?.length,
+      });
 
       try {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -339,6 +375,7 @@ const Swap = ({
       onResetForm();
     } catch (e) {
       if (shouldTrackError(e)) {
+        trackEvent('Aggregator - Swap error', { source: selectedRoute.swapper.id, fromSteps: !!transactions?.length });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error swapping', JSON.stringify(e), {
           swapper: selectedRoute.swapper.id,
@@ -393,7 +430,15 @@ const Swap = ({
         balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS);
       }
 
+      trackEvent('Aggregator - Safe swap submitting', {
+        source: selectedRoute.swapper.id,
+        fromSteps: !!transactions?.length,
+      });
       const result = await aggregatorService.approveAndSwapSafe(selectedRoute as SwapOptionWithTx);
+      trackEvent('Aggregator - Safe swap submitted', {
+        source: selectedRoute.swapper.id,
+        fromSteps: !!transactions?.length,
+      });
 
       try {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -465,6 +510,10 @@ const Swap = ({
       onResetForm();
     } catch (e) {
       if (shouldTrackError(e)) {
+        trackEvent('Aggregator - Safe swap error', {
+          source: selectedRoute.swapper.id,
+          fromSteps: !!transactions?.length,
+        });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error swapping', JSON.stringify(e), {
           swapper: selectedRoute.swapper.id,
@@ -485,6 +534,11 @@ const Swap = ({
 
   const addCustomTokenToList = (token: Token) => {
     dispatch(addCustomToken(token));
+    trackEvent('Aggregator - Add custom token', {
+      tokenSymbol: token.symbol,
+      tokenAddress: token.address,
+      chainId: currentNetwork.chainId,
+    });
   };
 
   const handleTransactionSimulationWait = (transactions?: TransactionStep[], response?: BlowfishResponse) => {
@@ -615,6 +669,7 @@ const Swap = ({
       },
     });
 
+    trackEvent('Aggregator - Start swap steps');
     setTransactionsToExecute(newSteps);
     setRefreshQuotes(false);
     setShouldShowSteps(true);
@@ -623,6 +678,10 @@ const Swap = ({
   const startSelectingCoin = (token: Token) => {
     setSelecting(token);
     setShouldShowPicker(true);
+    trackEvent('Aggregator - start selecting coin', {
+      selected: token.address,
+      is: selecting.address === from?.address ? 'from' : 'to',
+    });
   };
 
   const handleFromValueChange = (newFromValue: string) => {

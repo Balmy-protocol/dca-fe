@@ -20,6 +20,7 @@ import useDCAGraphql from 'hooks/useDCAGraphql';
 import usePairService from 'hooks/usePairService';
 import { useAppDispatch } from 'state/hooks';
 import { setDCAChainId } from 'state/create-position/actions';
+import useTrackEvent from 'hooks/useTrackEvent';
 import useErrorService from 'hooks/useErrorService';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
@@ -44,11 +45,16 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const errorService = useErrorService();
+  const trackEvent = useTrackEvent();
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
   const selectedNetwork = useSelectedNetwork();
   const sdkMappedNetworks = useSdkMappedChains();
   const web3Service = useWeb3Service();
   // const hasInitiallySetNetwork = React.useState()
+
+  React.useEffect(() => {
+    trackEvent('DCA - Visit create page');
+  }, []);
 
   React.useEffect(() => {
     const chainIdToUse = Number(chainId);
@@ -63,8 +69,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       dispatch(fetchGraphTokenList(networkToSet.chainId));
     } else if (SUPPORTED_NETWORKS_DCA.includes(currentNetwork.chainId)) {
-      dispatch(setDCAChainId(currentNetwork.chainId));
-    } else {
       dispatch(setDCAChainId(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId));
     }
   }, []);

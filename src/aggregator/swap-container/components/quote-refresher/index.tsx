@@ -4,6 +4,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { FormattedMessage } from 'react-intl';
 import IconButton from '@mui/material/IconButton';
 import { Typography } from '@mui/material';
+import useTrackEvent from 'hooks/useTrackEvent';
 
 const StyledRefresherContainer = styled.div`
   display: flex;
@@ -25,10 +26,12 @@ const TIMER_FOR_RESET = 60;
 
 const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
+  const trackEvent = useTrackEvent();
 
   const onRefreshRoute = () => {
     setTimer(TIMER_FOR_RESET);
     refreshQuotes();
+    trackEvent('Aggregator - Refresh quotes');
   };
 
   React.useEffect(() => {
