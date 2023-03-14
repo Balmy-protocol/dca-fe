@@ -24,7 +24,7 @@ import {
   STRING_PERMISSIONS,
 } from 'config/constants';
 import { getFrequencyLabel } from 'utils/parsing';
-import { buildEtherscanAddress } from 'utils/etherscan';
+import { buildEtherscanAddress, buildEtherscanTransaction } from 'utils/etherscan';
 import Link from '@mui/material/Link';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
@@ -53,6 +53,7 @@ const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}
   margin: ${({ $isFirst }) => ($isFirst ? '0px 5px 0px 0px' : '0px 5px')};
+  display: flex;
 `;
 
 const StyledTimeline = styled(Grid)`
@@ -103,6 +104,12 @@ const StyledTimelineContainer = styled(Grid)`
 const StyledCenteredGrid = styled(Grid)`
   display: flex;
   align-items: center;
+`;
+
+const StyledTitleEnd = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 const StyledTimelineIcon = styled.div`
@@ -348,6 +355,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const buildCreatedItem = (positionState: ActionState, position: FullPosition) => ({
@@ -391,6 +399,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const buildTransferedItem = (positionState: ActionState, position: FullPosition) => ({
@@ -437,6 +446,7 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition)
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
@@ -520,6 +530,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
@@ -554,6 +565,7 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -586,6 +598,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
@@ -638,6 +651,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
@@ -697,6 +711,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const buildTerminatedItem = (positionState: ActionState) => ({
@@ -706,6 +721,7 @@ const buildTerminatedItem = (positionState: ActionState) => ({
   toOrder: parseInt(positionState.createdAtBlock, 10),
   time: parseInt(positionState.createdAtTimestamp, 10),
   id: positionState.id,
+  hash: positionState.transaction.hash,
 });
 
 const MESSAGE_MAP = {
@@ -765,15 +781,26 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
                 <Typography variant="body1" fontWeight={500}>
                   {historyItem.title}
                 </Typography>
-                <Tooltip
-                  title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_FULL)}
-                  arrow
-                  placement="top"
-                >
-                  <StyledTitleMainText variant="body2">
-                    {DateTime.fromSeconds(historyItem.time).toRelative()}
-                  </StyledTitleMainText>
-                </Tooltip>
+                <StyledTitleEnd>
+                  <Tooltip
+                    title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_FULL)}
+                    arrow
+                    placement="top"
+                  >
+                    <StyledTitleMainText variant="body2">
+                      {DateTime.fromSeconds(historyItem.time).toRelative()}
+                    </StyledTitleMainText>
+                  </Tooltip>
+                  <Typography variant="body2">
+                    <StyledLink
+                      href={buildEtherscanTransaction(historyItem.hash, position.chainId)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <OpenInNewIcon fontSize="inherit" style={{ color: '#3076F6' }} />
+                    </StyledLink>
+                  </Typography>
+                </StyledTitleEnd>
               </StyledTimelineContentTitle>
               <Grid item xs={12}>
                 <StyledTimelineContentText container>
