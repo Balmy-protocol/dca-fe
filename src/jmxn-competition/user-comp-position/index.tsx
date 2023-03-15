@@ -237,8 +237,7 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
                     `(${parseUsdPrice(
                       token,
                       amount,
-                      prices[token.address].mul(BigNumber.from(10).pow(18)).div(jmxnInUsd),
-                      false
+                      prices[token.address].mul(BigNumber.from(10).pow(18)).div(jmxnInUsd)
                     ).toFixed(2)} MXN)`
                   }
                   icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={token} />}
@@ -296,8 +295,7 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
                           `(${parseUsdPrice(
                             to,
                             BigNumber.from(position.totalSwapped),
-                            prices[to.address].mul(BigNumber.from(10).pow(18)).div(jmxnInUsd),
-                            false
+                            prices[to.address].mul(BigNumber.from(10).pow(18)).div(jmxnInUsd)
                           ).toFixed(2)} MXN)`
                         }
                         icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={to} />}
