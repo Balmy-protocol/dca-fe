@@ -143,6 +143,13 @@ export const ALLOWED_YIELDS: Record<
       name: 'Aave V3',
       token: emptyTokenWithAddress('AAVE'),
     },
+    {
+      id: 'b6fbf2c4-2782-4a55-b7d5-c592b5546a67', // aave-v3 MaticX
+      tokenAddress: '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // aave-v3 MaticX
+      poolId: 'b6fbf2c4-2782-4a55-b7d5-c592b5546a67', // aave-v3 MaticX
+      name: 'Aave V3',
+      token: emptyTokenWithAddress('AAVE'),
+    },
     // {
     //   id: '59447a2f-7c4d-433a-a84b-ac6e53986680', // aave-v3 DPI
     //   // TODO: put real address
@@ -227,6 +234,20 @@ export const ALLOWED_YIELDS: Record<
       id: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // aave-v3 LINK
       tokenAddress: '0x8127ce8a7055e2e99c94aee6e20ffc2bdb3770a8', // aave-v3 LINK
       poolId: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // aave-v3 LINK
+      name: 'Aave V3',
+      token: emptyTokenWithAddress('AAVE'),
+    },
+    {
+      id: '03a0cf78-c2f0-4ce5-85a8-2d5b77349276', // aave-v3 wstETH
+      tokenAddress: '0xd81cba2ce0c4c2a9d0db16529ee1d1bc532d8c53', // aave-v3 wstETH
+      poolId: '03a0cf78-c2f0-4ce5-85a8-2d5b77349276', // aave-v3 wstETH
+      name: 'Aave V3',
+      token: emptyTokenWithAddress('AAVE'),
+    },
+    {
+      id: '87e476df-2d7c-4ee9-913c-e0d96865ef82', // aave-v3 OP
+      tokenAddress: '0x348a1213fa28a43855e5bb103bdfd7f357543626', // aave-v3 OP
+      poolId: '87e476df-2d7c-4ee9-913c-e0d96865ef82', // aave-v3 OP
       name: 'Aave V3',
       token: emptyTokenWithAddress('AAVE'),
     },
