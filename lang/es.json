@@ -2666,5 +2666,9 @@
   "yyT6co": {
     "defaultMessage": "Luego de costo de transacción:",
     "description": "aggregatorAfterTransaction"
+  },
+  "H82UVr": {
+    "defaultMessage": "¿Cómo funciona?/Riesgos",
+    "description": "howItWorks"
   }
 }

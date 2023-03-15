@@ -231,7 +231,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               <ListItemIcon>
                 <InsightsIcon />
               </ListItemIcon>
-              <ListItemText primary={<FormattedMessage description="invest" defaultMessage="Invest" />} />
+              <ListItemText primary={<FormattedMessage description="invest" defaultMessage="Invest (DCA)" />} />
               {openFirstSubTab ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={openFirstSubTab} timeout="auto" unmountOnExit>
@@ -313,7 +313,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                   onClick={() => handleTabChange({ index: 0, url: 'create' }, false)}
                   label={
                     <StyledTabLabel>
-                      <FormattedMessage description="invest" defaultMessage="Invest" />
+                      <FormattedMessage description="invest" defaultMessage="Invest (DCA)" />
                       <ArrowDropDownIcon fontSize="inherit" />
                     </StyledTabLabel>
                   }

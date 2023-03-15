@@ -711,6 +711,10 @@
     "defaultMessage": "This is a custom token you are importing, trade at your own risk.",
     "description": "customTokenWarning"
   },
+  "H82UVr": {
+    "defaultMessage": "How it works/Risks",
+    "description": "howItWorks"
+  },
   "Hbiw7t": {
     "defaultMessage": "For more information, feel free to check our",
     "description": "faqDoINeedToPayAnyFeesResponsePart3"
@@ -2002,10 +2006,6 @@
   "nV5R/e": {
     "defaultMessage": "day",
     "description": "oneDaySingularSubject"
-  },
-  "nWm9Qa": {
-    "defaultMessage": "Invest",
-    "description": "invest"
   },
   "naApNE": {
     "defaultMessage": "30 minutes (1 swap)",
