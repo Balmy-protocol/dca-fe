@@ -5,7 +5,6 @@ import isUndefined from 'lodash/isUndefined';
 import usePrevious from 'hooks/usePrevious';
 import { BigNumber } from 'ethers';
 import { parseUnits } from '@ethersproject/units';
-import { STABLE_COINS } from 'config/constants';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
 import useAccount from './useAccount';
@@ -33,7 +32,7 @@ function useRawUsdPrice(
 
   React.useEffect(() => {
     async function callPromise() {
-      if (from && !STABLE_COINS.includes(from.symbol)) {
+      if (from) {
         try {
           const price = await priceService.getUsdHistoricPrice([from], date, chainId);
           if (price && price[from.address]) {

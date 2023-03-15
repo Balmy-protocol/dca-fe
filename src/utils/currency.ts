@@ -109,18 +109,9 @@ export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: nu
   underlyingTokens: [],
 });
 
-export const parseUsdPrice = (
-  from?: Token | null,
-  amount?: BigNumber | null,
-  usdPrice?: BigNumber,
-  forceStableCoins = true
-) => {
+export const parseUsdPrice = (from?: Token | null, amount?: BigNumber | null, usdPrice?: BigNumber) => {
   if (!from || !amount) {
     return 0;
-  }
-
-  if (STABLE_COINS.includes(from.symbol) && forceStableCoins) {
-    return parseFloat(formatUnits(amount, from.decimals));
   }
 
   if (amount.lte(BigNumber.from(0)) || !usdPrice) {
