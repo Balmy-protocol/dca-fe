@@ -361,6 +361,12 @@
       "value": "No pudimos obtener el precio de uno de los tokens"
     }
   ],
+  "1uma6Q": [
+    {
+      "type": 0,
+      "value": "Discord de Euler."
+    }
+  ],
   "27/rlO": [
     {
       "type": 0,
@@ -403,6 +409,12 @@
     {
       "type": 0,
       "value": "Ver en el explorador"
+    }
+  ],
+  "3IslZU": [
+    {
+      "type": 0,
+      "value": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro"
     }
   ],
   "3Ovbmx": [
@@ -1081,6 +1093,12 @@
       "value": "from"
     }
   ],
+  "BjSXQD": [
+    {
+      "type": 0,
+      "value": "y"
+    }
+  ],
   "Bq70E5": [
     {
       "type": 0,
@@ -1575,6 +1593,12 @@
     {
       "type": 0,
       "value": " en su lugar"
+    }
+  ],
+  "FYVhW/": [
+    {
+      "type": 0,
+      "value": "Cerrando su posición"
     }
   ],
   "FfyCRZ": [
@@ -2151,6 +2175,12 @@
       "value": " para usted"
     }
   ],
+  "Kq/AiW": [
+    {
+      "type": 0,
+      "value": "Pegar dirección del portapapeles"
+    }
+  ],
   "KxGrUy": [
     {
       "type": 0,
@@ -2495,6 +2525,12 @@
       "value": "token"
     }
   ],
+  "OHZobw": [
+    {
+      "type": 0,
+      "value": "y"
+    }
+  ],
   "OPn8Nq": [
     {
       "type": 1,
@@ -2625,6 +2661,12 @@
       "value": "Si no desea hacer esto, aún puede agregar fondos a su posición actual"
     }
   ],
+  "P/MnGd": [
+    {
+      "type": 0,
+      "value": "Debido a la grieta de seguridad de Euler, el protocolo Angle ah sido pausado. Como consequencia, los oraculos y los intercambios no pueden operar confiablemente y han sido pausados."
+    }
+  ],
   "POGYlh": [
     {
       "type": 0,
@@ -2705,6 +2747,12 @@
     {
       "type": 0,
       "value": "DefiLlama"
+    }
+  ],
+  "QC2PNc": [
+    {
+      "type": 0,
+      "value": "Cerrando tu posición"
     }
   ],
   "QDVx7K": [
@@ -2858,7 +2906,7 @@
   "Rgfl8x": [
     {
       "type": 0,
-      "value": "Recomendado"
+      "value": "Costo de gas considerado"
     }
   ],
   "RknjsQ": [
@@ -2943,6 +2991,12 @@
     {
       "type": 0,
       "value": "Discord"
+    }
+  ],
+  "Si3cOF": [
+    {
+      "type": 0,
+      "value": "Mayor cantidad de tokens recibidos"
     }
   ],
   "SwiTok": [
@@ -3337,6 +3391,12 @@
       "value": "Ver recibo"
     }
   ],
+  "YGZ1lp": [
+    {
+      "type": 0,
+      "value": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro"
+    }
+  ],
   "YRoLhe": [
     {
       "type": 0,
@@ -3637,6 +3697,12 @@
       "value": "sección de retornos"
     }
   ],
+  "aPLZ1u": [
+    {
+      "type": 0,
+      "value": "Retirado:"
+    }
+  ],
   "aPrJJm": [
     {
       "type": 0,
@@ -3763,6 +3829,12 @@
       "value": " USD"
     }
   ],
+  "bQUS8A": [
+    {
+      "type": 0,
+      "value": "Cantidad de confetti:"
+    }
+  ],
   "bZG2wW": [
     {
       "type": 0,
@@ -3887,6 +3959,12 @@
       "value": "¡Transacción enviada!"
     }
   ],
+  "cmiLaP": [
+    {
+      "type": 0,
+      "value": "Precio de compra promedio"
+    }
+  ],
   "cwqjrt": [
     {
       "type": 0,
@@ -3917,6 +3995,12 @@
     {
       "type": 0,
       "value": "Su posición se cerrará aquí y crearemos una nueva en"
+    }
+  ],
+  "d9VBkP": [
+    {
+      "type": 0,
+      "value": "Custom"
     }
   ],
   "dHuWI1": [
@@ -4060,7 +4144,7 @@
   "f8zceY": [
     {
       "type": 0,
-      "value": "¿Cómo funciona?"
+      "value": "¿Cómo funciona?/Riesgos"
     }
   ],
   "fAutJH": [
@@ -4169,6 +4253,12 @@
     {
       "type": 0,
       "value": "intercambios"
+    }
+  ],
+  "gQubrG": [
+    {
+      "type": 0,
+      "value": "Intercambios"
     }
   ],
   "gVbrRz": [
@@ -4785,6 +4875,12 @@
       "value": "Transferir el intercambio a otra dirección"
     }
   ],
+  "nAoD6G": [
+    {
+      "type": 0,
+      "value": "Precio de compra promedio"
+    }
+  ],
   "nFFzXV": [
     {
       "type": 0,
@@ -4818,7 +4914,7 @@
   "nWm9Qa": [
     {
       "type": 0,
-      "value": "Invertir"
+      "value": "Invertir (DCA)"
     }
   ],
   "naApNE": [
@@ -4901,6 +4997,36 @@
     {
       "type": 0,
       "value": "Intercambiar"
+    }
+  ],
+  "p0sB2R": [
+    {
+      "type": 0,
+      "value": "No agregamos ningun tipo de comision extra. Estas recibiendo extactamente los mismos precios como si hubieses interactuado con el Aggregador directamente. "
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": " Algunos agregadores soportan compartir su fee con los referidos, pero esto no es ningun cargo extra para ti"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "Para clarificar, los agregadores no estan priorizados de ninguna manera, podes elegir como ordenar los resultados por ti mismo."
     }
   ],
   "p3Xa0W": [
@@ -5479,6 +5605,12 @@
       "value": "Para empezar a generar retornos, tendremos que cerrar su posición actual y crear una nueva. Los datos históricos de esta posición aparecerán como una posición cerrada"
     }
   ],
+  "ttC5dQ": [
+    {
+      "type": 0,
+      "value": "Invertir (DCA)"
+    }
+  ],
   "twerhs": [
     {
       "type": 0,
@@ -5519,6 +5651,12 @@
     {
       "type": 0,
       "value": " - Se está confirmando la aprobación del token"
+    }
+  ],
+  "uV7tE7": [
+    {
+      "type": 0,
+      "value": "Costo de Gas considerado"
     }
   ],
   "uZWTRx": [
@@ -5587,6 +5725,12 @@
       "value": "Usted ha rechazado la transacción"
     }
   ],
+  "vedPfb": [
+    {
+      "type": 0,
+      "value": "Intercambio"
+    }
+  ],
   "vlDLmo": [
     {
       "type": 0,
@@ -5597,6 +5741,12 @@
     {
       "type": 0,
       "value": "Recibes"
+    }
+  ],
+  "vmZ52D": [
+    {
+      "type": 0,
+      "value": "Precio de mercado"
     }
   ],
   "vqkOyW": [
@@ -5639,6 +5789,12 @@
     {
       "type": 0,
       "value": "aqui."
+    }
+  ],
+  "wHKSsk": [
+    {
+      "type": 0,
+      "value": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro"
     }
   ],
   "wJOLei": [
@@ -5707,6 +5863,12 @@
     {
       "type": 1,
       "value": "address"
+    }
+  ],
+  "xIIhB5": [
+    {
+      "type": 0,
+      "value": "+ retornos generados"
     }
   ],
   "xRD2R7": [
@@ -5815,6 +5977,12 @@
     {
       "type": 0,
       "value": "horas"
+    }
+  ],
+  "yyT6co": [
+    {
+      "type": 0,
+      "value": "Luego de costo de transacción:"
     }
   ],
   "z/57ga": [
