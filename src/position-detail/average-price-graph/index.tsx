@@ -1,7 +1,18 @@
 import React from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
-import { Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Line, ComposedChart } from 'recharts';
+import {
+  Area,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+  ComposedChart,
+  ReferenceLine,
+  Label,
+} from 'recharts';
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
@@ -258,16 +269,20 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
               dataKey="market"
             />
             <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
-            <Line
-              connectNulls
-              legendType="none"
-              type="monotone"
+            <ReferenceLine
+              y={averageBuyPrice}
+              label={
+                <Label
+                  value={averageBuyPrice}
+                  position="insideBottomLeft"
+                  fill="#DCE2F9"
+                  stroke="#DCE2F9"
+                  opacity={0.8}
+                />
+              }
               strokeWidth="3px"
               stroke="#DCE2F9"
-              dot={false}
-              activeDot={false}
-              strokeDasharray="5 5"
-              dataKey="average"
+              opacity={0.8}
             />
             {/* <Area
               dataKey="range"
