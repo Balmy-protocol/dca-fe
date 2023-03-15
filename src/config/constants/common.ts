@@ -85,8 +85,7 @@ export const TOKEN_BLACKLIST = [
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
 
-  '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // POLY - MATIcX Aave v3
-  '0xfa68fb4628dff1028cfec22b4162fccd0d45efb6', // POLY - MaticX
+  '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // POLY - MaticX Aave v3
   '0x348a1213fa28a43855e5bb103bdfd7f357543626', // OP - OP Aave v3
 ];
 
