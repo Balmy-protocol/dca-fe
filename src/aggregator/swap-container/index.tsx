@@ -1,8 +1,9 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
+import find from 'lodash/find';
 import { getProtocolToken } from 'mocks/tokens';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, NETWORKS } from 'config/constants';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, NETWORKS, REMOVED_AGG_CHAINS } from 'config/constants';
 import { SwapOption, Token } from 'types';
 import { useAggregatorState } from 'state/aggregator/hooks';
 import { useAppDispatch } from 'state/hooks';
@@ -25,6 +26,7 @@ import { SwapSortOptions } from 'config/constants/aggregator';
 import useSwapOption from 'hooks/useSwapOption';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
+import useSdkMappedChains from 'hooks/useMappedSdkChains';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
@@ -42,6 +44,8 @@ const SwapContainer = () => {
   const actualCurrentNetwork = useCurrentNetwork();
   const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
   const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
+  const sdkMappedNetworks = useSdkMappedChains();
+
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
     to,
@@ -57,9 +61,20 @@ const SwapContainer = () => {
 
   const [refreshQuotes, setRefreshQuotes] = React.useState(true);
 
+  const mappedNetworks = React.useMemo(
+    () => sdkMappedNetworks.filter((network) => !REMOVED_AGG_CHAINS.includes(network?.chainId || -1)),
+    [sdkMappedNetworks]
+  );
+
   React.useEffect(() => {
-    dispatch(setAggregatorChainId(Number(chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId)));
-  }, []);
+    let networkToSet = find(mappedNetworks, { chainId: Number(chainId) });
+    if (!networkToSet && chainId) {
+      networkToSet = find(mappedNetworks, { name: chainId.toLowerCase() });
+    }
+    dispatch(
+      setAggregatorChainId(Number(networkToSet?.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId))
+    );
+  }, [mappedNetworks]);
 
   React.useEffect(() => {
     if (fromParamToken) {

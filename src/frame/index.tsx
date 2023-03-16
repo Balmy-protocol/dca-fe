@@ -33,7 +33,7 @@ import useWeb3Service from 'hooks/useWeb3Service';
 import ErrorBoundary from 'common/error-boundary/indext';
 import useAccount from 'hooks/useAccount';
 import FeedbackCard from 'common/feedback-card';
-import usdSdkChains from 'hooks/useSdkChains';
+import useSdkChains from 'hooks/useSdkChains';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
 // FONTS
@@ -105,7 +105,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
   const web3Service = useWeb3Service();
   const account = useAccount();
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
-  const aggSupportedNetworks = usdSdkChains();
+  const aggSupportedNetworks = useSdkChains();
   const currentBreakPoint = useCurrentBreakpoint();
 
   const theme = createTheme({

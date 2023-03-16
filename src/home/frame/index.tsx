@@ -1,5 +1,6 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
+import find from 'lodash/find';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useSubTab } from 'state/tabs/hooks';
 import { useParams } from 'react-router-dom';
@@ -15,6 +16,7 @@ import { setDCAChainId } from 'state/create-position/actions';
 import useErrorService from 'hooks/useErrorService';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
+import useSdkMappedChains from 'hooks/useMappedSdkChains';
 import { fetchGraphTokenList } from 'state/token-lists/actions';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
@@ -34,15 +36,21 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const errorService = useErrorService();
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
   const selectedNetwork = useSelectedNetwork();
-  // const hasInitiallySetNetwork = React.useState()
+  // const hasInitiallySetNetwork = React.useState();
+  const sdkMappedNetworks = useSdkMappedChains();
 
   React.useEffect(() => {
     const chainIdToUse = Number(chainId);
 
-    if (SUPPORTED_NETWORKS_DCA.includes(chainIdToUse)) {
-      dispatch(setDCAChainId(chainIdToUse));
+    let networkToSet = find(sdkMappedNetworks, { chainId: chainIdToUse });
+    if (!networkToSet) {
+      networkToSet = find(sdkMappedNetworks, { name: chainId.toLowerCase() });
+    }
+
+    if (networkToSet && SUPPORTED_NETWORKS_DCA.includes(networkToSet.chainId)) {
+      dispatch(setDCAChainId(networkToSet.chainId));
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispatch(fetchGraphTokenList(chainIdToUse));
+      dispatch(fetchGraphTokenList(networkToSet.chainId));
     } else if (SUPPORTED_NETWORKS_DCA.includes(currentNetwork.chainId)) {
       dispatch(setDCAChainId(currentNetwork.chainId));
     } else {

@@ -1,9 +1,10 @@
+import React from 'react';
 import useSdkService from 'hooks/useSdkService';
 
-function usdSdkChains() {
+function useSdkChains() {
   const sdkService = useSdkService();
 
-  return sdkService.getSupportedChains();
+  return React.useMemo(() => sdkService.getSupportedChains(), []);
 }
 
-export default usdSdkChains;
+export default useSdkChains;
