@@ -22,7 +22,7 @@ import useWalletService from 'hooks/useWalletService';
 import { useLocation, useParams } from 'react-router-dom';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
-import usdSdkChains from 'hooks/useSdkChains';
+import useSdkChains from 'hooks/useSdkChains';
 import { FormattedMessage } from 'react-intl';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 
@@ -103,7 +103,7 @@ const NetworkLabel = ({ network }: NetworkLabelProps) => {
   const replaceHistory = useReplaceHistory();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const currentBreakPoint = useCurrentBreakpoint();
-  const aggSupportedNetworks = usdSdkChains();
+  const aggSupportedNetworks = useSdkChains();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
