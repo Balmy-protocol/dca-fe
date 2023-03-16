@@ -907,6 +907,10 @@
     "defaultMessage": "Open wallet",
     "description": "openWallet"
   },
+  "LS2WKt": {
+    "defaultMessage": "We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk.",
+    "description": "aggregatorPriceNotFound"
+  },
   "LbRNWF": {
     "defaultMessage": "Migrate {from}/{to} position",
     "description": "migrate title"
@@ -1406,6 +1410,10 @@
   "YmpFX8": {
     "defaultMessage": "Your positions",
     "description": "positions title"
+  },
+  "Yo7O05": {
+    "defaultMessage": "Unkown price",
+    "description": "unkown"
   },
   "YpaT9e": {
     "defaultMessage": "Compete on who has the most total value locked on Mean Finance. This includes both swapped and unswapped liquidity on your positions",
@@ -2474,6 +2482,10 @@
   "z/57ga": {
     "defaultMessage": "{readable}",
     "description": "fourHoursPluralTime"
+  },
+  "z0M49Z": {
+    "defaultMessage": "and",
+    "description": "andWithSpaces"
   },
   "z43qzX": {
     "defaultMessage": "Connect Wallet",

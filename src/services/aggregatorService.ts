@@ -2,6 +2,7 @@
 import { BigNumber, Signer, utils } from 'ethers';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import { v4 as uuidv4 } from 'uuid';
+import isUndefined from 'lodash/isUndefined';
 
 // MOCKS
 import { PositionVersions } from 'config/constants';
@@ -162,28 +163,28 @@ export default class AggregatorService {
         sellAmount: {
           amount: BigNumber.from(sellAmountAmount),
           amountInUnits: sellAmountAmountInUnits,
-          amountInUSD: Number(sellAmountAmountInUsd) || 0,
+          amountInUSD: (!isUndefined(sellAmountAmountInUsd) && Number(sellAmountAmountInUsd)) || undefined,
         },
         buyAmount: {
           amount: BigNumber.from(buyAmountAmount),
           amountInUnits: buyAmountAmountInUnits,
-          amountInUSD: Number(buyAmountAmountInUsd) || 0,
+          amountInUSD: (!isUndefined(buyAmountAmountInUsd) && Number(buyAmountAmountInUsd)) || undefined,
         },
         maxSellAmount: {
           amount: BigNumber.from(maxSellAmountAmount),
           amountInUnits: maxSellAmountAmountInUnits,
-          amountInUSD: Number(maxSellAmountAmountInUsd) || 0,
+          amountInUSD: (!isUndefined(maxSellAmountAmountInUsd) && Number(maxSellAmountAmountInUsd)) || undefined,
         },
         minBuyAmount: {
           amount: BigNumber.from(minBuyAmountAmount),
           amountInUnits: minBuyAmountAmountInUnits,
-          amountInUSD: Number(minBuyAmountAmountInUsd) || 0,
+          amountInUSD: (!isUndefined(minBuyAmountAmountInUsd) && Number(minBuyAmountAmountInUsd)) || undefined,
         },
         gas: {
           estimatedGas: BigNumber.from(estimatedGas),
           estimatedCost: BigNumber.from(estimatedCost),
           estimatedCostInUnits,
-          estimatedCostInUSD: Number(estimatedCostInUSD) || 0,
+          estimatedCostInUSD: (!isUndefined(estimatedCostInUSD) && Number(estimatedCostInUSD)) || undefined,
           gasTokenSymbol,
         },
         swapper: {

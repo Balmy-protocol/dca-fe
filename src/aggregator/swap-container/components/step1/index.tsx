@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
+import isUndefined from 'lodash/isUndefined';
 import Button from 'common/button';
 import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress, formatCurrencyAmount, toToken } from 'utils/currency';
 import Tooltip from '@mui/material/Tooltip';
 import { BigNumber } from 'ethers';
@@ -12,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import SearchIcon from '@mui/icons-material/Search';
-import { InputAdornment, ListSubheader, MenuItem, Select, TextField } from '@mui/material';
+import { Alert, InputAdornment, ListSubheader, MenuItem, Select, TextField } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
 import Badge from '@mui/material/Badge';
@@ -222,6 +223,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;
 
+  const fromPriceToShow = fromFetchedPrice || fromPrice;
+  const toPriceToShow = toFetchedPrice || toPrice;
+
   if (isLoadingRoute) {
     if (isBuyOrder) {
       fromValueToUse = '...';
@@ -404,7 +408,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 onChange={handleFromValueChange}
                 token={from}
                 fullWidth
-                usdValue={parseFloat(fromPrice?.toString() || fromFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                usdValue={
+                  (!isUndefined(fromPriceToShow) && parseFloat(fromPriceToShow.toFixed(2)).toFixed(2)) || undefined
+                }
                 onTokenSelect={() => startSelectingCoin(from || emptyTokenWithAddress('from'))}
               />
             </StyledTokenInputContainer>
@@ -432,7 +438,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 onChange={handleToValueChange}
                 token={to}
                 fullWidth
-                usdValue={parseFloat(toPrice?.toString() || toFetchedPrice?.toFixed(2) || '0').toFixed(2)}
+                usdValue={(!isUndefined(toPriceToShow) && parseFloat(toPriceToShow.toFixed(2)).toFixed(2)) || undefined}
                 onTokenSelect={() => startSelectingCoin(to || emptyTokenWithAddress('to'))}
                 impact={priceImpact}
               />
@@ -451,6 +457,25 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             setTransactionWillFail={setTransactionWillFail}
             forceProviderSimulation={!!transferTo}
           />
+          {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
+            <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
+              <FormattedMessage
+                description="aggregatorPriceNotFound"
+                defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
+                values={{
+                  from: isUndefined(fromPriceToShow) ? selectedRoute.sellToken.symbol : '',
+                  to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
+                  and:
+                    isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
+                      ? defineMessage({
+                          defaultMessage: ' and ',
+                          description: 'andWithSpaces',
+                        })
+                      : '',
+                }}
+              />
+            </Alert>
+          )}
           <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} to={to} />
           <StyledButtonContainer>
             {buttonToShow}
