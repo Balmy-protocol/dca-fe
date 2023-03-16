@@ -193,32 +193,32 @@ const AggregatorTokenInput = ({
             <Typography variant="body2" color="#939494">
               {token?.name}
             </Typography>
-            {isUndefined(usdValue) && !!value && value !== '0' && value !== '...' && (
-              <StyledUsdContainer>
+            <StyledUsdContainer>
+              {isUndefined(usdValue) && !!value && value !== '0' && value !== '...' && Number(value) !== 0 && (
                 <Typography variant="body2" color="#EB5757">
                   <FormattedMessage description="unkown" defaultMessage="Unkown price" />
                 </Typography>
-              </StyledUsdContainer>
-            )}
-            {!isUndefined(usdValue) && (
-              <StyledUsdContainer>
-                <Typography variant="body2" color="#939494">
-                  ${usdValue}
-                </Typography>
-                {impact && !isNaN(impact) && isFinite(Number(impact)) && (
-                  <Typography
-                    variant="body2"
-                    color={
-                      // eslint-disable-next-line no-nested-ternary
-                      Number(impact) < -2.5 ? '#EB5757' : Number(impact) > 0 ? '#219653' : 'rgba(255, 255, 255, 0.5)'
-                    }
-                  >
-                    ({Number(impact) > 0 ? '+' : ''}
-                    {impact}%)
+              )}
+              {!isUndefined(usdValue) && (
+                <>
+                  <Typography variant="body2" color="#939494">
+                    ${usdValue}
                   </Typography>
-                )}
-              </StyledUsdContainer>
-            )}
+                  {impact && !isNaN(impact) && isFinite(Number(impact)) && (
+                    <Typography
+                      variant="body2"
+                      color={
+                        // eslint-disable-next-line no-nested-ternary
+                        Number(impact) < -2.5 ? '#EB5757' : Number(impact) > 0 ? '#219653' : 'rgba(255, 255, 255, 0.5)'
+                      }
+                    >
+                      ({Number(impact) > 0 ? '+' : ''}
+                      {impact}%)
+                    </Typography>
+                  )}
+                </>
+              )}
+            </StyledUsdContainer>
           </StyledSecondPartContainer>
         </StyledFormControl>
       </StyledControls>
