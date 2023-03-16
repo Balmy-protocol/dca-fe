@@ -10,28 +10,28 @@ export type SwapOption = {
   sellAmount: {
     amount: BigNumber;
     amountInUnits: string;
-    amountInUSD: number;
+    amountInUSD?: number;
   };
   buyAmount: {
     amount: BigNumber;
     amountInUnits: string;
-    amountInUSD: number;
+    amountInUSD?: number;
   };
   maxSellAmount: {
     amount: BigNumber;
     amountInUnits: string;
-    amountInUSD: number;
+    amountInUSD?: number;
   };
   minBuyAmount: {
     amount: BigNumber;
     amountInUnits: string;
-    amountInUSD: number;
+    amountInUSD?: number;
   };
   gas: {
     estimatedGas: BigNumber;
     estimatedCost: BigNumber;
     estimatedCostInUnits: string;
-    estimatedCostInUSD: number;
+    estimatedCostInUSD?: number;
     gasTokenSymbol: string;
   };
   swapper: {

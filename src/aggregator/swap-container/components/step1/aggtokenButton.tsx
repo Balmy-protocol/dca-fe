@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from 'common/button';
+import isUndefined from 'lodash/isUndefined';
 import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import isFinite from 'lodash/isFinite';
@@ -192,7 +193,14 @@ const AggregatorTokenInput = ({
             <Typography variant="body2" color="#939494">
               {token?.name}
             </Typography>
-            {usdValue && (
+            {isUndefined(usdValue) && !!value && value !== '0' && value !== '...' && (
+              <StyledUsdContainer>
+                <Typography variant="body2" color="#EB5757">
+                  <FormattedMessage description="unkown" defaultMessage="Unkown price" />
+                </Typography>
+              </StyledUsdContainer>
+            )}
+            {!isUndefined(usdValue) && (
               <StyledUsdContainer>
                 <Typography variant="body2" color="#939494">
                   ${usdValue}

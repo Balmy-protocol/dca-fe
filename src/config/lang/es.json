@@ -1823,6 +1823,12 @@
       "value": "Usted está importando un token personalizado, comercie bajo su propio riesgo."
     }
   ],
+  "H82UVr": [
+    {
+      "type": 0,
+      "value": "¿Cómo funciona?/Riesgos"
+    }
+  ],
   "Hbiw7t": [
     {
       "type": 0,
@@ -2247,6 +2253,28 @@
     {
       "type": 0,
       "value": "Abrir billetera"
+    }
+  ],
+  "LS2WKt": [
+    {
+      "type": 0,
+      "value": "No pudimos calcular el precio para "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 1,
+      "value": "and"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": ", esto implica que no podemos estimar el impacto en el precio. Por favor se cauteloso e intercambia bajo tu propio riesgo."
     }
   ],
   "LbRNWF": [
@@ -3481,6 +3509,12 @@
     {
       "type": 0,
       "value": "Tus posiciónes"
+    }
+  ],
+  "Yo7O05": [
+    {
+      "type": 0,
+      "value": "Precio desconocido"
     }
   ],
   "YpaT9e": [
@@ -5989,6 +6023,12 @@
     {
       "type": 1,
       "value": "readable"
+    }
+  ],
+  "z0M49Z": [
+    {
+      "type": 0,
+      "value": "y"
     }
   ],
   "z43qzX": [

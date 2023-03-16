@@ -2670,5 +2670,17 @@
   "H82UVr": {
     "defaultMessage": "¿Cómo funciona?/Riesgos",
     "description": "howItWorks"
+  },
+  "LS2WKt": {
+    "defaultMessage": "No pudimos calcular el precio para {from}{and}{to}, esto implica que no podemos estimar el impacto en el precio. Por favor se cauteloso e intercambia bajo tu propio riesgo.",
+    "description": "aggregatorPriceNotFound"
+  },
+  "Yo7O05": {
+    "defaultMessage": "Precio desconocido",
+    "description": "unkown"
+  },
+  "z0M49Z": {
+    "defaultMessage": "y",
+    "description": "andWithSpaces"
   }
 }

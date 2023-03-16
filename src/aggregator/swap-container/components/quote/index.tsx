@@ -1,6 +1,7 @@
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import isNaN from 'lodash/isNaN';
+import isUndefined from 'lodash/isUndefined';
 import isFinite from 'lodash/isFinite';
 import * as React from 'react';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
@@ -311,11 +312,13 @@ const SwapQuote = ({
               size="small"
             />
           )}
-          <DarkChip
-            size="small"
-            icon={<LocalGasStationIcon fontSize="small" />}
-            label={`${toPrecision(quote.gas.estimatedCostInUSD.toString())} $`}
-          />
+          {!isUndefined(quote.gas.estimatedCostInUSD) && (
+            <DarkChip
+              size="small"
+              icon={<LocalGasStationIcon fontSize="small" />}
+              label={`${toPrecision(quote.gas.estimatedCostInUSD.toString())} $`}
+            />
+          )}
         </StyledTitleDataContainer>
       </StyledTitleContainer>
       <StyledRouteContainer
@@ -327,9 +330,16 @@ const SwapQuote = ({
             <Typography variant="body1">
               {`${formatCurrencyAmount(quote.sellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`}
             </Typography>
-            <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
-              {`$${parseFloat(quote.sellAmount.amountInUSD.toString()).toFixed(2)}`}
-            </Typography>
+            {!isUndefined(quote.sellAmount.amountInUSD) && (
+              <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+                {`$${parseFloat(quote.sellAmount.amountInUSD.toString()).toFixed(2)}`}
+              </Typography>
+            )}
+            {isUndefined(quote.sellAmount.amountInUSD) && (
+              <Typography variant="caption" color="#EB5757">
+                <FormattedMessage description="unkown" defaultMessage="Unkown price" />
+              </Typography>
+            )}
           </StyledTokenAmountContainer>
         </StyledTokenContainer>
         <StyledDexContainer>
@@ -346,9 +356,16 @@ const SwapQuote = ({
               {`${formatCurrencyAmount(quote.buyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`}
             </Typography>
             <StyledUsdContainer>
-              <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
-                {`$${parseFloat(quote.buyAmount.amountInUSD.toString()).toFixed(2)}`}
-              </Typography>
+              {!isUndefined(quote.buyAmount.amountInUSD) && (
+                <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+                  {`$${parseFloat(quote.buyAmount.amountInUSD.toString()).toFixed(2)}`}
+                </Typography>
+              )}
+              {isUndefined(quote.buyAmount.amountInUSD) && (
+                <Typography variant="caption" color="#EB5757">
+                  <FormattedMessage description="unkown" defaultMessage="Unkown price" />
+                </Typography>
+              )}
               {!isNaN(priceImpact) && isFinite(Number(priceImpact)) && priceImpact && (
                 <Typography
                   variant="caption"
