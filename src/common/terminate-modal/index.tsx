@@ -51,8 +51,10 @@ const TerminateModal = ({
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [useProtocolToken, setUseProtocolToken] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const remainingLiquidity = remainingLiquidityUnderlying || position.remainingLiquidity;
-  const toWithdraw = toWithdrawUnderlying || position.toWithdraw;
+  const remainingLiquidity =
+    remainingLiquidityUnderlying || position.remainingLiquidityUnderlying || position.remainingLiquidity;
+  const toWithdraw = toWithdrawUnderlying || position.toWithdrawUnderlying || position.toWithdraw;
+
   const hasProtocolToken =
     position.from.address === protocolToken.address || position.to.address === protocolToken.address;
   const hasWrappedOrProtocol =
