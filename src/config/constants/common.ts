@@ -87,6 +87,7 @@ export const TOKEN_BLACKLIST = [
 
   '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // POLY - MaticX Aave v3
   '0x348a1213fa28a43855e5bb103bdfd7f357543626', // OP - OP Aave v3
+  '0x51318b7d00db7acc4026c88c3952b66278b6a67f', // ARBI - PLS
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
