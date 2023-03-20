@@ -182,7 +182,10 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
       try {
         const web3Network = await providerService.getNetwork();
         const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
-        if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
+        if (
+          (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) &&
+          !(web3Network as { chainId: number; defaultProvider: boolean }).defaultProvider
+        ) {
           dispatch(setNetwork(networkToSet as NetworkStruct));
           if (networkToSet) {
             web3Service.setNetwork(networkToSet?.chainId);

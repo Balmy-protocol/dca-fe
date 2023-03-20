@@ -64,7 +64,10 @@ export default class ProviderService {
     }
 
     if ((provider as ProviderWithChainId)?.chainId) {
-      return Promise.resolve({ chainId: parseInt((provider as ProviderWithChainId)?.chainId, 16) });
+      return Promise.resolve({
+        chainId: parseInt((provider as ProviderWithChainId)?.chainId, 16),
+        defaultProvider: true,
+      });
     }
     return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
