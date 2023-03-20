@@ -29,6 +29,7 @@ import AggregatorService from './aggregatorService';
 import SdkService from './sdkService';
 import ErrorService from './errorService';
 import SimulationService from './simulationService';
+import SafeService from './safeService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -85,6 +86,8 @@ export default class Web3Service {
 
   simulationService: SimulationService;
 
+  safeService: SafeService;
+
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -111,7 +114,7 @@ export default class Web3Service {
 
     // initialize services
     this.providerService = new ProviderService(client);
-    // this.contractService = new ContractService(this.providerService); //
+    this.safeService = new SafeService();
     this.contractService = new ContractService(this.providerService);
     this.transactionService = new TransactionService(this.contractService, this.providerService);
     this.walletService = new WalletService(this.contractService, this.axiosClient, this.providerService);
@@ -131,13 +134,15 @@ export default class Web3Service {
       this.contractService,
       this.sdkService,
       this.apolloClient,
-      this.providerService
+      this.providerService,
+      this.safeService
     );
     this.positionService = new PositionService(
       this.walletService,
       this.pairService,
       this.contractService,
       this.meanApiService,
+      this.safeService,
       this.apolloClient,
       this.providerService
     );
@@ -165,6 +170,10 @@ export default class Web3Service {
 
   getSdkService() {
     return this.sdkService;
+  }
+
+  getSafeService() {
+    return this.safeService;
   }
 
   getSimulationService() {

@@ -17,6 +17,7 @@ export const finalizeTransaction = createAction<{
   receipt: TransactionReceipt;
   extendedTypeData: TransactionTypeDataOptions | Record<string, never>;
   chainId: number;
+  realSafeHash?: string;
 }>('transactions/finalizeTransaction');
 export const checkedTransaction = createAction<{
   hash: string;

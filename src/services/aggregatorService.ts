@@ -20,6 +20,7 @@ import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
+import SafeService from './safeService';
 
 export default class AggregatorService {
   modal: SafeAppWeb3Modal;
@@ -36,18 +37,22 @@ export default class AggregatorService {
 
   providerService: ProviderService;
 
+  safeService: SafeService;
+
   constructor(
     walletService: WalletService,
     contractService: ContractService,
     sdkService: SdkService,
     DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
-    providerService: ProviderService
+    providerService: ProviderService,
+    safeService: SafeService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
     this.sdkService = sdkService;
     this.apolloClient = DCASubgraph;
     this.providerService = providerService;
+    this.safeService = safeService;
   }
 
   getSigner() {
@@ -67,6 +72,16 @@ export default class AggregatorService {
     const transactionToSend = await this.addGasLimit(route.tx);
 
     return this.providerService.sendTransaction(transactionToSend);
+  }
+
+  async approveAndSwapSafe(route: SwapOptionWithTx) {
+    const approveTx = await this.walletService.buildApproveSpecificTokenTx(
+      route.sellToken,
+      route.swapper.allowanceTarget,
+      BigNumber.from(route.sellAmount.amount)
+    );
+
+    return this.safeService.submitMultipleTxs([approveTx, route.tx]);
   }
 
   async getSwapOptions(
