@@ -71,7 +71,7 @@ export default createReducer(initialState, (builder) =>
       }
       tx.retries += 1;
     })
-    .addCase(finalizeTransaction, (state, { payload: { hash, receipt, extendedTypeData, chainId } }) => {
+    .addCase(finalizeTransaction, (state, { payload: { hash, receipt, extendedTypeData, chainId, realSafeHash } }) => {
       const tx = state[chainId][hash];
       if (!tx) {
         return;
@@ -82,6 +82,7 @@ export default createReducer(initialState, (builder) =>
         ...tx.typeData,
         ...extendedTypeData,
       };
+      tx.realSafeHash = realSafeHash;
     })
     .addCase(removeTransaction, (state, { payload: { hash, chainId } }) => {
       const tx = state[chainId][hash];

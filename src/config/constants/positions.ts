@@ -60,6 +60,7 @@ export const MINIMUM_LIQUIDITY_USD = parseFloat('5000');
 
 export const POSSIBLE_ACTIONS = {
   createPosition: 'createPosition',
+  approveAndCreatePosition: 'approveAndCreatePosition',
   approveToken: 'approveToken',
   approveTokenExact: 'approveTokenExact',
 };

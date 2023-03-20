@@ -136,6 +136,8 @@ export default class ContractService {
       hub['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'];
     (hub as unknown as HubContract).estimateGas.deposit =
       hub.estimateGas['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'];
+    (hub as unknown as HubContract).populateTransaction.deposit =
+      hub.populateTransaction['deposit(address,address,uint256,uint32,uint32,address,(address,uint8[])[])'];
 
     return hub as unknown as HubContract;
   }
