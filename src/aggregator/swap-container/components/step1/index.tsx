@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import isUndefined from 'lodash/isUndefined';
+import isEqual from 'lodash/isEqual';
 import Button from 'common/button';
 import { SwapOption, Token } from 'types';
 import Typography from '@mui/material/Typography';
@@ -250,7 +251,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const hasNonDefaultSettings =
     slippage !== DEFAULT_AGGREGATOR_SETTINGS.slippage.toString() ||
     gasSpeed !== DEFAULT_AGGREGATOR_SETTINGS.gasSpeed ||
-    !!disabledDexes.length;
+    !isEqual(disabledDexes, DEFAULT_AGGREGATOR_SETTINGS.disabledDexes);
 
   const priceImpact =
     selectedRoute &&

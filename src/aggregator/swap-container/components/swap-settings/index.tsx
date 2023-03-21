@@ -38,6 +38,7 @@ const StyledOverlay = styled.div`
   background-color: #1b1b1c;
   padding: 24px;
   display: flex;
+  overflow: auto;
 `;
 
 const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
@@ -173,7 +174,13 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
             customSpacing={10}
             style={{ flex: '1', alignItems: 'flex-end', justifyContent: 'center', display: 'flex' }}
           >
-            <Button variant="contained" color="secondary" onClick={onRestoreDefaults} fullWidth>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={onRestoreDefaults}
+              fullWidth
+              sx={{ marginBottom: '10px' }}
+            >
               <FormattedMessage
                 description="advancedAggregatorSettingsRestoreDefaults"
                 defaultMessage="Restore defaults"

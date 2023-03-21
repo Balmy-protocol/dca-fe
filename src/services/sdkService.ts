@@ -47,7 +47,7 @@ export default class SdkService {
                     `https://api.mean.finance/v1/swap/networks/${chainId}/quotes`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['uniswap', 'odos', 'rango', '0x'],
+                sourceIds: ['uniswap', 'odos', 'rango', '0x', 'firebird'],
               },
             ],
           },
