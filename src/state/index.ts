@@ -20,7 +20,7 @@ import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 import error from './error/reducer';
 
-const LATEST_VERSION = '1.0.5';
+const LATEST_VERSION = '1.0.6';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
 const TRANSACTION_VERSION_KEY = 'transactions_version';
 const TRANSACTION_KEY = 'redux_localstorage_simple_transactions';
