@@ -207,13 +207,13 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const selectedNetwork = useSelectedNetwork();
   const currentNetwork = useCurrentNetwork();
 
-  const [fromFetchedPrice] = useUsdPrice(
+  const [fromFetchedPrice, isLoadingFromPrice] = useUsdPrice(
     from,
     parseUnits(fromValueToUse || '0', selectedRoute?.sellToken.decimals || from?.decimals),
     undefined,
     selectedNetwork.chainId
   );
-  const [toFetchedPrice] = useUsdPrice(
+  const [toFetchedPrice, isLoadingToPrice] = useUsdPrice(
     to,
     parseUnits(toValueToUse || '0', selectedRoute?.buyToken.decimals || to?.decimals),
     undefined,
@@ -408,6 +408,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 onChange={handleFromValueChange}
                 token={from}
                 fullWidth
+                isLoadingPrice={isLoadingFromPrice}
                 usdValue={
                   (!isUndefined(fromPriceToShow) && parseFloat(fromPriceToShow.toFixed(2)).toFixed(2)) || undefined
                 }
@@ -438,6 +439,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                 onChange={handleToValueChange}
                 token={to}
                 fullWidth
+                isLoadingPrice={isLoadingToPrice}
                 usdValue={(!isUndefined(toPriceToShow) && parseFloat(toPriceToShow.toFixed(2)).toFixed(2)) || undefined}
                 onTokenSelect={() => startSelectingCoin(to || emptyTokenWithAddress('to'))}
                 impact={priceImpact}

@@ -119,6 +119,7 @@ interface TokenInputProps {
   usdValue?: string;
   onTokenSelect: () => void;
   impact?: string | null | boolean;
+  isLoadingPrice?: boolean;
 }
 
 const AggregatorTokenInput = ({
@@ -132,6 +133,7 @@ const AggregatorTokenInput = ({
   usdValue,
   onTokenSelect,
   impact,
+  isLoadingPrice,
 }: TokenInputProps) => {
   const inputRef = React.createRef();
   const validator = (nextValue: string) => {
@@ -194,11 +196,16 @@ const AggregatorTokenInput = ({
               {token?.name}
             </Typography>
             <StyledUsdContainer>
-              {isUndefined(usdValue) && !!value && value !== '0' && value !== '...' && Number(value) !== 0 && (
-                <Typography variant="body2" color="#EB5757">
-                  <FormattedMessage description="unkown" defaultMessage="Unkown price" />
-                </Typography>
-              )}
+              {isUndefined(usdValue) &&
+                !isLoadingPrice &&
+                !!value &&
+                value !== '0' &&
+                value !== '...' &&
+                Number(value) !== 0 && (
+                  <Typography variant="body2" color="#EB5757">
+                    <FormattedMessage description="unkown" defaultMessage="Unknown price" />
+                  </Typography>
+                )}
               {!isUndefined(usdValue) && (
                 <>
                   <Typography variant="body2" color="#939494">
