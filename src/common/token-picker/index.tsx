@@ -27,7 +27,7 @@ import useTokenList from 'hooks/useTokenList';
 import TokenLists from 'common/token-lists';
 import { formatCurrencyAmount } from 'utils/currency';
 import FilledInput from '@mui/material/FilledInput';
-import { createStyles, Tooltip } from '@mui/material';
+import { createStyles, Skeleton, Tooltip } from '@mui/material';
 import useMulticallBalances from 'hooks/useMulticallBalances';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
@@ -148,6 +148,10 @@ interface RowProps {
   data: RowData;
 }
 
+interface EmptyRowProps {
+  style: CSSProperties;
+}
+
 interface TokenPickerProps {
   availableFrom?: string[];
   isOpen?: boolean;
@@ -185,6 +189,40 @@ const useListItemStyles = makeStyles(({ palette }) => ({
     },
   },
 }));
+
+const LoadingRow = ({ style }: EmptyRowProps) => {
+  const classes = useListItemStyles();
+
+  return (
+    <StyledListItem classes={classes} style={style}>
+      <StyledListItemIcon>
+        <Skeleton variant="circular" width={24} height={24} animation="wave" />
+      </StyledListItemIcon>
+      <ListItemText disableTypography>
+        <StyledTokenTextContainer>
+          <Typography variant="body1" sx={{ width: '50%' }}>
+            <Skeleton variant="text" animation="wave" />
+          </Typography>
+        </StyledTokenTextContainer>
+      </ListItemText>
+      <StyledBalanceContainer>
+        <Skeleton variant="text" width={12} />
+      </StyledBalanceContainer>
+    </StyledListItem>
+  );
+};
+
+const EmptyRow = () => (
+  <StyledTokenTextContainer>
+    <Typography variant="h6" sx={{ textAlign: 'center' }}>
+      <FormattedMessage
+        description="noTokenFound"
+        defaultMessage="We could not find any token with those search parameters"
+      />
+    </Typography>
+  </StyledTokenTextContainer>
+);
+
 const Row = ({
   index,
   style,
@@ -204,6 +242,14 @@ const Row = ({
   const isCustomToken = (!!customToken && tokenKeys[index] === customToken.token.address) || isImportedToken;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const token = !isCustomToken || isImportedToken ? tokenList[tokenKeys[index]] : customToken!.token;
+
+  if (index === 0 && tokenKeys.length === 1 && tokenKeys[0] === 'loading') {
+    return <LoadingRow style={style} />;
+  }
+
+  if (index === 0 && !tokenKeys.length && !token) {
+    return <EmptyRow />;
+  }
 
   if (!token) {
     return null;
@@ -449,7 +495,7 @@ const TokenPicker = ({
 
   const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(rawMemoTokenKeysToUse);
 
-  const [customToken] = useCustomToken(
+  const [customToken, isLoadingCustomToken] = useCustomToken(
     search,
     !isAggregator || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
   );
@@ -504,7 +550,7 @@ const TokenPicker = ({
     () => ({
       onClick: handleItemSelected,
       tokenList,
-      tokenKeys: memoizedTokenKeys,
+      tokenKeys: !memoizedTokenKeys.length && isLoadingCustomToken ? ['loading'] : memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
       tokenBalances:
         (isLoadingBalances && (!balances || !Object.keys(balances).length)) ||
@@ -524,6 +570,7 @@ const TokenPicker = ({
       isLoadingBalances,
       currentNetwork.chainId,
       actualCurrentNetwork.chainId,
+      isLoadingCustomToken,
     ]
   );
 
@@ -612,7 +659,7 @@ const TokenPicker = ({
                 {({ height, width }) => (
                   <StyledList
                     height={height}
-                    itemCount={memoizedTokenKeys.length}
+                    itemCount={itemData.tokenKeys.length || 1}
                     itemSize={52}
                     width={width}
                     itemData={itemData}
