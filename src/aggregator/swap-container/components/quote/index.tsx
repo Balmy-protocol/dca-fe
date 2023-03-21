@@ -337,7 +337,7 @@ const SwapQuote = ({
             )}
             {isUndefined(quote.sellAmount.amountInUSD) && (
               <Typography variant="caption" color="#EB5757">
-                <FormattedMessage description="unkown" defaultMessage="Unkown price" />
+                <FormattedMessage description="unkown" defaultMessage="Unknown price" />
               </Typography>
             )}
           </StyledTokenAmountContainer>
@@ -363,7 +363,7 @@ const SwapQuote = ({
               )}
               {isUndefined(quote.buyAmount.amountInUSD) && (
                 <Typography variant="caption" color="#EB5757">
-                  <FormattedMessage description="unkown" defaultMessage="Unkown price" />
+                  <FormattedMessage description="unkown" defaultMessage="Unknown price" />
                 </Typography>
               )}
               {!isNaN(priceImpact) && isFinite(Number(priceImpact)) && priceImpact && (

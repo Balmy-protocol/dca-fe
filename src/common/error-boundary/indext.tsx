@@ -159,7 +159,7 @@ class ErrorBoundary extends Component<Props, State> {
         errorAction = 'Positions details page';
       }
       const errorMessageToShow = errorMessage || errorMessageProp || (error && error.message);
-      const errorNameToShow = errorName || errorNameProp || (error && error.name) || 'Unkown Error';
+      const errorNameToShow = errorName || errorNameProp || (error && error.name) || 'Unknown Error';
       const errorStackToShow =
         errorStackTrace || errorStackTraceProp || (error && error.stack) || 'Unknown error stack';
       return (
