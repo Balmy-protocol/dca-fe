@@ -432,7 +432,11 @@ export default createReducer(initialState, (builder) =>
         name: 'Mean Finance',
         logoURI: '',
         timestamp: new Date().getTime(),
-        tokens: [],
+        tokens: [
+          ...((state.byUrl['Mean Finance Graph Allowed Tokens'] &&
+            state.byUrl['Mean Finance Graph Allowed Tokens'].tokens) ||
+            []),
+        ],
         version: { major: 0, minor: 0, patch: 0 },
         hasLoaded: false,
         requestId,
