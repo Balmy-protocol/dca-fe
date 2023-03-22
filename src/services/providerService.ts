@@ -198,11 +198,52 @@ export default class ProviderService {
     }
   }
 
+  async addNetwork(newChainId: number, callbackBeforeReload?: () => void) {
+    const providerInfo = this.getProviderInfo();
+
+    try {
+      const network = find(NETWORKS, { chainId: newChainId });
+
+      if (network) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await this.provider.send('wallet_addEthereumChain', [
+          {
+            chainId: `0x${newChainId.toString(16)}`,
+            chainName: network.name,
+            nativeCurrency: network.nativeCurrency,
+            rpcUrls: network.rpc,
+          },
+        ]);
+        await this.provider.send('wallet_switchEthereumChain', [{ chainId: `0x${newChainId.toString(16)}` }]);
+        if (callbackBeforeReload) {
+          callbackBeforeReload();
+        }
+        if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
+          window.location.reload();
+        }
+      }
+    } catch (addError) {
+      console.error('Error adding new chain to metamask');
+    }
+  }
+
   async changeNetwork(newChainId: number, callbackBeforeReload?: () => void) {
     const providerInfo = this.getProviderInfo();
 
     try {
-      await this.provider.send('wallet_switchEthereumChain', [{ chainId: `0x${newChainId.toString(16)}` }]);
+      const response: { code?: number; message?: string } | null = (await this.provider.send(
+        'wallet_switchEthereumChain',
+        [{ chainId: `0x${newChainId.toString(16)}` }]
+      )) as { code?: number; message?: string } | null;
+
+      if (
+        response &&
+        ((response.code && response.code === 4902) || (response.message && response.message === 'Chain does not exist'))
+      ) {
+        await this.addNetwork(newChainId, callbackBeforeReload);
+        return;
+      }
+
       if (callbackBeforeReload) {
         callbackBeforeReload();
       }
@@ -212,30 +253,7 @@ export default class ProviderService {
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (switchError.code === 4902 || switchError.message === 'Chain does not exist') {
-        try {
-          const network = find(NETWORKS, { chainId: newChainId });
-
-          if (network) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            await this.provider.send('wallet_addEthereumChain', [
-              {
-                chainId: `0x${newChainId.toString(16)}`,
-                chainName: network.name,
-                nativeCurrency: network.nativeCurrency,
-                rpcUrls: network.rpc,
-              },
-            ]);
-            await this.provider.send('wallet_switchEthereumChain', [{ chainId: `0x${newChainId.toString(16)}` }]);
-            if (callbackBeforeReload) {
-              callbackBeforeReload();
-            }
-            if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
-              window.location.reload();
-            }
-          }
-        } catch (addError) {
-          console.error('Error adding new chain to metamask');
-        }
+        await this.addNetwork(newChainId, callbackBeforeReload);
       }
     }
   }
