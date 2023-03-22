@@ -21,9 +21,9 @@ import useSupportsSigning from 'hooks/useSupportsSigning';
 import { fullPositionToMappedPosition } from 'utils/parsing';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTokenList from 'hooks/useTokenList';
-import useConnectedNetwork from 'hooks/useConnectedNetwork';
 import { setNetwork } from 'state/config/actions';
 import { useAppDispatch } from 'state/hooks';
+import useCurrentNetwork from 'hooks/useCurrentNetwork';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -56,7 +56,7 @@ const PositionDataControls = ({
 }: PositionDataControlsProps) => {
   const { remainingSwaps, chainId } = fullPositionToMappedPosition(position);
   const [hasSignSupport] = useSupportsSigning();
-  const [network] = useConnectedNetwork();
+  const network = useCurrentNetwork();
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
   const tokenList = useTokenList();
