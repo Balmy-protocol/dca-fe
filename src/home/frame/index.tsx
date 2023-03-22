@@ -105,7 +105,8 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     }
   );
 
-  const isLoadingIntervals = isLoading || isLoadingSwapIntervals || !hasLoadedPairs;
+  // TODO- Move this logic to swap container
+  const isLoadingIntervals = isLoading || (isLoadingSwapIntervals && tabIndex === 0) || !hasLoadedPairs;
 
   return (
     <Grid container spacing={3}>
