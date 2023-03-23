@@ -253,11 +253,6 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                           <Leaderboard />
                           {/* </RollbarContext> */}
                         </Route>
-                        <Route path="/jmxn-competition">
-                          {/* <RollbarContext context="/leaderboard"> */}
-                          <JmxnCompetition />
-                          {/* </RollbarContext> */}
-                        </Route>
                         <Route path="/positions">
                           {/* <RollbarContext context="/positions"> */}
                           <Home isLoading={isLoading || isLoadingNetwork} />
