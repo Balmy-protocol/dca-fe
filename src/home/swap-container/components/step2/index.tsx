@@ -305,7 +305,7 @@ const SwapSecondStep = React.forwardRef<HTMLDivElement, SwapSecondStepProps>((pr
               )}
             <StyledYieldHelpContainer variant="body1" onClick={() => setHelpExpanded(!isHelpExpanded)}>
               <HelpOutlineOutlinedIcon fontSize="inherit" color="primary" />
-              <FormattedMessage description="howItWorks" defaultMessage="How it works/Risks" />
+              <FormattedMessage description="howItWorks" defaultMessage="How it works / Risks" />
               {isHelpExpanded ? <ArrowDropUpIcon fontSize="inherit" /> : <ArrowDropDownIcon fontSize="inherit" />}
             </StyledYieldHelpContainer>
             <Collapse in={isHelpExpanded}>
