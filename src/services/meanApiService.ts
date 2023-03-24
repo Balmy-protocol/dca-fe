@@ -316,11 +316,12 @@ export default class MeanApiService {
     return this.providerService.sendTransaction(transactionToSend);
   }
 
-  async getAllowedPairs(): Promise<AllowedPairs> {
+  async getAllowedPairs(chainId?: number): Promise<AllowedPairs> {
     const currentNetwork = await this.providerService.getNetwork();
+    const chainIdTouse = chainId || currentNetwork.chainId;
     try {
       const allowedPairsResponse = await this.axiosClient.get<MeanFinanceAllowedPairsResponse>(
-        `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/config`
+        `${MEAN_API_URL}/v1/dca/networks/${chainIdTouse}/config`
       );
 
       return allowedPairsResponse.data.supportedPairs.map((allowedPair) => ({

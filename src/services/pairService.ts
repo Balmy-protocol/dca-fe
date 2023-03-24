@@ -142,7 +142,7 @@ export default class PairService {
       );
     }
 
-    this.allowedPairs = await this.meanApiService.getAllowedPairs();
+    this.allowedPairs = await this.meanApiService.getAllowedPairs(chainId);
 
     this.hasFetchedAvailablePairs = true;
   }
