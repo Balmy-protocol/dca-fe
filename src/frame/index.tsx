@@ -24,7 +24,6 @@ import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NE
 import { setNetwork } from 'state/config/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import Leaderboard from 'leaderboard';
-import JmxnCompetition from 'jmxn-competition';
 import Vector1 from 'assets/svg/vector1.svg';
 import Vector2 from 'assets/svg/vector2.svg';
 import find from 'lodash/find';
