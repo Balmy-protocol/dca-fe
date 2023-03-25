@@ -1567,6 +1567,20 @@
       "value": "Gas ahorrado"
     }
   ],
+  "FGbffU": [
+    {
+      "type": 0,
+      "value": "Aprobar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " y wrappear"
+    }
+  ],
   "FMbBaD": [
     {
       "type": 0,
@@ -1827,6 +1841,20 @@
     {
       "type": 0,
       "value": "¿Cómo funciona?/Riesgos"
+    }
+  ],
+  "HKZyB6": [
+    {
+      "type": 0,
+      "value": "Aprobar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " y crear posición"
     }
   ],
   "Hbiw7t": [
@@ -4319,6 +4347,20 @@
       "value": "Configuración avanzada"
     }
   ],
+  "gdQB3o": [
+    {
+      "type": 0,
+      "value": "Aprobar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " e intercambiar"
+    }
+  ],
   "gjyuVH": [
     {
       "type": 0,
@@ -4447,6 +4489,12 @@
     {
       "type": 0,
       "value": "¡Estaremos agregando más pronto!"
+    }
+  ],
+  "ha8PgS": [
+    {
+      "type": 0,
+      "value": "Aprobar y modificar posición"
     }
   ],
   "haoCMr": [
