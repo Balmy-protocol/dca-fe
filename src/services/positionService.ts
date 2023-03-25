@@ -675,7 +675,7 @@ export default class PositionService {
         possibleYieldTo
       );
 
-    if (possibleYieldFrom || possibleYieldTo || fromToken.address === PROTOCOL_TOKEN_ADDRESS) {
+    if (possibleYieldFrom || fromToken.address === PROTOCOL_TOKEN_ADDRESS) {
       return this.meanApiService.getDepositTx(
         takeFrom,
         from,
