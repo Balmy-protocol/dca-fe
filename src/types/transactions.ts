@@ -254,4 +254,5 @@ export interface TransactionDetails {
   type: TransactionTypes;
   typeData: TransactionTypeDataOptions;
   position?: Position;
+  realSafeHash?: string;
 }

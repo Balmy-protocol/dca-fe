@@ -13,8 +13,10 @@ import { TransactionReceipt } from 'types';
 import { setInitialized } from 'state/initializer/actions';
 import useTransactionService from 'hooks/useTransactionService';
 import useWalletService from 'hooks/useWalletService';
+import useSafeService from 'hooks/useSafeService';
 import usePositionService from 'hooks/usePositionService';
 import { updatePosition } from 'state/position-details/actions';
+import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { usePendingTransactions } from './hooks';
 import { checkedTransaction, finalizeTransaction, removeTransaction, transactionFailed } from './actions';
@@ -48,6 +50,8 @@ export default function Updater(): null {
   const transactionService = useTransactionService();
   const walletService = useWalletService();
   const positionService = usePositionService();
+  const loadedAsSafeApp = useLoadedAsSafeApp();
+  const safeService = useSafeService();
 
   const currentNetwork = useCurrentNetwork();
 
@@ -161,6 +165,15 @@ export default function Updater(): null {
                 };
               }
 
+              let realSafeHash;
+              try {
+                if (loadedAsSafeApp) {
+                  realSafeHash = await safeService.getHashFromSafeTxHash(hash);
+                }
+              } catch (e) {
+                console.error('Unable to fetch real tx hash from safe hash');
+              }
+
               positionService.handleTransaction({
                 ...transactions[hash],
                 typeData: {
@@ -191,6 +204,7 @@ export default function Updater(): null {
                   },
                   extendedTypeData,
                   chainId: currentNetwork.chainId,
+                  realSafeHash,
                 })
               );
 
@@ -256,7 +270,15 @@ export default function Updater(): null {
             console.error(`Failed to check transaction hash: ${hash}`, error);
           });
       });
-  }, [walletService.getAccount(), transactions, lastBlockNumber, dispatch, getReceipt, checkIfTransactionExists]);
+  }, [
+    walletService.getAccount(),
+    transactions,
+    lastBlockNumber,
+    dispatch,
+    getReceipt,
+    checkIfTransactionExists,
+    loadedAsSafeApp,
+  ]);
 
   return null;
 }

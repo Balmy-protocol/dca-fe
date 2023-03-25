@@ -60,6 +60,8 @@ import useErrorService from 'hooks/useErrorService';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { shouldTrackError } from 'utils/errors';
 import useReplaceHistory from 'hooks/useReplaceHistory';
+import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
+import { TransactionResponse } from '@ethersproject/providers';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
 
@@ -189,6 +191,7 @@ const Swap = ({
     );
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0, fromYield, toYield]);
   const isCreatingPair = useHasPendingPairCreation(from, to);
+  const loadedAsSafeApp = useLoadedAsSafeApp();
 
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
   const hasConfirmedApproval = useHasConfirmedApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
@@ -416,6 +419,94 @@ const Swap = ({
     }
   };
 
+  const handleSafeApproveAndSwap = async () => {
+    if (!from || !to || !loadedAsSafeApp) return;
+    setShouldShowStalePairModal(false);
+    const fromSymbol = from.symbol;
+
+    try {
+      setModalLoading({
+        content: (
+          <Typography variant="body1">
+            <FormattedMessage
+              description="creating position"
+              defaultMessage="Creating a position to swap {from} to {to}"
+              values={{ from: fromSymbol || '', to: (to && to.symbol) || '' }}
+            />
+          </Typography>
+        ),
+      });
+      const result = await positionService.approveAndDepositSafe(
+        from,
+        to,
+        fromValue,
+        frequencyType,
+        frequencyValue,
+        shouldEnableYield ? fromYield?.tokenAddress : undefined,
+        shouldEnableYield ? toYield?.tokenAddress : undefined
+      );
+      const hubAddress = await contractService.getHUBAddress();
+      const companionAddress = await contractService.getHUBCompanionAddress();
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      result.hash = result.safeTxHash;
+
+      addTransaction(result as unknown as TransactionResponse, {
+        type: TRANSACTION_TYPES.NEW_POSITION,
+        typeData: {
+          from,
+          to,
+          fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
+          toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
+          fromValue,
+          frequencyType: frequencyType.toString(),
+          frequencyValue,
+          startedAt: Date.now(),
+          id: result.safeTxHash,
+          isCreatingPair: !existingPair,
+          version: LATEST_VERSION,
+          addressFor:
+            to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
+              ? companionAddress
+              : hubAddress,
+        },
+      });
+      setModalSuccess({
+        hash: result.safeTxHash,
+        content: (
+          <FormattedMessage
+            description="success creating position"
+            defaultMessage="Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{ from: fromSymbol || '', to: (to && to.symbol) || '' }}
+          />
+        ),
+      });
+
+      setFromValue('');
+      setRate('0');
+      setToYield(undefined);
+      setFromYield(undefined);
+      setCreateStep(0);
+    } catch (e) {
+      // User rejecting transaction
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error creating position', JSON.stringify(e), {
+          from: from.address,
+          to: to.address,
+          chainId: currentNetwork.chainId,
+        });
+      }
+      setModalError({
+        content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
+        /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+        error: { code: e.code, message: e.message, data: e.data },
+      });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    }
+  };
+
   const preHandleApprove = (amount?: BigNumber) => {
     if (!existingPair) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -456,6 +547,26 @@ const Swap = ({
     } else {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       handleSwap();
+    }
+  };
+
+  const preHandleSafeApproveAndSwap = () => {
+    if (!from || !to) {
+      return;
+    }
+    const isStale =
+      calculateStale(
+        existingPair?.lastExecutedAt || 0,
+        frequencyType,
+        existingPair?.lastCreatedAt || 0,
+        existingPair?.swapInfo || null
+      ) === STALE;
+
+    if (isStale) {
+      setShouldShowStalePairModal(true);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      handleSafeApproveAndSwap();
     }
   };
 
@@ -526,12 +637,14 @@ const Swap = ({
 
   const POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: handleSwap,
+    approveAndCreatePosition: preHandleSafeApproveAndSwap,
     approveToken: handleApproveToken,
     approveTokenExact: (amount?: BigNumber) => handleApproveToken(amount),
   };
 
   const PRE_POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: preHandleSwap,
+    approveAndCreatePosition: preHandleSafeApproveAndSwap,
     approveToken: preHandleApprove,
     approveTokenExact: (amount?: BigNumber) => preHandleApprove(amount),
   };
@@ -731,6 +844,52 @@ const Swap = ({
     </StyledButton>
   );
 
+  const SafeApproveAndStartPositionButton = (
+    <StyledButton
+      size="large"
+      variant="contained"
+      disabled={
+        !!shouldDisableApproveButton ||
+        isLoading ||
+        isLoadingPairIsSupported ||
+        !!shouldShowNotEnoughForWhale ||
+        swapsIsMax
+      }
+      color="secondary"
+      fullWidth
+      onClick={() => checkForLowLiquidity(POSSIBLE_ACTIONS.approveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
+    >
+      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="swapsCannotBeMax"
+            defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
+            values={{ MAX_UINT_32 }}
+          />
+        </Typography>
+      )}
+      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="approve and create position"
+            defaultMessage="Approve {from} and create position"
+            values={{ from: from?.symbol || '' }}
+          />
+        </Typography>
+      )}
+      {!isLoading && !isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="notenoughwhale"
+            defaultMessage="You can only deposit with a minimum value of {value} USD"
+            values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
+          />
+        </Typography>
+      )}
+      {(isLoading || isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
+    </StyledButton>
+  );
+
   const CreatingPairButton = (
     <StyledButton size="large" variant="contained" disabled color="secondary" fullWidth>
       <Typography variant="body1">
@@ -835,6 +994,8 @@ const Swap = ({
     ButtonToShow = NextStepButton;
   } else if (!hasEnoughUsdForDeposit) {
     ButtonToShow = NoMinForDepositButton;
+  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to && loadedAsSafeApp) {
+    ButtonToShow = SafeApproveAndStartPositionButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
     ButtonToShow = ApproveTokenButton;
   } else if (isCreatingPair) {
