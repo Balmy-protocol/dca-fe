@@ -41,6 +41,17 @@ export default class ProviderService {
     return this.signer.sendTransaction(transactionToSend);
   }
 
+  async sendTransactionWithGasLimit(tx: TransactionRequest) {
+    const gasUsed = await this.estimateGas(tx);
+
+    const transactionToSend = {
+      ...tx,
+      gasLimit: gasUsed.mul(BigNumber.from(130)).div(BigNumber.from(100)), // 30% more
+    };
+
+    return this.signer.sendTransaction(transactionToSend);
+  }
+
   getSigner() {
     return this.signer;
   }

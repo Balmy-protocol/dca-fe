@@ -11,7 +11,6 @@ import {
   PermissionPermit,
   Token,
 } from 'types';
-import { TransactionRequest } from '@ethersproject/providers';
 import { emptyTokenWithAddress } from 'utils/currency';
 
 // MOCKS
@@ -57,25 +56,17 @@ export default class MeanApiService {
     return {};
   }
 
-  async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
-    const gasUsed = await this.providerService.estimateGas(tx);
-
-    return {
-      ...tx,
-      gasLimit: gasUsed.mul(BigNumber.from(130)).div(BigNumber.from(100)), // 30% more
-    };
-  }
-
-  async depositUsingYield(
+  async getDepositTx(
+    takeFrom: string,
     from: string,
     to: string,
     totalAmmount: BigNumber,
     swaps: BigNumber,
     interval: BigNumber,
-    yieldFrom: string | undefined,
-    yieldTo: string | undefined,
     account: string,
-    permissions: { operator: string; permissions: number[] }[]
+    permissions: { operator: string; permissions: number[] }[],
+    yieldFrom?: string,
+    yieldTo?: string
   ) {
     const currentNetwork = await this.providerService.getNetwork();
     const hubAddress = await this.contractService.getHUBAddress();
@@ -87,7 +78,7 @@ export default class MeanApiService {
     const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
       {
-        takeFromCaller: { token: from, amount: totalAmmount.toString() },
+        takeFromCaller: { token: takeFrom, amount: totalAmmount.toString() },
         from: yieldFrom || fromToUse,
         to: yieldTo || toTouse,
         amountOfSwaps: swaps.toNumber(),
@@ -100,45 +91,35 @@ export default class MeanApiService {
       }
     );
 
-    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
-
-    return this.providerService.sendTransaction(transactionToSend);
+    return transactionResponse.data.tx;
   }
 
-  async depositUsingProtocolToken(
+  async deposit(
+    takeFrom: string,
     from: string,
     to: string,
     totalAmmount: BigNumber,
     swaps: BigNumber,
     interval: BigNumber,
     account: string,
-    permissions: { operator: string; permissions: string[] }[]
+    permissions: { operator: string; permissions: number[] }[],
+    yieldFrom?: string,
+    yieldTo?: string
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const hubAddress = await this.contractService.getHUBAddress();
-    const toTouse = to === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to;
-
-    // Call to api and get transaction
-    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
-      {
-        takeFromCaller: { token: from, amount: totalAmmount.toString() },
-        from: wrappedProtocolToken.address,
-        to: toTouse,
-        amountOfSwaps: swaps.toNumber(),
-        swapInterval: interval.toNumber(),
-        owner: account,
-        hub: hubAddress,
-        permissions,
-        dex: { only: 'MeanTransformer' },
-        ...this.getDeadlineSlippageDefault(),
-      }
+    const transaction = await this.getDepositTx(
+      takeFrom,
+      from,
+      to,
+      totalAmmount,
+      swaps,
+      interval,
+      account,
+      permissions,
+      yieldFrom,
+      yieldTo
     );
 
-    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
-
-    return this.providerService.sendTransaction(transactionToSend);
+    return this.providerService.sendTransactionWithGasLimit(transaction);
   }
 
   async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
@@ -182,9 +163,7 @@ export default class MeanApiService {
       }
     );
 
-    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
-
-    return this.providerService.sendTransaction(transactionToSend);
+    return this.providerService.sendTransactionWithGasLimit(transactionResponse.data.tx);
   }
 
   async terminateUsingOtherTokens(
@@ -214,12 +193,10 @@ export default class MeanApiService {
       }
     );
 
-    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
-
-    return this.providerService.sendTransaction(transactionToSend);
+    return this.providerService.sendTransactionWithGasLimit(transactionResponse.data.tx);
   }
 
-  async increasePositionUsingOtherToken(
+  async getIncreasePositionUsingOtherTokenTx(
     id: string,
     newAmount: BigNumber,
     newSwaps: BigNumber,
@@ -244,12 +221,30 @@ export default class MeanApiService {
       }
     );
 
-    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
-
-    return this.providerService.sendTransaction(transactionToSend);
+    return transactionResponse.data.tx;
   }
 
-  async reducePositionUsingOtherToken(
+  async increasePositionUsingOtherToken(
+    id: string,
+    newAmount: BigNumber,
+    newSwaps: BigNumber,
+    positionVersion: PositionVersions,
+    tokenFrom: string,
+    permissionPermit?: PermissionPermit
+  ) {
+    const transaction = await this.getIncreasePositionUsingOtherTokenTx(
+      id,
+      newAmount,
+      newSwaps,
+      positionVersion,
+      tokenFrom,
+      permissionPermit
+    );
+
+    return this.providerService.sendTransactionWithGasLimit(transaction);
+  }
+
+  async getReducePositionUsingOtherTokenTx(
     id: string,
     newAmount: BigNumber,
     newSwaps: BigNumber,
@@ -279,9 +274,29 @@ export default class MeanApiService {
       }
     );
 
-    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
+    return transactionResponse.data.tx;
+  }
 
-    return this.providerService.sendTransaction(transactionToSend);
+  async reducePositionUsingOtherToken(
+    id: string,
+    newAmount: BigNumber,
+    newSwaps: BigNumber,
+    recipient: string,
+    positionVersion: PositionVersions,
+    tokenFrom: string,
+    permissionPermit?: PermissionPermit
+  ) {
+    const transaction = await this.getReducePositionUsingOtherTokenTx(
+      id,
+      newAmount,
+      newSwaps,
+      recipient,
+      positionVersion,
+      tokenFrom,
+      permissionPermit
+    );
+
+    return this.providerService.sendTransactionWithGasLimit(transaction);
   }
 
   async migratePosition(
@@ -311,9 +326,7 @@ export default class MeanApiService {
       }
     );
 
-    const transactionToSend = await this.addGasLimit(transactionResponse.data.tx);
-
-    return this.providerService.sendTransaction(transactionToSend);
+    return this.providerService.sendTransactionWithGasLimit(transactionResponse.data.tx);
   }
 
   async getAllowedPairs(chainId?: number): Promise<AllowedPairs> {

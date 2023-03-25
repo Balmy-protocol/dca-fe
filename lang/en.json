@@ -619,6 +619,10 @@
     "defaultMessage": "Gas saved",
     "description": "gasSavedGraphTitle"
   },
+  "FGbffU": {
+    "defaultMessage": "Approve {from} and wrap",
+    "description": "wrap agg"
+  },
   "FMbBaD": {
     "defaultMessage": "Investing in:",
     "description": "jmxnUserCompInvestingIn"
@@ -714,6 +718,10 @@
   "H82UVr": {
     "defaultMessage": "How it works/Risks",
     "description": "howItWorks"
+  },
+  "HKZyB6": {
+    "defaultMessage": "Approve {from} and create position",
+    "description": "approve and create position"
   },
   "Hbiw7t": {
     "defaultMessage": "For more information, feel free to check our",
@@ -1747,6 +1755,10 @@
     "defaultMessage": "Advanced settings",
     "description": "advancedAggregatorSettings"
   },
+  "gdQB3o": {
+    "defaultMessage": "Approve {from} and swap",
+    "description": "approve and swap agg"
+  },
   "gjyuVH": {
     "defaultMessage": "Only tokens compatible with {token}",
     "description": "createdPairsSwitchToken"
@@ -1790,6 +1802,10 @@
   "hZOkep": {
     "defaultMessage": "Aggregators sometimes fail or give you less than they said they would. This of course sucks!{br}{br}Well when you are using Mean's Meta Aggregator, we will simulate your transactions to make sure it doesn't fail when you submit it. And, at the same time, we will show you the how your balances will change so that can be 100% sure that you'll get what you expect!{br}{br}The balance changes are currently available only on:{br}{br}- Ethereum{br}{br}- Polygon{br}{br}We will be adding more soon",
     "description": "faqWhatIsTransactionSimulationResponse"
+  },
+  "ha8PgS": {
+    "defaultMessage": "Approve and modify position",
+    "description": "modifyPosition"
   },
   "haoCMr": {
     "defaultMessage": "Calculating the cost of creating this position",

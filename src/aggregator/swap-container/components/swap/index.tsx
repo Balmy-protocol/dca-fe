@@ -41,6 +41,8 @@ import { shouldTrackError } from 'utils/errors';
 import useErrorService from 'hooks/useErrorService';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import { addCustomToken } from 'state/token-lists/actions';
+import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
+import { TransactionResponse } from '@ethersproject/providers';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
 
@@ -126,6 +128,7 @@ const Swap = ({
   const simulationService = useSimulationService();
   const replaceHistory = useReplaceHistory();
   const actualCurrentNetwork = useCurrentNetwork();
+  const loadedAsSafeApp = useLoadedAsSafeApp();
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
@@ -299,6 +302,132 @@ const Swap = ({
           newSteps[index] = {
             ...newSteps[index],
             hash: result.hash,
+            done: true,
+          };
+
+          setTransactionsToExecute(newSteps);
+        }
+      }
+
+      setRefreshQuotes(true);
+
+      onResetForm();
+    } catch (e) {
+      if (shouldTrackError(e)) {
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error swapping', JSON.stringify(e), {
+          swapper: selectedRoute.swapper.id,
+          chainId: currentNetwork.chainId,
+          from: selectedRoute.sellToken.address,
+          to: selectedRoute.buyToken.address,
+          buyAmount: selectedRoute.buyAmount.amountInUnits,
+          sellAmount: selectedRoute.sellAmount.amountInUnits,
+          type: selectedRoute.type,
+        });
+      }
+      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setRefreshQuotes(true);
+    }
+  };
+
+  const handleSafeApproveAndSwap = async (transactions?: TransactionStep[]) => {
+    if (!from || !to || !selectedRoute || !selectedRoute.tx || !loadedAsSafeApp) return;
+    const fromSymbol = from.symbol;
+    const toSymbol = to.symbol;
+    const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6);
+    const toAmount = formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4, 6);
+    try {
+      const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
+      const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
+      setRefreshQuotes(false);
+
+      setModalLoading({
+        content: (
+          <Typography variant="body1">
+            {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
+            {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
+            {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
+              (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
+              <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
+            )}
+            {` `}
+            <FormattedMessage
+              description="swap aggregator loading title"
+              defaultMessage="{fromAmount} {from} for {toAmount} {to} for you"
+              values={{ from: fromSymbol, to: toSymbol, fromAmount, toAmount }}
+            />
+          </Typography>
+        ),
+      });
+
+      let balanceBefore: BigNumber | null = null;
+
+      if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
+        balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS);
+      }
+
+      const result = await aggregatorService.approveAndSwapSafe(selectedRoute as SwapOptionWithTx);
+
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        meanApiService.trackEvent('Swap on aggregator', {
+          swapper: selectedRoute.swapper.id,
+          chainId: currentNetwork.chainId,
+          chainName: currentNetwork.name,
+          from: selectedRoute.sellToken.address,
+          fromSymbol: selectedRoute.sellToken.symbol,
+          to: selectedRoute.buyToken.address,
+          toSymbol: selectedRoute.buyToken.symbol,
+          buyAmount: selectedRoute.buyAmount.amountInUnits,
+          sellAmount: selectedRoute.sellAmount.amountInUnits,
+          buyAmountUsd: selectedRoute.buyAmount.amountInUSD,
+          sellAmountUsd: selectedRoute.sellAmount.amountInUSD,
+          type: selectedRoute.type,
+        });
+      } catch (e) {
+        console.error('Error tracking through mixpanel', e);
+      }
+
+      let transactionType = TRANSACTION_TYPES.SWAP;
+
+      if (isWrap) {
+        transactionType = TRANSACTION_TYPES.WRAP;
+      } else if (isUnwrap) {
+        transactionType = TRANSACTION_TYPES.UNWRAP;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      result.hash = result.safeTxHash;
+
+      addTransaction(result as unknown as TransactionResponse, {
+        type: transactionType,
+        typeData: {
+          from: fromSymbol,
+          to: toSymbol,
+          amountFrom: fromAmount,
+          amountTo: toAmount,
+          balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
+          transferTo,
+        },
+      });
+
+      setModalClosed({ content: '' });
+      setCurrentTransaction(result.safeTxHash);
+      setShouldShowConfirmation(true);
+      setShouldShowSteps(false);
+
+      if (transactions?.length) {
+        const newSteps = [...transactions];
+
+        const index = findIndex(transactions, { type: TRANSACTION_ACTION_SWAP });
+
+        if (index !== -1) {
+          newSteps[index] = {
+            ...newSteps[index],
+            hash: result.safeTxHash,
             done: true,
           };
 
@@ -591,6 +720,41 @@ const Swap = ({
     </StyledButton>
   );
 
+  const ApproveAndSwapSafeButton = (
+    <StyledButton
+      size="large"
+      variant="contained"
+      disabled={!!shouldDisableApproveButton}
+      color="secondary"
+      fullWidth
+      onClick={() => handleSafeApproveAndSwap()}
+    >
+      {isLoadingRoute && <CenteredLoadingIndicator />}
+      {!isLoadingRoute && (
+        <Typography variant="body1">
+          {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
+            <FormattedMessage
+              description="wrap agg"
+              defaultMessage="Approve {from} and wrap"
+              values={{ from: from.symbol }}
+            />
+          )}
+          {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
+            <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
+          )}
+          {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
+            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
+            <FormattedMessage
+              description="approve and swap agg"
+              defaultMessage="Approve {from} and swap"
+              values={{ from: from?.symbol || '' }}
+            />
+          )}
+        </Typography>
+      )}
+    </StyledButton>
+  );
+
   const NoFundsButton = (
     <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
       <Typography variant="body1">
@@ -607,6 +771,8 @@ const Swap = ({
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
+  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to && loadedAsSafeApp) {
+    ButtonToShow = ApproveAndSwapSafeButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
     ButtonToShow = ProceedButton;
   } else {
