@@ -57,8 +57,6 @@ import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import useAccount from 'hooks/useAccount';
 import useErrorService from 'hooks/useErrorService';
 import { shouldTrackError } from 'utils/errors';
-import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
-import { TransactionResponse } from '@ethersproject/providers';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -110,7 +108,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const [hasSignSupport] = useSupportsSigning();
   const remainingLiquidity = (depositedRateUnderlying || oldRate).mul(remainingSwaps);
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
-  const loadedAsSafeApp = useLoadedAsSafeApp();
 
   let fromToUse = position.from;
   if (fromToUse.address === PROTOCOL_TOKEN_ADDRESS) {
@@ -353,91 +350,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     }
   };
 
-  const handleApproveAndModifyRateAndSwapsSafe = async () => {
-    if (!position) {
-      return;
-    }
-
-    try {
-      handleCancel();
-
-      setModalLoading({
-        content: (
-          <>
-            <Typography variant="body1">
-              <FormattedMessage
-                description="Modifying rate for position"
-                defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural}"
-                values={{
-                  from: position.from.symbol,
-                  to: position.to.symbol,
-                  rate,
-                  frequency: frequencyValue,
-                  frequencyType: intl.formatMessage(STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb),
-                  frequencyTypePlural: getFrequencyLabel(intl, position.swapInterval.toString(), frequencyValue),
-                }}
-              />
-            </Typography>
-          </>
-        ),
-      });
-      const result = await positionService.approveAndModifyRateAndSwapsSafe(
-        position,
-        rate,
-        frequencyValue,
-        useWrappedProtocolToken
-      );
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      result.hash = result.safeTxHash;
-
-      addTransaction(result as unknown as TransactionResponse, {
-        type: TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION,
-        typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
-        position,
-      });
-
-      setModalSuccess({
-        hash: result.safeTxHash,
-        content: (
-          <FormattedMessage
-            description="success modify rate for position"
-            defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{
-              from: position.from.symbol,
-              to: position.to.symbol,
-              rate,
-              frequency: frequencyValue,
-              frequencyType: intl.formatMessage(STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb),
-              frequencyTypePlural: getFrequencyLabel(intl, position.swapInterval.toString(), frequencyValue),
-            }}
-          />
-        ),
-      });
-    } catch (e) {
-      // User rejecting transaction
-      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      if (shouldTrackError(e)) {
-        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        void errorService.logError('Error changin rate and swaps', JSON.stringify(e), {
-          position: position.id,
-          chainId: position.chainId,
-          rate,
-          swaps: frequencyValue,
-        });
-      }
-      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({
-        content: (
-          <FormattedMessage description="modalErrorChangeRateAndSwaps" defaultMessage="Error changing rate and swaps" />
-        ),
-        error: { code: e.code, message: e.message, data: e.data },
-      });
-      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    }
-  };
-
   const handleApproveToken = async (isExact?: boolean) => {
     if (!fromToUse) return;
     const fromSymbol = fromToUse.symbol;
@@ -524,7 +436,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     options?: SplitButtonOptions;
   }[] = [];
 
-  if (needsToApprove && loadedAsSafeApp) {
+  if (needsToApprove) {
     actions = [
       {
         color: 'primary',
@@ -590,18 +502,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwaps,
-        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
-      },
-    ];
-  }
-
-  if (needsToApprove && loadedAsSafeApp) {
-    actions = [
-      {
-        color: 'secondary',
-        variant: 'contained',
-        label: <FormattedMessage description="modifyPosition" defaultMessage="Approve and modify position" />,
-        onClick: handleApproveAndModifyRateAndSwapsSafe,
         disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
       },
     ];
