@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { BigNumber, BigNumberish, BytesLike } from 'ethers';
-import { Contract, PopulatedTransaction } from '@ethersproject/contracts';
+import { Contract } from '@ethersproject/contracts';
 import { TransactionResponse } from '@ethersproject/providers';
 import { DCAHub } from '@mean-finance/dca-v2-core/dist';
 
@@ -159,18 +159,6 @@ export interface HubContract extends DCAHub {
       account: string,
       permissions: { operator: string; permissions: number[] }[]
     ) => Promise<BigNumber>;
-  };
-
-  populateTransaction: DCAHub['populateTransaction'] & {
-    deposit: (
-      from: string,
-      to: string,
-      totalAmmount: BigNumber,
-      swaps: BigNumber,
-      interval: BigNumber,
-      account: string,
-      permissions: { operator: string; permissions: number[] }[]
-    ) => Promise<PopulatedTransaction>;
   };
 }
 

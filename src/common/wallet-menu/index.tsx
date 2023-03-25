@@ -162,10 +162,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
 
             return {
               content: buildTransactionDetail(transaction),
-              link: buildEtherscanTransaction(
-                transaction.realSafeHash || transaction.hash,
-                transaction.chainId || currentNetwork.chainId
-              ),
+              link: buildEtherscanTransaction(transaction.hash, transaction.chainId || currentNetwork.chainId),
               isPending: transaction.isPending,
               id: transaction.hash,
               contextMenu: [

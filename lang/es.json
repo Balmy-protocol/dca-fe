@@ -2682,21 +2682,5 @@
   "z0M49Z": {
     "defaultMessage": "y",
     "description": "andWithSpaces"
-  },
-  "ha8PgS": {
-    "defaultMessage": "Aprobar y modificar posición",
-    "description": "modifyPosition"
-  },
-  "gdQB3o": {
-    "defaultMessage": "Aprobar {from} e intercambiar",
-    "description": "approve and swap agg"
-  },
-  "HKZyB6": {
-    "defaultMessage": "Aprobar {from} y crear posición",
-    "description": "approve and create position"
-  },
-  "FGbffU": {
-    "defaultMessage": "Aprobar {from} y wrappear",
-    "description": "wrap agg"
   }
 }

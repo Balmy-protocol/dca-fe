@@ -52,7 +52,6 @@ import {
   LATEST_VERSION,
   SIGN_VERSION,
   TOKEN_TYPE_YIELD_BEARING_SHARES,
-  POSITION_VERSION_4,
 } from 'config/constants';
 import { PermissionManagerContract, PermissionPermit } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
@@ -65,7 +64,6 @@ import WalletService from './walletService';
 import PairService from './pairService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
-import SafeService from './safeService';
 
 export default class PositionService {
   modal: SafeAppWeb3Modal;
@@ -86,8 +84,6 @@ export default class PositionService {
 
   meanApiService: MeanApiService;
 
-  safeService: SafeService;
-
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
   hasFetchedCurrentPositions: boolean;
@@ -99,7 +95,6 @@ export default class PositionService {
     pairService: PairService,
     contractService: ContractService,
     meanApiService: MeanApiService,
-    safeService: SafeService,
     DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
     providerService: ProviderService
   ) {
@@ -109,7 +104,6 @@ export default class PositionService {
     this.meanApiService = meanApiService;
     this.providerService = providerService;
     this.apolloClient = DCASubgraph;
-    this.safeService = safeService;
     this.currentPositions = {};
     this.pastPositions = {};
     this.hasFetchedCurrentPositions = false;
@@ -607,136 +601,6 @@ export default class PositionService {
     return JSON.parse(atob(tokenData.substring(29))) as NFTData;
   }
 
-  async buildDepositParams(
-    from: Token,
-    to: Token,
-    fromValue: string,
-    frequencyType: BigNumber,
-    frequencyValue: string,
-    yieldFrom?: string,
-    yieldTo?: string
-  ) {
-    const token = from;
-
-    const weiValue = parseUnits(fromValue, token.decimals);
-
-    const amountOfSwaps = BigNumber.from(frequencyValue);
-    const swapInterval = frequencyType;
-    const companionAddress = await this.contractService.getHUBCompanionAddress();
-    let permissions: number[] = [];
-
-    if (amountOfSwaps.gt(BigNumber.from(MAX_UINT_32))) {
-      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
-    }
-
-    if (yieldFrom) {
-      permissions = [...permissions, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE];
-    }
-
-    if (yieldTo) {
-      permissions = [...permissions, PERMISSIONS.WITHDRAW];
-    }
-
-    if (yieldFrom || yieldTo) {
-      permissions = [...permissions, PERMISSIONS.TERMINATE];
-    }
-
-    return {
-      takeFrom: from.address,
-      from: from.address,
-      to: to.address,
-      totalAmmount: weiValue,
-      swaps: amountOfSwaps,
-      interval: swapInterval,
-      account: this.walletService.getAccount(),
-      permissions: [{ operator: companionAddress, permissions }],
-      yieldFrom,
-      yieldTo,
-    };
-  }
-
-  async buildDepositTx(
-    fromToken: Token,
-    toToken: Token,
-    fromValue: string,
-    frequencyType: BigNumber,
-    frequencyValue: string,
-    possibleYieldFrom?: string,
-    possibleYieldTo?: string
-  ) {
-    const { takeFrom, from, to, totalAmmount, swaps, interval, account, permissions, yieldFrom, yieldTo } =
-      await this.buildDepositParams(
-        fromToken,
-        toToken,
-        fromValue,
-        frequencyType,
-        frequencyValue,
-        possibleYieldFrom,
-        possibleYieldTo
-      );
-
-    if (possibleYieldFrom || possibleYieldTo || fromToken.address === PROTOCOL_TOKEN_ADDRESS) {
-      return this.meanApiService.getDepositTx(
-        takeFrom,
-        from,
-        to,
-        totalAmmount,
-        swaps,
-        interval,
-        account,
-        permissions,
-        yieldFrom,
-        yieldTo
-      );
-    }
-
-    const hubInstance = await this.contractService.getHubInstance();
-
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-
-    const toToUse = to.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken.address : to;
-
-    return hubInstance.populateTransaction.deposit(
-      from,
-      yieldTo || toToUse,
-      totalAmmount,
-      swaps,
-      interval,
-      account,
-      permissions
-    );
-  }
-
-  async approveAndDepositSafe(
-    from: Token,
-    to: Token,
-    fromValue: string,
-    frequencyType: BigNumber,
-    frequencyValue: string,
-    yieldFrom?: string,
-    yieldTo?: string
-  ) {
-    const { totalAmmount } = await this.buildDepositParams(
-      from,
-      to,
-      fromValue,
-      frequencyType,
-      frequencyValue,
-      yieldFrom,
-      yieldTo
-    );
-    const approveTx = await this.walletService.buildApproveTx(
-      from,
-      !!yieldFrom || !!yieldTo || from.address === PROTOCOL_TOKEN_ADDRESS,
-      POSITION_VERSION_4,
-      totalAmmount
-    );
-    const depositTx = await this.buildDepositTx(from, to, fromValue, frequencyType, frequencyValue, yieldFrom, yieldTo);
-
-    return this.safeService.submitMultipleTxs([approveTx, depositTx]);
-  }
-
   async deposit(
     from: Token,
     to: Token,
@@ -746,9 +610,76 @@ export default class PositionService {
     yieldFrom?: string,
     yieldTo?: string
   ): Promise<TransactionResponse> {
-    const tx = await this.buildDepositTx(from, to, fromValue, frequencyType, frequencyValue, yieldFrom, yieldTo);
+    const token = from;
 
-    return this.providerService.sendTransactionWithGasLimit(tx);
+    const weiValue = parseUnits(fromValue, token.decimals);
+
+    const amountOfSwaps = BigNumber.from(frequencyValue);
+    const swapInterval = frequencyType;
+    const currentNetwork = await this.providerService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const companionAddress = await this.contractService.getHUBCompanionAddress();
+
+    if (amountOfSwaps.gt(BigNumber.from(MAX_UINT_32))) {
+      throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
+    }
+
+    if (yieldFrom) {
+      const permissions = yieldTo
+        ? [
+            {
+              operator: companionAddress,
+              permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE],
+            },
+          ]
+        : [
+            {
+              operator: companionAddress,
+              permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE],
+            },
+          ];
+      return this.meanApiService.depositUsingYield(
+        from.address,
+        to.address,
+        weiValue,
+        amountOfSwaps,
+        swapInterval,
+        yieldFrom,
+        yieldTo,
+        this.walletService.getAccount(),
+        permissions
+      );
+    }
+
+    if (from.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase()) {
+      return this.meanApiService.depositUsingProtocolToken(
+        from.address,
+        yieldTo || to.address,
+        weiValue,
+        amountOfSwaps,
+        swapInterval,
+        this.walletService.getAccount(),
+        []
+      );
+    }
+
+    const hubInstance = await this.contractService.getHubInstance();
+
+    const toToUse = to.address.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken : to;
+
+    const permissions = yieldTo
+      ? [{ operator: companionAddress, permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE] }]
+      : [];
+
+    return hubInstance.deposit(
+      from.address,
+      yieldTo || toToUse.address,
+      weiValue,
+      amountOfSwaps,
+      swapInterval,
+      this.walletService.getAccount(),
+      permissions
+    );
   }
 
   async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
@@ -887,12 +818,13 @@ export default class PositionService {
     );
   }
 
-  async buildModifyRateAndSwapsParams(
+  async modifyRateAndSwaps(
     position: Position,
     newRateUnderlying: string,
     newSwaps: string,
     useWrappedProtocolToken: boolean
-  ) {
+  ): Promise<TransactionResponse> {
+    const hubInstance = await this.contractService.getHubInstance(position.version);
     const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
@@ -918,156 +850,97 @@ export default class PositionService {
     );
     const remainingLiquidity = (position.depositedRateUnderlying || position.rate).mul(position.remainingSwaps);
 
-    const isIncrease = newAmount.gte(remainingLiquidity);
+    const hasYield = position.from.underlyingTokens.length;
 
-    return {
-      id: position.positionId,
-      amount: isIncrease ? newAmount.sub(remainingLiquidity) : remainingLiquidity.sub(newAmount),
-      swaps: BigNumber.from(newSwaps),
-      version: position.version,
-      account: this.walletService.getAccount(),
-      isIncrease,
-      companionAddress,
-      tokenFrom:
+    if ((position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) && !hasYield) {
+      if (newAmount.gte(remainingLiquidity)) {
+        return hubInstance.increasePosition(
+          position.positionId,
+          newAmount.sub(remainingLiquidity),
+          BigNumber.from(newSwaps)
+        );
+      }
+
+      return hubInstance.reducePosition(
+        position.positionId,
+        remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.walletService.getAccount()
+      );
+    }
+
+    if (newAmount.gte(remainingLiquidity)) {
+      const companionHasIncrease = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
+
+      if (companionHasIncrease) {
+        return this.meanApiService.increasePositionUsingOtherToken(
+          position.positionId,
+          newAmount.sub(remainingLiquidity),
+          BigNumber.from(newSwaps),
+          position.version,
+          position.from.address === PROTOCOL_TOKEN_ADDRESS && useWrappedProtocolToken
+            ? wrappedProtocolToken.address
+            : position.from.address
+        );
+      }
+
+      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+        position,
+        companionAddress,
+        PERMISSIONS.INCREASE
+      );
+
+      return this.meanApiService.increasePositionUsingOtherToken(
+        position.positionId,
+        newAmount.sub(remainingLiquidity),
+        BigNumber.from(newSwaps),
+        position.version,
         position.from.address === PROTOCOL_TOKEN_ADDRESS && useWrappedProtocolToken
           ? wrappedProtocolToken.address
           : position.from.address,
-    };
-  }
+        {
+          permissions,
+          deadline: deadline.toString(),
+          v,
+          r: hexlify(r),
+          s: hexlify(s),
+          tokenId: position.positionId,
+        }
+      );
+    }
 
-  async getModifyRateAndSwapsSignature(
-    position: Position,
-    newRateUnderlying: string,
-    newSwaps: string,
-    useWrappedProtocolToken: boolean
-  ) {
-    const { companionAddress, isIncrease } = await this.buildModifyRateAndSwapsParams(
-      position,
-      newRateUnderlying,
-      newSwaps,
-      useWrappedProtocolToken
-    );
+    const companionHasReduce = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
+
+    if (companionHasReduce) {
+      return this.meanApiService.reducePositionUsingOtherToken(
+        position.positionId,
+        remainingLiquidity.sub(newAmount),
+        BigNumber.from(newSwaps),
+        this.walletService.getAccount(),
+        position.version,
+        position.from.address === PROTOCOL_TOKEN_ADDRESS && useWrappedProtocolToken
+          ? wrappedProtocolToken.address
+          : position.from.address
+      );
+    }
 
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
       companionAddress,
-      isIncrease ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
+      PERMISSIONS.REDUCE
     );
 
-    return {
-      permissions,
-      deadline: deadline.toString(),
-      v,
-      r: hexlify(r),
-      s: hexlify(s),
-      tokenId: position.positionId,
-    };
-  }
-
-  async buildModifyRateAndSwapsTx(
-    position: Position,
-    newRateUnderlying: string,
-    newSwaps: string,
-    useWrappedProtocolToken: boolean,
-    getSignature = true
-  ) {
-    const hubInstance = await this.contractService.getHubInstance(position.version);
-    const { id, amount, swaps, version, account, isIncrease, tokenFrom } = await this.buildModifyRateAndSwapsParams(
-      position,
-      newRateUnderlying,
-      newSwaps,
-      useWrappedProtocolToken
+    return this.meanApiService.reducePositionUsingOtherToken(
+      position.positionId,
+      remainingLiquidity.sub(newAmount),
+      BigNumber.from(newSwaps),
+      this.walletService.getAccount(),
+      position.version,
+      position.from.address === PROTOCOL_TOKEN_ADDRESS && useWrappedProtocolToken
+        ? wrappedProtocolToken.address
+        : position.from.address,
+      { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
     );
-    const hasYield = position.from.underlyingTokens.length;
-
-    if ((position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) && !hasYield) {
-      if (isIncrease) {
-        return hubInstance.populateTransaction.increasePosition(id, amount, swaps);
-      }
-
-      return hubInstance.populateTransaction.reducePosition(id, amount, swaps, account);
-    }
-
-    let companionHasPermission = true;
-
-    if (isIncrease) {
-      companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
-    } else {
-      companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
-    }
-
-    let permissionSignature;
-
-    if (!companionHasPermission && getSignature) {
-      permissionSignature = await this.getModifyRateAndSwapsSignature(
-        position,
-        newRateUnderlying,
-        newSwaps,
-        useWrappedProtocolToken
-      );
-    }
-
-    if (isIncrease) {
-      return this.meanApiService.getIncreasePositionUsingOtherTokenTx(
-        id,
-        amount,
-        swaps,
-        version,
-        tokenFrom,
-        permissionSignature
-      );
-    }
-
-    return this.meanApiService.getReducePositionUsingOtherTokenTx(
-      id,
-      amount,
-      swaps,
-      account,
-      version,
-      tokenFrom,
-      permissionSignature
-    );
-  }
-
-  async approveAndModifyRateAndSwapsSafe(
-    position: Position,
-    newRateUnderlying: string,
-    newSwaps: string,
-    useWrappedProtocolToken: boolean
-  ) {
-    const { amount, tokenFrom } = await this.buildModifyRateAndSwapsParams(
-      position,
-      newRateUnderlying,
-      newSwaps,
-      useWrappedProtocolToken
-    );
-    const hasYield = position.from.underlyingTokens.length;
-
-    const approveTx = await this.walletService.buildApproveTx(
-      emptyTokenWithAddress(tokenFrom),
-      !!hasYield || (position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken),
-      POSITION_VERSION_4,
-      amount
-    );
-    const modifyTx = await this.buildModifyRateAndSwapsTx(
-      position,
-      newRateUnderlying,
-      newSwaps,
-      useWrappedProtocolToken
-    );
-
-    return this.safeService.submitMultipleTxs([approveTx, modifyTx]);
-  }
-
-  async modifyRateAndSwaps(
-    position: Position,
-    newRateUnderlying: string,
-    newSwaps: string,
-    useWrappedProtocolToken: boolean
-  ): Promise<TransactionResponse> {
-    const tx = await this.buildModifyRateAndSwapsTx(position, newRateUnderlying, newSwaps, useWrappedProtocolToken);
-
-    return this.providerService.sendTransactionWithGasLimit(tx);
   }
 
   async setPendingTransaction(transaction: TransactionDetails) {

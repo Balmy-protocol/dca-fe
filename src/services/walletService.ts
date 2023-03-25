@@ -4,7 +4,7 @@ import React from 'react';
 import { Interface } from '@ethersproject/abi';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
-import { TransactionResponse, Network, TransactionRequest } from '@ethersproject/providers';
+import { TransactionResponse, Network } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
 import { GetUsedTokensData, Token } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
@@ -291,29 +291,6 @@ export default class WalletService {
       token,
       allowance: formatUnits(allowance, token.decimals),
     };
-  }
-
-  async buildApproveSpecificTokenTx(
-    token: Token,
-    addressToApprove: string,
-    amount?: BigNumber
-  ): Promise<TransactionRequest> {
-    const erc20 = await this.contractService.getTokenInstance(token.address);
-
-    return erc20.populateTransaction.approve(addressToApprove, amount || MaxUint256);
-  }
-
-  async buildApproveTx(
-    token: Token,
-    shouldUseCompanion = false,
-    positionVersion: PositionVersions = LATEST_VERSION,
-    amount?: BigNumber
-  ): Promise<TransactionRequest> {
-    const addressToApprove = shouldUseCompanion
-      ? await this.contractService.getHUBCompanionAddress(positionVersion)
-      : await this.contractService.getHUBAddress(positionVersion);
-
-    return this.buildApproveSpecificTokenTx(token, addressToApprove, amount);
   }
 
   async approveToken(
