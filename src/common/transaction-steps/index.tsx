@@ -37,7 +37,7 @@ import Address from 'common/address';
 import { emptyTokenWithAddress } from 'utils/currency';
 import CircularProgress from '@mui/material/CircularProgress';
 import { BigNumber } from 'ethers';
-import AllowanceSplitButton from 'common/allowance-split-button';
+import AllowanceSplitButton, { AllowanceType } from 'common/allowance-split-button';
 import TransactionSimulation from 'common/transaction-simulation';
 
 const StyledIconButton = styled(IconButton)`
@@ -238,6 +238,7 @@ const buildApproveTokenItem = ({
                 target={extraData.swapper}
                 tokenYield={null}
                 color="secondary"
+                defaultApproval={AllowanceType.specific}
               />
             </StyledTransactionStepButtonContainer>
           )}

@@ -11,6 +11,11 @@ import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from 'utils/currency';
 import { useHasPendingApproval } from 'state/transactions/hooks';
 
+export enum AllowanceType {
+  specific = 'specific',
+  max = 'max',
+}
+
 interface AllowanceSplitButtonProps {
   disabled?: boolean;
   onMaxApprove: () => void;
@@ -20,6 +25,7 @@ interface AllowanceSplitButtonProps {
   tokenYield: YieldOption | null | undefined;
   target?: string;
   color?: CustomButtonProps['color'];
+  defaultApproval?: AllowanceType;
 }
 
 const StyledTooltip = styled(Tooltip)`
@@ -50,14 +56,53 @@ export const AllowanceTooltip = (props: { symbol: string; target?: string }) => 
 };
 
 const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
-  const { disabled, onMaxApprove, onApproveExact, token, tokenYield, amount, color: passedColor, target } = props;
+  const {
+    disabled,
+    onMaxApprove,
+    onApproveExact,
+    token,
+    tokenYield,
+    amount,
+    color: passedColor,
+    target,
+    defaultApproval,
+  } = props;
   const color = passedColor || 'primary';
   const web3Service = useWeb3Service();
   const hasPendingApproval = useHasPendingApproval(token, web3Service.getAccount(), !!tokenYield?.tokenAddress);
   const symbol = token?.symbol || '';
+
+  const defaultAction =
+    defaultApproval === AllowanceType.specific && amount ? () => onApproveExact(amount) : () => onMaxApprove();
+  const secondaryAction =
+    defaultApproval === AllowanceType.specific && amount
+      ? () => onMaxApprove()
+      : () => amount && onApproveExact(amount);
+
+  const infiniteText = (
+    <FormattedMessage
+      description="Allow us to use your coin (home max)"
+      defaultMessage="Approve Max {symbol}"
+      values={{
+        symbol,
+      }}
+    />
+  );
+
+  const specificText = (
+    <FormattedMessage
+      description="Allow us to use your coin (home exact)"
+      defaultMessage="Approve {amount} {symbol}"
+      values={{ symbol, amount: token && amount ? formatCurrencyAmount(amount, token, 4) : '' }}
+    />
+  );
+
+  const defaultText = defaultApproval === AllowanceType.specific ? specificText : infiniteText;
+  const secondaryText = defaultApproval === AllowanceType.specific ? infiniteText : specificText;
+
   return (
     <SplitButton
-      onClick={() => onMaxApprove()}
+      onClick={defaultAction}
       text={
         <>
           {hasPendingApproval ? (
@@ -69,13 +114,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
               }}
             />
           ) : (
-            <FormattedMessage
-              description="Allow us to use your coin (home max)"
-              defaultMessage="Approve Max {symbol}"
-              values={{
-                symbol,
-              }}
-            />
+            defaultText
           )}
           {!hasPendingApproval && <AllowanceTooltip target={target} symbol={symbol} />}
         </>
@@ -85,15 +124,9 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
       color={color}
       options={[
         {
-          text: (
-            <FormattedMessage
-              description="Allow us to use your coin (home exact)"
-              defaultMessage="Approve {amount} {symbol}"
-              values={{ symbol, amount: token && amount ? formatCurrencyAmount(amount, token, 4) : '' }}
-            />
-          ),
+          text: secondaryText,
           disabled: disabled || !amount,
-          onClick: () => amount && onApproveExact(amount),
+          onClick: secondaryAction,
         },
       ]}
       size="large"
