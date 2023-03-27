@@ -43,7 +43,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     const chainIdToUse = Number(chainId);
 
     let networkToSet = find(sdkMappedNetworks, { chainId: chainIdToUse });
-    if (!networkToSet) {
+    if (!networkToSet && chainId) {
       networkToSet = find(sdkMappedNetworks, { name: chainId.toLowerCase() });
     }
 
