@@ -680,7 +680,12 @@ export const SIGN_VERSION: Record<PositionVersions, string> = {
 export const DEFILLAMA_PROTOCOL_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export const BLOWFISH_ENABLED_CHAINS = [NETWORKS.mainnet.chainId, NETWORKS.polygon.chainId];
+export const BLOWFISH_ENABLED_CHAINS = [
+  NETWORKS.mainnet.chainId,
+  NETWORKS.polygon.chainId,
+  NETWORKS.arbitrum.chainId,
+  NETWORKS.bsc.chainId,
+];
 
 export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.mainnet.chainId]: 'https://api.0x.org',
