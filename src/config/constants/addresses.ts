@@ -270,13 +270,13 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   },
 };
 
-const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, currencySymbol, wToken }: Chain) => ({
+const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken }: Chain) => ({
   chainId,
   name,
   mainCurrency: `${chainId}-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`,
   nativeCurrency: {
-    name: currencySymbol,
-    symbol: currencySymbol,
+    name: nativeCurrency.name,
+    symbol: nativeCurrency.symbol,
     decimals: 18,
   },
   wToken,
