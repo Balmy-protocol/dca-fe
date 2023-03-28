@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { buildSDK, SOURCES_METADATA } from '@mean-finance/sdk';
+import { buildSDK, SourceId, SOURCES_METADATA } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
 import { BaseProvider } from '@ethersproject/providers';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from 'config/constants/aggregator';
@@ -28,7 +28,7 @@ export default class SdkService {
     this.sdk = buildSDK({
       provider: {
         source: {
-          type: 'only-first-provider-that-supports-chain',
+          type: 'prioritized',
           sources: [{ type: 'updatable-ethers', provider: () => this.provider }, { type: 'public-rpcs' }],
         },
       },
@@ -37,17 +37,17 @@ export default class SdkService {
           type: 'overridable-source-list',
           lists: {
             default: {
-              type: 'default',
+              type: 'local',
             },
             overrides: [
               {
                 list: {
                   type: 'api',
-                  baseUri: ({ chainId }: { chainId: number }) =>
-                    `https://api.mean.finance/v1/swap/networks/${chainId}/quotes`,
+                  baseUri: ({ chainId, sourceId }: { chainId: number; sourceId: SourceId }) =>
+                    `https://api.mean.finance/v1/swap/networks/${chainId}/quotes/${sourceId}`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['uniswap', 'odos', 'rango', '0x', 'firebird'],
+                sourceIds: ['uniswap', 'odos', 'rango', '0x', 'firebird', 'changelly'],
               },
             ],
           },
@@ -186,7 +186,6 @@ export default class SdkService {
         }
       );
     }
-
     return responses;
   }
 
@@ -206,9 +205,13 @@ export default class SdkService {
       return this.walletService.getCustomToken(address);
     }
 
-    const tokenResponse = await this.sdk.tokenService.getTokens({ addresses: [{ addresses: [address], chainId }] });
+    const tokenResponse = await this.sdk.metadataService.getMetadataForChain({
+      chainId,
+      addresses: [address],
+      config: { fields: { requirements: { decimals: 'required', symbol: 'required', name: 'required' } } },
+    });
 
-    const token = tokenResponse[chainId][address];
+    const token = tokenResponse[address];
 
     if (!token) {
       return undefined;
