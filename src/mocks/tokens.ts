@@ -422,3 +422,7 @@ export const KOVAN_TOKENS = {
   [LINK_ADDRESSES[NETWORKS.kovan.chainId]]: LINK(NETWORKS.kovan.chainId),
   [SNX_ADDRESSES[NETWORKS.kovan.chainId]]: SNX(NETWORKS.kovan.chainId),
 };
+
+export const TOKEN_MAP_SYMBOL: Record<string, string> = {
+  '0x3082cc23568ea640225c2467653db90e9250aaa0': 'RDNT V2',
+};

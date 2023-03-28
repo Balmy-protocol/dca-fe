@@ -3,7 +3,7 @@ import { TokenList } from 'types';
 import reduce from 'lodash/reduce';
 import keyBy from 'lodash/keyBy';
 import { ALLOWED_YIELDS, TOKEN_BLACKLIST } from 'config/constants';
-import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS, TOKEN_MAP_SYMBOL } from 'mocks/tokens';
 import { useSavedAggregatorTokenLists, useTokensLists } from 'state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 
@@ -32,13 +32,15 @@ function useTokenList(isAggregator = false, filter = true) {
             ? {
                 ...acc,
                 ...keyBy(
-                  tokensList.tokens.filter(
-                    (token) =>
-                      token.chainId === currentNetwork.chainId &&
-                      !Object.keys(acc).includes(token.address) &&
-                      (isAggregator || !reducedYieldTokens.includes(token.address)) &&
-                      (!filter || !TOKEN_BLACKLIST.includes(token.address))
-                  ),
+                  tokensList.tokens
+                    .filter(
+                      (token) =>
+                        token.chainId === currentNetwork.chainId &&
+                        !Object.keys(acc).includes(token.address) &&
+                        (isAggregator || !reducedYieldTokens.includes(token.address)) &&
+                        (!filter || !TOKEN_BLACKLIST.includes(token.address))
+                    )
+                    .map((token) => ({ ...token, name: TOKEN_MAP_SYMBOL[token.address] || token.name })),
                   'address'
                 ),
               }
