@@ -6,7 +6,6 @@ import { TransformerRegistry__factory } from '@mean-finance/transformers/dist';
 import { ethers, Signer } from 'ethers';
 import { Network, AlchemyProvider } from '@ethersproject/providers';
 import find from 'lodash/find';
-// import allExportedFromTypechained from '@mean-finance/typechained/lib';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';

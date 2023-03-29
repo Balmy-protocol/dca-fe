@@ -144,7 +144,7 @@ export default class ProviderService {
     try {
       if (provider) {
         // ff's fuck metamask
-        if (providerInfo.name === 'MetaMask') {
+        if (providerInfo.name === 'MetaMask' && window.ethereum && window.ethereum.on) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
           window.ethereum.on('accountsChanged', () => {
             window.location.reload();
