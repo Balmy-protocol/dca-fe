@@ -93,7 +93,7 @@ export default class SdkService {
       ...(isBuyOrder ? { buyAmount: quote.buyAmount.amount.toString() } : {}),
       ...(recipient ? { recipient } : {}),
       ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
-      ...(gasSpeed ? { gasSpeed } : {}),
+      ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
       ...(skipValidation ? { skipValidation } : {}),
       ...(isBuyOrder ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
       quoteTimeout: '5s',
