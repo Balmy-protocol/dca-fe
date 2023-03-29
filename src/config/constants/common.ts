@@ -104,3 +104,5 @@ export const DISABLED_YIELD_WITHDRAWS = [
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
 ];
+
+export const WALLET_CONNECT_PROJECT_ID = '052f72d940052c096c832ee451b63a14';
