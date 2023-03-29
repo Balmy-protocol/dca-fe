@@ -3,6 +3,7 @@ import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
 import { Web3Service } from 'types';
 import styled from 'styled-components';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -22,9 +23,14 @@ interface ConnectWalletButtonProps {
 }
 
 const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => (
-  <StyledButton variant="outlined" color="default" onClick={() => web3Service.connect()}>
-    <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
-  </StyledButton>
+  <ConnectButton.Custom>
+    {({ openConnectModal }) => (
+      <StyledButton variant="outlined" color="default" onClick={openConnectModal}>
+        <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
+      </StyledButton>
+    )}
+  </ConnectButton.Custom>
+  //
 );
 
 export default ConnectWalletButton;

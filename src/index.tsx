@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { Client, WagmiConfig } from 'wagmi';
 import EnMessages from 'config/lang/en_US.json';
 import EsMessages from 'config/lang/es.json';
 import WalletContext from 'common/wallet-context';
@@ -36,6 +38,10 @@ function loadLocaleData(locale: SupportedLanguages) {
 
 const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
   const [account, setAccount] = React.useState('');
+  const [{ wagmiClient, chains }, setConfig] = React.useState<{
+    wagmiClient: Nullable<Client>;
+    chains: Nullable<any[]>;
+  }>({ wagmiClient: null, chains: null });
   const [web3Service] = React.useState(new Web3Service(DCASubgraphs, UNISubgraphs, setAccount));
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
   const [setUpModalError, setSetUpModalError] = React.useState<Error | null>(null);
@@ -44,7 +50,8 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
   React.useEffect(() => {
     async function setWeb3ModalEffect() {
       try {
-        await web3Service.setUpModal();
+        const setUpResponse = await web3Service.setUpModal();
+        setConfig(setUpResponse);
       } catch (e) {
         setSetUpModalError(e);
       }
@@ -79,7 +86,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
         <IntlProvider locale={selectedLocale} defaultLocale="en" messages={loadLocaleData(selectedLocale)}>
           <Provider store={store}>
-            {!isLoading && <MainApp isLoading={isLoading} initializationError={setUpModalError} />}
+            {!isLoading && wagmiClient && chains && (
+              <WagmiConfig client={wagmiClient}>
+                <RainbowKitProvider chains={chains}>
+                  <MainApp isLoading={isLoading} initializationError={setUpModalError} />
+                </RainbowKitProvider>
+              </WagmiConfig>
+            )}
           </Provider>
         </IntlProvider>
       </WalletContext.Provider>
