@@ -224,8 +224,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;
 
-  const fromPriceToShow = fromFetchedPrice || fromPrice;
-  const toPriceToShow = toFetchedPrice || toPrice;
+  const fromPriceToShow = fromPrice || fromFetchedPrice;
+  const toPriceToShow = toPrice || toFetchedPrice;
 
   if (isLoadingRoute) {
     if (isBuyOrder) {
