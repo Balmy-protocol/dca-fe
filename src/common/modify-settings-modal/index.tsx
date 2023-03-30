@@ -524,7 +524,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     options?: SplitButtonOptions;
   }[] = [];
 
-  if (needsToApprove && loadedAsSafeApp) {
+  if (needsToApprove && !loadedAsSafeApp) {
     actions = [
       {
         color: 'primary',
