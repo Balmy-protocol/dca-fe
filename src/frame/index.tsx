@@ -9,6 +9,7 @@ import NavBar from 'common/navbar';
 import AppFooter from 'common/footer';
 import Home from 'home';
 import Aggregator from 'aggregator';
+import JbrlCompetition from 'jbrl-competition';
 import FAQ from 'faq';
 import TransactionUpdater from 'state/transactions/transactionUpdater';
 import BlockNumberUpdater from 'state/block-number/blockNumberUpdater';
@@ -2391,6 +2392,11 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                         <Route path="/leaderboard">
                           {/* <RollbarContext context="/leaderboard"> */}
                           <Leaderboard />
+                          {/* </RollbarContext> */}
+                        </Route>
+                        <Route path="/jbrl-competition">
+                          {/* <RollbarContext context="/leaderboard"> */}
+                          <JbrlCompetition />
                           {/* </RollbarContext> */}
                         </Route>
                         <Route path="/positions">

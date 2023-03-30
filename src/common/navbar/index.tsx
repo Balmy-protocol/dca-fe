@@ -153,6 +153,10 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       setOpenFirstSubtab(false);
       dispatch(changeMainTab(2));
       pushToHistory('/swap');
+    } else if (location.pathname === '/jbrl-competition') {
+      setOpenFirstSubtab(false);
+      dispatch(changeMainTab(3));
+      pushToHistory('/jbrl-competition');
     } else if (location.pathname === '/' || location.pathname === '/create') {
       dispatch(changeMainTab(0));
       dispatch(changeSubTab(0));
@@ -215,6 +219,11 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                 label={<FormattedMessage description="swap" defaultMessage="Swap" />}
                 value={2}
               />
+              <StyledTab
+                onClick={() => handleTabChange({ index: 3, url: 'jbrl-competition' })}
+                label={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
+                value={3}
+              />
             </StyledTabs>
             <IconButton onClick={() => setOpenDrawer(true)}>
               <MenuIcon />
@@ -259,6 +268,14 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                 <CurrencyExchangeIcon />
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="swap" defaultMessage="Swap" />} />
+            </ListItemButton>
+            <ListItemButton onClick={() => handleTabChange({ index: 3, url: 'jbrl-competition' })}>
+              <ListItemIcon>
+                <CurrencyExchangeIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
+              />
             </ListItemButton>
           </List>
           <Divider />
@@ -323,6 +340,11 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                   label={<FormattedMessage description="swap" defaultMessage="Swap" />}
                   value={2}
                 />
+                <StyledTab
+                  onClick={() => handleTabChange({ index: 3, url: 'jbrl-competition' })}
+                  label={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
+                  value={3}
+                />
               </StyledTabs>
             </StyledNavbarMainContent>
           )}
@@ -355,6 +377,10 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                     <StyledTab
                       onClick={() => handleSubTabChange({ index: 1, mainIndex: 0, url: 'positions' })}
                       label={<FormattedMessage description="positions" defaultMessage="Positions" />}
+                    />
+                    <StyledTab
+                      onClick={() => handleSubTabChange({ index: 2, mainIndex: 0, url: 'jbrl-competition' })}
+                      label={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
                     />
                   </StyledTabs>
                 </StyledSubContent>
