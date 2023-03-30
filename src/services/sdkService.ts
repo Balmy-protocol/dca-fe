@@ -75,28 +75,31 @@ export default class SdkService {
 
     const isBuyOrder = quote.type === 'buy';
 
-    return this.sdk.quoteService.getQuote(quote.swapper.id, {
-      sellToken: quote.sellToken.address,
-      buyToken: quote.buyToken.address,
-      chainId: network,
-      order: isBuyOrder
-        ? {
-            type: 'buy',
-            buyAmount: quote.buyAmount.amount.toString(),
-          }
-        : {
-            type: 'sell',
-            sellAmount: quote.sellAmount.amount.toString() || '0',
-          },
-      takerAddress,
-      ...(!isBuyOrder ? { sellAmount: quote.sellAmount.amount.toString() } : {}),
-      ...(isBuyOrder ? { buyAmount: quote.buyAmount.amount.toString() } : {}),
-      ...(recipient ? { recipient } : {}),
-      ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
-      ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
-      ...(skipValidation ? { skipValidation } : {}),
-      ...(isBuyOrder ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
-      quoteTimeout: '5s',
+    return this.sdk.quoteService.getQuote({
+      sourceId: quote.swapper.id,
+      request: {
+        sellToken: quote.sellToken.address,
+        buyToken: quote.buyToken.address,
+        chainId: network,
+        order: isBuyOrder
+          ? {
+              type: 'buy',
+              buyAmount: quote.buyAmount.amount.toString(),
+            }
+          : {
+              type: 'sell',
+              sellAmount: quote.sellAmount.amount.toString() || '0',
+            },
+        takerAddress,
+        ...(!isBuyOrder ? { sellAmount: quote.sellAmount.amount.toString() } : {}),
+        ...(isBuyOrder ? { buyAmount: quote.buyAmount.amount.toString() } : {}),
+        ...(recipient ? { recipient } : {}),
+        ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
+        ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
+        ...(skipValidation ? { skipValidation } : {}),
+        ...(isBuyOrder ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
+        quoteTimeout: '5s',
+      },
     });
   }
 
@@ -121,8 +124,8 @@ export default class SdkService {
     let responses;
 
     if (!takerAddress) {
-      responses = await this.sdk.quoteService.estimateAllQuotes(
-        {
+      responses = await this.sdk.quoteService.estimateAllQuotes({
+        request: {
           sellToken: from,
           buyToken: to,
           chainId: network,
@@ -145,16 +148,16 @@ export default class SdkService {
           ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
           quoteTimeout: '5s',
         },
-        {
+        config: {
           sort: {
             by: sortQuotesBy,
           },
           ignoredFailed: false,
-        }
-      );
+        },
+      });
     } else {
-      responses = await this.sdk.quoteService.getAllQuotes(
-        {
+      responses = await this.sdk.quoteService.getAllQuotes({
+        request: {
           sellToken: from,
           buyToken: to,
           chainId: network,
@@ -178,13 +181,13 @@ export default class SdkService {
           ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
           quoteTimeout: '5s',
         },
-        {
+        config: {
           sort: {
             by: sortQuotesBy,
           },
           ignoredFailed: false,
-        }
-      );
+        },
+      });
     }
     return responses;
   }
