@@ -7,6 +7,7 @@ import {
   initializeModifyRateSettings,
   setRate,
   setModeType,
+  resetModifySettingsModal,
 } from './actions';
 
 export interface ModifyRateSettingsState {
@@ -30,7 +31,7 @@ export default createReducer(initialState, (builder) =>
     .addCase(initializeModifyRateSettings, (state, { payload: { fromValue, frequencyValue, rate, modeType } }) => {
       state.fromValue = fromValue;
       state.rate = rate;
-      state.modeType = modeType
+      state.modeType = modeType;
       state.frequencyValue = frequencyValue;
       state.useWrappedProtocolToken = false;
     })
@@ -49,4 +50,7 @@ export default createReducer(initialState, (builder) =>
     .addCase(setUseWrappedProtocolToken, (state, { payload }) => {
       state.useWrappedProtocolToken = payload;
     })
+    .addCase(resetModifySettingsModal, () => ({
+      ...initialState,
+    }))
 );

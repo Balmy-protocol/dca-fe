@@ -13,9 +13,9 @@ function useSupportsSigning(): [boolean | undefined, boolean, string?] {
   const account = usePrevious(currentAccount);
 
   React.useEffect(() => {
-    async function callPromise() {
+    function callPromise() {
       try {
-        const promiseResult = await web3Service.getSignSupport();
+        const promiseResult = web3Service.getSignSupport();
         setResult(promiseResult);
         setError(undefined);
       } catch (e) {

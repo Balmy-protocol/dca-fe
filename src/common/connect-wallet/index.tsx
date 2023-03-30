@@ -1,7 +1,6 @@
 import React from 'react';
 import Button from 'common/button';
 import { FormattedMessage } from 'react-intl';
-import { Web3Service } from 'types';
 import styled from 'styled-components';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
@@ -18,11 +17,7 @@ const StyledButton = styled(Button)`
   text-transform: none;
 `;
 
-interface ConnectWalletButtonProps {
-  web3Service: Web3Service;
-}
-
-const ConnectWalletButton = ({ web3Service }: ConnectWalletButtonProps) => (
+const ConnectWalletButton = () => (
   <ConnectButton.Custom>
     {({ openConnectModal }) => (
       <StyledButton variant="outlined" color="default" onClick={openConnectModal}>

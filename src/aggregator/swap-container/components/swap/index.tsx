@@ -45,6 +45,7 @@ import useReplaceHistory from 'hooks/useReplaceHistory';
 import { setNetwork } from 'state/config/actions';
 import { addCustomToken } from 'state/token-lists/actions';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { TransactionResponse } from '@ethersproject/providers';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -111,6 +112,7 @@ const Swap = ({
   const dispatch = useAppDispatch();
   const containerRef = React.useRef(null);
   const meanApiService = useMeanApiService();
+  const { openConnectModal } = useConnectModal();
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
@@ -676,13 +678,7 @@ const Swap = ({
   const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx || transactionWillFail;
 
   const NoWalletButton = (
-    <StyledButton
-      size="large"
-      color="default"
-      variant="outlined"
-      fullWidth
-      onClick={() => web3Service.connect(undefined, currentNetwork.chainId)}
-    >
+    <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={openConnectModal}>
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>

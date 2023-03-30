@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
-import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { Client, WagmiConfig } from 'wagmi';
 import EnMessages from 'config/lang/en_US.json';
 import EsMessages from 'config/lang/es.json';
@@ -40,6 +40,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
   const [account, setAccount] = React.useState('');
   const [{ wagmiClient, chains }, setConfig] = React.useState<{
     wagmiClient: Nullable<Client>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     chains: Nullable<any[]>;
   }>({ wagmiClient: null, chains: null });
   const [web3Service] = React.useState(new Web3Service(DCASubgraphs, UNISubgraphs, setAccount));
@@ -88,7 +89,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
           <Provider store={store}>
             {!isLoading && wagmiClient && chains && (
               <WagmiConfig client={wagmiClient}>
-                <RainbowKitProvider chains={chains}>
+                <RainbowKitProvider chains={chains} theme={darkTheme()}>
                   <MainApp isLoading={isLoading} initializationError={setUpModalError} />
                 </RainbowKitProvider>
               </WagmiConfig>

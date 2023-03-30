@@ -6,6 +6,8 @@ import { FullPosition, LastSwappedAt, Position, SwapInfo, Token, YieldOptions, A
 import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, toReadable } from 'config/constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
 import { IntlShape } from 'react-intl';
+import { Chain } from '@mean-finance/sdk';
+import { Chain as WagmiChain } from 'wagmi/chains';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -277,3 +279,36 @@ export const calculateNextSwapAvailableAt = (
   }
   return nextSwapAvailableAt;
 };
+
+export const chainToWagmiNetwork = ({
+  chainId,
+  name,
+  publicRPCs,
+  nativeCurrency,
+  testnet,
+  explorer,
+}: Chain): WagmiChain => ({
+  name,
+  id: chainId,
+  nativeCurrency: {
+    ...nativeCurrency,
+    decimals: 18,
+  },
+  network: name,
+  /** Collection of RPC endpoints */
+  rpcUrls: {
+    default: {
+      http: publicRPCs,
+    },
+    public: {
+      http: publicRPCs,
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'etherscan',
+      url: explorer,
+    },
+  },
+  testnet,
+});
