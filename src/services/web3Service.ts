@@ -2,19 +2,54 @@ import { ethers, Signer } from 'ethers';
 import { ExternalProvider, Provider, Network } from '@ethersproject/providers';
 import { Web3Modal } from '@web3modal/standalone';
 import { EthereumClient } from '@web3modal/ethereum';
-import { configureChains, createClient, Client, Connector } from 'wagmi';
-import { arbitrum, mainnet, polygon, optimism } from 'wagmi/chains';
-import { getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { configureChains, createClient, Client, Connector, Chain } from 'wagmi';
+import { getAllChains } from '@mean-finance/sdk';
+import {
+  injectedWallet,
+  rainbowWallet,
+  metaMaskWallet,
+  coinbaseWallet,
+  walletConnectWallet,
+  trustWallet,
+  argentWallet,
+  safeWallet,
+  ledgerWallet,
+  braveWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import {
+  mainnet,
+  polygon,
+  bsc,
+  avalanche,
+  fantom,
+  arbitrum,
+  optimism,
+  celo,
+  gnosis,
+  klaytn,
+  aurora,
+  cronos,
+  okc,
+  harmonyOne,
+  boba,
+  moonriver,
+  moonbeam,
+  evmos,
+  canto,
+} from 'wagmi/chains';
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
 
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
 import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
 import { DUMMY_ARCX_CLIENT } from 'utils/dummy-arcx-client';
+import { chainToWagmiNetwork } from 'utils/parsing';
 
 // MOCKS
-import { NETWORKS, PositionVersions } from 'config/constants';
+import { NETWORKS, PositionVersions, UNSUPPORTED_WAGMI_CHAIN } from 'config/constants';
 
+import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from 'config/constants/custom-wallets';
 import { setupAxiosClient } from 'state';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -291,7 +326,7 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect(suppliedProvider?: Provider, connector?: Connector<Provider>) {
+  async connect(suppliedProvider?: Provider, connector?: Connector<Provider>, chainId?: number) {
     const connectorProvider = await connector?.getProvider();
 
     if (!suppliedProvider && !connectorProvider) {
@@ -385,18 +420,72 @@ export default class Web3Service {
   }
 
   async setUpModal() {
+    const sdkChains = getAllChains();
+
+    const addedNetworks: Chain[] = [];
+
+    UNSUPPORTED_WAGMI_CHAIN.forEach((chainId) => {
+      const found = find(sdkChains, { chainId });
+      if (found) {
+        addedNetworks.push(chainToWagmiNetwork(found));
+      }
+    });
+
     const { chains, provider, webSocketProvider } = configureChains(
-      [polygon, optimism, arbitrum, mainnet],
+      [
+        mainnet,
+        polygon,
+        bsc,
+        avalanche,
+        fantom,
+        arbitrum,
+        optimism,
+        celo,
+        gnosis,
+        klaytn,
+        aurora,
+        cronos,
+        okc,
+        harmonyOne,
+        boba,
+        moonriver,
+        moonbeam,
+        evmos,
+        canto,
+        ...addedNetworks,
+      ],
       [
         // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
         publicProvider(),
       ]
     );
 
-    const { connectors } = getDefaultWallets({
-      appName: 'My RainbowKit App',
-      chains,
-    });
+    const connectors = connectorsForWallets([
+      {
+        groupName: 'Popular',
+        wallets: [
+          injectedWallet({ chains }),
+          frameWallet({ chains }),
+          rabbyWallet({ chains }),
+          metaMaskWallet({ chains }),
+          walletConnectWallet({ chains }),
+          rainbowWallet({ chains }),
+          coinbaseWallet({ chains, appName: 'Mean Finance' }),
+          braveWallet({ chains }),
+        ],
+      },
+      {
+        groupName: 'More',
+        wallets: [
+          trustWallet({ chains }),
+          ripioWallet({ chains }),
+          argentWallet({ chains }),
+          safeWallet({ chains }),
+          ledgerWallet({ chains }),
+          bitkeepWallet({ chains }),
+        ],
+      },
+    ]);
 
     const wagmiClient = createClient({
       autoConnect: true,
@@ -413,11 +502,12 @@ export default class Web3Service {
       (state) => ({
         connector: state.connector,
         status: state.status,
+        chainId: state.data?.chain?.id,
       }),
       (curr, prev) => {
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          this.connect(undefined, curr.connector);
+          this.connect(undefined, curr.connector, curr.chainId);
         }
       }
     );

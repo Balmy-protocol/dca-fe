@@ -37,11 +37,11 @@ export default class ProviderService {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (this.providerInfo.id === 'walletconnect' && provider.wc && provider.wc.peerMeta) {
+      if (this.providerInfo.id === 'walletconnect' && provider.connector && provider.connector.peerMeta) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        this.providerInfo.name = provider.wc.peerMeta.name;
+        this.providerInfo.name = provider.connector.peerMeta.name;
       }
     } catch {
       console.error('Failed to set providerInfo name for wc');
@@ -95,6 +95,7 @@ export default class ProviderService {
         defaultProvider: true,
       });
     }
+
     return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
 
@@ -108,6 +109,10 @@ export default class ProviderService {
 
   getGasPrice() {
     return this.provider.getGasPrice();
+  }
+
+  getIsConnected() {
+    return !!this.provider;
   }
 
   getBaseProvider(network?: Network) {
@@ -247,6 +252,7 @@ export default class ProviderService {
       if (callbackBeforeReload) {
         callbackBeforeReload();
       }
+
       if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
         window.location.reload();
       }

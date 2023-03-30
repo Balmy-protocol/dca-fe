@@ -62,6 +62,7 @@ import { shouldTrackError } from 'utils/errors';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAppDispatch } from 'state/hooks';
 import { setNetwork } from 'state/config/actions';
 import SwapFirstStep from '../step1';
@@ -149,6 +150,7 @@ const Swap = ({
   const [showFirstStep, setShowFirstStep] = React.useState(false);
   const [showSecondStep, setShowSecondStep] = React.useState(false);
   const [isRender, setIsRender] = React.useState(true);
+  const { openConnectModal } = useConnectModal();
   const [modeType, setModeType] = React.useState(MODE_TYPES.FULL_DEPOSIT.id);
   const [rate, setRate] = React.useState('0');
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
@@ -772,13 +774,7 @@ const Swap = ({
   );
 
   const NoWalletButton = (
-    <StyledButton
-      size="large"
-      color="primary"
-      variant="contained"
-      fullWidth
-      onClick={() => web3Service.connect(undefined, currentNetwork.chainId)}
-    >
+    <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={openConnectModal}>
       <Typography variant="body1">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>

@@ -30,6 +30,7 @@ import {
   setRate,
   setModeType,
   setUseWrappedProtocolToken,
+  resetModifySettingsModal,
 } from 'state/modify-rate-settings/actions';
 import FrequencyInput from 'common/frequency-easy-input';
 import {
@@ -173,6 +174,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const handleCancel = () => {
     onCancel();
+  };
+
+  const handleClose = () => {
+    handleCancel();
+    dispatch(resetModifySettingsModal());
   };
 
   const handleFromValueChange = (newFromValue: string) => {
@@ -350,6 +356,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         error: { code: e.code, message: e.message, data: e.data },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+
+      dispatch(resetModifySettingsModal());
     }
   };
 
@@ -436,6 +444,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
+
+    dispatch(resetModifySettingsModal());
   };
 
   const handleApproveToken = async (isExact?: boolean) => {
@@ -611,7 +621,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     <Modal
       open={open}
       showCloseButton
-      onClose={handleCancel}
+      onClose={handleClose}
       showCloseIcon
       maxWidth="sm"
       title={<FormattedMessage description="changeDuration title" defaultMessage="Change duration and rate" />}

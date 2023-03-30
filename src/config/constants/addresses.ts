@@ -700,4 +700,12 @@ export const REMOVED_AGG_CHAINS = [58];
 
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
   `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
+
+// Unsupported wagmi OOTB chains
+// fuse: 122,
+// heco: 128,
+// velas: 106,
+// oasis: 42262,
+
+export const UNSUPPORTED_WAGMI_CHAIN = [122, 128, 106, 42262];
 /* eslint-enable */
