@@ -89,7 +89,7 @@ export const getDefaultByUrl = () => ({
       requestId: '',
       fetchable: true,
       parser: (list: { tokens: (Token & { protocol?: string })[] }) =>
-        list.tokens.filter((token) => token.protocol && token.protocol != 'dex'),
+        list.tokens.filter((token) => token.protocol && token.protocol !== 'dex'),
     },
 
   /* -------------------------------------------------------------------------- */
