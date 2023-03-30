@@ -2,14 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import WalletContext from 'common/wallet-context';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import IconButton from '@mui/material/IconButton';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import DiscordIcon from 'assets/svg/atom/discord';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import NetworkLabel from 'common/network-label';
 import WhaveLogoDark from 'assets/logo/wave_logo_dark';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -36,6 +34,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import AppBar from '@mui/material/AppBar';
 import ListItemText from '@mui/material/ListItemText';
+import Container from '@mui/material/Container';
 import usePushToHistory from 'hooks/usePushToHistory';
 import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
@@ -44,7 +43,8 @@ const StyledNavbarWrapper = styled.div`
   width: 100%;
   background: rgba(5, 3, 13, 0.1);
   box-shadow: inset 0px -1px 0px rgba(255, 255, 255, 0.1);
-  padding: 10px 0px;
+  // padding: 10px 0px;
+  padding-top: 10px;
   position: sticky;
   top: 0;
   // background: #121212;
@@ -71,7 +71,7 @@ const StyledNavbarMainContent = styled.div`
 const StyledSubContent = styled.div`
   display: flex;
   flex: 1;
-  margin-left: 45px;
+  margin-left: 60px;
 `;
 
 const StyledInsetSeparator = styled.div`
@@ -126,7 +126,6 @@ const RawTabs = withStyles(() =>
 )(Tabs);
 
 const StyledTabs = styled(RawTabs)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint>; noMargin?: boolean }>`
-  margin-left: ${({ breakpoint }) => (breakpoint !== 'xl' ? '50px' : '145px')};
   ${({ noMargin }) => (noMargin ? 'margin-left: 0px;' : '')}
 `;
 
@@ -136,7 +135,6 @@ interface NavBarProps {
 
 const NavBar = ({ isLoading }: NavBarProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
-  const currentNetwork = useCurrentNetwork();
   const tabIndex = useMainTab();
   const subTabIndex = useSubTab();
   const dispatch = useAppDispatch();
@@ -297,7 +295,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             </ListItemButton>
           </List>
         </Drawer>
-        <StyledNavbarContainer>
+        <Container sx={{ display: 'flex', paddingBottom: '10px' }}>
           {currentBreakPoint !== 'xs' && (
             <StyledNavbarMainContent>
               <WhaveLogoDark
@@ -306,7 +304,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               />
               <StyledTabs
                 breakpoint={currentBreakPoint}
-                TabIndicatorProps={{ style: { bottom: openFirstSubTab ? '0px' : '-10px' } }}
+                TabIndicatorProps={{ style: { bottom: '-10px' } }}
                 value={tabIndex}
               >
                 <StyledTab
@@ -330,7 +328,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
           )}
           <StyledNavbarEndContent small={currentBreakPoint === 'xs'}>
             <StyledButtonContainer breakpoint={currentBreakPoint}>
-              <NetworkLabel network={currentNetwork} />
+              {/* <NetworkLabel network={currentNetwork} /> */}
               <WalletContext.Consumer>
                 {({ web3Service }) =>
                   !web3Service.getAccount() && !isLoading ? (
@@ -342,28 +340,26 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               </WalletContext.Consumer>
             </StyledButtonContainer>
           </StyledNavbarEndContent>
-        </StyledNavbarContainer>
+        </Container>
         {currentBreakPoint !== 'xs' && (
           <Collapse in={openFirstSubTab}>
             <StyledInsetSeparator />
-            <StyledNavbarContainer>
-              <StyledSubContent>
-                <StyledTabs
-                  breakpoint={currentBreakPoint}
-                  TabIndicatorProps={{ style: { bottom: '-10px' } }}
-                  value={tabIndex === 0 ? subTabIndex : 1000}
-                >
-                  <StyledTab
-                    onClick={() => handleSubTabChange({ index: 0, mainIndex: 0, url: 'create' })}
-                    label={<FormattedMessage description="create" defaultMessage="Create" />}
-                  />
-                  <StyledTab
-                    onClick={() => handleSubTabChange({ index: 1, mainIndex: 0, url: 'positions' })}
-                    label={<FormattedMessage description="positions" defaultMessage="Positions" />}
-                  />
-                </StyledTabs>
-              </StyledSubContent>
-            </StyledNavbarContainer>
+            <Container>
+              <StyledNavbarContainer>
+                <StyledSubContent>
+                  <StyledTabs breakpoint={currentBreakPoint} value={tabIndex === 0 ? subTabIndex : 1000}>
+                    <StyledTab
+                      onClick={() => handleSubTabChange({ index: 0, mainIndex: 0, url: 'create' })}
+                      label={<FormattedMessage description="create" defaultMessage="Create" />}
+                    />
+                    <StyledTab
+                      onClick={() => handleSubTabChange({ index: 1, mainIndex: 0, url: 'positions' })}
+                      label={<FormattedMessage description="positions" defaultMessage="Positions" />}
+                    />
+                  </StyledTabs>
+                </StyledSubContent>
+              </StyledNavbarContainer>
+            </Container>
           </Collapse>
         )}
       </StyledNavbarWrapper>
