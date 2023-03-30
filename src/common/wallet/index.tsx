@@ -15,6 +15,11 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import Address from 'common/address';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
+import TokenIcon from 'common/token-icon';
+import { getGhTokenListLogoUrl, NETWORKS } from 'config';
+import { find } from 'lodash';
+import { toToken } from 'utils/currency';
+import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -38,6 +43,11 @@ const StyledBadge = withStyles(() =>
   })
 )(Badge);
 
+const StyledTokenIconContainer = styled.div<{ small: boolean }>`
+  margin-right: ${({ small }) => (small ? '0px' : '5px')};
+  display: flex;
+`;
+
 interface ConnectWalletButtonProps {
   web3Service: Web3Service;
   isLoading: boolean;
@@ -46,6 +56,7 @@ interface ConnectWalletButtonProps {
 const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
   const transactions = useAllTransactions();
   const [shouldOpenMenu, setShouldOpenMenu] = React.useState(false);
+  const currentBreakPoint = useCurrentBreakpoint();
   const hasPendingTransactions = useHasPendingTransactions();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
@@ -60,6 +71,8 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
     );
     setShouldOpenMenu(!shouldOpenMenu);
   };
+
+  const foundNetwork = find(NETWORKS, { chainId: currentNetwork.chainId });
 
   if (isLoading) return null;
 
@@ -77,8 +90,18 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
           color="transparent"
           variant="outlined"
           onClick={onOpen}
-          style={{ maxWidth: '220px', textTransform: 'none' }}
+          style={{ maxWidth: '220px', textTransform: 'none', display: 'flex', alignItems: 'center' }}
         >
+          <StyledTokenIconContainer small={false}>
+            <TokenIcon
+              size={currentBreakPoint === 'xs' ? '25px' : '20px'}
+              token={toToken({
+                address: foundNetwork?.mainCurrency || '',
+                chainId: (foundNetwork || currentNetwork).chainId,
+                logoURI: getGhTokenListLogoUrl((foundNetwork || currentNetwork).chainId, 'logo'),
+              })}
+            />
+          </StyledTokenIconContainer>
           <Typography noWrap>
             <Address address={web3Service.getAccount()} trimAddress />
           </Typography>
