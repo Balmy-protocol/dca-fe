@@ -159,6 +159,7 @@ import ETP from './etp.svg';
 import EUR from './eur.svg';
 import EULER from './euler.svg';
 import EVX from './evx.svg';
+import EXACTLY from './exactly.svg';
 import EXMO from './exmo.svg';
 import EXP from './exp.svg';
 import FAILED from './failed.svg';
@@ -1099,6 +1100,7 @@ const manifest = {
   EULER,
   EUR,
   '0xf3db5fa2c66b7af3eb0c0b782510816cbe4813b8': EVX,
+  EXACTLY,
   EXMO,
   '0x5330a5805b9db68ebcf5247bbc9097163c1c2442': EXP,
   FAILED,
@@ -1392,6 +1394,7 @@ const manifest = {
   XVG,
   XZC,
   '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e': YFI,
+  YEARN: YFI,
   '0xcbeaec699431857fdb4d37addbbdc20e132d4903': YOYOW,
   ZCL,
   ZEC,

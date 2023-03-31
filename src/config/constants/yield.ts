@@ -21,6 +21,14 @@ export const DISABLED_YIELDS = [
   '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
+  '0x67f70429750e38d6bae20839ace2692ff2eff52f', // Exactly - OP
+  '0xe9a15d436390beb7d9eb312546de3fb01b1468ea', // Exactly - USDC
+  '0x7eb7deac4929da076910c4aa35128ec70b0b820f', // Exactly - WETH
+  '0x0919Ad1E211400fec2770152Ee5add722475Dc24', // Yearn - USDC
+  '0x0e45f0ef7446d7879bF5b878f971614529BAbfB5', // Yearn - WETH
+  '0x8b5fA2400A892ef959c0f810AAa385Ff5d767aB3', // Yearn - WBTC
+  '0xB97183D2e5FA8954dcf7fbf16FC065d343278593', // Yearn - sUSD
+  '0x064AA994e3D69c9d5531BcA7502E2F35df09EB25', // Yearn - NDAI
 ].map((a) => a.toLowerCase());
 
 const BASE_YIELDS_PER_CHAIN: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
@@ -321,6 +329,62 @@ export const ALLOWED_YIELDS: Record<
       poolId: 'ef88396f-130e-477d-b9af-e568e296a5a7', // Sonne wstETH
       name: 'Sonne',
       token: emptyTokenWithAddress('SONNE'),
+    },
+    {
+      id: '334eb8d2-d8fa-401c-837a-221faf82021c', // Exactly OP
+      tokenAddress: '0x67f70429750e38d6bae20839ace2692ff2eff52f', // Exactly OP
+      poolId: '334eb8d2-d8fa-401c-837a-221faf82021c', // Exactly OP
+      name: 'Exactly',
+      token: emptyTokenWithAddress('EXACTLY'),
+    },
+    {
+      id: '9e6bd721-3862-42fc-9015-4c2916197938', // Exactly USDC
+      tokenAddress: '0xe9a15d436390beb7d9eb312546de3fb01b1468ea', // Exactly USDC
+      poolId: '9e6bd721-3862-42fc-9015-4c2916197938', // Exactly USDC
+      name: 'Exactly',
+      token: emptyTokenWithAddress('EXACTLY'),
+    },
+    {
+      id: '755541b1-6df1-4ae5-8e48-853640448dc6', // Exactly WETH
+      tokenAddress: '0x7eb7deac4929da076910c4aa35128ec70b0b820f', // Exactly WETH
+      poolId: '755541b1-6df1-4ae5-8e48-853640448dc6', // Exactly WETH
+      name: 'Exactly',
+      token: emptyTokenWithAddress('EXACTLY'),
+    },
+    {
+      id: '72e5842f-a9c6-48e3-9fcb-96c0844d9d49', // Yearn USDC
+      tokenAddress: '0x0919Ad1E211400fec2770152Ee5add722475Dc24', // Yearn USDC
+      poolId: '72e5842f-a9c6-48e3-9fcb-96c0844d9d49', // Yearn USDC
+      name: 'Yearn',
+      token: emptyTokenWithAddress('YEARN'),
+    },
+    {
+      id: '46aa0b40-cafc-485f-9014-e196d0b5da81', // Yearn WETH
+      tokenAddress: '0x0e45f0ef7446d7879bF5b878f971614529BAbfB5', // Yearn WETH
+      poolId: '46aa0b40-cafc-485f-9014-e196d0b5da81', // Yearn WETH
+      name: 'Yearn',
+      token: emptyTokenWithAddress('YEARN'),
+    },
+    // {
+    //   id: '755541b1-6df1-4ae5-8e48-853640448dc6', // Yearn WBTC
+    //   tokenAddress: '0x8b5fA2400A892ef959c0f810AAa385Ff5d767aB3', // Yearn WBTC
+    //   poolId: '755541b1-6df1-4ae5-8e48-853640448dc6', // Yearn WBTC
+    //   name: 'Yearn',
+    //   token: emptyTokenWithAddress('YEARN'),
+    // },
+    {
+      id: '8c5a1d0d-4300-4070-beff-fed553438e17', // Yearn sUSD
+      tokenAddress: '0xB97183D2e5FA8954dcf7fbf16FC065d343278593', // Yearn sUSD
+      poolId: '8c5a1d0d-4300-4070-beff-fed553438e17', // Yearn sUSD
+      name: 'Yearn',
+      token: emptyTokenWithAddress('YEARN'),
+    },
+    {
+      id: '9e7ff39f-dcc0-4127-9e9e-fe90a984cff9', // Yearn DAI
+      tokenAddress: '0x064AA994e3D69c9d5531BcA7502E2F35df09EB25', // Yearn DAI
+      poolId: '9e7ff39f-dcc0-4127-9e9e-fe90a984cff9', // Yearn DAI
+      name: 'Yearn',
+      token: emptyTokenWithAddress('YEARN'),
     },
     // {
     //   id: 'e5f45aa7-437e-4c35-8beb-9012bab859c5', // beefy WBTC
