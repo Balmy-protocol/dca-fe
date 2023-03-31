@@ -179,7 +179,7 @@ export interface DefillamaResponse {
   data: {
     apy: number;
     apyBase: number;
-    underlyingTokens: string[];
+    underlyingTokens?: string[];
     pool: string;
   }[];
 }

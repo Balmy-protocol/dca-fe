@@ -357,6 +357,7 @@ export const ALLOWED_YIELDS: Record<
       poolId: '72e5842f-a9c6-48e3-9fcb-96c0844d9d49', // Yearn USDC
       name: 'Yearn',
       token: emptyTokenWithAddress('YEARN'),
+      forcedUnderlyings: ['0x7f5c764cbc14f9669b88837ca1490cca17c31607'],
     },
     {
       id: '46aa0b40-cafc-485f-9014-e196d0b5da81', // Yearn WETH
@@ -364,6 +365,7 @@ export const ALLOWED_YIELDS: Record<
       poolId: '46aa0b40-cafc-485f-9014-e196d0b5da81', // Yearn WETH
       name: 'Yearn',
       token: emptyTokenWithAddress('YEARN'),
+      forcedUnderlyings: ['0x4200000000000000000000000000000000000006'],
     },
     // {
     //   id: '755541b1-6df1-4ae5-8e48-853640448dc6', // Yearn WBTC
@@ -371,6 +373,7 @@ export const ALLOWED_YIELDS: Record<
     //   poolId: '755541b1-6df1-4ae5-8e48-853640448dc6', // Yearn WBTC
     //   name: 'Yearn',
     //   token: emptyTokenWithAddress('YEARN'),
+    //   forcedUnderlyings: ['0x68f180fcce6836688e9084f035309e29bf0a2095'],
     // },
     {
       id: '8c5a1d0d-4300-4070-beff-fed553438e17', // Yearn sUSD
@@ -378,6 +381,7 @@ export const ALLOWED_YIELDS: Record<
       poolId: '8c5a1d0d-4300-4070-beff-fed553438e17', // Yearn sUSD
       name: 'Yearn',
       token: emptyTokenWithAddress('YEARN'),
+      forcedUnderlyings: ['0x8c6f28f2f1a3c87f0f938b96d27520d9751ec8d9'],
     },
     {
       id: '9e7ff39f-dcc0-4127-9e9e-fe90a984cff9', // Yearn DAI
@@ -385,6 +389,7 @@ export const ALLOWED_YIELDS: Record<
       poolId: '9e7ff39f-dcc0-4127-9e9e-fe90a984cff9', // Yearn DAI
       name: 'Yearn',
       token: emptyTokenWithAddress('YEARN'),
+      forcedUnderlyings: ['0xda10009cbd5d07dd0cecc66161fc93d7c9000da1'],
     },
     // {
     //   id: 'e5f45aa7-437e-4c35-8beb-9012bab859c5', // beefy WBTC

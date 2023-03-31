@@ -30,7 +30,10 @@ export default class YieldService {
 
     const yields = defillamaYields.data.data;
 
-    let yieldsByChain = ALLOWED_YIELDS[chainidTouse];
+    let yieldsByChain = ALLOWED_YIELDS[chainidTouse].map((option) => ({
+      ...option,
+      tokenAddress: option.tokenAddress.toLowerCase(),
+    }));
 
     if (useBlacklist) {
       yieldsByChain = yieldsByChain.filter((option) => !DISABLED_YIELDS.includes(option.tokenAddress));
@@ -39,7 +42,7 @@ export default class YieldService {
     return yieldsByChain.map((baseYield) => {
       const foundYield = find(yields, { pool: baseYield.poolId });
 
-      const enabledTokens = foundYield?.underlyingTokens.map((token) => token.toLowerCase()) || [];
+      const enabledTokens = foundYield?.underlyingTokens?.map((token) => token.toLowerCase()) || [];
 
       const forcedEnabledTokens = baseYield.forcedUnderlyings || [];
 
