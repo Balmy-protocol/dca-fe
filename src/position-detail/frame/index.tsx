@@ -38,6 +38,7 @@ import {
   PositionVersions,
   DEFAULT_NETWORK_FOR_VERSION,
   LATEST_VERSION,
+  FAIL_ON_ERROR,
 } from 'config/constants';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { initializeModifyRateSettings } from 'state/modify-rate-settings/actions';
@@ -158,7 +159,9 @@ const PositionDetailFrame = () => {
   const { loading: isLoadingSwaps, data: swapsData } = useQuery<{ pair: GetPairSwapsData }>(getPairSwaps, {
     variables: {
       id: position && position.pair.id,
+      ...((!FAIL_ON_ERROR && { subgraphError: 'allow' }) || { subgraphError: 'deny' }),
     },
+    errorPolicy: (!FAIL_ON_ERROR && 'ignore') || 'none',
     skip: !position,
     client,
   });

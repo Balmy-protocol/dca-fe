@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getLeaderboardPositions = gql`
-  query getLeaderboardPositions($first: Int, $lastId: String) {
-    positions(first: $first, where: { id_gt: $lastId }) {
+  query getLeaderboardPositions($first: Int, $lastId: String, $subgraphError: String) {
+    positions(first: $first, where: { id_gt: $lastId }, subgraphError: $subgraphError) {
       id
       createdAtTimestamp
       totalDeposited

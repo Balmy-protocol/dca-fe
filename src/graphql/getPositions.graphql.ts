@@ -1,12 +1,19 @@
 import gql from 'graphql-tag';
 
 const getCurrentPositions = gql`
-  query getCurrentPositions($address: String!, $first: Int, $lastId: String, $status: [String]) {
+  query getCurrentPositions(
+    $address: String!
+    $first: Int
+    $lastId: String
+    $status: [String]
+    $subgraphError: String
+  ) {
     positions(
       orderDirection: desc
       orderBy: createdAtTimestamp
       where: { id_gt: $lastId, user: $address, status_in: $status }
       first: $first
+      subgraphError: $subgraphError
     ) {
       id
       createdAtTimestamp
@@ -47,7 +54,7 @@ const getCurrentPositions = gql`
       pair {
         id
         activePositionsPerInterval
-        swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1) {
+        swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1, subgraphError: $subgraphError) {
           id
           executedAtTimestamp
         }

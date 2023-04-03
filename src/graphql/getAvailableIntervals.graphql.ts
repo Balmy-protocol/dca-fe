@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getAvailableIntervals = gql`
-  query getAvailableIntervals {
-    swapIntervals(where: { active: true }) {
+  query getAvailableIntervals($subgraphError: Boolean) {
+    swapIntervals(where: { active: true }, subgraphError: $subgraphError) {
       id
       interval
       active

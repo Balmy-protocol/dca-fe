@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getChainlinkPrices = gql`
-  query FeedSubscription($contractAddress: ID!, $from: Int!) {
-    feed(id: $contractAddress) {
+  query FeedSubscription($contractAddress: ID!, $from: Int!, $subgraphError: String) {
+    feed(id: $contractAddress, subgraphError: $subgraphError) {
       id
       version
       oracles {

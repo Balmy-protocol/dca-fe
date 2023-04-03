@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getPosition = gql`
-  query getPosition($id: String!, $first: Int, $skip: Int) {
-    position(id: $id) {
+  query getPosition($id: String!, $first: Int, $skip: Int, $subgraphError: String) {
+    position(id: $id, subgraphError: $subgraphError) {
       id
       createdAtTimestamp
       totalDeposited
@@ -92,7 +92,7 @@ const getPosition = gql`
       withdrawn
       toWithdraw
 
-      history(orderBy: createdAtBlock, orderDirection: asc, first: $first, skip: $skip) {
+      history(orderBy: createdAtBlock, orderDirection: asc, first: $first, skip: $skip, subgraphError: $subgraphError) {
         id
         action
         transaction {

@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const getPairSwaps = gql`
-  query getPairSwaps($id: ID) {
-    pair(id: $id) {
+  query getPairSwaps($id: ID, $subgraphError: String) {
+    pair(id: $id, subgraphError: $subgraphError) {
       id
       tokenA {
         address: id
@@ -35,7 +35,7 @@ const getPairSwaps = gql`
       createdAtTimestamp
       activePositionsPerInterval
       lastSwappedAt
-      swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1) {
+      swaps(orderBy: executedAtTimestamp, orderDirection: desc, first: 1, subgraphError: $subgraphError) {
         id
         executedAtTimestamp
         executedAtBlock

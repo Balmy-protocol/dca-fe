@@ -19,7 +19,7 @@ import useDCAGraphql from 'hooks/useDCAGraphql';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import getPairPrices from 'graphql/getPairPrices.graphql';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import { ONE_DAY, ONE_HOUR, STABLE_COINS, TOKEN_TYPE_BASE } from 'config/constants';
+import { FAIL_ON_ERROR, ONE_DAY, ONE_HOUR, STABLE_COINS, TOKEN_TYPE_BASE } from 'config/constants';
 import GraphFooter from 'common/graph-footer';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import MinimalTabs from 'common/minimal-tabs';
@@ -231,9 +231,11 @@ const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
   const { loading: loadingMeanData, data: pairData } = useQuery<GetPairPriceResponseData>(getPairPrices, {
     variables: {
       id: existingPair?.id,
+      ...((!FAIL_ON_ERROR && { subgraphError: 'allow' }) || { subgraphError: 'deny' }),
     },
     skip: !existingPair,
     client,
+    errorPolicy: (!FAIL_ON_ERROR && 'ignore') || 'none',
   });
 
   const { pair } = pairData || {};

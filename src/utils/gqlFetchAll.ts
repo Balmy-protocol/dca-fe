@@ -7,10 +7,12 @@ import {
   DocumentNode,
   WatchQueryFetchPolicy,
   ApolloError,
+  ApolloQueryResult,
 } from '@apollo/client';
 import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 import get from 'lodash/get';
+import { FAIL_ON_ERROR } from 'config';
 
 export interface GraphqlResults<T> {
   data: T | undefined;
@@ -67,16 +69,18 @@ export default async function gqlFetchAll<T>(
   const newQuery = client.watchQuery({
     query: queryToRun,
     fetchPolicy,
+    errorPolicy: (!FAIL_ON_ERROR && 'ignore') || 'none',
     variables: {
       ...variables,
       first: limit,
       lastId: '',
+      ...((!FAIL_ON_ERROR && { subgraphError: 'allow' }) || { subgraphError: 'deny' }),
     },
   });
 
   const results = await newQuery.result();
 
-  if (get(results.data, dataToSearch) && get(results.data, dataToSearch).length === limit) {
+  if (results && get(results.data, dataToSearch) && get(results.data, dataToSearch).length === limit) {
     return gqlFetchAll(
       client,
       queryToRun,

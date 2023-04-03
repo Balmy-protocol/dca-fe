@@ -4,7 +4,12 @@ import find from 'lodash/find';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useSubTab } from 'state/tabs/hooks';
 import { useParams } from 'react-router-dom';
-import { DEFAULT_NETWORK_FOR_VERSION, POSITION_VERSION_4, SUPPORTED_NETWORKS_DCA } from 'config/constants';
+import {
+  DEFAULT_NETWORK_FOR_VERSION,
+  FAIL_ON_ERROR,
+  POSITION_VERSION_4,
+  SUPPORTED_NETWORKS_DCA,
+} from 'config/constants';
 import { GetSwapIntervalsGraphqlResponse } from 'types';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import { useQuery } from '@apollo/client';
@@ -89,6 +94,10 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     getAvailableIntervals,
     {
       client,
+      variables: {
+        ...((!FAIL_ON_ERROR && { subgraphError: 'allow' }) || { subgraphError: 'deny' }),
+      },
+      errorPolicy: (!FAIL_ON_ERROR && 'ignore') || 'none',
     }
   );
 
