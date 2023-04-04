@@ -1,8 +1,7 @@
 import React from 'react';
-import find from 'lodash/find';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition, YieldOptions } from 'types';
+import { FullPosition } from 'types';
 import useWeb3Service from 'hooks/useWeb3Service';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -60,7 +59,6 @@ interface PositionSummaryControlsProps {
   position: FullPosition;
   disabled: boolean;
   onWithdraw: (useProtocolToken: boolean) => void;
-  yieldOptions: YieldOptions;
 }
 
 const PositionSummaryControls = ({
@@ -73,7 +71,6 @@ const PositionSummaryControls = ({
   position,
   onViewNFT,
   disabled,
-  yieldOptions,
 }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -83,8 +80,6 @@ const PositionSummaryControls = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
-  const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
   const isPending = pendingTransaction !== null;
@@ -98,14 +93,14 @@ const PositionSummaryControls = ({
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&
     !TOKEN_BLACKLIST.includes(position.from.address) &&
-    !TOKEN_BLACKLIST.includes((fromHasYield && fromSupportsYield?.tokenAddress) || '') &&
-    !TOKEN_BLACKLIST.includes((toHasYield && toSupportsYield?.tokenAddress) || '') &&
+    !TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') &&
+    !TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') &&
     shouldEnableFrequency(position.swapInterval.interval, position.from.address, position.to.address, position.chainId);
 
   const disabledWithdraw =
-    disabled || DISABLED_YIELD_WITHDRAWS.includes((toHasYield && toSupportsYield?.tokenAddress) || '');
+    disabled || DISABLED_YIELD_WITHDRAWS.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '');
   const disabledWithdrawFunds =
-    disabled || DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && fromSupportsYield?.tokenAddress) || '');
+    disabled || DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '');
 
   const shouldShowWithdrawWrappedToken =
     BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
@@ -135,7 +130,9 @@ const PositionSummaryControls = ({
           variant="outlined"
           color="transparent"
           size="small"
-          disabled={disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))}
+          disabled={
+            disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
+          }
           onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
         >
           <FormattedMessage

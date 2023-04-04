@@ -624,7 +624,6 @@ const PositionDetailFrame = () => {
               disabled={shouldShowChangeNetwork}
               onWithdrawFunds={onWithdrawFunds}
               onWithdraw={onWithdraw}
-              yieldOptions={yieldOptions || []}
             />
           )}
         </Grid>

@@ -134,8 +134,8 @@ const PositionDataControls = ({
   const disabledIncrease =
     disabled ||
     TOKEN_BLACKLIST.includes(position.from.address) ||
-    TOKEN_BLACKLIST.includes((fromHasYield && fromSupportsYield?.tokenAddress) || '') ||
-    TOKEN_BLACKLIST.includes((toHasYield && toSupportsYield?.tokenAddress) || '') ||
+    TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
+    TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.interval,
       position.from.address,
