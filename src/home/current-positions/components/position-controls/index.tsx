@@ -164,7 +164,7 @@ const PositionControls = ({
   const disabledIncrease =
     disabled ||
     TOKEN_BLACKLIST.includes(position.from.address) ||
-    TOKEN_BLACKLIST.includes((fromHasYield && fromSupportsYield?.tokenAddress) || '') ||
+    TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),
       position.from.address,
@@ -173,7 +173,7 @@ const PositionControls = ({
     );
 
   const disabledWithdraw =
-    disabled || DISABLED_YIELD_WITHDRAWS.includes((toHasYield && toSupportsYield?.tokenAddress) || '');
+    disabled || DISABLED_YIELD_WITHDRAWS.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '');
 
   return (
     <StyledCallToActionContainer>
