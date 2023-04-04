@@ -21,11 +21,7 @@ export const DISABLED_YIELDS = [
   '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
-  '0x1fa23ee1319f6f3f2973fd41f83a08cdd99fea5d', // Yearn - WETH
-  '0x60b828bd57b35078f728c8a40d768600410e796d', // Yearn - USDC
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
-  '0x23a6e4d15a52407e760e9a2bb6c38f27c5a6e667', // Yearn - sUSD
-  '0xcc69c0c520e8faf9eec1e1e8946b67e0c9c427b0', // Yearn - DAI
 ].map((a) => a.toLowerCase());
 
 const BASE_YIELDS_PER_CHAIN: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
