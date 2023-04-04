@@ -21,9 +21,6 @@ export const DISABLED_YIELDS = [
   '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
-  '0x67f70429750e38d6bae20839ace2692ff2eff52f', // Exactly - OP
-  '0xe9a15d436390beb7d9eb312546de3fb01b1468ea', // Exactly - USDC
-  '0x7eb7deac4929da076910c4aa35128ec70b0b820f', // Exactly - WETH
   '0x0919Ad1E211400fec2770152Ee5add722475Dc24', // Yearn - USDC
   '0x0e45f0ef7446d7879bF5b878f971614529BAbfB5', // Yearn - WETH
   '0x8b5fA2400A892ef959c0f810AAa385Ff5d767aB3', // Yearn - WBTC
