@@ -88,11 +88,7 @@ export const TOKEN_BLACKLIST = [
   '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // POLY - MaticX Aave v3
   '0x348a1213fa28a43855e5bb103bdfd7f357543626', // OP - OP Aave v3
   '0x1622bf67e6e5747b81866fe0b85178a93c7f86e3', // ARBI - UMAMI
-  '0x1fa23ee1319f6f3f2973fd41f83a08cdd99fea5d', // Yearn - WETH
-  '0x60b828bd57b35078f728c8a40d768600410e796d', // Yearn - USDC
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
-  '0x23a6e4d15a52407e760e9a2bb6c38f27c5a6e667', // Yearn - sUSD
-  '0xcc69c0c520e8faf9eec1e1e8946b67e0c9c427b0', // Yearn - DAI
   '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97', // OP - STG
 ];
 
