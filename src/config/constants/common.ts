@@ -93,6 +93,7 @@ export const TOKEN_BLACKLIST = [
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
   '0x23a6e4d15a52407e760e9a2bb6c38f27c5a6e667', // Yearn - sUSD
   '0xcc69c0c520e8faf9eec1e1e8946b67e0c9c427b0', // Yearn - DAI
+  '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97', // OP - STG
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
