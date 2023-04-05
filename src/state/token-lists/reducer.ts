@@ -310,7 +310,19 @@ export const getDefaultByUrl = () => ({
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
 
-  // Gnosis Chain
+  // Boba Ethereum chain
+  'https://raw.githubusercontent.com/OolongSwap/boba-community-token-list/main/build/boba.tokenlist.json': {
+    name: 'OolongSwap',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
+
+  // Gnosis chain
   'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json': {
     name: 'HoneySwap',
     logoURI: '',
@@ -404,6 +416,8 @@ export const initialState: TokenListsState = {
     'https://tokens.1inch.io/v1.1/8217',
     'https://tokens.1inch.io/v1.1/1313161554',
     'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
+    // Boba Ethereum chain
+    'https://raw.githubusercontent.com/OolongSwap/boba-community-token-list/main/build/boba.tokenlist.json',
     // Gnosis chain
     'https://files.cow.fi/tokens/CowSwap.json',
     'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
