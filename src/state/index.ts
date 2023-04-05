@@ -153,6 +153,8 @@ const store = configureStore({
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
           'https://tokens.1inch.io/v1.1/8217',
           'https://tokens.1inch.io/v1.1/1313161554',
+          'https://files.cow.fi/tokens/CowSwap.json',
+          'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
           'custom-tokens',
         ],
         byUrl: getDefaultByUrl(),

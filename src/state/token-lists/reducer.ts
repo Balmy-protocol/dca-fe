@@ -166,7 +166,8 @@ export const getDefaultByUrl = () => ({
     chainId: 100,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+    parser: (list: TokensLists) =>
+      Object.values(list as Record<string, Token>).filter((entry) => !entry.name.includes('RealToken')),
   },
   'https://tokens.1inch.io/v1.1/42161': {
     name: '1Inch Arbitrum',
@@ -323,6 +324,26 @@ export const getDefaultByUrl = () => ({
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
+  'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json': {
+    name: 'HoneySwap',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
+  'https://files.cow.fi/tokens/CowSwap.json': {
+    name: 'CowSwap',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
@@ -348,6 +369,8 @@ export const initialState: TokenListsState = {
     'https://tokens.1inch.io/v1.1/8217',
     'https://tokens.1inch.io/v1.1/1313161554',
     'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
+    'https://files.cow.fi/tokens/CowSwap.json',
+    'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
     'custom-tokens',
   ],
   byUrl: getDefaultByUrl(),
