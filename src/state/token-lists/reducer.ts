@@ -323,6 +323,16 @@ export const getDefaultByUrl = () => ({
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
+  'https://raw.githubusercontent.com/OolongSwap/boba-community-token-list/main/build/boba.tokenlist.json': {
+    name: 'OolongSwap',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
@@ -348,6 +358,7 @@ export const initialState: TokenListsState = {
     'https://tokens.1inch.io/v1.1/8217',
     'https://tokens.1inch.io/v1.1/1313161554',
     'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
+    'https://raw.githubusercontent.com/OolongSwap/boba-community-token-list/main/build/boba.tokenlist.json',
     'custom-tokens',
   ],
   byUrl: getDefaultByUrl(),

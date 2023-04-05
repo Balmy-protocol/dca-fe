@@ -153,6 +153,7 @@ const store = configureStore({
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
           'https://tokens.1inch.io/v1.1/8217',
           'https://tokens.1inch.io/v1.1/1313161554',
+          'https://raw.githubusercontent.com/OolongSwap/boba-community-token-list/main/build/boba.tokenlist.json',
           'custom-tokens',
         ],
         byUrl: getDefaultByUrl(),
