@@ -153,6 +153,10 @@ const store = configureStore({
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
           'https://tokens.1inch.io/v1.1/8217',
           'https://tokens.1inch.io/v1.1/1313161554',
+          // Velas chain
+          'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',
+          'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json',
+          'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json',
           'custom-tokens',
         ],
         byUrl: getDefaultByUrl(),
