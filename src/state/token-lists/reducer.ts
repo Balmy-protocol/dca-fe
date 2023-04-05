@@ -154,20 +154,6 @@ export const getDefaultByUrl = () => ({
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
-  'https://tokens.1inch.io/v1.1/100': {
-    name: '1Inch xDAI',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: false,
-    requestId: '',
-    fetchable: true,
-    chainId: 100,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
-  },
   'https://tokens.1inch.io/v1.1/42161': {
     name: '1Inch Arbitrum',
     logoURI: '',
@@ -323,6 +309,45 @@ export const getDefaultByUrl = () => ({
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
+
+  // Gnosis Chain
+  'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json': {
+    name: 'HoneySwap',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
+  'https://files.cow.fi/tokens/CowSwap.json': {
+    name: 'CowSwap',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
+  'https://tokens.1inch.io/v1.1/100': {
+    name: '1Inch xDAI',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 100,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) =>
+      Object.values(list as unknown as Record<string, Token>).filter((entry) => !entry.name.includes('RealToken')),
+  },
+
+  // Velas chain
   'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json':
     {
       name: 'WagyuSwap',
@@ -346,7 +371,7 @@ export const getDefaultByUrl = () => ({
       fetchable: true,
     },
   'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json': {
-    name: 'AstroSwap',
+    name: 'WaveLength',
     logoURI: '',
     timestamp: new Date().getTime(),
     tokens: [],
@@ -365,7 +390,6 @@ export const initialState: TokenListsState = {
     'https://tokens.1inch.io/v1.1/250',
     'https://tokens.1inch.io/v1.1/43114',
     'https://tokens.1inch.io/v1.1/42161',
-    'https://tokens.1inch.io/v1.1/100',
     'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
     'https://swap.crodex.app/tokens.json',
     'https://token-list.sushi.com/',
@@ -380,6 +404,10 @@ export const initialState: TokenListsState = {
     'https://tokens.1inch.io/v1.1/8217',
     'https://tokens.1inch.io/v1.1/1313161554',
     'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
+    // Gnosis chain
+    'https://files.cow.fi/tokens/CowSwap.json',
+    'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
+    'https://tokens.1inch.io/v1.1/100',
     // Velas chain
     'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',
     'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json',
