@@ -323,6 +323,38 @@ export const getDefaultByUrl = () => ({
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
   },
+  'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json':
+    {
+      name: 'WagyuSwap',
+      logoURI: '',
+      timestamp: new Date().getTime(),
+      tokens: [],
+      version: { major: 0, minor: 0, patch: 0 },
+      hasLoaded: false,
+      requestId: '',
+      fetchable: true,
+    },
+  'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json':
+    {
+      name: 'AstroSwap',
+      logoURI: '',
+      timestamp: new Date().getTime(),
+      tokens: [],
+      version: { major: 0, minor: 0, patch: 0 },
+      hasLoaded: false,
+      requestId: '',
+      fetchable: true,
+    },
+  'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json': {
+    name: 'AstroSwap',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
@@ -348,6 +380,10 @@ export const initialState: TokenListsState = {
     'https://tokens.1inch.io/v1.1/8217',
     'https://tokens.1inch.io/v1.1/1313161554',
     'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
+    // Velas chain
+    'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',
+    'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json',
+    'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json',
     'custom-tokens',
   ],
   byUrl: getDefaultByUrl(),
