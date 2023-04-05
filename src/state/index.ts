@@ -132,36 +132,65 @@ const store = configureStore({
       tokenLists: {
         activeLists: ['Mean Finance Graph Allowed Tokens'],
         activeAggregatorLists: [
+          // General
           'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
-          'tokens.1inch.eth',
-          'https://tokens.1inch.io/v1.1/56',
-          'https://tokens.1inch.io/v1.1/250',
-          'https://tokens.1inch.io/v1.1/43114',
-          'https://tokens.1inch.io/v1.1/42161',
-          'https://swap.crodex.app/tokens.json',
-          'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
-          'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
-          'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
-          'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wagyu/src/config/constants/tokenLists/pancake-default.tokenlist.json',
-          'https://token-list.sushi.com/',
-          'https://raw.githubusercontent.com/BeamSwap/beamswap-tokenlist/main/tokenlist.json',
-          'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json',
-          'https://raw.githubusercontent.com/evmoswap/default-token-list/main/assets/tokens/evmos.json',
-          // 'https://extendedtokens.uniswap.org',
-          'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
+          'https://token-list.sushi.com/',
+          'tokens.1inch.eth',
+
+          // BNB
+          'https://tokens.1inch.io/v1.1/56',
+
+          // Fantom
+          'https://tokens.1inch.io/v1.1/250',
+
+          // Avalanche
+          'https://tokens.1inch.io/v1.1/43114',
+
+          // Arbitrum
+          'https://tokens.1inch.io/v1.1/42161',
+
+          // CRO
+          'https://swap.crodex.app/tokens.json',
+          'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
+
+          // Oasis
+          'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
+
+          // Canto
+          'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json',
+
+          // Moonbeam
+          'https://raw.githubusercontent.com/BeamSwap/beamswap-tokenlist/main/tokenlist.json',
+
+          // EVMOS
+          'https://raw.githubusercontent.com/evmoswap/default-token-list/main/assets/tokens/evmos.json',
+          'https://raw.githubusercontent.com/SpaceFinance/default-token-list/main/spaceswap.tokenlist.json',
+
+          // Celo
+          'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
+
+          // Klatyn
           'https://tokens.1inch.io/v1.1/8217',
+
+          // Aurora
           'https://tokens.1inch.io/v1.1/1313161554',
-          // Boba Ethereum chain
+          'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
+
+          // Boba Ethereum
           'https://raw.githubusercontent.com/OolongSwap/boba-community-token-list/main/build/boba.tokenlist.json',
-          // Gnosis chain
+
+          // Gnosis
           'https://files.cow.fi/tokens/CowSwap.json',
           'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
           'https://tokens.1inch.io/v1.1/100',
-          // Velas chain
+
+          // Velas
           'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',
           'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json',
           'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json',
+
+          // Custom tokens
           'custom-tokens',
         ],
         byUrl: getDefaultByUrl(),
