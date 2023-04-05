@@ -144,7 +144,6 @@ const store = configureStore({
           'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
           'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wagyu/src/config/constants/tokenLists/pancake-default.tokenlist.json',
           'https://token-list.sushi.com/',
-          'https://tokens.1inch.io/v1.1/100',
           'https://raw.githubusercontent.com/BeamSwap/beamswap-tokenlist/main/tokenlist.json',
           'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json',
           'https://raw.githubusercontent.com/evmoswap/default-token-list/main/assets/tokens/evmos.json',
@@ -153,7 +152,16 @@ const store = configureStore({
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
           'https://tokens.1inch.io/v1.1/8217',
           'https://tokens.1inch.io/v1.1/1313161554',
+          // Boba Ethereum chain
           'https://raw.githubusercontent.com/OolongSwap/boba-community-token-list/main/build/boba.tokenlist.json',
+          // Gnosis chain
+          'https://files.cow.fi/tokens/CowSwap.json',
+          'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
+          'https://tokens.1inch.io/v1.1/100',
+          // Velas chain
+          'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',
+          'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json',
+          'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json',
           'custom-tokens',
         ],
         byUrl: getDefaultByUrl(),
