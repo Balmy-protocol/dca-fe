@@ -204,6 +204,11 @@ export default class SdkService {
   async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: BigNumber } | undefined> {
     const currentNetwork = await this.providerService.getNetwork();
     const account = this.walletService.getAccount();
+    const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
+
+    if (!validRegex.test(address)) {
+      return undefined;
+    }
 
     if (chainId === currentNetwork.chainId && !!account) {
       return this.walletService.getCustomToken(address);
