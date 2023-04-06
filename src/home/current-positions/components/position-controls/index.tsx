@@ -132,6 +132,7 @@ const PositionControls = ({
             rel="noreferrer"
             underline="none"
             color="inherit"
+            sx={{ display: 'flex', alignItems: 'center' }}
           >
             <Typography variant="body2" component="span">
               <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
