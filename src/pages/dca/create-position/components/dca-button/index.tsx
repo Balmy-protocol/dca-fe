@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage, useIntl } from 'react-intl';
-import AllowanceSplitButton from '@common/components/allowance-split-button';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, usdPriceToToken } from '@common/utils/currency';
 import {
@@ -215,14 +214,39 @@ const DcaButton = ({
   );
 
   const ApproveTokenButton = (
-    <AllowanceSplitButton
-      onMaxApprove={() => onClick(POSSIBLE_ACTIONS.approveToken as keyof typeof POSSIBLE_ACTIONS)}
-      onApproveExact={(amount) => onClick(POSSIBLE_ACTIONS.approveTokenExact as keyof typeof POSSIBLE_ACTIONS, amount)}
-      amount={from && (fromValue ? parseUnits(fromValue, from?.decimals) : null)}
-      disabled={isApproveTokenDisabled}
-      token={from}
-      tokenYield={fromYield}
-    />
+    <StyledButton
+      size="large"
+      variant="contained"
+      disabled={!!isApproveTokenDisabled || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
+      color="secondary"
+      fullWidth
+      onClick={() => onClick(POSSIBLE_ACTIONS.approveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
+    >
+      {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="swapsCannotBeMax"
+            defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
+            values={{ MAX_UINT_32 }}
+          />
+        </Typography>
+      )}
+      {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage description="create position" defaultMessage="Approve and create position" />
+        </Typography>
+      )}
+      {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="notenoughwhale"
+            defaultMessage="You can only deposit with a minimum value of {value} USD"
+            values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
+          />
+        </Typography>
+      )}
+      {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
+    </StyledButton>
   );
 
   const StartPositionButton = (
@@ -268,7 +292,7 @@ const DcaButton = ({
       disabled={!!shouldDisableApproveButton || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
       color="secondary"
       fullWidth
-      onClick={() => onClick(POSSIBLE_ACTIONS.approveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
+      onClick={() => onClick(POSSIBLE_ACTIONS.safeApproveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
     >
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
         <Typography variant="body1">

@@ -17,7 +17,9 @@ import {
   TransactionActionWaitForSimulationType,
   TransactionActionWaitForSimulationData,
   BlowfishResponse,
-} from '@types';
+  TransactionActionCreatePositionType,
+  TransactionActionCreatePositionData,
+} from 'types';
 import {
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
   TRANSACTION_ACTION_SWAP,
@@ -25,6 +27,7 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
+  TRANSACTION_ACTION_CREATE_POSITION,
 } from '@constants';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
@@ -132,12 +135,20 @@ interface TransactionActionSwap extends TransactionActionBase {
 
 interface TransactionActionSwapProps extends TransactionActionSwap, ItemProps {}
 
+interface TransactionActionCreatePosition extends TransactionActionBase {
+  type: TransactionActionCreatePositionType;
+  extraData: TransactionActionCreatePositionData;
+}
+
+interface TransactionActionCreatePositionProps extends TransactionActionCreatePosition, ItemProps {}
+
 export type TransactionAction =
   | TransactionActionApproveToken
   | TransactionActionApproveTokenSign
   | TransactionActionWaitForApproval
   | TransactionActionWaitForSimulation
-  | TransactionActionSwap;
+  | TransactionActionSwap
+  | TransactionActionCreatePosition;
 type TransactionActions = TransactionAction[];
 
 interface TransactionConfirmationProps {
@@ -519,12 +530,49 @@ const buildSwapItem = ({
   ),
 });
 
+const buildCreatePositionItem = ({
+  onAction,
+  extraData,
+  step,
+  isLast,
+  isFirst,
+  isCurrentStep,
+  transactions,
+}: TransactionActionCreatePositionProps) => ({
+  content: () => (
+    <>
+      <StyledTransactionStepIcon isLast={isLast} isFirst={isFirst}>
+        <StyledTransactionStepIconContent>
+          <TokenIcon token={extraData.to} size="40px" />
+        </StyledTransactionStepIconContent>
+      </StyledTransactionStepIcon>
+      <StyledTransactionStepContent>
+        <Typography variant="body1">
+          <FormattedMessage
+            description="transationStepSwapTokens"
+            defaultMessage="{step} - Create position"
+            values={{ step }}
+          />
+        </Typography>
+        {isCurrentStep && (
+          <StyledTransactionStepButtonContainer>
+            <Button variant="contained" color="secondary" fullWidth size="large" onClick={() => onAction(transactions)}>
+              <FormattedMessage description="swapWallet" defaultMessage="Create position" />
+            </Button>
+          </StyledTransactionStepButtonContainer>
+        )}
+      </StyledTransactionStepContent>
+    </>
+  ),
+});
+
 type TransactionActionProps =
   | TransactionActionApproveTokenProps
   | TransactionActionApproveTokenSignProps
   | TransactionActionWaitForApprovalProps
   | TransactionActionWaitForSimulationProps
-  | TransactionActionSwapProps;
+  | TransactionActionSwapProps
+  | TransactionActionCreatePositionProps;
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
   [TRANSACTION_ACTION_APPROVE_TOKEN]: buildApproveTokenItem,
@@ -533,6 +581,7 @@ const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) =
   [TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL]: buildWaitForSignApprovalItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIMULATION]: buildWaitForSimulationItem,
   [TRANSACTION_ACTION_SWAP]: buildSwapItem,
+  [TRANSACTION_ACTION_CREATE_POSITION]: buildCreatePositionItem,
 };
 
 const TransactionSteps = ({ shouldShow, handleClose, transactions }: TransactionConfirmationProps) => {
