@@ -25,4 +25,18 @@ export default class SafeService {
 
     return tx.txHash;
   }
+
+  async isSafeApp() {
+    // eslint-disable-next-line no-void
+    if ((window === null || window === void 0 ? void 0 : window.parent) === window) {
+      return false;
+    }
+
+    const safeInfo = await Promise.race([
+      this.safeAppSdk.safe.getInfo(),
+      new Promise((resolve) => setTimeout(resolve, 200)),
+    ]);
+
+    return !!safeInfo;
+  }
 }

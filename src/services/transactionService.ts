@@ -3,6 +3,7 @@ import { Log } from '@ethersproject/providers';
 
 import ContractService from './contractService';
 import ProviderService from './providerService';
+import SdkService from './sdkService';
 
 export default class TransactionService {
   contractService: ContractService;
@@ -11,10 +12,13 @@ export default class TransactionService {
 
   loadedAsSafeApp: boolean;
 
-  constructor(contractService: ContractService, providerService: ProviderService) {
+  sdkService: SdkService;
+
+  constructor(contractService: ContractService, providerService: ProviderService, sdkService: SdkService) {
     this.loadedAsSafeApp = false;
     this.providerService = providerService;
     this.contractService = contractService;
+    this.sdkService = sdkService;
   }
 
   getLoadedAsSafeApp() {
@@ -26,12 +30,12 @@ export default class TransactionService {
   }
 
   // TRANSACTION HANDLING
-  getTransactionReceipt(txHash: string) {
-    return this.providerService.getTransactionReceipt(txHash);
+  getTransactionReceipt(txHash: string, chainId: number) {
+    return this.sdkService.getTransactionReceipt(txHash, chainId);
   }
 
-  getTransaction(txHash: string) {
-    return this.providerService.getTransaction(txHash);
+  getTransaction(txHash: string, chainId: number) {
+    return this.sdkService.getTransaction(txHash, chainId);
   }
 
   waitForTransaction(txHash: string) {

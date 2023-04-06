@@ -2,14 +2,15 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import omit from 'lodash/omit';
+import values from 'lodash/values';
 import useBuildTransactionMessage from 'hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from 'hooks/useBuildRejectedTransactionMessage';
 import Zoom from '@mui/material/Zoom';
-import { useBlockNumber } from 'state/block-number/hooks';
+import { useBlockNumber, useGetBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
 import EtherscanLink from 'common/view-on-etherscan';
-import { TransactionReceipt } from 'types';
+import { TransactionDetails, TransactionReceipt } from 'types';
 import { setInitialized } from 'state/initializer/actions';
 import useTransactionService from 'hooks/useTransactionService';
 import useWalletService from 'hooks/useWalletService';
@@ -57,10 +58,18 @@ export default function Updater(): null {
 
   const lastBlockNumber = useBlockNumber(currentNetwork.chainId);
 
+  const getBlockNumber = useGetBlockNumber();
+
   const dispatch = useAppDispatch();
   const state = useAppSelector((appState) => appState.transactions);
 
-  const transactions = useMemo(() => state[currentNetwork.chainId] || {}, [state, currentNetwork]);
+  const transactions = useMemo(
+    () =>
+      values(state).reduce<{
+        [txHash: string]: TransactionDetails;
+      }>((acc, chainState) => ({ ...acc, ...chainState }), {}) || {},
+    [state, currentNetwork]
+  );
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -70,16 +79,17 @@ export default function Updater(): null {
   const pendingTransactions = usePendingTransactions();
 
   const getReceipt = useCallback(
-    (hash: string) => {
+    (hash: string, chainId: number) => {
       if (!walletService.getAccount()) throw new Error('No library or chainId');
-      return transactionService.getTransactionReceipt(hash);
+      return transactionService.getTransactionReceipt(hash, chainId);
     },
     [walletService]
   );
   const checkIfTransactionExists = useCallback(
-    (hash: string) => {
+    (hash: string, chainId: number) => {
       if (!walletService.getAccount()) throw new Error('No library or chainId');
-      return transactionService.getTransaction(hash).then((tx: ethers.providers.TransactionResponse) => {
+      return transactionService.getTransaction(hash, chainId).then((tx: ethers.providers.TransactionResponse) => {
+        const lastBlockNumberForChain = getBlockNumber(chainId);
         if (!tx) {
           if (transactions[hash].retries > 2) {
             if (transactions[hash].type)
@@ -107,16 +117,18 @@ export default function Updater(): null {
               }
             );
           } else {
-            dispatch(transactionFailed({ hash, blockNumber: lastBlockNumber, chainId: currentNetwork.chainId }));
+            dispatch(
+              transactionFailed({ hash, blockNumber: lastBlockNumberForChain, chainId: currentNetwork.chainId })
+            );
           }
         } else {
-          dispatch(checkedTransaction({ hash, blockNumber: lastBlockNumber, chainId: currentNetwork.chainId }));
+          dispatch(checkedTransaction({ hash, blockNumber: lastBlockNumberForChain, chainId: currentNetwork.chainId }));
         }
 
         return true;
       });
     },
-    [walletService, walletService.getAccount(), transactions, lastBlockNumber, dispatch, currentNetwork]
+    [walletService, walletService.getAccount(), transactions, getBlockNumber, dispatch, currentNetwork]
   );
 
   useEffect(() => {
@@ -131,9 +143,9 @@ export default function Updater(): null {
     if (!walletService.getAccount() || !lastBlockNumber) return;
 
     Object.keys(transactions)
-      .filter((hash) => shouldCheck(lastBlockNumber, transactions[hash]))
+      .filter((hash) => shouldCheck(getBlockNumber(transactions[hash].chainId) || -1, transactions[hash]))
       .forEach((hash) => {
-        const promise = getReceipt(hash);
+        const promise = getReceipt(hash, transactions[hash].chainId);
         promise
           .then(async (receipt) => {
             if (receipt && !transactions[hash].receipt && receipt.status !== 0) {
@@ -203,7 +215,7 @@ export default function Updater(): null {
                     effectiveGasPrice: (receipt.effectiveGasPrice || 0).toString(),
                   },
                   extendedTypeData,
-                  chainId: currentNetwork.chainId,
+                  chainId: transactions[hash].chainId,
                   realSafeHash,
                 })
               );
@@ -229,7 +241,7 @@ export default function Updater(): null {
 
               // the receipt was fetched before the block, fast forward to that block to trigger balance updates
               if (receipt.blockNumber > lastBlockNumber) {
-                dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber, chainId: currentNetwork.chainId }));
+                dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber, chainId: transactions[hash].chainId }));
               }
             } else if (receipt && !transactions[hash].receipt && receipt?.status === 0) {
               if (receipt?.status === 0) {
@@ -260,7 +272,7 @@ export default function Updater(): null {
                 );
               } else {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                checkIfTransactionExists(hash);
+                checkIfTransactionExists(hash, transactions[hash].chainId);
               }
             }
 
