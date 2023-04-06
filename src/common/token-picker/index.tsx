@@ -215,7 +215,7 @@ const LoadingRow = ({ style }: EmptyRowProps) => {
 
 const EmptyRow = () => (
   <StyledTokenTextContainer>
-    <Typography variant="h6" sx={{ textAlign: 'center' }}>
+    <Typography variant="body1" sx={{ textAlign: 'center' }}>
       <FormattedMessage
         description="noTokenFound"
         defaultMessage="We could not find any token with those search parameters"
