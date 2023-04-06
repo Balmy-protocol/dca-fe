@@ -62,6 +62,8 @@ function useCustomToken(
               balanceUsd,
             };
             setState({ isLoading: false, result: promiseResult, error: undefined });
+          } else {
+            setState({ isLoading: false, result: undefined, error: 'Invalid address' });
           }
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });
