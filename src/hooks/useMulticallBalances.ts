@@ -10,14 +10,22 @@ import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
 import useAccount from './useAccount';
 
-function useMulticallBalances(
-  tokens: string[] | undefined | null
-): [Record<string, { balance: BigNumber; balanceUsd: BigNumber }> | undefined, boolean, string?] {
+interface BalanceResponse {
+  balance: BigNumber;
+  balanceUsd: BigNumber;
+}
+
+interface Result {
+  balances: Record<string, BalanceResponse>;
+  chainId: number;
+}
+
+function useMulticallBalances(tokens: string[] | undefined | null): [Result | undefined, boolean, string?] {
   const walletService = useWalletService();
   const priceService = usePriceService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
-    result?: Record<string, { balance: BigNumber; balanceUsd: BigNumber }>;
+    result?: Result;
     error?: string;
   }>({
     isLoading: false,
@@ -64,7 +72,11 @@ function useMulticallBalances(
             {}
           );
 
-          setState({ isLoading: false, result: promiseResult, error: undefined });
+          setState({
+            isLoading: false,
+            result: { balances: promiseResult, chainId: currentNetwork.chainId },
+            error: undefined,
+          });
         } catch (e) {
           console.error('error fetching balances', e);
           setState({ result: undefined, error: e as string, isLoading: false });
