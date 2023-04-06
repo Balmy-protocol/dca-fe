@@ -289,7 +289,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             !REMOVED_AGG_CHAINS.includes(network?.chainId || -1) &&
             network?.name.toLowerCase().includes(chainSearch.toLowerCase())
         ),
-    [supportedChains]
+    [supportedChains, chainSearch]
   );
 
   return (
