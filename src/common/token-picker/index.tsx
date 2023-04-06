@@ -140,6 +140,7 @@ interface RowData {
   customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
   isLoadingTokenBalances: boolean;
   customTokens: TokenList;
+  balancesChainId?: number;
 }
 
 interface RowProps {
@@ -235,6 +236,7 @@ const Row = ({
     customToken,
     customTokens,
     isLoadingTokenBalances,
+    balancesChainId,
   },
 }: RowProps) => {
   const classes = useListItemStyles();
@@ -349,8 +351,10 @@ const Row = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {!Object.keys(tokenBalances).length && isLoadingTokenBalances && <CenteredLoadingIndicator size={10} />}
-        {tokenBalances && !!Object.keys(tokenBalances).length && (
+        {(!Object.keys(tokenBalances).length || balancesChainId !== token.chainId) && isLoadingTokenBalances && (
+          <CenteredLoadingIndicator size={10} />
+        )}
+        {tokenBalances && !!Object.keys(tokenBalances).length && balancesChainId === token.chainId && (
           <>
             {tokenBalance && (
               <Typography variant="body1" color="#FFFFFF">
@@ -503,7 +507,7 @@ const TokenPicker = ({
   const balances = React.useMemo(
     () => ({
       ...(inchBalances || {}),
-      ...(tokenBalances || {}),
+      ...(tokenBalances?.balances || {}),
     }),
     [tokenBalances, inchBalances]
   );
@@ -557,6 +561,7 @@ const TokenPicker = ({
         currentNetwork.chainId !== actualCurrentNetwork.chainId
           ? {}
           : balances || {},
+      balancesChainId: tokenBalances?.chainId,
       customToken: isAggregator ? customToken : undefined,
       isLoadingTokenBalances: isLoadingBalances,
       customTokens: isAggregator ? customTokens : {},

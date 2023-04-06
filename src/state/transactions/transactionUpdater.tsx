@@ -68,7 +68,7 @@ export default function Updater(): null {
       values(state).reduce<{
         [txHash: string]: TransactionDetails;
       }>((acc, chainState) => ({ ...acc, ...chainState }), {}) || {},
-    [state, currentNetwork]
+    [state]
   );
 
   const { enqueueSnackbar } = useSnackbar();
@@ -99,7 +99,7 @@ export default function Updater(): null {
                   ...transactions[hash].typeData,
                 },
               });
-            dispatch(removeTransaction({ hash, chainId: currentNetwork.chainId }));
+            dispatch(removeTransaction({ hash, chainId: transactions[hash].chainId }));
             enqueueSnackbar(
               buildRejectedTransactionMessage({
                 ...transactions[hash],
@@ -118,17 +118,19 @@ export default function Updater(): null {
             );
           } else {
             dispatch(
-              transactionFailed({ hash, blockNumber: lastBlockNumberForChain, chainId: currentNetwork.chainId })
+              transactionFailed({ hash, blockNumber: lastBlockNumberForChain, chainId: transactions[hash].chainId })
             );
           }
         } else {
-          dispatch(checkedTransaction({ hash, blockNumber: lastBlockNumberForChain, chainId: currentNetwork.chainId }));
+          dispatch(
+            checkedTransaction({ hash, blockNumber: lastBlockNumberForChain, chainId: transactions[hash].chainId })
+          );
         }
 
         return true;
       });
     },
-    [walletService, walletService.getAccount(), transactions, getBlockNumber, dispatch, currentNetwork]
+    [walletService, walletService.getAccount(), transactions, getBlockNumber, dispatch]
   );
 
   useEffect(() => {
@@ -158,7 +160,11 @@ export default function Updater(): null {
               }
 
               if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
-                const parsedLog = await transactionService.parseLog(receipt.logs, currentNetwork.chainId, 'Deposited');
+                const parsedLog = await transactionService.parseLog(
+                  receipt.logs,
+                  transactions[hash].chainId,
+                  'Deposited'
+                );
                 extendedTypeData = {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                   id: parsedLog.args.positionId.toString(),
@@ -169,7 +175,11 @@ export default function Updater(): null {
                 transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION ||
                 transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION_YIELD
               ) {
-                const parsedLog = await transactionService.parseLog(receipt.logs, currentNetwork.chainId, 'Deposited');
+                const parsedLog = await transactionService.parseLog(
+                  receipt.logs,
+                  transactions[hash].chainId,
+                  'Deposited'
+                );
 
                 extendedTypeData = {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -209,7 +219,7 @@ export default function Updater(): null {
                   hash,
                   receipt: {
                     ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
-                    chainId: currentNetwork.chainId,
+                    chainId: transactions[hash].chainId,
                     gasUsed: (receipt.gasUsed || 0).toString(),
                     cumulativeGasUsed: (receipt.cumulativeGasUsed || 0).toString(),
                     effectiveGasPrice: (receipt.effectiveGasPrice || 0).toString(),
