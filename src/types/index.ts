@@ -56,6 +56,7 @@ export type TransactionActionWaitForApprovalType = 'WAIT_FOR_APPROVAL';
 export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
 export type TransactionActionWaitForQuotesSimulationType = 'WAIT_FOR_QUOTES_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
+export type TransactionActionCreatePositionType = 'CREATE_POSITION';
 
 export type TransactionActionType =
   // Common
@@ -65,7 +66,8 @@ export type TransactionActionType =
   | TransactionActionWaitForSimulationType
   | TransactionActionWaitForQuotesSimulationType
   | TransactionActionWaitForSignApprovalType
-  | TransactionActionSwapType;
+  | TransactionActionSwapType
+  | TransactionActionCreatePositionType;
 
 export enum AllowanceType {
   specific = 'specific',
@@ -104,7 +106,16 @@ export interface TransactionActionSwapData {
   signature?: { deadline: number; v: number; r: Buffer; s: Buffer; nonce: BigNumber; rawSignature: string };
 }
 
+export interface TransactionActionCreatePositionData {
+  from: Token;
+  to: Token;
+  fromValue: string;
+  frequencyType: BigNumber;
+  frequencyValue: string;
+}
+
 export type TransactionActionExtraData =
   | TransactionActionApproveTokenData
   | TransactionActionWaitForApprovalData
-  | TransactionActionSwapData;
+  | TransactionActionSwapData
+  | TransactionActionCreatePositionData;
