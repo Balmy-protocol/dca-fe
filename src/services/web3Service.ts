@@ -154,7 +154,6 @@ export default class Web3Service {
     this.providerService = new ProviderService(client);
     this.safeService = new SafeService();
     this.contractService = new ContractService(this.providerService);
-    this.transactionService = new TransactionService(this.contractService, this.providerService);
     this.walletService = new WalletService(this.contractService, this.axiosClient, this.providerService);
     this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
     this.pairService = new PairService(
@@ -167,6 +166,7 @@ export default class Web3Service {
     );
     this.yieldService = new YieldService(this.walletService, this.providerService, this.axiosClient);
     this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient);
+    this.transactionService = new TransactionService(this.contractService, this.providerService, this.sdkService);
     this.aggregatorService = new AggregatorService(
       this.walletService,
       this.contractService,
@@ -512,7 +512,7 @@ export default class Web3Service {
       }
     );
 
-    const loadedAsSafeApp = false;
+    const loadedAsSafeApp = await this.safeService.isSafeApp();
 
     this.transactionService.setLoadedAsSafeApp(loadedAsSafeApp);
     this.meanApiService.setLoadedAsSafeApp(loadedAsSafeApp);

@@ -228,4 +228,12 @@ export default class SdkService {
       balance: BigNumber.from(0),
     };
   }
+
+  getTransactionReceipt(txHash: string, chainId: number) {
+    return this.sdk.providerSource.getEthersProvider({ chainId }).getTransactionReceipt(txHash);
+  }
+
+  getTransaction(txHash: string, chainId: number) {
+    return this.sdk.providerSource.getEthersProvider({ chainId }).getTransaction(txHash);
+  }
 }
