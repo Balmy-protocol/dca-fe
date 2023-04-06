@@ -27,11 +27,15 @@ export default class EventService {
   async trackEvent(action: string, extraData?: Record<string | number, unknown>) {
     const network = await this.providerService.getNetwork();
     const hashedId = await this.getIdentifier();
-    return this.meanApiService.trackEvent(action, {
-      distinct_id: this.sessionId,
-      hashedId,
-      chanId: network.chainId,
-      ...(extraData || {}),
-    });
+    return this.meanApiService.trackEvent(
+      action,
+      {
+        distinct_id: this.sessionId,
+        hashedId,
+        chanId: network.chainId,
+        ...(extraData || {}),
+      },
+      'test'
+    );
   }
 }
