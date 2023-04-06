@@ -15,3 +15,7 @@ export const MAX_DEDUCTION = {
   [NETWORKS.optimism.chainId]: parseUnits('0.000525', getProtocolToken(NETWORKS.optimism.chainId).decimals),
   [NETWORKS.mainnet.chainId]: parseUnits('0.021', getProtocolToken(NETWORKS.mainnet.chainId).decimals),
 };
+
+export const getMinAmountForMaxDeduction = (chainId: number) =>
+  MIN_AMOUNT_FOR_MAX_DEDUCTION[chainId] || parseUnits('0.1', 18);
+export const getMaxDeduction = (chainId: number) => MAX_DEDUCTION[chainId] || parseUnits('0.045', 18);

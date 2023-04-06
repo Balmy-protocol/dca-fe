@@ -26,7 +26,13 @@ import find from 'lodash/find';
 import TokenIcon from 'common/token-icon';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import { getGhTokenListLogoUrl, NETWORKS, REMOVED_AGG_CHAINS } from 'config';
+import {
+  getGhTokenListLogoUrl,
+  getMaxDeduction,
+  getMinAmountForMaxDeduction,
+  NETWORKS,
+  REMOVED_AGG_CHAINS,
+} from 'config';
 import { getAllChains } from '@mean-finance/sdk';
 import useSdkChains from 'hooks/useSdkChains';
 import useAccount from 'hooks/useAccount';
@@ -238,8 +244,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const onSetMaxBalance = () => {
     if (balance && from) {
       if (from.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue = balance.gte(parseUnits('1', from.decimals))
-          ? balance.sub(parseUnits('0.1', from.decimals))
+        const maxValue = balance.gte(getMinAmountForMaxDeduction(currentNetwork.chainId))
+          ? balance.sub(getMaxDeduction(currentNetwork.chainId))
           : balance;
         handleFromValueChange(formatUnits(maxValue, from.decimals));
       } else {
