@@ -382,11 +382,12 @@ export default class MeanApiService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async trackEvent(action: string, extraData: any) {
+  async trackEvent(action: string, extraData: any, project: 'main' | 'test' = 'main') {
     return this.axiosClient.post(`${MEAN_API_URL}/v1/mixpanel-track`, {
       action,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       extraData,
+      project,
     });
   }
 
