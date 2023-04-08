@@ -2553,15 +2553,14 @@
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/sdk@0.0.50":
-  version "0.0.50"
-  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.50.tgz#b42422d811b02aae537da3b7893d94f778cae1b3"
-  integrity sha512-VjzguBB19RrQCMpeMNt7cwU2CohBtlfuPC89AqWou5a54xIXqVEDD0uPVyQenzrXLpy5E0ElfEBIyrELLkJWVA==
+"@mean-finance/sdk@0.0.60":
+  version "0.0.60"
+  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.60.tgz#9124f3f3867521e28d47278b058f2b19abaade39"
+  integrity sha512-IcCJNZ55iSmR4nv8Qs1NX+G6HrgmPV5GCTdwh4KEHbu/SVJ6ybxfnk7E9XQU2/i1FQCcop+UvwFIVPVn4VnbJQ==
   dependencies:
     cross-fetch "3.1.5"
     ethers "5.7.2"
     ms "3.0.0-canary.1"
-    query-string-esm "6.13.6"
 
 "@mean-finance/swappers@1.1.0":
   version "1.1.0"
@@ -10488,15 +10487,6 @@ qs@~6.5.2:
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.3.tgz#3aeeffc91967ef6e35c0e488ef46fb296ab76aad"
   integrity sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==
-
-query-string-esm@6.13.6:
-  version "6.13.6"
-  resolved "https://registry.yarnpkg.com/query-string-esm/-/query-string-esm-6.13.6.tgz#f90e6078952acb99de0a7e41ae2b0b649288147f"
-  integrity sha512-1Jvw9eLG/lt40LMTeLmpdj8T2dkf7Hnd6ifQFPhqzF4wvHFSNDQNgFWUB4oPOCw3QvAVUNW8FFKsBpVpIcELlw==
-  dependencies:
-    decode-uri-component "^0.2.0"
-    split-on-first "^1.0.0"
-    strict-uri-encode "^2.0.0"
 
 query-string@6.13.5:
   version "6.13.5"

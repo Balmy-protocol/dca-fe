@@ -9,6 +9,7 @@ import { AxiosInstance } from 'axios';
 import { toToken } from 'utils/currency';
 import ProviderService from './providerService';
 import WalletService from './walletService';
+import { MEAN_API_URL } from 'config/constants/addresses';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<{}>>;
@@ -44,7 +45,7 @@ export default class SdkService {
                 list: {
                   type: 'api',
                   baseUri: ({ chainId, sourceId }: { chainId: number; sourceId: SourceId }) =>
-                    `https://api.mean.finance/v1/swap/networks/${chainId}/quotes/${sourceId}`,
+                    `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
                   sources: SOURCES_METADATA,
                 },
                 sourceIds: ['uniswap', 'odos', 'rango', '0x', 'firebird', 'changelly'],
@@ -98,8 +99,8 @@ export default class SdkService {
         ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
         ...(skipValidation ? { skipValidation } : {}),
         ...(isBuyOrder ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
-        quoteTimeout: '5s',
       },
+      config: { timeout: '5s' },
     });
   }
 
@@ -146,13 +147,13 @@ export default class SdkService {
           ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
           ...(skipValidation ? { skipValidation } : {}),
           ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
-          quoteTimeout: '5s',
         },
         config: {
           sort: {
             by: sortQuotesBy,
           },
           ignoredFailed: false,
+          timeout: '5s',
         },
       });
     } else {
@@ -179,13 +180,13 @@ export default class SdkService {
           ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
           ...(skipValidation ? { skipValidation } : {}),
           ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
-          quoteTimeout: '5s',
         },
         config: {
           sort: {
             by: sortQuotesBy,
           },
           ignoredFailed: false,
+          timeout: '5s',
         },
       });
     }
