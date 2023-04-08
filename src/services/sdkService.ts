@@ -7,9 +7,9 @@ import { BigNumber } from 'ethers';
 import { SwapOption, Token } from 'types';
 import { AxiosInstance } from 'axios';
 import { toToken } from 'utils/currency';
+import { MEAN_API_URL } from 'config/constants/addresses';
 import ProviderService from './providerService';
 import WalletService from './walletService';
-import { MEAN_API_URL } from 'config/constants/addresses';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<{}>>;
