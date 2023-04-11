@@ -382,7 +382,8 @@ export default class Web3Service {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         await this.walletService.changeNetworkAutomatically(chainId, () => this.setNetwork(chainId));
       } else {
-        this.setNetwork((await this.providerService.getNetwork()).chainId);
+        const providerChainId = (await this.providerService.getNetwork()).chainId;
+        this.setNetwork(providerChainId);
       }
     } catch (e) {
       console.error('Error changing network');

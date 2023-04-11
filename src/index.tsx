@@ -15,6 +15,7 @@ import { Theme } from '@mui/material/styles';
 import { Settings } from 'luxon';
 import LanguageContext from 'common/language-context';
 import { SupportedLanguages } from 'config/constants/lang';
+import { getChainIdFromUrl } from 'utils/urlParser';
 import MainApp from './frame';
 // import './index.css';
 
@@ -67,6 +68,8 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
 
   const isLoading = isLoadingWeb3;
 
+  const chainId = getChainIdFromUrl();
+
   return (
     <LanguageContext.Provider
       value={{
@@ -89,7 +92,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
           <Provider store={store}>
             {!isLoading && wagmiClient && chains && (
               <WagmiConfig client={wagmiClient}>
-                <RainbowKitProvider chains={chains} theme={darkTheme()}>
+                <RainbowKitProvider chains={chains} initialChain={chainId} theme={darkTheme()}>
                   <MainApp isLoading={isLoading} initializationError={setUpModalError} />
                 </RainbowKitProvider>
               </WagmiConfig>

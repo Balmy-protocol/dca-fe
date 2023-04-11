@@ -1,6 +1,12 @@
 import { BigNumber, ethers, Signer } from 'ethers';
 import find from 'lodash/find';
-import { AUTOMATIC_CHAIN_CHANGING_WALLETS, NETWORKS, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config';
+import {
+  AUTOMATIC_CHAIN_CHANGING_WALLETS,
+  NETWORKS,
+  LATEST_VERSION,
+  DEFAULT_NETWORK_FOR_VERSION,
+  CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
+} from 'config';
 import { getNetwork as getStringNetwork, Provider, Network, TransactionRequest } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { getProviderInfo } from 'web3modal';
@@ -193,7 +199,7 @@ export default class ProviderService {
             window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
           }
 
-          if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
+          if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
             window.location.reload();
           }
         });
@@ -223,7 +229,7 @@ export default class ProviderService {
         if (callbackBeforeReload) {
           callbackBeforeReload();
         }
-        if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
+        if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
           window.location.reload();
         }
       }
@@ -253,7 +259,7 @@ export default class ProviderService {
         callbackBeforeReload();
       }
 
-      if (!AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) {
+      if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
         window.location.reload();
       }
     } catch (switchError) {
