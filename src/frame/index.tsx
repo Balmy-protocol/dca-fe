@@ -24,7 +24,6 @@ import { SnackbarProvider } from 'notistack';
 import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NETWORKS } from 'config/constants';
 import { setNetwork } from 'state/config/actions';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import Leaderboard from 'pages/leaderboard';
 import Vector1 from 'assets/svg/vector1.svg';
 import Vector2 from 'assets/svg/vector2.svg';
 import find from 'lodash/find';
@@ -2388,11 +2387,6 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                         <Route path="/:chainId/positions/:positionVersion/:positionId">
                           {/* <RollbarContext context="/positions/details"> */}
                           <PositionDetail />
-                          {/* </RollbarContext> */}
-                        </Route>
-                        <Route path="/leaderboard">
-                          {/* <RollbarContext context="/leaderboard"> */}
-                          <Leaderboard />
                           {/* </RollbarContext> */}
                         </Route>
                         <Route path="/jbrl-competition">
