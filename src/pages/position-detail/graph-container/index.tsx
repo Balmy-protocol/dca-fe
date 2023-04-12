@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition } from 'types';
-import ProfitLossGraph, { Legends as ProfitLossLegends } from 'position-detail/profit-loss-graph';
-import AveragePriceGraph, { Legends as AveragePriceLegends } from 'position-detail/average-price-graph';
-import GasSavedGraph, { Legends as GasSavedLegends } from 'position-detail/gas-saved-graph';
-import SwapPriceGraph, { Legends as SwapPriceLegends } from 'position-detail/swap-price-graph';
+import ProfitLossGraph, { Legends as ProfitLossLegends } from 'pages/position-detail/profit-loss-graph';
+import AveragePriceGraph, { Legends as AveragePriceLegends } from 'pages/position-detail/average-price-graph';
+import GasSavedGraph, { Legends as GasSavedLegends } from 'pages/position-detail/gas-saved-graph';
+import SwapPriceGraph, { Legends as SwapPriceLegends } from 'pages/position-detail/swap-price-graph';
 import { NETWORKS } from 'config';
 import GraphSelector from './graph-selector';
 

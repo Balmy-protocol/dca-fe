@@ -2,11 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import PositionSwaps from 'position-detail/swaps';
+import PositionSwaps from 'pages/position-detail/swaps';
 import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
-import Details from 'position-detail/position-data';
+import Details from 'pages/position-detail/position-data';
 import Sticky from 'react-stickynode';
-import GraphContainer from 'position-detail/graph-container';
+import GraphContainer from 'pages/position-detail/graph-container';
 import { BigNumber } from 'ethers';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 
