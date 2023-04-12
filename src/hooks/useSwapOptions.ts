@@ -14,6 +14,7 @@ import {
 } from 'config/constants/aggregator';
 import { useBlockNumber } from 'state/block-number/hooks';
 import { BigNumber } from 'ethers';
+import { MAX_UINT_32 } from 'config';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
 import useSelectedNetwork from './useSelectedNetwork';
@@ -183,7 +184,9 @@ function useSwapOptions(
   let resultToReturn = !error ? result || prevResult : undefined;
 
   if (sorting === SORT_LEAST_GAS && resultToReturn) {
-    resultToReturn = [...resultToReturn].sort((a, b) => (a.gas.estimatedCost.lt(b.gas.estimatedCost) ? -1 : 1));
+    resultToReturn = [...resultToReturn].sort((a, b) =>
+      a.gas?.estimatedCost.lt(b.gas?.estimatedCost || MAX_UINT_32) ? -1 : 1
+    );
   }
 
   if (sorting === SORT_MOST_RETURN && resultToReturn) {

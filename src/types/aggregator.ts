@@ -27,7 +27,7 @@ export type SwapOption = {
     amountInUnits: string;
     amountInUSD?: number;
   };
-  gas: {
+  gas?: {
     estimatedGas: BigNumber;
     estimatedCost: BigNumber;
     estimatedCostInUnits: string;
