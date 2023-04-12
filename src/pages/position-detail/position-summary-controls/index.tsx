@@ -10,10 +10,10 @@ import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
 import { TOKEN_BLACKLIST, LATEST_VERSION, shouldEnableFrequency, DISABLED_YIELD_WITHDRAWS } from 'config';
-import Button from 'common/button';
-import SplitButton from 'common/split-button';
+import Button from 'common/components/button';
+import SplitButton from 'common/components/split-button';
 import useSupportsSigning from 'hooks/useSupportsSigning';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
 import { BigNumber } from 'ethers';
 
 const StyledButton = styled(Button)`

@@ -1,5 +1,5 @@
 import { YieldOption } from 'types';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { emptyTokenWithAddress } from 'common/utils/currency';
 import { NETWORKS } from './addresses';
 
 export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {

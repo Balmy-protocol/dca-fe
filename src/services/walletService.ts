@@ -9,14 +9,14 @@ import { formatUnits } from '@ethersproject/units';
 import { GetUsedTokensData, Token } from 'types';
 import { MaxUint256 } from '@ethersproject/constants';
 import isUndefined from 'lodash/isUndefined';
-import { toToken } from 'utils/currency';
+import { toToken } from 'common/utils/currency';
 
 // ABIS
 import ERC20ABI from 'abis/erc20.json';
 import MULTICALLABI from 'abis/Multicall.json';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
 import {
   LATEST_VERSION,
   MULTICALL_ADDRESS,

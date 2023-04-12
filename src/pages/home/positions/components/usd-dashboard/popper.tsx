@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithDecimals, formatCurrencyAmount } from 'utils/currency';
+import { emptyTokenWithDecimals, formatCurrencyAmount } from 'common/utils/currency';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;

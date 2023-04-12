@@ -4,8 +4,8 @@ import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
 import { Token } from 'types';
-import { formatCurrencyAmount } from 'utils/currency';
-import { capitalizeFirstLetter } from 'utils/parsing';
+import { formatCurrencyAmount } from 'common/utils/currency';
+import { capitalizeFirstLetter } from 'common/utils/parsing';
 
 const StyledPaper = styled.div`
   padding: 16px;

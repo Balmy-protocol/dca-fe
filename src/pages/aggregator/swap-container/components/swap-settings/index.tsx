@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Slide from '@mui/material/Slide';
 import Grid from '@mui/material/Grid';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import IconButton from '@mui/material/IconButton';
@@ -16,9 +16,9 @@ import {
   setDisabledDexes,
   setConfetti,
 } from 'state/aggregator-settings/actions';
-import SlippageInput from 'common/slippage-input';
-import ConfettiInput from 'common/confetti-input';
-import GasSelector from 'common/gas-selector';
+import SlippageInput from 'common/components/slippage-input';
+import ConfettiInput from 'common/components/confetti-input';
+import GasSelector from 'common/components/gas-selector';
 import { GasKeys } from 'config/constants/aggregator';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';

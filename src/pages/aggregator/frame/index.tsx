@@ -1,7 +1,7 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import styled from 'styled-components';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
 import { changeMainTab } from 'state/tabs/actions';
 import { useAppDispatch } from 'state/hooks';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';

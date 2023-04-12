@@ -18,7 +18,7 @@ import useCurrentNetwork from 'hooks/useCurrentNetwork';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION, TRANSACTION_TYPES } from 'config/constants';
 import pickBy from 'lodash/pickBy';
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'common/mocks/tokens';
 import usePositionService from 'hooks/usePositionService';
 import useWalletService from 'hooks/useWalletService';
 import useArcx from 'hooks/useArcx';

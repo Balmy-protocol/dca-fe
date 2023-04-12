@@ -20,16 +20,16 @@ import {
   calculateNextSwapAvailableAt,
   sortTokens,
   sortTokensByAddress,
-} from 'utils/parsing';
+} from 'common/utils/parsing';
 import { BigNumber } from 'ethers';
 
 // GQL queries
 import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
 import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
-import gqlFetchAll from 'utils/gqlFetchAll';
+import gqlFetchAll from 'common/utils/gqlFetchAll';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'common/mocks/tokens';
 import {
   ORACLES,
   PositionVersions,

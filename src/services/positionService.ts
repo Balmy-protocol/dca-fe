@@ -44,7 +44,7 @@ import GET_POSITIONS from 'graphql/getPositions.graphql';
 import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'common/mocks/tokens';
 import {
   MAX_UINT_32,
   NETWORKS_FOR_MENU,
@@ -60,9 +60,9 @@ import {
 } from 'config/constants';
 import { PermissionManagerContract, PermissionPermit } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
-import { emptyTokenWithAddress } from 'utils/currency';
-import { getDisplayToken } from 'utils/parsing';
-import gqlFetchAll, { GraphqlResults } from 'utils/gqlFetchAll';
+import { emptyTokenWithAddress } from 'common/utils/currency';
+import { getDisplayToken } from 'common/utils/parsing';
+import gqlFetchAll, { GraphqlResults } from 'common/utils/gqlFetchAll';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';

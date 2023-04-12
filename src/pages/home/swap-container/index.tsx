@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import orderBy from 'lodash/orderBy';
-import GraphWidget from 'common/graph-widget';
-import { getProtocolToken } from 'mocks/tokens';
+import GraphWidget from 'common/components/graph-widget';
+import { getProtocolToken } from 'common/mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from 'hooks/useSelectedNetwork';
 import {

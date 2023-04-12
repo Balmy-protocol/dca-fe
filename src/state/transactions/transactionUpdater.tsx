@@ -9,7 +9,7 @@ import Zoom from '@mui/material/Zoom';
 import { useBlockNumber, useGetBlockNumber } from 'state/block-number/hooks';
 import { updateBlockNumber } from 'state/block-number/actions';
 import { TRANSACTION_TYPES } from 'config/constants';
-import EtherscanLink from 'common/view-on-etherscan';
+import EtherscanLink from 'common/components/view-on-etherscan';
 import { TransactionDetails, TransactionReceipt } from 'types';
 import { setInitialized } from 'state/initializer/actions';
 import useTransactionService from 'hooks/useTransactionService';

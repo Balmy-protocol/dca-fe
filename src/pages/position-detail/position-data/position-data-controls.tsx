@@ -1,6 +1,6 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
@@ -13,12 +13,12 @@ import {
   shouldEnableFrequency,
 } from 'config/constants';
 import { BigNumber } from 'ethers';
-import { buildEtherscanTransaction } from 'utils/etherscan';
+import { buildEtherscanTransaction } from 'common/utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
 import useWalletService from 'hooks/useWalletService';
 import useSupportsSigning from 'hooks/useSupportsSigning';
-import { fullPositionToMappedPosition } from 'utils/parsing';
+import { fullPositionToMappedPosition } from 'common/utils/parsing';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useTokenList from 'hooks/useTokenList';
 import { setNetwork } from 'state/config/actions';

@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { emptyTokenWithAddress } from 'common/utils/currency';
 import { useBlockNumber } from 'state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';

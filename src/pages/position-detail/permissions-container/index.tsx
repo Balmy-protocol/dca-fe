@@ -16,13 +16,13 @@ import { FormattedMessage } from 'react-intl';
 import { TRANSACTION_TYPES } from 'config/constants';
 import { discardChanges, submitPermissionChanges } from 'state/position-permissions/actions';
 import { useAppDispatch } from 'state/hooks';
-import AddAddressPermissionModal from 'common/add-address-permission-modal';
+import AddAddressPermissionModal from 'common/components/add-address-permission-modal';
 import Paper from '@mui/material/Paper';
 import usePositionService from 'hooks/usePositionService';
-import { fullPositionToMappedPosition } from 'utils/parsing';
+import { fullPositionToMappedPosition } from 'common/utils/parsing';
 import useAccount from 'hooks/useAccount';
 import useErrorService from 'hooks/useErrorService';
-import { shouldTrackError } from 'utils/errors';
+import { shouldTrackError } from 'common/utils/errors';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;

@@ -5,7 +5,7 @@ import { AxiosInstance, AxiosResponse } from 'axios';
 import { CoinGeckoPriceResponse, Token, TxPriceResponse } from 'types';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'common/mocks/tokens';
 import {
   COINGECKO_IDS,
   DEFAULT_NETWORK_FOR_VERSION,
@@ -19,7 +19,7 @@ import {
   ZRX_API_ADDRESS,
 } from 'config/constants';
 import { DateTime } from 'luxon';
-import { emptyTokenWithAddress } from 'utils/currency';
+import { emptyTokenWithAddress } from 'common/utils/currency';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';

@@ -4,7 +4,7 @@ import { DefillamaResponse, YieldOptions } from 'types';
 
 // MOCKS
 import { ALLOWED_YIELDS, DISABLED_YIELDS } from 'config/constants';
-import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken } from 'common/mocks/tokens';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 

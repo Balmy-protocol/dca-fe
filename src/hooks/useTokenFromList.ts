@@ -1,7 +1,7 @@
 import React from 'react';
 import { Token } from 'types';
 import find from 'lodash/find';
-import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
 import { useTokensLists } from 'state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 

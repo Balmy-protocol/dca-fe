@@ -20,10 +20,10 @@ import { FullPosition, Token } from 'types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
 import { POSITION_ACTIONS, STABLE_COINS } from 'config/constants';
-import GraphTooltip from 'common/graph-tooltip';
+import GraphTooltip from 'common/components/graph-tooltip';
 import EmptyGraph from 'assets/svg/emptyGraph';
-import { formatCurrencyAmount } from 'utils/currency';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { formatCurrencyAmount } from 'common/utils/currency';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
 
 const StyledContainer = styled(Paper)`
   display: flex;

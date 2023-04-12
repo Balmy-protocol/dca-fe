@@ -22,7 +22,7 @@ import { POSITION_ACTIONS } from 'config/constants';
 import EmptyGraph from 'assets/svg/emptyGraph';
 import usePriceService from 'hooks/usePriceService';
 import { formatUnits } from '@ethersproject/units';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
 import ProfitLossTooltip from './tooltip';
 
 const StyledContainer = styled(Paper)`

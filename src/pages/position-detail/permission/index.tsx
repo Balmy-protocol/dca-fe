@@ -11,14 +11,14 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
-import { buildEtherscanAddress } from 'utils/etherscan';
+import { buildEtherscanAddress } from 'common/utils/etherscan';
 import { useAppDispatch } from 'hooks/state';
 import { addPermission, removePermission } from 'state/position-permissions/actions';
 import { isCompanionAddress, STRING_PERMISSIONS } from 'config/constants';
 import { FormattedMessage, useIntl } from 'react-intl';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import Address from 'common/address';
+import Address from 'common/components/address';
 
 interface PositionPermissionProps {
   positionPermission: PositionPermission;
