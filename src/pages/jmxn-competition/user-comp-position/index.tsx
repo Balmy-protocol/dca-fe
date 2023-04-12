@@ -7,7 +7,7 @@ import { FullPosition, Token, YieldOptions } from 'types';
 import { BigNumber } from 'ethers';
 import { Card, CardContent, Collapse, Divider, Paper, Typography } from '@mui/material';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { JMXN_ADDRESS, JMXN_TOKEN } from 'jmxn-competition/constants';
+import { JMXN_ADDRESS, JMXN_TOKEN } from 'pages/jmxn-competition/constants';
 import { formatCurrencyAmount, parseUsdPrice } from 'utils/currency';
 import TokenIcon from 'common/token-icon';
 import CustomChip from 'common/custom-chip';

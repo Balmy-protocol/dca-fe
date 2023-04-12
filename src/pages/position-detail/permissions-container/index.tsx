@@ -4,13 +4,13 @@ import Grid from '@mui/material/Grid';
 import { FullPosition } from 'types';
 import useTransactionModal from 'hooks/useTransactionModal';
 import { useTransactionAdder } from 'state/transactions/hooks';
-import PositionPermissionsControls from 'position-detail/position-permissions-controls ';
+import PositionPermissionsControls from 'pages/position-detail/position-permissions-controls ';
 import {
   useHasModifiedPermissions,
   useModifiedPermissions,
   usePositionPermissions,
 } from 'state/position-permissions/hooks';
-import PositionPermission from 'position-detail/permission';
+import PositionPermission from 'pages/position-detail/permission';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { TRANSACTION_TYPES } from 'config/constants';

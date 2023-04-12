@@ -14,7 +14,13 @@ import { getDisplayToken } from 'utils/parsing';
 import useRawUsdPrices from 'hooks/useUsdRawPrices';
 import { parseUsdPrice, toToken } from 'utils/currency';
 import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
-import { CREATED_AT_STOP, JMXN_CUTOFF, JMXN_ADDRESS, JMXN_TOKEN, CREATED_AT_START } from 'jmxn-competition/constants';
+import {
+  CREATED_AT_STOP,
+  JMXN_CUTOFF,
+  JMXN_ADDRESS,
+  JMXN_TOKEN,
+  CREATED_AT_START,
+} from 'pages/jmxn-competition/constants';
 import { Typography } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
 import useYieldOptions from 'hooks/useYieldOptions';

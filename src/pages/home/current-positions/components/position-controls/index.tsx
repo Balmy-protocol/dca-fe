@@ -284,7 +284,11 @@ const PositionControls = ({
               </Typography>
             </Link>
           </MenuItem>
-          <MenuItem onClick={handleTerminate} disabled={disabled || !isOnNetwork || disabledWithdraw} style={{ color: '#FF5359' }}>
+          <MenuItem
+            onClick={handleTerminate}
+            disabled={disabled || !isOnNetwork || disabledWithdraw}
+            style={{ color: '#FF5359' }}
+          >
             <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
           </MenuItem>
         </StyledMenu>
