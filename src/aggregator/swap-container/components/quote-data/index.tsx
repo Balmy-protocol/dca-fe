@@ -56,7 +56,7 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
           <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
         </Typography>
         <Typography variant="body2">
-          {quote?.gas.estimatedCostInUSD
+          {quote?.gas?.estimatedCostInUSD
             ? `$${quote.gas.estimatedCostInUSD} (${formatCurrencyAmount(
                 quote.gas.estimatedCost,
                 protocolToken,

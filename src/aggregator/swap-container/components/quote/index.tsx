@@ -237,7 +237,7 @@ const SwapQuote = ({
     quote &&
     showTransactionCost &&
     !!quote.buyAmount.amountInUSD &&
-    !!quote.gas.estimatedCostInUSD &&
+    !!quote.gas?.estimatedCostInUSD &&
     Math.round((quote.buyAmount.amountInUSD - quote.gas.estimatedCostInUSD) * 100) / 100;
 
   const priceImpactAfterTxCost =
@@ -296,7 +296,7 @@ const SwapQuote = ({
               size="small"
             />
           )}
-          {quote.gas.estimatedCost.gt(bestQuote?.gas.estimatedCost || 0) && (
+          {quote.gas?.estimatedCost.gt(bestQuote?.gas?.estimatedCost || 0) && (
             <StatusChip
               label={<FormattedMessage description="moreGas" defaultMessage="More gas" />}
               color="error"
@@ -312,11 +312,13 @@ const SwapQuote = ({
               size="small"
             />
           )}
-          {!isUndefined(quote.gas.estimatedCostInUSD) && (
+          {!isUndefined(quote.gas?.estimatedCostInUSD) && (
             <DarkChip
               size="small"
               icon={<LocalGasStationIcon fontSize="small" />}
-              label={`${toPrecision(quote.gas.estimatedCostInUSD.toString())} $`}
+              // Disabling since we are sure this existis due to the previous check
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              label={`${toPrecision(quote.gas!.estimatedCostInUSD.toString())} $`}
             />
           )}
         </StyledTitleDataContainer>
