@@ -84,7 +84,15 @@ const SwapContainer = () => {
     } else if (fromParamCustomToken && !from) {
       dispatch(setFrom(fromParamCustomToken.token));
     } else if (!from && !to && !toParamToken && !toParamCustomToken) {
-      dispatch(setFrom(getProtocolToken(Number(chainId || actualCurrentNetwork.chainId || currentNetwork.chainId))));
+      let networkToUse = find(mappedNetworks, { chainId: Number(chainId) });
+      if (!networkToUse && chainId) {
+        networkToUse = find(mappedNetworks, { name: chainId.toLowerCase() });
+      }
+      dispatch(
+        setFrom(
+          getProtocolToken(Number(networkToUse?.chainId || actualCurrentNetwork.chainId || currentNetwork.chainId))
+        )
+      );
     }
 
     if (toParamToken) {
