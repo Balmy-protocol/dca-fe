@@ -321,6 +321,13 @@ const SwapQuote = ({
               label={`${toPrecision(quote.gas!.estimatedCostInUSD.toString())} $`}
             />
           )}
+          {isUndefined(quote.gas?.estimatedCostInUSD) && (
+            <DarkChip
+              size="small"
+              icon={<LocalGasStationIcon fontSize="small" />}
+              label={<FormattedMessage description="unkown" defaultMessage="Unknown" />}
+            />
+          )}
         </StyledTitleDataContainer>
       </StyledTitleContainer>
       <StyledRouteContainer
