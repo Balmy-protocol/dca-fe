@@ -17,7 +17,6 @@ import LanguageContext from 'common/components/language-context';
 import { SupportedLanguages } from 'config/constants/lang';
 import { getChainIdFromUrl } from 'common/utils/urlParser';
 import MainApp from './frame';
-// import './index.css';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
