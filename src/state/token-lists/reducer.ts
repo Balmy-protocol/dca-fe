@@ -68,6 +68,27 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
   },
+  'https://api.portals.fi/v1/tokens/format/uniswap': {
+    name: 'Portals',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
+  'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=true&include_pricing=false&include_preview=false':
+    {
+      name: 'Wido',
+      logoURI: '',
+      timestamp: new Date().getTime(),
+      tokens: [],
+      version: { major: 0, minor: 0, patch: 0 },
+      hasLoaded: false,
+      requestId: '',
+      fetchable: true,
+    },
 
   /* -------------------------------------------------------------------------- */
   /*                                    Canto                                   */
