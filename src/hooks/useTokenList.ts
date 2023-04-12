@@ -3,7 +3,7 @@ import { TokenList } from 'types';
 import reduce from 'lodash/reduce';
 import keyBy from 'lodash/keyBy';
 import { ALLOWED_YIELDS, TOKEN_BLACKLIST } from 'config/constants';
-import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS, TOKEN_MAP_SYMBOL } from 'mocks/tokens';
+import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS, TOKEN_MAP_SYMBOL } from 'common/mocks/tokens';
 import { useSavedAggregatorTokenLists, useTokensLists } from 'state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 

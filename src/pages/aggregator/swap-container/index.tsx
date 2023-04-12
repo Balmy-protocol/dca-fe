@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import find from 'lodash/find';
-import { getProtocolToken } from 'mocks/tokens';
+import { getProtocolToken } from 'common/mocks/tokens';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, NETWORKS, REMOVED_AGG_CHAINS } from 'config/constants';
 import { SwapOption, Token } from 'types';

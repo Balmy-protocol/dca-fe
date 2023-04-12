@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import isUndefined from 'lodash/isUndefined';
 import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
@@ -9,7 +9,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FormHelperText from '@mui/material/FormHelperText';
 import { createStyles, FilledInput, Typography } from '@mui/material';
 import { withStyles, makeStyles } from '@mui/styles';
-import TokenIcon from 'common/token-icon';
+import TokenIcon from 'common/components/token-icon';
 import { FormattedMessage } from 'react-intl';
 
 const StyledTokenInputContainer = styled.div`

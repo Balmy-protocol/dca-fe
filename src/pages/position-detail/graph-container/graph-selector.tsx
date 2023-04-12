@@ -1,7 +1,7 @@
 import * as React from 'react';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import { createStyles } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';

@@ -28,11 +28,11 @@ import {
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import useAvailablePairs from 'hooks/useAvailablePairs';
-import { formatCurrencyAmount } from 'utils/currency';
+import { formatCurrencyAmount } from 'common/utils/currency';
 import { BigNumber } from 'ethers';
 import { defineMessage, useIntl } from 'react-intl';
-import { getWrappedProtocolToken } from 'mocks/tokens';
-import { getFrequencyLabel } from 'utils/parsing';
+import { getWrappedProtocolToken } from 'common/mocks/tokens';
+import { getFrequencyLabel } from 'common/utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 

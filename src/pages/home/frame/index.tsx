@@ -1,7 +1,7 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import find from 'lodash/find';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
 import { useSubTab } from 'state/tabs/hooks';
 import { useParams } from 'react-router-dom';
 import {

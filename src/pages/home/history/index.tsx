@@ -1,8 +1,8 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import usePastPositions from 'hooks/usePastPositions';
-import EmptyPositions from 'common/empty-positions';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import EmptyPositions from 'common/components/empty-positions';
+import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
 import usePositionService from 'hooks/usePositionService';
 import PastPosition from './components/position';
 

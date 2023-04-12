@@ -6,8 +6,8 @@ import { DateTime } from 'luxon';
 import { AvailablePair, Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage, useIntl } from 'react-intl';
-import TokenInput from 'common/token-input';
-import FrequencyInput from 'common/frequency-easy-input';
+import TokenInput from 'common/components/token-input';
+import FrequencyInput from 'common/components/frequency-easy-input';
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
   MINIMUM_USD_RATE_FOR_YIELD,
@@ -15,16 +15,16 @@ import {
   SWAP_INTERVALS_MAP,
 } from 'config/constants';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import { BigNumber } from 'ethers';
 import Switch from '@mui/material/Switch';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import Collapse from '@mui/material/Collapse';
-import YieldTokenSelector from 'common/yield-token-selector';
+import YieldTokenSelector from 'common/components/yield-token-selector';
 import useCurrentNetwork from 'hooks/useSelectedNetwork';
-import { formatCurrencyAmount, usdPriceToToken } from 'utils/currency';
+import { formatCurrencyAmount, usdPriceToToken } from 'common/utils/currency';
 import findIndex from 'lodash/findIndex';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`

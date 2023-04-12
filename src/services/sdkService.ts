@@ -6,7 +6,7 @@ import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from 'config/constants/agg
 import { BigNumber } from 'ethers';
 import { SwapOption, Token } from 'types';
 import { AxiosInstance } from 'axios';
-import { toToken } from 'utils/currency';
+import { toToken } from 'common/utils/currency';
 import { MEAN_API_URL } from 'config/constants/addresses';
 import ProviderService from './providerService';
 import WalletService from './walletService';

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import find from 'lodash/find';
 import { FormattedMessage } from 'react-intl';
 import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN } from 'config/constants/aggregator';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import { createStyles, Theme } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';

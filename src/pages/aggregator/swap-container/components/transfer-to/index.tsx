@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { useAppDispatch } from 'hooks/state';

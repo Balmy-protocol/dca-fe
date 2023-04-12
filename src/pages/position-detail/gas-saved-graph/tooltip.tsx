@@ -3,7 +3,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
-import { capitalizeFirstLetter } from 'utils/parsing';
+import { capitalizeFirstLetter } from 'common/utils/parsing';
 
 const StyledPaper = styled.div`
   padding: 16px;
