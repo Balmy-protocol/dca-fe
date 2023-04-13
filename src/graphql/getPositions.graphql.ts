@@ -72,6 +72,11 @@ const getCurrentPositions = gql`
       remainingLiquidity
       withdrawn
       toWithdraw
+      permissions {
+        id
+        operator
+        permissions
+      }
     }
   }
 `;

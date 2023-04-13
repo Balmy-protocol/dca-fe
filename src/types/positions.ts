@@ -33,6 +33,13 @@ export type PositionActions =
   | 'TRANSFERED'
   | 'PERMISSIONS_MODIFIED';
 
+export type PermissionData = {
+  id: string;
+  operator: string;
+  permissions: Permission[];
+};
+
+export type FullPermission = { [key: string]: PermissionData };
 export interface Position {
   from: Token;
   to: Token;
@@ -63,6 +70,7 @@ export interface Position {
   yieldTo?: string;
   toWithdrawUnderlying: Nullable<BigNumber>;
   remainingLiquidityUnderlying: Nullable<BigNumber>;
+  permissions?: PermissionData[];
 }
 
 export interface FullPosition {

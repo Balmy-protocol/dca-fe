@@ -236,4 +236,67 @@ export default class SdkService {
   getTransaction(txHash: string, chainId: number) {
     return this.sdk.providerSource.getEthersProvider({ chainId }).getTransaction(txHash);
   }
+
+  async getMultipleBalances(tokens: Token[]): Promise<Record<number, Record<string, BigNumber>>> {
+    const account = this.walletService.getAccount();
+    const balances = await this.sdk.balanceService.getBalancesForTokens({
+      account,
+      tokens: tokens.reduce<Record<number, string[]>>((acc, token) => {
+        const newAcc = {
+          ...acc,
+        };
+
+        if (!newAcc[token.chainId]) {
+          newAcc[token.chainId] = [];
+        }
+
+        if (!newAcc[token.chainId].includes(token.address)) {
+          newAcc[token.chainId] = [...newAcc[token.chainId], token.address];
+        }
+
+        return newAcc;
+      }, {}),
+    });
+
+    const chainIds = Object.keys(balances);
+
+    return chainIds.reduce(
+      (acc, chainId) => ({
+        ...acc,
+        [chainId]: Object.keys(balances[Number(chainId)]).reduce(
+          (tokenAcc, tokenAddress) => ({
+            ...tokenAcc,
+            [tokenAddress]: BigNumber.from(balances[Number(chainId)][tokenAddress]),
+          }),
+          {}
+        ),
+      }),
+      {}
+    );
+  }
+
+  async getMultipleAllowances(
+    tokenChecks: Record<string, string>,
+    chainId: number
+  ): Promise<Record<string, Record<string, BigNumber>>> {
+    const account = this.walletService.getAccount();
+    const allowances = await this.sdk.allowanceService.getMultipleAllowances({
+      chainId,
+      check: Object.keys(tokenChecks).map((tokenAddress) => ({
+        token: tokenAddress,
+        owner: account,
+        spender: tokenChecks[tokenAddress],
+      })),
+    });
+
+    return Object.keys(tokenChecks).reduce<Record<string, Record<string, BigNumber>>>(
+      (acc, address) => ({
+        ...acc,
+        [address]: {
+          [tokenChecks[address]]: BigNumber.from(allowances[address][account][tokenChecks[address]]),
+        },
+      }),
+      {}
+    );
+  }
 }

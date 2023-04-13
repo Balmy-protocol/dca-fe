@@ -5,6 +5,7 @@ import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
+import findIndex from 'lodash/findIndex';
 import { hexlify } from 'ethers/lib/utils';
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import {
@@ -31,6 +32,9 @@ import {
   WithdrawFundsTypeData,
   YieldOption,
   MigratePositionYieldTypeData,
+  TransactionPositionManyTypeDataOptions,
+  EulerClaimTerminateManyTypeData,
+  EulerClaimPermitManyTypeData,
 } from 'types';
 
 // GRAPHQL
@@ -248,6 +252,7 @@ export default class PositionService {
                   (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
                   position.createdAtTimestamp,
                 pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
+                ...(!!position.permissions && { permissions: position.permissions }),
               };
             }),
             'id'
@@ -380,7 +385,7 @@ export default class PositionService {
   async getSignatureForPermission(
     position: Position,
     contractAddress: string,
-    permission: number,
+    permission: PERMISSIONS,
     permissionManagerAddressProvided?: string,
     erc712Name?: string
   ) {
@@ -887,6 +892,83 @@ export default class PositionService {
     );
   }
 
+  async terminateManyRaw(positions: Position[]): Promise<TransactionResponse> {
+    const { chainId } = positions[0];
+
+    // Check that all positions are from the same chain
+    const isOneOnDifferentChain = positions.some((position) => position.chainId !== chainId);
+    if (isOneOnDifferentChain) {
+      throw new Error('Should not call terminate many for positions on different chains');
+    }
+
+    const companionInstance = await this.contractService.getHUBCompanionInstance(LATEST_VERSION);
+    const account = this.walletService.getAccount();
+    const terminatesData: string[] = [];
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < positions.length; i++) {
+      const position = positions[i];
+      const hubAddress = await this.contractService.getHUBAddress(position.version);
+
+      const terminateData = companionInstance.interface.encodeFunctionData('terminate', [
+        hubAddress,
+        position.positionId,
+        account,
+        account,
+      ]);
+      terminatesData.push(terminateData);
+    }
+
+    return companionInstance.multicall(terminatesData);
+  }
+
+  async givePermissionToMultiplePositions(
+    positions: Position[],
+    permissions: PERMISSIONS[],
+    permittedAddress: string
+  ): Promise<TransactionResponse> {
+    const { chainId, version } = positions[0];
+
+    // Check that all positions are from the same chain and same version
+    const isOneOnDifferentChainOrVersion = positions.some(
+      (position) => position.chainId !== chainId || position.version !== version
+    );
+    if (isOneOnDifferentChainOrVersion) {
+      throw new Error('Should not call give permission many for positions on different chains or versions');
+    }
+
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(version);
+
+    const positionsDataPromises = positions.map(async ({ positionId }) => {
+      const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await permissionManagerInstance.hasPermissions(
+        positionId,
+        permittedAddress,
+        [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE]
+      );
+
+      const defaultPermissions = [
+        ...(hasIncrease || permissions.includes(PERMISSIONS.INCREASE) ? [PERMISSIONS.INCREASE] : []),
+        ...(hasReduce || permissions.includes(PERMISSIONS.REDUCE) ? [PERMISSIONS.REDUCE] : []),
+        ...(hasWithdraw || permissions.includes(PERMISSIONS.WITHDRAW) ? [PERMISSIONS.WITHDRAW] : []),
+        ...(hasTerminate || permissions.includes(PERMISSIONS.TERMINATE) ? [PERMISSIONS.TERMINATE] : []),
+      ];
+
+      return {
+        tokenId: positionId,
+        permissionSets: [
+          {
+            operator: permittedAddress,
+            permissions: defaultPermissions,
+          },
+        ],
+      };
+    });
+
+    const positionsData = await Promise.all(positionsDataPromises);
+
+    return permissionManagerInstance.modifyMany(positionsData);
+  }
+
   async buildModifyRateAndSwapsParams(
     position: Position,
     newRateUnderlying: string,
@@ -1152,6 +1234,19 @@ export default class PositionService {
     if (this.currentPositions[id]) {
       this.currentPositions[id].pendingTransaction = transaction.hash;
     }
+
+    if (
+      transaction.type === TRANSACTION_TYPES.EULER_CLAIM_PERMIT_MANY ||
+      transaction.type === TRANSACTION_TYPES.EULER_CLAIM_TERMINATE_MANY
+    ) {
+      const { positionIds } = typeData as TransactionPositionManyTypeDataOptions;
+
+      positionIds.forEach((positionId) => {
+        if (this.currentPositions[positionId]) {
+          this.currentPositions[positionId].pendingTransaction = transaction.hash;
+        }
+      });
+    }
   }
 
   handleTransactionRejection(transaction: TransactionDetails) {
@@ -1168,6 +1263,17 @@ export default class PositionService {
       delete this.currentPositions[`pending-transaction-${transaction.hash}-v${LATEST_VERSION}`];
     } else if (id) {
       this.currentPositions[id].pendingTransaction = '';
+    } else if (
+      transaction.type === TRANSACTION_TYPES.EULER_CLAIM_PERMIT_MANY ||
+      transaction.type === TRANSACTION_TYPES.EULER_CLAIM_TERMINATE_MANY
+    ) {
+      const { positionIds } = typeData as TransactionPositionManyTypeDataOptions;
+
+      positionIds.forEach((positionId) => {
+        if (this.currentPositions[positionId]) {
+          this.currentPositions[positionId].pendingTransaction = '';
+        }
+      });
     }
   }
 
@@ -1180,7 +1286,12 @@ export default class PositionService {
     }
 
     const typeData = transaction.typeData as TransactionPositionTypeDataOptions;
-    if (!this.currentPositions[typeData.id] && transaction.type !== TRANSACTION_TYPES.NEW_POSITION) {
+    if (
+      !this.currentPositions[typeData.id] &&
+      transaction.type !== TRANSACTION_TYPES.NEW_POSITION &&
+      transaction.type !== TRANSACTION_TYPES.EULER_CLAIM_PERMIT_MANY &&
+      transaction.type !== TRANSACTION_TYPES.EULER_CLAIM_TERMINATE_MANY
+    ) {
       if (transaction.position) {
         this.currentPositions[typeData.id] = {
           ...transaction.position,
@@ -1221,6 +1332,20 @@ export default class PositionService {
           pendingTransaction: '',
         };
         delete this.currentPositions[terminatePositionTypeData.id];
+        break;
+      }
+      case TRANSACTION_TYPES.EULER_CLAIM_TERMINATE_MANY: {
+        const { positionIds } = transaction.typeData as EulerClaimTerminateManyTypeData;
+        positionIds.forEach((id) => {
+          this.pastPositions[id] = {
+            ...this.currentPositions[id],
+            toWithdraw: BigNumber.from(0),
+            remainingLiquidity: BigNumber.from(0),
+            remainingSwaps: BigNumber.from(0),
+            pendingTransaction: '',
+          };
+          delete this.currentPositions[id];
+        });
         break;
       }
       case TRANSACTION_TYPES.MIGRATE_POSITION: {
@@ -1434,6 +1559,47 @@ export default class PositionService {
       case TRANSACTION_TYPES.MODIFY_PERMISSIONS: {
         const modifyPermissionsTypeData = transaction.typeData as ModifyPermissionsTypeData;
         this.currentPositions[modifyPermissionsTypeData.id].pendingTransaction = '';
+        break;
+      }
+      case TRANSACTION_TYPES.EULER_CLAIM_PERMIT_MANY: {
+        const { positionIds, permissions, permittedAddress } = transaction.typeData as EulerClaimPermitManyTypeData;
+        positionIds.forEach((id) => {
+          const positionPermissions = this.currentPositions[id].permissions;
+          if (positionPermissions) {
+            let newPermissions = [...positionPermissions];
+            const permissionIndex = findIndex(positionPermissions, { operator: permittedAddress.toLowerCase() });
+            if (permissionIndex !== -1) {
+              newPermissions[permissionIndex] = {
+                ...positionPermissions[permissionIndex],
+                permissions: [
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  ...positionPermissions[permissionIndex].permissions,
+                  ...permissions,
+                ],
+              };
+            } else {
+              newPermissions = [
+                ...newPermissions,
+                {
+                  id: permittedAddress,
+                  operator: permittedAddress,
+                  permissions,
+                },
+              ];
+            }
+            this.currentPositions[id].permissions = newPermissions;
+          } else {
+            this.currentPositions[id].permissions = [
+              {
+                id: permittedAddress,
+                operator: permittedAddress,
+                permissions,
+              },
+            ];
+          }
+
+          this.currentPositions[id].pendingTransaction = '';
+        });
         break;
       }
       default:
