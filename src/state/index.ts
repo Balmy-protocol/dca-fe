@@ -14,6 +14,7 @@ import aggregatorSettings from './aggregator-settings/reducer';
 import initializer from './initializer/reducer';
 import modifyRateSettings from './modify-rate-settings/reducer';
 import positionDetails from './position-details/reducer';
+import eulerClaim from './euler-claim/reducer';
 import positionPermissions from './position-permissions/reducer';
 import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
@@ -87,6 +88,7 @@ const PERSISTED_STATES: string[] = [
   'aggregatorSettings',
   'tokenLists.customTokens',
   'config.selectedLocale',
+  'eulerClaim',
 ];
 
 const store = configureStore({
@@ -105,6 +107,7 @@ const store = configureStore({
     error,
     positionDetails,
     aggregatorSettings,
+    eulerClaim,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient }, serializableCheck: false }).concat([
@@ -120,6 +123,9 @@ const store = configureStore({
         showTransactionCost: DEFAULT_AGGREGATOR_SETTINGS.showTransactionCost,
         confettiParticleCount: DEFAULT_AGGREGATOR_SETTINGS.confetti,
         sorting: DEFAULT_AGGREGATOR_SETTINGS.sorting,
+      },
+      eulerClaim: {
+        signature: '',
       },
       config: {
         network: undefined,

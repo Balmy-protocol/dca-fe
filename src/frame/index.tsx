@@ -37,6 +37,7 @@ import FeedbackCard from 'common/feedback-card';
 import useSdkChains from 'hooks/useSdkChains';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
+import EulerClaimFrame from 'euler-claim/frame';
 
 // FONTS
 // import Lato300EOT from 'lato-v32-latin-300.eot';
@@ -2402,6 +2403,11 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                         <Route path="/positions">
                           {/* <RollbarContext context="/positions"> */}
                           <Home isLoading={isLoading || isLoadingNetwork} />
+                          {/* </RollbarContext> */}
+                        </Route>
+                        <Route path="/euler-claim">
+                          {/* <RollbarContext context="/positions"> */}
+                          <EulerClaimFrame isLoading={isLoading || isLoadingNetwork} />
                           {/* </RollbarContext> */}
                         </Route>
                         <Route path="/create/:chainId?/:from?/:to?">

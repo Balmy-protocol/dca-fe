@@ -30,6 +30,10 @@ export class MulticallContract extends Contract {
   };
 }
 
+export class EulerClaimContract extends Contract {
+  migrate: (amount: BigNumberish, acceptanceToken: BytesLike) => Promise<TransactionResponse>;
+}
+
 export class ERC20Contract extends Contract {
   balanceOf: (address: string) => Promise<BigNumber>;
 

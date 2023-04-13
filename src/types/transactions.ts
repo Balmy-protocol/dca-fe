@@ -1,7 +1,7 @@
 import { Log } from '@ethersproject/providers';
 import { PositionVersions } from 'config';
 import { Oracles } from './contracts';
-import { Position } from './positions';
+import { Permission, Position } from './positions';
 import { Token } from './tokens';
 
 export interface TransactionReceipt {
@@ -50,7 +50,12 @@ export type TransactionTypes =
   // AGGREGATOR
   | 'SWAP'
   | 'WRAP'
-  | 'UNWRAP';
+  | 'UNWRAP'
+  // EULER CLAIM
+  | 'EULER_CLAIM_TERMINATE_MANY'
+  | 'EULER_CLAIM_PERMIT_MANY'
+  | 'EULER_CLAIM_APPROVE_MIGRATOR'
+  | 'EULER_CLAIM_CLAIM_FROM_MIGRATOR';
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
 
@@ -172,6 +177,28 @@ export interface WrapEtherTypeData {
   amount: string;
 }
 
+export interface EulerClaimTerminateManyTypeData {
+  id: string;
+  positionIds: string[];
+}
+
+export interface EulerClaimPermitManyTypeData {
+  id: string;
+  positionIds: string[];
+  permissions: Permission[];
+  permittedAddress: string;
+}
+
+export interface EulerClaimApproveMigratorTypeData {
+  token: Token;
+  id: string;
+}
+
+export interface EulerClaimClaimFromMigratorTypeData {
+  token: Token;
+  id: string;
+}
+
 export interface NoOpTypeData {
   id: string;
 }
@@ -215,7 +242,11 @@ export type TransactionPositionTypeDataOptions =
   | WithdrawFundsTypeData
   | MigratePositionYieldTypeData
   | TransferTypeData
+  | EulerClaimTerminateManyTypeData
+  | EulerClaimPermitManyTypeData
   | NoOpTypeData;
+
+export type TransactionPositionManyTypeDataOptions = EulerClaimTerminateManyTypeData | EulerClaimPermitManyTypeData;
 
 export type TransactionTypeDataOptions =
   | WithdrawTypeData
@@ -236,6 +267,8 @@ export type TransactionTypeDataOptions =
   | MigratePositionYieldTypeData
   | TransferTypeData
   | TransactionAggregatorTypeDataOptions
+  | EulerClaimTerminateManyTypeData
+  | EulerClaimPermitManyTypeData
   | NoOpTypeData;
 
 export interface TransactionDetails {

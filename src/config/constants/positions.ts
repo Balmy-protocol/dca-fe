@@ -40,6 +40,12 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
   SWAP: 'SWAP',
   WRAP: 'WRAP',
   UNWRAP: 'UNWRAP',
+
+  // EULER CLAIM
+  EULER_CLAIM_TERMINATE_MANY: 'EULER_CLAIM_TERMINATE_MANY',
+  EULER_CLAIM_PERMIT_MANY: 'EULER_CLAIM_PERMIT_MANY',
+  EULER_CLAIM_APPROVE_MIGRATOR: 'EULER_CLAIM_APPROVE_MIGRATOR',
+  EULER_CLAIM_CLAIM_FROM_MIGRATOR: 'EULER_CLAIM_CLAIM_FROM_MIGRATOR',
 };
 
 export const FULL_DEPOSIT_TYPE = 'full_deposit';
@@ -175,12 +181,12 @@ export const ORACLE_STRINGS = {
   [ORACLES.UNISWAP]: 'Uniswap V3',
 };
 
-export const PERMISSIONS = {
-  INCREASE: 0,
-  REDUCE: 1,
-  WITHDRAW: 2,
-  TERMINATE: 3,
-};
+export enum PERMISSIONS {
+  INCREASE = 0,
+  REDUCE = 1,
+  WITHDRAW = 2,
+  TERMINATE = 3,
+}
 
 export const STRING_PERMISSIONS: Record<Permission, MessageDescriptor> = {
   INCREASE: defineMessage({ defaultMessage: 'Increase position', description: 'permissionsIncreasePermission' }),

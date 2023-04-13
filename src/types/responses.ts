@@ -1,5 +1,6 @@
 import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import { PermissionData } from './positions';
 import { Token } from './tokens';
 
 export interface PoolLiquidityData {
@@ -80,6 +81,7 @@ export type PositionResponse = {
   totalSwapped: BigNumber;
   totalWithdrawn: BigNumber;
   createdAtTimestamp: number;
+  permissions?: PermissionData[];
 };
 
 export interface TxPriceResponse {
