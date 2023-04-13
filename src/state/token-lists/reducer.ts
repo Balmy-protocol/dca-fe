@@ -78,7 +78,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
   },
-  'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=true&include_pricing=false&include_preview=false':
+  'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=false&include_pricing=false&include_preview=false':
     {
       name: 'Wido',
       logoURI: '',
@@ -88,6 +88,8 @@ export const getDefaultByUrl = () => ({
       hasLoaded: false,
       requestId: '',
       fetchable: true,
+      parser: (list: { tokens: (Token & { protocol?: string })[] }) =>
+        list.tokens.filter((token) => token.protocol && token.protocol != 'dex'),
     },
 
   /* -------------------------------------------------------------------------- */
@@ -446,6 +448,7 @@ export const initialState: TokenListsState = {
     'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
     'https://token-list.sushi.com/',
     'tokens.1inch.eth',
+    'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=false&include_pricing=false&include_preview=false',
 
     // BNB
     'https://tokens.1inch.io/v1.1/56',
