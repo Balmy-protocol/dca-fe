@@ -88,6 +88,10 @@ export const getDefaultByUrl = () => ({
       hasLoaded: false,
       requestId: '',
       fetchable: true,
+      parser: (list: TokensLists) =>
+        Object.values(list as unknown as Record<string, Token & { protocol?: string }>).filter(
+          (token) => token.protocol && token.protocol != 'dex'
+        ),
     },
 
   /* -------------------------------------------------------------------------- */
@@ -446,6 +450,7 @@ export const initialState: TokenListsState = {
     'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
     'https://token-list.sushi.com/',
     'tokens.1inch.eth',
+    'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=true&include_pricing=false&include_preview=false',
 
     // BNB
     'https://tokens.1inch.io/v1.1/56',
