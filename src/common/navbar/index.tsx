@@ -378,10 +378,6 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                       onClick={() => handleSubTabChange({ index: 1, mainIndex: 0, url: 'positions' })}
                       label={<FormattedMessage description="positions" defaultMessage="Positions" />}
                     />
-                    <StyledTab
-                      onClick={() => handleSubTabChange({ index: 2, mainIndex: 0, url: 'jbrl-competition' })}
-                      label={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
-                    />
                   </StyledTabs>
                 </StyledSubContent>
               </StyledNavbarContainer>
