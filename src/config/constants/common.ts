@@ -90,6 +90,8 @@ export const TOKEN_BLACKLIST = [
   '0x1622bf67e6e5747b81866fe0b85178a93c7f86e3', // ARBI - UMAMI
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
   '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97', // OP - STG
+
+  '0x2e9a6df78e42a30712c10a9dc4b1c8656f8f2879', // ARBITRUM - Malicious MKR
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
