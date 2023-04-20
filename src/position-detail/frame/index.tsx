@@ -584,36 +584,15 @@ const PositionDetailFrame = () => {
               </Alert>
             </Grid>
           ))}
-        {!!position.from.underlyingTokens.length && position.chainId === 1 && (
+        {!!position.to.underlyingTokens.length && !!position.from.underlyingTokens.length && position.chainId === 1 && (
           <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
             <Alert severity="warning">
               <FormattedMessage
                 description="positionEulerHack1"
-                defaultMessage="Euler has frozen the contracts after the hack, so modifying positions is not possible at the moment. Stay updated on the situation by joining our"
+                defaultMessage="Euler has frozen the contracts after the hack, so withdraw is not possible at the moment. You might be entitled to claim compensation, to do this visit the"
               />
-              <StyledLink href="https://discord.mean.finance" target="_blank">
-                <FormattedMessage description="Discord" defaultMessage="Discord" />
-              </StyledLink>
-              <FormattedMessage description="positionEulerHack2" defaultMessage="and" />
-              <StyledLink href="https://discord.gg/CdG97VSYGk" target="_blank">
-                <FormattedMessage description="Euler's Discord." defaultMessage="Euler's Discord." />
-              </StyledLink>
-            </Alert>
-          </Grid>
-        )}
-        {!!position.to.underlyingTokens.length && position.chainId === 1 && (
-          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
-            <Alert severity="warning">
-              <FormattedMessage
-                description="positionEulerHack1"
-                defaultMessage="Euler has frozen the contracts after the hack, so withdraw is not possible at the moment. Stay updated on the situation by joining our"
-              />
-              <StyledLink href="https://discord.mean.finance" target="_blank">
-                <FormattedMessage description="Discord" defaultMessage="Discord" />
-              </StyledLink>
-              <FormattedMessage description="positionEulerHack2" defaultMessage="and" />
-              <StyledLink href="https://discord.gg/CdG97VSYGk" target="_blank">
-                <FormattedMessage description="Euler's Discord." defaultMessage="Euler's Discord." />
+              <StyledLink href="https://mean.finance/euler-claim" target="_blank">
+                <FormattedMessage description="EulerClaim ClaimPage" defaultMessage="claim page" />
               </StyledLink>
             </Alert>
           </Grid>

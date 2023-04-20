@@ -22,6 +22,9 @@ import {
   WithdrawFundsTypeData,
   MigratePositionYieldTypeData,
   SwapTypeData,
+  EulerClaimClaimFromMigratorTypeData,
+  EulerClaimPermitManyTypeData,
+  EulerClaimTerminateManyTypeData,
 } from 'types';
 import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
 import { formatCurrencyAmount } from 'utils/currency';
@@ -368,6 +371,45 @@ function useBuildTransactionDetail() {
                   tokenApprovalExactTypeData.token,
                   4
                 ),
+              }
+            );
+            break;
+          }
+          case TRANSACTION_TYPES.EULER_CLAIM_CLAIM_FROM_MIGRATOR: {
+            const eulerClaimClaimFromMigratorTypeData = tx.typeData as EulerClaimClaimFromMigratorTypeData;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsEulerClaimClaimFromMigrator',
+                defaultMessage: 'You claimed your due for {token} from the Euler Claim page',
+              }),
+              {
+                token: eulerClaimClaimFromMigratorTypeData.token.symbol,
+              }
+            );
+            break;
+          }
+          case TRANSACTION_TYPES.EULER_CLAIM_PERMIT_MANY: {
+            const eulerClaimPermitManyTypeData = tx.typeData as EulerClaimPermitManyTypeData;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsEulerClaimPermitMany',
+                defaultMessage: 'Allow Mean Finance to close {positions} positions',
+              }),
+              {
+                positions: eulerClaimPermitManyTypeData.positionIds.length,
+              }
+            );
+            break;
+          }
+          case TRANSACTION_TYPES.EULER_CLAIM_TERMINATE_MANY: {
+            const eulerClaimTerminateManyTypeData = tx.typeData as EulerClaimTerminateManyTypeData;
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailsEulerClaimTerminateMany',
+                defaultMessage: 'Close {positions} positions',
+              }),
+              {
+                positions: eulerClaimTerminateManyTypeData.positionIds.length,
               }
             );
             break;
