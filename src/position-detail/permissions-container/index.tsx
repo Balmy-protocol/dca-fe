@@ -178,7 +178,6 @@ const PositionPermissionsContainer = ({
                     <PositionPermission
                       positionPermission={permission}
                       shouldDisable={shouldDisable}
-                      positionVersion={position.version}
                       chainId={position.chainId}
                     />
                   </Grid>

@@ -15,14 +15,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { ActionState, FullPosition } from 'types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from 'utils/currency';
-import {
-  COMPANION_ADDRESS,
-  LATEST_VERSION,
-  POSITION_ACTIONS,
-  POSITION_VERSION_3,
-  STABLE_COINS,
-  STRING_PERMISSIONS,
-} from 'config/constants';
+import { isCompanionAddress, POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS } from 'config/constants';
 import { getFrequencyLabel } from 'utils/parsing';
 import { buildEtherscanAddress, buildEtherscanTransaction } from 'utils/etherscan';
 import Link from '@mui/material/Link';
@@ -466,12 +459,10 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                     rel="noreferrer"
                     $isFirst={index === 0}
                   >
-                    {permission.operator.toLowerCase() ===
-                    (
-                      COMPANION_ADDRESS[position.version][position.chainId] ||
-                      COMPANION_ADDRESS[LATEST_VERSION][position.chainId]
-                    ).toLowerCase() ? (
-                      'Mean Finance Companion'
+                    {isCompanionAddress(permission.operator, chainId).isCompanion ? (
+                      `${
+                        (isCompanionAddress(permission.operator, chainId).isOldCompanion && 'Old ') || ''
+                      }Mean Finance Companion`
                     ) : (
                       <Address address={permission.operator} />
                     )}
@@ -510,9 +501,10 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {permission.operator.toLowerCase() ===
-                    COMPANION_ADDRESS[POSITION_VERSION_3][chainId].toLowerCase() ? (
-                      'Mean Finance Companion'
+                    {isCompanionAddress(permission.operator, chainId).isCompanion ? (
+                      `${
+                        (isCompanionAddress(permission.operator, chainId).isOldCompanion && 'Old ') || ''
+                      }Mean Finance Companion`
                     ) : (
                       <Address address={permission.operator} />
                     )}

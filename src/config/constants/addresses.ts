@@ -431,11 +431,25 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0xa3DB2c0D23720e8CDA0f4d80A53B94d20d02b061',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.polygon.chainId]: '0x49c590F6a2dfB0f809E82B9e2BF788C0Dd1c31f9',
-    [NETWORKS.optimism.chainId]: '0x49c590F6a2dfB0f809E82B9e2BF788C0Dd1c31f9',
-    [NETWORKS.arbitrum.chainId]: '0x49c590F6a2dfB0f809E82B9e2BF788C0Dd1c31f9',
-    [NETWORKS.mainnet.chainId]: '0x49c590F6a2dfB0f809E82B9e2BF788C0Dd1c31f9',
+    [NETWORKS.polygon.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
+    [NETWORKS.optimism.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
+    [NETWORKS.arbitrum.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
+    [NETWORKS.mainnet.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
   },
+};
+
+const OLD_VERSION_4_COMPANION_ADDRESS = '0x49c590F6a2dfB0f809E82B9e2BF788C0Dd1c31f9';
+export const isCompanionAddress = (address: string, chainId: number) => {
+  if (address.toLowerCase() === OLD_VERSION_4_COMPANION_ADDRESS.toLowerCase()) {
+    return { isCompanion: true, isOldCompanion: true };
+  }
+
+  const versionObjects = Object.values(COMPANION_ADDRESS);
+
+  return {
+    isCompanion: versionObjects.some((addresses) => addresses[chainId].toLowerCase() === address.toLowerCase()),
+    isOldCompanion: false,
+  };
 };
 
 export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<PositionVersions> = {

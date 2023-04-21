@@ -14,7 +14,7 @@ import Link from '@mui/material/Link';
 import { buildEtherscanAddress } from 'utils/etherscan';
 import { useAppDispatch } from 'hooks/state';
 import { addPermission, removePermission } from 'state/position-permissions/actions';
-import { COMPANION_ADDRESS, LATEST_VERSION, PositionVersions, STRING_PERMISSIONS } from 'config/constants';
+import { isCompanionAddress, STRING_PERMISSIONS } from 'config/constants';
 import { FormattedMessage, useIntl } from 'react-intl';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -23,7 +23,6 @@ import Address from 'common/address';
 interface PositionPermissionProps {
   positionPermission: PositionPermission;
   shouldDisable: boolean;
-  positionVersion: PositionVersions;
   chainId: ChainId;
 }
 
@@ -106,12 +105,7 @@ const HelpTexts = {
   ),
 };
 
-const PositionPermissionItem = ({
-  positionPermission,
-  shouldDisable,
-  positionVersion,
-  chainId,
-}: PositionPermissionProps) => {
+const PositionPermissionItem = ({ positionPermission, shouldDisable, chainId }: PositionPermissionProps) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
@@ -122,6 +116,8 @@ const PositionPermissionItem = ({
       dispatch(removePermission({ operator: positionPermission.operator, permission }));
     }
   };
+
+  const operatorIsCompanion = isCompanionAddress(positionPermission.operator, chainId);
 
   return (
     <StyledCard elevation={2}>
@@ -136,11 +132,8 @@ const PositionPermissionItem = ({
                   rel="noreferrer"
                 >
                   <Typography variant="body2" component="span">
-                    {positionPermission.operator.toLowerCase() ===
-                    (
-                      COMPANION_ADDRESS[positionVersion][chainId] || COMPANION_ADDRESS[LATEST_VERSION][chainId]
-                    ).toLowerCase() ? (
-                      'Mean Finance Companion'
+                    {operatorIsCompanion.isCompanion ? (
+                      `${(operatorIsCompanion.isOldCompanion && 'Old ') || ''}Mean Finance Companion`
                     ) : (
                       <Address address={positionPermission.operator} />
                     )}
