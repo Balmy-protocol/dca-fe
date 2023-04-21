@@ -447,7 +447,9 @@ export const isCompanionAddress = (address: string, chainId: number) => {
   const versionObjects = Object.values(COMPANION_ADDRESS);
 
   return {
-    isCompanion: versionObjects.some((addresses) => addresses[chainId].toLowerCase() === address.toLowerCase()),
+    isCompanion: versionObjects.some(
+      (addresses) => addresses[chainId] && addresses[chainId].toLowerCase() === address.toLowerCase()
+    ),
     isOldCompanion: false,
   };
 };
