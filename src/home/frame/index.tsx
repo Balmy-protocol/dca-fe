@@ -70,6 +70,8 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
       dispatch(fetchGraphTokenList(networkToSet.chainId));
     } else if (SUPPORTED_NETWORKS_DCA.includes(currentNetwork.chainId)) {
       dispatch(setDCAChainId(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId));
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispatch(fetchGraphTokenList(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId));
     }
   }, []);
 
