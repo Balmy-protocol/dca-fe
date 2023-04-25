@@ -211,12 +211,12 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
 
       if (from?.address === PROTOCOL_TOKEN_ADDRESS || to?.address === PROTOCOL_TOKEN_ADDRESS) {
         walletService
-          .getBalance(PROTOCOL_TOKEN_ADDRESS)
+          .getBalance(PROTOCOL_TOKEN_ADDRESS, (transactionReceipt?.typeData as SwapTypeData).transferTo || undefined)
           .then((newBalance) => setBalanceAfter(newBalance))
           .catch((e) => console.error('Error fetching balance after swap', e));
       }
     }
-  }, [isTransactionPending, previousTransactionPending, success, timerRef, from, to]);
+  }, [isTransactionPending, previousTransactionPending, success, timerRef, from, to, transactionReceipt]);
 
   const onGoToEtherscan = () => {
     const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
@@ -227,6 +227,8 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
   let sentFrom: BigNumber | null = null;
   let gotTo: BigNumber | null = null;
   let gasUsed: BigNumber | null = null;
+  const transferTo: string | undefined | null =
+    transactionReceipt?.typeData && (transactionReceipt.typeData as SwapTypeData).transferTo;
   if (transactionReceipt?.receipt && to && from) {
     const { balanceBefore } = transactionReceipt.typeData as SwapTypeData;
 
@@ -250,7 +252,6 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
       sentFrom = BigNumber.from(balanceBefore).sub(balanceAfter.add(gasUsed));
     }
     if (to.address !== PROTOCOL_TOKEN_ADDRESS) {
-      const { transferTo } = transactionReceipt.typeData as SwapTypeData;
       gotTo =
         aggregatorService.findTransferValue(
           {
@@ -360,6 +361,15 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                   {toPrice && (
                     <Typography variant="caption" color="#939494">
                       ${parseUsdPrice(to, gotTo, toPrice).toFixed(2)}
+                    </Typography>
+                  )}
+                  {transferTo && (
+                    <Typography variant="caption" color="#939494">
+                      <FormattedMessage
+                        description="transactionConfirmationTransferTo"
+                        defaultMessage="Transfered to: {account}"
+                        values={{ account: `${transferTo.slice(0, 6)}...${transferTo.slice(-6)}` }}
+                      />
                     </Typography>
                   )}
                 </StyledAmountContainer>

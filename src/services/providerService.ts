@@ -81,8 +81,8 @@ export default class ProviderService {
     return this.signer.getAddress();
   }
 
-  getBalance() {
-    return this.signer.getBalance();
+  getBalance(address: string) {
+    return this.provider.getBalance(address);
   }
 
   getProviderInfo() {
