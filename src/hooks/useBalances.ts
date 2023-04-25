@@ -1,14 +1,14 @@
 import React from 'react';
+import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from 'hooks/usePrevious';
 import { useHasPendingTransactions } from 'state/transactions/hooks';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithAddress } from 'utils/currency';
 import { useBlockNumber } from 'state/block-number/hooks';
-import useSelectedNetwork from './useSelectedNetwork';
-import useWalletService from './useWalletService';
-import usePriceService from './usePriceService';
 import useAccount from './useAccount';
+import useSdkService from './useSdkService';
+import usePriceService from './usePriceService';
+import useSelectedNetwork from './useSelectedNetwork';
 
 interface BalanceResponse {
   balance: BigNumber;
@@ -20,9 +20,9 @@ interface Result {
   chainId: number;
 }
 
-function useMulticallBalances(tokens: string[] | undefined | null): [Result | undefined, boolean, string?] {
-  const walletService = useWalletService();
-  const priceService = usePriceService();
+function useBalances(tokens: Token[] | undefined | null): [Result | undefined, boolean, string?] {
+  const account = useAccount();
+  const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
     result?: Result;
@@ -36,26 +36,28 @@ function useMulticallBalances(tokens: string[] | undefined | null): [Result | un
   const hasPendingTransactions = useHasPendingTransactions();
   const prevTokens = usePrevious(tokens);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = useAccount();
   const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
+  const priceService = usePriceService();
   const prevResult = usePrevious(result, false);
 
   React.useEffect(() => {
     async function callPromise() {
-      if (tokens?.length) {
+      if (tokens) {
         try {
-          const balanceResults = await walletService.getMulticallBalances(tokens);
+          const balanceResults = await sdkService.getMultipleBalances(tokens);
 
           let priceResults: Record<string, BigNumber> = {};
 
           try {
             priceResults = await priceService.getUsdHistoricPrice(
-              tokens
-                .filter((token) => (balanceResults[token] || BigNumber.from(0)).gt(BigNumber.from(0)))
-                .map((key) => emptyTokenWithAddress(key))
+              tokens.filter((token) =>
+                (balanceResults[token.chainId][token.address] || BigNumber.from(0)).gt(BigNumber.from(0))
+              ),
+              undefined,
+              currentNetwork.chainId
             );
           } catch (e) {
             console.error('Error fetching prices from defillama', e);
@@ -64,21 +66,21 @@ function useMulticallBalances(tokens: string[] | undefined | null): [Result | un
           const promiseResult = tokens.reduce(
             (acc, token) => ({
               ...acc,
-              [token]: {
-                balance: balanceResults[token],
-                balanceUsd: (balanceResults[token] || BigNumber.from(0)).mul(priceResults[token] || BigNumber.from(0)),
+              [token.address]: {
+                balance: balanceResults[token.chainId][token.address],
+                balanceUsd: (balanceResults[token.chainId][token.address] || BigNumber.from(0)).mul(
+                  priceResults[token.address] || BigNumber.from(0)
+                ),
               },
             }),
             {}
           );
-
           setState({
             isLoading: false,
             result: { balances: promiseResult, chainId: currentNetwork.chainId },
             error: undefined,
           });
         } catch (e) {
-          console.error('error fetching balances', e);
           setState({ result: undefined, error: e as string, isLoading: false });
         }
       }
@@ -111,15 +113,15 @@ function useMulticallBalances(tokens: string[] | undefined | null): [Result | un
     account,
     prevBlockNumber,
     blockNumber,
-    walletService,
+    sdkService,
     prevPendingTrans,
   ]);
 
-  if (!tokens?.length) {
+  if (!tokens || !tokens.length) {
     return [undefined, false, undefined];
   }
 
   return [result || prevResult, isLoading, error];
 }
 
-export default useMulticallBalances;
+export default useBalances;
