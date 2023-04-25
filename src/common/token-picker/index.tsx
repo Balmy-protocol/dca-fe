@@ -25,10 +25,9 @@ import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import useTokenList from 'hooks/useTokenList';
 import TokenLists from 'common/token-lists';
-import { formatCurrencyAmount } from 'utils/currency';
+import { formatCurrencyAmount, toToken } from 'utils/currency';
 import FilledInput from '@mui/material/FilledInput';
 import { createStyles, Skeleton, Tooltip } from '@mui/material';
-import useMulticallBalances from 'hooks/useMulticallBalances';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import Switch from '@mui/material/Switch';
@@ -37,7 +36,7 @@ import useAllowedPairs from 'hooks/useAllowedPairs';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import { useCustomTokens } from 'state/token-lists/hooks';
 import use1InchBalances from 'hooks/use1InchBalances';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useBalances from 'hooks/useBalances';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -395,7 +394,6 @@ const TokenPicker = ({
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const currentNetwork = useSelectedNetwork();
-  const actualCurrentNetwork = useCurrentNetwork();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
   const allowedPairs = useAllowedPairs();
@@ -497,7 +495,9 @@ const TokenPicker = ({
 
   const rawMemoTokenKeysToUse = React.useMemo(() => tokenKeysToUse.sort(), [tokenKeysToUse]);
 
-  const [tokenBalances, isLoadingTokenBalances] = useMulticallBalances(rawMemoTokenKeysToUse);
+  const [tokenBalances, isLoadingTokenBalances] = useBalances(
+    rawMemoTokenKeysToUse.map((tokenKey) => toToken({ address: tokenKey, chainId: currentNetwork.chainId }))
+  );
 
   const [customToken, isLoadingCustomToken] = useCustomToken(
     search,
@@ -556,11 +556,7 @@ const TokenPicker = ({
       tokenList,
       tokenKeys: !memoizedTokenKeys.length && isLoadingCustomToken ? ['loading'] : memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
-      tokenBalances:
-        (isLoadingBalances && (!balances || !Object.keys(balances).length)) ||
-        currentNetwork.chainId !== actualCurrentNetwork.chainId
-          ? {}
-          : balances || {},
+      tokenBalances: isLoadingBalances && (!balances || !Object.keys(balances).length) ? {} : balances || {},
       balancesChainId: tokenBalances?.chainId,
       customToken: isAggregator ? customToken : undefined,
       isLoadingTokenBalances: isLoadingBalances,
@@ -574,7 +570,6 @@ const TokenPicker = ({
       customToken,
       isLoadingBalances,
       currentNetwork.chainId,
-      actualCurrentNetwork.chainId,
       isLoadingCustomToken,
     ]
   );
