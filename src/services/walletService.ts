@@ -162,7 +162,7 @@ export default class WalletService {
     const hasProtocolToken = addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1;
 
     if (addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1) {
-      protocolBalance = await this.providerService.getBalance();
+      protocolBalance = await this.providerService.getBalance(account);
     }
 
     return results
@@ -259,12 +259,14 @@ export default class WalletService {
     };
   }
 
-  async getBalance(address?: string): Promise<BigNumber> {
-    const account = this.getAccount();
+  async getBalance(address?: string, passedAccount?: string): Promise<BigNumber> {
+    const connectedAccount = this.getAccount();
+
+    const account = passedAccount || connectedAccount;
 
     if (!address || !account) return Promise.resolve(BigNumber.from(0));
 
-    if (address === PROTOCOL_TOKEN_ADDRESS) return this.providerService.getBalance();
+    if (address === PROTOCOL_TOKEN_ADDRESS) return this.providerService.getBalance(account);
 
     const ERC20Interface = new Interface(ERC20ABI);
 

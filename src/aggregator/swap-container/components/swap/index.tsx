@@ -296,7 +296,7 @@ const Swap = ({
       let balanceBefore: BigNumber | null = null;
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
-        balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS);
+        balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS, selectedRoute.transferTo || undefined);
       }
 
       trackEvent('Aggregator - Swap submitting', {
