@@ -180,7 +180,7 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
             <FormattedMessage description="jbrlUserCompTotalEarned" defaultMessage="Total earned:" />
           </Typography>
           <Typography variant="body1" sx={{ marginLeft: '5px' }}>
-            {userPosition.generatedUsd.toFixed(2)} MXN
+            {userPosition.generatedUsd.toFixed(2)} BRL
           </Typography>
           {showDetails ? <ExpandLessIcon fontSize="medium" /> : <ExpandMoreIcon fontSize="medium" />}
         </StyledDetailWrapper>
@@ -193,7 +193,7 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
                 <FormattedMessage description="jbrlUserCompTotalDeposited" defaultMessage="Total deposited:" />
               </Typography>
               <Typography variant="body1" sx={{ marginLeft: '5px' }}>
-                {formatCurrencyAmount(BigNumber.from(userPosition.totalDeposited), JBRL_TOKEN, 4)} MXN
+                {formatCurrencyAmount(BigNumber.from(userPosition.totalDeposited), JBRL_TOKEN, 4)} BRL
               </Typography>
             </StyledDetailWrapper>
             <StyledDetailWrapper>
@@ -209,7 +209,7 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
                 <FormattedMessage description="jbrlUserCompTotalUsed" defaultMessage="Used funds:" />
               </Typography>
               <Typography variant="body1" sx={{ marginLeft: '5px' }}>
-                {formatCurrencyAmount(BigNumber.from(userPosition.totalUsed), JBRL_TOKEN, 4)} MXN
+                {formatCurrencyAmount(BigNumber.from(userPosition.totalUsed), JBRL_TOKEN, 4)} BRL
               </Typography>
             </StyledDetailWrapper>
             <StyledDetailWrapper>
@@ -217,7 +217,7 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
                 <FormattedMessage description="jbrlUserCompTotalProfi" defaultMessage="Profit:" />
               </Typography>
               <Typography variant="body1" sx={{ marginLeft: '5px' }}>
-                {profit.toFixed(2)}%
+                {!isNaN(profit) ? `${profit.toFixed(2)}` : '0'}%
               </Typography>
             </StyledDetailWrapper>
           </StyledMainData>
@@ -238,7 +238,7 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
                       token,
                       amount,
                       prices[token.address].mul(BigNumber.from(10).pow(18)).div(jbrlInUsd)
-                    ).toFixed(2)} MXN)`
+                    ).toFixed(2)} BRL)`
                   }
                   icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={token} />}
                 >
@@ -296,7 +296,7 @@ const UserCompPosition = ({ userPosition, prices, yieldOptions, leaderboardPosit
                             to,
                             BigNumber.from(position.totalSwapped),
                             prices[to.address].mul(BigNumber.from(10).pow(18)).div(jbrlInUsd)
-                          ).toFixed(2)} MXN)`
+                          ).toFixed(2)} BRL)`
                         }
                         icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={to} />}
                       >
