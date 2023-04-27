@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTransaction } from '@mean-finance/sdk';
 import useSimulateTransaction from 'hooks/useSimulateTransaction';
 import CenteredLoadingIndicator from 'common/centered-loading-indicator';
 import Typography from '@mui/material/Typography';
@@ -34,7 +34,7 @@ const StyledBlowfishContainer = styled.div`
 `;
 
 interface QuoteSimulationProps {
-  tx?: QuoteTx;
+  tx?: QuoteTransaction;
   cantFund: boolean | null;
   isApproved: boolean;
   isLoadingRoute: boolean;

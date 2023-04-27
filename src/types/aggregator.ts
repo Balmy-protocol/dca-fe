@@ -1,4 +1,4 @@
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTransaction } from '@mean-finance/sdk';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 
@@ -41,9 +41,9 @@ export type SwapOption = {
     id: string;
   };
   type: string;
-  tx?: QuoteTx;
+  tx?: QuoteTransaction;
 };
 
 export interface SwapOptionWithTx extends SwapOption {
-  tx: QuoteTx;
+  tx: QuoteTransaction;
 }
