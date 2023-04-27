@@ -8,7 +8,7 @@ import { FullPosition, Token, YieldOptions } from 'types';
 import { BigNumber } from 'ethers';
 import { Card, CardContent, Collapse, Divider, Paper, Typography } from '@mui/material';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { JBRL_ADDRESS, JBRL_TOKEN } from 'jbrl-competition/constants';
+import { JBRL_ADDRESS, JBRL_TOKEN } from 'pages/jbrl-competition/constants';
 import { formatCurrencyAmount, parseUsdPrice } from 'common/utils/currency';
 import TokenIcon from 'common/components/token-icon';
 import CustomChip from 'common/components/custom-chip';

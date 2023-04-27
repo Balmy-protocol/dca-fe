@@ -12,7 +12,7 @@ import useTransactionModal from 'hooks/useTransactionModal';
 import { Interface } from 'ethers/lib/utils';
 import { shouldTrackError } from 'common/utils/errors';
 import useErrorService from 'hooks/useErrorService';
-import { ClaimWithBalance } from 'euler-claim/types';
+import { ClaimWithBalance } from 'pages/euler-claim/types';
 import EULERMIGRATORABI from 'abis/EulerMigrator.json';
 import useProviderService from 'hooks/useProviderService';
 import CardContent from '@mui/material/CardContent';
@@ -21,8 +21,8 @@ import CardActions from '@mui/material/CardActions';
 import { formatCurrencyAmount, parseUsdPrice } from 'common/utils/currency';
 import ComposedTokenIcon from 'common/components/composed-token-icon';
 import CustomChip from 'common/components/custom-chip';
-import { DAI, WETH, USDC } from 'euler-claim/constants';
-import useHasPendingClaim from 'euler-claim/hooks/useHasPendingClaim';
+import { DAI, WETH, USDC } from 'pages/euler-claim/constants';
+import useHasPendingClaim from 'pages/euler-claim/hooks/useHasPendingClaim';
 
 const StyledCard = styled(Card)`
   border-radius: 10px;

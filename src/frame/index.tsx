@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Container from '@mui/material/Container';
-import JbrlCompetition from 'jbrl-competition';
+import JbrlCompetition from 'pages/jbrl-competition';
 import AppFooter from 'common/components/footer';
 import Home from 'pages/home';
 import Aggregator from 'pages/aggregator';
@@ -35,7 +35,7 @@ import FeedbackCard from 'common/components/feedback-card';
 import useSdkChains from 'hooks/useSdkChains';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
-import EulerClaimFrame from 'euler-claim/frame';
+import EulerClaimFrame from 'pages/euler-claim/frame';
 import NavBar from './navbar';
 
 // FONTS
