@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
 import useSdkBalances from 'hooks/useSdkBalances';
 import { DAI, EULER_4626_ADDRESSES, EULER_4626_TOKENS, USDC, WETH } from 'euler-claim/constants';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import usePositionService from 'hooks/usePositionService';
 import useAccount from 'hooks/useAccount';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import usePrevious from 'hooks/usePrevious';
 import { COMPANION_ADDRESS, EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS } from 'config';
 import { BigNumber } from 'ethers';

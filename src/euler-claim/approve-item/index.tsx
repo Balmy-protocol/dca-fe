@@ -1,6 +1,6 @@
 import React from 'react';
 import { EULER_CLAIM_MIGRATORS_ADDRESSES, TRANSACTION_TYPES } from 'config';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import useWeb3Service from 'hooks/useWeb3Service';
 import { useHasPendingApproval, useTransactionAdder } from 'state/transactions/hooks';
 import styled from 'styled-components';
@@ -12,7 +12,7 @@ import { FormattedMessage } from 'react-intl';
 import useTrackEvent from 'hooks/useTrackEvent';
 import useTransactionModal from 'hooks/useTransactionModal';
 import useWalletService from 'hooks/useWalletService';
-import { shouldTrackError } from 'utils/errors';
+import { shouldTrackError } from 'common/utils/errors';
 import useErrorService from 'hooks/useErrorService';
 
 const StyledApproveItem = styled.div`

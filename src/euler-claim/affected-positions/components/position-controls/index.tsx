@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Button from 'common/button';
+import Button from 'common/components/button';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
