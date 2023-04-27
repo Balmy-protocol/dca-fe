@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
 import useSdkBalances from 'hooks/useSdkBalances';
-import { DAI, EULER_4626_ADDRESSES, EULER_4626_TOKENS, USDC, WETH } from 'euler-claim/constants';
+import { DAI, EULER_4626_ADDRESSES, EULER_4626_TOKENS, USDC, WETH } from 'pages/euler-claim/constants';
 import useCurrentPositions from 'hooks/useCurrentPositions';
 import usePositionService from 'hooks/usePositionService';
 import useAccount from 'hooks/useAccount';
@@ -13,15 +13,15 @@ import { COMPANION_ADDRESS, EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS } from 'co
 import { BigNumber } from 'ethers';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import AffectedPositions from 'euler-claim/affected-positions';
-import ClaimChecklist from 'euler-claim/checklist';
-import useClaimRates from 'euler-claim/hooks/useClaimRates';
+import AffectedPositions from 'pages/euler-claim/affected-positions';
+import ClaimChecklist from 'pages/euler-claim/checklist';
+import useClaimRates from 'pages/euler-claim/hooks/useClaimRates';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { ClaimWithBalance } from 'euler-claim/types';
+import { ClaimWithBalance } from 'pages/euler-claim/types';
 import useRawUsdPrices from 'hooks/useUsdRawPrices';
 import useSdkAllowances from 'hooks/useSdkAllowances';
 import usePastPositions from 'hooks/usePastPositions';
-import TerminatedAffectedPositions from 'euler-claim/terminated-affected-positions';
+import TerminatedAffectedPositions from 'pages/euler-claim/terminated-affected-positions';
 
 const StyledContainer = styled.div`
   display: flex;

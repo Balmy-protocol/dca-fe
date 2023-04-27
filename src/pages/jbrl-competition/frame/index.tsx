@@ -21,7 +21,7 @@ import {
   JBRL_TOKEN,
   CREATED_AT_START,
   POSITION_CUTOFF,
-} from 'jbrl-competition/constants';
+} from 'pages/jbrl-competition/constants';
 import { Typography } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
 import useYieldOptions from 'hooks/useYieldOptions';
