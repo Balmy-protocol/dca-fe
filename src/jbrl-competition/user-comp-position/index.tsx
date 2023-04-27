@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import find from 'lodash/find';
+import isNaN from 'lodash/isNaN';
 import Button from 'common/button';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { FullPosition, Token, YieldOptions } from 'types';
