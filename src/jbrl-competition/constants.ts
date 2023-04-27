@@ -1,6 +1,6 @@
 import { parseUnits } from '@ethersproject/units';
 import { NETWORKS } from 'config';
-import { toToken } from 'utils/currency';
+import { toToken } from 'common/utils/currency';
 
 export const CREATED_AT_STOP = 1682640000;
 export const CREATED_AT_START = 1682467200;

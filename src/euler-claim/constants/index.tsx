@@ -1,4 +1,4 @@
-import { toToken } from 'utils/currency';
+import { toToken } from 'common/utils/currency';
 
 export const EULER_4626_ADDRESSES = [
   '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // ETH - USDC. Euler. Disabled due to hack.

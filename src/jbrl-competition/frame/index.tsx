@@ -2,17 +2,17 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
-import Button from 'common/button';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import Button from 'common/components/button';
+import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
 import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
 import useGqlFetchAll from 'hooks/useGqlFetchAll';
 import useDCAGraphql from 'hooks/useDCAGraphql';
 import { FullPosition, Token } from 'types';
 import { NETWORKS, POSITION_VERSION_4 } from 'config';
 import { BigNumber } from 'ethers';
-import { getDisplayToken } from 'utils/parsing';
+import { getDisplayToken } from 'common/utils/parsing';
 import useRawUsdPrices from 'hooks/useUsdRawPrices';
-import { parseUsdPrice, toToken } from 'utils/currency';
+import { parseUsdPrice, toToken } from 'common/utils/currency';
 import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
 import {
   CREATED_AT_STOP,
