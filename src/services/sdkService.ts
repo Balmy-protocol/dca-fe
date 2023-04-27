@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { buildSDK, SourceId, SOURCES_METADATA } from '@mean-finance/sdk';
+import { buildSDK, ProviderSourceInput, SourceId, SOURCES_METADATA } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
 import { BaseProvider } from '@ethersproject/providers';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from 'config/constants/aggregator';
@@ -30,7 +30,13 @@ export default class SdkService {
       provider: {
         source: {
           type: 'prioritized',
-          sources: [{ type: 'updatable-ethers', provider: () => this.provider }, { type: 'public-rpcs' }],
+          sources: [
+            {
+              type: 'updatable',
+              provider: () => this.provider && ({ type: 'ethers', instance: this.provider } as ProviderSourceInput),
+            },
+            { type: 'public-rpcs' },
+          ],
         },
       },
       quotes: {
@@ -235,11 +241,11 @@ export default class SdkService {
   }
 
   getTransactionReceipt(txHash: string, chainId: number) {
-    return this.sdk.providerSource.getEthersProvider({ chainId }).getTransactionReceipt(txHash);
+    return this.sdk.providerService.getEthersProvider({ chainId }).getTransactionReceipt(txHash);
   }
 
   getTransaction(txHash: string, chainId: number) {
-    return this.sdk.providerSource.getEthersProvider({ chainId }).getTransaction(txHash);
+    return this.sdk.providerService.getEthersProvider({ chainId }).getTransaction(txHash);
   }
 
   async getMultipleBalances(tokens: Token[]): Promise<Record<number, Record<string, BigNumber>>> {
@@ -285,7 +291,7 @@ export default class SdkService {
     chainId: number
   ): Promise<Record<string, Record<string, BigNumber>>> {
     const account = this.walletService.getAccount();
-    const allowances = await this.sdk.allowanceService.getMultipleAllowances({
+    const allowances = await this.sdk.allowanceService.getMultipleAllowancesInChain({
       chainId,
       check: Object.keys(tokenChecks).map((tokenAddress) => ({
         token: tokenAddress,

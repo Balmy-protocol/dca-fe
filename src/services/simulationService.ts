@@ -1,4 +1,4 @@
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTransaction } from '@mean-finance/sdk';
 import { BLOWFISH_ENABLED_CHAINS } from 'config';
 import { BigNumber } from 'ethers';
 import { BlowfishResponse } from 'types';
@@ -17,7 +17,7 @@ export default class SimulationService {
     this.providerService = providerService;
   }
 
-  async simulateGasPriceTransaction(txData: QuoteTx): Promise<BlowfishResponse> {
+  async simulateGasPriceTransaction(txData: QuoteTransaction): Promise<BlowfishResponse> {
     await this.providerService.estimateGas(txData);
 
     return {
@@ -30,7 +30,7 @@ export default class SimulationService {
   }
 
   async simulateTransaction(
-    txData: QuoteTx,
+    txData: QuoteTransaction,
     chainId: number,
     forceProviderSimulation?: boolean
   ): Promise<BlowfishResponse> {

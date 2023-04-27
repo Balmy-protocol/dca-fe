@@ -3,13 +3,13 @@ import isEqual from 'lodash/isEqual';
 import { BlowfishResponse } from 'types';
 import debounce from 'lodash/debounce';
 import usePrevious from 'hooks/usePrevious';
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTransaction } from '@mean-finance/sdk';
 import useSimulationService from './useSimulationService';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
 function useSimulateTransaction(
-  tx?: QuoteTx,
+  tx?: QuoteTransaction,
   chainId?: number,
   skip?: boolean,
   forceProviderSimulation?: boolean
@@ -26,27 +26,30 @@ function useSimulateTransaction(
   const prevForceProviderSimulation = usePrevious(forceProviderSimulation);
 
   const debouncedCall = React.useCallback(
-    debounce(async (debouncedTx?: QuoteTx, debouncedChainId?: number, debouncedForceProviderSimulation?: boolean) => {
-      if (debouncedTx && debouncedChainId) {
-        setState({ isLoading: true, result: undefined, error: undefined });
+    debounce(
+      async (debouncedTx?: QuoteTransaction, debouncedChainId?: number, debouncedForceProviderSimulation?: boolean) => {
+        if (debouncedTx && debouncedChainId) {
+          setState({ isLoading: true, result: undefined, error: undefined });
 
-        try {
-          const promiseResult = await simulationService.simulateTransaction(
-            debouncedTx,
-            debouncedChainId,
-            debouncedForceProviderSimulation
-          );
+          try {
+            const promiseResult = await simulationService.simulateTransaction(
+              debouncedTx,
+              debouncedChainId,
+              debouncedForceProviderSimulation
+            );
 
-          if (promiseResult) {
-            setState({ result: promiseResult, error: undefined, isLoading: false });
-          } else {
-            setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
+            if (promiseResult) {
+              setState({ result: promiseResult, error: undefined, isLoading: false });
+            } else {
+              setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
+            }
+          } catch (e) {
+            setState({ result: undefined, error: e as string, isLoading: false });
           }
-        } catch (e) {
-          setState({ result: undefined, error: e as string, isLoading: false });
         }
-      }
-    }, 500),
+      },
+      500
+    ),
     [setState]
   );
 

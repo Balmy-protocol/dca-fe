@@ -1,6 +1,6 @@
 import type Web3Service from 'services/web3Service';
 import React from 'react';
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTransaction } from '@mean-finance/sdk';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';
@@ -79,7 +79,7 @@ export interface TransactionActionWaitForApprovalData {
 }
 
 export interface TransactionActionWaitForSimulationData {
-  tx: QuoteTx;
+  tx: QuoteTransaction;
   chainId: number;
   simulation?: BlowfishResponse;
 }
