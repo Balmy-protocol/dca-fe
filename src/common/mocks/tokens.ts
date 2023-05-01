@@ -1,7 +1,7 @@
-import { getGhTokenListLogoUrl, NETWORKS, TOKEN_TYPE_BASE, TOKEN_TYPE_WRAPPED } from 'config/constants';
+import { getGhTokenListLogoUrl, NETWORKS, TOKEN_TYPE_BASE, TOKEN_TYPE_WRAPPED } from '@constants';
 import find from 'lodash/find';
-import { Token } from 'types';
-import { toToken } from 'common/utils/currency';
+import { Token } from '@types';
+import { toToken } from '@common/utils/currency';
 
 const DAI_ADDRESSES = {
   [NETWORKS.mainnet.chainId]: '0x6b175474e89094c44da98b954eedeac495271d0f',

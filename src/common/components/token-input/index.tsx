@@ -1,18 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from 'common/components/button';
-import { Token } from 'types';
+import Button from '@common/components/button';
+import { Token } from '@types';
 import { FormattedMessage } from 'react-intl';
 import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
-import { PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import FormHelperText from '@mui/material/FormHelperText';
-import TokenIcon from 'common/components/token-icon';
+import TokenIcon from '@common/components/token-icon';
 import { createStyles, FilledInput, Typography } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { formatCurrencyAmount } from 'common/utils/currency';
-import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import { MAX_DEDUCTION, MIN_AMOUNT_FOR_MAX_DEDUCTION } from 'config';
+import { formatCurrencyAmount } from '@common/utils/currency';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { MAX_DEDUCTION, MIN_AMOUNT_FOR_MAX_DEDUCTION } from '@constants';
 
 const StyledTokenInputContainer = styled.div`
   display: flex;

@@ -2,8 +2,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
 import { setupCache, setup } from 'axios-cache-adapter';
 import axios from 'axios';
-import { SupportedLanguages } from 'config/constants/lang';
-import { DEFAULT_AGGREGATOR_SETTINGS } from 'config/constants/aggregator';
+import { SupportedLanguages } from '@constants/lang';
+import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';

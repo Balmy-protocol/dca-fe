@@ -1,7 +1,7 @@
 import React from 'react';
-import { Positions } from 'types';
-import { useAllTransactions } from 'state/transactions/hooks';
-import { useHasInitialized } from 'state/initializer/hooks';
+import { Positions } from '@types';
+import { useAllTransactions } from '@state/transactions/hooks';
+import { useHasInitialized } from '@state/initializer/hooks';
 import usePositionService from './usePositionService';
 import useAccount from './useAccount';
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
-import { SetStateCallback } from 'types';
+import { SetStateCallback } from '@types';
 import Button from '@mui/material/Button';
 
 interface SelectOption {

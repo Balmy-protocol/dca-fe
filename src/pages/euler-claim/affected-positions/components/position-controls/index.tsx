@@ -1,15 +1,15 @@
 import * as React from 'react';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { Position } from 'types';
+import { Position } from '@types';
 import Link from '@mui/material/Link';
-import { useAppDispatch } from 'state/hooks';
-import { setPosition } from 'state/position-details/actions';
-import { changePositionDetailsTab } from 'state/tabs/actions';
-import usePushToHistory from 'hooks/usePushToHistory';
-import useTrackEvent from 'hooks/useTrackEvent';
+import { useAppDispatch } from '@state/hooks';
+import { setPosition } from '@state/position-details/actions';
+import { changePositionDetailsTab } from '@state/tabs/actions';
+import usePushToHistory from '@hooks/usePushToHistory';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledCardFooterButton = styled(Button)``;
 

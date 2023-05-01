@@ -1,21 +1,21 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import orderBy from 'lodash/orderBy';
-import GraphWidget from 'common/components/graph-widget';
-import { getProtocolToken } from 'common/mocks/tokens';
+import GraphWidget from '@common/components/graph-widget';
+import { getProtocolToken } from '@common/mocks/tokens';
 import Hidden from '@mui/material/Hidden';
-import useCurrentNetwork from 'hooks/useSelectedNetwork';
+import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import {
   DEFAULT_NETWORK_FOR_VERSION,
   LATEST_VERSION,
   ONE_DAY,
   shouldEnableFrequency,
   STRING_SWAP_INTERVALS,
-} from 'config/constants';
-import { GetSwapIntervalsGraphqlResponse, Token, YieldOption } from 'types';
+} from '@constants';
+import { GetSwapIntervalsGraphqlResponse, Token, YieldOption } from '@types';
 import { BigNumber } from 'ethers';
-import { useCreatePositionState } from 'state/create-position/hooks';
-import { useAppDispatch } from 'state/hooks';
+import { useCreatePositionState } from '@state/create-position/hooks';
+import { useAppDispatch } from '@state/hooks';
 import {
   setFrequencyType,
   setFrequencyValue,
@@ -25,13 +25,13 @@ import {
   setTo,
   setToYield,
   setYieldEnabled,
-} from 'state/create-position/actions';
+} from '@state/create-position/actions';
 import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import useYieldOptions from 'hooks/useYieldOptions';
-import useReplaceHistory from 'hooks/useReplaceHistory';
-import useTrackEvent from 'hooks/useTrackEvent';
-import useToken from 'hooks/useToken';
+import useYieldOptions from '@hooks/useYieldOptions';
+import useReplaceHistory from '@hooks/useReplaceHistory';
+import useTrackEvent from '@hooks/useTrackEvent';
+import useToken from '@hooks/useToken';
 import Swap from './components/swap';
 
 interface SwapContainerProps {

@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { TransactionReceipt, TransactionTypes, TransactionTypeDataOptions, Position } from 'types';
+import { TransactionReceipt, TransactionTypes, TransactionTypeDataOptions, Position } from '@types';
 
 export const addTransaction = createAction<{
   hash: string;

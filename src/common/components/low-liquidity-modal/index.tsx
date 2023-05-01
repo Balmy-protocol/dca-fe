@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from 'common/components/modal';
+import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import { POSSIBLE_ACTIONS } from 'config/constants';
+import { POSSIBLE_ACTIONS } from '@constants';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `

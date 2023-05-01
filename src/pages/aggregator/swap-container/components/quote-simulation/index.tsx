@@ -1,17 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 import { QuoteTransaction } from '@mean-finance/sdk';
-import useSimulateTransaction from 'hooks/useSimulateTransaction';
-import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
+import useSimulateTransaction from '@hooks/useSimulateTransaction';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import Typography from '@mui/material/Typography';
-import BlowfishLogo from 'assets/logo/powered_by_blowfish';
-import { BLOWFISH_ENABLED_CHAINS } from 'config';
+import BlowfishLogo from '@assets/logo/powered_by_blowfish';
+import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import { FormattedMessage } from 'react-intl';
-import TransactionSimulation from 'common/components/transaction-simulation';
-import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import TokenIcon from 'common/components/token-icon';
-import { emptyTokenWithAddress } from 'common/utils/currency';
+import TransactionSimulation from '@common/components/transaction-simulation';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import TokenIcon from '@common/components/token-icon';
+import { emptyTokenWithAddress } from '@common/utils/currency';
 
 const StyledTransactionSimulationContainer = styled.div`
   padding: 16px;

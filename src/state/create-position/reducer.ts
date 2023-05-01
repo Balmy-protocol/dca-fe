@@ -1,7 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { DEFAULT_NETWORK_FOR_VERSION, ONE_DAY, POSITION_VERSION_4 } from 'config/constants';
+import { DEFAULT_NETWORK_FOR_VERSION, ONE_DAY, POSITION_VERSION_4 } from '@constants';
 import { BigNumber } from 'ethers';
-import { Token, YieldOption } from 'types';
+import { Token, YieldOption } from '@types';
 import {
   setFromValue,
   setFrom,

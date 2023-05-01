@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -7,8 +7,8 @@ import Grow from '@mui/material/Grow';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition } from 'types';
-import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
+import { FullPosition } from '@types';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 interface WithdrawButtonProps {
   onClick: (useProtocolToken: boolean) => void;

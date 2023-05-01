@@ -1,25 +1,25 @@
 import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
-import { Token } from 'types';
+import { Token } from '@types';
 import Typography from '@mui/material/Typography';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import TokenButton from 'common/components/token-button';
-import TokenInput from 'common/components/token-input';
-import FrequencyInput from 'common/components/frequency-easy-input';
-import FrequencyTypeInput from 'common/components/frequency-type-input';
+import TokenButton from '@common/components/token-button';
+import TokenInput from '@common/components/token-input';
+import FrequencyInput from '@common/components/frequency-easy-input';
+import FrequencyTypeInput from '@common/components/frequency-type-input';
 import IconButton from '@mui/material/IconButton';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { getGhTokenListLogoUrl, NETWORKS, STRING_SWAP_INTERVALS, SUPPORTED_NETWORKS_DCA } from 'config/constants';
-import { emptyTokenWithAddress, toToken } from 'common/utils/currency';
+import { getGhTokenListLogoUrl, NETWORKS, STRING_SWAP_INTERVALS, SUPPORTED_NETWORKS_DCA } from '@constants';
+import { emptyTokenWithAddress, toToken } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
 import { find } from 'lodash';
-import TokenIcon from 'common/components/token-icon';
-// import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import useSelectedNetwork from 'hooks/useSelectedNetwork';
+import TokenIcon from '@common/components/token-icon';
+// import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-// import useWalletService from 'hooks/useWalletService';
+// import useWalletService from '@hooks/useWalletService';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
   ${({ $show }) => !$show && 'position: absolute;width: auto;'};

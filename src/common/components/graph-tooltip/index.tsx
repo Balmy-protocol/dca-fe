@@ -3,7 +3,7 @@ import capitalize from 'lodash/capitalize';
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
-import { Token } from 'types';
+import { Token } from '@types';
 
 const StyledPaper = styled.div`
   padding: 16px;

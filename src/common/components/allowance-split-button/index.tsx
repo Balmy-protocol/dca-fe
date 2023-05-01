@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import SplitButton from 'common/components/split-button';
-import { CustomButtonProps } from 'common/components/button';
-import { Token, YieldOption } from 'types';
+import SplitButton from '@common/components/split-button';
+import { CustomButtonProps } from '@common/components/button';
+import { Token, YieldOption } from '@types';
 import { FormattedMessage } from 'react-intl';
-import useWeb3Service from 'hooks/useWeb3Service';
+import useWeb3Service from '@hooks/useWeb3Service';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { BigNumber } from 'ethers';
-import { formatCurrencyAmount } from 'common/utils/currency';
-import { useHasPendingApproval } from 'state/transactions/hooks';
+import { formatCurrencyAmount } from '@common/utils/currency';
+import { useHasPendingApproval } from '@state/transactions/hooks';
 
 export enum AllowanceType {
   specific = 'specific',

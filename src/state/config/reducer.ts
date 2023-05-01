@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { SupportedLanguages } from 'config/constants/lang';
+import { SupportedLanguages } from '@constants/lang';
 import { setNetwork, toggleTheme, setSelectedLocale } from './actions';
 
 export interface ApplicationState {

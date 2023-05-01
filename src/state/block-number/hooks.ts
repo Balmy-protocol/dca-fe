@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from 'react-redux';
-import { useAppSelector } from 'state/hooks';
+import { useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
 
 export function useBlockNumber(chainId: number): number | undefined {

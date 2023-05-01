@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { PositionPermission } from 'types';
+import { PositionPermission } from '@types';
 import {
   setPermissions,
   removePermission,

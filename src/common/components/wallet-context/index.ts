@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Web3Service from 'services/web3Service';
+import Web3Service from '@services/web3Service';
 import axios, { AxiosInstance } from 'axios';
 
 export type WalletContextValue = {

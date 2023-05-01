@@ -13,30 +13,24 @@ import {
   AvailablePair,
   LastSwappedAt,
   NextSwapAvailableAt,
-} from 'types';
+} from '@types';
 import { DateTime } from 'luxon';
 import {
   activePositionsPerIntervalToHasToExecute,
   calculateNextSwapAvailableAt,
   sortTokens,
   sortTokensByAddress,
-} from 'common/utils/parsing';
+} from '@common/utils/parsing';
 import { BigNumber } from 'ethers';
 
 // GQL queries
-import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
-import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
-import gqlFetchAll from 'common/utils/gqlFetchAll';
+import GET_PAIR_LIQUIDITY from '@graphql/getPairLiquidity.graphql';
+import GET_AVAILABLE_PAIRS from '@graphql/getAvailablePairs.graphql';
+import gqlFetchAll from '@common/utils/gqlFetchAll';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'common/mocks/tokens';
-import {
-  ORACLES,
-  PositionVersions,
-  LATEST_VERSION,
-  DEFAULT_NETWORK_FOR_VERSION,
-  SWAP_INTERVALS_MAP,
-} from 'config/constants';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { ORACLES, PositionVersions, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION, SWAP_INTERVALS_MAP } from '@constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';

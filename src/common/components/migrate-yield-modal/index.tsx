@@ -1,23 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from 'common/components/modal';
+import Modal from '@common/components/modal';
 import isUndefined from 'lodash/isUndefined';
-import { Position, YieldOption } from 'types';
+import { Position, YieldOption } from '@types';
 import { FormattedMessage } from 'react-intl';
-import useTransactionModal from 'hooks/useTransactionModal';
+import useTransactionModal from '@hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
-import { useTransactionAdder } from 'state/transactions/hooks';
-import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
+import { useTransactionAdder } from '@state/transactions/hooks';
+import { PERMISSIONS, TRANSACTION_TYPES } from '@constants';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import Grid from '@mui/material/Grid';
-import { ButtonTypes } from 'common/components/button';
-import usePositionService from 'hooks/usePositionService';
-import useYieldOptions from 'hooks/useYieldOptions';
-import YieldTokenSelector from 'common/components/yield-token-selector';
-import { formatCurrencyAmount } from 'common/utils/currency';
+import { ButtonTypes } from '@common/components/button';
+import usePositionService from '@hooks/usePositionService';
+import useYieldOptions from '@hooks/useYieldOptions';
+import YieldTokenSelector from '@common/components/yield-token-selector';
+import { formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
-import useErrorService from 'hooks/useErrorService';
-import { shouldTrackError } from 'common/utils/errors';
+import useErrorService from '@hooks/useErrorService';
+import { shouldTrackError } from '@common/utils/errors';
 
 const StyledGrid = styled(Grid)`
   display: flex;

@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Token } from 'types';
+import { Token } from '@types';
 import SvgIcon from '@mui/material/SvgIcon';
-import CryptoIcons from 'assets/svg/color';
+import CryptoIcons from '@assets/svg/color';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import { PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
-import useTokenListUnfiltered from 'hooks/useTokenFromList';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import useTokenListUnfiltered from '@hooks/useTokenFromList';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineOutlinedIcon)<{ $realSize: string }>`
   font-size: ${({ $realSize }) => $realSize};

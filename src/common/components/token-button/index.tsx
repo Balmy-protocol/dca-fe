@@ -1,8 +1,8 @@
 import React from 'react';
-import Button from 'common/components/button';
-import { Token } from 'types';
+import Button from '@common/components/button';
+import { Token } from '@types';
 import styled from 'styled-components';
-import TokenIcon from 'common/components/token-icon';
+import TokenIcon from '@common/components/token-icon';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { FormattedMessage } from 'react-intl';
 

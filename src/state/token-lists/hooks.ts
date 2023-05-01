@@ -1,8 +1,8 @@
-import { useAppSelector } from 'hooks/state';
+import { useAppSelector } from '@hooks/state';
 import keyBy from 'lodash/keyBy';
 import React from 'react';
 import some from 'lodash/some';
-import { TokenList, TokensLists } from 'types';
+import { TokenList, TokensLists } from '@types';
 
 export function useSavedTokenLists() {
   return useAppSelector((state) => state.tokenLists.activeLists);

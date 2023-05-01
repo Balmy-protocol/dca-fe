@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { Permission, PositionPermission } from 'types';
+import { Permission, PositionPermission } from '@types';
 
 export const setPermissions = createAction<{ id: string; permissions: Record<string, PositionPermission> }>(
   'positionPermissions/setPermissions'

@@ -1,5 +1,5 @@
 import { Log } from '@ethersproject/providers';
-import { PositionVersions } from 'config';
+import { PositionVersions } from '@constants';
 import { Oracles } from './contracts';
 import { Permission, Position } from './positions';
 import { Token } from './tokens';

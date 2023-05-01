@@ -6,17 +6,17 @@ import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import { TransactionResponse, Network, TransactionRequest } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
-import { GetUsedTokensData, Token } from 'types';
+import { GetUsedTokensData, Token, ERC20Contract, MulticallContract } from '@types';
 import { MaxUint256 } from '@ethersproject/constants';
 import isUndefined from 'lodash/isUndefined';
-import { toToken } from 'common/utils/currency';
+import { toToken } from '@common/utils/currency';
 
 // ABIS
-import ERC20ABI from 'abis/erc20.json';
-import MULTICALLABI from 'abis/Multicall.json';
+import ERC20ABI from '@abis/erc20.json';
+import MULTICALLABI from '@abis/Multicall.json';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import {
   LATEST_VERSION,
   MULTICALL_ADDRESS,
@@ -24,8 +24,7 @@ import {
   NETWORKS,
   NULL_ADDRESS,
   PositionVersions,
-} from 'config/constants';
-import { ERC20Contract, MulticallContract } from 'types/contracts';
+} from '@constants';
 import ContractService from './contractService';
 import ProviderService from './providerService';
 

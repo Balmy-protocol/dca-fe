@@ -1,6 +1,6 @@
-import { SWAP_INTERVALS_MAP } from 'config/constants';
+import { SWAP_INTERVALS_MAP } from '@constants';
 import { BigNumber } from 'ethers';
-import { SwapInfo } from 'types';
+import { SwapInfo } from '@types';
 import { calculateStale, HEALTHY, NO_SWAP_INFORMATION, STALE, NOTHING_TO_EXECUTE } from './parsing';
 
 describe('Parsing', () => {

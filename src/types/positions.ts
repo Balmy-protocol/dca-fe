@@ -1,4 +1,4 @@
-import { PositionVersions } from 'config';
+import { PositionVersions } from '@constants';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 

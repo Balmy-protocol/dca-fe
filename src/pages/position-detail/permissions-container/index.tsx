@@ -1,28 +1,28 @@
 import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
-import { FullPosition } from 'types';
-import useTransactionModal from 'hooks/useTransactionModal';
-import { useTransactionAdder } from 'state/transactions/hooks';
-import PositionPermissionsControls from 'pages/position-detail/position-permissions-controls ';
+import { FullPosition } from '@types';
+import useTransactionModal from '@hooks/useTransactionModal';
+import { useTransactionAdder } from '@state/transactions/hooks';
+import PositionPermissionsControls from '@pages/position-detail/position-permissions-controls ';
 import {
   useHasModifiedPermissions,
   useModifiedPermissions,
   usePositionPermissions,
-} from 'state/position-permissions/hooks';
-import PositionPermission from 'pages/position-detail/permission';
+} from '@state/position-permissions/hooks';
+import PositionPermission from '@pages/position-detail/permission';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import { TRANSACTION_TYPES } from 'config/constants';
-import { discardChanges, submitPermissionChanges } from 'state/position-permissions/actions';
-import { useAppDispatch } from 'state/hooks';
-import AddAddressPermissionModal from 'common/components/add-address-permission-modal';
+import { TRANSACTION_TYPES } from '@constants';
+import { discardChanges, submitPermissionChanges } from '@state/position-permissions/actions';
+import { useAppDispatch } from '@state/hooks';
+import AddAddressPermissionModal from '@common/components/add-address-permission-modal';
 import Paper from '@mui/material/Paper';
-import usePositionService from 'hooks/usePositionService';
-import { fullPositionToMappedPosition } from 'common/utils/parsing';
-import useAccount from 'hooks/useAccount';
-import useErrorService from 'hooks/useErrorService';
-import { shouldTrackError } from 'common/utils/errors';
+import usePositionService from '@hooks/usePositionService';
+import { fullPositionToMappedPosition } from '@common/utils/parsing';
+import useAccount from '@hooks/useAccount';
+import useErrorService from '@hooks/useErrorService';
+import { shouldTrackError } from '@common/utils/errors';
 
 const StyledControlsWrapper = styled(Grid)<{ isPending: boolean }>`
   display: flex;

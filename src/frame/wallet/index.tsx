@@ -1,24 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useAppDispatch } from 'state/hooks';
-import { useAllTransactions, useHasPendingTransactions } from 'state/transactions/hooks';
-import { useBadgeNumber } from 'state/transactions-badge/hooks';
-import { updateBadgeNumber } from 'state/transactions-badge/actions';
+import { useAppDispatch } from '@state/hooks';
+import { useAllTransactions, useHasPendingTransactions } from '@state/transactions/hooks';
+import { useBadgeNumber } from '@state/transactions-badge/hooks';
+import { updateBadgeNumber } from '@state/transactions-badge/actions';
 
 import Badge from '@mui/material/Badge';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Web3Service } from 'types';
-import Button from 'common/components/button';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import Address from 'common/components/address';
+import { Web3Service } from '@types';
+import Button from '@common/components/button';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import Address from '@common/components/address';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import TokenIcon from 'common/components/token-icon';
-import { getGhTokenListLogoUrl, NETWORKS } from 'config';
+import TokenIcon from '@common/components/token-icon';
+import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
 import { find } from 'lodash';
-import { toToken } from 'common/utils/currency';
-import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
+import { toToken } from '@common/utils/currency';
+import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import WalletMenu from '../wallet-menu';
 
 const StyledButton = styled(Button)`

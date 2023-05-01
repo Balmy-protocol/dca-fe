@@ -1,6 +1,6 @@
-import { NETWORKS } from 'config';
+import { NETWORKS } from '@constants';
 import find from 'lodash/find';
-import { useAppSelector } from 'state/hooks';
+import { useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
 
 export function useCreatePositionState() {

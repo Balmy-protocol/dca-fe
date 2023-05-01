@@ -1,8 +1,8 @@
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from 'config/constants';
-import { useAggregatorNetwork } from 'state/aggregator/hooks';
-import { useDCANetwork } from 'state/create-position/hooks';
-import { useMainTab } from 'state/tabs/hooks';
-import { NetworkStruct } from 'types';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from '@constants';
+import { useAggregatorNetwork } from '@state/aggregator/hooks';
+import { useDCANetwork } from '@state/create-position/hooks';
+import { useMainTab } from '@state/tabs/hooks';
+import { NetworkStruct } from '@types';
 
 function useSelectedNetwork() {
   const aggregatorNetwork = useAggregatorNetwork();

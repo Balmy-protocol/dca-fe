@@ -1,6 +1,6 @@
 import { parseUnits } from '@ethersproject/units';
 import { createReducer } from '@reduxjs/toolkit';
-import { LATEST_VERSION, POSITION_ACTIONS, TRANSACTION_TYPES } from 'config';
+import { LATEST_VERSION, POSITION_ACTIONS, TRANSACTION_TYPES } from '@constants';
 import { BigNumber } from 'ethers';
 import {
   AddFundsTypeData,
@@ -12,7 +12,7 @@ import {
   TerminatePositionTypeData,
   TransferTypeData,
   WithdrawTypeData,
-} from 'types';
+} from '@types';
 import { setPosition, updatePosition, updateShowBreakdown } from './actions';
 
 export interface PositionDetailsState {

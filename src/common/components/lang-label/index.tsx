@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
-import useChangeLanguage from 'hooks/useChangeLanguage';
-import { SupportedLanguages, SUPPORTED_LANGUAGES_STRING } from 'config/constants/lang';
-import { useSelectedLocale } from 'state/config/hooks';
-import { useAppDispatch } from 'state/hooks';
-import { setSelectedLocale } from 'state/config/actions';
+import useChangeLanguage from '@hooks/useChangeLanguage';
+import { SupportedLanguages, SUPPORTED_LANGUAGES_STRING } from '@constants/lang';
+import { useSelectedLocale } from '@state/config/hooks';
+import { useAppDispatch } from '@state/hooks';
+import { setSelectedLocale } from '@state/config/actions';
 
 const usePopoverStyles = makeStyles((theme: Theme) =>
   createStyles({

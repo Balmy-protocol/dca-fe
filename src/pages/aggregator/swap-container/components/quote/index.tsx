@@ -6,21 +6,21 @@ import isFinite from 'lodash/isFinite';
 import * as React from 'react';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import styled from 'styled-components';
-import { SwapOption, Token } from 'types';
-import TokenIcon from 'common/components/token-icon';
+import { SwapOption, Token } from '@types';
+import TokenIcon from '@common/components/token-icon';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import Typography from '@mui/material/Typography';
-import { emptyTokenWithLogoURI, formatCurrencyAmount } from 'common/utils/currency';
+import { emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { withStyles } from '@mui/styles';
 import { FormattedMessage } from 'react-intl';
 import { parseUnits } from '@ethersproject/units';
-import { SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from 'config/constants/aggregator';
-import useSpecificAllowance from 'hooks/useSpecificAllowance';
-import { MAX_BI } from 'config';
+import { SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
+import useSpecificAllowance from '@hooks/useSpecificAllowance';
+import { MAX_BI } from '@constants';
 import { BigNumber } from 'ethers';
-import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
+import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 
 const DarkChip = withStyles(() => ({
   root: {

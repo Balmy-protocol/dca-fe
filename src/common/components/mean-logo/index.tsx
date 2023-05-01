@@ -1,6 +1,6 @@
 import React from 'react';
-import MeanLogoLight from 'assets/logo/light_logo.svg';
-import MeanLogoDark from 'assets/logo/dark_logo.svg';
+import MeanLogoLight from '@assets/logo/light_logo.svg';
+import MeanLogoDark from '@assets/logo/dark_logo.svg';
 
 interface MeanLogoProps {
   theme: 'light' | 'dark';

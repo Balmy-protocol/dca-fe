@@ -1,6 +1,6 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
-import { FullPosition } from 'types';
+import { FullPosition } from '@types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import { withStyles } from '@mui/styles';

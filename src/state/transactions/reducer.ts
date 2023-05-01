@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { TransactionDetails } from 'types';
+import { TransactionDetails } from '@types';
 import keys from 'lodash/keys';
 import {
   addTransaction,

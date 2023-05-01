@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
-import { SetStateCallback } from 'types';
+import { SetStateCallback } from '@types';
 import FilledInput from '@mui/material/FilledInput';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import { DEFAULT_AGGREGATOR_SETTINGS } from 'config/constants/aggregator';
+import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 
 interface ConfettiInputProps {
   id: string;

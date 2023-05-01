@@ -2,8 +2,8 @@ import React from 'react';
 import Link from '@mui/material/Link';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { buildEtherscanTransaction } from 'common/utils/etherscan';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { buildEtherscanTransaction } from '@common/utils/etherscan';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 interface EtherscanLinkProps {
   hash: string;

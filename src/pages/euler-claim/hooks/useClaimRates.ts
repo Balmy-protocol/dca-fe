@@ -1,11 +1,11 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
+import usePrevious from '@hooks/usePrevious';
 import { BigNumber, ethers } from 'ethers';
-import EULERMIGRATORABI from 'abis/EulerMigrator.json';
+import EULERMIGRATORABI from '@abis/EulerMigrator.json';
 import { Interface } from '@ethersproject/abi';
-import useProviderService from 'hooks/useProviderService';
-import { EULER_CLAIM_MIGRATORS_ADDRESSES } from 'config';
+import useProviderService from '@hooks/useProviderService';
+import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 
 function useClaimRates(
   tokenKeys: string[] | undefined | null

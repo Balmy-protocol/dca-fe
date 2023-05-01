@@ -1,16 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from 'common/components/modal';
-import { Position } from 'types';
+import Modal from '@common/components/modal';
+import { Position } from '@types';
 import { FormattedMessage } from 'react-intl';
-import useTransactionModal from 'hooks/useTransactionModal';
+import useTransactionModal from '@hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
-import { useTransactionAdder } from 'state/transactions/hooks';
-import { TRANSACTION_TYPES } from 'config/constants';
+import { useTransactionAdder } from '@state/transactions/hooks';
+import { TRANSACTION_TYPES } from '@constants';
 import Link from '@mui/material/Link';
-import usePositionService from 'hooks/usePositionService';
-import useErrorService from 'hooks/useErrorService';
-import { shouldTrackError } from 'common/utils/errors';
+import usePositionService from '@hooks/usePositionService';
+import useErrorService from '@hooks/useErrorService';
+import { shouldTrackError } from '@common/utils/errors';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `

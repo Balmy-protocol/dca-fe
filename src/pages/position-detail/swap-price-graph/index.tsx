@@ -7,7 +7,7 @@ import { Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import { FullPosition, Token } from 'types';
+import { FullPosition, Token } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
 import {
@@ -16,13 +16,13 @@ import {
   FREQUENCY_TO_PERIOD,
   POSITION_ACTIONS,
   STABLE_COINS,
-} from 'config/constants';
-import GraphTooltip from 'common/components/graph-tooltip';
-import EmptyGraph from 'assets/svg/emptyGraph';
-import { formatCurrencyAmount } from 'common/utils/currency';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
-import usePriceService from 'hooks/usePriceService';
-import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
+} from '@constants';
+import GraphTooltip from '@common/components/graph-tooltip';
+import EmptyGraph from '@assets/svg/emptyGraph';
+import { formatCurrencyAmount } from '@common/utils/currency';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import usePriceService from '@hooks/usePriceService';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 
 const StyledContainer = styled(Paper)`
   display: flex;

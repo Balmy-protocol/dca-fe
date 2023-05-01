@@ -2,12 +2,12 @@
 import { buildSDK, ProviderSourceInput, SourceId, SOURCES_METADATA } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
 import { BaseProvider } from '@ethersproject/providers';
-import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from 'config/constants/aggregator';
+import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from '@constants/aggregator';
 import { BigNumber } from 'ethers';
-import { SwapOption, Token } from 'types';
+import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
-import { toToken } from 'common/utils/currency';
-import { MEAN_API_URL } from 'config/constants/addresses';
+import { toToken } from '@common/utils/currency';
+import { MEAN_API_URL } from '@constants/addresses';
 import ProviderService from './providerService';
 import WalletService from './walletService';
 

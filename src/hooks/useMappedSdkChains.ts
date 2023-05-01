@@ -1,9 +1,9 @@
 import React from 'react';
 import find from 'lodash/find';
 import compact from 'lodash/compact';
-import useSdkChains from 'hooks/useSdkChains';
+import useSdkChains from '@hooks/useSdkChains';
 import { getAllChains } from '@mean-finance/sdk';
-import { NETWORKS } from 'config';
+import { NETWORKS } from '@constants';
 
 function useSdkMappedChains() {
   const supportedChains = useSdkChains();

@@ -1,20 +1,14 @@
 import React from 'react';
-import { SwapOption, Token } from 'types';
+import { SwapOption, Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
-import usePrevious from 'hooks/usePrevious';
-import { useHasPendingTransactions } from 'state/transactions/hooks';
+import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
-import {
-  GasKeys,
-  SORT_LEAST_GAS,
-  SORT_MOST_PROFIT,
-  SORT_MOST_RETURN,
-  SwapSortOptions,
-} from 'config/constants/aggregator';
-import { useBlockNumber } from 'state/block-number/hooks';
+import { GasKeys, SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
+import { useBlockNumber } from '@state/block-number/hooks';
 import { BigNumber } from 'ethers';
-import { MAX_UINT_32 } from 'config';
+import { MAX_UINT_32 } from '@constants';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
 import useSelectedNetwork from './useSelectedNetwork';

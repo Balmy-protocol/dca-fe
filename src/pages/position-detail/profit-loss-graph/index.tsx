@@ -15,14 +15,14 @@ import {
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import { ActionState, FullPosition } from 'types';
+import { ActionState, FullPosition } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { POSITION_ACTIONS } from 'config/constants';
-import EmptyGraph from 'assets/svg/emptyGraph';
-import usePriceService from 'hooks/usePriceService';
+import { POSITION_ACTIONS } from '@constants';
+import EmptyGraph from '@assets/svg/emptyGraph';
+import usePriceService from '@hooks/usePriceService';
 import { formatUnits } from '@ethersproject/units';
-import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import ProfitLossTooltip from './tooltip';
 
 const StyledContainer = styled(Paper)`

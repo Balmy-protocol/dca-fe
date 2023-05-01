@@ -1,4 +1,4 @@
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from 'config';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from '@constants';
 import isNaN from 'lodash/isNaN';
 
 const CREATE_REGEX = /^\/create\/(\d+).*$/;

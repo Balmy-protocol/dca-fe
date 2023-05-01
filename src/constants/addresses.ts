@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 
 import { Chains, getAllChains } from '@mean-finance/sdk';
-import { NetworkStruct } from 'types';
+import { NetworkStruct } from '@types';
 import findKey from 'lodash/findKey';
 import { Chain } from '@mean-finance/sdk/dist/types';
 import {

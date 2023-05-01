@@ -1,12 +1,12 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import styled from 'styled-components';
-import { Position } from 'types';
+import { Position } from '@types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import useYieldOptions from 'hooks/useYieldOptions';
+import useYieldOptions from '@hooks/useYieldOptions';
 import Paper from '@mui/material/Paper';
-import { NETWORKS } from 'config';
+import { NETWORKS } from '@constants';
 import ActivePosition from './components/position';
 
 const StyledGridItem = styled(Grid)`

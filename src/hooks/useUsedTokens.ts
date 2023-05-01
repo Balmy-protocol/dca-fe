@@ -1,7 +1,7 @@
 import React from 'react';
-import { UsedToken } from 'types';
+import { UsedToken } from '@types';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
+import usePrevious from '@hooks/usePrevious';
 import useWalletService from './useWalletService';
 import useAccount from './useAccount';
 

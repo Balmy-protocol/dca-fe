@@ -25,14 +25,14 @@ import {
   EulerClaimClaimFromMigratorTypeData,
   EulerClaimPermitManyTypeData,
   EulerClaimTerminateManyTypeData,
-} from 'types';
-import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
-import { formatCurrencyAmount } from 'common/utils/currency';
+} from '@types';
+import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from '@constants';
+import { formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
 import { defineMessage, useIntl } from 'react-intl';
-import useAvailablePairs from 'hooks/useAvailablePairs';
-import { getWrappedProtocolToken } from 'common/mocks/tokens';
-import { getFrequencyLabel } from 'common/utils/parsing';
+import useAvailablePairs from '@hooks/useAvailablePairs';
+import { getWrappedProtocolToken } from '@common/mocks/tokens';
+import { getFrequencyLabel } from '@common/utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 

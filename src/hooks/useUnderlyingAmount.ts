@@ -1,9 +1,9 @@
 import React from 'react';
-import { Token } from 'types';
+import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import some from 'lodash/some';
 import every from 'lodash/every';
-import usePrevious from 'hooks/usePrevious';
+import usePrevious from '@hooks/usePrevious';
 import { BigNumber } from 'ethers';
 import useMeanApiService from './useMeanApiService';
 

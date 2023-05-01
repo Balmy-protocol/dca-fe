@@ -1,14 +1,14 @@
 import React from 'react';
 import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
-import { useHasPendingTransactions } from 'state/transactions/hooks';
+import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
-import { useBlockNumber } from 'state/block-number/hooks';
+import { useBlockNumber } from '@state/block-number/hooks';
+import useSelectedNetwork from './useSelectedNetwork';
+import usePriceService from './usePriceService';
 import useAccount from './useAccount';
 import useSdkService from './useSdkService';
-import usePriceService from './usePriceService';
-import useSelectedNetwork from './useSelectedNetwork';
 
 interface BalanceResponse {
   balance: BigNumber;

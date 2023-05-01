@@ -5,13 +5,13 @@ import { ResponsiveContainer, XAxis, YAxis, Legend, CartesianGrid, Line, Compose
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import { FullPosition } from 'types';
+import { FullPosition } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { POSITION_ACTIONS } from 'config/constants';
-import EmptyGraph from 'assets/svg/emptyGraph';
-import usePriceService from 'hooks/usePriceService';
-import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
+import { POSITION_ACTIONS } from '@constants';
+import EmptyGraph from '@assets/svg/emptyGraph';
+import usePriceService from '@hooks/usePriceService';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { formatUnits } from '@ethersproject/units';
 import GasSavedTooltip from './tooltip';
 

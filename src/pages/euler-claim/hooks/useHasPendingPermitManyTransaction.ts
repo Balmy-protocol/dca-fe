@@ -1,6 +1,6 @@
-import { TRANSACTION_TYPES } from 'config';
+import { TRANSACTION_TYPES } from '@constants';
 import { useMemo } from 'react';
-import { useAllNotClearedTransactions } from 'state/transactions/hooks';
+import { useAllNotClearedTransactions } from '@state/transactions/hooks';
 
 const useHasPendingTransactions = () => {
   const transactions = useAllNotClearedTransactions();

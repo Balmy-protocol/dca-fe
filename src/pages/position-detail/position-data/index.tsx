@@ -1,12 +1,12 @@
 import React from 'react';
-import { FullPosition, GetPairSwapsData, YieldOptions } from 'types';
+import { FullPosition, GetPairSwapsData, YieldOptions } from '@types';
 import Typography from '@mui/material/Typography';
-import TokenIcon from 'common/components/token-icon';
+import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithAddress, formatCurrencyAmount } from 'common/utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import {
   activePositionsPerIntervalToHasToExecute,
   calculateNextSwapAvailableAt,
@@ -15,15 +15,9 @@ import {
   fullPositionToMappedPosition,
   getTimeFrequencyLabel,
   STALE,
-} from 'common/utils/parsing';
-import {
-  NETWORKS,
-  POSITION_ACTIONS,
-  STABLE_COINS,
-  STRING_SWAP_INTERVALS,
-  VERSIONS_ALLOWED_MODIFY,
-} from 'config/constants';
-import useUsdPrice from 'hooks/useUsdPrice';
+} from '@common/utils/parsing';
+import { NETWORKS, POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from '@constants';
+import useUsdPrice from '@hooks/useUsdPrice';
 import LinearProgress from '@mui/material/LinearProgress';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
@@ -31,17 +25,17 @@ import { withStyles } from '@mui/styles';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import find from 'lodash/find';
-import CustomChip from 'common/components/custom-chip';
-import ComposedTokenIcon from 'common/components/composed-token-icon';
-import { useShowBreakdown } from 'state/position-details/hooks';
-import { useAppDispatch } from 'state/hooks';
+import CustomChip from '@common/components/custom-chip';
+import ComposedTokenIcon from '@common/components/composed-token-icon';
+import { useShowBreakdown } from '@state/position-details/hooks';
+import { useAppDispatch } from '@state/hooks';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import { updateShowBreakdown } from 'state/position-details/actions';
+import { updateShowBreakdown } from '@state/position-details/actions';
 import { formatUnits } from '@ethersproject/units';
 import { Theme, Tooltip } from '@mui/material';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import PositionDataControls from './position-data-controls';
 
 const DarkTooltip = withStyles((theme: Theme) => ({

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Token } from 'types';
+import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
-import usePrevious from 'hooks/usePrevious';
+import usePrevious from '@hooks/usePrevious';
 import usePriceService from './usePriceService';
 
 function useGraphPrice(

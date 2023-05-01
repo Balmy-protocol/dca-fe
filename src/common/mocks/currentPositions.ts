@@ -1,5 +1,5 @@
-import { LATEST_VERSION, ONE_DAY, TOKEN_TYPE_BASE } from 'config/constants';
-import { Position } from 'types';
+import { LATEST_VERSION, ONE_DAY, TOKEN_TYPE_BASE } from '@constants';
+import { Position } from '@types';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from './tokens';
 

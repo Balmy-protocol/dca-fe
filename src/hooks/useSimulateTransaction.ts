@@ -1,9 +1,9 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import { BlowfishResponse } from 'types';
+import { BlowfishResponse } from '@types';
 import debounce from 'lodash/debounce';
-import usePrevious from 'hooks/usePrevious';
 import { QuoteTransaction } from '@mean-finance/sdk';
+import usePrevious from '@hooks/usePrevious';
 import useSimulationService from './useSimulationService';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';

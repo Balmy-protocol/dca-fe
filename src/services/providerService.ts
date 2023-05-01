@@ -6,7 +6,7 @@ import {
   LATEST_VERSION,
   DEFAULT_NETWORK_FOR_VERSION,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
-} from 'config';
+} from '@constants';
 import { getNetwork as getStringNetwork, Provider, Network, TransactionRequest } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { getProviderInfo } from 'web3modal';

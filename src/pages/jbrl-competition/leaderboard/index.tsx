@@ -1,8 +1,8 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import { BigNumber } from 'ethers';
-import { FullPosition, Token, YieldOptions } from 'types';
-import UserCompPosition from 'pages/jbrl-competition/user-comp-position';
+import { FullPosition, Token, YieldOptions } from '@types';
+import UserCompPosition from '@pages/jbrl-competition/user-comp-position';
 
 interface LeaderboardSummaryProps {
   userPositions: {

@@ -1,7 +1,7 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-import { STRING_SWAP_INTERVALS } from 'config/constants';
+import { STRING_SWAP_INTERVALS } from '@constants';
 import { useIntl } from 'react-intl';
 
 interface FrequencyInputProps {

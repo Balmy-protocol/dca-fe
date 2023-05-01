@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { FullPosition, TransactionDetails } from 'types';
+import { FullPosition, TransactionDetails } from '@types';
 
 export const setPosition = createAction<FullPosition | null>('positionDetails/setPosition');
 

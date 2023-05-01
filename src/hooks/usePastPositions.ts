@@ -1,6 +1,6 @@
 import React from 'react';
-import { Positions } from 'types';
-import { useAllTransactions } from 'state/transactions/hooks';
+import { Positions } from '@types';
+import { useAllTransactions } from '@state/transactions/hooks';
 import usePositionService from './usePositionService';
 import useAccount from './useAccount';
 

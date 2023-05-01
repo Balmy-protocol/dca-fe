@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import LoadingIndicator from 'common/components/centered-loading-indicator';
+import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Link from '@mui/material/Link';
-import { buildEtherscanTransaction } from 'common/utils/etherscan';
-import { TRANSACTION_ERRORS } from 'common/utils/errors';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import Modal from 'common/components/modal';
+import { buildEtherscanTransaction } from '@common/utils/etherscan';
+import { TRANSACTION_ERRORS } from '@common/utils/errors';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import Modal from '@common/components/modal';
 
 const StyledContainer = styled.div`
   display: flex;
