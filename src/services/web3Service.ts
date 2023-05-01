@@ -47,7 +47,7 @@ import { DUMMY_ARCX_CLIENT } from 'utils/dummy-arcx-client';
 import { chainToWagmiNetwork } from 'utils/parsing';
 
 // MOCKS
-import { NETWORKS, PositionVersions, UNSUPPORTED_WAGMI_CHAIN } from 'config/constants';
+import { NETWORKS, PositionVersions, UNSUPPORTED_WAGMI_CHAIN, RAW_NETWORKS } from 'config/constants';
 
 import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from 'config/constants/custom-wallets';
 import { setupAxiosClient } from 'state';
@@ -67,6 +67,7 @@ import ErrorService from './errorService';
 import SimulationService from './simulationService';
 import SafeService from './safeService';
 import EventService from './eventService';
+import ConnextService from './connextService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -129,6 +130,8 @@ export default class Web3Service {
 
   safeService: SafeService;
 
+  connextService: ConnextService;
+
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -179,6 +182,13 @@ export default class Web3Service {
       this.providerService,
       this.safeService
     );
+    this.connextService = new ConnextService(
+      '0x123456',
+      '01001', // origin domain ID
+      'https://',
+      '121212', // destinantion domain ID
+      'https://'
+    );
     this.positionService = new PositionService(
       this.walletService,
       this.pairService,
@@ -186,7 +196,8 @@ export default class Web3Service {
       this.meanApiService,
       this.safeService,
       this.apolloClient,
-      this.providerService
+      this.providerService,
+      this.connextService
     );
     this.priceService = new PriceService(
       this.walletService,
@@ -236,6 +247,10 @@ export default class Web3Service {
 
   getPositionService() {
     return this.positionService;
+  }
+
+  getConnextService() {
+    return this.connextService;
   }
 
   getAggregatorService() {
