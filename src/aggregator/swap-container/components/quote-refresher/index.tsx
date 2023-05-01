@@ -26,6 +26,7 @@ const TIMER_FOR_RESET = 60;
 
 const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
+  const inactiveTimeRef = React.useRef<number | null>(null);
   const trackEvent = useTrackEvent();
 
   const onRefreshRoute = () => {
@@ -36,7 +37,14 @@ const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: Quot
 
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
-      setTimeout(() => setTimer((newTimer) => newTimer - 1), 1000);
+      if (inactiveTimeRef.current && inactiveTimeRef.current + 60 * 1000 < Date.now()) {
+        setTimer(TIMER_FOR_RESET);
+        refreshQuotes();
+      } else {
+        setTimeout(() => setTimer((newTimer) => newTimer - 1), 1000);
+      }
+    } else {
+      inactiveTimeRef.current = Date.now();
     }
   };
 
