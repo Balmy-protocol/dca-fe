@@ -34,7 +34,25 @@ const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: Quot
     trackEvent('Aggregator - Refresh quotes');
   };
 
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      setTimeout(() => setTimer((newTimer) => newTimer - 1), 1000);
+    }
+  };
+
   React.useEffect(() => {
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (document.visibilityState !== 'visible') {
+      return;
+    }
+
     if (timer > 0 && !isLoading) {
       setTimeout(() => setTimer(timer - 1), 1000);
     } else {
