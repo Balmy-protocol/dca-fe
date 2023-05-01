@@ -76,7 +76,6 @@ export const TOKEN_BLACKLIST = [
   '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12', // POLY - GNS optimism Beefy wrapper
   '0xaab6af05e12faae0a5d9597c79588846f0df15b8', // POLY - MVX optimism Beefy wrapper
   '0xe0b52e49357fd4daf2c15e02058dce6bc0057db4', // POLY - AGEUR
-  '0xd01eaff32ca784b07e04776f605cdcb39221b017', // POLY - stMATIC on Aave v3
 
   '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // ETH - USDC. Euler. Disabled due to hack.
   '0xd4de9d2fc1607d1df63e1c95ecbfa8d7946f5457', // ETH - WETH. Euler. Disabled due to hack.
