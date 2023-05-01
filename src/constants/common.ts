@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/lib/ethers';
-import { TransactionActionType } from 'types';
+import { TransactionActionType } from '@types';
 
 export const MAX_UINT_32 = 4294967295;
 

@@ -8,28 +8,28 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import TokenIcon from 'common/components/token-icon';
+import TokenIcon from '@common/components/token-icon';
 import {
   getTimeFrequencyLabel,
   calculateStale,
   STALE,
   calculateYield,
   sortTokensByAddress,
-} from 'common/utils/parsing';
-import { ChainId, Position, Token, YieldOptions } from 'types';
-import { NETWORKS, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, VERSIONS_ALLOWED_MODIFY } from 'config/constants';
-import useAvailablePairs from 'hooks/useAvailablePairs';
+} from '@common/utils/parsing';
+import { ChainId, Position, Token, YieldOptions } from '@types';
+import { NETWORKS, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, VERSIONS_ALLOWED_MODIFY } from '@constants';
+import useAvailablePairs from '@hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithAddress, formatCurrencyAmount } from 'common/utils/currency';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
-import ComposedTokenIcon from 'common/components/composed-token-icon';
-import CustomChip from 'common/components/custom-chip';
+import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import ComposedTokenIcon from '@common/components/composed-token-icon';
+import CustomChip from '@common/components/custom-chip';
 import { Link, Theme, Tooltip } from '@mui/material';
-import useUsdPrice from 'hooks/useUsdPrice';
+import useUsdPrice from '@hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;

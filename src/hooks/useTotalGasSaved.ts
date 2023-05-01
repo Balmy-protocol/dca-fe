@@ -1,9 +1,9 @@
 import React from 'react';
-import { FullPosition } from 'types';
+import { FullPosition } from '@types';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
+import usePrevious from '@hooks/usePrevious';
 import { BigNumber } from 'ethers';
-import { POSITION_ACTIONS } from 'config';
+import { POSITION_ACTIONS } from '@constants';
 import usePriceService from './usePriceService';
 
 function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber | undefined, boolean, string?] {

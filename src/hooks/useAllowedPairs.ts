@@ -1,6 +1,6 @@
 import React from 'react';
-import { AllowedPairs } from 'types';
-import { useAllTransactions } from 'state/transactions/hooks';
+import { AllowedPairs } from '@types';
+import { useAllTransactions } from '@state/transactions/hooks';
 import usePairService from './usePairService';
 
 function useAllowedPairs() {

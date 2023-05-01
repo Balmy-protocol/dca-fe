@@ -1,5 +1,5 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { CHAINLINK_GRAPHQL_URL } from 'config/constants';
+import { CHAINLINK_GRAPHQL_URL } from '@constants';
 
 const client = new ApolloClient({
   uri: CHAINLINK_GRAPHQL_URL[1],

@@ -1,5 +1,5 @@
 import { defineMessage, MessageDescriptor } from 'react-intl';
-import { Oracles, Permission, PositionActions, PositionStatus, TransactionTypesConstant } from 'types';
+import { Oracles, Permission, PositionActions, PositionStatus, TransactionTypesConstant } from '@types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
 

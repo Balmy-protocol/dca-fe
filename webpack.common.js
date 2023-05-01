@@ -38,7 +38,21 @@ module.exports = {
     clean: true,
   },
   resolve: {
-    modules: [path.resolve(__dirname, 'src'), 'node_modules'],
+    alias: {
+      '@common': path.resolve(__dirname, 'src/common'),
+      '@assets': path.resolve(__dirname, 'src/assets'),
+      '@abis': path.resolve(__dirname, 'src/abis'),
+      '@fonts': path.resolve(__dirname, 'src/fonts'),
+      '@constants': path.resolve(__dirname, 'src/constants'),
+      '@frame': path.resolve(__dirname, 'src/frame'),
+      '@graphql': path.resolve(__dirname, 'src/graphql'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
+      '@lang': path.resolve(__dirname, 'src/lang'),
+      '@pages': path.resolve(__dirname, 'src/pages'),
+      '@services': path.resolve(__dirname, 'src/services'),
+      '@state': path.resolve(__dirname, 'src/state'),
+      '@types': path.resolve(__dirname, 'src/types'),
+    },
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
     fallback: {
       stream: require.resolve('stream-browserify'),

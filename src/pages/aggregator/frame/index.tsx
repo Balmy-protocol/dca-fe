@@ -1,12 +1,12 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import styled from 'styled-components';
-import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
-import { changeMainTab } from 'state/tabs/actions';
-import { useAppDispatch } from 'state/hooks';
-import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
-import useTrackEvent from 'hooks/useTrackEvent';
-import { useIsLoadingAggregatorTokenLists } from 'state/token-lists/hooks';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
+import { changeMainTab } from '@state/tabs/actions';
+import { useAppDispatch } from '@state/hooks';
+import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
+import useTrackEvent from '@hooks/useTrackEvent';
+import { useIsLoadingAggregatorTokenLists } from '@state/token-lists/hooks';
 import SwapContainer from '../swap-container';
 
 const StyledGrid = styled(Grid)<{ isSmall?: boolean }>`

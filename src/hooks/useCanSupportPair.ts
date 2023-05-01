@@ -1,9 +1,9 @@
 import React from 'react';
-import { Token } from 'types';
+import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
+import usePrevious from '@hooks/usePrevious';
 import isUndefined from 'lodash/isUndefined';
-import { useHasPendingTransactions } from 'state/transactions/hooks';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import usePairService from './usePairService';
 import useAccount from './useAccount';
 

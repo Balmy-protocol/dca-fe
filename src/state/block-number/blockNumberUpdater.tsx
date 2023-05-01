@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAppDispatch } from 'state/hooks';
-import useDebounce from 'hooks/useDebounce';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import useTransactionService from 'hooks/useTransactionService';
-import useWalletService from 'hooks/useWalletService';
+import { useAppDispatch } from '@state/hooks';
+import useDebounce from '@hooks/useDebounce';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import useTransactionService from '@hooks/useTransactionService';
+import useWalletService from '@hooks/useWalletService';
 import { updateBlockNumber } from './actions';
 
 export default function Updater(): null {

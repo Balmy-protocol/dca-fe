@@ -1,8 +1,8 @@
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import find from 'lodash/find';
-import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
-import { useSubTab } from 'state/tabs/hooks';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
+import { useSubTab } from '@state/tabs/hooks';
 import { useParams } from 'react-router-dom';
 import {
   DEFAULT_NETWORK_FOR_VERSION,
@@ -10,24 +10,24 @@ import {
   POSITION_VERSION_4,
   SUPPORTED_NETWORKS_DCA,
   NETWORKS,
-} from 'config/constants';
-import { GetSwapIntervalsGraphqlResponse, NetworkStruct } from 'types';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+} from '@constants';
+import { GetSwapIntervalsGraphqlResponse, NetworkStruct } from '@types';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useQuery } from '@apollo/client';
-import getAvailableIntervals from 'graphql/getAvailableIntervals.graphql';
-import { setNetwork } from 'state/config/actions';
-import useDCAGraphql from 'hooks/useDCAGraphql';
-import usePairService from 'hooks/usePairService';
-import { useAppDispatch } from 'state/hooks';
-import { setDCAChainId } from 'state/create-position/actions';
-import useTrackEvent from 'hooks/useTrackEvent';
-import useErrorService from 'hooks/useErrorService';
-import useReplaceHistory from 'hooks/useReplaceHistory';
-import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import useSdkMappedChains from 'hooks/useMappedSdkChains';
-import useWalletService from 'hooks/useWalletService';
-import useWeb3Service from 'hooks/useWeb3Service';
-import { fetchGraphTokenList } from 'state/token-lists/actions';
+import getAvailableIntervals from '@graphql/getAvailableIntervals.graphql';
+import { setNetwork } from '@state/config/actions';
+import useDCAGraphql from '@hooks/useDCAGraphql';
+import usePairService from '@hooks/usePairService';
+import { useAppDispatch } from '@state/hooks';
+import { setDCAChainId } from '@state/create-position/actions';
+import useTrackEvent from '@hooks/useTrackEvent';
+import useErrorService from '@hooks/useErrorService';
+import useReplaceHistory from '@hooks/useReplaceHistory';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import useSdkMappedChains from '@hooks/useMappedSdkChains';
+import useWalletService from '@hooks/useWalletService';
+import useWeb3Service from '@hooks/useWeb3Service';
+import { fetchGraphTokenList } from '@state/token-lists/actions';
 import SwapContainer from '../swap-container';
 import Positions from '../positions';
 

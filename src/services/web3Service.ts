@@ -43,14 +43,14 @@ import { publicProvider } from 'wagmi/providers/public';
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
 import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
-import { DUMMY_ARCX_CLIENT } from 'common/utils/dummy-arcx-client';
-import { chainToWagmiNetwork } from 'common/utils/parsing';
+import { DUMMY_ARCX_CLIENT } from '@common/utils/dummy-arcx-client';
+import { chainToWagmiNetwork } from '@common/utils/parsing';
 
 // MOCKS
-import { NETWORKS, PositionVersions, UNSUPPORTED_WAGMI_CHAIN } from 'config/constants';
+import { NETWORKS, PositionVersions, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 
-import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from 'config/constants/custom-wallets';
-import { setupAxiosClient } from 'state';
+import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
+import { setupAxiosClient } from '@state';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import TransactionService from './transactionService';

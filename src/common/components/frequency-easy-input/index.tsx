@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { SetStateCallback } from 'types';
+import { SetStateCallback } from '@types';
 import findIndex from 'lodash/findIndex';
 import FilledInput from '@mui/material/FilledInput';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import { defineMessage, useIntl } from 'react-intl';
 
 interface FrequencyEasyInputProps {

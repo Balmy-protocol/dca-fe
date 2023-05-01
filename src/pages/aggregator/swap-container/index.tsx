@@ -1,13 +1,13 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import find from 'lodash/find';
-import { getProtocolToken } from 'common/mocks/tokens';
-import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, NETWORKS, REMOVED_AGG_CHAINS } from 'config/constants';
-import { SwapOption, Token } from 'types';
-import { useAggregatorState } from 'state/aggregator/hooks';
-import { useAppDispatch } from 'state/hooks';
-import useTrackEvent from 'hooks/useTrackEvent';
+import { getProtocolToken } from '@common/mocks/tokens';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, NETWORKS, REMOVED_AGG_CHAINS } from '@constants';
+import { SwapOption, Token } from '@types';
+import { useAggregatorState } from '@state/aggregator/hooks';
+import { useAppDispatch } from '@state/hooks';
+import useTrackEvent from '@hooks/useTrackEvent';
 import {
   setFrom,
   setFromValue,
@@ -17,18 +17,18 @@ import {
   resetForm,
   setAggregatorChainId,
   toggleFromTo,
-} from 'state/aggregator/actions';
-import { setSorting } from 'state/aggregator-settings/actions';
-import useSwapOptions from 'hooks/useSwapOptions';
-import useCustomToken from 'hooks/useCustomToken';
+} from '@state/aggregator/actions';
+import { setSorting } from '@state/aggregator-settings/actions';
+import useSwapOptions from '@hooks/useSwapOptions';
+import useCustomToken from '@hooks/useCustomToken';
 import { useParams } from 'react-router-dom';
-import useToken from 'hooks/useToken';
-import { SwapSortOptions } from 'config/constants/aggregator';
-import useSwapOption from 'hooks/useSwapOption';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
-import useSdkMappedChains from 'hooks/useMappedSdkChains';
-import useReplaceHistory from 'hooks/useReplaceHistory';
+import useToken from '@hooks/useToken';
+import { SwapSortOptions } from '@constants/aggregator';
+import useSwapOption from '@hooks/useSwapOption';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
+import useSdkMappedChains from '@hooks/useMappedSdkChains';
+import useReplaceHistory from '@hooks/useReplaceHistory';
 import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
 import SwapQuotes from './components/quotes';

@@ -1,18 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from 'common/components/modal';
-import { FullPosition } from 'types';
+import Modal from '@common/components/modal';
+import { FullPosition } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import useTransactionModal from 'hooks/useTransactionModal';
-import { useTransactionAdder } from 'state/transactions/hooks';
-import { TRANSACTION_TYPES } from 'config/constants';
+import useTransactionModal from '@hooks/useTransactionModal';
+import { useTransactionAdder } from '@state/transactions/hooks';
+import { TRANSACTION_TYPES } from '@constants';
 import TextField from '@mui/material/TextField';
-import usePositionService from 'hooks/usePositionService';
-import { fullPositionToMappedPosition } from 'common/utils/parsing';
-import useErrorService from 'hooks/useErrorService';
-import { shouldTrackError } from 'common/utils/errors';
-import useTrackEvent from 'hooks/useTrackEvent';
+import usePositionService from '@hooks/usePositionService';
+import { fullPositionToMappedPosition } from '@common/utils/parsing';
+import useErrorService from '@hooks/useErrorService';
+import { shouldTrackError } from '@common/utils/errors';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledTransferContainer = styled.div`
   display: flex;

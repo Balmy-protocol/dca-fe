@@ -1,4 +1,4 @@
-import useSdkService from 'hooks/useSdkService';
+import useSdkService from '@hooks/useSdkService';
 
 function useSdkDexes() {
   const sdkService = useSdkService();

@@ -25,12 +25,12 @@ import {
   EulerClaimClaimFromMigratorTypeData,
   EulerClaimPermitManyTypeData,
   EulerClaimTerminateManyTypeData,
-} from 'types';
-import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
-import useAvailablePairs from 'hooks/useAvailablePairs';
-import { getFrequencyLabel } from 'common/utils/parsing';
+} from '@types';
+import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from '@constants';
+import useAvailablePairs from '@hooks/useAvailablePairs';
+import { getFrequencyLabel } from '@common/utils/parsing';
 import { BigNumber } from 'ethers/lib/ethers';
-import { formatCurrencyAmount } from 'common/utils/currency';
+import { formatCurrencyAmount } from '@common/utils/currency';
 import { useIntl, defineMessage } from 'react-intl';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';

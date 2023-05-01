@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import Bulb from 'assets/svg/bulb';
+import Bulb from '@assets/svg/bulb';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;

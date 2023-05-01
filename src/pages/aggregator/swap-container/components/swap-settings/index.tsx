@@ -2,32 +2,32 @@ import React from 'react';
 import styled from 'styled-components';
 import Slide from '@mui/material/Slide';
 import Grid from '@mui/material/Grid';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { useAggregatorSettingsState } from 'state/aggregator-settings/hooks';
-import { useAppDispatch } from 'state/hooks';
+import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
+import { useAppDispatch } from '@state/hooks';
 import {
   setGasSpeed,
   setSlippage,
   restoreDefaults,
   setDisabledDexes,
   setConfetti,
-} from 'state/aggregator-settings/actions';
-import SlippageInput from 'common/components/slippage-input';
-import ConfettiInput from 'common/components/confetti-input';
-import GasSelector from 'common/components/gas-selector';
-import { GasKeys } from 'config/constants/aggregator';
+} from '@state/aggregator-settings/actions';
+import SlippageInput from '@common/components/slippage-input';
+import ConfettiInput from '@common/components/confetti-input';
+import GasSelector from '@common/components/gas-selector';
+import { GasKeys } from '@constants/aggregator';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import useSdkDexes from 'hooks/useSdkSources';
+import useSdkDexes from '@hooks/useSdkSources';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
-import useTrackEvent from 'hooks/useTrackEvent';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledOverlay = styled.div`
   position: absolute;

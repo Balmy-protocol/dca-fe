@@ -1,24 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
 import { formatUnits } from '@ethersproject/units';
-import Modal from 'common/components/modal';
-import { Position } from 'types';
+import Modal from '@common/components/modal';
+import { Position } from '@types';
 import { FormattedMessage } from 'react-intl';
-import useTransactionModal from 'hooks/useTransactionModal';
+import useTransactionModal from '@hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
-import { useTransactionAdder } from 'state/transactions/hooks';
-import { PERMISSIONS, TRANSACTION_TYPES } from 'config/constants';
-import { getProtocolToken, getWrappedProtocolToken } from 'common/mocks/tokens';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { useTransactionAdder } from '@state/transactions/hooks';
+import { PERMISSIONS, TRANSACTION_TYPES } from '@constants';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { BigNumber } from 'ethers';
-import useSupportsSigning from 'hooks/useSupportsSigning';
-import usePositionService from 'hooks/usePositionService';
-import useErrorService from 'hooks/useErrorService';
-import { shouldTrackError } from 'common/utils/errors';
-import useTrackEvent from 'hooks/useTrackEvent';
+import useSupportsSigning from '@hooks/useSupportsSigning';
+import usePositionService from '@hooks/usePositionService';
+import useErrorService from '@hooks/useErrorService';
+import { shouldTrackError } from '@common/utils/errors';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface TerminateModalProps {
   position: Position;

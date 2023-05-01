@@ -6,9 +6,9 @@ import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import { useSavedAggregatorTokenLists, useSavedTokenLists, useTokensLists } from 'state/token-lists/hooks';
-import { useAppDispatch } from 'hooks/state';
-import { enableAggregatorTokenList, enableTokenList } from 'state/token-lists/actions';
+import { useSavedAggregatorTokenLists, useSavedTokenLists, useTokensLists } from '@state/token-lists/hooks';
+import { useAppDispatch } from '@hooks/state';
+import { enableAggregatorTokenList, enableTokenList } from '@state/token-lists/actions';
 
 const StyledCard = styled(Card)`
   padding: 16px;

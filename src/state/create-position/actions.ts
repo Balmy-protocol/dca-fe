@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { BigNumber } from 'ethers';
-import { Token, YieldOption } from 'types';
+import { Token, YieldOption } from '@types';
 
 export const setFromValue = createAction<string>('createPosition/setFromValue');
 

@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { GasKeys, SwapSortOptions } from 'config/constants/aggregator';
+import { GasKeys, SwapSortOptions } from '@constants/aggregator';
 
 export const setSlippage = createAction<string>('aggregatorSettings/setSlippage');
 

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { NetworkStruct, Position, Token, YieldOptions } from 'types';
+import { NetworkStruct, Position, Token, YieldOptions } from '@types';
 import {
   TOKEN_BLACKLIST,
   NETWORKS,
@@ -12,28 +12,28 @@ import {
   VERSIONS_ALLOWED_MODIFY,
   shouldEnableFrequency,
   DISABLED_YIELD_WITHDRAWS,
-} from 'config/constants';
+} from '@constants';
 import { BigNumber } from 'ethers';
-import { buildEtherscanTransaction } from 'common/utils/etherscan';
+import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import useWalletService from 'hooks/useWalletService';
-import { useAppDispatch } from 'state/hooks';
-import { setPosition } from 'state/position-details/actions';
-import { changePositionDetailsTab } from 'state/tabs/actions';
-import useTokenList from 'hooks/useTokenList';
-import usePushToHistory from 'hooks/usePushToHistory';
-import { setNetwork } from 'state/config/actions';
-import useWeb3Service from 'hooks/useWeb3Service';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import useTrackEvent from 'hooks/useTrackEvent';
+import useWalletService from '@hooks/useWalletService';
+import { useAppDispatch } from '@state/hooks';
+import { setPosition } from '@state/position-details/actions';
+import { changePositionDetailsTab } from '@state/tabs/actions';
+import useTokenList from '@hooks/useTokenList';
+import usePushToHistory from '@hooks/usePushToHistory';
+import { setNetwork } from '@state/config/actions';
+import useWeb3Service from '@hooks/useWeb3Service';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledCardFooterButton = styled(Button)``;
 

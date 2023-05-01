@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { buildEtherscanTransaction } from 'common/utils/etherscan';
-import { FullPosition } from 'types';
-import useWeb3Service from 'hooks/useWeb3Service';
+import { buildEtherscanTransaction } from '@common/utils/etherscan';
+import { FullPosition } from '@types';
+import useWeb3Service from '@hooks/useWeb3Service';
 
 const PositionControlsContainer = styled.div`
   display: flex;

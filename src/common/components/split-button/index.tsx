@@ -5,7 +5,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import Button, { CustomButtonProps } from 'common/components/button';
+import Button, { CustomButtonProps } from '@common/components/button';
 
 const StyledButton = styled(Button)`
   white-space: nowrap;

@@ -12,27 +12,22 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import CreatedIcon from '@mui/icons-material/NewReleases';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { ActionState, FullPosition } from 'types';
+import { ActionState, FullPosition } from '@types';
 import { DateTime } from 'luxon';
-import { formatCurrencyAmount } from 'common/utils/currency';
-import {
-  POSITION_ACTIONS,
-  STABLE_COINS,
-  STRING_PERMISSIONS,
-  isCompanionAddress
-} from 'config/constants';
-import { getFrequencyLabel } from 'common/utils/parsing';
-import { buildEtherscanAddress, buildEtherscanTransaction } from 'common/utils/etherscan';
+import { formatCurrencyAmount } from '@common/utils/currency';
+import { POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS, isCompanionAddress } from '@constants';
+import { getFrequencyLabel } from '@common/utils/parsing';
+import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
 import Link from '@mui/material/Link';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import Address from 'common/components/address';
-import useUsdPrice from 'hooks/useUsdPrice';
+import Address from '@common/components/address';
+import useUsdPrice from '@hooks/useUsdPrice';
 import { withStyles } from '@mui/styles';
 import { Theme } from '@mui/material';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
-import CustomChip from 'common/components/custom-chip';
-import ComposedTokenIcon from 'common/components/composed-token-icon';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import CustomChip from '@common/components/custom-chip';
+import ComposedTokenIcon from '@common/components/composed-token-icon';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {

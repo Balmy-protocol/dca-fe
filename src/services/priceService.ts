@@ -2,10 +2,10 @@ import { BigNumber } from 'ethers';
 import findKey from 'lodash/findKey';
 import { formatEther, formatUnits, parseUnits } from '@ethersproject/units';
 import { AxiosInstance, AxiosResponse } from 'axios';
-import { CoinGeckoPriceResponse, Token, TxPriceResponse } from 'types';
+import { CoinGeckoPriceResponse, Token, TxPriceResponse } from '@types';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import {
   COINGECKO_IDS,
   DEFAULT_NETWORK_FOR_VERSION,
@@ -17,9 +17,9 @@ import {
   NETWORKS,
   STABLE_COINS,
   ZRX_API_ADDRESS,
-} from 'config/constants';
+} from '@constants';
 import { DateTime } from 'luxon';
-import { emptyTokenWithAddress } from 'common/utils/currency';
+import { emptyTokenWithAddress } from '@common/utils/currency';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';

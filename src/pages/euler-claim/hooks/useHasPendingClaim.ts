@@ -1,8 +1,8 @@
-import { TRANSACTION_TYPES } from 'config';
-import useWalletService from 'hooks/useWalletService';
+import { TRANSACTION_TYPES } from '@constants';
+import useWalletService from '@hooks/useWalletService';
 import { useMemo } from 'react';
-import { useAllTransactions } from 'state/transactions/hooks';
-import { EulerClaimClaimFromMigratorTypeData, Token } from 'types';
+import { useAllTransactions } from '@state/transactions/hooks';
+import { EulerClaimClaimFromMigratorTypeData, Token } from '@types';
 
 const useHasPendingClaim = (token: Token | null) => {
   const allTransactions = useAllTransactions();

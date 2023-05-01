@@ -1,9 +1,9 @@
 import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import Typography from '@mui/material/Typography';
-import Modal from 'common/components/modal';
+import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -11,19 +11,19 @@ import {
   useAllNotClearedTransactions,
   useHasPendingTransactions,
   useIsTransactionPending,
-} from 'state/transactions/hooks';
-import { NetworkStruct, TransactionDetails } from 'types';
-import useBuildTransactionDetail from 'hooks/useBuildTransactionDetail';
-import { clearAllTransactions, removeTransaction } from 'state/transactions/actions';
-import { useAppDispatch } from 'state/hooks';
+} from '@state/transactions/hooks';
+import { NetworkStruct, TransactionDetails } from '@types';
+import useBuildTransactionDetail from '@hooks/useBuildTransactionDetail';
+import { clearAllTransactions, removeTransaction } from '@state/transactions/actions';
+import { useAppDispatch } from '@state/hooks';
 import Link from '@mui/material/Link';
-import { buildEtherscanTransaction, buildEtherscanAddress } from 'common/utils/etherscan';
-import useWeb3Service from 'hooks/useWeb3Service';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import MinimalTimeline from 'common/components/minimal-timeline';
-import { getGhTokenListLogoUrl, NETWORKS } from 'config';
-import TokenIcon from 'common/components/token-icon';
-import { toToken } from 'common/utils/currency';
+import { buildEtherscanTransaction, buildEtherscanAddress } from '@common/utils/etherscan';
+import useWeb3Service from '@hooks/useWeb3Service';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import MinimalTimeline from '@common/components/minimal-timeline';
+import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
+import TokenIcon from '@common/components/token-icon';
+import { toToken } from '@common/utils/currency';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `

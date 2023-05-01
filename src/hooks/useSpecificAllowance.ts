@@ -1,10 +1,10 @@
 import React from 'react';
-import { Token } from 'types';
+import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
-import { useHasPendingTransactions } from 'state/transactions/hooks';
-import { EMPTY_TOKEN } from 'common/mocks/tokens';
-import { useBlockNumber } from 'state/block-number/hooks';
+import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
+import { EMPTY_TOKEN } from '@common/mocks/tokens';
+import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 

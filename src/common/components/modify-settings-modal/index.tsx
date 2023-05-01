@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { formatUnits, parseUnits } from '@ethersproject/units';
-import Modal from 'common/components/modal';
-import { Position } from 'types';
+import Modal from '@common/components/modal';
+import { Position } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import useTransactionModal from 'hooks/useTransactionModal';
+import useTransactionModal from '@hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
-import { useHasPendingApproval, useTransactionAdder } from 'state/transactions/hooks';
+import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
   DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
@@ -17,13 +17,13 @@ import {
   RATE_TYPE,
   STRING_SWAP_INTERVALS,
   TRANSACTION_TYPES,
-} from 'config/constants';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+} from '@constants';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { BigNumber } from 'ethers';
 import Grid from '@mui/material/Grid';
-import TokenInput from 'common/components/token-input';
-import { AllowanceTooltip } from 'common/components/allowance-split-button';
+import TokenInput from '@common/components/token-input';
+import { AllowanceTooltip } from '@common/components/allowance-split-button';
 import {
   setFrequencyValue,
   setFromValue,
@@ -31,36 +31,36 @@ import {
   setModeType,
   setUseWrappedProtocolToken,
   resetModifySettingsModal,
-} from 'state/modify-rate-settings/actions';
-import FrequencyInput from 'common/components/frequency-easy-input';
+} from '@state/modify-rate-settings/actions';
+import FrequencyInput from '@common/components/frequency-easy-input';
 import {
   useModifyRateSettingsFrequencyValue,
   useModifyRateSettingsFromValue,
   useModifyRateSettingsModeType,
   useModifyRateSettingsRate,
   useModifyRateSettingsUseWrappedProtocolToken,
-} from 'state/modify-rate-settings/hooks';
-import useBalance from 'hooks/useBalance';
-import { useAppDispatch } from 'state/hooks';
-import { getFrequencyLabel } from 'common/utils/parsing';
-import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from 'common/utils/currency';
-import useAllowance from 'hooks/useAllowance';
+} from '@state/modify-rate-settings/hooks';
+import useBalance from '@hooks/useBalance';
+import { useAppDispatch } from '@state/hooks';
+import { getFrequencyLabel } from '@common/utils/parsing';
+import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from '@common/utils/currency';
+import useAllowance from '@hooks/useAllowance';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
-import { ButtonTypes } from 'common/components/button';
-import { SplitButtonOptions } from 'common/components/split-button';
-import useSupportsSigning from 'hooks/useSupportsSigning';
-import usePositionService from 'hooks/usePositionService';
-import useWalletService from 'hooks/useWalletService';
-import useContractService from 'hooks/useContractService';
-import useRawUsdPrice from 'hooks/useUsdRawPrice';
-import useAccount from 'hooks/useAccount';
-import useErrorService from 'hooks/useErrorService';
-import { shouldTrackError } from 'common/utils/errors';
-import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
+import { ButtonTypes } from '@common/components/button';
+import { SplitButtonOptions } from '@common/components/split-button';
+import useSupportsSigning from '@hooks/useSupportsSigning';
+import usePositionService from '@hooks/usePositionService';
+import useWalletService from '@hooks/useWalletService';
+import useContractService from '@hooks/useContractService';
+import useRawUsdPrice from '@hooks/useUsdRawPrice';
+import useAccount from '@hooks/useAccount';
+import useErrorService from '@hooks/useErrorService';
+import { shouldTrackError } from '@common/utils/errors';
+import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
-import useTrackEvent from 'hooks/useTrackEvent';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledRateContainer = styled.div`
   display: flex;

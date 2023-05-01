@@ -1,10 +1,10 @@
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
-import { DefillamaResponse, YieldOptions } from 'types';
+import { DefillamaResponse, YieldOptions } from '@types';
 
 // MOCKS
-import { ALLOWED_YIELDS, DISABLED_YIELDS } from 'config/constants';
-import { getProtocolToken, getWrappedProtocolToken } from 'common/mocks/tokens';
+import { ALLOWED_YIELDS, DISABLED_YIELDS } from '@constants';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 

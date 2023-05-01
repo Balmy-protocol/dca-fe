@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import isUndefined from 'lodash/isUndefined';
 import isEqual from 'lodash/isEqual';
-import Button from 'common/components/button';
-import { SwapOption, Token } from 'types';
+import Button from '@common/components/button';
+import { SwapOption, Token } from '@types';
 import Typography from '@mui/material/Typography';
 import { defineMessage, FormattedMessage } from 'react-intl';
-import { emptyTokenWithAddress, formatCurrencyAmount, toToken } from 'common/utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount, toToken } from '@common/utils/currency';
 import Tooltip from '@mui/material/Tooltip';
 import { BigNumber } from 'ethers';
 import IconButton from '@mui/material/IconButton';
@@ -16,26 +16,26 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 import SearchIcon from '@mui/icons-material/Search';
 import { Alert, InputAdornment, ListSubheader, MenuItem, Select, TextField } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from 'config/constants/aggregator';
+import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys } from '@constants/aggregator';
 import Badge from '@mui/material/Badge';
 import FormHelperText from '@mui/material/FormHelperText';
-import { PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { formatUnits, parseUnits } from '@ethersproject/units';
-import useUsdPrice from 'hooks/useUsdPrice';
+import useUsdPrice from '@hooks/useUsdPrice';
 import find from 'lodash/find';
-import TokenIcon from 'common/components/token-icon';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import useSelectedNetwork from 'hooks/useSelectedNetwork';
+import TokenIcon from '@common/components/token-icon';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import {
   getGhTokenListLogoUrl,
   getMaxDeduction,
   getMinAmountForMaxDeduction,
   NETWORKS,
   REMOVED_AGG_CHAINS,
-} from 'config';
+} from '@constants';
 import { getAllChains } from '@mean-finance/sdk';
-import useSdkChains from 'hooks/useSdkChains';
-import useAccount from 'hooks/useAccount';
+import useSdkChains from '@hooks/useSdkChains';
+import useAccount from '@hooks/useAccount';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import AggregatorTokenInput from './aggtokenButton';

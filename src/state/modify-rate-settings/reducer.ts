@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { FULL_DEPOSIT_TYPE, RATE_TYPE } from 'config/constants';
+import { FULL_DEPOSIT_TYPE, RATE_TYPE } from '@constants';
 import {
   setFromValue,
   setFrequencyValue,

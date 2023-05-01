@@ -1,19 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition } from 'types';
-import useWeb3Service from 'hooks/useWeb3Service';
+import { FullPosition } from '@types';
+import useWeb3Service from '@hooks/useWeb3Service';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import { TOKEN_BLACKLIST, LATEST_VERSION, shouldEnableFrequency, DISABLED_YIELD_WITHDRAWS } from 'config';
-import Button from 'common/components/button';
-import SplitButton from 'common/components/split-button';
-import useSupportsSigning from 'hooks/useSupportsSigning';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'common/mocks/tokens';
+import { TOKEN_BLACKLIST, LATEST_VERSION, shouldEnableFrequency, DISABLED_YIELD_WITHDRAWS } from '@constants';
+import Button from '@common/components/button';
+import SplitButton from '@common/components/split-button';
+import useSupportsSigning from '@hooks/useSupportsSigning';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { BigNumber } from 'ethers';
 
 const StyledButton = styled(Button)`

@@ -1,29 +1,23 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition, NetworkStruct, YieldOptions } from 'types';
-import {
-  TOKEN_BLACKLIST,
-  NETWORKS,
-  OLD_VERSIONS,
-  VERSIONS_ALLOWED_MODIFY,
-  shouldEnableFrequency,
-} from 'config/constants';
+import { FullPosition, NetworkStruct, YieldOptions } from '@types';
+import { TOKEN_BLACKLIST, NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY, shouldEnableFrequency } from '@constants';
 import { BigNumber } from 'ethers';
-import { buildEtherscanTransaction } from 'common/utils/etherscan';
+import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Link from '@mui/material/Link';
-import useWalletService from 'hooks/useWalletService';
-import useSupportsSigning from 'hooks/useSupportsSigning';
-import { fullPositionToMappedPosition } from 'common/utils/parsing';
-import useWeb3Service from 'hooks/useWeb3Service';
-import useTokenList from 'hooks/useTokenList';
-import { setNetwork } from 'state/config/actions';
-import { useAppDispatch } from 'state/hooks';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import useWalletService from '@hooks/useWalletService';
+import useSupportsSigning from '@hooks/useSupportsSigning';
+import { fullPositionToMappedPosition } from '@common/utils/parsing';
+import useWeb3Service from '@hooks/useWeb3Service';
+import useTokenList from '@hooks/useTokenList';
+import { setNetwork } from '@state/config/actions';
+import { useAppDispatch } from '@state/hooks';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 const StyledCardFooterButton = styled(Button)``;
 

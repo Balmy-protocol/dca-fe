@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from 'common/components/button';
+import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { ConnectButton } from '@rainbow-me/rainbowkit';

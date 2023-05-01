@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { FULL_DEPOSIT_TYPE, RATE_TYPE } from 'config/constants';
+import { FULL_DEPOSIT_TYPE, RATE_TYPE } from '@constants';
 
 export const initializeModifyRateSettings = createAction<{
   fromValue: string;

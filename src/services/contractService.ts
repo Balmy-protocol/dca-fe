@@ -8,11 +8,11 @@ import { Network, AlchemyProvider } from '@ethersproject/providers';
 import find from 'lodash/find';
 
 // ABIS
-import ERC20ABI from 'abis/erc20.json';
-import CHAINLINK_ORACLE_ABI from 'abis/ChainlinkOracle.json';
-import UNISWAP_ORACLE_ABI from 'abis/UniswapOracle.json';
-import OE_GAS_ORACLE_ABI from 'abis/OEGasOracle.json';
-import SMOL_DOMAIN_ABI from 'abis/SmolDomain.json';
+import ERC20ABI from '@abis/erc20.json';
+import CHAINLINK_ORACLE_ABI from '@abis/ChainlinkOracle.json';
+import UNISWAP_ORACLE_ABI from '@abis/UniswapOracle.json';
+import OE_GAS_ORACLE_ABI from '@abis/OEGasOracle.json';
+import SMOL_DOMAIN_ABI from '@abis/SmolDomain.json';
 
 // ADDRESSES
 import {
@@ -28,8 +28,8 @@ import {
   OE_GAS_ORACLE_ADDRESS,
   TRANSFORMER_REGISTRY_ADDRESS,
   SMOL_DOMAIN_ADDRESS,
-} from 'config/constants';
-import { ERC20Contract, HubContract, OEGasOracle, OracleContract, SmolDomainContract } from 'types';
+} from '@constants';
+import { ERC20Contract, HubContract, OEGasOracle, OracleContract, SmolDomainContract } from '@types';
 import ProviderService from './providerService';
 
 export default class ContractService {

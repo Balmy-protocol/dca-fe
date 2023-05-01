@@ -1,7 +1,7 @@
 import React from 'react';
-import { Token } from 'types';
+import { Token } from '@types';
 import { BigNumber } from 'ethers';
-import { parseUsdPrice } from 'common/utils/currency';
+import { parseUsdPrice } from '@common/utils/currency';
 import useRawUsdPrice from './useUsdRawPrice';
 
 function useUsdPrice(

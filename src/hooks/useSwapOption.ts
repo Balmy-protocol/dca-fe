@@ -1,11 +1,11 @@
 import React from 'react';
-import { SwapOption, SwapOptionWithTx } from 'types';
+import { SwapOption, SwapOptionWithTx } from '@types';
 import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
-import usePrevious from 'hooks/usePrevious';
-import { useHasPendingTransactions } from 'state/transactions/hooks';
-import { GasKeys } from 'config/constants/aggregator';
-import { useBlockNumber } from 'state/block-number/hooks';
+import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
+import { GasKeys } from '@constants/aggregator';
+import { useBlockNumber } from '@state/block-number/hooks';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
 import useSelectedNetwork from './useSelectedNetwork';

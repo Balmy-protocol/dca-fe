@@ -1,4 +1,4 @@
-import type Web3Service from 'services/web3Service';
+import type Web3Service from '@services/web3Service';
 import React from 'react';
 import { QuoteTransaction } from '@mean-finance/sdk';
 import { BigNumber } from 'ethers';

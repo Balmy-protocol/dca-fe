@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BlowfishReponseData, BlowfishResponse, StateChangeKind } from 'types';
+import { BlowfishReponseData, BlowfishResponse, StateChangeKind } from '@types';
 import Typography from '@mui/material/Typography';
 import { BigNumber } from 'ethers';
-import { toToken } from 'common/utils/currency';
-import TokenIcon from 'common/components/token-icon';
-import useSelectedNetwork from 'hooks/useSelectedNetwork';
+import { toToken } from '@common/utils/currency';
+import TokenIcon from '@common/components/token-icon';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
 
 const StyledTransactionSimulationsContainer = styled.div`
   display: flex;

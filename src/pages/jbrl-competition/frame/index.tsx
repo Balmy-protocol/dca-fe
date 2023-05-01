@@ -2,18 +2,18 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
-import Button from 'common/components/button';
-import CenteredLoadingIndicator from 'common/components/centered-loading-indicator';
-import useCurrentBreakpoint from 'hooks/useCurrentBreakpoint';
-import useGqlFetchAll from 'hooks/useGqlFetchAll';
-import useDCAGraphql from 'hooks/useDCAGraphql';
-import { FullPosition, Token } from 'types';
-import { NETWORKS, POSITION_VERSION_4 } from 'config';
+import Button from '@common/components/button';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
+import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
+import useGqlFetchAll from '@hooks/useGqlFetchAll';
+import useDCAGraphql from '@hooks/useDCAGraphql';
+import { FullPosition, Token } from '@types';
+import { NETWORKS, POSITION_VERSION_4 } from '@constants';
 import { BigNumber } from 'ethers';
-import { getDisplayToken } from 'common/utils/parsing';
-import useRawUsdPrices from 'hooks/useUsdRawPrices';
-import { parseUsdPrice, toToken } from 'common/utils/currency';
-import useUnderlyingAmount from 'hooks/useUnderlyingAmount';
+import { getDisplayToken } from '@common/utils/parsing';
+import useRawUsdPrices from '@hooks/useUsdRawPrices';
+import { parseUsdPrice, toToken } from '@common/utils/currency';
+import useUnderlyingAmount from '@hooks/useUnderlyingAmount';
 import {
   CREATED_AT_STOP,
   JBRL_CUTOFF,
@@ -21,14 +21,14 @@ import {
   JBRL_TOKEN,
   CREATED_AT_START,
   POSITION_CUTOFF,
-} from 'pages/jbrl-competition/constants';
+} from '@pages/jbrl-competition/constants';
 import { Typography } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
-import useYieldOptions from 'hooks/useYieldOptions';
+import useYieldOptions from '@hooks/useYieldOptions';
 import { useHistory } from 'react-router-dom';
-import { changeMainTab } from 'state/tabs/actions';
+import { changeMainTab } from '@state/tabs/actions';
 import { formatUnits } from '@ethersproject/units';
-import { useAppDispatch } from 'state/hooks';
+import { useAppDispatch } from '@state/hooks';
 import LeaderboardSummary from '../leaderboard';
 import LeaderboardRules from '../rules';
 import getPositions from '../graphql/getPositions.graphql';

@@ -35,16 +35,18 @@ import {
   TransactionPositionManyTypeDataOptions,
   EulerClaimTerminateManyTypeData,
   EulerClaimPermitManyTypeData,
-} from 'types';
+  PermissionManagerContract,
+  PermissionPermit,
+} from '@types';
 
 // GRAPHQL
-import GET_POSITIONS from 'graphql/getPositions.graphql';
+import GET_POSITIONS from '@graphql/getPositions.graphql';
 
 // ABIS
-import PERMISSION_MANAGER_ABI from 'abis/PermissionsManager.json';
+import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from 'common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from '@common/mocks/tokens';
 import {
   MAX_UINT_32,
   NETWORKS_FOR_MENU,
@@ -57,12 +59,11 @@ import {
   SIGN_VERSION,
   TOKEN_TYPE_YIELD_BEARING_SHARES,
   POSITION_VERSION_4,
-} from 'config/constants';
-import { PermissionManagerContract, PermissionPermit } from 'types/contracts';
+} from '@constants';
 import { fromRpcSig } from 'ethereumjs-util';
-import { emptyTokenWithAddress } from 'common/utils/currency';
-import { getDisplayToken } from 'common/utils/parsing';
-import gqlFetchAll, { GraphqlResults } from 'common/utils/gqlFetchAll';
+import { emptyTokenWithAddress } from '@common/utils/currency';
+import { getDisplayToken } from '@common/utils/parsing';
+import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';

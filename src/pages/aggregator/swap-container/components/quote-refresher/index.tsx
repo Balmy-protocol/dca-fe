@@ -4,7 +4,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { FormattedMessage } from 'react-intl';
 import IconButton from '@mui/material/IconButton';
 import { Typography } from '@mui/material';
-import useTrackEvent from 'hooks/useTrackEvent';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledRefresherContainer = styled.div`
   display: flex;

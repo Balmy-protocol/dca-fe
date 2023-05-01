@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from 'common/components/modal';
+import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import { ButtonTypes } from 'common/components/button';
-import { Position } from 'types';
-import { changeMainTab, changeSubTab } from 'state/tabs/actions';
-import { useAppDispatch } from 'hooks/state';
-import usePushToHistory from 'hooks/usePushToHistory';
+import { ButtonTypes } from '@common/components/button';
+import { Position } from '@types';
+import { changeMainTab, changeSubTab } from '@state/tabs/actions';
+import { useAppDispatch } from '@hooks/state';
+import usePushToHistory from '@hooks/usePushToHistory';
 
 const StyledSuggestMigrateContainer = styled.div`
   display: flex;

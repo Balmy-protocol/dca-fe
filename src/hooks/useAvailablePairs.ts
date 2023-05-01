@@ -1,6 +1,6 @@
 import React from 'react';
-import { AvailablePairs } from 'types';
-import { useAllTransactions } from 'state/transactions/hooks';
+import { AvailablePairs } from '@types';
+import { useAllTransactions } from '@state/transactions/hooks';
 import usePairService from './usePairService';
 
 function useAvailablePairs() {

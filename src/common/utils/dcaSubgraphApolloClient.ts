@@ -6,8 +6,8 @@ import {
   PositionVersions,
   POSITION_VERSION_4,
   POSITION_VERSION_1,
-} from 'config';
-import GraphqlService from 'services/graphql';
+} from '@constants';
+import GraphqlService from '@services/graphql';
 
 const clients: Record<PositionVersions, Record<number, GraphqlService>> = {
   [POSITION_VERSION_1]: {

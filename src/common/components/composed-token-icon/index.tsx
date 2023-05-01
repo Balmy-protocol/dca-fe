@@ -1,7 +1,7 @@
-import TokenIcon from 'common/components/token-icon';
+import TokenIcon from '@common/components/token-icon';
 import React from 'react';
 import styled from 'styled-components';
-import { Token } from 'types';
+import { Token } from '@types';
 
 const StyledComposedTokenIconContainer = styled.div<{ hasTokenTop: boolean }>`
   display: flex;

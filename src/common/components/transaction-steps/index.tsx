@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import Slide from '@mui/material/Slide';
 import findIndex from 'lodash/findIndex';
-import { useIsTransactionPending } from 'state/transactions/hooks';
-import useSelectedNetwork from 'hooks/useSelectedNetwork';
-import { buildEtherscanTransaction } from 'common/utils/etherscan';
+import { useIsTransactionPending } from '@state/transactions/hooks';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import {
   TransactionActionApproveTokenType,
   TransactionActionApproveTokenData,
@@ -17,7 +17,7 @@ import {
   TransactionActionWaitForSimulationType,
   TransactionActionWaitForSimulationData,
   BlowfishResponse,
-} from 'types';
+} from '@types';
 import {
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
   TRANSACTION_ACTION_SWAP,
@@ -25,20 +25,20 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
-} from 'config';
+} from '@constants';
 import { FormattedMessage } from 'react-intl';
-import ArrowLeft from 'assets/svg/atom/arrow-left';
+import ArrowLeft from '@assets/svg/atom/arrow-left';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import TokenIcon from 'common/components/token-icon';
-import Button from 'common/components/button';
-import useWeb3Service from 'hooks/useWeb3Service';
-import Address from 'common/components/address';
-import { emptyTokenWithAddress } from 'common/utils/currency';
+import TokenIcon from '@common/components/token-icon';
+import Button from '@common/components/button';
+import useWeb3Service from '@hooks/useWeb3Service';
+import Address from '@common/components/address';
+import { emptyTokenWithAddress } from '@common/utils/currency';
 import CircularProgress from '@mui/material/CircularProgress';
 import { BigNumber } from 'ethers';
-import AllowanceSplitButton, { AllowanceType } from 'common/components/allowance-split-button';
-import TransactionSimulation from 'common/components/transaction-simulation';
+import AllowanceSplitButton, { AllowanceType } from '@common/components/allowance-split-button';
+import TransactionSimulation from '@common/components/transaction-simulation';
 
 const StyledIconButton = styled(IconButton)`
   margin-right: 5px;

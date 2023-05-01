@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from 'common/components/modal';
-import { Token, YieldOptions } from 'types';
-import TokenPicker from 'common/components/token-picker';
+import Modal from '@common/components/modal';
+import { Token, YieldOptions } from '@types';
+import TokenPicker from '@common/components/token-picker';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 

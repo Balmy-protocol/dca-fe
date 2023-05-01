@@ -11,18 +11,18 @@ import {
   TransactionPositionTypeDataOptions,
   NewPositionTypeData,
   Position,
-} from 'types';
-import { useAppDispatch, useAppSelector } from 'hooks/state';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+} from '@types';
+import { useAppDispatch, useAppSelector } from '@hooks/state';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
-import useWeb3Service from 'hooks/useWeb3Service';
-import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION, TRANSACTION_TYPES } from 'config/constants';
+import useWeb3Service from '@hooks/useWeb3Service';
+import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION, TRANSACTION_TYPES } from '@constants';
 import pickBy from 'lodash/pickBy';
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'common/mocks/tokens';
-import usePositionService from 'hooks/usePositionService';
-import useWalletService from 'hooks/useWalletService';
-import useArcx from 'hooks/useArcx';
-import { useBlockNumber } from 'state/block-number/hooks';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
+import usePositionService from '@hooks/usePositionService';
+import useWalletService from '@hooks/useWalletService';
+import useArcx from '@hooks/useArcx';
+import { useBlockNumber } from '@state/block-number/hooks';
 import { addTransaction } from './actions';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions

@@ -1,9 +1,9 @@
-import { EULER_CLAIM_MIGRATORS_ADDRESSES, TRANSACTION_TYPES } from 'config';
-import { EULER_4626_ADDRESSES } from 'pages/euler-claim/constants';
-import useWeb3Service from 'hooks/useWeb3Service';
+import { EULER_CLAIM_MIGRATORS_ADDRESSES, TRANSACTION_TYPES } from '@constants';
+import { EULER_4626_ADDRESSES } from '@pages/euler-claim/constants';
+import useWeb3Service from '@hooks/useWeb3Service';
 import { useMemo } from 'react';
-import { useAllTransactions } from 'state/transactions/hooks';
-import { ApproveTokenTypeData } from 'types';
+import { useAllTransactions } from '@state/transactions/hooks';
+import { ApproveTokenTypeData } from '@types';
 
 const useHasPendingMigratorApprovals = () => {
   const allTransactions = useAllTransactions();

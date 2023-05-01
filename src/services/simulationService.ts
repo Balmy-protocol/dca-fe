@@ -1,7 +1,7 @@
 import { QuoteTransaction } from '@mean-finance/sdk';
-import { BLOWFISH_ENABLED_CHAINS } from 'config';
+import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import { BigNumber } from 'ethers';
-import { BlowfishResponse } from 'types';
+import { BlowfishResponse } from '@types';
 
 // MOCKS
 import MeanApiService from './meanApiService';

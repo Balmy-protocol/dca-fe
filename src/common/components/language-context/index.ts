@@ -1,4 +1,4 @@
-import { SupportedLanguages } from 'config/constants/lang';
+import { SupportedLanguages } from '@constants/lang';
 import * as React from 'react';
 
 export type LanguageContextValue = {

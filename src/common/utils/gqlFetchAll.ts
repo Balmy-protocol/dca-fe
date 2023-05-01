@@ -12,7 +12,7 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 import get from 'lodash/get';
-import { FAIL_ON_ERROR } from 'config';
+import { FAIL_ON_ERROR } from '@constants';
 
 export interface GraphqlResults<T> {
   data: T | undefined;

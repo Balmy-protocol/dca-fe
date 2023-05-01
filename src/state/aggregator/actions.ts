@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { SwapOption, Token } from 'types';
+import { SwapOption, Token } from '@types';
 
 export const setFromValue = createAction<{ value: string; updateMode?: boolean }>('aggregator/setFromValue');
 

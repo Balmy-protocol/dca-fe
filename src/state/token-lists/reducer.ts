@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import find from 'lodash/find';
-import { TokensLists, Token } from 'types';
+import { TokensLists, Token } from '@types';
 import {
   addCustomToken,
   enableAggregatorTokenList,

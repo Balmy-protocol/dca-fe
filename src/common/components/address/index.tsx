@@ -1,4 +1,4 @@
-import useWalletService from 'hooks/useWalletService';
+import useWalletService from '@hooks/useWalletService';
 import React from 'react';
 
 interface AddressProps {

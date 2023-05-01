@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button, { ButtonTypes } from 'common/components/button';
-import SplitButton, { SplitButtonOptions } from 'common/components/split-button';
+import Button, { ButtonTypes } from '@common/components/button';
+import SplitButton, { SplitButtonOptions } from '@common/components/split-button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';

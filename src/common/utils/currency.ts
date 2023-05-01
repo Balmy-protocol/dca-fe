@@ -1,11 +1,11 @@
 /* eslint-disable */
 import { formatUnits, parseUnits } from '@ethersproject/units';
-import { STABLE_COINS, TOKEN_TYPE_BASE } from 'config';
+import { STABLE_COINS, TOKEN_TYPE_BASE } from '@constants';
 import _Decimal from 'decimal.js-light';
 import { BigNumber } from 'ethers';
 import JSBI from 'jsbi';
 import toFormat from 'toformat';
-import { Token, TokenType } from 'types';
+import { Token, TokenType } from '@types';
 
 const Decimal = toFormat(_Decimal);
 
