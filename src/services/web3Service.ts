@@ -512,11 +512,16 @@ export default class Web3Service {
         connector: state.connector,
         status: state.status,
         chainId: state.data?.chain?.id,
+        account: state.data?.account,
       }),
       (curr, prev) => {
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.connect(undefined, curr.connector, curr.chainId);
+        }
+
+        if (curr.status === 'connected' && prev.status === 'connected' && curr.account !== prev.account) {
+          this.providerService.handleAccountChange();
         }
       }
     );

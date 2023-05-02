@@ -164,6 +164,22 @@ export default class ProviderService {
     return this.provider.off(eventName);
   }
 
+  handleAccountChange() {
+    window.location.reload();
+  }
+
+  handleChainChanged(newChainId: string) {
+    const providerInfo = this.getProviderInfo();
+
+    if (window.location.pathname === '/' || window.location.pathname.startsWith('/create')) {
+      window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
+    }
+
+    if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
+      window.location.reload();
+    }
+  }
+
   async addEventListeners() {
     const provider = await this.getBaseProvider();
     const providerInfo = this.getProviderInfo();
@@ -173,36 +189,18 @@ export default class ProviderService {
         // ff's fuck metamask
         if (providerInfo && providerInfo.name === 'MetaMask' && window.ethereum && window.ethereum.on) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          window.ethereum.on('accountsChanged', () => {
-            window.location.reload();
-          });
+          window.ethereum.on('accountsChanged', () => this.handleAccountChange());
 
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          window.ethereum.on('chainChanged', (newChainId: string) => {
-            if (window.location.pathname === '/' || window.location.pathname.startsWith('/create')) {
-              window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
-            }
-
-            window.location.reload();
-          });
+          window.ethereum.on('chainChanged', (newChainId: string) => this.handleChainChanged(newChainId));
         }
         // handle metamask account change
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        provider.on('accountsChanged', () => {
-          window.location.reload();
-        });
+        provider.on('accountsChanged', () => this.handleAccountChange());
 
         // extremely recommended by metamask
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        provider.on('chainChanged', (newChainId: string) => {
-          if (window.location.pathname === '/' || window.location.pathname.startsWith('/create')) {
-            window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
-          }
-
-          if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
-            window.location.reload();
-          }
-        });
+        provider.on('chainChanged', (newChainId: string) => this.handleChainChanged(newChainId));
       }
     } catch (e) {
       console.error('Avoidable error when initializing metamask events', e);
