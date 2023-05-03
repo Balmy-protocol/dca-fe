@@ -20,14 +20,14 @@ import useAvailablePairs from '@hooks/useAvailablePairs';
 import getPairPrices from '@graphql/getPairPrices.graphql';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { FAIL_ON_ERROR, ONE_DAY, ONE_HOUR, STABLE_COINS, TOKEN_TYPE_BASE } from '@constants';
-import GraphFooter from '@common/components/graph-footer';
 import EmptyGraph from '@assets/svg/emptyGraph';
-import MinimalTabs from '@common/components/minimal-tabs';
 import useGraphPrice from '@hooks/useGraphPrice';
 import useUsdPrice from '@hooks/useUsdPrice';
 import { parseUnits } from '@ethersproject/units';
 import { withStyles } from '@mui/styles';
 import Chip from '@mui/material/Chip';
+import GraphFooter from './components/graph-footer';
+import MinimalTabs from './components/minimal-tabs';
 
 const DarkChip = withStyles(() => ({
   root: {

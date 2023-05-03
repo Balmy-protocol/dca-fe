@@ -8,12 +8,12 @@ import DiscordIcon from '@assets/svg/atom/discord';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import MeanLogo from '@common/components/mean-logo';
 import { useThemeMode } from '@state/config/hooks';
 import { Typography } from '@mui/material';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
-import LanguageLabel from '@common/components/lang-label';
 import usePushToHistory from '@hooks/usePushToHistory';
+import LanguageLabel from './components/lang-label';
+import MeanLogo from './components/mean-logo';
 
 const StyledFooterContainer = styled.div<{ isSmall: boolean }>`
   display: flex;

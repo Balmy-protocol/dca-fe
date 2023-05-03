@@ -7,7 +7,7 @@ import { AvailablePair, Token, YieldOption, YieldOptions } from '@types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage, useIntl } from 'react-intl';
 import TokenInput from '@common/components/token-input';
-import FrequencyInput from '@pages/dca/components/frequency-easy-input';
+import FrequencyInput from '@common/components/frequency-easy-input';
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
   MINIMUM_USD_RATE_FOR_YIELD,
@@ -22,7 +22,7 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import Collapse from '@mui/material/Collapse';
-import YieldTokenSelector from '@pages/dca/components/yield-token-selector';
+import YieldTokenSelector from '@common/components/yield-token-selector';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import { formatCurrencyAmount, usdPriceToToken } from '@common/utils/currency';
 import findIndex from 'lodash/findIndex';

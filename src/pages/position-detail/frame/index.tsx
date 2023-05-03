@@ -15,21 +15,16 @@ import getPairSwaps from '@graphql/getPairSwaps.graphql';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
 import Button from '@common/components/button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import PositionNotFound from '@pages/position-detail/position-not-found';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAppDispatch } from '@state/hooks';
 import { changeMainTab, changePositionDetailsTab, changeSubTab } from '@state/tabs/actions';
 import { usePositionDetailsTab } from '@state/tabs/hooks';
-import PositionPermissionsContainer from '@pages/position-detail/permissions-container';
-import { setPermissions } from '@state/position-permissions/actions';
 import { FormattedMessage } from 'react-intl';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import NFTModal from '@pages/dca/components/view-nft-modal';
-import TransferPositionModal from '@pages/dca/components/transfer-position-modal';
-import TerminateModal from '@pages/dca/components/terminate-modal';
-import ModifySettingsModal from '@pages/dca/components/modify-settings-modal';
+import TerminateModal from '@common/components/terminate-modal';
+import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';
 import {
   PERMISSIONS,
@@ -47,10 +42,10 @@ import usePositionService from '@hooks/usePositionService';
 import useIsOnCorrectNetwork from '@hooks/useIsOnCorrectNetwork';
 import { setPosition } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
-import MigrateYieldModal from '@pages/dca/components/migrate-yield-modal';
+import MigrateYieldModal from '@common/components/migrate-yield-modal';
 import useGqlFetchAll from '@hooks/useGqlFetchAll';
 import useYieldOptions from '@hooks/useYieldOptions';
-import SuggestMigrateYieldModal from '@pages/dca/components/suggest-migrate-yield-modal';
+import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
 import useUnderlyingAmount from '@hooks/useUnderlyingAmount';
 import Link from '@mui/material/Link';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
@@ -60,8 +55,13 @@ import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
-import PositionControls from '../position-summary-controls';
-import PositionSummaryContainer from '../summary-container';
+import { setPermissions } from '@state/position-permissions/actions';
+import PositionNotFound from '../components/position-not-found';
+import PositionControls from '../components/position-summary-controls';
+import PositionSummaryContainer from '../components/summary-container';
+import PositionPermissionsContainer from '../components/permissions-container';
+import NFTModal from '../components/view-nft-modal';
+import TransferPositionModal from '../components/transfer-position-modal';
 
 const StyledTab = withStyles(() =>
   createStyles({

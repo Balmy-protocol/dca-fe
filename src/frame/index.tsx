@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import JbrlCompetition from '@pages/jbrl-competition';
-import AppFooter from '@common/components/footer';
 import DCA from '@pages/dca';
 import Aggregator from '@pages/aggregator';
 import FAQ from '@pages/faq';
@@ -30,12 +29,13 @@ import useProviderService from '@hooks/useProviderService';
 import useWeb3Service from '@hooks/useWeb3Service';
 import ErrorBoundary from '@common/components/error-boundary/indext';
 import useAccount from '@hooks/useAccount';
-import FeedbackCard from '@common/components/feedback-card';
 import useSdkChains from '@hooks/useSdkChains';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
 import EulerClaimFrame from '@pages/euler-claim/frame';
-import NavBar from './navbar';
+import AppFooter from './components/footer';
+import FeedbackCard from './components/feedback-card';
+import NavBar from './components/navbar';
 import theme from './theme';
 
 // FONTS

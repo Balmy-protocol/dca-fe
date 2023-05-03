@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import orderBy from 'lodash/orderBy';
-import GraphWidget from '@common/components/graph-widget';
 import { getProtocolToken } from '@common/mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
@@ -33,6 +32,7 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useToken from '@hooks/useToken';
 import Swap from './components/swap';
+import GraphWidget from './components/graph-widget';
 
 interface SwapContainerProps {
   swapIntervalsData?: GetSwapIntervalsGraphqlResponse;
