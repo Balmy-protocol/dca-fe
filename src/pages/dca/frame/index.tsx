@@ -28,7 +28,7 @@ import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import useWalletService from '@hooks/useWalletService';
 import useWeb3Service from '@hooks/useWeb3Service';
 import { fetchGraphTokenList } from '@state/token-lists/actions';
-import SwapContainer from '../swap-container';
+import CreatePosition from '../create-position';
 import Positions from '../positions';
 
 interface HomeFrameProps {
@@ -134,7 +134,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
         <>
           {tabIndex === 0 ? (
             <Grid item xs={12} style={{ display: 'flex' }}>
-              <SwapContainer swapIntervalsData={swapIntervalsData} handleChangeNetwork={handleChangeNetwork} />
+              <CreatePosition swapIntervalsData={swapIntervalsData} handleChangeNetwork={handleChangeNetwork} />
             </Grid>
           ) : (
             <Grid item xs={12} style={{ display: 'flex' }}>

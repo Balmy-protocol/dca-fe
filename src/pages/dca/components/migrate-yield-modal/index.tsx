@@ -13,11 +13,11 @@ import Grid from '@mui/material/Grid';
 import { ButtonTypes } from '@common/components/button';
 import usePositionService from '@hooks/usePositionService';
 import useYieldOptions from '@hooks/useYieldOptions';
-import YieldTokenSelector from '@common/components/yield-token-selector';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
+import YieldTokenSelector from '../yield-token-selector';
 
 const StyledGrid = styled(Grid)`
   display: flex;
