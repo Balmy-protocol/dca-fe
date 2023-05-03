@@ -17,12 +17,12 @@ import {
   POSITION_ACTIONS,
   STABLE_COINS,
 } from '@constants';
-import GraphTooltip from '@common/components/graph-tooltip';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import usePriceService from '@hooks/usePriceService';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
+import GraphTooltip from '../graph-tooltip';
 
 const StyledContainer = styled(Paper)`
   display: flex;

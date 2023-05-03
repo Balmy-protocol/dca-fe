@@ -4,9 +4,8 @@ import Grid from '@mui/material/Grid';
 import { Token } from '@types';
 import Typography from '@mui/material/Typography';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import TokenButton from '@common/components/token-button';
 import TokenInput from '@common/components/token-input';
-import FrequencyInput from '@pages/dca/components/frequency-easy-input';
+import FrequencyInput from '@common/components/frequency-easy-input';
 import FrequencyTypeInput from '@pages/dca/components/frequency-type-input';
 import IconButton from '@mui/material/IconButton';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
@@ -20,6 +19,7 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 // import useWalletService from '@hooks/useWalletService';
+import TokenButton from '../token-button';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
   ${({ $show }) => !$show && 'position: absolute;width: auto;'};

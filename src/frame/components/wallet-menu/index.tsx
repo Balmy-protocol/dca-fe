@@ -20,10 +20,10 @@ import Link from '@mui/material/Link';
 import { buildEtherscanTransaction, buildEtherscanAddress } from '@common/utils/etherscan';
 import useWeb3Service from '@hooks/useWeb3Service';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import MinimalTimeline from '@common/components/minimal-timeline';
 import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
 import TokenIcon from '@common/components/token-icon';
 import { toToken } from '@common/utils/currency';
+import MinimalTimeline from './components/minimal-timeline';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
