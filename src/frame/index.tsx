@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import JbrlCompetition from '@pages/jbrl-competition';
 import AppFooter from '@common/components/footer';
-import Home from '@pages/home';
+import DCA from '@pages/dca';
 import Aggregator from '@pages/aggregator';
 import FAQ from '@pages/faq';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
@@ -193,7 +193,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                         </Route>
                         <Route path="/positions">
                           {/* <RollbarContext context="/positions"> */}
-                          <Home isLoading={isLoading || isLoadingNetwork} />
+                          <DCA isLoading={isLoading || isLoadingNetwork} />
                           {/* </RollbarContext> */}
                         </Route>
                         <Route path="/euler-claim">
@@ -203,7 +203,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                         </Route>
                         <Route path="/create/:chainId?/:from?/:to?">
                           {/* <RollbarContext context="/create"> */}
-                          <Home isLoading={isLoading || isLoadingNetwork} />
+                          <DCA isLoading={isLoading || isLoadingNetwork} />
                           {/* </RollbarContext> */}
                         </Route>
                         <Route path="/swap/:chainId?/:from?/:to?">
@@ -211,7 +211,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                         </Route>
                         <Route path="/:chainId?/:from?/:to?">
                           {/* <RollbarContext context="/main"> */}
-                          <Home isLoading={isLoading || isLoadingNetwork} />
+                          <DCA isLoading={isLoading || isLoadingNetwork} />
                           {/* </RollbarContext> */}
                         </Route>
                       </Switch>
