@@ -16,9 +16,6 @@ import {
   setDisabledDexes,
   setConfetti,
 } from '@state/aggregator-settings/actions';
-import SlippageInput from '@common/components/slippage-input';
-import ConfettiInput from '@common/components/confetti-input';
-import GasSelector from '@common/components/gas-selector';
 import { GasKeys } from '@constants/aggregator';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -28,6 +25,9 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
 import useTrackEvent from '@hooks/useTrackEvent';
+import SlippageInput from './components/slippage-input';
+import GasSelector from './components/gas-selector';
+import ConfettiInput from './components/confetti-input';
 
 const StyledOverlay = styled.div`
   position: absolute;
