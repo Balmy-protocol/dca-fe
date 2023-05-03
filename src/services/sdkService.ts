@@ -54,7 +54,7 @@ export default class SdkService {
                     `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['uniswap', 'odos', 'rango', '0x', 'firebird', 'changelly'],
+                sourceIds: ['uniswap', 'rango', '0x', 'firebird', 'changelly'],
               },
             ],
           },
