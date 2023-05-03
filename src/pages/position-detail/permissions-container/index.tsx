@@ -16,7 +16,7 @@ import { FormattedMessage } from 'react-intl';
 import { TRANSACTION_TYPES } from '@constants';
 import { discardChanges, submitPermissionChanges } from '@state/position-permissions/actions';
 import { useAppDispatch } from '@state/hooks';
-import AddAddressPermissionModal from '@common/components/add-address-permission-modal';
+import AddAddressPermissionModal from '@pages/position-detail/add-address-permission-modal';
 import Paper from '@mui/material/Paper';
 import usePositionService from '@hooks/usePositionService';
 import { fullPositionToMappedPosition } from '@common/utils/parsing';
