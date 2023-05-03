@@ -32,7 +32,6 @@ import {
   setUseWrappedProtocolToken,
   resetModifySettingsModal,
 } from '@state/modify-rate-settings/actions';
-import FrequencyInput from '@common/components/frequency-easy-input';
 import {
   useModifyRateSettingsFrequencyValue,
   useModifyRateSettingsFromValue,
@@ -61,6 +60,7 @@ import { shouldTrackError } from '@common/utils/errors';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
 import useTrackEvent from '@hooks/useTrackEvent';
+import FrequencyInput from '../frequency-easy-input';
 
 const StyledRateContainer = styled.div`
   display: flex;

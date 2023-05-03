@@ -6,15 +6,15 @@ import isUndefined from 'lodash/isUndefined';
 import { NetworkStruct, Token, YieldOption, YieldOptions } from '@types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
-import TokenPicker from '@common/components/dca-token-picker';
+import TokenPicker from '@pages/dca/components/dca-token-picker';
 import { FormattedMessage, useIntl } from 'react-intl';
 import Button from '@common/components/button';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
 import useBalance from '@hooks/useBalance';
 import useUsedTokens from '@hooks/useUsedTokens';
-import StalePairModal from '@common/components/stale-pair-modal';
-import LowLiquidityModal from '@common/components/low-liquidity-modal';
+import StalePairModal from '@pages/dca/components/stale-pair-modal';
+import LowLiquidityModal from '@pages/dca/components/low-liquidity-modal';
 import AllowanceSplitButton from '@common/components/allowance-split-button';
 import {
   FULL_DEPOSIT_TYPE,

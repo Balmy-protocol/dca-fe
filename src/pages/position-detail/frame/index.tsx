@@ -26,10 +26,10 @@ import { setPermissions } from '@state/position-permissions/actions';
 import { FormattedMessage } from 'react-intl';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import NFTModal from '@common/components/view-nft-modal';
-import TransferPositionModal from '@common/components/transfer-position-modal';
-import TerminateModal from '@common/components/terminate-modal';
-import ModifySettingsModal from '@common/components/modify-settings-modal';
+import NFTModal from '@pages/dca/components/view-nft-modal';
+import TransferPositionModal from '@pages/dca/components/transfer-position-modal';
+import TerminateModal from '@pages/dca/components/terminate-modal';
+import ModifySettingsModal from '@pages/dca/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';
 import {
   PERMISSIONS,
@@ -47,10 +47,10 @@ import usePositionService from '@hooks/usePositionService';
 import useIsOnCorrectNetwork from '@hooks/useIsOnCorrectNetwork';
 import { setPosition } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
-import MigrateYieldModal from '@common/components/migrate-yield-modal';
+import MigrateYieldModal from '@pages/dca/components/migrate-yield-modal';
 import useGqlFetchAll from '@hooks/useGqlFetchAll';
 import useYieldOptions from '@hooks/useYieldOptions';
-import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
+import SuggestMigrateYieldModal from '@pages/dca/components/suggest-migrate-yield-modal';
 import useUnderlyingAmount from '@hooks/useUnderlyingAmount';
 import Link from '@mui/material/Link';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
