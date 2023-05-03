@@ -19,6 +19,7 @@ import TokenIcon from 'common/token-icon';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { Button } from '@mui/material';
 // import useWalletService from 'hooks/useWalletService';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
@@ -118,6 +119,7 @@ interface SwapFirstStepProps {
   buttonToShow: React.ReactNode;
   fromValueUsdPrice: number;
   onChangeNetwork: (chainId: number) => void;
+  handlePolygonDestinantion: () => void;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -139,6 +141,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     show,
     fromValueUsdPrice,
     onChangeNetwork,
+    handlePolygonDestinantion,
   } = props;
 
   // const walletService = useWalletService();
@@ -244,6 +247,11 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
             </StyledTokenContainer>
           </StyledTokensContainer>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
+            <Button onClick={() => handlePolygonDestinantion()} style={{ display: 'flex', marginTop: '10px' }}>
+              Select Polygon
+            </Button>
+          </div>
         </StyledContentContainer>
       </Grid>
       <Grid item xs={12}>

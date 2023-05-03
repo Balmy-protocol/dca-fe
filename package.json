@@ -127,6 +127,7 @@
     "assert": "^2.0.0",
     "axios": "^0.21.1",
     "axios-cache-adapter": "^2.7.3",
+    "browserify-zlib": "^0.2.0",
     "canvas-confetti": "^1.6.0",
     "crypto-browserify": "^3.12.0",
     "cryptocurrency-icons": "^0.17.2",
@@ -166,7 +167,8 @@
     "uuid": "^9.0.0",
     "wagmi": "^0.12.7",
     "web3modal": "^1.9.3",
-    "zlib": "^1.0.5"
+    "zlib": "^1.0.5",
+    "zlib-browserify": "^0.0.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md}": [

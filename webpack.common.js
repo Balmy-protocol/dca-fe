@@ -23,6 +23,9 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser.js',
     }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
     new webpack.DefinePlugin({
       'process.env.ETHPLORER_KEY': JSON.stringify('EK-7xNxe-HDazjQ3-smGdU'),
     }),
@@ -40,6 +43,9 @@ module.exports = {
   resolve: {
     modules: [path.resolve(__dirname, 'src'), 'node_modules'],
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
+    alias: {
+      zlib: require.resolve('browserify-zlib'),
+    },
     fallback: {
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),
@@ -47,7 +53,10 @@ module.exports = {
       http: require.resolve('stream-http'),
       https: require.resolve('https-browserify'),
       os: require.resolve('os-browserify/browser'),
+      zlib: false,
       url: require.resolve('url'),
+      fs: false,
+      path: false,
     },
   },
   module: {

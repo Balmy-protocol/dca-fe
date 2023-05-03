@@ -57,7 +57,6 @@ import {
   SIGN_VERSION,
   TOKEN_TYPE_YIELD_BEARING_SHARES,
   POSITION_VERSION_4,
-  RAW_NETWORKS,
 } from 'config/constants';
 import { PermissionManagerContract, PermissionPermit } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
@@ -630,6 +629,8 @@ export default class PositionService {
     yieldFrom?: string,
     yieldTo?: string
   ) {
+    // eslint-disable-next-line no-console
+    console.log('Into the deposit params');
     const token = from;
 
     const weiValue = parseUnits(fromValue, token.decimals);
@@ -739,8 +740,11 @@ export default class PositionService {
     frequencyType: BigNumber,
     frequencyValue: string,
     yieldFromPossible?: string,
-    yieldToPossible?: string
+    yieldToPossible?: string,
+    destinantionChainID?: number
   ) {
+    // eslint-disable-next-line no-console
+    console.log('Into the build');
     const { forwardCallData } = await this.buildDepositParams(
       fromToken,
       toToken,
@@ -750,20 +754,32 @@ export default class PositionService {
       yieldFromPossible,
       yieldToPossible
     );
+    // eslint-disable-next-line no-console
+    console.log({ forwardCallData });
     const xTargetAddress = '0x';
 
     // dont think need this at all
     // const xTargetInstance = await this.contractService.getxTargetInstance(xTargetAddress);
-    const currentRPC = RAW_NETWORKS[this.walletService.network.name].rpc[0];
-    const domainID = this.connextService.getDomainID(this.walletService.network.name);
+    const currentRPC = this.connextService.getRPCURL(this.walletService.network.chainId) as string;
+    const originDomainID = this.connextService.getDomainID(this.walletService.network.chainId);
+    const destinantionDomainID = this.connextService.getDomainID(destinantionChainID as number);
     // still have to figure out how to check destination domain
-    const originUSDC = this.connextService.getNativeUSDCAddress(this.walletService.network.name);
-    const destinantionUSDC = this.connextService.getNativeUSDCAddress(this.walletService.network.name);
+    const originUSDC = this.connextService.getNativeUSDCAddress(this.walletService.network.chainId);
+    const destinantionUSDC = this.connextService.getNativeUSDCAddress(destinantionChainID as number);
+    // eslint-disable-next-line no-console
+    console.log({
+      currentRPC,
+      originDomainID,
+      destinantionDomainID,
+      originUSDC,
+      destinantionUSDC,
+      destinantionChainID,
+    });
 
     // get RPC on the basis of chainID
     // get the pool fees.
     const poolFee = await this.connextService.getPoolFeeForUniV3Helper(
-      domainID, // Destination Domain
+      destinantionDomainID, // Destination Domain
       toToken.address, // final destination token, Address should be getting from user
       destinantionUSDC, // destinantion USDC
       currentRPC
@@ -776,19 +792,19 @@ export default class PositionService {
     );
 
     const callDataForMeanProtocol = await this.connextService.getXCallCallDataHelper(
-      domainID, // destinantion Domain
+      destinantionDomainID, // destinantion Domain
       forwardCallData,
       destinantionCallDataParams
     );
 
     // calculating relayerFees
-    const relayerFees = await this.connextService.getCalculatedRelayerFees();
+    const relayerFees = await this.connextService.getCalculatedRelayerFees(originDomainID, destinantionDomainID);
 
     // swap can be done after figuring out about domains, and also after deploying contract
 
     const swapAndXCallParams = getSwapAndXcallParams(
-      domainID,
-      domainID,
+      originDomainID,
+      destinantionDomainID,
       fromToken.address,
       originUSDC, // USDC for origin chain
       '100',
@@ -838,8 +854,11 @@ export default class PositionService {
     frequencyType: BigNumber,
     frequencyValue: string,
     yieldFrom?: string,
-    yieldTo?: string
+    yieldTo?: string,
+    isPolygonDestnantion?: boolean
   ): Promise<TransactionResponse> {
+    // eslint-disable-next-line no-console
+    console.log('Xcall depposit called');
     const { swapAndXCallParams } = await this.buildXcallDepositParams(
       from,
       to,
@@ -847,13 +866,20 @@ export default class PositionService {
       frequencyType,
       frequencyValue,
       yieldFrom,
-      yieldTo
+      yieldTo,
+      isPolygonDestnantion ? 137 : 0
     );
+
+    // eslint-disable-next-line no-console
+    console.log({ swapAndXCallParams });
 
     const txRequest = await this.connextService.prepareSwapAndXCallHelper(
       swapAndXCallParams,
       this.walletService.account as string
     );
+
+    // eslint-disable-next-line no-console
+    console.log(txRequest, 'transaction reqyest from xCall');
 
     return this.providerService.sendTransactionWithGasLimit({ ...txRequest });
   }
