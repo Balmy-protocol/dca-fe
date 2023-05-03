@@ -527,10 +527,23 @@ const TokenPicker = ({
             parseFloat(formatUnits(balances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
           0;
 
-        return tokenABalance > tokenBBalance ? -1 : 1;
+        if (tokenABalance || tokenBBalance) {
+          return tokenABalance > tokenBBalance ? -1 : 1;
+        }
+
+        const key = search.toLowerCase();
+        const isGoodMatchA = tokenList[tokenKeyA].symbol.toLowerCase().startsWith(key);
+        const isGoodMatchB = tokenList[tokenKeyB].symbol.toLowerCase().startsWith(key);
+
+        if (isGoodMatchA !== isGoodMatchB) {
+          // XOR
+          return isGoodMatchA ? -1 : 1;
+        }
+
+        return tokenList[tokenKeyA].symbol.localeCompare(tokenList[tokenKeyB].symbol);
       }),
     ],
-    [balances, memoizedUnorderedTokenKeys, tokenList, customToken]
+    [balances, memoizedUnorderedTokenKeys, tokenList, customToken, search]
   );
 
   const handleItemSelected = (token: Token, isCustomToken: boolean) => {
