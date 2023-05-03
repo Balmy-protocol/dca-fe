@@ -6,7 +6,6 @@ import find from 'lodash/find';
 import { BlowfishResponse, NetworkStruct, SwapOption, SwapOptionWithTx, Token } from '@types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import TokenPicker from '@common/components/aggregator-token-picker';
 import findIndex from 'lodash/findIndex';
 import Button from '@common/components/button';
 import useBalance from '@hooks/useBalance';
@@ -50,6 +49,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { TransactionResponse } from '@ethersproject/providers';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
+import TokenPicker from '../aggregator-token-picker';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
