@@ -99,7 +99,6 @@ const Swap = ({
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
-  const [whaleMode] = React.useState(false);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
@@ -660,14 +659,12 @@ const Swap = ({
     />
   );
 
-  const filteredFrequencies = whaleMode
-    ? availableFrequencies
-    : availableFrequencies.filter(
-        (frequency) =>
-          !(
-            WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]
-          ).includes(frequency.value.toString())
-      );
+  const filteredFrequencies = availableFrequencies.filter(
+    (frequency) =>
+      !(WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
+        frequency.value.toString()
+      )
+  );
 
   return (
     <StyledPaper variant="outlined" ref={containerRef}>
