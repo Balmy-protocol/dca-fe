@@ -48,17 +48,19 @@ export const TRANSACTION_TYPES: TransactionTypesConstant = {
   EULER_CLAIM_CLAIM_FROM_MIGRATOR: 'EULER_CLAIM_CLAIM_FROM_MIGRATOR',
 };
 
-export const FULL_DEPOSIT_TYPE = 'full_deposit';
-export const RATE_TYPE = 'by_rate';
+export enum ModeTypesIds {
+  FULL_DEPOSIT_TYPE = 'full_deposit',
+  RATE_TYPE = 'by_rate',
+}
 
 export const MODE_TYPES = {
   FULL_DEPOSIT: {
     label: 'Full deposit',
-    id: FULL_DEPOSIT_TYPE,
+    id: ModeTypesIds.FULL_DEPOSIT_TYPE,
   },
   RATE: {
     label: 'By rate',
-    id: RATE_TYPE,
+    id: ModeTypesIds.RATE_TYPE,
   },
 };
 

@@ -24,6 +24,7 @@ import EmptyGraph from '@assets/svg/emptyGraph';
 import useGraphPrice from '@hooks/useGraphPrice';
 import useUsdPrice from '@hooks/useUsdPrice';
 import { parseUnits } from '@ethersproject/units';
+import { useCreatePositionState } from '@state/create-position/hooks';
 import { withStyles } from '@mui/styles';
 import Chip from '@mui/material/Chip';
 import GraphFooter from './components/graph-footer';
@@ -38,8 +39,6 @@ const DarkChip = withStyles(() => ({
 }))(Chip);
 
 interface GraphWidgetProps {
-  from: Token | null;
-  to: Token | null;
   withFooter?: boolean;
 }
 
@@ -157,7 +156,8 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   type: TOKEN_TYPE_BASE,
   underlyingTokens: [],
 };
-const GraphWidget = ({ from, to, withFooter }: GraphWidgetProps) => {
+const GraphWidget = ({ withFooter }: GraphWidgetProps) => {
+  const { from, to } = useCreatePositionState();
   let tokenA: GraphToken = EMPTY_GRAPH_TOKEN;
   let tokenB: GraphToken = EMPTY_GRAPH_TOKEN;
   let defiLlamaData: UniMappedPrice[] = [];

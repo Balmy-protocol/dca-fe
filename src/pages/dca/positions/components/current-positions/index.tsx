@@ -9,7 +9,7 @@ import { BigNumber } from 'ethers';
 import { ChainId, Position, YieldOptions } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, SUPPORTED_NETWORKS, TRANSACTION_TYPES } from '@constants';
+import { ModeTypesIds, PERMISSIONS, SUPPORTED_NETWORKS, TRANSACTION_TYPES } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
@@ -197,7 +197,9 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         ),
         rate: formatUnits(position.depositedRateUnderlying || position.rate, position.from.decimals),
         frequencyValue: position.remainingSwaps.toString(),
-        modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0)) ? FULL_DEPOSIT_TYPE : RATE_TYPE,
+        modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0))
+          ? ModeTypesIds.FULL_DEPOSIT_TYPE
+          : ModeTypesIds.RATE_TYPE,
       })
     );
     setShowModifyRateSettingsModal(true);

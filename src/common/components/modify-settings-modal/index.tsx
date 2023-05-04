@@ -10,11 +10,10 @@ import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
   DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
-  FULL_DEPOSIT_TYPE,
   MINIMUM_USD_RATE_FOR_DEPOSIT,
   MINIMUM_USD_RATE_FOR_YIELD,
+  ModeTypesIds,
   PERMISSIONS,
-  RATE_TYPE,
   STRING_SWAP_INTERVALS,
   TRANSACTION_TYPES,
 } from '@constants';
@@ -185,7 +184,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const handleFromValueChange = (newFromValue: string) => {
     if (!fromToUse) return;
-    dispatch(setModeType(FULL_DEPOSIT_TYPE));
+    dispatch(setModeType(ModeTypesIds.FULL_DEPOSIT_TYPE));
     dispatch(setFromValue(newFromValue));
     dispatch(
       setRate(
@@ -205,7 +204,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const handleRateValueChange = (newRate: string) => {
     if (!fromToUse) return;
-    dispatch(setModeType(RATE_TYPE));
+    dispatch(setModeType(ModeTypesIds.RATE_TYPE));
     dispatch(setRate(newRate));
     dispatch(
       setFromValue(
@@ -226,7 +225,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const handleFrequencyChange = (newFrequencyValue: string) => {
     if (!fromToUse) return;
     dispatch(setFrequencyValue(newFrequencyValue));
-    if (modeType === RATE_TYPE) {
+    if (modeType === ModeTypesIds.RATE_TYPE) {
       dispatch(
         setFromValue(
           (rate &&

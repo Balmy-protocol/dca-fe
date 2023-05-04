@@ -28,7 +28,7 @@ import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';
 import {
   PERMISSIONS,
-  RATE_TYPE,
+  ModeTypesIds,
   TRANSACTION_TYPES,
   PositionVersions,
   DEFAULT_NETWORK_FOR_VERSION,
@@ -460,7 +460,7 @@ const PositionDetailFrame = () => {
         fromValue: formatUnits(remainingLiquidityToUse, positionInUse.from.decimals),
         rate: formatUnits(rateToUse, positionInUse.from.decimals),
         frequencyValue: positionInUse.remainingSwaps.toString(),
-        modeType: RATE_TYPE,
+        modeType: ModeTypesIds.RATE_TYPE,
       })
     );
     trackEvent('DCA - Position details - Show add funds modal');

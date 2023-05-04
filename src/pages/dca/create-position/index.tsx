@@ -4,22 +4,14 @@ import orderBy from 'lodash/orderBy';
 import { getProtocolToken } from '@common/mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
-import {
-  DEFAULT_NETWORK_FOR_VERSION,
-  LATEST_VERSION,
-  ONE_DAY,
-  shouldEnableFrequency,
-  STRING_SWAP_INTERVALS,
-} from '@constants';
-import { GetSwapIntervalsGraphqlResponse, Token, YieldOption } from '@types';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, shouldEnableFrequency, STRING_SWAP_INTERVALS } from '@constants';
+import { GetSwapIntervalsGraphqlResponse, YieldOption } from '@types';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { useAppDispatch } from '@state/hooks';
 import {
-  setFrequencyType,
   setFrequencyValue,
   setFrom,
-  setFromValue,
   setFromYield,
   setTo,
   setToYield,
@@ -28,7 +20,6 @@ import {
 import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import useYieldOptions from '@hooks/useYieldOptions';
-import useReplaceHistory from '@hooks/useReplaceHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useToken from '@hooks/useToken';
 import Swap from './components/swap';
@@ -40,15 +31,13 @@ interface SwapContainerProps {
 }
 
 const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainerProps) => {
-  const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield } =
-    useCreatePositionState();
+  const { from, to } = useCreatePositionState();
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const currentNetwork = useCurrentNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true);
   const toParamToken = useToken(toParam, true);
-  const replaceHistory = useReplaceHistory();
   const trackEvent = useTrackEvent();
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
 
@@ -83,63 +72,6 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
         }))) ||
     [];
 
-  const onSetFrom = (newFrom: Token) => {
-    // check for decimals
-    if (from && newFrom.decimals < from.decimals) {
-      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
-      let newFromValue = fromValue;
-      if (splitValue && splitValue[2] !== '') {
-        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, newFrom.decimals)}`;
-      }
-
-      dispatch(setFromValue(newFromValue));
-    }
-
-    dispatch(setFrom(newFrom));
-
-    if (!shouldEnableFrequency(frequencyType.toString(), newFrom.address, to?.address, currentNetwork.chainId)) {
-      dispatch(setFrequencyType(ONE_DAY));
-    }
-
-    replaceHistory(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
-    trackEvent('DCA - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
-  };
-  const onSetTo = (newTo: Token) => {
-    dispatch(setTo(newTo));
-    if (!shouldEnableFrequency(frequencyType.toString(), from?.address, newTo.address, currentNetwork.chainId)) {
-      dispatch(setFrequencyType(ONE_DAY));
-    }
-    if (from) {
-      replaceHistory(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
-    }
-    trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
-  };
-
-  const toggleFromTo = () => {
-    dispatch(setTo(from));
-
-    // check for decimals
-    if (to && from && to.decimals < from.decimals) {
-      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
-      let newFromValue = fromValue;
-      if (splitValue && splitValue[2] !== '') {
-        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, to.decimals)}`;
-      }
-
-      dispatch(setFromValue(newFromValue));
-    }
-    dispatch(setFrom(to));
-
-    if (to) {
-      replaceHistory(`/create/${currentNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
-    }
-    trackEvent('DCA - Toggle from/to', { fromAddress: from?.address, toAddress: to?.address });
-  };
-
-  const onSetFrequencyType = (newFrequencyType: BigNumber) => {
-    dispatch(setFrequencyType(newFrequencyType));
-    trackEvent('DCA - Set frequency type', {});
-  };
   const onSetFrequencyValue = (newFrequencyValue: string) => {
     dispatch(setFrequencyValue(newFrequencyValue));
     trackEvent('DCA - Set frequency value', {});
@@ -161,24 +93,11 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
       <Grid item xs={12} md={5}>
         <Swap
-          from={from}
-          to={to}
-          setFrom={onSetFrom}
-          setTo={onSetTo}
-          frequencyType={frequencyType}
-          frequencyValue={frequencyValue}
-          setFrequencyType={onSetFrequencyType}
           setFrequencyValue={onSetFrequencyValue}
           setYieldEnabled={onSetYieldEnabled}
-          fromValue={fromValue}
-          setFromValue={(newFromValue) => dispatch(setFromValue(newFromValue))}
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
-          toggleFromTo={toggleFromTo}
-          yieldEnabled={yieldEnabled}
           yieldOptions={yieldOptions || []}
           isLoadingYieldOptions={isLoadingYieldOptions}
-          fromYield={fromYield}
-          toYield={toYield}
           setFromYield={onSetFromYield}
           setToYield={onSetToYield}
           availableFrequencies={availableFrequencies}
@@ -187,7 +106,7 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
       </Grid>
       <Hidden mdDown>
         <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
-          <GraphWidget from={from} to={to} withFooter />
+          <GraphWidget withFooter />
         </Grid>
       </Hidden>
     </Grid>
