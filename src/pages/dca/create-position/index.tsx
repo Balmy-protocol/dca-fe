@@ -9,11 +9,10 @@ import { GetSwapIntervalsGraphqlResponse } from '@types';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { useAppDispatch } from '@state/hooks';
-import { setFrequencyValue, setFrom, setTo } from '@state/create-position/actions';
+import { setFrom, setTo } from '@state/create-position/actions';
 import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import useYieldOptions from '@hooks/useYieldOptions';
-import useTrackEvent from '@hooks/useTrackEvent';
 import useToken from '@hooks/useToken';
 import Swap from './components/swap';
 import GraphWidget from './components/graph-widget';
@@ -31,7 +30,6 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true);
   const toParamToken = useToken(toParam, true);
-  const trackEvent = useTrackEvent();
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
 
   React.useEffect(() => {
@@ -65,16 +63,10 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
         }))) ||
     [];
 
-  const onSetFrequencyValue = (newFrequencyValue: string) => {
-    dispatch(setFrequencyValue(newFrequencyValue));
-    trackEvent('DCA - Set frequency value', {});
-  };
-
   return (
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
       <Grid item xs={12} md={5}>
         <Swap
-          setFrequencyValue={onSetFrequencyValue}
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
           yieldOptions={yieldOptions || []}
           isLoadingYieldOptions={isLoadingYieldOptions}

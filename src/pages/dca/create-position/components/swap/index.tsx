@@ -51,6 +51,7 @@ import {
   setRate,
   setToYield,
   setFromYield,
+  setFrequencyValue,
 } from '@state/create-position/actions';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import useAllowance from '@hooks/useAllowance';
@@ -93,7 +94,6 @@ interface AvailableSwapInterval {
 }
 
 interface SwapProps {
-  setFrequencyValue: (newFrequencyValue: string) => void;
   currentNetwork: { chainId: number; name: string };
   availableFrequencies: AvailableSwapInterval[];
   yieldOptions: YieldOptions;
@@ -102,7 +102,6 @@ interface SwapProps {
 }
 
 const Swap = ({
-  setFrequencyValue,
   currentNetwork,
   availableFrequencies,
   yieldOptions,
@@ -589,7 +588,8 @@ const Swap = ({
 
   const handleFrequencyChange = (newFrequencyValue: string) => {
     if (!from) return;
-    setFrequencyValue(newFrequencyValue);
+    dispatch(setFrequencyValue(newFrequencyValue));
+    trackEvent('DCA - Set frequency value', {});
     if (modeType === ModeTypesIds.RATE_TYPE) {
       dispatch(
         setFromValue(
