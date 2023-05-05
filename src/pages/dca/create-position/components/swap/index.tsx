@@ -33,6 +33,7 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/t
 import useWalletService from '@hooks/useWalletService';
 import useContractService from '@hooks/useContractService';
 import usePositionService from '@hooks/usePositionService';
+import Grid from '@mui/material/Grid';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
@@ -52,9 +53,17 @@ import {
   setFromYield,
 } from '@state/create-position/actions';
 import { useCreatePositionState } from '@state/create-position/hooks';
+import useAllowance from '@hooks/useAllowance';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
 import DcaButton from '../dca-button';
+import NextSwapAvailable from '../next-swap-available';
+
+export const StyledContentContainer = styled.div`
+  background-color: #292929;
+  padding: 16px;
+  border-radius: 8px;
+`;
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -64,6 +73,15 @@ const StyledPaper = styled(Paper)`
   flex-grow: 1;
   background-color: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(6px);
+`;
+
+export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
+  ${({ $show }) => !$show && 'position: absolute;width: auto;'};
+  ${({ $zIndex }) => `z-index: ${$zIndex};`}
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 90;
 `;
 
 interface AvailableSwapInterval {
@@ -114,6 +132,7 @@ const Swap = ({
   // const pairService = usePairService();
   const [balance, , balanceErrors] = useBalance(from);
   const [usedTokens] = useUsedTokens();
+  const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -644,24 +663,6 @@ const Swap = ({
     }
   };
 
-  const ButtonToShow = (
-    <DcaButton
-      onClick={onButtonClick}
-      cantFund={cantFund}
-      usdPrice={usdPrice}
-      shouldEnableYield={shouldEnableYield}
-      balance={balance}
-      balanceErrors={balanceErrors}
-      fromCanHaveYield={fromCanHaveYield}
-      toCanHaveYield={toCanHaveYield}
-      isLoadingUsdPrice={isLoadingUsdPrice}
-      handleSetStep={handleSetStep}
-      step={createStep}
-      rateUsdPrice={rateUsdPrice}
-      fromValueUsdPrice={fromValueUsdPrice}
-    />
-  );
-
   const filteredFrequencies = availableFrequencies.filter(
     (frequency) =>
       !(WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
@@ -708,18 +709,41 @@ const Swap = ({
         timeout={isRender ? 0 : 500}
         easing="ease-out"
       >
-        <SwapFirstStep
-          startSelectingCoin={startSelectingCoin}
-          cantFund={cantFund}
-          balance={balance}
-          frequencies={filteredFrequencies}
-          handleFrequencyChange={handleFrequencyChange}
-          buttonToShow={ButtonToShow}
-          show={showFirstStep}
-          fromValueUsdPrice={fromValueUsdPrice}
-          onChangeNetwork={handleChangeNetwork}
-          handleFromValueChange={handleFromValueChange}
-        />
+        <StyledGrid container rowSpacing={2} $show={showFirstStep} $zIndex={90}>
+          <Grid item xs={12}>
+            <SwapFirstStep
+              startSelectingCoin={startSelectingCoin}
+              cantFund={cantFund}
+              balance={balance}
+              frequencies={filteredFrequencies}
+              handleFrequencyChange={handleFrequencyChange}
+              fromValueUsdPrice={fromValueUsdPrice}
+              onChangeNetwork={handleChangeNetwork}
+              handleFromValueChange={handleFromValueChange}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <StyledContentContainer>
+              <DcaButton
+                onClick={onButtonClick}
+                cantFund={cantFund}
+                usdPrice={usdPrice}
+                shouldEnableYield={shouldEnableYield}
+                allowance={allowance}
+                allowanceErrors={allowanceErrors}
+                balance={balance}
+                balanceErrors={balanceErrors}
+                fromCanHaveYield={fromCanHaveYield}
+                toCanHaveYield={toCanHaveYield}
+                isLoadingUsdPrice={isLoadingUsdPrice}
+                handleSetStep={handleSetStep}
+                step={createStep}
+                rateUsdPrice={rateUsdPrice}
+                fromValueUsdPrice={fromValueUsdPrice}
+              />
+            </StyledContentContainer>
+          </Grid>
+        </StyledGrid>
       </Slide>
       <Slide
         direction="left"
@@ -732,23 +756,46 @@ const Swap = ({
         timeout={500}
         easing="ease-out"
       >
-        <SwapSecondStep
-          show={showSecondStep}
-          onBack={() => setCreateStep(0)}
-          fromValueUsdPrice={fromValueUsdPrice}
-          rateUsdPrice={rateUsdPrice}
-          handleRateValueChange={handleRateValueChange}
-          handleFromValueChange={handleFromValueChange}
-          handleFrequencyChange={handleFrequencyChange}
-          buttonToShow={ButtonToShow}
-          yieldEnabled={shouldEnableYield}
-          fromCanHaveYield={fromCanHaveYield}
-          toCanHaveYield={toCanHaveYield}
-          yieldOptions={yieldOptions}
-          isLoadingYieldOptions={isLoadingYieldOptions}
-          usdPrice={usdPrice}
-          existingPair={existingPair}
-        />
+        <StyledGrid container rowSpacing={2} $show={showSecondStep} $zIndex={89}>
+          <Grid item xs={12}>
+            <SwapSecondStep
+              onBack={() => setCreateStep(0)}
+              fromValueUsdPrice={fromValueUsdPrice}
+              rateUsdPrice={rateUsdPrice}
+              handleRateValueChange={handleRateValueChange}
+              handleFromValueChange={handleFromValueChange}
+              handleFrequencyChange={handleFrequencyChange}
+              yieldEnabled={shouldEnableYield}
+              fromCanHaveYield={fromCanHaveYield}
+              toCanHaveYield={toCanHaveYield}
+              yieldOptions={yieldOptions}
+              isLoadingYieldOptions={isLoadingYieldOptions}
+              usdPrice={usdPrice}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <StyledContentContainer>
+              <DcaButton
+                onClick={onButtonClick}
+                cantFund={cantFund}
+                usdPrice={usdPrice}
+                shouldEnableYield={shouldEnableYield}
+                balance={balance}
+                balanceErrors={balanceErrors}
+                allowance={allowance}
+                allowanceErrors={allowanceErrors}
+                fromCanHaveYield={fromCanHaveYield}
+                toCanHaveYield={toCanHaveYield}
+                isLoadingUsdPrice={isLoadingUsdPrice}
+                handleSetStep={handleSetStep}
+                step={createStep}
+                rateUsdPrice={rateUsdPrice}
+                fromValueUsdPrice={fromValueUsdPrice}
+              />
+              <NextSwapAvailable existingPair={existingPair} yieldEnabled={yieldEnabled} />
+            </StyledContentContainer>
+          </Grid>
+        </StyledGrid>
       </Slide>
     </StyledPaper>
   );

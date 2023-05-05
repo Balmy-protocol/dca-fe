@@ -31,7 +31,7 @@ import { useHasConfirmedApproval, useHasPendingApproval, useHasPendingPairCreati
 import useCanSupportPair from '@hooks/useCanSupportPair';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { formatUnits, parseUnits } from '@ethersproject/units';
-import useAllowance from '@hooks/useAllowance';
+import { Allowance } from '@hooks/useAllowance';
 import { EMPTY_TOKEN, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useWalletService from '@hooks/useWalletService';
@@ -56,9 +56,11 @@ interface DcaButtonProps {
   usdPrice?: BigNumber;
   shouldEnableYield: boolean;
   balance?: BigNumber;
+  allowance: Allowance;
   rateUsdPrice: number;
   fromValueUsdPrice: number;
   balanceErrors?: string;
+  allowanceErrors?: string;
   fromCanHaveYield: boolean;
   toCanHaveYield: boolean;
   isLoadingUsdPrice: boolean;
@@ -69,6 +71,8 @@ interface DcaButtonProps {
 const DcaButton = ({
   cantFund,
   usdPrice,
+  allowance,
+  allowanceErrors,
   shouldEnableYield,
   balance,
   balanceErrors,
@@ -98,8 +102,6 @@ const DcaButton = ({
   const trackEvent = useTrackEvent();
 
   const hasConfirmedApproval = useHasConfirmedApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
-
-  const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
   const hasEnoughUsdForDeposit =
     !!usdPrice &&

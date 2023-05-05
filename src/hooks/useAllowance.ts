@@ -10,7 +10,7 @@ import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import useAccount from './useAccount';
 
-type Allowance = {
+export type Allowance = {
   token: Token;
   allowance: string | undefined;
 };
