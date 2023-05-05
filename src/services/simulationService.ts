@@ -52,6 +52,11 @@ export default class SimulationService {
       chainId
     );
 
+    // If blowfish simulation failed check for simulating the estimateGas
+    if (results.data.simulationResults.error) {
+      return this.simulateGasPriceTransaction(txData);
+    }
+
     return {
       action: results.data.action,
       simulationResults: {
