@@ -94,10 +94,14 @@ const QuoteSimulation = ({
           <Typography variant="h6">
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
-          {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && !forceProviderSimulation && (
-            <TransactionSimulation items={transactionSimulation} />
-          )}
-          {(!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) || forceProviderSimulation) && (
+          {BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) &&
+            !forceProviderSimulation &&
+            !!transactionSimulation.simulationResults.expectedStateChanges.length && (
+              <TransactionSimulation items={transactionSimulation} />
+            )}
+          {(!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) ||
+            forceProviderSimulation ||
+            !transactionSimulation.simulationResults.expectedStateChanges.length) && (
             <Typography variant="body1" color="#219653" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
               <TokenIcon token={emptyTokenWithAddress('CHECK')} size="28px" />
               <FormattedMessage description="normalSimulationSuccess" defaultMessage="Transaction will be successful" />
