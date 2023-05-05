@@ -2,10 +2,13 @@ import AAVE from './aave.svg';
 import ARBITRUM from './arbitrum.svg';
 import AVAX from './avax.svg';
 import BNB from './bnb.svg';
+import CHECK from './check.svg';
+import CLOCK from './clock.svg';
 import DAI from './dai.svg';
 import ETH from './eth.svg';
 import EULER from './euler.svg';
 import EXACTLY from './exactly.svg';
+import FAILED from './failed.svg';
 import FTM from './ftm.svg';
 import GAS from './gas.svg';
 import HT from './ht.svg';
@@ -18,6 +21,8 @@ const manifest = {
   '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9': AAVE,
   AAVE,
   ARBITRUM,
+  CHECK,
+  CLOCK,
   '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '10-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
@@ -37,6 +42,7 @@ const manifest = {
   '100-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': DAI,
   EULER,
   EXACTLY,
+  FAILED,
   GAS,
   OPTIMISM,
   SONNE,
