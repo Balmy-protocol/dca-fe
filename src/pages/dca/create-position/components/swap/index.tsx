@@ -2,7 +2,7 @@ import React from 'react';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { Token, YieldOption, YieldOptions } from '@types';
+import { Token, YieldOptions } from '@types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import TokenPicker from '@pages/dca/components/dca-token-picker';
@@ -41,7 +41,16 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
 import { useAppDispatch } from '@state/hooks';
-import { setFromValue, setFrom, setFrequencyType, setTo, setModeType, setRate } from '@state/create-position/actions';
+import {
+  setFromValue,
+  setFrom,
+  setFrequencyType,
+  setTo,
+  setModeType,
+  setRate,
+  setToYield,
+  setFromYield,
+} from '@state/create-position/actions';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
@@ -67,13 +76,10 @@ interface AvailableSwapInterval {
 
 interface SwapProps {
   setFrequencyValue: (newFrequencyValue: string) => void;
-  setYieldEnabled: (newYieldEnabled: boolean) => void;
   currentNetwork: { chainId: number; name: string };
   availableFrequencies: AvailableSwapInterval[];
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
-  setFromYield: (newYield?: null | YieldOption) => void;
-  setToYield: (newYield?: null | YieldOption) => void;
   handleChangeNetwork: (newChainId: number) => void;
 }
 
@@ -81,11 +87,8 @@ const Swap = ({
   setFrequencyValue,
   currentNetwork,
   availableFrequencies,
-  setYieldEnabled,
   yieldOptions,
   isLoadingYieldOptions,
-  setFromYield,
-  setToYield,
   handleChangeNetwork,
 }: SwapProps) => {
   const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield, modeType, rate } =
@@ -344,8 +347,8 @@ const Swap = ({
 
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
-      setToYield(undefined);
-      setFromYield(undefined);
+      dispatch(setToYield(undefined));
+      dispatch(setFromYield(undefined));
       setCreateStep(0);
     } catch (e) {
       // User rejecting transaction
@@ -435,8 +438,8 @@ const Swap = ({
 
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
-      setToYield(undefined);
-      setFromYield(undefined);
+      dispatch(setToYield(undefined));
+      dispatch(setFromYield(undefined));
       setCreateStep(0);
     } catch (e) {
       // User rejecting transaction
@@ -732,28 +735,17 @@ const Swap = ({
         <SwapSecondStep
           show={showSecondStep}
           onBack={() => setCreateStep(0)}
-          from={from}
-          to={to}
-          rate={rate}
           fromValueUsdPrice={fromValueUsdPrice}
           rateUsdPrice={rateUsdPrice}
           handleRateValueChange={handleRateValueChange}
           handleFromValueChange={handleFromValueChange}
-          frequencyType={frequencyType}
-          frequencyValue={frequencyValue}
-          fromValue={fromValue}
           handleFrequencyChange={handleFrequencyChange}
           buttonToShow={ButtonToShow}
           yieldEnabled={shouldEnableYield}
-          setYieldEnabled={setYieldEnabled}
           fromCanHaveYield={fromCanHaveYield}
           toCanHaveYield={toCanHaveYield}
           yieldOptions={yieldOptions}
           isLoadingYieldOptions={isLoadingYieldOptions}
-          fromYield={fromYield}
-          toYield={toYield}
-          setFromYield={setFromYield}
-          setToYield={setToYield}
           usdPrice={usdPrice}
           existingPair={existingPair}
         />

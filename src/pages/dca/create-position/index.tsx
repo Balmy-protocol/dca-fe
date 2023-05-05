@@ -5,18 +5,11 @@ import { getProtocolToken } from '@common/mocks/tokens';
 import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, shouldEnableFrequency, STRING_SWAP_INTERVALS } from '@constants';
-import { GetSwapIntervalsGraphqlResponse, YieldOption } from '@types';
+import { GetSwapIntervalsGraphqlResponse } from '@types';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { useAppDispatch } from '@state/hooks';
-import {
-  setFrequencyValue,
-  setFrom,
-  setFromYield,
-  setTo,
-  setToYield,
-  setYieldEnabled,
-} from '@state/create-position/actions';
+import { setFrequencyValue, setFrom, setTo } from '@state/create-position/actions';
 import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import useYieldOptions from '@hooks/useYieldOptions';
@@ -76,30 +69,15 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
     dispatch(setFrequencyValue(newFrequencyValue));
     trackEvent('DCA - Set frequency value', {});
   };
-  const onSetYieldEnabled = (newYieldEnabled: boolean) => {
-    dispatch(setYieldEnabled(newYieldEnabled));
-    trackEvent('DCA - Set yield enabled', {});
-  };
-  const onSetFromYield = (newYield?: YieldOption | null) => {
-    dispatch(setFromYield(newYield));
-    trackEvent('DCA - Set yield from', {});
-  };
-  const onSetToYield = (newYield?: YieldOption | null) => {
-    dispatch(setToYield(newYield));
-    trackEvent('DCA - Set yield to', {});
-  };
 
   return (
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
       <Grid item xs={12} md={5}>
         <Swap
           setFrequencyValue={onSetFrequencyValue}
-          setYieldEnabled={onSetYieldEnabled}
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
           yieldOptions={yieldOptions || []}
           isLoadingYieldOptions={isLoadingYieldOptions}
-          setFromYield={onSetFromYield}
-          setToYield={onSetToYield}
           availableFrequencies={availableFrequencies}
           handleChangeNetwork={handleChangeNetwork}
         />
