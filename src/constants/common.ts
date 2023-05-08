@@ -91,6 +91,7 @@ export const TOKEN_BLACKLIST = [
   '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97', // OP - STG
 
   '0x2e9a6df78e42a30712c10a9dc4b1c8656f8f2879', // ARBITRUM - Malicious MKR
+  '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
