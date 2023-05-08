@@ -26,10 +26,6 @@ export default class ConnextService {
   }
 
   async getCalculatedRelayerFees(originDomain: string, destinationDomain: string) {
-    // const origin = this.getDomainID(this.walletService.network.chainId);
-    // const destination = this.getDomainID(this.destinantionChainID);
-    // const originRPC = this.getRPCURL(this.walletService.network.chainId) as string;
-    // const destinantionRPC = this.getRPCURL(this.destinantionChainID) as string;
     const domainConfig: { [domainId: string]: { providers: string[] } } = {};
 
     const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)

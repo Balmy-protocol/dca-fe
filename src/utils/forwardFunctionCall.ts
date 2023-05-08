@@ -15,7 +15,7 @@ export const getForwardFunctionCallHelper = (
 ) => {
   const { defaultAbiCoder } = ethers.utils;
   const encodedData = defaultAbiCoder.encode(
-    ['address', 'address', 'uint256', 'uint32', 'uint32', 'address', 'IDCAPermissionManager.PermissionSet[]'],
+    ['address', 'address', 'uint256', 'uint32', 'address', 'tuple(address operator,uint256[] permissions)[]'],
     [from, to, amountOfSwaps, swapInterval, owner, permissions]
   );
   return encodedData;

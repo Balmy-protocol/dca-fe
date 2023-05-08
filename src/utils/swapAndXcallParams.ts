@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 export const getSwapAndXcallParams = (
   originDomain: string,
   destinationDomain: string,
@@ -8,10 +10,12 @@ export const getSwapAndXcallParams = (
   callData: string,
   relayerFeeInNativeAsset: string
 ) => {
+  const fromAssetOrigin =
+    fromAsset === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? ethers.constants.AddressZero : fromAsset;
   const swapAndXCallParams = {
     originDomain,
     destinationDomain,
-    fromAsset, // BNB
+    fromAsset: fromAssetOrigin, // BNB
     toAsset, // USDC
     amountIn: amountIn.toString(),
     to,
