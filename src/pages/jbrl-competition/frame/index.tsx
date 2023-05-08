@@ -2,7 +2,6 @@ import React from 'react';
 import Grid from '@mui/material/Grid';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
-import Button from '@common/components/button';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import useGqlFetchAll from '@hooks/useGqlFetchAll';
@@ -25,10 +24,7 @@ import {
 import { Typography } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
 import useYieldOptions from '@hooks/useYieldOptions';
-import { useHistory } from 'react-router-dom';
-import { changeMainTab } from '@state/tabs/actions';
 import { formatUnits } from '@ethersproject/units';
-import { useAppDispatch } from '@state/hooks';
 import LeaderboardSummary from '../leaderboard';
 import LeaderboardRules from '../rules';
 import getPositions from '../graphql/getPositions.graphql';
@@ -50,8 +46,6 @@ interface UserCompPositions {
 
 const HomeFrame = () => {
   const currentBreakPoint = useCurrentBreakpoint();
-  const history = useHistory();
-  const dispatch = useAppDispatch();
   const client = useDCAGraphql(Number(NETWORKS.polygon.chainId), POSITION_VERSION_4);
   const {
     loading: isLoadingPositions,
@@ -66,11 +60,6 @@ const HomeFrame = () => {
     },
     'positions'
   );
-
-  const onCreatePosition = () => {
-    dispatch(changeMainTab(0));
-    history.push('/create/137/0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722/');
-  };
 
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(NETWORKS.polygon.chainId);
 
@@ -313,14 +302,6 @@ const HomeFrame = () => {
                   defaultMessage="Start investing with JBRL and win amazing prices!"
                 />
               </Typography>
-            </Grid>
-            <Grid xs={12} sx={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-              <Button variant="contained" color="secondary" onClick={onCreatePosition}>
-                <FormattedMessage
-                  description="jbrlUserCompTitleCallToAction"
-                  defaultMessage="Create position and start competing"
-                />
-              </Button>
             </Grid>
             <Grid xs={12} sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
               <LeaderboardRules />
