@@ -2,54 +2,70 @@ import React from 'react';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import find from 'lodash/find';
-import { BlowfishResponse, NetworkStruct, SwapOption, SwapOptionWithTx, Token } from '@types';
+import { BlowfishResponse, SwapOptionWithTx, Token } from '@types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import findIndex from 'lodash/findIndex';
-import Button from '@common/components/button';
 import useBalance from '@hooks/useBalance';
+import Button from '@common/components/button';
 import useUsedTokens from '@hooks/useUsedTokens';
 import {
   BLOWFISH_ENABLED_CHAINS,
-  NETWORKS,
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_SWAP,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
   TRANSACTION_TYPES,
 } from '@constants';
+import Tooltip from '@mui/material/Tooltip';
+import SendIcon from '@mui/icons-material/Send';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useWalletService from '@hooks/useWalletService';
-import useWeb3Service from '@hooks/useWeb3Service';
 import useAggregatorService from '@hooks/useAggregatorService';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import TransferToModal from '@common/components/transfer-to-modal';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import TransactionSteps, { TransactionAction as TransactionStep } from '@common/components/transaction-steps';
-import { GasKeys } from '@constants/aggregator';
 import { useAppDispatch } from '@state/hooks';
 import useSimulationService from '@hooks/useSimulationService';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { setAggregatorChainId } from '@state/aggregator/actions';
 import useMeanApiService from '@hooks/useMeanApiService';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
-import useReplaceHistory from '@hooks/useReplaceHistory';
-import { setNetwork } from '@state/config/actions';
 import { addCustomToken } from '@state/token-lists/actions';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { TransactionResponse } from '@ethersproject/providers';
+import Grid from '@mui/material/Grid';
+import { resetForm, setFrom, setFromValue, setSelectedRoute, setTo, setToValue } from '@state/aggregator/actions';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { useAggregatorState } from '@state/aggregator/hooks';
+import useReplaceHistory from '@hooks/useReplaceHistory';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
 import TokenPicker from '../aggregator-token-picker';
+import SwapButton from '../swap-button';
+
+const StyledButtonContainer = styled.div`
+  display: flex;
+  flex: 1;
+  background-color: #292929;
+  position: relative;
+  padding: 16px;
+  border-radius: 8px;
+  border-top-right-radius: 0px;
+  border-top-left-radius: 0px;
+  gap: 10px;
+`;
+
+const StyledIconButton = styled(Button)`
+  border-radius: 12px;
+  min-width: 45px;
+`;
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -61,59 +77,24 @@ const StyledPaper = styled(Paper)`
   backdrop-filter: blur(6px);
 `;
 
-const StyledButton = styled(Button)`
-  padding: 10px 18px;
-  border-radius: 12px;
+const StyledGrid = styled(Grid)`
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 90;
 `;
 
 interface SwapProps {
-  from: Token | null;
-  fromValue: string;
-  isBuyOrder: boolean;
-  toValue: string;
-  to: Token | null;
-  setFrom: (from: Token) => void;
-  setTo: (to: Token) => void;
-  setFromValue: (newFromValue: string, updateMode?: boolean) => void;
-  setToValue: (newToValue: string, updateMode?: boolean) => void;
-  currentNetwork: { chainId: number; name: string };
-  selectedRoute: SwapOption | null;
   isLoadingRoute: boolean;
-  onResetForm: () => void;
-  toggleFromTo: () => void;
-  transferTo: string | null;
-  slippage: string;
-  gasSpeed: GasKeys;
-  disabledDexes: string[];
   setRefreshQuotes: (refreshQuotes: boolean) => void;
 }
 
-const Swap = ({
-  from,
-  to,
-  fromValue,
-  toValue,
-  setFrom,
-  setTo,
-  setFromValue,
-  setToValue,
-  isBuyOrder,
-  selectedRoute,
-  currentNetwork,
-  isLoadingRoute,
-  onResetForm,
-  transferTo,
-  slippage,
-  gasSpeed,
-  disabledDexes,
-  setRefreshQuotes,
-  toggleFromTo,
-}: SwapProps) => {
-  const web3Service = useWeb3Service();
+const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
   const dispatch = useAppDispatch();
+  const currentNetwork = useSelectedNetwork();
   const containerRef = React.useRef(null);
   const meanApiService = useMeanApiService();
-  const { openConnectModal } = useConnectModal();
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
@@ -132,39 +113,13 @@ const Swap = ({
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const simulationService = useSimulationService();
-  const replaceHistory = useReplaceHistory();
   const actualCurrentNetwork = useCurrentNetwork();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const trackEvent = useTrackEvent();
+  const replaceHistory = useReplaceHistory();
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
-
-  const handleChangeNetwork = (chainId: number) => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetworkAutomatically(chainId, () => {
-      const networkToSet = find(NETWORKS, { chainId });
-      dispatch(setNetwork(networkToSet as NetworkStruct));
-      if (networkToSet) {
-        web3Service.setNetwork(networkToSet?.chainId);
-      }
-    });
-    dispatch(setAggregatorChainId(chainId));
-    replaceHistory(`/swap/${chainId}`);
-    trackEvent('Aggregator - Change displayed network');
-  };
-
-  const onChangeNetwork = (chainId: number) => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId, () => {
-      const networkToSet = find(NETWORKS, { chainId });
-      replaceHistory(`/swap/${chainId}`);
-      dispatch(setNetwork(networkToSet as NetworkStruct));
-      if (networkToSet) {
-        web3Service.setNetwork(networkToSet?.chainId);
-      }
-    });
-  };
 
   const fromValueToUse =
     isBuyOrder && selectedRoute
@@ -179,6 +134,10 @@ const Swap = ({
         formatUnits(selectedRoute?.buyAmount.amount || '0', selectedRoute?.buyToken.decimals)) ||
       '0' ||
       '';
+
+  const onResetForm = () => {
+    dispatch(resetForm());
+  };
 
   const handleApproveToken = async (transactions?: TransactionStep[], amount?: BigNumber) => {
     if (!from || !to || !selectedRoute) return;
@@ -684,19 +643,27 @@ const Swap = ({
     });
   };
 
-  const handleFromValueChange = (newFromValue: string) => {
-    if (!from) return;
-    setFromValue(newFromValue, true);
-  };
-
-  const handleToValueChange = (newToValue: string) => {
-    if (!to) return;
-    setToValue(newToValue, true);
-  };
-
   const handleBackTransactionSteps = () => {
     setShouldShowSteps(false);
     setRefreshQuotes(true);
+  };
+
+  const onSetFrom = (newFrom: Token, updateMode = false) => {
+    dispatch(setSelectedRoute(null));
+    dispatch(setFromValue({ value: '', updateMode }));
+    dispatch(setFrom(newFrom));
+    replaceHistory(`/swap/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    trackEvent('Aggregator - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
+  };
+
+  const onSetTo = (newTo: Token, updateMode = false) => {
+    dispatch(setSelectedRoute(null));
+    dispatch(setToValue({ value: '', updateMode }));
+    dispatch(setTo(newTo));
+    if (from) {
+      replaceHistory(`/swap/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
+    }
+    trackEvent('Aggregator - Set to', { fromAddress: newTo?.address, toAddress: from?.address });
   };
 
   const formattedUnits =
@@ -704,7 +671,7 @@ const Swap = ({
     formatUnits(selectedRoute.maxSellAmount.amount, selectedRoute.sellToken.decimals);
 
   const cantFund =
-    from &&
+    !!from &&
     isOnCorrectNetwork &&
     !!fromValueToUse &&
     !!balance &&
@@ -715,153 +682,12 @@ const Swap = ({
     !selectedRoute ||
     (from &&
       selectedRoute &&
-      (!fromValueToUse
+      (!fromValue
         ? true
         : (allowance.allowance &&
             allowance.token.address === from.address &&
-            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValueToUse, from.decimals))) ||
+            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
-
-  const shouldDisableApproveButton =
-    !from ||
-    !to ||
-    !fromValueToUse ||
-    cantFund ||
-    !balance ||
-    !selectedRoute ||
-    balanceErrors ||
-    allowanceErrors ||
-    parseUnits(fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).lte(BigNumber.from(0)) ||
-    isLoadingRoute;
-
-  const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx || transactionWillFail;
-
-  const NoWalletButton = (
-    <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={openConnectModal}>
-      <Typography variant="body1">
-        <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
-      </Typography>
-    </StyledButton>
-  );
-
-  const IncorrectNetworkButton = (
-    <StyledButton
-      size="large"
-      color="secondary"
-      variant="contained"
-      onClick={() => onChangeNetwork(currentNetwork.chainId)}
-      fullWidth
-    >
-      <Typography variant="body1">
-        <FormattedMessage
-          description="incorrect network"
-          defaultMessage="Change network to {network}"
-          values={{ network: currentNetwork.name }}
-        />
-      </Typography>
-    </StyledButton>
-  );
-
-  const ProceedButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      disabled={!!shouldDisableApproveButton}
-      color="secondary"
-      fullWidth
-      onClick={handleMultiSteps}
-    >
-      <Typography variant="body1">
-        <FormattedMessage description="proceed agg" defaultMessage="Continue" />
-      </Typography>
-    </StyledButton>
-  );
-
-  const SwapButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      disabled={!!shouldDisableButton}
-      color="secondary"
-      fullWidth
-      onClick={() => handleSwap()}
-    >
-      {isLoadingRoute && <CenteredLoadingIndicator />}
-      {!isLoadingRoute && (
-        <Typography variant="body1">
-          {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
-            <FormattedMessage description="wrap agg" defaultMessage="Wrap" />
-          )}
-          {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
-            <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
-          )}
-          {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-            <FormattedMessage description="swap agg" defaultMessage="Swap" />
-          )}
-        </Typography>
-      )}
-    </StyledButton>
-  );
-
-  const ApproveAndSwapSafeButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      disabled={!!shouldDisableApproveButton}
-      color="secondary"
-      fullWidth
-      onClick={() => handleSafeApproveAndSwap()}
-    >
-      {isLoadingRoute && <CenteredLoadingIndicator />}
-      {!isLoadingRoute && (
-        <Typography variant="body1">
-          {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
-            <FormattedMessage
-              description="wrap agg"
-              defaultMessage="Approve {from} and wrap"
-              values={{ from: from.symbol }}
-            />
-          )}
-          {from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS && (
-            <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
-          )}
-          {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-            <FormattedMessage
-              description="approve and swap agg"
-              defaultMessage="Approve {from} and swap"
-              values={{ from: from?.symbol || '' }}
-            />
-          )}
-        </Typography>
-      )}
-    </StyledButton>
-  );
-
-  const NoFundsButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
-      <Typography variant="body1">
-        <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
-      </Typography>
-    </StyledButton>
-  );
-
-  let ButtonToShow;
-
-  if (!web3Service.getAccount()) {
-    ButtonToShow = NoWalletButton;
-  } else if (!isOnCorrectNetwork) {
-    ButtonToShow = IncorrectNetworkButton;
-  } else if (cantFund) {
-    ButtonToShow = NoFundsButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to && loadedAsSafeApp) {
-    ButtonToShow = ApproveAndSwapSafeButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
-    ButtonToShow = ProceedButton;
-  } else {
-    ButtonToShow = SwapButton;
-  }
 
   return (
     <>
@@ -888,38 +714,70 @@ const Swap = ({
           shouldShow={shouldShowPicker}
           onClose={() => setShouldShowPicker(false)}
           isFrom={selecting === from}
-          onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? setFrom : setTo}
+          onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
           usedTokens={usedTokens}
           ignoreValues={[]}
           yieldOptions={[]}
           isLoadingYieldOptions={false}
           onAddToken={addCustomTokenToList}
         />
-        <SwapFirstStep
-          from={from}
-          to={to}
-          setTransactionWillFail={setTransactionWillFail}
-          disabledDexes={disabledDexes}
-          onChangeNetwork={handleChangeNetwork}
-          fromValue={fromValueToUse}
-          toValue={toValueToUse}
-          toggleFromTo={toggleFromTo}
-          startSelectingCoin={startSelectingCoin}
-          cantFund={cantFund}
-          handleFromValueChange={handleFromValueChange}
-          handleToValueChange={handleToValueChange}
-          balance={balance}
-          buttonToShow={ButtonToShow}
-          selectedRoute={selectedRoute}
-          isBuyOrder={isBuyOrder}
-          isLoadingRoute={isLoadingRoute}
-          transferTo={transferTo}
-          onOpenTransferTo={() => setShouldShowTransferModal(true)}
-          onShowSettings={() => setShouldShowSettings(true)}
-          slippage={slippage}
-          gasSpeed={gasSpeed}
-          isApproved={isApproved}
-        />
+        <StyledGrid container rowSpacing={2}>
+          <Grid item xs={12}>
+            <SwapFirstStep
+              from={from}
+              to={to}
+              setTransactionWillFail={setTransactionWillFail}
+              toValue={toValueToUse}
+              startSelectingCoin={startSelectingCoin}
+              cantFund={cantFund}
+              balance={balance}
+              selectedRoute={selectedRoute}
+              isBuyOrder={isBuyOrder}
+              isLoadingRoute={isLoadingRoute}
+              transferTo={transferTo}
+              onOpenTransferTo={() => setShouldShowTransferModal(true)}
+              onShowSettings={() => setShouldShowSettings(true)}
+              isApproved={isApproved}
+              fromValue={fromValue}
+            />
+            <StyledButtonContainer>
+              <SwapButton
+                cantFund={cantFund}
+                fromValue={fromValueToUse}
+                isApproved={isApproved}
+                allowanceErrors={allowanceErrors}
+                balance={balance}
+                balanceErrors={balanceErrors}
+                isLoadingRoute={isLoadingRoute}
+                transactionWillFail={transactionWillFail}
+                handleMultiSteps={handleMultiSteps}
+                handleSwap={handleSwap}
+                handleSafeApproveAndSwap={handleSafeApproveAndSwap}
+              />
+              {!transferTo && (
+                <StyledIconButton
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  onClick={() => setShouldShowTransferModal(true)}
+                >
+                  <Tooltip
+                    title={
+                      <FormattedMessage
+                        description="tranferToTooltip"
+                        defaultMessage="Swap and transfer to another address"
+                      />
+                    }
+                    arrow
+                    placement="top"
+                  >
+                    <SendIcon fontSize="inherit" />
+                  </Tooltip>
+                </StyledIconButton>
+              )}
+            </StyledButtonContainer>
+          </Grid>
+        </StyledGrid>
       </StyledPaper>
     </>
   );
