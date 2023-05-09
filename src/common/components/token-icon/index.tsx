@@ -52,6 +52,7 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
         height={realSize}
         width={realSize}
         alt={token?.symbol}
+        style={{ borderRadius: '50%' }}
         className={isInChip ? 'MuiChip-icon' : ''}
       />
     );

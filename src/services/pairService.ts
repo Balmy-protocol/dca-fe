@@ -3,8 +3,6 @@ import findIndex from 'lodash/findIndex';
 import {
   Token,
   AvailablePairs,
-  PoolLiquidityData,
-  PoolsLiquidityDataGraphqlResponse,
   Oracles,
   AvailablePairsGraphqlResponse,
   AvailablePairResponse,
@@ -25,7 +23,6 @@ import {
 import { BigNumber } from 'ethers';
 
 // GQL queries
-import GET_PAIR_LIQUIDITY from '@graphql/getPairLiquidity.graphql';
 import GET_AVAILABLE_PAIRS from '@graphql/getAvailablePairs.graphql';
 import gqlFetchAll from '@common/utils/gqlFetchAll';
 
@@ -52,8 +49,6 @@ export default class PairService {
 
   meanApiService: MeanApiService;
 
-  uniClient: Record<PositionVersions, Record<number, GraphqlService>>;
-
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
   hasFetchedAvailablePairs: boolean;
@@ -63,8 +58,7 @@ export default class PairService {
     contractService: ContractService,
     meanApiService: MeanApiService,
     providerService: ProviderService,
-    DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
-    UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>
+    DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
@@ -74,9 +68,6 @@ export default class PairService {
     this.allowedPairs = [];
     this.hasFetchedAvailablePairs = false;
 
-    if (UNISubgraphs) {
-      this.uniClient = UNISubgraphs;
-    }
     if (DCASubgraphs) {
       this.apolloClient = DCASubgraphs;
     }
@@ -251,42 +242,6 @@ export default class PairService {
     }
 
     return oracleInUse;
-  }
-
-  async getPairLiquidity(token0: Token, token1: Token) {
-    let tokenA;
-    let tokenB;
-    const currentNetwork = await this.providerService.getNetwork();
-    if (token0.address < token1.address) {
-      tokenA = token0.address;
-      tokenB = token1.address;
-    } else {
-      tokenA = token1.address;
-      tokenB = token0.address;
-    }
-    const poolsWithLiquidityResponse = await gqlFetchAll<PoolsLiquidityDataGraphqlResponse>(
-      this.uniClient[LATEST_VERSION][currentNetwork.chainId].getClient(),
-      GET_PAIR_LIQUIDITY,
-      {
-        tokenA,
-        tokenB,
-      },
-      'pools'
-    );
-
-    let liquidity = 0;
-    if (poolsWithLiquidityResponse.data) {
-      liquidity = poolsWithLiquidityResponse.data.pools.reduce((acc: number, pool: PoolLiquidityData) => {
-        pool.poolHourData.forEach((hourData) => {
-          // eslint-disable-next-line no-param-reassign
-          acc += parseFloat(hourData.volumeUSD);
-        });
-
-        return acc;
-      }, 0);
-    }
-
-    return liquidity;
   }
 
   async canSupportPair(tokenFrom: Token, tokenTo: Token) {

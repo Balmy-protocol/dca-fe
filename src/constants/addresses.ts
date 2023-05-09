@@ -94,7 +94,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   },
   bsc: {
     chainId: 56,
-    name: 'BSC',
+    name: 'BNB',
     mainCurrency: 'BNB',
     nativeCurrency: {
       name: 'BNB',
@@ -311,6 +311,7 @@ export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.mainnet.chainId,
+  NETWORKS.bsc.chainId,
 ];
 export const SUPPORTED_NETWORKS = [
   NETWORKS.mainnet.chainId,
@@ -329,6 +330,7 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.optimism.chainId,
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
+  NETWORKS.bsc.chainId,
 ];
 
 export const COINGECKO_IDS = {
@@ -343,6 +345,7 @@ export const COINGECKO_IDS = {
   [NETWORKS.optimismKovan.chainId]: 'optimistic-ethereum',
   [NETWORKS.mumbai.chainId]: 'mumbai',
   [NETWORKS.arbitrum.chainId]: 'arbitrum-one',
+  [NETWORKS.bsc.chainId]: 'binance-smart-chain',
 };
 
 // export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
@@ -351,6 +354,7 @@ export const NETWORKS_FOR_MENU = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.mainnet.chainId,
+  NETWORKS.bsc.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
@@ -385,6 +389,7 @@ export const HUB_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.arbitrum.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.mainnet.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
+    [NETWORKS.bsc.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
   },
 };
 
@@ -403,6 +408,7 @@ export const ORACLE_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: '0x9e1ca4Cd00ED059C5d34204DCe622549583545d9',
     [NETWORKS.arbitrum.chainId]: '0x9e1ca4Cd00ED059C5d34204DCe622549583545d9',
     [NETWORKS.mainnet.chainId]: '0x9e1ca4Cd00ED059C5d34204DCe622549583545d9',
+    [NETWORKS.bsc.chainId]: '0x9e1ca4Cd00ED059C5d34204DCe622549583545d9',
   },
 };
 
@@ -429,6 +435,7 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
     [NETWORKS.arbitrum.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
     [NETWORKS.mainnet.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
+    [NETWORKS.bsc.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
   },
 };
 
@@ -463,6 +470,7 @@ export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.arbitrum.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.mainnet.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
+    [NETWORKS.bsc.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
   },
 };
 
@@ -481,6 +489,7 @@ export const CHAINLINK_ORACLE_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: '0x5587d300d41E418B3F4DC7c273351748a116d78B',
     [NETWORKS.arbitrum.chainId]: '0x5587d300d41E418B3F4DC7c273351748a116d78B',
     [NETWORKS.mainnet.chainId]: '0x5587d300d41E418B3F4DC7c273351748a116d78B',
+    [NETWORKS.bsc.chainId]: '0x5587d300d41E418B3F4DC7c273351748a116d78B',
   },
 };
 
@@ -499,6 +508,7 @@ export const UNISWAP_ORACLE_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: '0xD741623299413d02256aAC2101f8B30873fED1d2',
     [NETWORKS.arbitrum.chainId]: '0xD741623299413d02256aAC2101f8B30873fED1d2',
     [NETWORKS.mainnet.chainId]: '0xD741623299413d02256aAC2101f8B30873fED1d2',
+    [NETWORKS.bsc.chainId]: '0xD741623299413d02256aAC2101f8B30873fED1d2',
   },
 };
 
@@ -525,6 +535,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.arbitrum.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.mainnet.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
+    [NETWORKS.bsc.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
   },
 };
 
@@ -537,6 +548,7 @@ export const TRANSFORMER_REGISTRY_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: '0xC0136591Df365611B1452B5F8823dEF69Ff3A685',
     [NETWORKS.arbitrum.chainId]: '0xC0136591Df365611B1452B5F8823dEF69Ff3A685',
     [NETWORKS.mainnet.chainId]: '0xC0136591Df365611B1452B5F8823dEF69Ff3A685',
+    [NETWORKS.bsc.chainId]: '0xC0136591Df365611B1452B5F8823dEF69Ff3A685',
   },
 };
 
@@ -551,6 +563,7 @@ export const MULTICALL_ADDRESS: Record<number, string> = {
   [NETWORKS.polygon.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.arbitrum.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.mainnet.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [NETWORKS.bsc.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
 export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
@@ -570,26 +583,8 @@ export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-optimism',
     [NETWORKS.arbitrum.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-arbitrum',
     [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-ethereum',
-  },
-};
-
-export const UNI_GRAPHQL_URL: AddressMap<PositionVersions> = {
-  [POSITION_VERSION_1]: {},
-  [POSITION_VERSION_2]: {},
-  [POSITION_VERSION_3]: {
-    [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/fibofinance/uniswap-v3-kovan',
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
-    [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon',
-    [NETWORKS.arbitrum.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-dev',
-  },
-  [POSITION_VERSION_4]: {
-    [NETWORKS.kovan.chainId]: 'https://api.thegraph.com/subgraphs/name/fibofinance/uniswap-v3-kovan',
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
-    [NETWORKS.mumbai.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis',
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon',
-    [NETWORKS.arbitrum.chainId]: 'https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-dev',
-    [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+    [NETWORKS.bsc.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-ethereum',
+    [NETWORKS.bsc.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-bnb',
   },
 };
 
