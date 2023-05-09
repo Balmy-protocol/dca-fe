@@ -16,7 +16,7 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import confetti from 'canvas-confetti';
 import useAggregatorService from '@hooks/useAggregatorService';
 import useWalletService from '@hooks/useWalletService';
-import { SwapTypeData, Token } from '@types';
+import { Token, TransactionTypes } from '@types';
 import { BigNumber } from 'ethers';
 import TokenIcon from '@common/components/token-icon';
 import { Divider } from '@mui/material';
@@ -209,9 +209,12 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
         clearTimeout(timerRef.current);
       }
 
-      if (from?.address === PROTOCOL_TOKEN_ADDRESS || to?.address === PROTOCOL_TOKEN_ADDRESS) {
+      if (
+        (from?.address === PROTOCOL_TOKEN_ADDRESS || to?.address === PROTOCOL_TOKEN_ADDRESS) &&
+        transactionReceipt?.type === TransactionTypes.swap
+      ) {
         walletService
-          .getBalance(PROTOCOL_TOKEN_ADDRESS, (transactionReceipt?.typeData as SwapTypeData).transferTo || undefined)
+          .getBalance(PROTOCOL_TOKEN_ADDRESS, transactionReceipt?.typeData.transferTo || undefined)
           .then((newBalance) => setBalanceAfter(newBalance))
           .catch((e) => console.error('Error fetching balance after swap', e));
       }
@@ -227,10 +230,14 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
   let sentFrom: BigNumber | null = null;
   let gotTo: BigNumber | null = null;
   let gasUsed: BigNumber | null = null;
-  const transferTo: string | undefined | null =
-    transactionReceipt?.typeData && (transactionReceipt.typeData as SwapTypeData).transferTo;
-  if (transactionReceipt?.receipt && to && from) {
-    const { balanceBefore } = transactionReceipt.typeData as SwapTypeData;
+  let typeData;
+
+  if (transactionReceipt?.type === TransactionTypes.swap) {
+    typeData = transactionReceipt.typeData;
+  }
+  const transferTo: string | undefined | null = typeData?.transferTo;
+  if (transactionReceipt?.receipt && to && from && typeData) {
+    const { balanceBefore } = typeData;
 
     gasUsed = BigNumber.from(transactionReceipt.receipt.gasUsed).mul(
       BigNumber.from(transactionReceipt.receipt.effectiveGasPrice)

@@ -2,7 +2,17 @@ import React from 'react';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { BlowfishResponse, SwapOptionWithTx, Token } from '@types';
+import {
+  ApproveTokenExactTypeData,
+  ApproveTokenTypeData,
+  BlowfishResponse,
+  SwapOptionWithTx,
+  SwapTypeData,
+  Token,
+  TransactionTypes,
+  UnwrapTypeData,
+  WrapTypeData,
+} from '@types';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import findIndex from 'lodash/findIndex';
@@ -15,7 +25,6 @@ import {
   TRANSACTION_ACTION_SWAP,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
-  TRANSACTION_TYPES,
 } from '@constants';
 import Tooltip from '@mui/material/Tooltip';
 import SendIcon from '@mui/icons-material/Send';
@@ -165,14 +174,27 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
         fromSteps: !!transactions?.length,
       });
 
-      addTransaction(result, {
-        type: amount ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
-        typeData: {
-          token: from,
-          addressFor: selectedRoute.swapper.allowanceTarget,
-          ...(!!amount && { amount: amount.toString() }),
-        },
-      });
+      const transactionTypeDataBase = {
+        token: from,
+        addressFor: selectedRoute.swapper.allowanceTarget,
+      };
+
+      let transactionTypeData: ApproveTokenExactTypeData | ApproveTokenTypeData = {
+        type: TransactionTypes.approveToken,
+        typeData: transactionTypeDataBase,
+      };
+
+      if (amount) {
+        transactionTypeData = {
+          type: TransactionTypes.approveTokenExact,
+          typeData: {
+            ...transactionTypeDataBase,
+            amount: amount.toString(),
+          },
+        };
+      }
+
+      addTransaction(result, transactionTypeData);
 
       setModalClosed({ content: '' });
 
@@ -288,25 +310,33 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
         console.error('Error tracking through mixpanel', e);
       }
 
-      let transactionType = TRANSACTION_TYPES.SWAP;
+      const baseTransactionData = {
+        from: fromSymbol,
+        to: toSymbol,
+        amountFrom: fromAmount,
+        amountTo: toAmount,
+        balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
+        transferTo,
+      };
+
+      let transactionTypeData: SwapTypeData | WrapTypeData | UnwrapTypeData = {
+        type: TransactionTypes.swap,
+        typeData: baseTransactionData,
+      };
 
       if (isWrap) {
-        transactionType = TRANSACTION_TYPES.WRAP;
+        transactionTypeData = {
+          type: TransactionTypes.wrap,
+          typeData: baseTransactionData,
+        };
       } else if (isUnwrap) {
-        transactionType = TRANSACTION_TYPES.UNWRAP;
+        transactionTypeData = {
+          type: TransactionTypes.unwrap,
+          typeData: baseTransactionData,
+        };
       }
 
-      addTransaction(result, {
-        type: transactionType,
-        typeData: {
-          from: fromSymbol,
-          to: toSymbol,
-          amountFrom: fromAmount,
-          amountTo: toAmount,
-          balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
-          transferTo,
-        },
-      });
+      addTransaction(result, transactionTypeData);
 
       setModalClosed({ content: '' });
       setCurrentTransaction(result.hash);
@@ -419,29 +449,36 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
         console.error('Error tracking through mixpanel', e);
       }
 
-      let transactionType = TRANSACTION_TYPES.SWAP;
+      const baseTransactionData = {
+        from: fromSymbol,
+        to: toSymbol,
+        amountFrom: fromAmount,
+        amountTo: toAmount,
+        balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
+        transferTo,
+      };
+      let transactionTypeData: SwapTypeData | WrapTypeData | UnwrapTypeData = {
+        type: TransactionTypes.swap,
+        typeData: baseTransactionData,
+      };
 
       if (isWrap) {
-        transactionType = TRANSACTION_TYPES.WRAP;
+        transactionTypeData = {
+          type: TransactionTypes.wrap,
+          typeData: baseTransactionData,
+        };
       } else if (isUnwrap) {
-        transactionType = TRANSACTION_TYPES.UNWRAP;
+        transactionTypeData = {
+          type: TransactionTypes.unwrap,
+          typeData: baseTransactionData,
+        };
       }
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       result.hash = result.safeTxHash;
 
-      addTransaction(result as unknown as TransactionResponse, {
-        type: transactionType,
-        typeData: {
-          from: fromSymbol,
-          to: toSymbol,
-          amountFrom: fromAmount,
-          amountTo: toAmount,
-          balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
-          transferTo,
-        },
-      });
+      addTransaction(result as unknown as TransactionResponse, transactionTypeData);
 
       setModalClosed({ content: '' });
       setCurrentTransaction(result.safeTxHash);

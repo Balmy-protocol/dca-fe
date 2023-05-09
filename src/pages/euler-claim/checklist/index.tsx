@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Position } from '@types';
+import { Position, TransactionTypes } from '@types';
 import find from 'lodash/find';
 import Button from '@common/components/button';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
@@ -21,7 +21,7 @@ import usePositionService from '@hooks/usePositionService';
 import useTransactionModal from '@hooks/useTransactionModal';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS, PERMISSIONS, TRANSACTION_TYPES } from '@constants';
+import { EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS, PERMISSIONS } from '@constants';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import useContractService from '@hooks/useContractService';
@@ -272,7 +272,7 @@ const ClaimChecklist = ({
       trackEvent('Euler claim - Terminate many submitted');
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.EULER_CLAIM_TERMINATE_MANY,
+        type: TransactionTypes.eulerClaimTerminateMany,
         typeData: {
           id: result.hash,
           positionIds: positions.map((position) => position.id),
@@ -361,7 +361,7 @@ const ClaimChecklist = ({
       trackEvent('Euler claim - Permit many submitted');
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.EULER_CLAIM_PERMIT_MANY,
+        type: TransactionTypes.eulerClaimPermitMany,
         typeData: {
           id: result.hash,
           positionIds: positions.map((position) => position.id),

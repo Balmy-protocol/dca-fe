@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
-import { FullPosition } from '@types';
+import { FullPosition, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { TRANSACTION_TYPES } from '@constants';
 import TextField from '@mui/material/TextField';
 import usePositionService from '@hooks/usePositionService';
 import { fullPositionToMappedPosition } from '@common/utils/parsing';
@@ -65,7 +64,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       trackEvent('DCA - Transfer position submitting');
       const result = await positionService.transfer(fullPositionToMappedPosition(position), toAddress);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.TRANSFER_POSITION,
+        type: TransactionTypes.transferPosition,
         typeData: {
           id: fullPositionToMappedPosition(position).id,
           from: position.from.symbol,

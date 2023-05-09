@@ -2,7 +2,7 @@ import React from 'react';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { Token, YieldOptions } from '@types';
+import { Token, YieldOptions, TransactionTypes, ApproveTokenExactTypeData, ApproveTokenTypeData } from '@types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import TokenPicker from '@pages/dca/components/dca-token-picker';
@@ -13,7 +13,6 @@ import useUsedTokens from '@hooks/useUsedTokens';
 import StalePairModal from '@pages/dca/components/stale-pair-modal';
 import {
   POSSIBLE_ACTIONS,
-  TRANSACTION_TYPES,
   WHALE_MODE_FREQUENCIES,
   NETWORKS,
   LATEST_VERSION,
@@ -263,14 +262,28 @@ const Swap = ({
           ? await contractService.getHUBCompanionAddress()
           : await contractService.getHUBAddress();
       trackEvent('DCA - Approve token submitted');
-      addTransaction(result, {
-        type: amount ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
-        typeData: {
-          token: from,
-          addressFor: hubAddress,
-          ...(!!amount && { amount: amount.toString() }),
-        },
-      });
+
+      const transactionTypeDataBase = {
+        token: from,
+        addressFor: hubAddress,
+      };
+
+      let transactionTypeData: ApproveTokenExactTypeData | ApproveTokenTypeData = {
+        type: TransactionTypes.approveToken,
+        typeData: transactionTypeDataBase,
+      };
+
+      if (amount) {
+        transactionTypeData = {
+          type: TransactionTypes.approveTokenExact,
+          typeData: {
+            ...transactionTypeDataBase,
+            amount: amount.toString(),
+          },
+        };
+      }
+
+      addTransaction(result, transactionTypeData);
       setModalSuccess({
         hash: result.hash,
         content: (
@@ -333,7 +346,7 @@ const Swap = ({
       const companionAddress = await contractService.getHUBCompanionAddress();
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.NEW_POSITION,
+        type: TransactionTypes.newPosition,
         typeData: {
           from,
           to,
@@ -424,7 +437,7 @@ const Swap = ({
       result.hash = result.safeTxHash;
 
       addTransaction(result as unknown as TransactionResponse, {
-        type: TRANSACTION_TYPES.NEW_POSITION,
+        type: TransactionTypes.newPosition,
         typeData: {
           from,
           to,
