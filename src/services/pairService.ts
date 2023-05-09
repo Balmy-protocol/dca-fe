@@ -142,7 +142,7 @@ export default class PairService {
   }
 
   // PAIR METHODS
-  addNewPair(tokenA: Token, tokenB: Token, oracle: Oracles, frequencyType: BigNumber) {
+  addNewPair(tokenA: Token, tokenB: Token, frequencyType: BigNumber) {
     const [token0, token1] = sortTokens(tokenA, tokenB);
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

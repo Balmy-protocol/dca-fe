@@ -1,9 +1,9 @@
 import React from 'react';
-import { EULER_CLAIM_MIGRATORS_ADDRESSES, TRANSACTION_TYPES } from '@constants';
+import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 import Button from '@common/components/button';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import styled from 'styled-components';
-import { EulerClaimContract, Token } from '@types';
+import { EulerClaimContract, Token, TransactionTypes } from '@types';
 import { BigNumber, Contract } from 'ethers';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -80,7 +80,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
       trackEvent('Euler claim - Claim token submitted');
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.EULER_CLAIM_CLAIM_FROM_MIGRATOR,
+        type: TransactionTypes.eulerClaimClaimFromMigrator,
         typeData: {
           token,
           id: result.hash,

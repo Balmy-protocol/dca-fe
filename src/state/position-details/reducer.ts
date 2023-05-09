@@ -1,18 +1,8 @@
 import { parseUnits } from '@ethersproject/units';
 import { createReducer } from '@reduxjs/toolkit';
-import { LATEST_VERSION, POSITION_ACTIONS, TRANSACTION_TYPES } from '@constants';
+import { LATEST_VERSION, POSITION_ACTIONS } from '@constants';
 import { BigNumber } from 'ethers';
-import {
-  AddFundsTypeData,
-  FullPosition,
-  ModifyRateAndSwapsPositionTypeData,
-  ModifySwapsPositionTypeData,
-  RemoveFundsTypeData,
-  ResetPositionTypeData,
-  TerminatePositionTypeData,
-  TransferTypeData,
-  WithdrawTypeData,
-} from '@types';
+import { FullPosition, TransactionTypes } from '@types';
 import { setPosition, updatePosition, updateShowBreakdown } from './actions';
 
 export interface PositionDetailsState {
@@ -50,7 +40,7 @@ export default createReducer(initialState, (builder) =>
       const history = [...state.position.history];
 
       switch (transaction.type) {
-        case TRANSACTION_TYPES.TERMINATE_POSITION: {
+        case TransactionTypes.terminatePosition: {
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.TERMINATED,
@@ -82,10 +72,10 @@ export default createReducer(initialState, (builder) =>
               hash: transaction.hash,
               timestamp: (Date.now() / 1000).toString(),
             },
-            withdrawnSwapped: (transaction.typeData as TerminatePositionTypeData).toWithdraw,
-            withdrawnSwappedUnderlying: (transaction.typeData as TerminatePositionTypeData).toWithdraw,
-            withdrawnRemaining: (transaction.typeData as TerminatePositionTypeData).remainingLiquidity,
-            withdrawnRemainingUnderlying: (transaction.typeData as TerminatePositionTypeData).remainingLiquidity,
+            withdrawnSwapped: transaction.typeData.toWithdraw,
+            withdrawnSwappedUnderlying: transaction.typeData.toWithdraw,
+            withdrawnRemaining: transaction.typeData.remainingLiquidity,
+            withdrawnRemainingUnderlying: transaction.typeData.remainingLiquidity,
           });
           position = {
             ...position,
@@ -96,53 +86,7 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
-        case TRANSACTION_TYPES.MIGRATE_POSITION: {
-          history.push({
-            id: transaction.hash,
-            action: POSITION_ACTIONS.TERMINATED,
-            rate: position.rate,
-            oldRate: position.rate,
-            from: position.user,
-            to: position.user,
-            remainingSwaps: position.remainingSwaps,
-            oldRemainingSwaps: position.remainingSwaps,
-            swapped: '0',
-            withdrawn: position.withdrawn,
-            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
-            withdrawnUnderlyingAccum: null,
-            swappedUnderlying: '0',
-            permissions: [],
-            rateUnderlying: position.rate,
-            depositedRateUnderlying: position.rate,
-            pairSwap: {
-              ratioUnderlyingBToA: '1',
-              ratioUnderlyingAToB: '1',
-              ratioUnderlyingAToBWithFee: '1',
-              ratioUnderlyingBToAWithFee: '1',
-            },
-            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
-            createdAtTimestamp: (Date.now() / 1000).toString(),
-            transaction: {
-              id: transaction.hash,
-              hash: transaction.hash,
-              timestamp: (Date.now() / 1000).toString(),
-            },
-            withdrawnSwapped: '0',
-            withdrawnSwappedUnderlying: '0',
-            withdrawnRemaining: '0',
-            withdrawnRemainingUnderlying: '0',
-          });
-          position = {
-            ...position,
-            status: 'TERMINATED',
-            toWithdraw: BigNumber.from(0).toString(),
-            remainingLiquidity: BigNumber.from(0).toString(),
-            remainingSwaps: BigNumber.from(0).toString(),
-          };
-          break;
-        }
-        case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
+        case TransactionTypes.migratePosition: {
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.TERMINATED,
@@ -188,7 +132,53 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
-        case TRANSACTION_TYPES.WITHDRAW_POSITION: {
+        case TransactionTypes.migratePositionYield: {
+          history.push({
+            id: transaction.hash,
+            action: POSITION_ACTIONS.TERMINATED,
+            rate: position.rate,
+            oldRate: position.rate,
+            from: position.user,
+            to: position.user,
+            remainingSwaps: position.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
+            swapped: '0',
+            withdrawn: position.withdrawn,
+            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
+            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
+            swappedUnderlying: '0',
+            permissions: [],
+            rateUnderlying: position.rate,
+            depositedRateUnderlying: position.rate,
+            pairSwap: {
+              ratioUnderlyingBToA: '1',
+              ratioUnderlyingAToB: '1',
+              ratioUnderlyingAToBWithFee: '1',
+              ratioUnderlyingBToAWithFee: '1',
+            },
+            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
+            createdAtTimestamp: (Date.now() / 1000).toString(),
+            transaction: {
+              id: transaction.hash,
+              hash: transaction.hash,
+              timestamp: (Date.now() / 1000).toString(),
+            },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
+          });
+          position = {
+            ...position,
+            status: 'TERMINATED',
+            toWithdraw: BigNumber.from(0).toString(),
+            remainingLiquidity: BigNumber.from(0).toString(),
+            remainingSwaps: BigNumber.from(0).toString(),
+          };
+          break;
+        }
+        case TransactionTypes.withdrawPosition: {
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.WITHDREW,
@@ -201,7 +191,7 @@ export default createReducer(initialState, (builder) =>
             swapped: '0',
             withdrawn: position.toWithdraw,
             oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: (transaction.typeData as WithdrawTypeData).withdrawnUnderlying || position.toWithdraw,
+            withdrawnUnderlying: transaction.typeData.withdrawnUnderlying || position.toWithdraw,
             withdrawnUnderlyingAccum: position.toWithdrawUnderlyingAccum,
             swappedUnderlying: '0',
             permissions: [],
@@ -234,8 +224,8 @@ export default createReducer(initialState, (builder) =>
 
           break;
         }
-        case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
-          const addFundsTypeData = transaction.typeData as AddFundsTypeData;
+        case TransactionTypes.addFundsPosition: {
+          const addFundsTypeData = transaction.typeData;
           const newRemainingLiquidity = BigNumber.from(position.remainingLiquidity).add(
             parseUnits(addFundsTypeData.newFunds, addFundsTypeData.decimals)
           );
@@ -285,8 +275,8 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
-        case TRANSACTION_TYPES.RESET_POSITION: {
-          const resetPositionTypeData = transaction.typeData as ResetPositionTypeData;
+        case TransactionTypes.resetPosition: {
+          const resetPositionTypeData = transaction.typeData;
           const resetPositionSwapDifference = BigNumber.from(resetPositionTypeData.newSwaps).lt(
             BigNumber.from(position.remainingSwaps)
           )
@@ -348,8 +338,8 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
-        case TRANSACTION_TYPES.REMOVE_FUNDS: {
-          const removeFundsTypeData = transaction.typeData as RemoveFundsTypeData;
+        case TransactionTypes.removeFunds: {
+          const removeFundsTypeData = transaction.typeData;
           const removeFundsDifference = parseUnits(
             removeFundsTypeData.ammountToRemove,
             removeFundsTypeData.decimals
@@ -419,8 +409,8 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
-        case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION: {
-          const modifySwapsPositionTypeData = transaction.typeData as ModifySwapsPositionTypeData;
+        case TransactionTypes.modifySwapsPosition: {
+          const modifySwapsPositionTypeData = transaction.typeData;
           const newRemainingSwaps = BigNumber.from(modifySwapsPositionTypeData.newSwaps);
 
           const newRate = BigNumber.from(position.remainingLiquidity).div(newRemainingSwaps).toString();
@@ -469,8 +459,8 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
-        case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
-          const modifyRateAndSwapsPositionTypeData = transaction.typeData as ModifyRateAndSwapsPositionTypeData;
+        case TransactionTypes.modifyRateAndSwapsPosition: {
+          const modifyRateAndSwapsPositionTypeData = transaction.typeData;
           const modifiedRateAndSwapsSwapDifference = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
             BigNumber.from(position.remainingSwaps)
           )
@@ -536,7 +526,7 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
-        case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
+        case TransactionTypes.withdrawFunds: {
           history.push({
             id: transaction.hash,
             action: POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
@@ -583,8 +573,8 @@ export default createReducer(initialState, (builder) =>
           };
           break;
         }
-        case TRANSACTION_TYPES.TRANSFER_POSITION: {
-          const transferPositionTypeData = transaction.typeData as TransferTypeData;
+        case TransactionTypes.transferPosition: {
+          const transferPositionTypeData = transaction.typeData;
 
           history.push({
             id: transaction.hash,

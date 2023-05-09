@@ -6,10 +6,10 @@ import EmptyPositions from '@pages/dca/components/empty-positions';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
-import { ChainId, Position, YieldOptions } from '@types';
+import { ChainId, Position, YieldOptions, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { ModeTypesIds, PERMISSIONS, SUPPORTED_NETWORKS, TRANSACTION_TYPES } from '@constants';
+import { ModeTypesIds, PERMISSIONS, SUPPORTED_NETWORKS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
@@ -134,8 +134,11 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
 
       const result = await positionService.withdraw(position, useProtocolToken);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.WITHDRAW_POSITION,
-        typeData: { id: position.id, withdrawnUnderlying: position.toWithdrawUnderlying?.toString() },
+        type: TransactionTypes.withdrawPosition,
+        typeData: {
+          id: position.id,
+          withdrawnUnderlying: position.toWithdrawUnderlying && position.toWithdrawUnderlying.toString(),
+        },
         position,
       });
       setModalSuccess({
