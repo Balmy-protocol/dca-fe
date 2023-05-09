@@ -14,7 +14,6 @@ export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
 export const DISABLED_YIELDS = [
   '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11', // POLYGON - CRV
   '0x1dd5629903441b2dd0d03f76ec7673add920e765', // POLYGON - jEUR
-  '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // POLYGON - MaticX
   '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // ETH - USDC. Euler. Disabled due to hack.
   '0xd4de9d2fc1607d1df63e1c95ecbfa8d7946f5457', // ETH - WETH. Euler. Disabled due to hack.
   '0xc4113b7605d691e073c162809060b6c5ae402f1e', // ETH - DAI. Euler. Disabled due to hack.
