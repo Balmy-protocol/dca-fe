@@ -6,12 +6,12 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { NetworkStruct, Position, Token, YieldOptions } from '@types';
 import {
-  TOKEN_BLACKLIST,
   NETWORKS,
   OLD_VERSIONS,
   VERSIONS_ALLOWED_MODIFY,
   shouldEnableFrequency,
   DISABLED_YIELD_WITHDRAWS,
+  DCA_TOKEN_BLACKLIST,
 } from '@constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
@@ -208,8 +208,8 @@ const PositionControls = ({
 
   const disabledIncrease =
     disabled ||
-    TOKEN_BLACKLIST.includes(position.from.address) ||
-    TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
+    DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
+    DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),
       position.from.address,

@@ -5,7 +5,13 @@ import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, NetworkStruct, YieldOptions } from '@types';
-import { TOKEN_BLACKLIST, NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY, shouldEnableFrequency } from '@constants';
+import {
+  DCA_TOKEN_BLACKLIST,
+  NETWORKS,
+  OLD_VERSIONS,
+  VERSIONS_ALLOWED_MODIFY,
+  shouldEnableFrequency,
+} from '@constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -137,9 +143,9 @@ const PositionDataControls = ({
 
   const disabledIncrease =
     disabled ||
-    TOKEN_BLACKLIST.includes(position.from.address) ||
-    TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
-    TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') ||
+    DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
+    DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
+    DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.interval,
       position.from.address,
