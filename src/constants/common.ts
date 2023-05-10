@@ -59,6 +59,10 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 };
 
 export const TOKEN_BLACKLIST = [
+  '0x2e9a6df78e42a30712c10a9dc4b1c8656f8f2879', // ARBITRUM - Malicious MKR
+];
+
+export const DCA_TOKEN_BLACKLIST = [
   '0x5fe2b58c013d7601147dcdd68c143a77499f5531', // POLY - GRT
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // POLY - SNX
   '0x65559aa14915a70190438ef90104769e5e890a00', // OE - ENS
@@ -88,11 +92,8 @@ export const TOKEN_BLACKLIST = [
   '0x1622bf67e6e5747b81866fe0b85178a93c7f86e3', // ARBI - UMAMI
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
   '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97', // OP - STG
-
-  '0x2e9a6df78e42a30712c10a9dc4b1c8656f8f2879', // ARBITRUM - Malicious MKR
-  '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
-  '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
   '0x18c46621af7cbcdf58b155517d22b4ae7c5f2cd1', // POLY - wstEth Aave
+  '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
