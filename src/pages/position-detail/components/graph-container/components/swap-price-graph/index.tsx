@@ -177,7 +177,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
 
         const index = findIndex(mergedMap, (item) => !!(item as { swap: number }).swap);
 
-        setPrices(mergedMap.slice(index - 1));
+        setPrices(mergedMap.slice((index || 1) - 1));
       } finally {
         setIsLoadingPrices(false);
         setHasLoadedPrices(true);
