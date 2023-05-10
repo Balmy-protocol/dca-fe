@@ -23,6 +23,7 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
 import TokenIcon from '@common/components/token-icon';
 import { toToken } from '@common/utils/currency';
+import Address from '@common/components/address';
 import MinimalTimeline from './components/minimal-timeline';
 
 const StyledLink = styled(Link)`
@@ -136,7 +137,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
           </StyledRecentTransactionsTitleContainer>
           <StyledAccount>
             <Typography variant="subtitle1" fontWeight={500}>
-              {account}
+              <Address address={account} trimAddress trimSize={10} />
             </Typography>
           </StyledAccount>
           <StyledLink

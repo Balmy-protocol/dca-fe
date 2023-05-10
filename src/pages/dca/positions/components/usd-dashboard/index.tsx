@@ -26,11 +26,12 @@ import { usdFormatter } from '@common/utils/parsing';
 import { Hidden } from '@mui/material';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@hooks/state';
+import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import { changeMainTab } from '@state/tabs/actions';
 import DashboardPopper from './popper';
 
-const StyledCountDashboardContainer = styled(Grid)`
-  min-height: 190px;
+const StyledCountDashboardContainer = styled(Grid)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
+  ${({ breakpoint }) => (breakpoint !== 'xs' ? 'min-height: 190px;' : '')}
 
   .label-top {
     transform: translateY(20px);
@@ -162,6 +163,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
   const [showPopper, setShowPopper] = React.useState(false);
   const pushToHistory = usePushToHistory();
   const dispatch = useAppDispatch();
+  const currentBreakPoint = useCurrentBreakpoint();
 
   const handlePopperEl = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -499,7 +501,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
   );
 
   return (
-    <StyledCountDashboardContainer container>
+    <StyledCountDashboardContainer container breakpoint={currentBreakPoint}>
       <Grid item xs={12} sx={{ paddingBottom: '10px' }}>
         <Typography variant="body1" sx={{ fontWeight: 500 }}>
           <FormattedMessage description="generatedDashboard" defaultMessage="Total value" />

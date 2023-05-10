@@ -4,9 +4,10 @@ import React from 'react';
 interface AddressProps {
   address: string;
   trimAddress?: boolean;
+  trimSize?: number;
 }
 
-const Address = ({ address, trimAddress }: AddressProps) => {
+const Address = ({ address, trimAddress, trimSize }: AddressProps) => {
   const walletService = useWalletService();
   const [addressEns, setAddressEns] = React.useState<string | null>(null);
   const [hasSearchedForEns, setSearchedForEns] = React.useState(false);
@@ -21,6 +22,11 @@ const Address = ({ address, trimAddress }: AddressProps) => {
     }
   }, [addressEns, hasSearchedForEns]);
 
-  return <>{addressEns || (trimAddress ? `${address.slice(0, 6)}...${address.slice(-6)}` : address)}</>;
+  return (
+    <>
+      {addressEns ||
+        (trimAddress ? `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}` : address)}
+    </>
+  );
 };
 export default Address;

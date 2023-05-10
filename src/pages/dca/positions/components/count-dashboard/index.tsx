@@ -13,14 +13,15 @@ import { withStyles } from '@mui/styles';
 import { Hidden, Typography } from '@mui/material';
 import { BigNumber } from 'ethers';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 
 const StyledTypography = styled(Typography)<{ disabled: boolean }>`
   ${({ disabled }) => disabled && 'color: rgba(255, 255, 255, 0.5);'}
   font-weight: 500;
 `;
 
-const StyledCountDashboardContainer = styled(Grid)`
-  min-height: 190px;
+const StyledCountDashboardContainer = styled(Grid)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
+  ${({ breakpoint }) => (breakpoint !== 'xs' ? 'min-height: 190px;' : '')}
 
   .label-top {
     transform: translateY(20px);
@@ -89,7 +90,7 @@ type PositionCountRaw = Record<string, ChainCounter>;
 const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountDashboardProps) => {
   const positions = useCurrentPositions();
   const intl = useIntl();
-
+  const currentBreakpoint = useCurrentBreakpoint();
   const positionsCountRaw = React.useMemo(() => {
     const reducedPositions = positions.reduce<PositionCountRaw>((acc, position) => {
       const newAcc: PositionCountRaw = {
@@ -231,7 +232,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
   );
 
   return (
-    <StyledCountDashboardContainer container>
+    <StyledCountDashboardContainer container breakpoint={currentBreakpoint}>
       <Grid item xs={12} sx={{ paddingBottom: '10px' }}>
         <Typography variant="body1" sx={{ fontWeight: 500 }}>
           <FormattedMessage description="onGoingPositionsDashboard" defaultMessage="Ongoing positions" />
