@@ -7,7 +7,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { Token, TokenList, YieldOptions } from '@types';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import ListItem from '@mui/material/ListItem';
 // import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -394,6 +394,7 @@ const TokenPicker = ({
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
   const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
   const currentNetwork = useSelectedNetwork();
+  const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
   const allowedPairs = useAllowedPairs();
@@ -613,7 +614,12 @@ const TokenPicker = ({
             </Grid>
             <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>
               <StyledFilledInput
-                placeholder="Search your token by symbol, name or address"
+                placeholder={intl.formatMessage(
+                  defineMessage({
+                    defaultMessage: 'Search your token by symbol, name or address',
+                    description: 'tokenPickerSearch',
+                  })
+                )}
                 value={search}
                 onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
                   setSearch(evt.currentTarget.value)

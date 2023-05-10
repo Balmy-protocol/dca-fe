@@ -447,6 +447,12 @@
       "value": "Redes compatibles:"
     }
   ],
+  "47pR2c": [
+    {
+      "type": 0,
+      "value": "Desconocido"
+    }
+  ],
   "4IAoDw": [
     {
       "type": 0,
@@ -763,6 +769,12 @@
     {
       "type": 0,
       "value": " se enviará a su billetera."
+    }
+  ],
+  "7mMiMn": [
+    {
+      "type": 0,
+      "value": "&nbsp;proximamente. Crea una posición para ser incluido en el proximo intercambio."
     }
   ],
   "7nNkhI": [
@@ -1736,7 +1748,7 @@
   "Gcz9a9": [
     {
       "type": 0,
-      "value": "Competencia de jBRL"
+      "value": "Competencia de jMXN"
     }
   ],
   "Gg22iu": [
@@ -2227,6 +2239,16 @@
       "value": "1 semana"
     }
   ],
+  "L+sTrb": [
+    {
+      "type": 0,
+      "value": "Transferido a: "
+    },
+    {
+      "type": 1,
+      "value": "account"
+    }
+  ],
   "LFvqJr": [
     {
       "type": 0,
@@ -2417,6 +2439,12 @@
       "value": "Transacción en progreso"
     }
   ],
+  "N7zGCL": [
+    {
+      "type": 0,
+      "value": "No encontramos ningun token con esos parametros de busqueda"
+    }
+  ],
   "NHDjvA": [
     {
       "type": 0,
@@ -2494,7 +2522,7 @@
   "NcWBc1": [
     {
       "type": 0,
-      "value": "Empeza a invertir con jBRL y gana premios increibles!"
+      "value": "Empeza a invertir con jMXN y gana premios increibles!"
     }
   ],
   "Nd61ag": [
@@ -3319,6 +3347,12 @@
     {
       "type": 0,
       "value": "El sentimiento general del cripto mercado"
+    }
+  ],
+  "Wad0yc": [
+    {
+      "type": 0,
+      "value": "Buscar token por simbolo, nombre o dirección"
     }
   ],
   "WetLa9": [
@@ -5323,6 +5357,12 @@
       "value": "Modificaciones"
     }
   ],
+  "qdZe6N": [
+    {
+      "type": 0,
+      "value": "Competencia jBRL"
+    }
+  ],
   "qodglE": [
     {
       "type": 0,
@@ -5951,6 +5991,12 @@
     {
       "type": 0,
       "value": "+ retornos generados"
+    }
+  ],
+  "xOdkNW": [
+    {
+      "type": 0,
+      "value": "Como funciona / Riesgos"
     }
   ],
   "xRD2R7": [

@@ -39,6 +39,10 @@
     "defaultMessage": "How does Mean Finance work?",
     "description": "faqHowDoesMeanFinanceWork"
   },
+  "+uUHm7": {
+    "defaultMessage": "Allow {token} to be claimed",
+    "description": "eulerClaimApproveItemApprove"
+  },
   "+vAQ2s": {
     "defaultMessage": "Close position",
     "description": "permissionsClosePermission"
@@ -87,6 +91,10 @@
     "defaultMessage": "Half",
     "description": "half"
   },
+  "032sSy": {
+    "defaultMessage": "Earned by token:",
+    "description": "jbrlUserCompEarnedInToken"
+  },
   "07ZWiK": {
     "defaultMessage": "hour",
     "description": "oneHourSingularSubject"
@@ -94,6 +102,10 @@
   "07xzKO": {
     "defaultMessage": "Approve {remainingLiquidityDifference} {symbol}",
     "description": "Allow us to use your coin (modal exact)"
+  },
+  "0CK/Jd": {
+    "defaultMessage": "Yes, you can opt in to generate yield with the tokens you are buying, just remember that The safety of the funds will be up to the selected platform, so please do your own research to perform an educated risk/reward assessment. That being said, enabling generating yield could be a game winning decision.",
+    "description": "jbrlRulesCanYieldResponse"
   },
   "0CdUh0": {
     "defaultMessage": "Creating their position",
@@ -111,10 +123,6 @@
     "defaultMessage": "every 30 minutes",
     "description": "thirtyMinutesEvery"
   },
-  "0t0iJb": {
-    "defaultMessage": "Migrating your {from}/{to} position",
-    "description": "migrating position"
-  },
   "0tTtPb": {
     "defaultMessage": "1 week (1 swap)",
     "description": "oneWeekSingular"
@@ -131,6 +139,10 @@
     "defaultMessage": "How many {type}?",
     "description": "howManyFreq"
   },
+  "1W+K73": {
+    "defaultMessage": "4 - Terminate your open positions",
+    "description": "eulerClaimTerminatePositions"
+  },
   "1W/BMl": {
     "defaultMessage": "{step} - Transaction simulated",
     "description": "transationStepWaitApprove"
@@ -142,10 +154,6 @@
   "1mv4e2": {
     "defaultMessage": "We could not fetch the price of one of the tokens",
     "description": "No price available"
-  },
-  "1uma6Q": {
-    "defaultMessage": "Euler's Discord.",
-    "description": "Euler's Discord."
   },
   "27/rlO": {
     "defaultMessage": "Do you take any fees?",
@@ -171,13 +179,17 @@
     "defaultMessage": "View on explorer",
     "description": "view on etherscan"
   },
-  "3IslZU": {
-    "defaultMessage": "Euler has frozen the contracts after the hack, so modifying positions is not possible at the moment. Stay updated on the situation by joining our",
-    "description": "positionEulerHack1"
+  "2peKiw": {
+    "defaultMessage": "Allowing {symbol} to be claimed",
+    "description": "eulerClaim approving token"
   },
   "3Ovbmx": {
     "defaultMessage": "Next swap:",
     "description": "positionDetailsNextSwapAtTitle"
+  },
+  "3iyxPJ": {
+    "defaultMessage": "To compete, you will need to invest a total of 500 jBRL among all your positions. That being said, you can compete with up to 6 positions. Be sure to deploy your positions on the 26 and 27 of April!",
+    "description": "jbrlRulesHowToCompeteResponse"
   },
   "3oTxXg": {
     "defaultMessage": "Position Closed",
@@ -190,6 +202,10 @@
   "4/vG7I": {
     "defaultMessage": "Transfer a position",
     "description": "feedbackOptionTransferPosition"
+  },
+  "47pR2c": {
+    "defaultMessage": "Unknown",
+    "description": "unkown"
   },
   "4IAoDw": {
     "defaultMessage": "({toPrice} USD)",
@@ -275,6 +291,14 @@
     "defaultMessage": "Next swap for this position will be executed",
     "description": "nextSwapCreate"
   },
+  "6aGdAH": {
+    "defaultMessage": "In order to receive your Euler claim, you'll need to close your existing positions. In return you'll get a vault token that represents your claim. In this first step, you'll be giving Mean Finance's contract permission to close your positions",
+    "description": "eulerClaimApproveCompanionDetails"
+  },
+  "6gpOh9": {
+    "defaultMessage": "1 - Connect to Ethereum",
+    "description": "eulerClaimConnectToEthereum"
+  },
   "6lcY/P": {
     "defaultMessage": "When will my position be swapped?",
     "description": "faqWhenWillMyPositionBeSwapped"
@@ -291,9 +315,9 @@
     "defaultMessage": "We currently don't support any platform to generate yield with this token",
     "description": "noYieldAvailable"
   },
-  "7NwTX3": {
-    "defaultMessage": "Migrate position",
-    "description": "migrate position"
+  "7I0IKP": {
+    "defaultMessage": "Close {positions} positions",
+    "description": "transactionDetailsEulerClaimTerminateMany"
   },
   "7S36Rv": {
     "defaultMessage": "How much {from} do you want to invest?",
@@ -311,6 +335,10 @@
     "defaultMessage": "By terminating the current position {toWithdraw} {to} will be sent to your wallet.",
     "description": "howItWorksDescriptionStep3"
   },
+  "7mMiMn": {
+    "defaultMessage": "&nbsp;soon. Create a position now to be included in the next swap.",
+    "description": "nextSwapCreateSoon"
+  },
   "7nNkhI": {
     "defaultMessage": "Withdraw from a position",
     "description": "feedbackOptionWithdrawPosition"
@@ -323,6 +351,10 @@
     "defaultMessage": "Wrap",
     "description": "wrap agg"
   },
+  "8iukT1": {
+    "defaultMessage": "Allow Mean Finance to close {positions} positions",
+    "description": "transactionDetailsEulerClaimPermitMany"
+  },
   "8nVUyg": {
     "defaultMessage": "minute",
     "description": "oneMinuteSingularSubject"
@@ -330,6 +362,10 @@
   "8okGX/": {
     "defaultMessage": "will only be able to",
     "description": "positionPermissionsModified only"
+  },
+  "8ulxw3": {
+    "defaultMessage": "{positions} positions were closed",
+    "description": "transactionMessagesEulerClaimTerminateMany"
   },
   "8uwFtl": {
     "defaultMessage": "We do not support this chain yet",
@@ -351,6 +387,10 @@
     "defaultMessage": "FAQ",
     "description": "faq"
   },
+  "9VSwYz": {
+    "defaultMessage": "Investing in:",
+    "description": "jbrlUserCompInvestingIn"
+  },
   "9ka/f/": {
     "defaultMessage": "No {status} positions yet.",
     "description": "empty positions"
@@ -366,6 +406,10 @@
   "A/jHZp": {
     "defaultMessage": "Add funds to existing position",
     "description": "addFundsExisting"
+  },
+  "A2vla8": {
+    "defaultMessage": "Terminating {positions} positions",
+    "description": "eulerClaim terminating many positions"
   },
   "A7a2Lo": {
     "defaultMessage": "Rate:",
@@ -391,10 +435,6 @@
     "defaultMessage": "This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones",
     "description": "AddressessPermissions"
   },
-  "AiRKI+": {
-    "defaultMessage": "Withdraw swapped",
-    "description": "withdraw swapped"
-  },
   "Ak27ll": {
     "defaultMessage": "{tokenNumber} tokens",
     "description": "tokenlisttokens"
@@ -402,10 +442,6 @@
   "Aq2WRe": {
     "defaultMessage": "Total value",
     "description": "generatedDashboard"
-  },
-  "AqqLuk": {
-    "defaultMessage": "Total deposited:",
-    "description": "jmxnUserCompTotalDeposited"
   },
   "AzL+qV": {
     "defaultMessage": "Discard changes",
@@ -435,9 +471,17 @@
     "defaultMessage": "Why is my position stale?",
     "description": "faqWhyIsMyPositionStale"
   },
+  "B9zOaK": {
+    "defaultMessage": "Now, you'll need to close your existing positions. In return, you'll get some vault tokens that represent your claim over the Euler compensation. Thanks for the previous step, you can close all positions in only one transaction",
+    "description": "eulerClaimTerminatePositionsDetails"
+  },
   "BElDng": {
     "defaultMessage": "This is the maximum you will spend based on your slippage settings",
     "description": "quoteDataMaximumTooltip"
+  },
+  "BUJfa3": {
+    "defaultMessage": "By signing this Release, clicking \"I Agree\" on the web interface at euler.finance or executing the EulerClaims smart contract and accepting the redemption, I and any protocol I represent hereby irrevocably and unconditionally release all claims I and any protocol I represent (or other separate related or affiliated legal entities) (\"Releasing Parties\") may have against Euler Labs, Ltd., the Euler Foundation, the Euler Decentralized Autonomous Organization, members of the Euler Decentralized Autonomous Organization, and any of their agents, affiliates, officers, employees, or principals (\"Released Parties\") related to this matter whether such claims are known or unknown at this time and regardless of how such claims arise and the laws governing such claims (which shall include but not be limited to any claims arising out of Euler's terms of use). This release constitutes an express and voluntary binding waiver and relinquishment to the fullest extent permitted by law. Releasing Parties further agree to indemnify the Released Parties from any and all third-party claims arising or related to this matter, including damages, attorneys fees, and any other costs related to those claims. If I am acting for or on behalf of a company (or other such separate related or affiliated legal entity), by signing this Release, clicking \"I Agree\" on the web interface at euler.finance or executing the EulerClaims smart contract and accepting the redemption, I confirm that I am duly authorised to enter into this contract on its behalf.{br}{br}This agreement and all disputes relating to or arising under this agreement (including the interpretation, validity or enforcement thereof) will be governed by and subject to the laws of England and Wales and the courts of London, England shall have exclusive jurisdiction to determine any such dispute. To the extent that the terms of this release are inconsistent with any previous agreement and/or Euler's terms of use, I accept that these terms take priority and, where necessary, replace the previous terms.",
+    "description": "eulerClaimSignTermsDetails"
   },
   "BZcZ2I": {
     "defaultMessage": "When you set up a position, you are creating an intention to swap one token for the other. Then, some external user can come and execute the swap for you, honoring the desired frequency of course. When they execute your swap, you are charged a 0.6% fee on the amount that was swapped. This fee is then split between Mean Finance and the swapper. Since you don’t have to execute the swap by yourself, you don’t need to pay any gas.",
@@ -446,10 +490,6 @@
   "Bh1aAA": {
     "defaultMessage": "You will need to provide an aditional {addAmmount} {from}",
     "description": "rate add detail"
-  },
-  "BjSXQD": {
-    "defaultMessage": "and",
-    "description": "positionEulerHack2"
   },
   "Bq70E5": {
     "defaultMessage": "View on explorer",
@@ -462,10 +502,6 @@
   "BrtSAY": {
     "defaultMessage": "Disconnect",
     "description": "disconnect"
-  },
-  "BsPq9s": {
-    "defaultMessage": "Compete on who has the most positions on Mean Finance",
-    "description": "leaderboard position"
   },
   "Bxzkan": {
     "defaultMessage": "The popularity/demand of the tokens involved in the swap",
@@ -495,6 +531,10 @@
     "defaultMessage": "Error approving token",
     "description": "modalErrorApprovingToken"
   },
+  "CPvJUn": {
+    "defaultMessage": "You need to sign the following terms and coditions to move forward:",
+    "description": "eulerClaimSignTermsDetails"
+  },
   "CUp6QA": {
     "defaultMessage": "{type} left",
     "description": "days to finish"
@@ -506,6 +546,10 @@
   "CdFs0C": {
     "defaultMessage": "Swaps are no longer going to be executed, you won't be able to make any new modifications to this position and the NFT will be burned.",
     "description": "terminate description"
+  },
+  "Cg3VYn": {
+    "defaultMessage": "Mean Finance can now close {positions} positions",
+    "description": "transactionMessagesEulerClaimPermitMany"
   },
   "CioUeM": {
     "defaultMessage": "One or both of the tokens in this position allow generating yield while your positions gets swapped. We suggest creating a new position so it starts generating yield for you. If you agree, we will send you to the create page with the same tokens specified in your position.",
@@ -547,6 +591,10 @@
     "defaultMessage": "Unknown error: {message}",
     "description": "unkown_error"
   },
+  "DcgWHC": {
+    "defaultMessage": "As the last step you will need to redeem for each of your tokens the claimable amount.",
+    "description": "eulerClaimClaimTokensDetails"
+  },
   "DmNbMo": {
     "defaultMessage": "Feedback",
     "description": "feedback"
@@ -579,6 +627,10 @@
     "defaultMessage": "Your withdrawal of {toSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "withdraw from success"
   },
+  "EUXFDv": {
+    "defaultMessage": "Total earned:",
+    "description": "jbrlUserCompTotalEarned"
+  },
   "EVgPpp": {
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "fifteenMinutesPlural"
@@ -591,6 +643,10 @@
     "defaultMessage": "More gas",
     "description": "moreGas"
   },
+  "EZrnlt": {
+    "defaultMessage": "Claiming your due for {token} from the Euler Claim page",
+    "description": "transactionRejectedEulerClaimClaimFromMigrator"
+  },
   "EeY1Iw": {
     "defaultMessage": "Run for:",
     "description": "history run for in position"
@@ -602,6 +658,10 @@
   "Eo86hF": {
     "defaultMessage": "Permissions on your position:",
     "description": "AddressessPermissions"
+  },
+  "EwUtBa": {
+    "defaultMessage": "Used funds:",
+    "description": "jbrlUserCompTotalUsed"
   },
   "EzTqXK": {
     "defaultMessage": "View permissions",
@@ -623,10 +683,6 @@
     "defaultMessage": "Approve {from} and wrap",
     "description": "wrap agg"
   },
-  "FMbBaD": {
-    "defaultMessage": "Investing in:",
-    "description": "jmxnUserCompInvestingIn"
-  },
   "FW4Fp5": {
     "defaultMessage": "Get {protocolToken} as {wrappedProtocolToken} instead",
     "description": "Terminate get weth"
@@ -642,6 +698,14 @@
   "FlMmaB": {
     "defaultMessage": "Waiting for confirmation",
     "description": "Waiting confirmation"
+  },
+  "FmT3Yy": {
+    "defaultMessage": "Profit:",
+    "description": "jbrlUserCompTotalProfi"
+  },
+  "FsMgnw": {
+    "defaultMessage": "Can I enable “generate yield” option on my positions?",
+    "description": "jbrlRulesCanYield"
   },
   "FwDtZA": {
     "defaultMessage": "Positions",
@@ -679,6 +743,10 @@
     "defaultMessage": "Select network",
     "description": "supportedNetworks"
   },
+  "GW9CoO": {
+    "defaultMessage": "There will be 5 winners, at the end of the competition the top 5 portfolios in terms of net worth will be the ones to get prizes. The prizes will be sent to the winner addresses shortly after the competition ends.{br}{br}1st place 1,500 jBRL{br}2nd place 1250 jBRL{br}3rd place 1000 jBRL{br}4th place 750 jBRL{br}5th place 500 jBRL",
+    "description": "jbrlRulesPrizes"
+  },
   "GZ31rF": {
     "defaultMessage": "Your withdrawal of funds of {fromSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "withdraw from success"
@@ -686,10 +754,6 @@
   "GZNskB": {
     "defaultMessage": "1 day (1 swap)",
     "description": "oneDaySingular"
-  },
-  "Gcz9a9": {
-    "defaultMessage": "jMXN Competition",
-    "description": "jmxnUserCompTitle"
   },
   "Gg22iu": {
     "defaultMessage": "Create {from}:{to} pair",
@@ -715,10 +779,6 @@
     "defaultMessage": "This is a custom token you are importing, trade at your own risk.",
     "description": "customTokenWarning"
   },
-  "H82UVr": {
-    "defaultMessage": "How it works/Risks",
-    "description": "howItWorks"
-  },
   "HKZyB6": {
     "defaultMessage": "Approve {from} and create position",
     "description": "approve and create position"
@@ -743,17 +803,9 @@
     "defaultMessage": "Withdraw remaining {token}",
     "description": "withdraw funds"
   },
-  "HuMusT": {
-    "defaultMessage": "Withdraw funds",
-    "description": "withdraw funds"
-  },
   "HxyTxG": {
     "defaultMessage": "Time left:",
     "description": "positionDetailsRemainingTimeTitle"
-  },
-  "HznJD1": {
-    "defaultMessage": "All {to} balance will be sent to you and all {from} balance will be used to create a new position with the same rate and remaining swaps.",
-    "description": "closed description"
   },
   "I0PpAd": {
     "defaultMessage": "Average buy price:",
@@ -767,17 +819,13 @@
     "defaultMessage": "Transaction cost:",
     "description": "transactionConfirmationBalanceChangesGasUsed"
   },
-  "IEFMij": {
-    "defaultMessage": "You are not connected to this network",
-    "description": "networkLabelWarning"
-  },
-  "ILcAj5": {
-    "defaultMessage": "Change duration",
-    "description": "change duration"
-  },
   "IQ0+94": {
     "defaultMessage": "Select an option",
     "description": "feedbackEmptyOption"
+  },
+  "IdkM8U": {
+    "defaultMessage": "It starts 26 of April 00:00 UTC and ends 27 May. To participate, you must create your positions from April 26 to 27. The competition ends on the 27 of May.",
+    "description": "jbrlRulesWhenStartResponse"
   },
   "IhGLAD": {
     "defaultMessage": "({swaps} SWAP{plural})",
@@ -791,17 +839,9 @@
     "defaultMessage": "Best price always",
     "description": "descBestPrice"
   },
-  "IrR4U4": {
-    "defaultMessage": "Stale",
-    "description": "stale"
-  },
   "It+xt8": {
     "defaultMessage": "* We do not collect any extra data than the one you have put here",
     "description": "feedbackDisclaimer"
-  },
-  "ItXuIA": {
-    "defaultMessage": "Change duration and rate",
-    "description": "change rate"
   },
   "IuW2wC": {
     "defaultMessage": "Withdrawing {toSymbol}",
@@ -839,6 +879,10 @@
     "defaultMessage": "Supporting:",
     "description": "meanFinanceMetaAggregatorSupporting"
   },
+  "Jnqjl0": {
+    "defaultMessage": "Steps to claim your assets",
+    "description": "eulerClaimStepsNeeded title"
+  },
   "K/HInO": {
     "defaultMessage": "This allows the address to decrease the funds and modify the duration of your position",
     "description": "reduce permission helptext"
@@ -859,10 +903,6 @@
     "defaultMessage": "Set to run for:",
     "description": "positionCreatedSwaps"
   },
-  "KTvwXg": {
-    "defaultMessage": "Closed",
-    "description": "terminated"
-  },
   "Kbpl3O": {
     "defaultMessage": "Select",
     "description": "select"
@@ -874,10 +914,6 @@
   "KmmquQ": {
     "defaultMessage": "Select a pair to view its price history",
     "description": "No pair selected"
-  },
-  "KpQxqG": {
-    "defaultMessage": "We'll swap {rate} {from} {frequency} for {frequencyPlural} for you",
-    "description": "rate detail"
   },
   "Kq/AiW": {
     "defaultMessage": "Paste address from clipboard",
@@ -891,9 +927,17 @@
     "defaultMessage": "1 week",
     "description": "oneWeekSingularTime"
   },
+  "L+sTrb": {
+    "defaultMessage": "Transfered to: {account}",
+    "description": "transactionConfirmationTransferTo"
+  },
   "LFvqJr": {
     "defaultMessage": "Approve Max {symbol}",
     "description": "Allow us to use your coin (home max)"
+  },
+  "LIJQek": {
+    "defaultMessage": "Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the",
+    "description": "positionEulerHack1"
   },
   "LJHU2o": {
     "defaultMessage": "Withdraws",
@@ -919,9 +963,9 @@
     "defaultMessage": "We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk.",
     "description": "aggregatorPriceNotFound"
   },
-  "LbRNWF": {
-    "defaultMessage": "Migrate {from}/{to} position",
-    "description": "migrate title"
+  "LlYdJz": {
+    "defaultMessage": "claim page",
+    "description": "EulerClaim ClaimPage"
   },
   "LogV+u": {
     "defaultMessage": "Restore defaults",
@@ -943,13 +987,29 @@
     "defaultMessage": "{step} - Submit the transaction approval with your wallet",
     "description": "transationStepApprove"
   },
+  "Myc4cp": {
+    "defaultMessage": "5 - Approve your tokens to be claimed",
+    "description": "eulerClaimApproveTokens"
+  },
   "MzzvpH": {
     "defaultMessage": "New trade",
     "description": "transactionConfirmationNewTrade"
   },
+  "N2ExtZ": {
+    "defaultMessage": "6 - Claim your tokens",
+    "description": "eulerClaimClaimTokens"
+  },
   "N4Okjv": {
     "defaultMessage": "Transaction in progress",
     "description": "transactionConfirmationInProgress"
+  },
+  "N7zGCL": {
+    "defaultMessage": "We could not find any token with those search parameters",
+    "description": "noTokenFound"
+  },
+  "N8rmoQ": {
+    "defaultMessage": "Claim Euler redemption",
+    "description": "eulerClaim title"
   },
   "NPuJa6": {
     "defaultMessage": "Mean Finance contracts have been audited by Pessimistic and PeckShield. You can read the reports",
@@ -966,10 +1026,6 @@
   "NXDtFv": {
     "defaultMessage": "Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "success creating position"
-  },
-  "NcWBc1": {
-    "defaultMessage": "Start investing with JMXN and win amazing prices!",
-    "description": "jmxnUserCompTitleDesc"
   },
   "Nd61ag": {
     "defaultMessage": "This allows the address to close your position",
@@ -994,10 +1050,6 @@
   "NsIFlt": {
     "defaultMessage": "Executed:",
     "description": "positionDetailsExecutedTitle"
-  },
-  "NxEUb6": {
-    "defaultMessage": "Position settings",
-    "description": "position settings"
   },
   "O+yqTs": {
     "defaultMessage": "View in explorer",
@@ -1031,9 +1083,13 @@
     "defaultMessage": "Swap and transfer to another address",
     "description": "tranferToTooltip"
   },
-  "OalKNY": {
-    "defaultMessage": "Compete on who has the most traded volume locked on Mean Finance. This includes swapped liquidity on your positions",
-    "description": "leaderboard traded volume"
+  "OV5gMx": {
+    "defaultMessage": "You’ve got a total of 6 positions at your disposal, diversify your portfolio using various strategies. You can either decide to invest your 500 jBRL on one position, or diversify your portfolio using more positions (maximum 6 positions). Combinations are endless.",
+    "description": "jbrlRulesCanWithdrawResponse"
+  },
+  "ObW6Xl": {
+    "defaultMessage": "No, you should not withdraw funds from your positions or add more jBRL to your positions. Funds that are withdrawn from positions will not be taken into account.",
+    "description": "faqWhatIsTransactionSimulationResponse"
   },
   "OdWJTU": {
     "defaultMessage": "{frequency} {hasYield}",
@@ -1063,6 +1119,14 @@
     "defaultMessage": "Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted.",
     "description": "positionagEURNotSupported"
   },
+  "PDBTFX": {
+    "defaultMessage": "How can I compete?",
+    "description": "jbrlRulesHowToCompete"
+  },
+  "PFt59p": {
+    "defaultMessage": "Giving our Hub Companion permission to close {positions} have been succesfully submitted to the blockchain and will be confirmed soon",
+    "description": "eulerClaim success permit many positions"
+  },
   "POGYlh": {
     "defaultMessage": "Position permissions modified",
     "description": "timelineTypeTransfered"
@@ -1075,6 +1139,10 @@
     "defaultMessage": "${amount} USD saved",
     "description": "savedProtocolTooltip"
   },
+  "PdEubf": {
+    "defaultMessage": "View positons",
+    "description": "jbrlUserCompViewPositions"
+  },
   "Pmf45s": {
     "defaultMessage": "Transfer to another address:",
     "description": "transferToDescription"
@@ -1083,9 +1151,17 @@
     "defaultMessage": "Sell",
     "description": "sell"
   },
+  "PwlAU3": {
+    "defaultMessage": "Total deposited:",
+    "description": "jbrlUserCompTotalDeposited"
+  },
   "PxOAUe": {
     "defaultMessage": "every 30 minutes",
     "description": "thiertyMinutesAdverb"
+  },
+  "Q+yMWA": {
+    "defaultMessage": "Connect to Ethereum",
+    "description": "eulerClaimConnectToEthereumButton"
   },
   "Q1G3hW": {
     "defaultMessage": "Set the address to transfer",
@@ -1106,10 +1182,6 @@
   "QDVx7K": {
     "defaultMessage": "Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here",
     "description": "positionJEURNotSupported"
-  },
-  "QYjgIw": {
-    "defaultMessage": "Current: {type} left",
-    "description": "current days to finish"
   },
   "Qe8t1L": {
     "defaultMessage": "Connect wallet",
@@ -1207,6 +1279,10 @@
     "defaultMessage": "Most received tokens",
     "description": "sortMostReturnSellOrder"
   },
+  "SkAtKM": {
+    "defaultMessage": "{token} is now ready to be claimed",
+    "description": "eulerClaimApproveItemSuccess"
+  },
   "SwiTok": {
     "defaultMessage": "Withdrawing balance from their position",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart4"
@@ -1218,6 +1294,10 @@
   "TGj1j/": {
     "defaultMessage": "5 minutes",
     "description": "fiveMinutesSingularTime"
+  },
+  "TP6wj4": {
+    "defaultMessage": "Balance: {balance} {token}",
+    "description": "eulerClaimClaimItemBalance"
   },
   "TdURzq": {
     "defaultMessage": "in progress",
@@ -1247,6 +1327,10 @@
     "defaultMessage": "Confirm this transaction in your wallet",
     "description": "Confirm in wallet"
   },
+  "UiA6NW": {
+    "defaultMessage": "Allowing Mean Finance to close {positions} positions",
+    "description": "transactionRejectedEulerClaimPermitMany"
+  },
   "UmgvZJ": {
     "defaultMessage": "$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available",
     "description": "positionUNIDXNotSupported"
@@ -1263,17 +1347,17 @@
     "defaultMessage": "This is the minimum you will receive based on your slippage settings",
     "description": "quoteDataMinimumTooltip"
   },
+  "V/TZsi": {
+    "defaultMessage": "Waiting for the approval of {token} to be confirmed",
+    "description": "eulerClaimApproveItemPending"
+  },
+  "V/yrI6": {
+    "defaultMessage": "Can I add or withdraw funds from my positions?",
+    "description": "jbrlRulesCanWithdraw"
+  },
   "V314M5": {
     "defaultMessage": "Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period while neutralizing the short-term volatility in the market.{br}The purchases occur regardless of the asset's price and at regular intervals. In effect, this strategy removes much of the detailed work of attempting to time the market in order to make purchases of assets at the best prices.",
     "description": "whatIsDcaAnswer"
-  },
-  "VBCnJk": {
-    "defaultMessage": "Positions:",
-    "description": "jmxnUserCompPositions"
-  },
-  "VZcHUA": {
-    "defaultMessage": "View positons",
-    "description": "jmxnUserCompViewPositions"
   },
   "VaWvMp": {
     "defaultMessage": "Selected route:",
@@ -1315,9 +1399,21 @@
     "defaultMessage": "You can start generating yield",
     "description": "startGainYield title"
   },
+  "WMrqAA": {
+    "defaultMessage": "Connect your wallet to start the process",
+    "description": "eulerClaimNoClaim NoWallet"
+  },
+  "WVBvAR": {
+    "defaultMessage": "Waiting for the claim of {token} to be confirmed",
+    "description": "eulerClaimClaimItemPending"
+  },
   "WaK61o": {
     "defaultMessage": "The general sentiment of the crypto market",
     "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart2"
+  },
+  "Wad0yc": {
+    "defaultMessage": "Search your token by symbol, name or address",
+    "description": "tokenPickerSearch"
   },
   "WetLa9": {
     "defaultMessage": "No swaps yet",
@@ -1330,6 +1426,10 @@
   "WszPax": {
     "defaultMessage": "Error while withdrawing",
     "description": "modalErrorWithdraw"
+  },
+  "WvVPX2": {
+    "defaultMessage": "Euler has frozen the contracts after the hack, so withdraw is not possible at the moment. You might be entitled to claim compensation, to do this visit the",
+    "description": "positionEulerHack1"
   },
   "X/B1lK": {
     "defaultMessage": "let us know you encountered this error, it would be helpful to copy the error log with the button below and paste that in the message",
@@ -1346,10 +1446,6 @@
   "XI+HWn": {
     "defaultMessage": "Maximum spent:",
     "description": "quoteDataMaxSent"
-  },
-  "XOwvOZ": {
-    "defaultMessage": "You are migrating a position from a deprecated version of Mean Finance to the newest one.",
-    "description": "migrate description primary"
   },
   "XbrtpH": {
     "defaultMessage": "All",
@@ -1379,10 +1475,6 @@
     "defaultMessage": "View receipt",
     "description": "transactionConfirmationViewReceipt"
   },
-  "YGZ1lp": {
-    "defaultMessage": "Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. Stay updated on the situation by joining our",
-    "description": "positionEulerHack1"
-  },
   "YRoLhe": {
     "defaultMessage": "This will transfer your position, your NFT and all the liquidity stored in the position to the new address.",
     "description": "transfer sub description"
@@ -1394,14 +1486,6 @@
   "YWW6wc": {
     "defaultMessage": "Oooops",
     "description": "errorEncounteredOops"
-  },
-  "YhEuCJ": {
-    "defaultMessage": "Withdraw",
-    "description": "Withdraw"
-  },
-  "YhPAsu": {
-    "defaultMessage": "Total earned:",
-    "description": "jmxnUserCompTotalEarned"
   },
   "YhkTRN": {
     "defaultMessage": "CLOSED",
@@ -1419,13 +1503,13 @@
     "defaultMessage": "Your positions",
     "description": "positions title"
   },
-  "Yo7O05": {
-    "defaultMessage": "Unkown price",
-    "description": "unkown"
+  "YuQahx": {
+    "defaultMessage": "Error terminating many positions",
+    "description": "modalErrorEulerClaimTerminatingMany"
   },
-  "YpaT9e": {
-    "defaultMessage": "Compete on who has the most total value locked on Mean Finance. This includes both swapped and unswapped liquidity on your positions",
-    "description": "leaderboard total value locked"
+  "YxMaBm": {
+    "defaultMessage": "Unknown price",
+    "description": "unkown"
   },
   "ZATHUb": {
     "defaultMessage": "Go to position",
@@ -1439,10 +1523,6 @@
     "defaultMessage": "Is Mean Finance audited?",
     "description": "faqIsMeanFinanceAudited"
   },
-  "ZBiobz": {
-    "defaultMessage": "Profit:",
-    "description": "jmxnUserCompTotalProfi"
-  },
   "ZCPyG3": {
     "defaultMessage": "Unsupported method",
     "description": "unsupported_method"
@@ -1454,6 +1534,10 @@
   "ZDyEAS": {
     "defaultMessage": "Your {from}/{to} position transfer to {toAddress} has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "position transfer success"
+  },
+  "ZFSRsJ": {
+    "defaultMessage": "Terminate {positions} positions",
+    "description": "eulerClaimTerminatePositionsButton"
   },
   "ZIFOHu": {
     "defaultMessage": "Position Transfered",
@@ -1531,9 +1615,9 @@
     "defaultMessage": "You pay",
     "description": "youPay"
   },
-  "aoHWJU": {
-    "defaultMessage": "In position: {balance} {symbol}",
-    "description": "in position"
+  "ap2j3l": {
+    "defaultMessage": "Now that you have the claim tokens on your wallet, you will need to authorize Euler's claim contract to use them. There is a claim contract for each of the claim tokens, so you'll need to approve each one individually",
+    "description": "eulerClaimApproveTokensDetails"
   },
   "b0Bg0T": {
     "defaultMessage": "The pair {from}:{to} has been created",
@@ -1546,10 +1630,6 @@
   "b9AGHu": {
     "defaultMessage": "Back",
     "description": "goBack"
-  },
-  "bBX0k1": {
-    "defaultMessage": "Earned by token:",
-    "description": "jmxnUserCompEarnedInToken"
   },
   "bCOphI": {
     "defaultMessage": "swaps",
@@ -1566,10 +1646,6 @@
   "bQUS8A": {
     "defaultMessage": "Confetti count:",
     "description": "advancedAggregatorSettingsConfetti"
-  },
-  "bZG2wW": {
-    "defaultMessage": "Create position",
-    "description": "Create pair submit"
   },
   "bdyKpA": {
     "defaultMessage": "Timeline",
@@ -1591,10 +1667,6 @@
     "defaultMessage": "Modify {from}:{to} position to swap {rate} {freq} for {swaps}",
     "description": "transactionDetailsModifyRateAndSwaps"
   },
-  "c9qXGP": {
-    "defaultMessage": "Migrating your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon",
-    "description": "migrating position success"
-  },
   "cA3qXj": {
     "defaultMessage": "Approving Hub Companion to modify your {from}:{to} position",
     "description": "transactionDetailsApproveCompanion"
@@ -1611,6 +1683,10 @@
     "defaultMessage": "Average buy price",
     "description": "averageBuyPriceLegend"
   },
+  "cn+Vmr": {
+    "defaultMessage": "To participate, you should invest a total of 500 jBRL among all your positions. You don’t need to fill any form.",
+    "description": "jbrlRulesHowMuchInvestResponse"
+  },
   "cwqjrt": {
     "defaultMessage": "Add funds",
     "description": "addFunds"
@@ -1622,10 +1698,6 @@
   "d1oHnW": {
     "defaultMessage": "{readable}",
     "description": "oneWeekPluralTime"
-  },
-  "d2mT2I": {
-    "defaultMessage": "Your position will be closed here and we will create a new one on",
-    "description": "migrate description"
   },
   "d9VBkP": {
     "defaultMessage": "Custom",
@@ -1647,9 +1719,17 @@
     "defaultMessage": "Withdrawing {fromSymbol} funds",
     "description": "Withdrawing funds from"
   },
+  "dVfgM1": {
+    "defaultMessage": "You will get back",
+    "description": "eulerClaimSummary"
+  },
   "di6jKR": {
     "defaultMessage": "You are disconnected from the net",
     "description": "all_network_disconnect"
+  },
+  "dzxV45": {
+    "defaultMessage": "Giving our Hub Companion permission to close {positions} positions",
+    "description": "eulerClaim permit many positions"
   },
   "e1vYrA": {
     "defaultMessage": "No yield",
@@ -1667,9 +1747,17 @@
     "defaultMessage": "Sometimes you don't want to sell tokens, but you want to buy exactly a certain amount. For example, instead of selling 1000 USDC for ETH, you might instead want to buy 1 ETH with USDC.{br}{br}Most aggregators don't offer this feature, so we will show you those who do, and try to estimate a “buy order” on those who don't",
     "description": "faqWhatIsBuyOrdersResponse"
   },
+  "ePBTfz": {
+    "defaultMessage": "jBRL Competition",
+    "description": "jbrlUserCompTitle"
+  },
   "eQUdcX": {
     "defaultMessage": "{step} - Transaction simulation failed",
     "description": "transationStepWaitSimulateFailed"
+  },
+  "efb44c": {
+    "defaultMessage": "You are all caught up! You have nothing to claim.",
+    "description": "eulerClaimNoClaim title"
   },
   "eiCVwX": {
     "defaultMessage": "We could not fetch a route for your swap",
@@ -1679,13 +1767,9 @@
     "defaultMessage": "Manage list & tokens",
     "description": "manageListAndTokens"
   },
-  "ezierc": {
-    "defaultMessage": "Discord",
-    "description": "Discord"
-  },
-  "f++zf9": {
-    "defaultMessage": "Position finished",
-    "description": "no funds"
+  "f/vH/r": {
+    "defaultMessage": "Claiming all due for {symbol}",
+    "description": "eulerClaim claming token"
   },
   "f2UpW9": {
     "defaultMessage": "Worse price",
@@ -1698,6 +1782,10 @@
   "fAutJH": {
     "defaultMessage": "Executed {executedSwaps}/{totalSwaps} swaps",
     "description": "executedSwapsTooltip"
+  },
+  "fIM4Uw": {
+    "defaultMessage": "Rules",
+    "description": "faq"
   },
   "fJcP5V": {
     "defaultMessage": "Submit feedback",
@@ -1727,9 +1815,13 @@
     "defaultMessage": "Modify a position",
     "description": "feedbackOptionModifyPosition"
   },
-  "gIl4Bi": {
-    "defaultMessage": "Are you sure you want to withdraw {ammount} {to}?",
-    "description": "Withdraw warning"
+  "g8E7J6": {
+    "defaultMessage": "Start investing with JBRL and win amazing prices!",
+    "description": "jbrlUserCompTitleDesc"
+  },
+  "gAXe/N": {
+    "defaultMessage": "In order to start the Euler claim process you need to connect to the Ethereum network",
+    "description": "eulerClaimConnectToEthereumDetails"
   },
   "gQEJk+": {
     "defaultMessage": "swaps",
@@ -1738,6 +1830,10 @@
   "gQubrG": {
     "defaultMessage": "Swaps",
     "description": "swapPriceGraphTitle"
+  },
+  "gUSZ2C": {
+    "defaultMessage": "You have terminated all your active positions.",
+    "description": "terminated affected positions"
   },
   "gVbrRz": {
     "defaultMessage": "View receipt",
@@ -1750,6 +1846,10 @@
   "gZSAHC": {
     "defaultMessage": "Least spent",
     "description": "sortMostReturnBuyOrder"
+  },
+  "ga1v9k": {
+    "defaultMessage": "These are the positions that you have that were affected by the euler vulnerability",
+    "description": "eulerClaimAffectedPositions description"
   },
   "gblaCK": {
     "defaultMessage": "Advanced settings",
@@ -1766,10 +1866,6 @@
   "gm52Lx": {
     "defaultMessage": "You've probably heard many DEXes or aggregators claim that they offer the best prices. Well, now you can be sure. We will query all of them at the same time so you don't have to, and you will be able to choose the one that best fits your needs",
     "description": "faqWhatIsResponse"
-  },
-  "gqaG8I": {
-    "defaultMessage": "Withdraw deposited",
-    "description": "withdraw funds"
   },
   "gqiFWl": {
     "defaultMessage": "Swapped:",
@@ -1807,17 +1903,9 @@
     "defaultMessage": "Approve and modify position",
     "description": "modifyPosition"
   },
-  "haoCMr": {
-    "defaultMessage": "Calculating the cost of creating this position",
-    "description": "calculate pair cost"
-  },
-  "hmyz7z": {
-    "defaultMessage": "This cannot be undone.",
-    "description": "migrate warning"
-  },
-  "huUVCB": {
-    "defaultMessage": "You are the first person to create a position for this pair of tokens. Because of this, the gas cost is going to be higher than a normal position creation. This, however, will be a one time operation. Are you sure you want to create the {from}/{to} position?",
-    "description": "create pair question"
+  "i+8o6D": {
+    "defaultMessage": "How much jBRL can I invest?",
+    "description": "jbrlRulesHowMuchInvest"
   },
   "i1xngQ": {
     "defaultMessage": "1 {from} = {currencySymbol}{average} {to}",
@@ -1855,13 +1943,13 @@
     "defaultMessage": "week",
     "description": "oneWeekSingularSubject"
   },
+  "iur3fC": {
+    "defaultMessage": "Your positions terminations have been succesfully submitted to the blockchain and will be confirmed soon",
+    "description": "eulerClaim success terminating many positions"
+  },
   "iyoNsc": {
     "defaultMessage": "Choose network",
     "description": "supportedNetworks"
-  },
-  "jJcSKd": {
-    "defaultMessage": "error while migrating position",
-    "description": "modalErrorMigratingPosition"
   },
   "jKP6bq": {
     "defaultMessage": "When do I need to pay gas fees?",
@@ -1919,6 +2007,10 @@
     "defaultMessage": "Confirm address",
     "description": "transfer to selectAddress"
   },
+  "kfSd4h": {
+    "defaultMessage": "Claim all due for {token}",
+    "description": "eulerClaimClaimItemClaim"
+  },
   "kksiFn": {
     "defaultMessage": "your position",
     "description": "positionPermissionsModified your position"
@@ -1947,13 +2039,9 @@
     "defaultMessage": "Select platform",
     "description": "selectYieldPlatform"
   },
-  "lJRhFc": {
-    "defaultMessage": "We'll return {fromValue} to you and stop swapping this position",
-    "description": "rate detail"
-  },
-  "lQ1Iy9": {
-    "defaultMessage": "Create position for {from}/{to}",
-    "description": "First deposit"
+  "lMDxfZ": {
+    "defaultMessage": "You rejected the signature",
+    "description": "modalErrorEulerClaimSignTerms"
   },
   "lltepo": {
     "defaultMessage": "STALE",
@@ -1967,6 +2055,10 @@
     "defaultMessage": "You sell",
     "description": "You sell"
   },
+  "lxxRDc": {
+    "defaultMessage": "&nbsp;approximately {nextSwapAvailableAt}.",
+    "description": "nextSwapCreateTime"
+  },
   "m3YpJM": {
     "defaultMessage": "How is the price calculated for each swap?",
     "description": "faqHowIsThePriceCalculatedForEachSwap"
@@ -1978,6 +2070,10 @@
   "mhGi8/": {
     "defaultMessage": "What is swap and transfer?",
     "description": "faqWhatIsSwapAndTransfer"
+  },
+  "ml+wWE": {
+    "defaultMessage": "What are the prizes?",
+    "description": "jbrlRulesPrizes"
   },
   "mljOZT": {
     "defaultMessage": "There is no data available about this pair",
@@ -2051,6 +2147,10 @@
     "defaultMessage": "+ yield",
     "description": "yield detail"
   },
+  "obUvKx": {
+    "defaultMessage": "Error giving our Hub Companion permission to close many positions",
+    "description": "modalErrorEulerClaimPermitMany"
+  },
   "ocCMPR": {
     "defaultMessage": "Generate yield",
     "description": "yieldTitle"
@@ -2067,6 +2167,10 @@
     "defaultMessage": "We don't add any extra fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly.{br}{br}Some aggregators support revenue sharing so we might get some part of their fee, but this is no extra charge to you.{br}{br}To clarify, these aggregators are not prioritized in any way, you can choose how to sort the results by yourself.",
     "description": "faqFeesResponse"
   },
+  "p19qS8": {
+    "defaultMessage": "Give permission for {positions} positions",
+    "description": "eulerClaimPermitPositionsButton"
+  },
   "p3Xa0W": {
     "defaultMessage": "Set to whom you want to transfer your position to",
     "description": "transfer description"
@@ -2079,10 +2183,6 @@
     "defaultMessage": "You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to enable this option.",
     "description": "disabledByUsdValue"
   },
-  "pH36vJ": {
-    "defaultMessage": "Create position and start competing",
-    "description": "jmxnUserCompTitleCallToAction"
-  },
   "pMZxIC": {
     "defaultMessage": "DONE",
     "description": "donePositions"
@@ -2094,6 +2194,10 @@
   "pWI5/m": {
     "defaultMessage": "No yield",
     "description": "noYieldOption"
+  },
+  "pXSi3Q": {
+    "defaultMessage": "Your affected positions",
+    "description": "eulerClaimAffectedPositions title"
   },
   "pc75Ig": {
     "defaultMessage": "Come by to our",
@@ -2127,10 +2231,6 @@
     "defaultMessage": "Transaction simulation",
     "description": "blowfishSimulationTitle"
   },
-  "qCw/BH": {
-    "defaultMessage": "Did you forget about your position? This are the addresses that have the most value to withdraw between their positions",
-    "description": "leaderboard forgot"
-  },
   "qD/8eI": {
     "defaultMessage": "Is it safe?",
     "description": "faqIsSafe"
@@ -2138,10 +2238,6 @@
   "qHy8j2": {
     "defaultMessage": "Back to create position",
     "description": "backToSwap"
-  },
-  "qQYnqF": {
-    "defaultMessage": "The TRUE DCAOR is the one who's position has been set to run for the longest time",
-    "description": "leaderbord truedcaor"
   },
   "qQeTLj": {
     "defaultMessage": "{amount} {from} have been removed from your {from}:{to} position",
@@ -2159,17 +2255,25 @@
     "defaultMessage": "Modifications",
     "description": "modifications"
   },
+  "qdZe6N": {
+    "defaultMessage": "jBRL Competition",
+    "description": "jCompetition"
+  },
+  "qefrsY": {
+    "defaultMessage": "2 - Sign terms and conditions",
+    "description": "eulerClaimSignTerms"
+  },
   "qodglE": {
     "defaultMessage": "Error while transfering position",
     "description": "modalErrorTransferPosition"
   },
+  "qyNjbD": {
+    "defaultMessage": "Can I modify my positions once deployed?",
+    "description": "jbrlRulesCanModify"
+  },
   "r+KI3m": {
     "defaultMessage": "Error changing rate and swaps",
     "description": "modalErrorChangeRateAndSwaps"
-  },
-  "r0L/01": {
-    "defaultMessage": "Withdraw {toSymbol} from {from}/{to} position",
-    "description": "withdraw title"
   },
   "r3H6D4": {
     "defaultMessage": "You are not authorized to make this operation",
@@ -2182,10 +2286,6 @@
   "rEo0yG": {
     "defaultMessage": "MAX",
     "description": "maxWallet"
-  },
-  "rJAtmd": {
-    "defaultMessage": "Used funds:",
-    "description": "jmxnUserCompTotalUsed"
   },
   "rKNAVd": {
     "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you migrate the position.",
@@ -2238,6 +2338,10 @@
   "sjxuA4": {
     "defaultMessage": "Least gas",
     "description": "sortLeastGas"
+  },
+  "svNyZV": {
+    "defaultMessage": "When does it start/end?",
+    "description": "jbrlRulesWhenStart"
   },
   "t0oI3L": {
     "defaultMessage": "You will get back {from} {fromSymbol} and {to} {toSymbol}",
@@ -2307,9 +2411,9 @@
     "defaultMessage": "Unwrap",
     "description": "unwrap agg"
   },
-  "uHCFsv": {
-    "defaultMessage": "approximately {nextSwapAvailableAt}.",
-    "description": "nextSwapCreateTime"
+  "u1Wmms": {
+    "defaultMessage": "3 - Allow Mean Finance to close your positions",
+    "description": "eulerClaimApproveCompanion"
   },
   "uRlu53": {
     "defaultMessage": "{step} - The token approval is being confirmed",
@@ -2322,6 +2426,10 @@
   "uZWTRx": {
     "defaultMessage": "How can we improve it?",
     "description": "feedbackInput"
+  },
+  "ueaAt/": {
+    "defaultMessage": "Nothing more to claim",
+    "description": "eulerClaimSummary NoMore"
   },
   "v1SP5g": {
     "defaultMessage": "4 hours",
@@ -2350,10 +2458,6 @@
   "vXfC3z": {
     "defaultMessage": "You rejected the transaction",
     "description": "rejected_transaction"
-  },
-  "vYf+z8": {
-    "defaultMessage": "soon. Create a position now to be included in the next swap.",
-    "description": "nextSwapCreateSoon"
   },
   "vedPfb": {
     "defaultMessage": "Swap",
@@ -2387,13 +2491,13 @@
     "defaultMessage": "here.",
     "description": "here"
   },
-  "wHKSsk": {
-    "defaultMessage": "Euler has frozen the contracts after the hack, so withdraw is not possible at the moment. Stay updated on the situation by joining our",
-    "description": "positionEulerHack1"
-  },
   "wJOLei": {
     "defaultMessage": "Swapping",
     "description": "swap agg loading"
+  },
+  "wQPZ/0": {
+    "defaultMessage": "You will be able to claim:",
+    "description": "eulerClaimClaimItemAbleToClaim"
   },
   "wY55VA": {
     "defaultMessage": "No deposit or withdrawal fees",
@@ -2406,6 +2510,10 @@
   "wnvvrB": {
     "defaultMessage": "Error approving token",
     "description": "modalErrorApprove"
+  },
+  "wxhlLq": {
+    "defaultMessage": "You claimed your due for {token} from the Euler Claim page",
+    "description": "transactionMessagesEulerClaimClaimFromMigrator"
   },
   "wzEneQ": {
     "defaultMessage": "Close",
@@ -2423,9 +2531,21 @@
     "defaultMessage": "Transfer {from}:{to} position to {address}",
     "description": "transactionDetailsTransfer"
   },
+  "x9IS3+": {
+    "defaultMessage": "Positions:",
+    "description": "jbrlUserCompPositions"
+  },
   "xIIhB5": {
     "defaultMessage": "+ yield",
     "description": "positionWithdrawn"
+  },
+  "xLr7Kx": {
+    "defaultMessage": "You claimed your due for {token} from the Euler Claim page",
+    "description": "transactionDetailsEulerClaimClaimFromMigrator"
+  },
+  "xOdkNW": {
+    "defaultMessage": "How it works / Risks",
+    "description": "howItWorks"
   },
   "xRD2R7": {
     "defaultMessage": "Transaction will fail. We recommend choosing another route",
@@ -2446,6 +2566,10 @@
   "xqGD8L": {
     "defaultMessage": "Start generating yield",
     "description": "startEarningYield"
+  },
+  "xryoH6": {
+    "defaultMessage": "Closing {positions} positions",
+    "description": "transactionRejectedEulerClaimTerminateMany"
   },
   "xu/Gut": {
     "defaultMessage": "Closed positions",
@@ -2475,6 +2599,10 @@
     "defaultMessage": "+ yield",
     "description": "plusYield"
   },
+  "ykds7h": {
+    "defaultMessage": "You shall not modify the parameters of your positions once you have deployed them. Nor can positions be transferred. If a position get modified, it will not be taken into account.{br}{br}So plan your positions well before deploying them.",
+    "description": "jbrlRulesCanModifyResponse"
+  },
   "yoTCFN": {
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "fourHoursPlural"
@@ -2490,6 +2618,10 @@
   "yw4rkM": {
     "defaultMessage": "hours",
     "description": "hours"
+  },
+  "yx4jde": {
+    "defaultMessage": "If you had positions generating yield on Euler you were affected by the hack on their protocol. Below you'll be able to follow the steps to claim compensation for your lost funds",
+    "description": "eulerClaim description"
   },
   "yyT6co": {
     "defaultMessage": "After transaction cost:",
@@ -2534,6 +2666,10 @@
   "zlapVJ": {
     "defaultMessage": "Transaction cost:",
     "description": "quoteDataFee"
+  },
+  "zn3CFB": {
+    "defaultMessage": "How many positions can I use?",
+    "description": "jbrlRulesCanWithdraw"
   },
   "znN7fQ": {
     "defaultMessage": "Never executed",

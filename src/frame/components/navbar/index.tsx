@@ -17,6 +17,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import InsightsIcon from '@mui/icons-material/Insights';
 import AddIcon from '@mui/icons-material/Add';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { useAppDispatch } from '@state/hooks';
@@ -38,6 +39,7 @@ import Container from '@mui/material/Container';
 import usePushToHistory from '@hooks/usePushToHistory';
 import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
+import LanguageLabel from '../footer/components/lang-label';
 
 const StyledNavbarWrapper = styled.div`
   width: 100%;
@@ -219,11 +221,6 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                 label={<FormattedMessage description="swap" defaultMessage="Swap" />}
                 value={2}
               />
-              <StyledTab
-                onClick={() => handleTabChange({ index: 3, url: 'jbrl-competition' })}
-                label={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
-                value={3}
-              />
             </StyledTabs>
             <IconButton onClick={() => setOpenDrawer(true)}>
               <MenuIcon />
@@ -271,7 +268,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             </ListItemButton>
             <ListItemButton onClick={() => handleTabChange({ index: 3, url: 'jbrl-competition' })}>
               <ListItemIcon>
-                <CurrencyExchangeIcon />
+                <EmojiEventsIcon />
               </ListItemIcon>
               <ListItemText
                 primary={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
@@ -361,6 +358,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                 }
               </WalletContext.Consumer>
             </StyledButtonContainer>
+            {currentBreakPoint === 'xs' && <LanguageLabel />}
           </StyledNavbarEndContent>
         </Container>
         {currentBreakPoint !== 'xs' && (

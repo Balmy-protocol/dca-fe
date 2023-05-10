@@ -2698,5 +2698,33 @@
   "FGbffU": {
     "defaultMessage": "Aprobar {from} y wrappear",
     "description": "wrap agg"
+  },
+  "47pR2c": {
+    "defaultMessage": "Desconocido",
+    "description": "unkown"
+  },
+  "7mMiMn": {
+    "defaultMessage": "&nbsp;proximamente. Crea una posición para ser incluido en el proximo intercambio.",
+    "description": "nextSwapCreateSoon"
+  },
+  "L+sTrb": {
+    "defaultMessage": "Transferido a: {account}",
+    "description": "transactionConfirmationTransferTo"
+  },
+  "N7zGCL": {
+    "defaultMessage": "No encontramos ningun token con esos parametros de busqueda",
+    "description": "noTokenFound"
+  },
+  "qdZe6N": {
+    "defaultMessage": "Competencia jBRL",
+    "description": "jCompetition"
+  },
+  "xOdkNW": {
+    "defaultMessage": "Como funciona / Riesgos",
+    "description": "howItWorks"
+  },
+  "Wad0yc": {
+    "defaultMessage": "Buscar token por simbolo, nombre o dirección",
+    "description": "tokenPickerSearch"
   }
 }
