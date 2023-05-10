@@ -45,6 +45,7 @@ const StyledWalletContainer = styled.div`
   display: flex;
   flex-direction: column;
   text-align: start;
+  flex: 1;
 `;
 
 const StyledWalletInformationContainer = styled.div`
