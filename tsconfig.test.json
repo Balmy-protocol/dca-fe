@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    // "target": "ES2021",
+    "module": "es6",
+    "target": "es5",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "types": ["node", "jest"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "allowJs": true
+  },
+  "extends": "./tsconfig.json",
+  "include": ["./integration", ".", "./tests/**/*", "src/**/*"],
+}
