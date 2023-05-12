@@ -1,4 +1,4 @@
-import type Web3Service from '@services/web3Service';
+// import type Web3Service from '@services/web3Service';
 import React from 'react';
 import { QuoteTransaction } from '@mean-finance/sdk';
 import { BigNumber } from 'ethers';
@@ -17,7 +17,7 @@ export * from './sdk';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
-export { Web3Service };
+// export { Web3Service };
 
 export type Web3ServicePromisableMethods =
   | 'connect'

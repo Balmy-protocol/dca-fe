@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { formatUnits, parseUnits } from '@ethersproject/units';
-import { STABLE_COINS, TOKEN_TYPE_BASE } from '@constants';
+import { TOKEN_TYPE_BASE } from '@constants/common';
+import { STABLE_COINS } from '@constants/addresses';
 import _Decimal from 'decimal.js-light';
 import { BigNumber } from 'ethers';
 import JSBI from 'jsbi';

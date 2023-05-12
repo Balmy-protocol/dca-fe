@@ -5,8 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 
 // MOCKS
-import { PositionVersions } from '@constants';
-import { SwapOption, SwapOptionWithTx, Token } from '@types';
+import { SwapOption, SwapOptionWithTx, Token, PositionVersions } from '@types';
 import { TransactionReceipt, TransactionRequest } from '@ethersproject/providers';
 import { toToken } from '@common/utils/currency';
 import { Interface } from '@ethersproject/abi';

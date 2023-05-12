@@ -1,16 +1,10 @@
 /* eslint-disable no-template-curly-in-string */
 
 import { Chains, getAllChains } from '@mean-finance/sdk';
-import { NetworkStruct } from '@types';
+import { NetworkStruct, PositionVersions } from '@types';
 import findKey from 'lodash/findKey';
 import { Chain } from '@mean-finance/sdk/dist/types';
-import {
-  POSITION_VERSION_2,
-  POSITION_VERSION_3,
-  PositionVersions,
-  POSITION_VERSION_4,
-  POSITION_VERSION_1,
-} from './common';
+import { POSITION_VERSION_2, POSITION_VERSION_3, POSITION_VERSION_4, POSITION_VERSION_1 } from './common';
 
 // type WithKey<K extends string | number | symbol> = {
 //   [k in K]: boolean

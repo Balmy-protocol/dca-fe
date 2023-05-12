@@ -10,7 +10,7 @@ import SickIcon from '@mui/icons-material/Sick';
 import Button from '@common/components/button';
 import WalletContext from '@common/components/wallet-context';
 import Link from '@mui/material/Link';
-import { Web3Service } from '@types';
+import Web3Service from '@services/web3Service';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `

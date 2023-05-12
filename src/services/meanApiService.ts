@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from '@constants';
+import { LATEST_VERSION, MEAN_API_URL } from '@constants';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import {
   AllowedPairs,
@@ -10,6 +10,7 @@ import {
   MeanFinanceResponse,
   PermissionPermit,
   Token,
+  PositionVersions,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 

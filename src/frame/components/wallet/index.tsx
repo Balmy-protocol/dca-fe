@@ -8,7 +8,6 @@ import { updateBadgeNumber } from '@state/transactions-badge/actions';
 import Badge from '@mui/material/Badge';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Web3Service } from '@types';
 import Button from '@common/components/button';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import Address from '@common/components/address';
@@ -18,6 +17,7 @@ import TokenIcon from '@common/components/token-icon';
 import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
 import { find } from 'lodash';
 import { toToken } from '@common/utils/currency';
+import useWeb3Service from '@hooks/useWeb3Service';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import WalletMenu from '../wallet-menu';
 
@@ -49,11 +49,10 @@ const StyledTokenIconContainer = styled.div<{ small: boolean }>`
 `;
 
 interface ConnectWalletButtonProps {
-  web3Service: Web3Service;
   isLoading: boolean;
 }
 
-const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
+const WalletButton = ({ isLoading }: ConnectWalletButtonProps) => {
   const transactions = useAllTransactions();
   const [shouldOpenMenu, setShouldOpenMenu] = React.useState(false);
   const currentBreakPoint = useCurrentBreakpoint();
@@ -61,6 +60,7 @@ const WalletButton = ({ web3Service, isLoading }: ConnectWalletButtonProps) => {
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const badge = useBadgeNumber(currentNetwork.chainId);
+  const web3Service = useWeb3Service();
 
   const onOpen = () => {
     dispatch(
