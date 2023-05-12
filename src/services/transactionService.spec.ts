@@ -1,5 +1,7 @@
-import { TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
+import { Log, TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
 import { ModuleMocker } from 'jest-mock';
+import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
+import { HubContract } from '@types';
 import TransactionService from './transactionService';
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -106,7 +108,7 @@ describe('Transaction Service', () => {
         transactionService.setLoadedAsSafeApp(true);
       });
 
-      test('it should set an interval to call the providerService getBlockNumber', () => {
+      test('it should set an interval to call the providerService getBlockNumber', async () => {
         const callback = jest.fn();
 
         providerService.getBlockNumber.mockResolvedValue(10);
@@ -121,12 +123,16 @@ describe('Transaction Service', () => {
         // Fast-forward until all timers have been executed
         jest.advanceTimersByTime(10000);
         expect(providerService.getBlockNumber).toHaveBeenCalled();
-        expect(callback).toHaveBeenCalledWith(10);
+        expect(callback).toHaveBeenCalledWith(expect.any(Promise));
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const result = await (callback.mock.calls[0][0] as unknown as Promise<number>);
+        expect(result).toEqual(10);
       });
     });
     describe('when it is not loaded as a safe app', () => {
       beforeEach(() => {
-        transactionService.setLoadedAsSafeApp(true);
+        transactionService.setLoadedAsSafeApp(false);
       });
 
       test('it should call the providerService on block', () => {
@@ -139,7 +145,97 @@ describe('Transaction Service', () => {
     });
   });
 
-  describe('removeOnBlock', () => {});
+  describe('removeOnBlock', () => {
+    test('it should call the provider service to remove the block listener', () => {
+      transactionService.removeOnBlock();
+      expect(providerService.off).toHaveBeenCalledWith('block');
+    });
+  });
 
-  describe('parseLog', () => {});
+  describe('parseLog', () => {
+    beforeEach(() => {
+      contractService.getHUBAddress.mockResolvedValue('hubAddress');
+      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHubInstance.mockResolvedValue({
+        interface: { parseLog: jest.fn().mockReturnValue({ name: 'hubLog' }) },
+      } as unknown as HubContract);
+      contractService.getHUBCompanionInstance.mockResolvedValue({
+        interface: { parseLog: jest.fn().mockReturnValue({ name: 'companionLog' }) },
+      } as unknown as DCAHubCompanion);
+    });
+
+    it('should return the hub parsed log', async () => {
+      const hubLog = {
+        address: 'hubAddress',
+      } as Log;
+
+      const result = await transactionService.parseLog([hubLog], 1, 'hubLog');
+
+      expect(result).toEqual({ name: 'hubLog' });
+    });
+
+    it('should return the companion parsed log', async () => {
+      const companionLog = {
+        address: 'companionAddress',
+      } as Log;
+
+      const result = await transactionService.parseLog([companionLog], 1, 'companionLog');
+
+      expect(result).toEqual({ name: 'companionLog' });
+    });
+
+    it('should return undefined if no logs match the hub or the companion address', async () => {
+      const companionLog = {
+        address: 'anotherAddress',
+      } as Log;
+
+      const result = await transactionService.parseLog([companionLog], 1, 'companionLog');
+
+      expect(result).toEqual(undefined);
+    });
+
+    it('should return the first parsed log of the list', async () => {
+      const hubLog = {
+        address: 'hubAddress',
+      } as Log;
+      const companionLog = {
+        address: 'anotherAddress',
+      } as Log;
+
+      contractService.getHubInstance.mockResolvedValue({
+        interface: { parseLog: jest.fn().mockReturnValue({ name: 'event', from: 'hub' }) },
+      } as unknown as HubContract);
+      contractService.getHUBCompanionInstance.mockResolvedValue({
+        interface: { parseLog: jest.fn().mockReturnValue({ name: 'event', from: 'companion' }) },
+      } as unknown as DCAHubCompanion);
+
+      const result = await transactionService.parseLog([hubLog, companionLog], 1, 'event');
+
+      expect(result).toEqual({ name: 'event', from: 'hub' });
+    });
+
+    it('should not fail on failing to parse a log', async () => {
+      const hubLog = {
+        address: 'hubAddress',
+      } as Log;
+      const companionLog = {
+        address: 'anotherAddress',
+      } as Log;
+
+      contractService.getHubInstance.mockResolvedValue({
+        interface: { parseLog: jest.fn().mockReturnValue({ name: 'event', from: 'hub' }) },
+      } as unknown as HubContract);
+      contractService.getHUBCompanionInstance.mockResolvedValue({
+        interface: {
+          parseLog: jest.fn().mockImplementation(() => {
+            throw new Error('blabalbla');
+          }),
+        },
+      } as unknown as DCAHubCompanion);
+
+      const result = await transactionService.parseLog([hubLog, companionLog], 1, 'event');
+
+      expect(result).toEqual({ name: 'event', from: 'hub' });
+    });
+  });
 });

@@ -353,7 +353,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                   !web3Service.getAccount() && !isLoading ? (
                     <ConnectWalletButtom />
                   ) : (
-                    <WalletButtom isLoading={isLoading} web3Service={web3Service} />
+                    <WalletButtom isLoading={isLoading} />
                   )
                 }
               </WalletContext.Consumer>

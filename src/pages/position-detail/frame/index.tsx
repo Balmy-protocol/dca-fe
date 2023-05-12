@@ -8,7 +8,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import getPosition from '@graphql/getPosition.graphql';
 import useDCAGraphql from '@hooks/useDCAGraphql';
 import { useParams } from 'react-router-dom';
-import { FullPosition, GetPairSwapsData, NFTData, TransactionTypes } from '@types';
+import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionTypes } from '@types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import getPairSwaps from '@graphql/getPairSwaps.graphql';
@@ -26,14 +26,7 @@ import { createStyles } from '@mui/material/styles';
 import TerminateModal from '@common/components/terminate-modal';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';
-import {
-  PERMISSIONS,
-  ModeTypesIds,
-  PositionVersions,
-  DEFAULT_NETWORK_FOR_VERSION,
-  LATEST_VERSION,
-  FAIL_ON_ERROR,
-} from '@constants';
+import { PERMISSIONS, ModeTypesIds, DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, FAIL_ON_ERROR } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';

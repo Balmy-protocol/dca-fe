@@ -13,6 +13,7 @@ import {
   AvailablePair,
   LastSwappedAt,
   NextSwapAvailableAt,
+  PositionVersions,
 } from '@types';
 import { DateTime } from 'luxon';
 import {
@@ -30,7 +31,7 @@ import gqlFetchAll from '@common/utils/gqlFetchAll';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { ORACLES, PositionVersions, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION, SWAP_INTERVALS_MAP } from '@constants';
+import { ORACLES, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION, SWAP_INTERVALS_MAP } from '@constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';

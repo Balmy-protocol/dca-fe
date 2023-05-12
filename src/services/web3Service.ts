@@ -39,6 +39,7 @@ import {
 } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
+import { PositionVersions } from '@types';
 
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
@@ -47,7 +48,7 @@ import { DUMMY_ARCX_CLIENT } from '@common/utils/dummy-arcx-client';
 import { chainToWagmiNetwork } from '@common/utils/parsing';
 
 // MOCKS
-import { NETWORKS, PositionVersions, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
+import { NETWORKS, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 
 import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
 import { setupAxiosClient } from '@state';
