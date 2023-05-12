@@ -23,13 +23,12 @@ import {
   ORACLE_ADDRESS,
   PERMISSION_MANAGER_ADDRESS,
   UNISWAP_ORACLE_ADDRESS,
-  PositionVersions,
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
   TRANSFORMER_REGISTRY_ADDRESS,
   SMOL_DOMAIN_ADDRESS,
 } from '@constants';
-import { ERC20Contract, HubContract, OEGasOracle, OracleContract, SmolDomainContract } from '@types';
+import { ERC20Contract, HubContract, OEGasOracle, OracleContract, SmolDomainContract, PositionVersions } from '@types';
 import ProviderService from './providerService';
 
 export default class ContractService {

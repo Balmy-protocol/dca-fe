@@ -21,6 +21,7 @@ import {
   PermissionManagerContract,
   PermissionPermit,
   TransactionTypes,
+  PositionVersions,
 } from '@types';
 
 // GRAPHQL
@@ -37,7 +38,6 @@ import {
   PERMISSIONS,
   POSITIONS_VERSIONS,
   POSITION_VERSION_2,
-  PositionVersions,
   LATEST_VERSION,
   SIGN_VERSION,
   TOKEN_TYPE_YIELD_BEARING_SHARES,

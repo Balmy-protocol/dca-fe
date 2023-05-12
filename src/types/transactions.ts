@@ -1,6 +1,5 @@
 import { Log } from '@ethersproject/providers';
-import { PositionVersions } from '@constants';
-import { Permission, Position } from './positions';
+import { Permission, Position, PositionVersions } from './positions';
 import { Token } from './tokens';
 
 export interface TransactionReceipt {
