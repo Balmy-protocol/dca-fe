@@ -1,14 +1,14 @@
 module.exports = {
-  plugins: ['@typescript-eslint', 'eslint-comments', 'jest', 'promise', 'formatjs'],
+  plugins: ['@typescript-eslint', 'eslint-comments', 'promise', 'formatjs', 'jest'],
   ignorePatterns: ['jest.config.ts', '.eslintrc.js'],
   extends: [
     'airbnb-typescript',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:eslint-comments/recommended',
-    'plugin:jest/recommended',
     'plugin:promise/recommended',
     'prettier',
+    'plugin:jest/recommended',
   ],
   env: {
     node: true,
@@ -51,6 +51,15 @@ module.exports = {
       rules: {
         // Allow `require()`
         '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+    {
+      files: ['*.spec.ts'],
+      plugins: ['jest'],
+      rules: {
+        // you should turn the original rule off *only* for test files
+        '@typescript-eslint/unbound-method': 'off',
+        'jest/unbound-method': 'error',
       },
     },
   ],
