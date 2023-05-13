@@ -337,11 +337,11 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                   label={<FormattedMessage description="swap" defaultMessage="Swap" />}
                   value={2}
                 />
-                <StyledTab
+                {/* <StyledTab
                   onClick={() => handleTabChange({ index: 3, url: 'jbrl-competition' })}
                   label={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
                   value={3}
-                />
+                /> */}
               </StyledTabs>
             </StyledNavbarMainContent>
           )}
