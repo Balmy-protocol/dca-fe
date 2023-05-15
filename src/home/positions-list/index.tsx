@@ -5,10 +5,10 @@ import EmptyPositions from '@pages/dca/components/empty-positions';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
-import { ChainId, Position, YieldOptions, TransactionTypes } from '@types';
+import { ChainId, Position, YieldOptions } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { ModeTypesIds, PERMISSIONS, SUPPORTED_NETWORKS } from '@constants';
+import { FULL_DEPOSIT_TYPE, PERMISSIONS, RATE_TYPE, SUPPORTED_NETWORKS, TRANSACTION_TYPES } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
@@ -22,7 +22,6 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
 import useErrorService from '@hooks/useErrorService';
 import useYieldOptions from '@hooks/useYieldOptions';
-import { TransactionResponse } from '@ethersproject/providers';
 import TerminateModal from '@common/components/terminate-modal';
 import { shouldTrackError } from '@common/utils/errors';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
@@ -39,18 +38,8 @@ interface CurrentPositionsProps {
   finished?: boolean;
 }
 
-function comparePositions(positionA: Position, positionB: Position) {
-  const isAFinished = positionA.remainingSwaps.lte(BigNumber.from(0));
-  const isBFinished = positionB.remainingSwaps.lte(BigNumber.from(0));
-  if (isAFinished !== isBFinished) {
-    return isAFinished ? 1 : -1;
-  }
-
-  return positionA.startedAt > positionB.startedAt ? -1 : 1;
-}
-
 const PositionsList = ({ isLoading, positions, finished }: CurrentPositionsProps) => {
-  const hasSignSupport = useSupportsSigning();
+  const [hasSignSupport] = useSupportsSigning();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const currentNetwork = useCurrentNetwork();
   const protocolToken = getProtocolToken(currentNetwork.chainId);
@@ -120,11 +109,11 @@ const PositionsList = ({ isLoading, positions, finished }: CurrentPositionsProps
                 values={{ toSymbol }}
               />
             </Typography>
-            {(!!useProtocolToken || !!hasYield) && !hasPermission && hasSignSupport && (
+            {(!!useProtocolToken || !!hasYield) && !hasPermission && (
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
-                  defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
+                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
                   values={{ token: position.to.symbol }}
                 />
               </Typography>
@@ -133,32 +122,14 @@ const PositionsList = ({ isLoading, positions, finished }: CurrentPositionsProps
         ),
       });
 
-      let result;
-      let hash;
-
-      if (hasSignSupport) {
-        result = await positionService.withdraw(position, useProtocolToken);
-
-        hash = result.hash;
-      } else {
-        result = await positionService.withdrawSafe(position);
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        result.hash = result.safeTxHash;
-        hash = result.safeTxHash;
-      }
-
-      addTransaction(result as TransactionResponse, {
-        type: TransactionTypes.withdrawPosition,
-        typeData: {
-          id: position.id,
-          withdrawnUnderlying: position.toWithdrawUnderlying && position.toWithdrawUnderlying.toString(),
-        },
+      const result = await positionService.withdraw(position, useProtocolToken);
+      addTransaction(result, {
+        type: TRANSACTION_TYPES.WITHDRAW_POSITION,
+        typeData: { id: position.id, withdrawnUnderlying: position.toWithdrawUnderlying?.toString() },
         position,
       });
       setModalSuccess({
-        hash,
+        hash: result.hash,
         content: (
           <FormattedMessage
             description="withdraw from success"
@@ -205,9 +176,7 @@ const PositionsList = ({ isLoading, positions, finished }: CurrentPositionsProps
         ),
         rate: formatUnits(position.depositedRateUnderlying || position.rate, position.from.decimals),
         frequencyValue: position.remainingSwaps.toString(),
-        modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0))
-          ? ModeTypesIds.FULL_DEPOSIT_TYPE
-          : ModeTypesIds.RATE_TYPE,
+        modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0)) ? FULL_DEPOSIT_TYPE : RATE_TYPE,
       })
     );
     setShowModifyRateSettingsModal(true);

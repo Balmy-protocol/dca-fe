@@ -51,7 +51,7 @@ import useSupportsSigning from '@hooks/useSupportsSigning';
 import { TransactionResponse } from '@ethersproject/providers';
 import { setPermissions } from '@state/position-permissions/actions';
 import PositionNotFound from '../components/position-not-found';
-import PositionControls from '../components/position-summary-controls';
+import PositionSummaryControls from '../components/position-summary-controls';
 import PositionSummaryContainer from '../components/summary-container';
 import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
@@ -654,7 +654,7 @@ const PositionDetailFrame = () => {
             />
           </StyledTabs>
           {positionInUse.status !== 'TERMINATED' && (
-            <PositionControls
+            <PositionSummaryControls
               onTerminate={handleShowTerminateModal}
               onModifyRate={onShowModifyRateSettings}
               onTransfer={handleShowTransferModal}

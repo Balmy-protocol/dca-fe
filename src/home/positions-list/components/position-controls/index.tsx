@@ -12,7 +12,6 @@ import {
   shouldEnableFrequency,
   DISABLED_YIELD_WITHDRAWS,
   DCA_TOKEN_BLACKLIST,
-  DCA_PAIR_BLACKLIST,
   LATEST_VERSION,
   COMPANION_ADDRESS,
 } from '@constants';
@@ -216,7 +215,6 @@ const PositionControls = ({
   const disabledIncrease =
     disabled ||
     DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
-    DCA_PAIR_BLACKLIST.includes(position.pairId) ||
     DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),

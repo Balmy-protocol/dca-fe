@@ -25,6 +25,7 @@ import {
 
 // GRAPHQL
 import GET_POSITIONS from '@graphql/getPositions.graphql';
+import GET_PERMISSIONED_POSITIONS from '@graphql/getPermissionedPositions.graphql';
 
 // ABIS
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
@@ -139,7 +140,8 @@ export default class PositionService {
       this.hasFetchedCurrentPositions = true;
       return;
     }
-    const promises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
+    const positionsPromises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
+    const permissionedPositionsPromises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
     const networksAndVersions: { network: number; version: PositionVersions }[] = [];
 
     POSITIONS_VERSIONS.forEach((version) =>
@@ -149,7 +151,7 @@ export default class PositionService {
           return;
         }
         networksAndVersions.push({ version, network });
-        promises.push(
+        positionsPromises.push(
           gqlFetchAll<PositionsGraphqlResponse>(
             currentApolloClient.getClient(),
             GET_POSITIONS,
@@ -161,10 +163,27 @@ export default class PositionService {
             'network-only'
           )
         );
+        permissionedPositionsPromises.push(
+          gqlFetchAll<PositionsGraphqlResponse>(
+            currentApolloClient.getClient(),
+            GET_PERMISSIONED_POSITIONS,
+            {
+              address: account.toLowerCase(),
+            },
+            'positions',
+            'network-only'
+          )
+        );
       })
     );
 
-    const results = await Promise.all(promises.map((promise) => promise.catch(() => ({ data: null, error: true }))));
+    const positionsResults = await Promise.all(
+      positionsPromises.map((promise) => promise.catch(() => ({ data: null, error: true })))
+    );
+
+    const permissionedPositionsResults = await Promise.all(
+      permissionedPositionsPromises.map((promise) => promise.catch(() => ({ data: null, error: true })))
+    );
 
     const currentPositions = {
       ...this.currentPositions,
@@ -177,7 +196,11 @@ export default class PositionService {
       attr: 'remainingLiquidityUnderlying' | 'toWithdrawUnderlying';
     }[] = [];
 
-    this.currentPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
+    const mapPositions = (
+      acc: PositionKeyBy,
+      gqlResult: GraphqlResults<PositionsGraphqlResponse>,
+      index: number
+    ): PositionKeyBy => {
       const { network, version } = networksAndVersions[index];
       if (!gqlResult.error && gqlResult.data) {
         return {
@@ -251,7 +274,13 @@ export default class PositionService {
         };
       }
       return acc;
-    }, currentPositions);
+    };
+
+    const positions = positionsResults.reduce<PositionKeyBy>(mapPositions, currentPositions);
+
+    const permissionedPositions = permissionedPositionsResults.reduce<PositionKeyBy>(mapPositions, currentPositions);
+
+    this.currentPositions = { ...positions, ...permissionedPositions };
 
     const underlyingReponses = await this.meanApiService.getUnderlyingTokens(
       underlyingsNeededToFetch.map(({ token, amount }) => ({ token, amount }))

@@ -16,8 +16,10 @@ import {
   MINIMUM_USD_RATE_FOR_YIELD,
   ModeTypesIds,
   NETWORKS,
-  PERMISSIONS,
   STRING_SWAP_INTERVALS,
+  COMPANION_ADDRESS,
+  LATEST_VERSION,
+  PERMISSIONS,
 } from '@constants';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -62,6 +64,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import usePermit2Service from '@hooks/usePermit2Service';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
+import { useAccountPermissions, mergeCompanionPermissions } from 'state/position-permissions/hooks';
 import FrequencyInput from '../frequency-easy-input';
 
 const StyledRateContainer = styled.div`
@@ -96,8 +99,22 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { swapInterval, from, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
+  const { swapInterval, from, remainingSwaps, rate: oldRate, depositedRateUnderlying, to } = position;
   const account = useAccount();
+  const companionAddress =
+    COMPANION_ADDRESS[position.version][position.chainId] || COMPANION_ADDRESS[LATEST_VERSION][position.chainId];
+  const accountPermissions = useAccountPermissions(position.positionId, position.user);
+  const companionPermissions = useAccountPermissions(
+    position.positionId,
+    position.user,
+    companionAddress.toLowerCase()
+  );
+  const hasYield = !!from.underlyingTokens.length || !!to.underlyingTokens.length;
+
+  const mergedPermissions = hasYield
+    ? mergeCompanionPermissions(accountPermissions, companionPermissions)
+    : accountPermissions;
+
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -127,7 +144,31 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       useWrappedProtocolToken = true;
     }
   }
-  const shouldShowWrappedProtocolSwitch = position.from.address === PROTOCOL_TOKEN_ADDRESS && hasSignSupport;
+
+  const isProtocolToken = position.from.address === PROTOCOL_TOKEN_ADDRESS;
+  const shouldShowWrappedProtocolSwitch = isProtocolToken && hasSignSupport;
+  const isIncreasingPosition = remainingLiquidity
+    .sub(parseUnits(fromValue || '0', fromToUse.decimals))
+    .lte(BigNumber.from(0));
+
+  const hasNotChangedPosition = remainingLiquidity
+    .sub(parseUnits(fromValue || '0', fromToUse.decimals))
+    .eq(BigNumber.from(0));
+
+  const companionHasRequiredPermission = isIncreasingPosition
+    ? !!companionPermissions.INCREASE
+    : !!companionPermissions.REDUCE;
+
+  const defaultWrapped =
+    shouldShowWrappedProtocolSwitch && !accountPermissions.isOwner && !companionHasRequiredPermission;
+
+  React.useEffect(() => {
+    if (defaultWrapped && !useWrappedProtocolToken) {
+      fromToUse = wrappedProtocolToken;
+      dispatch(setUseWrappedProtocolToken(!useWrappedProtocolToken));
+    }
+  }, [defaultWrapped, useWrappedProtocolToken]);
+
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
   const errorService = useErrorService();
@@ -137,11 +178,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     useWrappedProtocolToken ? wrappedProtocolToken : position.from,
     allowanceTarget
   );
+
   const [balance] = useBalance(fromToUse);
   const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const realBalance = balance && balance.add(remainingLiquidity);
-  const hasYield = !!from.underlyingTokens.length;
   const [usdPrice] = useRawUsdPrice(from);
   const trackEvent = useTrackEvent();
   const fromValueUsdPrice = parseUsdPrice(
@@ -149,6 +190,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
     usdPrice
   );
+
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
   const remainingLiquidityDifference = remainingLiquidity
     .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
@@ -162,20 +204,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
     parseUnits(fromValue, fromToUse.decimals).gt(realBalance);
 
-  const isIncreasingPosition = remainingLiquidity
-    .sub(parseUnits(fromValue || '0', fromToUse.decimals))
-    .lte(BigNumber.from(0));
-
   const needsToApprove =
     !hasConfirmedApproval &&
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
-    position.user === account.toLowerCase() &&
     allowance.allowance &&
     allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
     allowance.token.address === fromToUse.address &&
     isIncreasingPosition &&
     !hasPendingApproval &&
-    parseUnits(allowance.allowance, fromToUse.decimals).lt(remainingLiquidityDifference);
+    parseUnits(allowance.allowance, fromToUse.decimals).lt(remainingLiquidityDifference) &&
+    !!mergedPermissions.INCREASE;
 
   const handleCancel = () => {
     onCancel();
@@ -303,7 +341,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               />
             </Typography>
             {(((position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken) || hasYield) &&
-              !hasPermission) ||
+              !hasPermission &&
+              !companionHasRequiredPermission &&
+              accountPermissions.isOwner) ||
               (goesThroughPermit2 && (
                 <Typography variant="body1">
                   {!isIncreasingPosition && (
@@ -683,7 +723,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwaps,
-        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
+        disabled:
+          !!cantFund ||
+          frequencyValue === '0' ||
+          shouldDisableByUsd ||
+          (!mergedPermissions.INCREASE && isIncreasingPosition) ||
+          (!mergedPermissions.REDUCE && !isIncreasingPosition) ||
+          hasNotChangedPosition,
       },
     ];
   }
@@ -742,6 +788,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                       onChange={() => dispatch(setUseWrappedProtocolToken(!useWrappedProtocolToken))}
                       name="enableDisableWrappedProtocolToken"
                       color="primary"
+                      disabled={defaultWrapped}
                     />
                   }
                   label={
@@ -753,6 +800,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   }
                 />
               </FormGroup>
+            )}
+            {defaultWrapped && (
+              <FormattedMessage
+                description="useWrappedTokenHint"
+                defaultMessage="You can only use {token} because the Mean Finance Companion doesn't have the required permissions"
+                values={{ token: wrappedProtocolToken.symbol }}
+              />
             )}
             <TokenInput
               id="from-value"
@@ -834,7 +888,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
               .eq(BigNumber.from(0)) && (
               <Typography variant="body2">
-                {isIncreasingPosition ? (
+                {isIncreasingPosition && mergedPermissions.INCREASE && (
                   <FormattedMessage
                     description="rate add detail"
                     defaultMessage="You will need to provide an aditional {addAmmount} {from}"
@@ -843,18 +897,46 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                       addAmmount: formatUnits(remainingLiquidityDifference, fromToUse.decimals),
                     }}
                   />
-                ) : (
-                  <FormattedMessage
-                    description="rate withdraw detail"
-                    defaultMessage="We will return {returnAmmount} {from} to you"
-                    values={{
-                      from: fromToUse.symbol,
-                      returnAmmount: formatUnits(remainingLiquidityDifference, fromToUse.decimals),
-                    }}
-                  />
                 )}
+                {!isIncreasingPosition &&
+                  mergedPermissions.REDUCE &&
+                  (accountPermissions.isOwner ? (
+                    <FormattedMessage
+                      description="rate withdraw detail"
+                      defaultMessage="We will return {returnAmmount} {from} to you"
+                      values={{
+                        from: fromToUse.symbol,
+                        returnAmmount: formatUnits(remainingLiquidityDifference, fromToUse.decimals),
+                      }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      description="rate permissioned withdraw detail"
+                      defaultMessage="We will return {returnAmmount} {from} to the owner of this position"
+                      values={{
+                        from: fromToUse.symbol,
+                        returnAmmount: formatUnits(remainingLiquidityDifference, fromToUse.decimals),
+                      }}
+                    />
+                  ))}
               </Typography>
             )}
+          {!mergedPermissions.INCREASE && isIncreasingPosition && !hasNotChangedPosition && (
+            <Typography variant="body2">
+              <FormattedMessage
+                description="rate add detail"
+                defaultMessage="You don't have the required permission to increase this position"
+              />
+            </Typography>
+          )}
+          {!mergedPermissions.REDUCE && !isIncreasingPosition && (
+            <Typography variant="body2">
+              <FormattedMessage
+                description="rate add detail"
+                defaultMessage="You don't have the required permission to reduce this position"
+              />
+            </Typography>
+          )}
         </Grid>
         {shouldDisableByUsd && (
           <Grid item xs={12}>

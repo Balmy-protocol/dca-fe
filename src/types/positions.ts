@@ -57,6 +57,7 @@ export type PermissionData = {
   id: string;
   operator: string;
   permissions: Permission[];
+  __typename: string;
 };
 
 export type FullPermission = { [key: string]: PermissionData };

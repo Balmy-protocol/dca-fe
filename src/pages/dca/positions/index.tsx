@@ -5,6 +5,8 @@ import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
+import { BigNumber } from 'ethers';
+import { Position } from 'types';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { changeOpenClosePositionTab } from '@state/tabs/actions';
@@ -15,7 +17,7 @@ import usePrevious from '@hooks/usePrevious';
 import useAccount from '@hooks/useAccount';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import History from './components/history';
-import CurrentPositions from './components/current-positions';
+import PositionsList from '../positions-list';
 import PositionDashboard from './components/dashboard';
 
 const StyledContainer = styled.div`
@@ -94,6 +96,16 @@ const StyledPaper = styled(Paper)`
   align-items: flex-start;
 `;
 
+function comparePositions(positionA: Position, positionB: Position) {
+  const isAFinished = positionA.remainingSwaps.lte(BigNumber.from(0));
+  const isBFinished = positionB.remainingSwaps.lte(BigNumber.from(0));
+  if (isAFinished !== isBFinished) {
+    return isAFinished ? 1 : -1;
+  }
+
+  return positionA.startedAt > positionB.startedAt ? -1 : 1;
+}
+
 const Positions = () => {
   const tabIndex = useOpenClosePositionTab();
   const dispatch = useAppDispatch();
@@ -102,7 +114,31 @@ const Positions = () => {
   const account = useAccount();
   const [isLoading, setIsLoading] = React.useState(false);
   const prevAccount = usePrevious(account);
-  const positions = useCurrentPositions();
+  const positions = useCurrentPositions(true);
+
+  const positionsInProgress = positions
+    .filter(
+      ({ toWithdraw, remainingSwaps, user }) =>
+        (toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))) &&
+        user.toLowerCase() === account.toLowerCase()
+    )
+    .sort(comparePositions);
+  const positionsFinished = positions
+    .filter(
+      ({ toWithdraw, remainingSwaps, user }) =>
+        toWithdraw.lte(BigNumber.from(0)) &&
+        remainingSwaps.lte(BigNumber.from(0)) &&
+        user.toLowerCase() === account.toLowerCase()
+    )
+    .sort(comparePositions);
+
+  const permissionedPositionsInProgress = positions
+    .filter(
+      ({ toWithdraw, remainingSwaps, user }) =>
+        (toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))) &&
+        user.toLowerCase() !== account.toLowerCase()
+    )
+    .sort(comparePositions);
 
   React.useEffect(() => {
     const fetchPositions = async () => {
@@ -145,7 +181,7 @@ const Positions = () => {
               disableRipple
               label={
                 <Typography variant="h6">
-                  <FormattedMessage description="openPositions" defaultMessage="Open positions" />
+                  <FormattedMessage description="openPositions" defaultMessage="Open" />
                 </Typography>
               }
             />
@@ -154,15 +190,59 @@ const Positions = () => {
               sx={{ marginLeft: '32px' }}
               label={
                 <Typography variant="h6">
-                  <FormattedMessage description="terminatedPositions" defaultMessage="Closed positions" />
+                  <FormattedMessage description="emptyPositions" defaultMessage="Empty" />
                 </Typography>
               }
             />
+            <StyledTab
+              disableRipple
+              sx={{ marginLeft: '32px' }}
+              label={
+                <Typography variant="h6">
+                  <FormattedMessage description="terminatedPositions" defaultMessage="Closed" />
+                </Typography>
+              }
+            />
+            {!!permissionedPositionsInProgress.length && (
+              <StyledTab
+                disableRipple
+                sx={{ marginLeft: '32px' }}
+                label={
+                  <Typography variant="h6">
+                    <FormattedMessage description="terminatedPositions" defaultMessage="Permissioned" />
+                  </Typography>
+                }
+              />
+            )}
           </StyledTabs>
         </StyledTabsContainers>
         <StyledPositionsContainer>
           <StyledPaper variant="outlined">
-            {tabIndex === 0 ? <CurrentPositions isLoading={!hasLoadedPositions || isLoading} /> : <History />}
+            {(() => {
+              switch (tabIndex) {
+                case 0: // OPEN
+                  return <PositionsList isLoading={!hasLoadedPositions || isLoading} positions={positionsInProgress} />;
+                case 1: // EMPTY
+                  return (
+                    <PositionsList
+                      isLoading={!hasLoadedPositions || isLoading}
+                      positions={positionsFinished}
+                      finished
+                    />
+                  );
+                case 2: // CLOSED
+                  return <History />;
+                case 3: // PERMISSIONED
+                  return (
+                    <PositionsList
+                      isLoading={!hasLoadedPositions || isLoading}
+                      positions={permissionedPositionsInProgress}
+                    />
+                  );
+                default:
+                  return null;
+              }
+            })()}
           </StyledPaper>
         </StyledPositionsContainer>
       </StyledPositions>

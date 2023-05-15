@@ -170,6 +170,7 @@ const PositionPermissionsContainer = ({
               onDiscardChanges={onDiscardChanges}
               onAddAddress={() => setShouldShowAddAddressModal(true)}
               disabled={disabled}
+              permissions={permissions}
             />
           )}
         </StyledControlsWrapper>
