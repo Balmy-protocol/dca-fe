@@ -44,7 +44,7 @@ export default createReducer(initialState, (builder) =>
           retries: 0,
           chainId,
           position,
-        };
+        } as TransactionDetails;
       }
     )
     .addCase(checkedTransaction, (state, { payload: { hash, blockNumber, chainId } }) => {

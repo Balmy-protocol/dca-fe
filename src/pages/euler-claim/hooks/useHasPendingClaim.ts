@@ -1,8 +1,7 @@
-import { TRANSACTION_TYPES } from '@constants';
 import useWalletService from '@hooks/useWalletService';
 import { useMemo } from 'react';
 import { useAllTransactions } from '@state/transactions/hooks';
-import { EulerClaimClaimFromMigratorTypeData, Token } from '@types';
+import { Token, TransactionTypes } from '@types';
 
 const useHasPendingClaim = (token: Token | null) => {
   const allTransactions = useAllTransactions();
@@ -16,12 +15,12 @@ const useHasPendingClaim = (token: Token | null) => {
       typeof tokenAddress === 'string' &&
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
-        if (allTransactions[hash].type !== TRANSACTION_TYPES.EULER_CLAIM_CLAIM_FROM_MIGRATOR) return false;
         const tx = allTransactions[hash];
+        if (tx.type !== TransactionTypes.eulerClaimClaimFromMigrator) return false;
         if (tx.receipt) {
           return false;
         }
-        return (<EulerClaimClaimFromMigratorTypeData>tx.typeData).token.address === tokenAddress && tx.from === spender;
+        return tx.typeData.token.address === tokenAddress && tx.from === spender;
       }),
     [allTransactions, spender, tokenAddress]
   );

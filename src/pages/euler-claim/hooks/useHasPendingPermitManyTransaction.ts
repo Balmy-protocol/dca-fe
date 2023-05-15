@@ -1,4 +1,4 @@
-import { TRANSACTION_TYPES } from '@constants';
+import { TransactionTypes } from '@types';
 import { useMemo } from 'react';
 import { useAllNotClearedTransactions } from '@state/transactions/hooks';
 
@@ -8,7 +8,7 @@ const useHasPendingTransactions = () => {
   return useMemo(
     () =>
       Object.keys(transactions).some(
-        (hash) => transactions[hash].type === TRANSACTION_TYPES.EULER_CLAIM_PERMIT_MANY && !transactions[hash].receipt
+        (hash) => transactions[hash].type === TransactionTypes.eulerClaimPermitMany && !transactions[hash].receipt
       ),
     [transactions]
   );

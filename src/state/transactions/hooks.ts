@@ -2,21 +2,12 @@ import { TransactionResponse } from '@ethersproject/providers';
 import { useCallback, useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import find from 'lodash/find';
-import {
-  TransactionDetails,
-  TransactionTypes,
-  TransactionTypeDataOptions,
-  ApproveTokenTypeData,
-  Token,
-  TransactionPositionTypeDataOptions,
-  NewPositionTypeData,
-  Position,
-} from '@types';
+import { TransactionDetails, TransactionTypes, Token, TransactionAdderCustomData } from '@types';
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 import useWeb3Service from '@hooks/useWeb3Service';
-import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION, TRANSACTION_TYPES } from '@constants';
+import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import usePositionService from '@hooks/usePositionService';
@@ -26,17 +17,7 @@ import { useBlockNumber } from '@state/block-number/hooks';
 import { addTransaction } from './actions';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
-export function useTransactionAdder(): (
-  response: TransactionResponse,
-  customData: {
-    summary?: string;
-    approval?: { tokenAddress: string; spender: string };
-    claim?: { recipient: string };
-    type: TransactionTypes;
-    typeData: TransactionTypeDataOptions;
-    position?: Position;
-  }
-) => void {
+export function useTransactionAdder(): (response: TransactionResponse, customData: TransactionAdderCustomData) => void {
   const positionService = usePositionService();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
@@ -44,24 +25,7 @@ export function useTransactionAdder(): (
   const arcxClient = useArcx();
 
   return useCallback(
-    (
-      response: TransactionResponse,
-      {
-        summary,
-        approval,
-        claim,
-        type,
-        typeData,
-        position,
-      }: {
-        type: TransactionTypes;
-        typeData: TransactionTypeDataOptions;
-        summary?: string;
-        claim?: { recipient: string };
-        approval?: { tokenAddress: string; spender: string };
-        position?: Position;
-      } = { type: TRANSACTION_TYPES.NO_OP, typeData: { id: 'NO_OP' } }
-    ) => {
+    (response: TransactionResponse, customData: TransactionAdderCustomData) => {
       if (!walletService.getAccount()) return;
 
       const { hash } = response;
@@ -72,13 +36,9 @@ export function useTransactionAdder(): (
         addTransaction({
           hash,
           from: walletService.getAccount(),
-          approval,
-          summary,
-          claim,
-          type,
-          typeData,
           chainId: currentNetwork.chainId,
-          position: position && { ...position },
+          ...customData,
+          position: customData.position && { ...customData.position },
         })
       );
       try {
@@ -87,8 +47,8 @@ export function useTransactionAdder(): (
           chain: currentNetwork.chainId,
           transactionHash: hash,
           metadata: {
-            type,
-            position: position && position.positionId,
+            type: customData.type,
+            position: customData.position && customData.position.positionId,
           },
         });
       } catch (e) {
@@ -98,15 +58,11 @@ export function useTransactionAdder(): (
       positionService.setPendingTransaction({
         hash,
         from: walletService.getAccount(),
-        approval,
-        summary,
-        claim,
-        type,
-        typeData,
         chainId: currentNetwork.chainId,
         addedTime: new Date().getTime(),
         retries: 0,
-        position: position && { ...position },
+        ...customData,
+        position: customData.position && { ...customData.position },
       });
     },
     [dispatch, walletService.getAccount(), currentNetwork]
@@ -234,19 +190,15 @@ export function useHasPendingApproval(
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
-        if (
-          allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN &&
-          allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN_EXACT
-        )
-          return false;
         const tx = allTransactions[hash];
+        if (tx.type !== TransactionTypes.approveToken && tx.type !== TransactionTypes.approveTokenExact) return false;
+
         if (tx.receipt) {
           return false;
         }
+
         return (
-          (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress &&
-          (<ApproveTokenTypeData>tx.typeData).addressFor === addressToCheck &&
-          tx.from === spender
+          tx.typeData.token.address === tokenAddress && tx.typeData.addressFor === addressToCheck && tx.from === spender
         );
       }),
     [allTransactions, spender, tokenAddress, addressToCheck]
@@ -260,8 +212,8 @@ export function useHasPendingWrap(): boolean {
     () =>
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
-        if (allTransactions[hash].type !== TRANSACTION_TYPES.WRAP_ETHER) return false;
         const tx = allTransactions[hash];
+        if (tx.type !== TransactionTypes.wrapEther) return false;
         return !tx.receipt;
       }),
     [allTransactions]
@@ -286,19 +238,19 @@ export function useHasPendingPairCreation(from: Token | null, to: Token | null):
       !!to &&
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
-        if (allTransactions[hash].type !== TRANSACTION_TYPES.NEW_POSITION) return false;
         const tx = allTransactions[hash];
+        if (tx.type !== TransactionTypes.newPosition) return false;
         if (tx.receipt) {
           return false;
         }
-        let txFrom = (<NewPositionTypeData>tx.typeData).from.address;
+        let txFrom = tx.typeData.from.address;
         txFrom = txFrom === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : txFrom;
-        let txTo = (<NewPositionTypeData>tx.typeData).to.address;
+        let txTo = tx.typeData.to.address;
         txTo = txTo === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : txTo;
         return (
           (txFrom === fromAddress || txTo === fromAddress) &&
           (txFrom === toAddress || txTo === toAddress) &&
-          (<NewPositionTypeData>tx.typeData).isCreatingPair
+          tx.typeData.isCreatingPair
         );
       }),
     [allTransactions, fromAddress, toAddress, from, to]
@@ -313,16 +265,19 @@ export function usePositionHasPendingTransaction(position: string): string | nul
     const foundTransaction = find(allTransactions, (transaction) => {
       if (!transaction) return false;
       if (
-        transaction.type === TRANSACTION_TYPES.NEW_PAIR ||
-        transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN ||
-        transaction.type === TRANSACTION_TYPES.APPROVE_TOKEN_EXACT ||
-        transaction.type === TRANSACTION_TYPES.WRAP_ETHER
+        transaction.type === TransactionTypes.newPair ||
+        transaction.type === TransactionTypes.approveToken ||
+        transaction.type === TransactionTypes.approveTokenExact ||
+        transaction.type === TransactionTypes.swap ||
+        transaction.type === TransactionTypes.wrap ||
+        transaction.type === TransactionTypes.unwrap ||
+        transaction.type === TransactionTypes.wrapEther
       )
         return false;
       if (transaction.receipt) {
         return false;
       }
-      return (<TransactionPositionTypeDataOptions>transaction.typeData).id === position;
+      return transaction.typeData.id === position;
     });
 
     return foundTransaction?.hash || null;
@@ -338,11 +293,11 @@ export function usePositionHasTransfered(position: string): string | null {
   return useMemo(() => {
     const foundTransaction = find(allTransactions, (transaction) => {
       if (!transaction) return false;
-      if (transaction.type !== TRANSACTION_TYPES.TRANSFER_POSITION) return false;
+      if (transaction.type !== TransactionTypes.transferPosition) return false;
       // cache this for 3 blocks
       if (transaction.receipt && (blockNumber || 0) - transaction.receipt.blockNumber > 3) return false;
 
-      return !!transaction.receipt && (<TransactionPositionTypeDataOptions>transaction.typeData).id === position;
+      return !!transaction.receipt && transaction.typeData.id === position;
     });
 
     return foundTransaction?.hash || null;
@@ -370,16 +325,12 @@ export function useHasConfirmedApproval(
       typeof spender === 'string' &&
       Object.keys(allTransactions).some((hash) => {
         if (!allTransactions[hash]) return false;
-        if (
-          allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN &&
-          allTransactions[hash].type !== TRANSACTION_TYPES.APPROVE_TOKEN_EXACT
-        )
-          return false;
         const tx = allTransactions[hash];
+        if (tx.type !== TransactionTypes.approveToken && tx.type !== TransactionTypes.approveTokenExact) return false;
         return (
           tx.receipt &&
-          (<ApproveTokenTypeData>tx.typeData).token.address === tokenAddress &&
-          (<ApproveTokenTypeData>tx.typeData).addressFor === addressToCheck &&
+          tx.typeData.token.address === tokenAddress &&
+          tx.typeData.addressFor === addressToCheck &&
           (blockNumber || 0) - (tx.receipt.blockNumber || 0) <= 3 &&
           tx.from === spender
         );

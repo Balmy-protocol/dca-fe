@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
-import { FullPosition } from '@types';
+import { FullPosition, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import {
@@ -11,7 +11,6 @@ import {
 } from '@state/position-permissions/hooks';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import { TRANSACTION_TYPES } from '@constants';
 import { discardChanges, submitPermissionChanges } from '@state/position-permissions/actions';
 import { useAppDispatch } from '@state/hooks';
 import Paper from '@mui/material/Paper';
@@ -90,7 +89,7 @@ const PositionPermissionsContainer = ({
         modifiedPermissions
       );
       addTransaction(result, {
-        type: TRANSACTION_TYPES.MODIFY_PERMISSIONS,
+        type: TransactionTypes.modifyPermissions,
         typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol },
         position: fullPositionToMappedPosition(position),
       });

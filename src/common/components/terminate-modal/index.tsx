@@ -2,12 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { formatUnits } from '@ethersproject/units';
 import Modal from '@common/components/modal';
-import { Position } from '@types';
+import { Position, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { PERMISSIONS, TRANSACTION_TYPES } from '@constants';
+import { PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import FormGroup from '@mui/material/FormGroup';
@@ -127,7 +127,7 @@ const TerminateModal = ({
 
       const result = await positionService.terminate(position, terminateWithUnwrap);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.TERMINATE_POSITION,
+        type: TransactionTypes.terminatePosition,
         typeData: {
           id: position.id,
           remainingLiquidity: remainingLiquidity.toString(),

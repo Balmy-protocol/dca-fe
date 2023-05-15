@@ -6,7 +6,7 @@ import isFinite from 'lodash/isFinite';
 import * as React from 'react';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import styled from 'styled-components';
-import { SwapOption, Token } from '@types';
+import { SwapOption } from '@types';
 import TokenIcon from '@common/components/token-icon';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import Typography from '@mui/material/Typography';
@@ -16,11 +16,15 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { withStyles } from '@mui/styles';
 import { FormattedMessage } from 'react-intl';
 import { parseUnits } from '@ethersproject/units';
-import { SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
+import { SORT_MOST_PROFIT, SORT_MOST_RETURN } from '@constants/aggregator';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import { MAX_BI } from '@constants';
 import { BigNumber } from 'ethers';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
+import { useAggregatorState } from '@state/aggregator/hooks';
+import { setSelectedRoute } from '@state/aggregator/actions';
+import { useAppDispatch } from '@state/hooks';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const DarkChip = withStyles(() => ({
   root: {
@@ -169,12 +173,7 @@ const StyledUsdContainer = styled.div`
 interface SwapQuotesProps {
   quote: SwapOption;
   isSelected?: boolean;
-  from: Token | null;
-  to: Token | null;
-  setRoute: (newRoute: SwapOption) => void;
-  isBuyOrder: boolean;
   bestQuote?: SwapOption;
-  sorting: SwapSortOptions;
   disabled: boolean;
 }
 
@@ -189,22 +188,23 @@ const toPrecision = (value: string) => {
   return parseFloat(preciseValue).toFixed(3);
 };
 
-const SwapQuote = ({
-  quote,
-  isSelected,
-  from,
-  to,
-  setRoute,
-  isBuyOrder,
-  bestQuote,
-  sorting,
-  disabled,
-}: SwapQuotesProps) => {
-  const { showTransactionCost: showTransactionCostConfig } = useAggregatorSettingsState();
+const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) => {
+  const { showTransactionCost: showTransactionCostConfig, sorting } = useAggregatorSettingsState();
+  const { from, to, isBuyOrder, selectedRoute } = useAggregatorState();
+  const dispatch = useAppDispatch();
+  const trackEvent = useTrackEvent();
 
   if (!to || !from) {
     return null;
   }
+
+  const setRoute = (newRoute: SwapOption) => {
+    dispatch(setSelectedRoute(newRoute));
+    trackEvent('Aggregator - Change selected route', {
+      fromSource: selectedRoute?.swapper.id,
+      toSource: newRoute.swapper.id,
+    });
+  };
 
   let isWorsePrice = false;
 
