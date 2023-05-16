@@ -1,5 +1,5 @@
 import { defineMessage, MessageDescriptor } from 'react-intl';
-import { Oracles, Permission, PositionActions, PositionStatus, TransactionTypesConstant } from '@types';
+import { Oracles, Permission, PositionActions, PositionStatus } from '@types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
 
@@ -12,53 +12,19 @@ export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT = 5;
 
-export const TRANSACTION_TYPES: TransactionTypesConstant = {
-  // COMMON
-  APPROVE_TOKEN: 'APPROVE_TOKEN',
-  APPROVE_TOKEN_EXACT: 'APPROVE_TOKEN_EXACT',
-
-  // DCA
-  NEW_POSITION: 'NEW_POSITION',
-  NEW_PAIR: 'NEW_PAIR',
-  TRANSFER_POSITION: 'TRANSFER_POSITION',
-  TERMINATE_POSITION: 'TERMINATE_POSITION',
-  APPROVE_COMPANION: 'APPROVE_COMPANION',
-  WITHDRAW_POSITION: 'WITHDRAW_POSITION',
-  ADD_FUNDS_POSITION: 'ADD_FUNDS_POSITION',
-  MODIFY_SWAPS_POSITION: 'MODIFY_SWAPS_POSITION',
-  MODIFY_RATE_AND_SWAPS_POSITION: 'MODIFY_RATE_AND_SWAPS_POSITION',
-  REMOVE_FUNDS: 'REMOVE_FUNDS',
-  RESET_POSITION: 'RESET_POSITION',
-  WRAP_ETHER: 'WRAP_ETHER',
-  MODIFY_PERMISSIONS: 'MODIFY_PERMISSIONS',
-  NO_OP: 'NO_OP',
-  MIGRATE_POSITION: 'MIGRATE_POSITION',
-  MIGRATE_POSITION_YIELD: 'MIGRATE_POSITION_YIELD',
-  WITHDRAW_FUNDS: 'WITHDRAW_FUNDS',
-
-  // AGGREGATOR
-  SWAP: 'SWAP',
-  WRAP: 'WRAP',
-  UNWRAP: 'UNWRAP',
-
-  // EULER CLAIM
-  EULER_CLAIM_TERMINATE_MANY: 'EULER_CLAIM_TERMINATE_MANY',
-  EULER_CLAIM_PERMIT_MANY: 'EULER_CLAIM_PERMIT_MANY',
-  EULER_CLAIM_APPROVE_MIGRATOR: 'EULER_CLAIM_APPROVE_MIGRATOR',
-  EULER_CLAIM_CLAIM_FROM_MIGRATOR: 'EULER_CLAIM_CLAIM_FROM_MIGRATOR',
-};
-
-export const FULL_DEPOSIT_TYPE = 'full_deposit';
-export const RATE_TYPE = 'by_rate';
+export enum ModeTypesIds {
+  FULL_DEPOSIT_TYPE = 'full_deposit',
+  RATE_TYPE = 'by_rate',
+}
 
 export const MODE_TYPES = {
   FULL_DEPOSIT: {
     label: 'Full deposit',
-    id: FULL_DEPOSIT_TYPE,
+    id: ModeTypesIds.FULL_DEPOSIT_TYPE,
   },
   RATE: {
     label: 'By rate',
-    id: RATE_TYPE,
+    id: ModeTypesIds.RATE_TYPE,
   },
 };
 

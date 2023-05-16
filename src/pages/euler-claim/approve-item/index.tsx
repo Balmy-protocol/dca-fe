@@ -1,10 +1,10 @@
 import React from 'react';
-import { EULER_CLAIM_MIGRATORS_ADDRESSES, TRANSACTION_TYPES } from '@constants';
+import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 import Button from '@common/components/button';
 import useWeb3Service from '@hooks/useWeb3Service';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import styled from 'styled-components';
-import { Token } from '@types';
+import { Token, TransactionTypes } from '@types';
 import { BigNumber } from 'ethers';
 import Typography from '@mui/material/Typography';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -63,7 +63,7 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
       trackEvent('Euler claim - Approve token submitted');
 
       addTransaction(result, {
-        type: TRANSACTION_TYPES.APPROVE_TOKEN,
+        type: TransactionTypes.approveToken,
         typeData: {
           token,
           addressFor: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],

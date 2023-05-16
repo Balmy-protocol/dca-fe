@@ -2,7 +2,6 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import EmptyRoutes from '@assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { SwapSortOptions } from '@constants/aggregator';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -15,7 +14,8 @@ import styled from 'styled-components';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';
 import useSdkDexes from '@hooks/useSdkSources';
-import { SwapOption, Token } from '@types';
+import { SwapOption } from '@types';
+import { useAggregatorState } from '@state/aggregator/hooks';
 import SwapQuote from '../quote';
 import QuoteRefresher from '../quote-refresher';
 import QuoteSorter from '../quote-sorter';
@@ -84,15 +84,8 @@ interface SourceMetadataWithId extends SourceMetadata {
 interface SwapQuotesProps {
   quotes: SwapOption[];
   isLoading: boolean;
-  from: Token | null;
-  to: Token | null;
-  selectedRoute: SwapOption | null;
-  setRoute: (newRoute: SwapOption) => void;
-  setSorting: (newSort: string) => void;
-  sorting: SwapSortOptions;
   fetchOptions: () => void;
   refreshQuotes: boolean;
-  isBuyOrder: boolean;
   bestQuote?: SwapOption;
   swapOptionsError?: string;
 }
@@ -100,18 +93,12 @@ interface SwapQuotesProps {
 const SwapQuotes = ({
   quotes,
   isLoading,
-  from,
-  to,
-  selectedRoute,
-  setRoute,
-  setSorting,
-  sorting,
   fetchOptions,
   refreshQuotes,
-  isBuyOrder,
   bestQuote,
   swapOptionsError,
 }: SwapQuotesProps) => {
+  const { from, to, isBuyOrder, selectedRoute } = useAggregatorState();
   const dexes = useSdkDexes();
   const dexesKeys = Object.keys(dexes);
   const mappedDexes = dexesKeys.reduce<SourceMetadataWithId[][]>((acc, dexKey, index) => {
@@ -258,7 +245,7 @@ const SwapQuotes = ({
   return (
     <StyledPaper variant="outlined" $column $align={!isLoading}>
       <StyledTitleContainer>
-        <QuoteSorter isLoading={isLoading} setQuoteSorting={setSorting} sorting={sorting} isBuyOrder={isBuyOrder} />
+        <QuoteSorter isLoading={isLoading} isBuyOrder={isBuyOrder} />
         <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} disableRefreshQuotes={!refreshQuotes} />
       </StyledTitleContainer>
       {isLoading && (
@@ -270,15 +257,10 @@ const SwapQuotes = ({
       {!isLoading &&
         quotes.map((quote) => (
           <SwapQuote
-            setRoute={setRoute}
-            from={from}
-            to={to}
             isSelected={quote.swapper.name === selectedRoute?.swapper.name}
             quote={quote}
             key={`${from?.symbol || ''}-${to?.symbol || ''}-${quote.swapper.name}`}
-            isBuyOrder={isBuyOrder}
             bestQuote={bestQuote}
-            sorting={sorting}
             disabled={!refreshQuotes}
           />
         ))}

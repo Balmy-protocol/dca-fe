@@ -8,7 +8,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import getPosition from '@graphql/getPosition.graphql';
 import useDCAGraphql from '@hooks/useDCAGraphql';
 import { useParams } from 'react-router-dom';
-import { FullPosition, GetPairSwapsData, NFTData } from '@types';
+import { FullPosition, GetPairSwapsData, NFTData, TransactionTypes } from '@types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import getPairSwaps from '@graphql/getPairSwaps.graphql';
@@ -28,8 +28,7 @@ import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';
 import {
   PERMISSIONS,
-  RATE_TYPE,
-  TRANSACTION_TYPES,
+  ModeTypesIds,
   PositionVersions,
   DEFAULT_NETWORK_FOR_VERSION,
   LATEST_VERSION,
@@ -304,7 +303,7 @@ const PositionDetailFrame = () => {
 
       const result = await positionService.withdraw(fullPositionToMappedPosition(positionInUse), useProtocolToken);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.WITHDRAW_POSITION,
+        type: TransactionTypes.withdrawPosition,
         typeData: {
           id: fullPositionToMappedPosition(positionInUse).id,
           withdrawnUnderlying: toWithdrawUnderlying.toString(),
@@ -401,7 +400,7 @@ const PositionDetailFrame = () => {
         !useProtocolToken
       );
       addTransaction(result, {
-        type: TRANSACTION_TYPES.WITHDRAW_FUNDS,
+        type: TransactionTypes.withdrawFunds,
         typeData: {
           id: fullPositionToMappedPosition(positionInUse).id,
           from: fromSymbol,
@@ -460,7 +459,7 @@ const PositionDetailFrame = () => {
         fromValue: formatUnits(remainingLiquidityToUse, positionInUse.from.decimals),
         rate: formatUnits(rateToUse, positionInUse.from.decimals),
         frequencyValue: positionInUse.remainingSwaps.toString(),
-        modeType: RATE_TYPE,
+        modeType: ModeTypesIds.RATE_TYPE,
       })
     );
     trackEvent('DCA - Position details - Show add funds modal');

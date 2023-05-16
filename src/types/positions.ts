@@ -8,6 +8,14 @@ export type SwapInterval = {
   description: string;
 };
 
+export type AvailableSwapInterval = {
+  label: {
+    singular: string;
+    adverb: string;
+  };
+  value: BigNumber;
+};
+
 export interface NFTData {
   description: string;
   image: string;

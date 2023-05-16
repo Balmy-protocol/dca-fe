@@ -2,12 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import isUndefined from 'lodash/isUndefined';
-import { Position, YieldOption } from '@types';
+import { Position, YieldOption, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { PERMISSIONS, TRANSACTION_TYPES } from '@constants';
+import { PERMISSIONS } from '@constants';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import Grid from '@mui/material/Grid';
 import { ButtonTypes } from '@common/components/button';
@@ -107,7 +107,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
       });
       const result = await positionService.migrateYieldPosition(position, fromYield, toYield);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.MIGRATE_POSITION_YIELD,
+        type: TransactionTypes.migratePositionYield,
         typeData: {
           id: position.id,
           from: position.from.symbol,

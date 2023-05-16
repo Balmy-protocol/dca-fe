@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import Modal from '@common/components/modal';
-import { Position } from '@types';
+import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
@@ -10,13 +10,11 @@ import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
   DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
-  FULL_DEPOSIT_TYPE,
   MINIMUM_USD_RATE_FOR_DEPOSIT,
   MINIMUM_USD_RATE_FOR_YIELD,
+  ModeTypesIds,
   PERMISSIONS,
-  RATE_TYPE,
   STRING_SWAP_INTERVALS,
-  TRANSACTION_TYPES,
 } from '@constants';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -185,7 +183,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const handleFromValueChange = (newFromValue: string) => {
     if (!fromToUse) return;
-    dispatch(setModeType(FULL_DEPOSIT_TYPE));
+    dispatch(setModeType(ModeTypesIds.FULL_DEPOSIT_TYPE));
     dispatch(setFromValue(newFromValue));
     dispatch(
       setRate(
@@ -205,7 +203,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const handleRateValueChange = (newRate: string) => {
     if (!fromToUse) return;
-    dispatch(setModeType(RATE_TYPE));
+    dispatch(setModeType(ModeTypesIds.RATE_TYPE));
     dispatch(setRate(newRate));
     dispatch(
       setFromValue(
@@ -226,7 +224,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const handleFrequencyChange = (newFrequencyValue: string) => {
     if (!fromToUse) return;
     dispatch(setFrequencyValue(newFrequencyValue));
-    if (modeType === RATE_TYPE) {
+    if (modeType === ModeTypesIds.RATE_TYPE) {
       dispatch(
         setFromValue(
           (rate &&
@@ -318,7 +316,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       });
       const result = await positionService.modifyRateAndSwaps(position, rate, frequencyValue, useWrappedProtocolToken);
       addTransaction(result, {
-        type: TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION,
+        type: TransactionTypes.modifyRateAndSwapsPosition,
         typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
         position,
       });
@@ -408,7 +406,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       result.hash = result.safeTxHash;
 
       addTransaction(result as unknown as TransactionResponse, {
-        type: TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION,
+        type: TransactionTypes.modifyRateAndSwapsPosition,
         typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
         position,
       });
@@ -484,15 +482,27 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       const hubAddress = await contractService.getHUBAddress(position.version);
       const companionAddress = await contractService.getHUBCompanionAddress(position.version);
 
-      addTransaction(result, {
-        type: isExact ? TRANSACTION_TYPES.APPROVE_TOKEN_EXACT : TRANSACTION_TYPES.APPROVE_TOKEN,
-        typeData: {
-          token: fromToUse,
-          addressFor: fromHasYield ? companionAddress : hubAddress,
-          ...(isExact && { amount: remainingLiquidityDifference.toString() }),
-        },
-        position,
-      });
+      const transactionTypeDataBase = {
+        token: fromToUse,
+        addressFor: fromHasYield ? companionAddress : hubAddress,
+      };
+
+      let transactionTypeData: ApproveTokenExactTypeData | ApproveTokenTypeData = {
+        type: TransactionTypes.approveToken,
+        typeData: transactionTypeDataBase,
+      };
+
+      if (isExact) {
+        transactionTypeData = {
+          type: TransactionTypes.approveTokenExact,
+          typeData: {
+            ...transactionTypeDataBase,
+            amount: remainingLiquidityDifference.toString(),
+          },
+        };
+      }
+
+      addTransaction(result, transactionTypeData);
       setModalSuccess({
         hash: result.hash,
         content: (

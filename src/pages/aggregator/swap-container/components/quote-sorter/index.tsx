@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import find from 'lodash/find';
 import { FormattedMessage } from 'react-intl';
-import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN } from '@constants/aggregator';
+import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
 import Button from '@common/components/button';
 import { createStyles, Theme } from '@mui/material';
 import { withStyles } from '@mui/styles';
@@ -13,6 +13,10 @@ import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { useAppDispatch } from '@state/hooks';
+import { setSorting } from '@state/aggregator-settings/actions';
+import useTrackEvent from '@hooks/useTrackEvent';
+import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -36,8 +40,6 @@ const StyledMenu = withStyles(() =>
 
 interface QuoteSorterProps {
   isLoading: boolean;
-  setQuoteSorting: (sorting: string) => void;
-  sorting: string;
   isBuyOrder: boolean;
 }
 
@@ -84,18 +86,28 @@ const SORT_OPTIONS = (isBuyOrder: boolean) => [
   },
 ];
 
-const QuoteSorter = ({ isLoading, setQuoteSorting, sorting, isBuyOrder }: QuoteSorterProps) => {
+const QuoteSorter = ({ isLoading, isBuyOrder }: QuoteSorterProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const { sorting } = useAggregatorSettingsState();
   const open = Boolean(anchorEl);
+  const dispatch = useAppDispatch();
+  const trackEvent = useTrackEvent();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = (key: string) => {
+
+  const setQuoteSorting = (newSort: SwapSortOptions) => {
+    dispatch(setSorting(newSort));
+    trackEvent('Aggregator - Change selected sorting', { sort: newSort });
+  };
+
+  const handleClose = (key: SwapSortOptions) => {
     if (key && typeof key === 'string') {
       setQuoteSorting(key);
     }
     setAnchorEl(null);
   };
+
   const selectedOption = find(SORT_OPTIONS(isBuyOrder), { key: sorting });
 
   return (
@@ -126,7 +138,7 @@ const QuoteSorter = ({ isLoading, setQuoteSorting, sorting, isBuyOrder }: QuoteS
         onClose={handleClose}
       >
         {SORT_OPTIONS(isBuyOrder).map((option) => (
-          <MenuItem onClick={() => handleClose(option.key)} disableRipple key={option.key}>
+          <MenuItem onClick={() => handleClose(option.key as SwapSortOptions)} disableRipple key={option.key}>
             {option.label}
             <Typography variant="body2" sx={{ display: 'flex' }}>
               <DarkTooltip title={option.help} arrow placement="top">
