@@ -363,7 +363,7 @@ export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct
   [POSITION_VERSION_1]: NETWORKS.optimism,
   [POSITION_VERSION_2]: NETWORKS.optimism,
   [POSITION_VERSION_3]: NETWORKS.optimism,
-  [POSITION_VERSION_4]: NETWORKS.polygon,
+  [POSITION_VERSION_4]: NETWORKS.mainnet,
 };
 
 export const DEFAULT_NETWORK_FOR_AGGREGATOR = NETWORKS.mainnet;
