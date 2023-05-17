@@ -7,7 +7,7 @@ import { BigNumber } from 'ethers';
 import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import { MEAN_API_URL } from '@constants/addresses';
+import { MEAN_API_URL, NULL_ADDRESS } from '@constants/addresses';
 import ProviderService from './providerService';
 import WalletService from './walletService';
 
@@ -279,6 +279,10 @@ export default class SdkService {
         const newAcc = {
           ...acc,
         };
+
+        if (token.address === NULL_ADDRESS) {
+          return newAcc;
+        }
 
         if (!newAcc[token.chainId]) {
           newAcc[token.chainId] = [];

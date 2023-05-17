@@ -12,7 +12,7 @@ import useSdkService from './useSdkService';
 
 interface BalanceResponse {
   balance: BigNumber;
-  balanceUsd: BigNumber;
+  balanceUsd?: BigNumber;
 }
 
 interface Result {
@@ -68,9 +68,9 @@ function useBalances(tokens: Token[] | undefined | null): [Result | undefined, b
               ...acc,
               [token.address]: {
                 balance: balanceResults[token.chainId][token.address],
-                balanceUsd: (balanceResults[token.chainId][token.address] || BigNumber.from(0)).mul(
-                  priceResults[token.address] || BigNumber.from(0)
-                ),
+                balanceUsd:
+                  priceResults[token.address] &&
+                  (balanceResults[token.chainId][token.address] || BigNumber.from(0)).mul(priceResults[token.address]),
               },
             }),
             {}

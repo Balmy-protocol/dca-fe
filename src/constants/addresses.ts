@@ -284,7 +284,7 @@ const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, 
 });
 
 export const NETWORKS: Record<string, NetworkStruct> = getAllChains()
-  .filter((chain) => !chain.testnet)
+  .filter((chain) => !chain.testnet || chain.ids.includes('base-goerli'))
   .reduce(
     (acc, sdkNetwork) => {
       const foundNetworkKey = findKey(RAW_NETWORKS, { chainId: sdkNetwork.chainId });

@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
+import orderBy from 'lodash/orderBy';
 import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
-import { InputAdornment, ListSubheader, MenuItem, Select, TextField } from '@mui/material';
+import { Chip, InputAdornment, ListSubheader, MenuItem, Select, TextField } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import useSdkChains from '@hooks/useSdkChains';
 import { getAllChains } from '@mean-finance/sdk';
@@ -48,28 +49,32 @@ const NetworkSelector = () => {
 
   const mappedNetworks = React.useMemo(
     () =>
-      supportedChains
-        .map((networkId) => {
-          const foundSdkNetwork = find(
-            getAllChains().filter((chain) => !chain.testnet),
-            { chainId: networkId }
-          );
-          const foundNetwork = find(NETWORKS, { chainId: networkId });
+      orderBy(
+        supportedChains
+          .map((networkId) => {
+            const foundSdkNetwork = find(
+              getAllChains().filter((chain) => !chain.testnet || chain.ids.includes('base-goerli')),
+              { chainId: networkId }
+            );
+            const foundNetwork = find(NETWORKS, { chainId: networkId });
 
-          if (!foundSdkNetwork) {
-            return null;
-          }
+            if (!foundSdkNetwork) {
+              return null;
+            }
 
-          return {
-            ...foundSdkNetwork,
-            ...(foundNetwork || {}),
-          };
-        })
-        .filter(
-          (network) =>
-            !REMOVED_AGG_CHAINS.includes(network?.chainId || -1) &&
-            network?.name.toLowerCase().includes(chainSearch.toLowerCase())
-        ),
+            return {
+              ...foundSdkNetwork,
+              ...(foundNetwork || {}),
+            };
+          })
+          .filter(
+            (network) =>
+              !REMOVED_AGG_CHAINS.includes(network?.chainId || -1) &&
+              network?.name.toLowerCase().includes(chainSearch.toLowerCase())
+          ),
+        ['testnet'],
+        ['desc']
+      ),
     [supportedChains, chainSearch]
   );
 
@@ -154,6 +159,13 @@ const NetworkSelector = () => {
                   })}
                 />
                 {network.name}
+                {network.testnet && (
+                  <Chip
+                    label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+                    size="small"
+                    color="warning"
+                  />
+                )}
               </MenuItem>
             );
           })}

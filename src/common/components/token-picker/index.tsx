@@ -36,7 +36,6 @@ import useCustomToken from '@hooks/useCustomToken';
 import useAllowedPairs from '@hooks/useAllowedPairs';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useCustomTokens } from '@state/token-lists/hooks';
-import use1InchBalances from '@hooks/use1InchBalances';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -135,7 +134,7 @@ interface RowData {
   tokenKeys: string[];
   onClick: (token: Token, isCustomToken: boolean) => void;
   yieldOptions: YieldOptions;
-  tokenBalances: Record<string, { balance: BigNumber; balanceUsd: BigNumber }>;
+  tokenBalances: Record<string, { balance: BigNumber; balanceUsd?: BigNumber }>;
   customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
   isLoadingTokenBalances: boolean;
   customTokens: TokenList;
@@ -265,7 +264,7 @@ const Row = ({
       ? (tokenBalances &&
           tokenBalances[token.address] &&
           tokenBalances[token.address].balanceUsd &&
-          parseFloat(formatUnits(tokenBalances[token.address].balanceUsd, token.decimals + 18))) ||
+          parseFloat(formatUnits(tokenBalances[token.address].balanceUsd || BigNumber.from(0), token.decimals + 18))) ||
         0
       : (customToken?.balanceUsd && parseFloat(formatUnits(customToken?.balanceUsd, token.decimals + 18))) || 0;
 
@@ -400,7 +399,6 @@ const TokenPicker = ({
   const allowedPairs = useAllowedPairs();
   let tokenKeysToUse: string[] = [];
   const customTokens = useCustomTokens();
-  const [inchBalances, isLoadingInchBalances] = use1InchBalances();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
 
   React.useEffect(() => {
@@ -507,10 +505,9 @@ const TokenPicker = ({
 
   const balances = React.useMemo(
     () => ({
-      ...(inchBalances || {}),
       ...(tokenBalances?.balances || {}),
     }),
-    [tokenBalances, inchBalances]
+    [tokenBalances]
   );
 
   const memoizedTokenKeys = React.useMemo(
@@ -519,13 +516,22 @@ const TokenPicker = ({
       ...memoizedUnorderedTokenKeys.sort((tokenKeyA, tokenKeyB) => {
         if (!balances) return tokenKeyA < tokenKeyB ? -1 : 1;
 
+        const ABalanceToUse =
+          (balances[tokenKeyA] && (balances[tokenKeyA].balanceUsd || balances[tokenKeyA].balance)) || BigNumber.from(0);
+        const BBalanceToUse =
+          (balances[tokenKeyB] && (balances[tokenKeyB].balanceUsd || balances[tokenKeyB].balance)) || BigNumber.from(0);
+
         const tokenABalance =
           (balances[tokenKeyA] &&
-            parseFloat(formatUnits(balances[tokenKeyA].balanceUsd, tokenList[tokenKeyA].decimals + 18))) ||
+            parseFloat(
+              formatUnits(ABalanceToUse, tokenList[tokenKeyA].decimals + (balances[tokenKeyA].balanceUsd ? 18 : 0))
+            )) ||
           0;
         const tokenBBalance =
           (balances[tokenKeyB] &&
-            parseFloat(formatUnits(balances[tokenKeyB].balanceUsd, tokenList[tokenKeyB].decimals + 18))) ||
+            parseFloat(
+              formatUnits(BBalanceToUse, tokenList[tokenKeyB].decimals + (balances[tokenKeyB].balanceUsd ? 18 : 0))
+            )) ||
           0;
 
         if (tokenABalance || tokenBBalance) {
@@ -562,7 +568,7 @@ const TokenPicker = ({
     setSearch(value);
   };
 
-  const isLoadingBalances = isLoadingInchBalances || isLoadingTokenBalances;
+  const isLoadingBalances = isLoadingTokenBalances;
 
   const itemData: RowData = React.useMemo(
     () => ({
