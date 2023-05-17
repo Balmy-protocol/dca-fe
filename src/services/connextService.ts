@@ -1,7 +1,7 @@
 import { getPoolFeeForUniV3, getXCallCallData, prepareSwapAndXCall } from '@connext/chain-abstraction';
 import { DestinationCallDataParams, Swapper, SwapAndXCallParams } from '@connext/chain-abstraction/dist/types';
 import { SdkConfig, create } from '@connext/sdk';
-import { RAW_NETWORKS, SUPPORTED_CHAINS_BY_CONNEXT } from 'config';
+import { NETWORKS, RAW_NETWORKS, SUPPORTED_CHAINS_BY_CONNEXT } from 'config';
 import WalletService from './walletService';
 
 interface DomainID {
@@ -9,8 +9,6 @@ interface DomainID {
 }
 
 export default class ConnextService {
-  sdkConfig: SdkConfig;
-
   walletService: WalletService;
 
   destinantionChainID: number;
@@ -21,7 +19,7 @@ export default class ConnextService {
   }
 
   getRPCURL(chainID: number) {
-    const network = Object.values(RAW_NETWORKS).find((net) => net.chainId === chainID);
+    const network = Object.values(NETWORKS).find((net) => net.chainId === chainID);
     return network?.rpc[0];
   }
 
@@ -36,12 +34,12 @@ export default class ConnextService {
       domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10)) as string] };
     });
 
-    this.sdkConfig = {
+    const sdkConfig: SdkConfig = {
       signerAddress: this.walletService.account as string,
       network: 'mainnet', // can change it to testnet as well
       chains: domainConfig,
     };
-    const { sdkBase } = await create(this.sdkConfig);
+    const { sdkBase } = await create(sdkConfig);
     const relayerFees = await sdkBase.estimateRelayerFee({
       originDomain,
       destinationDomain,

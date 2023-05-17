@@ -120,7 +120,7 @@ interface SwapProps {
   setToYield: (newYield?: null | YieldOption) => void;
   handleChangeNetwork: (newChainId: number) => void;
   handlePolygonDestinantion: () => void;
-  isPolygonDestnantion: boolean;
+  isPolygonDestination: boolean;
 }
 
 const Swap = ({
@@ -146,7 +146,7 @@ const Swap = ({
   setFromYield,
   setToYield,
   handleChangeNetwork,
-  isPolygonDestnantion,
+  isPolygonDestination,
   handlePolygonDestinantion,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
@@ -367,9 +367,6 @@ const Swap = ({
         ),
       });
       trackEvent('DCA - Create position submitting');
-      // change it to xCall here.
-      // eslint-disable-next-line no-console
-      console.log('Doing xcall', { from, to, fromValue, frequencyType, frequencyValue, fromYield, toYield });
       const result = await positionService.xCallDeposit(
         from,
         to,
@@ -378,10 +375,8 @@ const Swap = ({
         frequencyValue,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined,
-        isPolygonDestnantion
+        isPolygonDestination
       );
-      // eslint-disable-next-line no-console
-      console.log(result, 'result from Xcall from button');
       trackEvent('DCA - Create position submitted');
       const hubAddress = await contractService.getHUBAddress();
       const companionAddress = await contractService.getHUBCompanionAddress();

@@ -788,4 +788,8 @@ export const SUPPORTED_CHAINS_BY_CONNEXT: Record<number, { domainId: string; nam
   },
 };
 
+export const X_TARGET_ADDRESS: Record<number, string> = {
+  137: '0xC825d25123Ca8d49066cf8F0AeE164660056e172',
+};
+
 /* eslint-enable */

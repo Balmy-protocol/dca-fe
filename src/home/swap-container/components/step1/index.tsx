@@ -19,7 +19,7 @@ import TokenIcon from 'common/token-icon';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { Button } from '@mui/material';
+import Button from 'common/button';
 // import useWalletService from 'hooks/useWalletService';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
@@ -248,7 +248,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             </StyledTokenContainer>
           </StyledTokensContainer>
           <div style={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
-            <Button onClick={() => handlePolygonDestinantion()} style={{ display: 'flex', marginTop: '10px' }}>
+            <Button color="default" onClick={() => handlePolygonDestinantion()}>
               Select Polygon
             </Button>
           </div>

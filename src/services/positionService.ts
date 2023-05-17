@@ -57,15 +57,13 @@ import {
   SIGN_VERSION,
   TOKEN_TYPE_YIELD_BEARING_SHARES,
   POSITION_VERSION_4,
+  X_TARGET_ADDRESS,
 } from 'config/constants';
 import { PermissionManagerContract, PermissionPermit } from 'types/contracts';
 import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from 'utils/currency';
 import { getDisplayToken } from 'utils/parsing';
 import gqlFetchAll, { GraphqlResults } from 'utils/gqlFetchAll';
-import { getChainIdFromUrl } from 'utils/urlParser';
-import { getSwapAndXcallParams } from '../utils/swapAndXcallParams';
-import { getForwardFunctionCallHelper } from '../utils/forwardFunctionCall';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -74,7 +72,7 @@ import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 import SafeService from './safeService';
 import ConnextService from './connextService';
-import { getDestinationCallDataParams } from '../utils/destinantionCallParams';
+import { getDestinationCallDataParams, getSwapAndXcallParams, getForwardFunctionCallHelper } from '../utils/connext';
 
 export default class PositionService {
   modal: SafeAppWeb3Modal;
@@ -629,7 +627,8 @@ export default class PositionService {
     frequencyValue: string,
     yieldFrom?: string,
     yieldTo?: string,
-    destinantionUSDC?: string // destinantion token address
+    destinantionUSDC?: string, // destinantion token address
+    destinationChainID?: number
   ) {
     const token = from;
 
@@ -655,11 +654,11 @@ export default class PositionService {
     if (yieldFrom || yieldTo) {
       permissions = [...permissions, PERMISSIONS.TERMINATE];
     }
-    const POLYGON_WETH = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619';
+    const POLYGON_WETH = getWrappedProtocolToken(destinationChainID as number);
 
     const forwardCallData = getForwardFunctionCallHelper(
       destinantionUSDC as string, // destination USDC
-      POLYGON_WETH, // destinantion token
+      POLYGON_WETH.address, // destinantion token
       amountOfSwaps,
       swapInterval,
       this.walletService.getAccount(),
@@ -740,13 +739,13 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
+    destinantionChainID: number,
     yieldFromPossible?: string,
-    yieldToPossible?: string,
-    destinantionChainID?: number
+    yieldToPossible?: string
   ) {
-    const destinantionUSDC = this.connextService.getNativeUSDCAddress(destinantionChainID as number);
+    const destinantionUSDC = this.connextService.getNativeUSDCAddress(destinantionChainID);
 
-    const { forwardCallData } = await this.buildDepositParams(
+    const { forwardCallData, totalAmmount } = await this.buildDepositParams(
       fromToken,
       toToken,
       fromValue,
@@ -754,28 +753,29 @@ export default class PositionService {
       frequencyValue,
       yieldFromPossible,
       yieldToPossible,
-      destinantionUSDC
+      destinantionUSDC,
+      destinantionChainID
     );
 
-    const xTargetAddress = '0xC825d25123Ca8d49066cf8F0AeE164660056e172'; // polygon address for mean target
+    const xTargetAddress = X_TARGET_ADDRESS[destinantionChainID]; // polygon address for mean target
 
-    const chainID = getChainIdFromUrl();
-    const POLYGON_WETH = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'; // can have any address in UI for destination
-    const destinantionRPC = this.connextService.getRPCURL(destinantionChainID as number);
+    const chainID = (await this.providerService.getNetwork()).chainId;
+    const POLYGON_WETH = getWrappedProtocolToken(destinantionChainID); // can have any address in UI for destination
+    const destinantionRPC = this.connextService.getRPCURL(destinantionChainID);
     const originDomainID = this.connextService.getDomainID(chainID);
-    const destinantionDomainID = this.connextService.getDomainID(destinantionChainID as number);
+    const destinantionDomainID = this.connextService.getDomainID(destinantionChainID);
     const originUSDC = this.connextService.getNativeUSDCAddress(chainID);
 
     // get the pool fees.
     const poolFee = await this.connextService.getPoolFeeForUniV3Helper(
       destinantionDomainID, // Destination Domain
-      destinantionUSDC, // final destination token, Address should be getting from user
-      POLYGON_WETH, // destinantion USDC
+      destinantionUSDC, // Destinantion USDC address
+      POLYGON_WETH.address, // destinantion Token
       destinantionRPC as string
     );
 
     const destinantionCallDataParams = getDestinationCallDataParams(
-      this.walletService.account as string,
+      this.walletService.getAccount(),
       destinantionUSDC, // to the token on destination
       poolFee as string
     );
@@ -790,14 +790,15 @@ export default class PositionService {
     const relayerFees = await this.connextService.getCalculatedRelayerFees(originDomainID, destinantionDomainID);
 
     // swap can be done after figuring out about domains, and also after deploying contract
-    const amountIn = BigNumber.from('40000000000000');
+    // eslint-disable-next-line no-console
+    console.log('amount in', totalAmmount.toString());
 
     const swapAndXCallParams = getSwapAndXcallParams(
       originDomainID,
       destinantionDomainID,
       fromToken.address,
       originUSDC, // USDC for origin chain
-      amountIn.toString(),
+      totalAmmount.toString(),
       xTargetAddress,
       callDataForMeanProtocol,
       relayerFees
@@ -842,7 +843,7 @@ export default class PositionService {
     frequencyValue: string,
     yieldFrom?: string,
     yieldTo?: string,
-    isPolygonDestnantion?: boolean
+    isPolygonDestination?: boolean
   ): Promise<TransactionResponse> {
     const swapAndXCallParams = await this.buildXcallDepositParams(
       from,
@@ -850,14 +851,14 @@ export default class PositionService {
       fromValue,
       frequencyType,
       frequencyValue,
+      isPolygonDestination ? 137 : 0,
       yieldFrom,
-      yieldTo,
-      isPolygonDestnantion ? 137 : 0
+      yieldTo
     );
 
     const txRequest = await this.connextService.prepareSwapAndXCallHelper(
       swapAndXCallParams,
-      this.walletService.account as string
+      this.walletService.getAccount()
     );
 
     return this.providerService.sendTransaction(txRequest as TransactionRequest);
