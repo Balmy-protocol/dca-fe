@@ -13,7 +13,7 @@ function useSdkMappedChains() {
       compact(
         supportedChains.map((networkId) => {
           const foundSdkNetwork = find(
-            getAllChains().filter((chain) => !chain.testnet),
+            getAllChains().filter((chain) => !chain.testnet || chain.ids.includes('base-goerli')),
             { chainId: networkId }
           );
           const foundNetwork = find(NETWORKS, { chainId: networkId });

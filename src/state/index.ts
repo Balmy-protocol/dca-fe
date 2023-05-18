@@ -143,6 +143,10 @@ const store = configureStore({
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
           'https://token-list.sushi.com/',
           'tokens.1inch.eth',
+          'https://raw.githubusercontent.com/ethereum-optimism/ethereum-optimism.github.io/master/optimism.tokenlist.json',
+
+          // Base Goerli
+          'https://api.odos.xyz/info/tokens/84531',
 
           // BNB
           'https://tokens.1inch.io/v1.1/56',
