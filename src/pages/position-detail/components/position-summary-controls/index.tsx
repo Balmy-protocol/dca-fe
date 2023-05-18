@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition } from '@types';
-import { useAccountPermissions, mergeCompanionPermissions } from 'state/position-permissions/hooks';
+import { useAccountPermissions, mergeCompanionPermissions } from '@state/position-permissions/hooks';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';

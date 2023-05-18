@@ -11,7 +11,7 @@ import { PERMISSIONS, LATEST_VERSION, COMPANION_ADDRESS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import FormGroup from '@mui/material/FormGroup';
-import { createPermissionsObject, PositionPermissions } from 'state/position-permissions/hooks';
+import { createPermissionsObject, PositionPermissions } from '@state/position-permissions/hooks';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { BigNumber } from 'ethers';

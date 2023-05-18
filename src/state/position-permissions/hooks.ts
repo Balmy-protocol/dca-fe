@@ -1,7 +1,7 @@
 import some from 'lodash/some';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
-import useWeb3Service from 'hooks/useWeb3Service';
+import useWeb3Service from '@hooks/useWeb3Service';
 import { useMemo } from 'react';
 import { useAppSelector } from '@state/hooks';
 import { FullPermission, Permission } from '@types';

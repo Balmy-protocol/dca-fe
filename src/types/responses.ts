@@ -2,7 +2,6 @@ import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { PermissionData } from './positions';
 import { Token } from './tokens';
-import { PermissionData } from './positions';
 
 export interface PoolLiquidityData {
   id: string;
