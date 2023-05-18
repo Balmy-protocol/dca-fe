@@ -51,7 +51,7 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
   const replaceHistory = useReplaceHistory();
   const trackEvent = useTrackEvent();
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
-  const [isPolygonDestination, setIsPolygonDestination] = React.useState<boolean>(false);
+  const [destinationChainID, setDestinationChainID] = React.useState<number>(currentNetwork.chainId);
 
   React.useEffect(() => {
     if (fromParamToken) {
@@ -116,12 +116,6 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
     trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };
 
-  const handlePolygonDestinantion = () => {
-    // eslint-disable-next-line no-console
-    console.log('Clicked');
-    setIsPolygonDestination(true);
-  };
-
   const toggleFromTo = () => {
     dispatch(setTo(from));
 
@@ -164,6 +158,10 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
     trackEvent('DCA - Set yield to', {});
   };
 
+  const handleDestinationChainID = (chainID: number) => {
+    setDestinationChainID(chainID);
+  };
+
   return (
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
       <Grid item xs={12} md={5}>
@@ -190,8 +188,8 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
           setToYield={onSetToYield}
           availableFrequencies={availableFrequencies}
           handleChangeNetwork={handleChangeNetwork}
-          isPolygonDestination={isPolygonDestination}
-          handlePolygonDestinantion={handlePolygonDestinantion}
+          destinationChainID={destinationChainID}
+          handleDestinationChainID={handleDestinationChainID}
         />
       </Grid>
       <Hidden mdDown>

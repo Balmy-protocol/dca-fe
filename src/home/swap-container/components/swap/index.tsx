@@ -119,8 +119,8 @@ interface SwapProps {
   setFromYield: (newYield?: null | YieldOption) => void;
   setToYield: (newYield?: null | YieldOption) => void;
   handleChangeNetwork: (newChainId: number) => void;
-  handlePolygonDestinantion: () => void;
-  isPolygonDestination: boolean;
+  destinationChainID?: number;
+  handleDestinationChainID: (chainID: number) => void;
 }
 
 const Swap = ({
@@ -146,8 +146,8 @@ const Swap = ({
   setFromYield,
   setToYield,
   handleChangeNetwork,
-  isPolygonDestination,
-  handlePolygonDestinantion,
+  destinationChainID,
+  handleDestinationChainID,
 }: SwapProps) => {
   const web3Service = useWeb3Service();
   const containerRef = React.useRef(null);
@@ -375,7 +375,7 @@ const Swap = ({
         frequencyValue,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined,
-        isPolygonDestination
+        destinationChainID
       );
       trackEvent('DCA - Create position submitted');
       const hubAddress = await contractService.getHUBAddress();
@@ -1121,7 +1121,8 @@ const Swap = ({
           show={showFirstStep}
           fromValueUsdPrice={fromValueUsdPrice}
           onChangeNetwork={handleChangeNetwork}
-          handlePolygonDestinantion={handlePolygonDestinantion}
+          destinationChainID={destinationChainID}
+          handleDestinationChainID={handleDestinationChainID}
         />
       </Slide>
       <Slide

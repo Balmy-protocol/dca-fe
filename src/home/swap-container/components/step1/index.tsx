@@ -19,7 +19,6 @@ import TokenIcon from 'common/token-icon';
 import useSelectedNetwork from 'hooks/useSelectedNetwork';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Button from 'common/button';
 // import useWalletService from 'hooks/useWalletService';
 
 const StyledGrid = styled(Grid)<{ $show: boolean }>`
@@ -119,7 +118,8 @@ interface SwapFirstStepProps {
   buttonToShow: React.ReactNode;
   fromValueUsdPrice: number;
   onChangeNetwork: (chainId: number) => void;
-  handlePolygonDestinantion: () => void;
+  destinationChainID?: number;
+  handleDestinationChainID: (chainID: number) => void;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -141,14 +141,22 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     show,
     fromValueUsdPrice,
     onChangeNetwork,
-    handlePolygonDestinantion,
+    destinationChainID,
+    handleDestinationChainID,
   } = props;
+  const currentNetwork = useSelectedNetwork();
+
+  // const [destinationID, setDestinationID] = useState<number>(currentNetwork.chainId);
 
   // const walletService = useWalletService();
   // const account = walletService.getAccount();
   // const currentNetwork = useCurrentNetwork();
-  const currentNetwork = useSelectedNetwork();
+
   const intl = useIntl();
+
+  // const handleDestinationNetworkChange = (networkID: number) => {
+  //   setDestinationID(networkID);
+  // };
 
   return (
     <StyledGrid container rowSpacing={2} $show={show} ref={ref}>
@@ -228,6 +236,79 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       </Grid>
       <Grid item xs={12}>
         <StyledContentContainer>
+          <StyledRateContainer>
+            <Typography variant="body1">
+              <FormattedMessage description="supportedNetworks" defaultMessage="Choose Destination network:" />
+            </Typography>
+            <StyledNetworkButtonsContainer>
+              <Select
+                id="choose-destination-network"
+                fullWidth
+                value={destinationChainID}
+                onChange={(evt) => handleDestinationChainID(Number(evt.target.value))}
+                placeholder={intl.formatMessage(
+                  defineMessage({ defaultMessage: 'Choose destinantion network', description: 'supportedNetworks' })
+                )}
+                renderValue={(selected) => {
+                  if (!SUPPORTED_NETWORKS_DCA.includes(selected)) {
+                    return (
+                      <em>
+                        <FormattedMessage description="supportedNetworks" defaultMessage="Select network" />
+                      </em>
+                    );
+                  }
+
+                  const foundNetwork = find(NETWORKS, { chainId: destinationChainID });
+
+                  if (!foundNetwork) {
+                    return null;
+                  }
+
+                  return (
+                    <>
+                      <TokenIcon
+                        size="20px"
+                        token={toToken({
+                          address: foundNetwork?.mainCurrency,
+                          chainId: destinationChainID,
+                          logoURI: getGhTokenListLogoUrl(destinationChainID as number, 'logo'),
+                        })}
+                      />
+                      {foundNetwork.name}
+                    </>
+                  );
+                }}
+                size="small"
+                SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
+              >
+                {SUPPORTED_NETWORKS_DCA.map((network) => {
+                  const foundNetwork = find(NETWORKS, { chainId: network });
+
+                  if (!foundNetwork) {
+                    return null;
+                  }
+
+                  return (
+                    <MenuItem sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={network}>
+                      <TokenIcon
+                        size="20px"
+                        token={toToken({
+                          address: foundNetwork?.mainCurrency,
+                          chainId: network,
+                          logoURI: getGhTokenListLogoUrl(network, 'logo'),
+                        })}
+                      />
+                      {foundNetwork.name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </StyledNetworkButtonsContainer>
+          </StyledRateContainer>
+        </StyledContentContainer>
+      </Grid>
+      <Grid item xs={12}>
+        <StyledContentContainer>
           <StyledTokensContainer>
             <StyledTokenContainer>
               <Typography variant="body1">
@@ -247,13 +328,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
               <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
             </StyledTokenContainer>
           </StyledTokensContainer>
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'end' }}>
-            <Button color="default" onClick={() => handlePolygonDestinantion()}>
-              Select Polygon
-            </Button>
-          </div>
         </StyledContentContainer>
       </Grid>
+
       <Grid item xs={12}>
         <StyledContentContainer>
           {/* rate */}

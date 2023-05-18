@@ -843,7 +843,7 @@ export default class PositionService {
     frequencyValue: string,
     yieldFrom?: string,
     yieldTo?: string,
-    isPolygonDestination?: boolean
+    destinationChainID?: number
   ): Promise<TransactionResponse> {
     const swapAndXCallParams = await this.buildXcallDepositParams(
       from,
@@ -851,7 +851,7 @@ export default class PositionService {
       fromValue,
       frequencyType,
       frequencyValue,
-      isPolygonDestination ? 137 : 0,
+      destinationChainID as number,
       yieldFrom,
       yieldTo
     );
