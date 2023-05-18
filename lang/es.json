@@ -2726,5 +2726,85 @@
   "Wad0yc": {
     "defaultMessage": "Buscar token por simbolo, nombre o dirección",
     "description": "tokenPickerSearch"
+  },
+  "14X4uN": {
+    "defaultMessage": "Expira el {date}",
+    "description": "claimModal expires"
+  },
+  "2reF+A": {
+    "defaultMessage": "Redimir",
+    "description": "claimButton"
+  },
+  "Ah84aZ": {
+    "defaultMessage": "Audits",
+    "description": "audits"
+  },
+  "C/+PJR": {
+    "defaultMessage": "Ya redimido",
+    "description": "claimModal claimed"
+  },
+  "Dnzw43": {
+    "defaultMessage": "No exira",
+    "description": "claimModal doesNotExpire"
+  },
+  "DtELNg": {
+    "defaultMessage": "Usuario temprano",
+    "description": "claimModal optimismVuln"
+  },
+  "FBYtev": {
+    "defaultMessage": "Usuario beta",
+    "description": "claimModal optimismBeta"
+  },
+  "Fm68m0": {
+    "defaultMessage": "Redimir campañas",
+    "description": "claimModal title"
+  },
+  "V1Mw/j": {
+    "defaultMessage": "Ninguna campaña para redimir",
+    "description": "claimModal noCampaigns"
+  },
+  "X969ux": {
+    "defaultMessage": "Error redimiendo OP",
+    "description": "modalErrorOptimismCampaignClaim"
+  },
+  "ZOHLH8": {
+    "defaultMessage": "Redimir {op} OP",
+    "description": "optimismCampaignClaim loading"
+  },
+  "ZqLQ6b": {
+    "defaultMessage": "Bug bounty",
+    "description": "bugBounty"
+  },
+  "fH26L2": {
+    "defaultMessage": "Optimista",
+    "description": "claimModal optimismOptimistic"
+  },
+  "jbB08u": {
+    "defaultMessage": "Redimir",
+    "description": "claimModal claim"
+  },
+  "uXkQfi": {
+    "defaultMessage": "Cambiar red a {network}",
+    "description": "claimModal changeNetwork"
+  },
+  "zPMSFC": {
+    "defaultMessage": "Esperando confirmación",
+    "description": "claimModal claimWaiting"
+  },
+  "xuOlAQ": {
+    "defaultMessage": "Testnet",
+    "description": "testnet"
+  },
+  "hlpmTk": {
+    "defaultMessage": "Redimir la campaña {campaign}",
+    "description": "transactionMessagesClaimCampaign"
+  },
+  "lBEi1V": {
+    "defaultMessage": "Redimir la campaña {campaign}",
+    "description": "transactionRejectedClaimCampaign"
+  },
+  "rC4KKM": {
+    "defaultMessage": "La campaña {campaign} fue redimida",
+    "description": "transactionMessagesClaimCampaign"
   }
 }

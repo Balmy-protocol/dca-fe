@@ -200,7 +200,7 @@ export default class Web3Service {
     );
     this.errorService = new ErrorService(this.meanApiService);
     this.simulationService = new SimulationService(this.meanApiService, this.providerService);
-    this.campaignService = new CampaignService(this.meanApiService, this.priceService);
+    this.campaignService = new CampaignService(this.meanApiService, this.priceService, this.providerService);
   }
 
   setArcxClient(newArcxClient: ArcxAnalyticsSdk) {

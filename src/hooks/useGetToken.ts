@@ -3,7 +3,7 @@ import React from 'react';
 import useTokenList from './useTokenList';
 
 function useGetToken() {
-  const tokenList = useTokenList();
+  const tokenList = useTokenList(true, true, false);
 
   return React.useCallback(
     (tokenAddress: string, checkForSymbol = false) => {

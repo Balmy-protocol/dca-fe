@@ -301,6 +301,16 @@
       "value": "Simulado de la transacción"
     }
   ],
+  "14X4uN": [
+    {
+      "type": 0,
+      "value": "Expira el "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
   "156xZf": [
     {
       "type": 0,
@@ -409,6 +419,12 @@
     {
       "type": 0,
       "value": "Ver en el explorador"
+    }
+  ],
+  "2reF+A": [
+    {
+      "type": 0,
+      "value": "Redimir"
     }
   ],
   "3IslZU": [
@@ -969,6 +985,12 @@
       "value": "Migrar la posición y empezar a generar retornos"
     }
   ],
+  "Ah84aZ": [
+    {
+      "type": 0,
+      "value": "Audits"
+    }
+  ],
   "AhEpzv": [
     {
       "type": 0,
@@ -1149,6 +1171,12 @@
     {
       "type": 0,
       "value": "Soporta generar retornos"
+    }
+  ],
+  "C/+PJR": [
+    {
+      "type": 0,
+      "value": "Ya redimido"
     }
   ],
   "C5Zkoh": [
@@ -1337,10 +1365,22 @@
       "value": "Feedback"
     }
   ],
+  "Dnzw43": [
+    {
+      "type": 0,
+      "value": "No exira"
+    }
+  ],
   "Do1Kxz": [
     {
       "type": 0,
       "value": "Transacciones recientes"
+    }
+  ],
+  "DtELNg": [
+    {
+      "type": 0,
+      "value": "Usuario temprano"
     }
   ],
   "E6P1+X": [
@@ -1579,6 +1619,12 @@
       "value": "Gas ahorrado"
     }
   ],
+  "FBYtev": [
+    {
+      "type": 0,
+      "value": "Usuario beta"
+    }
+  ],
   "FGbffU": [
     {
       "type": 0,
@@ -1637,6 +1683,12 @@
     {
       "type": 0,
       "value": "Esperando confirmación"
+    }
+  ],
+  "Fm68m0": [
+    {
+      "type": 0,
+      "value": "Redimir campañas"
     }
   ],
   "FwDtZA": [
@@ -3229,6 +3281,12 @@
       "value": "Este es el mínimo que recibirás en función de tu configuración de deslizamiento"
     }
   ],
+  "V1Mw/j": [
+    {
+      "type": 0,
+      "value": "Ninguna campaña para redimir"
+    }
+  ],
   "V314M5": [
     {
       "type": 0,
@@ -3417,6 +3475,12 @@
     {
       "type": 0,
       "value": "% APY"
+    }
+  ],
+  "X969ux": [
+    {
+      "type": 0,
+      "value": "Error redimiendo OP"
     }
   ],
   "XI+HWn": [
@@ -3677,6 +3741,20 @@
       "value": "Posición modificada"
     }
   ],
+  "ZOHLH8": [
+    {
+      "type": 0,
+      "value": "Redimir "
+    },
+    {
+      "type": 1,
+      "value": "op"
+    },
+    {
+      "type": 0,
+      "value": " OP"
+    }
+  ],
   "ZQb/dg": [
     {
       "type": 0,
@@ -3741,6 +3819,12 @@
     {
       "type": 0,
       "value": " para usted por"
+    }
+  ],
+  "ZqLQ6b": [
+    {
+      "type": 0,
+      "value": "Bug bounty"
     }
   ],
   "Zsuz+g": [
@@ -4265,6 +4349,12 @@
       "value": " intercambios"
     }
   ],
+  "fH26L2": [
+    {
+      "type": 0,
+      "value": "Optimista"
+    }
+  ],
   "fJcP5V": [
     {
       "type": 0,
@@ -4537,6 +4627,16 @@
       "value": "Canculando el costo de creación de esta posición"
     }
   ],
+  "hlpmTk": [
+    {
+      "type": 0,
+      "value": "Redimir la campaña "
+    },
+    {
+      "type": 1,
+      "value": "campaign"
+    }
+  ],
   "hmyz7z": [
     {
       "type": 0,
@@ -4739,6 +4839,12 @@
       "value": "from"
     }
   ],
+  "jbB08u": [
+    {
+      "type": 0,
+      "value": "Redimir"
+    }
+  ],
   "jbb8PB": [
     {
       "type": 0,
@@ -4849,6 +4955,16 @@
     {
       "type": 0,
       "value": "Crear una posición"
+    }
+  ],
+  "lBEi1V": [
+    {
+      "type": 0,
+      "value": "Redimir la campaña "
+    },
+    {
+      "type": 1,
+      "value": "campaign"
     }
   ],
   "lBsNBG": [
@@ -5429,6 +5545,20 @@
       "value": "to"
     }
   ],
+  "rC4KKM": [
+    {
+      "type": 0,
+      "value": "La campaña "
+    },
+    {
+      "type": 1,
+      "value": "campaign"
+    },
+    {
+      "type": 0,
+      "value": " fue redimida"
+    }
+  ],
   "rEo0yG": [
     {
       "type": 0,
@@ -5781,6 +5911,16 @@
       "value": "Costo de Gas considerado"
     }
   ],
+  "uXkQfi": [
+    {
+      "type": 0,
+      "value": "Cambiar red a "
+    },
+    {
+      "type": 1,
+      "value": "network"
+    }
+  ],
   "uZWTRx": [
     {
       "type": 0,
@@ -6035,6 +6175,12 @@
       "value": "Posiciones cerradas"
     }
   ],
+  "xuOlAQ": [
+    {
+      "type": 0,
+      "value": "Testnet"
+    }
+  ],
   "xurFDH": [
     {
       "type": 0,
@@ -6157,6 +6303,12 @@
     {
       "type": 0,
       "value": " - Se envió la aprobación del token"
+    }
+  ],
+  "zPMSFC": [
+    {
+      "type": 0,
+      "value": "Esperando confirmación"
     }
   ],
   "zSo0el": [

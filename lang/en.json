@@ -131,6 +131,10 @@
     "defaultMessage": "Transaction simulation",
     "description": "descTransactionSimulation"
   },
+  "14X4uN": {
+    "defaultMessage": "Expires on {date}",
+    "description": "claimModal expires"
+  },
   "156xZf": {
     "defaultMessage": "Gas saved in USD",
     "description": "gasSavedBullet"
@@ -182,6 +186,10 @@
   "2peKiw": {
     "defaultMessage": "Allowing {symbol} to be claimed",
     "description": "eulerClaim approving token"
+  },
+  "2reF+A": {
+    "defaultMessage": "Claim",
+    "description": "claimButton"
   },
   "3Ovbmx": {
     "defaultMessage": "Next swap:",
@@ -431,6 +439,10 @@
     "defaultMessage": "Migrate position and start generating yield",
     "description": "generateYield"
   },
+  "Ah84aZ": {
+    "defaultMessage": "Audits",
+    "description": "audits"
+  },
   "AhEpzv": {
     "defaultMessage": "This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones",
     "description": "AddressessPermissions"
@@ -510,6 +522,10 @@
   "ByRaJ4": {
     "defaultMessage": "Supports yield",
     "description": "supportsYield"
+  },
+  "C/+PJR": {
+    "defaultMessage": "Already claimed",
+    "description": "claimModal claimed"
   },
   "C5Zkoh": {
     "defaultMessage": "Transfering your position to {toAddress}",
@@ -599,9 +615,17 @@
     "defaultMessage": "Feedback",
     "description": "feedback"
   },
+  "Dnzw43": {
+    "defaultMessage": "Does not expire",
+    "description": "claimModal doesNotExpire"
+  },
   "Do1Kxz": {
     "defaultMessage": "Recent transactions",
     "description": "recent transactions"
+  },
+  "DtELNg": {
+    "defaultMessage": "Early user",
+    "description": "claimModal optimismVuln"
   },
   "E6P1+X": {
     "defaultMessage": "Swaps",
@@ -679,6 +703,10 @@
     "defaultMessage": "Gas saved",
     "description": "gasSavedGraphTitle"
   },
+  "FBYtev": {
+    "defaultMessage": "Beta user",
+    "description": "claimModal optimismBeta"
+  },
   "FGbffU": {
     "defaultMessage": "Approve {from} and wrap",
     "description": "wrap agg"
@@ -698,6 +726,10 @@
   "FlMmaB": {
     "defaultMessage": "Waiting for confirmation",
     "description": "Waiting confirmation"
+  },
+  "Fm68m0": {
+    "defaultMessage": "Claim campaigns",
+    "description": "claimModal title"
   },
   "FmT3Yy": {
     "defaultMessage": "Profit:",
@@ -1355,6 +1387,10 @@
     "defaultMessage": "Can I add or withdraw funds from my positions?",
     "description": "jbrlRulesCanWithdraw"
   },
+  "V1Mw/j": {
+    "defaultMessage": "No campaigns to claim",
+    "description": "claimModal noCampaigns"
+  },
   "V314M5": {
     "defaultMessage": "Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period while neutralizing the short-term volatility in the market.{br}The purchases occur regardless of the asset's price and at regular intervals. In effect, this strategy removes much of the detailed work of attempting to time the market in order to make purchases of assets at the best prices.",
     "description": "whatIsDcaAnswer"
@@ -1442,6 +1478,10 @@
   "X2tycj": {
     "defaultMessage": "Generating {token} at {platform} with {apy}% APY",
     "description": "generatingYieldAt"
+  },
+  "X969ux": {
+    "defaultMessage": "Error claiming OP",
+    "description": "modalErrorOptimismCampaignClaim"
   },
   "XI+HWn": {
     "defaultMessage": "Maximum spent:",
@@ -1551,6 +1591,10 @@
     "defaultMessage": "Position Modified",
     "description": "timelineTypeModified"
   },
+  "ZOHLH8": {
+    "defaultMessage": "Claiming {op} OP",
+    "description": "optimismCampaignClaim loading"
+  },
   "ZQb/dg": {
     "defaultMessage": "Choose network:",
     "description": "supportedNetworks"
@@ -1566,6 +1610,10 @@
   "ZaSmdn": {
     "defaultMessage": "Close {from}:{to} position",
     "description": "transactionDetailsTerminate"
+  },
+  "ZqLQ6b": {
+    "defaultMessage": "Bug bounty",
+    "description": "bugBounty"
   },
   "Zsuz+g": {
     "defaultMessage": "every 1 minute",
@@ -1783,6 +1831,10 @@
     "defaultMessage": "Executed {executedSwaps}/{totalSwaps} swaps",
     "description": "executedSwapsTooltip"
   },
+  "fH26L2": {
+    "defaultMessage": "Optimistic",
+    "description": "claimModal optimismOptimistic"
+  },
   "fIM4Uw": {
     "defaultMessage": "Rules",
     "description": "faq"
@@ -1903,6 +1955,10 @@
     "defaultMessage": "Approve and modify position",
     "description": "modifyPosition"
   },
+  "hlpmTk": {
+    "defaultMessage": "Claim the {campaign} campaign",
+    "description": "transactionMessagesClaimCampaign"
+  },
   "i+8o6D": {
     "defaultMessage": "How much jBRL can I invest?",
     "description": "jbrlRulesHowMuchInvest"
@@ -1979,6 +2035,10 @@
     "defaultMessage": "You are now ready to use {amount} {from}",
     "description": "transactionMessagesApproveTokenExact"
   },
+  "jbB08u": {
+    "defaultMessage": "Claim",
+    "description": "claimModal claim"
+  },
   "jbb8PB": {
     "defaultMessage": "And set what permissions to set for this address",
     "description": "add permission checkbox description"
@@ -2034,6 +2094,10 @@
   "l5M7uf": {
     "defaultMessage": "Creating a position",
     "description": "feedbackOptionCreatePosition"
+  },
+  "lBEi1V": {
+    "defaultMessage": "Claiming the {campaign} campaign",
+    "description": "transactionRejectedClaimCampaign"
   },
   "lBsNBG": {
     "defaultMessage": "Select platform",
@@ -2283,6 +2347,10 @@
     "defaultMessage": "You have withdrawn from your {from}:{to} position",
     "description": "transactionMessagesWithdraw"
   },
+  "rC4KKM": {
+    "defaultMessage": "The {campaign} campaign has been claimed",
+    "description": "transactionMessagesClaimCampaign"
+  },
   "rEo0yG": {
     "defaultMessage": "MAX",
     "description": "maxWallet"
@@ -2422,6 +2490,10 @@
   "uV7tE7": {
     "defaultMessage": "Gas cost considered",
     "description": "sortHighReturn"
+  },
+  "uXkQfi": {
+    "defaultMessage": "Change network to {network}",
+    "description": "claimModal changeNetwork"
   },
   "uZWTRx": {
     "defaultMessage": "How can we improve it?",
@@ -2575,6 +2647,10 @@
     "defaultMessage": "Closed positions",
     "description": "terminatedPositions"
   },
+  "xuOlAQ": {
+    "defaultMessage": "Testnet",
+    "description": "testnet"
+  },
   "xurFDH": {
     "defaultMessage": "Mean Finance",
     "description": "meanFinanceLegend"
@@ -2646,6 +2722,10 @@
   "zNOHJl": {
     "defaultMessage": "{step} - The token approval is submitted",
     "description": "transationStepWaitApprove"
+  },
+  "zPMSFC": {
+    "defaultMessage": "Waiting for confirmation",
+    "description": "claimModal claimWaiting"
   },
   "zSo0el": {
     "defaultMessage": "every day",

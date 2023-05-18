@@ -95,6 +95,7 @@ const StyledNavbarEndContent = styled.div<{ small: boolean }>`
   ${({ small }) => (small ? 'flex: 1;' : '')}
   ${({ small }) => (small ? 'padding: 0 10px;' : '')}
   ${({ small }) => (small ? 'justify-content: space-between;' : '')}
+  align-items: center;
 `;
 
 const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
@@ -347,7 +348,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             </StyledNavbarMainContent>
           )}
           <StyledNavbarEndContent small={currentBreakPoint === 'xs'}>
-            <ClaimButton />
+            {!isLoading && <ClaimButton />}
             <StyledButtonContainer breakpoint={currentBreakPoint}>
               {/* <NetworkLabel network={currentNetwork} /> */}
               <WalletContext.Consumer>
