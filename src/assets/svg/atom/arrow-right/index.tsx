@@ -1,6 +1,6 @@
 import React from 'react';
 import SvgIcon from '@mui/material/SvgIcon';
-import { useThemeMode } from 'state/config/hooks';
+import { useThemeMode } from '@state/config/hooks';
 
 interface IconProps {
   size?: string;

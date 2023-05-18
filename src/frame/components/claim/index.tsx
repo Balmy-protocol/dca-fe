@@ -1,10 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
+import some from 'lodash/some';
 import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
-import WhaveLogoDark from 'assets/logo/wave_logo_dark';
+import useClaimableCampaigns from '@hooks/useClaimableCampaigns';
+import WhaveLogoDark from '@assets/logo/wave_logo_dark';
 import Typography from '@mui/material/Typography';
 import ClaimModal from '@common/components/claim-modal';
+import Badge from '@mui/material/Badge';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
 
 const StyledMeanLogoContainer = styled.div`
   background: black;
@@ -12,6 +17,19 @@ const StyledMeanLogoContainer = styled.div`
   border-radius: 20px;
   padding: 5px;
 `;
+
+const StyledBadge = withStyles(() =>
+  createStyles({
+    root: {
+      marginRight: '10px',
+    },
+    badge: {
+      color: 'white',
+      marginRight: '2px',
+      marginTop: '2px',
+    },
+  })
+)(Badge);
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -23,25 +41,34 @@ const StyledButton = styled(Button)`
   :hover {
     box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.302), 0 4px 8px 3px rgba(60, 64, 67, 0.149);
   }
-  margin-right: 10px;
   padding: 4px 8px;
   gap: 5px;
 `;
 
 const ClaimButton = () => {
   const [shouldShowClaimModal, setShouldShowClaimModal] = React.useState(false);
+  const [campaigns, isLoadingCampaigns] = useClaimableCampaigns();
+
+  const hasUnclaimedCampaigns = some(campaigns, (campaign) => !campaign.claimed);
 
   return (
     <>
-      <ClaimModal open={shouldShowClaimModal} onCancel={() => setShouldShowClaimModal(false)} />
-      <StyledButton variant="outlined" color="transparent" onClick={() => setShouldShowClaimModal(true)}>
-        <StyledMeanLogoContainer>
-          <WhaveLogoDark size="16px" />
-        </StyledMeanLogoContainer>
-        <Typography variant="body1">
-          <FormattedMessage description="claimButton" defaultMessage="Claim" />
-        </Typography>
-      </StyledButton>
+      <ClaimModal
+        open={shouldShowClaimModal}
+        campaigns={campaigns}
+        isLoadingCampaigns={isLoadingCampaigns}
+        onCancel={() => setShouldShowClaimModal(false)}
+      />
+      <StyledBadge badgeContent={hasUnclaimedCampaigns ? ' ' : ''} variant="dot" color="secondary">
+        <StyledButton variant="outlined" size="small" color="transparent" onClick={() => setShouldShowClaimModal(true)}>
+          <StyledMeanLogoContainer>
+            <WhaveLogoDark size="13px" />
+          </StyledMeanLogoContainer>
+          <Typography variant="body1">
+            <FormattedMessage description="claimButton" defaultMessage="Claim" />
+          </Typography>
+        </StyledButton>
+      </StyledBadge>
     </>
   );
 };

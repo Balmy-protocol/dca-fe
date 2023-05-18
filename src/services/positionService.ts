@@ -1143,6 +1143,7 @@ export default class PositionService {
       transaction.type === TransactionTypes.approveTokenExact ||
       transaction.type === TransactionTypes.swap ||
       transaction.type === TransactionTypes.wrap ||
+      transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
       transaction.type === TransactionTypes.wrapEther
     )
@@ -1274,6 +1275,7 @@ export default class PositionService {
       transaction.type === TransactionTypes.approveTokenExact ||
       transaction.type === TransactionTypes.swap ||
       transaction.type === TransactionTypes.wrap ||
+      transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
       transaction.type === TransactionTypes.wrapEther
     ) {

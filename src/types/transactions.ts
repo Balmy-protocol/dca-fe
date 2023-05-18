@@ -54,6 +54,8 @@ export enum TransactionTypes {
   eulerClaimPermitMany = 'EULER_CLAIM_PERMIT_MANY',
   eulerClaimApproveMigrator = 'EULER_CLAIM_APPROVE_MIGRATOR',
   eulerClaimClaimFromMigrator = 'EULER_CLAIM_CLAIM_FROM_MIGRATOR',
+  // CAMPAIGNS
+  claimCampaign = 'CLAIM_CAMPAIGN',
 }
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
@@ -301,6 +303,14 @@ export interface NewPairTypeData {
   };
 }
 
+export interface ClaimCampaignTypeData {
+  type: TransactionTypes.claimCampaign;
+  typeData: {
+    id?: number | string;
+    name: string;
+  };
+}
+
 export type TransactionAggregatorTypeDataOptions = SwapTypeData;
 
 export type TransactionPositionTypeDataOptions =
@@ -349,6 +359,7 @@ export type TransactionTypeDataOptions =
   | EulerClaimClaimFromMigratorTypeData
   | WrapTypeData
   | UnwrapTypeData
+  | ClaimCampaignTypeData
   | NoOpTypeData;
 
 export type TransactionDetailsBase = {

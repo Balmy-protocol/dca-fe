@@ -283,6 +283,42 @@ export function usePositionHasPendingTransaction(position: string): string | nul
     return foundTransaction?.hash || null;
   }, [allTransactions, position]);
 }
+// return wether a campaign is waiting for the claim
+export function useCampaignHasPendingTransaction(campaignId: string): boolean {
+  const allTransactions = useAllTransactions();
+
+  return useMemo(
+    () =>
+      Object.keys(allTransactions).some((hash) => {
+        if (!allTransactions[hash]) return false;
+        const tx = allTransactions[hash];
+        if (tx.type !== TransactionTypes.claimCampaign) return false;
+        if (tx.receipt) {
+          return false;
+        }
+        return tx.typeData.id === campaignId && !tx.receipt;
+      }),
+    [allTransactions, campaignId]
+  );
+}
+// return wether a campaign is waiting for the claim
+export function useCampaignHasConfirmedTransaction(campaignId: string): boolean {
+  const allTransactions = useAllTransactions();
+
+  return useMemo(
+    () =>
+      Object.keys(allTransactions).some((hash) => {
+        if (!allTransactions[hash]) return false;
+        const tx = allTransactions[hash];
+        if (tx.type !== TransactionTypes.claimCampaign) return false;
+        if (tx.receipt) {
+          return false;
+        }
+        return tx.typeData.id === campaignId && tx.receipt;
+      }),
+    [allTransactions, campaignId]
+  );
+}
 
 // returns whether a token has been transfered
 export function usePositionHasTransfered(position: string): string | null {

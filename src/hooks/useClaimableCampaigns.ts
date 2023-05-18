@@ -1,12 +1,13 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
+import find from 'lodash/find';
 import compact from 'lodash/compact';
-import usePrevious from 'hooks/usePrevious';
-import { useHasPendingTransactions } from 'state/transactions/hooks';
-import { useBlockNumber } from 'state/block-number/hooks';
-import { parseUsdPrice } from 'utils/currency';
-import { Campaigns } from 'types';
-import useCurrentNetwork from './useCurrentNetwork';
+import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
+import { parseUsdPrice } from '@common/utils/currency';
+import { Campaigns, Token } from '@types';
+import { TOKEN_TYPE_BASE } from '@constants';
+import { useIsLoadingAggregatorTokenLists } from '@state/token-lists/hooks';
 import useAccount from './useAccount';
 import useCampaignService from './useCampaignService';
 import useGetToken from './useGetToken';
@@ -26,33 +27,41 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
   const hasPendingTransactions = useHasPendingTransactions();
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
-  const currentNetwork = useCurrentNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
   const campaignService = useCampaignService();
+  const isLoadingTokenList = useIsLoadingAggregatorTokenLists();
   const getToken = useGetToken();
 
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const promiseResult = await campaignService.getCampaigns();
+        const promiseResult = await campaignService.getCampaigns(account);
 
         const parsedCampaigns = promiseResult.map((campaign) => {
           const tokens = compact(campaign.tokens.map(({ address }) => getToken(address)));
 
-          // there is some token that we actually havent been able to get
-          if (campaign.tokens.length !== tokens.length) {
-            return null;
-          }
-
           return {
             ...campaign,
-            tokens: tokens.map((token, index) => ({
-              ...token,
-              balance: campaign.tokens[index].balance,
-              balanceUSD: parseUsdPrice(token, campaign.tokens[index].balance, campaign.tokens[index].usdPrice),
-            })),
+            tokens: campaign.tokens.map((token) => {
+              const foundToken = find(tokens, { address: token.address });
+
+              const fullToken: Token = {
+                address: token.address,
+                decimals: token.decimals,
+                name: token.name,
+                symbol: token.symbol,
+                chainId: campaign.chainId,
+                type: TOKEN_TYPE_BASE,
+                underlyingTokens: [],
+                ...(foundToken || {}),
+              };
+
+              return {
+                ...fullToken,
+                balance: token.balance,
+                balanceUSD: parseUsdPrice(fullToken, token.balance, token.usdPrice),
+              };
+            }),
           };
         });
 
@@ -65,17 +74,19 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
     if (
       (!isLoading && !result && !error) ||
       !isEqual(account, prevAccount) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
+      !isEqual(prevPendingTrans, hasPendingTransactions)
+      // (blockNumber &&
+      //   prevBlockNumber &&
+      //   blockNumber !== -1 &&
+      //   prevBlockNumber !== -1 &&
+      //   !isEqual(prevBlockNumber, blockNumber))
     ) {
-      setState({ isLoading: true, result: undefined, error: undefined });
+      if (account && !isLoadingTokenList) {
+        setState({ isLoading: true, result: undefined, error: undefined });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      callPromise();
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        callPromise();
+      }
     }
   }, [
     isLoading,
@@ -84,8 +95,10 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
     hasPendingTransactions,
     prevAccount,
     account,
-    prevBlockNumber,
-    blockNumber,
+    isLoadingTokenList,
+    // prevBlockNumber,
+    // blockNumber,
+    getToken,
     prevPendingTrans,
   ]);
 

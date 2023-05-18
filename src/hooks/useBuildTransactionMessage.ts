@@ -391,6 +391,20 @@ function useBuildTransactionMessages() {
           );
           break;
         }
+        case TransactionTypes.claimCampaign: {
+          const claimCampaignTypeData = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionMessagesClaimCampaign',
+              defaultMessage: 'The {campaign} campaign has been claimed',
+            }),
+            {
+              campaign: claimCampaignTypeData.name,
+            }
+          );
+          break;
+        }
         default:
           break;
       }

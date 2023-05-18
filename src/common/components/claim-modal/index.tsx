@@ -1,27 +1,21 @@
 import React from 'react';
-import Modal from 'common/modal';
-import Button from 'common/button';
+import Modal from '@common/components/modal';
 import styled from 'styled-components';
-import { DateTime } from 'luxon';
-import Typography from '@mui/material/Typography';
-import ArrowRight from 'assets/svg/atom/arrow-right';
 import { FormattedMessage } from 'react-intl';
 import Grid from '@mui/material/Grid';
-import useClaimableCampaigns from 'hooks/useClaimableCampaigns';
-import { Campaign } from 'types';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
-import TokenIcon from 'common/token-icon';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import { formatCurrencyAmount } from 'utils/currency';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
+import { Campaign, CampaignTypes, Campaigns, OptimismTypeData } from '@types';
+import ClaimItem from './components/claim-items';
+import OptimismAirdropClaimItem from './components/optimism-campaign';
 
 const StyledContent = styled.div`
   background-color: #333333;
   border-radius: 4px;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 14px;
+  gap: 5px;
 `;
 
 const StyledClaimContainer = styled.div`
@@ -32,67 +26,32 @@ const StyledClaimContainer = styled.div`
   flex: 1;
 `;
 
-const StyledCampaignSection = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const StyledTokensContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-interface ClaimItemProps {
-  campaign: Campaign;
-}
-
-const ClaimItem = ({ campaign }: ClaimItemProps) => (
-  <StyledContent>
-    <StyledCampaignSection>
-      <Typography variant="h6">{campaign.title}</Typography>
-
-      <Typography
-        variant="body2"
-        color="rgba(255, 255, 255, 0.5)"
-        sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
-      >
-        <HelpOutlineOutlinedIcon fontSize="inherit" />
-        <FormattedMessage
-          description="claimModal expires"
-          defaultMessage="Expires on {date}"
-          values={{
-            date: DateTime.fromSeconds(Number(campaign.expiresOn)).toLocaleString(DateTime.DATE_MED),
-          }}
-        />
-      </Typography>
-    </StyledCampaignSection>
-    <StyledCampaignSection>
-      <StyledTokensContainer>
-        <TokenIcon token={campaign.tokens[0]} />
-        <Typography variant="h6">
-          {formatCurrencyAmount(campaign.tokens[0].balance, campaign.tokens[0])} {campaign.tokens[0].symbol}
-        </Typography>
-        <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-          ${campaign.tokens[0].balanceUSD.toFixed(2)}
-        </Typography>
-      </StyledTokensContainer>
-      <Button variant="text" color="secondary">
-        <FormattedMessage description="claimModal claim" defaultMessage="Claim" />
-        <ArrowRight size="inherit" fill="inherit" />
-      </Button>
-    </StyledCampaignSection>
-  </StyledContent>
-);
-
 interface ClaimModalProps {
   onCancel: () => void;
   open: boolean;
+  campaigns?: Campaigns;
+  isLoadingCampaigns: boolean;
 }
 
-const ClaimModal = ({ open, onCancel }: ClaimModalProps) => {
-  const [campaigns, isLoadingCampaigns] = useClaimableCampaigns();
+const getCampaigItemComponent = (campaign: Campaign) => {
+  let componentToReturn: React.ReactNode;
+  switch (campaign.type) {
+    case CampaignTypes.common: {
+      componentToReturn = <ClaimItem campaign={campaign} />;
+      break;
+    }
+    case CampaignTypes.optimismAirdrop: {
+      componentToReturn = <OptimismAirdropClaimItem campaign={campaign as Campaign<OptimismTypeData>} />;
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  return componentToReturn;
+};
+
+const ClaimModal = ({ open, onCancel, campaigns, isLoadingCampaigns }: ClaimModalProps) => {
   const handleCancel = () => {
     onCancel();
   };
@@ -112,8 +71,8 @@ const ClaimModal = ({ open, onCancel }: ClaimModalProps) => {
           {campaigns &&
             !!campaigns.length &&
             campaigns.map((campaign) => (
-              <Grid item xs={12}>
-                <ClaimItem campaign={campaign} />
+              <Grid item xs={12} key={campaign.id} sx={{ paddingTop: '0px !important' }}>
+                {getCampaigItemComponent(campaign)}
               </Grid>
             ))}
           {campaigns && !campaigns.length && (
