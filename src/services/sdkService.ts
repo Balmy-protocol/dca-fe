@@ -273,6 +273,9 @@ export default class SdkService {
 
   async getMultipleBalances(tokens: Token[]): Promise<Record<number, Record<string, BigNumber>>> {
     const account = this.walletService.getAccount();
+    if (!account) {
+      throw new Error('account must exist');
+    }
     const balances = await this.sdk.balanceService.getBalancesForTokens({
       account,
       tokens: tokens.reduce<Record<number, string[]>>((acc, token) => {
