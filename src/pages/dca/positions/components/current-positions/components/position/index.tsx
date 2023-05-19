@@ -22,6 +22,7 @@ import {
   NETWORKS,
   STRING_SWAP_INTERVALS,
   SWAP_INTERVALS_MAP,
+  TESTNETS,
   VERSIONS_ALLOWED_MODIFY,
 } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
@@ -34,7 +35,7 @@ import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
-import { Link, Theme, Tooltip } from '@mui/material';
+import { Chip, Link, Theme, Tooltip } from '@mui/material';
 import useUsdPrice from '@hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 
@@ -286,6 +287,8 @@ const ActivePosition = ({
   const foundYieldTo =
     position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
+  const isTestnet = TESTNETS.includes(positionNetwork.chainId);
+
   return (
     <StyledCard variant="outlined">
       {positionNetwork && (
@@ -347,6 +350,15 @@ const ActivePosition = ({
               </StyledDeprecated>
             )}
           </StyledCardHeader>
+          {isTestnet && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Chip
+                label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+                size="small"
+                color="warning"
+              />
+            </StyledDetailWrapper>
+          )}
           <StyledDetailWrapper alignItems="flex-start">
             <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage

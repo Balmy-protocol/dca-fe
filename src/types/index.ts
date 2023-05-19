@@ -44,6 +44,7 @@ export interface NetworkStruct {
   rpc: string[];
   mainColor?: string;
   wToken?: string;
+  testnet?: boolean;
 }
 
 export type ChainId = number;

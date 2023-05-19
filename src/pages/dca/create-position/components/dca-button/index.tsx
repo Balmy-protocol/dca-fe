@@ -104,8 +104,12 @@ const DcaButton = ({
   const hasConfirmedApproval = useHasConfirmedApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
 
   const hasEnoughUsdForDeposit =
-    !!usdPrice &&
-    rateUsdPrice >= (MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT);
+    currentNetwork.testnet ||
+    (!isUndefined(usdPrice) &&
+      rateUsdPrice >=
+        (isUndefined(MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId])
+          ? DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT
+          : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId]));
 
   const isApproved =
     !from ||
@@ -163,7 +167,9 @@ const DcaButton = ({
 
   const minimumTokensNeeded = usdPriceToToken(
     from,
-    MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
+    isUndefined(MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId])
+      ? DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT
+      : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId],
     usdPrice
   );
 
@@ -325,7 +331,9 @@ const DcaButton = ({
           // eslint-disable-next-line no-template-curly-in-string
           defaultMessage="The position must have a minimum rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to be created."
           values={{
-            minimum: MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || MINIMUM_USD_RATE_FOR_DEPOSIT,
+            minimum: isUndefined(MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId])
+              ? DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT
+              : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId],
             minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
             symbol: from?.symbol || '',
             frequency: intl.formatMessage(

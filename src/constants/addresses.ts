@@ -263,9 +263,21 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
     },
     rpc: ['https://rpc.gnosischain.com', 'https://rpc.ankr.com/gnosis'],
   },
+  baseGoerli: {
+    chainId: 84531,
+    name: 'Base Goerli',
+    mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    mainColor: '#3076F6',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: ['https://goerli.base.org', 'https://base-goerli.public.blastapi.io'],
+  },
 };
 
-const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken }: Chain) => ({
+const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken, testnet }: Chain) => ({
   chainId,
   name,
   mainCurrency: `${chainId}-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`,
@@ -275,6 +287,7 @@ const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, 
     decimals: 18,
   },
   wToken,
+  testnet,
   rpc: publicRPCs ? [...publicRPCs] : [],
 });
 
@@ -305,6 +318,7 @@ export const TESTNETS = [
   NETWORKS.optimismKovan.chainId,
   NETWORKS.optimismGoerli.chainId,
   NETWORKS.mumbai.chainId,
+  NETWORKS.baseGoerli.chainId,
 ];
 
 export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
@@ -313,6 +327,7 @@ export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
   NETWORKS.arbitrum.chainId,
   NETWORKS.mainnet.chainId,
   NETWORKS.bsc.chainId,
+  NETWORKS.baseGoerli.chainId,
 ];
 export const SUPPORTED_NETWORKS = [
   NETWORKS.mainnet.chainId,
@@ -324,6 +339,7 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.avalanche.chainId,
   NETWORKS.heco.chainId,
   NETWORKS.xdai.chainId,
+  NETWORKS.baseGoerli.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -332,6 +348,7 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.bsc.chainId,
+  NETWORKS.baseGoerli.chainId,
 ];
 
 // export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
@@ -341,6 +358,7 @@ export const NETWORKS_FOR_MENU = [
   NETWORKS.arbitrum.chainId,
   NETWORKS.mainnet.chainId,
   NETWORKS.bsc.chainId,
+  NETWORKS.baseGoerli.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
@@ -376,6 +394,7 @@ export const HUB_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.arbitrum.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.mainnet.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.bsc.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
+    [NETWORKS.baseGoerli.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
   },
 };
 
@@ -403,6 +422,7 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.arbitrum.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
     [NETWORKS.mainnet.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
     [NETWORKS.bsc.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
+    [NETWORKS.baseGoerli.chainId]: '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
   },
 };
 
@@ -438,6 +458,7 @@ export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.arbitrum.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.mainnet.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.bsc.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
+    [NETWORKS.baseGoerli.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
   },
 };
 
@@ -465,6 +486,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.arbitrum.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.mainnet.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.bsc.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
+    [NETWORKS.baseGoerli.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
   },
 };
 
@@ -480,6 +502,7 @@ export const MULTICALL_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.mainnet.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.bsc.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
 export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
@@ -499,8 +522,8 @@ export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
     [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-optimism',
     [NETWORKS.arbitrum.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-arbitrum',
     [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-ethereum',
-    [NETWORKS.bsc.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-ethereum',
     [NETWORKS.bsc.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-bnb',
+    [NETWORKS.baseGoerli.chainId]: 'https://api.studio.thegraph.com/proxy/35446/dca-v2-yf-base-goerli/v0.0.1/',
   },
 };
 
@@ -535,6 +558,7 @@ export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
     [NETWORKS.okex.chainId]: 'https://www.oklink.com/okexchain/',
     [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
     [NETWORKS.xdai.chainId]: 'https://blockscout.com/xdai/mainnet/',
+    [NETWORKS.baseGoerli.chainId]: 'https://goerli.basescan.org/',
   }
 );
 
@@ -546,6 +570,7 @@ export const DEFILLAMA_IDS = {
   [NETWORKS.mumbai.chainId]: 'mumbai',
   [NETWORKS.moonbeam.chainId]: 'moonbeam',
   [NETWORKS.xdai.chainId]: 'gnosis',
+  [NETWORKS.baseGoerli.chainId]: 'base-goerli',
   [Chains.ETHEREUM.chainId]: 'ethereum',
   [Chains.BNB_CHAIN.chainId]: 'bsc',
   [Chains.POLYGON.chainId]: 'polygon',
