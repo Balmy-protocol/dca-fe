@@ -6,12 +6,12 @@ import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
-import useWalletService from './useWalletService';
 import useAccount from './useAccount';
+import useSdkService from './useSdkService';
 
 function useBalance(from: Token | undefined | null): [BigNumber | undefined, boolean, string?] {
   const account = useAccount();
-  const walletService = useWalletService();
+  const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
     result?: BigNumber;
@@ -35,8 +35,8 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await walletService.getBalance(from.address);
-          setState({ isLoading: false, result: promiseResult, error: undefined });
+          const promiseResult = await sdkService.getMultipleBalances([from]);
+          setState({ isLoading: false, result: promiseResult[from.chainId][from.address], error: undefined });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });
         }
@@ -71,7 +71,7 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
     prevBlockNumber,
     blockNumber,
     prevFrom,
-    walletService,
+    sdkService,
     prevPendingTrans,
   ]);
 
