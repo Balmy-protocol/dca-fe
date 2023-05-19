@@ -3,8 +3,10 @@ import { FormattedMessage } from 'react-intl';
 
 import Link from '@mui/material/Link';
 import styled from 'styled-components';
+import BugReportIcon from '@mui/icons-material/BugReport';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import DiscordIcon from '@assets/svg/atom/discord';
+import PreviewIcon from '@mui/icons-material/Preview';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -75,6 +77,24 @@ const Footer = () => {
             </StyledLink>
           </StyledFooterMainContent>
           <StyledFooterLinks>
+            <Typography variant="body2">
+              <StyledLink
+                underline="none"
+                target="_blank"
+                href="https://github.com/Mean-Finance/dca-v2-core/tree/main/audits"
+              >
+                <PreviewIcon fontSize="inherit" />
+                <FormattedMessage description="audits" defaultMessage="Audits" />
+              </StyledLink>
+            </Typography>
+
+            <Typography variant="body2">
+              <StyledLink underline="none" target="_blank" href="https://immunefi.com/bounty/meanfinance/">
+                <BugReportIcon fontSize="inherit" />
+                <FormattedMessage description="bugBounty" defaultMessage="Bug bounty" />
+              </StyledLink>
+            </Typography>
+
             <Typography variant="body2">
               <StyledLink underline="none" target="_blank" href="https://docs.mean.finance">
                 <DescriptionOutlinedIcon fontSize="inherit" />
