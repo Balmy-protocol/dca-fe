@@ -28,8 +28,6 @@ import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import useWalletService from '@hooks/useWalletService';
 import useWeb3Service from '@hooks/useWeb3Service';
 import { fetchGraphTokenList } from '@state/token-lists/actions';
-import { Alert } from '@mui/material';
-import { FormattedMessage } from 'react-intl';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
 
@@ -128,14 +126,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <Alert severity="warning">
-          <FormattedMessage
-            description="theGraphDowntime"
-            defaultMessage="Our subgraph provider will go under maintenance on May 22 at 05:00 UTC. There might be some issues loading positions during a small period of the maintenance window. Please note that positions are safe at all times and service will return to normal shortly"
-          />
-        </Alert>
-      </Grid>
       {isLoadingIntervals ? (
         <Grid item xs={12} style={{ display: 'flex' }}>
           <CenteredLoadingIndicator size={70} />

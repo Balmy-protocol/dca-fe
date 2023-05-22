@@ -311,10 +311,6 @@
     "defaultMessage": "Close {from}/{to} position",
     "description": "terminate title"
   },
-  "744LIp": {
-    "defaultMessage": "Our subgraph provider will go under maintenance on May 22 at 05:00 UTC. There might be some issues loading positions during a small period of the maintenance window. Please note that positions are safe at all times and service will return to normal shortly",
-    "description": "theGraphDowntime"
-  },
   "7CQ1xI": {
     "defaultMessage": "We currently don't support any platform to generate yield with this token",
     "description": "noYieldAvailable"
@@ -434,10 +430,6 @@
   "Adg2/y": {
     "defaultMessage": "Migrate position and start generating yield",
     "description": "generateYield"
-  },
-  "Ah84aZ": {
-    "defaultMessage": "Audits",
-    "description": "audits"
   },
   "AhEpzv": {
     "defaultMessage": "This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones",
@@ -1575,10 +1567,6 @@
     "defaultMessage": "Close {from}:{to} position",
     "description": "transactionDetailsTerminate"
   },
-  "ZqLQ6b": {
-    "defaultMessage": "Bug bounty",
-    "description": "bugBounty"
-  },
   "Zsuz+g": {
     "defaultMessage": "every 1 minute",
     "description": "oneMinuteAdverb"
@@ -2586,10 +2574,6 @@
   "xu/Gut": {
     "defaultMessage": "Closed positions",
     "description": "terminatedPositions"
-  },
-  "xuOlAQ": {
-    "defaultMessage": "Testnet",
-    "description": "testnet"
   },
   "xurFDH": {
     "defaultMessage": "Mean Finance",

@@ -2726,21 +2726,5 @@
   "Wad0yc": {
     "defaultMessage": "Buscar token por simbolo, nombre o dirección",
     "description": "tokenPickerSearch"
-  },
-  "ZqLQ6b": {
-    "defaultMessage": "Bug bounty",
-    "description": "bugBounty"
-  },
-  "744LIp": {
-    "defaultMessage": "Nuestro proveedor de subgráficos entrará en mantenimiento el 22 de mayo a las 05:00 UTC. Puede haber algunos problemas para cargar posiciones durante un breve período de la ventana de mantenimiento. Ten en cuenta que las posiciones están seguras en todo momento y el servicio volverá a la normalidad en breve.",
-    "description": "theGraphDowntime"
-  },
-  "Ah84aZ": {
-    "defaultMessage": "Auditorías",
-    "description": "audits"
-  },
-  "xuOlAQ": {
-    "defaultMessage": "Testnet",
-    "description": "testnet"
   }
 }

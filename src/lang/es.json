@@ -679,12 +679,6 @@
       "value": "to"
     }
   ],
-  "744LIp": [
-    {
-      "type": 0,
-      "value": "Nuestro proveedor de subgráficos entrará en mantenimiento el 22 de mayo a las 05:00 UTC. Puede haber algunos problemas para cargar posiciones durante un breve período de la ventana de mantenimiento. Ten en cuenta que las posiciones están seguras en todo momento y el servicio volverá a la normalidad en breve."
-    }
-  ],
   "7CQ1xI": [
     {
       "type": 0,
@@ -973,12 +967,6 @@
     {
       "type": 0,
       "value": "Migrar la posición y empezar a generar retornos"
-    }
-  ],
-  "Ah84aZ": [
-    {
-      "type": 0,
-      "value": "Auditorías"
     }
   ],
   "AhEpzv": [
@@ -3755,12 +3743,6 @@
       "value": " para usted por"
     }
   ],
-  "ZqLQ6b": [
-    {
-      "type": 0,
-      "value": "Bug bounty"
-    }
-  ],
   "Zsuz+g": [
     {
       "type": 0,
@@ -6051,12 +6033,6 @@
     {
       "type": 0,
       "value": "Posiciones cerradas"
-    }
-  ],
-  "xuOlAQ": [
-    {
-      "type": 0,
-      "value": "Testnet"
     }
   ],
   "xurFDH": [

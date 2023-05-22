@@ -596,14 +596,6 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
-        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
-          <Alert severity="warning">
-            <FormattedMessage
-              description="theGraphDowntime"
-              defaultMessage="Our subgraph provider will go under maintenance on May 22 at 05:00 UTC. There might be some issues loading positions during a small period of the maintenance window. Please note that positions are safe at all times and service will return to normal shortly"
-            />
-          </Alert>
-        </Grid>
         <Grid
           item
           xs={12}
