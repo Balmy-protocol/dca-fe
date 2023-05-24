@@ -6,7 +6,7 @@ import YieldService from './yieldService';
 import ProviderService from './providerService';
 
 jest.mock('./providerService');
-jest.mock('./WalletService');
+jest.mock('./walletService');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('@constants/yield', () => ({
   ...jest.requireActual('@constants/yield'),
