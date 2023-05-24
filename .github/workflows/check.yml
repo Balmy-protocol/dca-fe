@@ -3,8 +3,10 @@ name: Check
 on: [pull_request]
 
 jobs:
-  lint:
+  build:
     runs-on: ubuntu-latest
+
+    name: Build, Lint and Test
 
     strategy:
       matrix:
