@@ -15,6 +15,7 @@ import HT from './ht.svg';
 import MATIC from './matic.svg';
 import OPTIMISM from './optimism.svg';
 import SONNE from './sonne.svg';
+import YEARN from './yfi.svg';
 
 const manifest = {
   // TOKENS
@@ -46,6 +47,7 @@ const manifest = {
   GAS,
   OPTIMISM,
   SONNE,
+  YEARN,
 };
 
 export default manifest;
