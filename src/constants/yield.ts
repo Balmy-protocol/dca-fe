@@ -344,6 +344,13 @@ export const ALLOWED_YIELDS: Record<
       token: emptyTokenWithAddress('EXACTLY'),
     },
     {
+      id: '01a0ab55-7324-4ac5-9ee1-f1c7f31346ea', // Exactly wstETH
+      tokenAddress: '0xa61ef65f330bb9f3fce823aee704052d8dcdb27a', // Exactly wstETH
+      poolId: '01a0ab55-7324-4ac5-9ee1-f1c7f31346ea', // Exactly wstETH
+      name: 'Exactly',
+      token: emptyTokenWithAddress('EXACTLY'),
+    },
+    {
       id: '46aa0b40-cafc-485f-9014-e196d0b5da81', // Yearn WETH
       tokenAddress: '0x1fa23ee1319f6f3f2973fd41f83a08cdd99fea5d', // Yearn WETH
       poolId: '46aa0b40-cafc-485f-9014-e196d0b5da81', // Yearn WETH
