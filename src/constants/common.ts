@@ -56,6 +56,7 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 
 export const TOKEN_BLACKLIST = [
   '0x2e9a6df78e42a30712c10a9dc4b1c8656f8f2879', // ARBITRUM - Malicious MKR
+  '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // OP - WTF optimism
 ];
 
 export const DCA_TOKEN_BLACKLIST = [
