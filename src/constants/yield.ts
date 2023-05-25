@@ -367,9 +367,9 @@ export const ALLOWED_YIELDS: Record<
       forcedUnderlyings: ['0x7f5c764cbc14f9669b88837ca1490cca17c31607'],
     },
     // {
-    //   id: '755541b1-6df1-4ae5-8e48-853640448dc6', // Yearn WBTC
+    //   id: '', // Yearn WBTC
     //   tokenAddress: '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn WBTC
-    //   poolId: '755541b1-6df1-4ae5-8e48-853640448dc6', // Yearn WBTC
+    //   poolId: '', // Yearn WBTC
     //   name: 'Yearn',
     //   token: emptyTokenWithAddress('YEARN'),
     //   forcedUnderlyings: ['0x68f180fcce6836688e9084f035309e29bf0a2095'],
