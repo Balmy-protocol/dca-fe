@@ -85,6 +85,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
 
+  '0x57f93e3fcb2b7ef126aeeda1f959c9ee4625aa70', // OP - MAI Aave v3
   '0x348a1213fa28a43855e5bb103bdfd7f357543626', // OP - OP Aave v3
   '0x1622bf67e6e5747b81866fe0b85178a93c7f86e3', // ARBI - UMAMI
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
