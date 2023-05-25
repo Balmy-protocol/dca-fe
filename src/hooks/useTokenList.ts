@@ -7,7 +7,7 @@ import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS, TOKEN_MAP_SYMBOL } from '@com
 import { useSavedAggregatorTokenLists, useTokensLists } from '@state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 
-function useTokenList(isAggregator = false, filter = true, filterChainId = true) {
+function useTokenList(isAggregator = false, filter = true, filterChainId = true, multichain = false) {
   const currentNetwork = useSelectedNetwork();
   const tokensLists = useTokensLists();
   const savedDCATokenLists = ['Mean Finance Graph Allowed Tokens'];
@@ -36,6 +36,7 @@ function useTokenList(isAggregator = false, filter = true, filterChainId = true)
                     .filter(
                       (token) =>
                         (!filterChainId || token.chainId === currentNetwork.chainId) &&
+                        (multichain || token.chainId === currentNetwork.chainId) &&
                         !Object.keys(acc).includes(token.address) &&
                         (isAggregator || !reducedYieldTokens.includes(token.address)) &&
                         (!filter || !(isAggregator ? TOKEN_BLACKLIST : DCA_TOKEN_BLACKLIST).includes(token.address))

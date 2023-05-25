@@ -67,12 +67,12 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     if (networkToSet && SUPPORTED_NETWORKS_DCA.includes(networkToSet.chainId)) {
       dispatch(setDCAChainId(networkToSet.chainId));
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispatch(fetchGraphTokenList(networkToSet.chainId));
+      // dispatch(fetchGraphTokenList(networkToSet.chainId));
     } else if (SUPPORTED_NETWORKS_DCA.includes(currentNetwork.chainId)) {
       dispatch(setDCAChainId(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId));
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispatch(fetchGraphTokenList(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId));
     }
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    dispatch(fetchGraphTokenList());
   }, []);
 
   React.useEffect(() => {
@@ -95,18 +95,18 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const handleChangeNetwork = (newChainId: number) => {
     if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      walletService.changeNetworkAutomatically(newChainId, () => {
-        const networkToSet = find(NETWORKS, { chainId: newChainId });
-        dispatch(setNetwork(networkToSet as NetworkStruct));
-        if (networkToSet) {
-          web3Service.setNetwork(networkToSet?.chainId);
-        }
-      });
+      // walletService.changeNetworkAutomatically(newChainId, () => {
+      //   const networkToSet = find(NETWORKS, { chainId: newChainId });
+      //   dispatch(setNetwork(networkToSet as NetworkStruct));
+      //   if (networkToSet) {
+      //     web3Service.setNetwork(networkToSet?.chainId);
+      //   }
+      // });
       replaceHistory(`/create/${newChainId}`);
       dispatch(setDCAChainId(newChainId));
       setHasLoadedPairs(false);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispatch(fetchGraphTokenList(newChainId));
+      // dispatch(fetchGraphTokenList(newChainId));
     }
   };
 

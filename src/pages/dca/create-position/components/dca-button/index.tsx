@@ -84,7 +84,7 @@ const DcaButton = ({
   rateUsdPrice,
   fromValueUsdPrice,
 }: DcaButtonProps) => {
-  const { from, to, fromValue, frequencyType, fromYield, toYield, frequencyValue } = useCreatePositionState();
+  const { from, to, fromValue, frequencyType, fromYield, toYield, frequencyValue, fundWith } = useCreatePositionState();
   const currentNetwork = useSelectedNetwork();
   const { openConnectModal } = useConnectModal();
   const intl = useIntl();
@@ -269,7 +269,11 @@ const DcaButton = ({
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
         <Typography variant="body1">
-          <FormattedMessage description="create position" defaultMessage="Create position" />
+          <FormattedMessage
+            description="create position"
+            defaultMessage="Create position {chain}"
+            values={{ chain: fundWith?.chainId !== currentNetwork.chainId ? ` on ${currentNetwork.name}` : '' }}
+          />
         </Typography>
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (

@@ -23,7 +23,7 @@ interface AvailableSwapInterval {
 }
 
 interface SwapFirstStepProps {
-  startSelectingCoin: (token: Token) => void;
+  startSelectingCoin: (token: Token, multiChain?: boolean) => void;
   cantFund: boolean | null;
   handleFrequencyChange: (newValue: string) => void;
   balance?: BigNumber;
@@ -61,6 +61,7 @@ const SwapFirstStep = ({
           cantFund={cantFund}
           fromValueUsdPrice={fromValueUsdPrice}
           handleFromValueChange={handleFromValueChange}
+          startSelectingCoin={startSelectingCoin}
         />
       </StyledContentContainer>
     </Grid>

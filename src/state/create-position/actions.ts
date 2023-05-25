@@ -7,6 +7,8 @@ export const setFromValue = createAction<string>('createPosition/setFromValue');
 
 export const setFrom = createAction<Token | null>('createPosition/setFrom');
 
+export const setFundWith = createAction<Token | null>('createPosition/setFundWith');
+
 export const setTo = createAction<Token | null>('createPosition/setTo');
 
 export const setFrequencyType = createAction<BigNumber>('createPosition/setFrequencyType');

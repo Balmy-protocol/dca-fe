@@ -7,12 +7,12 @@ import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import FormHelperText from '@mui/material/FormHelperText';
-import TokenIcon from '@common/components/token-icon';
 import { createStyles, FilledInput, Typography } from '@mui/material';
 import { withStyles } from '@mui/styles';
-import { formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { MAX_DEDUCTION, MIN_AMOUNT_FOR_MAX_DEDUCTION } from '@constants';
+import MinimalComposedTokenIcon from '@common/components/minimal-composed-token-icon';
+import { getGhTokenListLogoUrl, MAX_DEDUCTION, MIN_AMOUNT_FOR_MAX_DEDUCTION } from '@constants';
 
 const StyledTokenInputContainer = styled.div`
   display: flex;
@@ -98,6 +98,7 @@ interface TokenInputProps {
   withHalf?: boolean;
   maxWidth?: string;
   usdValue?: string;
+  showChain?: boolean;
 }
 
 const TokenInput = ({
@@ -115,6 +116,7 @@ const TokenInput = ({
   withMax,
   maxWidth,
   usdValue,
+  showChain,
 }: TokenInputProps) => {
   const inputRef = React.createRef();
   const currentNetwork = useSelectedNetwork();
@@ -168,7 +170,17 @@ const TokenInput = ({
       <StyledFormControlMinimal onClick={onFocusInput} maxWidth={maxWidth}>
         {token && (
           <StyledTokenIconContainer>
-            <TokenIcon token={token} />
+            <MinimalComposedTokenIcon
+              tokenBottom={token}
+              tokenTop={
+                showChain
+                  ? toToken({
+                      chainId: token.chainId,
+                      logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
+                    })
+                  : undefined
+              }
+            />
           </StyledTokenIconContainer>
         )}
         <StyledAmountContainer>
@@ -201,7 +213,17 @@ const TokenInput = ({
         <StyledFormControl onClick={onFocusInput}>
           {token && (
             <StyledTokenIconContainer>
-              <TokenIcon token={token} />
+              <MinimalComposedTokenIcon
+                tokenBottom={token}
+                tokenTop={
+                  showChain
+                    ? toToken({
+                        chainId: token.chainId,
+                        logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
+                      })
+                    : undefined
+                }
+              />
             </StyledTokenIconContainer>
           )}
           <StyledAmountContainer>

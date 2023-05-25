@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import styled from 'styled-components';
-import remove from 'lodash/remove';
+// import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Token, TokenList, YieldOptions } from '@types';
@@ -16,11 +16,12 @@ import Search from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import Button from '@common/components/button';
+import MinimalComposedTokenIcon from '@common/components/minimal-composed-token-icon';
 
 // import Chip from '@mui/material/Chip';
-import TokenIcon from '@common/components/token-icon';
 import { makeStyles, withStyles } from '@mui/styles';
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useTokenList from '@hooks/useTokenList';
@@ -28,7 +29,6 @@ import TokenLists from '@common/components/token-lists';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import FilledInput from '@mui/material/FilledInput';
 import { createStyles, Skeleton, Tooltip } from '@mui/material';
-import useBalances from '@hooks/useBalances';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import Switch from '@mui/material/Switch';
@@ -36,6 +36,11 @@ import useCustomToken from '@hooks/useCustomToken';
 import useAllowedPairs from '@hooks/useAllowedPairs';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useCustomTokens } from '@state/token-lists/hooks';
+import useMultichainBalances from '@hooks/useMultichainBalances';
+import { SUPPORTED_NETWORKS_DCA, getGhTokenListLogoUrl } from '@constants';
+import { useAppDispatch } from '@state/hooks';
+import { changeMainTab, changeSubTab } from '@state/tabs/actions';
+import usePushToHistory from '@hooks/usePushToHistory';
 
 type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -131,14 +136,15 @@ const StyledCopyIcon = styled(ContentCopyIcon)`
 
 interface RowData {
   tokenList: TokenList;
-  tokenKeys: string[];
+  tokens: Token[];
   onClick: (token: Token, isCustomToken: boolean) => void;
   yieldOptions: YieldOptions;
-  tokenBalances: Record<string, { balance: BigNumber; balanceUsd?: BigNumber }>;
+  tokenBalances: Record<number, Record<string, { balance: BigNumber; balanceUsd?: BigNumber }>>;
   customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
   isLoadingTokenBalances: boolean;
   customTokens: TokenList;
   balancesChainId?: number;
+  multichain?: boolean;
 }
 
 interface RowProps {
@@ -164,6 +170,7 @@ interface TokenPickerProps {
   isLoadingYieldOptions: boolean;
   isAggregator?: boolean;
   showWrappedAndProtocol?: boolean;
+  multichain?: boolean;
 }
 
 const useListItemStyles = makeStyles(({ palette }) => ({
@@ -210,6 +217,33 @@ const LoadingRow = ({ style }: EmptyRowProps) => {
   );
 };
 
+const AggregatorRow = ({ style }: EmptyRowProps) => {
+  const classes = useListItemStyles();
+  const dispatch = useAppDispatch();
+  const pushToHistory = usePushToHistory();
+
+  const onClick = () => {
+    dispatch(changeMainTab(1));
+    dispatch(changeSubTab(0));
+    pushToHistory(`/swap`);
+  };
+  return (
+    <StyledListItem classes={classes} style={style}>
+      <StyledListItemIcon />
+      <ListItemText disableTypography>
+        <StyledTokenTextContainer>
+          <Typography variant="body1">Want to fund with another token that is not in your wallet?</Typography>
+        </StyledTokenTextContainer>
+      </ListItemText>
+      <StyledBalanceContainer>
+        <Button variant="contained" color="secondary" onClick={onClick}>
+          Get token
+        </Button>
+      </StyledBalanceContainer>
+    </StyledListItem>
+  );
+};
+
 const EmptyRow = () => (
   <StyledTokenTextContainer>
     <Typography variant="body1" sx={{ textAlign: 'center' }}>
@@ -224,29 +258,24 @@ const EmptyRow = () => (
 const Row = ({
   index,
   style,
-  data: {
-    onClick,
-    tokenList,
-    tokenKeys,
-    yieldOptions,
-    tokenBalances,
-    customToken,
-    customTokens,
-    isLoadingTokenBalances,
-    balancesChainId,
-  },
+  data: { onClick, tokens, yieldOptions, tokenBalances, customToken, customTokens, isLoadingTokenBalances, multichain },
 }: RowProps) => {
   const classes = useListItemStyles();
-  const isImportedToken = !!customTokens[tokenKeys[index]];
-  const isCustomToken = (!!customToken && tokenKeys[index] === customToken.token.address) || isImportedToken;
+  const isImportedToken = tokens[index] && !!customTokens[tokens[index].address];
+  const isCustomToken =
+    (!!customToken && tokens[index] && tokens[index].address === customToken.token.address) || isImportedToken;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const token = !isCustomToken || isImportedToken ? tokenList[tokenKeys[index]] : customToken!.token;
+  const token = !isCustomToken || isImportedToken ? tokens[index] : customToken!.token;
 
-  if (index === 0 && tokenKeys.length === 1 && tokenKeys[0] === 'loading') {
+  if (index === 0 && tokens.length === (multichain ? 2 : 1) && tokens[0].address === 'loading') {
     return <LoadingRow style={style} />;
   }
 
-  if (index === 0 && !tokenKeys.length && !token) {
+  if (index === tokens.length - 1 && multichain) {
+    return <AggregatorRow style={style} />;
+  }
+
+  if (index === 0 && !tokens.length && !token) {
     return <EmptyRow />;
   }
 
@@ -256,14 +285,24 @@ const Row = ({
 
   const tokenBalance =
     !isCustomToken || isImportedToken
-      ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0)
+      ? (tokenBalances &&
+          tokenBalances[token.chainId] &&
+          tokenBalances[token.chainId][token.address] &&
+          tokenBalances[token.chainId][token.address].balance) ||
+        BigNumber.from(0)
       : customToken?.balance ?? BigNumber.from(0);
   const tokenValue =
     !isCustomToken || isImportedToken
       ? (tokenBalances &&
-          tokenBalances[token.address] &&
-          tokenBalances[token.address].balanceUsd &&
-          parseFloat(formatUnits(tokenBalances[token.address].balanceUsd || BigNumber.from(0), token.decimals + 18))) ||
+          tokenBalances[token.chainId] &&
+          tokenBalances[token.chainId][token.address] &&
+          tokenBalances[token.chainId][token.address].balanceUsd &&
+          parseFloat(
+            formatUnits(
+              tokenBalances[token.chainId][token.address].balanceUsd || BigNumber.from(0),
+              token.decimals + 18
+            )
+          )) ||
         0
       : (customToken?.balanceUsd && parseFloat(formatUnits(customToken?.balanceUsd, token.decimals + 18))) || 0;
 
@@ -313,7 +352,18 @@ const Row = ({
   return (
     <StyledListItem classes={classes} onClick={() => onClick(token, isCustomToken)} style={style}>
       <StyledListItemIcon>
-        <TokenIcon size="24px" token={token} />
+        <MinimalComposedTokenIcon
+          size="24px"
+          tokenBottom={token}
+          tokenTop={
+            multichain
+              ? toToken({
+                  chainId: token.chainId,
+                  logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
+                })
+              : undefined
+          }
+        />
       </StyledListItemIcon>
       <ListItemText disableTypography>
         <StyledTokenTextContainer>
@@ -348,10 +398,8 @@ const Row = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {(!Object.keys(tokenBalances).length || balancesChainId !== token.chainId) && isLoadingTokenBalances && (
-          <CenteredLoadingIndicator size={10} />
-        )}
-        {tokenBalances && !!Object.keys(tokenBalances).length && balancesChainId === token.chainId && (
+        {!Object.keys(tokenBalances).length && isLoadingTokenBalances && <CenteredLoadingIndicator size={10} />}
+        {tokenBalances && !!Object.keys(tokenBalances).length && (
           <>
             {tokenBalance && (
               <Typography variant="body1" color="#FFFFFF">
@@ -383,18 +431,22 @@ const TokenPicker = ({
   isAggregator,
   showWrappedAndProtocol,
   onAddToken,
+  multichain,
 }: TokenPickerProps) => {
-  const tokenList = useTokenList(isAggregator);
+  const tokenList = useTokenList(isAggregator, true, true, multichain);
   const searchInputRef = React.useRef<HTMLElement>();
   const [search, setSearch] = React.useState('');
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
-  const tokenKeys = React.useMemo(() => Object.keys(tokenList), [tokenList]);
+  const tokens = React.useMemo(
+    () => [...Object.values(tokenList), ...SUPPORTED_NETWORKS_DCA.map((chainId) => getProtocolToken(chainId))],
+    [tokenList]
+  );
   const currentNetwork = useSelectedNetwork();
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
   const allowedPairs = useAllowedPairs();
-  let tokenKeysToUse: string[] = [];
+  let tokensToUse: Token[] = [];
   const customTokens = useCustomTokens();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
 
@@ -411,13 +463,13 @@ const TokenPicker = ({
           if (current.tokenA.address !== otherToCheck?.address && current.tokenB.address !== otherToCheck?.address) {
             return accum;
           }
-          const tokensToAdd = [current.tokenA.address, current.tokenB.address];
+          const tokensToAdd = [current.tokenA, current.tokenB];
 
           if (
             current.tokenA.address === wrappedProtocolToken.address ||
             current.tokenB.address === wrappedProtocolToken.address
           ) {
-            tokensToAdd.push(PROTOCOL_TOKEN_ADDRESS);
+            tokensToAdd.push(toToken({ address: PROTOCOL_TOKEN_ADDRESS }));
           }
 
           return [...accum, ...tokensToAdd];
@@ -426,9 +478,9 @@ const TokenPicker = ({
     [allowedPairs, otherToCheck]
   );
 
-  tokenKeysToUse = React.useMemo(
-    () => (isOnlyAllowedPairs && !!otherSelected ? uniqTokensFromPairs : tokenKeys),
-    [isOnlyAllowedPairs, otherSelected, uniqTokensFromPairs, tokenKeys]
+  tokensToUse = React.useMemo(
+    () => (isOnlyAllowedPairs && !!otherSelected ? uniqTokensFromPairs : tokens),
+    [isOnlyAllowedPairs, otherSelected, uniqTokensFromPairs, tokens]
   );
 
   const handleOnClose = () => {
@@ -444,54 +496,52 @@ const TokenPicker = ({
     !showWrappedAndProtocol &&
     (otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address);
 
-  const memoizedUnorderedTokenKeys = React.useMemo(() => {
-    const filteredTokenKeys = tokenKeysToUse
+  const memoizedUnorderedTokens = React.useMemo(() => {
+    const filteredTokens = tokensToUse
       .filter(
-        (el) =>
-          tokenList[el] &&
-          (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
-            tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
-            tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
-          !ignoreValues.includes(el) &&
-          tokenList[el].chainId === currentNetwork.chainId &&
-          el !== otherSelected?.address &&
+        (token) =>
+          (token.name.toLowerCase().includes(search.toLowerCase()) ||
+            token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+            token.address.toLowerCase().includes(search.toLowerCase())) &&
+          !ignoreValues.includes(token.address) &&
+          (multichain || token.chainId === currentNetwork.chainId) &&
+          token.address !== otherSelected?.address &&
           (!otherIsProtocol ||
-            (otherIsProtocol && el !== wrappedProtocolToken.address && el !== PROTOCOL_TOKEN_ADDRESS))
+            (otherIsProtocol &&
+              token.address !== wrappedProtocolToken.address &&
+              token.address !== PROTOCOL_TOKEN_ADDRESS))
       )
       .sort();
 
-    if (filteredTokenKeys.findIndex((el) => el === getWrappedProtocolToken(currentNetwork.chainId).address) !== -1) {
-      remove(filteredTokenKeys, (token) => token === getWrappedProtocolToken(currentNetwork.chainId).address);
-      filteredTokenKeys.unshift(getWrappedProtocolToken(currentNetwork.chainId).address);
-    }
+    // if (filteredTokenKeys.findIndex((el) => el === getWrappedProtocolToken(currentNetwork.chainId).address) !== -1) {
+    //   remove(filteredTokenKeys, (token) => token === getWrappedProtocolToken(currentNetwork.chainId).address);
+    //   filteredTokenKeys.unshift(getWrappedProtocolToken(currentNetwork.chainId).address);
+    // }
 
-    if (filteredTokenKeys.findIndex((el) => el === PROTOCOL_TOKEN_ADDRESS) !== -1) {
-      remove(filteredTokenKeys, (token) => token === PROTOCOL_TOKEN_ADDRESS);
-      filteredTokenKeys.unshift(PROTOCOL_TOKEN_ADDRESS);
-    }
+    // if (filteredTokenKeys.findIndex((el) => el === PROTOCOL_TOKEN_ADDRESS) !== -1) {
+    //   remove(filteredTokenKeys, (token) => token === PROTOCOL_TOKEN_ADDRESS);
+    //   filteredTokenKeys.unshift(PROTOCOL_TOKEN_ADDRESS);
+    // }
 
-    return filteredTokenKeys;
+    return filteredTokens;
   }, [
-    tokenKeysToUse,
+    tokensToUse,
     search,
     ignoreValues,
-    tokenKeys,
     availableFrom,
     otherIsProtocol,
     currentNetwork.chainId,
     otherSelected,
   ]);
 
-  const rawMemoTokenKeysToUse = React.useMemo(() => tokenKeysToUse.sort(), [tokenKeysToUse]);
+  const rawMemoTokensToUse = React.useMemo(() => tokensToUse.sort(), [tokensToUse]);
 
-  const [tokenBalances, isLoadingTokenBalances] = useBalances(
-    rawMemoTokenKeysToUse.map((tokenKey) => toToken({ address: tokenKey, chainId: currentNetwork.chainId }))
-  );
+  const [tokenBalances, isLoadingTokenBalances] = useMultichainBalances([
+    ...rawMemoTokensToUse,
+    ...SUPPORTED_NETWORKS_DCA.map((chainId) => toToken({ chainId, address: PROTOCOL_TOKEN_ADDRESS })),
+  ]);
 
-  const [customToken, isLoadingCustomToken] = useCustomToken(
-    search,
-    !isAggregator || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
-  );
+  const [customToken, isLoadingCustomToken] = useCustomToken(search, !isAggregator);
 
   const balances = React.useMemo(
     () => ({
@@ -500,47 +550,71 @@ const TokenPicker = ({
     [tokenBalances]
   );
 
-  const memoizedTokenKeys = React.useMemo(
+  const memoizedTokens = React.useMemo(
     () => [
-      ...(customToken ? [customToken.token.address] : []),
-      ...memoizedUnorderedTokenKeys.sort((tokenKeyA, tokenKeyB) => {
-        if (!balances) return tokenKeyA < tokenKeyB ? -1 : 1;
+      ...(customToken ? [customToken.token] : []),
+      ...memoizedUnorderedTokens
+        .sort((tokenA, tokenB) => {
+          if (!balances) return tokenA.address < tokenB.address ? -1 : 1;
 
-        const ABalanceToUse =
-          (balances[tokenKeyA] && (balances[tokenKeyA].balanceUsd || balances[tokenKeyA].balance)) || BigNumber.from(0);
-        const BBalanceToUse =
-          (balances[tokenKeyB] && (balances[tokenKeyB].balanceUsd || balances[tokenKeyB].balance)) || BigNumber.from(0);
+          const ABalanceToUse =
+            (balances[tokenA.chainId] &&
+              balances[tokenA.chainId][tokenA.address] &&
+              (balances[tokenA.chainId][tokenA.address].balanceUsd ||
+                balances[tokenA.chainId][tokenA.address].balance)) ||
+            BigNumber.from(0);
+          const BBalanceToUse =
+            (balances[tokenB.chainId] &&
+              balances[tokenB.chainId][tokenB.address] &&
+              (balances[tokenB.chainId][tokenB.address].balanceUsd ||
+                balances[tokenB.chainId][tokenB.address].balance)) ||
+            BigNumber.from(0);
 
-        const tokenABalance =
-          (balances[tokenKeyA] &&
-            parseFloat(
-              formatUnits(ABalanceToUse, tokenList[tokenKeyA].decimals + (balances[tokenKeyA].balanceUsd ? 18 : 0))
-            )) ||
-          0;
-        const tokenBBalance =
-          (balances[tokenKeyB] &&
-            parseFloat(
-              formatUnits(BBalanceToUse, tokenList[tokenKeyB].decimals + (balances[tokenKeyB].balanceUsd ? 18 : 0))
-            )) ||
-          0;
+          const tokenABalance =
+            (balances[tokenA.chainId] &&
+              balances[tokenA.chainId][tokenA.address] &&
+              parseFloat(
+                formatUnits(
+                  ABalanceToUse,
+                  tokenA.decimals + (balances[tokenA.chainId][tokenA.address].balanceUsd ? 18 : 0)
+                )
+              )) ||
+            0;
+          const tokenBBalance =
+            (balances[tokenB.chainId] &&
+              balances[tokenB.chainId][tokenB.address] &&
+              parseFloat(
+                formatUnits(
+                  BBalanceToUse,
+                  tokenB.decimals + (balances[tokenB.chainId][tokenB.address].balanceUsd ? 18 : 0)
+                )
+              )) ||
+            0;
 
-        if (tokenABalance || tokenBBalance) {
-          return tokenABalance > tokenBBalance ? -1 : 1;
-        }
+          if (tokenABalance || tokenBBalance) {
+            return tokenABalance > tokenBBalance ? -1 : 1;
+          }
 
-        const key = search.toLowerCase();
-        const isGoodMatchA = tokenList[tokenKeyA].symbol.toLowerCase().startsWith(key);
-        const isGoodMatchB = tokenList[tokenKeyB].symbol.toLowerCase().startsWith(key);
+          const key = search.toLowerCase();
+          const isGoodMatchA = tokenA.symbol.toLowerCase().startsWith(key);
+          const isGoodMatchB = tokenB.symbol.toLowerCase().startsWith(key);
 
-        if (isGoodMatchA !== isGoodMatchB) {
-          // XOR
-          return isGoodMatchA ? -1 : 1;
-        }
+          if (isGoodMatchA !== isGoodMatchB) {
+            // XOR
+            return isGoodMatchA ? -1 : 1;
+          }
 
-        return tokenList[tokenKeyA].symbol.localeCompare(tokenList[tokenKeyB].symbol);
-      }),
+          return tokenA.symbol.localeCompare(tokenB.symbol);
+        })
+        .filter(
+          (token) =>
+            !multichain ||
+            (balances &&
+              balances[token.chainId] &&
+              balances[token.chainId][token.address].balance.gt(BigNumber.from(0)))
+        ),
     ],
-    [balances, memoizedUnorderedTokenKeys, tokenList, customToken, search]
+    [balances, memoizedUnorderedTokens, tokenList, customToken, search]
   );
 
   const handleItemSelected = (token: Token, isCustomToken: boolean) => {
@@ -564,16 +638,17 @@ const TokenPicker = ({
     () => ({
       onClick: handleItemSelected,
       tokenList,
-      tokenKeys: !memoizedTokenKeys.length && isLoadingCustomToken ? ['loading'] : memoizedTokenKeys,
+      tokens: !memoizedTokens.length && isLoadingCustomToken ? [toToken({ address: 'loading' })] : memoizedTokens,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
       tokenBalances: isLoadingBalances && (!balances || !Object.keys(balances).length) ? {} : balances || {},
       balancesChainId: tokenBalances?.chainId,
       customToken: isAggregator ? customToken : undefined,
       isLoadingTokenBalances: isLoadingBalances,
       customTokens: isAggregator ? customTokens : {},
+      multichain,
     }),
     [
-      memoizedTokenKeys,
+      memoizedTokens,
       tokenList,
       balances,
       yieldOptions,
@@ -581,6 +656,7 @@ const TokenPicker = ({
       isLoadingBalances,
       currentNetwork.chainId,
       isLoadingCustomToken,
+      multichain,
     ]
   );
 
@@ -601,8 +677,11 @@ const TokenPicker = ({
           <>
             <Grid item xs={12} style={{ flexBasis: 'auto' }}>
               <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+                {/* eslint-disable-next-line no-nested-ternary */}
                 {isFrom ? (
                   <FormattedMessage description="You sell" defaultMessage="You sell" />
+                ) : multichain ? (
+                  <FormattedMessage description="Fund with" defaultMessage="Fund with" />
                 ) : (
                   <FormattedMessage description="You receive" defaultMessage="You receive" />
                 )}
@@ -662,7 +741,11 @@ const TokenPicker = ({
             <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
               <StyledDialogTitle>
                 <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
-                  <FormattedMessage description="token list" defaultMessage="Token list" />
+                  {multichain ? (
+                    <FormattedMessage description="token list" defaultMessage="Tokens in your wallet" />
+                  ) : (
+                    <FormattedMessage description="token list" defaultMessage="Token list" />
+                  )}
                 </Typography>
                 {/* <IconButton aria-label="close" onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}>
                   <StyledTuneIcon />
@@ -674,7 +757,7 @@ const TokenPicker = ({
                 {({ height, width }) => (
                   <StyledList
                     height={height}
-                    itemCount={itemData.tokenKeys.length || 1}
+                    itemCount={(itemData.tokens.length || 1) + (multichain ? 1 : 0)}
                     itemSize={52}
                     width={width}
                     itemData={itemData}

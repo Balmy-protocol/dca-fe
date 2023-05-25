@@ -55,6 +55,7 @@ import {
   setToYield,
   setFromYield,
   setFrequencyValue,
+  setFundWith,
 } from '@state/create-position/actions';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import useAllowance from '@hooks/useAllowance';
@@ -112,14 +113,26 @@ const Swap = ({
   isLoadingYieldOptions,
   handleChangeNetwork,
 }: SwapProps) => {
-  const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield, modeType, rate } =
-    useCreatePositionState();
+  const {
+    fromValue,
+    frequencyType,
+    frequencyValue,
+    from,
+    to,
+    yieldEnabled,
+    fromYield,
+    toYield,
+    modeType,
+    rate,
+    fundWith,
+  } = useCreatePositionState();
   const containerRef = React.useRef(null);
   const [createStep, setCreateStep] = React.useState<0 | 1>(0);
   const [showFirstStep, setShowFirstStep] = React.useState(false);
   const [showSecondStep, setShowSecondStep] = React.useState(false);
   const [isRender, setIsRender] = React.useState(true);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
+  const [shouldShowMultichainPicker, setShouldShowMultichainPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
@@ -137,7 +150,7 @@ const Swap = ({
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   // const pairService = usePairService();
-  const [balance, , balanceErrors] = useBalance(from);
+  const [balance, , balanceErrors] = useBalance(fundWith || from);
   const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
   const existingPair = React.useMemo(() => {
@@ -162,7 +175,11 @@ const Swap = ({
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0, fromYield, toYield]);
   const loadedAsSafeApp = useLoadedAsSafeApp();
 
-  const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(from);
+  const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(
+    fundWith || from,
+    undefined,
+    fundWith?.chainId || currentNetwork.chainId
+  );
 
   const replaceHistory = useReplaceHistory();
 
@@ -174,8 +191,8 @@ const Swap = ({
   );
 
   const fromValueUsdPrice = parseUsdPrice(
-    from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
+    fundWith || from,
+    (fromValue !== '' && parseUnits(fromValue, (fundWith || from)?.decimals)) || null,
     usdPrice
   );
 
@@ -197,11 +214,11 @@ const Swap = ({
   let rateForUsdPrice: BigNumber | null = null;
 
   try {
-    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
+    rateForUsdPrice = (rate !== '' && parseUnits(rate, (fundWith || from)?.decimals)) || null;
     // eslint-disable-next-line no-empty
   } catch {}
 
-  const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
+  const rateUsdPrice = parseUsdPrice(fundWith || from, rateForUsdPrice, usdPrice);
 
   const hasEnoughUsdForYield =
     !!usdPrice &&
@@ -231,6 +248,21 @@ const Swap = ({
     replaceHistory(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
     trackEvent('DCA - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
   };
+  const onSetFundWith = (newFundWith: Token) => {
+    // check for decimals
+    if (from && newFundWith.decimals < from.decimals) {
+      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
+      let newFromValue = fromValue;
+      if (splitValue && splitValue[2] !== '') {
+        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, newFundWith.decimals)}`;
+      }
+
+      dispatch(setFromValue(newFromValue));
+    }
+
+    dispatch(setFundWith(newFundWith));
+  };
+
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
     if (!shouldEnableFrequency(frequencyType.toString(), from?.address, newTo.address, currentNetwork.chainId)) {
@@ -662,9 +694,10 @@ const Swap = ({
     }
   };
 
-  const startSelectingCoin = (token: Token) => {
+  const startSelectingCoin = (token: Token, multiChain?: boolean) => {
     setSelecting(token);
     setShouldShowPicker(true);
+    setShouldShowMultichainPicker(!!multiChain);
     trackEvent('DCA - start selecting coin', {
       selected: token.address,
       is: selecting.address === from?.address ? 'from' : 'to',
@@ -762,7 +795,7 @@ const Swap = ({
     }
   };
 
-  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
+  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, (fundWith || from).decimals).gt(balance);
 
   const handleSetStep = (step: 0 | 1) => {
     if (isRender) {
@@ -806,11 +839,19 @@ const Swap = ({
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
         isFrom={selecting === from}
-        onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
+        // eslint-disable-next-line no-nested-ternary
+        onChange={
+          (from && selecting.address === from.address) || selecting.address === 'from'
+            ? shouldShowMultichainPicker
+              ? onSetFundWith
+              : onSetFrom
+            : onSetTo
+        }
         ignoreValues={[]}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
+        multichain={shouldShowMultichainPicker}
       />
       <Slide
         direction="right"
