@@ -92,7 +92,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97', // OP - STG
   '0x18c46621af7cbcdf58b155517d22b4ae7c5f2cd1', // POLY - wstEth Aave
   '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
-  '0xaddb6a0412de1ba0f936dcaeb8aaa24578dcf3b2', // OPTI - cbETH
+  // '0xaddb6a0412de1ba0f936dcaeb8aaa24578dcf3b2', // OPTI - cbETH
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
