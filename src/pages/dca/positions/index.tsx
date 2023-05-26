@@ -16,7 +16,7 @@ import usePositionService from '@hooks/usePositionService';
 import usePrevious from '@hooks/usePrevious';
 import useAccount from '@hooks/useAccount';
 import useCurrentPositions from '@hooks/useCurrentPositions';
-import PositionsList from '../../../home/positions-list';
+import PositionsList from '@pages/dca/positions/components/current-positions';
 import History from './components/history';
 import PositionDashboard from './components/dashboard';
 
