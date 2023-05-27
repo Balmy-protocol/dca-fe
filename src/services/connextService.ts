@@ -1,7 +1,7 @@
 import { getPoolFeeForUniV3, getXCallCallData, prepareSwapAndXCall } from '@connext/chain-abstraction';
 import { DestinationCallDataParams, Swapper, SwapAndXCallParams } from '@connext/chain-abstraction/dist/types';
 import { SdkConfig, create } from '@connext/sdk';
-import { NETWORKS, RAW_NETWORKS, SUPPORTED_CHAINS_BY_CONNEXT } from 'config';
+import { NETWORKS, SUPPORTED_CHAINS_BY_CONNEXT } from 'config';
 import WalletService from './walletService';
 
 interface DomainID {
@@ -65,6 +65,37 @@ export default class ConnextService {
   async prepareSwapAndXCallHelper(swapAndXCallParams: SwapAndXCallParams, signerAddress: string) {
     const txRequest = await prepareSwapAndXCall(swapAndXCallParams, signerAddress);
     return txRequest;
+  }
+
+  async getEstimateAmountReceived(
+    originDomain: string,
+    destinationDomain: string,
+    originToken: string,
+    amount: number
+  ) {
+    const domainConfig: { [domainId: string]: { providers: string[] } } = {};
+
+    const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)
+      .filter(([key]) => typeof key === 'number')
+      .map(([key, value]) => ({ domainId: value.domainId, chainId: key }));
+
+    domainChainIds.forEach((obj) => {
+      domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10)) as string] };
+    });
+
+    const sdkConfig: SdkConfig = {
+      signerAddress: this.walletService.account as string,
+      network: 'mainnet', // can change it to testnet as well
+      chains: domainConfig,
+    };
+    const { sdkBase } = await create(sdkConfig);
+    const estimateReceived = await sdkBase.calculateAmountReceived(
+      originDomain,
+      destinationDomain,
+      originToken,
+      amount
+    );
+    return estimateReceived;
   }
 
   getDomainID(networkName: number): string {
