@@ -158,7 +158,6 @@ interface TokenPickerProps {
   onClose: () => void;
   onAddToken?: (token: Token) => void;
   isFrom: boolean;
-  usedTokens: string[];
   ignoreValues: string[];
   otherSelected?: Token | null;
   yieldOptions: YieldOptions;
@@ -378,8 +377,6 @@ const TokenPicker = ({
   onChange,
   ignoreValues,
   isOpen,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  usedTokens,
   otherSelected,
   yieldOptions,
   isLoadingYieldOptions,
@@ -443,11 +440,6 @@ const TokenPicker = ({
     }
   };
 
-  // const memoizedUsedTokens = React.useMemo(
-  //   () => usedTokens.filter((el) => !ignoreValues.includes(el) && tokenKeysToUse.includes(el)),
-  //   [usedTokens, ignoreValues, tokenKeysToUse]
-  // );
-
   const otherIsProtocol =
     !showWrappedAndProtocol &&
     (otherSelected?.address === PROTOCOL_TOKEN_ADDRESS || otherSelected?.address === wrappedProtocolToken.address);
@@ -460,7 +452,6 @@ const TokenPicker = ({
           (tokenList[el].name.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].symbol.toLowerCase().includes(search.toLowerCase()) ||
             tokenList[el].address.toLowerCase().includes(search.toLowerCase())) &&
-          // !usedTokens.includes(el) &&
           !ignoreValues.includes(el) &&
           tokenList[el].chainId === currentNetwork.chainId &&
           el !== otherSelected?.address &&
@@ -483,7 +474,6 @@ const TokenPicker = ({
   }, [
     tokenKeysToUse,
     search,
-    // usedTokens,
     ignoreValues,
     tokenKeys,
     availableFrom,

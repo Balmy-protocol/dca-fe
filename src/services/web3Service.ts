@@ -161,7 +161,7 @@ export default class Web3Service {
     this.providerService = new ProviderService(client);
     this.safeService = new SafeService();
     this.contractService = new ContractService(this.providerService);
-    this.walletService = new WalletService(this.contractService, this.axiosClient, this.providerService);
+    this.walletService = new WalletService(this.contractService, this.providerService);
     this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
     this.eventService = new EventService(this.meanApiService, this.providerService);
     this.pairService = new PairService(

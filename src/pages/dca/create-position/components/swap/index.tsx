@@ -9,7 +9,6 @@ import TokenPicker from '@pages/dca/components/dca-token-picker';
 import { FormattedMessage } from 'react-intl';
 import find from 'lodash/find';
 import useBalance from '@hooks/useBalance';
-import useUsedTokens from '@hooks/useUsedTokens';
 import StalePairModal from '@pages/dca/components/stale-pair-modal';
 import {
   POSSIBLE_ACTIONS,
@@ -129,7 +128,6 @@ const Swap = ({
   const trackEvent = useTrackEvent();
   // const pairService = usePairService();
   const [balance, , balanceErrors] = useBalance(from);
-  const [usedTokens] = useUsedTokens();
   const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
   const existingPair = React.useMemo(() => {
@@ -701,7 +699,6 @@ const Swap = ({
         onClose={() => setShouldShowPicker(false)}
         isFrom={selecting === from}
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
-        usedTokens={usedTokens}
         ignoreValues={[]}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
