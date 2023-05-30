@@ -1,8 +1,8 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
+import usePrevious from '@hooks/usePrevious';
 import { ApolloClient, DocumentNode, NormalizedCacheObject, QueryResult } from '@apollo/client';
-import gqlFetchAll from 'utils/gqlFetchAll';
+import gqlFetchAll from '@common/utils/gqlFetchAll';
 import useDCAGraphql from './useDCAGraphql';
 
 function useGqlFetchAll<T>(

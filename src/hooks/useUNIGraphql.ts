@@ -1,4 +1,5 @@
-import { PositionVersions, LATEST_VERSION } from 'config';
+import { LATEST_VERSION } from '@constants';
+import { PositionVersions } from '@types';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWeb3Service from './useWeb3Service';
 

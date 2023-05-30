@@ -2,8 +2,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
 import { setupCache, setup } from 'axios-cache-adapter';
 import axios from 'axios';
-import { SupportedLanguages } from 'config/constants/lang';
-import { DEFAULT_AGGREGATOR_SETTINGS } from 'config/constants/aggregator';
+import { SupportedLanguages } from '@constants/lang';
+import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
@@ -143,7 +143,10 @@ const store = configureStore({
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
           'https://token-list.sushi.com/',
           'tokens.1inch.eth',
-          'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=false&include_pricing=false&include_preview=false',
+          'https://raw.githubusercontent.com/ethereum-optimism/ethereum-optimism.github.io/master/optimism.tokenlist.json',
+
+          // Base Goerli
+          'https://api.odos.xyz/info/tokens/84531',
 
           // BNB
           'https://tokens.1inch.io/v1.1/56',

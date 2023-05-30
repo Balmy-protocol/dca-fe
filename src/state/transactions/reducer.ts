@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { TransactionDetails } from 'types';
+import { TransactionDetails } from '@types';
 import keys from 'lodash/keys';
 import {
   addTransaction,
@@ -44,7 +44,7 @@ export default createReducer(initialState, (builder) =>
           retries: 0,
           chainId,
           position,
-        };
+        } as TransactionDetails;
       }
     )
     .addCase(checkedTransaction, (state, { payload: { hash, blockNumber, chainId } }) => {

@@ -1,7 +1,8 @@
 import { getPoolFeeForUniV3, getXCallCallData, prepareSwapAndXCall } from '@connext/chain-abstraction';
 import { DestinationCallDataParams, Swapper, SwapAndXCallParams } from '@connext/chain-abstraction/dist/types';
 import { SdkConfig, create } from '@connext/sdk';
-import { NETWORKS, SUPPORTED_CHAINS_BY_CONNEXT } from 'config';
+import { NETWORKS, SUPPORTED_CHAINS_BY_CONNEXT } from '@constants';
+import { find } from 'lodash';
 import WalletService from './walletService';
 
 interface DomainID {
@@ -19,8 +20,11 @@ export default class ConnextService {
   }
 
   getRPCURL(chainID: number) {
-    const network = Object.values(NETWORKS).find((net) => net.chainId === chainID);
-    return network?.rpc[0];
+    const network = find(NETWORKS, { chainId: chainID });
+    if (network) {
+      return network.rpc[0];
+    }
+    throw Error('Network not supported');
   }
 
   async getCalculatedRelayerFees(originDomain: string, destinationDomain: string) {
@@ -31,7 +35,7 @@ export default class ConnextService {
       .map(([key, value]) => ({ domainId: value.domainId, chainId: key }));
 
     domainChainIds.forEach((obj) => {
-      domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10)) as string] };
+      domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10))] };
     });
 
     const sdkConfig: SdkConfig = {
@@ -49,11 +53,12 @@ export default class ConnextService {
   }
 
   async getPoolFeeForUniV3Helper(domainID: string, token0: string, token1: string, rpcURL: string) {
-    if (!rpcURL || !token0 || !token1) {
-      return null;
+    try {
+      const poolFee = await getPoolFeeForUniV3(domainID, rpcURL, token0, token1);
+      return poolFee;
+    } catch (err) {
+      throw Error('Failed to fetch Pool Fees');
     }
-    const poolFee = await getPoolFeeForUniV3(domainID, rpcURL, token0, token1);
-    return poolFee;
   }
 
   async getXCallCallDataHelper(domainID: string, forwardCallData: string, params: DestinationCallDataParams) {
@@ -80,7 +85,7 @@ export default class ConnextService {
       .map(([key, value]) => ({ domainId: value.domainId, chainId: key }));
 
     domainChainIds.forEach((obj) => {
-      domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10)) as string] };
+      domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10))] };
     });
 
     const sdkConfig: SdkConfig = {

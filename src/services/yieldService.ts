@@ -1,11 +1,10 @@
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
-import { DefillamaResponse, YieldOptions } from 'types';
+import { DefillamaResponse, YieldOptions } from '@types';
 
 // MOCKS
-import { ALLOWED_YIELDS, DISABLED_YIELDS } from 'config/constants';
-import { getProtocolToken, getWrappedProtocolToken } from 'mocks/tokens';
-import WalletService from './walletService';
+import { ALLOWED_YIELDS, DISABLED_YIELDS } from '@constants';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import ProviderService from './providerService';
 
 export default class YieldService {
@@ -13,10 +12,7 @@ export default class YieldService {
 
   providerService: ProviderService;
 
-  walletService: WalletService;
-
-  constructor(walletService: WalletService, providerService: ProviderService, axiosClient: AxiosInstance) {
-    this.walletService = walletService;
+  constructor(providerService: ProviderService, axiosClient: AxiosInstance) {
     this.providerService = providerService;
     this.axiosClient = axiosClient;
   }
@@ -44,7 +40,7 @@ export default class YieldService {
 
       const enabledTokens = foundYield?.underlyingTokens?.map((token) => token.toLowerCase()) || [];
 
-      const forcedEnabledTokens = baseYield.forcedUnderlyings || [];
+      const forcedEnabledTokens = baseYield.forcedUnderlyings?.map((underlying) => underlying.toLowerCase()) || [];
 
       const wrappedProtocolToken = getWrappedProtocolToken(chainidTouse);
 

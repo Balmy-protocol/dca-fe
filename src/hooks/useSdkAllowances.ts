@@ -1,9 +1,9 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
-import { useHasPendingTransactions } from 'state/transactions/hooks';
+import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
-import { useBlockNumber } from 'state/block-number/hooks';
+import { useBlockNumber } from '@state/block-number/hooks';
 import useAccount from './useAccount';
 import useSdkService from './useSdkService';
 

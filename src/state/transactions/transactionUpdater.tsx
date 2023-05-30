@@ -3,22 +3,21 @@ import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import omit from 'lodash/omit';
 import values from 'lodash/values';
-import useBuildTransactionMessage from 'hooks/useBuildTransactionMessage';
-import useBuildRejectedTransactionMessage from 'hooks/useBuildRejectedTransactionMessage';
+import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
+import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
 import Zoom from '@mui/material/Zoom';
-import { useBlockNumber, useGetBlockNumber } from 'state/block-number/hooks';
-import { updateBlockNumber } from 'state/block-number/actions';
-import { TRANSACTION_TYPES } from 'config/constants';
-import EtherscanLink from 'common/view-on-etherscan';
-import { TransactionDetails, TransactionReceipt } from 'types';
-import { setInitialized } from 'state/initializer/actions';
-import useTransactionService from 'hooks/useTransactionService';
-import useWalletService from 'hooks/useWalletService';
-import useSafeService from 'hooks/useSafeService';
-import usePositionService from 'hooks/usePositionService';
-import { updatePosition } from 'state/position-details/actions';
-import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';
-import useCurrentNetwork from 'hooks/useCurrentNetwork';
+import { useBlockNumber, useGetBlockNumber } from '@state/block-number/hooks';
+import { updateBlockNumber } from '@state/block-number/actions';
+import EtherscanLink from '@common/components/view-on-etherscan';
+import { TransactionDetails, TransactionReceipt, TransactionTypes } from '@types';
+import { setInitialized } from '@state/initializer/actions';
+import useTransactionService from '@hooks/useTransactionService';
+import useWalletService from '@hooks/useWalletService';
+import useSafeService from '@hooks/useSafeService';
+import usePositionService from '@hooks/usePositionService';
+import { updatePosition } from '@state/position-details/actions';
+import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { usePendingTransactions } from './hooks';
 import { checkedTransaction, finalizeTransaction, removeTransaction, transactionFailed } from './actions';
 import { useAppDispatch, useAppSelector } from '../hooks';
@@ -91,22 +90,22 @@ export default function Updater(): null {
       return transactionService.getTransaction(hash, chainId).then((tx: ethers.providers.TransactionResponse) => {
         const lastBlockNumberForChain = getBlockNumber(chainId);
         if (!tx) {
-          if (transactions[hash].retries > 2) {
-            if (transactions[hash].type)
-              positionService.handleTransactionRejection({
-                ...transactions[hash],
-                typeData: {
-                  ...transactions[hash].typeData,
-                },
-              });
+          const txToCheck = transactions[hash];
+          if (txToCheck.retries > 2) {
+            positionService.handleTransactionRejection({
+              ...txToCheck,
+              typeData: {
+                ...txToCheck.typeData,
+              },
+            } as TransactionDetails);
             dispatch(removeTransaction({ hash, chainId: transactions[hash].chainId }));
             enqueueSnackbar(
               buildRejectedTransactionMessage({
-                ...transactions[hash],
+                ...txToCheck,
                 typeData: {
-                  ...transactions[hash].typeData,
+                  ...txToCheck.typeData,
                 },
-              }),
+              } as TransactionDetails),
               {
                 variant: 'error',
                 anchorOrigin: {
@@ -150,36 +149,26 @@ export default function Updater(): null {
         const promise = getReceipt(hash, transactions[hash].chainId);
         promise
           .then(async (receipt) => {
-            if (receipt && !transactions[hash].receipt && receipt.status !== 0) {
+            const tx = transactions[hash];
+            if (receipt && !tx.receipt && receipt.status !== 0) {
               let extendedTypeData = {};
 
-              if (transactions[hash].type === TRANSACTION_TYPES.NEW_PAIR) {
+              if (tx.type === TransactionTypes.newPair) {
                 extendedTypeData = {
                   id: ethers.utils.hexValue(receipt.logs[receipt.logs.length - 1].data),
                 };
               }
 
-              if (transactions[hash].type === TRANSACTION_TYPES.NEW_POSITION) {
-                const parsedLog = await transactionService.parseLog(
-                  receipt.logs,
-                  transactions[hash].chainId,
-                  'Deposited'
-                );
+              if (tx.type === TransactionTypes.newPosition) {
+                const parsedLog = await transactionService.parseLog(receipt.logs, tx.chainId, 'Deposited');
                 extendedTypeData = {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                   id: parsedLog.args.positionId.toString(),
                 };
               }
 
-              if (
-                transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION ||
-                transactions[hash].type === TRANSACTION_TYPES.MIGRATE_POSITION_YIELD
-              ) {
-                const parsedLog = await transactionService.parseLog(
-                  receipt.logs,
-                  transactions[hash].chainId,
-                  'Deposited'
-                );
+              if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
+                const parsedLog = await transactionService.parseLog(receipt.logs, tx.chainId, 'Deposited');
 
                 extendedTypeData = {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -197,21 +186,21 @@ export default function Updater(): null {
               }
 
               positionService.handleTransaction({
-                ...transactions[hash],
+                ...tx,
                 typeData: {
-                  ...transactions[hash].typeData,
+                  ...tx.typeData,
                   ...extendedTypeData,
                 },
-              });
+              } as TransactionDetails);
 
               dispatch(
                 updatePosition({
-                  ...transactions[hash],
+                  ...tx,
                   typeData: {
-                    ...transactions[hash].typeData,
+                    ...tx.typeData,
                     ...extendedTypeData,
                   },
-                })
+                } as TransactionDetails)
               );
 
               dispatch(
@@ -219,25 +208,25 @@ export default function Updater(): null {
                   hash,
                   receipt: {
                     ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
-                    chainId: transactions[hash].chainId,
+                    chainId: tx.chainId,
                     gasUsed: (receipt.gasUsed || 0).toString(),
                     cumulativeGasUsed: (receipt.cumulativeGasUsed || 0).toString(),
                     effectiveGasPrice: (receipt.effectiveGasPrice || 0).toString(),
                   },
                   extendedTypeData,
-                  chainId: transactions[hash].chainId,
+                  chainId: tx.chainId,
                   realSafeHash,
                 })
               );
 
               enqueueSnackbar(
                 buildTransactionMessage({
-                  ...transactions[hash],
+                  ...tx,
                   typeData: {
-                    ...transactions[hash].typeData,
+                    ...tx.typeData,
                     ...extendedTypeData,
                   },
-                }),
+                } as TransactionDetails),
                 {
                   variant: 'success',
                   anchorOrigin: {
@@ -253,24 +242,22 @@ export default function Updater(): null {
               if (receipt.blockNumber > lastBlockNumber) {
                 dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber, chainId: transactions[hash].chainId }));
               }
-            } else if (receipt && !transactions[hash].receipt && receipt?.status === 0) {
+            } else if (receipt && !tx.receipt && receipt?.status === 0) {
               if (receipt?.status === 0) {
-                if (transactions[hash].type) {
-                  positionService.handleTransactionRejection({
-                    ...transactions[hash],
-                    typeData: {
-                      ...transactions[hash].typeData,
-                    },
-                  });
-                }
-                dispatch(removeTransaction({ hash, chainId: transactions[hash].chainId }));
+                positionService.handleTransactionRejection({
+                  ...tx,
+                  typeData: {
+                    ...tx.typeData,
+                  },
+                } as TransactionDetails);
+                dispatch(removeTransaction({ hash, chainId: tx.chainId }));
                 enqueueSnackbar(
                   buildRejectedTransactionMessage({
-                    ...transactions[hash],
+                    ...tx,
                     typeData: {
-                      ...transactions[hash].typeData,
+                      ...tx.typeData,
                     },
-                  }),
+                  } as TransactionDetails),
                   {
                     variant: 'error',
                     anchorOrigin: {

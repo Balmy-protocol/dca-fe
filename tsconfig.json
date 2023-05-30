@@ -13,11 +13,21 @@
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitThis": true,
+    "ignoreDeprecations": "5.0",
     "noImplicitUseStrict": true,
     "strictNullChecks": true,
     "resolveJsonModule": true,
-    "baseUrl": "./src"
+    "baseUrl": "./src",
+    "paths": {
+      "@*": [
+        "*"
+      ]
+    }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "./jest.setup.ts",
+    "./jest.config.ts"
+  ],
   "exclude": ["node_modules"]
 }

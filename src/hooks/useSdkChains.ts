@@ -1,5 +1,5 @@
 import React from 'react';
-import useSdkService from 'hooks/useSdkService';
+import useSdkService from '@hooks/useSdkService';
 
 function useSdkChains() {
   const sdkService = useSdkService();

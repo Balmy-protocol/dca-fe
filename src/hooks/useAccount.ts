@@ -1,4 +1,4 @@
-import WalletContext from 'common/wallet-context';
+import WalletContext from '@common/components/wallet-context';
 import React from 'react';
 
 function useAccount(): string {

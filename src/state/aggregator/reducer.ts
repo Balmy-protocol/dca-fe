@@ -1,7 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { SwapOption, Token } from 'types';
-import { DEFAULT_NETWORK_FOR_AGGREGATOR } from 'config';
-import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { SwapOption, Token } from '@types';
+import { DEFAULT_NETWORK_FOR_AGGREGATOR } from '@constants';
+import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import {
   setFromValue,
   setFrom,

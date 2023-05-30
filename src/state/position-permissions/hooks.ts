@@ -2,7 +2,7 @@ import some from 'lodash/some';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
 import { useMemo } from 'react';
-import { useAppSelector } from 'state/hooks';
+import { useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
 
 export function usePositionPermissions(positionId: string) {

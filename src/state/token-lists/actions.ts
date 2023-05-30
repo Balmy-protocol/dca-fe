@@ -1,11 +1,11 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, MEAN_GRAPHQL_URL } from 'config/constants';
-import GraphqlService from 'services/graphql';
-import { Token, TokenListResponse, TokensLists } from 'types';
-import gqlFetchAll from 'utils/gqlFetchAll';
-import { getURLFromQuery } from 'utils/parsing';
-import GET_TOKEN_LIST from 'graphql/getTokenList.graphql';
+import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, MEAN_GRAPHQL_URL } from '@constants';
+import GraphqlService from '@services/graphql';
+import { Token, TokenListResponse, TokensLists } from '@types';
+import gqlFetchAll from '@common/utils/gqlFetchAll';
+import { getURLFromQuery } from '@common/utils/parsing';
+import GET_TOKEN_LIST from '@graphql/getTokenList.graphql';
 
 export const enableTokenList = createAction<{
   tokenList: string;

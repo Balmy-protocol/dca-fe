@@ -1,6 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import find from 'lodash/find';
-import { TokensLists, Token } from 'types';
+import { TokensLists, Token } from '@types';
+import { toToken } from '@common/utils/currency';
 import {
   addCustomToken,
   enableAggregatorTokenList,
@@ -68,6 +69,16 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
   },
+  'https://raw.githubusercontent.com/ethereum-optimism/ethereum-optimism.github.io/master/optimism.tokenlist.json': {
+    name: 'Superchain token list',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+  },
   'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=false&include_pricing=false&include_preview=false':
     {
       name: 'Wido',
@@ -99,6 +110,25 @@ export const getDefaultByUrl = () => ({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /*                                     Base Goerli                                    */
+  /* -------------------------------------------------------------------------- */
+  'https://api.odos.xyz/info/tokens/84531': {
+    name: 'Odos Base Goerli token list',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 84531,
+    parser: (list: { tokenMap: Record<string, Token> }) =>
+      Object.entries(list.tokenMap).map(([key, token]) =>
+        toToken({ ...token, address: key, logoURI: `https://assets.odos.xyz/tokens/${token.symbol}.webp` })
+      ),
   },
 
   /* -------------------------------------------------------------------------- */
@@ -438,7 +468,10 @@ export const initialState: TokenListsState = {
     'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
     'https://token-list.sushi.com/',
     'tokens.1inch.eth',
-    'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=false&include_pricing=false&include_preview=false',
+    'https://github.com/ethereum-optimism/ethereum-optimism.github.io/blob/master/optimism.tokenlist.json',
+
+    // Base Goerli
+    'https://api.odos.xyz/info/tokens/84531',
 
     // BNB
     'https://tokens.1inch.io/v1.1/56',

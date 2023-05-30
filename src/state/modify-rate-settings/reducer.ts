@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { FULL_DEPOSIT_TYPE, RATE_TYPE } from 'config/constants';
+import { ModeTypesIds } from '@constants';
 import {
   setFromValue,
   setFrequencyValue,
@@ -16,7 +16,7 @@ export interface ModifyRateSettingsState {
   frequencyValue: string;
   rate: string;
   useWrappedProtocolToken: boolean;
-  modeType: typeof FULL_DEPOSIT_TYPE | typeof RATE_TYPE;
+  modeType: ModeTypesIds;
 }
 
 const initialState: ModifyRateSettingsState = {
@@ -24,7 +24,7 @@ const initialState: ModifyRateSettingsState = {
   frequencyValue: '0',
   rate: '0',
   useWrappedProtocolToken: false,
-  modeType: FULL_DEPOSIT_TYPE,
+  modeType: ModeTypesIds.FULL_DEPOSIT_TYPE,
 };
 export default createReducer(initialState, (builder) =>
   builder

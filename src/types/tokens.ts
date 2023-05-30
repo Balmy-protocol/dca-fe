@@ -1,3 +1,5 @@
+import { BigNumber } from 'ethers';
+
 type TokenTypeBase = 'BASE';
 type TokenTypeWrapped = 'WRAPPED_PROTOCOL_TOKEN';
 type TokenTypeYieldBearingShares = 'YIELD_BEARING_SHARE';
@@ -14,6 +16,11 @@ export type Token = {
   type: TokenType;
   underlyingTokens: Token[];
 };
+
+export interface TokenWithUSD extends Token {
+  balance: BigNumber;
+  balanceUSD: number;
+}
 
 export type TokenList = Record<string, Token>;
 

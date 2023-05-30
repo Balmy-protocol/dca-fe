@@ -1,5 +1,5 @@
 import React from 'react';
-import { TransactionModalContext, TransactionModalContextValue } from 'common/transaction-modal';
+import { TransactionModalContext, TransactionModalContextValue } from '@common/components/transaction-modal';
 
 function useTransactionModal(): (
   | TransactionModalContextValue['setLoadingConfig']

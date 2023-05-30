@@ -6,26 +6,18 @@ import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import { TransactionResponse, Network, TransactionRequest } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
-import { GetUsedTokensData, Token } from 'types';
+import { GetUsedTokensData, Token, ERC20Contract, MulticallContract, PositionVersions } from '@types';
 import { MaxUint256 } from '@ethersproject/constants';
 import isUndefined from 'lodash/isUndefined';
-import { toToken } from 'utils/currency';
+import { toToken } from '@common/utils/currency';
 
 // ABIS
-import ERC20ABI from 'abis/erc20.json';
-import MULTICALLABI from 'abis/Multicall.json';
+import ERC20ABI from '@abis/erc20.json';
+import MULTICALLABI from '@abis/Multicall.json';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
-import {
-  LATEST_VERSION,
-  MULTICALL_ADDRESS,
-  MULTICALL_DEFAULT_ADDRESS,
-  NETWORKS,
-  NULL_ADDRESS,
-  PositionVersions,
-} from 'config/constants';
-import { ERC20Contract, MulticallContract } from 'types/contracts';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { LATEST_VERSION, MULTICALL_ADDRESS, MULTICALL_DEFAULT_ADDRESS, NETWORKS, NULL_ADDRESS } from '@constants';
 import ContractService from './contractService';
 import ProviderService from './providerService';
 
@@ -162,7 +154,7 @@ export default class WalletService {
     const hasProtocolToken = addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1;
 
     if (addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1) {
-      protocolBalance = await this.providerService.getBalance();
+      protocolBalance = await this.providerService.getBalance(account);
     }
 
     return results
@@ -259,12 +251,14 @@ export default class WalletService {
     };
   }
 
-  async getBalance(address?: string): Promise<BigNumber> {
-    const account = this.getAccount();
+  async getBalance(address?: string, passedAccount?: string): Promise<BigNumber> {
+    const connectedAccount = this.getAccount();
+
+    const account = passedAccount || connectedAccount;
 
     if (!address || !account) return Promise.resolve(BigNumber.from(0));
 
-    if (address === PROTOCOL_TOKEN_ADDRESS) return this.providerService.getBalance();
+    if (address === PROTOCOL_TOKEN_ADDRESS) return this.providerService.getBalance(account);
 
     const ERC20Interface = new Interface(ERC20ABI);
 

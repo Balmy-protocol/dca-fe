@@ -1,4 +1,5 @@
-import { PositionVersions, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from 'config';
+import { LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION } from '@constants';
+import { PositionVersions } from '@types';
 import useCurrentNetwork from './useCurrentNetwork';
 import useWeb3Service from './useWeb3Service';
 

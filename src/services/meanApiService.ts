@@ -1,17 +1,23 @@
 import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { LATEST_VERSION, MEAN_API_URL, PositionVersions } from 'config';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from 'mocks/tokens';
+import { LATEST_VERSION, MEAN_API_URL } from '@constants';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import {
   AllowedPairs,
   BlowfishResponse,
+  CampaignTypes,
   MeanApiUnderlyingResponse,
   MeanFinanceAllowedPairsResponse,
   MeanFinanceResponse,
+  OptimismAirdropCampaingResponse,
   PermissionPermit,
+  RawCampaign,
+  RawCampaigns,
   Token,
-} from 'types';
-import { emptyTokenWithAddress } from 'utils/currency';
+  PositionVersions,
+} from '@types';
+import { emptyTokenWithAddress } from '@common/utils/currency';
+import { CLAIM_ABIS } from '@constants/campaigns';
 
 // MOCKS
 import ContractService from './contractService';
@@ -409,5 +415,49 @@ export default class MeanApiService {
       userAccount,
       metadata,
     });
+  }
+
+  async getCampaigns(address: string): Promise<RawCampaigns> {
+    let optimismClaimCampaign: RawCampaign | undefined;
+    try {
+      const getOptimismClaimCampaignData = await this.axiosClient.get<OptimismAirdropCampaingResponse>(
+        `${MEAN_API_URL}/v1/optimism-airdrop/${address}`
+      );
+
+      optimismClaimCampaign = {
+        name: 'Optimism Airdrop',
+        proof: getOptimismClaimCampaignData.data.proof,
+        claimContract: '0xf453cc2cb0d016a028a34162cf1f9efbb799c2d7',
+        tokens: [
+          {
+            token: '0x4200000000000000000000000000000000000042',
+            symbol: 'OP',
+            name: 'Optimism',
+            decimals: 18,
+            amount: getOptimismClaimCampaignData.data.op,
+          },
+        ],
+        type: CampaignTypes.optimismAirdrop,
+        typeData: { positions: getOptimismClaimCampaignData.data.positions },
+        claimed: false,
+      };
+
+      const provider = await this.providerService.getProvider();
+
+      const contract = new ethers.Contract(optimismClaimCampaign.claimContract, CLAIM_ABIS.optimismAirdrop, provider);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const claimed = (await contract.claimed(address)) as boolean;
+
+      optimismClaimCampaign.claimed = claimed;
+    } catch (e) {
+      console.error(e);
+    }
+
+    return {
+      10: {
+        ...((optimismClaimCampaign && { optimismAirdrop: optimismClaimCampaign }) || {}),
+      },
+    };
   }
 }

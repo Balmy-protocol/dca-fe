@@ -6,16 +6,16 @@ import isUndefined from 'lodash/isUndefined';
 import { NetworkStruct, Token, YieldOption, YieldOptions } from 'types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
-import TokenPicker from 'common/dca-token-picker';
+import TokenPicker from '@common/components/token-picker';
 import { FormattedMessage, useIntl } from 'react-intl';
-import Button from 'common/button';
+import Button from '@common/components/button';
 import Tooltip from '@mui/material/Tooltip';
 import find from 'lodash/find';
 import useBalance from 'hooks/useBalance';
 import useUsedTokens from 'hooks/useUsedTokens';
-import StalePairModal from 'common/stale-pair-modal';
-import LowLiquidityModal from 'common/low-liquidity-modal';
-import AllowanceSplitButton from 'common/allowance-split-button';
+import StalePairModal from '@pages/dca/components/stale-pair-modal';
+import LowLiquidityModal from '@pages/dca/components/low-liquidity-modal';
+import AllowanceSplitButton from '@common/components/allowance-split-button';
 import {
   FULL_DEPOSIT_TYPE,
   MODE_TYPES,
@@ -34,21 +34,21 @@ import {
   MINIMUM_USD_RATE_FOR_DEPOSIT,
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
   STRING_SWAP_INTERVALS,
-} from 'config/constants';
+} from '@constants';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import useTransactionModal from 'hooks/useTransactionModal';
-import { emptyTokenWithAddress, parseUsdPrice, formatCurrencyAmount, usdPriceToToken } from 'utils/currency';
+import { emptyTokenWithAddress, parseUsdPrice, formatCurrencyAmount, usdPriceToToken } from '@common/utils/currency';
 import {
   useTransactionAdder,
   useHasPendingApproval,
   useHasPendingPairCreation,
   useHasConfirmedApproval,
 } from 'state/transactions/hooks';
-import { calculateStale, STALE } from 'utils/parsing';
+import { calculateStale, STALE } from '@common/utils/parsing';
 import useAvailablePairs from 'hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, EMPTY_TOKEN } from 'mocks/tokens';
-import CenteredLoadingIndicator from 'common/centered-loading-indicator';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, EMPTY_TOKEN } from '@common/mocks/tokens';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useAllowance from 'hooks/useAllowance';
 import useCanSupportPair from 'hooks/useCanSupportPair';
 import useWalletService from 'hooks/useWalletService';
@@ -58,7 +58,7 @@ import useRawUsdPrice from 'hooks/useUsdRawPrice';
 import useWeb3Service from 'hooks/useWeb3Service';
 import useErrorService from 'hooks/useErrorService';
 import useCurrentNetwork from 'hooks/useCurrentNetwork';
-import { shouldTrackError } from 'utils/errors';
+import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from 'hooks/useTrackEvent';
 import useReplaceHistory from 'hooks/useReplaceHistory';
 import useLoadedAsSafeApp from 'hooks/useLoadedAsSafeApp';

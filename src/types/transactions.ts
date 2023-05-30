@@ -1,7 +1,5 @@
 import { Log } from '@ethersproject/providers';
-import { PositionVersions } from 'config';
-import { Oracles } from './contracts';
-import { Permission, Position } from './positions';
+import { Permission, Position, PositionVersions } from './positions';
 import { Token } from './tokens';
 
 export interface TransactionReceipt {
@@ -25,204 +23,292 @@ export interface TransactionReceipt {
   chainId: number;
 }
 
-export type TransactionTypes =
+export enum TransactionTypes {
   // Common
-  | 'APPROVE_TOKEN'
-  | 'APPROVE_TOKEN_EXACT'
+  approveToken = 'APPROVE_TOKEN',
+  approveTokenExact = 'APPROVE_TOKEN_EXACT',
   // DCA
-  | 'NEW_POSITION'
-  | 'NEW_PAIR'
-  | 'WRAP_ETHER'
-  | 'TERMINATE_POSITION'
-  | 'WITHDRAW_POSITION'
-  | 'ADD_FUNDS_POSITION'
-  | 'NO_OP'
-  | 'REMOVE_FUNDS'
-  | 'MODIFY_SWAPS_POSITION'
-  | 'MODIFY_RATE_AND_SWAPS_POSITION'
-  | 'TRANSFER_POSITION'
-  | 'APPROVE_COMPANION'
-  | 'MODIFY_PERMISSIONS'
-  | 'MIGRATE_POSITION'
-  | 'MIGRATE_POSITION_YIELD'
-  | 'WITHDRAW_FUNDS'
-  | 'RESET_POSITION'
+  newPosition = 'NEW_POSITION',
+  newPair = 'NEW_PAIR',
+  wrapEther = 'WRAP_ETHER',
+  terminatePosition = 'TERMINATE_POSITION',
+  withdrawPosition = 'WITHDRAW_POSITION',
+  addFundsPosition = 'ADD_FUNDS_POSITION',
+  noOp = 'NO_OP',
+  removeFunds = 'REMOVE_FUNDS',
+  modifySwapsPosition = 'MODIFY_SWAPS_POSITION',
+  modifyRateAndSwapsPosition = 'MODIFY_RATE_AND_SWAPS_POSITION',
+  transferPosition = 'TRANSFER_POSITION',
+  approveCompanion = 'APPROVE_COMPANION',
+  modifyPermissions = 'MODIFY_PERMISSIONS',
+  migratePosition = 'MIGRATE_POSITION',
+  migratePositionYield = 'MIGRATE_POSITION_YIELD',
+  withdrawFunds = 'WITHDRAW_FUNDS',
+  resetPosition = 'RESET_POSITION',
   // AGGREGATOR
-  | 'SWAP'
-  | 'WRAP'
-  | 'UNWRAP'
+  swap = 'SWAP',
+  wrap = 'WRAP',
+  unwrap = 'UNWRAP',
   // EULER CLAIM
-  | 'EULER_CLAIM_TERMINATE_MANY'
-  | 'EULER_CLAIM_PERMIT_MANY'
-  | 'EULER_CLAIM_APPROVE_MIGRATOR'
-  | 'EULER_CLAIM_CLAIM_FROM_MIGRATOR';
+  eulerClaimTerminateMany = 'EULER_CLAIM_TERMINATE_MANY',
+  eulerClaimPermitMany = 'EULER_CLAIM_PERMIT_MANY',
+  eulerClaimApproveMigrator = 'EULER_CLAIM_APPROVE_MIGRATOR',
+  eulerClaimClaimFromMigrator = 'EULER_CLAIM_CLAIM_FROM_MIGRATOR',
+  // CAMPAIGNS
+  claimCampaign = 'CLAIM_CAMPAIGN',
+}
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
 
 export interface SwapTypeData {
-  from: string;
-  to: string;
-  amountFrom: string;
-  amountTo: string;
-  balanceBefore: string | null;
-  transferTo?: string | null;
+  type: TransactionTypes.swap;
+  typeData: {
+    from: string;
+    to: string;
+    amountFrom: string;
+    amountTo: string;
+    balanceBefore: string | null;
+    transferTo?: string | null;
+  };
 }
 
 export interface WrapTypeData {
-  from: string;
-  to: string;
-  amountFrom: string;
-  amountTo: string;
+  type: TransactionTypes.wrap;
+  typeData: {
+    from: string;
+    to: string;
+    amountFrom: string;
+    amountTo: string;
+  };
 }
 
 export interface UnwrapTypeData {
-  from: string;
-  to: string;
-  amountFrom: string;
-  amountTo: string;
+  type: TransactionTypes.unwrap;
+  typeData: {
+    from: string;
+    to: string;
+    amountFrom: string;
+    amountTo: string;
+  };
 }
 
 export interface WithdrawTypeData {
-  id: number | string;
-  withdrawnUnderlying: string | null;
+  type: TransactionTypes.withdrawPosition;
+  typeData: {
+    id: number | string;
+    withdrawnUnderlying: string | null;
+  };
 }
 
 export interface WithdrawFundsTypeData {
-  id: number | string;
-  from: string;
-  removedFunds: string;
+  type: TransactionTypes.withdrawFunds;
+  typeData: {
+    id: number | string;
+    from: string;
+    removedFunds: string;
+  };
 }
 
 export interface TransferTypeData {
-  id: number | string;
-  from: string;
-  to: string;
-  toAddress: string;
+  type: TransactionTypes.transferPosition;
+  typeData: {
+    id: number | string;
+    from: string;
+    to: string;
+    toAddress: string;
+  };
 }
 
 export interface ModifyPermissionsTypeData {
-  id: number | string;
-  from: string;
-  to: string;
+  type: TransactionTypes.modifyPermissions;
+  typeData: {
+    id: number | string;
+    from: string;
+    to: string;
+  };
 }
 export interface MigratePositionTypeData {
-  id: number | string;
-  from: string;
-  to: string;
-  newId?: string;
+  type: TransactionTypes.migratePosition;
+  typeData: {
+    id: number | string;
+    from: string;
+    to: string;
+    newId?: string;
+  };
 }
 
 export interface MigratePositionYieldTypeData {
-  id: number | string;
-  from: string;
-  to: string;
-  fromYield?: string;
-  toYield?: string;
-  newId?: string;
+  type: TransactionTypes.migratePositionYield;
+  typeData: {
+    id: number | string;
+    from: string;
+    to: string;
+    fromYield?: string;
+    toYield?: string;
+    newId?: string;
+  };
 }
 
 export interface ApproveCompanionTypeData {
-  id: number | string;
-  from: string;
-  to: string;
+  type: TransactionTypes.approveCompanion;
+  typeData: {
+    id: number | string;
+    from: string;
+    to: string;
+  };
 }
 
 export interface AddFundsTypeData {
-  id: number | string;
-  newFunds: string;
-  decimals: number;
+  type: TransactionTypes.addFundsPosition;
+  typeData: {
+    id: number | string;
+    newFunds: string;
+    decimals: number;
+  };
 }
 
 export interface ResetPositionTypeData {
-  id: number | string;
-  newFunds: string;
-  newSwaps: string;
-  decimals: number;
+  type: TransactionTypes.resetPosition;
+  typeData: {
+    id: number | string;
+    newFunds: string;
+    newSwaps: string;
+    decimals: number;
+  };
 }
 
 export interface RemoveFundsTypeData {
-  id: number | string;
-  ammountToRemove: string;
-  decimals: number;
+  type: TransactionTypes.removeFunds;
+  typeData: {
+    id: number | string;
+    ammountToRemove: string;
+    decimals: number;
+  };
 }
 export interface ModifySwapsPositionTypeData {
-  id: number | string;
-  newSwaps: string;
+  type: TransactionTypes.modifySwapsPosition;
+  typeData: {
+    id: number | string;
+    newSwaps: string;
+  };
 }
 
 export interface ModifyRateAndSwapsPositionTypeData {
-  id: number | string;
-  newRate: string;
-  decimals: number;
-  newSwaps: string;
+  type: TransactionTypes.modifyRateAndSwapsPosition;
+  typeData: {
+    id: number | string;
+    newRate: string;
+    decimals: number;
+    newSwaps: string;
+  };
 }
 export interface TerminatePositionTypeData {
-  id: number | string;
-  toWithdraw: string;
-  remainingLiquidity: string;
+  type: TransactionTypes.terminatePosition;
+  typeData: {
+    id: number | string;
+    toWithdraw: string;
+    remainingLiquidity: string;
+  };
 }
 
 export interface ApproveTokenTypeData {
-  token: Token;
-  addressFor: string;
+  type: TransactionTypes.approveToken;
+  typeData: {
+    token: Token;
+    addressFor: string;
+  };
 }
 
 export interface ApproveTokenExactTypeData {
-  token: Token;
-  addressFor: string;
-  amount: string;
+  type: TransactionTypes.approveTokenExact;
+  typeData: {
+    token: Token;
+    addressFor: string;
+    amount: string;
+  };
 }
 
 export interface WrapEtherTypeData {
-  amount: string;
+  type: TransactionTypes.wrapEther;
+  typeData: {
+    amount: string;
+  };
 }
 
 export interface EulerClaimTerminateManyTypeData {
-  id: string;
-  positionIds: string[];
+  type: TransactionTypes.eulerClaimTerminateMany;
+  typeData: {
+    id: string;
+    positionIds: string[];
+  };
 }
 
 export interface EulerClaimPermitManyTypeData {
-  id: string;
-  positionIds: string[];
-  permissions: Permission[];
-  permittedAddress: string;
+  type: TransactionTypes.eulerClaimPermitMany;
+  typeData: {
+    id: string;
+    positionIds: string[];
+    permissions: Permission[];
+    permittedAddress: string;
+  };
 }
 
 export interface EulerClaimApproveMigratorTypeData {
-  token: Token;
-  id: string;
+  type: TransactionTypes.eulerClaimApproveMigrator;
+  typeData: {
+    token: Token;
+    id: string;
+  };
 }
 
 export interface EulerClaimClaimFromMigratorTypeData {
-  token: Token;
-  id: string;
+  type: TransactionTypes.eulerClaimClaimFromMigrator;
+  typeData: {
+    token: Token;
+    id: string;
+  };
 }
 
 export interface NoOpTypeData {
-  id: string;
+  type: TransactionTypes.noOp;
+  typeData: {
+    id: string;
+  };
 }
 
 export interface NewPositionTypeData {
-  from: Token;
-  to: Token;
-  fromYield?: string;
-  toYield?: string;
-  fromValue: string;
-  frequencyType: string;
-  frequencyValue: string;
-  id: string;
-  startedAt: number;
-  isCreatingPair: boolean;
-  oracle: Oracles;
-  addressFor: string;
-  version: PositionVersions;
+  type: TransactionTypes.newPosition;
+  typeData: {
+    from: Token;
+    to: Token;
+    fromYield?: string;
+    toYield?: string;
+    fromValue: string;
+    frequencyType: string;
+    frequencyValue: string;
+    id: string;
+    startedAt: number;
+    isCreatingPair: boolean;
+    addressFor: string;
+    version: PositionVersions;
+  };
 }
 
 export interface NewPairTypeData {
-  id?: number | string;
-  token0: Token;
-  token1: Token;
+  type: TransactionTypes.newPair;
+  typeData: {
+    id?: number | string;
+    token0: Token;
+    token1: Token;
+  };
+}
+
+export interface ClaimCampaignTypeData {
+  type: TransactionTypes.claimCampaign;
+  typeData: {
+    id?: number | string;
+    name: string;
+  };
 }
 
 export type TransactionAggregatorTypeDataOptions = SwapTypeData;
@@ -249,6 +335,7 @@ export type TransactionPositionTypeDataOptions =
 export type TransactionPositionManyTypeDataOptions = EulerClaimTerminateManyTypeData | EulerClaimPermitManyTypeData;
 
 export type TransactionTypeDataOptions =
+  | ApproveTokenExactTypeData
   | WithdrawTypeData
   | AddFundsTypeData
   | ModifySwapsPositionTypeData
@@ -269,9 +356,13 @@ export type TransactionTypeDataOptions =
   | TransactionAggregatorTypeDataOptions
   | EulerClaimTerminateManyTypeData
   | EulerClaimPermitManyTypeData
+  | EulerClaimClaimFromMigratorTypeData
+  | WrapTypeData
+  | UnwrapTypeData
+  | ClaimCampaignTypeData
   | NoOpTypeData;
 
-export interface TransactionDetails {
+export type TransactionDetailsBase = {
   hash: string;
   isCleared?: boolean;
   approval?: { tokenAddress: string; spender: string };
@@ -284,8 +375,32 @@ export interface TransactionDetails {
   addedTime: number;
   confirmedTime?: number;
   from: string;
-  type: TransactionTypes;
-  typeData: TransactionTypeDataOptions;
   position?: Position;
   realSafeHash?: string;
-}
+};
+
+export type TransactionDetails<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
+  TransactionDetailsBase & T;
+
+export type TransactionAdderCustomDataBase = {
+  summary?: string;
+  approval?: { tokenAddress: string; spender: string };
+  claim?: { recipient: string };
+  position?: Position;
+};
+
+export type TransactionAdderCustomData<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
+  TransactionAdderCustomDataBase & T;
+
+export type TransactionAdderPayloadBase = {
+  hash: string;
+  from: string;
+  approval?: { tokenAddress: string; spender: string };
+  claim?: { recipient: string };
+  summary?: string;
+  chainId: number;
+  position?: Position;
+};
+
+export type TransactionAdderPayload<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
+  TransactionAdderPayloadBase & T;

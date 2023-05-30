@@ -13,30 +13,25 @@ import {
   AvailablePair,
   LastSwappedAt,
   NextSwapAvailableAt,
-} from 'types';
+  PositionVersions,
+} from '@types';
 import { DateTime } from 'luxon';
 import {
   activePositionsPerIntervalToHasToExecute,
   calculateNextSwapAvailableAt,
   sortTokens,
   sortTokensByAddress,
-} from 'utils/parsing';
+} from '@common/utils/parsing';
 import { BigNumber } from 'ethers';
 
 // GQL queries
-import GET_PAIR_LIQUIDITY from 'graphql/getPairLiquidity.graphql';
-import GET_AVAILABLE_PAIRS from 'graphql/getAvailablePairs.graphql';
-import gqlFetchAll from 'utils/gqlFetchAll';
+import GET_PAIR_LIQUIDITY from '@graphql/getPairLiquidity.graphql';
+import GET_AVAILABLE_PAIRS from '@graphql/getAvailablePairs.graphql';
+import gqlFetchAll from '@common/utils/gqlFetchAll';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from 'mocks/tokens';
-import {
-  ORACLES,
-  PositionVersions,
-  LATEST_VERSION,
-  DEFAULT_NETWORK_FOR_VERSION,
-  SWAP_INTERVALS_MAP,
-} from 'config/constants';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { ORACLES, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION, SWAP_INTERVALS_MAP } from '@constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -148,7 +143,7 @@ export default class PairService {
   }
 
   // PAIR METHODS
-  addNewPair(tokenA: Token, tokenB: Token, oracle: Oracles, frequencyType: BigNumber) {
+  addNewPair(tokenA: Token, tokenB: Token, frequencyType: BigNumber) {
     const [token0, token1] = sortTokens(tokenA, tokenB);
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

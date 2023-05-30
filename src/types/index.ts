@@ -1,6 +1,5 @@
-import type Web3Service from 'services/web3Service';
 import React from 'react';
-import { QuoteTx } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteTransaction } from '@mean-finance/sdk';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';
@@ -14,10 +13,11 @@ export * from './contracts';
 export * from './yield';
 export * from './aggregator';
 export * from './sdk';
+export * from './campaigns';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
-export { Web3Service };
+// export { Web3Service };
 
 export type Web3ServicePromisableMethods =
   | 'connect'
@@ -79,7 +79,7 @@ export interface TransactionActionWaitForApprovalData {
 }
 
 export interface TransactionActionWaitForSimulationData {
-  tx: QuoteTx;
+  tx: QuoteTransaction;
   chainId: number;
   simulation?: BlowfishResponse;
 }

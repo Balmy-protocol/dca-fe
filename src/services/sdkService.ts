@@ -1,13 +1,13 @@
 // eslint-disable-next-line max-classes-per-file
-import { buildSDK, SourceId, SOURCES_METADATA } from '@mean-finance/sdk';
+import { buildSDK, ProviderSourceInput, SourceId, SOURCES_METADATA } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
 import { BaseProvider } from '@ethersproject/providers';
-import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from 'config/constants/aggregator';
+import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from '@constants/aggregator';
 import { BigNumber } from 'ethers';
-import { SwapOption, Token } from 'types';
+import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
-import { toToken } from 'utils/currency';
-import { MEAN_API_URL } from 'config/constants/addresses';
+import { toToken } from '@common/utils/currency';
+import { MEAN_API_URL, NULL_ADDRESS } from '@constants/addresses';
 import ProviderService from './providerService';
 import WalletService from './walletService';
 
@@ -30,7 +30,13 @@ export default class SdkService {
       provider: {
         source: {
           type: 'prioritized',
-          sources: [{ type: 'updatable-ethers', provider: () => this.provider }, { type: 'public-rpcs' }],
+          sources: [
+            {
+              type: 'updatable',
+              provider: () => this.provider && ({ type: 'ethers', instance: this.provider } as ProviderSourceInput),
+            },
+            { type: 'public-rpcs' },
+          ],
         },
       },
       quotes: {
@@ -48,8 +54,31 @@ export default class SdkService {
                     `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['uniswap', 'odos', 'rango', '0x', 'firebird', 'changelly'],
+                sourceIds: ['uniswap', 'rango', '0x', 'firebird', 'changelly'],
               },
+            ],
+          },
+        },
+      },
+      price: {
+        source: {
+          type: 'cached',
+          config: {
+            expiration: {
+              useCachedValue: { ifUnder: '1m' },
+              useCachedValueIfCalculationFailed: { ifUnder: '5m' },
+            },
+            maxSize: 20,
+          },
+          underlyingSource: {
+            type: 'prioritized',
+            sources: [
+              { type: 'coingecko' },
+              { type: 'portals-fi' },
+              // We place Mean Finance before DefiLlama because DefiLlama can quote 4626 tokens, but they are updated once
+              // every hour. Mean's price source has the more up-to-date
+              { type: 'mean-finance' },
+              { type: 'defi-llama' },
             ],
           },
         },
@@ -235,21 +264,28 @@ export default class SdkService {
   }
 
   getTransactionReceipt(txHash: string, chainId: number) {
-    return this.sdk.providerSource.getEthersProvider({ chainId }).getTransactionReceipt(txHash);
+    return this.sdk.providerService.getEthersProvider({ chainId }).getTransactionReceipt(txHash);
   }
 
   getTransaction(txHash: string, chainId: number) {
-    return this.sdk.providerSource.getEthersProvider({ chainId }).getTransaction(txHash);
+    return this.sdk.providerService.getEthersProvider({ chainId }).getTransaction(txHash);
   }
 
   async getMultipleBalances(tokens: Token[]): Promise<Record<number, Record<string, BigNumber>>> {
     const account = this.walletService.getAccount();
+    if (!account) {
+      throw new Error('account must exist');
+    }
     const balances = await this.sdk.balanceService.getBalancesForTokens({
       account,
       tokens: tokens.reduce<Record<number, string[]>>((acc, token) => {
         const newAcc = {
           ...acc,
         };
+
+        if (token.address === NULL_ADDRESS) {
+          return newAcc;
+        }
 
         if (!newAcc[token.chainId]) {
           newAcc[token.chainId] = [];
@@ -285,7 +321,7 @@ export default class SdkService {
     chainId: number
   ): Promise<Record<string, Record<string, BigNumber>>> {
     const account = this.walletService.getAccount();
-    const allowances = await this.sdk.allowanceService.getMultipleAllowances({
+    const allowances = await this.sdk.allowanceService.getMultipleAllowancesInChain({
       chainId,
       check: Object.keys(tokenChecks).map((tokenAddress) => ({
         token: tokenAddress,

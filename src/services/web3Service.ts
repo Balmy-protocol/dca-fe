@@ -39,18 +39,19 @@ import {
 } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
+import { PositionVersions } from '@types';
 
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
 import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
-import { DUMMY_ARCX_CLIENT } from 'utils/dummy-arcx-client';
-import { chainToWagmiNetwork } from 'utils/parsing';
+import { DUMMY_ARCX_CLIENT } from '@common/utils/dummy-arcx-client';
+import { chainToWagmiNetwork } from '@common/utils/parsing';
 
 // MOCKS
-import { NETWORKS, PositionVersions, UNSUPPORTED_WAGMI_CHAIN } from 'config/constants';
+import { NETWORKS, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 
-import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from 'config/constants/custom-wallets';
-import { setupAxiosClient } from 'state';
+import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
+import { setupAxiosClient } from '@state';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import TransactionService from './transactionService';
@@ -68,6 +69,7 @@ import SimulationService from './simulationService';
 import SafeService from './safeService';
 import EventService from './eventService';
 import ConnextService from './connextService';
+import CampaignService from './campaignService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -132,6 +134,8 @@ export default class Web3Service {
 
   connextService: ConnextService;
 
+  campaignService: CampaignService;
+
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
@@ -171,7 +175,7 @@ export default class Web3Service {
       this.apolloClient,
       this.uniClient
     );
-    this.yieldService = new YieldService(this.walletService, this.providerService, this.axiosClient);
+    this.yieldService = new YieldService(this.providerService, this.axiosClient);
     this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient);
     this.transactionService = new TransactionService(this.contractService, this.providerService, this.sdkService);
     this.aggregatorService = new AggregatorService(
@@ -201,6 +205,7 @@ export default class Web3Service {
     );
     this.errorService = new ErrorService(this.meanApiService);
     this.simulationService = new SimulationService(this.meanApiService, this.providerService);
+    this.campaignService = new CampaignService(this.meanApiService, this.priceService, this.providerService);
   }
 
   setArcxClient(newArcxClient: ArcxAnalyticsSdk) {
@@ -277,6 +282,10 @@ export default class Web3Service {
 
   getEventService() {
     return this.eventService;
+  }
+
+  getCampaignService() {
+    return this.campaignService;
   }
 
   getModal() {
@@ -521,11 +530,16 @@ export default class Web3Service {
         connector: state.connector,
         status: state.status,
         chainId: state.data?.chain?.id,
+        account: state.data?.account,
       }),
       (curr, prev) => {
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.connect(undefined, curr.connector, curr.chainId);
+        }
+
+        if (curr.status === 'connected' && prev.status === 'connected' && curr.account !== prev.account) {
+          this.providerService.handleAccountChange();
         }
       }
     );

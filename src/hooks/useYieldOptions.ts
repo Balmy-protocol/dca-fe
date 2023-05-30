@@ -1,8 +1,8 @@
 import React from 'react';
 import isUndefined from 'lodash/isUndefined';
 import isEqual from 'lodash/isEqual';
-import usePrevious from 'hooks/usePrevious';
-import { YieldOptions } from 'types';
+import usePrevious from '@hooks/usePrevious';
+import { YieldOptions } from '@types';
 import useSelectedNetwork from './useSelectedNetwork';
 import useYieldService from './useYieldService';
 import useAccount from './useAccount';

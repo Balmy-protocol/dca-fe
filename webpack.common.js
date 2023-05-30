@@ -23,9 +23,6 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser.js',
     }),
-    new webpack.ProvidePlugin({
-      process: 'process/browser',
-    }),
     new webpack.DefinePlugin({
       'process.env.ETHPLORER_KEY': JSON.stringify('EK-7xNxe-HDazjQ3-smGdU'),
     }),
@@ -41,11 +38,23 @@ module.exports = {
     clean: true,
   },
   resolve: {
-    modules: [path.resolve(__dirname, 'src'), 'node_modules'],
-    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
     alias: {
+      '@common': path.resolve(__dirname, 'src/common'),
+      '@assets': path.resolve(__dirname, 'src/assets'),
+      '@abis': path.resolve(__dirname, 'src/abis'),
+      '@fonts': path.resolve(__dirname, 'src/fonts'),
+      '@constants': path.resolve(__dirname, 'src/constants'),
+      '@frame': path.resolve(__dirname, 'src/frame'),
+      '@graphql': path.resolve(__dirname, 'src/graphql'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
+      '@lang': path.resolve(__dirname, 'src/lang'),
+      '@pages': path.resolve(__dirname, 'src/pages'),
+      '@services': path.resolve(__dirname, 'src/services'),
+      '@state': path.resolve(__dirname, 'src/state'),
+      '@types': path.resolve(__dirname, 'src/types'),
       zlib: require.resolve('browserify-zlib'),
     },
+    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
     fallback: {
       stream: require.resolve('stream-browserify'),
       crypto: require.resolve('crypto-browserify'),

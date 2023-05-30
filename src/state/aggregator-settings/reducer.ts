@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys, SwapSortOptions } from 'config/constants/aggregator';
+import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys, SwapSortOptions } from '@constants/aggregator';
 import {
   setSlippage,
   setGasSpeed,

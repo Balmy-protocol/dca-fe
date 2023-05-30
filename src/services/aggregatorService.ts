@@ -5,16 +5,15 @@ import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 
 // MOCKS
-import { PositionVersions } from 'config/constants';
-import { SwapOption, SwapOptionWithTx, Token } from 'types';
+import { SwapOption, SwapOptionWithTx, Token, PositionVersions } from '@types';
 import { TransactionReceipt, TransactionRequest } from '@ethersproject/providers';
-import { toToken } from 'utils/currency';
+import { toToken } from '@common/utils/currency';
 import { Interface } from '@ethersproject/abi';
-import ERC20ABI from 'abis/erc20.json';
-import WRAPPEDABI from 'abis/weth.json';
-import { getProtocolToken } from 'mocks/tokens';
+import ERC20ABI from '@abis/erc20.json';
+import WRAPPEDABI from '@abis/weth.json';
+import { getProtocolToken } from '@common/mocks/tokens';
 import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
-import { GasKeys, SwapSortOptions } from 'config/constants/aggregator';
+import { GasKeys, SwapSortOptions } from '@constants/aggregator';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';

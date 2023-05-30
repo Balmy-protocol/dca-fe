@@ -1,38 +1,13 @@
 import React from 'react';
 import find from 'lodash/find';
-import {
-  TransactionDetails,
-  NewPositionTypeData,
-  TerminatePositionTypeData,
-  WithdrawTypeData,
-  AddFundsTypeData,
-  RemoveFundsTypeData,
-  ModifySwapsPositionTypeData,
-  ModifyRateAndSwapsPositionTypeData,
-  NewPairTypeData,
-  Position,
-  ApproveTokenTypeData,
-  ApproveTokenExactTypeData,
-  WrapEtherTypeData,
-  ResetPositionTypeData,
-  TransferTypeData,
-  ApproveCompanionTypeData,
-  ModifyPermissionsTypeData,
-  MigratePositionTypeData,
-  WithdrawFundsTypeData,
-  MigratePositionYieldTypeData,
-  SwapTypeData,
-  EulerClaimClaimFromMigratorTypeData,
-  EulerClaimPermitManyTypeData,
-  EulerClaimTerminateManyTypeData,
-} from 'types';
-import { TRANSACTION_TYPES, STRING_SWAP_INTERVALS } from 'config/constants';
-import useAvailablePairs from 'hooks/useAvailablePairs';
-import { formatCurrencyAmount } from 'utils/currency';
+import { TransactionDetails, Position, TransactionTypes } from '@types';
+import { STRING_SWAP_INTERVALS } from '@constants';
+import useAvailablePairs from '@hooks/useAvailablePairs';
+import { formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
 import { defineMessage, useIntl } from 'react-intl';
-import { getWrappedProtocolToken } from 'mocks/tokens';
-import { getFrequencyLabel } from 'utils/parsing';
+import { getWrappedProtocolToken } from '@common/mocks/tokens';
+import { getFrequencyLabel } from '@common/utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
@@ -53,26 +28,26 @@ function useBuildTransactionMessages() {
         })
       );
       switch (tx.type) {
-        case TRANSACTION_TYPES.WRAP: {
-          const swapTypeData = tx.typeData as SwapTypeData;
+        case TransactionTypes.wrap: {
+          const swapTypeData = tx.typeData;
 
           message = `Wrapped ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
           break;
         }
-        case TRANSACTION_TYPES.UNWRAP: {
-          const swapTypeData = tx.typeData as SwapTypeData;
+        case TransactionTypes.unwrap: {
+          const swapTypeData = tx.typeData;
 
           message = `Unwrapped ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
           break;
         }
-        case TRANSACTION_TYPES.SWAP: {
-          const swapTypeData = tx.typeData as SwapTypeData;
+        case TransactionTypes.swap: {
+          const swapTypeData = tx.typeData;
 
           message = `Swapped ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
           break;
         }
-        case TRANSACTION_TYPES.WRAP_ETHER: {
-          const wrapEtherTypeData = tx.typeData as WrapEtherTypeData;
+        case TransactionTypes.wrapEther: {
+          const wrapEtherTypeData = tx.typeData;
 
           message = intl.formatMessage(
             defineMessage({
@@ -86,8 +61,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.NEW_POSITION: {
-          const newPositionTypeData = tx.typeData as NewPositionTypeData;
+        case TransactionTypes.newPosition: {
+          const newPositionTypeData = tx.typeData;
 
           message = intl.formatMessage(
             defineMessage({
@@ -101,8 +76,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.TERMINATE_POSITION: {
-          const terminatePositionTypeData = tx.typeData as TerminatePositionTypeData;
+        case TransactionTypes.terminatePosition: {
+          const terminatePositionTypeData = tx.typeData;
           const terminatedPosition = find(positions, { id: terminatePositionTypeData.id });
           if (terminatedPosition) {
             message = intl.formatMessage(
@@ -118,8 +93,8 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TRANSACTION_TYPES.WITHDRAW_FUNDS: {
-          const withdrawFundsPositionTypeData = tx.typeData as WithdrawFundsTypeData;
+        case TransactionTypes.withdrawFunds: {
+          const withdrawFundsPositionTypeData = tx.typeData;
           const withdrawnPosition = tx.position || find(positions, { id: withdrawFundsPositionTypeData.id });
           if (withdrawnPosition) {
             message = intl.formatMessage(
@@ -139,8 +114,8 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TRANSACTION_TYPES.WITHDRAW_POSITION: {
-          const withdrawPositionTypeData = tx.typeData as WithdrawTypeData;
+        case TransactionTypes.withdrawPosition: {
+          const withdrawPositionTypeData = tx.typeData;
           const withdrawnPosition = find(positions, { id: withdrawPositionTypeData.id });
           if (withdrawnPosition) {
             message = intl.formatMessage(
@@ -156,8 +131,8 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TRANSACTION_TYPES.ADD_FUNDS_POSITION: {
-          const addFundsTypeData = tx.typeData as AddFundsTypeData;
+        case TransactionTypes.addFundsPosition: {
+          const addFundsTypeData = tx.typeData;
           const fundedPosition = find(positions, { id: addFundsTypeData.id });
           if (fundedPosition) {
             message = intl.formatMessage(
@@ -174,8 +149,8 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TRANSACTION_TYPES.RESET_POSITION: {
-          const resetPositionTypeData = tx.typeData as ResetPositionTypeData;
+        case TransactionTypes.resetPosition: {
+          const resetPositionTypeData = tx.typeData;
           const resettedPosition = find(positions, { id: resetPositionTypeData.id });
           const swapInterval = BigNumber.from((resettedPosition as Position).swapInterval);
 
@@ -197,8 +172,8 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TRANSACTION_TYPES.REMOVE_FUNDS: {
-          const removeFundsTypeData = tx.typeData as RemoveFundsTypeData;
+        case TransactionTypes.removeFunds: {
+          const removeFundsTypeData = tx.typeData;
           const removeFundedPosition = find(positions, { id: removeFundsTypeData.id });
           if (removeFundedPosition) {
             message = intl.formatMessage(
@@ -216,8 +191,8 @@ function useBuildTransactionMessages() {
           break;
         }
 
-        case TRANSACTION_TYPES.MODIFY_SWAPS_POSITION: {
-          const modifySwapsPositionTypeData = tx.typeData as ModifySwapsPositionTypeData;
+        case TransactionTypes.modifySwapsPosition: {
+          const modifySwapsPositionTypeData = tx.typeData;
           const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
           const swapInterval = BigNumber.from((modifiedPosition as Position).swapInterval);
 
@@ -237,8 +212,8 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TRANSACTION_TYPES.MODIFY_RATE_AND_SWAPS_POSITION: {
-          const modifyRateAndSwapsPositionTypeData = tx.typeData as ModifyRateAndSwapsPositionTypeData;
+        case TransactionTypes.modifyRateAndSwapsPosition: {
+          const modifyRateAndSwapsPositionTypeData = tx.typeData;
           const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
           const swapInterval = BigNumber.from((modifiedRatePosition as Position).swapInterval);
 
@@ -261,8 +236,8 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TRANSACTION_TYPES.TRANSFER_POSITION: {
-          const transferedTypeData = tx.typeData as TransferTypeData;
+        case TransactionTypes.transferPosition: {
+          const transferedTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesTransfer',
@@ -276,8 +251,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.MODIFY_PERMISSIONS: {
-          const transferedTypeData = tx.typeData as ModifyPermissionsTypeData;
+        case TransactionTypes.modifyPermissions: {
+          const transferedTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesModifyPermissions',
@@ -290,8 +265,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.APPROVE_COMPANION: {
-          const approveCompanionTypeData = tx.typeData as ApproveCompanionTypeData;
+        case TransactionTypes.approveCompanion: {
+          const approveCompanionTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesApproveCompanion',
@@ -304,8 +279,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.MIGRATE_POSITION: {
-          const approveCompanionTypeData = tx.typeData as MigratePositionTypeData;
+        case TransactionTypes.migratePosition: {
+          const approveCompanionTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesMigrate',
@@ -318,8 +293,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.MIGRATE_POSITION_YIELD: {
-          const approveCompanionTypeData = tx.typeData as MigratePositionYieldTypeData;
+        case TransactionTypes.migratePositionYield: {
+          const approveCompanionTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesMigrate',
@@ -332,8 +307,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.NEW_PAIR: {
-          const newPairTypeData = tx.typeData as NewPairTypeData;
+        case TransactionTypes.newPair: {
+          const newPairTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesNewPair',
@@ -346,8 +321,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.APPROVE_TOKEN: {
-          const tokenApprovalTypeData = tx.typeData as ApproveTokenTypeData;
+        case TransactionTypes.approveToken: {
+          const tokenApprovalTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesApproveToken',
@@ -359,8 +334,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.APPROVE_TOKEN_EXACT: {
-          const tokenApprovalExactTypeData = tx.typeData as ApproveTokenExactTypeData;
+        case TransactionTypes.approveTokenExact: {
+          const tokenApprovalExactTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesApproveTokenExact',
@@ -377,8 +352,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.EULER_CLAIM_CLAIM_FROM_MIGRATOR: {
-          const eulerClaimClaimFromMigratorTypeData = tx.typeData as EulerClaimClaimFromMigratorTypeData;
+        case TransactionTypes.eulerClaimClaimFromMigrator: {
+          const eulerClaimClaimFromMigratorTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesEulerClaimClaimFromMigrator',
@@ -390,8 +365,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.EULER_CLAIM_PERMIT_MANY: {
-          const eulerClaimPermitManyTypeData = tx.typeData as EulerClaimPermitManyTypeData;
+        case TransactionTypes.eulerClaimPermitMany: {
+          const eulerClaimPermitManyTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesEulerClaimPermitMany',
@@ -403,8 +378,8 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TRANSACTION_TYPES.EULER_CLAIM_TERMINATE_MANY: {
-          const eulerClaimTerminateManyTypeData = tx.typeData as EulerClaimTerminateManyTypeData;
+        case TransactionTypes.eulerClaimTerminateMany: {
+          const eulerClaimTerminateManyTypeData = tx.typeData;
           message = intl.formatMessage(
             defineMessage({
               description: 'transactionMessagesEulerClaimTerminateMany',
@@ -412,6 +387,20 @@ function useBuildTransactionMessages() {
             }),
             {
               positions: eulerClaimTerminateManyTypeData.positionIds.length,
+            }
+          );
+          break;
+        }
+        case TransactionTypes.claimCampaign: {
+          const claimCampaignTypeData = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionMessagesClaimCampaign',
+              defaultMessage: 'The {campaign} campaign has been claimed',
+            }),
+            {
+              campaign: claimCampaignTypeData.name,
             }
           );
           break;

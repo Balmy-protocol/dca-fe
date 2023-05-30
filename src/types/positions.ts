@@ -1,11 +1,25 @@
-import { PositionVersions } from 'config';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
+
+export enum PositionVersions {
+  POSITION_VERSION_1 = '1',
+  POSITION_VERSION_2 = '2',
+  POSITION_VERSION_3 = '3',
+  POSITION_VERSION_4 = '4',
+}
 
 export type SwapInterval = {
   id: string;
   interval: BigNumber;
   description: string;
+};
+
+export type AvailableSwapInterval = {
+  label: {
+    singular: string;
+    adverb: string;
+  };
+  value: BigNumber;
 };
 
 export interface NFTData {

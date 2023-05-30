@@ -1,7 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { DEFAULT_NETWORK_FOR_VERSION, ONE_DAY, POSITION_VERSION_4 } from 'config/constants';
+import { DEFAULT_NETWORK_FOR_VERSION, ModeTypesIds, ONE_DAY, POSITION_VERSION_4 } from '@constants';
 import { BigNumber } from 'ethers';
-import { Token, YieldOption } from 'types';
+import { Token, YieldOption } from '@types';
 import {
   setFromValue,
   setFrom,
@@ -12,10 +12,13 @@ import {
   setFromYield,
   setToYield,
   setDCAChainId,
+  setRate,
+  setModeType,
 } from './actions';
 
 export interface CreatePositionState {
   fromValue: string;
+  rate: string;
   frequencyType: BigNumber;
   frequencyValue: string;
   from: Token | null;
@@ -24,12 +27,15 @@ export interface CreatePositionState {
   fromYield: YieldOption | null | undefined;
   toYield: YieldOption | null | undefined;
   chainId: number;
+  modeType: ModeTypesIds;
 }
 
 const initialState: CreatePositionState = {
   fromValue: '',
   frequencyType: ONE_DAY,
   frequencyValue: '7',
+  modeType: ModeTypesIds.FULL_DEPOSIT_TYPE,
+  rate: '',
   from: null,
   to: null,
   yieldEnabled: true,
@@ -65,6 +71,12 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setToYield, (state, { payload }) => {
       state.toYield = payload;
+    })
+    .addCase(setRate, (state, { payload }) => {
+      state.rate = payload;
+    })
+    .addCase(setModeType, (state, { payload }) => {
+      state.modeType = payload;
     })
     .addCase(setDCAChainId, (state, { payload }) => {
       state.chainId = payload;
