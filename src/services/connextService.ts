@@ -89,7 +89,7 @@ export default class ConnextService {
     });
 
     const sdkConfig: SdkConfig = {
-      signerAddress: this.walletService.account as string,
+      signerAddress: this.walletService.getAccount(),
       network: 'mainnet', // can change it to testnet as well
       chains: domainConfig,
     };
