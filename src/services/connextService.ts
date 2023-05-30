@@ -127,4 +127,35 @@ export default class ConnextService {
     };
     return USDC_ADDRESS[networkName];
   }
+
+  async getTransferStatus(transactionHash: string) {
+    try {
+      const domainConfig: { [domainId: string]: { providers: string[] } } = {};
+
+      const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)
+        .filter(([key]) => typeof key === 'number')
+        .map(([key, value]) => ({ domainId: value.domainId, chainId: key }));
+
+      domainChainIds.forEach((obj) => {
+        domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10))] };
+      });
+
+      const sdkConfig: SdkConfig = {
+        signerAddress: this.walletService.getAccount(),
+        network: 'mainnet', // can change it to testnet as well
+        chains: domainConfig,
+      };
+      const { sdkUtils } = await create(sdkConfig);
+      const params: { transactionHash: string } = {
+        transactionHash,
+      };
+      const transferStatus = await sdkUtils.getTransfers(params);
+      if (!transferStatus) {
+        throw Error('Failed to fetch transfer status');
+      }
+      return transferStatus;
+    } catch (err) {
+      throw Error(err);
+    }
+  }
 }
