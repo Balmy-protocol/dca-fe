@@ -1,12 +1,9 @@
 import { ethers, BigNumber } from 'ethers';
-import { AxiosInstance, AxiosResponse } from 'axios';
 import React from 'react';
 import { Interface } from '@ethersproject/abi';
-import mapKeys from 'lodash/mapKeys';
-import mapValues from 'lodash/mapValues';
 import { TransactionResponse, Network, TransactionRequest } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
-import { GetUsedTokensData, Token, ERC20Contract, MulticallContract, PositionVersions } from '@types';
+import { Token, ERC20Contract, MulticallContract, PositionVersions } from '@types';
 import { MaxUint256 } from '@ethersproject/constants';
 import isUndefined from 'lodash/isUndefined';
 import { toToken } from '@common/utils/currency';
@@ -30,12 +27,9 @@ export default class WalletService {
 
   providerService: ProviderService;
 
-  axiosClient: AxiosInstance;
-
-  constructor(contractService: ContractService, axiosClient: AxiosInstance, providerService: ProviderService) {
+  constructor(contractService: ContractService, providerService: ProviderService) {
     this.contractService = contractService;
     this.providerService = providerService;
-    this.axiosClient = axiosClient;
   }
 
   async setAccount(account?: string | null, setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
@@ -48,16 +42,6 @@ export default class WalletService {
 
   getAccount() {
     return this.account || '';
-  }
-
-  getUsedTokens(): Promise<AxiosResponse<GetUsedTokensData> | null> {
-    if (!this.getAccount()) {
-      return Promise.resolve(null);
-    }
-
-    return this.axiosClient.get<GetUsedTokensData>(
-      `https://api.ethplorer.io/getAddressInfo/${this.getAccount() || ''}?apiKey=${process.env.ETHPLORER_KEY || ''}`
-    );
   }
 
   async getEns(address: string) {
@@ -115,79 +99,6 @@ export default class WalletService {
     } catch (switchError) {
       console.error('Error switching chains', switchError);
     }
-  }
-
-  async getMulticallBalances(addresses?: string[]): Promise<Record<string, BigNumber>> {
-    const account = this.getAccount();
-    const currentNetwork = await this.providerService.getNetwork();
-
-    if (!addresses?.length || !account) return Promise.resolve({});
-
-    const ERC20Interface = new Interface(ERC20ABI);
-
-    const filteredAddresses = addresses.filter((address) => address !== PROTOCOL_TOKEN_ADDRESS);
-
-    const provider = await this.providerService.getProvider();
-
-    const balancesCall = await Promise.all(
-      filteredAddresses.map((address) => {
-        const erc20 = new ethers.Contract(address, ERC20Interface, provider) as unknown as ERC20Contract;
-
-        return erc20.populateTransaction.balanceOf(account).then((populatedTransaction) => ({
-          target: populatedTransaction.to as string,
-          allowFailure: true,
-          callData: populatedTransaction.data as string,
-        }));
-      })
-    );
-
-    const multicallInstance = new ethers.Contract(
-      MULTICALL_ADDRESS[currentNetwork.chainId] || MULTICALL_DEFAULT_ADDRESS,
-      MULTICALLABI,
-      provider
-    ) as unknown as MulticallContract;
-
-    const results = await multicallInstance.callStatic.aggregate3(balancesCall);
-
-    let protocolBalance: BigNumber | null = null;
-
-    const hasProtocolToken = addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1;
-
-    if (addresses.indexOf(PROTOCOL_TOKEN_ADDRESS) !== -1) {
-      protocolBalance = await this.providerService.getBalance(account);
-    }
-
-    return results
-      .filter(({ success }) => !!success)
-      .reduce<Record<string, BigNumber>>(
-        (acc, balanceResult, index) => ({
-          ...acc,
-          [filteredAddresses[index]]: BigNumber.from(
-            ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
-          ),
-        }),
-        {
-          ...(hasProtocolToken && protocolBalance ? { [PROTOCOL_TOKEN_ADDRESS]: protocolBalance } : {}),
-        }
-      );
-  }
-
-  async get1InchBalances(): Promise<Record<string, BigNumber>> {
-    const account = this.getAccount();
-    const currentNetwork = await this.providerService.getNetwork();
-
-    if (!account) return Promise.resolve({});
-
-    const inchResponse = await this.axiosClient.get<Record<string, string>>(
-      `https://balances.1inch.io/v1.1/${currentNetwork.chainId}/balances/${account}`
-    );
-
-    const balances = inchResponse.data;
-
-    return mapValues(
-      mapKeys(balances, (value, key) => key.toLowerCase()),
-      (balance) => BigNumber.from(balance)
-    );
   }
 
   async getCustomToken(address: string): Promise<{ token: Token; balance: BigNumber } | undefined> {

@@ -20,7 +20,6 @@ interface TokenPickerProps {
   onChange: SetFromToState;
   onClose: () => void;
   isFrom: boolean;
-  usedTokens: string[];
   ignoreValues: string[];
   otherSelected?: Token | null;
   yieldOptions: YieldOptions;
@@ -34,7 +33,6 @@ const DcaTokenPicker = ({
   onClose,
   onChange,
   ignoreValues,
-  usedTokens,
   otherSelected,
   yieldOptions,
   isLoadingYieldOptions,
@@ -47,7 +45,6 @@ const DcaTokenPicker = ({
         onClose={onClose}
         onChange={onChange}
         ignoreValues={ignoreValues}
-        usedTokens={usedTokens}
         otherSelected={otherSelected}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
