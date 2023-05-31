@@ -186,7 +186,7 @@ export default class Web3Service {
       this.providerService,
       this.safeService
     );
-    this.connextService = new ConnextService(this.walletService, 137); // hardcoding polygon ID
+    this.connextService = new ConnextService(this.walletService); // hardcoding polygon ID
     this.positionService = new PositionService(
       this.walletService,
       this.pairService,

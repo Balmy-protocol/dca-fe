@@ -43,6 +43,7 @@ import {
   TOKEN_TYPE_YIELD_BEARING_SHARES,
   POSITION_VERSION_4,
   X_TARGET_ADDRESS,
+  SUPPORTED_CHAINS_BY_CONNEXT,
 } from '@constants';
 import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
@@ -642,11 +643,11 @@ export default class PositionService {
     if (yieldFrom || yieldTo) {
       permissions = [...permissions, PERMISSIONS.TERMINATE];
     }
-    const POLYGON_WETH = getWrappedProtocolToken(destinationChainID as number);
+    const destinationToken = getWrappedProtocolToken(destinationChainID as number);
 
     const forwardCallData = getForwardFunctionCallHelper(
       destinationUSDC as string, // destination USDC
-      POLYGON_WETH.address, // destinantion token
+      destinationToken.address, // destinantion token
       amountOfSwaps,
       swapInterval,
       this.walletService.getAccount(),
@@ -727,11 +728,11 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
-    destinantionChainID: number,
+    destinationChainID: number,
     yieldFromPossible?: string,
     yieldToPossible?: string
   ) {
-    const destinationUSDC = this.connextService.getNativeUSDCAddress(destinantionChainID);
+    const destinationUSDC = this.connextService.getNativeUSDCAddress(destinationChainID);
 
     const { forwardCallData, totalAmmount } = await this.buildDepositParams(
       fromToken,
@@ -742,16 +743,16 @@ export default class PositionService {
       yieldFromPossible,
       yieldToPossible,
       destinationUSDC,
-      destinantionChainID
+      destinationChainID
     );
 
-    const xTargetAddress = X_TARGET_ADDRESS[destinantionChainID]; // polygon address for mean target
+    const xTargetAddress = X_TARGET_ADDRESS[destinationChainID]; // polygon address for mean target
 
     const chainID = (await this.providerService.getNetwork()).chainId;
-    const DestinationToken = getWrappedProtocolToken(destinantionChainID); // can have any address in UI for destination
-    const destinantionRPC = this.connextService.getRPCURL(destinantionChainID);
-    const originDomainID = this.connextService.getDomainID(chainID);
-    const destinantionDomainID = this.connextService.getDomainID(destinantionChainID);
+    const DestinationToken = getWrappedProtocolToken(destinationChainID); // can have any address in UI for destination
+    const destinantionRPC = this.connextService.getRPCURL(destinationChainID);
+    const originDomainID = SUPPORTED_CHAINS_BY_CONNEXT[chainID].domainId;
+    const destinantionDomainID = SUPPORTED_CHAINS_BY_CONNEXT[chainID].domainId;
     const originUSDC = this.connextService.getNativeUSDCAddress(chainID);
 
     // get the pool fees.
@@ -832,7 +833,7 @@ export default class PositionService {
     yieldFrom?: string,
     yieldTo?: string,
     destinationChainID?: number
-  ): Promise<TransactionResponse> {
+  ) {
     const swapAndXCallParams = await this.buildXcallDepositParams(
       from,
       to,
@@ -851,7 +852,7 @@ export default class PositionService {
     if (!txRequest) {
       throw Error('TX Request failed for xCall');
     }
-    return this.providerService.sendTransaction(txRequest);
+    return txRequest;
   }
 
   async deposit(
@@ -860,11 +861,25 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
+    fundWithToken: Token,
     yieldFrom?: string,
     yieldTo?: string
   ): Promise<TransactionResponse> {
-    const tx = await this.buildDepositTx(from, to, fromValue, frequencyType, frequencyValue, yieldFrom, yieldTo);
+    if (fundWithToken.chainId !== from.chainId || fundWithToken.chainId !== to.chainId) {
+      const tx = await this.xCallDeposit(
+        from,
+        to,
+        fromValue,
+        frequencyType,
+        frequencyValue,
+        yieldFrom as string,
+        yieldTo,
+        fundWithToken.chainId
+      );
+      return this.providerService.sendTransaction(tx);
+    }
 
+    const tx = await this.buildDepositTx(from, to, fromValue, frequencyType, frequencyValue, yieldFrom, yieldTo);
     return this.providerService.sendTransactionWithGasLimit(tx);
   }
 

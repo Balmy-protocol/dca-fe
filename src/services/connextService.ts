@@ -12,22 +12,10 @@ interface DomainID {
 export default class ConnextService {
   walletService: WalletService;
 
-  destinantionChainID: number;
+  sdkConfig: SdkConfig;
 
-  constructor(walletService: WalletService, destinantionChainID: number) {
+  constructor(walletService: WalletService) {
     this.walletService = walletService;
-    this.destinantionChainID = destinantionChainID;
-  }
-
-  getRPCURL(chainID: number) {
-    const network = find(NETWORKS, { chainId: chainID });
-    if (network) {
-      return network.rpc[0];
-    }
-    throw Error('Network not supported');
-  }
-
-  async getCalculatedRelayerFees(originDomain: string, destinationDomain: string) {
     const domainConfig: { [domainId: string]: { providers: string[] } } = {};
 
     const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)
@@ -39,11 +27,23 @@ export default class ConnextService {
     });
 
     const sdkConfig: SdkConfig = {
-      signerAddress: this.walletService.account as string,
+      signerAddress: this.walletService.getAccount(),
       network: 'mainnet', // can change it to testnet as well
       chains: domainConfig,
     };
-    const { sdkBase } = await create(sdkConfig);
+    this.sdkConfig = sdkConfig;
+  }
+
+  getRPCURL(chainID: number) {
+    const network = find(NETWORKS, { chainId: chainID });
+    if (network) {
+      return network.rpc[0];
+    }
+    throw Error('Network not supported');
+  }
+
+  async getCalculatedRelayerFees(originDomain: string, destinationDomain: string) {
+    const { sdkBase } = await create(this.sdkConfig);
     const relayerFees = await sdkBase.estimateRelayerFee({
       originDomain,
       destinationDomain,
@@ -63,13 +63,11 @@ export default class ConnextService {
 
   async getXCallCallDataHelper(domainID: string, forwardCallData: string, params: DestinationCallDataParams) {
     const swapper = Swapper.UniV3;
-    const callDataForMeantTarget = await getXCallCallData(domainID, swapper, forwardCallData, params);
-    return callDataForMeantTarget;
+    return getXCallCallData(domainID, swapper, forwardCallData, params);
   }
 
   async prepareSwapAndXCallHelper(swapAndXCallParams: SwapAndXCallParams, signerAddress: string) {
-    const txRequest = await prepareSwapAndXCall(swapAndXCallParams, signerAddress);
-    return txRequest;
+    return prepareSwapAndXCall(swapAndXCallParams, signerAddress);
   }
 
   async getEstimateAmountReceived(
@@ -78,22 +76,7 @@ export default class ConnextService {
     originToken: string,
     amount: number
   ) {
-    const domainConfig: { [domainId: string]: { providers: string[] } } = {};
-
-    const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)
-      .filter(([key]) => typeof key === 'number')
-      .map(([key, value]) => ({ domainId: value.domainId, chainId: key }));
-
-    domainChainIds.forEach((obj) => {
-      domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10))] };
-    });
-
-    const sdkConfig: SdkConfig = {
-      signerAddress: this.walletService.getAccount(),
-      network: 'mainnet', // can change it to testnet as well
-      chains: domainConfig,
-    };
-    const { sdkBase } = await create(sdkConfig);
+    const { sdkBase } = await create(this.sdkConfig);
     const estimateReceived = await sdkBase.calculateAmountReceived(
       originDomain,
       destinationDomain,
@@ -101,19 +84,6 @@ export default class ConnextService {
       amount
     );
     return estimateReceived;
-  }
-
-  getDomainID(networkName: number): string {
-    const domainID: DomainID = {
-      1: '6648936',
-      137: '1886350457',
-      10: '1869640809',
-      42161: '1634886255',
-      100: '6778479',
-      56: '6450786',
-    };
-
-    return domainID[networkName];
   }
 
   getNativeUSDCAddress(networkName: number) {
@@ -130,22 +100,7 @@ export default class ConnextService {
 
   async getTransferStatus(transactionHash: string) {
     try {
-      const domainConfig: { [domainId: string]: { providers: string[] } } = {};
-
-      const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)
-        .filter(([key]) => typeof key === 'number')
-        .map(([key, value]) => ({ domainId: value.domainId, chainId: key }));
-
-      domainChainIds.forEach((obj) => {
-        domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10))] };
-      });
-
-      const sdkConfig: SdkConfig = {
-        signerAddress: this.walletService.getAccount(),
-        network: 'mainnet', // can change it to testnet as well
-        chains: domainConfig,
-      };
-      const { sdkUtils } = await create(sdkConfig);
+      const { sdkUtils } = await create(this.sdkConfig);
       const params: { transactionHash: string } = {
         transactionHash,
       };
