@@ -326,6 +326,7 @@ export default class Web3Service {
 
   setAccount(account: string) {
     this.account = account;
+    this.connextService.sdkInit();
   }
 
   setNetwork(chainId: number) {

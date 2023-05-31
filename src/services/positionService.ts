@@ -616,8 +616,7 @@ export default class PositionService {
     frequencyValue: string,
     yieldFrom?: string,
     yieldTo?: string,
-    destinationUSDC?: string, // destinantion token address
-    destinationChainID?: number
+    destinationUSDC?: string // destinantion token address
   ) {
     const token = from;
 
@@ -643,11 +642,11 @@ export default class PositionService {
     if (yieldFrom || yieldTo) {
       permissions = [...permissions, PERMISSIONS.TERMINATE];
     }
-    const destinationToken = getWrappedProtocolToken(destinationChainID as number);
+    const destinationToken = from.address;
 
     const forwardCallData = getForwardFunctionCallHelper(
       destinationUSDC as string, // destination USDC
-      destinationToken.address, // destinantion token
+      destinationToken, // destinantion token
       amountOfSwaps,
       swapInterval,
       this.walletService.getAccount(),
@@ -729,11 +728,10 @@ export default class PositionService {
     frequencyType: BigNumber,
     frequencyValue: string,
     destinationChainID: number,
+    fundWithToken: Token,
     yieldFromPossible?: string,
     yieldToPossible?: string
   ) {
-    const destinationUSDC = this.connextService.getNativeUSDCAddress(destinationChainID);
-
     const { forwardCallData, totalAmmount } = await this.buildDepositParams(
       fromToken,
       toToken,
@@ -742,30 +740,28 @@ export default class PositionService {
       frequencyValue,
       yieldFromPossible,
       yieldToPossible,
-      destinationUSDC,
-      destinationChainID
+      toToken.address
     );
 
     const xTargetAddress = X_TARGET_ADDRESS[destinationChainID]; // polygon address for mean target
 
-    const chainID = (await this.providerService.getNetwork()).chainId;
-    const DestinationToken = getWrappedProtocolToken(destinationChainID); // can have any address in UI for destination
+    const DestinationToken = fromToken.address; // can have any address in UI for destination
     const destinantionRPC = this.connextService.getRPCURL(destinationChainID);
-    const originDomainID = SUPPORTED_CHAINS_BY_CONNEXT[chainID].domainId;
-    const destinantionDomainID = SUPPORTED_CHAINS_BY_CONNEXT[chainID].domainId;
-    const originUSDC = this.connextService.getNativeUSDCAddress(chainID);
+    const originDomainID = SUPPORTED_CHAINS_BY_CONNEXT[fundWithToken.chainId].domainId;
+    const destinantionDomainID = SUPPORTED_CHAINS_BY_CONNEXT[fromToken.chainId].domainId;
+    const originUSDC = this.connextService.getNativeUSDCAddress(fundWithToken.chainId);
 
     // get the pool fees.
     const poolFee = await this.connextService.getPoolFeeForUniV3Helper(
       destinantionDomainID, // Destination Domain
-      destinationUSDC, // Destinantion USDC address
-      DestinationToken.address, // destinantion Token
+      toToken.address, // Destinantion USDC address
+      DestinationToken, // destinantion Token
       destinantionRPC
     );
 
     const destinantionCallDataParams = getDestinationCallDataParams(
       this.walletService.getAccount(),
-      destinationUSDC, // to the token on destination
+      toToken.address, // underlying token on destination
       poolFee
     );
 
@@ -785,7 +781,7 @@ export default class PositionService {
     const swapAndXCallParams = getSwapAndXcallParams(
       originDomainID,
       destinantionDomainID,
-      fromToken.address,
+      fundWithToken.address,
       originUSDC, // USDC for origin chain
       totalAmmount.toString(),
       xTargetAddress,
@@ -830,9 +826,9 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
+    fundWithToken: Token,
     yieldFrom?: string,
-    yieldTo?: string,
-    destinationChainID?: number
+    yieldTo?: string
   ) {
     const swapAndXCallParams = await this.buildXcallDepositParams(
       from,
@@ -840,7 +836,8 @@ export default class PositionService {
       fromValue,
       frequencyType,
       frequencyValue,
-      destinationChainID as number,
+      from.chainId,
+      fundWithToken,
       yieldFrom,
       yieldTo
     );
@@ -872,9 +869,9 @@ export default class PositionService {
         fromValue,
         frequencyType,
         frequencyValue,
+        fundWithToken,
         yieldFrom as string,
-        yieldTo,
-        fundWithToken.chainId
+        yieldTo
       );
       return this.providerService.sendTransaction(tx);
     }

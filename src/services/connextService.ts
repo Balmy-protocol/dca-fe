@@ -16,6 +16,9 @@ export default class ConnextService {
 
   constructor(walletService: WalletService) {
     this.walletService = walletService;
+  }
+
+  sdkInit() {
     const domainConfig: { [domainId: string]: { providers: string[] } } = {};
 
     const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)
@@ -32,6 +35,7 @@ export default class ConnextService {
       chains: domainConfig,
     };
     this.sdkConfig = sdkConfig;
+    return sdkConfig;
   }
 
   getRPCURL(chainID: number) {
