@@ -732,53 +732,25 @@ export const SUPPORTED_CHAINS_BY_CONNEXT: Record<number, { domainId: string; nam
     name: 'Optimism',
     network: 'mainnet',
   },
-  100: {
-    domainId: '6778479',
-    // Gnosis Chain
-    name: 'Gnosis',
-    network: 'mainnet',
-  },
   137: {
     domainId: '1886350457',
     // Polygon
     name: 'Polygon',
     network: 'mainnet',
   },
-  420: {
-    domainId: '1735356532',
-    // Optimism-Goerli
-    name: 'OptGoerli',
-    network: 'testnet',
-  },
+
   42161: {
     domainId: '1634886255',
     // Arbitrum One
     name: 'Arbitrum',
     network: 'mainnet',
   },
-  421613: {
-    domainId: '1734439522',
-    // Arbitrum-Goerli
-    name: 'ArbGoerli',
-    network: 'testnet',
-  },
-  5: {
-    domainId: '1735353714',
-    // Goerli
-    name: 'Goerli',
-    network: 'testnet',
-  },
+
   56: {
     domainId: '6450786',
     // BNB Chain
     name: 'BNB',
     network: 'mainnet',
-  },
-  80001: {
-    domainId: '9991',
-    // Mumbai
-    name: 'Mumbai',
-    network: 'testnet',
   },
 };
 

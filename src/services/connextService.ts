@@ -22,11 +22,11 @@ export default class ConnextService {
     const domainConfig: { [domainId: string]: { providers: string[] } } = {};
 
     const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)
-      .filter(([key]) => typeof key === 'number')
-      .map(([key, value]) => ({ domainId: value.domainId, chainId: key }));
+      .filter(([key]) => !Number.isNaN(Number(key)))
+      .map(([key, value]) => ({ domainId: value.domainId, chainId: Number(key) }));
 
     domainChainIds.forEach((obj) => {
-      domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10))] };
+      domainConfig[obj.domainId] = { providers: [this.getRPCURL(obj.chainId)] };
     });
 
     const sdkConfig: SdkConfig = {
