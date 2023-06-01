@@ -59,7 +59,7 @@ const ClaimButton = () => {
         isLoadingCampaigns={isLoadingCampaigns}
         onCancel={() => setShouldShowClaimModal(false)}
       />
-      <StyledBadge badgeContent={hasUnclaimedCampaigns ? ' ' : ''} variant="dot" color="secondary">
+      <StyledBadge showZero={false} badgeContent={hasUnclaimedCampaigns ? ' ' : 0} variant="dot" color="secondary">
         <StyledButton variant="outlined" size="small" color="transparent" onClick={() => setShouldShowClaimModal(true)}>
           <StyledMeanLogoContainer>
             <WhaveLogoDark size="13px" />
