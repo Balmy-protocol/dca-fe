@@ -1,10 +1,9 @@
 import styled from 'styled-components';
 import React from 'react';
-import find from 'lodash/find';
 import { FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import { useCreatePositionState } from '@state/create-position/hooks';
-import { NETWORKS, STRING_SWAP_INTERVALS } from '@constants';
+import { STRING_SWAP_INTERVALS } from '@constants';
 import TokenInput from '@common/components/token-input';
 import FrequencyInput from '@common/components/frequency-easy-input';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';

@@ -394,6 +394,7 @@ const Swap = ({
         fromValue,
         frequencyType,
         frequencyValue,
+        fundWith,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined
       );
@@ -839,8 +840,8 @@ const Swap = ({
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
         isFrom={selecting === from}
-        // eslint-disable-next-line no-nested-ternary
         onChange={
+          // eslint-disable-next-line no-nested-ternary
           (from && selecting.address === from.address) || selecting.address === 'from'
             ? shouldShowMultichainPicker
               ? onSetFundWith

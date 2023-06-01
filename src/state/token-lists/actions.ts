@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, MEAN_GRAPHQL_URL, SUPPORTED_NETWORKS_DCA } from '@constants';
+import { LATEST_VERSION, MEAN_GRAPHQL_URL, SUPPORTED_NETWORKS_DCA } from '@constants';
 import GraphqlService from '@services/graphql';
 import { Token, TokenListResponse, TokensLists } from '@types';
 import gqlFetchAll from '@common/utils/gqlFetchAll';
@@ -30,13 +30,7 @@ export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extr
 
 export const fetchGraphTokenList = createAsyncThunk<Token[], number | undefined, { extra: AxiosInstance }>(
   'tokenLists/fetchGraphTokenList',
-  async (passedChainId, { getState }) => {
-    const {
-      config: { network },
-    } = getState() as {
-      config: { network: { chainId: number; name: string } };
-    };
-
+  async () => {
     const promises: Promise<Token[]>[] = [];
 
     // eslint-disable-next-line no-restricted-syntax

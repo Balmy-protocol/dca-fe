@@ -858,11 +858,11 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
-    fundWithToken: Token,
+    fundWithToken: Token | null,
     yieldFrom?: string,
     yieldTo?: string
   ): Promise<TransactionResponse> {
-    if (fundWithToken.chainId !== from.chainId || fundWithToken.chainId !== to.chainId) {
+    if (fundWithToken && (fundWithToken.chainId !== from.chainId || fundWithToken.chainId !== to.chainId)) {
       const tx = await this.xCallDeposit(
         from,
         to,
