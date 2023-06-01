@@ -68,6 +68,7 @@ import ErrorService from './errorService';
 import SimulationService from './simulationService';
 import SafeService from './safeService';
 import EventService from './eventService';
+import ConnextService from './connextService';
 import CampaignService from './campaignService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
@@ -131,6 +132,8 @@ export default class Web3Service {
 
   safeService: SafeService;
 
+  connextService: ConnextService;
+
   campaignService: CampaignService;
 
   constructor(
@@ -183,6 +186,7 @@ export default class Web3Service {
       this.providerService,
       this.safeService
     );
+    this.connextService = new ConnextService(this.walletService); // hardcoding polygon ID
     this.positionService = new PositionService(
       this.walletService,
       this.pairService,
@@ -190,7 +194,8 @@ export default class Web3Service {
       this.meanApiService,
       this.safeService,
       this.apolloClient,
-      this.providerService
+      this.providerService,
+      this.connextService
     );
     this.priceService = new PriceService(
       this.walletService,
@@ -241,6 +246,10 @@ export default class Web3Service {
 
   getPositionService() {
     return this.positionService;
+  }
+
+  getConnextService() {
+    return this.connextService;
   }
 
   getAggregatorService() {
@@ -317,6 +326,7 @@ export default class Web3Service {
 
   setAccount(account: string) {
     this.account = account;
+    this.connextService.sdkInit();
   }
 
   setNetwork(chainId: number) {

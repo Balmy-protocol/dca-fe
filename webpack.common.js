@@ -52,6 +52,7 @@ module.exports = {
       '@services': path.resolve(__dirname, 'src/services'),
       '@state': path.resolve(__dirname, 'src/state'),
       '@types': path.resolve(__dirname, 'src/types'),
+      zlib: require.resolve('browserify-zlib'),
     },
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
     fallback: {
@@ -61,7 +62,10 @@ module.exports = {
       http: require.resolve('stream-http'),
       https: require.resolve('https-browserify'),
       os: require.resolve('os-browserify/browser'),
+      zlib: false,
       url: require.resolve('url'),
+      fs: false,
+      path: false,
     },
   },
   module: {
