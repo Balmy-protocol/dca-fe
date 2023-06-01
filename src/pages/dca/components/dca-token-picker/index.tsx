@@ -20,11 +20,11 @@ interface TokenPickerProps {
   onChange: SetFromToState;
   onClose: () => void;
   isFrom: boolean;
-  usedTokens: string[];
   ignoreValues: string[];
   otherSelected?: Token | null;
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
+  multichain?: boolean;
 }
 
 const DcaTokenPicker = ({
@@ -34,10 +34,10 @@ const DcaTokenPicker = ({
   onClose,
   onChange,
   ignoreValues,
-  usedTokens,
   otherSelected,
   yieldOptions,
   isLoadingYieldOptions,
+  multichain,
 }: TokenPickerProps) => (
   <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" actions={[]} fullHeight keepMounted>
     <StyledOverlay>
@@ -47,11 +47,11 @@ const DcaTokenPicker = ({
         onClose={onClose}
         onChange={onChange}
         ignoreValues={ignoreValues}
-        usedTokens={usedTokens}
         otherSelected={otherSelected}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         isOpen={shouldShow}
+        multichain={multichain}
       />
     </StyledOverlay>
   </Modal>

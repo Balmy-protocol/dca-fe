@@ -9,7 +9,6 @@ import TokenPicker from '@pages/dca/components/dca-token-picker';
 import { FormattedMessage } from 'react-intl';
 import find from 'lodash/find';
 import useBalance from '@hooks/useBalance';
-import useUsedTokens from '@hooks/useUsedTokens';
 import StalePairModal from '@pages/dca/components/stale-pair-modal';
 import {
   POSSIBLE_ACTIONS,
@@ -21,8 +20,13 @@ import {
   ONE_DAY,
   shouldEnableFrequency,
   ModeTypesIds,
+  TRANSACTION_ACTION_APPROVE_TOKEN,
+  TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+  TRANSACTION_ACTION_CREATE_POSITION,
 } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
+import findIndex from 'lodash/findIndex';
+import TransactionSteps, { TransactionAction as TransactionStep } from '@common/components/transaction-steps';
 import { emptyTokenWithAddress, parseUsdPrice } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { calculateStale, STALE } from '@common/utils/parsing';
@@ -51,6 +55,7 @@ import {
   setToYield,
   setFromYield,
   setFrequencyValue,
+  setFundWith,
 } from '@state/create-position/actions';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import useAllowance from '@hooks/useAllowance';
@@ -58,6 +63,7 @@ import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
 import DcaButton from '../dca-button';
 import NextSwapAvailable from '../next-swap-available';
+import PositionConfirmation from '../position-confirmation';
 
 export const StyledContentContainer = styled.div`
   background-color: #292929;
@@ -107,18 +113,30 @@ const Swap = ({
   isLoadingYieldOptions,
   handleChangeNetwork,
 }: SwapProps) => {
-  const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield, modeType, rate } =
-    useCreatePositionState();
+  const {
+    fromValue,
+    frequencyType,
+    frequencyValue,
+    from,
+    to,
+    yieldEnabled,
+    fromYield,
+    toYield,
+    modeType,
+    rate,
+    fundWith,
+  } = useCreatePositionState();
   const containerRef = React.useRef(null);
   const [createStep, setCreateStep] = React.useState<0 | 1>(0);
   const [showFirstStep, setShowFirstStep] = React.useState(false);
   const [showSecondStep, setShowSecondStep] = React.useState(false);
   const [isRender, setIsRender] = React.useState(true);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
+  const [shouldShowMultichainPicker, setShouldShowMultichainPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
   const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
-  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
+  const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const positionService = usePositionService();
@@ -127,9 +145,12 @@ const Swap = ({
   const availablePairs = useAvailablePairs();
   const errorService = useErrorService();
   const trackEvent = useTrackEvent();
+  const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
+  const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
+  const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
+  const [currentTransaction, setCurrentTransaction] = React.useState('');
   // const pairService = usePairService();
-  const [balance, , balanceErrors] = useBalance(from);
-  const [usedTokens] = useUsedTokens();
+  const [balance, , balanceErrors] = useBalance(fundWith || from);
   const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
 
   const existingPair = React.useMemo(() => {
@@ -154,7 +175,11 @@ const Swap = ({
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0, fromYield, toYield]);
   const loadedAsSafeApp = useLoadedAsSafeApp();
 
-  const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(from);
+  const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(
+    fundWith || from,
+    undefined,
+    fundWith?.chainId || currentNetwork.chainId
+  );
 
   const replaceHistory = useReplaceHistory();
 
@@ -166,8 +191,8 @@ const Swap = ({
   );
 
   const fromValueUsdPrice = parseUsdPrice(
-    from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
+    fundWith || from,
+    (fromValue !== '' && parseUnits(fromValue, (fundWith || from)?.decimals)) || null,
     usdPrice
   );
 
@@ -189,11 +214,11 @@ const Swap = ({
   let rateForUsdPrice: BigNumber | null = null;
 
   try {
-    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
+    rateForUsdPrice = (rate !== '' && parseUnits(rate, (fundWith || from)?.decimals)) || null;
     // eslint-disable-next-line no-empty
   } catch {}
 
-  const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
+  const rateUsdPrice = parseUsdPrice(fundWith || from, rateForUsdPrice, usdPrice);
 
   const hasEnoughUsdForYield =
     !!usdPrice &&
@@ -223,6 +248,21 @@ const Swap = ({
     replaceHistory(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
     trackEvent('DCA - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
   };
+  const onSetFundWith = (newFundWith: Token) => {
+    // check for decimals
+    if (from && newFundWith.decimals < from.decimals) {
+      const splitValue = /^(\d*)\.?(\d*)$/.exec(fromValue);
+      let newFromValue = fromValue;
+      if (splitValue && splitValue[2] !== '') {
+        newFromValue = `${splitValue[1]}.${splitValue[2].substring(0, newFundWith.decimals)}`;
+      }
+
+      dispatch(setFromValue(newFromValue));
+    }
+
+    dispatch(setFundWith(newFundWith));
+  };
+
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
     if (!shouldEnableFrequency(frequencyType.toString(), from?.address, newTo.address, currentNetwork.chainId)) {
@@ -234,7 +274,7 @@ const Swap = ({
     trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };
 
-  const handleApproveToken = async (amount?: BigNumber) => {
+  const handleApproveToken = async (transactions?: TransactionStep[], amount?: BigNumber) => {
     if (!from || !to) return;
     const fromSymbol = from.symbol;
 
@@ -284,16 +324,32 @@ const Swap = ({
       }
 
       addTransaction(result, transactionTypeData);
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="success approving token"
-            defaultMessage="Approving use of {from} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: fromSymbol || '' }}
-          />
-        ),
-      });
+
+      setModalClosed({ content: '' });
+
+      if (transactions?.length) {
+        const newSteps = [...transactions];
+
+        const approveIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
+
+        if (approveIndex !== -1) {
+          newSteps[approveIndex] = {
+            ...newSteps[approveIndex],
+            done: true,
+            hash: result.hash,
+          };
+
+          const waitIndex = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
+          if (waitIndex !== -1) {
+            newSteps[waitIndex] = {
+              ...newSteps[waitIndex],
+              hash: result.hash,
+            };
+          }
+        }
+
+        setTransactionsToExecute(newSteps);
+      }
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -314,7 +370,7 @@ const Swap = ({
     }
   };
 
-  const handleSwap = async () => {
+  const handleSwap = async (transactions?: TransactionStep[]) => {
     if (!from || !to) return;
     setShouldShowStalePairModal(false);
     const fromSymbol = from.symbol;
@@ -338,6 +394,7 @@ const Swap = ({
         fromValue,
         frequencyType,
         frequencyValue,
+        fundWith,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined
       );
@@ -365,17 +422,28 @@ const Swap = ({
               : hubAddress,
         },
       });
-      setModalSuccess({
-        hash: result.hash,
-        content: (
-          <FormattedMessage
-            description="success creating position"
-            defaultMessage="Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: fromSymbol || '', to: (to && to.symbol) || '' }}
-          />
-        ),
-      });
 
+      setModalClosed({ content: '' });
+
+      if (transactions?.length) {
+        const newSteps = [...transactions];
+
+        const index = findIndex(transactions, { type: TRANSACTION_ACTION_CREATE_POSITION });
+
+        if (index !== -1) {
+          newSteps[index] = {
+            ...newSteps[index],
+            hash: result.hash,
+            done: true,
+          };
+
+          setTransactionsToExecute(newSteps);
+        }
+      }
+
+      setShouldShowConfirmation(true);
+      setShouldShowSteps(false);
+      setCurrentTransaction(result.hash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
       dispatch(setToYield(undefined));
@@ -456,17 +524,11 @@ const Swap = ({
               : hubAddress,
         },
       });
-      setModalSuccess({
-        hash: result.safeTxHash,
-        content: (
-          <FormattedMessage
-            description="success creating position"
-            defaultMessage="Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{ from: fromSymbol || '', to: (to && to.symbol) || '' }}
-          />
-        ),
-      });
+      setModalClosed({ content: '' });
 
+      setShouldShowConfirmation(true);
+      setShouldShowSteps(false);
+      setCurrentTransaction(result.safeTxHash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
       dispatch(setToYield(undefined));
@@ -492,10 +554,88 @@ const Swap = ({
     }
   };
 
-  const preHandleApprove = (amount?: BigNumber) => {
+  const handleBackTransactionSteps = () => {
+    setShouldShowSteps(false);
+  };
+
+  const handleTransactionEndedForWait = (transactions?: TransactionStep[]) => {
+    if (!transactions?.length) {
+      return;
+    }
+
+    const newSteps = [...transactions];
+
+    const index = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
+
+    if (index !== -1) {
+      newSteps[index] = {
+        ...newSteps[index],
+        done: true,
+        checkForPending: false,
+      };
+
+      setTransactionsToExecute(newSteps);
+    }
+  };
+
+  const handleMultiSteps = () => {
+    if (!from || fromValue === '' || !to) {
+      return;
+    }
+
+    const newSteps: TransactionStep[] = [];
+
+    const amountToApprove = parseUnits(fromValue, from.decimals);
+
+    newSteps.push({
+      hash: '',
+      onAction: handleApproveToken,
+      checkForPending: false,
+      done: false,
+      type: TRANSACTION_ACTION_APPROVE_TOKEN,
+      extraData: {
+        token: from,
+        amount: amountToApprove,
+        swapper: 'Mean Finance',
+      },
+    });
+
+    newSteps.push({
+      hash: '',
+      onAction: handleTransactionEndedForWait,
+      checkForPending: true,
+      done: false,
+      type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+      extraData: {
+        token: from,
+        amount: amountToApprove,
+      },
+    });
+
+    newSteps.push({
+      hash: '',
+      onAction: handleSwap,
+      checkForPending: true,
+      done: false,
+      type: TRANSACTION_ACTION_CREATE_POSITION,
+      extraData: {
+        from,
+        to,
+        fromValue,
+        frequencyType,
+        frequencyValue,
+      },
+    });
+
+    trackEvent('DCA - Start create steps');
+    setTransactionsToExecute(newSteps);
+    setShouldShowSteps(true);
+  };
+
+  const preHandleApproveAndCreate = () => {
     if (!existingPair) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleApproveToken(amount);
+      handleMultiSteps();
       return;
     }
 
@@ -511,7 +651,7 @@ const Swap = ({
       setShouldShowStalePairModal(true);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleApproveToken(amount);
+      handleMultiSteps();
     }
   };
 
@@ -555,9 +695,10 @@ const Swap = ({
     }
   };
 
-  const startSelectingCoin = (token: Token) => {
+  const startSelectingCoin = (token: Token, multiChain?: boolean) => {
     setSelecting(token);
     setShouldShowPicker(true);
+    setShouldShowMultichainPicker(!!multiChain);
     trackEvent('DCA - start selecting coin', {
       selected: token.address,
       is: selecting.address === from?.address ? 'from' : 'to',
@@ -632,36 +773,30 @@ const Swap = ({
 
   const POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: handleSwap,
-    approveAndCreatePosition: preHandleSafeApproveAndSwap,
-    approveToken: handleApproveToken,
-    approveTokenExact: (amount?: BigNumber) => handleApproveToken(amount),
+    safeApproveAndCreatePosition: preHandleSafeApproveAndSwap,
+    approveAndCreatePosition: handleMultiSteps,
   };
 
   const PRE_POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: preHandleSwap,
-    approveAndCreatePosition: preHandleSafeApproveAndSwap,
-    approveToken: preHandleApprove,
-    approveTokenExact: (amount?: BigNumber) => preHandleApprove(amount),
+    safeApproveAndCreatePosition: preHandleSafeApproveAndSwap,
+    approveAndCreatePosition: preHandleApproveAndCreate,
   };
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  const onButtonClick = async (actionToDo: keyof typeof POSSIBLE_ACTIONS, amount?: BigNumber) => {
+  const onButtonClick = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
     setCurrentAction(actionToDo);
     if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo](amount);
+      PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
 
-      if (actionToDo === 'approveToken') {
-        trackEvent('DCA - Approve full token amount', { fromAddress: from?.address, toAddress: to?.address });
-      } else if (actionToDo === 'approveTokenExact') {
-        trackEvent('DCA - Approve exact token amount', { fromAddress: from?.address, toAddress: to?.address });
-      } else if (actionToDo === 'createPosition') {
+      if (actionToDo === 'createPosition') {
         trackEvent('DCA - Create position', { fromAddress: from?.address, toAddress: to?.address });
       }
     }
   };
 
-  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
+  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, (fundWith || from).decimals).gt(balance);
 
   const handleSetStep = (step: 0 | 1) => {
     if (isRender) {
@@ -685,14 +820,19 @@ const Swap = ({
 
   return (
     <StyledPaper variant="outlined" ref={containerRef}>
+      <TransactionSteps
+        shouldShow={shouldShowSteps}
+        handleClose={handleBackTransactionSteps}
+        transactions={transactionsToExecute}
+      />
+      <PositionConfirmation
+        shouldShow={shouldShowConfirmation}
+        transaction={currentTransaction}
+        handleClose={() => setShouldShowConfirmation(false)}
+      />
       <StalePairModal
         open={shouldShowStalePairModal}
-        onConfirm={() => {
-          if (currentAction === POSSIBLE_ACTIONS.approveTokenExact) {
-            return POSSIBLE_ACTIONS_FUNCTIONS[currentAction](parseUnits(fromValue, from?.decimals));
-          }
-          return POSSIBLE_ACTIONS_FUNCTIONS[currentAction]();
-        }}
+        onConfirm={() => POSSIBLE_ACTIONS_FUNCTIONS[currentAction]()}
         onCancel={() => setShouldShowStalePairModal(false)}
       />
 
@@ -700,12 +840,19 @@ const Swap = ({
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
         isFrom={selecting === from}
-        onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
-        usedTokens={usedTokens}
+        onChange={
+          // eslint-disable-next-line no-nested-ternary
+          (from && selecting.address === from.address) || selecting.address === 'from'
+            ? shouldShowMultichainPicker
+              ? onSetFundWith
+              : onSetFrom
+            : onSetTo
+        }
         ignoreValues={[]}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
+        multichain={shouldShowMultichainPicker}
       />
       <Slide
         direction="right"

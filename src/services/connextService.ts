@@ -2,6 +2,7 @@ import { getPoolFeeForUniV3, getXCallCallData, prepareSwapAndXCall } from '@conn
 import { DestinationCallDataParams, Swapper, SwapAndXCallParams } from '@connext/chain-abstraction/dist/types';
 import { SdkConfig, create } from '@connext/sdk';
 import { NETWORKS, SUPPORTED_CHAINS_BY_CONNEXT } from '@constants';
+import { ConnextTransferStatusResponse } from '@types';
 import { find } from 'lodash';
 import WalletService from './walletService';
 
@@ -108,7 +109,7 @@ export default class ConnextService {
       const params: { transactionHash: string } = {
         transactionHash,
       };
-      const transferStatus = await sdkUtils.getTransfers(params);
+      const transferStatus = (await sdkUtils.getTransfers(params)) as ConnextTransferStatusResponse;
       if (!transferStatus) {
         throw Error('Failed to fetch transfer status');
       }

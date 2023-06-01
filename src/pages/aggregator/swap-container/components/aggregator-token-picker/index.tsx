@@ -20,7 +20,6 @@ interface TokenPickerProps {
   onChange: SetFromToState;
   onClose: () => void;
   isFrom: boolean;
-  usedTokens: string[];
   ignoreValues: string[];
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
@@ -34,7 +33,6 @@ const AggregatorTokenPicker = ({
   onClose,
   onChange,
   ignoreValues,
-  usedTokens,
   yieldOptions,
   isLoadingYieldOptions,
   onAddToken,
@@ -48,7 +46,6 @@ const AggregatorTokenPicker = ({
         onClose={onClose}
         onChange={onChange}
         ignoreValues={ignoreValues}
-        usedTokens={usedTokens}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         onAddToken={onAddToken}

@@ -6,6 +6,7 @@ import { useCreatePositionState } from '@state/create-position/hooks';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import TokenInput from '@common/components/token-input';
 import FrequencyInput from '@common/components/frequency-easy-input';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
 
 const StyledSummaryContainer = styled.div`
   display: flex;
@@ -38,11 +39,41 @@ const Summary = ({
   fromCanHaveYield,
   fromValueUsdPrice,
 }: Props) => {
-  const { from, fromValue, rate, frequencyValue, fromYield, frequencyType } = useCreatePositionState();
+  const { from, fromValue, rate, frequencyValue, fromYield, frequencyType, fundWith } = useCreatePositionState();
   const intl = useIntl();
+  const selectedNetwork = useSelectedNetwork();
 
   return (
     <>
+      {fundWith && (
+        <StyledSummaryContainer>
+          <Typography variant="body1" component="span">
+            <FormattedMessage description="invest detail" defaultMessage="You'll use" />
+          </Typography>
+          <StyledInputContainer>
+            <TokenInput
+              id="from-minimal-value"
+              value={fromValue || '0'}
+              onChange={handleFromValueChange}
+              withBalance={false}
+              token={fundWith}
+              showChain={fundWith.chainId !== from?.chainId}
+              isMinimal
+              maxWidth="210px"
+              usdValue={fromValueUsdPrice.toFixed(2)}
+            />
+          </StyledInputContainer>
+          {fundWith.chainId !== from?.chainId && (
+            <Typography variant="body1" component="span">
+              <FormattedMessage
+                description="invest detail"
+                defaultMessage="to create a position on {chain}"
+                values={{ chain: selectedNetwork.name }}
+              />
+            </Typography>
+          )}
+        </StyledSummaryContainer>
+      )}
       <StyledSummaryContainer>
         <Typography variant="body1" component="span">
           <FormattedMessage description="invest detail" defaultMessage="You'll invest" />

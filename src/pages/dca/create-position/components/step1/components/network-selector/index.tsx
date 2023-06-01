@@ -33,7 +33,7 @@ const NetworkSelector = ({ onChangeNetwork }: Props) => {
   return (
     <StyledNetworkContainer>
       <Typography variant="body1">
-        <FormattedMessage description="supportedNetworks" defaultMessage="Choose network:" />
+        <FormattedMessage description="supportedNetworks" defaultMessage="Create position on:" />
       </Typography>
       <StyledNetworkButtonsContainer>
         <Select
@@ -48,7 +48,7 @@ const NetworkSelector = ({ onChangeNetwork }: Props) => {
             if (!SUPPORTED_NETWORKS_DCA.includes(selected)) {
               return (
                 <em>
-                  <FormattedMessage description="supportedNetworks" defaultMessage="Select network" />
+                  <FormattedMessage description="supportedNetworks" defaultMessage="Create position on" />
                 </em>
               );
             }

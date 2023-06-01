@@ -32,9 +32,9 @@ export const MINIMUM_LIQUIDITY_USD = parseFloat('5000');
 
 export const POSSIBLE_ACTIONS = {
   createPosition: 'createPosition',
+  safeApproveAndCreatePosition: 'safeApproveAndCreatePosition',
   approveAndCreatePosition: 'approveAndCreatePosition',
-  approveToken: 'approveToken',
-  approveTokenExact: 'approveTokenExact',
+  // approveTokenExact: 'approveTokenExact',
 };
 
 export const WHALE_MODE_FREQUENCIES = {

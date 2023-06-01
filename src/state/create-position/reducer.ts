@@ -13,6 +13,7 @@ import {
   setToYield,
   setDCAChainId,
   setRate,
+  setFundWith,
   setModeType,
 } from './actions';
 
@@ -23,6 +24,7 @@ export interface CreatePositionState {
   frequencyValue: string;
   from: Token | null;
   to: Token | null;
+  fundWith: Token | null;
   yieldEnabled: boolean;
   fromYield: YieldOption | null | undefined;
   toYield: YieldOption | null | undefined;
@@ -38,6 +40,7 @@ const initialState: CreatePositionState = {
   rate: '',
   from: null,
   to: null,
+  fundWith: null,
   yieldEnabled: true,
   fromYield: undefined,
   toYield: undefined,
@@ -52,6 +55,9 @@ export default createReducer(initialState, (builder) =>
     .addCase(setFrom, (state, { payload }) => {
       state.from = payload;
       state.fromYield = undefined;
+    })
+    .addCase(setFundWith, (state, { payload }) => {
+      state.fundWith = payload;
     })
     .addCase(setTo, (state, { payload }) => {
       state.to = payload;

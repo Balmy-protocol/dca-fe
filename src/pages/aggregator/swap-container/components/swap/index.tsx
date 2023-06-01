@@ -18,7 +18,6 @@ import { FormattedMessage } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import useBalance from '@hooks/useBalance';
 import Button from '@common/components/button';
-import useUsedTokens from '@hooks/useUsedTokens';
 import {
   BLOWFISH_ENABLED_CHAINS,
   TRANSACTION_ACTION_APPROVE_TOKEN,
@@ -115,7 +114,6 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
   const [balance, , balanceErrors] = useBalance(from);
-  const [usedTokens] = useUsedTokens();
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const [transactionWillFail, setTransactionWillFail] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -752,7 +750,6 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
           onClose={() => setShouldShowPicker(false)}
           isFrom={selecting === from}
           onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
-          usedTokens={usedTokens}
           ignoreValues={[]}
           yieldOptions={[]}
           isLoadingYieldOptions={false}

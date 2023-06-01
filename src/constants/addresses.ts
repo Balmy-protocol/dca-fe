@@ -738,14 +738,12 @@ export const SUPPORTED_CHAINS_BY_CONNEXT: Record<number, { domainId: string; nam
     name: 'Polygon',
     network: 'mainnet',
   },
-
   42161: {
     domainId: '1634886255',
     // Arbitrum One
     name: 'Arbitrum',
     network: 'mainnet',
   },
-
   56: {
     domainId: '6450786',
     // BNB Chain

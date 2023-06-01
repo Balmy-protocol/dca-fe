@@ -14,6 +14,7 @@ export * from './yield';
 export * from './aggregator';
 export * from './sdk';
 export * from './campaigns';
+export * from './connext';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -57,6 +58,7 @@ export type TransactionActionWaitForSignApprovalType = 'WAIT_FOR_SIGN_APPROVAL';
 export type TransactionActionWaitForApprovalType = 'WAIT_FOR_APPROVAL';
 export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
+export type TransactionActionCreatePositionType = 'CREATE_POSITION';
 
 export type TransactionActionType =
   // Common
@@ -65,7 +67,8 @@ export type TransactionActionType =
   | TransactionActionWaitForApprovalType
   | TransactionActionWaitForSimulationType
   | TransactionActionWaitForSignApprovalType
-  | TransactionActionSwapType;
+  | TransactionActionSwapType
+  | TransactionActionCreatePositionType;
 
 export interface TransactionActionApproveTokenData {
   token: Token;
@@ -91,7 +94,16 @@ export interface TransactionActionSwapData {
   buyAmount: BigNumber;
 }
 
+export interface TransactionActionCreatePositionData {
+  from: Token;
+  to: Token;
+  fromValue: string;
+  frequencyType: BigNumber;
+  frequencyValue: string;
+}
+
 export type TransactionActionExtraData =
   | TransactionActionApproveTokenData
   | TransactionActionWaitForApprovalData
-  | TransactionActionSwapData;
+  | TransactionActionSwapData
+  | TransactionActionCreatePositionData;
