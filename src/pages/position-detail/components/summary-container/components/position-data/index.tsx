@@ -6,7 +6,7 @@ import { DateTime } from 'luxon';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import {
   activePositionsPerIntervalToHasToExecute,
   calculateNextSwapAvailableAt,
@@ -16,7 +16,14 @@ import {
   getTimeFrequencyLabel,
   STALE,
 } from '@common/utils/parsing';
-import { NETWORKS, POSITION_ACTIONS, STABLE_COINS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from '@constants';
+import {
+  NETWORKS,
+  POSITION_ACTIONS,
+  STABLE_COINS,
+  STRING_SWAP_INTERVALS,
+  VERSIONS_ALLOWED_MODIFY,
+  getGhTokenListLogoUrl,
+} from '@constants';
 import useUsdPrice from '@hooks/useUsdPrice';
 import LinearProgress from '@mui/material/LinearProgress';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -341,7 +348,14 @@ const Details = ({
     <StyledCard>
       {positionNetwork && (
         <StyledNetworkLogoContainer>
-          <TokenIcon size="26px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
+          <TokenIcon
+            size="26px"
+            token={toToken({
+              address: positionNetwork.mainCurrency || positionNetwork.wToken,
+              chainId: positionNetwork.chainId,
+              logoURI: getGhTokenListLogoUrl(positionNetwork.chainId, 'logo'),
+            })}
+          />
         </StyledNetworkLogoContainer>
       )}
       <StyledCardContent>

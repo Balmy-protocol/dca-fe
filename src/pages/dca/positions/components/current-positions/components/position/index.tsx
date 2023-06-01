@@ -17,14 +17,20 @@ import {
   sortTokensByAddress,
 } from '@common/utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from '@types';
-import { NETWORKS, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, VERSIONS_ALLOWED_MODIFY } from '@constants';
+import {
+  getGhTokenListLogoUrl,
+  NETWORKS,
+  STRING_SWAP_INTERVALS,
+  SWAP_INTERVALS_MAP,
+  VERSIONS_ALLOWED_MODIFY,
+} from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { BigNumber } from 'ethers';
-import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
@@ -284,7 +290,14 @@ const ActivePosition = ({
     <StyledCard variant="outlined">
       {positionNetwork && (
         <StyledNetworkLogoContainer>
-          <TokenIcon size="26px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
+          <TokenIcon
+            size="26px"
+            token={toToken({
+              address: positionNetwork.mainCurrency || positionNetwork.wToken,
+              chainId: positionNetwork.chainId,
+              logoURI: getGhTokenListLogoUrl(positionNetwork.chainId, 'logo'),
+            })}
+          />
         </StyledNetworkLogoContainer>
       )}
       <StyledCardContent>

@@ -93,4 +93,29 @@ export const rabbyWallet = ({ chains, ...options }: MyWalletOptions): Wallet => 
     }),
   };
 };
+
+export const defiantWallet = ({ chains, ...options }: MyWalletOptions): Wallet => {
+  const isDefiantInjected =
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    typeof window !== 'undefined' && window.ethereum?.isDefiant === true;
+
+  return {
+    id: 'defiant',
+    name: 'Defiant',
+    iconUrl:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAM+SURBVHgB5VZbTxNREP522e2NUgoFRC5iQkhUNOIt0RdNjC9q9Nk/4A/wL/gb/AEm+mB8MJoYjdFEDfFCBBMQAZFABa3chFJKKW1315lO17bQ0AuGB53k9PScPWe+OXNmvjmKRYJdFBW7LGUDxjeA+V/SVyJaOYvjCeDWXRNGijbqKtqagePdQFdH6TrKAnQ5gO5OE+8HUqiqAoIJDQuLGma6gFNHgRpPcR1KJUETmjPx5kMKn8cIWFNQF3Ci3q/i6nnAW42/D2hLOGLh9bskpkMWnG4HgSm4fA6o9e0QcOgL8Ina3CJgmIDHBexvA073AAE/8HEE6B+yoNNp+YQXCdTrqQAwEgUePgd+zMlYpZiuoqbS/WmqjNv3iiG53xrqCPSszG2WbdPi3hO6r3mySqGFisyxdYptLf35OZ/9zx+4C0eAkYnCOgsCstvYhUvLosAGMGk+kbCwGjUJ2MoD3tzGg2LcZtmSFrF14PYDcWdaIf2w0y3TIkOsNKhpWAivmGgMaAKAnJaxIpkENogcXM4igOz3aCw7ZjCTgQwbUEDXoik0NQig1wvsCdDpk7LfSfna0rQVLG1/oaBZWQX6Bin6hpEDQoBGpqcWWzdxoNMFjUy+RFHZ2oySpOAd1tYAZyjkPW6iMcNuApjK9DoBfQ3GCTgBt8tEqbJtWnC0DQxbmAmZWFiysLhsA5viaktO7PcpuHnDUzANygK0havD/acUUDFyZdygAErh+jWdPKFifMrARNDAlQsOIgSlmKrigGOTwLNekCsBnZL6xGHg5BEJjEqkaLVgt3a2A/XEHscOgu4LOxLl/3lifAtRYBB3fp/Nfnz8Mr/PFa4gYcrXF2+JxqaEc1l6+4E7j7LrWG+u/HEpKxgcBfa1AMt0bw663Wla3EgMYhhC3tVUcjpapfIz3zJBM5DfJ2UqSU+PeJyimSitg/TMLhC9JaRccQXJO2F6oMomjaIxSpzq0GWe5zxuChxS+qpPamE7KRydlJrIZWktJjTI7x4WTiV+hvhqsmB5J7RfYWwRAzAYn3IjKSkQWeM8lKjtOSRrmQKZlXgvk7WZCT9ez3o4lard+ZxaVpSyYl2XE1Uq/35a/AZQtItS4ilAgwAAAABJRU5ErkJggg==',
+    iconBackground: '#FFFFFF',
+    installed: isDefiantInjected,
+    downloadUrls: {
+      browserExtension: 'https://rabby.io/',
+    },
+    createConnector: () => ({
+      connector: new InjectedConnector({
+        chains,
+        options,
+      }),
+    }),
+  };
+};
 /* eslint-enable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */

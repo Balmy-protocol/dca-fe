@@ -85,8 +85,6 @@ export default class Web3Service {
 
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
-  uniClient: Record<PositionVersions, Record<number, GraphqlService>>;
-
   network: Network;
 
   account: string;
@@ -135,7 +133,6 @@ export default class Web3Service {
 
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
-    UNISubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
     client?: ethers.providers.Web3Provider,
     modal?: Web3Modal
@@ -148,9 +145,6 @@ export default class Web3Service {
     }
     if (DCASubgraphs) {
       this.apolloClient = DCASubgraphs;
-    }
-    if (UNISubgraphs) {
-      this.uniClient = UNISubgraphs;
     }
 
     this.loadedAsSafeApp = false;
@@ -169,8 +163,7 @@ export default class Web3Service {
       this.contractService,
       this.meanApiService,
       this.providerService,
-      this.apolloClient,
-      this.uniClient
+      this.apolloClient
     );
     this.yieldService = new YieldService(this.providerService, this.axiosClient);
     this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient);
@@ -281,10 +274,6 @@ export default class Web3Service {
 
   getModal() {
     return this.modal;
-  }
-
-  getUNIGraphqlClient() {
-    return this.uniClient;
   }
 
   getDCAGraphqlClient() {

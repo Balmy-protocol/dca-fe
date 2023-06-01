@@ -8,6 +8,7 @@ export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.arbitrum.chainId]: 1,
   [NETWORKS.polygon.chainId]: 1,
   [NETWORKS.mainnet.chainId]: 5,
+  [NETWORKS.bsc.chainId]: 1,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT = 5;
@@ -39,6 +40,14 @@ export const POSSIBLE_ACTIONS = {
 
 export const WHALE_MODE_FREQUENCIES = {
   [NETWORKS.polygon.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+    ONE_HOUR.toString(),
+    FOUR_HOURS.toString(),
+  ],
+  [NETWORKS.bsc.chainId]: [
     ONE_MINUTE.toString(),
     FIVE_MINUTES.toString(),
     FIFTEEN_MINUTES.toString(),
@@ -82,6 +91,14 @@ export const WHALE_MODE_FREQUENCIES = {
 
 export const WHALE_MINIMUM_VALUES = {
   [NETWORKS.kovan.chainId]: {
+    [ONE_MINUTE.toString()]: 10000,
+    [FIVE_MINUTES.toString()]: 10000,
+    [FIFTEEN_MINUTES.toString()]: 10000,
+    [THIRTY_MINUTES.toString()]: 10000,
+    [ONE_HOUR.toString()]: 10000,
+    [FOUR_HOURS.toString()]: 10000,
+  },
+  [NETWORKS.bsc.chainId]: {
     [ONE_MINUTE.toString()]: 10000,
     [FIVE_MINUTES.toString()]: 10000,
     [FIFTEEN_MINUTES.toString()]: 10000,

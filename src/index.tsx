@@ -8,7 +8,6 @@ import EsMessages from '@lang/es.json';
 import WalletContext from '@common/components/wallet-context';
 import Web3Service from '@services/web3Service';
 import DCASubgraphs from '@common/utils/dcaSubgraphApolloClient';
-import UNISubgraphs from '@common/utils/graphPricesApolloClient';
 import { Provider } from 'react-redux';
 import store, { axiosClient } from '@state';
 import { Theme } from '@mui/material/styles';
@@ -43,7 +42,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     chains: Nullable<any[]>;
   }>({ wagmiClient: null, chains: null });
-  const [web3Service] = React.useState(new Web3Service(DCASubgraphs, UNISubgraphs, setAccount));
+  const [web3Service] = React.useState(new Web3Service(DCASubgraphs, setAccount));
   const [isLoadingWeb3, setIsLoadingWeb3] = React.useState(true);
   const [setUpModalError, setSetUpModalError] = React.useState<Error | null>(null);
   const [selectedLocale, setSelectedLocale] = React.useState(locale || SupportedLanguages.english);
