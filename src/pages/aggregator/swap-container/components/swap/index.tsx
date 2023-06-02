@@ -41,7 +41,6 @@ import TransactionSteps, { TransactionAction as TransactionStep } from '@common/
 import { useAppDispatch } from '@state/hooks';
 import useSimulationService from '@hooks/useSimulationService';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useMeanApiService from '@hooks/useMeanApiService';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import { addCustomToken } from '@state/token-lists/actions';
@@ -102,7 +101,6 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
   const containerRef = React.useRef(null);
-  const meanApiService = useMeanApiService();
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
@@ -290,10 +288,8 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
 
       try {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        meanApiService.trackEvent('Swap on aggregator', {
+        trackEvent('Swap on aggregator', {
           swapper: selectedRoute.swapper.id,
-          chainId: currentNetwork.chainId,
-          chainName: currentNetwork.name,
           from: selectedRoute.sellToken.address,
           fromSymbol: selectedRoute.sellToken.symbol,
           to: selectedRoute.buyToken.address,
@@ -429,10 +425,8 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
 
       try {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        meanApiService.trackEvent('Swap on aggregator', {
+        trackEvent('Swap on aggregator', {
           swapper: selectedRoute.swapper.id,
-          chainId: currentNetwork.chainId,
-          chainName: currentNetwork.name,
           from: selectedRoute.sellToken.address,
           fromSymbol: selectedRoute.sellToken.symbol,
           to: selectedRoute.buyToken.address,

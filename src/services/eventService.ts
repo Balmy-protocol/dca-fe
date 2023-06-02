@@ -1,41 +1,51 @@
-import { v4 as uuidv4 } from 'uuid';
 import md5 from 'md5';
-import MeanApiService from './meanApiService';
+import MixpanelLibray, { Mixpanel, Response } from 'mixpanel-browser';
 import ProviderService from './providerService';
+import { NETWORKS } from '@constants/addresses';
+import find from 'lodash/find';
 
 export default class EventService {
-  meanApiService: MeanApiService;
-
   providerService: ProviderService;
 
-  sessionId: string;
+  mixpanel: Mixpanel;
 
-  identifierId: string;
-
-  constructor(meanApiService: MeanApiService, providerService: ProviderService) {
-    this.meanApiService = meanApiService;
+  constructor(providerService: ProviderService) {
     this.providerService = providerService;
-    this.sessionId = uuidv4();
+    this.mixpanel = MixpanelLibray.init(
+      '7f62e8855fcbcd72de460ba40b6fc06b',
+      { api_host: 'https://mean-finance-mixpanel-proxy.herokuapp.com' },
+      ' '
+    );
+    this.mixpanel.set_config({ persistence: 'localStorage' });
+    // We can identify user
+    // const id = await this.getIdentifier();
+    // this.mixpanel.identify(id);
   }
 
   async getIdentifier() {
     const account = await this.providerService.getAddress();
-
-    return (account && md5(account)) || md5(this.sessionId);
+    return md5(account);
   }
 
   async trackEvent(action: string, extraData?: Record<string | number, unknown>) {
     const network = await this.providerService.getNetwork();
-    const hashedId = await this.getIdentifier();
-    return this.meanApiService.trackEvent(
-      action,
-      {
-        distinct_id: this.sessionId,
-        hashedId,
-        chanId: network.chainId,
-        ...(extraData || {}),
-      },
-      'test'
-    );
+    const foundNetwork = find(NETWORKS, { chainId: network.chainId });
+    return new Promise<void>((resolve, reject) => {
+      this.mixpanel.track(
+        action,
+        {
+          chainId: network.chainId,
+          chainName: foundNetwork?.name,
+          ...(extraData || {}),
+        },
+        (err: Response) => {
+          if (!err) {
+            console.log(' SEEE E E E E ENT');
+            resolve();
+          }
+          reject(err);
+        }
+      );
+    });
   }
 }
