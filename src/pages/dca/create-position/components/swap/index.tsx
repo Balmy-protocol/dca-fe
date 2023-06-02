@@ -23,6 +23,7 @@ import {
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_CREATE_POSITION,
+  TRANSACTION_ACTION_WAIT_FOR_BRIDGING,
 } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
 import findIndex from 'lodash/findIndex';
@@ -191,7 +192,7 @@ const Swap = ({
 
   const fromValueUsdPrice = parseUsdPrice(
     from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
+    (fromValue !== '' && !fundWith && parseUnits(fromValue, from?.decimals)) || null,
     usdPrice
   );
 
@@ -460,18 +461,28 @@ const Swap = ({
             done: true,
           };
 
+          // const waitIndex = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_BRIDGING });
+          // if (waitIndex !== -1) {
+          //   newSteps[waitIndex] = {
+          //     ...newSteps[waitIndex],
+          //     hash: result.hash,
+          //   };
+          // }
+
           setTransactionsToExecute(newSteps);
         }
       }
 
+      // if (!fundWith) {
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
-      setCurrentTransaction(result.hash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
       dispatch(setToYield(undefined));
       dispatch(setFromYield(undefined));
       setCreateStep(0);
+      // }
+      setCurrentTransaction(result.hash);
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e)) {
@@ -603,6 +614,26 @@ const Swap = ({
     }
   };
 
+  const handleTransactionEndedForWaitBridging = (transactions?: TransactionStep[]) => {
+    if (!transactions?.length) {
+      return;
+    }
+
+    const newSteps = [...transactions];
+
+    const index = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_BRIDGING });
+
+    if (index !== -1) {
+      newSteps[index] = {
+        ...newSteps[index],
+        done: true,
+        checkForPending: false,
+      };
+
+      setTransactionsToExecute(newSteps);
+    }
+  };
+
   const handleMultiSteps = () => {
     if (!from || fromValue === '' || !to) {
       return;
@@ -637,20 +668,6 @@ const Swap = ({
       },
     });
 
-    // if (fundWith && fundWith.chainId !== selectedNetwork.chainId) {
-    //   newSteps.push({
-    //     hash: '',
-    //     onAction: handleTransactionEndedForWait,
-    //     checkForPending: true,
-    //     done: false,
-    //     type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
-    //     extraData: {
-    //       token: from,
-    //       amount: amountToApprove,
-    //     },
-    //   });
-    // }
-
     newSteps.push({
       hash: '',
       onAction: handleSwap,
@@ -665,6 +682,25 @@ const Swap = ({
         frequencyValue,
       },
     });
+
+    // if (fundWith && fundWith.chainId !== selectedNetwork.chainId) {
+    //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    //   const chainFrom = find(NETWORKS, { chainId: fundWith.chainId })!;
+    //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    //   const chainTo = find(NETWORKS, { chainId: selectedNetwork.chainId })!;
+    //   newSteps.push({
+    //     hash: '',
+    //     onAction: handleTransactionEndedForWait,
+    //     checkForPending: true,
+    //     done: false,
+    //     type: TRANSACTION_ACTION_WAIT_FOR_BRIDGING,
+    //     extraData: {
+    //       token: from,
+    //       chainFrom: chainFrom.name,
+    //       chainTo: chainTo.name,
+    //     },
+    //   });
+    // }
 
     trackEvent('DCA - Start create steps');
     setTransactionsToExecute(newSteps);
@@ -916,7 +952,7 @@ const Swap = ({
               balance={balance}
               frequencies={filteredFrequencies}
               handleFrequencyChange={handleFrequencyChange}
-              fromValueUsdPrice={fromValueUsdPrice}
+              fromValueUsdPrice={fundWithValueUsdPrice || fromValueUsdPrice}
               onChangeNetwork={handleChangeNetwork}
               handleFromValueChange={handleFromValueChange}
             />

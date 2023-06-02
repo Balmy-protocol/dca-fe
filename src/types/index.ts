@@ -86,7 +86,6 @@ export interface TransactionActionWaitForApprovalData {
 
 export interface TransactionActionWaitForBridgingData {
   token: Token;
-  amount: BigNumber;
   chainFrom: string;
   chainTo: string;
 }

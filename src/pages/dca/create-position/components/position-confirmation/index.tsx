@@ -103,6 +103,8 @@ const TIMES_PER_NETWORK = {
 
 const DEFAULT_TIME_PER_NETWORK = 30;
 
+const DEFAULT_TIMER_FOR_BRIDGE = 60 * 4;
+
 const PositionConfirmation = ({ shouldShow, handleClose, transaction }: PositionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
   const getPendingTransaction = useIsTransactionPending();
@@ -118,7 +120,12 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
   const trackEvent = useTrackEvent();
 
   const onGoToEtherscan = () => {
-    const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
+    let url: string;
+    if (transactionReceipt?.type !== TransactionTypes.bridgeFunds) {
+      url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
+    } else {
+      url = `https://connextscan.io/tx/${transactionReceipt.hash}?src=search`;
+    }
     window.open(url, '_blank');
     trackEvent('DCA - Transaction steps - View transaction details');
   };
@@ -149,12 +156,20 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
 
   React.useEffect(() => {
     setSuccess(false);
-    setTimer(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
+    setTimer(
+      transactionReceipt?.type !== TransactionTypes.bridgeFunds
+        ? TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK
+        : DEFAULT_TIMER_FOR_BRIDGE
+    );
   }, [transaction]);
 
   React.useEffect(() => {
     if (!success && isTransactionPending && !previousTransactionPending) {
-      setTimer(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
+      setTimer(
+        transactionReceipt?.type !== TransactionTypes.bridgeFunds
+          ? TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK
+          : DEFAULT_TIMER_FOR_BRIDGE
+      );
     }
     if (!isTransactionPending && previousTransactionPending) {
       setTimer(0);
@@ -177,7 +192,7 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
         clearTimeout(timerRef.current);
       }
     }
-  }, [isTransactionPending, previousTransactionPending, success, timerRef]);
+  }, [isTransactionPending, previousTransactionPending, success, timerRef, transactionReceipt]);
 
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
@@ -194,13 +209,21 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
             </linearGradient>
           </svg>
           <Typography variant="h6">
-            {!success ? (
-              <FormattedMessage
-                description="transactionConfirmationInProgress"
-                defaultMessage="Transaction in progress"
-              />
-            ) : (
-              <FormattedMessage description="transactionConfirmationBalanceChanges" defaultMessage="Trade confirmed" />
+            {!success && (
+              <>
+                {transactionReceipt?.type === TransactionTypes.bridgeFunds && (
+                  <FormattedMessage
+                    description="positionConfirmationInProgress"
+                    defaultMessage="Bridging funds and creating position"
+                  />
+                )}
+                {transactionReceipt?.type !== TransactionTypes.bridgeFunds && (
+                  <FormattedMessage description="positionConfirmationInProgress" defaultMessage="Creating position" />
+                )}
+              </>
+            )}
+            {success && (
+              <FormattedMessage description="positionConfirmationBalanceChanges" defaultMessage="Position created" />
             )}
           </Typography>
         </StyledTitleContainer>
@@ -217,7 +240,12 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
             variant="determinate"
             value={
               !success
-                ? (1 - timer / (TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK)) * 100
+                ? (1 -
+                    timer /
+                      (transactionReceipt?.type !== TransactionTypes.bridgeFunds
+                        ? TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK
+                        : DEFAULT_TIMER_FOR_BRIDGE)) *
+                  100
                 : 100
             }
             thickness={4}
@@ -247,7 +275,13 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
             size="large"
           >
             {!success ? (
-              <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
+              <FormattedMessage
+                description="positionConfirmationViewExplorer"
+                defaultMessage="View in {explorer}"
+                values={{
+                  explorer: transactionReceipt?.type === TransactionTypes.bridgeFunds ? 'ConnextScan' : 'explorer',
+                }}
+              />
             ) : (
               <FormattedMessage
                 description="transactionDCAConfirmationViewPosition"
