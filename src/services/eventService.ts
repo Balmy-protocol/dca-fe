@@ -16,10 +16,7 @@ export default class EventService {
       { api_host: 'https://mean-finance-mixpanel-proxy.herokuapp.com' },
       ' '
     );
-    this.mixpanel.set_config({ persistence: 'localStorage' });
-    // We can identify user
-    // const id = await this.getIdentifier();
-    // this.mixpanel.identify(id);
+    this.mixpanel.set_config({ persistence: 'localStorage', ignore_dnt: true });
   }
 
   async getIdentifier() {
@@ -40,7 +37,6 @@ export default class EventService {
         },
         (err: Response) => {
           if (!err) {
-            console.log(' SEEE E E E E ENT');
             resolve();
           }
           reject(err);
