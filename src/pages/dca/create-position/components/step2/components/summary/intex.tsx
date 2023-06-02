@@ -7,6 +7,9 @@ import { STRING_SWAP_INTERVALS } from '@constants';
 import TokenInput from '@common/components/token-input';
 import FrequencyInput from '@common/components/frequency-easy-input';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import useConnextEstimation from '@hooks/useConnextEstimation';
+import { formatUnits, parseUnits } from '@ethersproject/units';
+import { BigNumber } from 'ethers';
 
 const StyledSummaryContainer = styled.div`
   display: flex;
@@ -28,6 +31,7 @@ type Props = {
   yieldEnabled: boolean;
   fromCanHaveYield: boolean;
   fromValueUsdPrice: number;
+  fundWithValueUsdPrice: number;
 };
 
 const Summary = ({
@@ -38,10 +42,28 @@ const Summary = ({
   yieldEnabled,
   fromCanHaveYield,
   fromValueUsdPrice,
+  fundWithValueUsdPrice,
 }: Props) => {
   const { from, fromValue, rate, frequencyValue, fromYield, frequencyType, fundWith } = useCreatePositionState();
   const intl = useIntl();
   const selectedNetwork = useSelectedNetwork();
+  const [connextEstimation, isLoadingEstimation] = useConnextEstimation(
+    fundWith,
+    parseUnits(fromValue || '0', (fundWith || from)?.decimals),
+    selectedNetwork.chainId
+  );
+
+  const fromValueToShow =
+    (connextEstimation && formatUnits(connextEstimation?.amountReceived, from?.decimals)) || fromValue || '0';
+  const connextRate =
+    connextEstimation &&
+    connextEstimation.amountReceived.gt(BigNumber.from(0)) &&
+    frequencyValue &&
+    BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+    from &&
+    formatUnits(connextEstimation.amountReceived.div(BigNumber.from(frequencyValue)), from.decimals);
+
+  const rateToShow = connextRate || rate;
 
   return (
     <>
@@ -60,7 +82,7 @@ const Summary = ({
               showChain={fundWith.chainId !== from?.chainId}
               isMinimal
               maxWidth="210px"
-              usdValue={fromValueUsdPrice.toFixed(2)}
+              usdValue={fundWithValueUsdPrice.toFixed(2)}
             />
           </StyledInputContainer>
           {fundWith.chainId !== from?.chainId && (
@@ -81,13 +103,15 @@ const Summary = ({
         <StyledInputContainer>
           <TokenInput
             id="from-minimal-value"
-            value={fromValue || '0'}
+            value={fromValueToShow}
             onChange={handleFromValueChange}
             withBalance={false}
             token={from}
             isMinimal
             maxWidth="210px"
+            disabled={!!fundWith && fundWith.address !== from?.address}
             usdValue={fromValueUsdPrice.toFixed(2)}
+            loading={isLoadingEstimation}
           />
         </StyledInputContainer>
       </StyledSummaryContainer>
@@ -98,12 +122,14 @@ const Summary = ({
         <StyledInputContainer>
           <TokenInput
             id="rate-value"
-            value={rate}
+            value={rateToShow}
             onChange={handleRateValueChange}
             withBalance={false}
             token={from}
+            disabled={!!fundWith && fundWith.address !== from?.address}
             isMinimal
             usdValue={rateUsdPrice.toFixed(2)}
+            loading={isLoadingEstimation}
           />
         </StyledInputContainer>
         {yieldEnabled && fromCanHaveYield && fromYield !== null && (

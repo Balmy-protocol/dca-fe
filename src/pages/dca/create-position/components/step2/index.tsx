@@ -24,6 +24,7 @@ interface SwapSecondStepProps {
   handleFrequencyChange: (newValue: string) => void;
   onBack: () => void;
   fromValueUsdPrice: number;
+  fundWithValueUsdPrice: number;
   rateUsdPrice: number;
   usdPrice?: BigNumber;
   yieldEnabled: boolean;
@@ -44,6 +45,7 @@ const SwapSecondStep = ({
   fromCanHaveYield,
   usdPrice,
   toCanHaveYield,
+  fundWithValueUsdPrice,
 }: SwapSecondStepProps) => (
   <Grid container rowSpacing={2}>
     <Grid item xs={12}>
@@ -64,6 +66,7 @@ const SwapSecondStep = ({
           yieldEnabled={yieldEnabled}
           fromCanHaveYield={fromCanHaveYield}
           fromValueUsdPrice={fromValueUsdPrice}
+          fundWithValueUsdPrice={fundWithValueUsdPrice}
         />
       </StyledContentContainer>
     </Grid>

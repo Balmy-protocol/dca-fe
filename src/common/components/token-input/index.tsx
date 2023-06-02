@@ -7,7 +7,7 @@ import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import FormHelperText from '@mui/material/FormHelperText';
-import { createStyles, FilledInput, Typography } from '@mui/material';
+import { createStyles, FilledInput, Skeleton, Typography } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -99,6 +99,7 @@ interface TokenInputProps {
   maxWidth?: string;
   usdValue?: string;
   showChain?: boolean;
+  loading?: boolean;
 }
 
 const TokenInput = ({
@@ -117,6 +118,7 @@ const TokenInput = ({
   maxWidth,
   usdValue,
   showChain,
+  loading,
 }: TokenInputProps) => {
   const inputRef = React.createRef();
   const currentNetwork = useSelectedNetwork();
@@ -184,23 +186,42 @@ const TokenInput = ({
           </StyledTokenIconContainer>
         )}
         <StyledAmountContainer>
-          <StyledFilledInput
-            id={id}
-            value={value}
-            onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-            style={{ width: `calc(${value.length + 1}ch + 25px)` }}
-            type="text"
-            disableUnderline
-            inputProps={{
-              style: { paddingTop: usdValue ? '8px' : '0px' },
-            }}
-          />
-          {usdValue && (
-            <StyledUsdContainer>
-              <Typography variant="caption" color="#939494">
-                ${usdValue}
-              </Typography>
-            </StyledUsdContainer>
+          {!loading && (
+            <>
+              <StyledFilledInput
+                id={id}
+                value={value}
+                disabled={disabled}
+                onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+                style={{ width: `calc(${value.length + 1}ch + 25px)` }}
+                type="text"
+                disableUnderline
+                inputProps={{
+                  style: { paddingTop: usdValue ? '8px' : '0px' },
+                }}
+              />
+              {usdValue && (
+                <StyledUsdContainer>
+                  <Typography variant="caption" color="#939494">
+                    ${usdValue}
+                  </Typography>
+                </StyledUsdContainer>
+              )}
+            </>
+          )}
+          {loading && (
+            <>
+              <Skeleton
+                variant="text"
+                width="calc(6ch + 25px)"
+                sx={{ margin: '8px 12px 0px 12px', fontSize: 'inherit' }}
+              />
+              <StyledUsdContainer>
+                <Typography variant="caption" color="#939494">
+                  <Skeleton variant="text" width="calc(6ch + 25px)" sx={{ fontSize: 'inherit' }} />
+                </Typography>
+              </StyledUsdContainer>
+            </>
           )}
         </StyledAmountContainer>
       </StyledFormControlMinimal>

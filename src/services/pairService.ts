@@ -293,10 +293,9 @@ export default class PairService {
     // if they are not connected we show everything as available
     if (!this.providerService.getProvider()) return true;
 
-    const network = await this.providerService.getNetwork();
-
-    const token0 = tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenFrom;
-    const token1 = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenTo;
+    const token0 =
+      tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(tokenFrom.chainId) : tokenFrom;
+    const token1 = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(tokenTo.chainId) : tokenTo;
 
     const [tokenA, tokenB] = sortTokens(token0, token1);
 

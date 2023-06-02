@@ -99,7 +99,7 @@ interface AvailableSwapInterval {
 }
 
 interface SwapProps {
-  currentNetwork: { chainId: number; name: string };
+  selectedNetwork: { chainId: number; name: string };
   availableFrequencies: AvailableSwapInterval[];
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
@@ -107,7 +107,7 @@ interface SwapProps {
 }
 
 const Swap = ({
-  currentNetwork,
+  selectedNetwork,
   availableFrequencies,
   yieldOptions,
   isLoadingYieldOptions,
@@ -152,6 +152,7 @@ const Swap = ({
   // const pairService = usePairService();
   const [balance, , balanceErrors] = useBalance(fundWith || from);
   const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
+  const [fundWithAllowance, , fundWithAllowanceErrors] = useAllowance(fundWith);
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -159,10 +160,10 @@ const Swap = ({
     let tokenB = toYield?.tokenAddress || to.address;
 
     if (tokenA === PROTOCOL_TOKEN_ADDRESS) {
-      tokenA = getWrappedProtocolToken(currentNetwork.chainId).address;
+      tokenA = getWrappedProtocolToken(selectedNetwork.chainId).address;
     }
     if (tokenB === PROTOCOL_TOKEN_ADDRESS) {
-      tokenB = getWrappedProtocolToken(currentNetwork.chainId).address;
+      tokenB = getWrappedProtocolToken(selectedNetwork.chainId).address;
     }
 
     const token0 = tokenA < tokenB ? tokenA : tokenB;
@@ -175,11 +176,9 @@ const Swap = ({
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0, fromYield, toYield]);
   const loadedAsSafeApp = useLoadedAsSafeApp();
 
-  const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(
-    fundWith || from,
-    undefined,
-    fundWith?.chainId || currentNetwork.chainId
-  );
+  const [usdPrice, isLoadingUsdPrice] = useRawUsdPrice(from, undefined, from?.chainId);
+
+  const [fundWithUsdPrice, isLoadingFundWithUsdPrice] = useRawUsdPrice(fundWith, undefined, fundWith?.chainId);
 
   const replaceHistory = useReplaceHistory();
 
@@ -191,9 +190,15 @@ const Swap = ({
   );
 
   const fromValueUsdPrice = parseUsdPrice(
-    fundWith || from,
-    (fromValue !== '' && parseUnits(fromValue, (fundWith || from)?.decimals)) || null,
+    from,
+    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
     usdPrice
+  );
+
+  const fundWithValueUsdPrice = parseUsdPrice(
+    fundWith,
+    (fromValue !== '' && fundWith && parseUnits(fromValue, fundWith.decimals)) || null,
+    fundWithUsdPrice
   );
 
   React.useEffect(() => {
@@ -212,17 +217,23 @@ const Swap = ({
   }, [from]);
 
   let rateForUsdPrice: BigNumber | null = null;
+  let fundWithRateForUsdPrice: BigNumber | null = null;
 
   try {
     rateForUsdPrice = (rate !== '' && parseUnits(rate, (fundWith || from)?.decimals)) || null;
+    fundWithRateForUsdPrice = (rate !== '' && fundWith && parseUnits(rate, fundWith.decimals)) || null;
     // eslint-disable-next-line no-empty
   } catch {}
 
-  const rateUsdPrice = parseUsdPrice(fundWith || from, rateForUsdPrice, usdPrice);
+  const fundWithRateUsdPrice = fundWith && parseUsdPrice(fundWith, fundWithRateForUsdPrice, fundWithUsdPrice);
+
+  const rateUsdPrice = parseUsdPrice(from, rateForUsdPrice, usdPrice);
 
   const hasEnoughUsdForYield =
     !!usdPrice &&
-    rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
+    (!fundWith || !!fundWithUsdPrice) &&
+    (fundWithRateUsdPrice || rateUsdPrice) >=
+      (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
 
   // only allowed if set for 10 days and at least 10 USD
   const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield) && hasEnoughUsdForYield;
@@ -241,11 +252,11 @@ const Swap = ({
 
     dispatch(setFrom(newFrom));
 
-    if (!shouldEnableFrequency(frequencyType.toString(), newFrom.address, to?.address, currentNetwork.chainId)) {
+    if (!shouldEnableFrequency(frequencyType.toString(), newFrom.address, to?.address, selectedNetwork.chainId)) {
       dispatch(setFrequencyType(ONE_DAY));
     }
 
-    replaceHistory(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    replaceHistory(`/create/${selectedNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
     trackEvent('DCA - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
   };
   const onSetFundWith = (newFundWith: Token) => {
@@ -265,11 +276,11 @@ const Swap = ({
 
   const onSetTo = (newTo: Token) => {
     dispatch(setTo(newTo));
-    if (!shouldEnableFrequency(frequencyType.toString(), from?.address, newTo.address, currentNetwork.chainId)) {
+    if (!shouldEnableFrequency(frequencyType.toString(), from?.address, newTo.address, selectedNetwork.chainId)) {
       dispatch(setFrequencyType(ONE_DAY));
     }
     if (from) {
-      replaceHistory(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
+      replaceHistory(`/create/${selectedNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
     trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };
@@ -291,21 +302,19 @@ const Swap = ({
         ),
       });
       trackEvent('DCA - Approve token submitting');
-      const result = await walletService.approveToken(
-        from,
-        !!(shouldEnableYield && fromYield?.tokenAddress),
-        undefined,
-        amount
+
+      const allowanceTarget = await positionService.getDcaAllowanceTarget(
+        fundWith || from,
+        selectedNetwork.chainId,
+        !!(shouldEnableYield && fromYield?.tokenAddress)
       );
-      const hubAddress =
-        shouldEnableYield && fromYield?.tokenAddress
-          ? await contractService.getHUBCompanionAddress()
-          : await contractService.getHUBAddress();
+
+      const result = await walletService.approveSpecificToken(fundWith || from, allowanceTarget, amount);
       trackEvent('DCA - Approve token submitted');
 
       const transactionTypeDataBase = {
         token: from,
-        addressFor: hubAddress,
+        addressFor: allowanceTarget,
       };
 
       let transactionTypeData: ApproveTokenExactTypeData | ApproveTokenTypeData = {
@@ -359,7 +368,7 @@ const Swap = ({
         void errorService.logError('Error approving token', JSON.stringify(e), {
           from: from.address,
           to: to.address,
-          chainId: currentNetwork.chainId,
+          chainId: (fundWith || from).chainId,
         });
       }
       setModalError({
@@ -402,26 +411,40 @@ const Swap = ({
       const hubAddress = await contractService.getHUBAddress();
       const companionAddress = await contractService.getHUBCompanionAddress();
 
-      addTransaction(result, {
-        type: TransactionTypes.newPosition,
-        typeData: {
-          from,
-          to,
-          fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
-          toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
-          fromValue,
-          frequencyType: frequencyType.toString(),
-          frequencyValue,
-          startedAt: Date.now(),
-          id: result.hash,
-          isCreatingPair: !existingPair,
-          version: LATEST_VERSION,
-          addressFor:
-            to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
-              ? companionAddress
-              : hubAddress,
-        },
-      });
+      const data = {
+        from,
+        to,
+        fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
+        toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
+        fromValue,
+        frequencyType: frequencyType.toString(),
+        frequencyValue,
+        startedAt: Date.now(),
+        chainId: selectedNetwork.chainId,
+        fundWith,
+        id: result.hash,
+        isCreatingPair: !existingPair,
+        version: LATEST_VERSION,
+        addressFor:
+          to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
+            ? companionAddress
+            : hubAddress,
+      };
+
+      if (fundWith) {
+        addTransaction(result, {
+          type: TransactionTypes.bridgeFunds,
+          typeData: {
+            ...data,
+            fundWith,
+          },
+        });
+      } else {
+        addTransaction(result, {
+          type: TransactionTypes.newPosition,
+          typeData: data,
+        });
+      }
 
       setModalClosed({ content: '' });
 
@@ -457,7 +480,7 @@ const Swap = ({
         void errorService.logError('Error creating position', JSON.stringify(e), {
           from: from.address,
           to: to.address,
-          chainId: currentNetwork.chainId,
+          chainId: (fundWith || from).chainId,
         });
       }
       setModalError({
@@ -509,9 +532,11 @@ const Swap = ({
         typeData: {
           from,
           to,
+          chainId: selectedNetwork.chainId,
           fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
           toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
           fromValue,
+          fundWith,
           frequencyType: frequencyType.toString(),
           frequencyValue,
           startedAt: Date.now(),
@@ -542,7 +567,7 @@ const Swap = ({
         void errorService.logError('Error creating position', JSON.stringify(e), {
           from: from.address,
           to: to.address,
-          chainId: currentNetwork.chainId,
+          chainId: (fundWith || from).chainId,
         });
       }
       setModalError({
@@ -611,6 +636,20 @@ const Swap = ({
         amount: amountToApprove,
       },
     });
+
+    // if (fundWith && fundWith.chainId !== selectedNetwork.chainId) {
+    //   newSteps.push({
+    //     hash: '',
+    //     onAction: handleTransactionEndedForWait,
+    //     checkForPending: true,
+    //     done: false,
+    //     type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+    //     extraData: {
+    //       token: from,
+    //       amount: amountToApprove,
+    //     },
+    //   });
+    // }
 
     newSteps.push({
       hash: '',
@@ -813,7 +852,7 @@ const Swap = ({
 
   const filteredFrequencies = availableFrequencies.filter(
     (frequency) =>
-      !(WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
+      !(WHALE_MODE_FREQUENCIES[selectedNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
         frequency.value.toString()
       )
   );
@@ -889,17 +928,20 @@ const Swap = ({
                 cantFund={cantFund}
                 usdPrice={usdPrice}
                 shouldEnableYield={shouldEnableYield}
-                allowance={allowance}
-                allowanceErrors={allowanceErrors}
+                allowance={fundWithAllowance || (!fundWith && allowance)}
+                allowanceErrors={fundWithAllowanceErrors || (!fundWith && allowanceErrors) || undefined}
                 balance={balance}
                 balanceErrors={balanceErrors}
                 fromCanHaveYield={fromCanHaveYield}
                 toCanHaveYield={toCanHaveYield}
-                isLoadingUsdPrice={isLoadingUsdPrice}
                 handleSetStep={handleSetStep}
                 step={createStep}
                 rateUsdPrice={rateUsdPrice}
                 fromValueUsdPrice={fromValueUsdPrice}
+                isLoadingUsdPrice={isLoadingUsdPrice || isLoadingFundWithUsdPrice}
+                fundWithRateUsdPrice={fundWithRateUsdPrice}
+                fundWithValueUsdPrice={fundWithValueUsdPrice}
+                fundWithUsdPrice={fundWithUsdPrice}
               />
             </StyledContentContainer>
           </Grid>
@@ -931,6 +973,7 @@ const Swap = ({
               yieldOptions={yieldOptions}
               isLoadingYieldOptions={isLoadingYieldOptions}
               usdPrice={usdPrice}
+              fundWithValueUsdPrice={fundWithValueUsdPrice}
             />
           </Grid>
           <Grid item xs={12}>
@@ -942,11 +985,14 @@ const Swap = ({
                 shouldEnableYield={shouldEnableYield}
                 balance={balance}
                 balanceErrors={balanceErrors}
-                allowance={allowance}
-                allowanceErrors={allowanceErrors}
+                allowance={fundWithAllowance || (!fundWith && allowance)}
+                allowanceErrors={fundWithAllowanceErrors || (!fundWith && allowanceErrors) || undefined}
                 fromCanHaveYield={fromCanHaveYield}
                 toCanHaveYield={toCanHaveYield}
-                isLoadingUsdPrice={isLoadingUsdPrice}
+                isLoadingUsdPrice={isLoadingUsdPrice || isLoadingFundWithUsdPrice}
+                fundWithRateUsdPrice={fundWithRateUsdPrice}
+                fundWithValueUsdPrice={fundWithValueUsdPrice}
+                fundWithUsdPrice={fundWithUsdPrice}
                 handleSetStep={handleSetStep}
                 step={createStep}
                 rateUsdPrice={rateUsdPrice}

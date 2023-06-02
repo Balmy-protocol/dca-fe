@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import omit from 'lodash/omit';
 import values from 'lodash/values';
@@ -18,7 +18,9 @@ import usePositionService from '@hooks/usePositionService';
 import { updatePosition } from '@state/position-details/actions';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import { usePendingTransactions } from './hooks';
+import useConnextService from '@hooks/useConnextService';
+import { TransactionResponse } from '@ethersproject/providers';
+import { usePendingTransactions, useTransactionAdder } from './hooks';
 import { checkedTransaction, finalizeTransaction, removeTransaction, transactionFailed } from './actions';
 import { useAppDispatch, useAppSelector } from '../hooks';
 
@@ -52,6 +54,9 @@ export default function Updater(): null {
   const positionService = usePositionService();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const safeService = useSafeService();
+  const connextService = useConnextService();
+  const addTransaction = useTransactionAdder();
+  const intervalRef = React.useRef(true);
 
   const currentNetwork = useCurrentNetwork();
 
@@ -80,6 +85,7 @@ export default function Updater(): null {
   const getReceipt = useCallback(
     (hash: string, chainId: number) => {
       if (!walletService.getAccount()) throw new Error('No library or chainId');
+      console.log('fetching receipt for', hash, chainId);
       return transactionService.getTransactionReceipt(hash, chainId);
     },
     [walletService]
@@ -134,7 +140,6 @@ export default function Updater(): null {
 
   useEffect(() => {
     pendingTransactions.forEach((transaction) => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction(transaction);
     });
     dispatch(setInitialized());
@@ -150,9 +155,131 @@ export default function Updater(): null {
         promise
           .then(async (receipt) => {
             const tx = transactions[hash];
+            console.log('checking receipt for', tx);
             if (receipt && !tx.receipt && receipt.status !== 0) {
               let extendedTypeData = {};
+              let forceDoNotFinalizeTransaction = false;
 
+              const finalize = async () => {
+                let realSafeHash;
+                try {
+                  if (loadedAsSafeApp) {
+                    realSafeHash = await safeService.getHashFromSafeTxHash(hash);
+                  }
+                } catch (e) {
+                  console.error('Unable to fetch real tx hash from safe hash');
+                }
+
+                positionService.handleTransaction({
+                  ...tx,
+                  typeData: {
+                    ...tx.typeData,
+                    ...extendedTypeData,
+                  },
+                } as TransactionDetails);
+
+                dispatch(
+                  updatePosition({
+                    ...tx,
+                    typeData: {
+                      ...tx.typeData,
+                      ...extendedTypeData,
+                    },
+                  } as TransactionDetails)
+                );
+
+                dispatch(
+                  finalizeTransaction({
+                    hash,
+                    receipt: {
+                      ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
+                      chainId: tx.chainId,
+                      gasUsed: (receipt.gasUsed || 0).toString(),
+                      cumulativeGasUsed: (receipt.cumulativeGasUsed || 0).toString(),
+                      effectiveGasPrice: (receipt.effectiveGasPrice || 0).toString(),
+                    },
+                    extendedTypeData,
+                    chainId: tx.chainId,
+                    realSafeHash,
+                  })
+                );
+
+                enqueueSnackbar(
+                  buildTransactionMessage({
+                    ...tx,
+                    typeData: {
+                      ...tx.typeData,
+                      ...extendedTypeData,
+                    },
+                  } as TransactionDetails),
+                  {
+                    variant: 'success',
+                    anchorOrigin: {
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    },
+                    action: () => <EtherscanLink hash={hash} />,
+                    TransitionComponent: Zoom,
+                  }
+                );
+
+                // the receipt was fetched before the block, fast forward to that block to trigger balance updates
+                if (receipt.blockNumber > lastBlockNumber) {
+                  dispatch(
+                    updateBlockNumber({ blockNumber: receipt.blockNumber, chainId: transactions[hash].chainId })
+                  );
+                }
+              };
+              if (tx.type === TransactionTypes.bridgeFunds) {
+                forceDoNotFinalizeTransaction = true;
+                if (intervalRef.current) {
+                  try {
+                    const interval = setInterval(() => {
+                      const execTransaction = async () => {
+                        console.log('fetching status');
+                        const connextStatus = await connextService.getTransferStatus(tx.hash);
+
+                        const status = connextStatus[0];
+                        console.log('status fetched', status);
+                        if (status && status.execute_transaction_hash) {
+                          console.log('finalizing transaction and adding new one');
+                          clearInterval(interval);
+                          await finalize();
+                          console.log('added transactions');
+                          addTransaction(
+                            {
+                              hash: status.execute_transaction_hash,
+                              blockNumber: status.execute_block_number,
+                              timestamp: status.execute_timestamp,
+                              confirmations: 0,
+                              from: status.execute_caller,
+                              gasLimit: BigNumber.from(status.execute_gas_limit || '0'),
+                              nonce: 0,
+                              value: BigNumber.from(0),
+                              chainId: tx.typeData.chainId,
+                            } as unknown as TransactionResponse,
+                            {
+                              type: TransactionTypes.newPosition,
+                              typeData: tx.typeData,
+                            }
+                          );
+                          intervalRef.current = true;
+                        }
+                      };
+
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                      execTransaction();
+                    }, 5000);
+
+                    intervalRef.current = false;
+                  } catch (e) {
+                    forceDoNotFinalizeTransaction = false;
+                    console.log('Error checking connext status', e);
+                  }
+                }
+              }
+
+              console.log('got here');
               if (tx.type === TransactionTypes.newPair) {
                 extendedTypeData = {
                   id: ethers.utils.hexValue(receipt.logs[receipt.logs.length - 1].data),
@@ -160,10 +287,10 @@ export default function Updater(): null {
               }
 
               if (tx.type === TransactionTypes.newPosition) {
-                const parsedLog = await transactionService.parseLog(receipt.logs, tx.chainId, 'Deposited');
+                const parsedLog = await transactionService.parseLog(receipt.logs, tx.typeData.chainId, 'Deposited');
                 extendedTypeData = {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-                  id: parsedLog.args.positionId.toString(),
+                  newId: parsedLog.args.positionId.toString(),
                 };
               }
 
@@ -176,71 +303,10 @@ export default function Updater(): null {
                 };
               }
 
-              let realSafeHash;
-              try {
-                if (loadedAsSafeApp) {
-                  realSafeHash = await safeService.getHashFromSafeTxHash(hash);
-                }
-              } catch (e) {
-                console.error('Unable to fetch real tx hash from safe hash');
-              }
-
-              positionService.handleTransaction({
-                ...tx,
-                typeData: {
-                  ...tx.typeData,
-                  ...extendedTypeData,
-                },
-              } as TransactionDetails);
-
-              dispatch(
-                updatePosition({
-                  ...tx,
-                  typeData: {
-                    ...tx.typeData,
-                    ...extendedTypeData,
-                  },
-                } as TransactionDetails)
-              );
-
-              dispatch(
-                finalizeTransaction({
-                  hash,
-                  receipt: {
-                    ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
-                    chainId: tx.chainId,
-                    gasUsed: (receipt.gasUsed || 0).toString(),
-                    cumulativeGasUsed: (receipt.cumulativeGasUsed || 0).toString(),
-                    effectiveGasPrice: (receipt.effectiveGasPrice || 0).toString(),
-                  },
-                  extendedTypeData,
-                  chainId: tx.chainId,
-                  realSafeHash,
-                })
-              );
-
-              enqueueSnackbar(
-                buildTransactionMessage({
-                  ...tx,
-                  typeData: {
-                    ...tx.typeData,
-                    ...extendedTypeData,
-                  },
-                } as TransactionDetails),
-                {
-                  variant: 'success',
-                  anchorOrigin: {
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  },
-                  action: () => <EtherscanLink hash={hash} />,
-                  TransitionComponent: Zoom,
-                }
-              );
-
-              // the receipt was fetched before the block, fast forward to that block to trigger balance updates
-              if (receipt.blockNumber > lastBlockNumber) {
-                dispatch(updateBlockNumber({ blockNumber: receipt.blockNumber, chainId: transactions[hash].chainId }));
+              console.log('checking this transaction', tx);
+              if (!forceDoNotFinalizeTransaction) {
+                console.log('finalizing transaction');
+                await finalize();
               }
             } else if (receipt && !tx.receipt && receipt?.status === 0) {
               if (receipt?.status === 0) {
@@ -287,6 +353,7 @@ export default function Updater(): null {
     getReceipt,
     checkIfTransactionExists,
     loadedAsSafeApp,
+    intervalRef,
   ]);
 
   return null;

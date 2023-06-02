@@ -19,6 +19,8 @@ import {
   BlowfishResponse,
   TransactionActionCreatePositionType,
   TransactionActionCreatePositionData,
+  TransactionActionWaitForBridgingType,
+  TransactionActionWaitForBridgingData,
 } from 'types';
 import {
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
@@ -28,6 +30,7 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
   TRANSACTION_ACTION_CREATE_POSITION,
+  TRANSACTION_ACTION_WAIT_FOR_BRIDGING,
 } from '@constants';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
@@ -119,6 +122,13 @@ interface TransactionActionWaitForApproval extends TransactionActionBase {
 
 interface TransactionActionWaitForApprovalProps extends TransactionActionWaitForApproval, ItemProps {}
 
+interface TransactionActionWaitForBridging extends TransactionActionBase {
+  type: TransactionActionWaitForBridgingType;
+  extraData: TransactionActionWaitForBridgingData;
+}
+
+interface TransactionActionWaitForBridgingProps extends TransactionActionWaitForBridging, ItemProps {}
+
 interface TransactionActionWaitForSimulation extends Omit<TransactionActionBase, 'onAction'> {
   type: TransactionActionWaitForSimulationType;
   extraData: TransactionActionWaitForSimulationData;
@@ -146,6 +156,7 @@ export type TransactionAction =
   | TransactionActionApproveToken
   | TransactionActionApproveTokenSign
   | TransactionActionWaitForApproval
+  | TransactionActionWaitForBridging
   | TransactionActionWaitForSimulation
   | TransactionActionSwap
   | TransactionActionCreatePosition;
@@ -450,6 +461,70 @@ const buildWaitForApprovalItem = ({
   },
 });
 
+const buildWaitForBridginglItem = ({
+  hash,
+  onAction,
+  checkForPending,
+  step,
+  isLast,
+  isFirst,
+  getPendingTransaction,
+  transactions,
+  extraData,
+  isCurrentStep,
+  done,
+}: TransactionActionWaitForBridgingProps) => ({
+  content: () => {
+    const isPendingTransaction = getPendingTransaction(hash);
+    const [icon, setIcon] = React.useState<keyof typeof WaitIcons>(checkForPending ? 'disabled' : 'success');
+    React.useEffect(() => {
+      if (hash && checkForPending && isPendingTransaction && isCurrentStep) {
+        setIcon('pending');
+      }
+      if (hash && checkForPending && !isPendingTransaction && isCurrentStep) {
+        setIcon('success');
+        onAction(transactions);
+      }
+    }, [isPendingTransaction, checkForPending, onAction, transactions]);
+
+    return (
+      <>
+        <StyledTransactionStepIcon isLast={isLast} isFirst={isFirst}>
+          <StyledTransactionStepIconContent>{WaitIcons[icon]}</StyledTransactionStepIconContent>
+        </StyledTransactionStepIcon>
+        <StyledTransactionStepContent>
+          <Typography variant="body1">
+            {hash && checkForPending && isPendingTransaction && isCurrentStep && (
+              <FormattedMessage
+                description="transationStepWaitApprove"
+                defaultMessage="{step} - Your {token} on {chainFrom} is being sent to {chainTo}"
+                values={{
+                  step,
+                  token: extraData.token.symbol,
+                  chainFrom: extraData.chainFrom,
+                  chainTo: extraData.chainTo,
+                }}
+              />
+            )}
+            {((!hash && checkForPending && !isPendingTransaction) || done) && (
+              <FormattedMessage
+                description="transationStepWaitApprove"
+                defaultMessage="{step} - Your {token} on {chainFrom} was sent to {chainTo}"
+                values={{
+                  step,
+                  token: extraData.token.symbol,
+                  chainFrom: extraData.chainFrom,
+                  chainTo: extraData.chainTo,
+                }}
+              />
+            )}
+          </Typography>
+        </StyledTransactionStepContent>
+      </>
+    );
+  },
+});
+
 const buildWaitForSignApprovalItem = ({
   hash,
   onAction,
@@ -571,6 +646,7 @@ type TransactionActionProps =
   | TransactionActionApproveTokenSignProps
   | TransactionActionWaitForApprovalProps
   | TransactionActionWaitForSimulationProps
+  | TransactionActionWaitForBridgingProps
   | TransactionActionSwapProps
   | TransactionActionCreatePositionProps;
 
@@ -578,6 +654,7 @@ const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) =
   [TRANSACTION_ACTION_APPROVE_TOKEN]: buildApproveTokenItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN]: buildApproveTokenSignItem,
   [TRANSACTION_ACTION_WAIT_FOR_APPROVAL]: buildWaitForApprovalItem,
+  [TRANSACTION_ACTION_WAIT_FOR_BRIDGING]: buildWaitForBridginglItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL]: buildWaitForSignApprovalItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIMULATION]: buildWaitForSimulationItem,
   [TRANSACTION_ACTION_SWAP]: buildSwapItem,

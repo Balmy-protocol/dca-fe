@@ -53,11 +53,14 @@ interface DcaButtonProps {
   handleSetStep: (newStep: number) => void;
   cantFund: boolean;
   usdPrice?: BigNumber;
+  fundWithUsdPrice?: BigNumber;
   shouldEnableYield: boolean;
   balance?: BigNumber;
   allowance: Allowance;
   rateUsdPrice: number;
+  fundWithRateUsdPrice: number | null;
   fromValueUsdPrice: number;
+  fundWithValueUsdPrice: number;
   balanceErrors?: string;
   allowanceErrors?: string;
   fromCanHaveYield: boolean;
@@ -70,6 +73,7 @@ interface DcaButtonProps {
 const DcaButton = ({
   cantFund,
   usdPrice,
+  fundWithUsdPrice,
   allowance,
   allowanceErrors,
   shouldEnableYield,
@@ -82,7 +86,9 @@ const DcaButton = ({
   step,
   onClick,
   rateUsdPrice,
+  fundWithRateUsdPrice,
   fromValueUsdPrice,
+  fundWithValueUsdPrice,
 }: DcaButtonProps) => {
   const { from, to, fromValue, frequencyType, fromYield, toYield, frequencyValue, fundWith } = useCreatePositionState();
   const currentNetwork = useSelectedNetwork();
@@ -91,7 +97,7 @@ const DcaButton = ({
   const actualCurrentNetwork = useCurrentNetwork();
   const walletService = useWalletService();
   const web3Service = useWeb3Service();
-  const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
+  const isOnCorrectNetwork = actualCurrentNetwork.chainId === (fundWith || currentNetwork).chainId;
   const isCreatingPair = useHasPendingPairCreation(from, to);
   const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
@@ -104,7 +110,9 @@ const DcaButton = ({
 
   const hasEnoughUsdForDeposit =
     !!usdPrice &&
-    rateUsdPrice >= (MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT);
+    (!fundWith || !!fundWithUsdPrice) &&
+    (fundWithRateUsdPrice || rateUsdPrice) >=
+      (MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT);
 
   const isApproved =
     !from ||
@@ -115,7 +123,14 @@ const DcaButton = ({
         : (allowance.allowance &&
             allowance.token.address === from.address &&
             parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
-          from.address === PROTOCOL_TOKEN_ADDRESS));
+          from.address === PROTOCOL_TOKEN_ADDRESS)) ||
+    (fundWith &&
+      (!fromValue
+        ? true
+        : (allowance.allowance &&
+            allowance.token.address === fundWith.address &&
+            parseUnits(allowance.allowance, fundWith.decimals).gte(parseUnits(fromValue, fundWith.decimals))) ||
+          fundWith.address === PROTOCOL_TOKEN_ADDRESS));
 
   const swapsIsMax = BigNumber.from(frequencyValue || '0').gt(BigNumber.from(MAX_UINT_32));
 
@@ -128,7 +143,7 @@ const DcaButton = ({
     !balance ||
     balanceErrors ||
     allowanceErrors ||
-    parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
+    parseUnits(fromValue, (fundWith || from).decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0)) ||
     (shouldEnableYield && fromCanHaveYield && isUndefined(fromYield)) ||
     (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
@@ -148,8 +163,13 @@ const DcaButton = ({
     frequencyValue &&
     !isLoadingUsdPrice &&
     usdPrice &&
-    parseFloat(formatUnits(parseUnits(fromValue, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) *
-      fromValueUsdPrice <
+    parseFloat(
+      formatUnits(
+        parseUnits(fromValue, (fundWith || from).decimals).mul(BigNumber.from(frequencyValue)),
+        (fundWith || from).decimals
+      )
+    ) *
+      (fundWithValueUsdPrice || fromValueUsdPrice) <
       (WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] || Infinity);
 
   shouldShowNotEnoughForWhale =
@@ -161,9 +181,9 @@ const DcaButton = ({
         )));
 
   const minimumTokensNeeded = usdPriceToToken(
-    from,
+    fundWith || from,
     MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
-    usdPrice
+    fundWithUsdPrice || usdPrice
   );
 
   const onChangeNetwork = (chainId: number) => {

@@ -1,14 +1,29 @@
 import { getPoolFeeForUniV3, getXCallCallData, prepareSwapAndXCall } from '@connext/chain-abstraction';
 import { DestinationCallDataParams, Swapper, SwapAndXCallParams } from '@connext/chain-abstraction/dist/types';
 import { SdkConfig, create } from '@connext/sdk';
+import { BigNumber, ethers } from 'ethers';
 import { NETWORKS, SUPPORTED_CHAINS_BY_CONNEXT } from '@constants';
-import { ConnextTransferStatusResponse } from '@types';
+import { ConnextTransferStatusResponse, Token } from '@types';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { find } from 'lodash';
 import WalletService from './walletService';
 
 interface DomainID {
   [key: number]: string;
 }
+
+export const DEPLOYED_ADDRESSES: Record<string, Record<string, string>> = {
+  swapandxcall: {
+    '6648936': '', // ETH mainnet
+    '1869640809': '', // Optimism
+    '6450786': '0x119dd93154780d7604D50014c4545b4906928bFF', // BNB Chain
+    '6778479': '', // Gnosis Chain
+    '1886350457': '0x6e92344d08F8443a9C704452ac66bEFB90D32E12', // Polygon
+    '1634886255': '0xa28DE94d2e6F84659c2C32dF14334Daa08DD6461', // Arbitrum One
+    '2053862243': '', // zkSync2 mainnet
+    '1887071085': '', // Polygon zkEVM
+  },
+};
 
 export default class ConnextService {
   walletService: WalletService;
@@ -23,11 +38,11 @@ export default class ConnextService {
     const domainConfig: { [domainId: string]: { providers: string[] } } = {};
 
     const domainChainIds = Object.entries(SUPPORTED_CHAINS_BY_CONNEXT)
-      .filter(([key]) => typeof key === 'number')
-      .map(([key, value]) => ({ domainId: value.domainId, chainId: key }));
+      .filter(([key]) => !Number.isNaN(Number(key)))
+      .map(([key, value]) => ({ domainId: value.domainId, chainId: Number(key) }));
 
     domainChainIds.forEach((obj) => {
-      domainConfig[obj.domainId] = { providers: [this.getRPCURL(parseInt(obj.chainId, 10))] };
+      domainConfig[obj.domainId] = { providers: [this.getRPCURL(obj.chainId)] };
     });
 
     const sdkConfig: SdkConfig = {
@@ -75,17 +90,14 @@ export default class ConnextService {
     return prepareSwapAndXCall(swapAndXCallParams, signerAddress);
   }
 
-  async getEstimateAmountReceived(
-    originDomain: string,
-    destinationDomain: string,
-    originToken: string,
-    amount: number
-  ) {
+  async getEstimateAmountReceived(chainFrom: number, chainTo: number, originToken: string, amount: BigNumber) {
+    const originDomain = SUPPORTED_CHAINS_BY_CONNEXT[chainFrom].domainId;
+    const destinationDomain = SUPPORTED_CHAINS_BY_CONNEXT[chainTo].domainId;
     const { sdkBase } = await create(this.sdkConfig);
     const estimateReceived = await sdkBase.calculateAmountReceived(
       originDomain,
       destinationDomain,
-      originToken,
+      originToken === PROTOCOL_TOKEN_ADDRESS ? ethers.constants.AddressZero : originToken,
       amount
     );
     return estimateReceived;
@@ -117,5 +129,9 @@ export default class ConnextService {
     } catch (err) {
       throw Error(err);
     }
+  }
+
+  getAllowanceTarget(token: Token): string {
+    return DEPLOYED_ADDRESSES.swapandxcall[SUPPORTED_CHAINS_BY_CONNEXT[token.chainId].domainId];
   }
 }

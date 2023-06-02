@@ -393,7 +393,6 @@ export default class Web3Service {
 
     // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
 
-    this.setAccount(account);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
 
     try {
@@ -408,7 +407,9 @@ export default class Web3Service {
       console.error('Error changing network');
     }
 
-    await this.walletService.setAccount(undefined, this.setAccountCallback);
+    await this.walletService.setAccount(account, this.setAccountCallback);
+
+    this.setAccount(account);
 
     await this.sdkService.resetProvider();
 

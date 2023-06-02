@@ -45,6 +45,8 @@ export enum TransactionTypes {
   migratePositionYield = 'MIGRATE_POSITION_YIELD',
   withdrawFunds = 'WITHDRAW_FUNDS',
   resetPosition = 'RESET_POSITION',
+  // DCA WITH CONNEXT
+  bridgeFunds = 'BRIDGE_FUNDS',
   // AGGREGATOR
   swap = 'SWAP',
   wrap = 'WRAP',
@@ -276,22 +278,31 @@ export interface NoOpTypeData {
   };
 }
 
+type NewPositionData = {
+  from: Token;
+  to: Token;
+  fromYield?: string;
+  toYield?: string;
+  fromValue: string;
+  frequencyType: string;
+  frequencyValue: string;
+  id: string;
+  startedAt: number;
+  isCreatingPair: boolean;
+  addressFor: string;
+  version: PositionVersions;
+  chainId: number;
+  fundWith: Token | null;
+  newId?: string;
+};
 export interface NewPositionTypeData {
   type: TransactionTypes.newPosition;
-  typeData: {
-    from: Token;
-    to: Token;
-    fromYield?: string;
-    toYield?: string;
-    fromValue: string;
-    frequencyType: string;
-    frequencyValue: string;
-    id: string;
-    startedAt: number;
-    isCreatingPair: boolean;
-    addressFor: string;
-    version: PositionVersions;
-  };
+  typeData: NewPositionData;
+}
+
+export interface BridgeFundsTypeData {
+  type: TransactionTypes.bridgeFunds;
+  typeData: NewPositionData & { fundWith: Token };
 }
 
 export interface NewPairTypeData {
@@ -330,6 +341,7 @@ export type TransactionPositionTypeDataOptions =
   | TransferTypeData
   | EulerClaimTerminateManyTypeData
   | EulerClaimPermitManyTypeData
+  | BridgeFundsTypeData
   | NoOpTypeData;
 
 export type TransactionPositionManyTypeDataOptions = EulerClaimTerminateManyTypeData | EulerClaimPermitManyTypeData;
@@ -347,6 +359,7 @@ export type TransactionTypeDataOptions =
   | NewPositionTypeData
   | ResetPositionTypeData
   | NewPairTypeData
+  | BridgeFundsTypeData
   | ApproveCompanionTypeData
   | ModifyPermissionsTypeData
   | MigratePositionTypeData

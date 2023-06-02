@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import orderBy from 'lodash/orderBy';
 import { getProtocolToken } from '@common/mocks/tokens';
 import Hidden from '@mui/material/Hidden';
-import useCurrentNetwork from '@hooks/useSelectedNetwork';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, shouldEnableFrequency, STRING_SWAP_INTERVALS } from '@constants';
 import { GetSwapIntervalsGraphqlResponse } from '@types';
 import { BigNumber } from 'ethers';
@@ -26,29 +26,29 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
   const { from, to } = useCreatePositionState();
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const currentNetwork = useCurrentNetwork();
+  const selectedNetwork = useSelectedNetwork();
   const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true);
   const toParamToken = useToken(toParam, true);
-  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
+  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(selectedNetwork.chainId, true);
 
   React.useEffect(() => {
     if (fromParamToken) {
       dispatch(setFrom(fromParamToken));
     } else if (!from) {
-      dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
+      dispatch(setFrom(getProtocolToken(selectedNetwork.chainId)));
     }
 
     if (toParamToken) {
       dispatch(setTo(toParamToken));
     }
-  }, [currentNetwork.chainId]);
+  }, [selectedNetwork.chainId]);
 
   const availableFrequencies =
     (swapIntervalsData &&
       orderBy(swapIntervalsData.swapIntervals, [(swapInterval) => parseInt(swapInterval.interval, 10)], ['asc'])
         .filter((swapInterval) =>
-          shouldEnableFrequency(swapInterval.interval, from?.address, to?.address, currentNetwork.chainId)
+          shouldEnableFrequency(swapInterval.interval, from?.address, to?.address, selectedNetwork.chainId)
         )
         .map((swapInterval) => ({
           label: {
@@ -67,7 +67,7 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
       <Grid item xs={12} md={5}>
         <Swap
-          currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
+          selectedNetwork={selectedNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
           yieldOptions={yieldOptions || []}
           isLoadingYieldOptions={isLoadingYieldOptions}
           availableFrequencies={availableFrequencies}

@@ -1,4 +1,4 @@
-export interface ConnextTransferStatusResponse {
+export interface ConnextTransferStatus {
   transfer_id: string;
   nonce: number;
   to: string;
@@ -53,3 +53,5 @@ export interface ConnextTransferStatusResponse {
   relayer_fee: string;
   error_status: string | null;
 }
+
+export type ConnextTransferStatusResponse = ConnextTransferStatus[];

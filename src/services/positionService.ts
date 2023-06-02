@@ -880,6 +880,21 @@ export default class PositionService {
     return this.providerService.sendTransactionWithGasLimit(tx);
   }
 
+  getDcaAllowanceTarget(
+    token: Token,
+    positionChainId: number,
+    shouldUseCompanion = false,
+    positionVersion: PositionVersions = LATEST_VERSION
+  ) {
+    if (token.chainId !== positionChainId) {
+      return this.connextService.getAllowanceTarget(token);
+    }
+
+    return shouldUseCompanion
+      ? this.contractService.getHUBCompanionAddress(positionVersion)
+      : this.contractService.getHUBAddress(positionVersion);
+  }
+
   async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
     const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -1276,7 +1291,7 @@ export default class PositionService {
     return this.providerService.sendTransactionWithGasLimit(tx);
   }
 
-  async setPendingTransaction(transaction: TransactionDetails) {
+  setPendingTransaction(transaction: TransactionDetails) {
     if (
       transaction.type === TransactionTypes.newPair ||
       transaction.type === TransactionTypes.approveToken ||
@@ -1291,14 +1306,14 @@ export default class PositionService {
 
     const { typeData } = transaction;
     let { id } = typeData;
-    const network = await this.providerService.getNetwork();
-    const protocolToken = getProtocolToken(network.chainId);
-    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
 
-    if (transaction.type === TransactionTypes.newPosition) {
+    if (transaction.type === TransactionTypes.newPosition || transaction.type === TransactionTypes.bridgeFunds) {
       const newPositionTypeData = transaction.typeData;
-      id = `pending-transaction-${transaction.hash}`;
+      id = `pending-transaction-${newPositionTypeData.id}`;
       const { fromYield, toYield } = newPositionTypeData;
+
+      const protocolToken = getProtocolToken(newPositionTypeData.chainId);
+      const wrappedProtocolToken = getWrappedProtocolToken(newPositionTypeData.chainId);
 
       let fromToUse =
         newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
@@ -1322,7 +1337,7 @@ export default class PositionService {
         from: fromToUse,
         to: toToUse,
         user: this.walletService.getAccount(),
-        chainId: network.chainId,
+        chainId: newPositionTypeData.chainId,
         positionId: id,
         toWithdraw: BigNumber.from(0),
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
@@ -1440,16 +1455,20 @@ export default class PositionService {
     switch (transaction.type) {
       case TransactionTypes.newPosition: {
         const newPositionTypeData = transaction.typeData;
-        const newId = newPositionTypeData.id;
+        const { newId } = newPositionTypeData;
+
+        if (!newId) {
+          return;
+        }
         if (!this.currentPositions[`${newId}-v${newPositionTypeData.version}`]) {
           this.currentPositions[`${newId}-v${newPositionTypeData.version}`] = {
-            ...this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
+            ...this.currentPositions[`pending-transaction-${newPositionTypeData.id}-v${newPositionTypeData.version}`],
             pendingTransaction: '',
             id: `${newId}-v${newPositionTypeData.version}`,
             positionId: newId,
           };
         }
-        delete this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
+        delete this.currentPositions[`pending-transaction-${newPositionTypeData.id}-v${newPositionTypeData.version}`];
         this.pairService.addNewPair(
           newPositionTypeData.from,
           newPositionTypeData.to,

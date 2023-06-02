@@ -36,7 +36,7 @@ export function useTransactionAdder(): (response: TransactionResponse, customDat
         addTransaction({
           hash,
           from: walletService.getAccount(),
-          chainId: currentNetwork.chainId,
+          chainId: response.chainId || currentNetwork.chainId,
           ...customData,
           position: customData.position && { ...customData.position },
         })
@@ -54,11 +54,10 @@ export function useTransactionAdder(): (response: TransactionResponse, customDat
       } catch (e) {
         console.error('Error sending transaction event to arcx');
       }
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction({
         hash,
         from: walletService.getAccount(),
-        chainId: currentNetwork.chainId,
+        chainId: response.chainId || currentNetwork.chainId,
         addedTime: new Date().getTime(),
         retries: 0,
         ...customData,

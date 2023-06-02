@@ -1,7 +1,7 @@
 import React from 'react';
 import find from 'lodash/find';
 import { TransactionDetails, Position, TransactionTypes } from '@types';
-import { STRING_SWAP_INTERVALS } from '@constants';
+import { NETWORKS, STRING_SWAP_INTERVALS } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
@@ -72,6 +72,28 @@ function useBuildTransactionMessages() {
             {
               from: newPositionTypeData.from.symbol,
               to: newPositionTypeData.to.symbol,
+            }
+          );
+          break;
+        }
+        case TransactionTypes.bridgeFunds: {
+          const bridgeFundsTypeData = tx.typeData;
+
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const chainFrom = find(NETWORKS, { chainId: bridgeFundsTypeData.fundWith.chainId })!;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const chainTo = find(NETWORKS, { chainId: bridgeFundsTypeData.chainId })!;
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionMessagesBridgeFunds',
+              defaultMessage: 'Bridging {fundWith} from {chainFrom} to {chainTo} to create {from}:{to} position',
+            }),
+            {
+              from: bridgeFundsTypeData.from.symbol,
+              to: bridgeFundsTypeData.to.symbol,
+              fundWith: bridgeFundsTypeData.fundWith.symbol,
+              chainFrom: chainFrom.name,
+              chainTo: chainTo.name,
             }
           );
           break;

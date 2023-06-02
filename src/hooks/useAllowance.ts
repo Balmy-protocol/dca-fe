@@ -8,6 +8,7 @@ import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import useAccount from './useAccount';
+import useConnextService from './useConnextService';
 
 export type Allowance = {
   token: Token;
@@ -40,12 +41,19 @@ function useAllowance(
   const prevResult = usePrevious(result, false, 'allowance');
   const prevUsesYield = usePrevious(usesYield);
   const prevVersion = usePrevious(version);
+  const connextService = useConnextService();
 
   React.useEffect(() => {
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await walletService.getAllowance(from, usesYield, version);
+          let promiseResult: Allowance;
+          if (from.chainId === currentNetwork.chainId) {
+            promiseResult = await walletService.getAllowance(from, usesYield, version);
+          } else {
+            const allowanceTarget = connextService.getAllowanceTarget(from);
+            promiseResult = await walletService.getSpecificAllowance(from, allowanceTarget);
+          }
           setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: dummyToken, error: e as string, isLoading: false });

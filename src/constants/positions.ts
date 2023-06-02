@@ -4,9 +4,9 @@ import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
 
 export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
-  [NETWORKS.optimism.chainId]: 1,
-  [NETWORKS.arbitrum.chainId]: 1,
-  [NETWORKS.polygon.chainId]: 1,
+  [NETWORKS.optimism.chainId]: 0.00001,
+  [NETWORKS.arbitrum.chainId]: 0.00001,
+  [NETWORKS.polygon.chainId]: 0.00001,
   [NETWORKS.mainnet.chainId]: 5,
 };
 

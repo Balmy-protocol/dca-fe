@@ -56,6 +56,7 @@ export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
 export type TransactionActionApproveTokenSignType = 'APPROVE_TOKEN_SIGN';
 export type TransactionActionWaitForSignApprovalType = 'WAIT_FOR_SIGN_APPROVAL';
 export type TransactionActionWaitForApprovalType = 'WAIT_FOR_APPROVAL';
+export type TransactionActionWaitForBridgingType = 'WAIT_FOR_BRIDGING';
 export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
 export type TransactionActionCreatePositionType = 'CREATE_POSITION';
@@ -67,6 +68,8 @@ export type TransactionActionType =
   | TransactionActionWaitForApprovalType
   | TransactionActionWaitForSimulationType
   | TransactionActionWaitForSignApprovalType
+  | TransactionActionWaitForBridgingType
+  | TransactionActionSwapType
   | TransactionActionSwapType
   | TransactionActionCreatePositionType;
 
@@ -79,6 +82,13 @@ export interface TransactionActionApproveTokenData {
 export interface TransactionActionWaitForApprovalData {
   token: Token;
   amount: BigNumber;
+}
+
+export interface TransactionActionWaitForBridgingData {
+  token: Token;
+  amount: BigNumber;
+  chainFrom: string;
+  chainTo: string;
 }
 
 export interface TransactionActionWaitForSimulationData {

@@ -433,7 +433,7 @@ const TokenPicker = ({
   onAddToken,
   multichain,
 }: TokenPickerProps) => {
-  const tokenList = useTokenList(isAggregator, true, true, multichain);
+  const tokenList = useTokenList(isAggregator, true, multichain);
   const searchInputRef = React.useRef<HTMLElement>();
   const [search, setSearch] = React.useState('');
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
@@ -524,15 +524,7 @@ const TokenPicker = ({
     // }
 
     return filteredTokens;
-  }, [
-    tokensToUse,
-    search,
-    ignoreValues,
-    availableFrom,
-    otherIsProtocol,
-    currentNetwork.chainId,
-    otherSelected,
-  ]);
+  }, [tokensToUse, search, ignoreValues, availableFrom, otherIsProtocol, currentNetwork.chainId, otherSelected]);
 
   const rawMemoTokensToUse = React.useMemo(() => tokensToUse.sort(), [tokensToUse]);
 
@@ -611,6 +603,7 @@ const TokenPicker = ({
             !multichain ||
             (balances &&
               balances[token.chainId] &&
+              balances[token.chainId][token.address] &&
               balances[token.chainId][token.address].balance.gt(BigNumber.from(0)))
         ),
     ],
