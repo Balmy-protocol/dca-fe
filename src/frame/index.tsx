@@ -32,6 +32,9 @@ import useAccount from '@hooks/useAccount';
 import useSdkChains from '@hooks/useSdkChains';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
+import Alert from '@mui/material/Alert';
+import { FormattedMessage } from 'react-intl';
+import Link from '@mui/material/Link';
 import EulerClaimFrame from '@pages/euler-claim/frame';
 import AppFooter from './components/footer';
 import FeedbackCard from './components/feedback-card';
@@ -58,6 +61,13 @@ declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   export interface DefaultTheme extends Theme {}
 }
+
+const StyledLink = styled(Link)`
+  margin: 0px 5px;
+  ${({ theme: usedTheme }) => `
+    color: ${usedTheme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
 
 const StyledVector1Container = styled.div`
   position: fixed;
@@ -168,6 +178,20 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
               </StyledVector2Container>
               <StyledContainer>
                 <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
+                  <Grid item xs={12}>
+                    <Alert severity="warning">
+                      <FormattedMessage
+                        description="optimismBedrockWarning"
+                        defaultMessage="On June 6th, Optimism Mainnet will upgrade to Bedrock. During the upgrade, we expected downtime from ~9am - 1pm PST, when new transactions will not be accepted. Check its status here."
+                      />
+                      <StyledLink
+                        href="https://oplabs.notion.site/Bedrock-Mission-Control-EXTERNAL-fca344b1f799447cb1bcf3aae62157c5"
+                        target="_blank"
+                      >
+                        <FormattedMessage description="here" defaultMessage="here." />
+                      </StyledLink>
+                    </Alert>
+                  </Grid>
                   <StyledAppGridContainer item xs={12}>
                     <ErrorBoundary error={initializationError}>
                       <Switch>
