@@ -181,7 +181,7 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                     <Alert severity="warning">
                       <FormattedMessage
                         description="optimismBedrockWarning"
-                        defaultMessage="On June 6th, Optimism Mainnet will upgrade to Bedrock. During the upgrade, we expected downtime from ~9am - 1pm PST, when new transactions will not be accepted. Check its status"
+                        defaultMessage="On June 6th, Optimism Mainnet will upgrade to Bedrock. During the upgrade, some downtime is expected between ~9am to 1pm PST. During this time window, new transactions will not be accepted. You can check the upgrade status"
                       />
                       <StyledLink
                         href="https://oplabs.notion.site/Bedrock-Mission-Control-EXTERNAL-fca344b1f799447cb1bcf3aae62157c5"
