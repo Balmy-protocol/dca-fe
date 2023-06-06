@@ -18,10 +18,15 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
+          
       - name: Install dependencies
         run: yarn install --pure-lockfile
+
       - name: Build
         run: yarn build
+        env:
+          MIXPANEL_TOKEN: ${{ secrets.DEVELOPMENT_MIXPANEL_TOKEN }}
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -29,7 +34,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+
       - name: Deploy
         run: aws s3 sync ./dist s3://${{ secrets.AWS_S3_PLAYGROUND_ID }} --exclude "*" --include "bundle.js.map" --include "bundle.js"
+
       - name: Create invalidation
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_PLAYGROUND_ID }} --paths "/bundle.js.map" "/bundle.js"
