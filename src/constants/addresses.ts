@@ -675,6 +675,8 @@ export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST', 'jEUR', 'jGBP
 
 export const MEAN_API_URL = 'https://api.mean.finance';
 
+export const MEAN_PROXY_PANEL_URL = 'https://mean-finance-mixpanel-proxy.herokuapp.com';
+
 export const SIGN_VERSION: Record<PositionVersions, string> = {
   [POSITION_VERSION_1]: '1',
   [POSITION_VERSION_2]: '1',

@@ -18,8 +18,7 @@ import { FormattedMessage } from 'react-intl';
 import { parseUnits } from '@ethersproject/units';
 import { SORT_MOST_PROFIT, SORT_MOST_RETURN } from '@constants/aggregator';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
-import { MAX_BI } from '@constants';
-import { BigNumber } from 'ethers';
+import { BigNumber, constants } from 'ethers';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { setSelectedRoute } from '@state/aggregator/actions';
@@ -211,7 +210,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
   const [allowance] = useSpecificAllowance(quote.sellToken, quote.swapper.allowanceTarget);
 
   const parsedAllowance = allowance.allowance && parseUnits(allowance.allowance || '0', quote.sellToken.decimals);
-  const isApproved = (parsedAllowance || MAX_BI).gte(BigNumber.from(quote.maxSellAmount.amount));
+  const isApproved = (parsedAllowance || constants.MaxUint256).gte(BigNumber.from(quote.maxSellAmount.amount));
 
   if (isBuyOrder) {
     isWorsePrice = quote.sellAmount.amount.gt(bestQuote?.sellAmount.amount || 0);

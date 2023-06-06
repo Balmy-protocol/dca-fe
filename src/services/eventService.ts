@@ -1,7 +1,7 @@
 import md5 from 'md5';
 import MixpanelLibray, { Mixpanel, Response } from 'mixpanel-browser';
 import ProviderService from './providerService';
-import { NETWORKS } from '@constants/addresses';
+import { MEAN_PROXY_PANEL_URL, NETWORKS } from '@constants/addresses';
 import find from 'lodash/find';
 
 export default class EventService {
@@ -11,11 +11,7 @@ export default class EventService {
 
   constructor(providerService: ProviderService) {
     this.providerService = providerService;
-    this.mixpanel = MixpanelLibray.init(
-      '7f62e8855fcbcd72de460ba40b6fc06b',
-      { api_host: 'https://mean-finance-mixpanel-proxy.herokuapp.com' },
-      ' '
-    );
+    this.mixpanel = MixpanelLibray.init('7f62e8855fcbcd72de460ba40b6fc06b', { api_host: MEAN_PROXY_PANEL_URL }, ' ');
     this.mixpanel.set_config({ persistence: 'localStorage', ignore_dnt: true });
   }
 
