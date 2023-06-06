@@ -10,4 +10,9 @@ module.exports = merge(common, {
     historyApiFallback: true,
     hot: true,
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.MIXPANEL_TOKEN': JSON.stringify('88e3c264a8903a720090734b3e908fa4'),
+    }),
+  ],
 });
