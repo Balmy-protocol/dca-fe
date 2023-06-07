@@ -26,6 +26,9 @@ jobs:
         run: yarn build
         env:
           MIXPANEL_TOKEN: ${{ secrets.DEVELOPMENT_MIXPANEL_TOKEN }}
+          ARCX_KEY: ${{ secrets.ARCX_KEY }}
+          ETHPLORER_KEY: ${{ secrets.ETHPLORER_KEY }}
+          ETHERSCAN_API: ${{ secrets.ETHERSCAN_API }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

@@ -17,7 +17,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import InsightsIcon from '@mui/icons-material/Insights';
 import AddIcon from '@mui/icons-material/Add';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { useAppDispatch } from '@state/hooks';
@@ -157,10 +156,6 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       setOpenFirstSubtab(false);
       dispatch(changeMainTab(2));
       pushToHistory('/swap');
-    } else if (location.pathname === '/jbrl-competition') {
-      setOpenFirstSubtab(false);
-      dispatch(changeMainTab(3));
-      pushToHistory('/jbrl-competition');
     } else if (location.pathname === '/' || location.pathname === '/create') {
       dispatch(changeMainTab(0));
       dispatch(changeSubTab(0));
@@ -268,14 +263,6 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="swap" defaultMessage="Swap" />} />
             </ListItemButton>
-            <ListItemButton onClick={() => handleTabChange({ index: 3, url: 'jbrl-competition' })}>
-              <ListItemIcon>
-                <EmojiEventsIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
-              />
-            </ListItemButton>
           </List>
           <Divider />
           <List>
@@ -339,11 +326,6 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                   label={<FormattedMessage description="swap" defaultMessage="Swap" />}
                   value={2}
                 />
-                {/* <StyledTab
-                  onClick={() => handleTabChange({ index: 3, url: 'jbrl-competition' })}
-                  label={<FormattedMessage description="jCompetition" defaultMessage="jBRL Competition" />}
-                  value={3}
-                /> */}
               </StyledTabs>
             </StyledNavbarMainContent>
           )}

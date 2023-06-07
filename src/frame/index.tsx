@@ -5,7 +5,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Container from '@mui/material/Container';
-import JbrlCompetition from '@pages/jbrl-competition';
 import DCA from '@pages/dca';
 import Aggregator from '@pages/aggregator';
 import FAQ from '@pages/faq';
@@ -184,11 +183,6 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                         <Route path="/:chainId/positions/:positionVersion/:positionId">
                           {/* <RollbarContext context="/positions/details"> */}
                           <PositionDetail />
-                          {/* </RollbarContext> */}
-                        </Route>
-                        <Route path="/jbrl-competition">
-                          {/* <RollbarContext context="/leaderboard"> */}
-                          <JbrlCompetition />
                           {/* </RollbarContext> */}
                         </Route>
                         <Route path="/positions">
