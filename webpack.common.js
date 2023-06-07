@@ -1,4 +1,5 @@
 const path = require('path');
+const dotenv = require('dotenv');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const tsTransformer = require('@formatjs/ts-transformer');
 const webpack = require('webpack');
@@ -7,6 +8,7 @@ const WebpackBar = require('webpackbar');
 const { mean } = require('lodash');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
+const env = dotenv.config();
 
 module.exports = {
   entry: {
@@ -24,10 +26,10 @@ module.exports = {
       process: 'process/browser.js',
     }),
     new webpack.DefinePlugin({
-      'process.env.ETHPLORER_KEY': JSON.stringify('EK-7xNxe-HDazjQ3-smGdU'),
+      'process.env.ETHPLORER_KEY': JSON.stringify(process.env.ETHPLORER_KEY),
     }),
     new webpack.DefinePlugin({
-      'process.env.ETHERSCAN_API': JSON.stringify('4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF'),
+      'process.env.ETHERSCAN_API': JSON.stringify(process.env.ETHERSCAN_API),
     }),
     new WebpackBar(),
   ],
