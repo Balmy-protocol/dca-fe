@@ -31,7 +31,6 @@ import useAccount from '@hooks/useAccount';
 import useSdkChains from '@hooks/useSdkChains';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
-import Link from '@mui/material/Link';
 import EulerClaimFrame from '@pages/euler-claim/frame';
 import AppFooter from './components/footer';
 import FeedbackCard from './components/feedback-card';
