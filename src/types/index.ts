@@ -24,16 +24,13 @@ export type Web3ServicePromisableMethods =
   | 'disconnect'
   | 'setUpModal'
   | 'getBalance'
-  | 'getEstimatedPairCreation'
   | 'getCurrentPositions'
   | 'getNetwork'
   | 'getUsedTokens'
   | 'getAvailablePairs'
   | 'getAllowance'
   | 'canSupportPair'
-  | 'getPastPositions'
-  | 'getPairOracle'
-  | 'getUsdPrice';
+  | 'getPastPositions';
 
 export interface Network {
   chainId: number;

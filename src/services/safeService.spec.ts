@@ -15,7 +15,7 @@ jest.useFakeTimers();
 
 const MockedSafeAppSdk = jest.mocked(SafeAppsSDK, { shallow: true });
 
-describe('Simulation Service', () => {
+describe('Safe Service', () => {
   let safeService: SafeService;
   let getBySafeTxHashMock: jest.Mock;
   let sendMock: jest.Mock;

@@ -1,0 +1,66 @@
+describe('Mean API Service', () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+    jest.restoreAllMocks();
+  });
+
+  describe('getDeadlineSlippageDefault', () => {
+    test('it should return the default deadline and slippage when its a safe app', async () => {});
+
+    test('it should return an empty object when its not a safe app', async () => {});
+  });
+
+  describe('getDepositTx', () => {
+    test('it should call the mean api and return the tx received', async () => {});
+  });
+
+  describe('getUnderlyingTokens', () => {
+    test('it should filter tokens that dont have an underlying and return the underlying data from the api', async () => {});
+  });
+
+  describe('withdrawSwappedUsingOtherToken', () => {
+    test('it should call the mean api and send the transaction', async () => {});
+  });
+
+  describe('terminateUsingOtherTokens', () => {
+    test('it should call the mean api and send the transaction', async () => {});
+  });
+
+  describe('getIncreasePositionUsingOtherTokenTx', () => {
+    test('it should call the mean api and return the tx received', async () => {});
+  });
+
+  describe('getReducePositionUsingOtherTokenTx', () => {
+    test('it should call the mean api and return the tx received', async () => {});
+  });
+
+  describe('migratePosition', () => {
+    test('it should call the mean api and send the transaction', async () => {});
+  });
+
+  describe('getAllowedPairs', () => {
+    test('it should call the mean api and map the tokens to the Token object', async () => {});
+  });
+
+  describe('logError', () => {
+    test('it should call the mean api to log the error', async () => {});
+  });
+
+  describe('logFeedback', () => {
+    test('it should call the mean api to log the feedback', async () => {});
+  });
+
+  describe('trackEvent', () => {
+    test('it should call the mean api to track the event', async () => {});
+  });
+
+  describe('simulateTransaction', () => {
+    test('it should call the mean api to simulate the transaction', async () => {});
+  });
+
+  describe('getCampaigns', () => {
+    describe('Optimism campaing', () => {
+      test('it should call the mean api to get the user proof and return the campaign', async () => {});
+    });
+  });
+});

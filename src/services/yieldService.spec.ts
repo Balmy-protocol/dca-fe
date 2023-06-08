@@ -55,7 +55,7 @@ jest.mock('@constants/yield', () => ({
 }));
 
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
-describe('Transaction Service', () => {
+describe('Yield Service', () => {
   let yieldService: YieldService;
   let providerService: jest.MockedObject<ProviderService>;
   let axiosClient: MockAdapter;

@@ -6,7 +6,7 @@ jest.mock('./meanApiService');
 
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 
-describe('Transaction Service', () => {
+describe('Error Service', () => {
   let errorService: ErrorService;
   let meanApiService: jest.MockedObject<MeanApiService>;
 

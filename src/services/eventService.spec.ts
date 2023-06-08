@@ -15,7 +15,7 @@ const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedMd5 = jest.mocked(md5, { shallow: true });
 
-describe('Transaction Service', () => {
+describe('Event Service', () => {
   let eventService: EventService;
   let meanApiService: jest.MockedObject<MeanApiService>;
   let providerService: jest.MockedObject<ProviderService>;

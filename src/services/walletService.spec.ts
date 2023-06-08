@@ -27,7 +27,7 @@ const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
 const MockedEthers = jest.mocked(ethers, { shallow: true });
 
-describe('Contract Service', () => {
+describe('Wallet Service', () => {
   let walletService: WalletService;
   let providerService: jest.MockedObject<ProviderService>;
   let contractService: jest.MockedObject<ContractService>;
