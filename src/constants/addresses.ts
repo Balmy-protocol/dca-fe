@@ -96,6 +96,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
     chainId: 56,
     name: 'BNB',
     mainCurrency: 'BNB',
+    mainColor: '#FCD535',
     nativeCurrency: {
       name: 'BNB',
       symbol: 'BNB',

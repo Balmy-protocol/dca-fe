@@ -72,6 +72,7 @@ const StyledLabelContainer = styled.div`
 
 const COLORS = {
   ETH: '#3076F6',
+  BNB: '#FCD535',
   MATIC: '#6f41d8',
   OP: '#FF0615',
   LINK: '#2a5ada',
@@ -97,7 +98,7 @@ const COLORS = {
   GMX: '#25c1d2',
 };
 
-const DEFAULT_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const DEFAULT_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FCD535'];
 
 const BorderLinearProgress = withStyles(() =>
   createStyles({
