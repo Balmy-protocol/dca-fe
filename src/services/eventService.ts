@@ -25,7 +25,7 @@ export default class EventService {
     const network = await this.providerService.getNetwork();
     const foundNetwork = find(NETWORKS, { chainId: network.chainId });
     try {
-      return this.mixpanel.track(action, {
+      this.mixpanel.track(action, {
         chainId: network.chainId,
         chainName: foundNetwork?.name,
         ...(extraData || {}),
