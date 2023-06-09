@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import find from 'lodash/find';
+import isUndefined from 'lodash/isUndefined';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import Modal from '@common/components/modal';
 import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
@@ -13,6 +15,7 @@ import {
   MINIMUM_USD_RATE_FOR_DEPOSIT,
   MINIMUM_USD_RATE_FOR_YIELD,
   ModeTypesIds,
+  NETWORKS,
   PERMISSIONS,
   STRING_SWAP_INTERVALS,
 } from '@constants';
@@ -540,7 +543,10 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       ? MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD
       : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT;
 
-  const hasEnoughUsdForModify = !!usdPrice && rateUsdPrice >= minimumToUse;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const positionNetwork = find(NETWORKS, { chainId: position.chainId })!;
+
+  const hasEnoughUsdForModify = positionNetwork.testnet || (!isUndefined(usdPrice) && rateUsdPrice >= minimumToUse);
 
   const shouldDisableByUsd =
     rate !== '' && parseUnits(rate, from?.decimals).gt(BigNumber.from(0)) && !hasEnoughUsdForModify;
