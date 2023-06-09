@@ -3348,7 +3348,7 @@
     "@openzeppelin/contracts" "4.7.3"
     base64-sol "1.0.1"
 
-"@mean-finance/oracles@2.1.4", "@mean-finance/oracles@^2.1.4":
+"@mean-finance/oracles@2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@mean-finance/oracles/-/oracles-2.1.4.tgz#6b47ae1f7870daf7765ef8acdd0b1f3275ccd771"
   integrity sha512-jlNFlBibR+eGUW2INRvU16nD+qhk2SONRzswa42oK6QC1kGHILXIcdMNual4UsnFFuVw9Q+lH4O5swMoaQc9dg==
