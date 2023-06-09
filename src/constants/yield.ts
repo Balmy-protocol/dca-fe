@@ -455,6 +455,13 @@ export const ALLOWED_YIELDS: Record<
       name: 'Aave V3',
       token: emptyTokenWithAddress('AAVE'),
     },
+    {
+      id: 'e62bcb01-ed4c-4ec9-8cfa-e86e7ccf7688', // aave-v3 wstETH
+      tokenAddress: '0xca362c48eb09e39a31b3bd0a305737b11df10808', // aave-v3 wstETH
+      poolId: 'e62bcb01-ed4c-4ec9-8cfa-e86e7ccf7688', // aave-v3 wstETH
+      name: 'Aave V3',
+      token: emptyTokenWithAddress('AAVE'),
+    },
     // {
     //   id: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
     //   tokenAddress: '0x1a55d9164417856ad31df3705bbc263c380e56b1', // beefy GNS
