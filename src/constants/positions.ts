@@ -93,7 +93,6 @@ export const WHALE_MODE_FREQUENCIES = {
     FIVE_MINUTES.toString(),
     FIFTEEN_MINUTES.toString(),
     THIRTY_MINUTES.toString(),
-    ONE_HOUR.toString(),
   ],
 };
 
@@ -151,7 +150,6 @@ export const WHALE_MINIMUM_VALUES = {
     [FIVE_MINUTES.toString()]: 0,
     [FIFTEEN_MINUTES.toString()]: 0,
     [THIRTY_MINUTES.toString()]: 0,
-    [ONE_HOUR.toString()]: 0,
   },
 };
 
