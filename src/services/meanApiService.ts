@@ -100,34 +100,6 @@ export default class MeanApiService {
     return transactionResponse.data.tx;
   }
 
-  async deposit(
-    takeFrom: string,
-    from: string,
-    to: string,
-    totalAmmount: BigNumber,
-    swaps: BigNumber,
-    interval: BigNumber,
-    account: string,
-    permissions: { operator: string; permissions: number[] }[],
-    yieldFrom?: string,
-    yieldTo?: string
-  ) {
-    const transaction = await this.getDepositTx(
-      takeFrom,
-      from,
-      to,
-      totalAmmount,
-      swaps,
-      interval,
-      account,
-      permissions,
-      yieldFrom,
-      yieldTo
-    );
-
-    return this.providerService.sendTransactionWithGasLimit(transaction);
-  }
-
   async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
     const tokensToUse = tokens.filter((tokenObj) => !!tokenObj.token.underlyingTokens.length);
 
@@ -230,26 +202,6 @@ export default class MeanApiService {
     return transactionResponse.data.tx;
   }
 
-  async increasePositionUsingOtherToken(
-    id: string,
-    newAmount: BigNumber,
-    newSwaps: BigNumber,
-    positionVersion: PositionVersions,
-    tokenFrom: string,
-    permissionPermit?: PermissionPermit
-  ) {
-    const transaction = await this.getIncreasePositionUsingOtherTokenTx(
-      id,
-      newAmount,
-      newSwaps,
-      positionVersion,
-      tokenFrom,
-      permissionPermit
-    );
-
-    return this.providerService.sendTransactionWithGasLimit(transaction);
-  }
-
   async getReducePositionUsingOtherTokenTx(
     id: string,
     newAmount: BigNumber,
@@ -281,28 +233,6 @@ export default class MeanApiService {
     );
 
     return transactionResponse.data.tx;
-  }
-
-  async reducePositionUsingOtherToken(
-    id: string,
-    newAmount: BigNumber,
-    newSwaps: BigNumber,
-    recipient: string,
-    positionVersion: PositionVersions,
-    tokenFrom: string,
-    permissionPermit?: PermissionPermit
-  ) {
-    const transaction = await this.getReducePositionUsingOtherTokenTx(
-      id,
-      newAmount,
-      newSwaps,
-      recipient,
-      positionVersion,
-      tokenFrom,
-      permissionPermit
-    );
-
-    return this.providerService.sendTransactionWithGasLimit(transaction);
   }
 
   async migratePosition(
@@ -350,25 +280,6 @@ export default class MeanApiService {
     } catch {
       return [];
     }
-  }
-
-  async getAllowanceTarget() {
-    const currentNetwork = await this.providerService.getNetwork();
-    const allowanceResponse = await this.axiosClient.get<{ allowanceTarget: string }>(
-      `${MEAN_API_URL}/v1/swap/networks/${currentNetwork.chainId}/allowance-target`,
-      {
-        headers: {
-          'Cache-Control': 'no-cache',
-          Pragma: 'no-cache',
-          Expires: '0',
-        },
-        cache: {
-          maxAge: 0,
-        },
-      }
-    );
-
-    return allowanceResponse.data.allowanceTarget;
   }
 
   async logError(error: string, errorMessage: string, extraData?: unknown) {

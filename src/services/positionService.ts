@@ -440,37 +440,6 @@ export default class PositionService {
     };
   }
 
-  async migratePosition(position: Position): Promise<TransactionResponse> {
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
-    let permissionsPermit: PermissionPermit | undefined;
-    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
-
-    if (!companionHasPermission) {
-      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
-        position,
-        companionAddress,
-        PERMISSIONS.TERMINATE
-      );
-      permissionsPermit = {
-        permissions,
-        deadline: deadline.toString(),
-        v,
-        r: hexlify(r),
-        s: hexlify(s),
-        tokenId: position.positionId,
-      };
-    }
-
-    return this.meanApiService.migratePosition(
-      position.positionId,
-      position.from.address,
-      position.to.address,
-      this.walletService.getAccount(),
-      position.version,
-      permissionsPermit
-    );
-  }
-
   async migrateYieldPosition(
     position: Position,
     fromYield?: YieldOption | null,
@@ -513,62 +482,9 @@ export default class PositionService {
 
   async companionHasPermission(position: Position, permission: number) {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
-
-    if (!companionAddress) {
-      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
-    }
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
     return permissionManagerInstance.hasPermission(position.positionId, companionAddress, permission);
-  }
-
-  async companionIsApproved(position: Position): Promise<boolean> {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
-
-    if (!companionAddress) {
-      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
-    }
-
-    try {
-      await permissionManagerInstance.ownerOf(position.positionId);
-    } catch (e) {
-      // hack for when the subgraph has not updated yet but the position has been terminated
-      const error = e as { data?: { message?: string } };
-      if (
-        error &&
-        error.data &&
-        error.data.message &&
-        error.data.message === 'execution reverted: ERC721: owner query for nonexistent token'
-      )
-        return true;
-    }
-
-    const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
-      permissionManagerInstance.hasPermission(position.positionId, companionAddress, PERMISSIONS.INCREASE),
-      permissionManagerInstance.hasPermission(position.positionId, companionAddress, PERMISSIONS.REDUCE),
-      permissionManagerInstance.hasPermission(position.positionId, companionAddress, PERMISSIONS.WITHDRAW),
-      permissionManagerInstance.hasPermission(position.positionId, companionAddress, PERMISSIONS.TERMINATE),
-    ]);
-
-    return hasIncrease && hasReduce && hasWithdraw && hasTerminate;
-  }
-
-  async approveCompanionForPosition(position: Position): Promise<TransactionResponse> {
-    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
-
-    if (!companionAddress) {
-      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
-    }
-
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-
-    return permissionManagerInstance.modify(position.positionId, [
-      {
-        operator: companionAddress,
-        permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE, PERMISSIONS.WITHDRAW],
-      },
-    ]);
   }
 
   async modifyPermissions(position: Position, newPermissions: PositionPermission[]): Promise<TransactionResponse> {
@@ -771,11 +687,7 @@ export default class PositionService {
         useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address
       );
     }
-    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
-
-    if (!companionAddress) {
-      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
-    }
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
@@ -961,11 +873,7 @@ export default class PositionService {
   ) {
     const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
-
-    if (!companionAddress) {
-      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
-    }
+    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -1244,6 +1152,7 @@ export default class PositionService {
       transaction.type === TransactionTypes.approveTokenExact ||
       transaction.type === TransactionTypes.swap ||
       transaction.type === TransactionTypes.wrap ||
+      transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
       transaction.type === TransactionTypes.wrapEther
     )

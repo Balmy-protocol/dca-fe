@@ -1,34 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { DCAHub__factory, DCAPermissionsManager__factory } from '@mean-finance/dca-v2-core/dist';
 import { DCAHubCompanion__factory } from '@mean-finance/dca-v2-periphery/dist';
-import { OracleAggregator__factory } from '@mean-finance/oracles/dist';
-import { TransformerRegistry__factory } from '@mean-finance/transformers/dist';
 import { ethers, Signer } from 'ethers';
 import { Network, AlchemyProvider } from '@ethersproject/providers';
 import find from 'lodash/find';
 
 // ABIS
 import ERC20ABI from '@abis/erc20.json';
-import CHAINLINK_ORACLE_ABI from '@abis/ChainlinkOracle.json';
-import UNISWAP_ORACLE_ABI from '@abis/UniswapOracle.json';
 import OE_GAS_ORACLE_ABI from '@abis/OEGasOracle.json';
 import SMOL_DOMAIN_ABI from '@abis/SmolDomain.json';
 
 // ADDRESSES
 import {
-  CHAINLINK_ORACLE_ADDRESS,
   COMPANION_ADDRESS,
   HUB_ADDRESS,
   NETWORKS,
-  ORACLE_ADDRESS,
   PERMISSION_MANAGER_ADDRESS,
-  UNISWAP_ORACLE_ADDRESS,
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
-  TRANSFORMER_REGISTRY_ADDRESS,
   SMOL_DOMAIN_ADDRESS,
 } from '@constants';
-import { ERC20Contract, HubContract, OEGasOracle, OracleContract, SmolDomainContract, PositionVersions } from '@types';
+import { ERC20Contract, HubContract, OEGasOracle, SmolDomainContract, PositionVersions } from '@types';
 import ProviderService from './providerService';
 
 export default class ContractService {
@@ -73,47 +65,12 @@ export default class ContractService {
     );
   }
 
-  async getTransformerRegistryAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return (
-      TRANSFORMER_REGISTRY_ADDRESS[version || LATEST_VERSION][network.chainId] ||
-      TRANSFORMER_REGISTRY_ADDRESS[LATEST_VERSION][network.chainId]
-    );
-  }
-
   async getHUBCompanionAddress(version?: PositionVersions): Promise<string> {
     const network = await this.providerService.getNetwork();
 
     return (
       COMPANION_ADDRESS[version || LATEST_VERSION][network.chainId] ||
       COMPANION_ADDRESS[LATEST_VERSION][network.chainId]
-    );
-  }
-
-  async getOracleAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return (
-      ORACLE_ADDRESS[version || LATEST_VERSION][network.chainId] || ORACLE_ADDRESS[LATEST_VERSION][network.chainId]
-    );
-  }
-
-  async getChainlinkOracleAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return (
-      CHAINLINK_ORACLE_ADDRESS[version || LATEST_VERSION][network.chainId] ||
-      CHAINLINK_ORACLE_ADDRESS[LATEST_VERSION][network.chainId]
-    );
-  }
-
-  async getUniswapOracleAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return (
-      UNISWAP_ORACLE_ADDRESS[version || LATEST_VERSION][network.chainId] ||
-      UNISWAP_ORACLE_ADDRESS[LATEST_VERSION][network.chainId]
     );
   }
 
@@ -147,39 +104,11 @@ export default class ContractService {
     return DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
   }
 
-  async getTransformerRegistryInstance(version?: PositionVersions) {
-    const transformerRegistryAddress = await this.getTransformerRegistryAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getProvider();
-
-    return TransformerRegistry__factory.connect(transformerRegistryAddress, provider);
-  }
-
   async getHUBCompanionInstance(version?: PositionVersions) {
     const hubCompanionAddress = await this.getHUBCompanionAddress(version || LATEST_VERSION);
     const provider = await this.providerService.getProvider();
 
     return DCAHubCompanion__factory.connect(hubCompanionAddress, provider);
-  }
-
-  async getOracleInstance(version?: PositionVersions) {
-    const oracleAddress = await this.getOracleAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getProvider();
-
-    return OracleAggregator__factory.connect(oracleAddress, provider);
-  }
-
-  async getChainlinkOracleInstance(version?: PositionVersions): Promise<OracleContract> {
-    const chainlinkOracleAddress = await this.getChainlinkOracleAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getProvider();
-
-    return new ethers.Contract(chainlinkOracleAddress, CHAINLINK_ORACLE_ABI.abi, provider) as unknown as OracleContract;
-  }
-
-  async getUniswapOracleInstance(version?: PositionVersions): Promise<OracleContract> {
-    const uniswapOracleAddress = await this.getUniswapOracleAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getProvider();
-
-    return new ethers.Contract(uniswapOracleAddress, UNISWAP_ORACLE_ABI.abi, provider) as unknown as OracleContract;
   }
 
   async getOEGasOracleInstance(): Promise<OEGasOracle> {

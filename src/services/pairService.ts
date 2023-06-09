@@ -3,7 +3,6 @@ import findIndex from 'lodash/findIndex';
 import {
   Token,
   AvailablePairs,
-  Oracles,
   AvailablePairsGraphqlResponse,
   AvailablePairResponse,
   SwapInfo,
@@ -18,7 +17,6 @@ import {
   activePositionsPerIntervalToHasToExecute,
   calculateNextSwapAvailableAt,
   sortTokens,
-  sortTokensByAddress,
 } from '@common/utils/parsing';
 import { BigNumber } from 'ethers';
 
@@ -28,7 +26,7 @@ import gqlFetchAll from '@common/utils/gqlFetchAll';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { ORACLES, LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION, SWAP_INTERVALS_MAP } from '@constants';
+import { LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION, SWAP_INTERVALS_MAP } from '@constants';
 
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -182,66 +180,6 @@ export default class PairService {
 
   availablePairExists(token0: Token, token1: Token) {
     return !!find(this.availablePairs, { id: `${token0.address}-${token1.address}` });
-  }
-
-  async getPairOracle(pair: { tokenA: string; tokenB: string }, isExistingPair: boolean): Promise<Oracles> {
-    const connected = this.walletService.getAccount();
-
-    if (!connected) {
-      return ORACLES.CHAINLINK;
-    }
-
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const [tokenA, tokenB] = sortTokensByAddress(
-      pair.tokenA === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : pair.tokenA,
-      pair.tokenB === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : pair.tokenB
-    );
-
-    if (isExistingPair) {
-      const oracleInstance = await this.contractService.getOracleInstance();
-      const oracleInUse: Oracles = ORACLES.NONE;
-      try {
-        const oracleInUseAddress = (await oracleInstance.assignedOracle(tokenA, tokenB)).oracle;
-        const chainlinkAddress = await this.contractService.getChainlinkOracleAddress();
-        const isChainlink = oracleInUseAddress === chainlinkAddress;
-
-        if (isChainlink) {
-          return ORACLES.CHAINLINK;
-        }
-
-        const uniswapAddress = await this.contractService.getUniswapOracleAddress();
-        const isUniswap = oracleInUseAddress === uniswapAddress;
-
-        if (isUniswap) {
-          return ORACLES.UNISWAP;
-        }
-      } catch (e) {
-        console.error('Error fetching oracle in use for existing pair', pair, e);
-      }
-
-      return oracleInUse;
-    }
-
-    const chainLinkOracle = await this.contractService.getChainlinkOracleInstance();
-    const uniswapOracle = await this.contractService.getUniswapOracleInstance();
-
-    let oracleInUse: Oracles = ORACLES.NONE;
-    try {
-      const chainlinkSupportsPair = await chainLinkOracle.canSupportPair(tokenA, tokenB);
-      if (chainlinkSupportsPair) {
-        oracleInUse = ORACLES.CHAINLINK;
-      } else {
-        const uniswapSupportsPair = await uniswapOracle.canSupportPair(tokenA, tokenB);
-        if (uniswapSupportsPair) {
-          oracleInUse = ORACLES.UNISWAP;
-        }
-      }
-    } catch (e) {
-      console.error('Error fetching oracle support for pair', pair, e);
-    }
-
-    return oracleInUse;
   }
 
   async canSupportPair(tokenFrom: Token, tokenTo: Token) {

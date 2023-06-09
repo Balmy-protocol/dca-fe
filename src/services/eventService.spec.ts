@@ -14,7 +14,7 @@ const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedMd5 = jest.mocked(md5, { shallow: true });
 const MockedMixpanelBrowser = jest.mocked(mixpanel, { shallow: true });
 
-describe('Transaction Service', () => {
+describe('Event Service', () => {
   let eventService: EventService;
   let providerService: jest.MockedObject<ProviderService>;
   let setConfigMock: jest.Mock;
