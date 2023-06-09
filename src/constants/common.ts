@@ -1,9 +1,6 @@
-import { BigNumber } from 'ethers/lib/ethers';
 import { TransactionActionType, PositionVersions } from '@types';
 
 export const MAX_UINT_32 = 4294967295;
-
-export const MAX_BI = BigNumber.from('115792089237316195423570985008687907853269984665640564039457584007913129639935');
 
 export const {
   POSITION_VERSION_1, // BETA

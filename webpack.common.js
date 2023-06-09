@@ -31,6 +31,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.ETHERSCAN_API': JSON.stringify(process.env.ETHERSCAN_API),
     }),
+    new webpack.DefinePlugin({
+      'process.env.MIXPANEL_TOKEN': JSON.stringify(process.env.MIXPANEL_TOKEN),
+    }),
     new WebpackBar(),
   ],
   devtool: 'source-map',
