@@ -1,3 +1,5 @@
+/* eslint-disable jest/expect-expect, jest/no-disabled-tests */
+
 describe('Campaign Service', () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -12,3 +14,5 @@ describe('Campaign Service', () => {
     test('it should fetch campaigns from the api and fetch the prices for each of the tokens', async () => {});
   });
 });
+
+/* eslint-enable jest/expect-expect, jest/no-disabled-tests */

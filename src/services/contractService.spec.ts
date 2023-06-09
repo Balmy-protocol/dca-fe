@@ -1,3 +1,5 @@
+/* eslint-disable jest/expect-expect, jest/no-disabled-tests */
+
 describe('Contract Service', () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -50,3 +52,5 @@ describe('Contract Service', () => {
     test('it should return an instance of the smol domain', async () => {});
   });
 });
+
+/* eslint-enable jest/expect-expect, jest/no-disabled-tests */

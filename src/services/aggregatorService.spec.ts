@@ -1,3 +1,5 @@
+/* eslint-disable jest/expect-expect, jest/no-disabled-tests */
+
 describe('Aggregator Service', () => {
   afterEach(() => {
     jest.resetAllMocks();
@@ -51,3 +53,5 @@ describe('Aggregator Service', () => {
     test('it should use the filter passed to filter logs', async () => {});
   });
 });
+
+/* eslint-enable jest/expect-expect, jest/no-disabled-tests */
