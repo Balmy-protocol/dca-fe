@@ -608,7 +608,7 @@ export const BLOWFISH_ENABLED_CHAINS = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.bsc.chainId,
-  NETWORKS.optimism.chainId,
+  // NETWORKS.optimism.chainId,
 ];
 
 export const ZRX_API_ADDRESS: Record<number, string> = {
