@@ -2,7 +2,7 @@ import React from 'react';
 import find from 'lodash/find';
 import compact from 'lodash/compact';
 import useSdkChains from '@hooks/useSdkChains';
-import { getAllChains } from '@mean-finance/sdk';
+import { Chain, getAllChains } from '@mean-finance/sdk';
 import { NETWORKS } from '@constants';
 
 function useSdkMappedChains() {
@@ -10,7 +10,7 @@ function useSdkMappedChains() {
 
   return React.useMemo(
     () =>
-      compact(
+      compact<Chain>(
         supportedChains.map((networkId) => {
           const foundSdkNetwork = find(
             getAllChains().filter((chain) => !chain.testnet || chain.ids.includes('base-goerli')),
@@ -24,8 +24,8 @@ function useSdkMappedChains() {
 
           return {
             ...foundSdkNetwork,
-            ...(foundNetwork || {}),
-            name: foundSdkNetwork.name.toLowerCase() || foundNetwork?.name.toLowerCase(),
+            ...((foundNetwork as unknown as Chain) || {}),
+            name: foundSdkNetwork.name.toLowerCase() || foundNetwork?.name.toLowerCase() || '',
           };
         })
       ),

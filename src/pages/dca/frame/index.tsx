@@ -61,7 +61,10 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
 
     let networkToSet = find(sdkMappedNetworks, { chainId: chainIdToUse });
     if (!networkToSet && chainId) {
-      networkToSet = find(sdkMappedNetworks, { name: chainId.toLowerCase() });
+      networkToSet = find(
+        sdkMappedNetworks,
+        ({ name, ids }) => name.toLowerCase() === chainId.toLowerCase() || ids.includes(chainId.toLowerCase())
+      );
     }
 
     if (networkToSet && SUPPORTED_NETWORKS_DCA.includes(networkToSet.chainId)) {
