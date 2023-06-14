@@ -33,18 +33,13 @@ export enum TransactionTypes {
   wrapEther = 'WRAP_ETHER',
   terminatePosition = 'TERMINATE_POSITION',
   withdrawPosition = 'WITHDRAW_POSITION',
-  addFundsPosition = 'ADD_FUNDS_POSITION',
   noOp = 'NO_OP',
-  removeFunds = 'REMOVE_FUNDS',
-  modifySwapsPosition = 'MODIFY_SWAPS_POSITION',
   modifyRateAndSwapsPosition = 'MODIFY_RATE_AND_SWAPS_POSITION',
   transferPosition = 'TRANSFER_POSITION',
   approveCompanion = 'APPROVE_COMPANION',
   modifyPermissions = 'MODIFY_PERMISSIONS',
-  migratePosition = 'MIGRATE_POSITION',
   migratePositionYield = 'MIGRATE_POSITION_YIELD',
   withdrawFunds = 'WITHDRAW_FUNDS',
-  resetPosition = 'RESET_POSITION',
   // AGGREGATOR
   swap = 'SWAP',
   wrap = 'WRAP',
@@ -128,15 +123,6 @@ export interface ModifyPermissionsTypeData {
     to: string;
   };
 }
-export interface MigratePositionTypeData {
-  type: TransactionTypes.migratePosition;
-  typeData: {
-    id: number | string;
-    from: string;
-    to: string;
-    newId?: string;
-  };
-}
 
 export interface MigratePositionYieldTypeData {
   type: TransactionTypes.migratePositionYield;
@@ -156,41 +142,6 @@ export interface ApproveCompanionTypeData {
     id: number | string;
     from: string;
     to: string;
-  };
-}
-
-export interface AddFundsTypeData {
-  type: TransactionTypes.addFundsPosition;
-  typeData: {
-    id: number | string;
-    newFunds: string;
-    decimals: number;
-  };
-}
-
-export interface ResetPositionTypeData {
-  type: TransactionTypes.resetPosition;
-  typeData: {
-    id: number | string;
-    newFunds: string;
-    newSwaps: string;
-    decimals: number;
-  };
-}
-
-export interface RemoveFundsTypeData {
-  type: TransactionTypes.removeFunds;
-  typeData: {
-    id: number | string;
-    ammountToRemove: string;
-    decimals: number;
-  };
-}
-export interface ModifySwapsPositionTypeData {
-  type: TransactionTypes.modifySwapsPosition;
-  typeData: {
-    id: number | string;
-    newSwaps: string;
   };
 }
 
@@ -316,16 +267,11 @@ export type TransactionAggregatorTypeDataOptions = SwapTypeData;
 
 export type TransactionPositionTypeDataOptions =
   | WithdrawTypeData
-  | AddFundsTypeData
-  | ModifySwapsPositionTypeData
   | ModifyRateAndSwapsPositionTypeData
   | TerminatePositionTypeData
-  | RemoveFundsTypeData
   | NewPositionTypeData
-  | ResetPositionTypeData
   | ApproveCompanionTypeData
   | ModifyPermissionsTypeData
-  | MigratePositionTypeData
   | WithdrawFundsTypeData
   | MigratePositionYieldTypeData
   | TransferTypeData
@@ -338,19 +284,14 @@ export type TransactionPositionManyTypeDataOptions = EulerClaimTerminateManyType
 export type TransactionTypeDataOptions =
   | ApproveTokenExactTypeData
   | WithdrawTypeData
-  | AddFundsTypeData
-  | ModifySwapsPositionTypeData
   | ModifyRateAndSwapsPositionTypeData
   | TerminatePositionTypeData
   | ApproveTokenTypeData
   | WrapEtherTypeData
-  | RemoveFundsTypeData
   | NewPositionTypeData
-  | ResetPositionTypeData
   | NewPairTypeData
   | ApproveCompanionTypeData
   | ModifyPermissionsTypeData
-  | MigratePositionTypeData
   | WithdrawFundsTypeData
   | MigratePositionYieldTypeData
   | TransferTypeData

@@ -361,7 +361,7 @@ export default class PositionService {
                 totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
                 totalDeposited: BigNumber.from(position.totalDeposited),
                 pendingTransaction: '',
-                pairId: position.pair.id,
+                permissions: [],
                 version,
                 chainId: network,
                 pairLastSwappedAt:
@@ -1303,7 +1303,7 @@ export default class PositionService {
       let fromToUse =
         newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
       let toToUse =
-        newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to;
+        newPositionTypeData.to.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to;
 
       if (fromYield) {
         fromToUse = {
@@ -1332,13 +1332,16 @@ export default class PositionService {
           BigNumber.from(newPositionTypeData.frequencyValue)
         ),
         pairId: `${tokenA.address}-${tokenB.address}`,
-        depositedRateUnderlying: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
-          BigNumber.from(newPositionTypeData.frequencyValue)
-        ),
+        depositedRateUnderlying:
+          (fromYield &&
+            parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
+              BigNumber.from(newPositionTypeData.frequencyValue)
+            )) ||
+          null,
         toWithdrawUnderlying: null,
         remainingLiquidityUnderlying: null,
-        totalSwappedUnderlyingAccum: BigNumber.from(0),
-        toWithdrawUnderlyingAccum: BigNumber.from(0),
+        totalSwappedUnderlyingAccum: (toYield && BigNumber.from(0)) || null,
+        toWithdrawUnderlyingAccum: (toYield && BigNumber.from(0)) || null,
         remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
         remainingSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
         totalSwaps: BigNumber.from(newPositionTypeData.frequencyValue),
@@ -1352,6 +1355,7 @@ export default class PositionService {
         version: LATEST_VERSION,
         pairLastSwappedAt: newPositionTypeData.startedAt,
         pairNextSwapAvailableAt: newPositionTypeData.startedAt.toString(),
+        permissions: [],
       };
     }
 
@@ -1395,8 +1399,6 @@ export default class PositionService {
     const { id } = typeData;
     if (transaction.type === TransactionTypes.newPosition) {
       delete this.currentPositions[`pending-transaction-${transaction.hash}-v${LATEST_VERSION}`];
-    } else if (id) {
-      this.currentPositions[id].pendingTransaction = '';
     } else if (
       transaction.type === TransactionTypes.eulerClaimPermitMany ||
       transaction.type === TransactionTypes.eulerClaimTerminateMany
@@ -1408,6 +1410,8 @@ export default class PositionService {
           this.currentPositions[positionId].pendingTransaction = '';
         }
       });
+    } else if (id) {
+      this.currentPositions[id].pendingTransaction = '';
     }
   }
 
@@ -1467,6 +1471,7 @@ export default class PositionService {
           toWithdraw: BigNumber.from(0),
           remainingLiquidity: BigNumber.from(0),
           remainingSwaps: BigNumber.from(0),
+          remainingLiquidityUnderlying: BigNumber.from(0),
           pendingTransaction: '',
         };
         delete this.currentPositions[terminatePositionTypeData.id];
@@ -1484,28 +1489,6 @@ export default class PositionService {
           };
           delete this.currentPositions[id];
         });
-        break;
-      }
-      case TransactionTypes.migratePosition: {
-        const migratePositionTypeData = transaction.typeData;
-        this.pastPositions[migratePositionTypeData.id] = {
-          ...this.currentPositions[migratePositionTypeData.id],
-          pendingTransaction: '',
-        };
-        if (migratePositionTypeData.newId) {
-          this.currentPositions[migratePositionTypeData.newId] = {
-            ...this.currentPositions[migratePositionTypeData.id],
-            pendingTransaction: '',
-            toWithdraw: BigNumber.from(0),
-            swapped: BigNumber.from(0),
-            withdrawn: BigNumber.from(0),
-            totalExecutedSwaps: BigNumber.from(0),
-            status: 'ACTIVE',
-            version: LATEST_VERSION,
-            id: migratePositionTypeData.newId,
-          };
-        }
-        delete this.currentPositions[migratePositionTypeData.id];
         break;
       }
       case TransactionTypes.migratePositionYield: {
@@ -1561,85 +1544,6 @@ export default class PositionService {
         this.currentPositions[withdrawPositionTypeData.id].toWithdrawUnderlyingAccum = BigNumber.from(0);
         break;
       }
-      case TransactionTypes.addFundsPosition: {
-        const addFundsTypeData = transaction.typeData;
-        this.currentPositions[addFundsTypeData.id].pendingTransaction = '';
-        this.currentPositions[addFundsTypeData.id].remainingLiquidity = this.currentPositions[
-          addFundsTypeData.id
-        ].remainingLiquidity.add(parseUnits(addFundsTypeData.newFunds, addFundsTypeData.decimals));
-        this.currentPositions[addFundsTypeData.id].rate = this.currentPositions[
-          addFundsTypeData.id
-        ].remainingLiquidity.div(this.currentPositions[addFundsTypeData.id].remainingSwaps);
-        break;
-      }
-      case TransactionTypes.resetPosition: {
-        const resetPositionTypeData = transaction.typeData;
-        const resetPositionSwapDifference = BigNumber.from(resetPositionTypeData.newSwaps).lt(
-          this.currentPositions[resetPositionTypeData.id].remainingSwaps
-        )
-          ? this.currentPositions[resetPositionTypeData.id].remainingSwaps.sub(
-              BigNumber.from(resetPositionTypeData.newSwaps)
-            )
-          : BigNumber.from(resetPositionTypeData.newSwaps).sub(
-              this.currentPositions[resetPositionTypeData.id].remainingSwaps
-            );
-        this.currentPositions[resetPositionTypeData.id].pendingTransaction = '';
-        this.currentPositions[resetPositionTypeData.id].remainingLiquidity = this.currentPositions[
-          resetPositionTypeData.id
-        ].remainingLiquidity.add(parseUnits(resetPositionTypeData.newFunds, resetPositionTypeData.decimals));
-        this.currentPositions[resetPositionTypeData.id].totalSwaps = BigNumber.from(resetPositionTypeData.newSwaps).lt(
-          this.currentPositions[resetPositionTypeData.id].remainingSwaps
-        )
-          ? this.currentPositions[resetPositionTypeData.id].totalSwaps.sub(resetPositionSwapDifference)
-          : this.currentPositions[resetPositionTypeData.id].totalSwaps.add(resetPositionSwapDifference);
-        this.currentPositions[resetPositionTypeData.id].remainingSwaps = this.currentPositions[
-          resetPositionTypeData.id
-        ].remainingSwaps.add(BigNumber.from(resetPositionTypeData.newSwaps));
-        this.currentPositions[resetPositionTypeData.id].rate = this.currentPositions[
-          resetPositionTypeData.id
-        ].remainingLiquidity.div(this.currentPositions[resetPositionTypeData.id].remainingSwaps);
-        break;
-      }
-      case TransactionTypes.removeFunds: {
-        const removeFundsTypeData = transaction.typeData;
-        const removeFundsDifference = parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals).eq(
-          this.currentPositions[removeFundsTypeData.id].remainingLiquidity
-        )
-          ? this.currentPositions[removeFundsTypeData.id].remainingSwaps
-          : BigNumber.from(0);
-        const originalRemainingLiquidity = this.currentPositions[removeFundsTypeData.id].remainingLiquidity.toString();
-        this.currentPositions[removeFundsTypeData.id].pendingTransaction = '';
-        this.currentPositions[removeFundsTypeData.id].totalSwaps = parseUnits(
-          removeFundsTypeData.ammountToRemove,
-          removeFundsTypeData.decimals
-        ).eq(this.currentPositions[removeFundsTypeData.id].remainingLiquidity)
-          ? this.currentPositions[removeFundsTypeData.id].totalSwaps.sub(removeFundsDifference)
-          : this.currentPositions[removeFundsTypeData.id].totalSwaps;
-        this.currentPositions[removeFundsTypeData.id].remainingLiquidity = this.currentPositions[
-          removeFundsTypeData.id
-        ].remainingLiquidity.sub(parseUnits(removeFundsTypeData.ammountToRemove, removeFundsTypeData.decimals));
-        this.currentPositions[removeFundsTypeData.id].rate = this.currentPositions[
-          removeFundsTypeData.id
-        ].remainingLiquidity.div(this.currentPositions[removeFundsTypeData.id].remainingSwaps);
-        this.currentPositions[removeFundsTypeData.id].remainingSwaps = parseUnits(
-          removeFundsTypeData.ammountToRemove,
-          removeFundsTypeData.decimals
-        ).eq(BigNumber.from(originalRemainingLiquidity))
-          ? BigNumber.from(0)
-          : this.currentPositions[removeFundsTypeData.id].remainingSwaps;
-        break;
-      }
-      case TransactionTypes.modifySwapsPosition: {
-        const modifySwapsPositionTypeData = transaction.typeData;
-        this.currentPositions[modifySwapsPositionTypeData.id].pendingTransaction = '';
-        this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps = BigNumber.from(
-          modifySwapsPositionTypeData.newSwaps
-        );
-        this.currentPositions[modifySwapsPositionTypeData.id].rate = this.currentPositions[
-          modifySwapsPositionTypeData.id
-        ].remainingLiquidity.div(this.currentPositions[modifySwapsPositionTypeData.id].remainingSwaps);
-        break;
-      }
       case TransactionTypes.modifyRateAndSwapsPosition: {
         const modifyRateAndSwapsPositionTypeData = transaction.typeData;
         const modifiedRateAndSwapsSwapDifference = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
@@ -1656,6 +1560,13 @@ export default class PositionService {
           modifyRateAndSwapsPositionTypeData.newRate,
           modifyRateAndSwapsPositionTypeData.decimals
         );
+
+        if (this.currentPositions[modifyRateAndSwapsPositionTypeData.id].depositedRateUnderlying) {
+          this.currentPositions[modifyRateAndSwapsPositionTypeData.id].depositedRateUnderlying = parseUnits(
+            modifyRateAndSwapsPositionTypeData.newRate,
+            modifyRateAndSwapsPositionTypeData.decimals
+          );
+        }
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps = BigNumber.from(
           modifyRateAndSwapsPositionTypeData.newSwaps
         ).lt(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps)
@@ -1671,6 +1582,12 @@ export default class PositionService {
         this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity = this.currentPositions[
           modifyRateAndSwapsPositionTypeData.id
         ].rate.mul(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
+        if (this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidityUnderlying) {
+          this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidityUnderlying =
+            this.currentPositions[modifyRateAndSwapsPositionTypeData.id].rate.mul(
+              this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps
+            );
+        }
         break;
       }
       case TransactionTypes.withdrawFunds: {
@@ -1687,6 +1604,11 @@ export default class PositionService {
         ].totalSwaps.sub(this.currentPositions[withdrawFundsTypeData.id].remainingSwaps);
         this.currentPositions[withdrawFundsTypeData.id].remainingSwaps = BigNumber.from(0);
         this.currentPositions[withdrawFundsTypeData.id].remainingLiquidity = BigNumber.from(0);
+        this.currentPositions[withdrawFundsTypeData.id].remainingLiquidityUnderlying = this.currentPositions[
+          withdrawFundsTypeData.id
+        ].remainingLiquidityUnderlying
+          ? BigNumber.from('0')
+          : null;
         break;
       }
       case TransactionTypes.transferPosition: {
