@@ -21,6 +21,7 @@ import {
   POSITION_ACTIONS,
   STABLE_COINS,
   STRING_SWAP_INTERVALS,
+  TESTNETS,
   VERSIONS_ALLOWED_MODIFY,
   getGhTokenListLogoUrl,
 } from '@constants';
@@ -41,7 +42,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { updateShowBreakdown } from '@state/position-details/actions';
 import { formatUnits } from '@ethersproject/units';
-import { Theme, Tooltip } from '@mui/material';
+import { Chip, Theme, Tooltip } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import PositionDataControls from './position-data-controls';
 
@@ -344,6 +345,8 @@ const Details = ({
     pair?.lastSwappedAt || [0, 0, 0, 0, 0, 0, 0, 0]
   );
 
+  const isTestnet = TESTNETS.includes(positionNetwork.chainId);
+
   return (
     <StyledCard>
       {positionNetwork && (
@@ -415,6 +418,15 @@ const Details = ({
                 />
               </StyledProgressWrapper>
             </DarkTooltip>
+          )}
+          {isTestnet && (
+            <StyledDetailWrapper>
+              <Chip
+                label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+                size="small"
+                color="warning"
+              />
+            </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
             {!isPending && !hasNoFunds && !isStale && (

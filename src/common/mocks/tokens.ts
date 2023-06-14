@@ -35,6 +35,7 @@ const WETH_ADDRESSES = {
   [NETWORKS.optimismKovan.chainId]: '0x4200000000000000000000000000000000000006',
   [NETWORKS.optimism.chainId]: '0x4200000000000000000000000000000000000006',
   [NETWORKS.arbitrum.chainId]: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
+  [NETWORKS.baseGoerli.chainId]: '0x4200000000000000000000000000000000000006',
 };
 
 export const WETH = (chainId: number): Token => ({
@@ -181,6 +182,7 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.avalanche.chainId]: AVAX,
   [NETWORKS.heco.chainId]: HT,
   [NETWORKS.xdai.chainId]: XDAI,
+  [NETWORKS.baseGoerli.chainId]: ETH,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
@@ -195,6 +197,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.optimismGoerli.chainId]: WETH,
   [NETWORKS.optimism.chainId]: WETH,
   [NETWORKS.arbitrum.chainId]: WETH,
+  [NETWORKS.baseGoerli.chainId]: WETH,
 };
 
 export const getProtocolToken = (chainId: number) => {

@@ -7,6 +7,7 @@ export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
   [NETWORKS.optimism.chainId]: 5,
   [NETWORKS.arbitrum.chainId]: 5,
   [NETWORKS.mainnet.chainId]: 15,
+  [NETWORKS.baseGoerli.chainId]: 1,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
@@ -485,6 +486,7 @@ export const ALLOWED_YIELDS: Record<
     //   token: emptyTokenWithAddress('BEEFY'),
     // },
   ],
+  [NETWORKS.baseGoerli.chainId]: [],
   [NETWORKS.mainnet.chainId]: [
     {
       id: '61b7623c-9ac2-4a73-a748-8db0b1c8c5bc', // euler USDC

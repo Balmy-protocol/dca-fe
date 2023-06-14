@@ -9,6 +9,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { getGhTokenListLogoUrl, NETWORKS, SUPPORTED_NETWORKS_DCA } from '@constants';
 import styled from 'styled-components';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import Chip from '@mui/material/Chip';
 
 export const StyledNetworkContainer = styled.div`
   display: flex;
@@ -70,6 +71,13 @@ const NetworkSelector = ({ onChangeNetwork }: Props) => {
                   })}
                 />
                 {foundNetwork.name}
+                {foundNetwork.testnet && (
+                  <Chip
+                    label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+                    size="small"
+                    color="warning"
+                  />
+                )}
               </>
             );
           }}
@@ -94,6 +102,13 @@ const NetworkSelector = ({ onChangeNetwork }: Props) => {
                   })}
                 />
                 {foundNetwork.name}
+                {foundNetwork.testnet && (
+                  <Chip
+                    label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+                    size="small"
+                    color="warning"
+                  />
+                )}
               </MenuItem>
             );
           })}

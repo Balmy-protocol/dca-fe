@@ -9,6 +9,7 @@ export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.polygon.chainId]: 1,
   [NETWORKS.mainnet.chainId]: 5,
   [NETWORKS.bsc.chainId]: 1,
+  [NETWORKS.baseGoerli.chainId]: 0,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT = 5;
@@ -87,6 +88,12 @@ export const WHALE_MODE_FREQUENCIES = {
     ONE_HOUR.toString(),
     FOUR_HOURS.toString(),
   ],
+  [NETWORKS.baseGoerli.chainId]: [
+    ONE_MINUTE.toString(),
+    FIVE_MINUTES.toString(),
+    FIFTEEN_MINUTES.toString(),
+    THIRTY_MINUTES.toString(),
+  ],
 };
 
 export const WHALE_MINIMUM_VALUES = {
@@ -137,6 +144,12 @@ export const WHALE_MINIMUM_VALUES = {
     [THIRTY_MINUTES.toString()]: 10000,
     [ONE_HOUR.toString()]: 10000,
     [FOUR_HOURS.toString()]: 10000,
+  },
+  [NETWORKS.baseGoerli.chainId]: {
+    [ONE_MINUTE.toString()]: 0,
+    [FIVE_MINUTES.toString()]: 0,
+    [FIFTEEN_MINUTES.toString()]: 0,
+    [THIRTY_MINUTES.toString()]: 0,
   },
 };
 
