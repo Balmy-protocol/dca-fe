@@ -340,6 +340,7 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.heco.chainId,
   NETWORKS.xdai.chainId,
   NETWORKS.baseGoerli.chainId,
+  Chains.POLYGON_ZKEVM.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -559,6 +560,7 @@ export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
     [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
     [NETWORKS.xdai.chainId]: 'https://blockscout.com/xdai/mainnet/',
     [NETWORKS.baseGoerli.chainId]: 'https://goerli.basescan.org/',
+    [Chains.POLYGON_ZKEVM.chainId]: 'https://zkevm.polygonscan.com/',
   }
 );
 
@@ -591,6 +593,7 @@ export const DEFILLAMA_IDS = {
   [Chains.HARMONY_SHARD_0.chainId]: 'harmony',
   [Chains.MOONBEAM.chainId]: 'moonbeam',
   [Chains.VELAS.chainId]: 'velas',
+  [Chains.POLYGON_ZKEVM.chainId]: 'polygon-zkevm',
 };
 
 export const TOKEN_LISTS = {

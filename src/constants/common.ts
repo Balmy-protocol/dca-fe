@@ -54,6 +54,7 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 export const TOKEN_BLACKLIST = [
   '0x2e9a6df78e42a30712c10a9dc4b1c8656f8f2879', // ARBITRUM - Malicious MKR
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // OP - WTF optimism
+  '0x0000000000000000000000000000000000000000', // Never allow
 ];
 
 export const DCA_TOKEN_BLACKLIST = [
@@ -90,6 +91,12 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x18c46621af7cbcdf58b155517d22b4ae7c5f2cd1', // POLY - wstEth Aave
   '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
   // '0xaddb6a0412de1ba0f936dcaeb8aaa24578dcf3b2', // OPTI - cbETH
+  '0xb584516c8d90f133a48af5cc445cc5d924cf9863', // POLY ZKEVM - DUPLICATE WETH
+  '0xe765a819dbefdec134db20f0b82a2f3f13a5cd4a', // POLY ZKEVM - DUPLICATE FPI
+  '0x2b684d1bab13a547cd196ca6168d59509d9e9b37', // POLY ZKEVM - DUPLICATE FPIS
+  '0x95e4e1554a3f20932b559470eb57c56b7a26d10e', // POLY ZKEVM - DUPLICATE FRAX
+  '0x3e7bd82b7dbce275ff86ff419d8bdf37b05e574b', // POLY ZKEVM - DUPLICATE frxETH
+  '0x7940deae60fa6dbb56de469dfcddc84d2b6b17ea', // POLY ZKEVM - DUPLICATE FXS
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [

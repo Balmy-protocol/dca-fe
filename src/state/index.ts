@@ -145,6 +145,9 @@ const store = configureStore({
           'tokens.1inch.eth',
           'https://raw.githubusercontent.com/ethereum-optimism/ethereum-optimism.github.io/master/optimism.tokenlist.json',
 
+          // Polygon zkEvm
+          'https://api-polygon-tokens.polygon.technology/tokenlists/zkevmPopular.tokenlist.json',
+
           // Base Goerli
           'https://api.odos.xyz/info/tokens/84531',
 
