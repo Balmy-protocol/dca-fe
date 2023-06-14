@@ -1,6 +1,7 @@
 import React from 'react';
 import { Token } from '@types';
 import find from 'lodash/find';
+import orderBy from 'lodash/orderBy';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useTokensLists } from '@state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
@@ -17,12 +18,10 @@ function useTokenListUnfiltered(tokenAddress?: string) {
       return getProtocolToken(currentNetwork.chainId);
     }
 
-    const lists = Object.keys(tokensLists);
+    const lists = orderBy(Object.values(tokensLists), ['priority'], ['desc']);
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const list of lists) {
-      const fullList = tokensLists[list];
-
+    for (const fullList of lists) {
       const foundToken = find(fullList.tokens, { address: tokenAddress });
 
       if (foundToken) {
@@ -31,7 +30,7 @@ function useTokenListUnfiltered(tokenAddress?: string) {
     }
 
     return null;
-  }, [currentNetwork.chainId, tokenAddress]);
+  }, [currentNetwork.chainId, tokenAddress, tokensLists]);
 
   return tokenList;
 }

@@ -33,6 +33,7 @@ export interface TokensLists {
   hasLoaded: boolean;
   requestId: string;
   fetchable: boolean;
+  priority: number;
 }
 
 export interface TokenListToken {

@@ -38,6 +38,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 99,
   },
   'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json': {
     name: 'Compound token list',
@@ -48,6 +49,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
   'tokens.1inch.eth': {
     name: '1inch',
@@ -58,6 +60,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
   'https://token-list.sushi.com/': {
     name: 'Sushiswap token list',
@@ -68,6 +71,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
   'https://raw.githubusercontent.com/ethereum-optimism/ethereum-optimism.github.io/master/optimism.tokenlist.json': {
     name: 'Superchain token list',
@@ -78,6 +82,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
   'https://api.joinwido.com/tokens?include_metadata=true&include_unknown=false&include_pricing=false&include_preview=false':
     {
@@ -89,6 +94,7 @@ export const getDefaultByUrl = () => ({
       hasLoaded: false,
       requestId: '',
       fetchable: true,
+      priority: 0,
       parser: (list: { tokens: (Token & { protocol?: string })[] }) =>
         list.tokens.filter((token) => token.protocol && token.protocol !== 'dex'),
     },
@@ -107,6 +113,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 7700,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
@@ -125,6 +132,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 84531,
+    priority: 0,
     parser: (list: { tokenMap: Record<string, Token> }) =>
       Object.entries(list.tokenMap).map(([key, token]) =>
         toToken({ ...token, address: key, logoURI: `https://assets.odos.xyz/tokens/${token.symbol}.webp` })
@@ -145,6 +153,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 56,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
@@ -164,6 +173,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 250,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
@@ -180,6 +190,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 43114,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
@@ -199,6 +210,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 42161,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
@@ -217,6 +229,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
 
   /* -------------------------------------------------------------------------- */
@@ -232,6 +245,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
   'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json': {
     name: 'Cronos cronaswap',
@@ -243,6 +257,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 25,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: Token[]) => list,
@@ -261,6 +276,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
 
   /* -------------------------------------------------------------------------- */
@@ -277,6 +293,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 9001,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
@@ -290,6 +307,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
 
   /* -------------------------------------------------------------------------- */
@@ -306,6 +324,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 1313161554,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: { data: { tokens: Token[] } }) => list.data.tokens,
@@ -325,6 +344,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 42262,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: { data: { tokens: Token[] } }) => list.data.tokens,
@@ -344,6 +364,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 8217,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
@@ -363,6 +384,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 1313161554,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
@@ -381,6 +403,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
 
   /* -------------------------------------------------------------------------- */
@@ -396,6 +419,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
   'https://files.cow.fi/tokens/CowSwap.json': {
     name: 'CowSwap',
@@ -406,6 +430,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
   'https://tokens.1inch.io/v1.1/100': {
     name: '1Inch xDAI',
@@ -417,6 +442,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 100,
+    priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) =>
@@ -437,6 +463,7 @@ export const getDefaultByUrl = () => ({
       hasLoaded: false,
       requestId: '',
       fetchable: true,
+      priority: 0,
     },
   'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json':
     {
@@ -448,6 +475,7 @@ export const getDefaultByUrl = () => ({
       hasLoaded: false,
       requestId: '',
       fetchable: true,
+      priority: 0,
     },
   'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json': {
     name: 'WaveLength',
@@ -458,6 +486,7 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
 });
 export const initialState: TokenListsState = {
@@ -538,6 +567,7 @@ export const initialState: TokenListsState = {
     hasLoaded: true,
     requestId: '',
     fetchable: true,
+    priority: 0,
   },
   hasLoaded: false,
 };
@@ -619,6 +649,7 @@ export default createReducer(initialState, (builder) =>
         hasLoaded: false,
         requestId,
         fetchable: false,
+        priority: 98,
       };
     })
     .addCase(fetchGraphTokenList.fulfilled, (state, { payload }) => {
