@@ -30,7 +30,7 @@ const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
   const realSize = size || '28px';
   const [hasError, setHasError] = React.useState(false);
   let componentToRender = null;
-  const foundToken = useTokenListUnfiltered(token?.address);
+  const foundToken = useTokenListUnfiltered(token?.address, true);
   const tokenLogoUri = token?.logoURI || (token && foundToken && foundToken.logoURI);
   const addressToUse =
     token?.address && (token.address === PROTOCOL_TOKEN_ADDRESS ? `${token.chainId}-${token.address}` : token.address);

@@ -6,7 +6,7 @@ import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useTokensLists } from '@state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 
-function useTokenListUnfiltered(tokenAddress?: string) {
+function useTokenListUnfiltered(tokenAddress?: string, filterByLogoUri = false) {
   const currentNetwork = useSelectedNetwork();
   const tokensLists = useTokensLists();
 
@@ -24,7 +24,7 @@ function useTokenListUnfiltered(tokenAddress?: string) {
     for (const fullList of lists) {
       const foundToken = find(fullList.tokens, { address: tokenAddress });
 
-      if (foundToken) {
+      if (foundToken && (!filterByLogoUri || foundToken.logoURI)) {
         return foundToken;
       }
     }
