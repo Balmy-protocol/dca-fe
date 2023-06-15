@@ -22,15 +22,19 @@ import config from './config/reducer';
 import error from './error/reducer';
 
 const LATEST_VERSION = '1.0.6';
+const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.0';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
 const TRANSACTION_VERSION_KEY = 'transactions_version';
 const TRANSACTION_KEY = 'redux_localstorage_simple_transactions';
 const BADGE_KEY = 'redux_localstorage_simple_badge';
 const POSITION_DETAILS_KEY = 'redux_localstorage_simple_positionDetails';
+const AGGREGATOR_SETTINGS_KEY = 'redux_localstorage_simple_aggregatorSettings';
+const AGGREGATOR_SETTINGS_VERSION_KEY = 'mean_aggregator_settings_version';
 const MEAN_UI_VERSION_KEY = 'mean_ui_version';
 
 function checkStorageValidity() {
   const meanUIVersion = localStorage.getItem(MEAN_UI_VERSION_KEY);
+  const aggregatorSettingsVersion = localStorage.getItem(AGGREGATOR_SETTINGS_VERSION_KEY);
   const transactionVersion = localStorage.getItem(TRANSACTION_VERSION_KEY);
 
   if (transactionVersion !== LATEST_TRANSACTION_VERSION) {
@@ -54,6 +58,13 @@ function checkStorageValidity() {
     if (currentTransactions) {
       localStorage.setItem(TRANSACTION_KEY, currentTransactions);
     }
+  }
+
+  if (aggregatorSettingsVersion !== LATEST_AGGREGATOR_SETTINGS_VERSION) {
+    console.warn('different aggregator settings version detected, clearing storage');
+
+    localStorage.setItem(AGGREGATOR_SETTINGS_KEY, LATEST_AGGREGATOR_SETTINGS_VERSION);
+    localStorage.removeItem(AGGREGATOR_SETTINGS_KEY);
   }
 }
 
