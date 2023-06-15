@@ -34,7 +34,7 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
 } = {
   slippage: 0.3,
   gasSpeed: GAS_KEY_AVERAGE,
-  disabledDexes: ['firebird'],
+  disabledDexes: ['firebird', 'changelly'],
   showTransactionCost: true,
   confetti: 100,
   sorting: SORT_MOST_RETURN,
