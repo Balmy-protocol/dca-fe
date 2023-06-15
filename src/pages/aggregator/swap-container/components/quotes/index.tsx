@@ -1,5 +1,6 @@
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
+import Button from '@common/components/button';
 import EmptyRoutes from '@assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -150,6 +151,9 @@ const SwapQuotes = ({
                 defaultMessage="We could not fetch a route for your swap"
               />
             </Typography>
+            <Button variant="contained" color="secondary" onClick={fetchOptions}>
+              <FormattedMessage description="All routes failed action" defaultMessage="Try to get a route again" />
+            </Button>
           </StyledCenteredWrapper>
         </StyledPaper>
       </StyledPaper>
