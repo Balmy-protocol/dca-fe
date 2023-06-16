@@ -90,6 +90,9 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x18c46621af7cbcdf58b155517d22b4ae7c5f2cd1', // POLY - wstEth Aave
   '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
   '0x250632378e573c6be1ac2f97fcdf00515d0aa91b', // BSC - BETH
+
+  // Polygon - FBX - They moved liquidity from pair $FBX/$WETH to $FBX/$WSTEH
+  '0xd125443f38a69d776177c2b9c041f462936f8218',
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
