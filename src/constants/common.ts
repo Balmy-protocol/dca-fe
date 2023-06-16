@@ -90,8 +90,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x18c46621af7cbcdf58b155517d22b4ae7c5f2cd1', // POLY - wstEth Aave
   '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
   '0x250632378e573c6be1ac2f97fcdf00515d0aa91b', // BSC - BETH
-
-  '0xB0B195aEFA3650A6908f15CdaC7D92F8a5791B0B', // OP - $BOB waiting for announcement
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
