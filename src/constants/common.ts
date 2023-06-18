@@ -66,8 +66,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // OP - WTF optimism
   '0x2760e46d9bb43dafcbecaad1f64b93207f9f0ed7', // POLY - MVX
   // TODO: Remove this once we check beefy works correctly
-  '0x1a55d9164417856ad31df3705bbc263c380e56b1', // ARBI - GNS Beefy wrapper
-  '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03', // ARBI - GMX Beefy wrapper
   '0xf0cbbfad265a0e7c7e4fd2e1e6027a8dfa25676b', // OP - WBTC Beefy wrapper
   '0x72b25ce2f946c95a2194f5ac3322443d0057bc94', // OP - DAI Beefy wrapper
   '0x185d3a08140efaeb3c6bf173e751afb0bcb0d0c6', // OP - USDC Beefy wrapper
@@ -93,6 +91,18 @@ export const DCA_TOKEN_BLACKLIST = [
 
   // Polygon - FBX - They moved liquidity from pair $FBX/$WETH to $FBX/$WSTEH
   '0xd125443f38a69d776177c2b9c041f462936f8218',
+  // Arbitrum - Beefy GMX - Blacklisting so we can test it out
+  '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03',
+  // Arbitrum - Beefy GNS - Blacklisting so we can test it out
+  '0x1a55d9164417856ad31df3705bbc263c380e56b1',
+  // Arbitrum - FRAX - Blacklisting so we can test it out
+  '0x17fc002b466eec40dae837fc4be5c67993ddbd6f',
+  // Arbitrum - MIM - Blacklisting so we can test it out
+  '0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a',
+  // Arbitrum - MCB - Blacklisting so we can test it out
+  '0x4e352cf164e64adcbad318c3a1e222e9eba4ce42',
+  // Arbitrum - STG - Blacklisting so we can test it out
+  '0x6694340fc020c5e6b96567843da2df01b2ce1eb6',
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
