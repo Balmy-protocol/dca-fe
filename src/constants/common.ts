@@ -69,7 +69,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xf0cbbfad265a0e7c7e4fd2e1e6027a8dfa25676b', // OP - WBTC Beefy wrapper
   '0x72b25ce2f946c95a2194f5ac3322443d0057bc94', // OP - DAI Beefy wrapper
   '0x185d3a08140efaeb3c6bf173e751afb0bcb0d0c6', // OP - USDC Beefy wrapper
-  '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12', // POLY - GNS optimism Beefy wrapper
   '0xaab6af05e12faae0a5d9597c79588846f0df15b8', // POLY - MVX optimism Beefy wrapper
   '0xe0b52e49357fd4daf2c15e02058dce6bc0057db4', // POLY - AGEUR
 
@@ -105,6 +104,18 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x6694340fc020c5e6b96567843da2df01b2ce1eb6',
   // Arbitrum - GMD - Blacklisting so we can test it out
   '0x4945970efeec98d393b4b979b9be265a3ae28a8b',
+  // BNB - Beefy ETH on Valas - Blacklisting so we can test it out
+  '0x353699126117ba6ed8f5d5928dfa797564e99e40',
+  // BNB - Beefy BTCB on Valas - Blacklisting so we can test it out
+  '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e',
+  // BNB - Beefy BUSD on Valas - Blacklisting so we can test it out
+  '0x45c53c0068bf31715fb41685bab59fd0bbc387f9',
+  // Polygon - Beefy stMATIC on Aave - Blacklisting so we can test it out
+  '0x6cd724aafd1c5f0539d0d97eaa3088431eacdb92',
+  // Polygon - Beefy maticX on Aave - Blacklisting so we can test it out
+  '0xfc4c2e8b2c1655693f520e8115b95b057ac2d95b',
+  // Polygon - Beefy GNS on Gains - Blacklisting so we can test it out
+  '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12',
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [

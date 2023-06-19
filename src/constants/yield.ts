@@ -168,13 +168,27 @@ export const ALLOWED_YIELDS: Record<
       name: 'Aave V3',
       token: emptyTokenWithAddress('AAVE'),
     },
-    // {
-    //   id: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
-    //   tokenAddress: '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12', // beefy GNS
-    //   poolId: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
-    //   name: 'Beefy',
-    //   token: emptyTokenWithAddress('BEEFY'),
-    // },
+    {
+      id: '4325e562-82c3-420a-bb58-890439cc70be', // beefy stMATIC
+      tokenAddress: '0x6cd724aafd1c5f0539d0d97eaa3088431eacdb92', // beefy stMATIC
+      poolId: '4325e562-82c3-420a-bb58-890439cc70be', // beefy stMATIC
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: '3cb509ca-aa6e-44c0-973c-4dcd8c6b6cce', // beefy maticX
+      tokenAddress: '0xfc4c2e8b2c1655693f520e8115b95b057ac2d95b', // beefy maticX
+      poolId: '3cb509ca-aa6e-44c0-973c-4dcd8c6b6cce', // beefy maticX
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
+      tokenAddress: '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12', // beefy GNS
+      poolId: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
     // {
     //   id: 'fe084859-2384-4daf-86ec-63f5f8dcdaaa', // beefy MVX TODO: MISSING IN DEFILLAMA
     //   tokenAddress: '0xaab6af05e12faae0a5d9597c79588846f0df15b8', // beefy MVX
@@ -487,6 +501,29 @@ export const ALLOWED_YIELDS: Record<
     },
   ],
   [NETWORKS.baseGoerli.chainId]: [],
+  [NETWORKS.bsc.chainId]: [
+    {
+      id: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
+      tokenAddress: '0x353699126117ba6ed8f5d5928dfa797564e99e40', // beefy ETH
+      poolId: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
+      tokenAddress: '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e', // beefy BTCB
+      poolId: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
+      tokenAddress: '0x45c53c0068bf31715fb41685bab59fd0bbc387f9', // beefy BUSD
+      poolId: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+  ],
   [NETWORKS.mainnet.chainId]: [
     {
       id: '61b7623c-9ac2-4a73-a748-8db0b1c8c5bc', // euler USDC
