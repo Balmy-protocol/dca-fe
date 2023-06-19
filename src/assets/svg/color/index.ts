@@ -1,5 +1,6 @@
 import AAVE from './aave.svg';
 import ARBITRUM from './arbitrum.svg';
+import BEEFY from './beefy.svg';
 import AVAX from './avax.svg';
 import BNB from './bnb.svg';
 import CHECK from './check.svg';
@@ -49,6 +50,7 @@ const manifest = {
   OPTIMISM,
   SONNE,
   YEARN,
+  BEEFY,
 };
 
 export default manifest;

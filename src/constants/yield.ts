@@ -471,20 +471,20 @@ export const ALLOWED_YIELDS: Record<
       name: 'Aave V3',
       token: emptyTokenWithAddress('AAVE'),
     },
-    // {
-    //   id: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
-    //   tokenAddress: '0x1a55d9164417856ad31df3705bbc263c380e56b1', // beefy GNS
-    //   poolId: '388e73cb-1ea5-4cd3-9426-fdb40762c930', // beefy GNS
-    //   name: 'Beefy',
-    //   token: emptyTokenWithAddress('BEEFY'),
-    // },
-    // {
-    //   id: 'ba935cb2-a371-4f2b-9bd3-9881a995d68f', // beefy GMX
-    //   tokenAddress: '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03', // beefy GMX
-    //   poolId: 'ba935cb2-a371-4f2b-9bd3-9881a995d68f', // beefy GMX
-    //   name: 'Beefy',
-    //   token: emptyTokenWithAddress('BEEFY'),
-    // },
+    {
+      id: '65a7aa13-309a-4431-b7eb-f6dab368dca0', // beefy GNS
+      tokenAddress: '0x1a55d9164417856ad31df3705bbc263c380e56b1', // beefy GNS
+      poolId: '65a7aa13-309a-4431-b7eb-f6dab368dca0', // beefy GNS
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: 'ba935cb2-a371-4f2b-9bd3-9881a995d68f', // beefy GMX
+      tokenAddress: '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03', // beefy GMX
+      poolId: 'ba935cb2-a371-4f2b-9bd3-9881a995d68f', // beefy GMX
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
   ],
   [NETWORKS.baseGoerli.chainId]: [],
   [NETWORKS.mainnet.chainId]: [
