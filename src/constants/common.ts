@@ -103,6 +103,8 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x4e352cf164e64adcbad318c3a1e222e9eba4ce42',
   // Arbitrum - STG - Blacklisting so we can test it out
   '0x6694340fc020c5e6b96567843da2df01b2ce1eb6',
+  // Arbitrum - GMD - Blacklisting so we can test it out
+  '0x4945970efeec98d393b4b979b9be265a3ae28a8b',
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
