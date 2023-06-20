@@ -553,6 +553,12 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
       };
 
       setTransactionsToExecute(newSteps);
+
+      if (!response || response.simulationResults.error) {
+        trackEvent('Aggregator - Transaction simulation error', { source: selectedRoute?.swapper.id });
+      } else {
+        trackEvent('Aggregator - Transaction simulation successfull', { source: selectedRoute?.swapper.id });
+      }
     }
   };
 

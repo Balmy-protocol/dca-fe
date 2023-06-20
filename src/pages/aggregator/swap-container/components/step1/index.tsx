@@ -165,7 +165,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
         <StyledContentContainer $isLast>
           {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
           <QuoteSimulation
-            tx={selectedRoute?.tx}
+            route={selectedRoute}
             cantFund={cantFund}
             isApproved={isApproved}
             isLoadingRoute={isLoadingRoute}
