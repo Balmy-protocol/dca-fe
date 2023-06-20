@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { QuoteTransaction } from '@mean-finance/sdk';
 import useSimulateTransaction from '@hooks/useSimulateTransaction';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import Typography from '@mui/material/Typography';
@@ -12,6 +11,7 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithAddress } from '@common/utils/currency';
+import { SwapOption } from '@types';
 
 const StyledTransactionSimulationContainer = styled.div`
   padding: 16px;
@@ -34,7 +34,7 @@ const StyledBlowfishContainer = styled.div`
 `;
 
 interface QuoteSimulationProps {
-  tx?: QuoteTransaction;
+  route?: Nullable<SwapOption>;
   cantFund: boolean | null;
   isApproved: boolean;
   isLoadingRoute: boolean;
@@ -43,7 +43,7 @@ interface QuoteSimulationProps {
 }
 
 const QuoteSimulation = ({
-  tx,
+  route,
   cantFund,
   isApproved,
   isLoadingRoute,
@@ -53,7 +53,7 @@ const QuoteSimulation = ({
   const currentNetwork = useSelectedNetwork();
   const actualCurrentNetwork = useCurrentNetwork();
   const [transactionSimulation, isLoadingTransactionSimulation, transactionSimulationError] = useSimulateTransaction(
-    tx,
+    route,
     currentNetwork.chainId,
     cantFund || !isApproved || currentNetwork.chainId !== actualCurrentNetwork.chainId,
     forceProviderSimulation
@@ -67,7 +67,7 @@ const QuoteSimulation = ({
     }
   }, [currentNetwork.chainId, transactionSimulationError]);
 
-  if (cantFund || !isApproved || !tx || currentNetwork.chainId !== actualCurrentNetwork.chainId) {
+  if (cantFund || !isApproved || !route?.tx || currentNetwork.chainId !== actualCurrentNetwork.chainId) {
     return null;
   }
 

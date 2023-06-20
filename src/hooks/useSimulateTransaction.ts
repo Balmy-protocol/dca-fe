@@ -1,15 +1,15 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import { BlowfishResponse } from '@types';
+import { BlowfishResponse, SwapOption } from '@types';
 import debounce from 'lodash/debounce';
-import { QuoteTransaction } from '@mean-finance/sdk';
 import usePrevious from '@hooks/usePrevious';
 import useSimulationService from './useSimulationService';
+import useTrackEvent from './useTrackEvent';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
 function useSimulateTransaction(
-  tx?: QuoteTransaction,
+  route?: Nullable<SwapOption>,
   chainId?: number,
   skip?: boolean,
   forceProviderSimulation?: boolean
@@ -20,31 +20,43 @@ function useSimulateTransaction(
     result?: BlowfishResponse;
     error?: string;
   }>({ isLoading: false, result: undefined, error: undefined });
-  const txData = (tx && tx.data && tx.data.toString()) || null;
+  const txData = (route && route.tx && route.tx.data && route.tx.data.toString()) || null;
   const prevTxData = usePrevious(txData);
   const prevResult = usePrevious(result);
   const prevForceProviderSimulation = usePrevious(forceProviderSimulation);
+  const trackEvent = useTrackEvent();
 
   const debouncedCall = React.useCallback(
     debounce(
-      async (debouncedTx?: QuoteTransaction, debouncedChainId?: number, debouncedForceProviderSimulation?: boolean) => {
-        if (debouncedTx && debouncedChainId) {
+      async (
+        debouncedRoute?: Nullable<SwapOption>,
+        debouncedChainId?: number,
+        debouncedForceProviderSimulation?: boolean
+      ) => {
+        if (debouncedRoute && debouncedRoute.tx && debouncedChainId) {
           setState({ isLoading: true, result: undefined, error: undefined });
 
           try {
             const promiseResult = await simulationService.simulateTransaction(
-              debouncedTx,
+              debouncedRoute.tx,
               debouncedChainId,
               debouncedForceProviderSimulation
             );
 
             if (promiseResult) {
               setState({ result: promiseResult, error: undefined, isLoading: false });
+              if (promiseResult.simulationResults.error) {
+                trackEvent('Aggregator - Transaction simulation error', { source: debouncedRoute.swapper.id });
+              } else {
+                trackEvent('Aggregator - Transaction simulation successfull', { source: debouncedRoute.swapper.id });
+              }
             } else {
               setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
+              trackEvent('Aggregator - Transaction simulation error', { source: debouncedRoute.swapper.id });
             }
           } catch (e) {
             setState({ result: undefined, error: e as string, isLoading: false });
+            trackEvent('Aggregator - Transaction simulation error', { source: debouncedRoute.swapper.id });
           }
         }
       },
@@ -54,8 +66,8 @@ function useSimulateTransaction(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(tx, chainId, forceProviderSimulation),
-    [tx, chainId, forceProviderSimulation]
+    () => debouncedCall(route, chainId, forceProviderSimulation),
+    [route, chainId, forceProviderSimulation]
   );
 
   React.useEffect(() => {
@@ -82,7 +94,7 @@ function useSimulateTransaction(
     prevForceProviderSimulation,
   ]);
 
-  if (!tx) {
+  if (!route) {
     return [undefined, false, undefined, fetchOptions];
   }
 
