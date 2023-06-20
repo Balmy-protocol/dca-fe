@@ -90,10 +90,6 @@ export const DCA_TOKEN_BLACKLIST = [
 
   // Polygon - FBX - They moved liquidity from pair $FBX/$WETH to $FBX/$WSTEH
   '0xd125443f38a69d776177c2b9c041f462936f8218',
-  // Arbitrum - Beefy GMX - Blacklisting so we can test it out
-  '0x78e30dfd5ef67fd414002ec6b4136a7a687c3c03',
-  // Arbitrum - Beefy GNS - Blacklisting so we can test it out
-  '0x1a55d9164417856ad31df3705bbc263c380e56b1',
   // Arbitrum - FRAX - Blacklisting so we can test it out
   '0x17fc002b466eec40dae837fc4be5c67993ddbd6f',
   // Arbitrum - MIM - Blacklisting so we can test it out
