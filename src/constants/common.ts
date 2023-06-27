@@ -92,8 +92,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xd125443f38a69d776177c2b9c041f462936f8218',
   // Arbitrum - FRAX - Blacklisting so we can test it out
   '0x17fc002b466eec40dae837fc4be5c67993ddbd6f',
-  // Arbitrum - MCB - Blacklisting so we can test it out
-  '0x4e352cf164e64adcbad318c3a1e222e9eba4ce42',
   // Arbitrum - GMD - Blacklisting so we can test it out
   '0x4945970efeec98d393b4b979b9be265a3ae28a8b',
   // BNB - Beefy ETH on Valas - Blacklisting so we can test it out
