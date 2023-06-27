@@ -16,6 +16,7 @@ import TopBar from '../top-bar';
 import FromAmountInput from '../from-amount-input';
 import ToggleButton from '../toggle-button';
 import ToAmountInput from '../to-amount-input';
+import QuoteSelection from '../quote-selection';
 
 const StyledGrid = styled(Grid)`
   top: 16px;
@@ -52,6 +53,10 @@ interface SwapFirstStepProps {
   onShowSettings: () => void;
   isApproved: boolean;
   setTransactionWillFail: (transactionWillFail: boolean) => void;
+  quotes: SwapOption[];
+  fetchOptions: () => void;
+  refreshQuotes: boolean;
+  swapOptionsError?: string;
 }
 
 const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
@@ -71,6 +76,10 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     isApproved,
     setTransactionWillFail,
     onShowSettings,
+    quotes,
+    fetchOptions,
+    refreshQuotes,
+    swapOptionsError,
   } = props;
 
   let fromValueToUse =
@@ -164,6 +173,14 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       <Grid item xs={12}>
         <StyledContentContainer $isLast>
           {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
+          <QuoteSelection
+            quotes={quotes}
+            isLoading={isLoadingRoute}
+            bestQuote={quotes[0]}
+            fetchOptions={fetchOptions}
+            refreshQuotes={refreshQuotes}
+            swapOptionsError={swapOptionsError}
+          />
           <QuoteSimulation
             route={selectedRoute}
             cantFund={cantFund}

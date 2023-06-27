@@ -22,7 +22,7 @@ interface QuoteRefresherProps {
   disableRefreshQuotes: boolean;
 }
 
-const TIMER_FOR_RESET = 60;
+const TIMER_FOR_RESET = 60000;
 
 const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
@@ -74,17 +74,17 @@ const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: Quot
   return (
     <StyledRefresherContainer>
       {!isLoading && timer !== TIMER_FOR_RESET && !disableRefreshQuotes && (
-        <Typography variant="body1">
+        <Typography variant="caption">
           <FormattedMessage
             description="refreshRouteTimer"
-            defaultMessage="Refreshing routes in {timer}s"
+            defaultMessage="Refreshing quote in {timer}s"
             values={{ timer }}
           />
         </Typography>
       )}
       <StyledToggleTokenButton
         aria-label="close"
-        size="medium"
+        size="small"
         onClick={onRefreshRoute}
         disabled={isLoading || disableRefreshQuotes}
       >

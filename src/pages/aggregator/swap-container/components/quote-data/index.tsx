@@ -45,14 +45,6 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
     <StyledQuoteDataContainer>
       <StyledQuoteDataItem>
         <Typography variant="body2" color="inherit">
-          <FormattedMessage description="quoteDataSelectedRoute" defaultMessage="Selected route:" />
-        </Typography>
-        <Typography variant="body2" color="inherit">
-          {quote?.swapper.name || '-'}
-        </Typography>
-      </StyledQuoteDataItem>
-      <StyledQuoteDataItem>
-        <Typography variant="body2" color="inherit">
           <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
         </Typography>
         <Typography variant="body2">
@@ -66,7 +58,7 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
             : '-'}
         </Typography>
       </StyledQuoteDataItem>
-      {quote?.maxSellAmount && (
+      {quote?.maxSellAmount && quote?.maxSellAmount.amountInUnits !== quote?.sellAmount.amountInUnits && (
         <StyledQuoteDataItem>
           <Typography variant="body2" color="inherit">
             <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
@@ -92,30 +84,32 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
           </StyledMinimumContainer>
         </StyledQuoteDataItem>
       )}
-      <StyledQuoteDataItem>
-        <Typography variant="body2" color="inherit">
-          <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
-        </Typography>
-        <StyledMinimumContainer>
+      {quote?.minBuyAmount && quote?.minBuyAmount.amountInUnits !== quote?.buyAmount.amountInUnits && (
+        <StyledQuoteDataItem>
           <Typography variant="body2" color="inherit">
-            {quote?.minBuyAmount.amount && to
-              ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
-              : '-'}
+            <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
           </Typography>
-          <Tooltip
-            title={
-              <FormattedMessage
-                description="quoteDataMinimumTooltip"
-                defaultMessage="This is the minimum you will receive based on your slippage settings"
-              />
-            }
-            arrow
-            placement="top"
-          >
-            <HelpOutlineIcon fontSize="small" />
-          </Tooltip>
-        </StyledMinimumContainer>
-      </StyledQuoteDataItem>
+          <StyledMinimumContainer>
+            <Typography variant="body2" color="inherit">
+              {quote?.minBuyAmount.amount && to
+                ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
+                : '-'}
+            </Typography>
+            <Tooltip
+              title={
+                <FormattedMessage
+                  description="quoteDataMinimumTooltip"
+                  defaultMessage="This is the minimum you will receive based on your slippage settings"
+                />
+              }
+              arrow
+              placement="top"
+            >
+              <HelpOutlineIcon fontSize="small" />
+            </Tooltip>
+          </StyledMinimumContainer>
+        </StyledQuoteDataItem>
+      )}
     </StyledQuoteDataContainer>
   );
 };
