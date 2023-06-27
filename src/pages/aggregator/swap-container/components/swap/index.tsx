@@ -6,6 +6,7 @@ import {
   ApproveTokenExactTypeData,
   ApproveTokenTypeData,
   BlowfishResponse,
+  SwapOption,
   SwapOptionWithTx,
   SwapTypeData,
   Token,
@@ -94,9 +95,20 @@ const StyledGrid = styled(Grid)`
 interface SwapProps {
   isLoadingRoute: boolean;
   setRefreshQuotes: (refreshQuotes: boolean) => void;
+  quotes: SwapOption[];
+  fetchOptions: () => void;
+  refreshQuotes: boolean;
+  swapOptionsError?: string;
 }
 
-const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
+const Swap = ({
+  isLoadingRoute,
+  setRefreshQuotes,
+  quotes,
+  fetchOptions,
+  refreshQuotes,
+  swapOptionsError,
+}: SwapProps) => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
@@ -771,6 +783,10 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
               onShowSettings={() => setShouldShowSettings(true)}
               isApproved={isApproved}
               fromValue={fromValue}
+              quotes={quotes}
+              fetchOptions={fetchOptions}
+              refreshQuotes={refreshQuotes}
+              swapOptionsError={swapOptionsError}
             />
             <StyledButtonContainer>
               <SwapButton

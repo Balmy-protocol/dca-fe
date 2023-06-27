@@ -15,9 +15,7 @@ import useSwapOption from '@hooks/useSwapOption';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useSdkMappedChains from '@hooks/useMappedSdkChains';
-import AggregatorFAQ from './components/faq';
 import Swap from './components/swap';
-import SwapQuotes from './components/quotes';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
@@ -98,25 +96,15 @@ const SwapContainer = () => {
 
   return (
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
-      <Grid item xs={12} md={5}>
-        <Swap isLoadingRoute={isLoadingSwapOptions || isLoadingSwapOption} setRefreshQuotes={setRefreshQuotes} />
-      </Grid>
-      <Grid item xs={12} md={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
-        <Grid container spacing={2} alignItems="stretch" justify-content="center">
-          <Grid item xs={12} sx={{ display: 'flex' }}>
-            <SwapQuotes
-              quotes={(selectedRoute && swapOptions) || []}
-              isLoading={isLoadingSwapOptions}
-              fetchOptions={fetchOptions}
-              refreshQuotes={refreshQuotes}
-              bestQuote={swapOptions?.[0]}
-              swapOptionsError={swapOptionsError}
-            />
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12}>
-        <AggregatorFAQ />
+      <Grid item xs={12} sm={8} md={5}>
+        <Swap
+          isLoadingRoute={isLoadingSwapOptions || isLoadingSwapOption}
+          setRefreshQuotes={setRefreshQuotes}
+          quotes={(selectedRoute && swapOptions) || []}
+          swapOptionsError={swapOptionsError}
+          fetchOptions={fetchOptions}
+          refreshQuotes={refreshQuotes}
+        />
       </Grid>
     </Grid>
   );
