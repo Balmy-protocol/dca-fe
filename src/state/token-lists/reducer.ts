@@ -120,7 +120,7 @@ export const getDefaultByUrl = () => ({
   },
 
   /* -------------------------------------------------------------------------- */
-  /*                                     Base Goerli                                    */
+  /*                                     Base Goerli                            */
   /* -------------------------------------------------------------------------- */
   'https://api.odos.xyz/info/tokens/84531': {
     name: 'Odos Base Goerli token list',
@@ -488,6 +488,34 @@ export const getDefaultByUrl = () => ({
     fetchable: true,
     priority: 0,
   },
+
+  /* -------------------------------------------------------------------------- */
+  /*                                    KAVA                                    */
+  /* -------------------------------------------------------------------------- */
+
+  // 'https://market-api.openocean.finance/v2/kava/token': {
+  //   name: 'OpenOcean',
+  //   logoURI: '',
+  //   timestamp: new Date().getTime(),
+  //   tokens: [],
+  //   version: { major: 0, minor: 0, patch: 0 },
+  //   hasLoaded: false,
+  //   requestId: '',
+  //   fetchable: true,
+  //   chainId: 2222,
+  //   priority: 0,
+  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //   // @ts-ignore
+  //   parser: (list: TokensLists) =>
+  //     Object.values(list as unknown as Record<string, Token & { icon: string }>).map(({ decimals, name, address, symbol, icon }) => ({
+  //       name,
+  //       address,
+  //       decimals,
+  //       symbol,
+  //       chainId: 2222,
+  //       logoURI: icon,
+  //     })),
+  // },
 });
 export const initialState: TokenListsState = {
   activeLists: ['Mean Finance Graph Allowed Tokens'],
