@@ -7,7 +7,6 @@ import Button from '@common/components/button';
 import { createStyles, Theme } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import SortIcon from '@mui/icons-material/Sort';
 import Menu from '@mui/material/Menu';
 import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
@@ -37,6 +36,12 @@ const StyledMenu = withStyles(() =>
     },
   })
 )(Menu);
+
+const StyledContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 interface QuoteSorterProps {
   isLoading: boolean;
@@ -111,13 +116,15 @@ const QuoteSorter = ({ isLoading, isBuyOrder }: QuoteSorterProps) => {
   const selectedOption = find(SORT_OPTIONS(isBuyOrder), { key: sorting });
 
   return (
-    <div>
+    <StyledContainer>
+      <Typography variant="body1" sx={{ display: 'flex' }}>
+        <FormattedMessage description="selectBestQuoteBy" defaultMessage="Select by" />
+      </Typography>
       <Button
-        variant="outlined"
+        variant="text"
         color="default"
         disableElevation
         onClick={handleClick}
-        startIcon={<SortIcon />}
         endIcon={<KeyboardArrowDownIcon />}
         disabled={isLoading}
       >
@@ -148,7 +155,7 @@ const QuoteSorter = ({ isLoading, isBuyOrder }: QuoteSorterProps) => {
           </MenuItem>
         ))}
       </StyledMenu>
-    </div>
+    </StyledContainer>
   );
 };
 
