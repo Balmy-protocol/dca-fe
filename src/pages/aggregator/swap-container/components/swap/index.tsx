@@ -52,6 +52,7 @@ import Grid from '@mui/material/Grid';
 import { resetForm, setFrom, setFromValue, setSelectedRoute, setTo, setToValue } from '@state/aggregator/actions';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useAggregatorState } from '@state/aggregator/hooks';
+import usePermit2Service from '@hooks/usePermit2Service';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -134,6 +135,7 @@ const Swap = ({
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const trackEvent = useTrackEvent();
   const replaceHistory = useReplaceHistory();
+  const permit2Service = usePermit2Service();
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, selectedRoute?.swapper.allowanceTarget);
@@ -614,6 +616,11 @@ const Swap = ({
     if (!from || fromValueToUse === '' || !to || !selectedRoute) {
       return;
     }
+
+    permit2Service
+      .getPermit2SignedData(from, parseUnits(fromValueToUse, from.decimals), selectedRoute.swapper.allowanceTarget)
+      .then((signature) => console.log('got permit2 signature', signature))
+      .catch((e) => console.log('failed to get permit2signature', e));
 
     const newSteps: TransactionStep[] = [];
 

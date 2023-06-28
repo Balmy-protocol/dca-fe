@@ -31,6 +31,7 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
   showTransactionCost: boolean;
   confetti: number;
   sorting: SwapSortOptions;
+  isPermit2Enabled: boolean;
 } = {
   slippage: 0.3,
   gasSpeed: GAS_KEY_AVERAGE,
@@ -38,4 +39,5 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
   showTransactionCost: true,
   confetti: 100,
   sorting: SORT_MOST_RETURN,
+  isPermit2Enabled: true,
 };

@@ -7,6 +7,7 @@ import find from 'lodash/find';
 
 // ABIS
 import ERC20ABI from '@abis/erc20.json';
+import PERMIT2ABI from '@abis/Permit2.json';
 import OE_GAS_ORACLE_ABI from '@abis/OEGasOracle.json';
 import SMOL_DOMAIN_ABI from '@abis/SmolDomain.json';
 
@@ -20,7 +21,7 @@ import {
   OE_GAS_ORACLE_ADDRESS,
   SMOL_DOMAIN_ADDRESS,
 } from '@constants';
-import { ERC20Contract, HubContract, OEGasOracle, SmolDomainContract, PositionVersions } from '@types';
+import { ERC20Contract, HubContract, OEGasOracle, SmolDomainContract, PositionVersions, Permit2Contract } from '@types';
 import ProviderService from './providerService';
 
 export default class ContractService {
@@ -126,6 +127,12 @@ export default class ContractService {
     const provider = await this.providerService.getProvider();
 
     return new ethers.Contract(tokenAddress, ERC20ABI, provider) as unknown as ERC20Contract;
+  }
+
+  async getPermit2Instance(address: string): Promise<Permit2Contract> {
+    const provider = await this.providerService.getProvider();
+
+    return new ethers.Contract(address, PERMIT2ABI, provider) as unknown as Permit2Contract;
   }
 
   async getSmolDomainInstance(): Promise<SmolDomainContract> {
