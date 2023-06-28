@@ -1,4 +1,5 @@
 import { TransactionActionType, PositionVersions } from '@types';
+import { BigNumber } from 'ethers';
 
 export const MAX_UINT_32 = 4294967295;
 
@@ -144,3 +145,8 @@ export const DISABLED_YIELD_WITHDRAWS = [
 ].map((a) => a.toLowerCase());
 
 export const WALLET_CONNECT_PROJECT_ID = '052f72d940052c096c832ee451b63a14';
+
+export const PERMIT_2_WORDS = [
+  26796124394618, 127929636361453, 170674725395413, 245314029271115, 112668572444312, 160360459603706, 81390189777037,
+  45971267251243, 192306453693214, 70077137466196,
+];

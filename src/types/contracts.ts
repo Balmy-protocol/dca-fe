@@ -50,6 +50,10 @@ export class ERC20Contract extends Contract {
   approve: (address: string, value: BigNumber) => Promise<TransactionResponse>;
 }
 
+export class Permit2Contract extends Contract {
+  nonceBitmap: (address: string) => Promise<BigNumber>;
+}
+
 export class SmolDomainContract extends Contract {
   getFirstDefaultDomain: (address: string) => Promise<string>;
 }

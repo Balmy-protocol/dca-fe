@@ -15,6 +15,7 @@ import {
   restoreDefaults,
   setDisabledDexes,
   setConfetti,
+  setPermit2,
 } from '@state/aggregator-settings/actions';
 import { GasKeys } from '@constants/aggregator';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -24,6 +25,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
+import Switch from '@mui/material/Switch';
 import useTrackEvent from '@hooks/useTrackEvent';
 import SlippageInput from './components/slippage-input';
 import GasSelector from './components/gas-selector';
@@ -62,7 +64,7 @@ interface SwapSettingsProps {
 }
 
 const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
-  const { slippage, gasSpeed, disabledDexes, confettiParticleCount } = useAggregatorSettingsState();
+  const { slippage, gasSpeed, disabledDexes, confettiParticleCount, isPermit2Enabled } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const dexes = useSdkDexes();
   const [showDexes, setShowDexes] = React.useState(false);
@@ -78,6 +80,15 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
   };
   const onConfettiChange = (newConfettiParticleCount: number) => {
     dispatch(setConfetti(newConfettiParticleCount));
+  };
+  const onPermit2Change = (newPermitConfig: boolean) => {
+    dispatch(setPermit2(newPermitConfig));
+
+    if (newPermitConfig) {
+      trackEvent('Aggregator - Enable permit2');
+    } else {
+      trackEvent('Aggregator - Disable permit2');
+    }
   };
 
   const onRestoreDefaults = () => {
@@ -116,6 +127,19 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
               <FormattedMessage description="advancedAggregatorSettings" defaultMessage="Advanced settings" />
             </Typography>
           </Grid>
+          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
+            <StyledSettingContainer>
+              <Typography variant="body1">
+                <FormattedMessage description="advancedAggregatorSettingsPermit2" defaultMessage="Permit 2 approval:" />
+              </Typography>
+              <Switch
+                checked={isPermit2Enabled}
+                onChange={() => onPermit2Change(!isPermit2Enabled)}
+                name="enableDisablePermit2Approval"
+                color="primary"
+              />
+            </StyledSettingContainer>
+          </StyledGrid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer>
               <Typography variant="body1">

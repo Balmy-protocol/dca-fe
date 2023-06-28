@@ -8,6 +8,7 @@ import {
   setShowTransactionCost,
   setConfetti,
   setSorting,
+  setPermit2,
 } from './actions';
 
 export interface AggregatorSettingsState {
@@ -17,6 +18,7 @@ export interface AggregatorSettingsState {
   showTransactionCost: boolean;
   confettiParticleCount: number;
   sorting: SwapSortOptions;
+  isPermit2Enabled: boolean;
 }
 
 const initialState: AggregatorSettingsState = {
@@ -26,6 +28,7 @@ const initialState: AggregatorSettingsState = {
   showTransactionCost: DEFAULT_AGGREGATOR_SETTINGS.showTransactionCost,
   confettiParticleCount: DEFAULT_AGGREGATOR_SETTINGS.confetti,
   sorting: DEFAULT_AGGREGATOR_SETTINGS.sorting,
+  isPermit2Enabled: DEFAULT_AGGREGATOR_SETTINGS.isPermit2Enabled,
 };
 
 export default createReducer(initialState, (builder) =>
@@ -47,6 +50,9 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setConfetti, (state, { payload }) => {
       state.confettiParticleCount = payload;
+    })
+    .addCase(setPermit2, (state, { payload }) => {
+      state.isPermit2Enabled = payload;
     })
     .addCase(restoreDefaults, (state) => {
       state.gasSpeed = DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
