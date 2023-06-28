@@ -11,6 +11,8 @@ export const setShowTransactionCost = createAction<boolean>('aggregatorSettings/
 
 export const setConfetti = createAction<number>('aggregatorSettings/setConfetti');
 
+export const setPermit2 = createAction<boolean>('aggregatorSettings/setPermit2');
+
 export const restoreDefaults = createAction('aggregatorSettings/restoreDefaults');
 
 export const setSorting = createAction<SwapSortOptions>('aggregator/setSorting');
