@@ -118,7 +118,7 @@
     "@mui/material": "^5.6.3",
     "@mui/styled-engine-sc": "^5.6.1",
     "@mui/styles": "^5.6.2",
-    "@rainbow-me/rainbowkit": "^0.12.4",
+    "@rainbow-me/rainbowkit": "^0.12.16",
     "@reduxjs/toolkit": "^1.6.0",
     "@safe-global/safe-apps-sdk": "^7.10.1",
     "@types/react-redux": "^7.1.16",
@@ -164,7 +164,7 @@
     "toformat": "^2.0.0",
     "url": "^0.11.0",
     "uuid": "^9.0.0",
-    "wagmi": "^0.12.7",
+    "wagmi": "^0.12.18",
     "web3modal": "^1.9.3"
   },
   "lint-staged": {

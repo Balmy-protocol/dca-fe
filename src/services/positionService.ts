@@ -7,7 +7,6 @@ import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import findIndex from 'lodash/findIndex';
 import { hexlify } from 'ethers/lib/utils';
-import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import {
   Token,
   Position,
@@ -56,8 +55,6 @@ import ProviderService from './providerService';
 import SafeService from './safeService';
 
 export default class PositionService {
-  modal: SafeAppWeb3Modal;
-
   signer: Signer;
 
   currentPositions: PositionKeyBy;
