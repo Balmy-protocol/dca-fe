@@ -94,8 +94,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xbd1fe73e1f12bd2bc237de9b626f056f21f86427', // POLY - jMXN
   '0x250632378e573c6be1ac2f97fcdf00515d0aa91b', // BSC - BETH
 
-  // Polygon - FBX - They moved liquidity from pair $FBX/$WETH to $FBX/$WSTEH
-  '0xd125443f38a69d776177c2b9c041f462936f8218',
   // Arbitrum - FRAX - Blacklisting so we can test it out
   '0x17fc002b466eec40dae837fc4be5c67993ddbd6f',
   // Arbitrum - GMD - Blacklisting so we can test it out
