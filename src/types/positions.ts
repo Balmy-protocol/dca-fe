@@ -78,6 +78,7 @@ export interface Position {
   pendingTransaction: string;
   version: PositionVersions;
   chainId: number;
+  pairId: string;
   pairLastSwappedAt: number;
   pairNextSwapAvailableAt: string;
   yieldFrom?: string;

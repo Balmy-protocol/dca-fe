@@ -44,7 +44,7 @@ import {
 } from '@constants';
 import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { getDisplayToken } from '@common/utils/parsing';
+import { getDisplayToken, sortTokens } from '@common/utils/parsing';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -210,6 +210,7 @@ export default class PositionService {
                 totalSwaps: BigNumber.from(position.totalSwaps),
                 toWithdrawUnderlying: null,
                 remainingLiquidityUnderlying: null,
+                pairId: position.pair.id,
                 depositedRateUnderlying: position.depositedRateUnderlying
                   ? BigNumber.from(position.depositedRateUnderlying)
                   : null,
@@ -226,7 +227,6 @@ export default class PositionService {
                 totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
                 totalDeposited: BigNumber.from(position.totalDeposited),
                 pendingTransaction,
-                pairId: position.pair.id,
                 version,
                 chainId: network,
                 pairLastSwappedAt:
@@ -1083,6 +1083,7 @@ export default class PositionService {
         };
       }
 
+      const [tokenA, tokenB] = sortTokens(newPositionTypeData.from, newPositionTypeData.to);
       this.currentPositions[`${id}-v${newPositionTypeData.version}`] = {
         from: fromToUse,
         to: toToUse,
@@ -1095,6 +1096,7 @@ export default class PositionService {
         rate: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
           BigNumber.from(newPositionTypeData.frequencyValue)
         ),
+        pairId: `${tokenA.address}-${tokenB.address}`,
         depositedRateUnderlying: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals).div(
           BigNumber.from(newPositionTypeData.frequencyValue)
         ),

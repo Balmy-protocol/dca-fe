@@ -56,6 +56,11 @@ export const TOKEN_BLACKLIST = [
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // OP - WTF optimism
 ];
 
+export const DCA_PAIR_BLACKLIST = [
+  '0xa7a7ffe0520e90491e58c9c77f78d7cfc32d019e-0xd125443f38a69d776177c2b9c041f462936f8218', // POLY - FBX/waWETH
+  '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619-0xd125443f38a69d776177c2b9c041f462936f8218', // POLY - FBX/WETH
+];
+
 export const DCA_TOKEN_BLACKLIST = [
   '0x5fe2b58c013d7601147dcdd68c143a77499f5531', // POLY - GRT
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // POLY - SNX
