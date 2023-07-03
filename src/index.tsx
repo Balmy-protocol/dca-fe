@@ -58,11 +58,9 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
       setIsLoadingWeb3(false);
     }
 
-    if (!web3Service.getModal()) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      setWeb3ModalEffect();
-    }
-  }, [web3Service]);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    setWeb3ModalEffect();
+  }, []);
 
   const isLoading = isLoadingWeb3;
 

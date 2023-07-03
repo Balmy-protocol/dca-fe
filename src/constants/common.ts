@@ -56,6 +56,11 @@ export const TOKEN_BLACKLIST = [
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // OP - WTF optimism
 ];
 
+export const DCA_PAIR_BLACKLIST = [
+  '0xa7a7ffe0520e90491e58c9c77f78d7cfc32d019e-0xd125443f38a69d776177c2b9c041f462936f8218', // POLY - FBX/waWETH
+  '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619-0xd125443f38a69d776177c2b9c041f462936f8218', // POLY - FBX/WETH
+];
+
 export const DCA_TOKEN_BLACKLIST = [
   '0x5fe2b58c013d7601147dcdd68c143a77499f5531', // POLY - GRT
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // POLY - SNX
@@ -86,14 +91,11 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x296f55f8fb28e498b858d0bcda06d955b2cb3f97', // OP - STG
   '0x18c46621af7cbcdf58b155517d22b4ae7c5f2cd1', // POLY - wstEth Aave
   '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // POLY - jBRL
+  '0xbd1fe73e1f12bd2bc237de9b626f056f21f86427', // POLY - jMXN
   '0x250632378e573c6be1ac2f97fcdf00515d0aa91b', // BSC - BETH
 
-  // Polygon - FBX - They moved liquidity from pair $FBX/$WETH to $FBX/$WSTEH
-  '0xd125443f38a69d776177c2b9c041f462936f8218',
   // Arbitrum - FRAX - Blacklisting so we can test it out
   '0x17fc002b466eec40dae837fc4be5c67993ddbd6f',
-  // Arbitrum - MCB - Blacklisting so we can test it out
-  '0x4e352cf164e64adcbad318c3a1e222e9eba4ce42',
   // Arbitrum - GMD - Blacklisting so we can test it out
   '0x4945970efeec98d393b4b979b9be265a3ae28a8b',
   // BNB - Beefy ETH on Valas - Blacklisting so we can test it out

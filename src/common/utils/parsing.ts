@@ -219,6 +219,7 @@ export function fullPositionToMappedPosition(position: FullPosition, positionVer
     chainId: position.chainId,
     pairLastSwappedAt: parseInt(position.createdAtTimestamp, 10),
     pairNextSwapAvailableAt: position.createdAtTimestamp,
+    pairId: position.pair.id,
   };
 }
 

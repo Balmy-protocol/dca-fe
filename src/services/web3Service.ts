@@ -1,7 +1,5 @@
 import { ethers, Signer } from 'ethers';
 import { ExternalProvider, Provider, Network } from '@ethersproject/providers';
-import { Web3Modal } from '@web3modal/standalone';
-import { EthereumClient } from '@web3modal/ethereum';
 import { configureChains, createClient, Client, Connector, Chain } from 'wagmi';
 import { getAllChains } from '@mean-finance/sdk';
 import {
@@ -75,11 +73,7 @@ const WALLET_CONNECT_KEY = 'walletconnect';
 export default class Web3Service {
   client: ethers.providers.Web3Provider;
 
-  modal: Web3Modal;
-
   signer: Signer;
-
-  ethClient: EthereumClient;
 
   wagmiClient: Client;
 
@@ -134,14 +128,10 @@ export default class Web3Service {
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
-    client?: ethers.providers.Web3Provider,
-    modal?: Web3Modal
+    client?: ethers.providers.Web3Provider
   ) {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
-    }
-    if (modal) {
-      this.modal = modal;
     }
     if (DCASubgraphs) {
       this.apolloClient = DCASubgraphs;
@@ -272,10 +262,6 @@ export default class Web3Service {
     return this.campaignService;
   }
 
-  getModal() {
-    return this.modal;
-  }
-
   getDCAGraphqlClient() {
     return this.apolloClient;
   }
@@ -298,10 +284,6 @@ export default class Web3Service {
 
   setLoadedAsSafeApp(loadedAsSafeApp: boolean) {
     this.loadedAsSafeApp = loadedAsSafeApp;
-  }
-
-  setModal(modal: Web3Modal) {
-    this.modal = modal;
   }
 
   setAccount(account: string) {
@@ -474,9 +456,9 @@ export default class Web3Service {
           injectedWallet({ chains }),
           frameWallet({ chains }),
           rabbyWallet({ chains }),
-          metaMaskWallet({ chains }),
-          walletConnectWallet({ chains }),
-          rainbowWallet({ chains }),
+          metaMaskWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
+          walletConnectWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
+          rainbowWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           coinbaseWallet({ chains, appName: 'Mean Finance' }),
           braveWallet({ chains }),
         ],
@@ -484,11 +466,11 @@ export default class Web3Service {
       {
         groupName: 'More',
         wallets: [
-          trustWallet({ chains }),
+          trustWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           ripioWallet({ chains }),
-          argentWallet({ chains }),
+          argentWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           safeWallet({ chains }),
-          ledgerWallet({ chains }),
+          ledgerWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           bitkeepWallet({ chains }),
         ],
       },

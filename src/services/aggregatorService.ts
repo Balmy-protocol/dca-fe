@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 import { BigNumber, Signer, utils } from 'ethers';
-import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 
@@ -22,8 +21,6 @@ import SdkService from './sdkService';
 import SafeService from './safeService';
 
 export default class AggregatorService {
-  modal: SafeAppWeb3Modal;
-
   signer: Signer;
 
   contractService: ContractService;

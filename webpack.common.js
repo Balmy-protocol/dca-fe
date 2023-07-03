@@ -34,6 +34,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.MIXPANEL_TOKEN': JSON.stringify(process.env.MIXPANEL_TOKEN),
     }),
+    new webpack.DefinePlugin({
+      'process.env.WC_PROJECT_ID': JSON.stringify(process.env.WC_PROJECT_ID),
+    }),
     new WebpackBar(),
   ],
   devtool: 'source-map',

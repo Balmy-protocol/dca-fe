@@ -143,6 +143,7 @@ const PositionDataControls = ({
 
   const disabledIncrease =
     disabled ||
+    DCA_TOKEN_BLACKLIST.includes(position.pair.id) ||
     DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
     DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
     DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') ||

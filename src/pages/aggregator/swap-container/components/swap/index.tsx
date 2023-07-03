@@ -717,12 +717,10 @@ const Swap = ({ isLoadingRoute, setRefreshQuotes }: SwapProps) => {
     !selectedRoute ||
     (from &&
       selectedRoute &&
-      (!fromValue
-        ? true
-        : (allowance.allowance &&
-            allowance.token.address === from.address &&
-            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
-          from.address === PROTOCOL_TOKEN_ADDRESS));
+      ((allowance.allowance &&
+        allowance.token.address === from.address &&
+        parseUnits(allowance.allowance, from.decimals).gte(selectedRoute.maxSellAmount.amount)) ||
+        from.address === PROTOCOL_TOKEN_ADDRESS));
 
   return (
     <>

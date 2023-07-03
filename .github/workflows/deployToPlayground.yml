@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
-          
+
       - name: Install dependencies
         run: yarn install --pure-lockfile
 
@@ -28,8 +28,9 @@ jobs:
           MIXPANEL_TOKEN: ${{ secrets.DEVELOPMENT_MIXPANEL_TOKEN }}
           ARCX_KEY: ${{ secrets.ARCX_KEY }}
           ETHPLORER_KEY: ${{ secrets.ETHPLORER_KEY }}
+          WC_PROJECT_ID: ${{ secrets.WC_PROJECT_ID }}
           ETHERSCAN_API: ${{ secrets.ETHERSCAN_API }}
-          
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

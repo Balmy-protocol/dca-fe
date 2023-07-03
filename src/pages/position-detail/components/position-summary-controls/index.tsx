@@ -9,7 +9,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
 import { createStyles } from '@mui/material/styles';
-import { DCA_TOKEN_BLACKLIST, LATEST_VERSION, shouldEnableFrequency, DISABLED_YIELD_WITHDRAWS } from '@constants';
+import {
+  DCA_TOKEN_BLACKLIST,
+  LATEST_VERSION,
+  shouldEnableFrequency,
+  DISABLED_YIELD_WITHDRAWS,
+  DCA_PAIR_BLACKLIST,
+} from '@constants';
 import Button from '@common/components/button';
 import SplitButton from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';
@@ -92,6 +98,7 @@ const PositionSummaryControls = ({
 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&
+    !DCA_PAIR_BLACKLIST.includes(position.pair.id) &&
     !DCA_TOKEN_BLACKLIST.includes(position.from.address) &&
     !DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') &&
     !DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') &&

@@ -25,6 +25,7 @@ export const EmptyPosition: Position = {
   swapInterval: ONE_DAY,
   user: PROTOCOL_TOKEN_ADDRESS,
   swapped: BigNumber.from(0),
+  pairId: `${PROTOCOL_TOKEN_ADDRESS}-${PROTOCOL_TOKEN_ADDRESS}`,
   remainingLiquidity: BigNumber.from(0),
   rate: BigNumber.from(1),
   depositedRateUnderlying: BigNumber.from(1),
