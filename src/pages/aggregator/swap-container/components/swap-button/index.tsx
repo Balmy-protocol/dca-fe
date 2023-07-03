@@ -20,6 +20,7 @@ import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import { NetworkStruct } from '@types';
+import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 
 const StyledButton = styled(Button)`
   padding: 10px 18px;
@@ -54,6 +55,7 @@ const SwapButton = ({
   handleSafeApproveAndSwap,
 }: SwapButtonProps) => {
   const { from, to, selectedRoute } = useAggregatorState();
+  const { isPermit2Enabled } = useAggregatorSettingsState();
   const currentNetwork = useSelectedNetwork();
   const { openConnectModal } = useConnectModal();
   const actualCurrentNetwork = useCurrentNetwork();
@@ -212,7 +214,10 @@ const SwapButton = ({
     ButtonToShow = NoFundsButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to && loadedAsSafeApp) {
     ButtonToShow = ApproveAndSwapSafeButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
+  } else if (
+    (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) ||
+    (isPermit2Enabled && from?.address !== PROTOCOL_TOKEN_ADDRESS)
+  ) {
     ButtonToShow = ProceedButton;
   } else {
     ButtonToShow = ActualSwapButton;

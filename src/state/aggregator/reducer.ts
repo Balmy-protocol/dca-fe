@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { SwapOption, Token } from '@types';
+import { SwapOptionWithFailure, Token } from '@types';
 import { DEFAULT_NETWORK_FOR_AGGREGATOR } from '@constants';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import {
@@ -20,7 +20,7 @@ export interface AggregatorState {
   from: Token | null;
   to: Token | null;
   isBuyOrder: boolean;
-  selectedRoute: SwapOption | null;
+  selectedRoute: SwapOptionWithFailure | null;
   transferTo: null | string;
   network: number;
 }

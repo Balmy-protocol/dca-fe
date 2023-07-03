@@ -36,7 +36,12 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
       if (from) {
         try {
           const promiseResult = await sdkService.getMultipleBalances([from]);
-          setState({ isLoading: false, result: promiseResult[from.chainId][from.address], error: undefined });
+
+          if (!promiseResult[from.chainId][from.address]) {
+            setState({ result: undefined, error: 'Could not find balance for token', isLoading: false });
+          } else {
+            setState({ isLoading: false, result: promiseResult[from.chainId][from.address], error: undefined });
+          }
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });
         }

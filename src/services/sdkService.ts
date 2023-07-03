@@ -10,6 +10,7 @@ import { toToken } from '@common/utils/currency';
 import { MEAN_API_URL, NULL_ADDRESS } from '@constants/addresses';
 import ProviderService from './providerService';
 import WalletService from './walletService';
+import ContractService from './contractService';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<{}>>;
@@ -22,10 +23,18 @@ export default class SdkService {
 
   provider: BaseProvider | undefined;
 
-  constructor(walletService: WalletService, providerService: ProviderService, axiosClient: AxiosInstance) {
+  contractService: ContractService;
+
+  constructor(
+    walletService: WalletService,
+    providerService: ProviderService,
+    axiosClient: AxiosInstance,
+    contractService: ContractService
+  ) {
     this.walletService = walletService;
     this.providerService = providerService;
     this.axiosClient = axiosClient;
+    this.contractService = contractService;
     this.sdk = buildSDK({
       provider: {
         source: {
@@ -142,16 +151,21 @@ export default class SdkService {
     recipient?: string | null,
     slippagePercentage?: number,
     gasSpeed?: GasKeys,
-    takerAddress?: string,
+    passedTakerAddress?: string,
     skipValidation?: boolean,
     chainId?: number,
-    disabledDexes?: string[]
+    disabledDexes?: string[],
+    usePermit2 = false
   ) {
     const currentNetwork = await this.providerService.getNetwork();
+
+    const meanPermit2Address = await this.contractService.getMeanPermit2Address();
 
     const network = chainId || currentNetwork.chainId;
 
     let responses;
+
+    const takerAddress = usePermit2 ? meanPermit2Address : passedTakerAddress;
 
     if (!takerAddress) {
       responses = await this.sdk.quoteService.estimateAllQuotes({

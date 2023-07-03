@@ -1,6 +1,6 @@
 import { BigNumber, VoidSigner } from 'ethers';
 
-import { PERMIT_2_ADDRESS, PERMIT_2_WORDS } from '@constants';
+import { ONE_DAY, PERMIT_2_WORDS } from '@constants';
 import PERMIT2ABI from '@abis/Permit2.json';
 import { MaxUint256 } from '@ethersproject/constants';
 import { Token } from '@types';
@@ -33,8 +33,9 @@ export default class Permit2Service {
 
   async generateNonce({ user }: { user: string }): Promise<BigNumber> {
     const currentNetwork = await this.providerService.getNetwork();
+    const permit2Address = await this.contractService.getPermit2Address();
     const calls = PERMIT_2_WORDS.map((word) => ({
-      address: PERMIT_2_ADDRESS[currentNetwork.chainId],
+      address: permit2Address,
       abi: { json: PERMIT2ABI },
       functionName: 'nonceBitmap',
       args: [user, word],
@@ -44,51 +45,55 @@ export default class Permit2Service {
       chainId: currentNetwork.chainId,
       calls,
     })) as unknown as BigNumber[];
+
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < results.length; i++) {
-      const result = results[i];
+      // debugger;
+      const result = BigNumber.from(results[i]);
       if (result.lt(MaxUint256)) {
         // eslint-disable-next-line no-bitwise
-        return BigNumber.from((PERMIT_2_WORDS[i] << 8) + Math.log2(result.add(1).toNumber()));
+        return BigNumber.from(PERMIT_2_WORDS[i])
+          .shl(8)
+          .add(Math.log2(result.add(1).toNumber()));
       }
     }
 
     throw new Error('No nonce found');
   }
 
-  async getPermit2SignedData(token: Token, amount: BigNumber, addressFor: string) {
+  async getPermit2SignedData(token: Token, amount: BigNumber, addressFor?: string) {
     const signer = this.providerService.getSigner();
+    const permit2Address = await this.contractService.getPermit2Address();
+    const meanPermit2Address = await this.contractService.getMeanPermit2Address();
 
     const nonce = await this.generateNonce({ user: this.walletService.getAccount() });
+
     const typedData = {
       types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' },
+        PermitTransferFrom: [
+          { type: 'TokenPermissions', name: 'permitted' },
+          { type: 'address', name: 'spender' },
+          { type: 'uint256', name: 'nonce' },
+          { type: 'uint256', name: 'deadline' },
         ],
-        Permit: [
-          { name: 'owner', type: 'address' },
-          { name: 'spender', type: 'address' },
-          { name: 'value', type: 'uint256' },
-          { name: 'nonce', type: 'uint256' },
-          { name: 'deadline', type: 'uint256' },
+        TokenPermissions: [
+          { type: 'address', name: 'token' },
+          { type: 'uint256', name: 'amount' },
         ],
       },
-      primaryType: 'Permit',
       domain: {
-        name: token.name,
-        version: '1',
-        chainId: token.chainId, // Use the actual chainId
-        verifyingContract: token.address,
+        name: 'Permit2',
+        chainId: token.chainId,
+        verifyingContract: permit2Address,
       },
       message: {
-        owner: this.walletService.getAccount(),
-        spender: addressFor,
-        value: amount, // Specify the token amount to permit
-        nonce, // Nonce for this permit
-        deadline: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // Deadline for the permit, for example, 24 hours from now
+        permitted: {
+          token: token.address,
+          amount,
+        },
+        spender: addressFor || meanPermit2Address,
+        nonce,
+        deadline: Math.floor(Date.now() / 1000) + ONE_DAY.toNumber(), // Deadline for the permit, for example, 24 hours from now
       },
     };
 
@@ -102,10 +107,12 @@ export default class Permit2Service {
     const { v, r, s } = fromRpcSig(rawSignature);
 
     return {
-      deadline: MaxUint256,
+      deadline: typedData.message.deadline,
       v,
       r,
       s,
+      nonce,
+      rawSignature,
     };
   }
 }

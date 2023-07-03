@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import SplitButton from '@common/components/split-button';
 import { CustomButtonProps } from '@common/components/button';
-import { Token, YieldOption } from '@types';
+import { AllowanceType, Token, YieldOption } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useWeb3Service from '@hooks/useWeb3Service';
 import Tooltip from '@mui/material/Tooltip';
@@ -10,11 +10,6 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { useHasPendingApproval } from '@state/transactions/hooks';
-
-export enum AllowanceType {
-  specific = 'specific',
-  max = 'max',
-}
 
 interface AllowanceSplitButtonProps {
   disabled?: boolean;
@@ -26,6 +21,7 @@ interface AllowanceSplitButtonProps {
   target?: string;
   color?: CustomButtonProps['color'];
   defaultApproval?: AllowanceType;
+  tooltipText?: string;
 }
 
 const StyledTooltip = styled(Tooltip)`
@@ -33,19 +29,21 @@ const StyledTooltip = styled(Tooltip)`
   margin-left: 5px;
 `;
 
-export const AllowanceTooltip = (props: { symbol: string; target?: string }) => {
-  const { symbol, target } = props;
+export const AllowanceTooltip = (props: { symbol: string; target?: string; message?: string }) => {
+  const { symbol, target, message } = props;
   return (
     <StyledTooltip
       title={
-        <FormattedMessage
-          description="Allowance Tooltip"
-          defaultMessage="You must give the {target} smart contracts permission to use your {symbol}"
-          values={{
-            symbol,
-            target: target || 'Mean Finance',
-          }}
-        />
+        message || (
+          <FormattedMessage
+            description="Allowance Tooltip"
+            defaultMessage="You must give the {target} smart contracts permission to use your {symbol}"
+            values={{
+              symbol,
+              target: target || 'Mean Finance',
+            }}
+          />
+        )
       }
       arrow
       placement="top"
@@ -66,6 +64,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
     color: passedColor,
     target,
     defaultApproval,
+    tooltipText,
   } = props;
   const color = passedColor || 'primary';
   const web3Service = useWeb3Service();
@@ -116,7 +115,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
           ) : (
             defaultText
           )}
-          {!hasPendingApproval && <AllowanceTooltip target={target} symbol={symbol} />}
+          {!hasPendingApproval && <AllowanceTooltip message={tooltipText} target={target} symbol={symbol} />}
         </>
       }
       disabled={disabled}

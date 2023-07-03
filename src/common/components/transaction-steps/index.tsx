@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styled from 'styled-components';
 import Slide from '@mui/material/Slide';
 import findIndex from 'lodash/findIndex';
@@ -17,6 +17,9 @@ import {
   TransactionActionWaitForSimulationType,
   TransactionActionWaitForSimulationData,
   BlowfishResponse,
+  AllowanceType,
+  TransactionActionWaitForQuotesSimulationType,
+  TransactionActionWaitForQuotesSimulationData,
 } from '@types';
 import {
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
@@ -25,7 +28,10 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
+  TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION,
 } from '@constants';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
 import IconButton from '@mui/material/IconButton';
@@ -37,8 +43,9 @@ import Address from '@common/components/address';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import CircularProgress from '@mui/material/CircularProgress';
 import { BigNumber } from 'ethers';
-import AllowanceSplitButton, { AllowanceType } from '@common/components/allowance-split-button';
+import AllowanceSplitButton from '@common/components/allowance-split-button';
 import TransactionSimulation from '@common/components/transaction-simulation';
+import Tooltip from '@mui/material/Tooltip';
 
 const StyledIconButton = styled(IconButton)`
   margin-right: 5px;
@@ -73,6 +80,13 @@ const StyledTransactionSteps = styled.div`
   flex-direction: column;
 `;
 
+const StyledExplanation = styled.div`
+  display: flex;
+  padding-top: 10px;
+  cursor: help;
+  align-self: flex-start;
+`;
+
 interface TransactionActionBase {
   hash: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,6 +96,7 @@ interface TransactionActionBase {
   checkForPending?: boolean;
   done?: boolean;
   failed?: boolean;
+  explanation?: string;
 }
 
 interface ItemProps {
@@ -97,7 +112,7 @@ interface TransactionActionApproveToken extends TransactionActionBase {
   type: TransactionActionApproveTokenType;
   extraData: TransactionActionApproveTokenData;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onAction: (transactions: any, amount?: BigNumber) => void;
+  onAction: (amount?: BigNumber) => void;
 }
 
 interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, ItemProps {}
@@ -105,6 +120,8 @@ interface TransactionActionApproveTokenProps extends TransactionActionApproveTok
 interface TransactionActionApproveTokenSign extends TransactionActionBase {
   type: TransactionActionApproveTokenSignType;
   extraData: TransactionActionApproveTokenData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAction: (amount?: BigNumber) => void;
 }
 
 interface TransactionActionApproveTokenSignProps extends TransactionActionApproveTokenSign, ItemProps {}
@@ -125,6 +142,15 @@ interface TransactionActionWaitForSimulation extends Omit<TransactionActionBase,
 
 interface TransactionActionWaitForSimulationProps extends TransactionActionWaitForSimulation, ItemProps {}
 
+interface TransactionActionWaitForQuotesSimulation extends Omit<TransactionActionBase, 'onAction'> {
+  type: TransactionActionWaitForQuotesSimulationType;
+  extraData: TransactionActionWaitForQuotesSimulationData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAction: (transactions: any, response: BlowfishResponse) => void;
+}
+
+interface TransactionActionWaitForQuotesSimulationProps extends TransactionActionWaitForQuotesSimulation, ItemProps {}
+
 interface TransactionActionSwap extends TransactionActionBase {
   type: TransactionActionSwapType;
   extraData: TransactionActionSwapData;
@@ -137,6 +163,7 @@ export type TransactionAction =
   | TransactionActionApproveTokenSign
   | TransactionActionWaitForApproval
   | TransactionActionWaitForSimulation
+  | TransactionActionWaitForQuotesSimulation
   | TransactionActionSwap;
 type TransactionActions = TransactionAction[];
 
@@ -144,6 +171,7 @@ interface TransactionConfirmationProps {
   shouldShow: boolean;
   handleClose: () => void;
   transactions: TransactionActions;
+  onAction: () => void;
 }
 
 const StyledTransactionStep = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
@@ -204,7 +232,7 @@ const buildApproveTokenItem = ({
   isFirst,
   isCurrentStep,
   done,
-  transactions,
+  explanation,
 }: TransactionActionApproveTokenProps) => ({
   content: () => {
     const web3Service = useWeb3Service();
@@ -231,14 +259,15 @@ const buildApproveTokenItem = ({
           {isCurrentStep && (
             <StyledTransactionStepButtonContainer>
               <AllowanceSplitButton
-                onMaxApprove={() => onAction(transactions)}
-                onApproveExact={(amount) => onAction(transactions, amount)}
+                onMaxApprove={() => onAction()}
+                onApproveExact={(amount) => onAction(amount)}
                 amount={extraData.amount}
                 token={extraData.token}
                 target={extraData.swapper}
                 tokenYield={null}
                 color="secondary"
-                defaultApproval={AllowanceType.specific}
+                defaultApproval={extraData.defaultApproval || AllowanceType.specific}
+                tooltipText={extraData.help}
               />
             </StyledTransactionStepButtonContainer>
           )}
@@ -248,6 +277,15 @@ const buildApproveTokenItem = ({
                 <FormattedMessage description="viewReceipt" defaultMessage="View receipt" />
               </Button>
             </StyledTransactionStepButtonContainer>
+          )}
+          {explanation && (
+            <StyledExplanation>
+              <Tooltip title={explanation} arrow placement="top">
+                <Typography variant="body2" color="rgb(102, 178, 255)">
+                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
+                </Typography>
+              </Tooltip>
+            </StyledExplanation>
           )}
         </StyledTransactionStepContent>
       </>
@@ -262,7 +300,7 @@ const buildApproveTokenSignItem = ({
   isLast,
   isFirst,
   isCurrentStep,
-  transactions,
+  explanation,
 }: TransactionActionApproveTokenSignProps) => ({
   content: () => {
     const web3Service = useWeb3Service();
@@ -293,11 +331,20 @@ const buildApproveTokenSignItem = ({
                 color="secondary"
                 fullWidth
                 size="large"
-                onClick={() => onAction(transactions)}
+                onClick={() => onAction(extraData.amount)}
               >
                 <FormattedMessage description="openWallet" defaultMessage="Open wallet" />
               </Button>
             </StyledTransactionStepButtonContainer>
+          )}
+          {explanation && (
+            <StyledExplanation>
+              <Tooltip title={explanation} arrow placement="top">
+                <Typography variant="body2" color="rgb(102, 178, 255)">
+                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
+                </Typography>
+              </Tooltip>
+            </StyledExplanation>
           )}
         </StyledTransactionStepContent>
       </>
@@ -321,6 +368,7 @@ const buildWaitForSimulationItem = ({
   done,
   extraData,
   failed,
+  explanation,
 }: TransactionActionWaitForSimulationProps) => ({
   content: () => {
     const [icon, setIcon] = React.useState<keyof typeof WaitIcons>(
@@ -379,6 +427,186 @@ const buildWaitForSimulationItem = ({
               </>
             )}
           </Typography>
+          {explanation && (
+            <StyledExplanation>
+              <Tooltip title={explanation} arrow placement="top">
+                <Typography variant="body2" color="rgb(102, 178, 255)">
+                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
+                </Typography>
+              </Tooltip>
+            </StyledExplanation>
+          )}
+        </StyledTransactionStepContent>
+      </>
+    );
+  },
+});
+
+const SimulationItem = ({ quotes, step }: { quotes: number; step: number }) => {
+  const [timer, setTimer] = React.useState(0);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    if (timer < quotes) {
+      timerRef.current = setTimeout(() => setTimer(timer + 1), 1000);
+    }
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [timer]);
+
+  return (
+    <FormattedMessage
+      description="transationStepWaitSimulatePending"
+      defaultMessage="{step} - The transactions is being simulated ({current}/{total})"
+      values={{
+        step,
+        total: quotes,
+        current: timer,
+      }}
+    />
+  );
+};
+
+const StyledTopCircularProgress = withStyles(() =>
+  createStyles({
+    circle: {
+      strokeLinecap: 'round',
+    },
+  })
+)(CircularProgress);
+
+const StyledCircularContainer = styled.div`
+  align-self: stretch;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const StyledBottomCircularProgress = withStyles(() =>
+  createStyles({
+    root: {
+      color: 'rgba(255, 255, 255, 0.05)',
+    },
+    circle: {
+      strokeLinecap: 'round',
+    },
+  })
+)(CircularProgress);
+
+const SimulationItemProgressBar = ({ quotes }: { quotes: number }) => {
+  const [timer, setTimer] = React.useState(0);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    if (timer < quotes) {
+      timerRef.current = setTimeout(() => setTimer(timer + 1), (7 / quotes) * 1000);
+    }
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [timer, quotes]);
+
+  return (
+    <StyledCircularContainer>
+      <StyledBottomCircularProgress
+        size={40}
+        variant="determinate"
+        value={100}
+        thickness={4}
+        sx={{ position: 'absolute' }}
+      />
+      <StyledTopCircularProgress
+        size={40}
+        variant="determinate"
+        value={(1 - (quotes - timer) / quotes) * 100}
+        thickness={4}
+      />
+    </StyledCircularContainer>
+  );
+};
+
+const buildWaitForQuotesSimulationItem = ({
+  checkForPending,
+  step,
+  isLast,
+  isFirst,
+  isCurrentStep,
+  done,
+  extraData,
+  failed,
+  explanation,
+}: TransactionActionWaitForQuotesSimulationProps) => ({
+  content: () => {
+    const [icon, setIcon] = React.useState<keyof typeof WaitIcons>(
+      // eslint-disable-next-line no-nested-ternary
+      checkForPending ? 'disabled' : failed ? 'failed' : 'success'
+    );
+
+    React.useEffect(() => {
+      if (!extraData.simulation && isCurrentStep) {
+        setIcon('pending');
+      }
+      if (extraData.simulation && isCurrentStep) {
+        setIcon('success');
+      }
+      if (failed && isCurrentStep) {
+        setIcon('failed');
+      }
+    }, [extraData]);
+
+    return (
+      <>
+        <StyledTransactionStepIcon isLast={isLast} isFirst={isFirst}>
+          <StyledTransactionStepIconContent>
+            {checkForPending && !extraData.simulation && isCurrentStep && !failed ? (
+              <SimulationItemProgressBar quotes={extraData.quotes} />
+            ) : (
+              WaitIcons[icon]
+            )}
+          </StyledTransactionStepIconContent>
+        </StyledTransactionStepIcon>
+        <StyledTransactionStepContent>
+          <Typography variant="body1">
+            {failed && (
+              <FormattedMessage
+                description="transationStepWaitSimulateFailed"
+                defaultMessage="{step} - Transaction simulation failed"
+                values={{ step }}
+              />
+            )}
+            {checkForPending && !extraData.simulation && isCurrentStep && !failed && (
+              <SimulationItem quotes={extraData.quotes} step={step} />
+            )}
+            {checkForPending && !extraData.simulation && !isCurrentStep && !failed && (
+              <FormattedMessage
+                description="transationStepWaitSimulatePending"
+                defaultMessage="{step} - The transactions will be simulated"
+                values={{ step }}
+              />
+            )}
+            {(checkForPending || done) && extraData.simulation && !failed && (
+              <>
+                <FormattedMessage
+                  description="transationStepWaitApprove"
+                  defaultMessage="{step} - Transaction simulated"
+                  values={{ step }}
+                />
+                <TransactionSimulation items={extraData.simulation} />
+              </>
+            )}
+          </Typography>
+          {explanation && (
+            <StyledExplanation>
+              <Tooltip title={explanation} arrow placement="top">
+                <Typography variant="body2" color="rgb(102, 178, 255)">
+                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
+                </Typography>
+              </Tooltip>
+            </StyledExplanation>
+          )}
         </StyledTransactionStepContent>
       </>
     );
@@ -396,6 +624,7 @@ const buildWaitForApprovalItem = ({
   transactions,
   isCurrentStep,
   done,
+  explanation,
 }: TransactionActionWaitForApprovalProps) => ({
   content: () => {
     const isPendingTransaction = getPendingTransaction(hash);
@@ -433,6 +662,15 @@ const buildWaitForApprovalItem = ({
               />
             )}
           </Typography>
+          {explanation && (
+            <StyledExplanation>
+              <Tooltip title={explanation} arrow placement="top">
+                <Typography variant="body2" color="rgb(102, 178, 255)">
+                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
+                </Typography>
+              </Tooltip>
+            </StyledExplanation>
+          )}
         </StyledTransactionStepContent>
       </>
     );
@@ -449,6 +687,7 @@ const buildWaitForSignApprovalItem = ({
   getPendingTransaction,
   transactions,
   isCurrentStep,
+  explanation,
 }: TransactionActionWaitForApprovalProps) => ({
   content: () => {
     const isPendingTransaction = getPendingTransaction(hash);
@@ -477,6 +716,15 @@ const buildWaitForSignApprovalItem = ({
               values={{ step }}
             />
           </Typography>
+          {explanation && (
+            <StyledExplanation>
+              <Tooltip title={explanation} arrow placement="top">
+                <Typography variant="body2" color="rgb(102, 178, 255)">
+                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
+                </Typography>
+              </Tooltip>
+            </StyledExplanation>
+          )}
         </StyledTransactionStepContent>
       </>
     );
@@ -491,6 +739,7 @@ const buildSwapItem = ({
   isFirst,
   isCurrentStep,
   transactions,
+  explanation,
 }: TransactionActionSwapProps) => ({
   content: () => (
     <>
@@ -514,6 +763,15 @@ const buildSwapItem = ({
             </Button>
           </StyledTransactionStepButtonContainer>
         )}
+        {explanation && (
+          <StyledExplanation>
+            <Tooltip title={explanation} arrow placement="top">
+              <Typography variant="body2" color="rgb(102, 178, 255)">
+                <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
+              </Typography>
+            </Tooltip>
+          </StyledExplanation>
+        )}
       </StyledTransactionStepContent>
     </>
   ),
@@ -524,6 +782,7 @@ type TransactionActionProps =
   | TransactionActionApproveTokenSignProps
   | TransactionActionWaitForApprovalProps
   | TransactionActionWaitForSimulationProps
+  | TransactionActionWaitForQuotesSimulationProps
   | TransactionActionSwapProps;
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
@@ -532,10 +791,11 @@ const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) =
   [TRANSACTION_ACTION_WAIT_FOR_APPROVAL]: buildWaitForApprovalItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL]: buildWaitForSignApprovalItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIMULATION]: buildWaitForSimulationItem,
+  [TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION]: buildWaitForQuotesSimulationItem,
   [TRANSACTION_ACTION_SWAP]: buildSwapItem,
 };
 
-const TransactionSteps = ({ shouldShow, handleClose, transactions }: TransactionConfirmationProps) => {
+const TransactionSteps = ({ shouldShow, handleClose, transactions, onAction }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
   const currentNetwork = useSelectedNetwork();
 
@@ -575,6 +835,7 @@ const TransactionSteps = ({ shouldShow, handleClose, transactions }: Transaction
                 isFirst,
                 isLast,
                 isCurrentStep,
+                onAction,
               });
               return (
                 <StyledTransactionStep key={`${type}-${hash}-${step}`} isLast={isLast} isCurrentStep={isCurrentStep}>
@@ -589,4 +850,9 @@ const TransactionSteps = ({ shouldShow, handleClose, transactions }: Transaction
   );
 };
 
-export default TransactionSteps;
+TransactionSteps.whyDidYouRender = true;
+
+const memoed = memo(TransactionSteps);
+
+memoed.whyDidYouRender = true;
+export default memoed;
