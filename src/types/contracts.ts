@@ -54,6 +54,80 @@ export class Permit2Contract extends Contract {
   nonceBitmap: (address: string) => Promise<BigNumber>;
 }
 
+export class MeanPermit2Contract extends Contract {
+  sellOrderSwapWithGasMeasurement: (
+    params: {
+      // Deadline
+      deadline: number;
+      // Take from caller
+      tokenIn: string;
+      amountIn: BigNumber;
+      nonce?: BigNumber;
+      signature?: string;
+      // Swapp approval
+      allowanceTarget: string;
+      // Swap execution
+      swapper: string;
+      swapData: string;
+      // Swap validation
+      tokenOut: string;
+      minAmountOut: BigNumber;
+      // Transfer token out
+      transferOut: { recipient: string; shareBps: number }[];
+    },
+    overrides?: { value?: BigNumber }
+  ) => Promise<TransactionResponse>;
+
+  sellOrderSwap: (
+    params: {
+      // Deadline
+      deadline: number;
+      // Take from caller
+      tokenIn: string;
+      amountIn: BigNumber;
+      nonce?: BigNumber;
+      signature?: string;
+      // Swapp approval
+      allowanceTarget: string;
+      // Swap execution
+      swapper: string;
+      swapData: string;
+      // Swap validation
+      tokenOut: string;
+      minAmountOut: BigNumber;
+      // Transfer token out
+      transferOut: { recipient: string; shareBps: number }[];
+    },
+    overrides?: { value?: BigNumber }
+  ) => Promise<TransactionResponse>;
+
+  callStatic: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    sellOrderSwapWithGasMeasurement: (
+      params: {
+        // Deadline
+        deadline: number;
+        // Take from caller
+        tokenIn: string;
+        amountIn: BigNumber;
+        nonce?: BigNumber;
+        signature?: string;
+        // Swapp approval
+        allowanceTarget: string;
+        // Swap execution
+        swapper: string;
+        swapData: string;
+        // Swap validation
+        tokenOut: string;
+        minAmountOut: BigNumber;
+        // Transfer token out
+        transferOut: { recipient: string; shareBps: number }[];
+      },
+      overrides?: { value?: BigNumber }
+    ) => Promise<[BigNumber, BigNumber, BigNumber]>;
+  };
+}
+
 export class SmolDomainContract extends Contract {
   getFirstDefaultDomain: (address: string) => Promise<string>;
 }

@@ -39,6 +39,7 @@ const StyledTransactionSimulationIcon = styled.div<{ isFirst: boolean; isLast: b
     border-left: 1px dashed rgba(255, 255, 255, 0.5);
     ${({ isFirst }) => (isFirst ? 'top: 24px;' : '')}
     ${({ isLast }) => (isLast ? 'bottom: calc(100% - 24px);' : '')}
+    z-index: -1;
   }
 `;
 

@@ -8,6 +8,7 @@ import find from 'lodash/find';
 // ABIS
 import ERC20ABI from '@abis/erc20.json';
 import PERMIT2ABI from '@abis/Permit2.json';
+import MEANPERMIT2ABI from '@abis/MeanPermit2.json';
 import OE_GAS_ORACLE_ABI from '@abis/OEGasOracle.json';
 import SMOL_DOMAIN_ABI from '@abis/SmolDomain.json';
 
@@ -20,8 +21,18 @@ import {
   LATEST_VERSION,
   OE_GAS_ORACLE_ADDRESS,
   SMOL_DOMAIN_ADDRESS,
+  MEAN_PERMIT_2_ADDRESS,
+  PERMIT_2_ADDRESS,
 } from '@constants';
-import { ERC20Contract, HubContract, OEGasOracle, SmolDomainContract, PositionVersions, Permit2Contract } from '@types';
+import {
+  ERC20Contract,
+  HubContract,
+  OEGasOracle,
+  SmolDomainContract,
+  PositionVersions,
+  Permit2Contract,
+  MeanPermit2Contract,
+} from '@types';
 import ProviderService from './providerService';
 
 export default class ContractService {
@@ -73,6 +84,18 @@ export default class ContractService {
       COMPANION_ADDRESS[version || LATEST_VERSION][network.chainId] ||
       COMPANION_ADDRESS[LATEST_VERSION][network.chainId]
     );
+  }
+
+  async getMeanPermit2Address(): Promise<string> {
+    const network = await this.providerService.getNetwork();
+
+    return MEAN_PERMIT_2_ADDRESS[network.chainId] || MEAN_PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId];
+  }
+
+  async getPermit2Address(): Promise<string> {
+    const network = await this.providerService.getNetwork();
+
+    return PERMIT_2_ADDRESS[network.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId];
   }
 
   async getSmolDomainAddress(): Promise<string> {
@@ -129,10 +152,18 @@ export default class ContractService {
     return new ethers.Contract(tokenAddress, ERC20ABI, provider) as unknown as ERC20Contract;
   }
 
-  async getPermit2Instance(address: string): Promise<Permit2Contract> {
+  async getPermit2Instance(): Promise<Permit2Contract> {
     const provider = await this.providerService.getProvider();
+    const permit2Address = await this.getPermit2Address();
 
-    return new ethers.Contract(address, PERMIT2ABI, provider) as unknown as Permit2Contract;
+    return new ethers.Contract(permit2Address, PERMIT2ABI, provider) as unknown as Permit2Contract;
+  }
+
+  async getMeanPermit2Instance(): Promise<MeanPermit2Contract> {
+    const provider = await this.providerService.getProvider();
+    const meanPermit2Address = await this.getMeanPermit2Address();
+
+    return new ethers.Contract(meanPermit2Address, MEANPERMIT2ABI, provider) as unknown as MeanPermit2Contract;
   }
 
   async getSmolDomainInstance(): Promise<SmolDomainContract> {

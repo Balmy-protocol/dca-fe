@@ -9,6 +9,7 @@ import { Alert } from '@mui/material';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import useUsdPrice from '@hooks/useUsdPrice';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import QuoteSimulation from '../quote-simulation';
@@ -82,6 +83,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     swapOptionsError,
   } = props;
 
+  const { isPermit2Enabled } = useAggregatorSettingsState();
   let fromValueToUse =
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address &&
@@ -181,14 +183,16 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             refreshQuotes={refreshQuotes}
             swapOptionsError={swapOptionsError}
           />
-          <QuoteSimulation
-            route={selectedRoute}
-            cantFund={cantFund}
-            isApproved={isApproved}
-            isLoadingRoute={isLoadingRoute}
-            setTransactionWillFail={setTransactionWillFail}
-            forceProviderSimulation={!!transferTo}
-          />
+          {!isPermit2Enabled && (
+            <QuoteSimulation
+              route={selectedRoute}
+              cantFund={cantFund}
+              isApproved={isApproved}
+              isLoadingRoute={isLoadingRoute}
+              setTransactionWillFail={setTransactionWillFail}
+              forceProviderSimulation={!!transferTo}
+            />
+          )}
           {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
             <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
               <FormattedMessage

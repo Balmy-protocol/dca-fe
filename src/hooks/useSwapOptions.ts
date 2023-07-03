@@ -24,7 +24,8 @@ function useSwapOptions(
   transferTo?: string | null,
   slippage?: number,
   gasSpeed?: GasKeys,
-  disabledDexes?: string[]
+  disabledDexes?: string[],
+  isPermit2Enabled = false
 ): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
   const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
@@ -49,6 +50,7 @@ function useSwapOptions(
   const prevGasSpeed = usePrevious(gasSpeed);
   const prevSlippage = usePrevious(slippage);
   const prevDisabledDexes = usePrevious(disabledDexes);
+  const prevIsPermit2Enabled = usePrevious(isPermit2Enabled);
   const debouncedCall = React.useCallback(
     debounce(
       async (
@@ -61,7 +63,8 @@ function useSwapOptions(
         debouncedSlippage?: number,
         debouncedAccount?: string,
         debouncedChainId?: number,
-        debouncedDisabledDexes?: string[]
+        debouncedDisabledDexes?: string[],
+        debouncedIsPermit2Enabled = false
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
           const sellBuyValue = debouncedIsBuyOrder
@@ -86,7 +89,8 @@ function useSwapOptions(
               debouncedGasSpeed,
               debouncedAccount,
               debouncedChainId,
-              debouncedDisabledDexes
+              debouncedDisabledDexes,
+              debouncedIsPermit2Enabled
             );
 
             if (promiseResult.length) {
@@ -116,9 +120,22 @@ function useSwapOptions(
         slippage,
         account,
         currentNetwork.chainId,
-        disabledDexes
+        disabledDexes,
+        isPermit2Enabled
       ),
-    [from, to, value, isBuyOrder, transferTo, slippage, gasSpeed, account, currentNetwork.chainId, disabledDexes]
+    [
+      from,
+      to,
+      value,
+      isBuyOrder,
+      transferTo,
+      slippage,
+      gasSpeed,
+      account,
+      currentNetwork.chainId,
+      disabledDexes,
+      isPermit2Enabled,
+    ]
   );
 
   React.useEffect(() => {
@@ -133,6 +150,7 @@ function useSwapOptions(
       !isEqual(prevGasSpeed, gasSpeed) ||
       !isEqual(prevNetwork, currentNetwork.chainId) ||
       !isEqual(prevDisabledDexes, disabledDexes) ||
+      !isEqual(prevIsPermit2Enabled, isPermit2Enabled) ||
       !isEqual(prevSlippage, slippage)
     ) {
       if (from && to && value) {
@@ -169,6 +187,8 @@ function useSwapOptions(
     prevGasSpeed,
     prevNetwork,
     currentNetwork.chainId,
+    isPermit2Enabled,
+    prevIsPermit2Enabled,
   ]);
 
   if (!from || !value) {

@@ -508,7 +508,16 @@ export const PERMIT_2_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [NETWORKS.mainnet.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [NETWORKS.bsc.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
-  [NETWORKS.baseGoerli.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [NETWORKS.baseGoerli.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3 ',
+};
+
+export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
+  [NETWORKS.polygon.chainId]: '0xf79599c9604ce0178ac10dbbe19058095c40c58b',
+  [NETWORKS.optimism.chainId]: '0xf79599c9604ce0178ac10dbbe19058095c40c58b',
+  [NETWORKS.arbitrum.chainId]: '0xf79599c9604ce0178ac10dbbe19058095c40c58b',
+  [NETWORKS.mainnet.chainId]: '0xf79599c9604ce0178ac10dbbe19058095c40c58b',
+  [NETWORKS.bsc.chainId]: '0xf79599c9604ce0178ac10dbbe19058095c40c58b',
+  [NETWORKS.baseGoerli.chainId]: '0xf79599c9604ce0178ac10dbbe19058095c40c58b ',
 };
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {

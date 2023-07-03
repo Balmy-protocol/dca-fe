@@ -16,7 +16,11 @@ import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@com
 import Box from '@mui/material/Box';
 import { setSelectedRoute } from '@state/aggregator/actions';
 import { useAppDispatch } from '@state/hooks';
+import { withStyles } from '@mui/styles';
+import { createStyles } from '@mui/material/styles';
 import useTrackEvent from '@hooks/useTrackEvent';
+import CircularProgress from '@mui/material/CircularProgress';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import Popover from '@mui/material/Popover';
 import QuoteRefresher from '../quote-refresher';
 import QuoteSorter from '../quote-sorter';
@@ -70,6 +74,84 @@ interface SwapQuotesProps {
   swapOptionsError?: string;
 }
 
+const StyledTopCircularProgress = withStyles(() =>
+  createStyles({
+    circle: {
+      strokeLinecap: 'round',
+    },
+  })
+)(CircularProgress);
+
+const StyledCircularContainer = styled.div`
+  align-self: stretch;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const StyledBottomCircularProgress = withStyles(() =>
+  createStyles({
+    root: {
+      color: 'rgba(255, 255, 255, 0.05)',
+    },
+    circle: {
+      strokeLinecap: 'round',
+    },
+  })
+)(CircularProgress);
+
+const TransactionsProgress = ({ showSimulate }: { showSimulate: boolean }) => {
+  const [timer, setTimer] = React.useState(0);
+  const [timerStarted, startTimer] = React.useState(false);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    if (timerStarted && timer < 9) {
+      timerRef.current = setTimeout(() => setTimer(timer + 1), 450);
+    }
+
+    if (!timerStarted && showSimulate) {
+      setTimeout(() => startTimer(true), 5000);
+    }
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [timer, timerStarted]);
+
+  if (!timerStarted || !showSimulate) {
+    return (
+      <>
+        <CenteredLoadingIndicator size={40} noFlex />
+        <FormattedMessage description="loadingBestRoute" defaultMessage="Fetching the best route for you" />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <StyledCircularContainer>
+        <StyledBottomCircularProgress
+          size={40}
+          variant="determinate"
+          value={100}
+          thickness={4}
+          sx={{ position: 'absolute' }}
+        />
+        <StyledTopCircularProgress size={40} variant="determinate" value={(1 - (9 - timer) / 9) * 100} thickness={4} />
+      </StyledCircularContainer>
+      <FormattedMessage
+        description="quoteSelectionSimulatingQuotes"
+        defaultMessage="Simulating transactions ({current}/{total})"
+        values={{
+          total: 9,
+          current: timer,
+        }}
+      />
+    </>
+  );
+};
+
 const QuoteSelection = ({
   quotes,
   isLoading,
@@ -78,7 +160,8 @@ const QuoteSelection = ({
   bestQuote,
   swapOptionsError,
 }: SwapQuotesProps) => {
-  const { isBuyOrder, selectedRoute } = useAggregatorState();
+  const { isBuyOrder, selectedRoute, from } = useAggregatorState();
+  const { isPermit2Enabled } = useAggregatorSettingsState();
   const { sorting } = useAggregatorSettingsState();
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
@@ -128,6 +211,19 @@ const QuoteSelection = ({
   const open = Boolean(anchorEl);
   const id = open ? 'quotes-popover' : undefined;
 
+  let color: string | undefined = '#219653';
+
+  if (!isBestQuote) {
+    color = '#EB5757';
+  } else if (
+    betterBy &&
+    parseFloat(
+      formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || BigNumber.from(0), emptyTokenWithDecimals(18), 3, 2)
+    ) === 0
+  ) {
+    color = undefined;
+  }
+
   return (
     <StyledContainer>
       <Grid container alignItems="center">
@@ -137,8 +233,7 @@ const QuoteSelection = ({
         {isLoading && (
           <Grid item xs={12}>
             <StyledCenteredWrapper>
-              <CenteredLoadingIndicator size={40} noFlex />
-              <FormattedMessage description="loadingBestRoute" defaultMessage="Fetching the best route for you" />
+              <TransactionsProgress showSimulate={isPermit2Enabled && from?.address === PROTOCOL_TOKEN_ADDRESS} />
             </StyledCenteredWrapper>
           </Grid>
         )}
@@ -152,7 +247,7 @@ const QuoteSelection = ({
                 </Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>
-                <Typography variant="h6" color={isBestQuote ? '#219653' : '#EB5757'}>
+                <Typography variant="h6" color={color}>
                   {formatCurrencyAmount(
                     (isBestQuote ? betterBy : worseBy) || BigNumber.from(0),
                     emptyTokenWithDecimals(18),
@@ -162,7 +257,9 @@ const QuoteSelection = ({
                   %
                 </Typography>
                 <Typography variant="caption">
-                  {isBestQuote ? getBetterByLabel(sorting, isBuyOrder) : getWorseByLabel(sorting, isBuyOrder, true)}
+                  {isBestQuote
+                    ? getBetterByLabel(sorting, isBuyOrder, true)
+                    : getWorseByLabel(sorting, isBuyOrder, true)}
                 </Typography>
               </StyledBetterByContainer>
             </StyledQuoteContainer>
@@ -187,7 +284,7 @@ const QuoteSelection = ({
                 }}
                 anchorEl={anchorEl}
                 id={id}
-                open={open}
+                open={!isLoading && open}
                 onClose={handleClose}
                 disableAutoFocus
                 PaperProps={{
