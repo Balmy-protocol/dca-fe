@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { SwapOption, Token } from '@types';
+import { SwapOptionWithFailure, Token } from '@types';
 
 export const setFromValue = createAction<{ value: string; updateMode?: boolean }>('aggregator/setFromValue');
 
@@ -11,7 +11,7 @@ export const setTo = createAction<Token | null>('aggregator/setTo');
 
 export const toggleFromTo = createAction('aggregator/toggleFromTo');
 
-export const setSelectedRoute = createAction<SwapOption | null>('aggregator/setSelectedRoute');
+export const setSelectedRoute = createAction<SwapOptionWithFailure | null>('aggregator/setSelectedRoute');
 
 export const resetForm = createAction('aggregator/resetForm');
 

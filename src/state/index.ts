@@ -22,7 +22,7 @@ import config from './config/reducer';
 import error from './error/reducer';
 
 const LATEST_VERSION = '1.0.6';
-const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.2';
+const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.3';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
 const TRANSACTION_VERSION_KEY = 'transactions_version';
 const TRANSACTION_KEY = 'redux_localstorage_simple_transactions';
@@ -134,6 +134,7 @@ const store = configureStore({
         showTransactionCost: DEFAULT_AGGREGATOR_SETTINGS.showTransactionCost,
         confettiParticleCount: DEFAULT_AGGREGATOR_SETTINGS.confetti,
         sorting: DEFAULT_AGGREGATOR_SETTINGS.sorting,
+        isPermit2Enabled: DEFAULT_AGGREGATOR_SETTINGS.isPermit2Enabled,
       },
       eulerClaim: {
         signature: '',

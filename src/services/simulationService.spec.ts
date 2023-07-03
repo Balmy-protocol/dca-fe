@@ -6,9 +6,13 @@ import { AxiosResponse } from 'axios';
 import SimulationService from './simulationService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
+import ContractService from './contractService';
+import SdkService from './sdkService';
 
 jest.mock('./providerService');
 jest.mock('./meanApiService');
+jest.mock('./contractService');
+jest.mock('./sdkService');
 
 /**
  * Create mock instance of given class or function constructor
@@ -21,18 +25,26 @@ jest.useFakeTimers();
 
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
+const MockedContractService = jest.mocked(ContractService, { shallow: true });
+const MockedSdkService = jest.mocked(SdkService, { shallow: true });
 describe('Simulation Service', () => {
   let simulationService: SimulationService;
   let meanApiService: jest.MockedObject<MeanApiService>;
   let providerService: jest.MockedObject<ProviderService>;
+  let contractService: jest.MockedObject<ContractService>;
+  let sdkService: jest.MockedObject<SdkService>;
 
   beforeEach(() => {
     meanApiService = createMockInstance(MockedMeanApiService);
     providerService = createMockInstance(MockedProviderService);
+    contractService = createMockInstance(MockedContractService);
+    sdkService = createMockInstance(MockedSdkService);
 
     simulationService = new SimulationService(
       meanApiService as unknown as MeanApiService,
-      providerService as unknown as ProviderService
+      providerService as unknown as ProviderService,
+      contractService as unknown as ContractService,
+      sdkService as unknown as SdkService
     );
   });
 
@@ -40,6 +52,8 @@ describe('Simulation Service', () => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
   });
+
+  describe('simulateQuotes', () => {});
 
   describe('simulateGasPriceTransaction', () => {
     test('it should return the none action when the estimate gas passess', async () => {

@@ -49,7 +49,7 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
         </Typography>
         <Typography variant="body2">
           {quote?.gas?.estimatedCostInUSD
-            ? `$${quote.gas.estimatedCostInUSD} (${formatCurrencyAmount(
+            ? `$${quote.gas.estimatedCostInUSD.toFixed(2)} (${formatCurrencyAmount(
                 quote.gas.estimatedCost,
                 protocolToken,
                 2,

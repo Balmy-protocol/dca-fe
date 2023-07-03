@@ -60,5 +60,6 @@ export default createReducer(initialState, (builder) =>
       state.disabledDexes = DEFAULT_AGGREGATOR_SETTINGS.disabledDexes;
       state.showTransactionCost = DEFAULT_AGGREGATOR_SETTINGS.showTransactionCost;
       state.confettiParticleCount = DEFAULT_AGGREGATOR_SETTINGS.confetti;
+      state.isPermit2Enabled = DEFAULT_AGGREGATOR_SETTINGS.isPermit2Enabled;
     })
 );

@@ -54,6 +54,7 @@ export type TransactionActionApproveTokenSignType = 'APPROVE_TOKEN_SIGN';
 export type TransactionActionWaitForSignApprovalType = 'WAIT_FOR_SIGN_APPROVAL';
 export type TransactionActionWaitForApprovalType = 'WAIT_FOR_APPROVAL';
 export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
+export type TransactionActionWaitForQuotesSimulationType = 'WAIT_FOR_QUOTES_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
 
 export type TransactionActionType =
@@ -62,13 +63,20 @@ export type TransactionActionType =
   | TransactionActionApproveTokenSignType
   | TransactionActionWaitForApprovalType
   | TransactionActionWaitForSimulationType
+  | TransactionActionWaitForQuotesSimulationType
   | TransactionActionWaitForSignApprovalType
   | TransactionActionSwapType;
 
+export enum AllowanceType {
+  specific = 'specific',
+  max = 'max',
+}
 export interface TransactionActionApproveTokenData {
   token: Token;
   amount: BigNumber;
   swapper: string;
+  defaultApproval?: AllowanceType;
+  help?: string;
 }
 
 export interface TransactionActionWaitForApprovalData {
@@ -82,11 +90,17 @@ export interface TransactionActionWaitForSimulationData {
   simulation?: BlowfishResponse;
 }
 
+export interface TransactionActionWaitForQuotesSimulationData {
+  simulation?: BlowfishResponse;
+  quotes: number;
+}
+
 export interface TransactionActionSwapData {
   from: Token;
   to: Token;
   sellAmount: BigNumber;
   buyAmount: BigNumber;
+  signature?: { deadline: number; v: number; r: Buffer; s: Buffer; nonce: BigNumber; rawSignature: string };
 }
 
 export type TransactionActionExtraData =

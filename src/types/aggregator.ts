@@ -44,6 +44,10 @@ export type SwapOption = {
   tx?: QuoteTransaction;
 };
 
+export interface SwapOptionWithFailure extends SwapOption {
+  willFail?: boolean;
+}
+
 export interface SwapOptionWithTx extends SwapOption {
   tx: QuoteTransaction;
 }

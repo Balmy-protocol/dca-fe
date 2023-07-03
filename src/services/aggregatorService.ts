@@ -10,15 +10,18 @@ import { toToken } from '@common/utils/currency';
 import { Interface } from '@ethersproject/abi';
 import ERC20ABI from '@abis/erc20.json';
 import WRAPPEDABI from '@abis/weth.json';
-import { getProtocolToken } from '@common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
+import { quoteResponseToSwapOption } from '@common/utils/quotes';
 import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
-import { GasKeys, SwapSortOptions } from '@constants/aggregator';
+import { NULL_ADDRESS, ONE_DAY } from '@constants';
+import { GasKeys, SORT_MOST_PROFIT, SwapSortOptions } from '@constants/aggregator';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import SafeService from './safeService';
+import SimulationService from './simulationService';
 
 export default class AggregatorService {
   signer: Signer;
@@ -35,13 +38,16 @@ export default class AggregatorService {
 
   safeService: SafeService;
 
+  simulationService: SimulationService;
+
   constructor(
     walletService: WalletService,
     contractService: ContractService,
     sdkService: SdkService,
     DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
     providerService: ProviderService,
-    safeService: SafeService
+    safeService: SafeService,
+    simulationService: SimulationService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
@@ -49,6 +55,7 @@ export default class AggregatorService {
     this.apolloClient = DCASubgraph;
     this.providerService = providerService;
     this.safeService = safeService;
+    this.simulationService = simulationService;
   }
 
   getSigner() {
@@ -66,6 +73,41 @@ export default class AggregatorService {
 
   async swap(route: SwapOptionWithTx) {
     const transactionToSend = await this.addGasLimit(route.tx);
+
+    return this.providerService.sendTransaction(transactionToSend);
+  }
+
+  async swapPermit2(
+    route: SwapOptionWithTx,
+    signature?: { nonce: BigNumber; deadline: number; v: number; r: Buffer; s: Buffer; rawSignature: string }
+  ) {
+    const meanPermit2Instance = await this.contractService.getMeanPermit2Instance();
+    const address = this.walletService.getAccount();
+
+    const populatedTransaction = await meanPermit2Instance.populateTransaction.sellOrderSwap(
+      {
+        // Deadline
+        deadline: signature?.deadline || Math.floor(Date.now() / 1000) + ONE_DAY.toNumber(),
+        // Take from caller
+        tokenIn: route.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : route.sellToken.address,
+        amountIn: route.maxSellAmount.amount,
+        nonce: signature?.nonce || BigNumber.from(0),
+        signature: signature?.rawSignature || '0x',
+        // Swapp approval
+        allowanceTarget: route.swapper.allowanceTarget,
+        // Swap execution
+        swapper: route.tx.to,
+        swapData: route.tx.data,
+        // Swap validation
+        tokenOut: route.buyToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : route.buyToken.address,
+        minAmountOut: route.minBuyAmount.amount,
+        // Transfer token out
+        transferOut: [{ recipient: route.transferTo || address, shareBps: 0 }],
+      },
+      { value: route.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? route.maxSellAmount.amount : BigNumber.from(0) }
+    );
+
+    const transactionToSend = await this.addGasLimit(populatedTransaction);
 
     return this.providerService.sendTransaction(transactionToSend);
   }
@@ -91,7 +133,8 @@ export default class AggregatorService {
     gasSpeed?: GasKeys,
     takerAddress?: string,
     chainId?: number,
-    disabledDexes?: string[]
+    disabledDexes?: string[],
+    usePermit2 = false
   ) {
     const currentNetwork = await this.providerService.getNetwork();
 
@@ -130,7 +173,8 @@ export default class AggregatorService {
       takerAddress,
       !shouldValidate,
       network,
-      disabledDexes
+      disabledDexes,
+      usePermit2
     );
 
     const filteredOptions = swapOptionsResponse.filter((option) => !('failed' in option)) as QuoteResponse[];
@@ -140,74 +184,18 @@ export default class AggregatorService {
     const sellToken = from.address === protocolToken.address ? protocolToken : toToken(from);
     const buyToken = to.address === protocolToken.address ? protocolToken : toToken(to);
 
-    return filteredOptions.map<SwapOption>(
-      ({
-        sellAmount: {
-          amount: sellAmountAmount,
-          amountInUnits: sellAmountAmountInUnits,
-          amountInUSD: sellAmountAmountInUsd,
-        },
-        buyAmount: {
-          amount: buyAmountAmount,
-          amountInUnits: buyAmountAmountInUnits,
-          amountInUSD: buyAmountAmountInUsd,
-        },
-        maxSellAmount: {
-          amount: maxSellAmountAmount,
-          amountInUnits: maxSellAmountAmountInUnits,
-          amountInUSD: maxSellAmountAmountInUsd,
-        },
-        minBuyAmount: {
-          amount: minBuyAmountAmount,
-          amountInUnits: minBuyAmountAmountInUnits,
-          amountInUSD: minBuyAmountAmountInUsd,
-        },
-        gas,
-        source: { allowanceTarget, logoURI, name, id },
-        type,
-        tx,
-      }) => ({
-        id: uuidv4(),
-        transferTo,
-        sellToken,
-        buyToken,
-        sellAmount: {
-          amount: BigNumber.from(sellAmountAmount),
-          amountInUnits: sellAmountAmountInUnits,
-          amountInUSD: (!isUndefined(sellAmountAmountInUsd) && Number(sellAmountAmountInUsd)) || undefined,
-        },
-        buyAmount: {
-          amount: BigNumber.from(buyAmountAmount),
-          amountInUnits: buyAmountAmountInUnits,
-          amountInUSD: (!isUndefined(buyAmountAmountInUsd) && Number(buyAmountAmountInUsd)) || undefined,
-        },
-        maxSellAmount: {
-          amount: BigNumber.from(maxSellAmountAmount),
-          amountInUnits: maxSellAmountAmountInUnits,
-          amountInUSD: (!isUndefined(maxSellAmountAmountInUsd) && Number(maxSellAmountAmountInUsd)) || undefined,
-        },
-        minBuyAmount: {
-          amount: BigNumber.from(minBuyAmountAmount),
-          amountInUnits: minBuyAmountAmountInUnits,
-          amountInUSD: (!isUndefined(minBuyAmountAmountInUsd) && Number(minBuyAmountAmountInUsd)) || undefined,
-        },
-        gas: gas && {
-          estimatedGas: BigNumber.from(gas.estimatedGas),
-          estimatedCost: BigNumber.from(gas.estimatedCost),
-          estimatedCostInUnits: gas.estimatedCostInUnits,
-          estimatedCostInUSD: (!isUndefined(gas.estimatedCostInUSD) && Number(gas.estimatedCostInUSD)) || undefined,
-          gasTokenSymbol: gas.gasTokenSymbol,
-        },
-        swapper: {
-          allowanceTarget,
-          name,
-          logoURI,
-          id,
-        },
-        type,
-        tx,
-      })
-    );
+    let sortedOptions = filteredOptions.map<SwapOption>((quoteResponse) => ({
+      ...quoteResponseToSwapOption(quoteResponse),
+      transferTo,
+      sellToken,
+      buyToken,
+    }));
+
+    if (usePermit2 && from.address === protocolToken.address && takerAddress) {
+      sortedOptions = await this.simulationService.simulateQuotes(sortedOptions, sorting || SORT_MOST_PROFIT);
+    }
+
+    return sortedOptions;
   }
 
   async getSwapOption(
