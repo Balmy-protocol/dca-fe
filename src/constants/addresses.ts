@@ -275,6 +275,18 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
     },
     rpc: ['https://goerli.base.org', 'https://base-goerli.public.blastapi.io'],
   },
+  kava: {
+    chainId: 2222,
+    name: 'Kava',
+    mainCurrency: '',
+    mainColor: '#FF433E',
+    nativeCurrency: {
+      name: 'Kava',
+      symbol: 'KAVA',
+      decimals: 18,
+    },
+    rpc: ['https://evm.kava.io', 'https://evm2.kava.io'],
+  },
 };
 
 const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken, testnet }: Chain) => ({
@@ -591,6 +603,7 @@ export const DEFILLAMA_IDS = {
   [Chains.HARMONY_SHARD_0.chainId]: 'harmony',
   [Chains.MOONBEAM.chainId]: 'moonbeam',
   [Chains.VELAS.chainId]: 'velas',
+  [Chains.KAVA.chainId]: 'kava',
 };
 
 export const TOKEN_LISTS = {

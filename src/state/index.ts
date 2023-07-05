@@ -211,6 +211,9 @@ const store = configureStore({
           'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json',
           'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json',
 
+          // Kava
+          // 'https://market-api.openocean.finance/v2/kava/token',
+
           // Custom tokens
           'custom-tokens',
         ],
