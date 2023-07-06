@@ -335,7 +335,7 @@ const PositionControls = ({
           </Typography>
         </StyledCardFooterButton>
       )}
-      {!OLD_VERSIONS.includes(position.version) && isOnNetwork && (
+      {!OLD_VERSIONS.includes(position.version) && isOnNetwork && mergedPermissions.INCREASE && (
         <>
           {!disabled && (
             <StyledCardFooterButton
@@ -367,7 +367,7 @@ const PositionControls = ({
               </Typography>
             </StyledCardFooterButton>
           )}
-          {remainingSwaps.lte(BigNumber.from(0)) && shouldMigrateToYield && canAddFunds && (
+          {remainingSwaps.lte(BigNumber.from(0)) && shouldMigrateToYield && canAddFunds && mergedPermissions.INCREASE && (
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
@@ -380,7 +380,7 @@ const PositionControls = ({
               </Typography>
             </StyledCardFooterButton>
           )}
-          {!shouldMigrateToYield && canAddFunds && (
+          {!shouldMigrateToYield && canAddFunds && mergedPermissions.INCREASE && (
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
