@@ -94,8 +94,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xbd1fe73e1f12bd2bc237de9b626f056f21f86427', // POLY - jMXN
   '0x250632378e573c6be1ac2f97fcdf00515d0aa91b', // BSC - BETH
 
-  // Arbitrum - FRAX - Blacklisting so we can test it out
-  '0x17fc002b466eec40dae837fc4be5c67993ddbd6f',
   // Arbitrum - GMD - Blacklisting so we can test it out
   '0x4945970efeec98d393b4b979b9be265a3ae28a8b',
   // BNB - Beefy ETH on Valas - Blacklisting so we can test it out
