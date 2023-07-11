@@ -5,6 +5,7 @@ import EmptyPositions from '@pages/dca/components/empty-positions';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
+import keyBy from 'lodash/keyBy';
 import { ChainId, Position, YieldOptions, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
@@ -14,6 +15,7 @@ import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { useAppDispatch } from '@state/hooks';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
+import { setPermissions } from '@state/position-permissions/actions';
 import { formatUnits } from '@ethersproject/units';
 import { EmptyPosition } from '@common/mocks/currentPositions';
 import usePositionService from '@hooks/usePositionService';
@@ -208,6 +210,18 @@ const PositionsList = ({ isLoading, positions, finished }: CurrentPositionsProps
         modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0))
           ? ModeTypesIds.FULL_DEPOSIT_TYPE
           : ModeTypesIds.RATE_TYPE,
+      })
+    );
+    dispatch(
+      setPermissions({
+        id: position.positionId,
+        permissions: keyBy(
+          position.permissions?.map((permission) => ({
+            ...permission,
+            operator: permission.operator.toLowerCase(),
+          })),
+          'operator'
+        ),
       })
     );
     setShowModifyRateSettingsModal(true);
