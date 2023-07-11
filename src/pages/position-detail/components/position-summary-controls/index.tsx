@@ -254,7 +254,6 @@ const PositionSummaryControls = ({
           />
         </StyledButton>
       )}
-
       <PositionControlsMenuContainer>
         <IconButton onClick={handleClick} disabled={isPending}>
           <MoreVertIcon />
@@ -298,7 +297,7 @@ const PositionSummaryControls = ({
                 handleClose();
                 onTerminate();
               }}
-              disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
+              disabled={isPending || disabled || disabledWithdraw}
               style={{ color: '#FF5359' }}
             >
               <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
