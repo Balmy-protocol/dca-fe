@@ -155,8 +155,7 @@ const PositionSummaryControls = ({
           <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />
         </StyledButton>
       )}
-
-      {!shouldDisableArrow && mergedPermissions.WITHDRAW && mergedPermissions.REDUCE && (
+      {mergedPermissions.REDUCE && BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)) && (
         <SplitButton
           onClick={() => onWithdraw(!!hasSignSupport && isToProtocolToken && canWithdrawProtocolToken)}
           text={
@@ -169,7 +168,11 @@ const PositionSummaryControls = ({
             />
           }
           disabled={
-            disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
+            !mergedPermissions.WITHDRAW ||
+            disabledWithdraw ||
+            isPending ||
+            disabled ||
+            BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
           }
           variant="outlined"
           color="transparent"
@@ -189,7 +192,7 @@ const PositionSummaryControls = ({
                         }}
                       />
                     ),
-                    disabled: disabledWithdraw || isPending || disabled,
+                    disabled: !mergedPermissions.WITHDRAW || disabledWithdraw || isPending || disabled,
                     onClick: () => onWithdraw(false),
                   },
                 ]
@@ -203,11 +206,7 @@ const PositionSummaryControls = ({
                 />
               ),
               disabled:
-                disabledWithdrawFunds ||
-                isPending ||
-                disabled ||
-                BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)) ||
-                (isFromProtocolToken && !canWithdrawProtocolToken),
+                disabledWithdrawFunds || isPending || disabled || (isFromProtocolToken && !canWithdrawProtocolToken),
               onClick: onWithdrawFunds,
             },
             ...(isFromProtocolToken
@@ -222,8 +221,7 @@ const PositionSummaryControls = ({
                         }}
                       />
                     ),
-                    disabled:
-                      isPending || disabled || BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)),
+                    disabled: isPending || disabled,
                     onClick: () => onWithdrawFunds(false),
                   },
                 ]
@@ -231,7 +229,7 @@ const PositionSummaryControls = ({
           ]}
         />
       )}
-      {shouldDisableArrow && mergedPermissions.WITHDRAW && !mergedPermissions.REDUCE && (
+      {mergedPermissions.WITHDRAW && !mergedPermissions.REDUCE && (
         <StyledButton
           variant="outlined"
           color="transparent"
