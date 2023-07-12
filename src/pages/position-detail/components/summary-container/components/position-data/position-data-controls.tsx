@@ -5,12 +5,15 @@ import Typography from '@mui/material/Typography';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, NetworkStruct, YieldOptions } from '@types';
+import { useAccountPermissions, mergeCompanionPermissions } from '@state/position-permissions/hooks';
 import {
   DCA_TOKEN_BLACKLIST,
   NETWORKS,
   OLD_VERSIONS,
   VERSIONS_ALLOWED_MODIFY,
   shouldEnableFrequency,
+  COMPANION_ADDRESS,
+  LATEST_VERSION,
 } from '@constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
@@ -58,9 +61,17 @@ const PositionDataControls = ({
   const hasSignSupport = useSupportsSigning();
   const network = useCurrentNetwork();
   const web3Service = useWeb3Service();
-  const account = web3Service.getAccount();
   const tokenList = useTokenList();
   const dispatch = useAppDispatch();
+
+  const companionAddress =
+    COMPANION_ADDRESS[position.version][position.chainId] || COMPANION_ADDRESS[LATEST_VERSION][position.chainId];
+  const companionPermissions = useAccountPermissions(position.id, position.user, companionAddress.toLowerCase());
+  const accountPermissions = useAccountPermissions(position.id, position.user);
+  const hasYield = !!(position.to.underlyingTokens.length || position.from.underlyingTokens.length);
+  const mergedPermissions = hasYield
+    ? mergeCompanionPermissions(accountPermissions, companionPermissions)
+    : accountPermissions;
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -83,9 +94,7 @@ const PositionDataControls = ({
     });
   };
 
-  const isOwner = account && account.toLowerCase() === position.user.toLowerCase();
-
-  if (!isOwner || position.status === 'TERMINATED') return null;
+  if (!mergedPermissions.INCREASE || position.status === 'TERMINATED') return null;
 
   if (isPending) {
     return (
@@ -156,7 +165,7 @@ const PositionDataControls = ({
 
   return (
     <StyledCallToActionContainer>
-      {!isOldVersion && (
+      {!isOldVersion && mergedPermissions.INCREASE && (
         <StyledCardFooterButton
           variant="contained"
           color="secondary"
@@ -169,7 +178,7 @@ const PositionDataControls = ({
           </Typography>
         </StyledCardFooterButton>
       )}
-      {isOldVersion && shouldShowMigrate && (
+      {accountPermissions.isOwner && isOldVersion && shouldShowMigrate && (
         <StyledCardFooterButton
           variant="contained"
           color="migrate"
@@ -182,20 +191,24 @@ const PositionDataControls = ({
           </Typography>
         </StyledCardFooterButton>
       )}
-      {isOldVersion && shouldMigrateToYield && allowsModify && remainingSwaps.lte(BigNumber.from(0)) && (
-        <StyledCardFooterButton
-          variant="contained"
-          color="secondary"
-          onClick={onSuggestMigrateYield}
-          fullWidth
-          disabled={disabledIncrease}
-        >
-          <Typography variant="body2">
-            <FormattedMessage description="addFunds" defaultMessage="Add funds" />
-          </Typography>
-        </StyledCardFooterButton>
-      )}
-      {isOldVersion && !shouldMigrateToYield && allowsModify && (
+      {mergedPermissions.INCREASE &&
+        isOldVersion &&
+        shouldMigrateToYield &&
+        allowsModify &&
+        remainingSwaps.lte(BigNumber.from(0)) && (
+          <StyledCardFooterButton
+            variant="contained"
+            color="secondary"
+            onClick={onSuggestMigrateYield}
+            fullWidth
+            disabled={disabledIncrease}
+          >
+            <Typography variant="body2">
+              <FormattedMessage description="addFunds" defaultMessage="Add funds" />
+            </Typography>
+          </StyledCardFooterButton>
+        )}
+      {mergedPermissions.INCREASE && isOldVersion && !shouldMigrateToYield && allowsModify && (
         <StyledCardFooterButton
           variant="contained"
           color="secondary"
@@ -208,7 +221,7 @@ const PositionDataControls = ({
           </Typography>
         </StyledCardFooterButton>
       )}
-      {isOldVersion && shouldMigrateToYield && !allowsModify && (
+      {accountPermissions.isOwner && isOldVersion && shouldMigrateToYield && !allowsModify && (
         <StyledCardFooterButton
           variant="contained"
           color="migrate"
