@@ -155,7 +155,11 @@ const PositionSummaryControls = ({
           <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />
         </StyledButton>
       )}
-      {mergedPermissions.REDUCE && BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)) && (
+      {((mergedPermissions.REDUCE && BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0))) ||
+        (mergedPermissions.WITHDRAW &&
+          BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
+          isToProtocolToken &&
+          !canOnlyWithdrawWrappedToProtocolToken)) && (
         <SplitButton
           onClick={() => onWithdraw(!!hasSignSupport && isToProtocolToken && canWithdrawProtocolToken)}
           text={
@@ -206,7 +210,11 @@ const PositionSummaryControls = ({
                 />
               ),
               disabled:
-                disabledWithdrawFunds || isPending || disabled || (isFromProtocolToken && !canWithdrawProtocolToken),
+                disabledWithdrawFunds ||
+                isPending ||
+                disabled ||
+                (isFromProtocolToken && !canWithdrawProtocolToken) ||
+                BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)),
               onClick: onWithdrawFunds,
             },
             ...(isFromProtocolToken
@@ -229,29 +237,26 @@ const PositionSummaryControls = ({
           ]}
         />
       )}
-      {mergedPermissions.WITHDRAW && !mergedPermissions.REDUCE && (
-        <StyledButton
-          variant="outlined"
-          color="transparent"
-          size="small"
-          disabled={
-            disabledWithdraw ||
-            isPending ||
-            disabled ||
-            BigNumber.from(position.toWithdraw).lte(BigNumber.from(0)) ||
-            !mergedPermissions.WITHDRAW
-          }
-          onClick={() => onWithdraw(!!hasSignSupport && isToProtocolToken && canWithdrawProtocolToken)}
-        >
-          <FormattedMessage
-            description="withdrawToken"
-            defaultMessage="Withdraw {token}"
-            values={{
-              token: canOnlyWithdrawWrappedToProtocolToken ? wrappedProtocolToken.symbol : position.to.symbol,
-            }}
-          />
-        </StyledButton>
-      )}
+      {mergedPermissions.WITHDRAW &&
+        BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
+        (!mergedPermissions.REDUCE || BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0))) &&
+        (!isToProtocolToken || (isToProtocolToken && canOnlyWithdrawWrappedToProtocolToken)) && (
+          <StyledButton
+            variant="outlined"
+            color="transparent"
+            size="small"
+            disabled={disabledWithdraw || isPending || disabled || !mergedPermissions.WITHDRAW}
+            onClick={() => onWithdraw(!!hasSignSupport && isToProtocolToken && canWithdrawProtocolToken)}
+          >
+            <FormattedMessage
+              description="withdrawToken"
+              defaultMessage="Withdraw {token}"
+              values={{
+                token: canOnlyWithdrawWrappedToProtocolToken ? wrappedProtocolToken.symbol : position.to.symbol,
+              }}
+            />
+          </StyledButton>
+        )}
       <PositionControlsMenuContainer>
         <IconButton onClick={handleClick} disabled={isPending}>
           <MoreVertIcon />
