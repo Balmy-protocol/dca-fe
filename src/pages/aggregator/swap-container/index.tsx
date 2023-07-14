@@ -14,14 +14,18 @@ import useToken from '@hooks/useToken';
 import useSwapOption from '@hooks/useSwapOption';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
+import Hidden from '@mui/material/Hidden';
+import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import Swap from './components/swap';
+import AggregatorLanding from './components/landing';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
-  const { slippage, gasSpeed, disabledDexes, sorting, isPermit2Enabled } = useAggregatorSettingsState();
+  const { slippage, gasSpeed, disabledDexes, sorting } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
+  const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true, true);
   const toParamToken = useToken(toParam, true, true);
@@ -29,7 +33,6 @@ const SwapContainer = () => {
   const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
   const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
   const sdkMappedNetworks = useSdkMappedChains();
-
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
     to,
@@ -42,9 +45,13 @@ const SwapContainer = () => {
     disabledDexes,
     isPermit2Enabled
   );
-  const [swapOption, isLoadingSwapOption] = useSwapOption(selectedRoute, transferTo, parseFloat(slippage), gasSpeed);
-
-  const [refreshQuotes, setRefreshQuotes] = React.useState(true);
+  const [swapOption, isLoadingSwapOption] = useSwapOption(
+    selectedRoute,
+    transferTo,
+    parseFloat(slippage),
+    gasSpeed,
+    isPermit2Enabled
+  );
 
   const mappedNetworks = React.useMemo(
     () => sdkMappedNetworks.filter((network) => !REMOVED_AGG_CHAINS.includes(network?.chainId || -1)),
@@ -100,13 +107,20 @@ const SwapContainer = () => {
       <Grid item xs={12} sm={8} md={5}>
         <Swap
           isLoadingRoute={isLoadingSwapOptions || isLoadingSwapOption}
-          setRefreshQuotes={setRefreshQuotes}
           quotes={(selectedRoute && swapOptions) || []}
           swapOptionsError={swapOptionsError}
           fetchOptions={fetchOptions}
-          refreshQuotes={refreshQuotes}
         />
       </Grid>
+      <Hidden smDown>
+        <Grid item xs={12} md={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
+          <Grid container spacing={2} alignItems="stretch" justify-content="center">
+            <Grid item xs={12} sx={{ display: 'flex' }}>
+              <AggregatorLanding />
+            </Grid>
+          </Grid>
+        </Grid>
+      </Hidden>
     </Grid>
   );
 };

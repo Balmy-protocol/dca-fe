@@ -101,18 +101,23 @@ export default class SdkService {
 
   async getSwapOption(
     quote: SwapOption,
-    takerAddress: string,
+    passedTakerAddress: string,
     chainId?: number,
     recipient?: string | null,
     slippagePercentage?: number,
     gasSpeed?: GasKeys,
-    skipValidation?: boolean
+    skipValidation?: boolean,
+    usePermit2?: boolean
   ) {
     const currentNetwork = await this.providerService.getNetwork();
+
+    const meanPermit2Address = await this.contractService.getMeanPermit2Address();
 
     const network = chainId || currentNetwork.chainId;
 
     const isBuyOrder = quote.type === 'buy';
+
+    const takerAddress = usePermit2 && meanPermit2Address ? meanPermit2Address : passedTakerAddress;
 
     return this.sdk.quoteService.getQuote({
       sourceId: quote.swapper.id,
@@ -132,7 +137,7 @@ export default class SdkService {
         takerAddress,
         ...(!isBuyOrder ? { sellAmount: quote.sellAmount.amount.toString() } : {}),
         ...(isBuyOrder ? { buyAmount: quote.buyAmount.amount.toString() } : {}),
-        ...(recipient ? { recipient } : {}),
+        ...(recipient && !usePermit2 ? { recipient } : {}),
         ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
         ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
         ...(skipValidation ? { skipValidation } : {}),
@@ -165,7 +170,7 @@ export default class SdkService {
 
     let responses;
 
-    const takerAddress = usePermit2 ? meanPermit2Address : passedTakerAddress;
+    const takerAddress = usePermit2 && meanPermit2Address ? meanPermit2Address : passedTakerAddress;
 
     if (!takerAddress) {
       responses = await this.sdk.quoteService.estimateAllQuotes({
@@ -185,7 +190,7 @@ export default class SdkService {
           ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
-          ...(recipient ? { recipient } : {}),
+          ...(recipient && !usePermit2 ? { recipient } : {}),
           ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
           ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
           ...(skipValidation ? { skipValidation } : {}),
@@ -218,7 +223,7 @@ export default class SdkService {
           ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
           ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
           ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
-          ...(recipient ? { recipient } : {}),
+          ...(recipient && !usePermit2 ? { recipient } : {}),
           ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
           ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
           ...(skipValidation ? { skipValidation } : {}),

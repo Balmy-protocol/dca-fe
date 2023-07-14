@@ -67,6 +67,7 @@ import { useAggregatorState } from '@state/aggregator/hooks';
 import usePermit2Service from '@hooks/usePermit2Service';
 import { getBetterBy } from '@common/utils/quotes';
 import useReplaceHistory from '@hooks/useReplaceHistory';
+import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
@@ -110,31 +111,24 @@ const StyledGrid = styled(Grid)`
 
 interface SwapProps {
   isLoadingRoute: boolean;
-  setRefreshQuotes: (refreshQuotes: boolean) => void;
   quotes: SwapOption[];
   fetchOptions: () => void;
-  refreshQuotes: boolean;
   swapOptionsError?: string;
 }
 
-const Swap = ({
-  isLoadingRoute,
-  setRefreshQuotes,
-  quotes,
-  fetchOptions,
-  refreshQuotes,
-  swapOptionsError,
-}: SwapProps) => {
+const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapProps) => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
-  const { isPermit2Enabled, sorting } = useAggregatorSettingsState();
+  const { sorting } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
+  const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const intl = useIntl();
   const containerRef = React.useRef(null);
   const [betterQuote, setBetterQuote] = React.useState<SwapOption | null>(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
+  const [refreshQuotes, setRefreshQuotes] = React.useState(true);
   const errorService = useErrorService();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
@@ -224,10 +218,10 @@ const Swap = ({
         fromSteps: !!transactionsToExecute?.length,
       });
 
-      const addressToApprove =
-        (amount && selectedRoute.swapper.allowanceTarget) ||
-        PERMIT_2_ADDRESS[currentNetwork.chainId] ||
-        PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId];
+      const addressToApprove = isPermit2Enabled
+        ? PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId]
+        : selectedRoute.swapper.allowanceTarget;
+
       const result = await walletService.approveSpecificToken(from, addressToApprove, amount);
       trackEvent('Aggregator - Approve token submitted', {
         source: selectedRoute.swapper.id,
@@ -297,10 +291,9 @@ const Swap = ({
           sellAmount: selectedRoute.sellAmount.amountInUnits,
           type: selectedRoute.type,
         });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
     }
   };
 
@@ -431,8 +424,6 @@ const Swap = ({
       }
 
       setRefreshQuotes(true);
-
-      onResetForm();
     } catch (e) {
       if (shouldTrackError(e)) {
         trackEvent('Aggregator - Swap error', {
@@ -449,9 +440,9 @@ const Swap = ({
           sellAmount: selectedRoute.sellAmount.amountInUnits,
           type: selectedRoute.type,
         });
+        /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+        setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
       }
-      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setRefreshQuotes(true);
     }
@@ -592,9 +583,9 @@ const Swap = ({
           sellAmount: selectedRoute.sellAmount.amountInUnits,
           type: selectedRoute.type,
         });
+        /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+        setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
       }
-      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-      setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setRefreshQuotes(true);
     }
@@ -735,7 +726,12 @@ const Swap = ({
           const { signature } = newSteps[swapIndex].extraData as TransactionActionSwapData;
 
           if (signature) {
-            const simulatePromise = simulationService.simulateQuotes(quotes, sorting, signature);
+            const simulatePromise = simulationService.simulateQuotes(
+              quotes,
+              sorting,
+              signature,
+              (isBuyOrder && toValue && to && parseUnits(toValue, to.decimals)) || undefined
+            );
             return simulatePromise
               .then((sortedQuotes) => {
                 const originalQuote = find(sortedQuotes, { swapper: { id: selectedRoute.swapper.id } });
@@ -750,7 +746,8 @@ const Swap = ({
                       2
                     )
                   ).toFixed(3);
-                if (isThereABetterQuote && Number(isBetteryBy) > 0) {
+
+                if (isThereABetterQuote && (Number(isBetteryBy) > 0 || !originalQuote)) {
                   dispatch(setSelectedRoute(originalQuote || { ...selectedRoute, willFail: true }));
                   setBetterQuote(sortedQuotes[0]);
                   setShouldShowBetterQuoteModal(true);
@@ -768,7 +765,7 @@ const Swap = ({
                           },
                         },
                         {
-                          humanReadableDiff: `Buy ${selectedRoute.buyAmount.amountInUnits} ${selectedRoute.buyToken.symbol}`,
+                          humanReadableDiff: `Buy ${selectedRoute.buyAmount.amountInUnits} ${selectedRoute.buyToken.symbol} on ${selectedRoute.swapper.name}`,
                           rawInfo: {
                             kind: StateChangeKind.ERC20_TRANSFER,
                             data: { amount: { before: '0', after: '1' }, asset: selectedRoute.buyToken },
@@ -863,10 +860,16 @@ const Swap = ({
 
     const newSteps: TransactionStep[] = [];
 
-    const amountToApprove =
-      isBuyOrder && selectedRoute
-        ? BigNumber.from(selectedRoute.maxSellAmount.amount)
-        : parseUnits(fromValueToUse, from.decimals);
+    let amountToApprove = parseUnits(fromValueToUse, from.decimals);
+
+    if (isBuyOrder && selectedRoute) {
+      const maxBetweenQuotes = quotes.reduce<BigNumber>(
+        (acc, quote) => (acc.lte(quote.maxSellAmount.amount) ? quote.maxSellAmount.amount : acc),
+        BigNumber.from(0)
+      );
+
+      amountToApprove = maxBetweenQuotes;
+    }
 
     if (!isApproved) {
       newSteps.push({
@@ -875,14 +878,35 @@ const Swap = ({
         checkForPending: false,
         done: false,
         type: TRANSACTION_ACTION_APPROVE_TOKEN,
-        explanation: intl.formatMessage(
-          defineMessage({ description: 'approveTokenExplanation', defaultMessage: 'minutes' })
-        ),
+        explanation: isPermit2Enabled
+          ? intl.formatMessage(
+              defineMessage({
+                description: 'approveTokenExplanation',
+                defaultMessage:
+                  'By enabling Universal Approval, you will be able to use Uniswap, Mean, swap aggregators and more protocols without having to authorize each one of them',
+              })
+            )
+          : intl.formatMessage(
+              defineMessage({
+                description: 'approveTokenExplanationNoPermit2',
+                defaultMessage:
+                  'You need to explicitly allow {target} smart contracts to extract your {token} from your wallet to be able to be swapped',
+              }),
+              { target: selectedRoute.swapper.name, token: selectedRoute.sellToken.symbol }
+            ),
         extraData: {
           token: from,
           amount: amountToApprove,
-          swapper: selectedRoute.swapper.name,
+          swapper: isPermit2Enabled
+            ? intl.formatMessage(
+                defineMessage({
+                  description: 'us',
+                  defaultMessage: 'us',
+                })
+              )
+            : selectedRoute.swapper.name,
           defaultApproval: isPermit2Enabled ? AllowanceType.max : AllowanceType.specific,
+          isPermit2Enabled,
           help: intl.formatMessage(
             defineMessage({
               description: 'Allowance Tooltip',
@@ -914,7 +938,11 @@ const Swap = ({
         done: false,
         type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
         explanation: intl.formatMessage(
-          defineMessage({ description: 'permit2SignExplanation', defaultMessage: 'minutes' })
+          defineMessage({
+            description: 'permit2SignExplanation',
+            defaultMessage: 'Mean now needs your explicit authorization to swap {tokenFrom} into {tokenTo}',
+          }),
+          { tokenFrom: from.symbol, tokenTo: to.symbol }
         ),
         extraData: {
           token: from,
@@ -991,7 +1019,7 @@ const Swap = ({
     setRefreshQuotes(true);
     fetchOptions();
     setShouldShowSteps(false);
-  }, [setShouldShowSteps, setRefreshQuotes]);
+  }, [setShouldShowSteps, setRefreshQuotes, fetchOptions]);
 
   const onSetFrom = (newFrom: Token, updateMode = false) => {
     dispatch(setSelectedRoute(null));
@@ -1010,6 +1038,11 @@ const Swap = ({
     }
     trackEvent('Aggregator - Set to', { fromAddress: newTo?.address, toAddress: from?.address });
   };
+
+  const handleTransactionConfirmationClose = React.useCallback(() => {
+    onResetForm();
+    setShouldShowConfirmation(false);
+  }, [onResetForm, setShouldShowConfirmation]);
 
   const currentTransactionStep = React.useMemo(() => {
     const foundStep = find(transactionsToExecute, { done: false });
@@ -1059,7 +1092,7 @@ const Swap = ({
           from={from}
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
-          handleClose={() => setShouldShowConfirmation(false)}
+          handleClose={handleTransactionConfirmationClose}
         />
         <TransactionSteps
           shouldShow={shouldShowSteps}

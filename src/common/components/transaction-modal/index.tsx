@@ -109,7 +109,10 @@ export const TransactionModal = ({
       </StyledLoadingIndicatorWrapper>
       {loadingConfig.content}
       <Typography variant="body1">
-        <FormattedMessage description="Confirm in wallet" defaultMessage="Confirm this transaction in your wallet" />
+        <FormattedMessage
+          description="Confirm in wallet"
+          defaultMessage="Please check your wallet to confirm this transaction"
+        />
       </Typography>
     </>
   );

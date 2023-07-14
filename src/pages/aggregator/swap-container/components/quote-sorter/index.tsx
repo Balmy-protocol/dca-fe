@@ -45,35 +45,24 @@ const StyledContainer = styled.div`
 
 interface QuoteSorterProps {
   isLoading: boolean;
-  isBuyOrder: boolean;
 }
 
-const SORT_OPTIONS = (isBuyOrder: boolean) => [
-  ...(isBuyOrder
-    ? [
-        {
-          key: SORT_MOST_RETURN,
-          label: <FormattedMessage description="sortMostReturnBuyOrder" defaultMessage="Least spent" />,
-          help: (
-            <FormattedMessage
-              description="sortMostReturnBuyOrderHelp"
-              defaultMessage="Sort routes by where you have to spend less tokens"
-            />
-          ),
-        },
-      ]
-    : [
-        {
-          key: SORT_MOST_RETURN,
-          label: <FormattedMessage description="sortMostReturnSellOrder" defaultMessage="Most received tokens" />,
-          help: (
-            <FormattedMessage
-              description="sortMostReturnSellOrderHelp"
-              defaultMessage="Sort routes by where you can receive more tokens"
-            />
-          ),
-        },
-      ]),
+const SORT_OPTIONS = () => [
+  {
+    key: SORT_MOST_RETURN,
+    label: (
+      <FormattedMessage
+        description="sortMostReturnSellOrder"
+        defaultMessage="Most received tokens / Less spent tokens (for buy orders)"
+      />
+    ),
+    help: (
+      <FormattedMessage
+        description="sortMostReturnSellOrderHelp"
+        defaultMessage="Sort routes by where you can receive more tokens/spend less tokens"
+      />
+    ),
+  },
   {
     key: SORT_MOST_PROFIT,
     label: <FormattedMessage description="sortHighReturn" defaultMessage="Gas cost considered" />,
@@ -91,7 +80,7 @@ const SORT_OPTIONS = (isBuyOrder: boolean) => [
   },
 ];
 
-const QuoteSorter = ({ isLoading, isBuyOrder }: QuoteSorterProps) => {
+const QuoteSorter = ({ isLoading }: QuoteSorterProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { sorting } = useAggregatorSettingsState();
   const open = Boolean(anchorEl);
@@ -113,7 +102,7 @@ const QuoteSorter = ({ isLoading, isBuyOrder }: QuoteSorterProps) => {
     setAnchorEl(null);
   };
 
-  const selectedOption = find(SORT_OPTIONS(isBuyOrder), { key: sorting });
+  const selectedOption = find(SORT_OPTIONS(), { key: sorting });
 
   return (
     <StyledContainer>
@@ -144,7 +133,7 @@ const QuoteSorter = ({ isLoading, isBuyOrder }: QuoteSorterProps) => {
         open={open}
         onClose={handleClose}
       >
-        {SORT_OPTIONS(isBuyOrder).map((option) => (
+        {SORT_OPTIONS().map((option) => (
           <MenuItem onClick={() => handleClose(option.key as SwapSortOptions)} disableRipple key={option.key}>
             {option.label}
             <Typography variant="body2" sx={{ display: 'flex' }}>

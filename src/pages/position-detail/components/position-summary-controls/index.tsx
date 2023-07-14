@@ -92,7 +92,7 @@ const PositionSummaryControls = ({
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-  const [hasSignSupport] = useSupportsSigning();
+  const hasSignSupport = useSupportsSigning();
 
   if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
 

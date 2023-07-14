@@ -23,6 +23,16 @@
       "value": "La liquides de Livepeer en Arbitrum bajo considerablemente, por esto agregar fondos esta deshabilitado hasta que esta situacion se revierta."
     }
   ],
+  "+Rzphv": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Transacción simulada"
+    }
+  ],
   "+UA1IX": [
     {
       "type": 0,
@@ -32,7 +42,7 @@
   "+VGlht": [
     {
       "type": 0,
-      "value": "Esperando la aprobación de su "
+      "value": "Esperando la autorización de su "
     },
     {
       "type": 1,
@@ -166,7 +176,7 @@
   "/vWyXL": [
     {
       "type": 0,
-      "value": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción donde envía el "
+      "value": "Primero tendrá que firmar un mensaje (que no tiene costo) para autorizar nuestro contrato de Companion. Luego, tendrá que enviar la transacción donde envía el "
     },
     {
       "type": 1,
@@ -381,6 +391,12 @@
     {
       "type": 0,
       "value": "¿Cobran alguna comisión?"
+    }
+  ],
+  "2FHrOX": [
+    {
+      "type": 0,
+      "value": "Ver otras opciones"
     }
   ],
   "2NZFot": [
@@ -724,7 +740,7 @@
   "7YJRiI": [
     {
       "type": 0,
-      "value": "Aprobar "
+      "value": "Autorizar "
     },
     {
       "type": 1,
@@ -1304,7 +1320,7 @@
   "DIJWGT": [
     {
       "type": 0,
-      "value": "Esperando la aprobación de su "
+      "value": "Esperando la autorización de su "
     },
     {
       "type": 1,
@@ -1357,6 +1373,12 @@
     {
       "type": 1,
       "value": "message"
+    }
+  ],
+  "DcWDCQ": [
+    {
+      "type": 0,
+      "value": "¿Por que necesito hacer esto?"
     }
   ],
   "DmNbMo": [
@@ -1628,7 +1650,7 @@
   "FGbffU": [
     {
       "type": 0,
-      "value": "Aprobar "
+      "value": "Autorizar "
     },
     {
       "type": 1,
@@ -1643,6 +1665,28 @@
     {
       "type": 0,
       "value": "Invirtiendo en:"
+    }
+  ],
+  "FT80h0": [
+    {
+      "type": 0,
+      "value": "Simulando transacciones ("
+    },
+    {
+      "type": 1,
+      "value": "current"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "total"
+    },
+    {
+      "type": 0,
+      "value": ")"
     }
   ],
   "FW4Fp5": [
@@ -1689,6 +1733,12 @@
     {
       "type": 0,
       "value": "Redimir campañas"
+    }
+  ],
+  "FnRMc5": [
+    {
+      "type": 0,
+      "value": "Al habilitar la Aprobación Universal, vas a poder usar Uniswap, Mean, aggregadores y muchos otros protocoles sin tener que autorizar cada uno de ellos"
     }
   ],
   "FwDtZA": [
@@ -1910,7 +1960,7 @@
   "HKZyB6": [
     {
       "type": 0,
-      "value": "Aprobar "
+      "value": "Autorizar "
     },
     {
       "type": 1,
@@ -2108,7 +2158,7 @@
     },
     {
       "type": 0,
-      "value": " - Firme la aprobación del token con su billetera"
+      "value": " - Firme la autorización del token con su billetera"
     }
   ],
   "J4ZbBX": [
@@ -2179,6 +2229,18 @@
     {
       "type": 0,
       "value": "Soportamos:"
+    }
+  ],
+  "JkRQyY": [
+    {
+      "type": 0,
+      "value": "Primero necesitaras firmar un mensaje (que no tiene costo) para autorizar a nuestro contrato Companion. Luego, tendras que enviar la transacción donde se migrara tu posición."
+    }
+  ],
+  "JoH9Yo": [
+    {
+      "type": 0,
+      "value": "Encontramos un mejor quote para vos"
     }
   ],
   "K/HInO": [
@@ -2301,6 +2363,20 @@
       "value": "account"
     }
   ],
+  "LAaGdN": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Habilitar Aprobacion Universal para "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
   "LFvqJr": [
     {
       "type": 0,
@@ -2377,6 +2453,16 @@
     {
       "type": 0,
       "value": ", esto implica que no podemos estimar el impacto en el precio. Por favor se cauteloso e intercambia bajo tu propio riesgo."
+    }
+  ],
+  "LY4QAG": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Quotes validados y la transacción fue simulada"
     }
   ],
   "LbRNWF": [
@@ -2457,20 +2543,16 @@
       "value": "oldFrequency"
     }
   ],
+  "MFXOI0": [
+    {
+      "type": 0,
+      "value": "¿Que es la simulación de quotes?"
+    }
+  ],
   "MGGubs": [
     {
       "type": 0,
       "value": "¿Mean Finance cobra alguna comisión por el intercambio?"
-    }
-  ],
-  "MJey+4": [
-    {
-      "type": 1,
-      "value": "step"
-    },
-    {
-      "type": 0,
-      "value": " - Enviar la aprobación de la transacción con su billetera"
     }
   ],
   "Mcj/iy": [
@@ -2939,6 +3021,16 @@
       "value": "name"
     }
   ],
+  "QkhXLS": [
+    {
+      "type": 0,
+      "value": "Si, usar "
+    },
+    {
+      "type": 1,
+      "value": "swapper"
+    }
+  ],
   "QpkEk9": [
     {
       "type": 0,
@@ -3028,7 +3120,7 @@
   "RcB3pW": [
     {
       "type": 0,
-      "value": "La aprobación del uso de "
+      "value": "La autorización del uso de "
     },
     {
       "type": 1,
@@ -3076,7 +3168,7 @@
   "S0PtrE": [
     {
       "type": 0,
-      "value": "Necesita aprobación"
+      "value": "Necesita autorización"
     }
   ],
   "S2QomY": [
@@ -3111,6 +3203,12 @@
       "value": "s"
     }
   ],
+  "SE1aj0": [
+    {
+      "type": 0,
+      "value": "Intentar obtener otra ruta"
+    }
+  ],
   "SNN905": [
     {
       "type": 0,
@@ -3133,6 +3231,12 @@
     {
       "type": 0,
       "value": "Mayor cantidad de tokens recibidos"
+    }
+  ],
+  "SuOz7t": [
+    {
+      "type": 0,
+      "value": "Firmar con tu billetera"
     }
   ],
   "SwiTok": [
@@ -3440,7 +3544,7 @@
   "X1oKY8": [
     {
       "type": 0,
-      "value": "Approve Max "
+      "value": "Autorizar Max "
     },
     {
       "type": 1,
@@ -3530,7 +3634,7 @@
   "XtV8h8": [
     {
       "type": 0,
-      "value": "Aprobar token"
+      "value": "Autorizar token"
     }
   ],
   "Y9R08Z": [
@@ -3869,6 +3973,12 @@
     {
       "type": 0,
       "value": "Los intercambios ya no se van a ejecutar, no podrás hacer nuevas modificaciones en esta posición y el NFT se quemara."
+    }
+  ],
+  "aDA5jh": [
+    {
+      "type": 0,
+      "value": "Mayor cantidad de tokens recibidos / Menor cantidad de tokens gastados (para ordenes de compra)"
     }
   ],
   "aEQUw9": [
@@ -4367,6 +4477,12 @@
       "value": "Confirmo que la dirección anterior es correcta"
     }
   ],
+  "fe8hcE": [
+    {
+      "type": 0,
+      "value": "a nosotros"
+    }
+  ],
   "fi6uGQ": [
     {
       "type": 0,
@@ -4471,10 +4587,20 @@
       "value": "Configuración avanzada"
     }
   ],
+  "gcCrpy": [
+    {
+      "type": 0,
+      "value": "No, usar "
+    },
+    {
+      "type": 1,
+      "value": "swapper"
+    }
+  ],
   "gdQB3o": [
     {
       "type": 0,
-      "value": "Aprobar "
+      "value": "Autorizar "
     },
     {
       "type": 1,
@@ -4540,7 +4666,7 @@
   "hEvpJE": [
     {
       "type": 0,
-      "value": "Ordene las rutas por donde puede recibir más tokens"
+      "value": "Ordene las rutas por donde puede recibir más tokens/gastar menos tokens"
     }
   ],
   "hUTWyY": [
@@ -4618,7 +4744,7 @@
   "ha8PgS": [
     {
       "type": 0,
-      "value": "Aprobar y modificar posición"
+      "value": "Autorizar y modificar posición"
     }
   ],
   "haoCMr": [
@@ -5101,6 +5227,12 @@
       "value": "Agregar dirección"
     }
   ],
+  "n+0Kho": [
+    {
+      "type": 0,
+      "value": "Probablemente escuchaste que muchas aplicaciones dicen que te ofrecen el mejor precio: ahora podes estar seguro! Vamos a pedirle a todos al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades."
+    }
+  ],
   "n47KZD": [
     {
       "type": 0,
@@ -5177,6 +5309,12 @@
     {
       "type": 0,
       "value": "+ retornos generados"
+    }
+  ],
+  "oIVT9p": [
+    {
+      "type": 0,
+      "value": "Utilizar Aprobación Universal:"
     }
   ],
   "ocCMPR": [
@@ -5637,6 +5775,12 @@
       "value": "MAX_UINT_32"
     }
   ],
+  "s7Nenf": [
+    {
+      "type": 0,
+      "value": "Nuestros Contratos Inteligentes fueron contruidos para maximizar el poder de la Aprobación Universal para minimizar cualquier vulnerabilidad hacia ellos.Ademas, al utlizar la Aprobación Universal ahora podemos simular tus intercambios en cualquier red en la que estes, asi que ahora podes saber exactamente cuanto vas a recibir una vez que el intercambio se confirme! Por ultimo, nuestros Contratos Inteligentes fueron auditados por Omniscia y hay una bug bounty activa en ImmuneFi."
+    }
+  ],
   "s7Q4TB": [
     {
       "type": 0,
@@ -5661,6 +5805,32 @@
       "value": "Posiciones en curso"
     }
   ],
+  "sWB1pz": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Validando los quotes para darte el mejor precio ("
+    },
+    {
+      "type": 1,
+      "value": "current"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "total"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
   "sajNR4": [
     {
       "type": 0,
@@ -5679,6 +5849,16 @@
     {
       "type": 0,
       "value": "Menos gas"
+    }
+  ],
+  "t0+OFx": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Firmar la autorizacion del token en tu billetera"
     }
   ],
   "t0oI3L": [
@@ -5736,7 +5916,7 @@
   "tAzRkq": [
     {
       "type": 0,
-      "value": "Aprobar "
+      "value": "Autorizar "
     },
     {
       "type": 1,
@@ -5902,7 +6082,7 @@
     },
     {
       "type": 0,
-      "value": " - Se está confirmando la aprobación del token"
+      "value": " - Se está confirmando la autorización del token"
     }
   ],
   "uV7tE7": [
@@ -5925,6 +6105,22 @@
     {
       "type": 0,
       "value": "¿Cómo podemos mejorarlo?"
+    }
+  ],
+  "us01Br": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - La validación de los quotes falló"
+    }
+  ],
+  "v/Er//": [
+    {
+      "type": 0,
+      "value": "Por favor, ayudanos a mejorar al compartir tu feedback en la tab de Feedback o mandanos un mensaje en"
     }
   ],
   "v/LxnW": [
@@ -5953,10 +6149,38 @@
       "value": "minutos"
     }
   ],
+  "vCTA97": [
+    {
+      "type": 0,
+      "value": "Luego de simular los quotes, encontramos que "
+    },
+    {
+      "type": 1,
+      "value": "toTarget"
+    },
+    {
+      "type": 0,
+      "value": " seria mejor para el criterio de slección que elegiste. ¿Queres usar "
+    },
+    {
+      "type": 1,
+      "value": "toTarget"
+    },
+    {
+      "type": 0,
+      "value": "?"
+    }
+  ],
   "vHie/I": [
     {
       "type": 0,
       "value": "Estarás teniendo exactamente la misma experiencia que tendrías al usar el agregador directamente. No construimos ningún contrato inteligente sobre ellos así que no hay riesgo agregado. Al mismo tiempo, ofrecemos simulación de transacciones en algunas redes."
+    }
+  ],
+  "vIbAYN": [
+    {
+      "type": 0,
+      "value": "Seleccionar por"
     }
   ],
   "vNNVGj": [
@@ -6050,7 +6274,7 @@
   "wH5c58": [
     {
       "type": 0,
-      "value": "aqui."
+      "value": "Discord."
     }
   ],
   "wHKSsk": [
@@ -6063,6 +6287,16 @@
     {
       "type": 0,
       "value": "Intercambiando"
+    }
+  ],
+  "wXyOAT": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Los quotes serán validados"
     }
   ],
   "wY55VA": [
@@ -6087,6 +6321,28 @@
     {
       "type": 0,
       "value": "Cerrar"
+    }
+  ],
+  "x0ZohV": [
+    {
+      "type": 0,
+      "value": "Luego de simular los quotes, encotramos que "
+    },
+    {
+      "type": 1,
+      "value": "fromTarget"
+    },
+    {
+      "type": 0,
+      "value": " va a fallar si se ejecuta. "
+    },
+    {
+      "type": 1,
+      "value": "toTarget"
+    },
+    {
+      "type": 0,
+      "value": " esta actualmente ofreciendo los mejores resultados. ¿Queres usarlo??"
     }
   ],
   "x0hPUt": [
@@ -6137,6 +6393,24 @@
     {
       "type": 0,
       "value": "Como funciona / Riesgos"
+    }
+  ],
+  "xQGdu0": [
+    {
+      "type": 0,
+      "value": "Mean ahora necesita tu autorizacion explicita para intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "tokenFrom"
+    },
+    {
+      "type": 0,
+      "value": " a "
+    },
+    {
+      "type": 1,
+      "value": "tokenTo"
     }
   ],
   "xRD2R7": [
@@ -6302,7 +6576,7 @@
     },
     {
       "type": 0,
-      "value": " - Se envió la aprobación del token"
+      "value": " - Se envió la autorización del token"
     }
   ],
   "zPMSFC": [
@@ -6364,7 +6638,7 @@
   "zpSepL": [
     {
       "type": 0,
-      "value": "Aprobar "
+      "value": "Autorizar "
     },
     {
       "type": 1,

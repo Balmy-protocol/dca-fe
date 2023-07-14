@@ -110,7 +110,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const currentNetwork = useCurrentNetwork();
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const [hasSignSupport] = useSupportsSigning();
+  const hasSignSupport = useSupportsSigning();
   const remainingLiquidity = (depositedRateUnderlying || oldRate).mul(remainingSwaps);
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
   const loadedAsSafeApp = useLoadedAsSafeApp();
@@ -301,14 +301,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   {!isIncreasingPosition && (
                     <FormattedMessage
                       description="Approve signature companion text decrease"
-                      defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you will get your balance back as {token}."
+                      defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you will get your balance back as {token}."
                       values={{ token: position.from.symbol }}
                     />
                   )}
                   {isIncreasingPosition && (
                     <FormattedMessage
                       description="Approve signature companion text increase"
-                      defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary {token}."
+                      defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you send the necessary {token}."
                       values={{ token: position.from.symbol }}
                     />
                   )}
@@ -571,7 +571,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           <>
             <FormattedMessage
               description="Allow us to use your coin (modal max)"
-              defaultMessage="Approve Max {symbol}"
+              defaultMessage="Authorize Max {symbol}"
               values={{
                 symbol: fromToUse.symbol,
               }}
@@ -586,7 +586,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             text: (
               <FormattedMessage
                 description="Allow us to use your coin (modal exact)"
-                defaultMessage="Approve {remainingLiquidityDifference} {symbol}"
+                defaultMessage="Authorize {remainingLiquidityDifference} {symbol}"
                 values={{
                   symbol: fromToUse.symbol,
                   remainingLiquidityDifference: formatCurrencyAmount(remainingLiquidityDifference, fromToUse, 4),
@@ -638,7 +638,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       {
         color: 'secondary',
         variant: 'contained',
-        label: <FormattedMessage description="modifyPosition" defaultMessage="Approve and modify position" />,
+        label: <FormattedMessage description="modifyPosition" defaultMessage="Authorize and modify position" />,
         onClick: handleApproveAndModifyRateAndSwapsSafe,
         disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
       },

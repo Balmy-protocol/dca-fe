@@ -48,7 +48,7 @@ function comparePositions(positionA: Position, positionB: Position) {
 }
 
 const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
-  const [hasSignSupport] = useSupportsSigning();
+  const hasSignSupport = useSupportsSigning();
   const currentPositions = useCurrentPositions();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const currentNetwork = useCurrentNetwork();
@@ -123,7 +123,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
-                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
+                  defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
                   values={{ token: position.to.symbol }}
                 />
               </Typography>

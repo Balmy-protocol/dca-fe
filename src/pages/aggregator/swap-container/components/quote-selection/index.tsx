@@ -21,9 +21,10 @@ import { createStyles } from '@mui/material/styles';
 import useTrackEvent from '@hooks/useTrackEvent';
 import CircularProgress from '@mui/material/CircularProgress';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import Popover from '@mui/material/Popover';
 import QuoteRefresher from '../quote-refresher';
-import QuoteSorter from '../quote-sorter';
 import QuoteList from '../quote-list';
 
 const StyledContainer = styled.div`
@@ -161,8 +162,9 @@ const QuoteSelection = ({
   swapOptionsError,
 }: SwapQuotesProps) => {
   const { isBuyOrder, selectedRoute, from } = useAggregatorState();
-  const { isPermit2Enabled } = useAggregatorSettingsState();
   const { sorting } = useAggregatorSettingsState();
+  const currentNetwork = useSelectedNetwork();
+  const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
@@ -227,9 +229,6 @@ const QuoteSelection = ({
   return (
     <StyledContainer>
       <Grid container alignItems="center">
-        <Grid item xs={12}>
-          <QuoteSorter isLoading={isLoading} isBuyOrder={isBuyOrder} />
-        </Grid>
         {isLoading && (
           <Grid item xs={12}>
             <StyledCenteredWrapper>
@@ -237,7 +236,7 @@ const QuoteSelection = ({
             </StyledCenteredWrapper>
           </Grid>
         )}
-        {!isLoading && selectedRoute && (
+        {!isLoading && selectedRoute && quotes.length > 1 && (
           <Grid item xs={12}>
             <StyledQuoteContainer>
               <StyledSwapperContainer>
@@ -265,13 +264,34 @@ const QuoteSelection = ({
             </StyledQuoteContainer>
           </Grid>
         )}
+        {!isLoading && selectedRoute && quotes.length === 1 && (
+          <Grid item xs={12}>
+            <StyledQuoteContainer>
+              <StyledSwapperContainer>
+                <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
+                <Typography variant="h6" color="#ffffff">
+                  {selectedRoute.swapper.name}
+                </Typography>
+              </StyledSwapperContainer>
+              <StyledBetterByContainer>
+                <Typography variant="h6" color={color}>
+                  {formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken)}{' '}
+                  {selectedRoute.buyToken.symbol}
+                </Typography>
+                <Typography variant="caption">
+                  <FormattedMessage description="onlyOptionFound" defaultMessage="Only route available" />
+                </Typography>
+              </StyledBetterByContainer>
+            </StyledQuoteContainer>
+          </Grid>
+        )}
         <Grid item xs={12} sm={6}>
-          {selectedRoute && (
+          {selectedRoute && !isLoading && (
             <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} disableRefreshQuotes={!refreshQuotes} />
           )}
         </Grid>
         <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          {selectedRoute && (
+          {selectedRoute && quotes.length > 1 && !isLoading && (
             <>
               <Popover
                 anchorOrigin={{
@@ -301,7 +321,7 @@ const QuoteSelection = ({
                   sx={{
                     ml: '10px',
                     '&::before': {
-                      backgroundColor: 'rgba(255,255,255,0.12)',
+                      backgroundColor: '#292929',
                       content: '""',
                       display: 'block',
                       position: 'absolute',
@@ -310,6 +330,7 @@ const QuoteSelection = ({
                       top: 'calc(50% - 6px)',
                       transform: 'rotate(45deg)',
                       left: 6,
+                      zIndex: 99,
                     },
                   }}
                 />

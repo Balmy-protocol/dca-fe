@@ -22,6 +22,7 @@ interface AllowanceSplitButtonProps {
   color?: CustomButtonProps['color'];
   defaultApproval?: AllowanceType;
   tooltipText?: string;
+  hideTooltip?: boolean;
 }
 
 const StyledTooltip = styled(Tooltip)`
@@ -65,6 +66,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
     target,
     defaultApproval,
     tooltipText,
+    hideTooltip,
   } = props;
   const color = passedColor || 'primary';
   const web3Service = useWeb3Service();
@@ -81,7 +83,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
   const infiniteText = (
     <FormattedMessage
       description="Allow us to use your coin (home max)"
-      defaultMessage="Approve Max {symbol}"
+      defaultMessage="Authorize Max {symbol}"
       values={{
         symbol,
       }}
@@ -91,7 +93,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
   const specificText = (
     <FormattedMessage
       description="Allow us to use your coin (home exact)"
-      defaultMessage="Approve {amount} {symbol}"
+      defaultMessage="Authorize {amount} {symbol}"
       values={{ symbol, amount: token && amount ? formatCurrencyAmount(amount, token, 4) : '' }}
     />
   );
@@ -107,7 +109,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
           {hasPendingApproval ? (
             <FormattedMessage
               description="waiting for approval"
-              defaultMessage="Waiting for your {symbol} to be approved"
+              defaultMessage="Waiting for your {symbol} to be authorized"
               values={{
                 symbol,
               }}
@@ -115,7 +117,9 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
           ) : (
             defaultText
           )}
-          {!hasPendingApproval && <AllowanceTooltip message={tooltipText} target={target} symbol={symbol} />}
+          {!hasPendingApproval && !hideTooltip && (
+            <AllowanceTooltip message={tooltipText} target={target} symbol={symbol} />
+          )}
         </>
       }
       disabled={disabled}
