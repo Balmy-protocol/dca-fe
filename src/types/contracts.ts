@@ -125,7 +125,83 @@ export class MeanPermit2Contract extends Contract {
       },
       overrides?: { value?: BigNumber }
     ) => Promise<[BigNumber, BigNumber, BigNumber]>;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    buyOrderSwapWithGasMeasurement: (
+      params: {
+        // Deadline
+        deadline: number;
+        // Take from caller
+        tokenIn: string;
+        maxAmountIn: BigNumber;
+        nonce?: BigNumber;
+        signature?: string;
+        // Swapp approval
+        allowanceTarget: string;
+        // Swap execution
+        swapper: string;
+        swapData: string;
+        // Swap validation
+        tokenOut: string;
+        amountOut: BigNumber;
+        // Transfer token out
+        transferOut: { recipient: string; shareBps: number }[];
+        // Who to send the unspent tokenIn
+        unspentTokenInRecipient: string;
+      },
+      overrides?: { value?: BigNumber }
+    ) => Promise<[BigNumber, BigNumber, BigNumber]>;
   };
+
+  buyOrderSwapWithGasMeasurement: (
+    params: {
+      // Deadline
+      deadline: number;
+      // Take from caller
+      tokenIn: string;
+      maxAmountIn: BigNumber;
+      nonce?: BigNumber;
+      signature?: string;
+      // Swapp approval
+      allowanceTarget: string;
+      // Swap execution
+      swapper: string;
+      swapData: string;
+      // Swap validation
+      tokenOut: string;
+      amountOut: BigNumber;
+      // Transfer token out
+      transferOut: { recipient: string; shareBps: number }[];
+      // Who to send the unspent tokenIn
+      unspentTokenInRecipient: string;
+    },
+    overrides?: { value?: BigNumber }
+  ) => Promise<TransactionResponse>;
+
+  buyOrderSwap: (
+    params: {
+      // Deadline
+      deadline: number;
+      // Take from caller
+      tokenIn: string;
+      maxAmountIn: BigNumber;
+      nonce?: BigNumber;
+      signature?: string;
+      // Swapp approval
+      allowanceTarget: string;
+      // Swap execution
+      swapper: string;
+      swapData: string;
+      // Swap validation
+      tokenOut: string;
+      amountOut: BigNumber;
+      // Transfer token out
+      transferOut: { recipient: string; shareBps: number }[];
+      // Who to send the unspent tokenIn
+      unspentTokenInRecipient: string;
+    },
+    overrides?: { value?: BigNumber }
+  ) => Promise<TransactionResponse>;
 }
 
 export class SmolDomainContract extends Contract {

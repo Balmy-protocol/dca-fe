@@ -77,6 +77,7 @@ export interface TransactionActionApproveTokenData {
   swapper: string;
   defaultApproval?: AllowanceType;
   help?: string;
+  isPermit2Enabled?: boolean;
 }
 
 export interface TransactionActionWaitForApprovalData {

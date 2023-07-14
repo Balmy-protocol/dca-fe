@@ -99,7 +99,7 @@ const SwapQuotes = ({
   bestQuote,
   swapOptionsError,
 }: SwapQuotesProps) => {
-  const { from, to, isBuyOrder, selectedRoute } = useAggregatorState();
+  const { from, to, selectedRoute } = useAggregatorState();
   const dexes = useSdkDexes();
   const dexesKeys = Object.keys(dexes);
   const mappedDexes = dexesKeys.reduce<SourceMetadataWithId[][]>((acc, dexKey, index) => {
@@ -249,7 +249,7 @@ const SwapQuotes = ({
   return (
     <StyledPaper variant="outlined" $column $align={!isLoading}>
       <StyledTitleContainer>
-        <QuoteSorter isLoading={isLoading} isBuyOrder={isBuyOrder} />
+        <QuoteSorter isLoading={isLoading} />
         <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} disableRefreshQuotes={!refreshQuotes} />
       </StyledTitleContainer>
       {isLoading && (

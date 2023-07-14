@@ -67,7 +67,7 @@ const TerminateModal = ({
   const protocolIsTo =
     position.to.address === protocolToken.address || position.to.address === wrappedProtocolToken.address;
   const swappedOrLiquidity = protocolIsFrom ? remainingLiquidity : toWithdraw;
-  const [hasSignSupport] = useSupportsSigning();
+  const hasSignSupport = useSupportsSigning();
   const trackEvent = useTrackEvent();
 
   const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : BigNumber.from(0);
@@ -116,7 +116,7 @@ const TerminateModal = ({
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
-                  defaultMessage="You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
+                  defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
                   values={{ token: position.from.symbol }}
                 />
               </Typography>

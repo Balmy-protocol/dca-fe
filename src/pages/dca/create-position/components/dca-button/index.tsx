@@ -289,7 +289,7 @@ const DcaButton = ({
         <Typography variant="body1">
           <FormattedMessage
             description="approve and create position"
-            defaultMessage="Approve {from} and create position"
+            defaultMessage="Authorize {from} and create position"
             values={{ from: from?.symbol || '' }}
           />
         </Typography>

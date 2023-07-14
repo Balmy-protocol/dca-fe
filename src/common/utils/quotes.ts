@@ -70,8 +70,8 @@ export const getBetterBy = (
         secondQuote.sellAmount.amount
           .sub(bestQuote.sellAmount.amount)
           .mul(BigNumber.from(10).pow(18))
-          .div(secondQuote.sellAmount.amount)
-          .mul(100);
+          .mul(100)
+          .div(secondQuote.sellAmount.amount);
     } else {
       betterBy =
         secondQuote &&
@@ -79,14 +79,14 @@ export const getBetterBy = (
         bestQuote.buyAmount.amount
           .sub(secondQuote.buyAmount.amount)
           .mul(BigNumber.from(10).pow(18))
-          .div(secondQuote.buyAmount.amount)
-          .mul(100);
+          .mul(100)
+          .div(secondQuote.buyAmount.amount);
     }
   } else if (sorting === SORT_MOST_PROFIT) {
     const profitBest = calculateProfit(bestQuote);
     const profitSecond = calculateProfit(secondQuote);
     if (profitBest && profitSecond) {
-      betterBy = parseUnits(((profitBest * 100) / profitSecond).toString(), 18);
+      betterBy = parseUnits((((profitBest - profitSecond) / profitSecond) * 100).toString(), 18);
     }
   } else if (sorting === SORT_LEAST_GAS) {
     betterBy =
@@ -97,8 +97,8 @@ export const getBetterBy = (
       secondQuote.gas.estimatedCost
         .sub(bestQuote.gas.estimatedCost)
         .mul(BigNumber.from(10).pow(18))
-        .div(secondQuote.gas.estimatedCost)
-        .mul(100);
+        .mul(100)
+        .div(secondQuote.gas.estimatedCost);
   }
 
   return betterBy;
@@ -120,8 +120,8 @@ export const getWorseBy = (
         secondQuote.sellAmount.amount
           .sub(bestQuote.sellAmount.amount)
           .mul(BigNumber.from(10).pow(18))
-          .div(bestQuote.sellAmount.amount)
-          .mul(100);
+          .mul(100)
+          .div(bestQuote.sellAmount.amount);
     } else {
       worseBy =
         secondQuote &&
@@ -129,14 +129,14 @@ export const getWorseBy = (
         bestQuote.buyAmount.amount
           .sub(secondQuote.buyAmount.amount)
           .mul(BigNumber.from(10).pow(18))
-          .div(bestQuote.buyAmount.amount)
-          .mul(100);
+          .mul(100)
+          .div(bestQuote.buyAmount.amount);
     }
   } else if (sorting === SORT_MOST_PROFIT) {
     const profitBest = calculateProfit(bestQuote);
     const profitSecond = calculateProfit(secondQuote);
     if (profitBest && profitSecond) {
-      worseBy = parseUnits((100 - (profitBest * 100) / profitSecond).toString(), 18);
+      worseBy = parseUnits((((profitBest - profitSecond) / profitBest) * 100).toString(), 18);
     }
   } else if (sorting === SORT_LEAST_GAS) {
     worseBy =
@@ -147,8 +147,8 @@ export const getWorseBy = (
       secondQuote.gas.estimatedCost
         .sub(bestQuote.gas.estimatedCost)
         .mul(BigNumber.from(10).pow(18))
-        .div(bestQuote.gas.estimatedCost)
-        .mul(100);
+        .mul(100)
+        .div(bestQuote.gas.estimatedCost);
   }
 
   return worseBy;

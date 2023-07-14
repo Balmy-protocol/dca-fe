@@ -84,28 +84,56 @@ export default class AggregatorService {
     const meanPermit2Instance = await this.contractService.getMeanPermit2Instance();
     const address = this.walletService.getAccount();
 
-    const populatedTransaction = await meanPermit2Instance.populateTransaction.sellOrderSwap(
-      {
-        // Deadline
-        deadline: signature?.deadline || Math.floor(Date.now() / 1000) + ONE_DAY.toNumber(),
-        // Take from caller
-        tokenIn: route.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : route.sellToken.address,
-        amountIn: route.maxSellAmount.amount,
-        nonce: signature?.nonce || BigNumber.from(0),
-        signature: signature?.rawSignature || '0x',
-        // Swapp approval
-        allowanceTarget: route.swapper.allowanceTarget,
-        // Swap execution
-        swapper: route.tx.to,
-        swapData: route.tx.data,
-        // Swap validation
-        tokenOut: route.buyToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : route.buyToken.address,
-        minAmountOut: route.minBuyAmount.amount,
-        // Transfer token out
-        transferOut: [{ recipient: route.transferTo || address, shareBps: 0 }],
-      },
-      { value: route.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? route.maxSellAmount.amount : BigNumber.from(0) }
-    );
+    let populatedTransaction;
+
+    if (route.type === 'buy') {
+      populatedTransaction = await meanPermit2Instance.populateTransaction.buyOrderSwap(
+        {
+          // Deadline
+          deadline: signature?.deadline || Math.floor(Date.now() / 1000) + ONE_DAY.toNumber(),
+          // Take from caller
+          tokenIn: route.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : route.sellToken.address,
+          maxAmountIn: route.maxSellAmount.amount,
+          nonce: signature?.nonce || BigNumber.from(0),
+          signature: signature?.rawSignature || '0x',
+          // Swapp approval
+          allowanceTarget: route.swapper.allowanceTarget,
+          // Swap execution
+          swapper: route.tx.to,
+          swapData: route.tx.data,
+          // Swap validation
+          tokenOut: route.buyToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : route.buyToken.address,
+          amountOut: route.minBuyAmount.amount,
+          // Transfer token out
+          transferOut: [{ recipient: route.transferTo || address, shareBps: 0 }],
+          unspentTokenInRecipient: NULL_ADDRESS,
+        },
+        { value: route.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? route.maxSellAmount.amount : BigNumber.from(0) }
+      );
+    } else {
+      populatedTransaction = await meanPermit2Instance.populateTransaction.sellOrderSwap(
+        {
+          // Deadline
+          deadline: signature?.deadline || Math.floor(Date.now() / 1000) + ONE_DAY.toNumber(),
+          // Take from caller
+          tokenIn: route.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : route.sellToken.address,
+          amountIn: route.maxSellAmount.amount,
+          nonce: signature?.nonce || BigNumber.from(0),
+          signature: signature?.rawSignature || '0x',
+          // Swapp approval
+          allowanceTarget: route.swapper.allowanceTarget,
+          // Swap execution
+          swapper: route.tx.to,
+          swapData: route.tx.data,
+          // Swap validation
+          tokenOut: route.buyToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : route.buyToken.address,
+          minAmountOut: route.minBuyAmount.amount,
+          // Transfer token out
+          transferOut: [{ recipient: route.transferTo || address, shareBps: 0 }],
+        },
+        { value: route.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? route.maxSellAmount.amount : BigNumber.from(0) }
+      );
+    }
 
     const transactionToSend = await this.addGasLimit(populatedTransaction);
 
@@ -192,7 +220,12 @@ export default class AggregatorService {
     }));
 
     if (usePermit2 && from.address === protocolToken.address && takerAddress) {
-      sortedOptions = await this.simulationService.simulateQuotes(sortedOptions, sorting || SORT_MOST_PROFIT);
+      sortedOptions = await this.simulationService.simulateQuotes(
+        sortedOptions,
+        sorting || SORT_MOST_PROFIT,
+        undefined,
+        buyAmount
+      );
     }
 
     return sortedOptions;
@@ -204,7 +237,8 @@ export default class AggregatorService {
     transferTo?: string | null,
     slippage?: number,
     gasSpeed?: GasKeys,
-    chainId?: number
+    chainId?: number,
+    usePermit2?: boolean
   ) {
     const currentNetwork = await this.providerService.getNetwork();
 
@@ -240,7 +274,8 @@ export default class AggregatorService {
       transferTo,
       slippage,
       gasSpeed,
-      !shouldValidate
+      !shouldValidate,
+      usePermit2
     );
 
     const { sellToken, buyToken } = quote;

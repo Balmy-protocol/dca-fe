@@ -579,7 +579,7 @@ const ClaimChecklist = ({
               <Typography variant="h6">
                 <FormattedMessage
                   description="eulerClaimApproveTokens"
-                  defaultMessage="5 - Approve your tokens to be claimed"
+                  defaultMessage="5 - Authorize your tokens to be claimed"
                 />
               </Typography>
             </AccordionSummary>

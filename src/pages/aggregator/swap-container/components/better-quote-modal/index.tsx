@@ -16,6 +16,7 @@ import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { SORT_MOST_RETURN } from '@constants/aggregator';
 
 const StyledBetterQuoteContainer = styled.div`
   display: flex;
@@ -101,7 +102,7 @@ const BetterQuoteModal = ({
             },
           },
           {
-            humanReadableDiff: `Buy ${betterQuote.buyAmount.amountInUnits} ${betterQuote.buyToken.symbol}`,
+            humanReadableDiff: `Buy ${betterQuote.buyAmount.amountInUnits} ${betterQuote.buyToken.symbol} on ${betterQuote.swapper.name}`,
             rawInfo: {
               kind: StateChangeKind.ERC20_TRANSFER,
               data: { amount: { before: '0', after: '1' }, asset: betterQuote.buyToken },
@@ -142,14 +143,14 @@ const BetterQuoteModal = ({
             humanReadableDiff: `Sell ${selectedRoute.sellAmount.amountInUnits} ${selectedRoute.sellToken.symbol}`,
             rawInfo: {
               kind: StateChangeKind.ERC20_TRANSFER,
-              data: { amount: { before: '0', after: '0' }, asset: selectedRoute.sellToken },
+              data: { amount: { before: '1', after: '0' }, asset: selectedRoute.sellToken },
             },
           },
           {
-            humanReadableDiff: `Buy ${selectedRoute.buyAmount.amountInUnits} ${selectedRoute.buyToken.symbol}`,
+            humanReadableDiff: `Buy ${selectedRoute.buyAmount.amountInUnits} ${selectedRoute.buyToken.symbol} on ${selectedRoute.swapper.name}`,
             rawInfo: {
               kind: StateChangeKind.ERC20_TRANSFER,
-              data: { amount: { before: '0', after: '0' }, asset: selectedRoute.buyToken },
+              data: { amount: { before: '0', after: '1' }, asset: selectedRoute.buyToken },
             },
           },
         ],
@@ -215,8 +216,8 @@ const BetterQuoteModal = ({
           ) : (
             <FormattedMessage
               description="betterQuote selectBetterQuote"
-              defaultMessage="We found that {swapper} gives you a better result based on your search options, do you want to change it?"
-              values={{ swapper: betterQuote?.swapper.name || '' }}
+              defaultMessage="After simulating quotes, we found that {toTarget} would be better based on the chosen criteria. Do you want to use {toTarget} instead?"
+              values={{ toTarget: betterQuote?.swapper.name }}
             />
           )}
         </Typography>
@@ -261,6 +262,19 @@ const BetterQuoteModal = ({
                 </StyledSwapperContainer>
                 <StyledBetterByContainer>
                   <Typography variant="body1">{worseMetric}</Typography>
+                  {sorting !== SORT_MOST_RETURN && (
+                    <Typography variant="caption">
+                      <FormattedMessage
+                        description="betterQuoteDataFee"
+                        defaultMessage="Tx cost: {gas}"
+                        values={{
+                          gas: selectedRoute?.gas?.estimatedCostInUSD
+                            ? `$${selectedRoute.gas.estimatedCostInUSD.toFixed(2)}`
+                            : '-',
+                        }}
+                      />
+                    </Typography>
+                  )}
                 </StyledBetterByContainer>
               </StyledQuoteContainer>
               <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
@@ -281,6 +295,19 @@ const BetterQuoteModal = ({
                     <b>{formatCurrencyAmount(betterBy, emptyTokenWithDecimals(18), 2, 2)}%</b>{' '}
                     {getBetterByLabel(sorting, isBuyOrder)}
                   </Typography>
+                  {sorting !== SORT_MOST_RETURN && (
+                    <Typography variant="caption">
+                      <FormattedMessage
+                        description="betterQuoteDataFee"
+                        defaultMessage="Tx cost: {gas}"
+                        values={{
+                          gas: betterQuote?.gas?.estimatedCostInUSD
+                            ? `$${betterQuote.gas.estimatedCostInUSD.toFixed(2)}`
+                            : '-',
+                        }}
+                      />
+                    </Typography>
+                  )}
                 </StyledBetterByContainer>
               </StyledQuoteContainer>
             </>

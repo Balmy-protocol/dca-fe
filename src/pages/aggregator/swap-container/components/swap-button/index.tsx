@@ -20,7 +20,7 @@ import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import { NetworkStruct } from '@types';
-import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
+import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 
 const StyledButton = styled(Button)`
   padding: 10px 18px;
@@ -55,8 +55,8 @@ const SwapButton = ({
   handleSafeApproveAndSwap,
 }: SwapButtonProps) => {
   const { from, to, selectedRoute } = useAggregatorState();
-  const { isPermit2Enabled } = useAggregatorSettingsState();
   const currentNetwork = useSelectedNetwork();
+  const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const { openConnectModal } = useConnectModal();
   const actualCurrentNetwork = useCurrentNetwork();
   const web3Service = useWeb3Service();
@@ -176,7 +176,7 @@ const SwapButton = ({
           {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
             <FormattedMessage
               description="wrap agg"
-              defaultMessage="Approve {from} and wrap"
+              defaultMessage="Authorize {from} and wrap"
               values={{ from: from.symbol }}
             />
           )}
@@ -187,7 +187,7 @@ const SwapButton = ({
             (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
             <FormattedMessage
               description="approve and swap agg"
-              defaultMessage="Approve {from} and swap"
+              defaultMessage="Authorize {from} and swap"
               values={{ from: from?.symbol || '' }}
             />
           )}

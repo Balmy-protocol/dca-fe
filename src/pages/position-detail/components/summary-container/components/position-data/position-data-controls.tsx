@@ -55,7 +55,7 @@ const PositionDataControls = ({
   onSuggestMigrateYield,
 }: PositionDataControlsProps) => {
   const { remainingSwaps, chainId } = fullPositionToMappedPosition(position);
-  const [hasSignSupport] = useSupportsSigning();
+  const hasSignSupport = useSupportsSigning();
   const network = useCurrentNetwork();
   const web3Service = useWeb3Service();
   const account = web3Service.getAccount();

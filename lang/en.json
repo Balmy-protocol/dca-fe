@@ -1,4 +1,12 @@
 {
+  "+7DSFq": {
+    "defaultMessage": "Authorize {from} and create position",
+    "description": "approve and create position"
+  },
+  "+9NjvN": {
+    "defaultMessage": "Authorize {amount} {symbol}",
+    "description": "Allow us to use your coin (home exact)"
+  },
   "+IzX5q": {
     "defaultMessage": "{readable}",
     "description": "oneHourPluralTime"
@@ -14,6 +22,10 @@
   "+Q63Eo": {
     "defaultMessage": "Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted.",
     "description": "positionLPTNotSupported"
+  },
+  "+Rzphv": {
+    "defaultMessage": "{step} - Transaction simulated",
+    "description": "transationStepWaitSimulateSuccess"
   },
   "+UA1IX": {
     "defaultMessage": "No account required",
@@ -63,9 +75,17 @@
     "defaultMessage": "Users need to pay gas fees when interacting with their positions. At the same time, there is a protocol fee that is charged in each swap. That fee is currently 0.6%.",
     "description": "faqDoINeedToPayAnyFeesResponsePart1"
   },
+  "/SeEFZ": {
+    "defaultMessage": "Authorize {from} and wrap",
+    "description": "wrap agg"
+  },
   "/ePQOu": {
     "defaultMessage": "Our Hub Companion has been approved to modify your {from}:{to} position",
     "description": "transactionMessagesApproveCompanion"
+  },
+  "/f9cjF": {
+    "defaultMessage": "Sort routes by where you can receive more tokens/spend less tokens",
+    "description": "sortMostReturnSellOrderHelp"
   },
   "/gkMmp": {
     "defaultMessage": "Insufficient funds",
@@ -79,10 +99,6 @@
     "defaultMessage": "{step} - Swap tokens",
     "description": "transationStepSwapTokens"
   },
-  "/vWyXL": {
-    "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you send the necessary {token}.",
-    "description": "Approve signature companion text increase"
-  },
   "/wtb0w": {
     "defaultMessage": "Modify {from}:{to} position to run for {swaps} {frequency}",
     "description": "transactionDetailsModifySwaps"
@@ -91,21 +107,9 @@
     "defaultMessage": "Half",
     "description": "half"
   },
-  "032sSy": {
-    "defaultMessage": "Earned by token:",
-    "description": "jbrlUserCompEarnedInToken"
-  },
   "07ZWiK": {
     "defaultMessage": "hour",
     "description": "oneHourSingularSubject"
-  },
-  "07xzKO": {
-    "defaultMessage": "Approve {remainingLiquidityDifference} {symbol}",
-    "description": "Allow us to use your coin (modal exact)"
-  },
-  "0CK/Jd": {
-    "defaultMessage": "Yes, you can opt in to generate yield with the tokens you are buying, just remember that The safety of the funds will be up to the selected platform, so please do your own research to perform an educated risk/reward assessment. That being said, enabling generating yield could be a game winning decision.",
-    "description": "jbrlRulesCanYieldResponse"
   },
   "0CdUh0": {
     "defaultMessage": "Creating their position",
@@ -119,9 +123,17 @@
     "defaultMessage": "{readable}",
     "description": "fiveMinutesPluralTime"
   },
+  "0eRw3h": {
+    "defaultMessage": "Authorize {from}",
+    "description": "transactionDetailsApproveToken"
+  },
   "0jTBFS": {
     "defaultMessage": "every 30 minutes",
     "description": "thirtyMinutesEvery"
+  },
+  "0nJXdn": {
+    "defaultMessage": "{step} - Token authorization is submitted",
+    "description": "transationStepWaitApprove"
   },
   "0tTtPb": {
     "defaultMessage": "1 week (1 swap)",
@@ -147,10 +159,6 @@
     "defaultMessage": "4 - Terminate your open positions",
     "description": "eulerClaimTerminatePositions"
   },
-  "1W/BMl": {
-    "defaultMessage": "{step} - Transaction simulated",
-    "description": "transationStepWaitApprove"
-  },
   "1c3wKa": {
     "defaultMessage": "Your {from}:{to} position has been migrated",
     "description": "transactionMessagesMigrate"
@@ -163,6 +171,10 @@
     "defaultMessage": "Do you take any fees?",
     "description": "faqFees"
   },
+  "2FHrOX": {
+    "defaultMessage": "View other options",
+    "description": "viewOtherOptions"
+  },
   "2NZFot": {
     "defaultMessage": "Select address",
     "description": "transferToSelectAddress"
@@ -170,10 +182,6 @@
   "2TSf/Q": {
     "defaultMessage": "You don’t need to execute your swaps by yourself since Mean Finance incentivizes other users to execute swaps, for a profit. Now, these incentives can be affected by different factors:",
     "description": "faqWhyIsMyPositionStaleResponsePart1"
-  },
-  "2U1wB2": {
-    "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}.",
-    "description": "Approve signature companion text"
   },
   "2iKKX6": {
     "defaultMessage": "Withdraw and close position",
@@ -194,10 +202,6 @@
   "3Ovbmx": {
     "defaultMessage": "Next swap:",
     "description": "positionDetailsNextSwapAtTitle"
-  },
-  "3iyxPJ": {
-    "defaultMessage": "To compete, you will need to invest a total of 500 jBRL among all your positions. That being said, you can compete with up to 6 positions. Be sure to deploy your positions on the 26 and 27 of April!",
-    "description": "jbrlRulesHowToCompeteResponse"
   },
   "3oTxXg": {
     "defaultMessage": "Position Closed",
@@ -235,6 +239,10 @@
     "defaultMessage": "You must give the {target} smart contracts permission to use your {symbol}",
     "description": "Allowance Tooltip"
   },
+  "4sd00v": {
+    "defaultMessage": "Discord.",
+    "description": "here"
+  },
   "4t/CsS": {
     "defaultMessage": "Wrapping",
     "description": "wrap agg loading"
@@ -251,13 +259,13 @@
     "defaultMessage": "Setting your {from}/{to} position permissions",
     "description": "Modifying your position permissions"
   },
-  "5DbBUx": {
-    "defaultMessage": "What is transaction simulation?",
-    "description": "faqWhatIsTransactionSimulation"
-  },
   "5H+bme": {
     "defaultMessage": "Transaction confirmed!",
     "description": "transactionMessagesConfirmed"
+  },
+  "5QXn5Y": {
+    "defaultMessage": "Please check your wallet to confirm this transaction",
+    "description": "Confirm in wallet"
   },
   "5TdrSw": {
     "defaultMessage": "but in the future we will support more on-chain oracles.",
@@ -331,10 +339,6 @@
     "defaultMessage": "How much {from} do you want to invest?",
     "description": "howMuchToSell"
   },
-  "7YJRiI": {
-    "defaultMessage": "Approve {from}",
-    "description": "transactionDetailsApproveToken"
-  },
   "7fX0fL": {
     "defaultMessage": "Withdraw {amount} {from} funds from your {from}:{to} position",
     "description": "transactionDetailsWithdrawFunds"
@@ -395,9 +399,9 @@
     "defaultMessage": "FAQ",
     "description": "faq"
   },
-  "9VSwYz": {
-    "defaultMessage": "Investing in:",
-    "description": "jbrlUserCompInvestingIn"
+  "9eJCA8": {
+    "defaultMessage": "Waiting for your {symbol} to be authorized",
+    "description": "waiting for approval"
   },
   "9ka/f/": {
     "defaultMessage": "No {status} positions yet.",
@@ -454,6 +458,10 @@
   "Aq2WRe": {
     "defaultMessage": "Total value",
     "description": "generatedDashboard"
+  },
+  "AwBLGY": {
+    "defaultMessage": "Authorize Max {symbol}",
+    "description": "Allow us to use your coin (modal max)"
   },
   "AzL+qV": {
     "defaultMessage": "Discard changes",
@@ -587,10 +595,6 @@
     "defaultMessage": "every 4 hours",
     "description": "fourHoursAdverb"
   },
-  "DIJWGT": {
-    "defaultMessage": "Waiting for your {symbol} to be approved",
-    "description": "waiting for approval"
-  },
   "DPjSTq": {
     "defaultMessage": "There are no funds currently deposited in Mean Finance",
     "description": "generatedDashboardNoValuePart1"
@@ -606,6 +610,10 @@
   "DaGzbO": {
     "defaultMessage": "Unknown error: {message}",
     "description": "unkown_error"
+  },
+  "DcWDCQ": {
+    "defaultMessage": "Why do I need to do this?",
+    "description": "transactionStepsWhy"
   },
   "DcgWHC": {
     "defaultMessage": "As the last step you will need to redeem for each of your tokens the claimable amount.",
@@ -651,10 +659,6 @@
     "defaultMessage": "Your withdrawal of {toSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "withdraw from success"
   },
-  "EUXFDv": {
-    "defaultMessage": "Total earned:",
-    "description": "jbrlUserCompTotalEarned"
-  },
   "EVgPpp": {
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "fifteenMinutesPlural"
@@ -683,10 +687,6 @@
     "defaultMessage": "Permissions on your position:",
     "description": "AddressessPermissions"
   },
-  "EwUtBa": {
-    "defaultMessage": "Used funds:",
-    "description": "jbrlUserCompTotalUsed"
-  },
   "EzTqXK": {
     "defaultMessage": "View permissions",
     "description": "viewPermissions"
@@ -707,9 +707,9 @@
     "defaultMessage": "Beta user",
     "description": "claimModal optimismBeta"
   },
-  "FGbffU": {
-    "defaultMessage": "Approve {from} and wrap",
-    "description": "wrap agg"
+  "FT80h0": {
+    "defaultMessage": "Simulating transactions ({current}/{total})",
+    "description": "quoteSelectionSimulatingQuotes"
   },
   "FW4Fp5": {
     "defaultMessage": "Get {protocolToken} as {wrappedProtocolToken} instead",
@@ -731,13 +731,17 @@
     "defaultMessage": "Claim campaigns",
     "description": "claimModal title"
   },
-  "FmT3Yy": {
-    "defaultMessage": "Profit:",
-    "description": "jbrlUserCompTotalProfi"
+  "FnRMc5": {
+    "defaultMessage": "By enabling Universal Approval, you will be able to use Uniswap, Mean, swap aggregators and more protocols without having to authorize each one of them",
+    "description": "approveTokenExplanation"
   },
-  "FsMgnw": {
-    "defaultMessage": "Can I enable “generate yield” option on my positions?",
-    "description": "jbrlRulesCanYield"
+  "FnhEep": {
+    "defaultMessage": "Authorize {remainingLiquidityDifference} {symbol}",
+    "description": "Allow us to use your coin (modal exact)"
+  },
+  "FteRgZ": {
+    "defaultMessage": "The quote you had selected will fail",
+    "description": "failedQuote title"
   },
   "FwDtZA": {
     "defaultMessage": "Positions",
@@ -775,9 +779,9 @@
     "defaultMessage": "Select network",
     "description": "supportedNetworks"
   },
-  "GW9CoO": {
-    "defaultMessage": "There will be 5 winners, at the end of the competition the top 5 portfolios in terms of net worth will be the ones to get prizes. The prizes will be sent to the winner addresses shortly after the competition ends.{br}{br}1st place 1,500 jBRL{br}2nd place 1250 jBRL{br}3rd place 1000 jBRL{br}4th place 750 jBRL{br}5th place 500 jBRL",
-    "description": "jbrlRulesPrizes"
+  "GSUUrg": {
+    "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}.",
+    "description": "Approve signature companion text"
   },
   "GZ31rF": {
     "defaultMessage": "Your withdrawal of funds of {fromSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon",
@@ -811,9 +815,9 @@
     "defaultMessage": "This is a custom token you are importing, trade at your own risk.",
     "description": "customTokenWarning"
   },
-  "HKZyB6": {
-    "defaultMessage": "Approve {from} and create position",
-    "description": "approve and create position"
+  "H8Li0R": {
+    "defaultMessage": "Authorize Max {symbol}",
+    "description": "Allow us to use your coin (home max)"
   },
   "Hbiw7t": {
     "defaultMessage": "For more information, feel free to check our",
@@ -855,9 +859,9 @@
     "defaultMessage": "Select an option",
     "description": "feedbackEmptyOption"
   },
-  "IdkM8U": {
-    "defaultMessage": "It starts 26 of April 00:00 UTC and ends 27 May. To participate, you must create your positions from April 26 to 27. The competition ends on the 27 of May.",
-    "description": "jbrlRulesWhenStartResponse"
+  "IXS8Tv": {
+    "defaultMessage": "Transaction cost: {cost}",
+    "description": "failedQuote transactionCost"
   },
   "IhGLAD": {
     "defaultMessage": "({swaps} SWAP{plural})",
@@ -878,10 +882,6 @@
   "IuW2wC": {
     "defaultMessage": "Withdrawing {toSymbol}",
     "description": "Withdrawing from"
-  },
-  "J2NpSo": {
-    "defaultMessage": "{step} - Sign the token approval with your wallet",
-    "description": "transationStepApproveSign"
   },
   "J4ZbBX": {
     "defaultMessage": "No trading limits",
@@ -911,9 +911,17 @@
     "defaultMessage": "Supporting:",
     "description": "meanFinanceMetaAggregatorSupporting"
   },
+  "JkRQyY": {
+    "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you migrate the position.",
+    "description": "Authorize signature companion text migrate"
+  },
   "Jnqjl0": {
     "defaultMessage": "Steps to claim your assets",
     "description": "eulerClaimStepsNeeded title"
+  },
+  "JoH9Yo": {
+    "defaultMessage": "We found a better quote for you",
+    "description": "betterQuote title"
   },
   "K/HInO": {
     "defaultMessage": "This allows the address to decrease the funds and modify the duration of your position",
@@ -963,9 +971,9 @@
     "defaultMessage": "Transfered to: {account}",
     "description": "transactionConfirmationTransferTo"
   },
-  "LFvqJr": {
-    "defaultMessage": "Approve Max {symbol}",
-    "description": "Allow us to use your coin (home max)"
+  "LAaGdN": {
+    "defaultMessage": "{step} - Enable universal approval for {token}",
+    "description": "transationStepApprove"
   },
   "LIJQek": {
     "defaultMessage": "Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the",
@@ -987,13 +995,13 @@
     "defaultMessage": "This allows the address to increase the funds and modify the duration of your position",
     "description": "increase permission helptext"
   },
-  "LRE2+L": {
-    "defaultMessage": "Open wallet",
-    "description": "openWallet"
-  },
   "LS2WKt": {
     "defaultMessage": "We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk.",
     "description": "aggregatorPriceNotFound"
+  },
+  "LY4QAG": {
+    "defaultMessage": "{step} - Quotes validated and transaction simulated",
+    "description": "transationStepWaitSimulationSuccess"
   },
   "LlYdJz": {
     "defaultMessage": "claim page",
@@ -1015,13 +1023,9 @@
     "defaultMessage": "{increaseDecrease} duration to run for {frequency} from {oldFrequency}",
     "description": "positionModifiedSwaps"
   },
-  "MJey+4": {
-    "defaultMessage": "{step} - Submit the transaction approval with your wallet",
-    "description": "transationStepApprove"
-  },
-  "Myc4cp": {
-    "defaultMessage": "5 - Approve your tokens to be claimed",
-    "description": "eulerClaimApproveTokens"
+  "MFXOI0": {
+    "defaultMessage": "What is quote simulation?",
+    "description": "faqWhatIsTransactionSimulation"
   },
   "MzzvpH": {
     "defaultMessage": "New trade",
@@ -1091,10 +1095,6 @@
     "defaultMessage": "{yield} {frequency} for you for",
     "description": "rate detail"
   },
-  "O45uNV": {
-    "defaultMessage": "Please help us improve by sharing your feedback on the Feedback tab, or pinging us on Discord",
-    "description": "faqHavingIssuesResponse"
-  },
   "O75EVP": {
     "defaultMessage": "{prefix}{value} {token}",
     "description": "graph selectedItemValue"
@@ -1114,14 +1114,6 @@
   "OTyRfW": {
     "defaultMessage": "Swap and transfer to another address",
     "description": "tranferToTooltip"
-  },
-  "OV5gMx": {
-    "defaultMessage": "You’ve got a total of 6 positions at your disposal, diversify your portfolio using various strategies. You can either decide to invest your 500 jBRL on one position, or diversify your portfolio using more positions (maximum 6 positions). Combinations are endless.",
-    "description": "jbrlRulesCanWithdrawResponse"
-  },
-  "ObW6Xl": {
-    "defaultMessage": "No, you should not withdraw funds from your positions or add more jBRL to your positions. Funds that are withdrawn from positions will not be taken into account.",
-    "description": "faqWhatIsTransactionSimulationResponse"
   },
   "OdWJTU": {
     "defaultMessage": "{frequency} {hasYield}",
@@ -1151,10 +1143,6 @@
     "defaultMessage": "Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted.",
     "description": "positionagEURNotSupported"
   },
-  "PDBTFX": {
-    "defaultMessage": "How can I compete?",
-    "description": "jbrlRulesHowToCompete"
-  },
   "PFt59p": {
     "defaultMessage": "Giving our Hub Companion permission to close {positions} have been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "eulerClaim success permit many positions"
@@ -1171,10 +1159,6 @@
     "defaultMessage": "${amount} USD saved",
     "description": "savedProtocolTooltip"
   },
-  "PdEubf": {
-    "defaultMessage": "View positons",
-    "description": "jbrlUserCompViewPositions"
-  },
   "Pmf45s": {
     "defaultMessage": "Transfer to another address:",
     "description": "transferToDescription"
@@ -1182,10 +1166,6 @@
   "PwFUUt": {
     "defaultMessage": "Sell",
     "description": "sell"
-  },
-  "PwlAU3": {
-    "defaultMessage": "Total deposited:",
-    "description": "jbrlUserCompTotalDeposited"
   },
   "PxOAUe": {
     "defaultMessage": "every 30 minutes",
@@ -1231,6 +1211,10 @@
     "defaultMessage": "This was due to: {name}",
     "description": "errorEncounteredName"
   },
+  "QkhXLS": {
+    "defaultMessage": "Yes, use {swapper}",
+    "description": "failedQuote approve action"
+  },
   "QpkEk9": {
     "defaultMessage": "You have withdrawn {amount} {from} funds from your {from}:{to} position",
     "description": "transactionMessagesWithdrawFunds"
@@ -1246,10 +1230,6 @@
   "RK1KtY": {
     "defaultMessage": "{readable}",
     "description": "oneMinutePluralTime"
-  },
-  "RWQPRO": {
-    "defaultMessage": "Total earned:",
-    "description": "total earned"
   },
   "RXcwxI": {
     "defaultMessage": "Mean Finance relies on on-chain oracles to determine the price at the moment of the swap. Right now Mean Finance uses",
@@ -1291,9 +1271,9 @@
     "defaultMessage": "Since swaps are executed by external users, they can decide when to execute them. For example, let’s assume that you had created a position with daily swaps. This means that from 00 AM UTC to 11.59 PM UTC, your position can only be executed once. Once it is executed, it can't be executed again until 00 AM of the following day. The same happens with other frequencies, such as weekly or monthly.",
     "description": "faqWhenWillMyPositionBeSwappedResponse"
   },
-  "SBun7c": {
-    "defaultMessage": "Refreshing routes in {timer}s",
-    "description": "refreshRouteTimer"
+  "SE1aj0": {
+    "defaultMessage": "Try to get a route again",
+    "description": "All routes failed action"
   },
   "SNN905": {
     "defaultMessage": "For more information, feel free to check our",
@@ -1307,13 +1287,13 @@
     "defaultMessage": "Discord",
     "description": "discord"
   },
-  "Si3cOF": {
-    "defaultMessage": "Most received tokens",
-    "description": "sortMostReturnSellOrder"
-  },
   "SkAtKM": {
     "defaultMessage": "{token} is now ready to be claimed",
     "description": "eulerClaimApproveItemSuccess"
+  },
+  "SuOz7t": {
+    "defaultMessage": "Sign with your wallet",
+    "description": "signWithWallet"
   },
   "SwiTok": {
     "defaultMessage": "Withdrawing balance from their position",
@@ -1355,10 +1335,6 @@
     "defaultMessage": "Add address",
     "description": "Add address"
   },
-  "UhD0bk": {
-    "defaultMessage": "Confirm this transaction in your wallet",
-    "description": "Confirm in wallet"
-  },
   "UiA6NW": {
     "defaultMessage": "Allowing Mean Finance to close {positions} positions",
     "description": "transactionRejectedEulerClaimPermitMany"
@@ -1383,10 +1359,6 @@
     "defaultMessage": "Waiting for the approval of {token} to be confirmed",
     "description": "eulerClaimApproveItemPending"
   },
-  "V/yrI6": {
-    "defaultMessage": "Can I add or withdraw funds from my positions?",
-    "description": "jbrlRulesCanWithdraw"
-  },
   "V1Mw/j": {
     "defaultMessage": "No campaigns to claim",
     "description": "claimModal noCampaigns"
@@ -1394,10 +1366,6 @@
   "V314M5": {
     "defaultMessage": "Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period while neutralizing the short-term volatility in the market.{br}The purchases occur regardless of the asset's price and at regular intervals. In effect, this strategy removes much of the detailed work of attempting to time the market in order to make purchases of assets at the best prices.",
     "description": "whatIsDcaAnswer"
-  },
-  "VaWvMp": {
-    "defaultMessage": "Selected route:",
-    "description": "quoteDataSelectedRoute"
   },
   "VdhnM+": {
     "defaultMessage": "Swapped:",
@@ -1471,10 +1439,6 @@
     "defaultMessage": "let us know you encountered this error, it would be helpful to copy the error log with the button below and paste that in the message",
     "description": "errorEncounteredDiscordPart1"
   },
-  "X1oKY8": {
-    "defaultMessage": "Approve Max {symbol}",
-    "description": "Allow us to use your coin (modal max)"
-  },
   "X2tycj": {
     "defaultMessage": "Generating {token} at {platform} with {apy}% APY",
     "description": "generatingYieldAt"
@@ -1499,14 +1463,6 @@
     "defaultMessage": "DONE",
     "description": "finishedPosition"
   },
-  "XrLrtm": {
-    "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}.",
-    "description": "Approve signature companion text"
-  },
-  "XtV8h8": {
-    "defaultMessage": "Approve token",
-    "description": "lowLiqApproveToken"
-  },
   "Y9R08Z": {
     "defaultMessage": "Ignore transaction",
     "description": "ignoretransaction"
@@ -1519,10 +1475,6 @@
     "defaultMessage": "This will transfer your position, your NFT and all the liquidity stored in the position to the new address.",
     "description": "transfer sub description"
   },
-  "YVAdRx": {
-    "defaultMessage": "Sort routes by where you have to spend less tokens",
-    "description": "sortMostReturnBuyOrderHelp"
-  },
   "YWW6wc": {
     "defaultMessage": "Oooops",
     "description": "errorEncounteredOops"
@@ -1534,6 +1486,10 @@
   "YjbSf2": {
     "defaultMessage": "The position must have a minimum rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to be created.",
     "description": "disabledDepositByUsdValue"
+  },
+  "Yl3Tjj": {
+    "defaultMessage": "Aggregators sometimes fail or give you less than they said they would. This of course, sucks, but you can forget about that while using Mean's Meta Aggregator!{br}{br}By leveraging the power of Universal Approvals we are able to validate (with on-chain simulation) that all quotes provided by the price sources are valid! We verify that they won't fail, and that you are REALLY going to get the best price available.{br}{br}Additionally, we will show how your balances will change when submitting the transaction so that you can be 100% sure that you will get what you expect.",
+    "description": "faqWhatIsTransactionSimulationResponse"
   },
   "Yl6vl8": {
     "defaultMessage": "swaps",
@@ -1635,6 +1591,10 @@
     "defaultMessage": "Modifying their position",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart3"
   },
+  "aDA5jh": {
+    "defaultMessage": "Most received tokens / Less spent tokens (for buy orders)",
+    "description": "sortMostReturnSellOrder"
+  },
   "aEQUw9": {
     "defaultMessage": "fees section.",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart8"
@@ -1671,6 +1631,10 @@
     "defaultMessage": "The pair {from}:{to} has been created",
     "description": "transactionMessagesNewPair"
   },
+  "b0dKgD": {
+    "defaultMessage": "Authorize {from} and swap",
+    "description": "approve and swap agg"
+  },
   "b6x2Rx": {
     "defaultMessage": "Position Created",
     "description": "timelineTypeCreated"
@@ -1694,6 +1658,10 @@
   "bQUS8A": {
     "defaultMessage": "Confetti count:",
     "description": "advancedAggregatorSettingsConfetti"
+  },
+  "bZig5A": {
+    "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you will get your balance back as {token}.",
+    "description": "Approve signature companion text decrease"
   },
   "bdyKpA": {
     "defaultMessage": "Timeline",
@@ -1731,17 +1699,9 @@
     "defaultMessage": "Average buy price",
     "description": "averageBuyPriceLegend"
   },
-  "cn+Vmr": {
-    "defaultMessage": "To participate, you should invest a total of 500 jBRL among all your positions. You don’t need to fill any form.",
-    "description": "jbrlRulesHowMuchInvestResponse"
-  },
   "cwqjrt": {
     "defaultMessage": "Add funds",
     "description": "addFunds"
-  },
-  "czPp3R": {
-    "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you will get your balance back as {token}.",
-    "description": "Approve signature companion text decrease"
   },
   "d1oHnW": {
     "defaultMessage": "{readable}",
@@ -1795,10 +1755,6 @@
     "defaultMessage": "Sometimes you don't want to sell tokens, but you want to buy exactly a certain amount. For example, instead of selling 1000 USDC for ETH, you might instead want to buy 1 ETH with USDC.{br}{br}Most aggregators don't offer this feature, so we will show you those who do, and try to estimate a “buy order” on those who don't",
     "description": "faqWhatIsBuyOrdersResponse"
   },
-  "ePBTfz": {
-    "defaultMessage": "jBRL Competition",
-    "description": "jbrlUserCompTitle"
-  },
   "eQUdcX": {
     "defaultMessage": "{step} - Transaction simulation failed",
     "description": "transationStepWaitSimulateFailed"
@@ -1835,17 +1791,21 @@
     "defaultMessage": "Optimistic",
     "description": "claimModal optimismOptimistic"
   },
-  "fIM4Uw": {
-    "defaultMessage": "Rules",
-    "description": "faq"
-  },
   "fJcP5V": {
     "defaultMessage": "Submit feedback",
     "description": "feedbackButton"
   },
+  "fTLFqX": {
+    "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you send the necessary {token}.",
+    "description": "Approve signature companion text increase"
+  },
   "fatFLN": {
     "defaultMessage": "I confirm that the address above is correct",
     "description": "transferToValidateCheckboxLabel"
+  },
+  "fe8hcE": {
+    "defaultMessage": "us",
+    "description": "us"
   },
   "fi6uGQ": {
     "defaultMessage": "This position does not appear to be indexed yet",
@@ -1867,9 +1827,9 @@
     "defaultMessage": "Modify a position",
     "description": "feedbackOptionModifyPosition"
   },
-  "g8E7J6": {
-    "defaultMessage": "Start investing with JBRL and win amazing prices!",
-    "description": "jbrlUserCompTitleDesc"
+  "g8zVQK": {
+    "defaultMessage": "Authorize token",
+    "description": "lowLiqApproveToken"
   },
   "gAXe/N": {
     "defaultMessage": "In order to start the Euler claim process you need to connect to the Ethereum network",
@@ -1895,10 +1855,6 @@
     "defaultMessage": "Set to what address you want to give permissions to",
     "description": "add permission description"
   },
-  "gZSAHC": {
-    "defaultMessage": "Least spent",
-    "description": "sortMostReturnBuyOrder"
-  },
   "ga1v9k": {
     "defaultMessage": "These are the positions that you have that were affected by the euler vulnerability",
     "description": "eulerClaimAffectedPositions description"
@@ -1907,17 +1863,13 @@
     "defaultMessage": "Advanced settings",
     "description": "advancedAggregatorSettings"
   },
-  "gdQB3o": {
-    "defaultMessage": "Approve {from} and swap",
-    "description": "approve and swap agg"
+  "gcCrpy": {
+    "defaultMessage": "No, use {swapper}",
+    "description": "betterQuote reject action"
   },
   "gjyuVH": {
     "defaultMessage": "Only tokens compatible with {token}",
     "description": "createdPairsSwitchToken"
-  },
-  "gm52Lx": {
-    "defaultMessage": "You've probably heard many DEXes or aggregators claim that they offer the best prices. Well, now you can be sure. We will query all of them at the same time so you don't have to, and you will be able to choose the one that best fits your needs",
-    "description": "faqWhatIsResponse"
   },
   "gqiFWl": {
     "defaultMessage": "Swapped:",
@@ -1939,29 +1891,13 @@
     "defaultMessage": "What is Mean Finance's Meta Aggregator?",
     "description": "faqWhatIs"
   },
-  "hEvpJE": {
-    "defaultMessage": "Sort routes by where you can receive more tokens",
-    "description": "sortMostReturnSellOrderHelp"
-  },
   "hUTWyY": {
     "defaultMessage": "This allows the address to withdraw your swapped liquidity from your position",
     "description": "withdraw permission helptext"
   },
-  "hZOkep": {
-    "defaultMessage": "Aggregators sometimes fail or give you less than they said they would. This of course sucks!{br}{br}Well when you are using Mean's Meta Aggregator, we will simulate your transactions to make sure it doesn't fail when you submit it. And, at the same time, we will show you the how your balances will change so that can be 100% sure that you'll get what you expect!{br}{br}The balance changes are currently available only on:{br}{br}- Ethereum{br}{br}- Polygon{br}{br}We will be adding more soon",
-    "description": "faqWhatIsTransactionSimulationResponse"
-  },
-  "ha8PgS": {
-    "defaultMessage": "Approve and modify position",
-    "description": "modifyPosition"
-  },
   "hlpmTk": {
     "defaultMessage": "Claim the {campaign} campaign",
     "description": "transactionMessagesClaimCampaign"
-  },
-  "i+8o6D": {
-    "defaultMessage": "How much jBRL can I invest?",
-    "description": "jbrlRulesHowMuchInvest"
   },
   "i1xngQ": {
     "defaultMessage": "1 {from} = {currencySymbol}{average} {to}",
@@ -2043,6 +1979,10 @@
     "defaultMessage": "And set what permissions to set for this address",
     "description": "add permission checkbox description"
   },
+  "jlrow+": {
+    "defaultMessage": "5 - Authorize your tokens to be claimed",
+    "description": "eulerClaimApproveTokens"
+  },
   "k7UbIH": {
     "defaultMessage": "Connected with {provider}",
     "description": "connected with"
@@ -2107,6 +2047,14 @@
     "defaultMessage": "You rejected the signature",
     "description": "modalErrorEulerClaimSignTerms"
   },
+  "lOeF/4": {
+    "defaultMessage": "No, search again",
+    "description": "failedQuote reject action"
+  },
+  "lV3IKa": {
+    "defaultMessage": "Tx cost: {gas}",
+    "description": "betterQuoteDataFee"
+  },
   "lltepo": {
     "defaultMessage": "STALE",
     "description": "stale"
@@ -2135,10 +2083,6 @@
     "defaultMessage": "What is swap and transfer?",
     "description": "faqWhatIsSwapAndTransfer"
   },
-  "ml+wWE": {
-    "defaultMessage": "What are the prizes?",
-    "description": "jbrlRulesPrizes"
-  },
   "mljOZT": {
     "defaultMessage": "There is no data available about this pair",
     "description": "No data available"
@@ -2162,6 +2106,10 @@
   "mz7RzW": {
     "defaultMessage": "+ Add another wallet",
     "description": "add permission add more addresses"
+  },
+  "n+0Kho": {
+    "defaultMessage": "You've probably heard many applications claim they offer the best prices: well, now you can be sure! We will query all the best aggregators at the same time so you don't have to, and you will be able to choose the one that best fits your needs",
+    "description": "faqWhatIsResponse"
   },
   "n47KZD": {
     "defaultMessage": "Transfer swap to another address",
@@ -2210,6 +2158,10 @@
   "oGIpAl": {
     "defaultMessage": "+ yield",
     "description": "yield detail"
+  },
+  "oIVT9p": {
+    "defaultMessage": "Use Universal approval:",
+    "description": "advancedAggregatorSettingsPermit2"
   },
   "obUvKx": {
     "defaultMessage": "Error giving our Hub Companion permission to close many positions",
@@ -2319,10 +2271,6 @@
     "defaultMessage": "Modifications",
     "description": "modifications"
   },
-  "qdZe6N": {
-    "defaultMessage": "jBRL Competition",
-    "description": "jCompetition"
-  },
   "qefrsY": {
     "defaultMessage": "2 - Sign terms and conditions",
     "description": "eulerClaimSignTerms"
@@ -2330,10 +2278,6 @@
   "qodglE": {
     "defaultMessage": "Error while transfering position",
     "description": "modalErrorTransferPosition"
-  },
-  "qyNjbD": {
-    "defaultMessage": "Can I modify my positions once deployed?",
-    "description": "jbrlRulesCanModify"
   },
   "r+KI3m": {
     "defaultMessage": "Error changing rate and swaps",
@@ -2355,9 +2299,9 @@
     "defaultMessage": "MAX",
     "description": "maxWallet"
   },
-  "rKNAVd": {
-    "defaultMessage": "You will need to first sign a message (which is costless) to approve our Companion contract. Then, you will need to submit the transaction where you migrate the position.",
-    "description": "Approve signature companion text migrate"
+  "rVnHb0": {
+    "defaultMessage": "Authorize {amount} {from}",
+    "description": "transactionDetailsApproveTokenExact"
   },
   "reRP6P": {
     "defaultMessage": "{swaps} swap{plural}",
@@ -2387,6 +2331,10 @@
     "defaultMessage": "Amount of swaps cannot be higher than {MAX_UINT_32}",
     "description": "swapsCannotBeMax"
   },
+  "s7Nenf": {
+    "defaultMessage": "Our smart contracts have been built to leverage the power of Universal Approvals (link a nuestro posteo?) to minimize any possible exposure to them. Furthermore, by leveraging Universal Approvals we can simulate your trade on any network you are on, so you can now exactly what is going to happen once the swap gets executed! Last, our smart contracts have been audited by Omniscia and there is an active bug bounty on ImmuneFi.",
+    "description": "faqIsSafeResponse"
+  },
   "sCqMd/": {
     "defaultMessage": "DCA vs Lump Sum Profit %",
     "description": "swappedIfDca"
@@ -2399,6 +2347,10 @@
     "defaultMessage": "Ongoing positions",
     "description": "onGoingPositionsDashboard"
   },
+  "sWB1pz": {
+    "defaultMessage": "{step} - Validating quotes to get you the best price ({current}/{total})",
+    "description": "transationStepWaitSimulatePending"
+  },
   "sajNR4": {
     "defaultMessage": "~ {fromPrice} USD",
     "description": "current swapped in position price"
@@ -2407,9 +2359,9 @@
     "defaultMessage": "Least gas",
     "description": "sortLeastGas"
   },
-  "svNyZV": {
-    "defaultMessage": "When does it start/end?",
-    "description": "jbrlRulesWhenStart"
+  "t0+OFx": {
+    "defaultMessage": "{step} - Sign token authorization with your wallet",
+    "description": "transationStepApproveSign"
   },
   "t0oI3L": {
     "defaultMessage": "You will get back {from} {fromSymbol} and {to} {toSymbol}",
@@ -2426,10 +2378,6 @@
   "tAHtfP": {
     "defaultMessage": "for that frequency. Are you sure you want to create a position?",
     "description": "stale pair message"
-  },
-  "tAzRkq": {
-    "defaultMessage": "Approve {amount} {from}",
-    "description": "transactionDetailsApproveTokenExact"
   },
   "tHbIgJ": {
     "defaultMessage": "weekly",
@@ -2483,10 +2431,6 @@
     "defaultMessage": "3 - Allow Mean Finance to close your positions",
     "description": "eulerClaimApproveCompanion"
   },
-  "uRlu53": {
-    "defaultMessage": "{step} - The token approval is being confirmed",
-    "description": "transationStepWaitApprove"
-  },
   "uV7tE7": {
     "defaultMessage": "Gas cost considered",
     "description": "sortHighReturn"
@@ -2503,6 +2447,14 @@
     "defaultMessage": "Nothing more to claim",
     "description": "eulerClaimSummary NoMore"
   },
+  "us01Br": {
+    "defaultMessage": "{step} - Quotes validation failed",
+    "description": "transationStepWaitSimulateFailed"
+  },
+  "v/Er//": {
+    "defaultMessage": "Please help us improve by sharing your feedback on the Feedback tab, or pinging us on",
+    "description": "faqHavingIssuesResponse"
+  },
   "v1SP5g": {
     "defaultMessage": "4 hours",
     "description": "fourHoursSingularSubject"
@@ -2511,9 +2463,13 @@
     "defaultMessage": "minutes",
     "description": "minutes"
   },
-  "vHie/I": {
-    "defaultMessage": "You are having exactly the same experience as if you would have used the different aggregators directly. We haven't built any smart contracts on top of theirs, so there is no added risk. At the same time, we offer transaction simulations on some networks.",
-    "description": "faqIsSafeResponse"
+  "vCTA97": {
+    "defaultMessage": "After simulating quotes, we found that {toTarget} would be better based on the chosen criteria. Do you want to use {toTarget} instead?",
+    "description": "betterQuote selectBetterQuote"
+  },
+  "vIbAYN": {
+    "defaultMessage": "Select by",
+    "description": "selectBestQuoteBy"
   },
   "vNNVGj": {
     "defaultMessage": "For example, let’s assume that you’ve created a position that swaps 2000 USDC for ETH each day. Let’s also assume that, when the swap is executed, 2000 USDC = 1 ETH. Instead of getting 1 ETH, you would be getting 1 ETH - 0.6% = 0.994 ETH. That 0.6% will be split between Mean Finance and the user who actually executed the swap.",
@@ -2526,6 +2482,10 @@
   "vVsvjq": {
     "defaultMessage": "Withdraw as {to}",
     "description": "withdraw swapped as"
+  },
+  "vXQbPb": {
+    "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}.",
+    "description": "Approve signature companion text"
   },
   "vXfC3z": {
     "defaultMessage": "You rejected the transaction",
@@ -2571,6 +2531,10 @@
     "defaultMessage": "You will be able to claim:",
     "description": "eulerClaimClaimItemAbleToClaim"
   },
+  "wXyOAT": {
+    "defaultMessage": "{step} - Quotes will be validated",
+    "description": "transationStepWaitSimulatePending"
+  },
   "wY55VA": {
     "defaultMessage": "No deposit or withdrawal fees",
     "description": "faqWhyShouldIUseMeanFinanceResponsePart5"
@@ -2591,6 +2555,10 @@
     "defaultMessage": "Close",
     "description": "Close"
   },
+  "x0ZohV": {
+    "defaultMessage": "After simulating quotes, we found that {fromTarget} would fail if executed. {toTarget} is currently offering the best successful results. Would you like to use it?",
+    "description": "failedQuote selectBetterQuote"
+  },
   "x0hPUt": {
     "defaultMessage": "to",
     "description": "positionModifiedRateTo"
@@ -2602,10 +2570,6 @@
   "x2ydb5": {
     "defaultMessage": "Transfer {from}:{to} position to {address}",
     "description": "transactionDetailsTransfer"
-  },
-  "x9IS3+": {
-    "defaultMessage": "Positions:",
-    "description": "jbrlUserCompPositions"
   },
   "xIIhB5": {
     "defaultMessage": "+ yield",
@@ -2619,6 +2583,10 @@
     "defaultMessage": "How it works / Risks",
     "description": "howItWorks"
   },
+  "xQGdu0": {
+    "defaultMessage": "Mean now needs your explicit authorization to swap {tokenFrom} into {tokenTo}",
+    "description": "permit2SignExplanation"
+  },
   "xRD2R7": {
     "defaultMessage": "Transaction will fail. We recommend choosing another route",
     "description": "blowfishSimulationError"
@@ -2630,6 +2598,10 @@
   "xTu77D": {
     "defaultMessage": "Processing",
     "description": "transactionConfirmationProcessing"
+  },
+  "xZH54f": {
+    "defaultMessage": "Authorize and modify position",
+    "description": "modifyPosition"
   },
   "xf12eg": {
     "defaultMessage": "Close a position",
@@ -2667,6 +2639,10 @@
     "defaultMessage": "What is DCA?",
     "description": "whatIsDca"
   },
+  "y8HuQ+": {
+    "defaultMessage": "{step} - Token authorization is being confirmed",
+    "description": "transationStepWaitApprove"
+  },
   "yVecas": {
     "defaultMessage": "Rate:",
     "description": "current rate remaining"
@@ -2674,10 +2650,6 @@
   "yhA8mK": {
     "defaultMessage": "+ yield",
     "description": "plusYield"
-  },
-  "ykds7h": {
-    "defaultMessage": "You shall not modify the parameters of your positions once you have deployed them. Nor can positions be transferred. If a position get modified, it will not be taken into account.{br}{br}So plan your positions well before deploying them.",
-    "description": "jbrlRulesCanModifyResponse"
   },
   "yoTCFN": {
     "defaultMessage": "{readable} ({left} swaps)",
@@ -2747,10 +2719,6 @@
     "defaultMessage": "Transaction cost:",
     "description": "quoteDataFee"
   },
-  "zn3CFB": {
-    "defaultMessage": "How many positions can I use?",
-    "description": "jbrlRulesCanWithdraw"
-  },
   "znN7fQ": {
     "defaultMessage": "Never executed",
     "description": "history never run for in position"
@@ -2758,10 +2726,6 @@
   "zpPKoQ": {
     "defaultMessage": "Withdraw",
     "description": "positionWithdrawn"
-  },
-  "zpSepL": {
-    "defaultMessage": "Approve {amount} {symbol}",
-    "description": "Allow us to use your coin (home exact)"
   },
   "zr2gP1": {
     "defaultMessage": "Back to positions",

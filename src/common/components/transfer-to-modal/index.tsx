@@ -98,7 +98,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
       open={open}
       showCloseIcon
       onClose={onCancel}
-      maxWidth="md"
+      maxWidth="sm"
       title={<FormattedMessage description="transfer to title" defaultMessage="Transfer swap to another address" />}
       actions={[
         {

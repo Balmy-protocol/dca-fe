@@ -22,7 +22,7 @@ const StyledContainer = styled(Paper)`
   border-radius: 20px;
   background-color: #292929;
   backdrop-filter: blur(6px);
-  max-height: 210px;
+  max-height: 195px;
   overflow: auto;
 `;
 

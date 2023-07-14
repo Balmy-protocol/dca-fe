@@ -1,9 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { FormattedMessage } from 'react-intl';
 import IconButton from '@mui/material/IconButton';
-import { Typography } from '@mui/material';
+import { SvgIcon } from '@mui/material';
 import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledRefresherContainer = styled.div`
@@ -22,7 +20,30 @@ interface QuoteRefresherProps {
   disableRefreshQuotes: boolean;
 }
 
-const TIMER_FOR_RESET = 60000;
+const TIMER_FOR_RESET = 60;
+
+const CustomRefresherIcon = ({ fill }: { fill: number }) => (
+  <SvgIcon fontSize="inherit" viewBox="0 0 100 100">
+    <svg id="countdown-spinner" viewBox="0 0 100 100" height="100%">
+      <g>
+        <path d="M50 15A35 35 0 1 0 74.787 25.213" fill="none" stroke="white" strokeWidth="12" strokeOpacity="0.3" />
+        <path d="M50 0L50 30L66 15L50 0" fill="white" fillOpacity="0.3" />
+      </g>
+      <g>
+        <path
+          style={{ transition: 'all 1s ease-in-out' }}
+          d="M50 15A35 35 0 1 0 74.787 25.213"
+          fill="none"
+          stroke="white"
+          pathLength="60"
+          strokeDasharray="60"
+          strokeDashoffset={(-60 * fill) / 100}
+          strokeWidth="12"
+        />
+      </g>
+    </svg>
+  </SvgIcon>
+);
 
 const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
@@ -71,24 +92,16 @@ const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: Quot
     }
   }, [timer, refreshQuotes, isLoading]);
 
+  const timerPercentage = (timer * 100) / TIMER_FOR_RESET;
   return (
     <StyledRefresherContainer>
-      {!isLoading && timer !== TIMER_FOR_RESET && !disableRefreshQuotes && (
-        <Typography variant="caption">
-          <FormattedMessage
-            description="refreshRouteTimer"
-            defaultMessage="Refreshing quote in {timer}s"
-            values={{ timer }}
-          />
-        </Typography>
-      )}
       <StyledToggleTokenButton
         aria-label="close"
         size="small"
         onClick={onRefreshRoute}
         disabled={isLoading || disableRefreshQuotes}
       >
-        <RefreshIcon fontSize="inherit" />
+        <CustomRefresherIcon fill={timerPercentage} />
       </StyledToggleTokenButton>
     </StyledRefresherContainer>
   );

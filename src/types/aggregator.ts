@@ -40,7 +40,7 @@ export type SwapOption = {
     logoURI: string;
     id: string;
   };
-  type: string;
+  type: 'buy' | 'sell';
   tx?: QuoteTransaction;
 };
 

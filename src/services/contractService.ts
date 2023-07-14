@@ -89,13 +89,13 @@ export default class ContractService {
   async getMeanPermit2Address(): Promise<string> {
     const network = await this.providerService.getNetwork();
 
-    return MEAN_PERMIT_2_ADDRESS[network.chainId] || MEAN_PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId];
+    return MEAN_PERMIT_2_ADDRESS[network.chainId];
   }
 
   async getPermit2Address(): Promise<string> {
     const network = await this.providerService.getNetwork();
 
-    return PERMIT_2_ADDRESS[network.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId];
+    return PERMIT_2_ADDRESS[network.chainId];
   }
 
   async getSmolDomainAddress(): Promise<string> {

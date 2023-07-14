@@ -9,7 +9,7 @@ import { Alert } from '@mui/material';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import useUsdPrice from '@hooks/useUsdPrice';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
+import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import QuoteSimulation from '../quote-simulation';
@@ -83,7 +83,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     swapOptionsError,
   } = props;
 
-  const { isPermit2Enabled } = useAggregatorSettingsState();
   let fromValueToUse =
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address &&
@@ -98,6 +97,8 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       '';
 
   const selectedNetwork = useSelectedNetwork();
+
+  const isPermit2Enabled = useIsPermit2Enabled(selectedNetwork.chainId);
 
   const [fromFetchedPrice, isLoadingFromPrice] = useUsdPrice(
     from,
@@ -172,49 +173,51 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
           />
         </StyledContentContainer>
       </Grid>
-      <Grid item xs={12}>
-        <StyledContentContainer $isLast>
-          {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
-          <QuoteSelection
-            quotes={quotes}
-            isLoading={isLoadingRoute}
-            bestQuote={quotes[0]}
-            fetchOptions={fetchOptions}
-            refreshQuotes={refreshQuotes}
-            swapOptionsError={swapOptionsError}
-          />
-          {!isPermit2Enabled && (
-            <QuoteSimulation
-              route={selectedRoute}
-              cantFund={cantFund}
-              isApproved={isApproved}
-              isLoadingRoute={isLoadingRoute}
-              setTransactionWillFail={setTransactionWillFail}
-              forceProviderSimulation={!!transferTo}
+      {(isLoadingRoute || selectedRoute || transferTo) && (
+        <Grid item xs={12}>
+          <StyledContentContainer $isLast>
+            {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
+            <QuoteSelection
+              quotes={quotes}
+              isLoading={isLoadingRoute}
+              bestQuote={quotes[0]}
+              fetchOptions={fetchOptions}
+              refreshQuotes={refreshQuotes}
+              swapOptionsError={swapOptionsError}
             />
-          )}
-          {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
-            <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
-              <FormattedMessage
-                description="aggregatorPriceNotFound"
-                defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
-                values={{
-                  from: isUndefined(fromPriceToShow) ? selectedRoute.sellToken.symbol : '',
-                  to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
-                  and:
-                    isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
-                      ? defineMessage({
-                          defaultMessage: ' and ',
-                          description: 'andWithSpaces',
-                        })
-                      : '',
-                }}
+            {!isPermit2Enabled && (
+              <QuoteSimulation
+                route={selectedRoute}
+                cantFund={cantFund}
+                isApproved={isApproved}
+                isLoadingRoute={isLoadingRoute}
+                setTransactionWillFail={setTransactionWillFail}
+                forceProviderSimulation={!!transferTo}
               />
-            </Alert>
-          )}
-          <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} to={to} />
-        </StyledContentContainer>
-      </Grid>
+            )}
+            {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
+              <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
+                <FormattedMessage
+                  description="aggregatorPriceNotFound"
+                  defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
+                  values={{
+                    from: isUndefined(fromPriceToShow) ? selectedRoute.sellToken.symbol : '',
+                    to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
+                    and:
+                      isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
+                        ? defineMessage({
+                            defaultMessage: ' and ',
+                            description: 'andWithSpaces',
+                          })
+                        : '',
+                  }}
+                />
+              </Alert>
+            )}
+            <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} isBuyOrder={isBuyOrder} to={to} />
+          </StyledContentContainer>
+        </Grid>
+      )}
     </StyledGrid>
   );
 });

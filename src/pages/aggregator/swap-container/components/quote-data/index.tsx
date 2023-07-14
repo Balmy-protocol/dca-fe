@@ -34,9 +34,10 @@ const StyledMinimumContainer = styled.div`
 interface QuoteDataProps {
   quote: SwapOption | null;
   to: Token | null;
+  isBuyOrder: boolean;
 }
 
-const QuoteData = ({ quote, to }: QuoteDataProps) => {
+const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
   const network = useSelectedNetwork();
 
   const protocolToken = getProtocolToken(network.chainId);
@@ -58,7 +59,7 @@ const QuoteData = ({ quote, to }: QuoteDataProps) => {
             : '-'}
         </Typography>
       </StyledQuoteDataItem>
-      {quote?.maxSellAmount && quote?.maxSellAmount.amountInUnits !== quote?.sellAmount.amountInUnits && (
+      {isBuyOrder && quote?.maxSellAmount && quote?.maxSellAmount.amountInUnits !== quote?.sellAmount.amountInUnits && (
         <StyledQuoteDataItem>
           <Typography variant="body2" color="inherit">
             <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
