@@ -12,7 +12,7 @@
     "description": "faqWhyShouldIUseMeanFinanceResponsePart3"
   },
   "+VGlht": {
-    "defaultMessage": "Esperando la aprobación de su {token}",
+    "defaultMessage": "Esperando la autorización de su {token}",
     "description": "waiting for approval"
   },
   "+s/1rR": {
@@ -52,7 +52,7 @@
     "description": "transationStepSwapTokens"
   },
   "/vWyXL": {
-    "defaultMessage": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción donde envía el {token} necesario.",
+    "defaultMessage": "Primero tendrá que firmar un mensaje (que no tiene costo) para autorizar nuestro contrato de Companion. Luego, tendrá que enviar la transacción donde envía el {token} necesario.",
     "description": "Approve signature companion text increase"
   },
   "00Lmy0": {
@@ -360,7 +360,7 @@
     "description": "goBackToPositions"
   },
   "DIJWGT": {
-    "defaultMessage": "Esperando la aprobación de su {symbol}",
+    "defaultMessage": "Esperando la autorización de su {symbol}",
     "description": "waiting for approval"
   },
   "DPjSTq": {
@@ -556,7 +556,7 @@
     "description": "Withdrawing from"
   },
   "J2NpSo": {
-    "defaultMessage": "{step} - Firme la aprobación del token con su billetera",
+    "defaultMessage": "{step} - Firme la autorización del token con su billetera",
     "description": "transationStepApproveSign"
   },
   "J4ZbBX": {
@@ -651,8 +651,8 @@
     "defaultMessage": "¿Mean Finance cobra alguna comisión por el intercambio?",
     "description": "faqWhatIs"
   },
-  "MJey+4": {
-    "defaultMessage": "{step} - Enviar la aprobación de la transacción con su billetera",
+  "LAaGdN": {
+    "defaultMessage": "{step} - Habilitar Aprobacion Universal para {token}",
     "description": "transationStepApprove"
   },
   "MzzvpH": {
@@ -784,7 +784,7 @@
     "description": "terminate position"
   },
   "RcB3pW": {
-    "defaultMessage": "La aprobación del uso de {from} se ha enviado correctamente al blockchain y se confirmará en breve.",
+    "defaultMessage": "La autorización del uso de {from} se ha enviado correctamente al blockchain y se confirmará en breve.",
     "description": "success approving token"
   },
   "Rgfl8x": {
@@ -916,7 +916,7 @@
     "description": "errorEncounteredDiscordPart1"
   },
   "X1oKY8": {
-    "defaultMessage": "Approve Max {symbol}",
+    "defaultMessage": "Autorizar Max {symbol}",
     "description": "Allow us to use your coin (modal max)"
   },
   "X2tycj": {
@@ -948,7 +948,7 @@
     "description": "Approve signature companion text"
   },
   "XtV8h8": {
-    "defaultMessage": "Aprobar token",
+    "defaultMessage": "Autorizar token",
     "description": "lowLiqApproveToken"
   },
   "Y9R08Z": {
@@ -1236,7 +1236,7 @@
     "description": "timelineTypeSwap"
   },
   "hEvpJE": {
-    "defaultMessage": "Ordene las rutas por donde puede recibir más tokens",
+    "defaultMessage": "Ordene las rutas por donde puede recibir más tokens/gastar menos tokens",
     "description": "sortMostReturnSellOrderHelp"
   },
   "hUTWyY": {
@@ -1616,7 +1616,7 @@
     "description": "unwrap agg"
   },
   "uRlu53": {
-    "defaultMessage": "{step} - Se está confirmando la aprobación del token",
+    "defaultMessage": "{step} - Se está confirmando la autorización del token",
     "description": "transationStepWaitApprove"
   },
   "uZWTRx": {
@@ -1716,7 +1716,7 @@
     "description": "Connect wallet"
   },
   "zNOHJl": {
-    "defaultMessage": "{step} - Se envió la aprobación del token",
+    "defaultMessage": "{step} - Se envió la autorización del token",
     "description": "transationStepWaitApprove"
   },
   "zTt+tt": {
@@ -1740,7 +1740,7 @@
     "description": "positionWithdrawn"
   },
   "zpSepL": {
-    "defaultMessage": "Aprobar {amount} {symbol}",
+    "defaultMessage": "Autorizar {amount} {symbol}",
     "description": "Allow us to use your coin (home exact)"
   },
   "zr2gP1": {
@@ -2000,7 +2000,7 @@
     "description": "oneMinuteSingularTime"
   },
   "wH5c58": {
-    "defaultMessage": "aqui.",
+    "defaultMessage": "Discord.",
     "description": "here"
   },
   "xxuJDG": {
@@ -2060,7 +2060,7 @@
     "description": "transactionDetailsMigrate"
   },
   "7YJRiI": {
-    "defaultMessage": "Aprobar {from}",
+    "defaultMessage": "Autorizar {from}",
     "description": "transactionDetailsApproveToken"
   },
   "7fX0fL": {
@@ -2204,7 +2204,7 @@
     "description": "nextSwapCreateSoon"
   },
   "tAzRkq": {
-    "defaultMessage": "Aprobar {amount} {from}",
+    "defaultMessage": "Autorizar {amount} {from}",
     "description": "transactionDetailsApproveTokenExact"
   },
   "tdhen+": {
@@ -2376,7 +2376,7 @@
     "description": "normalSimulationSuccess"
   },
   "S0PtrE": {
-    "defaultMessage": "Necesita aprobación",
+    "defaultMessage": "Necesita autorización",
     "description": "needsApproval"
   },
   "U8Gqi0": {
@@ -2684,19 +2684,19 @@
     "description": "andWithSpaces"
   },
   "ha8PgS": {
-    "defaultMessage": "Aprobar y modificar posición",
+    "defaultMessage": "Autorizar y modificar posición",
     "description": "modifyPosition"
   },
   "gdQB3o": {
-    "defaultMessage": "Aprobar {from} e intercambiar",
+    "defaultMessage": "Autorizar {from} e intercambiar",
     "description": "approve and swap agg"
   },
   "HKZyB6": {
-    "defaultMessage": "Aprobar {from} y crear posición",
+    "defaultMessage": "Autorizar {from} y crear posición",
     "description": "approve and create position"
   },
   "FGbffU": {
-    "defaultMessage": "Aprobar {from} y wrappear",
+    "defaultMessage": "Autorizar {from} y wrappear",
     "description": "wrap agg"
   },
   "47pR2c": {
@@ -2806,5 +2806,113 @@
   "rC4KKM": {
     "defaultMessage": "La campaña {campaign} fue redimida",
     "description": "transactionMessagesClaimCampaign"
+  },
+  "+Rzphv": {
+    "defaultMessage": "{step} - Transacción simulada",
+    "description": "transationStepWaitSimulateSuccess"
+  },
+  "2FHrOX": {
+    "defaultMessage": "Ver otras opciones",
+    "description": "viewOtherOptions"
+  },
+  "DcWDCQ": {
+    "defaultMessage": "¿Por que necesito hacer esto?",
+    "description": "transactionStepsWhy"
+  },
+  "FT80h0": {
+    "defaultMessage": "Simulando transacciones ({current}/{total})",
+    "description": "quoteSelectionSimulatingQuotes"
+  },
+  "FnRMc5": {
+    "defaultMessage": "Al habilitar la Aprobación Universal, vas a poder usar Uniswap, Mean, aggregadores y muchos otros protocoles sin tener que autorizar cada uno de ellos",
+    "description": "approveTokenExplanation"
+  },
+  "JkRQyY": {
+    "defaultMessage": "Primero necesitaras firmar un mensaje (que no tiene costo) para autorizar a nuestro contrato Companion. Luego, tendras que enviar la transacción donde se migrara tu posición.",
+    "description": "Authorize signature companion text migrate"
+  },
+  "JoH9Yo": {
+    "defaultMessage": "Encontramos un mejor quote para vos",
+    "description": "betterQuote title"
+  },
+  "LY4QAG": {
+    "defaultMessage": "{step} - Quotes validados y la transacción fue simulada",
+    "description": "transationStepWaitSimulationSuccess"
+  },
+  "MFXOI0": {
+    "defaultMessage": "¿Que es la simulación de quotes?",
+    "description": "faqWhatIsTransactionSimulation"
+  },
+  "QkhXLS": {
+    "defaultMessage": "Si, usar {swapper}",
+    "description": "failedQuote approve action"
+  },
+  "SE1aj0": {
+    "defaultMessage": "Intentar obtener otra ruta",
+    "description": "All routes failed action"
+  },
+  "SuOz7t": {
+    "defaultMessage": "Firmar con tu billetera",
+    "description": "signWithWallet"
+  },
+  "aDA5jh": {
+    "defaultMessage": "Mayor cantidad de tokens recibidos / Menor cantidad de tokens gastados (para ordenes de compra)",
+    "description": "sortMostReturnSellOrder"
+  },
+  "fe8hcE": {
+    "defaultMessage": "a nosotros",
+    "description": "us"
+  },
+  "gcCrpy": {
+    "defaultMessage": "No, usar {swapper}",
+    "description": "betterQuote reject action"
+  },
+  "n+0Kho": {
+    "defaultMessage": "Probablemente escuchaste que muchas aplicaciones dicen que te ofrecen el mejor precio: ahora podes estar seguro! Vamos a pedirle a todos al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades.",
+    "description": "faqWhatIsResponse"
+  },
+  "oIVT9p": {
+    "defaultMessage": "Utilizar Aprobación Universal:",
+    "description": "advancedAggregatorSettingsPermit2"
+  },
+  "s7Nenf": {
+    "defaultMessage": "Nuestros Contratos Inteligentes fueron contruidos para maximizar el poder de la Aprobación Universal para minimizar cualquier vulnerabilidad hacia ellos.Ademas, al utlizar la Aprobación Universal ahora podemos simular tus intercambios en cualquier red en la que estes, asi que ahora podes saber exactamente cuanto vas a recibir una vez que el intercambio se confirme! Por ultimo, nuestros Contratos Inteligentes fueron auditados por Omniscia y hay una bug bounty activa en ImmuneFi.",
+    "description": "faqIsSafeResponse"
+  },
+  "sWB1pz": {
+    "defaultMessage": "{step} - Validando los quotes para darte el mejor precio ({current}/{total})",
+    "description": "transationStepWaitSimulatePending"
+  },
+  "t0+OFx": {
+    "defaultMessage": "{step} - Firmar la autorizacion del token en tu billetera",
+    "description": "transationStepApproveSign"
+  },
+  "us01Br": {
+    "defaultMessage": "{step} - La validación de los quotes falló",
+    "description": "transationStepWaitSimulateFailed"
+  },
+  "v/Er//": {
+    "defaultMessage": "Por favor, ayudanos a mejorar al compartir tu feedback en la tab de Feedback o mandanos un mensaje en",
+    "description": "faqHavingIssuesResponse"
+  },
+  "vCTA97": {
+    "defaultMessage": "Luego de simular los quotes, encontramos que {toTarget} seria mejor para el criterio de slección que elegiste. ¿Queres usar {toTarget}?",
+    "description": "betterQuote selectBetterQuote"
+  },
+  "vIbAYN": {
+    "defaultMessage": "Seleccionar por",
+    "description": "selectBestQuoteBy"
+  },
+  "wXyOAT": {
+    "defaultMessage": "{step} - Los quotes serán validados",
+    "description": "transationStepWaitSimulatePending"
+  },
+  "x0ZohV": {
+    "defaultMessage": "Luego de simular los quotes, encotramos que {fromTarget} va a fallar si se ejecuta. {toTarget} esta actualmente ofreciendo los mejores resultados. ¿Queres usarlo??",
+    "description": "failedQuote selectBetterQuote"
+  },
+  "xQGdu0": {
+    "defaultMessage": "Mean ahora necesita tu autorizacion explicita para intercambiar {tokenFrom} a {tokenTo}",
+    "description": "permit2SignExplanation"
   }
 }

@@ -324,7 +324,7 @@ function useBuildTransactionDetail() {
             message = intl.formatMessage(
               defineMessage({
                 description: 'transactionDetailsApproveToken',
-                defaultMessage: 'Approve {from}',
+                defaultMessage: 'Authorize {from}',
               }),
               {
                 from: tokenApprovalTypeData.token.symbol,
@@ -337,7 +337,7 @@ function useBuildTransactionDetail() {
             message = intl.formatMessage(
               defineMessage({
                 description: 'transactionDetailsApproveTokenExact',
-                defaultMessage: 'Approve {amount} {from}',
+                defaultMessage: 'Authorize {amount} {from}',
               }),
               {
                 from: tokenApprovalExactTypeData.token.symbol,

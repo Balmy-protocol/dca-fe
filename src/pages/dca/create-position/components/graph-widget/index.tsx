@@ -27,8 +27,8 @@ import { parseUnits } from '@ethersproject/units';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { withStyles } from '@mui/styles';
 import Chip from '@mui/material/Chip';
+import MinimalTabs from '@common/components/minimal-tabs';
 import GraphFooter from './components/graph-footer';
-import MinimalTabs from './components/minimal-tabs';
 
 const DarkChip = withStyles(() => ({
   root: {

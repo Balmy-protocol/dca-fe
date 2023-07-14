@@ -247,11 +247,19 @@ const buildApproveTokenItem = ({
         </StyledTransactionStepIcon>
         <StyledTransactionStepContent>
           <Typography variant="body1">
-            <FormattedMessage
-              description="transationStepApprove"
-              defaultMessage="{step} - Submit the transaction approval with your wallet"
-              values={{ step }}
-            />
+            {extraData.isPermit2Enabled ? (
+              <FormattedMessage
+                description="transationStepApprove"
+                defaultMessage="{step} - Enable universal approval for {token}"
+                values={{ step, target: extraData.swapper, token: extraData.token.symbol }}
+              />
+            ) : (
+              <FormattedMessage
+                description="transationStepApprove"
+                defaultMessage="{step} - Allow {target} to use your {token}"
+                values={{ step, target: extraData.swapper, token: extraData.token.symbol }}
+              />
+            )}
           </Typography>
           <Typography variant="body2" color="rgba(255, 255, 255, 0.5);">
             <Address trimAddress address={account} />
@@ -268,6 +276,7 @@ const buildApproveTokenItem = ({
                 color="secondary"
                 defaultApproval={extraData.defaultApproval || AllowanceType.specific}
                 tooltipText={extraData.help}
+                hideTooltip
               />
             </StyledTransactionStepButtonContainer>
           )}
@@ -317,7 +326,7 @@ const buildApproveTokenSignItem = ({
           <Typography variant="body1">
             <FormattedMessage
               description="transationStepApproveSign"
-              defaultMessage="{step} - Sign the token approval with your wallet"
+              defaultMessage="{step} - Sign token authorization with your wallet"
               values={{ step }}
             />
           </Typography>
@@ -333,7 +342,7 @@ const buildApproveTokenSignItem = ({
                 size="large"
                 onClick={() => onAction(extraData.amount)}
               >
-                <FormattedMessage description="openWallet" defaultMessage="Open wallet" />
+                <FormattedMessage description="signWithWallet" defaultMessage="Sign with your wallet" />
               </Button>
             </StyledTransactionStepButtonContainer>
           )}
@@ -419,7 +428,7 @@ const buildWaitForSimulationItem = ({
             {(checkForPending || done) && extraData.simulation && !failed && (
               <>
                 <FormattedMessage
-                  description="transationStepWaitApprove"
+                  description="transationStepWaitSimulateSuccess"
                   defaultMessage="{step} - Transaction simulated"
                   values={{ step }}
                 />
@@ -448,7 +457,7 @@ const SimulationItem = ({ quotes, step }: { quotes: number; step: number }) => {
 
   React.useEffect(() => {
     if (timer < quotes) {
-      timerRef.current = setTimeout(() => setTimer(timer + 1), 1000);
+      timerRef.current = setTimeout(() => setTimer(timer + 1), (7 / quotes) * 1000);
     }
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -458,7 +467,7 @@ const SimulationItem = ({ quotes, step }: { quotes: number; step: number }) => {
   return (
     <FormattedMessage
       description="transationStepWaitSimulatePending"
-      defaultMessage="{step} - The transactions is being simulated ({current}/{total})"
+      defaultMessage="{step} - Validating quotes to get you the best price ({current}/{total})"
       values={{
         step,
         total: quotes,
@@ -573,7 +582,7 @@ const buildWaitForQuotesSimulationItem = ({
             {failed && (
               <FormattedMessage
                 description="transationStepWaitSimulateFailed"
-                defaultMessage="{step} - Transaction simulation failed"
+                defaultMessage="{step} - Quotes validation failed"
                 values={{ step }}
               />
             )}
@@ -583,15 +592,15 @@ const buildWaitForQuotesSimulationItem = ({
             {checkForPending && !extraData.simulation && !isCurrentStep && !failed && (
               <FormattedMessage
                 description="transationStepWaitSimulatePending"
-                defaultMessage="{step} - The transactions will be simulated"
+                defaultMessage="{step} - Quotes will be validated"
                 values={{ step }}
               />
             )}
             {(checkForPending || done) && extraData.simulation && !failed && (
               <>
                 <FormattedMessage
-                  description="transationStepWaitApprove"
-                  defaultMessage="{step} - Transaction simulated"
+                  description="transationStepWaitSimulationSuccess"
+                  defaultMessage="{step} - Quotes validated and transaction simulated"
                   values={{ step }}
                 />
                 <TransactionSimulation items={extraData.simulation} />
@@ -650,14 +659,14 @@ const buildWaitForApprovalItem = ({
             {hash && checkForPending && isPendingTransaction && isCurrentStep && (
               <FormattedMessage
                 description="transationStepWaitApprove"
-                defaultMessage="{step} - The token approval is being confirmed"
+                defaultMessage="{step} - Token authorization is being confirmed"
                 values={{ step }}
               />
             )}
             {((!hash && checkForPending && !isPendingTransaction) || done) && (
               <FormattedMessage
                 description="transationStepWaitApprove"
-                defaultMessage="{step} - The token approval is submitted"
+                defaultMessage="{step} - Token authorization is submitted"
                 values={{ step }}
               />
             )}

@@ -33,7 +33,7 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
         <FormattedMessage description="lowLiqCreatePosition" defaultMessage="Create position anyway" />
       ),
       [POSSIBLE_ACTIONS.approveToken]: (
-        <FormattedMessage description="lowLiqApproveToken" defaultMessage="Approve token" />
+        <FormattedMessage description="lowLiqApproveToken" defaultMessage="Authorize token" />
       ),
     }),
     []

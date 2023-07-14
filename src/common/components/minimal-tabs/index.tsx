@@ -41,8 +41,14 @@ const StyledTabItem = styled(Button)<{ $isSelected: boolean }>`
   }
 `;
 
-const StyledTabIndicator = styled.div<{ width: number; left: number; height: number; top: number }>`
-  ${({ theme, left, top, width, height }) => `
+const StyledTabIndicator = styled.div<{
+  width: number;
+  left: number;
+  height: number;
+  top: number;
+  backgroundColor?: string;
+}>`
+  ${({ theme, left, top, width, height, backgroundColor }) => `
     transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     left: ${left + 2}px;
     top: ${top + 2}px;
@@ -52,7 +58,7 @@ const StyledTabIndicator = styled.div<{ width: number; left: number; height: num
     &:after {
       content: '';
       position: absolute;
-      background-color: ${theme.palette.mode === 'light' ? '#fff' : '#3076F6'};
+      background-color: ${backgroundColor || (theme.palette.mode === 'light' ? '#fff' : '#3076F6')};
       border-radius: 20px;
       box-shadow: 0 4px 12px 0 rgb(0 0 0 / 16%);
       top: 0;
@@ -69,6 +75,7 @@ interface MinimalSelectProps<T> {
   onChange: (option: SelectOption<T>) => void;
   selected: SelectOption<T>;
   disabled?: boolean;
+  indicatorColor?: string;
 }
 
 type SelectOptionsType<T> = SelectOption<T>[];
@@ -86,7 +93,13 @@ interface CustomCurrent {
   offsetHeight: number;
 }
 
-export default function MinimalTabs<T>({ options, selected, onChange, disabled }: MinimalSelectProps<T>) {
+export default function MinimalTabs<T>({
+  options,
+  selected,
+  onChange,
+  disabled,
+  indicatorColor,
+}: MinimalSelectProps<T>) {
   const [selectedRef, setSelectedRef] = useState<CustomCurrent | null>(null);
 
   return (
@@ -112,6 +125,7 @@ export default function MinimalTabs<T>({ options, selected, onChange, disabled }
           left={selectedRef.offsetLeft}
           top={selectedRef.offsetTop}
           height={selectedRef.offsetHeight}
+          backgroundColor={indicatorColor}
         />
       )}
     </StyledTabsContainer>

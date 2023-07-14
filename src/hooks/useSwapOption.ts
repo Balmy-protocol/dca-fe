@@ -16,7 +16,8 @@ function useSwapOptions(
   quote?: SwapOption | null,
   transferTo?: string | null,
   slippage?: number,
-  gasSpeed?: GasKeys
+  gasSpeed?: GasKeys,
+  usePermit2?: boolean
 ): [SwapOptionWithTx | undefined, boolean, string | undefined, () => void] {
   const walletService = useWalletService();
   const account = walletService.getAccount();
@@ -38,6 +39,7 @@ function useSwapOptions(
   const prevGasSpeed = usePrevious(gasSpeed);
   const prevSlippage = usePrevious(slippage);
   const prevQuote = usePrevious(quote);
+  const prevUsePermit2 = usePrevious(usePermit2);
   const debouncedCall = React.useCallback(
     debounce(
       async (
@@ -46,7 +48,8 @@ function useSwapOptions(
         debouncedGasSpeed?: GasKeys,
         debouncedSlippage?: number,
         debouncedAccount?: string,
-        debouncedChainId?: number
+        debouncedChainId?: number,
+        debouncedUsePermit2?: boolean
       ) => {
         if (debouncedQuote && debouncedAccount) {
           setState({ isLoading: true, result: undefined, error: undefined });
@@ -58,7 +61,8 @@ function useSwapOptions(
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed,
-              debouncedChainId
+              debouncedChainId,
+              debouncedUsePermit2
             );
 
             if (promiseResult) {
@@ -77,8 +81,8 @@ function useSwapOptions(
   );
 
   const fetchOptions = React.useCallback(
-    () => debouncedCall(quote, transferTo, gasSpeed, slippage, account, currentNetwork.chainId),
-    [quote, transferTo, slippage, gasSpeed, account, currentNetwork.chainId]
+    () => debouncedCall(quote, transferTo, gasSpeed, slippage, account, currentNetwork.chainId, usePermit2),
+    [quote, transferTo, slippage, gasSpeed, account, currentNetwork.chainId, usePermit2]
   );
 
   React.useEffect(() => {
@@ -91,7 +95,8 @@ function useSwapOptions(
         !isEqual(prevTransferTo, transferTo) ||
         !isEqual(prevGasSpeed, gasSpeed) ||
         !isEqual(prevNetwork, currentNetwork.chainId) ||
-        !isEqual(prevSlippage, slippage))
+        !isEqual(prevSlippage, slippage) ||
+        !isEqual(prevUsePermit2, usePermit2))
     ) {
       if (quote && account && !quote.tx) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -119,6 +124,8 @@ function useSwapOptions(
     prevGasSpeed,
     prevNetwork,
     currentNetwork.chainId,
+    usePermit2,
+    prevUsePermit2,
   ]);
 
   if (!quote) {

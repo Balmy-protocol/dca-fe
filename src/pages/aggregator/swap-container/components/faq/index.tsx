@@ -12,7 +12,6 @@ const StyledFAQContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  margin-top: 50px;
 `;
 
 const StyledLink = styled(Link)`
@@ -48,10 +47,6 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 
 const AggregatorFAQ = () => (
   <StyledFAQContainer>
-    <Typography variant="h4" sx={{ alignSelf: 'center', marginBottom: '10px' }}>
-      <FormattedMessage description="faq" defaultMessage="FAQ" />
-    </Typography>
-
     <Accordion disableGutters>
       <AccordionSummary>
         <Typography>
@@ -62,7 +57,7 @@ const AggregatorFAQ = () => (
         <Typography>
           <FormattedMessage
             description="faqWhatIsResponse"
-            defaultMessage="You've probably heard many DEXes or aggregators claim that they offer the best prices. Well, now you can be sure. We will query all of them at the same time so you don't have to, and you will be able to choose the one that best fits your needs"
+            defaultMessage="You've probably heard many applications claim they offer the best prices: well, now you can be sure! We will query all the best aggregators at the same time so you don't have to, and you will be able to choose the one that best fits your needs"
           />
         </Typography>
       </AccordionDetails>
@@ -96,7 +91,7 @@ const AggregatorFAQ = () => (
         <Typography>
           <FormattedMessage
             description="faqIsSafeResponse"
-            defaultMessage="You are having exactly the same experience as if you would have used the different aggregators directly. We haven't built any smart contracts on top of theirs, so there is no added risk. At the same time, we offer transaction simulations on some networks."
+            defaultMessage="Our smart contracts have been built to leverage the power of Universal Approvals (link a nuestro posteo?) to minimize any possible exposure to them. Furthermore, by leveraging Universal Approvals we can simulate your trade on any network you are on, so you can now exactly what is going to happen once the swap gets executed! Last, our smart contracts have been audited by Omniscia and there is an active bug bounty on ImmuneFi."
           />
         </Typography>
       </AccordionDetails>
@@ -104,17 +99,14 @@ const AggregatorFAQ = () => (
     <Accordion disableGutters>
       <AccordionSummary>
         <Typography>
-          <FormattedMessage
-            description="faqWhatIsTransactionSimulation"
-            defaultMessage="What is transaction simulation?"
-          />
+          <FormattedMessage description="faqWhatIsTransactionSimulation" defaultMessage="What is quote simulation?" />
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Typography>
           <FormattedMessage
             description="faqWhatIsTransactionSimulationResponse"
-            defaultMessage="Aggregators sometimes fail or give you less than they said they would. This of course sucks!{br}{br}Well when you are using Mean's Meta Aggregator, we will simulate your transactions to make sure it doesn't fail when you submit it. And, at the same time, we will show you the how your balances will change so that can be 100% sure that you'll get what you expect!{br}{br}The balance changes are currently available only on:{br}{br}- Ethereum{br}{br}- Polygon{br}{br}We will be adding more soon"
+            defaultMessage="Aggregators sometimes fail or give you less than they said they would. This of course, sucks, but you can forget about that while using Mean's Meta Aggregator!{br}{br}By leveraging the power of Universal Approvals we are able to validate (with on-chain simulation) that all quotes provided by the price sources are valid! We verify that they won't fail, and that you are REALLY going to get the best price available.{br}{br}Additionally, we will show how your balances will change when submitting the transaction so that you can be 100% sure that you will get what you expect."
             values={{
               p: (chunks: React.ReactNode) => <p>{chunks}</p>,
               br: <br />,
@@ -171,10 +163,10 @@ const AggregatorFAQ = () => (
         <Typography>
           <FormattedMessage
             description="faqHavingIssuesResponse"
-            defaultMessage="Please help us improve by sharing your feedback on the Feedback tab, or pinging us on Discord"
+            defaultMessage="Please help us improve by sharing your feedback on the Feedback tab, or pinging us on "
           />
           <StyledLink href="https://discord.com/channels/871887207202455584/871887788637839401" target="_blank">
-            <FormattedMessage description="here" defaultMessage="here." />
+            <FormattedMessage description="here" defaultMessage="Discord." />
           </StyledLink>
         </Typography>
       </AccordionDetails>

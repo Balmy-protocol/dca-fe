@@ -30,6 +30,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import SlippageInput from './components/slippage-input';
 import GasSelector from './components/gas-selector';
 import ConfettiInput from './components/confetti-input';
+import QuoteSorter from '../quote-sorter';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -130,7 +131,10 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer>
               <Typography variant="body1">
-                <FormattedMessage description="advancedAggregatorSettingsPermit2" defaultMessage="Permit 2 approval:" />
+                <FormattedMessage
+                  description="advancedAggregatorSettingsPermit2"
+                  defaultMessage="Use Universal approval:"
+                />
               </Typography>
               <Switch
                 checked={isPermit2Enabled}
@@ -147,6 +151,9 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
               </Typography>
               <SlippageInput value={slippage} onChange={onSlippageChange} id="slippage-input" />
             </StyledSettingContainer>
+          </StyledGrid>
+          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
+            <QuoteSorter isLoading={false} />
           </StyledGrid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer>

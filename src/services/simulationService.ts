@@ -22,9 +22,27 @@ function timeout(ms: number) {
 type SellOrderSwapWithGasMeasurementParam = Parameters<
   MeanPermit2Contract['callStatic']['sellOrderSwapWithGasMeasurement']
 >[0];
-interface CallInterface extends SellOrderSwapWithGasMeasurementParam {
+
+type BuyOrderSwapWithGasMeasurementParam = Parameters<
+  MeanPermit2Contract['callStatic']['buyOrderSwapWithGasMeasurement']
+>[0];
+
+type BuyOrderSwapWithGasMeasurementParamWithType = BuyOrderSwapWithGasMeasurementParam & {
+  type: 'buy';
+};
+
+type SellOrderSwapWithGasMeasurementParamWithType = SellOrderSwapWithGasMeasurementParam & {
+  type: 'sell';
+};
+
+type CallInterfaceWithoutValue =
+  | BuyOrderSwapWithGasMeasurementParamWithType
+  | SellOrderSwapWithGasMeasurementParamWithType;
+
+type CallInterface = CallInterfaceWithoutValue & {
   value: BigNumber;
-}
+  originalQuote: SwapOption;
+};
 
 export default class SimulationService {
   meanApiService: MeanApiService;
@@ -62,7 +80,8 @@ export default class SimulationService {
   async simulateQuotes(
     quotes: SwapOption[],
     sorting: SwapSortOptions,
-    signature?: { nonce: BigNumber; deadline: number; v: number; r: Buffer; s: Buffer; rawSignature: string }
+    signature?: { nonce: BigNumber; deadline: number; v: number; r: Buffer; s: Buffer; rawSignature: string },
+    minimumReceived?: BigNumber
   ): Promise<SwapOption[]> {
     const meanPermit2Instance = await this.contractService.getMeanPermit2Instance();
 
@@ -78,13 +97,12 @@ export default class SimulationService {
         return null;
       }
 
-      return {
+      let baseData: Partial<CallInterface> = {
         originalQuote: quote,
         // Deadline
         deadline: signature?.deadline || Math.floor(Date.now() / 1000) + ONE_DAY.toNumber(),
         // Take from caller
         tokenIn: quote.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : quote.sellToken.address,
-        amountIn: quote.maxSellAmount.amount,
         nonce: signature?.nonce || BigNumber.from(0),
         signature: signature?.rawSignature || '0x',
         // Swapp approval
@@ -94,27 +112,37 @@ export default class SimulationService {
         swapData: quote.tx.data,
         // Swap validation
         tokenOut: quote.buyToken.address === PROTOCOL_TOKEN_ADDRESS ? NULL_ADDRESS : quote.buyToken.address,
-        minAmountOut: quote.minBuyAmount.amount,
         // Transfer token out
         transferOut: [{ recipient: quote.transferTo || address, shareBps: 0 }],
-        value: quote.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? quote.maxSellAmount.amount : BigNumber.from(0),
       };
+
+      if (quote.type === 'buy') {
+        baseData = {
+          ...baseData,
+          type: 'buy',
+          maxAmountIn: quote.maxSellAmount.amount,
+          amountOut: quote.buyAmount.amount,
+          unspentTokenInRecipient: NULL_ADDRESS, // Using null address is cheaper and returns unspent to message.sender
+        } as CallInterface;
+      } else {
+        baseData = {
+          ...baseData,
+          type: 'sell',
+          amountIn: quote.sellAmount.amount,
+          minAmountOut: quote.minBuyAmount.amount,
+        } as CallInterface;
+      }
+
+      return {
+        ...baseData,
+        value: quote.sellToken.address === PROTOCOL_TOKEN_ADDRESS ? quote.maxSellAmount.amount : BigNumber.from(0),
+      } as CallInterface;
     });
 
     const quotesToCall = compact(mappedQuotes);
 
-    const groups = Math.ceil(quotesToCall.length / amountPerGroup);
-
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < groups; i++) {
-      // eslint-disable-next-line no-plusplus
-      for (let k = 0; k < amountPerGroup; k++) {
-        if (!calls[i]) {
-          calls[i] = [];
-        }
-
-        calls[i].push(quotesToCall[i + k]);
-      }
+    for (let i = 0; i < quotesToCall.length; i += amountPerGroup) {
+      calls.push(quotesToCall.slice(i, i + amountPerGroup));
     }
 
     let results: ([BigNumber, BigNumber, BigNumber] | null)[] = [];
@@ -123,10 +151,19 @@ export default class SimulationService {
       const promises: Promise<[BigNumber, BigNumber, BigNumber] | null>[] = [];
       // eslint-disable-next-line no-plusplus
       for (let k = 0; k < calls[i].length; k++) {
+        const currentCall = calls[i][k];
         promises.push(
-          meanPermit2Instance.callStatic
-            .sellOrderSwapWithGasMeasurement(omit(calls[i][k], 'value'), { value: calls[i][k].value })
-            .catch(() => null)
+          currentCall.type === 'buy'
+            ? meanPermit2Instance.callStatic
+                .buyOrderSwapWithGasMeasurement(omit(currentCall, ['value', 'type', 'originalQuote']), {
+                  value: currentCall.value,
+                })
+                .catch(() => null)
+            : meanPermit2Instance.callStatic
+                .sellOrderSwapWithGasMeasurement(omit(currentCall, ['value', 'type', 'originalQuote']), {
+                  value: currentCall.value,
+                })
+                .catch(() => null)
         );
       }
 
@@ -202,7 +239,13 @@ export default class SimulationService {
       };
     });
 
-    const sortedQuotes = sortQuotesBy(compact(hidratedQuotes), sorting, 'sell/buy amounts');
+    const sortedQuotes = sortQuotesBy(
+      compact(hidratedQuotes).filter(
+        (quote) => !minimumReceived || BigNumber.from(quote.minBuyAmount.amount).gte(minimumReceived)
+      ),
+      sorting,
+      'sell/buy amounts'
+    );
 
     return sortedQuotes.map<SwapOption>(quoteResponseToSwapOption);
   }

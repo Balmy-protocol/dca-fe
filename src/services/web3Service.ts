@@ -328,8 +328,7 @@ export default class Web3Service {
   }
 
   getSignSupport() {
-    const isSafeApp = false;
-    return !isSafeApp;
+    return !this.loadedAsSafeApp;
   }
 
   // BOOTSTRAP

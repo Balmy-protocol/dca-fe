@@ -50,6 +50,22 @@
         "type": "uint256"
       }
     ],
+    "name": "InvalidNativeAmount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "received",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "expected",
+        "type": "uint256"
+      }
+    ],
     "name": "ReceivedTooLittleTokenOut",
     "type": "error"
   },
@@ -173,7 +189,7 @@
                 "type": "uint256"
               }
             ],
-            "internalType": "struct IBasePermit2Adapter.TargetShare[]",
+            "internalType": "struct Token.DistributionTarget[]",
             "name": "transferOut",
             "type": "tuple[]"
           },
@@ -271,7 +287,7 @@
                 "type": "uint256"
               }
             ],
-            "internalType": "struct IBasePermit2Adapter.TargetShare[]",
+            "internalType": "struct Token.DistributionTarget[]",
             "name": "transferOut",
             "type": "tuple[]"
           },
@@ -402,7 +418,7 @@
                 "type": "uint256"
               }
             ],
-            "internalType": "struct IBasePermit2Adapter.TargetShare[]",
+            "internalType": "struct Token.DistributionTarget[]",
             "name": "distribution",
             "type": "tuple[]"
           }
@@ -521,7 +537,7 @@
                 "type": "uint256"
               }
             ],
-            "internalType": "struct IBasePermit2Adapter.TargetShare[]",
+            "internalType": "struct Token.DistributionTarget[]",
             "name": "distribution",
             "type": "tuple[]"
           }
@@ -619,7 +635,7 @@
                 "type": "uint256"
               }
             ],
-            "internalType": "struct IBasePermit2Adapter.TargetShare[]",
+            "internalType": "struct Token.DistributionTarget[]",
             "name": "transferOut",
             "type": "tuple[]"
           }
@@ -712,7 +728,7 @@
                 "type": "uint256"
               }
             ],
-            "internalType": "struct IBasePermit2Adapter.TargetShare[]",
+            "internalType": "struct Token.DistributionTarget[]",
             "name": "transferOut",
             "type": "tuple[]"
           }
@@ -742,5 +758,9 @@
     ],
     "stateMutability": "payable",
     "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]
