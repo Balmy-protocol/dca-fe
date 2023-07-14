@@ -105,6 +105,7 @@ export const DCA_TOKEN_BLACKLIST = [
   // Polygon - Beefy GNS on Gains - Blacklisting so we can test it out
   '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12',
   '0x1A5B0aaF478bf1FDA7b934c76E7692D722982a6D', // Abitrum - BFR
+  '0x1debd73e752beaf79865fd6446b0c970eae7732f', // Arbitrum - CBETH
 ];
 
 export const DISABLED_YIELD_WITHDRAWS = [
