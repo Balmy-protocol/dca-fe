@@ -38,6 +38,6 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
   disabledDexes: [],
   showTransactionCost: true,
   confetti: 100,
-  sorting: SORT_MOST_RETURN,
+  sorting: SORT_MOST_PROFIT,
   isPermit2Enabled: true,
 };
