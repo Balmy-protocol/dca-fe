@@ -12,7 +12,7 @@ import { createStyles, FilledInput, Typography } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { MAX_DEDUCTION, MIN_AMOUNT_FOR_MAX_DEDUCTION } from '@constants';
+import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
 
 const StyledTokenInputContainer = styled.div`
   display: flex;
@@ -130,9 +130,9 @@ const TokenInput = ({
   const handleMaxValue = () => {
     if (balance && token) {
       if (token.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue = balance.gte(MIN_AMOUNT_FOR_MAX_DEDUCTION[currentNetwork.chainId])
-          ? balance.sub(MAX_DEDUCTION[currentNetwork.chainId])
-          : balance;
+        const minAmountForMaxDeduction = getMinAmountForMaxDeduction(currentNetwork.chainId);
+        const maxDeduction = getMaxDeduction(currentNetwork.chainId);
+        const maxValue = balance.gte(minAmountForMaxDeduction) ? balance.sub(maxDeduction) : balance;
         onChange(formatUnits(maxValue, token.decimals));
       } else {
         onChange(formatUnits(balance, token.decimals));
@@ -143,11 +143,10 @@ const TokenInput = ({
   const handleHalfValue = () => {
     if (balance && token) {
       if (token.address === PROTOCOL_TOKEN_ADDRESS) {
+        const minAmountForMaxDeduction = getMinAmountForMaxDeduction(currentNetwork.chainId);
+        const maxDeduction = getMaxDeduction(currentNetwork.chainId);
         const amounToHalve =
-          balance.lte(MIN_AMOUNT_FOR_MAX_DEDUCTION[currentNetwork.chainId]) &&
-          balance.gt(MAX_DEDUCTION[currentNetwork.chainId])
-            ? balance.sub(MAX_DEDUCTION[currentNetwork.chainId])
-            : balance;
+          balance.lte(minAmountForMaxDeduction) && balance.gt(maxDeduction) ? balance.sub(maxDeduction) : balance;
 
         const halfValue = amounToHalve.div(BigNumber.from(2));
 
