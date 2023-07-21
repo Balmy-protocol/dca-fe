@@ -100,6 +100,12 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x353699126117ba6ed8f5d5928dfa797564e99e40',
   // BNB - Beefy BTCB on Valas - Blacklisting so we can test it out
   '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e',
+  // BNB - Beefy BUSD on Valas - Blacklisting so we can test it out
+  '0x45c53c0068bf31715fb41685bab59fd0bbc387f9',
+  // BNB - Beefy USDC on Valas - Blacklisting so we can test it out
+  '0x02d7eea2c017479ad319a0f24d6ad7a07f701d9d',
+  // BNB - Beefy DAI on Valas - Blacklisting so we can test it out
+  '0x1f2ae034a096f8e3faf8216d3843075474558773',
   // Polygon - Beefy maticX on Aave - Blacklisting so we can test it out
   '0xfc4c2e8b2c1655693f520e8115b95b057ac2d95b',
   // Polygon - Beefy GNS on Gains - Blacklisting so we can test it out
