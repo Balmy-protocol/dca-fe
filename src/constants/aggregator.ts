@@ -1,3 +1,5 @@
+import { defineMessage } from 'react-intl';
+
 export const GAS_KEY_SAFE_LOW = 'standard';
 export const GAS_KEY_AVERAGE = 'fast';
 export const GAS_KEY_FAST = 'instant';
@@ -10,6 +12,27 @@ export const GAS_LABELS_BY_KEY: Record<GasKeys, string> = {
   [GAS_KEY_SAFE_LOW]: 'standard',
   [GAS_KEY_AVERAGE]: 'fast',
   [GAS_KEY_FAST]: 'instant',
+};
+
+export enum TimeoutKey {
+  instant = '1s',
+  rapid = '2s',
+  balance = '3s',
+  patient = '5s',
+}
+
+export const TIMEOUT_KEYS: TimeoutKey[] = [
+  TimeoutKey.instant,
+  TimeoutKey.rapid,
+  TimeoutKey.balance,
+  TimeoutKey.patient,
+];
+
+export const TIMEOUT_LABELS_BY_KEY: Record<TimeoutKey, ReturnType<typeof defineMessage>> = {
+  [TimeoutKey.instant]: defineMessage({ defaultMessage: 'Instant', description: 'swapSettingsTimeoutInstantKey' }),
+  [TimeoutKey.rapid]: defineMessage({ defaultMessage: 'Rapid', description: 'swapSettingsTimeoutRapidKey' }),
+  [TimeoutKey.balance]: defineMessage({ defaultMessage: 'Balance', description: 'swapSettingsTimeoutBalanceKey' }),
+  [TimeoutKey.patient]: defineMessage({ defaultMessage: 'Patient', description: 'swapSettingsTimeoutPatientKey' }),
 };
 
 export const SORT_MOST_PROFIT = 'most-swapped-accounting-for-gas';
@@ -32,12 +55,14 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
   confetti: number;
   sorting: SwapSortOptions;
   isPermit2Enabled: boolean;
+  sourceTimeout: TimeoutKey;
 } = {
   slippage: 0.3,
   gasSpeed: GAS_KEY_AVERAGE,
   disabledDexes: [],
   showTransactionCost: true,
   confetti: 100,
-  sorting: SORT_MOST_PROFIT,
+  sorting: SORT_MOST_RETURN,
   isPermit2Enabled: true,
+  sourceTimeout: TimeoutKey.balance,
 };

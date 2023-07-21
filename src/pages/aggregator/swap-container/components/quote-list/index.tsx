@@ -4,10 +4,11 @@ import { SwapOption } from '@types';
 import Paper from '@mui/material/Paper';
 import { BigNumber } from 'ethers';
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
-import { SwapSortOptions } from '@constants/aggregator';
+import { SORT_MOST_PROFIT, SwapSortOptions } from '@constants/aggregator';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI, formatCurrencyAmount, emptyTokenWithDecimals } from '@common/utils/currency';
 import { Typography } from '@mui/material';
+import { useIntl } from 'react-intl';
 
 const StyledContainer = styled(Paper)`
   padding: 16px;
@@ -57,6 +58,7 @@ interface QuoteItemProps {
 }
 
 const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onClick }: QuoteItemProps) => {
+  const intl = useIntl();
   const isBestQuote = bestQuote?.swapper.id === quote?.swapper.id;
 
   const betterBy =
@@ -73,10 +75,13 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
       </StyledSwapperContainer>
       <StyledWorseByContainer>
         <Typography variant="body2" color={isBestQuote ? '#219653' : '#EB5757'}>
-          {formatCurrencyAmount(betterBy || worseBy || BigNumber.from(0), emptyTokenWithDecimals(18), 3, 2)}%
+          {formatCurrencyAmount(betterBy || worseBy || BigNumber.from(0), emptyTokenWithDecimals(18), 3, 2)}{' '}
+          {sorting === SORT_MOST_PROFIT ? ' USD' : '%'}
         </Typography>
         <Typography variant="caption">
-          {isBestQuote ? getBetterByLabel(sorting, isBuyOrder) : getWorseByLabel(sorting, isBuyOrder)}
+          {isBestQuote
+            ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder))
+            : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder))}
         </Typography>
       </StyledWorseByContainer>
     </StyledQuoteContainer>

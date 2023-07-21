@@ -82,7 +82,7 @@ const AllowanceSplitButton = (props: AllowanceSplitButtonProps) => {
 
   const infiniteText = (
     <FormattedMessage
-      description="Allow us to use your coin (home max)"
+      description="Allow us to use your coin (modal max)"
       defaultMessage="Authorize Max {symbol}"
       values={{
         symbol,

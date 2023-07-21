@@ -2,8 +2,9 @@ import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } f
 import { parseUnits } from '@ethersproject/units';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
-import { QuoteResponse } from '@mean-finance/sdk';
-import { SwapOption } from '@types';
+import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
+import { SwapOption, SwapOptionWithTx } from '@types';
+import { defineMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toToken } from './currency';
 
@@ -13,45 +14,98 @@ export function calculateProfit(quote?: Nullable<SwapOption>) {
   const soldUSD = sellAmount.amountInUSD && Number(sellAmount.amountInUSD);
   const boughtUSD = buyAmount.amountInUSD && Number(buyAmount.amountInUSD);
   const gasCostUSD = quote.gas?.estimatedCostInUSD && Number(quote.gas.estimatedCostInUSD);
+
   return !soldUSD || !boughtUSD || !gasCostUSD ? undefined : boughtUSD - soldUSD - gasCostUSD;
 }
 
 export const getBetterByLabel = (sorting: SwapSortOptions, isBuyOrder: boolean, addRecommended = false) => {
   if (sorting === SORT_MOST_RETURN) {
     if (isBuyOrder) {
-      return `less spent${addRecommended ? ' than second best' : ''}`;
+      return addRecommended
+        ? defineMessage({
+            description: 'betterByLabelMostReturnBuyOrderWithRecommended',
+            defaultMessage: 'less spent than second best',
+          })
+        : defineMessage({
+            description: 'betterByLabelMostReturnBuyOrderWithoutRecommended',
+            defaultMessage: 'less spent',
+          });
     }
 
-    return `more received${addRecommended ? ' than second best' : ''}`;
+    return addRecommended
+      ? defineMessage({
+          description: 'betterByLabelMostReturnSellOrderWithRecommended',
+          defaultMessage: 'more received than second best',
+        })
+      : defineMessage({
+          description: 'betterByLabelMostReturnSellOrderWithoutRecommended',
+          defaultMessage: 'more received',
+        });
   }
   if (sorting === SORT_MOST_PROFIT) {
-    return `more profitable${addRecommended ? ' than second best' : ''}`;
+    return addRecommended
+      ? defineMessage({
+          description: 'betterByLabelMostProfitWithRecommended',
+          defaultMessage: 'more profitable than second best',
+        })
+      : defineMessage({ description: 'betterByLabelMostProfitWithoutRecommended', defaultMessage: 'more profitable' });
   }
 
   if (sorting === SORT_LEAST_GAS) {
-    return `least gas used${addRecommended ? ' than second best' : ''}`;
+    return addRecommended
+      ? defineMessage({
+          description: 'betterByLabelLeastGasWithRecommended',
+          defaultMessage: 'least gas used than second best',
+        })
+      : defineMessage({ description: 'betterByLabelLeastGasWithoutRecommended', defaultMessage: 'least gas used' });
   }
 
-  return '';
+  return defineMessage({ description: 'empty', defaultMessage: '' });
 };
 
 export const getWorseByLabel = (sorting: SwapSortOptions, isBuyOrder: boolean, addRecommended = false) => {
   if (sorting === SORT_MOST_RETURN) {
     if (isBuyOrder) {
-      return `more spent${addRecommended ? ' than recommended' : ''}`;
+      return addRecommended
+        ? defineMessage({
+            description: 'worseByLabelMostReturnBuyOrderWithRecommended',
+            defaultMessage: 'more spent than recommended',
+          })
+        : defineMessage({
+            description: 'worseByLabelMostReturnBuyOrderWithoutRecommended',
+            defaultMessage: 'more spent',
+          });
     }
 
-    return `less received${addRecommended ? ' than recommended' : ''}`;
+    return addRecommended
+      ? defineMessage({
+          description: 'worseByLabelMostReturnSellOrderWithRecommended',
+          defaultMessage: 'less received than recommended',
+        })
+      : defineMessage({
+          description: 'worseByLabelMostReturnSellOrderWithoutRecommended',
+          defaultMessage: 'less received',
+        });
   }
   if (sorting === SORT_MOST_PROFIT) {
-    return `less profitable${addRecommended ? ' than recommended' : ''}`;
+    return addRecommended
+      ? defineMessage({
+          description: 'worseByLabelMostProfitWithRecommended',
+          defaultMessage: 'less profitable than recommended',
+        })
+      : defineMessage({ description: 'worseByLabelMostProfitWithoutRecommended', defaultMessage: 'less profitable' });
   }
 
   if (sorting === SORT_LEAST_GAS) {
-    return `more gas used${addRecommended ? ' than recommended' : ''}`;
+    return addRecommended
+      ? defineMessage({
+          description: 'worseByLabelLeastGasWithRecommended',
+          defaultMessage: 'more gas used than recommended',
+        })
+      : defineMessage({ description: 'worseByLabelLeastGasWithoutRecommended', defaultMessage: 'more gas used' });
   }
 
-  return '';
+  return defineMessage({ description: 'empty', defaultMessage: '' });
 };
 
 export const getBetterBy = (
@@ -85,8 +139,9 @@ export const getBetterBy = (
   } else if (sorting === SORT_MOST_PROFIT) {
     const profitBest = calculateProfit(bestQuote);
     const profitSecond = calculateProfit(secondQuote);
-    if (profitBest && profitSecond) {
-      betterBy = parseUnits((((profitBest - profitSecond) / profitSecond) * 100).toString(), 18);
+    if (!isUndefined(profitBest) && !isUndefined(profitSecond)) {
+      betterBy = parseUnits(parseFloat((profitBest - profitSecond).toFixed(20)).toString(), 18);
+      // betterBy = parseUnits(Math.abs(((profitBest - profitSecond) / profitSecond) * 100).toString(), 18);
     }
   } else if (sorting === SORT_LEAST_GAS) {
     betterBy =
@@ -136,7 +191,7 @@ export const getWorseBy = (
     const profitBest = calculateProfit(bestQuote);
     const profitSecond = calculateProfit(secondQuote);
     if (profitBest && profitSecond) {
-      worseBy = parseUnits((((profitBest - profitSecond) / profitBest) * 100).toString(), 18);
+      worseBy = parseUnits(parseFloat(Math.abs(profitSecond - profitBest).toFixed(20)).toString(), 18);
     }
   } else if (sorting === SORT_LEAST_GAS) {
     worseBy =
@@ -154,69 +209,101 @@ export const getWorseBy = (
   return worseBy;
 };
 
-export const quoteResponseToSwapOption = ({
+export const quoteResponseToSwapOption: (option: QuoteResponse & { estimatedTx?: QuoteTransaction }) => SwapOption = ({
   sellToken,
   buyToken,
-  sellAmount: { amount: sellAmountAmount, amountInUnits: sellAmountAmountInUnits, amountInUSD: sellAmountAmountInUsd },
-  buyAmount: { amount: buyAmountAmount, amountInUnits: buyAmountAmountInUnits, amountInUSD: buyAmountAmountInUsd },
-  maxSellAmount: {
-    amount: maxSellAmountAmount,
-    amountInUnits: maxSellAmountAmountInUnits,
-    amountInUSD: maxSellAmountAmountInUsd,
-  },
-  minBuyAmount: {
-    amount: minBuyAmountAmount,
-    amountInUnits: minBuyAmountAmountInUnits,
-    amountInUSD: minBuyAmountAmountInUsd,
-  },
+  sellAmount,
+  buyAmount,
+  maxSellAmount,
+  minBuyAmount,
   gas,
-  source: { allowanceTarget, logoURI, name, id },
+  source,
   type,
   tx,
   recipient,
-}: QuoteResponse) => ({
+  estimatedTx,
+}) => ({
   id: uuidv4(),
   transferTo: recipient,
-  sellToken: toToken(sellToken),
-  buyToken: toToken(buyToken),
+  sellToken: {
+    ...sellToken,
+    ...toToken(sellToken),
+  },
+  buyToken: {
+    ...buyToken,
+    ...toToken(buyToken),
+  },
   sellAmount: {
-    amount: BigNumber.from(sellAmountAmount),
-    amountInUnits: sellAmountAmountInUnits,
-    amountInUSD: (!isUndefined(sellAmountAmountInUsd) && Number(sellAmountAmountInUsd)) || undefined,
+    ...sellAmount,
+    amount: BigNumber.from(sellAmount.amount),
+    amountInUSD: (!isUndefined(sellAmount.amountInUSD) && Number(sellAmount.amountInUSD)) || undefined,
   },
   buyAmount: {
-    amount: BigNumber.from(buyAmountAmount),
-    amountInUnits: buyAmountAmountInUnits,
-    amountInUSD: (!isUndefined(buyAmountAmountInUsd) && Number(buyAmountAmountInUsd)) || undefined,
+    ...buyAmount,
+    amount: BigNumber.from(buyAmount.amount),
+    amountInUSD: (!isUndefined(buyAmount.amountInUSD) && Number(buyAmount.amountInUSD)) || undefined,
   },
   maxSellAmount: {
-    amount: BigNumber.from(maxSellAmountAmount),
-    amountInUnits: maxSellAmountAmountInUnits,
-    amountInUSD: (!isUndefined(maxSellAmountAmountInUsd) && Number(maxSellAmountAmountInUsd)) || undefined,
+    ...maxSellAmount,
+    amount: BigNumber.from(maxSellAmount.amount),
+    amountInUSD: (!isUndefined(maxSellAmount.amountInUSD) && Number(maxSellAmount.amountInUSD)) || undefined,
   },
   minBuyAmount: {
-    amount: BigNumber.from(minBuyAmountAmount),
-    amountInUnits: minBuyAmountAmountInUnits,
-    amountInUSD: (!isUndefined(minBuyAmountAmountInUsd) && Number(minBuyAmountAmountInUsd)) || undefined,
+    ...minBuyAmount,
+    amount: BigNumber.from(minBuyAmount.amount),
+    amountInUSD: (!isUndefined(minBuyAmount.amountInUSD) && Number(minBuyAmount.amountInUSD)) || undefined,
   },
   gas: gas && {
+    ...gas,
     estimatedGas: BigNumber.from(gas.estimatedGas),
     estimatedCost: BigNumber.from(gas.estimatedCost),
     estimatedCostInUnits: gas.estimatedCostInUnits,
     estimatedCostInUSD: (!isUndefined(gas.estimatedCostInUSD) && Number(gas.estimatedCostInUSD)) || undefined,
     gasTokenSymbol: gas.gasTokenSymbol,
+    gasTokenPrice: gas.gasTokenPrice,
   },
-  swapper: {
-    allowanceTarget,
-    name,
-    logoURI,
-    id,
-  },
+  swapper: source,
   type,
-  tx,
+  tx: tx || estimatedTx,
 });
 
 export const getQuoteMetric = (quote: SwapOption, isBuyOrder: boolean) =>
   isBuyOrder
     ? `${formatCurrencyAmount(quote.sellAmount.amount, quote.sellToken)} ${quote.sellToken.symbol}`
     : `${formatCurrencyAmount(quote.buyAmount.amount, quote.buyToken)} ${quote.buyToken.symbol}`;
+
+export const swapOptionToEstimatedQuoteResponseWithTx: (option: SwapOptionWithTx) => EstimatedQuoteResponseWithTx = (
+  option
+) => ({
+  ...option,
+  source: option.swapper,
+  sellAmount: {
+    ...option.sellAmount,
+    amount: option.sellAmount.amount.toString(),
+    amountInUSD: option.sellAmount.amountInUSD?.toString(),
+  },
+  maxSellAmount: {
+    ...option.maxSellAmount,
+    amount: option.maxSellAmount.amount.toString(),
+    amountInUSD: option.maxSellAmount.amountInUSD?.toString(),
+  },
+  buyAmount: {
+    ...option.buyAmount,
+    amount: option.buyAmount.amount.toString(),
+    amountInUSD: option.buyAmount.amountInUSD?.toString(),
+  },
+  minBuyAmount: {
+    ...option.minBuyAmount,
+    amount: option.minBuyAmount.amount.toString(),
+    amountInUSD: option.minBuyAmount.amountInUSD?.toString(),
+  },
+  gas: option.gas
+    ? {
+        ...option.gas,
+        estimatedGas: option.gas.estimatedGas.toString(),
+        estimatedCost: option.gas.estimatedCost.toString(),
+        estimatedCostInUSD: option.gas.estimatedCostInUSD?.toString(),
+      }
+    : undefined,
+  estimatedTx: option.tx,
+});

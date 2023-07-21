@@ -22,7 +22,7 @@ import {
   TransactionActionWaitForQuotesSimulationData,
   TransactionActionCreatePositionType,
   TransactionActionCreatePositionData,
-} from 'types';
+} from '@types';
 import {
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
   TRANSACTION_ACTION_SWAP,
@@ -468,7 +468,7 @@ const SimulationItem = ({ quotes, step }: { quotes: number; step: number }) => {
 
   React.useEffect(() => {
     if (timer < quotes) {
-      timerRef.current = setTimeout(() => setTimer(timer + 1), (7 / quotes) * 1000);
+      timerRef.current = setTimeout(() => setTimer(timer + 1), (7 / quotes) * 200);
     }
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -669,14 +669,14 @@ const buildWaitForApprovalItem = ({
           <Typography variant="body1">
             {hash && checkForPending && isPendingTransaction && isCurrentStep && (
               <FormattedMessage
-                description="transationStepWaitApprove"
+                description="transationStepWaitApproveConfirmed"
                 defaultMessage="{step} - Token authorization is being confirmed"
                 values={{ step }}
               />
             )}
             {((!hash && checkForPending && !isPendingTransaction) || done) && (
               <FormattedMessage
-                description="transationStepWaitApprove"
+                description="transationStepWaitApproveSubmitted"
                 defaultMessage="{step} - Token authorization is submitted"
                 values={{ step }}
               />
@@ -731,7 +731,7 @@ const buildWaitForSignApprovalItem = ({
         <StyledTransactionStepContent>
           <Typography variant="body1">
             <FormattedMessage
-              description="transationStepWaitApprove"
+              description="transationStepWaitForApproveSubmitted"
               defaultMessage="{step} - The token approval is submitted"
               values={{ step }}
             />
@@ -824,7 +824,7 @@ const buildCreatePositionItem = ({
         {isCurrentStep && (
           <StyledTransactionStepButtonContainer>
             <Button variant="contained" color="secondary" fullWidth size="large" onClick={() => onAction(transactions)}>
-              <FormattedMessage description="swapWallet" defaultMessage="Create position" />
+              <FormattedMessage description="createPositionWallet" defaultMessage="Create position" />
             </Button>
           </StyledTransactionStepButtonContainer>
         )}

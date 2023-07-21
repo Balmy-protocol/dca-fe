@@ -16,8 +16,9 @@ import {
   setDisabledDexes,
   setConfetti,
   setPermit2,
+  setSourceTimeout,
 } from '@state/aggregator-settings/actions';
-import { GasKeys } from '@constants/aggregator';
+import { GasKeys, TimeoutKey } from '@constants/aggregator';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import useSdkDexes from '@hooks/useSdkSources';
@@ -31,6 +32,7 @@ import SlippageInput from './components/slippage-input';
 import GasSelector from './components/gas-selector';
 import ConfettiInput from './components/confetti-input';
 import QuoteSorter from '../quote-sorter';
+import TimeoutSelector from './components/timeout-selector';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -65,7 +67,8 @@ interface SwapSettingsProps {
 }
 
 const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
-  const { slippage, gasSpeed, disabledDexes, confettiParticleCount, isPermit2Enabled } = useAggregatorSettingsState();
+  const { slippage, gasSpeed, disabledDexes, confettiParticleCount, isPermit2Enabled, sourceTimeout } =
+    useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const dexes = useSdkDexes();
   const [showDexes, setShowDexes] = React.useState(false);
@@ -78,6 +81,10 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
   const onGasSpeedChange = (newGasSpeed: GasKeys) => {
     dispatch(setGasSpeed(newGasSpeed));
     trackEvent('Aggregator - Set gas speed', { gasSpeed: newGasSpeed });
+  };
+  const onSourceTimeoutChange = (newSourceTimeout: TimeoutKey) => {
+    dispatch(setSourceTimeout(newSourceTimeout));
+    trackEvent('Aggregator - Set source timeout speed', { sourceTimeout: newSourceTimeout });
   };
   const onConfettiChange = (newConfettiParticleCount: number) => {
     dispatch(setConfetti(newConfettiParticleCount));
@@ -161,6 +168,17 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
                 <FormattedMessage description="advancedAggregatorSettingsGasSpeed" defaultMessage="Gas speed:" />
               </Typography>
               <GasSelector selected={gasSpeed} onChange={onGasSpeedChange} />
+            </StyledSettingContainer>
+          </StyledGrid>
+          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
+            <StyledSettingContainer>
+              <Typography variant="body1">
+                <FormattedMessage
+                  description="advancedAggregatorSettingsTimeout"
+                  defaultMessage="Source waiting time:"
+                />
+              </Typography>
+              <TimeoutSelector selected={sourceTimeout} onChange={onSourceTimeoutChange} />
             </StyledSettingContainer>
           </StyledGrid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>

@@ -22,7 +22,7 @@ import AggregatorLanding from './components/landing';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
-  const { slippage, gasSpeed, disabledDexes, sorting } = useAggregatorSettingsState();
+  const { slippage, gasSpeed, disabledDexes, sorting, sourceTimeout } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
@@ -43,7 +43,8 @@ const SwapContainer = () => {
     parseFloat(slippage),
     gasSpeed,
     disabledDexes,
-    isPermit2Enabled
+    isPermit2Enabled,
+    sourceTimeout
   );
   const [swapOption, isLoadingSwapOption] = useSwapOption(
     selectedRoute,

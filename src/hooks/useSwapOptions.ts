@@ -5,7 +5,14 @@ import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
-import { GasKeys, SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
+import {
+  GasKeys,
+  SORT_LEAST_GAS,
+  SORT_MOST_PROFIT,
+  SORT_MOST_RETURN,
+  SwapSortOptions,
+  TimeoutKey,
+} from '@constants/aggregator';
 import { useBlockNumber } from '@state/block-number/hooks';
 import { BigNumber } from 'ethers';
 import { MAX_UINT_32 } from '@constants';
@@ -25,7 +32,8 @@ function useSwapOptions(
   slippage?: number,
   gasSpeed?: GasKeys,
   disabledDexes?: string[],
-  isPermit2Enabled = false
+  isPermit2Enabled = false,
+  sourceTimeout = TimeoutKey.patient
 ): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
   const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
@@ -51,6 +59,7 @@ function useSwapOptions(
   const prevSlippage = usePrevious(slippage);
   const prevDisabledDexes = usePrevious(disabledDexes);
   const prevIsPermit2Enabled = usePrevious(isPermit2Enabled);
+  const prevSourceTimeout = usePrevious(sourceTimeout);
   const debouncedCall = React.useCallback(
     debounce(
       async (
@@ -64,7 +73,8 @@ function useSwapOptions(
         debouncedAccount?: string,
         debouncedChainId?: number,
         debouncedDisabledDexes?: string[],
-        debouncedIsPermit2Enabled = false
+        debouncedIsPermit2Enabled = false,
+        debouncedSourceTimeout = TimeoutKey.patient
       ) => {
         if (debouncedFrom && debouncedTo && debouncedValue) {
           const sellBuyValue = debouncedIsBuyOrder
@@ -90,7 +100,8 @@ function useSwapOptions(
               debouncedAccount,
               debouncedChainId,
               debouncedDisabledDexes,
-              debouncedIsPermit2Enabled
+              debouncedIsPermit2Enabled,
+              debouncedSourceTimeout
             );
 
             if (promiseResult.length) {
@@ -121,7 +132,8 @@ function useSwapOptions(
         account,
         currentNetwork.chainId,
         disabledDexes,
-        isPermit2Enabled
+        isPermit2Enabled,
+        sourceTimeout
       ),
     [
       from,
@@ -135,6 +147,7 @@ function useSwapOptions(
       currentNetwork.chainId,
       disabledDexes,
       isPermit2Enabled,
+      sourceTimeout,
     ]
   );
 
@@ -151,7 +164,8 @@ function useSwapOptions(
       !isEqual(prevNetwork, currentNetwork.chainId) ||
       !isEqual(prevDisabledDexes, disabledDexes) ||
       !isEqual(prevIsPermit2Enabled, isPermit2Enabled) ||
-      !isEqual(prevSlippage, slippage)
+      !isEqual(prevSlippage, slippage) ||
+      !isEqual(prevSourceTimeout, sourceTimeout)
     ) {
       if (from && to && value) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -172,6 +186,8 @@ function useSwapOptions(
     isBuyOrder,
     prevDisabledDexes,
     disabledDexes,
+    sourceTimeout,
+    prevSourceTimeout,
     // prevAccount,
     account,
     prevPendingTrans,

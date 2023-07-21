@@ -26,11 +26,9 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useWeb3Service from '@hooks/useWeb3Service';
-import { useHasConfirmedApproval, useHasPendingApproval, useHasPendingPairCreation } from '@state/transactions/hooks';
 import useCanSupportPair from '@hooks/useCanSupportPair';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { formatUnits, parseUnits } from '@ethersproject/units';
-import { Allowance } from '@hooks/useAllowance';
 import { EMPTY_TOKEN, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useWalletService from '@hooks/useWalletService';
@@ -55,7 +53,7 @@ interface DcaButtonProps {
   usdPrice?: BigNumber;
   shouldEnableYield: boolean;
   balance?: BigNumber;
-  allowance: Allowance;
+  isApproved: boolean;
   rateUsdPrice: number;
   fromValueUsdPrice: number;
   balanceErrors?: string;
@@ -70,7 +68,7 @@ interface DcaButtonProps {
 const DcaButton = ({
   cantFund,
   usdPrice,
-  allowance,
+  isApproved,
   allowanceErrors,
   shouldEnableYield,
   balance,
@@ -92,15 +90,11 @@ const DcaButton = ({
   const walletService = useWalletService();
   const web3Service = useWeb3Service();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
-  const isCreatingPair = useHasPendingPairCreation(from, to);
-  const hasPendingApproval = useHasPendingApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const replaceHistory = useReplaceHistory();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
-
-  const hasConfirmedApproval = useHasConfirmedApproval(from, web3Service.getAccount(), !!fromYield?.tokenAddress);
 
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
@@ -109,17 +103,6 @@ const DcaButton = ({
         (isUndefined(MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId])
           ? DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT
           : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId]));
-
-  const isApproved =
-    !from ||
-    hasConfirmedApproval ||
-    (from &&
-      (!fromValue
-        ? true
-        : (allowance.allowance &&
-            allowance.token.address === from.address &&
-            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
-          from.address === PROTOCOL_TOKEN_ADDRESS));
 
   const swapsIsMax = BigNumber.from(frequencyValue || '0').gt(BigNumber.from(MAX_UINT_32));
 
@@ -138,8 +121,6 @@ const DcaButton = ({
     (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
-
-  const isApproveTokenDisabled = !!isApproved || hasPendingApproval || !!shouldDisableApproveButton;
 
   const isTestnet = TESTNETS.includes(currentNetwork.chainId);
 
@@ -219,42 +200,6 @@ const DcaButton = ({
     </StyledButton>
   );
 
-  const ApproveTokenButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      disabled={!!isApproveTokenDisabled || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
-      color="secondary"
-      fullWidth
-      onClick={() => onClick(POSSIBLE_ACTIONS.approveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
-    >
-      {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
-        <Typography variant="body1">
-          <FormattedMessage
-            description="swapsCannotBeMax"
-            defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
-            values={{ MAX_UINT_32 }}
-          />
-        </Typography>
-      )}
-      {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body1">
-          <FormattedMessage description="create position" defaultMessage="Approve and create position" />
-        </Typography>
-      )}
-      {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body1">
-          <FormattedMessage
-            description="notenoughwhale"
-            defaultMessage="You can only deposit with a minimum value of {value} USD"
-            values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
-          />
-        </Typography>
-      )}
-      {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
-    </StyledButton>
-  );
-
   const StartPositionButton = (
     <StyledButton
       size="large"
@@ -331,14 +276,6 @@ const DcaButton = ({
     </StyledButton>
   );
 
-  const CreatingPairButton = (
-    <StyledButton size="large" variant="contained" disabled color="secondary" fullWidth>
-      <Typography variant="body1">
-        <FormattedMessage description="creating pair" defaultMessage="Creating this pair" />
-      </Typography>
-    </StyledButton>
-  );
-
   const NoFundsButton = (
     <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
       <Typography variant="body1">
@@ -405,30 +342,64 @@ const DcaButton = ({
     </StyledButton>
   );
 
+  const ApproveTokenButton = (
+    <StyledButton
+      size="large"
+      variant="contained"
+      disabled={!!shouldDisableApproveButton || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
+      color="secondary"
+      fullWidth
+      onClick={() => onClick(POSSIBLE_ACTIONS.approveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
+    >
+      {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="swapsCannotBeMax"
+            defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
+            values={{ MAX_UINT_32 }}
+          />
+        </Typography>
+      )}
+      {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage description="create position" defaultMessage="Authorize and create position" />
+        </Typography>
+      )}
+      {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
+        <Typography variant="body1">
+          <FormattedMessage
+            description="notenoughwhale"
+            defaultMessage="You can only deposit with a minimum value of {value} USD"
+            values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
+          />
+        </Typography>
+      )}
+      {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
+    </StyledButton>
+  );
+
   let ButtonToShow;
 
   if (!web3Service.getAccount()) {
     ButtonToShow = NoWalletButton;
+  } else if (!isOnCorrectNetwork) {
+    ButtonToShow = IncorrectNetworkButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
   } else if (isLoadingPairIsSupported) {
     ButtonToShow = LoadingButton;
-  } else if (!isOnCorrectNetwork) {
-    ButtonToShow = IncorrectNetworkButton;
-  } else if (!pairIsSupported && !isLoadingPairIsSupported && from && to) {
-    ButtonToShow = PairNotSupportedButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
+  } else if (!pairIsSupported && !isLoadingPairIsSupported && from && to) {
+    ButtonToShow = PairNotSupportedButton;
   } else if (step === 0) {
     ButtonToShow = NextStepButton;
   } else if (!hasEnoughUsdForDeposit) {
     ButtonToShow = NoMinForDepositButton;
   } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to && loadedAsSafeApp) {
     ButtonToShow = SafeApproveAndStartPositionButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) {
+  } else if (step === 1 && from?.address !== PROTOCOL_TOKEN_ADDRESS) {
     ButtonToShow = ApproveTokenButton;
-  } else if (isCreatingPair) {
-    ButtonToShow = CreatingPairButton;
   } else {
     ButtonToShow = StartPositionButton;
   }

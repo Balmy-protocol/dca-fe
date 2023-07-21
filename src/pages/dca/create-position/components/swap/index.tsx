@@ -2,11 +2,19 @@ import React from 'react';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import { Token, YieldOptions, TransactionTypes, ApproveTokenExactTypeData, ApproveTokenTypeData } from '@types';
+import {
+  Token,
+  YieldOptions,
+  TransactionTypes,
+  ApproveTokenExactTypeData,
+  ApproveTokenTypeData,
+  TransactionActionCreatePositionData,
+  AllowanceType,
+} from '@types';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
 import TokenPicker from '@pages/dca/components/dca-token-picker';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
 import useBalance from '@hooks/useBalance';
 import StalePairModal from '@pages/dca/components/stale-pair-modal';
@@ -23,10 +31,15 @@ import {
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_CREATE_POSITION,
+  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
+  PERMIT_2_ADDRESS,
 } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
 import findIndex from 'lodash/findIndex';
-import TransactionSteps, { TransactionAction as TransactionStep } from '@common/components/transaction-steps';
+import TransactionSteps, {
+  TransactionAction,
+  TransactionAction as TransactionStep,
+} from '@common/components/transaction-steps';
 import { emptyTokenWithAddress, parseUsdPrice } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { calculateStale, STALE } from '@common/utils/parsing';
@@ -57,7 +70,10 @@ import {
   setFrequencyValue,
 } from '@state/create-position/actions';
 import { useCreatePositionState } from '@state/create-position/hooks';
-import useAllowance from '@hooks/useAllowance';
+import usePermit2Service from '@hooks/usePermit2Service';
+import useSpecificAllowance from '@hooks/useSpecificAllowance';
+import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
+import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
 import SwapSecondStep from '../step2';
 import DcaButton from '../dca-button';
@@ -132,13 +148,16 @@ const Swap = ({
   const availablePairs = useAvailablePairs();
   const errorService = useErrorService();
   const trackEvent = useTrackEvent();
+  const permit2Service = usePermit2Service();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
-  // const pairService = usePairService();
+  const intl = useIntl();
+  const canUsePermit2 = useSupportsSigning();
+  const allowanceTarget = useDcaAllowanceTarget(currentNetwork.chainId, from, fromYield?.tokenAddress, canUsePermit2);
   const [balance, , balanceErrors] = useBalance(from);
-  const [allowance, , allowanceErrors] = useAllowance(from, !!fromYield?.tokenAddress);
+  const [allowance, , allowanceErrors] = useSpecificAllowance(from, allowanceTarget);
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -178,6 +197,16 @@ const Swap = ({
     (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
     usdPrice
   );
+
+  const isApproved =
+    !from ||
+    (from &&
+      (!fromValue
+        ? true
+        : (allowance.allowance &&
+            allowance.token.address === from.address &&
+            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
+          from.address === PROTOCOL_TOKEN_ADDRESS));
 
   React.useEffect(() => {
     if (!from) return;
@@ -242,7 +271,7 @@ const Swap = ({
     trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };
 
-  const handleApproveToken = async (transactions?: TransactionStep[], amount?: BigNumber) => {
+  const handleApproveToken = async (amount?: BigNumber) => {
     if (!from || !to) return;
     const fromSymbol = from.symbol;
 
@@ -259,21 +288,15 @@ const Swap = ({
         ),
       });
       trackEvent('DCA - Approve token submitting');
-      const result = await walletService.approveToken(
-        from,
-        !!(shouldEnableYield && fromYield?.tokenAddress),
-        undefined,
-        amount
-      );
-      const hubAddress =
-        shouldEnableYield && fromYield?.tokenAddress
-          ? await contractService.getHUBCompanionAddress()
-          : await contractService.getHUBAddress();
+      const addressToApprove = PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId];
+
+      const result = await walletService.approveSpecificToken(from, addressToApprove, amount);
+
       trackEvent('DCA - Approve token submitted');
 
       const transactionTypeDataBase = {
         token: from,
-        addressFor: hubAddress,
+        addressFor: addressToApprove,
       };
 
       let transactionTypeData: ApproveTokenExactTypeData | ApproveTokenTypeData = {
@@ -295,10 +318,10 @@ const Swap = ({
 
       setModalClosed({ content: '' });
 
-      if (transactions?.length) {
-        const newSteps = [...transactions];
+      if (transactionsToExecute?.length) {
+        const newSteps = [...transactionsToExecute];
 
-        const approveIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
+        const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
 
         if (approveIndex !== -1) {
           newSteps[approveIndex] = {
@@ -307,7 +330,7 @@ const Swap = ({
             hash: result.hash,
           };
 
-          const waitIndex = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
+          const waitIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
           if (waitIndex !== -1) {
             newSteps[waitIndex] = {
               ...newSteps[waitIndex],
@@ -338,7 +361,7 @@ const Swap = ({
     }
   };
 
-  const handleSwap = async (transactions?: TransactionStep[]) => {
+  const handleSwap = async () => {
     if (!from || !to) return;
     setShouldShowStalePairModal(false);
     const fromSymbol = from.symbol;
@@ -355,6 +378,17 @@ const Swap = ({
           </Typography>
         ),
       });
+
+      let signature;
+
+      if (transactionsToExecute?.length) {
+        const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_CREATE_POSITION });
+
+        if (index !== -1) {
+          signature = (transactionsToExecute[index].extraData as TransactionActionCreatePositionData).signature;
+        }
+      }
+
       trackEvent('DCA - Create position submitting');
       const result = await positionService.deposit(
         from,
@@ -363,7 +397,8 @@ const Swap = ({
         frequencyType,
         frequencyValue,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
-        shouldEnableYield ? toYield?.tokenAddress : undefined
+        shouldEnableYield ? toYield?.tokenAddress : undefined,
+        signature
       );
       trackEvent('DCA - Create position submitted');
       const hubAddress = await contractService.getHUBAddress();
@@ -392,10 +427,10 @@ const Swap = ({
 
       setModalClosed({ content: '' });
 
-      if (transactions?.length) {
-        const newSteps = [...transactions];
+      if (transactionsToExecute?.length) {
+        const newSteps = [...transactionsToExecute];
 
-        const index = findIndex(transactions, { type: TRANSACTION_ACTION_CREATE_POSITION });
+        const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_CREATE_POSITION });
 
         if (index !== -1) {
           newSteps[index] = {
@@ -521,18 +556,14 @@ const Swap = ({
     }
   };
 
-  const handleBackTransactionSteps = () => {
-    setShouldShowSteps(false);
-  };
-
-  const handleTransactionEndedForWait = (transactions?: TransactionStep[]) => {
-    if (!transactions?.length) {
-      return;
+  const handleApproveTransactionConfirmed = () => {
+    if (!transactionsToExecute?.length) {
+      return null;
     }
 
-    const newSteps = [...transactions];
+    const newSteps = [...transactionsToExecute];
 
-    const index = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
+    const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
 
     if (index !== -1) {
       newSteps[index] = {
@@ -543,123 +574,90 @@ const Swap = ({
 
       setTransactionsToExecute(newSteps);
     }
+
+    return null;
   };
 
-  const handleMultiSteps = () => {
-    if (!from || fromValue === '' || !to) {
-      return;
+  const handlePermit2Signed = (transactions?: TransactionStep[]) => {
+    if (!transactions?.length) {
+      return Promise.resolve(null);
     }
 
-    const newSteps: TransactionStep[] = [];
+    const newSteps = [...transactions];
 
-    const amountToApprove = parseUnits(fromValue, from.decimals);
+    const signIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN });
 
-    newSteps.push({
-      hash: '',
-      onAction: handleApproveToken,
-      checkForPending: false,
-      done: false,
-      type: TRANSACTION_ACTION_APPROVE_TOKEN,
-      extraData: {
-        token: from,
-        amount: amountToApprove,
-        swapper: 'Mean Finance',
-      },
-    });
+    if (signIndex !== -1) {
+      newSteps[signIndex] = {
+        ...newSteps[signIndex],
+        done: true,
+        checkForPending: false,
+      };
 
-    newSteps.push({
-      hash: '',
-      onAction: handleTransactionEndedForWait,
-      checkForPending: true,
-      done: false,
-      type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
-      extraData: {
-        token: from,
-        amount: amountToApprove,
-      },
-    });
+      setTransactionsToExecute(newSteps);
+    }
 
-    newSteps.push({
-      hash: '',
-      onAction: handleSwap,
-      checkForPending: true,
-      done: false,
-      type: TRANSACTION_ACTION_CREATE_POSITION,
-      extraData: {
-        from,
-        to,
-        fromValue,
-        frequencyType,
-        frequencyValue,
-      },
-    });
-
-    trackEvent('DCA - Start create steps');
-    setTransactionsToExecute(newSteps);
-    setShouldShowSteps(true);
+    return null;
   };
 
-  const preHandleApproveAndCreate = () => {
-    if (!existingPair) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleMultiSteps();
-      return;
-    }
+  const handleSignPermit2Approval = async (amount?: BigNumber) => {
+    if (!from || !to || !amount) return;
 
-    const isStale =
-      calculateStale(
-        existingPair?.lastExecutedAt || 0,
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
+    try {
+      trackEvent('DCA - Sign permi2Approval submitting', {
+        fromSteps: !!transactionsToExecute?.length,
+      });
+      const result = await permit2Service.getPermit2DcaSignedData(from, amount);
+      trackEvent('DCA - Sign permi2Approval submitting', {
+        fromSteps: !!transactionsToExecute?.length,
+      });
 
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleMultiSteps();
-    }
-  };
+      if (transactionsToExecute?.length) {
+        const newSteps = [...transactionsToExecute];
 
-  const preHandleSwap = () => {
-    if (!from || !to) {
-      return;
-    }
-    const isStale =
-      calculateStale(
-        existingPair?.lastExecutedAt || 0,
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
+        const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN });
 
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleSwap();
+        if (approveIndex !== -1) {
+          newSteps[approveIndex] = {
+            ...newSteps[approveIndex],
+            done: true,
+          };
+        }
+
+        const swapIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_CREATE_POSITION });
+
+        if (swapIndex !== -1) {
+          newSteps[swapIndex] = {
+            ...newSteps[swapIndex],
+            extraData: {
+              ...(newSteps[swapIndex].extraData as unknown as TransactionActionCreatePositionData),
+              signature: result,
+            },
+          } as TransactionAction;
+        }
+
+        setTransactionsToExecute(newSteps);
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        handlePermit2Signed(newSteps);
+      }
+    } catch (e) {
+      if (shouldTrackError(e)) {
+        trackEvent('DCA - Sign permi2Approval error', {
+          fromSteps: !!transactionsToExecute?.length,
+        });
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error signing permi2Approval DCA', JSON.stringify(e), {
+          chainId: currentNetwork.chainId,
+          from: from.address,
+          to: to.address,
+        });
+      }
     }
   };
 
-  const preHandleSafeApproveAndSwap = () => {
-    if (!from || !to) {
-      return;
-    }
-    const isStale =
-      calculateStale(
-        existingPair?.lastExecutedAt || 0,
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
-
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleSafeApproveAndSwap();
-    }
+  const handleBackTransactionSteps = () => {
+    setShouldShowSteps(false);
   };
 
   const startSelectingCoin = (token: Token) => {
@@ -737,6 +735,196 @@ const Swap = ({
     }
   };
 
+  const buildSteps = () => {
+    if (!from || fromValue === '' || !to) {
+      return [];
+    }
+
+    const newSteps: TransactionStep[] = [];
+
+    const amountToApprove = parseUnits(fromValue, from.decimals);
+
+    if (!isApproved) {
+      newSteps.push({
+        hash: '',
+        onAction: (amount) => handleApproveToken(amount),
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_APPROVE_TOKEN,
+        explanation: intl.formatMessage(
+          defineMessage({
+            description: 'approveTokenExplanation',
+            defaultMessage:
+              'By enabling Universal Approval, you will be able to use Uniswap, Mean, swap aggregators and more protocols without having to authorize each one of them',
+          })
+        ),
+        extraData: {
+          token: from,
+          amount: amountToApprove,
+          swapper: intl.formatMessage(
+            defineMessage({
+              description: 'us',
+              defaultMessage: 'us',
+            })
+          ),
+          defaultApproval: AllowanceType.max,
+          help: intl.formatMessage(
+            defineMessage({
+              description: 'Allowance Tooltip',
+              defaultMessage: 'You must give the {target} smart contracts permission to use your {symbol}',
+            }),
+            { target: 'Universal Approval' }
+          ),
+        },
+      });
+
+      newSteps.push({
+        hash: '',
+        onAction: (steps) => handlePermit2Signed(steps),
+        checkForPending: true,
+        done: false,
+        type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
+        extraData: {
+          token: from,
+          amount: amountToApprove,
+        },
+      });
+    }
+
+    newSteps.push({
+      hash: '',
+      onAction: (amount) => handleSignPermit2Approval(amount),
+      checkForPending: false,
+      done: false,
+      type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
+      explanation: intl.formatMessage(
+        defineMessage({
+          description: 'permit2SignExplanation',
+          defaultMessage:
+            'Mean now needs your explicit authorization to move {value} {tokenFrom} in order to create your position',
+        }),
+        { tokenFrom: from.symbol, value: fromValue }
+      ),
+      extraData: {
+        token: from,
+        amount: amountToApprove,
+        swapper: '',
+      },
+    });
+
+    newSteps.push({
+      hash: '',
+      onAction: handleSwap,
+      checkForPending: true,
+      done: false,
+      type: TRANSACTION_ACTION_CREATE_POSITION,
+      extraData: {
+        from,
+        to,
+        fromValue,
+        frequencyType,
+        frequencyValue,
+      },
+    });
+
+    return newSteps;
+  };
+
+  const handleMultiSteps = () => {
+    if (!from || fromValue === '' || !to) {
+      return;
+    }
+
+    const newSteps = buildSteps();
+
+    trackEvent('DCA - Start create steps');
+    setTransactionsToExecute(newSteps);
+    setShouldShowSteps(true);
+  };
+
+  const currentTransactionStep = React.useMemo(() => {
+    const foundStep = find(transactionsToExecute, { done: false });
+    return foundStep?.type || null;
+  }, [transactionsToExecute]);
+
+  const transactionOnAction = React.useMemo(() => {
+    switch (currentTransactionStep) {
+      case TRANSACTION_ACTION_APPROVE_TOKEN_SIGN:
+        return handleSignPermit2Approval;
+      case TRANSACTION_ACTION_APPROVE_TOKEN:
+        return handleApproveToken;
+      case TRANSACTION_ACTION_WAIT_FOR_APPROVAL:
+        return handleApproveTransactionConfirmed;
+      case TRANSACTION_ACTION_CREATE_POSITION:
+        return handleSwap;
+      default:
+        return () => {};
+    }
+  }, [currentTransactionStep]);
+
+  const preHandleApproveAndCreate = () => {
+    if (!existingPair) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      handleMultiSteps();
+      return;
+    }
+
+    const isStale =
+      calculateStale(
+        existingPair?.lastExecutedAt || 0,
+        frequencyType,
+        existingPair?.lastCreatedAt || 0,
+        existingPair?.swapInfo || null
+      ) === STALE;
+
+    if (isStale) {
+      setShouldShowStalePairModal(true);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      handleMultiSteps();
+    }
+  };
+
+  const preHandleSwap = () => {
+    if (!from || !to) {
+      return;
+    }
+    const isStale =
+      calculateStale(
+        existingPair?.lastExecutedAt || 0,
+        frequencyType,
+        existingPair?.lastCreatedAt || 0,
+        existingPair?.swapInfo || null
+      ) === STALE;
+
+    if (isStale) {
+      setShouldShowStalePairModal(true);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      handleSwap();
+    }
+  };
+
+  const preHandleSafeApproveAndSwap = () => {
+    if (!from || !to) {
+      return;
+    }
+    const isStale =
+      calculateStale(
+        existingPair?.lastExecutedAt || 0,
+        frequencyType,
+        existingPair?.lastCreatedAt || 0,
+        existingPair?.swapInfo || null
+      ) === STALE;
+
+    if (isStale) {
+      setShouldShowStalePairModal(true);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      handleSafeApproveAndSwap();
+    }
+  };
+
   const POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: handleSwap,
     safeApproveAndCreatePosition: preHandleSafeApproveAndSwap,
@@ -790,6 +978,7 @@ const Swap = ({
         shouldShow={shouldShowSteps}
         handleClose={handleBackTransactionSteps}
         transactions={transactionsToExecute}
+        onAction={transactionOnAction}
       />
       <PositionConfirmation
         shouldShow={shouldShowConfirmation}
@@ -847,7 +1036,7 @@ const Swap = ({
                 cantFund={cantFund}
                 usdPrice={usdPrice}
                 shouldEnableYield={shouldEnableYield}
-                allowance={allowance}
+                isApproved={isApproved}
                 allowanceErrors={allowanceErrors}
                 balance={balance}
                 balanceErrors={balanceErrors}
@@ -900,7 +1089,7 @@ const Swap = ({
                 shouldEnableYield={shouldEnableYield}
                 balance={balance}
                 balanceErrors={balanceErrors}
-                allowance={allowance}
+                isApproved={isApproved}
                 allowanceErrors={allowanceErrors}
                 fromCanHaveYield={fromCanHaveYield}
                 toCanHaveYield={toCanHaveYield}

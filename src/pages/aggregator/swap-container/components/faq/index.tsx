@@ -72,7 +72,7 @@ const AggregatorFAQ = () => (
         <Typography>
           <FormattedMessage
             description="faqFeesResponse"
-            defaultMessage="We don't add any extra fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly.{br}{br}Some aggregators support revenue sharing so we might get some part of their fee, but this is no extra charge to you.{br}{br}To clarify, these aggregators are not prioritized in any way, you can choose how to sort the results by yourself."
+            defaultMessage="We don't add any extra fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly.{br}{br}Some aggregators support revenue sharing so we might get some part of their fee, but this is no extra charge to you."
             values={{
               p: (chunks: React.ReactNode) => <p>{chunks}</p>,
               br: <br />,

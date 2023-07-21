@@ -1,40 +1,49 @@
-import { QuoteTransaction } from '@mean-finance/sdk';
+import { QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 
 export type SwapOption = {
   id: string;
-  sellToken: Token;
-  buyToken: Token;
+  sellToken: QuoteResponse['sellToken'] & Token;
+  buyToken: QuoteResponse['buyToken'] & Token;
   transferTo?: string | null;
-  sellAmount: {
+  sellAmount: Omit<QuoteResponse['sellAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: BigNumber;
     amountInUnits: string;
     amountInUSD?: number;
   };
-  buyAmount: {
+  buyAmount: Omit<QuoteResponse['buyAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: BigNumber;
     amountInUnits: string;
     amountInUSD?: number;
   };
-  maxSellAmount: {
+  maxSellAmount: Omit<QuoteResponse['maxSellAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: BigNumber;
     amountInUnits: string;
     amountInUSD?: number;
   };
-  minBuyAmount: {
+  minBuyAmount: Omit<QuoteResponse['minBuyAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: BigNumber;
     amountInUnits: string;
     amountInUSD?: number;
   };
-  gas?: {
+  gas?: Omit<
+    QuoteResponse['gas'],
+    | 'estimatedGas'
+    | 'estimatedCost'
+    | 'estimatedCostInUnits'
+    | 'estimatedCostInUSD'
+    | 'gasTokenSymbol'
+    | 'gasTokenPrice'
+  > & {
     estimatedGas: BigNumber;
     estimatedCost: BigNumber;
     estimatedCostInUnits: string;
     estimatedCostInUSD?: number;
     gasTokenSymbol: string;
+    gasTokenPrice?: number;
   };
-  swapper: {
+  swapper: QuoteResponse['source'] & {
     allowanceTarget: string;
     name: string;
     logoURI: string;

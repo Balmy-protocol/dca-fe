@@ -34,18 +34,17 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } fro
 import {
   MAX_UINT_32,
   NETWORKS_FOR_MENU,
-  PERMISSIONS,
   POSITIONS_VERSIONS,
   POSITION_VERSION_2,
   LATEST_VERSION,
   SIGN_VERSION,
   TOKEN_TYPE_YIELD_BEARING_SHARES,
-  POSITION_VERSION_4,
 } from '@constants';
 import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { getDisplayToken, sortTokens } from '@common/utils/parsing';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
+import { AddFunds, DCAPermission } from '@mean-finance/sdk';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -53,6 +52,8 @@ import PairService from './pairService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 import SafeService from './safeService';
+import Permit2Service from './permit2Service';
+import SdkService from './sdkService';
 
 export default class PositionService {
   signer: Signer;
@@ -73,6 +74,10 @@ export default class PositionService {
 
   safeService: SafeService;
 
+  permit2Service: Permit2Service;
+
+  sdkService: SdkService;
+
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
   hasFetchedCurrentPositions: boolean;
@@ -86,7 +91,9 @@ export default class PositionService {
     meanApiService: MeanApiService,
     safeService: SafeService,
     DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
-    providerService: ProviderService
+    providerService: ProviderService,
+    permit2Service: Permit2Service,
+    sdkService: SdkService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
@@ -95,10 +102,12 @@ export default class PositionService {
     this.providerService = providerService;
     this.apolloClient = DCASubgraph;
     this.safeService = safeService;
+    this.permit2Service = permit2Service;
     this.currentPositions = {};
     this.pastPositions = {};
     this.hasFetchedCurrentPositions = false;
     this.hasFetchedPastPositions = false;
+    this.sdkService = sdkService;
   }
 
   getSigner() {
@@ -366,7 +375,7 @@ export default class PositionService {
   async getSignatureForPermission(
     position: Position,
     contractAddress: string,
-    permission: PERMISSIONS,
+    permission: DCAPermission,
     permissionManagerAddressProvided?: string,
     erc712Name?: string
   ) {
@@ -385,17 +394,17 @@ export default class PositionService {
     ) as unknown as PermissionManagerContract;
 
     const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
-      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.INCREASE),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.REDUCE),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.WITHDRAW),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.TERMINATE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.INCREASE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.REDUCE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.WITHDRAW),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.TERMINATE),
     ]);
 
     const defaultPermissions = [
-      ...(hasIncrease ? [PERMISSIONS.INCREASE] : []),
-      ...(hasReduce ? [PERMISSIONS.REDUCE] : []),
-      ...(hasWithdraw ? [PERMISSIONS.WITHDRAW] : []),
-      ...(hasTerminate ? [PERMISSIONS.TERMINATE] : []),
+      ...(hasIncrease ? [DCAPermission.INCREASE] : []),
+      ...(hasReduce ? [DCAPermission.REDUCE] : []),
+      ...(hasWithdraw ? [DCAPermission.WITHDRAW] : []),
+      ...(hasTerminate ? [DCAPermission.TERMINATE] : []),
     ];
 
     const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
@@ -444,7 +453,7 @@ export default class PositionService {
   ): Promise<TransactionResponse> {
     const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
     let permissionsPermit: PermissionPermit | undefined;
-    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
+    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.TERMINATE);
     const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const fromToUse =
@@ -455,7 +464,7 @@ export default class PositionService {
       const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
         position,
         companionAddress,
-        PERMISSIONS.TERMINATE
+        DCAPermission.TERMINATE
       );
       permissionsPermit = {
         permissions,
@@ -491,7 +500,7 @@ export default class PositionService {
       position.positionId,
       newPermissions.map(({ permissions, operator }) => ({
         operator,
-        permissions: permissions.map((permission) => PERMISSIONS[permission]),
+        permissions: permissions.map((permission) => DCAPermission[permission]),
       }))
     );
   }
@@ -507,6 +516,20 @@ export default class PositionService {
 
     const tokenData = await permissionManagerInstance.tokenURI(position.positionId);
     return JSON.parse(atob(tokenData.substring(29))) as NFTData;
+  }
+
+  getAllowanceTarget(chainId: number, from: Token, yieldFrom?: Nullable<string>, usePermit2?: boolean) {
+    const wrappedProtocolToken = getWrappedProtocolToken(chainId);
+
+    const fromToUse =
+      yieldFrom || (from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address);
+
+    return this.sdkService.sdk.dcaService.management.getAllowanceTarget({
+      chainId,
+      from: fromToUse,
+      depositWith: from.address,
+      usePermit2,
+    });
   }
 
   async buildDepositParams(
@@ -532,15 +555,15 @@ export default class PositionService {
     }
 
     if (yieldFrom) {
-      permissions = [...permissions, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE];
+      permissions = [...permissions, DCAPermission.INCREASE, DCAPermission.REDUCE];
     }
 
     if (yieldTo) {
-      permissions = [...permissions, PERMISSIONS.WITHDRAW];
+      permissions = [...permissions, DCAPermission.WITHDRAW];
     }
 
     if (yieldFrom || yieldTo) {
-      permissions = [...permissions, PERMISSIONS.TERMINATE];
+      permissions = [...permissions, DCAPermission.TERMINATE];
     }
 
     return {
@@ -564,7 +587,8 @@ export default class PositionService {
     frequencyType: BigNumber,
     frequencyValue: string,
     possibleYieldFrom?: string,
-    possibleYieldTo?: string
+    possibleYieldTo?: string,
+    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
   ) {
     const { takeFrom, from, to, totalAmmount, swaps, interval, account, permissions, yieldFrom, yieldTo } =
       await this.buildDepositParams(
@@ -577,37 +601,38 @@ export default class PositionService {
         possibleYieldTo
       );
 
-    if (possibleYieldFrom || fromToken.address === PROTOCOL_TOKEN_ADDRESS) {
-      return this.meanApiService.getDepositTx(
-        takeFrom,
-        from,
-        to,
-        totalAmmount,
-        swaps,
-        interval,
-        account,
-        permissions,
-        yieldFrom,
-        yieldTo
-      );
-    }
-
-    const hubInstance = await this.contractService.getHubInstance();
-
     const currentNetwork = await this.providerService.getNetwork();
+
+    const deposit: AddFunds =
+      takeFrom.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS.toLowerCase() && signature
+        ? {
+            permitData: {
+              amount: totalAmmount.toString(),
+              token: takeFrom,
+              nonce: signature.nonce.toString(),
+              deadline: signature.deadline.toString(),
+            },
+            signature: signature.rawSignature,
+          }
+        : { token: takeFrom, amount: totalAmmount.toString() };
+
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
-    const toToUse = to.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken.address : to;
+    const fromToUse =
+      yieldFrom || (from.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken.address : from);
+    const toToUse =
+      yieldTo || (to.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken.address : to);
 
-    return hubInstance.populateTransaction.deposit(
-      from,
-      yieldTo || toToUse,
-      totalAmmount,
-      swaps,
-      interval,
-      account,
-      permissions
-    );
+    return this.sdkService.sdk.dcaService.management.buildCreatePositionTx({
+      chainId: currentNetwork.chainId,
+      from: { address: from, variantId: fromToUse },
+      to: { address: to, variantId: toToUse },
+      swapInterval: interval.toNumber(),
+      amountOfSwaps: swaps.toNumber(),
+      owner: account,
+      permissions,
+      deposit,
+    });
   }
 
   async approveAndDepositSafe(
@@ -628,12 +653,13 @@ export default class PositionService {
       yieldFrom,
       yieldTo
     );
-    const approveTx = await this.walletService.buildApproveTx(
-      from,
-      !!yieldFrom || !!yieldTo || from.address === PROTOCOL_TOKEN_ADDRESS,
-      POSITION_VERSION_4,
-      totalAmmount
-    );
+
+    const currentNetwork = await this.providerService.getNetwork();
+
+    const allowanceTarget = this.getAllowanceTarget(currentNetwork.chainId, from, yieldFrom, false);
+
+    const approveTx = await this.walletService.buildApproveSpecificTokenTx(from, allowanceTarget, totalAmmount);
+
     const depositTx = await this.buildDepositTx(from, to, fromValue, frequencyType, frequencyValue, yieldFrom, yieldTo);
 
     return this.safeService.submitMultipleTxs([approveTx, depositTx]);
@@ -645,10 +671,20 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
-    yieldFrom?: string,
-    yieldTo?: string
+    passedYieldFrom?: string,
+    passedYieldTo?: string,
+    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
   ): Promise<TransactionResponse> {
-    const tx = await this.buildDepositTx(from, to, fromValue, frequencyType, frequencyValue, yieldFrom, yieldTo);
+    const tx = await this.buildDepositTx(
+      from,
+      to,
+      fromValue,
+      frequencyType,
+      frequencyValue,
+      passedYieldFrom,
+      passedYieldTo,
+      signature
+    );
 
     return this.providerService.sendTransactionWithGasLimit(tx);
   }
@@ -674,7 +710,7 @@ export default class PositionService {
       return hubInstance.withdrawSwapped(position.positionId, this.walletService.getAccount());
     }
 
-    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
+    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.WITHDRAW);
 
     if (companionHasPermission) {
       return this.meanApiService.withdrawSwappedUsingOtherToken(
@@ -689,7 +725,7 @@ export default class PositionService {
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
       companionAddress,
-      PERMISSIONS.WITHDRAW
+      DCAPermission.WITHDRAW
     );
 
     return this.meanApiService.withdrawSwappedUsingOtherToken(
@@ -729,7 +765,7 @@ export default class PositionService {
       );
     }
 
-    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
+    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.TERMINATE);
 
     if (companionHasPermission) {
       return this.meanApiService.terminateUsingOtherTokens(
@@ -758,7 +794,7 @@ export default class PositionService {
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
       companionAddress,
-      PERMISSIONS.TERMINATE,
+      DCAPermission.TERMINATE,
       permissionManagerAddress,
       erc712Name
     );
@@ -817,7 +853,7 @@ export default class PositionService {
 
   async givePermissionToMultiplePositions(
     positions: Position[],
-    permissions: PERMISSIONS[],
+    permissions: DCAPermission[],
     permittedAddress: string
   ): Promise<TransactionResponse> {
     const { chainId, version } = positions[0];
@@ -836,14 +872,14 @@ export default class PositionService {
       const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await permissionManagerInstance.hasPermissions(
         positionId,
         permittedAddress,
-        [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE]
+        [DCAPermission.INCREASE, DCAPermission.REDUCE, DCAPermission.WITHDRAW, DCAPermission.TERMINATE]
       );
 
       const defaultPermissions = [
-        ...(hasIncrease || permissions.includes(PERMISSIONS.INCREASE) ? [PERMISSIONS.INCREASE] : []),
-        ...(hasReduce || permissions.includes(PERMISSIONS.REDUCE) ? [PERMISSIONS.REDUCE] : []),
-        ...(hasWithdraw || permissions.includes(PERMISSIONS.WITHDRAW) ? [PERMISSIONS.WITHDRAW] : []),
-        ...(hasTerminate || permissions.includes(PERMISSIONS.TERMINATE) ? [PERMISSIONS.TERMINATE] : []),
+        ...(hasIncrease || permissions.includes(DCAPermission.INCREASE) ? [DCAPermission.INCREASE] : []),
+        ...(hasReduce || permissions.includes(DCAPermission.REDUCE) ? [DCAPermission.REDUCE] : []),
+        ...(hasWithdraw || permissions.includes(DCAPermission.WITHDRAW) ? [DCAPermission.WITHDRAW] : []),
+        ...(hasTerminate || permissions.includes(DCAPermission.TERMINATE) ? [DCAPermission.TERMINATE] : []),
       ];
 
       return {
@@ -922,7 +958,7 @@ export default class PositionService {
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
       companionAddress,
-      isIncrease ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
+      isIncrease ? DCAPermission.INCREASE : DCAPermission.REDUCE
     );
 
     return {
@@ -940,10 +976,10 @@ export default class PositionService {
     newRateUnderlying: string,
     newSwaps: string,
     useWrappedProtocolToken: boolean,
-    getSignature = true
+    getSignature = true,
+    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
   ) {
-    const hubInstance = await this.contractService.getHubInstance(position.version);
-    const { id, amount, swaps, version, account, isIncrease, tokenFrom } = await this.buildModifyRateAndSwapsParams(
+    const { amount, swaps, account, isIncrease, tokenFrom } = await this.buildModifyRateAndSwapsParams(
       position,
       newRateUnderlying,
       newSwaps,
@@ -951,53 +987,69 @@ export default class PositionService {
     );
     const hasYield = position.from.underlyingTokens.length;
 
-    if ((position.from.address !== PROTOCOL_TOKEN_ADDRESS || useWrappedProtocolToken) && !hasYield) {
-      if (isIncrease) {
-        return hubInstance.populateTransaction.increasePosition(id, amount, swaps);
-      }
+    const currentNetwork = await this.providerService.getNetwork();
 
-      return hubInstance.populateTransaction.reducePosition(id, amount, swaps, account);
-    }
+    const yieldFrom = hasYield && position.from.underlyingTokens[0].address;
 
-    let companionHasPermission = true;
-
-    if (isIncrease) {
-      companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
-    } else {
-      companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
-    }
+    const usesCompanion = tokenFrom === PROTOCOL_TOKEN_ADDRESS || yieldFrom;
 
     let permissionSignature;
 
-    if (!companionHasPermission && getSignature) {
-      permissionSignature = await this.getModifyRateAndSwapsSignature(
-        position,
-        newRateUnderlying,
-        newSwaps,
-        useWrappedProtocolToken
-      );
+    if (usesCompanion) {
+      let companionHasPermission = true;
+
+      if (isIncrease) {
+        companionHasPermission = await this.companionHasPermission(position, DCAPermission.INCREASE);
+      } else {
+        companionHasPermission = await this.companionHasPermission(position, DCAPermission.REDUCE);
+      }
+
+      if (!companionHasPermission && getSignature) {
+        permissionSignature = await this.getModifyRateAndSwapsSignature(
+          position,
+          newRateUnderlying,
+          newSwaps,
+          useWrappedProtocolToken
+        );
+      }
     }
 
     if (isIncrease) {
-      return this.meanApiService.getIncreasePositionUsingOtherTokenTx(
-        id,
-        amount,
-        swaps,
-        version,
-        tokenFrom,
-        permissionSignature
-      );
+      const increase: AddFunds =
+        tokenFrom.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS.toLowerCase() && signature
+          ? {
+              permitData: {
+                amount: amount.toString(),
+                token: tokenFrom,
+                nonce: signature.nonce.toString(),
+                deadline: signature.deadline.toString(),
+              },
+              signature: signature.rawSignature,
+            }
+          : { token: tokenFrom, amount: amount.toString() };
+
+      return this.sdkService.sdk.dcaService.management.buildIncreasePositionTx({
+        chainId: currentNetwork.chainId,
+        positionId: position.positionId,
+        amountOfSwaps: swaps.toNumber(),
+        permissionPermit: permissionSignature,
+        increase,
+      });
     }
 
-    return this.meanApiService.getReducePositionUsingOtherTokenTx(
-      id,
-      amount,
-      swaps,
-      account,
-      version,
-      tokenFrom,
-      permissionSignature
-    );
+    const reduce: {
+      amountToBuy: string;
+      convertTo: string;
+    } = { amountToBuy: amount.toString(), convertTo: tokenFrom };
+
+    return this.sdkService.sdk.dcaService.management.buildReduceToBuyPositionTx({
+      chainId: currentNetwork.chainId,
+      positionId: position.positionId,
+      amountOfSwaps: swaps.toNumber(),
+      permissionPermit: permissionSignature,
+      reduce,
+      recipient: account,
+    });
   }
 
   async approveAndModifyRateAndSwapsSafe(
@@ -1014,12 +1066,21 @@ export default class PositionService {
     );
     const hasYield = position.from.underlyingTokens.length;
 
-    const approveTx = await this.walletService.buildApproveTx(
+    const currentNetwork = await this.providerService.getNetwork();
+
+    const allowanceTarget = this.getAllowanceTarget(
+      currentNetwork.chainId,
       emptyTokenWithAddress(tokenFrom),
-      !!hasYield || (position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken),
-      POSITION_VERSION_4,
+      (hasYield && position.from.underlyingTokens[0].address) || undefined,
+      false
+    );
+
+    const approveTx = await this.walletService.buildApproveSpecificTokenTx(
+      emptyTokenWithAddress(tokenFrom),
+      allowanceTarget,
       amount
     );
+
     const modifyTx = await this.buildModifyRateAndSwapsTx(
       position,
       newRateUnderlying,
@@ -1034,9 +1095,17 @@ export default class PositionService {
     position: Position,
     newRateUnderlying: string,
     newSwaps: string,
-    useWrappedProtocolToken: boolean
+    useWrappedProtocolToken: boolean,
+    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
   ): Promise<TransactionResponse> {
-    const tx = await this.buildModifyRateAndSwapsTx(position, newRateUnderlying, newSwaps, useWrappedProtocolToken);
+    const tx = await this.buildModifyRateAndSwapsTx(
+      position,
+      newRateUnderlying,
+      newSwaps,
+      useWrappedProtocolToken,
+      true,
+      signature
+    );
 
     return this.providerService.sendTransactionWithGasLimit(tx);
   }

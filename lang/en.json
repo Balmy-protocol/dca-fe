@@ -19,6 +19,10 @@
     "defaultMessage": "here",
     "description": "faqIsMeanFinanceAuditedHere"
   },
+  "+Pdo/e": {
+    "defaultMessage": "Source waiting time:",
+    "description": "advancedAggregatorSettingsTimeout"
+  },
   "+Q63Eo": {
     "defaultMessage": "Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted.",
     "description": "positionLPTNotSupported"
@@ -131,13 +135,13 @@
     "defaultMessage": "every 30 minutes",
     "description": "thirtyMinutesEvery"
   },
-  "0nJXdn": {
-    "defaultMessage": "{step} - Token authorization is submitted",
-    "description": "transationStepWaitApprove"
-  },
   "0tTtPb": {
     "defaultMessage": "1 week (1 swap)",
     "description": "oneWeekSingular"
+  },
+  "0v2uQH": {
+    "defaultMessage": "{step} - The token approval is submitted",
+    "description": "transationStepWaitForApproveSubmitted"
   },
   "0zC9ex": {
     "defaultMessage": "Transaction simulation",
@@ -198,6 +202,14 @@
   "2reF+A": {
     "defaultMessage": "Claim",
     "description": "claimButton"
+  },
+  "2sdL25": {
+    "defaultMessage": "Rapid",
+    "description": "swapSettingsTimeoutRapidKey"
+  },
+  "3D9cPf": {
+    "defaultMessage": "less received than recommended",
+    "description": "worseByLabelMostReturnSellOrderWithRecommended"
   },
   "3Ovbmx": {
     "defaultMessage": "Next swap:",
@@ -335,6 +347,10 @@
     "defaultMessage": "Close {positions} positions",
     "description": "transactionDetailsEulerClaimTerminateMany"
   },
+  "7PHuXr": {
+    "defaultMessage": "least gas used",
+    "description": "betterByLabelLeastGasWithoutRecommended"
+  },
   "7S36Rv": {
     "defaultMessage": "How much {from} do you want to invest?",
     "description": "howMuchToSell"
@@ -459,6 +475,10 @@
     "defaultMessage": "Total value",
     "description": "generatedDashboard"
   },
+  "AvAcmR": {
+    "defaultMessage": "more spent than recommended",
+    "description": "worseByLabelMostReturnBuyOrderWithRecommended"
+  },
   "AwBLGY": {
     "defaultMessage": "Authorize Max {symbol}",
     "description": "Allow us to use your coin (modal max)"
@@ -551,6 +571,10 @@
     "defaultMessage": "{amount} {from} have been added to your {from}:{to} position",
     "description": "transactionMessagesAddFunds"
   },
+  "CEw9Tp": {
+    "defaultMessage": "Instant",
+    "description": "swapSettingsTimeoutInstantKey"
+  },
   "CNGClN": {
     "defaultMessage": "Error approving token",
     "description": "modalErrorApprovingToken"
@@ -642,6 +666,10 @@
   "E9JRmw": {
     "defaultMessage": "Get {wrappedProtocolToken} as {protocolToken} instead",
     "description": "Terminate get eth"
+  },
+  "EDw+ss": {
+    "defaultMessage": "less spent",
+    "description": "betterByLabelMostReturnBuyOrderWithoutRecommended"
   },
   "EJMVdh": {
     "defaultMessage": "Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon",
@@ -799,6 +827,10 @@
     "defaultMessage": "Position Withdrew",
     "description": "timelineTypeWithdrawn"
   },
+  "Gn7TlR": {
+    "defaultMessage": "less received",
+    "description": "worseByLabelMostReturnSellOrderWithoutRecommended"
+  },
   "GoFOv6": {
     "defaultMessage": "Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural}",
     "description": "Modifying rate for position"
@@ -806,6 +838,10 @@
   "Gvb3qN": {
     "defaultMessage": "End users don’t have to pay gas fees when the swaps are executed.",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart6"
+  },
+  "Gyipsk": {
+    "defaultMessage": "Authorize and create position",
+    "description": "create position"
   },
   "Gzs80Q": {
     "defaultMessage": "Rate:",
@@ -815,9 +851,9 @@
     "defaultMessage": "This is a custom token you are importing, trade at your own risk.",
     "description": "customTokenWarning"
   },
-  "H8Li0R": {
-    "defaultMessage": "Authorize Max {symbol}",
-    "description": "Allow us to use your coin (home max)"
+  "H3V9SS": {
+    "defaultMessage": "Position created",
+    "description": "transactionConfirmationBalanceChangesCreatePosition"
   },
   "Hbiw7t": {
     "defaultMessage": "For more information, feel free to check our",
@@ -975,6 +1011,10 @@
     "defaultMessage": "{step} - Enable universal approval for {token}",
     "description": "transationStepApprove"
   },
+  "LCk5hK": {
+    "defaultMessage": "Authorize and modify position",
+    "description": "modifyPositionSafe"
+  },
   "LIJQek": {
     "defaultMessage": "Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the",
     "description": "positionEulerHack1"
@@ -1027,6 +1067,10 @@
     "defaultMessage": "What is quote simulation?",
     "description": "faqWhatIsTransactionSimulation"
   },
+  "Mj3zFe": {
+    "defaultMessage": "less profitable than recommended",
+    "description": "worseByLabelMostProfitWithRecommended"
+  },
   "MzzvpH": {
     "defaultMessage": "New trade",
     "description": "transactionConfirmationNewTrade"
@@ -1058,10 +1102,6 @@
   "NSmm8H": {
     "defaultMessage": "Add {amount} {from} to the {from}:{to} position",
     "description": "transactionDetailsAddFunds"
-  },
-  "NXDtFv": {
-    "defaultMessage": "Your position creation to swap {from} to {to} has been succesfully submitted to the blockchain and will be confirmed soon",
-    "description": "success creating position"
   },
   "Nd61ag": {
     "defaultMessage": "This allows the address to close your position",
@@ -1115,6 +1155,10 @@
     "defaultMessage": "Swap and transfer to another address",
     "description": "tranferToTooltip"
   },
+  "OV2Iz+": {
+    "defaultMessage": "Patient",
+    "description": "swapSettingsTimeoutPatientKey"
+  },
   "OdWJTU": {
     "defaultMessage": "{frequency} {hasYield}",
     "description": "positionDetailsCurrentRate"
@@ -1163,6 +1207,14 @@
     "defaultMessage": "Transfer to another address:",
     "description": "transferToDescription"
   },
+  "Ps7AYj": {
+    "defaultMessage": "View my position",
+    "description": "transactionDCAConfirmationViewPosition"
+  },
+  "Puzw/+": {
+    "defaultMessage": "more profitable than second best",
+    "description": "betterByLabelMostProfitWithRecommended"
+  },
   "PwFUUt": {
     "defaultMessage": "Sell",
     "description": "sell"
@@ -1170,6 +1222,10 @@
   "PxOAUe": {
     "defaultMessage": "every 30 minutes",
     "description": "thiertyMinutesAdverb"
+  },
+  "PzWYQ5": {
+    "defaultMessage": "{step} - Allow {target} to use your {token}",
+    "description": "transationStepApprove"
   },
   "Q+yMWA": {
     "defaultMessage": "Connect to Ethereum",
@@ -1299,6 +1355,10 @@
     "defaultMessage": "Withdrawing balance from their position",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart4"
   },
+  "SyQoGa": {
+    "defaultMessage": "more received",
+    "description": "betterByLabelMostReturnSellOrderWithoutRecommended"
+  },
   "TC32uH": {
     "defaultMessage": "Add {amount} {from} to your {from}:{to} position and set it to run for {swaps} {frequency}",
     "description": "transactionDetailsReset"
@@ -1423,6 +1483,10 @@
     "defaultMessage": "No swaps yet",
     "description": "positionDetailsAverageBuyPriceNotSwap"
   },
+  "WflDui": {
+    "defaultMessage": "Buy {amount} {token} on {target}",
+    "description": "quoteSimulationBuy"
+  },
   "Wq6AJT": {
     "defaultMessage": "Minimum received:",
     "description": "quoteDataRate"
@@ -1475,13 +1539,25 @@
     "defaultMessage": "This will transfer your position, your NFT and all the liquidity stored in the position to the new address.",
     "description": "transfer sub description"
   },
+  "YTU0JR": {
+    "defaultMessage": "less spent than second best",
+    "description": "betterByLabelMostReturnBuyOrderWithRecommended"
+  },
   "YWW6wc": {
     "defaultMessage": "Oooops",
     "description": "errorEncounteredOops"
   },
+  "Yg3ywp": {
+    "defaultMessage": "You need to explicitly allow {target} smart contracts to extract your {token} from your wallet to be able to be swapped",
+    "description": "approveTokenExplanationNoPermit2"
+  },
   "YhkTRN": {
     "defaultMessage": "CLOSED",
     "description": "finishedPosition"
+  },
+  "Yi27Xb": {
+    "defaultMessage": "Create position",
+    "description": "createPositionWallet"
   },
   "YjbSf2": {
     "defaultMessage": "The position must have a minimum rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to be created.",
@@ -1495,6 +1571,10 @@
     "defaultMessage": "swaps",
     "description": "fourHoursSubject"
   },
+  "YlFDyv": {
+    "defaultMessage": "more gas used than recommended",
+    "description": "worseByLabelLeastGasWithRecommended"
+  },
   "YmpFX8": {
     "defaultMessage": "Your positions",
     "description": "positions title"
@@ -1506,6 +1586,10 @@
   "YxMaBm": {
     "defaultMessage": "Unknown price",
     "description": "unkown"
+  },
+  "Z1Rsy/": {
+    "defaultMessage": "more spent",
+    "description": "worseByLabelMostReturnBuyOrderWithoutRecommended"
   },
   "ZATHUb": {
     "defaultMessage": "Go to position",
@@ -1566,6 +1650,10 @@
   "ZaSmdn": {
     "defaultMessage": "Close {from}:{to} position",
     "description": "transactionDetailsTerminate"
+  },
+  "ZnA5+8": {
+    "defaultMessage": "more gas used",
+    "description": "worseByLabelLeastGasWithoutRecommended"
   },
   "ZqLQ6b": {
     "defaultMessage": "Bug bounty",
@@ -1723,6 +1811,10 @@
     "defaultMessage": "swaps",
     "description": "fifteenMinutesSubject"
   },
+  "dR6SKH": {
+    "defaultMessage": "Create new position",
+    "description": "transactionDCAConfirmationNewPosition"
+  },
   "dSDGZh": {
     "defaultMessage": "Withdrawing {fromSymbol} funds",
     "description": "Withdrawing funds from"
@@ -1779,6 +1871,14 @@
     "defaultMessage": "Worse price",
     "description": "worsePrice"
   },
+  "f4Og0x": {
+    "defaultMessage": "Authorize and modify position",
+    "description": "modifyPositionPermit2"
+  },
+  "f5KZm+": {
+    "defaultMessage": "Balance",
+    "description": "swapSettingsTimeoutBalanceKey"
+  },
   "f8zceY": {
     "defaultMessage": "How it works",
     "description": "howItWorks"
@@ -1826,10 +1926,6 @@
   "g5MiM3": {
     "defaultMessage": "Modify a position",
     "description": "feedbackOptionModifyPosition"
-  },
-  "g8zVQK": {
-    "defaultMessage": "Authorize token",
-    "description": "lowLiqApproveToken"
   },
   "gAXe/N": {
     "defaultMessage": "In order to start the Euler claim process you need to connect to the Ethereum network",
@@ -1926,6 +2022,14 @@
   "iaKvlj": {
     "defaultMessage": "Sort routes by least gas spent",
     "description": "sortLeastGasHelp"
+  },
+  "il3O2a": {
+    "defaultMessage": "{step} - Token authorization is being confirmed",
+    "description": "transationStepWaitApproveConfirmed"
+  },
+  "io819p": {
+    "defaultMessage": "least gas used than second best",
+    "description": "betterByLabelLeastGasWithRecommended"
   },
   "ioNoF4": {
     "defaultMessage": "Change duration and rate",
@@ -2055,6 +2159,10 @@
     "defaultMessage": "Tx cost: {gas}",
     "description": "betterQuoteDataFee"
   },
+  "lVD3/C": {
+    "defaultMessage": "more profitable",
+    "description": "betterByLabelMostProfitWithoutRecommended"
+  },
   "lltepo": {
     "defaultMessage": "STALE",
     "description": "stale"
@@ -2123,6 +2231,10 @@
     "defaultMessage": "15 minutes (1 swap)",
     "description": "fifteenMinutesSingular"
   },
+  "nNVft5": {
+    "defaultMessage": "Sell {amount} {token}",
+    "description": "quoteSimulationSell"
+  },
   "nNo2x5": {
     "defaultMessage": "Total gas saved:",
     "description": "positionDetailsGasSavedPriceTitle"
@@ -2151,9 +2263,9 @@
     "defaultMessage": "Unfortunately, the CRV token can no longer be used as collateral on Aave V3. This means that it's not possible to swap this position.",
     "description": "positionCRVNotSupported"
   },
-  "o0WR6j": {
-    "defaultMessage": "Creating this pair",
-    "description": "creating pair"
+  "nxQJOZ": {
+    "defaultMessage": "Only route available",
+    "description": "onlyOptionFound"
   },
   "oGIpAl": {
     "defaultMessage": "+ yield",
@@ -2163,6 +2275,10 @@
     "defaultMessage": "Use Universal approval:",
     "description": "advancedAggregatorSettingsPermit2"
   },
+  "oRE5f/": {
+    "defaultMessage": "Authorize token and create position anyway",
+    "description": "lowLiqApproveToken"
+  },
   "obUvKx": {
     "defaultMessage": "Error giving our Hub Companion permission to close many positions",
     "description": "modalErrorEulerClaimPermitMany"
@@ -2171,6 +2287,10 @@
     "defaultMessage": "Generate yield",
     "description": "yieldTitle"
   },
+  "oe086u": {
+    "defaultMessage": "{step} - Token authorization is submitted",
+    "description": "transationStepWaitApproveSubmitted"
+  },
   "on7qPn": {
     "defaultMessage": "{fromAmount} {from} for {toAmount} {to} for you",
     "description": "swap aggregator loading title"
@@ -2178,10 +2298,6 @@
   "owBuje": {
     "defaultMessage": "Swap",
     "description": "swap agg"
-  },
-  "p0sB2R": {
-    "defaultMessage": "We don't add any extra fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly.{br}{br}Some aggregators support revenue sharing so we might get some part of their fee, but this is no extra charge to you.{br}{br}To clarify, these aggregators are not prioritized in any way, you can choose how to sort the results by yourself.",
-    "description": "faqFeesResponse"
   },
   "p19qS8": {
     "defaultMessage": "Give permission for {positions} positions",
@@ -2254,6 +2370,14 @@
   "qHy8j2": {
     "defaultMessage": "Back to create position",
     "description": "backToSwap"
+  },
+  "qKSABv": {
+    "defaultMessage": "{step} - Create position",
+    "description": "transationStepSwapTokens"
+  },
+  "qKjiic": {
+    "defaultMessage": "Mean now needs your explicit authorization to move {value} {tokenFrom} in order to create your position",
+    "description": "permit2SignExplanation"
   },
   "qQeTLj": {
     "defaultMessage": "{amount} {from} have been removed from your {from}:{to} position",
@@ -2335,6 +2459,10 @@
     "defaultMessage": "Our smart contracts have been built to leverage the power of Universal Approvals (link a nuestro posteo?) to minimize any possible exposure to them. Furthermore, by leveraging Universal Approvals we can simulate your trade on any network you are on, so you can now exactly what is going to happen once the swap gets executed! Last, our smart contracts have been audited by Omniscia and there is an active bug bounty on ImmuneFi.",
     "description": "faqIsSafeResponse"
   },
+  "s7Trca": {
+    "defaultMessage": "more received than second best",
+    "description": "betterByLabelMostReturnSellOrderWithRecommended"
+  },
   "sCqMd/": {
     "defaultMessage": "DCA vs Lump Sum Profit %",
     "description": "swappedIfDca"
@@ -2399,6 +2527,10 @@
     "defaultMessage": "Your {from}:{to} position has now been set to run for {swaps} {frequency}",
     "description": "transactionMessagesModifySwaps"
   },
+  "tfZ3sr": {
+    "defaultMessage": "less profitable",
+    "description": "worseByLabelMostProfitWithoutRecommended"
+  },
   "th+wsU": {
     "defaultMessage": "Reduce position",
     "description": "permissionsReducePermission"
@@ -2430,6 +2562,10 @@
   "u1Wmms": {
     "defaultMessage": "3 - Allow Mean Finance to close your positions",
     "description": "eulerClaimApproveCompanion"
+  },
+  "uHLMi9": {
+    "defaultMessage": "We don't add any extra fees at all. You are getting exactly the same prices as if you would have interacted with the aggregators directly.{br}{br}Some aggregators support revenue sharing so we might get some part of their fee, but this is no extra charge to you.",
+    "description": "faqFeesResponse"
   },
   "uV7tE7": {
     "defaultMessage": "Gas cost considered",
@@ -2599,10 +2735,6 @@
     "defaultMessage": "Processing",
     "description": "transactionConfirmationProcessing"
   },
-  "xZH54f": {
-    "defaultMessage": "Authorize and modify position",
-    "description": "modifyPosition"
-  },
   "xf12eg": {
     "defaultMessage": "Close a position",
     "description": "feedbackOptionClosePosition"
@@ -2638,10 +2770,6 @@
   "y2BvnY": {
     "defaultMessage": "What is DCA?",
     "description": "whatIsDca"
-  },
-  "y8HuQ+": {
-    "defaultMessage": "{step} - Token authorization is being confirmed",
-    "description": "transationStepWaitApprove"
   },
   "yVecas": {
     "defaultMessage": "Rate:",
@@ -2690,10 +2818,6 @@
   "zG7r/G": {
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "oneHourPlural"
-  },
-  "zNOHJl": {
-    "defaultMessage": "{step} - The token approval is submitted",
-    "description": "transationStepWaitApprove"
   },
   "zPMSFC": {
     "defaultMessage": "Waiting for confirmation",

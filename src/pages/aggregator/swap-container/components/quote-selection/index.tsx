@@ -3,7 +3,7 @@ import Button from '@common/components/button';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
 import { useAggregatorState } from '@state/aggregator/hooks';
@@ -24,6 +24,7 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import Popover from '@mui/material/Popover';
+import { SORT_MOST_PROFIT } from '@constants/aggregator';
 import QuoteRefresher from '../quote-refresher';
 import QuoteList from '../quote-list';
 
@@ -109,11 +110,11 @@ const TransactionsProgress = ({ showSimulate }: { showSimulate: boolean }) => {
 
   React.useEffect(() => {
     if (timerStarted && timer < 9) {
-      timerRef.current = setTimeout(() => setTimer(timer + 1), 450);
+      timerRef.current = setTimeout(() => setTimer(timer + 1), 333);
     }
 
     if (!timerStarted && showSimulate) {
-      setTimeout(() => startTimer(true), 5000);
+      setTimeout(() => startTimer(true), 3000);
     }
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -168,6 +169,7 @@ const QuoteSelection = ({
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
+  const intl = useIntl();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -253,12 +255,12 @@ const QuoteSelection = ({
                     3,
                     2
                   )}
-                  %
+                  {sorting === SORT_MOST_PROFIT ? ' USD' : '%'}
                 </Typography>
                 <Typography variant="caption">
                   {isBestQuote
-                    ? getBetterByLabel(sorting, isBuyOrder, true)
-                    : getWorseByLabel(sorting, isBuyOrder, true)}
+                    ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder, true))
+                    : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder, true))}
                 </Typography>
               </StyledBetterByContainer>
             </StyledQuoteContainer>
