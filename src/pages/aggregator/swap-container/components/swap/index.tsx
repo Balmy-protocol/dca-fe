@@ -216,6 +216,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       trackEvent('Aggregator - Approve token submitting', {
         source: selectedRoute.swapper.id,
         fromSteps: !!transactionsToExecute?.length,
+        isPermit2Enabled,
+        approvedToken: from.symbol,
       });
 
       const addressToApprove = isPermit2Enabled
@@ -226,6 +228,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       trackEvent('Aggregator - Approve token submitted', {
         source: selectedRoute.swapper.id,
         fromSteps: !!transactionsToExecute?.length,
+        isPermit2Enabled,
+        approvedToken: from.symbol,
       });
 
       const transactionTypeDataBase = {
@@ -280,6 +284,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         trackEvent('Aggregator - Approve token error', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
+          isPermit2Enabled,
+          approvedToken: from.symbol,
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error approving aggregator', JSON.stringify(e), {
@@ -293,6 +299,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
+      } else {
+        setModalClosed({});
       }
     }
   };
@@ -336,24 +344,15 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       trackEvent('Aggregator - Swap submitting', {
         source: selectedRoute.swapper.id,
         fromSteps: !!transactionsToExecute?.length,
+        isPermit2Enabled,
       });
 
-      let signature;
+      const result = await aggregatorService.swap(selectedRoute as SwapOptionWithTx);
 
-      if (transactionsToExecute?.length) {
-        const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_SWAP });
-
-        if (index !== -1) {
-          signature = (transactionsToExecute[index].extraData as TransactionActionSwapData).signature;
-        }
-      }
-
-      const result = isPermit2Enabled
-        ? await aggregatorService.swapPermit2(selectedRoute as SwapOptionWithTx, signature)
-        : await aggregatorService.swap(selectedRoute as SwapOptionWithTx);
       trackEvent('Aggregator - Swap submitted', {
         source: selectedRoute.swapper.id,
         fromSteps: !!transactionsToExecute?.length,
+        isPermit2Enabled,
       });
 
       try {
@@ -369,6 +368,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           buyAmountUsd: selectedRoute.buyAmount.amountInUSD,
           sellAmountUsd: selectedRoute.sellAmount.amountInUSD,
           type: selectedRoute.type,
+          isPermit2Enabled,
         });
       } catch (e) {
         console.error('Error tracking through mixpanel', e);
@@ -422,13 +422,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           setTransactionsToExecute(newSteps);
         }
       }
-
-      setRefreshQuotes(true);
     } catch (e) {
       if (shouldTrackError(e)) {
         trackEvent('Aggregator - Swap error', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
+          isPermit2Enabled,
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error swapping', JSON.stringify(e), {
@@ -439,9 +438,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           buyAmount: selectedRoute.buyAmount.amountInUnits,
           sellAmount: selectedRoute.sellAmount.amountInUnits,
           type: selectedRoute.type,
+          isPermit2Enabled,
         });
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
+      } else {
+        setModalClosed({});
       }
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setRefreshQuotes(true);
@@ -564,8 +566,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         }
       }
 
-      setRefreshQuotes(true);
-
       onResetForm();
     } catch (e) {
       if (shouldTrackError(e)) {
@@ -585,6 +585,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         });
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
+      } else {
+        setModalClosed({});
       }
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setRefreshQuotes(true);
@@ -624,12 +626,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       };
 
       setTransactionsToExecute(newSteps);
-
-      if (!response || response.simulationResults.error) {
-        trackEvent('Aggregator - Transaction simulation error', { source: selectedRoute?.swapper.id });
-      } else {
-        trackEvent('Aggregator - Transaction simulation successfull', { source: selectedRoute?.swapper.id });
-      }
     }
 
     index = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION });
@@ -649,12 +645,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       };
 
       setTransactionsToExecute(newSteps);
-
-      if (!response || response.simulationResults.error) {
-        trackEvent('Aggregator - Transaction simulation error', { source: selectedRoute?.swapper.id });
-      } else {
-        trackEvent('Aggregator - Transaction simulation successfull', { source: selectedRoute?.swapper.id });
-      }
     }
   };
 
@@ -752,20 +742,33 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                   setBetterQuote(sortedQuotes[0]);
                   setShouldShowBetterQuoteModal(true);
                 } else {
+                  if (originalQuote) {
+                    dispatch(setSelectedRoute(originalQuote));
+                  }
                   handleTransactionSimulationWait(newSteps, {
                     action: 'NONE',
                     warnings: [],
                     simulationResults: {
                       expectedStateChanges: [
                         {
-                          humanReadableDiff: `Sell ${selectedRoute.sellAmount.amountInUnits} ${selectedRoute.sellToken.symbol}`,
+                          humanReadableDiff: intl.formatMessage(
+                            { description: 'quoteSimulationSell', defaultMessage: 'Sell {amount} {token}' },
+                            { amount: selectedRoute.sellAmount.amountInUnits, token: selectedRoute.sellToken.symbol }
+                          ),
                           rawInfo: {
                             kind: StateChangeKind.ERC20_TRANSFER,
                             data: { amount: { before: '1', after: '0' }, asset: selectedRoute.sellToken },
                           },
                         },
                         {
-                          humanReadableDiff: `Buy ${selectedRoute.buyAmount.amountInUnits} ${selectedRoute.buyToken.symbol} on ${selectedRoute.swapper.name}`,
+                          humanReadableDiff: intl.formatMessage(
+                            { description: 'quoteSimulationBuy', defaultMessage: 'Buy {amount} {token} on {target}' },
+                            {
+                              amount: selectedRoute.buyAmount.amountInUnits,
+                              token: selectedRoute.buyToken.symbol,
+                              target: selectedRoute.swapper.name,
+                            }
+                          ),
                           rawInfo: {
                             kind: StateChangeKind.ERC20_TRANSFER,
                             data: { amount: { before: '0', after: '1' }, asset: selectedRoute.buyToken },
@@ -849,6 +852,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           sellAmount: selectedRoute.sellAmount.amountInUnits,
           type: selectedRoute.type,
         });
+      } else {
+        setModalClosed({});
       }
     }
   };
@@ -912,7 +917,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               description: 'Allowance Tooltip',
               defaultMessage: 'You must give the {target} smart contracts permission to use your {symbol}',
             }),
-            { target: isPermit2Enabled ? 'Permit2' : selectedRoute.swapper.name, symbol: from.symbol }
+            { target: isPermit2Enabled ? 'Universal Approval' : selectedRoute.swapper.name, symbol: from.symbol }
           ),
         },
       });
@@ -999,7 +1004,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
     const newSteps = buildSteps();
 
-    trackEvent('Aggregator - Start swap steps');
+    trackEvent('Aggregator - Start swap steps', { isPermit2Enabled });
     setTransactionsToExecute(newSteps);
     setRefreshQuotes(false);
     setShouldShowSteps(true);
@@ -1042,6 +1047,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const handleTransactionConfirmationClose = React.useCallback(() => {
     onResetForm();
     setShouldShowConfirmation(false);
+    setRefreshQuotes(true);
   }, [onResetForm, setShouldShowConfirmation]);
 
   const currentTransactionStep = React.useMemo(() => {

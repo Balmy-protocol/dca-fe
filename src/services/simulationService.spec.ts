@@ -8,11 +8,13 @@ import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import SdkService from './sdkService';
+import EventService from './eventService';
 
 jest.mock('./providerService');
 jest.mock('./meanApiService');
 jest.mock('./contractService');
 jest.mock('./sdkService');
+jest.mock('./eventService');
 
 /**
  * Create mock instance of given class or function constructor
@@ -27,24 +29,28 @@ const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
 const MockedSdkService = jest.mocked(SdkService, { shallow: true });
+const MockedEventService = jest.mocked(EventService, { shallow: true });
 describe('Simulation Service', () => {
   let simulationService: SimulationService;
   let meanApiService: jest.MockedObject<MeanApiService>;
   let providerService: jest.MockedObject<ProviderService>;
   let contractService: jest.MockedObject<ContractService>;
   let sdkService: jest.MockedObject<SdkService>;
+  let eventService: jest.MockedObject<EventService>;
 
   beforeEach(() => {
     meanApiService = createMockInstance(MockedMeanApiService);
     providerService = createMockInstance(MockedProviderService);
     contractService = createMockInstance(MockedContractService);
     sdkService = createMockInstance(MockedSdkService);
+    eventService = createMockInstance(MockedEventService);
 
     simulationService = new SimulationService(
       meanApiService as unknown as MeanApiService,
       providerService as unknown as ProviderService,
       contractService as unknown as ContractService,
-      sdkService as unknown as SdkService
+      sdkService as unknown as SdkService,
+      eventService as unknown as EventService
     );
   });
 

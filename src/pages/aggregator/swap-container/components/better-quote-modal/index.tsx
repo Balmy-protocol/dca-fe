@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import EastIcon from '@mui/icons-material/East';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useAppDispatch } from '@state/hooks';
 import { setSelectedRoute } from '@state/aggregator/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -78,6 +78,7 @@ const BetterQuoteModal = ({
   const { sorting } = useAggregatorSettingsState();
   const { isBuyOrder } = useAggregatorState();
   const selectedNetwork = useSelectedNetwork();
+  const intl = useIntl();
 
   const handleSelectBetterQuote = () => {
     if (!betterQuote) {
@@ -86,8 +87,8 @@ const BetterQuoteModal = ({
     onCancel();
     dispatch(setSelectedRoute(betterQuote));
     trackEvent('Aggregator - Change better found quote', {
-      sourceFrom: selectedRoute?.swapper.name,
-      sourceTo: betterQuote.swapper.name,
+      originalSource: selectedRoute?.swapper.name,
+      betterSource: betterQuote.swapper.name,
     });
     onSelectBetterQuote({
       action: 'NONE',
@@ -95,14 +96,24 @@ const BetterQuoteModal = ({
       simulationResults: {
         expectedStateChanges: [
           {
-            humanReadableDiff: `Sell ${betterQuote.sellAmount.amountInUnits} ${betterQuote.sellToken.symbol}`,
+            humanReadableDiff: intl.formatMessage(
+              { description: 'quoteSimulationSell', defaultMessage: 'Sell {amount} {token}' },
+              { amount: betterQuote.sellAmount.amountInUnits, token: betterQuote.sellToken.symbol }
+            ),
             rawInfo: {
               kind: StateChangeKind.ERC20_TRANSFER,
               data: { amount: { before: '1', after: '0' }, asset: betterQuote.sellToken },
             },
           },
           {
-            humanReadableDiff: `Buy ${betterQuote.buyAmount.amountInUnits} ${betterQuote.buyToken.symbol} on ${betterQuote.swapper.name}`,
+            humanReadableDiff: intl.formatMessage(
+              { description: 'quoteSimulationBuy', defaultMessage: 'Buy {amount} {token} on {target}' },
+              {
+                amount: betterQuote.buyAmount.amountInUnits,
+                token: betterQuote.buyToken.symbol,
+                target: betterQuote.swapper.name,
+              }
+            ),
             rawInfo: {
               kind: StateChangeKind.ERC20_TRANSFER,
               data: { amount: { before: '0', after: '1' }, asset: betterQuote.buyToken },
@@ -120,7 +131,7 @@ const BetterQuoteModal = ({
       onCancel();
       onGoBack();
       trackEvent('Aggregator - Quote failed go back', {
-        sourceTo: betterQuote?.swapper.name,
+        failedSource: betterQuote?.swapper.name,
       });
 
       return;
@@ -131,8 +142,8 @@ const BetterQuoteModal = ({
     }
 
     trackEvent('Aggregator - Dont change better found quote', {
-      sourceFrom: selectedRoute.swapper.name,
-      sourceTo: betterQuote.swapper.name,
+      originalSource: selectedRoute.swapper.name,
+      betterSource: betterQuote.swapper.name,
     });
     onSelectBetterQuote({
       action: 'NONE',
@@ -140,14 +151,24 @@ const BetterQuoteModal = ({
       simulationResults: {
         expectedStateChanges: [
           {
-            humanReadableDiff: `Sell ${selectedRoute.sellAmount.amountInUnits} ${selectedRoute.sellToken.symbol}`,
+            humanReadableDiff: intl.formatMessage(
+              { description: 'quoteSimulationSell', defaultMessage: 'Sell {amount} {token}' },
+              { amount: selectedRoute.sellAmount.amountInUnits, token: selectedRoute.sellToken.symbol }
+            ),
             rawInfo: {
               kind: StateChangeKind.ERC20_TRANSFER,
               data: { amount: { before: '1', after: '0' }, asset: selectedRoute.sellToken },
             },
           },
           {
-            humanReadableDiff: `Buy ${selectedRoute.buyAmount.amountInUnits} ${selectedRoute.buyToken.symbol} on ${selectedRoute.swapper.name}`,
+            humanReadableDiff: intl.formatMessage(
+              { description: 'quoteSimulationBuy', defaultMessage: 'Buy {amount} {token} on {target}' },
+              {
+                amount: selectedRoute.buyAmount.amountInUnits,
+                token: selectedRoute.buyToken.symbol,
+                target: selectedRoute.swapper.name,
+              }
+            ),
             rawInfo: {
               kind: StateChangeKind.ERC20_TRANSFER,
               data: { amount: { before: '0', after: '1' }, asset: selectedRoute.buyToken },
@@ -293,7 +314,7 @@ const BetterQuoteModal = ({
                   </Typography>
                   <Typography variant="caption">
                     <b>{formatCurrencyAmount(betterBy, emptyTokenWithDecimals(18), 2, 2)}%</b>{' '}
-                    {getBetterByLabel(sorting, isBuyOrder)}
+                    {intl.formatMessage(getBetterByLabel(sorting, isBuyOrder))}
                   </Typography>
                   {sorting !== SORT_MOST_RETURN && (
                     <Typography variant="caption">

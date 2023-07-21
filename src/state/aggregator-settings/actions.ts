@@ -1,9 +1,11 @@
 import { createAction } from '@reduxjs/toolkit';
-import { GasKeys, SwapSortOptions } from '@constants/aggregator';
+import { GasKeys, SwapSortOptions, TimeoutKey } from '@constants/aggregator';
 
 export const setSlippage = createAction<string>('aggregatorSettings/setSlippage');
 
 export const setGasSpeed = createAction<GasKeys>('aggregatorSettings/setGasSpeed');
+
+export const setSourceTimeout = createAction<TimeoutKey>('aggregatorSettings/setSourceTimeout');
 
 export const setDisabledDexes = createAction<string[]>('aggregatorSettings/setDisabledDexes');
 

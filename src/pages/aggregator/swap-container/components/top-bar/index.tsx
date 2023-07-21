@@ -23,10 +23,12 @@ type Props = {
 };
 
 const TopBar = ({ onShowSettings }: Props) => {
-  const { slippage, gasSpeed, disabledDexes } = useAggregatorSettingsState();
+  const { slippage, gasSpeed, disabledDexes, sorting, sourceTimeout } = useAggregatorSettingsState();
   const hasNonDefaultSettings =
     slippage !== DEFAULT_AGGREGATOR_SETTINGS.slippage.toString() ||
     gasSpeed !== DEFAULT_AGGREGATOR_SETTINGS.gasSpeed ||
+    sorting !== DEFAULT_AGGREGATOR_SETTINGS.sorting ||
+    sourceTimeout !== DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout ||
     !isEqual(disabledDexes, DEFAULT_AGGREGATOR_SETTINGS.disabledDexes);
 
   return (

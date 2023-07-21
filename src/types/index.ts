@@ -103,7 +103,7 @@ export interface TransactionActionSwapData {
   to: Token;
   sellAmount: BigNumber;
   buyAmount: BigNumber;
-  signature?: { deadline: number; v: number; r: Buffer; s: Buffer; nonce: BigNumber; rawSignature: string };
+  signature?: { deadline: number; nonce: BigNumber; rawSignature: string };
 }
 
 export interface TransactionActionCreatePositionData {
@@ -112,6 +112,7 @@ export interface TransactionActionCreatePositionData {
   fromValue: string;
   frequencyType: BigNumber;
   frequencyValue: string;
+  signature?: { deadline: number; nonce: BigNumber; rawSignature: string };
 }
 
 export type TransactionActionExtraData =

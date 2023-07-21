@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys, SwapSortOptions } from '@constants/aggregator';
+import { DEFAULT_AGGREGATOR_SETTINGS, GasKeys, SwapSortOptions, TimeoutKey } from '@constants/aggregator';
 import {
   setSlippage,
   setGasSpeed,
@@ -8,6 +8,7 @@ import {
   setShowTransactionCost,
   setConfetti,
   setSorting,
+  setSourceTimeout,
   setPermit2,
 } from './actions';
 
@@ -19,6 +20,7 @@ export interface AggregatorSettingsState {
   confettiParticleCount: number;
   sorting: SwapSortOptions;
   isPermit2Enabled: boolean;
+  sourceTimeout: TimeoutKey;
 }
 
 const initialState: AggregatorSettingsState = {
@@ -29,6 +31,7 @@ const initialState: AggregatorSettingsState = {
   confettiParticleCount: DEFAULT_AGGREGATOR_SETTINGS.confetti,
   sorting: DEFAULT_AGGREGATOR_SETTINGS.sorting,
   isPermit2Enabled: DEFAULT_AGGREGATOR_SETTINGS.isPermit2Enabled,
+  sourceTimeout: DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout,
 };
 
 export default createReducer(initialState, (builder) =>
@@ -38,6 +41,9 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setGasSpeed, (state, { payload }) => {
       state.gasSpeed = payload;
+    })
+    .addCase(setSourceTimeout, (state, { payload }) => {
+      state.sourceTimeout = payload;
     })
     .addCase(setDisabledDexes, (state, { payload }) => {
       state.disabledDexes = payload;
@@ -57,9 +63,12 @@ export default createReducer(initialState, (builder) =>
     .addCase(restoreDefaults, (state) => {
       state.gasSpeed = DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
       state.slippage = DEFAULT_AGGREGATOR_SETTINGS.slippage.toString();
+      state.sourceTimeout = DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout;
       state.disabledDexes = DEFAULT_AGGREGATOR_SETTINGS.disabledDexes;
       state.showTransactionCost = DEFAULT_AGGREGATOR_SETTINGS.showTransactionCost;
       state.confettiParticleCount = DEFAULT_AGGREGATOR_SETTINGS.confetti;
       state.isPermit2Enabled = DEFAULT_AGGREGATOR_SETTINGS.isPermit2Enabled;
+      state.sorting = DEFAULT_AGGREGATOR_SETTINGS.sorting;
+      state.sourceTimeout = DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout;
     })
 );

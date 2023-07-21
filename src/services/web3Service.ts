@@ -161,6 +161,12 @@ export default class Web3Service {
     this.yieldService = new YieldService(this.providerService, this.axiosClient);
     this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient, this.contractService);
     this.transactionService = new TransactionService(this.contractService, this.providerService, this.sdkService);
+    this.permit2Service = new Permit2Service(
+      this.walletService,
+      this.contractService,
+      this.sdkService,
+      this.providerService
+    );
     this.positionService = new PositionService(
       this.walletService,
       this.pairService,
@@ -168,7 +174,9 @@ export default class Web3Service {
       this.meanApiService,
       this.safeService,
       this.apolloClient,
-      this.providerService
+      this.providerService,
+      this.permit2Service,
+      this.sdkService
     );
     this.priceService = new PriceService(
       this.walletService,
@@ -181,15 +189,10 @@ export default class Web3Service {
       this.meanApiService,
       this.providerService,
       this.contractService,
-      this.sdkService
+      this.sdkService,
+      this.eventService
     );
     this.campaignService = new CampaignService(this.meanApiService, this.priceService, this.providerService);
-    this.permit2Service = new Permit2Service(
-      this.walletService,
-      this.contractService,
-      this.sdkService,
-      this.providerService
-    );
     this.aggregatorService = new AggregatorService(
       this.walletService,
       this.contractService,

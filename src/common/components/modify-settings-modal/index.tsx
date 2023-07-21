@@ -44,7 +44,6 @@ import useBalance from '@hooks/useBalance';
 import { useAppDispatch } from '@state/hooks';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from '@common/utils/currency';
-import useAllowance from '@hooks/useAllowance';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Switch from '@mui/material/Switch';
@@ -53,7 +52,6 @@ import { SplitButtonOptions } from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useWalletService from '@hooks/useWalletService';
-import useContractService from '@hooks/useContractService';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import useAccount from '@hooks/useAccount';
 import useErrorService from '@hooks/useErrorService';
@@ -61,6 +59,9 @@ import { shouldTrackError } from '@common/utils/errors';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import { TransactionResponse } from '@ethersproject/providers';
 import useTrackEvent from '@hooks/useTrackEvent';
+import usePermit2Service from '@hooks/usePermit2Service';
+import useSpecificAllowance from '@hooks/useSpecificAllowance';
+import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import FrequencyInput from '../frequency-easy-input';
 
 const StyledRateContainer = styled.div`
@@ -95,7 +96,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { swapInterval, from, version, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
+  const { swapInterval, from, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
   const account = useAccount();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
@@ -105,7 +106,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const modeType = useModifyRateSettingsModeType();
   const positionService = usePositionService();
   const walletService = useWalletService();
-  const contractService = useContractService();
   const addTransaction = useTransactionAdder();
   const currentNetwork = useCurrentNetwork();
   const intl = useIntl();
@@ -114,6 +114,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const remainingLiquidity = (depositedRateUnderlying || oldRate).mul(remainingSwaps);
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
   const loadedAsSafeApp = useLoadedAsSafeApp();
+  const permit2Service = usePermit2Service();
 
   let fromToUse = position.from;
   if (fromToUse.address === PROTOCOL_TOKEN_ADDRESS) {
@@ -130,14 +131,15 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
   const errorService = useErrorService();
-  const [allowance] = useAllowance(
+  const yieldFrom = fromHasYield && position.from.underlyingTokens[0].address;
+  const allowanceTarget = useDcaAllowanceTarget(position.chainId, fromToUse, yieldFrom || undefined, hasSignSupport);
+  const [allowance] = useSpecificAllowance(
     useWrappedProtocolToken ? wrappedProtocolToken : position.from,
-    fromHasYield,
-    version
+    allowanceTarget
   );
   const [balance] = useBalance(fromToUse);
-  const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield);
-  const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield);
+  const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
+  const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const realBalance = balance && balance.add(remainingLiquidity);
   const hasYield = !!from.underlyingTokens.length;
   const [usdPrice] = useRawUsdPrice(from);
@@ -317,7 +319,31 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </>
         ),
       });
-      const result = await positionService.modifyRateAndSwaps(position, rate, frequencyValue, useWrappedProtocolToken);
+
+      let signature;
+
+      if (
+        (useWrappedProtocolToken || position.from.address !== PROTOCOL_TOKEN_ADDRESS) &&
+        isIncreasingPosition &&
+        hasSignSupport
+      ) {
+        const newAmount = BigNumber.from(parseUnits(rate, position.from.decimals)).mul(BigNumber.from(frequencyValue));
+
+        const amountToSign = newAmount.sub(remainingLiquidity);
+
+        signature = await permit2Service.getPermit2DcaSignedData(
+          position.from.address !== PROTOCOL_TOKEN_ADDRESS ? position.from : wrappedProtocolToken,
+          amountToSign
+        );
+      }
+
+      const result = await positionService.modifyRateAndSwaps(
+        position,
+        rate,
+        frequencyValue,
+        useWrappedProtocolToken,
+        signature
+      );
       addTransaction(result, {
         type: TransactionTypes.modifyRateAndSwapsPosition,
         typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
@@ -475,19 +501,15 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       });
 
       trackEvent('DCA - Modify position approve submitting', { isIncreasingPosition, useWrappedProtocolToken });
-      const result = await walletService.approveToken(
+      const result = await walletService.approveSpecificToken(
         fromToUse,
-        fromHasYield,
-        version,
+        allowanceTarget,
         isExact ? remainingLiquidityDifference : undefined
       );
 
-      const hubAddress = await contractService.getHUBAddress(position.version);
-      const companionAddress = await contractService.getHUBCompanionAddress(position.version);
-
       const transactionTypeDataBase = {
         token: fromToUse,
-        addressFor: fromHasYield ? companionAddress : hubAddress,
+        addressFor: allowanceTarget,
       };
 
       let transactionTypeData: ApproveTokenExactTypeData | ApproveTokenTypeData = {
@@ -576,7 +598,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 symbol: fromToUse.symbol,
               }}
             />
-            <AllowanceTooltip symbol={fromToUse.symbol} />
+            <AllowanceTooltip
+              symbol={fromToUse.symbol}
+              message={intl.formatMessage(
+                defineMessage({
+                  description: 'Allowance Tooltip',
+                  defaultMessage: 'You must give the {target} smart contracts permission to use your {symbol}',
+                }),
+                { target: "Universal Approval's" }
+              )}
+            />
           </>
         ),
         onClick: () => handleApproveToken(),
@@ -621,6 +652,24 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     ];
   }
 
+  if (
+    !needsToApprove &&
+    !loadedAsSafeApp &&
+    useWrappedProtocolToken &&
+    position.from.address !== PROTOCOL_TOKEN_ADDRESS &&
+    isIncreasingPosition
+  ) {
+    actions = [
+      {
+        color: 'secondary',
+        variant: 'contained',
+        label: <FormattedMessage description="modifyPositionPermit2" defaultMessage="Authorize and modify position" />,
+        onClick: handleModifyRateAndSwaps,
+        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
+      },
+    ];
+  }
+
   if (!needsToApprove && !hasPendingApproval) {
     actions = [
       {
@@ -638,7 +687,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       {
         color: 'secondary',
         variant: 'contained',
-        label: <FormattedMessage description="modifyPosition" defaultMessage="Authorize and modify position" />,
+        label: <FormattedMessage description="modifyPositionSafe" defaultMessage="Authorize and modify position" />,
         onClick: handleApproveAndModifyRateAndSwapsSafe,
         disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
       },

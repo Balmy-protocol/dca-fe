@@ -2404,7 +2404,7 @@
     "description": "transationStepWaitSimulateFailed"
   },
   "gm52Lx": {
-    "defaultMessage": "Probablemente escuchaste sobre varios DEXes o agregadores diciendo que ofrecen el mejor precio. Bueno, ahora podes estar seguro. Vamos a pedirle a todos al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades.",
+    "defaultMessage": "Probablemente escuchaste que muchas aplicaciones dicen ofrecer el mejor precio: ¡Ahora podes estar seguro! Vamos a pedirle a todos los proveedores de precio al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades.",
     "description": "faqWhatIsResponse"
   },
   "hEJQ3q": {
@@ -2440,7 +2440,7 @@
     "description": "blowfishSimulationError"
   },
   "yokaKf": {
-    "defaultMessage": "Estoy teniendo problemas ¿Qué puedo hacer?",
+    "defaultMessage": "Estoy teniendo problemas, ¿Qué puedo hacer?",
     "description": "faqHavingIssues"
   },
   "fatFLN": {
@@ -2635,8 +2635,8 @@
     "defaultMessage": "Precio de compra promedio",
     "description": "averagePriceGraphTitle"
   },
-  "p0sB2R": {
-    "defaultMessage": "No agregamos ningun tipo de comision extra. Estas recibiendo extactamente los mismos precios como si hubieses interactuado con el Aggregador directamente. {br}{br} Algunos agregadores soportan compartir su fee con los referidos, pero esto no es ningun cargo extra para ti{br}{br}Para clarificar, los agregadores no estan priorizados de ninguna manera, podes elegir como ordenar los resultados por ti mismo.",
+  "uHLMi9": {
+    "defaultMessage": "No agregamos ningun tipo de comision extra. Estas recibiendo extactamente los mismos precios como si hubieses interactuado con el Aggregador directamente. {br}{br} Algunos agregadores soportan compartir su fee con los referidos, pero esto no es ningun cargo extra para ti.",
     "description": "faqFeesResponse"
   },
   "ttC5dQ": {
@@ -2824,7 +2824,7 @@
     "description": "quoteSelectionSimulatingQuotes"
   },
   "FnRMc5": {
-    "defaultMessage": "Al habilitar la Aprobación Universal, vas a poder usar Uniswap, Mean, aggregadores y muchos otros protocoles sin tener que autorizar cada uno de ellos",
+    "defaultMessage": "Al habilitar la Aprobación Universal, vas a poder usar Uniswap, Mean, aggregadores y muchos otros protocolos sin tener que autorizar cada uno de ellos",
     "description": "approveTokenExplanation"
   },
   "JkRQyY": {
@@ -2832,15 +2832,15 @@
     "description": "Authorize signature companion text migrate"
   },
   "JoH9Yo": {
-    "defaultMessage": "Encontramos un mejor quote para vos",
+    "defaultMessage": "Encontramos una mejor cotización para vos",
     "description": "betterQuote title"
   },
   "LY4QAG": {
-    "defaultMessage": "{step} - Quotes validados y la transacción fue simulada",
+    "defaultMessage": "{step} - Cotizaciones validados y la transacción fue simulada",
     "description": "transationStepWaitSimulationSuccess"
   },
   "MFXOI0": {
-    "defaultMessage": "¿Que es la simulación de quotes?",
+    "defaultMessage": "¿Que es la simulación de cotizaciones?",
     "description": "faqWhatIsTransactionSimulation"
   },
   "QkhXLS": {
@@ -2868,7 +2868,7 @@
     "description": "betterQuote reject action"
   },
   "n+0Kho": {
-    "defaultMessage": "Probablemente escuchaste que muchas aplicaciones dicen que te ofrecen el mejor precio: ahora podes estar seguro! Vamos a pedirle a todos al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades.",
+    "defaultMessage": "Probablemente escuchaste que muchas aplicaciones dicen ofrecer el mejor precio: ¡Ahora podes estar seguro! Vamos a pedirle a todos los proveedores de precio al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades.",
     "description": "faqWhatIsResponse"
   },
   "oIVT9p": {
@@ -2876,19 +2876,19 @@
     "description": "advancedAggregatorSettingsPermit2"
   },
   "s7Nenf": {
-    "defaultMessage": "Nuestros Contratos Inteligentes fueron contruidos para maximizar el poder de la Aprobación Universal para minimizar cualquier vulnerabilidad hacia ellos.Ademas, al utlizar la Aprobación Universal ahora podemos simular tus intercambios en cualquier red en la que estes, asi que ahora podes saber exactamente cuanto vas a recibir una vez que el intercambio se confirme! Por ultimo, nuestros Contratos Inteligentes fueron auditados por Omniscia y hay una bug bounty activa en ImmuneFi.",
+    "defaultMessage": "Nuestros Contratos Inteligentes fueron construidos para maximizar el poder de la Aprobación Universal, minimizando así cualquier exposición a una potencial vulnerabilidad en ellos. además, al utilizar la Aprobación Universal ahora podemos simular tus intercambios en cualquier red en la que estes, así que ahora podes saber exactamente cuanto vas a recibir una vez que el intercambio se confirme. Por último, nuestros Contratos Inteligentes fueron auditados por Omniscia y hay una bug bounty activa en ImmuneFi.",
     "description": "faqIsSafeResponse"
   },
   "sWB1pz": {
-    "defaultMessage": "{step} - Validando los quotes para darte el mejor precio ({current}/{total})",
+    "defaultMessage": "{step} - Validando las cotizaciones para darte el mejor precio ({current}/{total})",
     "description": "transationStepWaitSimulatePending"
   },
   "t0+OFx": {
-    "defaultMessage": "{step} - Firmar la autorizacion del token en tu billetera",
+    "defaultMessage": "{step} - Firmar la autorización del token en tu billetera",
     "description": "transationStepApproveSign"
   },
   "us01Br": {
-    "defaultMessage": "{step} - La validación de los quotes falló",
+    "defaultMessage": "{step} - La validación de las cotizaciones falló",
     "description": "transationStepWaitSimulateFailed"
   },
   "v/Er//": {
@@ -2896,7 +2896,7 @@
     "description": "faqHavingIssuesResponse"
   },
   "vCTA97": {
-    "defaultMessage": "Luego de simular los quotes, encontramos que {toTarget} seria mejor para el criterio de slección que elegiste. ¿Queres usar {toTarget}?",
+    "defaultMessage": "Luego de simular las cotizaciones, encontramos que {toTarget} seria mejor para el criterio de slección que elegiste. ¿Queres usar {toTarget}?",
     "description": "betterQuote selectBetterQuote"
   },
   "vIbAYN": {
@@ -2904,15 +2904,184 @@
     "description": "selectBestQuoteBy"
   },
   "wXyOAT": {
-    "defaultMessage": "{step} - Los quotes serán validados",
+    "defaultMessage": "{step} - Las cotizaciones serán validadas",
     "description": "transationStepWaitSimulatePending"
   },
   "x0ZohV": {
-    "defaultMessage": "Luego de simular los quotes, encotramos que {fromTarget} va a fallar si se ejecuta. {toTarget} esta actualmente ofreciendo los mejores resultados. ¿Queres usarlo??",
+    "defaultMessage": "Luego de simular los cotizaciones, encontramos que {fromTarget} va a fallar si se ejecuta. {toTarget} esta actualmente ofreciendo los mejores resultados. ¿Queres usarlo??",
     "description": "failedQuote selectBetterQuote"
   },
   "xQGdu0": {
     "defaultMessage": "Mean ahora necesita tu autorizacion explicita para intercambiar {tokenFrom} a {tokenTo}",
     "description": "permit2SignExplanation"
+  },
+  "Gyipsk": {
+    "defaultMessage": "Autorizar y crear posición",
+    "description": "create position"
+  },
+  "H3V9SS": {
+    "defaultMessage": "Posición creada",
+    "description": "transactionConfirmationBalanceChangesCreatePosition"
+  },
+  "HdS4ZS": {
+    "defaultMessage": "Crear posición",
+    "description": "swapWallet"
+  },
+  "LCk5hK": {
+    "defaultMessage": "Autorizar y modificar posición",
+    "description": "modifyPositionSafe"
+  },
+  "Ps7AYj": {
+    "defaultMessage": "Ver mi posición",
+    "description": "transactionDCAConfirmationViewPosition"
+  },
+  "PzWYQ5": {
+    "defaultMessage": "{step} - Permitir a {target} utilizar tus {token}",
+    "description": "transationStepApprove"
+  },
+  "Yg3ywp": {
+    "defaultMessage": "Necesitas aprobar explicitamente a los Contratos Inteligentes de {target} para extraer tus {token} de tu wallet para ser intercambiados",
+    "description": "approveTokenExplanationNoPermit2"
+  },
+  "Yi27Xb": {
+    "defaultMessage": "Crear posición",
+    "description": "createPositionWallet"
+  },
+  "dR6SKH": {
+    "defaultMessage": "Crear nueva posición",
+    "description": "transactionDCAConfirmationNewPosition"
+  },
+  "f4Og0x": {
+    "defaultMessage": "Autorizar y modificar posición",
+    "description": "modifyPositionPermit2"
+  },
+  "oRE5f/": {
+    "defaultMessage": "Autorizar token y crear la posicicón de todas maneras",
+    "description": "lowLiqApproveToken"
+  },
+
+  "nxQJOZ": {
+    "defaultMessage": "Única ruta disponible",
+    "description": "onlyOptionFound"
+  },
+  "qKSABv": {
+    "defaultMessage": "{step} - Crear posición",
+    "description": "transationStepSwapTokens"
+  },
+  "qKjiic": {
+    "defaultMessage": "Mean ahora necesita tu autorizacion explicita para usar {value} {tokenFrom} para crear tu posición",
+    "description": "permit2SignExplanation"
+  },
+  "+Pdo/e": {
+    "defaultMessage": "Tiempo de espera:",
+    "description": "advancedAggregatorSettingsTimeout"
+  },
+  "0v2uQH": {
+    "defaultMessage": "{step} - La aprobación del token enviada",
+    "description": "transationStepWaitForApproveSubmitted"
+  },
+  "2sdL25": {
+    "defaultMessage": "Rapido",
+    "description": "swapSettingsTimeoutRapidKey"
+  },
+  "3D9cPf": {
+    "defaultMessage": "menos recibido que el recomendado",
+    "description": "worseByLabelMostReturnSellOrderWithRecommended"
+  },
+  "7PHuXr": {
+    "defaultMessage": "menos gas usado",
+    "description": "betterByLabelLeastGasWithoutRecommended"
+  },
+  "AvAcmR": {
+    "defaultMessage": "más gastado que el recomendado",
+    "description": "worseByLabelMostReturnBuyOrderWithRecommended"
+  },
+  "CEw9Tp": {
+    "defaultMessage": "Instantaneo",
+    "description": "swapSettingsTimeoutInstantKey"
+  },
+  "EDw+ss": {
+    "defaultMessage": "menos gastado",
+    "description": "betterByLabelMostReturnBuyOrderWithoutRecommended"
+  },
+  "Mj3zFe": {
+    "defaultMessage": "menos rentable que el recomendado",
+    "description": "worseByLabelMostProfitWithRecommended"
+  },
+  "OV2Iz+": {
+    "defaultMessage": "Paciente",
+    "description": "swapSettingsTimeoutPatientKey"
+  },
+  "Puzw/+": {
+    "defaultMessage": "más rentable que el segundo mejor",
+    "description": "betterByLabelMostProfitWithRecommended"
+  },
+  "SyQoGa": {
+    "defaultMessage": "más recibido",
+    "description": "betterByLabelMostReturnSellOrderWithoutRecommended"
+  },
+  "YTU0JR": {
+    "defaultMessage": "menos gastado que el segundo mejor",
+    "description": "betterByLabelMostReturnBuyOrderWithRecommended"
+  },
+  "YlFDyv": {
+    "defaultMessage": "más gas usado que el recomendado",
+    "description": "worseByLabelLeastGasWithRecommended"
+  },
+  "f5KZm+": {
+    "defaultMessage": "Balanceado",
+    "description": "swapSettingsTimeoutBalanceKey"
+  },
+  "il3O2a": {
+    "defaultMessage": "{step} - La autorización del token esta siendo confirmada",
+    "description": "transationStepWaitApproveConfirmed"
+  },
+  "io819p": {
+    "defaultMessage": "menos gas usado que el segundo mejor",
+    "description": "betterByLabelLeastGasWithRecommended"
+  },
+  "lVD3/C": {
+    "defaultMessage": "más rentable",
+    "description": "betterByLabelMostProfitWithoutRecommended"
+  },
+  "oe086u": {
+    "defaultMessage": "{step} - La autorización del token fue enviada",
+    "description": "transationStepWaitApproveSubmitted"
+  },
+  "s7Trca": {
+    "defaultMessage": "más recibido que el segundo mejor",
+    "description": "betterByLabelMostReturnSellOrderWithRecommended"
+  },
+  "tfZ3sr": {
+    "defaultMessage": "menos rentable",
+    "description": "worseByLabelMostProfitWithoutRecommended"
+  },
+  "Gn7TlR": {
+    "defaultMessage": "menos recibido",
+    "description": "worseByLabelMostReturnSellOrderWithoutRecommended"
+  },
+  "Z1Rsy/": {
+    "defaultMessage": "más gastado",
+    "description": "worseByLabelMostReturnBuyOrderWithoutRecommended"
+  },
+  "ZnA5+8": {
+    "defaultMessage": "más gas usado",
+    "description": "worseByLabelLeastGasWithoutRecommended"
+  },
+  "WflDui": {
+    "defaultMessage": "Comprar {amount} {token} en {target}",
+    "description": "quoteSimulationBuy"
+  },
+  "nNVft5": {
+    "defaultMessage": "Vender {amount} {token}",
+    "description": "quoteSimulationSell"
+  },
+  "+9NjvN": {
+    "defaultMessage": "Autorizar {amount} {symbol}",
+    "description": "Allow us to use your coin (home exact)"
+  },
+  "5QXn5Y": {
+    "defaultMessage": "Confirmar esta transacción en su billetera",
+    "description": "Confirm in wallet"
   }
 }

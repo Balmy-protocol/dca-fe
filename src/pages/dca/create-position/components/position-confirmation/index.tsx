@@ -17,6 +17,7 @@ import confetti from 'canvas-confetti';
 import { TransactionTypes } from '@types';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
+import usePushToHistory from '@hooks/usePushToHistory';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -116,6 +117,7 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const transactionReceipt = useTransaction(transaction);
   const trackEvent = useTrackEvent();
+  const pushToHistory = usePushToHistory();
 
   const onGoToEtherscan = () => {
     const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
@@ -129,10 +131,7 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
     }
 
     const positionId = transactionReceipt.typeData.id;
-    window.open(
-      `${window.location.origin}/${transactionReceipt.chainId}/positions/${LATEST_VERSION}/${positionId}`,
-      '_blank'
-    );
+    pushToHistory(`/${transactionReceipt.chainId}/positions/${LATEST_VERSION}/${positionId}`);
     trackEvent('DCA - Transaction steps - View details');
   };
 
@@ -200,7 +199,10 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
                 defaultMessage="Transaction in progress"
               />
             ) : (
-              <FormattedMessage description="transactionConfirmationBalanceChanges" defaultMessage="Trade confirmed" />
+              <FormattedMessage
+                description="transactionConfirmationBalanceChangesCreatePosition"
+                defaultMessage="Position created"
+              />
             )}
           </Typography>
         </StyledTitleContainer>
@@ -256,7 +258,10 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
             )}
           </Button>
           <Button variant="contained" color="secondary" onClick={handleNewPosition} fullWidth size="large">
-            <FormattedMessage description="transactionDCAConfirmationNewPosition" defaultMessage="Create another" />
+            <FormattedMessage
+              description="transactionDCAConfirmationNewPosition"
+              defaultMessage="Create new position"
+            />
           </Button>
         </StyledButonContainer>
       </StyledOverlay>

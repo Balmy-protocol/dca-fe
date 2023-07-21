@@ -1,8 +1,15 @@
 // eslint-disable-next-line max-classes-per-file
-import { buildSDK, ProviderSourceInput, SourceId, SOURCES_METADATA } from '@mean-finance/sdk';
+import {
+  buildSDK,
+  EstimatedQuoteRequest,
+  ProviderSourceInput,
+  QuoteRequest,
+  SourceId,
+  SOURCES_METADATA,
+} from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
 import { BaseProvider } from '@ethersproject/providers';
-import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys } from '@constants/aggregator';
+import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey } from '@constants/aggregator';
 import { BigNumber } from 'ethers';
 import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
@@ -156,87 +163,110 @@ export default class SdkService {
     recipient?: string | null,
     slippagePercentage?: number,
     gasSpeed?: GasKeys,
-    passedTakerAddress?: string,
+    takerAddress?: string,
     skipValidation?: boolean,
     chainId?: number,
     disabledDexes?: string[],
-    usePermit2 = false
+    usePermit2 = false,
+    sourceTimeout = TimeoutKey.patient
   ) {
     const currentNetwork = await this.providerService.getNetwork();
-
-    const meanPermit2Address = await this.contractService.getMeanPermit2Address();
 
     const network = chainId || currentNetwork.chainId;
 
     let responses;
 
-    const takerAddress = usePermit2 && meanPermit2Address ? meanPermit2Address : passedTakerAddress;
-
     if (!takerAddress) {
-      responses = await this.sdk.quoteService.estimateAllQuotes({
-        request: {
-          sellToken: from,
-          buyToken: to,
-          chainId: network,
-          order: buyAmount
-            ? {
-                type: 'buy',
-                buyAmount: buyAmount.toString(),
-              }
-            : {
-                type: 'sell',
-                sellAmount: sellAmount?.toString() || '0',
+      const request: EstimatedQuoteRequest = {
+        sellToken: from,
+        buyToken: to,
+        chainId: network,
+        order: buyAmount
+          ? {
+              type: 'buy',
+              buyAmount: buyAmount.toString(),
+            }
+          : {
+              type: 'sell',
+              sellAmount: sellAmount?.toString() || '0',
+            },
+        ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
+        ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
+        ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
+        ...(recipient && !usePermit2 ? { recipient } : {}),
+        ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
+        ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
+        ...(skipValidation ? { skipValidation } : {}),
+        ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
+      };
+
+      responses = await (usePermit2
+        ? this.sdk.permit2Service.quotes.estimateAllQuotes({
+            request,
+            config: {
+              sort: {
+                by: sortQuotesBy,
               },
-          ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
-          ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
-          ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
-          ...(recipient && !usePermit2 ? { recipient } : {}),
-          ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
-          ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
-          ...(skipValidation ? { skipValidation } : {}),
-          ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
-        },
-        config: {
-          sort: {
-            by: sortQuotesBy,
-          },
-          ignoredFailed: false,
-          timeout: '5s',
-        },
-      });
+              ignoredFailed: false,
+              timeout: sourceTimeout || '5s',
+            },
+          })
+        : this.sdk.quoteService.estimateAllQuotes({
+            request,
+            config: {
+              sort: {
+                by: sortQuotesBy,
+              },
+              ignoredFailed: false,
+              timeout: sourceTimeout || '5s',
+            },
+          }));
     } else {
-      responses = await this.sdk.quoteService.getAllQuotes({
-        request: {
-          sellToken: from,
-          buyToken: to,
-          chainId: network,
-          order: buyAmount
-            ? {
-                type: 'buy',
-                buyAmount: buyAmount.toString(),
-              }
-            : {
-                type: 'sell',
-                sellAmount: sellAmount?.toString() || '0',
+      const request: QuoteRequest = {
+        sellToken: from,
+        buyToken: to,
+        chainId: network,
+        order: buyAmount
+          ? {
+              type: 'buy',
+              buyAmount: buyAmount.toString(),
+            }
+          : {
+              type: 'sell',
+              sellAmount: sellAmount?.toString() || '0',
+            },
+        takerAddress,
+        ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
+        ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
+        ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
+        ...(recipient && !usePermit2 ? { recipient } : {}),
+        ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
+        ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
+        ...(skipValidation ? { skipValidation } : {}),
+        ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
+      };
+
+      responses = await (usePermit2
+        ? this.sdk.permit2Service.quotes.estimateAllQuotes({
+            request,
+            config: {
+              sort: {
+                by: sortQuotesBy,
               },
-          takerAddress,
-          ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
-          ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
-          ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
-          ...(recipient && !usePermit2 ? { recipient } : {}),
-          ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
-          ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
-          ...(skipValidation ? { skipValidation } : {}),
-          ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
-        },
-        config: {
-          sort: {
-            by: sortQuotesBy,
-          },
-          ignoredFailed: false,
-          timeout: '5s',
-        },
-      });
+              ignoredFailed: false,
+              timeout: sourceTimeout || '5s',
+            },
+          })
+        : this.sdk.quoteService.getAllQuotes({
+            request,
+            config: {
+              sort: {
+                by: sortQuotesBy,
+              },
+              ignoredFailed: false,
+              timeout: sourceTimeout || '5s',
+            },
+          }));
     }
     return responses;
   }
