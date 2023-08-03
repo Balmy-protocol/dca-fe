@@ -95,7 +95,12 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // Polygon - jBRL
   '0xbd1fe73e1f12bd2bc237de9b626f056f21f86427', // Polygon - jMXN
   '0x250632378e573c6be1ac2f97fcdf00515d0aa91b', // BNB Chain - BETH
-
+  // BNB - Beefy BUSD Valas - Blacklisting bc of terrible yield design
+  '0x45c53c0068bf31715fb41685bab59fd0bbc387f9',
+  // BNB - Beefy ETH Valas - Blacklisting bc of terrible yield design
+  '0x353699126117ba6ed8f5d5928dfa797564e99e40',
+  // BNB - Beefy BTCB Valas - Blacklisting bc of terrible yield design
+  '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e',
   // Arbitrum - GMD - Blacklisting so we can test it out
   '0x4945970efeec98d393b4b979b9be265a3ae28a8b',
   // BNB - Beefy USDC on Valas - Blacklisting so we can test it out
