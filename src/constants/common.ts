@@ -119,6 +119,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // Ethereum - wstETH. Euler. Disabled due to hack.
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI. Aave. Has less than 10k TVL so no defillama data.
+  '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - GMD - Blacklisting until release
   '0x5ea1f5eb87ef6564ff8efc101ec3b24fab5583b4', // BNB Chain - Venus USDC - Blacklisting until release
   '0xC721aa11BaA89Df3cF59dE754a8a891EFc64f2EF', // BNB Chain - Venus USDT - Blacklisting until release
   '0xc2327D99C09a7fd60b423C96Dd76573546f1885E', // BNB Chain - Venus BUSD - Blacklisting until release
