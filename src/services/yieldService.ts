@@ -3,7 +3,7 @@ import { AxiosInstance } from 'axios';
 import { DefillamaResponse, YieldOptions } from '@types';
 
 // MOCKS
-import { ALLOWED_YIELDS, DISABLED_YIELDS } from '@constants';
+import { ALLOWED_YIELDS, DCA_TOKEN_BLACKLIST } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import ProviderService from './providerService';
 
@@ -32,7 +32,9 @@ export default class YieldService {
     }));
 
     if (useBlacklist) {
-      yieldsByChain = yieldsByChain.filter((option) => !DISABLED_YIELDS.includes(option.tokenAddress));
+      yieldsByChain = yieldsByChain.filter(
+        (option) => !DCA_TOKEN_BLACKLIST.includes(option.tokenAddress.toLowerCase())
+      );
     }
 
     return yieldsByChain.map((baseYield) => {
