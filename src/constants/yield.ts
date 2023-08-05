@@ -12,19 +12,6 @@ export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
 
-export const DISABLED_YIELDS = [
-  '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11', // Polygon - CRV
-  '0x1dd5629903441b2dd0d03f76ec7673add920e765', // Polygon - jEUR
-  '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // Ethereum - USDC. Euler. Disabled due to hack.
-  '0xd4de9d2fc1607d1df63e1c95ecbfa8d7946f5457', // Ethereum - WETH. Euler. Disabled due to hack.
-  '0xc4113b7605d691e073c162809060b6c5ae402f1e', // Ethereum - DAI. Euler. Disabled due to hack.
-  '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // Ethereum - WBTC. Euler. Disabled due to hack.
-  '0xb95e6eee428902c234855990e18a632fa34407dc', // Ethereum - LUSD. Euler. Disabled due to hack.
-  '0x7c6d161b367ec0605260628c37b8dd778446256b', // Ethereum - wstETH. Euler. Disabled due to hack.
-  '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
-  '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI. Aave. Has less than 10k TVL so no defillama data.
-].map((a) => a.toLowerCase());
-
 const BASE_YIELDS_PER_CHAIN: Record<number, Pick<YieldOption, 'id' | 'poolId' | 'name' | 'token' | 'tokenAddress'>[]> =
   Object.keys(NETWORKS).reduce((acc, key) => ({ ...acc, [NETWORKS[key].chainId]: [] }), {});
 
@@ -502,27 +489,27 @@ export const ALLOWED_YIELDS: Record<
   ],
   [NETWORKS.baseGoerli.chainId]: [],
   [NETWORKS.bsc.chainId]: [
-    // {
-    //   id: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
-    //   tokenAddress: '0x353699126117ba6ed8f5d5928dfa797564e99e40', // beefy ETH
-    //   poolId: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
-    //   name: 'Beefy',
-    //   token: emptyTokenWithAddress('BEEFY'),
-    // },
-    // {
-    //   id: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
-    //   tokenAddress: '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e', // beefy BTCB
-    //   poolId: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
-    //   name: 'Beefy',
-    //   token: emptyTokenWithAddress('BEEFY'),
-    // },
-    // {
-    //   id: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
-    //   tokenAddress: '0x45c53c0068bf31715fb41685bab59fd0bbc387f9', // beefy BUSD
-    //   poolId: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
-    //   name: 'Beefy',
-    //   token: emptyTokenWithAddress('BEEFY'),
-    // },
+    {
+      id: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
+      tokenAddress: '0x353699126117ba6ed8f5d5928dfa797564e99e40', // beefy ETH
+      poolId: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
+      tokenAddress: '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e', // beefy BTCB
+      poolId: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
+      tokenAddress: '0x45c53c0068bf31715fb41685bab59fd0bbc387f9', // beefy BUSD
+      poolId: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
   ],
   [NETWORKS.mainnet.chainId]: [
     {

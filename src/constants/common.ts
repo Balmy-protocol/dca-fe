@@ -111,7 +111,17 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12',
   '0x1A5B0aaF478bf1FDA7b934c76E7692D722982a6D', // Abitrum - BFR
   '0x1debd73e752beaf79865fd6446b0c970eae7732f', // Arbitrum - CBETH
-];
+  '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11', // Polygon - CRV
+  '0x1dd5629903441b2dd0d03f76ec7673add920e765', // Polygon - jEUR
+  '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // Ethereum - USDC. Euler. Disabled due to hack.
+  '0xd4de9d2fc1607d1df63e1c95ecbfa8d7946f5457', // Ethereum - WETH. Euler. Disabled due to hack.
+  '0xc4113b7605d691e073c162809060b6c5ae402f1e', // Ethereum - DAI. Euler. Disabled due to hack.
+  '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // Ethereum - WBTC. Euler. Disabled due to hack.
+  '0xb95e6eee428902c234855990e18a632fa34407dc', // Ethereum - LUSD. Euler. Disabled due to hack.
+  '0x7c6d161b367ec0605260628c37b8dd778446256b', // Ethereum - wstETH. Euler. Disabled due to hack.
+  '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
+  '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI. Aave. Has less than 10k TVL so no defillama data.
+].map((a) => a.toLowerCase());
 
 export const DISABLED_YIELD_WITHDRAWS = [
   '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // ETH - USDC. Euler. Disabled due to hack.
@@ -120,6 +130,6 @@ export const DISABLED_YIELD_WITHDRAWS = [
   '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
-];
+].map((a) => a.toLowerCase());
 
 export const WALLET_CONNECT_PROJECT_ID = '052f72d940052c096c832ee451b63a14';
