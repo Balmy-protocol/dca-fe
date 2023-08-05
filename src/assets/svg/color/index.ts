@@ -8,6 +8,7 @@ import CLOCK from './clock.svg';
 import DAI from './dai.svg';
 import ETH from './eth.svg';
 import EULER from './euler.svg';
+import VENUS from './venus.svg';
 import EXACTLY from './exactly.svg';
 import FAILED from './failed.svg';
 import FTM from './ftm.svg';
@@ -51,6 +52,7 @@ const manifest = {
   SONNE,
   YEARN,
   BEEFY,
+  VENUS,
 };
 
 export default manifest;

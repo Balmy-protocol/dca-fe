@@ -574,4 +574,98 @@ export const ALLOWED_YIELDS: Record<
       forcedUnderlyings: ['0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0'],
     },
   ],
+  [NETWORKS.bsc.chainId]: [
+    // {
+    //   id: '', // Venus WBNB
+    //   tokenAddress: '', // Venus WBNB
+    //   poolId: '', // Venus WBNB
+    //   name: 'Venus',
+    //   token: emptyTokenWithAddress('VENUS'),
+    // },
+    {
+      id: '89eba1e5-1b1b-47b6-958b-38138a04c244', // Venus USDC
+      tokenAddress: '0x5ea1f5eb87ef6564ff8efc101ec3b24fab5583b4', // Venus USDC
+      poolId: '89eba1e5-1b1b-47b6-958b-38138a04c244', // Venus USDC
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '9f3a6015-5045-4471-ba65-ad3dc7c38269', // Venus USDT
+      tokenAddress: '0xC721aa11BaA89Df3cF59dE754a8a891EFc64f2EF', // Venus USDT
+      poolId: '9f3a6015-5045-4471-ba65-ad3dc7c38269', // Venus USDT
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '483533e6-3112-44a1-beae-7cae023065a6', // Venus BUSD
+      tokenAddress: '0xc2327D99C09a7fd60b423C96Dd76573546f1885E', // Venus BUSD
+      poolId: '483533e6-3112-44a1-beae-7cae023065a6', // Venus BUSD
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '87c8ee0d-b812-47c1-803f-f91a3907079e', // Venus BTCB
+      tokenAddress: '0xFf8Beda0C55Bf0e6963e8Ae986d76479BdEA9D4B', // Venus BTCB
+      poolId: '87c8ee0d-b812-47c1-803f-f91a3907079e', // Venus BTCB
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: 'de8928ad-d03a-423d-92d7-3c4648e3ffd2', // Venus ETH
+      tokenAddress: '0x50aE1B194d9e030c98405545EBa295319B49cA33', // Venus ETH
+      poolId: 'de8928ad-d03a-423d-92d7-3c4648e3ffd2', // Venus ETH
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '7f81b151-a769-45d3-ae54-ef378633f035', // Venus DAI
+      tokenAddress: '0x319d8497F6d8e5408A93e46538A681980F5DEEA5', // Venus DAI
+      poolId: '7f81b151-a769-45d3-ae54-ef378633f035', // Venus DAI
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    // ---
+    {
+      id: '3cbdf078-5b0a-4483-8308-46e2f5f60c83', // Venus ADA
+      tokenAddress: '0xB562CC5300e2Dd51f9770923b52cE5F372f97a0e', // Venus ADA
+      poolId: '3cbdf078-5b0a-4483-8308-46e2f5f60c83', // Venus ADA
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '88472ba3-f1e9-4da6-89da-eb12cf07e151', // Venus CAKE
+      tokenAddress: '0xc492eA9B5D9e3f4188a6c57F5F146dbfa37AC6D6', // Venus CAKE
+      poolId: '88472ba3-f1e9-4da6-89da-eb12cf07e151', // Venus CAKE
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '1403642f-2083-4173-bfb9-979a44a75ec4', // Venus MATIC
+      tokenAddress: '0xf3638ACAc71740e55C14d99e288F10ba4EDef348', // Venus MATIC
+      poolId: '1403642f-2083-4173-bfb9-979a44a75ec4', // Venus MATIC
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '422f1356-9e9c-471a-9641-135742da9891', // Venus DOT
+      tokenAddress: '0x69B8FdEd983a19C81bbF8b0Ea21e702395bb6E36', // Venus DOT
+      poolId: '422f1356-9e9c-471a-9641-135742da9891', // Venus DOT
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '866ae932-54a6-4cf2-af45-2e70a94f2d09', // Venus DOGE
+      tokenAddress: '0x0BADC4caa20E84e25e26a54CeC3faFeBcC7AB085', // Venus DOGE
+      poolId: '866ae932-54a6-4cf2-af45-2e70a94f2d09', // Venus DOGE
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '0204c8ff-0805-4515-a27e-742d23a15719', // Venus XRP
+      tokenAddress: '0xa2b783bB283cA621f32a8792FFE4A10ad817C039', // Venus XRP
+      poolId: '0204c8ff-0805-4515-a27e-742d23a15719', // Venus XRP
+      name: 'Venus',
+      token: emptyTokenWithAddress('VENUS'),
+    },
+  ],
 };
