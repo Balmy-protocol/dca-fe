@@ -173,7 +173,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
           />
         </StyledContentContainer>
       </Grid>
-      {(isLoadingRoute || selectedRoute || transferTo) && (
+      {(isLoadingRoute || selectedRoute || transferTo || swapOptionsError) && (
         <Grid item xs={12}>
           <StyledContentContainer $isLast>
             {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
