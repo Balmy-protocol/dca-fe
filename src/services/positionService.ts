@@ -704,37 +704,34 @@ export default class PositionService {
 
     const hasYield = position.to.underlyingTokens.length;
 
-    if (!useProtocolToken && !hasYield) {
-      const hubInstance = await this.contractService.getHubInstance(position.version);
-
-      return hubInstance.withdrawSwapped(position.positionId, this.walletService.getAccount());
-    }
-
     const companionHasPermission = await this.companionHasPermission(position, DCAPermission.WITHDRAW);
 
-    if (companionHasPermission) {
-      return this.meanApiService.withdrawSwappedUsingOtherToken(
-        position.positionId,
-        this.walletService.getAccount(),
-        position.version,
-        useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address
-      );
+    let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
+
+    if (!companionHasPermission && (useProtocolToken || hasYield)) {
+      const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+      permissionPermit = await this.getSignatureForPermission(position, companionAddress, DCAPermission.WITHDRAW);
     }
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
-    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
-      position,
-      companionAddress,
-      DCAPermission.WITHDRAW
-    );
+    const tx = await this.sdkService.sdk.dcaService.management.buildWithdrawPositionTx({
+      chainId: currentNetwork.chainId,
+      positionId: position.positionId,
+      withdraw: {
+        convertTo: useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address,
+      },
+      recipient: position.user,
+      permissionPermit: permissionPermit && {
+        permissions: permissionPermit.permissions,
+        deadline: permissionPermit.deadline.toString(),
+        v: permissionPermit.v,
+        r: hexlify(permissionPermit.r),
+        s: hexlify(permissionPermit.s),
+        tokenId: position.positionId,
+      },
+    });
 
-    return this.meanApiService.withdrawSwappedUsingOtherToken(
-      position.positionId,
-      this.walletService.getAccount(),
-      position.version,
-      useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address,
-      { permissions, deadline: deadline.toString(), v, r: hexlify(r), s: hexlify(s), tokenId: position.positionId }
-    );
+    return this.providerService.sendTransactionWithGasLimit(tx);
   }
 
   async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
@@ -755,70 +752,59 @@ export default class PositionService {
       (position.from.underlyingTokens.length && position.remainingLiquidity.gt(BigNumber.from(0))) ||
       (position.to.underlyingTokens.length && position.toWithdraw.gt(BigNumber.from(0)));
 
-    if (!useProtocolToken && !hasYield) {
-      const hubInstance = await this.contractService.getHubInstance(position.version);
-
-      return hubInstance.terminate(
-        position.positionId,
-        this.walletService.getAccount(),
-        this.walletService.getAccount()
-      );
-    }
-
     const companionHasPermission = await this.companionHasPermission(position, DCAPermission.TERMINATE);
 
-    if (companionHasPermission) {
-      return this.meanApiService.terminateUsingOtherTokens(
-        position.positionId,
-        this.walletService.getAccount(),
-        this.walletService.getAccount(),
-        position.version,
-        position.from.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
-          ? wrappedProtocolToken.address
-          : position.from.address,
-        position.to.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
-          ? wrappedProtocolToken.address
-          : position.to.address
+    let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
+
+    if (!companionHasPermission && (useProtocolToken || hasYield)) {
+      let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+      if (!companionAddress) {
+        companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+      }
+
+      const permissionManagerAddress = await this.contractService.getPermissionManagerAddress(position.version);
+
+      const erc712Name = position.version !== POSITION_VERSION_2 ? undefined : 'Mean Finance DCA';
+
+      permissionPermit = await this.getSignatureForPermission(
+        position,
+        companionAddress,
+        DCAPermission.TERMINATE,
+        permissionManagerAddress,
+        erc712Name
       );
     }
 
-    const permissionManagerAddress = await this.contractService.getPermissionManagerAddress(position.version);
-    let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
-
-    if (!companionAddress) {
-      companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
-    }
-
-    const erc712Name = position.version !== POSITION_VERSION_2 ? undefined : 'Mean Finance DCA';
-
-    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
-      position,
-      companionAddress,
-      DCAPermission.TERMINATE,
-      permissionManagerAddress,
-      erc712Name
-    );
-
-    return this.meanApiService.terminateUsingOtherTokens(
-      position.positionId,
-      this.walletService.getAccount(),
-      this.walletService.getAccount(),
-      position.version,
+    const fromToUse =
       position.from.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
         ? wrappedProtocolToken.address
-        : position.from.address,
+        : position.from.address;
+
+    const toToUse =
       position.to.address === PROTOCOL_TOKEN_ADDRESS && !useProtocolToken
         ? wrappedProtocolToken.address
-        : position.to.address,
-      {
-        permissions,
-        deadline: deadline.toString(),
-        v,
-        r: hexlify(r),
-        s: hexlify(s),
+        : position.to.address;
+
+    const tx = await this.sdkService.sdk.dcaService.management.buildTerminatePositionTx({
+      chainId: currentNetwork.chainId,
+      positionId: position.positionId,
+      withdraw: {
+        unswappedConvertTo: fromToUse,
+        swappedConvertTo: toToUse,
+      },
+      recipient: position.user,
+      permissionPermit: permissionPermit && {
+        permissions: permissionPermit.permissions,
+        deadline: permissionPermit.deadline.toString(),
+        v: permissionPermit.v,
+        r: hexlify(permissionPermit.r),
+        s: hexlify(permissionPermit.s),
         tokenId: position.positionId,
-      }
-    );
+      },
+    });
+
+    return this.providerService.sendTransactionWithGasLimit(tx);
   }
 
   async terminateManyRaw(positions: Position[]): Promise<TransactionResponse> {

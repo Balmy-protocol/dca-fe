@@ -12,28 +12,8 @@ describe.skip('Mean API Service', () => {
     test('it should return an empty object when its not a safe app', async () => {});
   });
 
-  describe('getDepositTx', () => {
-    test('it should call the mean api and return the tx received', async () => {});
-  });
-
   describe('getUnderlyingTokens', () => {
     test('it should filter tokens that dont have an underlying and return the underlying data from the api', async () => {});
-  });
-
-  describe('withdrawSwappedUsingOtherToken', () => {
-    test('it should call the mean api and send the transaction', async () => {});
-  });
-
-  describe('terminateUsingOtherTokens', () => {
-    test('it should call the mean api and send the transaction', async () => {});
-  });
-
-  describe('getIncreasePositionUsingOtherTokenTx', () => {
-    test('it should call the mean api and return the tx received', async () => {});
-  });
-
-  describe('getReducePositionUsingOtherTokenTx', () => {
-    test('it should call the mean api and return the tx received', async () => {});
   });
 
   describe('migratePosition', () => {
