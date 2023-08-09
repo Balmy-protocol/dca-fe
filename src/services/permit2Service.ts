@@ -1,4 +1,4 @@
-import { BigNumber, VoidSigner } from 'ethers';
+import { BigNumber, VoidSigner, ethers } from 'ethers';
 
 import { NULL_ADDRESS, ONE_DAY, PERMIT_2_WORDS } from '@constants';
 import { Token } from '@types';
@@ -50,10 +50,25 @@ export default class Permit2Service {
       preparedSignature.dataToSign.message
     );
 
+    // NOTE: Invalid Ledger + Metamask signatures need to be reconstructed until issue is solved and released
+    // https://github.com/MetaMask/eth-ledger-bridge-keyring/pull/152
+    // https://github.com/MetaMask/metamask-extension/issues/10240
+    // found in https://github.com/yearn/yearn-finance-v3/pull/750/files
+    const isInvalidLedgerSignature = rawSignature.endsWith('00') || rawSignature.endsWith('01');
+
+    if (!isInvalidLedgerSignature)
+      return {
+        deadline: Number(preparedSignature.permitData.deadline),
+        nonce: BigNumber.from(preparedSignature.permitData.nonce),
+        rawSignature,
+      };
+
+    const { r, s, v, recoveryParam } = ethers.utils.splitSignature(rawSignature);
+
     return {
       deadline: Number(preparedSignature.permitData.deadline),
       nonce: BigNumber.from(preparedSignature.permitData.nonce),
-      rawSignature,
+      rawSignature: ethers.utils.joinSignature({ r, s, v, recoveryParam }),
     };
   }
 
