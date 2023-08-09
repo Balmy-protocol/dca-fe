@@ -74,6 +74,7 @@ import SwapSettings from '../swap-settings';
 import TokenPicker from '../aggregator-token-picker';
 import SwapButton from '../swap-button';
 import BetterQuoteModal from '../better-quote-modal';
+import FailedQuotesModal from '../failed-quotes-modal';
 
 const StyledButtonContainer = styled.div`
   display: flex;
@@ -139,6 +140,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const [balance, , balanceErrors] = useBalance(from);
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const [shouldShowBetterQuoteModal, setShouldShowBetterQuoteModal] = React.useState(false);
+  const [shouldShowFailedQuotesModal, setShouldShowFailedQuotesModal] = React.useState(false);
   const [transactionWillFail, setTransactionWillFail] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
@@ -724,6 +726,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             );
             return simulatePromise
               .then((sortedQuotes) => {
+                if (!sortedQuotes.length) {
+                  handleTransactionSimulationWait(newSteps);
+                  setShouldShowFailedQuotesModal(true);
+                  return null;
+                }
                 const originalQuote = find(sortedQuotes, { swapper: { id: selectedRoute.swapper.id } });
                 const isThereABetterQuote = sortedQuotes[0].swapper.id !== selectedRoute.swapper.id;
                 const isBetteryBy =
@@ -1090,6 +1097,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         onSelectBetterQuote={(response: BlowfishResponse) =>
           handleTransactionSimulationWait(transactionsToExecute, response)
         }
+      />
+      <FailedQuotesModal
+        onCancel={() => setShouldShowFailedQuotesModal(false)}
+        onGoBack={handleBackTransactionSteps}
+        open={shouldShowFailedQuotesModal}
       />
       <StyledPaper variant="outlined" ref={containerRef}>
         <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
