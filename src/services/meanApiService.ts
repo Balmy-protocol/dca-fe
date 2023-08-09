@@ -1,7 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
 import { LATEST_VERSION, MEAN_API_URL } from '@constants';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import {
   AllowedPairs,
   BlowfishResponse,
@@ -62,44 +61,6 @@ export default class MeanApiService {
     return {};
   }
 
-  async getDepositTx(
-    takeFrom: string,
-    from: string,
-    to: string,
-    totalAmmount: BigNumber,
-    swaps: BigNumber,
-    interval: BigNumber,
-    account: string,
-    permissions: { operator: string; permissions: number[] }[],
-    yieldFrom?: string,
-    yieldTo?: string
-  ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const hubAddress = await this.contractService.getHUBAddress();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const fromToUse = from === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from;
-    const toTouse = to === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to;
-
-    // Call to api and get transaction
-    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-deposit`,
-      {
-        takeFromCaller: { token: takeFrom, amount: totalAmmount.toString() },
-        from: yieldFrom || fromToUse,
-        to: yieldTo || toTouse,
-        amountOfSwaps: swaps.toNumber(),
-        swapInterval: interval.toNumber(),
-        owner: account,
-        hub: hubAddress,
-        permissions,
-        dex: { only: 'MeanTransformer' },
-        ...this.getDeadlineSlippageDefault(),
-      }
-    );
-
-    return transactionResponse.data.tx;
-  }
-
   async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
     const tokensToUse = tokens.filter((tokenObj) => !!tokenObj.token.underlyingTokens.length);
 
@@ -115,124 +76,6 @@ export default class MeanApiService {
     );
 
     return underlyingResponse.data.underlying;
-  }
-
-  async withdrawSwappedUsingOtherToken(
-    id: string,
-    recipient: string,
-    positionVersion: PositionVersions,
-    convertTo: string,
-    permissionPermit?: PermissionPermit
-  ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
-
-    // Call to api and get transaction
-    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/withdraw-and-swap`,
-      {
-        positionId: id,
-        convertTo,
-        recipient,
-        hub: hubAddress,
-        permissionPermit,
-        dex: { only: 'MeanTransformer' },
-        ...this.getDeadlineSlippageDefault(),
-      }
-    );
-
-    return this.providerService.sendTransactionWithGasLimit(transactionResponse.data.tx);
-  }
-
-  async terminateUsingOtherTokens(
-    id: string,
-    recipientUnswapped: string,
-    recipientSwapped: string,
-    positionVersion: PositionVersions,
-    tokenFrom: string,
-    tokenTo: string,
-    permissionPermit?: PermissionPermit
-  ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
-
-    // Call to api and get transaction
-    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/terminate-and-swap`,
-      {
-        positionId: id,
-        recipient: recipientSwapped,
-        unswappedConvertTo: tokenFrom,
-        swappedConvertTo: tokenTo,
-        hub: hubAddress,
-        permissionPermit,
-        dex: { only: 'MeanTransformer' },
-        ...this.getDeadlineSlippageDefault(),
-      }
-    );
-
-    return this.providerService.sendTransactionWithGasLimit(transactionResponse.data.tx);
-  }
-
-  async getIncreasePositionUsingOtherTokenTx(
-    id: string,
-    newAmount: BigNumber,
-    newSwaps: BigNumber,
-    positionVersion: PositionVersions,
-    tokenFrom: string,
-    permissionPermit?: PermissionPermit
-  ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
-
-    // Call to api and get transaction
-    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-increase`,
-      {
-        takeFromCaller: { token: tokenFrom, amount: newAmount.toString() },
-        positionId: id,
-        amountOfSwaps: newSwaps.toNumber(),
-        hub: hubAddress,
-        permissionPermit,
-        dex: { only: 'MeanTransformer' },
-        ...this.getDeadlineSlippageDefault(),
-      }
-    );
-
-    return transactionResponse.data.tx;
-  }
-
-  async getReducePositionUsingOtherTokenTx(
-    id: string,
-    newAmount: BigNumber,
-    newSwaps: BigNumber,
-    recipient: string,
-    positionVersion: PositionVersions,
-    tokenFrom: string,
-    permissionPermit?: PermissionPermit
-  ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
-
-    // Call to api and get transaction
-    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/reduce-to-buy`,
-      {
-        positionId: id,
-        buy: {
-          amount: newAmount.toString(),
-          token: tokenFrom,
-        },
-        amountOfSwaps: newSwaps.toNumber(),
-        recipient,
-        dex: { only: 'MeanTransformer' },
-        hub: hubAddress,
-        permissionPermit,
-        ...this.getDeadlineSlippageDefault(),
-      }
-    );
-
-    return transactionResponse.data.tx;
   }
 
   async migratePosition(
