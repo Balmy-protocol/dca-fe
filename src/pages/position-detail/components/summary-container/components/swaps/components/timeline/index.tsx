@@ -12,7 +12,7 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import CreatedIcon from '@mui/icons-material/NewReleases';
 import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { ActionState, FullPosition } from '@types';
+import { ActionState, FullPosition, PositionPermission } from '@types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS, isCompanionAddress } from '@constants';
@@ -28,6 +28,7 @@ import { Theme } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
+import { isEqual } from 'lodash';
 
 const DarkTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -449,7 +450,32 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
     return (
       <>
         <Grid item xs={12}>
-          {positionState.permissions.map((permission, index) => (
+          {Object.values(
+            positionState.permissions.reduce<Record<string, PositionPermission>>((acc, permission) => {
+              const newAcc = {
+                ...acc,
+              };
+
+              const isCompanion = isCompanionAddress(permission.operator, chainId);
+
+              const operatorKey = isCompanion.isCompanion
+                ? `${(isCompanion.isOldCompanion && 'Old ') || ''}Mean Finance Companion`
+                : permission.operator;
+
+              if (newAcc[operatorKey]) {
+                if (
+                  operatorKey !== permission.operator &&
+                  !isEqual(newAcc[operatorKey].permissions, permission.permissions)
+                ) {
+                  newAcc[permission.operator] = permission;
+                }
+              } else {
+                newAcc[operatorKey] = permission;
+              }
+
+              return newAcc;
+            }, {})
+          ).map((permission, index) => (
             <Typography variant="body1">
               {permission.permissions.length ? (
                 <>
@@ -458,6 +484,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                     target="_blank"
                     rel="noreferrer"
                     $isFirst={index === 0}
+                    sx={{ display: 'inline-block !important' }}
                   >
                     {isCompanionAddress(permission.operator, chainId).isCompanion ? (
                       `${
@@ -500,6 +527,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
                     href={buildEtherscanAddress(permission.operator, position.chainId)}
                     target="_blank"
                     rel="noreferrer"
+                    sx={{ display: 'inline-block !important' }}
                   >
                     {isCompanionAddress(permission.operator, chainId).isCompanion ? (
                       `${

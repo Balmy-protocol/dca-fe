@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
-import { ethers, Signer, BigNumber, VoidSigner } from 'ethers';
+import { ethers, Signer, BigNumber, VoidSigner, PopulatedTransaction } from 'ethers';
 import keyBy from 'lodash/keyBy';
-import { TransactionResponse } from '@ethersproject/providers';
+import { TransactionRequest, TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
@@ -44,6 +44,7 @@ import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { getDisplayToken, sortTokens } from '@common/utils/parsing';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
+import { getCompanionNeedsIncreaseOrReduce } from '@common/utils/companion';
 import { AddFunds, DCAPermission } from '@mean-finance/sdk';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -372,6 +373,39 @@ export default class PositionService {
   }
 
   // POSITION METHODS
+  async fillAddressPermissions(
+    position: Position,
+    contractAddress: string,
+    permission: DCAPermission,
+    permissionManagerAddressProvided?: string
+  ) {
+    const signer = this.providerService.getSigner();
+    const { positionId, version } = position;
+    const permissionManagerAddress =
+      permissionManagerAddressProvided || (await this.contractService.getPermissionManagerAddress(version));
+    const permissionManagerInstance = new ethers.Contract(
+      permissionManagerAddress,
+      PERMISSION_MANAGER_ABI.abi,
+      signer
+    ) as unknown as PermissionManagerContract;
+
+    const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
+      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.INCREASE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.REDUCE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.WITHDRAW),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.TERMINATE),
+    ]);
+
+    const defaultPermissions = [
+      ...(hasIncrease ? [DCAPermission.INCREASE] : []),
+      ...(hasReduce ? [DCAPermission.REDUCE] : []),
+      ...(hasWithdraw ? [DCAPermission.WITHDRAW] : []),
+      ...(hasTerminate ? [DCAPermission.TERMINATE] : []),
+    ];
+
+    return [{ operator: contractAddress, permissions: [...defaultPermissions, permission] }];
+  }
+
   async getSignatureForPermission(
     position: Position,
     contractAddress: string,
@@ -393,20 +427,6 @@ export default class PositionService {
       signer
     ) as unknown as PermissionManagerContract;
 
-    const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
-      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.INCREASE),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.REDUCE),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.WITHDRAW),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.TERMINATE),
-    ]);
-
-    const defaultPermissions = [
-      ...(hasIncrease ? [DCAPermission.INCREASE] : []),
-      ...(hasReduce ? [DCAPermission.REDUCE] : []),
-      ...(hasWithdraw ? [DCAPermission.WITHDRAW] : []),
-      ...(hasTerminate ? [DCAPermission.TERMINATE] : []),
-    ];
-
     const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
 
     const PermissionSet = [
@@ -421,7 +441,12 @@ export default class PositionService {
       { name: 'deadline', type: 'uint256' },
     ];
 
-    const permissions = [{ operator: contractAddress, permissions: [...defaultPermissions, permission] }];
+    const permissions = await this.fillAddressPermissions(
+      position,
+      contractAddress,
+      permission,
+      permissionManagerAddressProvided
+    );
 
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await (signer as VoidSigner)._signTypedData(
@@ -493,16 +518,25 @@ export default class PositionService {
     return permissionManagerInstance.hasPermission(position.positionId, companionAddress, permission);
   }
 
-  async modifyPermissions(position: Position, newPermissions: PositionPermission[]): Promise<TransactionResponse> {
+  async getModifyPermissionsTx(
+    position: Position,
+    newPermissions: { operator: string; permissions: DCAPermission[] }[]
+  ): Promise<PopulatedTransaction> {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
 
-    return permissionManagerInstance.modify(
-      position.positionId,
+    return permissionManagerInstance.populateTransaction.modify(position.positionId, newPermissions);
+  }
+
+  async modifyPermissions(position: Position, newPermissions: PositionPermission[]): Promise<TransactionResponse> {
+    const tx = await this.getModifyPermissionsTx(
+      position,
       newPermissions.map(({ permissions, operator }) => ({
         operator,
         permissions: permissions.map((permission) => DCAPermission[permission]),
       }))
     );
+
+    return this.providerService.sendTransactionWithGasLimit(tx);
   }
 
   async transfer(position: Position, toAddress: string): Promise<TransactionResponse> {
@@ -734,6 +768,37 @@ export default class PositionService {
     return this.providerService.sendTransactionWithGasLimit(tx);
   }
 
+  async withdrawSafe(position: Position) {
+    const currentNetwork = await this.providerService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : position.to;
+
+    const hasYield = position.to.underlyingTokens.length;
+
+    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.WITHDRAW);
+
+    const withdrawTx = await this.sdkService.sdk.dcaService.management.buildWithdrawPositionTx({
+      chainId: currentNetwork.chainId,
+      positionId: position.positionId,
+      withdraw: {
+        convertTo: toToUse.address,
+      },
+      recipient: position.user,
+    });
+
+    let txs: TransactionRequest[] = [withdrawTx];
+    if (!companionHasPermission && hasYield) {
+      const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+      const permissions = await this.fillAddressPermissions(position, companionAddress, DCAPermission.WITHDRAW);
+      const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
+
+      txs = [modifyPermissionTx, ...txs];
+    }
+
+    return this.safeService.submitMultipleTxs(txs);
+  }
+
   async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
     const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -805,6 +870,45 @@ export default class PositionService {
     });
 
     return this.providerService.sendTransactionWithGasLimit(tx);
+  }
+
+  async terminateSafe(position: Position) {
+    const currentNetwork = await this.providerService.getNetwork();
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+
+    const hasYield =
+      (position.from.underlyingTokens.length && position.remainingLiquidity.gt(BigNumber.from(0))) ||
+      (position.to.underlyingTokens.length && position.toWithdraw.gt(BigNumber.from(0)));
+
+    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.TERMINATE);
+
+    const fromToUse =
+      position.from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.from.address;
+
+    const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
+
+    const terminateTx = await this.sdkService.sdk.dcaService.management.buildTerminatePositionTx({
+      chainId: currentNetwork.chainId,
+      positionId: position.positionId,
+      withdraw: {
+        unswappedConvertTo: fromToUse,
+        swappedConvertTo: toToUse,
+      },
+      recipient: position.user,
+    });
+
+    let txs: TransactionRequest[] = [terminateTx];
+
+    if (!companionHasPermission && hasYield) {
+      const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+
+      const permissions = await this.fillAddressPermissions(position, companionAddress, DCAPermission.TERMINATE);
+      const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
+
+      txs = [modifyPermissionTx, ...txs];
+    }
+
+    return this.safeService.submitMultipleTxs(txs);
   }
 
   async terminateManyRaw(positions: Position[]): Promise<TransactionResponse> {
@@ -1039,13 +1143,13 @@ export default class PositionService {
     });
   }
 
-  async approveAndModifyRateAndSwapsSafe(
+  async modifyRateAndSwapsSafe(
     position: Position,
     newRateUnderlying: string,
     newSwaps: string,
     useWrappedProtocolToken: boolean
   ) {
-    const { amount, tokenFrom } = await this.buildModifyRateAndSwapsParams(
+    const { amount, tokenFrom, isIncrease } = await this.buildModifyRateAndSwapsParams(
       position,
       newRateUnderlying,
       newSwaps,
@@ -1062,20 +1166,73 @@ export default class PositionService {
       false
     );
 
-    const approveTx = await this.walletService.buildApproveSpecificTokenTx(
-      emptyTokenWithAddress(tokenFrom),
-      allowanceTarget,
-      amount
-    );
-
     const modifyTx = await this.buildModifyRateAndSwapsTx(
       position,
       newRateUnderlying,
       newSwaps,
-      useWrappedProtocolToken
+      useWrappedProtocolToken,
+      false
     );
 
-    return this.safeService.submitMultipleTxs([approveTx, modifyTx]);
+    let txs: TransactionRequest[] = [modifyTx];
+
+    let fromToUse = position.from;
+    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    if (fromToUse.address === PROTOCOL_TOKEN_ADDRESS) {
+      fromToUse = wrappedProtocolToken;
+    }
+
+    const allowance = await this.walletService.getSpecificAllowance(
+      useWrappedProtocolToken ? wrappedProtocolToken : position.from,
+      allowanceTarget
+    );
+
+    const remainingLiquidityDifference = position.remainingLiquidity
+      .sub(BigNumber.from(newSwaps || '0').mul(parseUnits(newRateUnderlying || '0', fromToUse.decimals)))
+      .abs();
+
+    const needsToApprove =
+      fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
+      allowance.allowance &&
+      allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
+      allowance.token.address === fromToUse.address &&
+      isIncrease &&
+      parseUnits(allowance.allowance, fromToUse.decimals).lt(remainingLiquidityDifference);
+
+    const companionNeedsPermission = getCompanionNeedsIncreaseOrReduce(position);
+
+    if (needsToApprove) {
+      const approveTx = await this.walletService.buildApproveSpecificTokenTx(
+        emptyTokenWithAddress(tokenFrom),
+        allowanceTarget,
+        amount
+      );
+
+      txs = [approveTx, ...txs];
+    }
+    if (companionNeedsPermission) {
+      let companionHasPermission = true;
+
+      if (isIncrease) {
+        companionHasPermission = await this.companionHasPermission(position, DCAPermission.INCREASE);
+      } else {
+        companionHasPermission = await this.companionHasPermission(position, DCAPermission.REDUCE);
+      }
+
+      if (!companionHasPermission) {
+        const companionAddress = await this.contractService.getHUBCompanionAddress();
+        const permissions = await this.fillAddressPermissions(
+          position,
+          companionAddress,
+          isIncrease ? DCAPermission.INCREASE : DCAPermission.REDUCE
+        );
+        const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
+
+        txs = [modifyPermissionTx, ...txs];
+      }
+    }
+
+    return this.safeService.submitMultipleTxs(txs);
   }
 
   async modifyRateAndSwaps(
@@ -1516,8 +1673,23 @@ export default class PositionService {
         break;
       }
       case TransactionTypes.modifyPermissions: {
-        const modifyPermissionsTypeData = transaction.typeData;
-        this.currentPositions[modifyPermissionsTypeData.id].pendingTransaction = '';
+        const { id, permissions } = transaction.typeData;
+        this.currentPositions[id].pendingTransaction = '';
+        const positionPermissions = this.currentPositions[id].permissions;
+        if (positionPermissions) {
+          let newPermissions = [...positionPermissions];
+          permissions.forEach((permission) => {
+            const permissionIndex = findIndex(positionPermissions, { operator: permission.operator.toLowerCase() });
+            if (permissionIndex !== -1) {
+              newPermissions[permissionIndex] = permission;
+            } else {
+              newPermissions = [...newPermissions, permission];
+            }
+          });
+          this.currentPositions[id].permissions = newPermissions;
+        } else {
+          this.currentPositions[id].permissions = permissions;
+        }
         break;
       }
       case TransactionTypes.eulerClaimPermitMany: {

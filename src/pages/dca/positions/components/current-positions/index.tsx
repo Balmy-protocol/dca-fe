@@ -23,6 +23,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
 import useErrorService from '@hooks/useErrorService';
 import useYieldOptions from '@hooks/useYieldOptions';
+import { TransactionResponse } from '@ethersproject/providers';
 import TerminateModal from '@common/components/terminate-modal';
 import { shouldTrackError } from '@common/utils/errors';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
@@ -119,7 +120,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                 values={{ toSymbol }}
               />
             </Typography>
-            {(!!useProtocolToken || !!hasYield) && !hasPermission && (
+            {(!!useProtocolToken || !!hasYield) && !hasPermission && hasSignSupport && (
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
@@ -132,8 +133,23 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         ),
       });
 
-      const result = await positionService.withdraw(position, useProtocolToken);
-      addTransaction(result, {
+      let result;
+      let hash;
+
+      if (hasSignSupport) {
+        result = await positionService.withdraw(position, useProtocolToken);
+
+        hash = result.hash;
+      } else {
+        result = await positionService.withdrawSafe(position);
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        result.hash = result.safeTxHash;
+        hash = result.safeTxHash;
+      }
+
+      addTransaction(result as TransactionResponse, {
         type: TransactionTypes.withdrawPosition,
         typeData: {
           id: position.id,
@@ -142,7 +158,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         position,
       });
       setModalSuccess({
-        hash: result.hash,
+        hash,
         content: (
           <FormattedMessage
             description="withdraw from success"

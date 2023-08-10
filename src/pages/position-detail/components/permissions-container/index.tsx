@@ -90,7 +90,12 @@ const PositionPermissionsContainer = ({
       );
       addTransaction(result, {
         type: TransactionTypes.modifyPermissions,
-        typeData: { id: position.id, from: position.from.symbol, to: position.to.symbol },
+        typeData: {
+          id: position.id,
+          permissions: modifiedPermissions,
+          from: position.from.symbol,
+          to: position.to.symbol,
+        },
         position: fullPositionToMappedPosition(position),
       });
       setModalSuccess({

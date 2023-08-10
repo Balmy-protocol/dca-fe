@@ -28,7 +28,13 @@ export interface NFTData {
   name: string;
 }
 
-export type Permission = 'INCREASE' | 'REDUCE' | 'WITHDRAW' | 'TERMINATE';
+export enum Permission {
+  increase = 'INCREASE',
+  reduce = 'REDUCE',
+  withdraw = 'WITHDRAW',
+  terminate = 'TERMINATE',
+}
+
 export type PositionStatus = 'ACTIVE' | 'COMPLETED' | 'TERMINATED';
 export interface PositionPermission {
   id: string;

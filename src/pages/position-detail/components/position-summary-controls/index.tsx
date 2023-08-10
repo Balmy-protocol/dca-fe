@@ -109,6 +109,7 @@ const PositionSummaryControls = ({
   const disabledWithdrawFunds =
     disabled || DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '');
 
+  const disableModifyPosition = isPending || disabled;
   const shouldShowWithdrawWrappedToken =
     BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
     hasSignSupport &&
@@ -125,7 +126,7 @@ const PositionSummaryControls = ({
           variant="outlined"
           color="transparent"
           size="small"
-          disabled={isPending || disabled}
+          disabled={disableModifyPosition}
           onClick={onModifyRate}
         >
           <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />

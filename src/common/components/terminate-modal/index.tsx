@@ -19,6 +19,7 @@ import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { TransactionResponse } from '@ethersproject/providers';
 
 interface TerminateModalProps {
   position: Position;
@@ -112,7 +113,7 @@ const TerminateModal = ({
             <Typography variant="body1">
               <FormattedMessage description="Terminating position" defaultMessage="Closing your position" />
             </Typography>
-            {hasWrappedOrProtocol && terminateWithUnwrap && !hasPermission && (
+            {hasWrappedOrProtocol && terminateWithUnwrap && !hasPermission && hasSignSupport && (
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
@@ -125,8 +126,23 @@ const TerminateModal = ({
         ),
       });
 
-      const result = await positionService.terminate(position, terminateWithUnwrap);
-      addTransaction(result, {
+      let result;
+      let hash;
+
+      if (hasSignSupport) {
+        result = await positionService.terminate(position, terminateWithUnwrap);
+
+        hash = result.hash;
+      } else {
+        result = await positionService.terminateSafe(position);
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        result.hash = result.safeTxHash;
+        hash = result.safeTxHash;
+      }
+
+      addTransaction(result as TransactionResponse, {
         type: TransactionTypes.terminatePosition,
         typeData: {
           id: position.id,
@@ -136,7 +152,7 @@ const TerminateModal = ({
         position,
       });
       setModalSuccess({
-        hash: result.hash,
+        hash,
         content: (
           <FormattedMessage
             description="position termination success"
