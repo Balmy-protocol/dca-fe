@@ -256,6 +256,13 @@ export const ALLOWED_YIELDS: Record<
       token: emptyTokenWithAddress('AAVE'),
     },
     {
+      id: '3448ace6-076b-430a-9f80-e757b6fb4905', // aave-v3 MAI
+      tokenAddress: '0x57F93E3Fcb2b7eF126aeedA1f959c9EE4625aa70', // aave-v3 MAI
+      poolId: '3448ace6-076b-430a-9f80-e757b6fb4905', // aave-v3 MAI
+      name: 'Aave V3',
+      token: emptyTokenWithAddress('AAVE'),
+    },
+    {
       id: 'c34ed51f-3a16-4124-9501-94b36c1bad9d', // Sonne USDC
       tokenAddress: '0xec5993c902d25f43ede0a796dffb202d1d3ae535', // Sonne USDC
       poolId: 'c34ed51f-3a16-4124-9501-94b36c1bad9d', // Sonne USDC
