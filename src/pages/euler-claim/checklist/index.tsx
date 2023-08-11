@@ -366,7 +366,7 @@ const ClaimChecklist = ({
         typeData: {
           id: result.hash,
           positionIds: positions.map((position) => position.id),
-          permissions: [Permission.terminate],
+          permissions: [Permission.TERMINATE],
           permittedAddress: companionAddress,
         },
       });

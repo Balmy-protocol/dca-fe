@@ -44,7 +44,7 @@ import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { getDisplayToken, sortTokens } from '@common/utils/parsing';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
-import { getCompanionNeedsIncreaseOrReduce } from '@common/utils/companion';
+import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
 import { AddFunds, DCAPermission } from '@mean-finance/sdk';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -1199,7 +1199,7 @@ export default class PositionService {
       isIncrease &&
       parseUnits(allowance.allowance, fromToUse.decimals).lt(remainingLiquidityDifference);
 
-    const companionNeedsPermission = getCompanionNeedsIncreaseOrReduce(position);
+    const companionNeedsPermission = doesCompanionNeedIncreaseOrReducePermission(position);
 
     if (needsToApprove) {
       const approveTx = await this.walletService.buildApproveSpecificTokenTx(

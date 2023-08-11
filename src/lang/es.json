@@ -20,7 +20,7 @@
   "+CHvZG": [
     {
       "type": 0,
-      "value": "Dandole permisos sobre tu posición a nuestro Hub Companion"
+      "value": "Dándole permisos sobre tu posición a nuestro Hub Companion"
     }
   ],
   "+IzX5q": [
@@ -2682,7 +2682,7 @@
   "MYtzs2": [
     {
       "type": 0,
-      "value": "Luego de simular las cotizaciones, encontramos que todas las cotizaciones fallarian si se ejecutaran. Queremos disculparnos por esta ocurrencia. Podes probar buscar por cotizaciones nuevamente."
+      "value": "Luego de simular las cotizaciones, encontramos que todas las cotizaciones fallarían si se ejecutaran. Queremos disculparnos por esta ocurrencia. Podes probar buscando cotizaciones nuevamente."
     }
   ],
   "Mcj/iy": [
@@ -3430,7 +3430,7 @@
   "SzmD9Z": [
     {
       "type": 0,
-      "value": "Dandole permisos sobre tu posición a nuestro Hub Companion se ha enviado correctamente a la blockchain y sera confirmado pronto."
+      "value": "Dándole permisos sobre tu posición a nuestro Hub Companion se ha enviado correctamente a la blockchain y sera confirmado pronto."
     }
   ],
   "TC32uH": [
@@ -4400,7 +4400,7 @@
   "bassi3": [
     {
       "type": 0,
-      "value": "Ir atras y buscar de nuevo"
+      "value": "Ir atrás y buscar de nuevo"
     }
   ],
   "bdyKpA": [
@@ -4764,7 +4764,7 @@
   "fVfY1G": [
     {
       "type": 0,
-      "value": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Necesitamos que les des permisos directamente desde la pantalla de detalles de tu posicion para volver a habiltiar agregar fondos y retirar fondos."
+      "value": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Necesitamos que les des permisos directamente desde la pantalla de detalles de tu posición para volver a habilitar el agregado y retiro de fondos."
     }
   ],
   "fatFLN": [
@@ -5492,7 +5492,7 @@
   "mj2YEz": [
     {
       "type": 0,
-      "value": "Error encontrado dandole permisos a nuestro nuevo Hub Companion"
+      "value": "Error encontrado dándole permisos a nuestro nuevo Hub Companion"
     }
   ],
   "mljOZT": [
@@ -5992,7 +5992,7 @@
   "qvNbVb": [
     {
       "type": 0,
-      "value": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Dado que Gnosis Safe no permite firmar mensajes, necesitamos que explicitamente le des permisos a este nunevo Companion sobre tu posición, para que puedas usar libremente tu posición de Mean Finance."
+      "value": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Dado que Gnosis Safe no permite firmar mensajes, necesitamos que explícitamente le des permisos a este nuevo Companion sobre tu posición, para que puedas usar libremente tu posición de Mean Finance."
     }
   ],
   "r+KI3m": [

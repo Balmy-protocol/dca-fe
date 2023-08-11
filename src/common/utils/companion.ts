@@ -1,7 +1,7 @@
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { FullPosition, Permission, Position } from '@types';
 
-export const getCompanionNeedsWithdraw = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedWithdrawPermission = (position?: Nullable<FullPosition | Position>) => {
   if (!position) {
     return false;
   }
@@ -12,7 +12,7 @@ export const getCompanionNeedsWithdraw = (position?: Nullable<FullPosition | Pos
   return toHasYield || toIsProtocol;
 };
 
-export const getCompanionNeedsIncreaseOrReduce = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedIncreaseOrReducePermission = (position?: Nullable<FullPosition | Position>) => {
   if (!position) {
     return false;
   }
@@ -23,13 +23,13 @@ export const getCompanionNeedsIncreaseOrReduce = (position?: Nullable<FullPositi
   return fromHasYield || fromIsProtocol;
 };
 
-export const getCompanionNeedsTerminate = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedTerminatePermission = (position?: Nullable<FullPosition | Position>) => {
   if (!position) {
     return false;
   }
 
-  const needsIncreaseOrReduce = getCompanionNeedsIncreaseOrReduce(position);
-  const needsWithdraw = getCompanionNeedsWithdraw(position);
+  const needsIncreaseOrReduce = doesCompanionNeedIncreaseOrReducePermission(position);
+  const needsWithdraw = doesCompanionNeedWithdrawPermission(position);
 
   return needsIncreaseOrReduce || needsWithdraw;
 };
@@ -40,21 +40,21 @@ export const getCompanionNeededPermisssions = (position?: Nullable<FullPosition 
   }
   const permissionsNeeded: Permission[] = [];
 
-  const needsIncreaseOrReduce = getCompanionNeedsIncreaseOrReduce(position);
-  const needsWithdraw = getCompanionNeedsWithdraw(position);
-  const needsTerminate = getCompanionNeedsTerminate(position);
+  const needsIncreaseOrReduce = doesCompanionNeedIncreaseOrReducePermission(position);
+  const needsWithdraw = doesCompanionNeedWithdrawPermission(position);
+  const needsTerminate = doesCompanionNeedTerminatePermission(position);
 
   if (needsIncreaseOrReduce) {
-    permissionsNeeded.push(Permission.increase);
-    permissionsNeeded.push(Permission.reduce);
+    permissionsNeeded.push(Permission.INCREASE);
+    permissionsNeeded.push(Permission.REDUCE);
   }
 
   if (needsWithdraw) {
-    permissionsNeeded.push(Permission.withdraw);
+    permissionsNeeded.push(Permission.WITHDRAW);
   }
 
   if (needsTerminate) {
-    permissionsNeeded.push(Permission.terminate);
+    permissionsNeeded.push(Permission.TERMINATE);
   }
 
   return permissionsNeeded;

@@ -177,7 +177,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
             COMPANION_ADDRESS[position.version][position.chainId].toLowerCase()
         )[0];
 
-        return !companionPermissions || !companionPermissions.permissions.includes(Permission.terminate);
+        return !companionPermissions || !companionPermissions.permissions.includes(Permission.TERMINATE);
       }),
     [affectedPositions]
   );
