@@ -47,6 +47,8 @@ import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
+import useSupportsSigning from '@hooks/useSupportsSigning';
+import { TransactionResponse } from '@ethersproject/providers';
 import { setPermissions } from '@state/position-permissions/actions';
 import PositionNotFound from '../components/position-not-found';
 import PositionControls from '../components/position-summary-controls';
@@ -188,6 +190,7 @@ const PositionDetailFrame = () => {
         returnSame: !positionInUse?.from.underlyingTokens.length,
       },
     ]);
+  const hasSignSupport = useSupportsSigning();
 
   React.useEffect(() => {
     dispatch(changeMainTab(0));
@@ -280,7 +283,7 @@ const PositionDetailFrame = () => {
                 values={{ toSymbol }}
               />
             </Typography>
-            {useProtocolToken && !hasPermission && (
+            {useProtocolToken && !hasPermission && hasSignSupport && (
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
@@ -294,8 +297,23 @@ const PositionDetailFrame = () => {
       });
       trackEvent('DCA - Position details - Withdraw submitting', { chainId, useProtocolToken });
 
-      const result = await positionService.withdraw(fullPositionToMappedPosition(positionInUse), useProtocolToken);
-      addTransaction(result, {
+      let result;
+      let hash;
+
+      if (hasSignSupport) {
+        result = await positionService.withdraw(fullPositionToMappedPosition(positionInUse), useProtocolToken);
+
+        hash = result.hash;
+      } else {
+        result = await positionService.withdrawSafe(fullPositionToMappedPosition(positionInUse));
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        result.hash = result.safeTxHash;
+        hash = result.safeTxHash;
+      }
+
+      addTransaction(result as TransactionResponse, {
         type: TransactionTypes.withdrawPosition,
         typeData: {
           id: fullPositionToMappedPosition(positionInUse).id,
@@ -304,7 +322,7 @@ const PositionDetailFrame = () => {
         position: fullPositionToMappedPosition(positionInUse),
       });
       setModalSuccess({
-        hash: result.hash,
+        hash,
         content: (
           <FormattedMessage
             description="withdraw from success"
@@ -372,7 +390,7 @@ const PositionDetailFrame = () => {
                 values={{ fromSymbol }}
               />
             </Typography>
-            {useProtocolToken && !hasPermission && (
+            {useProtocolToken && !hasPermission && hasSignSupport && (
               <Typography variant="body1">
                 <FormattedMessage
                   description="Approve signature companion text"
@@ -386,13 +404,31 @@ const PositionDetailFrame = () => {
       });
       trackEvent('DCA - Position details - Withdraw funds submitting', { chainId, useProtocolToken });
 
-      const result = await positionService.modifyRateAndSwaps(
-        fullPositionToMappedPosition(positionInUse),
-        '0',
-        '0',
-        !useProtocolToken
-      );
-      addTransaction(result, {
+      let result;
+      let hash;
+
+      if (hasSignSupport) {
+        result = await positionService.modifyRateAndSwaps(
+          fullPositionToMappedPosition(positionInUse),
+          '0',
+          '0',
+          !useProtocolToken
+        );
+        hash = result.hash;
+      } else {
+        result = await positionService.modifyRateAndSwapsSafe(
+          fullPositionToMappedPosition(positionInUse),
+          '0',
+          '0',
+          !useProtocolToken
+        );
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        result.hash = result.safeTxHash;
+        hash = result.safeTxHash;
+      }
+      addTransaction(result as unknown as TransactionResponse, {
         type: TransactionTypes.withdrawFunds,
         typeData: {
           id: fullPositionToMappedPosition(positionInUse).id,
@@ -402,7 +438,7 @@ const PositionDetailFrame = () => {
         position: fullPositionToMappedPosition(positionInUse),
       });
       setModalSuccess({
-        hash: result.hash,
+        hash,
         content: (
           <FormattedMessage
             description="withdraw from success"

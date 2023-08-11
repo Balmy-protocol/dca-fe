@@ -438,14 +438,14 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
   },
 };
 
-const OLD_VERSION_4_COMPANION_ADDRESSES = [
+export const OLD_VERSION_4_COMPANION_ADDRESSES = [
   '0x49c590F6a2dfB0f809E82B9e2BF788C0Dd1c31f9',
   '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
   '0x1547d2b570916270e4922a6397f92E8fC9708b4a',
   '0xa392e0e0B6C2AD6D65b05F2B8036AA397483CAae',
 ].map((address) => address.toLowerCase());
 export const isCompanionAddress = (address: string, chainId: number) => {
-  if (OLD_VERSION_4_COMPANION_ADDRESSES.includes(address)) {
+  if (OLD_VERSION_4_COMPANION_ADDRESSES.includes(address.toLowerCase())) {
     return { isCompanion: true, isOldCompanion: true };
   }
 

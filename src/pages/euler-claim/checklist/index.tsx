@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Position, TransactionTypes } from '@types';
+import { Permission, Position, TransactionTypes } from '@types';
 import find from 'lodash/find';
 import Button from '@common/components/button';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
@@ -366,7 +366,7 @@ const ClaimChecklist = ({
         typeData: {
           id: result.hash,
           positionIds: positions.map((position) => position.id),
-          permissions: ['TERMINATE'],
+          permissions: [Permission.TERMINATE],
           permittedAddress: companionAddress,
         },
       });

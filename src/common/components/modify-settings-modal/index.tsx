@@ -399,7 +399,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     }
   };
 
-  const handleApproveAndModifyRateAndSwapsSafe = async () => {
+  const handleModifyRateAndSwapsSafe = async () => {
     if (!position) {
       return;
     }
@@ -428,7 +428,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         ),
       });
       trackEvent('DCA - Safe modify position submitting', { isIncreasingPosition, useWrappedProtocolToken });
-      const result = await positionService.approveAndModifyRateAndSwapsSafe(
+      const result = await positionService.modifyRateAndSwapsSafe(
         position,
         rate,
         frequencyValue,
@@ -694,7 +694,19 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         color: 'secondary',
         variant: 'contained',
         label: <FormattedMessage description="modifyPositionSafe" defaultMessage="Authorize and modify position" />,
-        onClick: handleApproveAndModifyRateAndSwapsSafe,
+        onClick: handleModifyRateAndSwapsSafe,
+        disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
+      },
+    ];
+  }
+
+  if (!needsToApprove && loadedAsSafeApp) {
+    actions = [
+      {
+        color: 'secondary',
+        variant: 'contained',
+        label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
+        onClick: handleModifyRateAndSwapsSafe,
         disabled: !!cantFund || frequencyValue === '0' || shouldDisableByUsd,
       },
     ];

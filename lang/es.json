@@ -3083,5 +3083,41 @@
   "5QXn5Y": {
     "defaultMessage": "Confirmar esta transacción en su billetera",
     "description": "Confirm in wallet"
+  },
+  "+CHvZG": {
+    "defaultMessage": "Dándole permisos sobre tu posición a nuestro Hub Companion",
+    "description": "positionDetailsGiveNewCompanionPermissionsLoading"
+  },
+  "/F1L2v": {
+    "defaultMessage": "Dar nuevos permisos",
+    "description": "safeCompanionDoesNotHavePermissionGive"
+  },
+  "8xMdMb": {
+    "defaultMessage": "Todas las cotizaciones van a fallar",
+    "description": "failedQuotes title"
+  },
+  "MYtzs2": {
+    "defaultMessage": "Luego de simular las cotizaciones, encontramos que todas las cotizaciones fallarían si se ejecutaran. Queremos disculparnos por esta ocurrencia. Podes probar buscando cotizaciones nuevamente.",
+    "description": "failedQuote selectBetterQuote"
+  },
+  "SzmD9Z": {
+    "defaultMessage": "Dándole permisos sobre tu posición a nuestro Hub Companion se ha enviado correctamente a la blockchain y sera confirmado pronto.",
+    "description": "positionDetailsGiveNewCompanionPermissionSuccess"
+  },
+  "bassi3": {
+    "defaultMessage": "Ir atrás y buscar de nuevo",
+    "description": "failedQuotes reject action"
+  },
+  "fVfY1G": {
+    "defaultMessage": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Necesitamos que les des permisos directamente desde la pantalla de detalles de tu posición para volver a habilitar el agregado y retiro de fondos.",
+    "description": "safeCompanionDoesNotHavePermissionList"
+  },
+  "mj2YEz": {
+    "defaultMessage": "Error encontrado dándole permisos a nuestro nuevo Hub Companion",
+    "description": "positionDetailsGiveNewCompanionPermissionsError"
+  },
+  "qvNbVb": {
+    "defaultMessage": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Dado que Gnosis Safe no permite firmar mensajes, necesitamos que explícitamente le des permisos a este nuevo Companion sobre tu posición, para que puedas usar libremente tu posición de Mean Finance.",
+    "description": "safeCompanionDoesNotHavePermission"
   }
 }

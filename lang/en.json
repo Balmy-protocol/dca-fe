@@ -7,6 +7,10 @@
     "defaultMessage": "Authorize {amount} {symbol}",
     "description": "Allow us to use your coin (home exact)"
   },
+  "+CHvZG": {
+    "defaultMessage": "Giving our Hub Companion permissions over your position",
+    "description": "positionDetailsGiveNewCompanionPermissionsLoading"
+  },
   "+IzX5q": {
     "defaultMessage": "{readable}",
     "description": "oneHourPluralTime"
@@ -74,6 +78,10 @@
   "/0oLaV": {
     "defaultMessage": "Setting or revoking permissions",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart6"
+  },
+  "/F1L2v": {
+    "defaultMessage": "Set new permissions",
+    "description": "safeCompanionDoesNotHavePermissionGive"
   },
   "/LSdRt": {
     "defaultMessage": "Users need to pay gas fees when interacting with their positions. At the same time, there is a protocol fee that is charged in each swap. That fee is currently 0.6%.",
@@ -398,6 +406,10 @@
   "8uwFtl": {
     "defaultMessage": "We do not support this chain yet",
     "description": "wrong chainId"
+  },
+  "8xMdMb": {
+    "defaultMessage": "All quotes will fail",
+    "description": "failedQuotes title"
   },
   "96zib+": {
     "defaultMessage": "{increaseDecrease} rate from",
@@ -1067,6 +1079,10 @@
     "defaultMessage": "What is quote simulation?",
     "description": "faqWhatIsTransactionSimulation"
   },
+  "MYtzs2": {
+    "defaultMessage": "After simulating quotes, we found that all would fail if executed. We are sorry for this outcome. You can try searching for quotes again.",
+    "description": "failedQuote selectBetterQuote"
+  },
   "Mj3zFe": {
     "defaultMessage": "less profitable than recommended",
     "description": "worseByLabelMostProfitWithRecommended"
@@ -1358,6 +1374,10 @@
   "SyQoGa": {
     "defaultMessage": "more received",
     "description": "betterByLabelMostReturnSellOrderWithoutRecommended"
+  },
+  "SzmD9Z": {
+    "defaultMessage": "Giving our Hub Companion permissions over your position submitted to the blockchain and will be confirmed soon",
+    "description": "positionDetailsGiveNewCompanionPermissionSuccess"
   },
   "TC32uH": {
     "defaultMessage": "Add {amount} {from} to your {from}:{to} position and set it to run for {swaps} {frequency}",
@@ -1751,6 +1771,10 @@
     "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you will get your balance back as {token}.",
     "description": "Approve signature companion text decrease"
   },
+  "bassi3": {
+    "defaultMessage": "Go back and search again",
+    "description": "failedQuotes reject action"
+  },
   "bdyKpA": {
     "defaultMessage": "Timeline",
     "description": "timeline"
@@ -1898,6 +1922,10 @@
   "fTLFqX": {
     "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you send the necessary {token}.",
     "description": "Approve signature companion text increase"
+  },
+  "fVfY1G": {
+    "defaultMessage": "We have released a new Hub Companion that allows us to give you a better experience. We need you to take an action directly from your position details page to re-enable adding funds and withdrawing.",
+    "description": "safeCompanionDoesNotHavePermissionList"
   },
   "fatFLN": {
     "defaultMessage": "I confirm that the address above is correct",
@@ -2191,6 +2219,10 @@
     "defaultMessage": "What is swap and transfer?",
     "description": "faqWhatIsSwapAndTransfer"
   },
+  "mj2YEz": {
+    "defaultMessage": "Error when giving new companion permissions",
+    "description": "positionDetailsGiveNewCompanionPermissionsError"
+  },
   "mljOZT": {
     "defaultMessage": "There is no data available about this pair",
     "description": "No data available"
@@ -2402,6 +2434,10 @@
   "qodglE": {
     "defaultMessage": "Error while transfering position",
     "description": "modalErrorTransferPosition"
+  },
+  "qvNbVb": {
+    "defaultMessage": "We have released a new Hub Companion that allows us to give you a better experience. Due to Gnosis Safe's not allowing to sign messages we need you to explicitely give this new Companion permissions over your position so it can allow you to enable you to freely use your Mean Finance position.",
+    "description": "safeCompanionDoesNotHavePermission"
   },
   "r+KI3m": {
     "defaultMessage": "Error changing rate and swaps",

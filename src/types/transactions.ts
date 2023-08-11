@@ -1,5 +1,5 @@
 import { Log } from '@ethersproject/providers';
-import { Permission, Position, PositionVersions } from './positions';
+import { Permission, Position, PositionPermission, PositionVersions } from './positions';
 import { Token } from './tokens';
 
 export interface TransactionReceipt {
@@ -123,6 +123,7 @@ export interface ModifyPermissionsTypeData {
   type: TransactionTypes.modifyPermissions;
   typeData: {
     id: number | string;
+    permissions: PositionPermission[];
     from: string;
     to: string;
   };

@@ -2,7 +2,8 @@ import { parseUnits } from '@ethersproject/units';
 import { createReducer } from '@reduxjs/toolkit';
 import { LATEST_VERSION, POSITION_ACTIONS } from '@constants';
 import { BigNumber } from 'ethers';
-import { FullPosition, TransactionTypes } from '@types';
+import findIndex from 'lodash/findIndex';
+import { FullPosition, PositionPermission, TransactionTypes } from '@types';
 import { setPosition, updatePosition, updateShowBreakdown } from './actions';
 
 export interface PositionDetailsState {
@@ -83,6 +84,65 @@ export default createReducer(initialState, (builder) =>
             toWithdraw: BigNumber.from(0).toString(),
             remainingLiquidity: BigNumber.from(0).toString(),
             remainingSwaps: BigNumber.from(0).toString(),
+          };
+          break;
+        }
+        case TransactionTypes.modifyPermissions: {
+          const modifyPermissionsTypeData = transaction.typeData;
+
+          const positionPermissions = position.permissions;
+          let newPermissions: PositionPermission[] = [];
+          if (positionPermissions) {
+            modifyPermissionsTypeData.permissions.forEach((permission) => {
+              const permissionIndex = findIndex(positionPermissions, { operator: permission.operator.toLowerCase() });
+              if (permissionIndex !== -1) {
+                newPermissions[permissionIndex] = permission;
+              } else {
+                newPermissions = [...newPermissions, permission];
+              }
+            });
+          } else {
+            newPermissions = modifyPermissionsTypeData.permissions;
+          }
+          history.push({
+            id: transaction.hash,
+            action: POSITION_ACTIONS.PERMISSIONS_MODIFIED,
+            rate: position.rate,
+            oldRate: position.rate,
+            from: position.user,
+            to: position.user,
+            remainingSwaps: position.remainingSwaps,
+            oldRemainingSwaps: position.remainingSwaps,
+            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
+            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
+            withdrawnUnderlyingAccum: null,
+            swappedUnderlying: '0',
+            swapped: '0',
+            withdrawn: position.withdrawn,
+            permissions: modifyPermissionsTypeData.permissions,
+            rateUnderlying: position.rate,
+            depositedRateUnderlying: position.rate,
+            pairSwap: {
+              ratioUnderlyingBToA: '1',
+              ratioUnderlyingAToB: '1',
+              ratioUnderlyingAToBWithFee: '1',
+              ratioUnderlyingBToAWithFee: '1',
+            },
+            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
+            createdAtTimestamp: (Date.now() / 1000).toString(),
+            transaction: {
+              id: transaction.hash,
+              hash: transaction.hash,
+              timestamp: (Date.now() / 1000).toString(),
+            },
+            withdrawnSwapped: '0',
+            withdrawnSwappedUnderlying: '0',
+            withdrawnRemaining: '0',
+            withdrawnRemainingUnderlying: '0',
+          });
+          position = {
+            ...position,
+            permissions: newPermissions,
           };
           break;
         }

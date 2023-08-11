@@ -17,6 +17,12 @@
       "value": "symbol"
     }
   ],
+  "+CHvZG": [
+    {
+      "type": 0,
+      "value": "Dándole permisos sobre tu posición a nuestro Hub Companion"
+    }
+  ],
   "+IzX5q": [
     {
       "type": 1,
@@ -149,6 +155,12 @@
     {
       "type": 0,
       "value": "Establecer o revocar permisos"
+    }
+  ],
+  "/F1L2v": [
+    {
+      "type": 0,
+      "value": "Dar nuevos permisos"
     }
   ],
   "/LSdRt": [
@@ -907,6 +919,12 @@
     {
       "type": 0,
       "value": "Esta cadena aún no es compatible"
+    }
+  ],
+  "8xMdMb": [
+    {
+      "type": 0,
+      "value": "Todas las cotizaciones van a fallar"
     }
   ],
   "94DkXG": [
@@ -2661,6 +2679,12 @@
       "value": "¿Mean Finance cobra alguna comisión por el intercambio?"
     }
   ],
+  "MYtzs2": [
+    {
+      "type": 0,
+      "value": "Luego de simular las cotizaciones, encontramos que todas las cotizaciones fallarían si se ejecutaran. Queremos disculparnos por esta ocurrencia. Podes probar buscando cotizaciones nuevamente."
+    }
+  ],
   "Mcj/iy": [
     {
       "type": 0,
@@ -3401,6 +3425,12 @@
     {
       "type": 0,
       "value": "más recibido"
+    }
+  ],
+  "SzmD9Z": [
+    {
+      "type": 0,
+      "value": "Dándole permisos sobre tu posición a nuestro Hub Companion se ha enviado correctamente a la blockchain y sera confirmado pronto."
     }
   ],
   "TC32uH": [
@@ -4367,6 +4397,12 @@
       "value": "Crear posición"
     }
   ],
+  "bassi3": [
+    {
+      "type": 0,
+      "value": "Ir atrás y buscar de nuevo"
+    }
+  ],
   "bdyKpA": [
     {
       "type": 0,
@@ -4723,6 +4759,12 @@
     {
       "type": 0,
       "value": "Enviar comentario"
+    }
+  ],
+  "fVfY1G": [
+    {
+      "type": 0,
+      "value": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Necesitamos que les des permisos directamente desde la pantalla de detalles de tu posición para volver a habilitar el agregado y retiro de fondos."
     }
   ],
   "fatFLN": [
@@ -5447,6 +5489,12 @@
       "value": "¿Qué es intercambiar y transferir?"
     }
   ],
+  "mj2YEz": [
+    {
+      "type": 0,
+      "value": "Error encontrado dándole permisos a nuestro nuevo Hub Companion"
+    }
+  ],
   "mljOZT": [
     {
       "type": 0,
@@ -5939,6 +5987,12 @@
     {
       "type": 0,
       "value": "Error transfiriendo la posición"
+    }
+  ],
+  "qvNbVb": [
+    {
+      "type": 0,
+      "value": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Dado que Gnosis Safe no permite firmar mensajes, necesitamos que explícitamente le des permisos a este nuevo Companion sobre tu posición, para que puedas usar libremente tu posición de Mean Finance."
     }
   ],
   "r+KI3m": [
