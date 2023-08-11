@@ -3105,19 +3105,19 @@
     "description": "positionDetailsGiveNewCompanionPermissionSuccess"
   },
   "bassi3": {
-    "defaultMessage": "Ir atras y buscar de nuevo",
+    "defaultMessage": "Ir atrás y buscar de nuevo",
     "description": "failedQuotes reject action"
   },
   "fVfY1G": {
-    "defaultMessage": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Necesitamos que les des permisos directamente desde la pantalla de detalles de tu posicion para volver a habiltiar agregar fondos y retirar fondos.",
+    "defaultMessage": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Necesitamos que les des permisos directamente desde la pantalla de detalles de tu posición para volver a habilitar el agregado y retiro de fondos.",
     "description": "safeCompanionDoesNotHavePermissionList"
   },
   "mj2YEz": {
-    "defaultMessage": "Error encontrado dandole permisos a nuestro nuevo Hub Companion",
+    "defaultMessage": "Error encontrado dándole permisos a nuestro nuevo Hub Companion",
     "description": "positionDetailsGiveNewCompanionPermissionsError"
   },
   "qvNbVb": {
-    "defaultMessage": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Dado que Gnosis Safe no permite firmar mensajes, necesitamos que explicitamente le des permisos a este nunevo Companion sobre tu posición, para que puedas usar libremente tu posición de Mean Finance.",
+    "defaultMessage": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Dado que Gnosis Safe no permite firmar mensajes, necesitamos que explícitamente le des permisos a este nuevo Companion sobre tu posición, para que puedas usar libremente tu posición de Mean Finance.",
     "description": "safeCompanionDoesNotHavePermission"
   }
 }

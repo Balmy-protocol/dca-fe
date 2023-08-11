@@ -9,11 +9,7 @@ export const getCompanionNeedsWithdraw = (position?: Nullable<FullPosition | Pos
   const toHasYield = position.to.underlyingTokens.length;
   const toIsProtocol = position.to.address === PROTOCOL_TOKEN_ADDRESS;
 
-  if (toHasYield || toIsProtocol) {
-    return true;
-  }
-
-  return false;
+  return toHasYield || toIsProtocol;
 };
 
 export const getCompanionNeedsIncreaseOrReduce = (position?: Nullable<FullPosition | Position>) => {
@@ -24,11 +20,7 @@ export const getCompanionNeedsIncreaseOrReduce = (position?: Nullable<FullPositi
   const fromHasYield = position.from.underlyingTokens.length;
   const fromIsProtocol = position.from.address === PROTOCOL_TOKEN_ADDRESS;
 
-  if (fromHasYield || fromIsProtocol) {
-    return true;
-  }
-
-  return false;
+  return fromHasYield || fromIsProtocol;
 };
 
 export const getCompanionNeedsTerminate = (position?: Nullable<FullPosition | Position>) => {
@@ -39,11 +31,7 @@ export const getCompanionNeedsTerminate = (position?: Nullable<FullPosition | Po
   const needsIncreaseOrReduce = getCompanionNeedsIncreaseOrReduce(position);
   const needsWithdraw = getCompanionNeedsWithdraw(position);
 
-  if (needsIncreaseOrReduce || needsWithdraw) {
-    return true;
-  }
-
-  return false;
+  return needsIncreaseOrReduce || needsWithdraw;
 };
 
 export const getCompanionNeededPermisssions = (position?: Nullable<FullPosition | Position>) => {
