@@ -3097,7 +3097,7 @@
     "description": "failedQuotes title"
   },
   "MYtzs2": {
-    "defaultMessage": "Luego de simular las cotizaciones, encontramos que todas las cotizaciones fallarian si se ejecutaran. Queremos disculparnos por esta ocurrencia. Podes probar buscar por cotizaciones nuevamente.",
+    "defaultMessage": "Luego de simular las cotizaciones, encontramos que todas las cotizaciones fallarían si se ejecutaran. Queremos disculparnos por esta ocurrencia. Podes probar buscando cotizaciones nuevamente.",
     "description": "failedQuote selectBetterQuote"
   },
   "SzmD9Z": {
