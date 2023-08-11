@@ -279,6 +279,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         );
       }
 
+      const goesThroughPermit2 =
+        (useWrappedProtocolToken || position.from.address !== PROTOCOL_TOKEN_ADDRESS) &&
+        isIncreasingPosition &&
+        hasSignSupport;
+
       trackEvent('DCA - Modify position submitting', { isIncreasingPosition, useWrappedProtocolToken });
       setModalLoading({
         content: (
@@ -297,8 +302,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 }}
               />
             </Typography>
-            {((position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken) || hasYield) &&
-              !hasPermission && (
+            {(((position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken) || hasYield) &&
+              !hasPermission) ||
+              (goesThroughPermit2 && (
                 <Typography variant="body1">
                   {!isIncreasingPosition && (
                     <FormattedMessage
@@ -315,7 +321,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                     />
                   )}
                 </Typography>
-              )}
+              ))}
           </>
         ),
       });

@@ -977,7 +977,8 @@ export default class PositionService {
 
     const yieldFrom = hasYield && position.from.underlyingTokens[0].address;
 
-    const usesCompanion = tokenFrom === PROTOCOL_TOKEN_ADDRESS || yieldFrom;
+    // if it uses signature it means it goes through permit2
+    const usesCompanion = tokenFrom === PROTOCOL_TOKEN_ADDRESS || yieldFrom || signature;
 
     let permissionSignature;
 
