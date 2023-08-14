@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 const getPosition = gql`
-  query getPosition($id: String!, $first: Int, $skip: Int, $subgraphError: String) {
+  query getPosition($id: String!, $first: Int, $lastId: String, $subgraphError: String) {
     position(id: $id, subgraphError: $subgraphError) {
       id
       createdAtTimestamp
@@ -92,7 +92,13 @@ const getPosition = gql`
       withdrawn
       toWithdraw
 
-      history(orderBy: createdAtBlock, orderDirection: asc, first: $first, skip: $skip, subgraphError: $subgraphError) {
+      history(
+        orderBy: createdAtBlock
+        orderDirection: asc
+        first: $first
+        where: { id_gt: $lastId }
+        subgraphError: $subgraphError
+      ) {
         id
         action
         transaction {
