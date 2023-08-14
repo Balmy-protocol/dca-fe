@@ -3121,7 +3121,7 @@
     "description": "safeCompanionDoesNotHavePermission"
   },
   "KLrr1c": {
-    "defaultMessage": "Nuestro proveedor de subgráficos entrará en mantenimiento el 24 de Agosto a las 07:00 UTC. Puede haber algunos problemas para cargar posiciones durante un breve período de la ventana de mantenimiento. Ten en cuenta que las posiciones están seguras en todo momento y el servicio volverá a la normalidad en breve.",
+    "defaultMessage": "Nuestro proveedor de subgráficos entrará en mantenimiento el 14 de Agosto a las 07:00 UTC. Puede haber algunos problemas para cargar posiciones durante un breve período de la ventana de mantenimiento. Ten en cuenta que las posiciones están seguras en todo momento y el servicio volverá a la normalidad en breve.",
     "description": "theGraphDowntime"
   }
 }
