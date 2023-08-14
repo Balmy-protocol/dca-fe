@@ -7,10 +7,6 @@
     "defaultMessage": "Authorize {amount} {symbol}",
     "description": "Allow us to use your coin (home exact)"
   },
-  "+CHvZG": {
-    "defaultMessage": "Giving our Hub Companion permissions over your position",
-    "description": "positionDetailsGiveNewCompanionPermissionsLoading"
-  },
   "+IzX5q": {
     "defaultMessage": "{readable}",
     "description": "oneHourPluralTime"
@@ -78,10 +74,6 @@
   "/0oLaV": {
     "defaultMessage": "Setting or revoking permissions",
     "description": "faqWhenDoINeedToPayGasFeesResponsePart6"
-  },
-  "/F1L2v": {
-    "defaultMessage": "Set new permissions",
-    "description": "safeCompanionDoesNotHavePermissionGive"
   },
   "/LSdRt": {
     "defaultMessage": "Users need to pay gas fees when interacting with their positions. At the same time, there is a protocol fee that is charged in each swap. That fee is currently 0.6%.",
@@ -991,6 +983,10 @@
     "defaultMessage": "Set to run for:",
     "description": "positionCreatedSwaps"
   },
+  "KLrr1c": {
+    "defaultMessage": "Our subgraph provider will go under maintenance on August 24 at 07:00 UTC. There might be some issues loading positions during a small period of the maintenance window. Please note that positions are safe at all times and service will return to normal shortly",
+    "description": "theGraphDowntime"
+  },
   "Kbpl3O": {
     "defaultMessage": "Select",
     "description": "select"
@@ -1374,10 +1370,6 @@
   "SyQoGa": {
     "defaultMessage": "more received",
     "description": "betterByLabelMostReturnSellOrderWithoutRecommended"
-  },
-  "SzmD9Z": {
-    "defaultMessage": "Giving our Hub Companion permissions over your position submitted to the blockchain and will be confirmed soon",
-    "description": "positionDetailsGiveNewCompanionPermissionSuccess"
   },
   "TC32uH": {
     "defaultMessage": "Add {amount} {from} to your {from}:{to} position and set it to run for {swaps} {frequency}",
@@ -1923,10 +1915,6 @@
     "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you send the necessary {token}.",
     "description": "Approve signature companion text increase"
   },
-  "fVfY1G": {
-    "defaultMessage": "We have released a new Hub Companion that allows us to give you a better experience. We need you to take an action directly from your position details page to re-enable adding funds and withdrawing.",
-    "description": "safeCompanionDoesNotHavePermissionList"
-  },
   "fatFLN": {
     "defaultMessage": "I confirm that the address above is correct",
     "description": "transferToValidateCheckboxLabel"
@@ -2219,10 +2207,6 @@
     "defaultMessage": "What is swap and transfer?",
     "description": "faqWhatIsSwapAndTransfer"
   },
-  "mj2YEz": {
-    "defaultMessage": "Error when giving new companion permissions",
-    "description": "positionDetailsGiveNewCompanionPermissionsError"
-  },
   "mljOZT": {
     "defaultMessage": "There is no data available about this pair",
     "description": "No data available"
@@ -2434,10 +2418,6 @@
   "qodglE": {
     "defaultMessage": "Error while transfering position",
     "description": "modalErrorTransferPosition"
-  },
-  "qvNbVb": {
-    "defaultMessage": "We have released a new Hub Companion that allows us to give you a better experience. Due to Gnosis Safe's not allowing to sign messages we need you to explicitely give this new Companion permissions over your position so it can allow you to enable you to freely use your Mean Finance position.",
-    "description": "safeCompanionDoesNotHavePermission"
   },
   "r+KI3m": {
     "defaultMessage": "Error changing rate and swaps",
