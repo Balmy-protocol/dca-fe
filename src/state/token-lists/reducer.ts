@@ -98,6 +98,28 @@ export const getDefaultByUrl = () => ({
       parser: (list: { tokens: (Token & { protocol?: string })[] }) =>
         list.tokens.filter((token) => token.protocol && token.protocol !== 'dex'),
     },
+  'https://li.quest/v1/tokens': {
+    name: 'Li.fi',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    priority: 0,
+    parser: (list: { tokens: Record<string, Token[]> }) =>
+      Object.values(list.tokens)
+        .reduce(
+          (acc, token) => [
+            ...acc,
+            ...token.map(toToken),
+            // Modifiy with all chains that we want tokens from,
+          ],
+          []
+        )
+        .filter((token) => [1101, 8453].includes(token.chainId)),
+  },
 
   /* -------------------------------------------------------------------------- */
   /*                                    Canto                                   */
@@ -137,6 +159,57 @@ export const getDefaultByUrl = () => ({
       Object.entries(list.tokenMap).map(([key, token]) =>
         toToken({ ...token, address: key, logoURI: `https://assets.odos.xyz/tokens/${token.symbol}.webp` })
       ),
+  },
+  /* -------------------------------------------------------------------------- */
+  /*                                     Base                            */
+  /* -------------------------------------------------------------------------- */
+  'https://api.odos.xyz/info/tokens/8453': {
+    name: 'Odos Base token list',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 8453,
+    priority: 0,
+    parser: (list: { tokenMap: Record<string, Token> }) =>
+      Object.entries(list.tokenMap).map(([key, token]) =>
+        toToken({ ...token, address: key, logoURI: `https://assets.odos.xyz/tokens/${token.symbol}.webp` })
+      ),
+  },
+  /* -------------------------------------------------------------------------- */
+  /*                                     Polygon ZkEvm                            */
+  /* -------------------------------------------------------------------------- */
+  'https://api.odos.xyz/info/tokens/1101': {
+    name: 'Odos Polygon ZkEvm token list',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 1101,
+    priority: 0,
+    parser: (list: { tokenMap: Record<string, Token> }) =>
+      Object.entries(list.tokenMap).map(([key, token]) =>
+        toToken({ ...token, address: key, logoURI: `https://assets.odos.xyz/tokens/${token.symbol}.webp` })
+      ),
+  },
+
+  'https://api-polygon-tokens.polygon.technology/tokenlists/zkevmPopular.tokenlist.json': {
+    name: 'Polygon zkEVM list',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 1101,
+    priority: 0,
   },
 
   /* -------------------------------------------------------------------------- */
@@ -526,9 +599,17 @@ export const initialState: TokenListsState = {
     'https://token-list.sushi.com/',
     'tokens.1inch.eth',
     'https://github.com/ethereum-optimism/ethereum-optimism.github.io/blob/master/optimism.tokenlist.json',
+    'https://li.quest/v1/tokens',
 
     // Base Goerli
     'https://api.odos.xyz/info/tokens/84531',
+
+    // Base
+    'https://api.odos.xyz/info/tokens/8453',
+
+    // Polygon ZkEvm
+    'https://api.odos.xyz/info/tokens/1101',
+    'https://api-polygon-tokens.polygon.technology/tokenlists/zkevmPopular.tokenlist.json',
 
     // BNB
     'https://tokens.1inch.io/v1.1/56',

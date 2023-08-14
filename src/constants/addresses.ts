@@ -275,6 +275,18 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
     },
     rpc: ['https://goerli.base.org', 'https://base-goerli.public.blastapi.io'],
   },
+  base: {
+    chainId: 8453,
+    name: 'Base',
+    mainCurrency: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    mainColor: '#3076F6',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    rpc: ['https://mainnet.base.org', 'https://base.meowrpc.com'],
+  },
   kava: {
     chainId: 2222,
     name: 'Kava',
@@ -525,6 +537,8 @@ export const PERMIT_2_ADDRESS: Record<number, string> = {
   [NETWORKS.kava.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [NETWORKS.heco.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [NETWORKS.okex.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.POLYGON_ZKEVM.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.BASE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
 export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
@@ -545,6 +559,8 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
   [NETWORKS.kava.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [NETWORKS.heco.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [NETWORKS.okex.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
+  [Chains.POLYGON_ZKEVM.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
+  [Chains.BASE.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
 };
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
@@ -649,6 +665,8 @@ export const DEFILLAMA_IDS = {
   [Chains.MOONBEAM.chainId]: 'moonbeam',
   [Chains.VELAS.chainId]: 'velas',
   [Chains.KAVA.chainId]: 'kava',
+  [Chains.POLYGON_ZKEVM.chainId]: 'polygon_zkevm',
+  [Chains.BASE.chainId]: 'base',
 };
 
 export const TOKEN_LISTS = {
@@ -703,7 +721,7 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
 };
 
-export const REMOVED_AGG_CHAINS = [58, Chains.POLYGON_ZKEVM.chainId];
+export const REMOVED_AGG_CHAINS = [58];
 
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
   `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
