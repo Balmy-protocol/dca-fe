@@ -129,6 +129,11 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x69B8FdEd983a19C81bbF8b0Ea21e702395bb6E36', // BNB Chain - Venus DOT - Blacklisting until release
   '0x0BADC4caa20E84e25e26a54CeC3faFeBcC7AB085', // BNB Chain - Venus DOGE - Blacklisting until release
   '0xa2b783bB283cA621f32a8792FFE4A10ad817C039', // BNB Chain - Venus XRP - Blacklisting until release
+
+  '0x67f70429750e38d6bae20839ace2692ff2eff52f', // OP - Exactly
+  '0xe9a15d436390beb7d9eb312546de3fb01b1468ea', // OP - Exactly
+  '0x7eb7deac4929da076910c4aa35128ec70b0b820f', // OP - Exactly
+  '0xa61ef65f330bb9f3fce823aee704052d8dcdb27a', // OP - Exactly
 ].map((a) => a.toLowerCase());
 
 export const DISABLED_YIELD_WITHDRAWS = [
