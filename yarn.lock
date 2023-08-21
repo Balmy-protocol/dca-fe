@@ -3326,12 +3326,12 @@
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/sdk@0.0.134":
-  version "0.0.134"
-  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.134.tgz#3483c8c7b686e157df0e17884968e4f473e2df69"
-  integrity sha512-h9cn9vQ0JcBh0vBiE86sIHPb3PuFCclqlQTV/CKGyd/fG7U+w+nUhfRYKd2hIWD3rbxlAUdhvR9jHIv3H5mA/A==
+"@mean-finance/sdk@0.0.139":
+  version "0.0.139"
+  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.139.tgz#bf69fc362340328c417100015dcf82348829ed6f"
+  integrity sha512-Bf6k0tgDzcdOFb60iBbMCCVJsB8TE4wsy49EfMB2+OkfYIpImyiQDLDU9s4NTi8K3Hn8DsGVQBDKAJzmp7vU3w==
   dependencies:
-    alchemy-sdk "2.9.0"
+    alchemy-sdk "2.9.2"
     cross-fetch "3.1.5"
     lru-cache "9.0.3"
     ms "3.0.0-canary.1"
@@ -5712,10 +5712,10 @@ ajv@^8.0.0, ajv@^8.0.1, ajv@^8.8.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-alchemy-sdk@2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/alchemy-sdk/-/alchemy-sdk-2.9.0.tgz#f8f32ae90c789019053814c7bc34d9aa7f66bcbd"
-  integrity sha512-vPFMGP43LrFQ9XOLHgVNyJCd1DDPK5qXniF5pdZzUA52h/FMHKkMaOayZNf63Y6GDQ1KGHqtyJIoSZtbPeg9kw==
+alchemy-sdk@2.9.2:
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/alchemy-sdk/-/alchemy-sdk-2.9.2.tgz#1aa2afdef0266295c53738b00c2b0b001cdc7d5e"
+  integrity sha512-DAmONxbzgqnKrQP8OLuF9rYdgbxJuxwTUmu3kC4/+1yD5p3Lhg4ZQP1RFTK4DTD9J1O0XEAcqkywmpW6hgR5lQ==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-provider" "^5.7.0"
