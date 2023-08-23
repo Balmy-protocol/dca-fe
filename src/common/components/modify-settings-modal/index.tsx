@@ -64,7 +64,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import usePermit2Service from '@hooks/usePermit2Service';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
-import { useAccountPermissions, mergeCompanionPermissions } from 'state/position-permissions/hooks';
+import { useAccountPermissions, mergeCompanionPermissions } from '@state/position-permissions/hooks';
 import FrequencyInput from '../frequency-easy-input';
 
 const StyledRateContainer = styled.div`
