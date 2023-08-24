@@ -34,6 +34,7 @@ import {
   moonbeam,
   evmos,
   canto,
+  polygonZkEvm,
 } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
@@ -462,6 +463,7 @@ export default class Web3Service {
         moonbeam,
         evmos,
         canto,
+        polygonZkEvm,
         ...addedNetworks,
       ],
       [

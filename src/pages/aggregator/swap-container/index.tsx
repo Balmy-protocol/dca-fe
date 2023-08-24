@@ -62,7 +62,10 @@ const SwapContainer = () => {
   React.useEffect(() => {
     let networkToSet = find(mappedNetworks, { chainId: Number(chainId) });
     if (!networkToSet && chainId) {
-      networkToSet = find(mappedNetworks, { name: chainId.toLowerCase() });
+      networkToSet = find(
+        mappedNetworks,
+        (network) => network.name === chainId.toLowerCase() || network.ids.includes(chainId.toLowerCase())
+      );
     }
     dispatch(
       setAggregatorChainId(Number(networkToSet?.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId))

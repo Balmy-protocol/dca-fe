@@ -157,9 +157,17 @@ const store = configureStore({
           'https://token-list.sushi.com/',
           'tokens.1inch.eth',
           'https://raw.githubusercontent.com/ethereum-optimism/ethereum-optimism.github.io/master/optimism.tokenlist.json',
+          'https://li.quest/v1/tokens',
 
           // Base Goerli
           'https://api.odos.xyz/info/tokens/84531',
+
+          // Base
+          'https://api.odos.xyz/info/tokens/8453',
+
+          // Polygon ZkEvm
+          'https://api.odos.xyz/info/tokens/1101',
+          'https://api-polygon-tokens.polygon.technology/tokenlists/zkevmPopular.tokenlist.json',
 
           // BNB
           'https://tokens.1inch.io/v1.1/56',
