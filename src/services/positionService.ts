@@ -755,7 +755,7 @@ export default class PositionService {
       withdraw: {
         convertTo: useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address,
       },
-      hubAddress,
+      dcaHub: hubAddress,
       recipient: position.user,
       permissionPermit: permissionPermit && {
         permissions: permissionPermit.permissions,
@@ -784,7 +784,7 @@ export default class PositionService {
     const withdrawTx = await this.sdkService.sdk.dcaService.management.buildWithdrawPositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
-      hubAddress,
+      dcaHub: hubAddress,
       withdraw: {
         convertTo: toToUse.address,
       },
@@ -865,7 +865,7 @@ export default class PositionService {
         unswappedConvertTo: fromToUse,
         swappedConvertTo: toToUse,
       },
-      hubAddress,
+      dcaHub: hubAddress,
       recipient: position.user,
       permissionPermit: permissionPermit && {
         permissions: permissionPermit.permissions,
@@ -899,7 +899,7 @@ export default class PositionService {
     const terminateTx = await this.sdkService.sdk.dcaService.management.buildTerminatePositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
-      hubAddress,
+      dcaHub: hubAddress,
       withdraw: {
         unswappedConvertTo: fromToUse,
         swappedConvertTo: toToUse,
@@ -1134,7 +1134,7 @@ export default class PositionService {
       return this.sdkService.sdk.dcaService.management.buildIncreasePositionTx({
         chainId: currentNetwork.chainId,
         positionId: position.positionId,
-        hubAddress,
+        dcaHub: hubAddress,
         amountOfSwaps: swaps.toNumber(),
         permissionPermit: permissionSignature,
         increase,
@@ -1149,7 +1149,7 @@ export default class PositionService {
     return this.sdkService.sdk.dcaService.management.buildReduceToBuyPositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
-      hubAddress,
+      dcaHub: hubAddress,
       amountOfSwaps: swaps.toNumber(),
       permissionPermit: permissionSignature,
       reduce,
