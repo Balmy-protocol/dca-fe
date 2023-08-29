@@ -7,11 +7,10 @@ import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import Typography from '@mui/material/Typography';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { PERMISSIONS, LATEST_VERSION, COMPANION_ADDRESS } from '@constants';
+import { PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import FormGroup from '@mui/material/FormGroup';
-import { createPermissionsObject, PositionPermissions } from '@state/position-permissions/hooks';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { BigNumber } from 'ethers';
@@ -55,20 +54,7 @@ const TerminateModal = ({
   const hasProtocolToken =
     position.from.address === protocolToken.address || position.to.address === protocolToken.address;
 
-  const companionAddress =
-    COMPANION_ADDRESS[position.version][position.chainId] || COMPANION_ADDRESS[LATEST_VERSION][position.chainId];
-  const companionPermissions = createPermissionsObject(
-    false,
-    position?.permissions?.find((permission) => permission.operator === companionAddress.toLowerCase())?.permissions
-  ) as PositionPermissions;
-
-  const defaultWrapped = hasProtocolToken ? !companionPermissions.TERMINATE : false;
-
   const [useWrappedProtocolToken, setUseWrappedProtocolToken] = React.useState(false);
-
-  React.useEffect(() => {
-    setUseWrappedProtocolToken(defaultWrapped);
-  }, [defaultWrapped]);
 
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const remainingLiquidity =
@@ -255,7 +241,6 @@ const TerminateModal = ({
                   checked={useWrappedProtocolToken}
                   onChange={(evt) => setUseWrappedProtocolToken(evt.target.checked)}
                   name="useWrappedProtocolToken"
-                  disabled={defaultWrapped}
                 />
               }
               label={
@@ -275,15 +260,6 @@ const TerminateModal = ({
               }
             />
           </FormGroup>
-        )}
-        {defaultWrapped && (
-          <Typography variant="body1">
-            <FormattedMessage
-              description="terminate warning wrapped companion"
-              defaultMessage="The Mean Finance Companion doesn't have the required permissons, you can only terminate with a Wrapped Protocol Token: {wrappedProtocolToken}."
-              values={{ wrappedProtocolToken: wrappedProtocolToken.symbol }}
-            />
-          </Typography>
         )}
       </StyledTerminateContainer>
     </Modal>
