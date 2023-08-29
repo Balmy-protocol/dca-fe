@@ -748,12 +748,14 @@ export default class PositionService {
       permissionPermit = await this.getSignatureForPermission(position, companionAddress, DCAPermission.WITHDRAW);
     }
 
+    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
     const tx = await this.sdkService.sdk.dcaService.management.buildWithdrawPositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
       withdraw: {
         convertTo: useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address,
       },
+      hubAddress,
       recipient: position.user,
       permissionPermit: permissionPermit && {
         permissions: permissionPermit.permissions,
@@ -777,9 +779,12 @@ export default class PositionService {
 
     const companionHasPermission = await this.companionHasPermission(position, DCAPermission.WITHDRAW);
 
+    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
+
     const withdrawTx = await this.sdkService.sdk.dcaService.management.buildWithdrawPositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
+      hubAddress,
       withdraw: {
         convertTo: toToUse.address,
       },
@@ -851,6 +856,8 @@ export default class PositionService {
         ? wrappedProtocolToken.address
         : position.to.address;
 
+    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
+
     const tx = await this.sdkService.sdk.dcaService.management.buildTerminatePositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
@@ -858,6 +865,7 @@ export default class PositionService {
         unswappedConvertTo: fromToUse,
         swappedConvertTo: toToUse,
       },
+      hubAddress,
       recipient: position.user,
       permissionPermit: permissionPermit && {
         permissions: permissionPermit.permissions,
@@ -887,9 +895,11 @@ export default class PositionService {
 
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
 
+    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
     const terminateTx = await this.sdkService.sdk.dcaService.management.buildTerminatePositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
+      hubAddress,
       withdraw: {
         unswappedConvertTo: fromToUse,
         swappedConvertTo: toToUse,
@@ -1105,6 +1115,8 @@ export default class PositionService {
       }
     }
 
+    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
+
     if (isIncrease) {
       const increase: AddFunds =
         tokenFrom.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS.toLowerCase() && signature
@@ -1122,6 +1134,7 @@ export default class PositionService {
       return this.sdkService.sdk.dcaService.management.buildIncreasePositionTx({
         chainId: currentNetwork.chainId,
         positionId: position.positionId,
+        hubAddress,
         amountOfSwaps: swaps.toNumber(),
         permissionPermit: permissionSignature,
         increase,
@@ -1136,6 +1149,7 @@ export default class PositionService {
     return this.sdkService.sdk.dcaService.management.buildReduceToBuyPositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
+      hubAddress,
       amountOfSwaps: swaps.toNumber(),
       permissionPermit: permissionSignature,
       reduce,
