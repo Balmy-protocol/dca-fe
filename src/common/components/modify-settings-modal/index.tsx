@@ -111,9 +111,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   );
   const hasYield = !!from.underlyingTokens.length || !!to.underlyingTokens.length;
 
-  const mergedPermissions = hasYield
-    ? mergeCompanionPermissions(accountPermissions, companionPermissions)
-    : accountPermissions;
+  const mergedPermissions = mergeCompanionPermissions(accountPermissions, companionPermissions);
 
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
@@ -158,16 +156,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const companionHasRequiredPermission = isIncreasingPosition
     ? !!companionPermissions.INCREASE
     : !!companionPermissions.REDUCE;
-
-  const defaultWrapped =
-    shouldShowWrappedProtocolSwitch && !accountPermissions.isOwner && !companionHasRequiredPermission;
-
-  React.useEffect(() => {
-    if (defaultWrapped && !useWrappedProtocolToken) {
-      fromToUse = wrappedProtocolToken;
-      dispatch(setUseWrappedProtocolToken(!useWrappedProtocolToken));
-    }
-  }, [defaultWrapped, useWrappedProtocolToken]);
 
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
@@ -788,7 +776,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                       onChange={() => dispatch(setUseWrappedProtocolToken(!useWrappedProtocolToken))}
                       name="enableDisableWrappedProtocolToken"
                       color="primary"
-                      disabled={defaultWrapped}
                     />
                   }
                   label={
@@ -800,13 +787,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   }
                 />
               </FormGroup>
-            )}
-            {defaultWrapped && (
-              <FormattedMessage
-                description="useWrappedTokenHint"
-                defaultMessage="You can only use {token} because the Mean Finance Companion doesn't have the required permissions"
-                values={{ token: wrappedProtocolToken.symbol }}
-              />
             )}
             <TokenInput
               id="from-value"
