@@ -5,7 +5,7 @@ import { useHasInitialized } from '@state/initializer/hooks';
 import usePositionService from './usePositionService';
 import useAccount from './useAccount';
 
-function useCurrentPositions(returnPermissioned?: boolean) {
+function useCurrentPositions(returnPermissioned = false) {
   const positionService = usePositionService();
   const account = useAccount();
   const transactions = useAllTransactions();
