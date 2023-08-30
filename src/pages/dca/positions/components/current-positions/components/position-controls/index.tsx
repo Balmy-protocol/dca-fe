@@ -289,7 +289,7 @@ const PositionControls = ({
               </Typography>
             </MenuItem>
           )}
-          {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && isToProtocolToken && accountPermissions.WITHDRAW && (
+          {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && mergedPermissions.WITHDRAW && (
             <MenuItem onClick={() => handleOnWithdraw(false)} disabled={disabled || !isOnNetwork || disabledWithdraw}>
               <Typography variant="body2">
                 <FormattedMessage
@@ -313,7 +313,7 @@ const PositionControls = ({
               </Typography>
             </Link>
           </MenuItem>
-          {((accountPermissions.TERMINATE && !hasYield) || mergedPermissions.TERMINATE) && (
+          {mergedPermissions.TERMINATE && (
             <MenuItem
               onClick={handleTerminate}
               disabled={disabled || !isOnNetwork || disabledWithdraw}
