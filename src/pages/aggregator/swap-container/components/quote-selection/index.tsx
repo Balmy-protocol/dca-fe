@@ -16,7 +16,7 @@ import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@com
 import Box from '@mui/material/Box';
 import { setSelectedRoute } from '@state/aggregator/actions';
 import { useAppDispatch } from '@state/hooks';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import useTrackEvent from '@hooks/useTrackEvent';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -76,13 +76,13 @@ interface SwapQuotesProps {
   swapOptionsError?: string;
 }
 
-const StyledTopCircularProgress = withStyles(() =>
+const StyledTopCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
     circle: {
       strokeLinecap: 'round',
     },
   })
-)(CircularProgress);
+);
 
 const StyledCircularContainer = styled.div`
   align-self: stretch;
@@ -92,7 +92,7 @@ const StyledCircularContainer = styled.div`
   align-items: center;
 `;
 
-const StyledBottomCircularProgress = withStyles(() =>
+const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
     root: {
       color: 'rgba(255, 255, 255, 0.05)',
@@ -101,7 +101,7 @@ const StyledBottomCircularProgress = withStyles(() =>
       strokeLinecap: 'round',
     },
   })
-)(CircularProgress);
+);
 
 const TransactionsProgress = ({ showSimulate }: { showSimulate: boolean }) => {
   const [timer, setTimer] = React.useState(0);

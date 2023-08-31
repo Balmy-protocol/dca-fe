@@ -4,7 +4,7 @@ import isNaN from 'lodash/isNaN';
 import { SetStateCallback } from '@types';
 import findIndex from 'lodash/findIndex';
 import FilledInput from '@mui/material/FilledInput';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import Button from '@common/components/button';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
@@ -49,7 +49,7 @@ const StyledTabContainer = styled.div`
   margin-left: 8px;
 `;
 
-const StyledFilledInput = withStyles(() =>
+const StyledFilledInput = withStyles(FilledInput, () =>
   createStyles({
     root: {
       paddingLeft: '8px',
@@ -59,7 +59,7 @@ const StyledFilledInput = withStyles(() =>
       paddingTop: '8px',
     },
   })
-)(FilledInput);
+);
 
 const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
   const tabIndex = findIndex(PREDEFINED_RANGES, { value });

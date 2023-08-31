@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import isUndefined from 'lodash/isUndefined';
 import { SwapOption, Token } from '@types';
-import { defineMessage, FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { BigNumber } from 'ethers';
 import { Alert } from '@mui/material';
 import { formatUnits, parseUnits } from '@ethersproject/units';
@@ -83,6 +83,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     swapOptionsError,
   } = props;
 
+  const intl = useIntl();
   let fromValueToUse =
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address &&
@@ -205,10 +206,12 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
                     to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
                     and:
                       isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
-                        ? defineMessage({
-                            defaultMessage: ' and ',
-                            description: 'andWithSpaces',
-                          })
+                        ? intl.formatMessage(
+                            defineMessage({
+                              defaultMessage: ' and ',
+                              description: 'andWithSpaces',
+                            })
+                          )
                         : '',
                   }}
                 />

@@ -9,7 +9,7 @@ import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { NETWORKS } from '@constants';
 import LinearProgress from '@mui/material/LinearProgress';
 import { createStyles } from '@mui/material/styles';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { Hidden, Typography } from '@mui/material';
 import { BigNumber } from 'ethers';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -51,7 +51,7 @@ const StyledBullet = styled.div<{ fill: string }>`
   ${({ fill }) => fill && `background-color: ${fill};`}
 `;
 
-const BorderLinearProgress = withStyles(() =>
+const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
   createStyles({
     root: {
       height: 8,
@@ -73,7 +73,7 @@ const BorderLinearProgress = withStyles(() =>
       background: 'rgba(255, 255, 255, 0.5)',
     },
   })
-)(StyledSwapsLinearProgress);
+);
 
 interface CountDashboardProps {
   selectedChain: null | number;

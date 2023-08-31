@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import {
   DCA_TOKEN_BLACKLIST,
@@ -46,14 +46,14 @@ const PositionControlsMenuContainer = styled.div`
   background-color: rgba(216, 216, 216, 0.05);
 `;
 
-const StyledMenu = withStyles(() =>
+const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
       border: '2px solid #A5AAB5',
       borderRadius: '8px',
     },
   })
-)(Menu);
+);
 
 interface PositionSummaryControlsProps {
   onTerminate: () => void;

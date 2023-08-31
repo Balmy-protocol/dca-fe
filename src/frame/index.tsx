@@ -3,7 +3,7 @@
 import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import DCA from '@pages/dca';
 import Aggregator from '@pages/aggregator';
@@ -169,46 +169,28 @@ const AppFrame = ({ isLoading, initializationError }: AppFrameProps) => {
                 <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
                   <StyledAppGridContainer item xs={12}>
                     <ErrorBoundary error={initializationError}>
-                      <Switch>
-                        <Route path="/faq">
-                          {/* <RollbarContext context="/faq"> */}
-                          <FAQ />
-                          {/* </RollbarContext> */}
-                        </Route>
-                        <Route path="/positions/:positionId">
-                          {/* <RollbarContext context="/positions/details"> */}
-                          <PositionDetail />
-                          {/* </RollbarContext> */}
-                        </Route>
-                        <Route path="/:chainId/positions/:positionVersion/:positionId">
-                          {/* <RollbarContext context="/positions/details"> */}
-                          <PositionDetail />
-                          {/* </RollbarContext> */}
-                        </Route>
-                        <Route path="/positions">
-                          {/* <RollbarContext context="/positions"> */}
-                          <DCA isLoading={isLoading || isLoadingNetwork} />
-                          {/* </RollbarContext> */}
-                        </Route>
-                        <Route path="/euler-claim">
-                          {/* <RollbarContext context="/positions"> */}
-                          <EulerClaimFrame isLoading={isLoading || isLoadingNetwork} />
-                          {/* </RollbarContext> */}
-                        </Route>
-                        <Route path="/create/:chainId?/:from?/:to?">
-                          {/* <RollbarContext context="/create"> */}
-                          <DCA isLoading={isLoading || isLoadingNetwork} />
-                          {/* </RollbarContext> */}
-                        </Route>
-                        <Route path="/swap/:chainId?/:from?/:to?">
-                          <Aggregator isLoading={isLoading || isLoadingNetwork} />
-                        </Route>
-                        <Route path="/:chainId?/:from?/:to?">
-                          {/* <RollbarContext context="/main"> */}
-                          <DCA isLoading={isLoading || isLoadingNetwork} />
-                          {/* </RollbarContext> */}
-                        </Route>
-                      </Switch>
+                      <Routes>
+                        <Route path="/faq" element={<FAQ />} />
+                        <Route path="/positions/:positionId" element={<PositionDetail />} />
+                        <Route path="/:chainId/positions/:positionVersion/:positionId" element={<PositionDetail />} />
+                        <Route path="/positions" element={<DCA isLoading={isLoading || isLoadingNetwork} />} />
+                        <Route
+                          path="/euler-claim"
+                          element={<EulerClaimFrame isLoading={isLoading || isLoadingNetwork} />}
+                        />
+                        <Route
+                          path="/create/:chainId?/:from?/:to?"
+                          element={<DCA isLoading={isLoading || isLoadingNetwork} />}
+                        />
+                        <Route
+                          path="/swap/:chainId?/:from?/:to?"
+                          element={<Aggregator isLoading={isLoading || isLoadingNetwork} />}
+                        />
+                        <Route
+                          path="/:chainId?/:from?/:to?"
+                          element={<DCA isLoading={isLoading || isLoadingNetwork} />}
+                        />
+                      </Routes>
                     </ErrorBoundary>
                   </StyledAppGridContainer>
                   <StyledFooterGridContainer item xs={12}>

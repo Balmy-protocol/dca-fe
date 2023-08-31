@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import Button, { ButtonProps } from '@mui/material/Button';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { Theme } from '@mui/material/styles';
 
 const colors = {
@@ -253,7 +253,7 @@ const StyledDisabledFontButton = styled(Button)`
   text-transform: none;
 `;
 
-const PrimaryButton = withStyles((theme: Theme) => ({
+const PrimaryButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: colors.primary[theme.palette.mode],
   },
@@ -277,9 +277,9 @@ const PrimaryButton = withStyles((theme: Theme) => ({
       background: backgroundColors.primary[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
-const SecondaryButton = withStyles((theme: Theme) => ({
+const SecondaryButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: backgroundColors.secondary[theme.palette.mode].default,
   },
@@ -303,9 +303,9 @@ const SecondaryButton = withStyles((theme: Theme) => ({
       background: backgroundColors.secondary[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
-const MigrateButton = withStyles((theme: Theme) => ({
+const MigrateButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: backgroundColors.migrate[theme.palette.mode].default,
   },
@@ -329,9 +329,9 @@ const MigrateButton = withStyles((theme: Theme) => ({
       background: backgroundColors.migrate[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
-const TertiaryButton = withStyles((theme: Theme) => ({
+const TertiaryButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: colors.tertiary[theme.palette.mode],
   },
@@ -355,9 +355,9 @@ const TertiaryButton = withStyles((theme: Theme) => ({
       background: backgroundColors.tertiary[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
-const DefaultButton = withStyles((theme: Theme) => ({
+const DefaultButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: colors.default[theme.palette.mode],
   },
@@ -382,9 +382,9 @@ const DefaultButton = withStyles((theme: Theme) => ({
       background: backgroundColors.default[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
-const TransparentButton = withStyles((theme: Theme) => ({
+const TransparentButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: colors.default[theme.palette.mode],
   },
@@ -411,9 +411,9 @@ const TransparentButton = withStyles((theme: Theme) => ({
     },
     backdropFilter: 'blur(6px)',
   },
-}))(StyledDisabledFontButton);
+}));
 
-const WhiteButton = withStyles((theme: Theme) => ({
+const WhiteButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: colors.white[theme.palette.mode],
   },
@@ -437,9 +437,9 @@ const WhiteButton = withStyles((theme: Theme) => ({
       background: backgroundColors.white[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
-const ErrorButton = withStyles((theme: Theme) => ({
+const ErrorButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: colors.error[theme.palette.mode],
   },
@@ -463,9 +463,9 @@ const ErrorButton = withStyles((theme: Theme) => ({
       background: backgroundColors.error[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
-const WarningButton = withStyles((theme: Theme) => ({
+const WarningButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: colors.warning[theme.palette.mode],
   },
@@ -489,9 +489,9 @@ const WarningButton = withStyles((theme: Theme) => ({
       background: backgroundColors.warning[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
-const PendingButton = withStyles((theme: Theme) => ({
+const PendingButton = withStyles(StyledDisabledFontButton, (theme: Theme) => ({
   text: {
     color: colors.pending[theme.palette.mode],
   },
@@ -515,7 +515,7 @@ const PendingButton = withStyles((theme: Theme) => ({
       background: backgroundColors.pending[theme.palette.mode].hover,
     },
   },
-}))(StyledDisabledFontButton);
+}));
 
 export const ButtonTypes = {
   primary: PrimaryButton,
@@ -534,7 +534,11 @@ export interface CustomButtonProps extends Omit<ButtonProps, 'color'> {
   color: keyof typeof ButtonTypes;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({ children, color, ...rest }: CustomButtonProps) => {
+const CustomButton: React.FC<PropsWithChildren<CustomButtonProps>> = ({
+  children,
+  color,
+  ...rest
+}: CustomButtonProps) => {
   const ButtonToRender = ButtonTypes[color];
 
   return <ButtonToRender {...rest}>{children}</ButtonToRender>;

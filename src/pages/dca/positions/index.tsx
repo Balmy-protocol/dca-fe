@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { changeOpenClosePositionTab } from '@state/tabs/actions';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import usePositionService from '@hooks/usePositionService';
 import usePrevious from '@hooks/usePrevious';
@@ -53,7 +53,7 @@ const StyledPositionsContainer = styled.div`
   flex: 1;
 `;
 
-const StyledTab = withStyles(() =>
+const StyledTab = withStyles(Tab, () =>
   createStyles({
     root: {
       textTransform: 'none',
@@ -66,9 +66,9 @@ const StyledTab = withStyles(() =>
       fontWeight: '500',
     },
   })
-)(Tab);
+);
 
-const StyledTabs = withStyles(() =>
+const StyledTabs = withStyles(Tabs, () =>
   createStyles({
     root: {
       overflow: 'visible',
@@ -80,7 +80,7 @@ const StyledTabs = withStyles(() =>
       background: '#3076F6',
     },
   })
-)(Tabs);
+);
 
 const StyledPaper = styled(Paper)`
   padding: 16px;

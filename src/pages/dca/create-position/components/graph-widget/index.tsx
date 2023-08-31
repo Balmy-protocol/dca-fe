@@ -25,18 +25,18 @@ import useGraphPrice from '@hooks/useGraphPrice';
 import useUsdPrice from '@hooks/useUsdPrice';
 import { parseUnits } from '@ethersproject/units';
 import { useCreatePositionState } from '@state/create-position/hooks';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import Chip from '@mui/material/Chip';
 import MinimalTabs from '@common/components/minimal-tabs';
 import GraphFooter from './components/graph-footer';
 
-const DarkChip = withStyles(() => ({
+const DarkChip = withStyles(Chip, () => ({
   root: {
     background: '#2e2c35',
     zIndex: '2',
     border: '1px solid rgba(255, 255, 255, 0.1)',
   },
-}))(Chip);
+}));
 
 interface GraphWidgetProps {
   withFooter?: boolean;

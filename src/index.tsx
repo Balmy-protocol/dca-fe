@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { Client, WagmiConfig } from 'wagmi';
@@ -10,17 +10,11 @@ import Web3Service from '@services/web3Service';
 import DCASubgraphs from '@common/utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
 import store, { axiosClient } from '@state';
-import { Theme } from '@mui/material/styles';
 import { Settings } from 'luxon';
 import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
 import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
-
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -102,9 +96,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale }: AppProps) => {
 
 function bootstrapApplication(locale: SupportedLanguages) {
   const messages = loadLocaleData(locale);
+  const container = document.getElementById('root');
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const root = createRoot(container!);
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  ReactDOM.render(<App locale={locale} messages={messages} />, document.getElementById('root'));
+  root.render(<App locale={locale} messages={messages} />);
 }
 
 bootstrapApplication(SupportedLanguages.english);

@@ -8,7 +8,7 @@ import WhaveLogoDark from '@assets/logo/wave_logo_dark';
 import Typography from '@mui/material/Typography';
 import ClaimModal from '@common/components/claim-modal';
 import Badge from '@mui/material/Badge';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 
 const StyledMeanLogoContainer = styled.div`
@@ -18,7 +18,7 @@ const StyledMeanLogoContainer = styled.div`
   padding: 5px;
 `;
 
-const StyledBadge = withStyles(() =>
+const StyledBadge = withStyles(Badge, () =>
   createStyles({
     root: {
       marginRight: '10px',
@@ -29,7 +29,7 @@ const StyledBadge = withStyles(() =>
       marginTop: '2px',
     },
   })
-)(Badge);
+);
 
 const StyledButton = styled(Button)`
   border-radius: 30px;

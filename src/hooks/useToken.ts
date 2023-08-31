@@ -1,7 +1,7 @@
 import findIndex from 'lodash/findIndex';
 import useTokenList from './useTokenList';
 
-function useToken(tokenAddress: string, checkForSymbol = false, isAggregator = false) {
+function useToken(tokenAddress?: string, checkForSymbol = false, isAggregator = false) {
   const tokenList = useTokenList(isAggregator);
 
   if (!tokenAddress) {

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { SetStateCallback } from '@types';
 import findIndex from 'lodash/findIndex';
 import FilledInput from '@mui/material/FilledInput';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import Button from '@common/components/button';
 import { defineMessage, useIntl } from 'react-intl';
@@ -54,7 +54,7 @@ const StyledTabContainer = styled.div`
   margin-left: 8px;
 `;
 
-const StyledFilledInput = withStyles(() =>
+const StyledFilledInput = withStyles(FilledInput, () =>
   createStyles({
     root: {
       paddingLeft: '8px',
@@ -64,7 +64,7 @@ const StyledFilledInput = withStyles(() =>
       paddingTop: '8px',
     },
   })
-)(FilledInput);
+);
 
 const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInputProps) => {
   const tabIndex = findIndex(PREDEFINED_RANGES, { value });

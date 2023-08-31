@@ -28,7 +28,7 @@ import {
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
@@ -41,14 +41,14 @@ import PositionControls from '../position-controls';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
-const DarkTooltip = withStyles((theme: Theme) => ({
+const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },
-}))(Tooltip);
+}));
 
-const BorderLinearProgress = withStyles(() =>
+const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
   createStyles({
     root: {
       height: 8,
@@ -60,7 +60,7 @@ const BorderLinearProgress = withStyles(() =>
       background: 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)',
     },
   })
-)(StyledSwapsLinearProgress);
+);
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;

@@ -21,7 +21,7 @@ import { useAppDispatch } from '@state/hooks';
 import { changeMainTab, changePositionDetailsTab, changeSubTab } from '@state/tabs/actions';
 import { usePositionDetailsTab } from '@state/tabs/hooks';
 import { FormattedMessage } from 'react-intl';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import TerminateModal from '@common/components/terminate-modal';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
@@ -57,7 +57,7 @@ import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
 
-const StyledTab = withStyles(() =>
+const StyledTab = withStyles(Tab, () =>
   createStyles({
     root: {
       textTransform: 'none',
@@ -70,9 +70,9 @@ const StyledTab = withStyles(() =>
       fontWeight: '500',
     },
   })
-)(Tab);
+);
 
-const StyledTabs = withStyles(() =>
+const StyledTabs = withStyles(Tabs, () =>
   createStyles({
     root: {
       overflow: 'visible',
@@ -84,7 +84,7 @@ const StyledTabs = withStyles(() =>
       overflow: 'visible !important',
     },
   })
-)(Tabs);
+);
 
 const StyledLink = styled(Link)`
   margin: 0px 5px;
@@ -143,7 +143,7 @@ const PositionDetailFrame = () => {
     data.position && {
       ...data.position,
       chainId: Number(chainId),
-      version: positionVersion,
+      version: positionVersion || LATEST_VERSION,
       from: getDisplayToken(data.position.from, Number(chainId)),
       to: getDisplayToken(data.position.to, Number(chainId)),
     };

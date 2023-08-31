@@ -3,15 +3,15 @@ import styled from 'styled-components';
 import Button from '@common/components/button';
 import Typography from '@mui/material/Typography';
 import Popover from '@mui/material/Popover';
-import { createStyles, makeStyles } from '@mui/styles';
-import { Theme } from '@mui/material';
+import { makeStyles } from 'tss-react/mui';
+import { Theme, createStyles } from '@mui/material';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import { SupportedLanguages, SUPPORTED_LANGUAGES_STRING } from '@constants/lang';
 import { useSelectedLocale } from '@state/config/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { setSelectedLocale } from '@state/config/actions';
 
-const usePopoverStyles = makeStyles((theme: Theme) =>
+const usePopoverStyles = makeStyles()((theme: Theme) =>
   createStyles({
     paper: {
       marginTop: theme.spacing(1),
@@ -43,7 +43,7 @@ const StyledButton = styled(Button)`
 `;
 
 const LanguageLabel = () => {
-  const popoverClasses = usePopoverStyles();
+  const { classes: popoverClasses } = usePopoverStyles();
   const [shouldOpenNetworkMenu, setShouldOpenNetworkMenu] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const selectedLanguage = useSelectedLocale();

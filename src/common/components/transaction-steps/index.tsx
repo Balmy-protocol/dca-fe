@@ -33,7 +33,7 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION,
   TRANSACTION_ACTION_CREATE_POSITION,
 } from '@constants';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
@@ -488,13 +488,13 @@ const SimulationItem = ({ quotes, step }: { quotes: number; step: number }) => {
   );
 };
 
-const StyledTopCircularProgress = withStyles(() =>
+const StyledTopCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
     circle: {
       strokeLinecap: 'round',
     },
   })
-)(CircularProgress);
+);
 
 const StyledCircularContainer = styled.div`
   align-self: stretch;
@@ -504,7 +504,7 @@ const StyledCircularContainer = styled.div`
   align-items: center;
 `;
 
-const StyledBottomCircularProgress = withStyles(() =>
+const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
     root: {
       color: 'rgba(255, 255, 255, 0.05)',
@@ -513,7 +513,7 @@ const StyledBottomCircularProgress = withStyles(() =>
       strokeLinecap: 'round',
     },
   })
-)(CircularProgress);
+);
 
 const SimulationItemProgressBar = ({ quotes }: { quotes: number }) => {
   const [timer, setTimer] = React.useState(0);

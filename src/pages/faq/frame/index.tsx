@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@state/hooks';
 import { changeMainTab } from '@state/tabs/actions';
 
@@ -60,11 +60,11 @@ const StyledLink = styled(Link)`
 `;
 
 const FAQFrame = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const onBackToApp = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   React.useEffect(() => {

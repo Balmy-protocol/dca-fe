@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import Button, { ButtonTypes } from '@common/components/button';
 import SplitButton, { SplitButtonOptions } from '@common/components/split-button';
@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import { FormattedMessage } from 'react-intl';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from 'tss-react/mui';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { Breakpoint, Typography } from '@mui/material';
@@ -51,7 +51,7 @@ const StyledDialog = styled(Dialog)`
   text-align: center;
 `;
 
-const useStyles = makeStyles({
+const useStyles = makeStyles()({
   paper: {
     borderRadius: 8,
     border: '2px solid rgba(255, 255, 255, 0.5)',
@@ -82,7 +82,7 @@ interface ModalProps {
   }[];
 }
 
-const Modal: React.FC<ModalProps> = ({
+const Modal: React.FC<PropsWithChildren<ModalProps>> = ({
   title,
   open,
   onClose,
@@ -95,7 +95,7 @@ const Modal: React.FC<ModalProps> = ({
   children,
   closeOnBackdrop,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const handleClose = () => {
     if (onClose && (showCloseButton || showCloseIcon || closeOnBackdrop)) {

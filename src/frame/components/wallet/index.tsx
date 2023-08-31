@@ -11,7 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@common/components/button';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import Address from '@common/components/address';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import TokenIcon from '@common/components/token-icon';
 import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
@@ -32,7 +32,7 @@ const StyledButton = styled(Button)`
   padding: 4px 8px;
 `;
 
-const StyledBadge = withStyles(() =>
+const StyledBadge = withStyles(Badge, () =>
   createStyles({
     badge: {
       backgroundColor: '#292929',
@@ -41,7 +41,7 @@ const StyledBadge = withStyles(() =>
       color: 'white',
     },
   })
-)(Badge);
+);
 
 const StyledTokenIconContainer = styled.div<{ small: boolean }>`
   margin-right: ${({ small }) => (small ? '0px' : '5px')};

@@ -9,7 +9,7 @@ import {
 } from '@constants';
 import { getNetwork as getStringNetwork, Provider, Network, TransactionRequest } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
-import { getProviderInfo } from 'web3modal';
+import { getProviderInfo } from '@common/utils/provider-info';
 
 interface ProviderWithChainId extends Provider {
   chainId: string;

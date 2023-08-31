@@ -19,7 +19,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 // import Chip from '@mui/material/Chip';
 import TokenIcon from '@common/components/token-icon';
-import { makeStyles, withStyles } from '@mui/styles';
+import { makeStyles, withStyles } from 'tss-react/mui';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -47,7 +47,7 @@ const StyledSwitchGrid = styled(Grid)`
   flex: 0;
 `;
 
-const StyledFilledInput = withStyles(() =>
+const StyledFilledInput = withStyles(FilledInput, () =>
   createStyles({
     root: {
       borderRadius: '8px',
@@ -56,7 +56,7 @@ const StyledFilledInput = withStyles(() =>
       paddingTop: '8px',
     },
   })
-)(FilledInput);
+);
 
 // const StyledChip = styled(Chip)`
 //   margin-right: 5px;
@@ -166,7 +166,7 @@ interface TokenPickerProps {
   showWrappedAndProtocol?: boolean;
 }
 
-const useListItemStyles = makeStyles(({ palette }) => ({
+const useListItemStyles = makeStyles()(({ palette }) => ({
   root: {
     borderRadius: 6,
     color: palette.text.secondary,
@@ -189,7 +189,7 @@ const useListItemStyles = makeStyles(({ palette }) => ({
 }));
 
 const LoadingRow = ({ style }: EmptyRowProps) => {
-  const classes = useListItemStyles();
+  const { classes } = useListItemStyles();
 
   return (
     <StyledListItem classes={classes} style={style}>
@@ -671,7 +671,8 @@ const TokenPicker = ({
             </StyledGrid>
             <StyledGrid item xs={12} style={{ flexGrow: 1 }}>
               <AutoSizer>
-                {({ height, width }) => (
+                {/* eslint-disable-next-line react/no-unused-prop-types */}
+                {({ height, width }: { width: number; height: number }) => (
                   <StyledList
                     height={height}
                     itemCount={itemData.tokenKeys.length || 1}

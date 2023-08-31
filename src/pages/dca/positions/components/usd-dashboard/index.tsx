@@ -10,7 +10,7 @@ import useCurrentPositions from '@hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import LinearProgress from '@mui/material/LinearProgress';
 import { createStyles } from '@mui/material/styles';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import Typography from '@mui/material/Typography';
 import Popper from '@mui/material/Popper';
 import { BigNumber } from 'ethers';
@@ -100,7 +100,7 @@ const COLORS = {
 
 const DEFAULT_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FCD535'];
 
-const BorderLinearProgress = withStyles(() =>
+const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
   createStyles({
     root: {
       height: 8,
@@ -122,7 +122,7 @@ const BorderLinearProgress = withStyles(() =>
       background: 'rgba(255, 255, 255, 0.5)',
     },
   })
-)(StyledSwapsLinearProgress);
+);
 
 type TokenCount = Record<
   string,

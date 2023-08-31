@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import Typography from '@mui/material/Typography';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { Theme, Tooltip, TooltipProps } from '@mui/material';
 
 const StyledChipContainer = styled.div<{ tooltip?: boolean; pointer?: boolean }>`
@@ -24,12 +24,12 @@ const StyledChildrenContainer = styled.div``;
 
 const StyledExtraTextContainer = styled(Typography)``;
 
-const DarkTooltip = withStyles((theme: Theme) => ({
+const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },
-}))(Tooltip);
+}));
 
 const CustomChipContent = React.forwardRef<
   HTMLDivElement,
@@ -52,14 +52,24 @@ const CustomChipContent = React.forwardRef<
   </StyledChipContainer>
 ));
 
-const CustomChip: React.FC<{
+interface CustomChipProps {
   icon: React.ReactNode;
   extraText?: React.ReactNode;
   pointer?: boolean;
   tooltip?: boolean;
   tooltipTitle?: React.ReactNode;
   tooltipPlacement?: TooltipProps['placement'];
-}> = ({ children, icon, extraText, tooltip, tooltipTitle, tooltipPlacement, pointer }) =>
+}
+
+const CustomChip: React.FC<PropsWithChildren<CustomChipProps>> = ({
+  children,
+  icon,
+  extraText,
+  tooltip,
+  tooltipTitle,
+  tooltipPlacement,
+  pointer,
+}) =>
   tooltip ? (
     <DarkTooltip title={tooltipTitle || ''} arrow placement={tooltipPlacement || 'top'}>
       <CustomChipContent icon={icon} extraText={extraText} tooltip={tooltip} pointer={pointer}>

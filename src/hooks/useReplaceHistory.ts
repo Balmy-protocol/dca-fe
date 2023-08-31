@@ -1,11 +1,11 @@
 import React from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function useReplaceHistory() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
-  return React.useCallback((path: string) => history.replace(`${path}${location.search}`), [history, location]);
+  return React.useCallback((path: string) => navigate(`${path}${location.search}`), [navigate, location]);
 }
 
 export default useReplaceHistory;

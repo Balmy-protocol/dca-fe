@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Slide from '@mui/material/Slide';
 import Button from '@common/components/button';
 import { createStyles } from '@mui/material/styles';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
@@ -63,16 +63,16 @@ const StyledButonContainer = styled.div`
   gap: 16px;
 `;
 
-const StyledTopCircularProgress = withStyles(() =>
+const StyledTopCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
     circle: {
       stroke: "url('#progressGradient')",
       strokeLinecap: 'round',
     },
   })
-)(CircularProgress);
+);
 
-const StyledBottomCircularProgress = withStyles(() =>
+const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
     root: {
       color: 'rgba(255, 255, 255, 0.05)',
@@ -81,16 +81,16 @@ const StyledBottomCircularProgress = withStyles(() =>
       strokeLinecap: 'round',
     },
   })
-)(CircularProgress);
+);
 
-const StyledCheckCircleIcon = withStyles(() =>
+const StyledCheckCircleIcon = withStyles(CheckCircleIcon, () =>
   createStyles({
     root: {
       stroke: "url('#successGradient')",
       fill: "url('#successGradient')",
     },
   })
-)(CheckCircleIcon);
+);
 
 const StyledTypography = styled(Typography)`
   display: flex;

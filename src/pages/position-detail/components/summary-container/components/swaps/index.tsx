@@ -3,13 +3,13 @@ import Grid from '@mui/material/Grid';
 import { FullPosition } from '@types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import PositionTimeline from './components/timeline';
 
-const StyledTab = withStyles(() =>
+const StyledTab = withStyles(Tab, () =>
   createStyles({
     root: {
       textTransform: 'none',
@@ -21,9 +21,9 @@ const StyledTab = withStyles(() =>
       fontWeight: '500 !important',
     },
   })
-)(Tab);
+);
 
-const StyledTabs = withStyles(() =>
+const StyledTabs = withStyles(Tabs, () =>
   createStyles({
     root: {
       overflow: 'visible',
@@ -35,7 +35,7 @@ const StyledTabs = withStyles(() =>
       overflow: 'visible !important',
     },
   })
-)(Tabs);
+);
 
 interface PositionSwapsProps {
   position: FullPosition;

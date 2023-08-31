@@ -7,7 +7,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { SourceMetadata } from '@mean-finance/sdk/dist/services/quotes/types';
 import compact from 'lodash/compact';
 import Chip from '@mui/material/Chip';
@@ -21,7 +21,7 @@ import SwapQuote from '../quote';
 import QuoteRefresher from '../quote-refresher';
 import QuoteSorter from '../quote-sorter';
 
-const StatusChip = withStyles(() => ({
+const StatusChip = withStyles(Chip, () => ({
   colorSuccess: {
     background: 'rgba(33, 150, 83, 0.1)',
     color: '#219653',
@@ -30,7 +30,7 @@ const StatusChip = withStyles(() => ({
     background: 'rgba(235, 87, 87, 0.1)',
     color: '#EB5757',
   },
-}))(Chip);
+}));
 
 const StyledPaper = styled(Paper)<{ $column?: boolean; $align?: boolean }>`
   padding: 16px;

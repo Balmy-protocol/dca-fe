@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { withRouter } from 'react-router-dom';
+import withRouter, { WithRouterInjectedProps } from '@common/components/withRouter';
 import { connect } from 'react-redux';
 import type { AppDispatch, RootState } from '@state';
 import { setError } from '@state/error/actions';
@@ -10,7 +10,6 @@ import SickIcon from '@mui/icons-material/Sick';
 import Button from '@common/components/button';
 import WalletContext from '@common/components/wallet-context';
 import Link from '@mui/material/Link';
-import Web3Service from '@services/web3Service';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -35,13 +34,11 @@ interface Props {
   errorName: string;
   errorStackTrace: string;
   hasError: boolean;
-  history: { listen: (callback: () => void) => void };
-  dismissError: () => void;
   error: Error | null;
 }
 
 interface HistoryhProps {
-  history: { listen: (callback: () => void) => void };
+  router: WithRouterInjectedProps;
   error: Error | null;
 }
 
@@ -53,6 +50,12 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
+  // eslint-disable-next-line react/static-property-placement
+  static contextType = WalletContext;
+
+  // eslint-disable-next-line react/static-property-placement
+  declare context: React.ContextType<typeof WalletContext>;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -61,10 +64,6 @@ class ErrorBoundary extends Component<Props, State> {
       errorName: '',
       errorStackTrace: '',
     };
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    props.history.listen(() => {
-      props.dismissError();
-    });
   }
 
   public static getDerivedStateFromError(e: Error): State {
@@ -75,8 +74,8 @@ class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
     try {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises, react/destructuring-assignment, @typescript-eslint/no-unsafe-member-access
-      (this.context.web3Service as Web3Service).getErrorService().logError('Uncaught error', error.message, errorInfo);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises, react/destructuring-assignment
+      this.context.web3Service.getErrorService().logError('Uncaught error', error.message, errorInfo);
       // eslint-disable-next-line no-empty
     } catch {}
   }
@@ -240,4 +239,4 @@ const mapDispatchToProps = (dispatch: AppDispatch) => ({
 
 ErrorBoundary.contextType = WalletContext;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default withRouter<any, any>(connect(mapStateToProps, mapDispatchToProps)(ErrorBoundary));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ErrorBoundary));

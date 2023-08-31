@@ -22,7 +22,7 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import { useAppDispatch } from '@state/hooks';
 import { useMainTab, useSubTab } from '@state/tabs/hooks';
 import { changeMainTab, changeSubTab } from '@state/tabs/actions';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import Collapse from '@mui/material/Collapse';
@@ -117,7 +117,7 @@ const StyledAppbarContainer = styled.div`
   padding: 0px 10px;
 `;
 
-const RawTabs = withStyles(() =>
+const RawTabs = withStyles(Tabs, () =>
   createStyles({
     root: {
       overflow: 'visible',
@@ -126,7 +126,7 @@ const RawTabs = withStyles(() =>
       overflow: 'visible !important',
     },
   })
-)(Tabs);
+);
 
 const StyledTabs = styled(RawTabs)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint>; noMargin?: boolean }>`
   ${({ noMargin }) => (noMargin ? 'margin-left: 0px;' : '')}

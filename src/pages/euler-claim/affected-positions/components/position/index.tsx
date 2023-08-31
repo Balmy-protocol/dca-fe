@@ -13,7 +13,7 @@ import { Position, Token, YieldOptions } from '@types';
 import { NETWORKS, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -23,12 +23,12 @@ import { Theme, Tooltip } from '@mui/material';
 import useUsdPrice from '@hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 
-const DarkTooltip = withStyles((theme: Theme) => ({
+const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },
-}))(Tooltip);
+}));
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;

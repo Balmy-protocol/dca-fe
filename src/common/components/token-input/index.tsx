@@ -9,7 +9,7 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import FormHelperText from '@mui/material/FormHelperText';
 import TokenIcon from '@common/components/token-icon';
 import { createStyles, FilledInput, Typography } from '@mui/material';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
@@ -25,7 +25,7 @@ const StyledControls = styled.div`
   gap: 8px;
 `;
 
-const StyledFilledInput = withStyles(() =>
+const StyledFilledInput = withStyles(FilledInput, () =>
   createStyles({
     root: {
       paddingLeft: '0px',
@@ -36,7 +36,7 @@ const StyledFilledInput = withStyles(() =>
       paddingBottom: '0px',
     },
   })
-)(FilledInput);
+);
 
 const StyledAmountContainer = styled.div`
   display: flex;

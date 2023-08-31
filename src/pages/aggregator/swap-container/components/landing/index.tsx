@@ -4,7 +4,7 @@ import EmptyRoutes from '@assets/svg/emptyRoutes';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import compact from 'lodash/compact';
 import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
@@ -15,7 +15,7 @@ import MinimalTabs from '@common/components/minimal-tabs';
 import { SourceMetadata } from '@mean-finance/sdk';
 import AggregatorFAQ from '../faq';
 
-const StatusChip = withStyles(() => ({
+const StatusChip = withStyles(Chip, () => ({
   colorSuccess: {
     background: 'rgba(33, 150, 83, 0.1)',
     color: '#219653',
@@ -24,7 +24,7 @@ const StatusChip = withStyles(() => ({
     background: 'rgba(235, 87, 87, 0.1)',
     color: '#EB5757',
   },
-}))(Chip);
+}));
 
 const StyledPaper = styled(Paper)<{ $column?: boolean; $align?: boolean }>`
   padding: 16px;

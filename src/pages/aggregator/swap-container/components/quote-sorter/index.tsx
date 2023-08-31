@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
 import Button from '@common/components/button';
 import { createStyles, Theme } from '@mui/material';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Menu from '@mui/material/Menu';
 import Typography from '@mui/material/Typography';
@@ -17,25 +17,25 @@ import { setSorting } from '@state/aggregator-settings/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 
-const DarkTooltip = withStyles((theme: Theme) => ({
+const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },
-}))(Tooltip);
+}));
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 5px;
 `;
 
-const StyledMenu = withStyles(() =>
+const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
       backgroundColor: '#1d1c1c',
       border: '2px solid rgba(255, 255, 255, 0.5)',
     },
   })
-)(Menu);
+);
 
 const StyledContainer = styled.div`
   display: flex;

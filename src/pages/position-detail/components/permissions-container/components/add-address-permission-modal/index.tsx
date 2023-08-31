@@ -14,7 +14,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -40,7 +40,7 @@ const StyledAddPermisionContainer = styled.div`
   gap: 24px;
 `;
 
-const StyledFilledInput = withStyles(() =>
+const StyledFilledInput = withStyles(TextField, () =>
   createStyles({
     root: {
       paddingLeft: '8px',
@@ -50,7 +50,7 @@ const StyledFilledInput = withStyles(() =>
       paddingTop: '8px',
     },
   })
-)(TextField);
+);
 
 const StyledInputContainer = styled.div`
   display: flex;

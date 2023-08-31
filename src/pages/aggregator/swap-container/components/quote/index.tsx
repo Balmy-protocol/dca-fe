@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import { emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
 import { parseUnits } from '@ethersproject/units';
 import { SORT_MOST_PROFIT, SORT_MOST_RETURN } from '@constants/aggregator';
@@ -25,7 +25,7 @@ import { setSelectedRoute } from '@state/aggregator/actions';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 
-const DarkChip = withStyles(() => ({
+const DarkChip = withStyles(Chip, () => ({
   root: {
     background: 'rgb(59 58 59)',
     color: 'rgba(255, 255, 255, 0.5)',
@@ -34,9 +34,9 @@ const DarkChip = withStyles(() => ({
   icon: {
     color: 'rgba(255, 255, 255, 0.5) !important',
   },
-}))(Chip);
+}));
 
-const StatusChip = withStyles(() => ({
+const StatusChip = withStyles(Chip, () => ({
   colorSuccess: {
     background: 'rgba(33, 150, 83, 0.1)',
     color: '#219653',
@@ -45,7 +45,7 @@ const StatusChip = withStyles(() => ({
     background: 'rgba(235, 87, 87, 0.1)',
     color: '#EB5757',
   },
-}))(Chip);
+}));
 
 const StyledPaper = styled(Paper)<{ $isSelected?: boolean; $disabled: boolean }>`
   position: relative;

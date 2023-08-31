@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
@@ -204,7 +204,7 @@ export const TransactionModal = ({
   );
 };
 
-const TransactionModalProvider: React.FC = ({ children }) => {
+const TransactionModalProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [loadingConfig, setLoadingConfig] = React.useState<LoadingConfig>({ content: null });
   const [successConfig, setSuccessConfig] = React.useState<SuccessConfig>({ content: null });
   const [errorConfig, setErrorConfig] = React.useState<ErrorConfig>({ content: null });

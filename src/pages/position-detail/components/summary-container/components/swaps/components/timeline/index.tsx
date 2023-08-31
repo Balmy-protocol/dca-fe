@@ -23,19 +23,19 @@ import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import Address from '@common/components/address';
 import useUsdPrice from '@hooks/useUsdPrice';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { Theme } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { isEqual } from 'lodash';
 
-const DarkTooltip = withStyles((theme: Theme) => ({
+const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },
-}))(Tooltip);
+}));
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 3px;

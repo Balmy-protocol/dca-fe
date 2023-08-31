@@ -23,7 +23,7 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
@@ -52,14 +52,14 @@ const PositionControlsContainer = styled.div`
   background-color: rgba(216, 216, 216, 0.05);
 `;
 
-const StyledMenu = withStyles(() =>
+const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
       border: '2px solid #A5AAB5',
       borderRadius: '8px',
     },
   })
-)(Menu);
+);
 
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;

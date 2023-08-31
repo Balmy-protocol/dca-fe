@@ -8,7 +8,7 @@ import { Token } from '@types';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FormHelperText from '@mui/material/FormHelperText';
 import { createStyles, FilledInput, Typography } from '@mui/material';
-import { withStyles, makeStyles } from '@mui/styles';
+import { withStyles, makeStyles } from 'tss-react/mui';
 import TokenIcon from '@common/components/token-icon';
 import { FormattedMessage } from 'react-intl';
 
@@ -52,7 +52,7 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const StyledFilledInput = withStyles(() =>
+const StyledFilledInput = withStyles(FilledInput, () =>
   createStyles({
     root: {
       paddingLeft: '0px',
@@ -65,7 +65,7 @@ const StyledFilledInput = withStyles(() =>
       paddingRight: '0px',
     },
   })
-)(FilledInput);
+);
 
 const StyledAmountContainer = styled.div`
   display: flex;
@@ -102,7 +102,7 @@ const typographyStyles = {
   lineHeight: '1.6',
 };
 
-const useButtonStyles = makeStyles({
+const useButtonStyles = makeStyles()({
   root: {
     ...typographyStyles,
   },
@@ -150,6 +150,8 @@ const AggregatorTokenInput = ({
     (inputRef.current as any).focus();
   };
 
+  const { classes: buttonClasses } = useButtonStyles();
+
   return (
     <StyledTokenInputContainer>
       <StyledControls>
@@ -163,7 +165,7 @@ const AggregatorTokenInput = ({
                 startIcon={<TokenIcon size="24px" token={token || undefined} />}
                 endIcon={<KeyboardArrowDownIcon fontSize="small" />}
                 onClick={onTokenSelect}
-                classes={useButtonStyles()}
+                classes={buttonClasses}
               >
                 {token ? token.symbol : <FormattedMessage description="select" defaultMessage="Select" />}
               </StyledButton>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import { SetStateCallback } from '@types';
 import FilledInput from '@mui/material/FilledInput';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 
@@ -21,7 +21,7 @@ const StyledFrequencyInputContainer = styled.div`
   justify-content: flex-end;
 `;
 
-const StyledFilledInput = withStyles(() =>
+const StyledFilledInput = withStyles(FilledInput, () =>
   createStyles({
     root: {
       paddingLeft: '8px',
@@ -31,7 +31,7 @@ const StyledFilledInput = withStyles(() =>
       paddingTop: '8px',
     },
   })
-)(FilledInput);
+);
 
 const ConfettiInput = ({ id, onChange, value }: ConfettiInputProps) => {
   const validator = (nextValue: string) => {

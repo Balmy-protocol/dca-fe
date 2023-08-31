@@ -3,20 +3,20 @@ import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import Button from '@common/components/button';
 import { createStyles } from '@mui/material';
-import { withStyles } from '@mui/styles';
+import { withStyles } from 'tss-react/mui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-const StyledMenu = withStyles(() =>
+const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
       backgroundColor: '#1d1c1c',
       border: '2px solid rgba(255, 255, 255, 0.5)',
     },
   })
-)(Menu);
+);
 
 interface GraphSelectorProps {
   setGraph: (sorting: number) => void;
