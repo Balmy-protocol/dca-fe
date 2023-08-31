@@ -129,6 +129,18 @@ export interface ModifyPermissionsTypeData {
   };
 }
 
+export interface MigratePositionTypeData {
+  type: TransactionTypes.migratePosition;
+  typeData: {
+    id: number | string;
+    from: string;
+    to: string;
+    fromYield?: string;
+    toYield?: string;
+    newId?: string;
+  };
+}
+
 export interface MigratePositionYieldTypeData {
   type: TransactionTypes.migratePositionYield;
   typeData: {
@@ -279,6 +291,7 @@ export type TransactionPositionTypeDataOptions =
   | ModifyPermissionsTypeData
   | WithdrawFundsTypeData
   | MigratePositionYieldTypeData
+  | MigratePositionTypeData
   | TransferTypeData
   | EulerClaimTerminateManyTypeData
   | EulerClaimPermitManyTypeData
@@ -298,6 +311,7 @@ export type TransactionTypeDataOptions =
   | ApproveCompanionTypeData
   | ModifyPermissionsTypeData
   | WithdrawFundsTypeData
+  | MigratePositionTypeData
   | MigratePositionYieldTypeData
   | TransferTypeData
   | TransactionAggregatorTypeDataOptions
@@ -324,6 +338,7 @@ export type TransactionDetailsBase = {
   from: string;
   position?: Position;
   realSafeHash?: string;
+  checking?: boolean;
 };
 
 export type TransactionDetails<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
