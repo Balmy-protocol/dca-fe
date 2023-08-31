@@ -378,6 +378,7 @@ export type TransactionDetailsBase = {
   from: string;
   position?: Position;
   realSafeHash?: string;
+  checking?: boolean;
 };
 
 export type TransactionDetails<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =

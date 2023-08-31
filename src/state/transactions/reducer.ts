@@ -3,11 +3,13 @@ import { TransactionDetails } from '@types';
 import keys from 'lodash/keys';
 import {
   addTransaction,
+  checkedTransactionExist,
   checkedTransaction,
   finalizeTransaction,
   clearAllTransactions,
   transactionFailed,
   removeTransaction,
+  setTransactionsChecking,
 } from './actions';
 
 const now = () => new Date().getTime();
@@ -44,10 +46,27 @@ export default createReducer(initialState, (builder) =>
           retries: 0,
           chainId,
           position,
+          checking: false,
         } as TransactionDetails;
       }
     )
-    .addCase(checkedTransaction, (state, { payload: { hash, blockNumber, chainId } }) => {
+    .addCase(setTransactionsChecking, (state, { payload }) => {
+      payload.forEach(({ hash, chainId }) => {
+        if (!state[chainId] || !state[chainId][hash]) {
+          console.error('Attempted to check inexisting transaction.');
+        }
+
+        state[chainId][hash].checking = true;
+      });
+    })
+    .addCase(checkedTransaction, (state, { payload: { hash, chainId } }) => {
+      if (!state[chainId] || !state[chainId][hash]) {
+        console.error('Attempted to check inexisting transaction.');
+      }
+
+      state[chainId][hash].checking = false;
+    })
+    .addCase(checkedTransactionExist, (state, { payload: { hash, blockNumber, chainId } }) => {
       const tx = state[chainId][hash];
       if (!tx || !blockNumber) {
         return;

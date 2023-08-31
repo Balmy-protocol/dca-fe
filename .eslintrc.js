@@ -44,6 +44,7 @@ module.exports = {
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'eslint-comments/no-unlimited-disable': 'off',
     'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state'] }],
+    'promise/catch-or-return': ['error', { allowFinally: true }],
   },
   overrides: [
     {
