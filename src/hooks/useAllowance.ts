@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Token, PositionVersions } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { EMPTY_TOKEN } from '@common/mocks/tokens';
-import { useBlockNumber } from '@state/block-number/hooks';
+import { IntervalSetActions } from '@constants/timing';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import useAccount from './useAccount';
+import useInterval from './useInterval';
 
 export type Allowance = {
   token: Token;
@@ -33,15 +34,14 @@ function useAllowance(
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = useAccount();
+  const selectedNetwork = useSelectedNetwork();
+  const prevSelectedNetwork = usePrevious(selectedNetwork);
   const prevAccount = usePrevious(account);
-  const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false, 'allowance');
   const prevUsesYield = usePrevious(usesYield);
   const prevVersion = usePrevious(version);
 
-  React.useEffect(() => {
+  const fetchAllowance = useCallback(() => {
     async function callPromise() {
       if (from) {
         try {
@@ -60,11 +60,7 @@ function useAllowance(
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       !isEqual(prevUsesYield, usesYield) ||
       !isEqual(prevVersion, version) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
+      !isEqual(selectedNetwork.chainId, prevSelectedNetwork?.chainId)
     ) {
       setState({ isLoading: true, result: dummyToken, error: undefined });
 
@@ -85,10 +81,12 @@ function useAllowance(
     prevAccount,
     account,
     prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
     walletService,
+    selectedNetwork.chainId,
+    prevSelectedNetwork?.chainId,
   ]);
+
+  useInterval(fetchAllowance, IntervalSetActions.allowance);
 
   if (!from) {
     return [dummyToken, false, undefined];

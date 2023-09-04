@@ -5,7 +5,6 @@ import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { GasKeys } from '@constants/aggregator';
-import { useBlockNumber } from '@state/block-number/hooks';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
 import useSelectedNetwork from './useSelectedNetwork';
@@ -31,8 +30,7 @@ function useSwapOptions(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
+  const prevCurrentNetwork = usePrevious(currentNetwork);
   const prevTransferTo = usePrevious(transferTo);
   const prevNetwork = usePrevious(currentNetwork.chainId);
   const prevResult = usePrevious(result, false);
@@ -96,7 +94,8 @@ function useSwapOptions(
         !isEqual(prevGasSpeed, gasSpeed) ||
         !isEqual(prevNetwork, currentNetwork.chainId) ||
         !isEqual(prevSlippage, slippage) ||
-        !isEqual(prevUsePermit2, usePermit2))
+        !isEqual(prevUsePermit2, usePermit2) ||
+        !isEqual(prevCurrentNetwork?.chainId, currentNetwork.chainId))
     ) {
       if (quote && account && !quote.tx) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -112,8 +111,8 @@ function useSwapOptions(
     prevAccount,
     account,
     prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
+    prevCurrentNetwork?.chainId,
+    currentNetwork.chainId,
     walletService,
     fetchOptions,
     prevTransferTo,

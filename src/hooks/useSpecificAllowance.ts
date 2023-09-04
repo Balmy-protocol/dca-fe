@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
+import { IntervalSetActions } from '@constants/timing';
 import { EMPTY_TOKEN } from '@common/mocks/tokens';
-import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
+import useInterval from './useInterval';
 
 type Allowance = {
   token: Token;
@@ -30,12 +31,11 @@ function useSpecificAllowance(from: Token | undefined | null, addressToCheck?: s
   const prevAccount = usePrevious(walletService.getAccount());
   const account = walletService.getAccount();
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
+  const prevCurrentNetwork = usePrevious(currentNetwork);
   const prevResult = usePrevious(result, false, 'allowance');
   const prevAddress = usePrevious(addressToCheck);
 
-  React.useEffect(() => {
+  const fetchSpecificAllowance = useCallback(() => {
     async function callPromise() {
       if (from && addressToCheck) {
         try {
@@ -53,11 +53,7 @@ function useSpecificAllowance(from: Token | undefined | null, addressToCheck?: s
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       !isEqual(prevAddress, addressToCheck) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
+      !isEqual(prevCurrentNetwork?.chainId, currentNetwork.chainId)
     ) {
       setState({ isLoading: true, result: dummyToken, error: undefined });
 
@@ -76,10 +72,12 @@ function useSpecificAllowance(from: Token | undefined | null, addressToCheck?: s
     prevAccount,
     account,
     prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
+    prevCurrentNetwork?.chainId,
+    currentNetwork.chainId,
     walletService,
   ]);
+
+  useInterval(fetchSpecificAllowance, IntervalSetActions.allowance);
 
   if (!from) {
     return [dummyToken, false, undefined];

@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Token } from 'types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
-import { useBlockNumber } from '@state/block-number/hooks';
+import { IntervalSetActions } from '@constants/timing';
 import useSelectedNetwork from './useSelectedNetwork';
 import usePriceService from './usePriceService';
 import useAccount from './useAccount';
 import useSdkService from './useSdkService';
+import useInterval from './useInterval';
 
 interface BalanceResponse {
   balance: BigNumber;
@@ -38,12 +39,11 @@ function useBalances(tokens: Token[] | undefined | null): [Result | undefined, b
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
+  const prevCurrentNetwork = usePrevious(currentNetwork);
   const priceService = usePriceService();
   const prevResult = usePrevious(result, false);
 
-  React.useEffect(() => {
+  const fetchBalances = useCallback(() => {
     async function callPromise() {
       if (tokens) {
         try {
@@ -91,11 +91,7 @@ function useBalances(tokens: Token[] | undefined | null): [Result | undefined, b
       !isEqual(prevTokens, tokens) ||
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
+      !isEqual(prevCurrentNetwork?.chainId, currentNetwork.chainId)
     ) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
@@ -111,11 +107,13 @@ function useBalances(tokens: Token[] | undefined | null): [Result | undefined, b
     hasPendingTransactions,
     prevAccount,
     account,
-    prevBlockNumber,
-    blockNumber,
+    currentNetwork.chainId,
+    prevCurrentNetwork?.chainId,
     sdkService,
     prevPendingTrans,
   ]);
+
+  useInterval(fetchBalances, IntervalSetActions.balance);
 
   if (!tokens || !tokens.length) {
     return [undefined, false, undefined];

@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
+import { IntervalSetActions } from '@constants/timing';
 import { BigNumber } from 'ethers';
-import { useBlockNumber } from '@state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
 import useAccount from './useAccount';
 import useSdkService from './useSdkService';
+import useInterval from './useInterval';
 
 function useSdkBalances(
   tokens: Token[] | undefined | null
@@ -29,11 +30,10 @@ function useSdkBalances(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
   const currentNetwork = useCurrentNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
+  const prevCurrentNetwork = usePrevious(currentNetwork);
   const prevResult = usePrevious(result, false);
 
-  React.useEffect(() => {
+  const fetchSdkBalances = useCallback(() => {
     async function callPromise() {
       if (tokens) {
         try {
@@ -50,11 +50,7 @@ function useSdkBalances(
       !isEqual(prevTokens, tokens) ||
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
+      !isEqual(prevCurrentNetwork?.chainId, currentNetwork.chainId)
     ) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
@@ -70,11 +66,13 @@ function useSdkBalances(
     hasPendingTransactions,
     prevAccount,
     account,
-    prevBlockNumber,
-    blockNumber,
+    prevCurrentNetwork?.chainId,
+    currentNetwork.chainId,
     sdkService,
     prevPendingTrans,
   ]);
+
+  useInterval(fetchSdkBalances, IntervalSetActions.balance);
 
   if (!tokens || !tokens.length) {
     return [undefined, false, undefined];

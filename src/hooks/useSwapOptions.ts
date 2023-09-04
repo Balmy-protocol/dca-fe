@@ -13,7 +13,6 @@ import {
   SwapSortOptions,
   TimeoutKey,
 } from '@constants/aggregator';
-import { useBlockNumber } from '@state/block-number/hooks';
 import { BigNumber } from 'ethers';
 import { MAX_UINT_32 } from '@constants';
 import useAggregatorService from './useAggregatorService';
@@ -50,8 +49,6 @@ function useSwapOptions(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = walletService.getAccount();
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevTransferTo = usePrevious(transferTo);
   const prevNetwork = usePrevious(currentNetwork.chainId);
   const prevResult = usePrevious(result, false);
@@ -191,8 +188,6 @@ function useSwapOptions(
     // prevAccount,
     account,
     prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
     walletService,
     fetchOptions,
     prevTransferTo,

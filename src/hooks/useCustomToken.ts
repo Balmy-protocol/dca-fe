@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { useBlockNumber } from '@state/block-number/hooks';
+import { IntervalSetActions } from '@constants/timing';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
 import useSdkService from './useSdkService';
+import useInterval from './useInterval';
 
 function useCustomToken(
   tokenAddress?: string | null,
@@ -34,12 +35,11 @@ function useCustomToken(
   const prevAccount = usePrevious(walletService.getAccount());
   const account = walletService.getAccount();
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
+  const prevCurrentNetwork = usePrevious(currentNetwork);
   const prevResult = usePrevious(result, false);
   const prevSkip = usePrevious(skip);
 
-  React.useEffect(() => {
+  const fetchCustomToken = useCallback(() => {
     async function callPromise() {
       if (tokenAddress) {
         try {
@@ -78,11 +78,7 @@ function useCustomToken(
         !isEqual(prevSkip, skip) ||
         !isEqual(account, prevAccount) ||
         !isEqual(prevPendingTrans, hasPendingTransactions) ||
-        (blockNumber &&
-          prevBlockNumber &&
-          blockNumber !== -1 &&
-          prevBlockNumber !== -1 &&
-          !isEqual(prevBlockNumber, blockNumber)))
+        !isEqual(prevCurrentNetwork?.chainId, currentNetwork.chainId))
     ) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
@@ -99,13 +95,15 @@ function useCustomToken(
     hasPendingTransactions,
     prevAccount,
     account,
-    prevBlockNumber,
-    blockNumber,
+    prevCurrentNetwork?.chainId,
+    currentNetwork.chainId,
     prevTokenAddress,
     walletService,
     prevPendingTrans,
     priceService,
   ]);
+
+  useInterval(fetchCustomToken, IntervalSetActions.tokens);
 
   if (!tokenAddress) {
     return [undefined, false, undefined];

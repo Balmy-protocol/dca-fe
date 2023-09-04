@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
+import { IntervalSetActions } from '@constants/timing';
 import { BigNumber } from 'ethers';
-import { useBlockNumber } from '@state/block-number/hooks';
 import useAccount from './useAccount';
 import useSdkService from './useSdkService';
+import useInterval from './useInterval';
 
 function useSdkAllowances(
   tokenChecks: Record<string, string> | undefined | null,
@@ -25,14 +26,12 @@ function useSdkAllowances(
 
   const hasPendingTransactions = useHasPendingTransactions();
   const prevTokenChecks = usePrevious(tokenChecks);
-  const prevChainId = usePrevious(chainId);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
-  const blockNumber = useBlockNumber(chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
+  const prevChainId = usePrevious(chainId);
   const prevResult = usePrevious(result, false);
 
-  React.useEffect(() => {
+  const fetchAllowances = useCallback(() => {
     async function callPromise() {
       if (tokenChecks) {
         try {
@@ -49,12 +48,7 @@ function useSdkAllowances(
       !isEqual(tokenChecks, prevTokenChecks) ||
       !isEqual(account, prevAccount) ||
       !isEqual(chainId, prevChainId) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
+      !isEqual(prevPendingTrans, hasPendingTransactions)
     ) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
@@ -70,13 +64,13 @@ function useSdkAllowances(
     hasPendingTransactions,
     prevAccount,
     account,
-    prevBlockNumber,
-    blockNumber,
     sdkService,
     prevPendingTrans,
     chainId,
     prevChainId,
   ]);
+
+  useInterval(fetchAllowances, IntervalSetActions.allowance);
 
   if (!tokenChecks || !Object.keys(tokenChecks).length) {
     return [undefined, false, undefined];

@@ -17,6 +17,7 @@ import usePositionService from '@hooks/usePositionService';
 import { updatePosition } from '@state/position-details/actions';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useInterval from '@hooks/useInterval';
+import { IntervalSetActions } from '@constants/timing';
 import { usePendingTransactions } from './hooks';
 import {
   checkedTransaction,
@@ -262,7 +263,7 @@ export default function Updater(): null {
     });
   }, [walletService.getAccount(), transactions, dispatch, getReceipt, checkIfTransactionExists, loadedAsSafeApp]);
 
-  useInterval(transactionChecker, 1000);
+  useInterval(transactionChecker, IntervalSetActions.transactions);
 
   return null;
 }
