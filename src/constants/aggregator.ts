@@ -17,7 +17,7 @@ export const GAS_LABELS_BY_KEY: Record<GasKeys, string> = {
 export enum TimeoutKey {
   instant = '1s',
   rapid = '2s',
-  balance = '3s',
+  balance = '3.5s',
   patient = '5s',
 }
 
