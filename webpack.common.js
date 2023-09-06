@@ -19,7 +19,6 @@ module.exports = {
       title: 'Production',
       template: './public/index.html',
       favicon: './public/favicon.ico',
-      inject: false,
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
@@ -40,8 +39,13 @@ module.exports = {
     new WebpackBar(),
   ],
   devtool: 'source-map',
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },

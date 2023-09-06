@@ -40,7 +40,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy
-        run: aws s3 sync ./dist s3://${{ secrets.AWS_S3_STAGING }} --exclude "*" --include "bundle.js.map" --include "bundle.js"
+        run: aws s3 sync ./dist s3://${{ secrets.AWS_S3_STAGING }} --exclude "*" --include "bundle.js.map" --include "bundle.js" --include "index.html"
 
       - name: Create invalidation
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_STAGING }} --paths "/bundle.js.map" "/bundle.js"
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_STAGING }} --paths "/bundle.js.map" "/bundle.js" "/index.html"
