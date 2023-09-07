@@ -557,6 +557,14 @@ const PositionDetailFrame = () => {
             </Link>
           </Button>
         </Grid>
+        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+          <Alert severity="warning">
+            <FormattedMessage
+              description="theGraphError"
+              defaultMessage="There is currently a problem with our subgraph provider and some positions might not show. Please note that positions are safe at all times and service will return to normal shortly"
+            />
+          </Alert>
+        </Grid>
         {((position.from.symbol === 'CRV' && position.from.underlyingTokens.length) ||
           (position.to.symbol === 'CRV' && position.to.underlyingTokens.length)) && (
           <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
