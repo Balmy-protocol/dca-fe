@@ -139,6 +139,8 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xe9a15d436390beb7d9eb312546de3fb01b1468ea', // Optimism - USDC - Exactly
   '0x7eb7deac4929da076910c4aa35128ec70b0b820f', // Optimism - WETH - Exactly
   '0xa61ef65f330bb9f3fce823aee704052d8dcdb27a', // Optimism - wstETH - Exactly
+
+  '0xdc6ff44d5d932cbd77b52e5612ba0529dc6226f1', // Optimism - WLD - Blacklisting until release
 ].map((a) => a.toLowerCase());
 
 export const DISABLED_YIELD_WITHDRAWS = [
