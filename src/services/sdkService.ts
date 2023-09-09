@@ -70,7 +70,7 @@ export default class SdkService {
                     `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['uniswap', 'rango', '0x', 'firebird', 'changelly'],
+                sourceIds: ['1inch', 'uniswap', 'rango', '0x', 'firebird', 'changelly'],
               },
             ],
           },
