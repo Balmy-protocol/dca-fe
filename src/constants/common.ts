@@ -129,9 +129,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI. Aave. Has less than 10k TVL so no defillama data.
   // --
   '0xB562CC5300e2Dd51f9770923b52cE5F372f97a0e', // BNB Chain - Venus ADA - Blacklisting until release
-  '0xc492eA9B5D9e3f4188a6c57F5F146dbfa37AC6D6', // BNB Chain - Venus CAKE - Blacklisting until release
   '0xf3638ACAc71740e55C14d99e288F10ba4EDef348', // BNB Chain - Venus MATIC - Blacklisting until release
-  '0x69B8FdEd983a19C81bbF8b0Ea21e702395bb6E36', // BNB Chain - Venus DOT - Blacklisting until release
   '0x0BADC4caa20E84e25e26a54CeC3faFeBcC7AB085', // BNB Chain - Venus DOGE - Blacklisting until release
   '0xa2b783bB283cA621f32a8792FFE4A10ad817C039', // BNB Chain - Venus XRP - Blacklisting until release
 
