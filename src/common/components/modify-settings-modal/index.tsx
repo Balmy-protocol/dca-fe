@@ -611,7 +611,10 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   description: 'Allowance Tooltip',
                   defaultMessage: 'You must give the {target} smart contracts permission to use your {symbol}',
                 }),
-                { target: "Universal Approval's" }
+                {
+                  target: "Universal Approval's",
+                  symbol: fromToUse.symbol,
+                }
               )}
             />
           </>
