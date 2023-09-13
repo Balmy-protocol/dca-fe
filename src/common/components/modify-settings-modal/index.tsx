@@ -580,7 +580,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     rate !== '' && parseUnits(rate, from?.decimals).gt(BigNumber.from(0)) && !hasEnoughUsdForModify;
 
   const minimumTokensNeeded = usdPriceToToken(from, minimumToUse, usdPrice);
-
+// CHANGE
   let actions: {
     label: React.ReactNode;
     onClick: () => void;
