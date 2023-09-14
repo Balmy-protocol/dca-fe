@@ -16,8 +16,9 @@ const StyledFAQContainer = styled.div`
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}
+  margin: 0 5px;
 `;
 
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
@@ -90,8 +91,18 @@ const AggregatorFAQ = () => (
       <AccordionDetails>
         <Typography>
           <FormattedMessage
-            description="faqIsSafeResponse"
-            defaultMessage="Our smart contracts have been built to leverage the power of Universal Approvals (link a nuestro posteo?) to minimize any possible exposure to them. Furthermore, by leveraging Universal Approvals we can simulate your trade on any network you are on, so you can now exactly what is going to happen once the swap gets executed! Last, our smart contracts have been audited by Omniscia and there is an active bug bounty on ImmuneFi."
+            description="faqIsSafeResponsePartOne"
+            defaultMessage="Our smart contracts have been built to leverage the power of "
+          />
+          <StyledLink
+            href="https://mean-finance.medium.com/approve-now-and-for-the-last-time-finally-8717dcde4e87"
+            target="_blank"
+          >
+            <FormattedMessage description="universal approvals" defaultMessage="Universal Approvals" />
+          </StyledLink>
+          <FormattedMessage
+            description="faqIsSafeResponsePartTwo"
+            defaultMessage="to minimize any possible exposure to them. Furthermore, by leveraging Universal Approvals we can simulate your trade on any network you are on, so you can now exactly what is going to happen once the swap gets executed! Last, our smart contracts have been audited by Omniscia and there is an active bug bounty on ImmuneFi."
           />
         </Typography>
       </AccordionDetails>
