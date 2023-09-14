@@ -45,7 +45,7 @@ import { emptyTokenWithAddress } from '@common/utils/currency';
 import { getDisplayToken, sortTokens } from '@common/utils/parsing';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
-import { AddFunds, DCAPermission } from '@mean-finance/sdk';
+import { AddFunds, DCAPermission, timeoutPromise } from '@mean-finance/sdk';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -163,8 +163,16 @@ export default class PositionService {
         );
       })
     );
-
-    const results = await Promise.all(promises.map((promise) => promise.catch(() => ({ data: null, error: true }))));
+    const results = await Promise.all(
+      promises.map(async (promise, index) => {
+        const isLastVersion = networksAndVersions[index].version === LATEST_VERSION;
+        try {
+          return await timeoutPromise(promise, !isLastVersion ? '30s' : undefined);
+        } catch {
+          return { data: null, error: true };
+        }
+      })
+    );
 
     const currentPositions = {
       ...this.currentPositions,
