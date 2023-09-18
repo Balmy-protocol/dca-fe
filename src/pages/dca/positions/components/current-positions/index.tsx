@@ -41,16 +41,6 @@ interface CurrentPositionsProps {
   finished?: boolean;
 }
 
-function comparePositions(positionA: Position, positionB: Position) {
-  const isAFinished = positionA.remainingSwaps.lte(BigNumber.from(0));
-  const isBFinished = positionB.remainingSwaps.lte(BigNumber.from(0));
-  if (isAFinished !== isBFinished) {
-    return isAFinished ? 1 : -1;
-  }
-
-  return positionA.startedAt > positionB.startedAt ? -1 : 1;
-}
-
 const PositionsList = ({ isLoading, positions, finished }: CurrentPositionsProps) => {
   const hasSignSupport = useSupportsSigning();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
