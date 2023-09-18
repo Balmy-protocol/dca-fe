@@ -6,7 +6,6 @@ import FormHelperText from '@mui/material/FormHelperText';
 import useAccount from '@hooks/useAccount';
 import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
@@ -73,7 +72,6 @@ const FromAmountInput = ({
 }: Props) => {
   const { from } = useAggregatorState();
   const account = useAccount();
-  const selectedNetwork = useSelectedNetwork();
   const currentNetwork = useCurrentNetwork();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
@@ -105,7 +103,7 @@ const FromAmountInput = ({
         <Typography variant="body1">
           <FormattedMessage description="youPay" defaultMessage="You pay" />
         </Typography>
-        {balance && from && currentNetwork.chainId === selectedNetwork.chainId && (
+        {balance && from && (
           <StyledFormHelperText onClick={onSetMaxBalance}>
             <FormattedMessage
               description="in wallet"
