@@ -14,7 +14,6 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/t
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useWalletService from '@hooks/useWalletService';
-import useReplaceHistory from '@hooks/useReplaceHistory';
 import { useAppDispatch } from '@state/hooks';
 import find from 'lodash/find';
 import { NETWORKS } from '@constants';
@@ -63,7 +62,6 @@ const SwapButton = ({
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const walletService = useWalletService();
-  const replaceHistory = useReplaceHistory();
   const dispatch = useAppDispatch();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
 
@@ -85,7 +83,6 @@ const SwapButton = ({
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     walletService.changeNetwork(chainId, () => {
       const networkToSet = find(NETWORKS, { chainId });
-      replaceHistory(`/swap/${chainId}`);
       dispatch(setNetwork(networkToSet as NetworkStruct));
       if (networkToSet) {
         web3Service.setNetwork(networkToSet?.chainId);
