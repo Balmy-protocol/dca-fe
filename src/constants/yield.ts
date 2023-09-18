@@ -333,6 +333,13 @@ export const ALLOWED_YIELDS: Record<
       token: emptyTokenWithAddress('SONNE'),
     },
     {
+      id: '3f963985-c6c9-4c56-9d5e-f5c20f80881e', // Sonne MAI
+      tokenAddress: '0x8214BC5875EF5A8A22a2d53F5E68c3Bb0b01B92e', // Sonne MAI
+      poolId: '3f963985-c6c9-4c56-9d5e-f5c20f80881e', // Sonne MAI
+      name: 'Sonne',
+      token: emptyTokenWithAddress('SONNE'),
+    },
+    {
       id: '334eb8d2-d8fa-401c-837a-221faf82021c', // Exactly OP
       tokenAddress: '0x67f70429750e38d6bae20839ace2692ff2eff52f', // Exactly OP
       poolId: '334eb8d2-d8fa-401c-837a-221faf82021c', // Exactly OP

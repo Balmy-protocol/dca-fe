@@ -127,11 +127,13 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // Ethereum - wstETH. Euler. Disabled due to hack.
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI. Aave. Has less than 10k TVL so no defillama data.
-  // --
+
   '0xB562CC5300e2Dd51f9770923b52cE5F372f97a0e', // BNB Chain - Venus ADA - Blacklisting until release
   '0xf3638ACAc71740e55C14d99e288F10ba4EDef348', // BNB Chain - Venus MATIC - Blacklisting until release
   '0x0BADC4caa20E84e25e26a54CeC3faFeBcC7AB085', // BNB Chain - Venus DOGE - Blacklisting until release
   '0xa2b783bB283cA621f32a8792FFE4A10ad817C039', // BNB Chain - Venus XRP - Blacklisting until release
+
+  '0x8214BC5875EF5A8A22a2d53F5E68c3Bb0b01B92e', // Optimism - Sonne MAI - Blacklisting until release
 
   '0x67f70429750e38d6bae20839ace2692ff2eff52f', // Optimism - OP - Exactly
   '0xe9a15d436390beb7d9eb312546de3fb01b1468ea', // Optimism - USDC - Exactly
