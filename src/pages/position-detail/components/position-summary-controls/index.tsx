@@ -102,7 +102,7 @@ const PositionSummaryControls = ({
     : accountPermissions;
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const hasSignSupport = useSupportsSigning();
-  const canWithdrawProtocolToken = !!(hasSignSupport && (accountPermissions.isOwner || companionPermissions.WITHDRAW));
+  const canWithdrawProtocolToken = !!(hasSignSupport && (accountPermissions.isOwner || mergedPermissions.WITHDRAW));
   const canOnlyWithdrawWrappedToProtocolToken = !canWithdrawProtocolToken && isToProtocolToken;
 
   if (
@@ -137,7 +137,7 @@ const PositionSummaryControls = ({
     BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
     hasSignSupport &&
     position.to.address === PROTOCOL_TOKEN_ADDRESS;
-  const shouldDisableArrow =
+  const shouldDisableArrow = // TODO: Ask fibo about this
     isPending ||
     disabled ||
     (!shouldShowWithdrawWrappedToken && BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)));
@@ -294,7 +294,7 @@ const PositionSummaryControls = ({
               <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
             </MenuItem>
           )}
-          {accountPermissions.TERMINATE && (
+          {mergedPermissions.TERMINATE && (
             <MenuItem
               onClick={() => {
                 handleClose();
