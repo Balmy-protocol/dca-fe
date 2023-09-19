@@ -11,7 +11,7 @@ import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { ModeTypesIds, PERMISSIONS, SUPPORTED_NETWORKS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import useCurrentNetwork from '@hooks/useSelectedNetwork';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { useAppDispatch } from '@state/hooks';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
