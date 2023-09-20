@@ -216,7 +216,7 @@ export const getDefaultByUrl = () => ({
   /*                                     BNB                                    */
   /* -------------------------------------------------------------------------- */
 
-  'https://tokens.1inch.io/v1.1/56': {
+  'https://tokens.1inch.io/v1.2/56': {
     name: '1Inch BSC',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -236,7 +236,7 @@ export const getDefaultByUrl = () => ({
   /*                                   Fantom                                   */
   /* -------------------------------------------------------------------------- */
 
-  'https://tokens.1inch.io/v1.1/250': {
+  'https://tokens.1inch.io/v1.2/250': {
     name: '1Inch FANTOM',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -253,7 +253,7 @@ export const getDefaultByUrl = () => ({
   },
 
   // Avalanche
-  'https://tokens.1inch.io/v1.1/43114': {
+  'https://tokens.1inch.io/v1.2/43114': {
     name: '1Inch AVALANCHE',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -273,7 +273,7 @@ export const getDefaultByUrl = () => ({
   /*                                  Arbitrum                                  */
   /* -------------------------------------------------------------------------- */
 
-  'https://tokens.1inch.io/v1.1/42161': {
+  'https://tokens.1inch.io/v1.2/42161': {
     name: '1Inch Arbitrum',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -283,6 +283,26 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 42161,
+    priority: 0,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: TokensLists) => Object.values(list as Record<string, Token>),
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /*                                   Polygon                                  */
+  /* -------------------------------------------------------------------------- */
+
+  'https://tokens.1inch.io/v1.2/137': {
+    name: '1Inch Polygon',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 137,
     priority: 0,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -427,7 +447,7 @@ export const getDefaultByUrl = () => ({
   /*                                   Klatyn                                   */
   /* -------------------------------------------------------------------------- */
 
-  'https://tokens.1inch.io/v1.1/8217': {
+  'https://tokens.1inch.io/v1.2/8217': {
     name: '1Inch Klaytn',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -447,7 +467,7 @@ export const getDefaultByUrl = () => ({
   /*                                   Aurora                                   */
   /* -------------------------------------------------------------------------- */
 
-  'https://tokens.1inch.io/v1.1/1313161554': {
+  'https://tokens.1inch.io/v1.2/1313161554': {
     name: '1Inch Aurora',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -505,7 +525,7 @@ export const getDefaultByUrl = () => ({
     fetchable: true,
     priority: 0,
   },
-  'https://tokens.1inch.io/v1.1/100': {
+  'https://tokens.1inch.io/v1.2/100': {
     name: '1Inch xDAI',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -612,16 +632,19 @@ export const initialState: TokenListsState = {
     'https://api-polygon-tokens.polygon.technology/tokenlists/zkevmPopular.tokenlist.json',
 
     // BNB
-    'https://tokens.1inch.io/v1.1/56',
+    'https://tokens.1inch.io/v1.2/56',
 
     // Fantom
-    'https://tokens.1inch.io/v1.1/250',
+    'https://tokens.1inch.io/v1.2/250',
 
     // Avalanche
-    'https://tokens.1inch.io/v1.1/43114',
+    'https://tokens.1inch.io/v1.2/43114',
 
     // Arbitrum
-    'https://tokens.1inch.io/v1.1/42161',
+    'https://tokens.1inch.io/v1.2/42161',
+
+    // Polygon
+    'https://tokens.1inch.io/v1.2/137',
 
     // CRO
     'https://swap.crodex.app/tokens.json',
@@ -644,10 +667,10 @@ export const initialState: TokenListsState = {
     'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
 
     // Klatyn
-    'https://tokens.1inch.io/v1.1/8217',
+    'https://tokens.1inch.io/v1.2/8217',
 
     // Aurora
-    'https://tokens.1inch.io/v1.1/1313161554',
+    'https://tokens.1inch.io/v1.2/1313161554',
     'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
 
     // Boba Ethereum
@@ -656,7 +679,7 @@ export const initialState: TokenListsState = {
     // Gnosis
     'https://files.cow.fi/tokens/CowSwap.json',
     'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
-    'https://tokens.1inch.io/v1.1/100',
+    'https://tokens.1inch.io/v1.2/100',
 
     // Velas
     'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',

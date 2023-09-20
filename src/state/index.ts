@@ -170,16 +170,19 @@ const store = configureStore({
           'https://api-polygon-tokens.polygon.technology/tokenlists/zkevmPopular.tokenlist.json',
 
           // BNB
-          'https://tokens.1inch.io/v1.1/56',
+          'https://tokens.1inch.io/v1.2/56',
 
           // Fantom
-          'https://tokens.1inch.io/v1.1/250',
+          'https://tokens.1inch.io/v1.2/250',
 
           // Avalanche
-          'https://tokens.1inch.io/v1.1/43114',
+          'https://tokens.1inch.io/v1.2/43114',
 
           // Arbitrum
-          'https://tokens.1inch.io/v1.1/42161',
+          'https://tokens.1inch.io/v1.2/42161',
+
+          // Polygon
+          'https://tokens.1inch.io/v1.2/137',
 
           // CRO
           'https://swap.crodex.app/tokens.json',
@@ -202,10 +205,10 @@ const store = configureStore({
           'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
 
           // Klatyn
-          'https://tokens.1inch.io/v1.1/8217',
+          'https://tokens.1inch.io/v1.2/8217',
 
           // Aurora
-          'https://tokens.1inch.io/v1.1/1313161554',
+          'https://tokens.1inch.io/v1.2/1313161554',
           'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
 
           // Boba Ethereum
@@ -214,7 +217,7 @@ const store = configureStore({
           // Gnosis
           'https://files.cow.fi/tokens/CowSwap.json',
           'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
-          'https://tokens.1inch.io/v1.1/100',
+          'https://tokens.1inch.io/v1.2/100',
 
           // Velas
           'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',
