@@ -201,7 +201,8 @@ export default class Web3Service {
       this.apolloClient,
       this.providerService,
       this.safeService,
-      this.simulationService
+      this.simulationService,
+      this.eventService
     );
   }
 

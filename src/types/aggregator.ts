@@ -60,3 +60,5 @@ export interface SwapOptionWithFailure extends SwapOption {
 export interface SwapOptionWithTx extends SwapOption {
   tx: QuoteTransaction;
 }
+
+export type QuoteErrorType = 'Timeout' | 'ReferralCode' | 'BigIntConversion' | 'NetworkRequest' | 'Unknown';
