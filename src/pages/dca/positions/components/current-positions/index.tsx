@@ -11,7 +11,6 @@ import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { ModeTypesIds, PERMISSIONS, SUPPORTED_NETWORKS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { useAppDispatch } from '@state/hooks';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
@@ -52,9 +51,6 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const hasSignSupport = useSupportsSigning();
   const currentPositions = useCurrentPositions();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
-  const currentNetwork = useCurrentNetwork();
-  const protocolToken = getProtocolToken(currentNetwork.chainId);
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const addTransaction = useTransactionAdder();
   const positionService = usePositionService();
   const errorService = useErrorService();
@@ -95,6 +91,9 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   }
 
   const onWithdraw = async (position: Position, useProtocolToken = false) => {
+    const protocolToken = getProtocolToken(position.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
+
     try {
       const { positionId } = position;
       const hasPermission = await positionService.companionHasPermission(
