@@ -57,6 +57,7 @@ export const TRANSACTION_ACTION_TYPES: Record<TransactionActionType, Transaction
 
 export const TOKEN_BLACKLIST = [
   '0x2e9a6df78e42a30712c10a9dc4b1c8656f8f2879', // Arbitrum - Malicious MKR
+  '0xb8cb8a7f4c2885c03e57e973c74827909fdc2032', // Polygon - Weird YFI
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // Optimism - WTF optimism
   '0xb584516c8d90f133a48af5cc445cc5d924cf9863', // POLY ZKEVM - DUPLICATE WETH
   '0xe765a819dbefdec134db20f0b82a2f3f13a5cd4a', // POLY ZKEVM - DUPLICATE FPI
