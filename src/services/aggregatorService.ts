@@ -12,8 +12,9 @@ import ERC20ABI from '@abis/erc20.json';
 import WRAPPEDABI from '@abis/weth.json';
 import { getProtocolToken } from '@common/mocks/tokens';
 import { categorizeError, quoteResponseToSwapOption } from '@common/utils/quotes';
-import { FailedQuote, QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
 import { GasKeys, SORT_MOST_PROFIT, SwapSortOptions, TimeoutKey } from '@constants/aggregator';
+import { compact } from 'lodash';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -150,9 +151,8 @@ export default class AggregatorService {
       sourceTimeout
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    const validOptions = (swapOptionsResponse as (QuoteResponse | FailedQuote)[]).reduce(
-      (acc: QuoteResponse[], option) => {
+    const validOptions = compact(
+      swapOptionsResponse.map((option) => {
         if ('failed' in option) {
           // eslint-disable-next-line no-void
           void this.eventService.trackEvent('Aggregator - Fetching quote error', {
@@ -160,14 +160,15 @@ export default class AggregatorService {
             sourceTimeout,
             errorType: categorizeError(option.error),
           });
-        } else {
-          // eslint-disable-next-line no-void
-          void this.eventService.trackEvent('Aggregator - Fetching quote successfull', { source: option.source.id });
-          acc.push(option);
+          return null;
         }
-        return acc;
-      },
-      []
+        // eslint-disable-next-line no-void
+        void this.eventService.trackEvent('Aggregator - Fetching quote successfull', {
+          source: option.source.id,
+          sourceTimeout,
+        });
+        return option;
+      }) as QuoteResponse[]
     );
 
     const protocolToken = getProtocolToken(network);
