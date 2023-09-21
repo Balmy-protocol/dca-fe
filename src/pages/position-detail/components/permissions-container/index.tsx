@@ -136,6 +136,8 @@ const PositionPermissionsContainer = ({
     dispatch(discardChanges());
   };
 
+  const activePermissions = Object.values(permissions).filter((permission) => !!permission.permissions.length);
+
   const shouldDisable =
     position.status === 'TERMINATED' ||
     !account ||
@@ -173,12 +175,12 @@ const PositionPermissionsContainer = ({
             />
           )}
         </StyledControlsWrapper>
-        {!!Object.values(permissions).length && (
+        {!!activePermissions.length && (
           <StyledFlexGridItem item xs={12}>
             <StyledPaper variant="outlined">
               <Grid container spacing={2}>
-                {Object.values(permissions).map((permission) => (
-                  <Grid item xs={12} md={4}>
+                {activePermissions.map((permission) => (
+                  <Grid item xs={12} md={4} key={permission.id}>
                     <PositionPermission
                       positionPermission={permission}
                       shouldDisable={shouldDisable}
