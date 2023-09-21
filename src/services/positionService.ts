@@ -363,6 +363,7 @@ export default class PositionService {
                 pendingTransaction: '',
                 permissions: [],
                 version,
+                pairId: position.pair.id,
                 chainId: network,
                 pairLastSwappedAt:
                   (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
@@ -566,7 +567,7 @@ export default class PositionService {
     const fromToUse =
       yieldFrom || (from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address);
 
-    return this.sdkService.sdk.dcaService.management.getAllowanceTarget({
+    return this.sdkService.getDCAAllowanceTarget({
       chainId,
       from: fromToUse,
       depositWith: from.address,
@@ -665,7 +666,7 @@ export default class PositionService {
     const toToUse =
       yieldTo || (to.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken.address : to);
 
-    return this.sdkService.sdk.dcaService.management.buildCreatePositionTx({
+    return this.sdkService.buildCreatePositionTx({
       chainId: currentNetwork.chainId,
       from: { address: from, variantId: fromToUse },
       to: { address: to, variantId: toToUse },
@@ -757,7 +758,7 @@ export default class PositionService {
     }
 
     const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
-    const tx = await this.sdkService.sdk.dcaService.management.buildWithdrawPositionTx({
+    const tx = await this.sdkService.buildWithdrawPositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
       withdraw: {
@@ -789,7 +790,7 @@ export default class PositionService {
 
     const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
 
-    const withdrawTx = await this.sdkService.sdk.dcaService.management.buildWithdrawPositionTx({
+    const withdrawTx = await this.sdkService.buildWithdrawPositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
       dcaHub: hubAddress,
@@ -866,7 +867,7 @@ export default class PositionService {
 
     const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
 
-    const tx = await this.sdkService.sdk.dcaService.management.buildTerminatePositionTx({
+    const tx = await this.sdkService.buildTerminatePositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
       withdraw: {
@@ -904,7 +905,7 @@ export default class PositionService {
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
 
     const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
-    const terminateTx = await this.sdkService.sdk.dcaService.management.buildTerminatePositionTx({
+    const terminateTx = await this.sdkService.buildTerminatePositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
       dcaHub: hubAddress,
@@ -1139,7 +1140,7 @@ export default class PositionService {
             }
           : { token: tokenFrom, amount: amount.toString() };
 
-      return this.sdkService.sdk.dcaService.management.buildIncreasePositionTx({
+      return this.sdkService.buildIncreasePositionTx({
         chainId: currentNetwork.chainId,
         positionId: position.positionId,
         dcaHub: hubAddress,
@@ -1154,7 +1155,7 @@ export default class PositionService {
       convertTo: string;
     } = { amountToBuy: amount.toString(), convertTo: tokenFrom };
 
-    return this.sdkService.sdk.dcaService.management.buildReduceToBuyPositionTx({
+    return this.sdkService.buildReduceToBuyPositionTx({
       chainId: currentNetwork.chainId,
       positionId: position.positionId,
       dcaHub: hubAddress,

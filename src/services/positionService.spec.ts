@@ -1,6 +1,7 @@
 import {
   HubContract,
   NewPositionTypeData,
+  Permission,
   PermissionData,
   Position,
   PositionVersions,
@@ -24,7 +25,7 @@ import {
 } from '@constants';
 import { emptyTokenWithAddress, toToken } from '@common/utils/currency';
 import { BigNumber, VoidSigner, ethers } from 'ethers';
-import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { parseUnits } from '@ethersproject/units';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
 import GET_POSITIONS from '@graphql/getPositions.graphql';
@@ -33,6 +34,7 @@ import { fromRpcSig } from 'ethereumjs-util';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
 import { TransactionResponse } from '@ethersproject/providers';
 import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
+import { DCAPermission } from '@mean-finance/sdk';
 
 import ProviderService from './providerService';
 import WalletService from './walletService';
@@ -42,6 +44,8 @@ import SafeService from './safeService';
 import PairService from './pairService';
 import GraphqlService from './graphql';
 import PositionService from './positionService';
+import Permit2Service from './permit2Service';
+import SdkService from './sdkService';
 
 jest.mock('./providerService');
 jest.mock('./walletService');
@@ -49,6 +53,8 @@ jest.mock('./contractService');
 jest.mock('./meanApiService');
 jest.mock('./safeService');
 jest.mock('./pairService');
+jest.mock('./sdkService');
+jest.mock('./permit2Service');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('ethereumjs-util', () => ({
   ...jest.requireActual('ethereumjs-util'),
@@ -75,6 +81,8 @@ const MockedContractService = jest.mocked(ContractService, { shallow: true });
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedSafeService = jest.mocked(SafeService, { shallow: true });
 const MockedPairService = jest.mocked(PairService, { shallow: true });
+const MockedPermit2Service = jest.mocked(Permit2Service, { shallow: true });
+const MockedSdkService = jest.mocked(SdkService, { shallow: false });
 const MockedGqlFetchAll = jest.mocked(gqlFetchAll, { shallow: true });
 const MockedFromRpcSig = jest.mocked(fromRpcSig, { shallow: true });
 
@@ -132,6 +140,7 @@ function createPositionMock({
 }: {
   from?: Token;
   to?: Token;
+  pairId?: string;
   user?: string;
   swapInterval?: BigNumber;
   swapped?: BigNumber;
@@ -159,9 +168,15 @@ function createPositionMock({
   remainingLiquidityUnderlying?: Nullable<BigNumber>;
   permissions?: PermissionData[];
 }): Position {
+  const fromToUse = (!isUndefined(from) && from) || toToken({ address: 'from' });
+  const toToUse = (!isUndefined(to) && to) || toToken({ address: 'to' });
+  const underlyingFrom = fromToUse.underlyingTokens[0];
+  const underlyingTo = toToUse.underlyingTokens[0];
+
   return {
-    from: (!isUndefined(from) && from) || toToken({ address: 'from' }),
-    to: (!isUndefined(to) && to) || toToken({ address: 'to' }),
+    from: fromToUse,
+    to: toToUse,
+    pairId: `${(underlyingFrom || fromToUse).address}-${(underlyingTo || toToUse).address}`,
     user: (!isUndefined(user) && user) || 'my account',
     swapInterval: (!isUndefined(swapInterval) && swapInterval) || ONE_DAY,
     swapped: (!isUndefined(swapped) && swapped) || parseUnits('10', 18),
@@ -322,7 +337,9 @@ function createGqlPositionMock({
     createdAtTimestamp: (!isUndefined(createdAtTimestamp) && createdAtTimestamp) || 1686329816,
     permissions: (!isUndefined(permissions) && permissions) || [],
     pair: (!isUndefined(pair) && pair) || {
-      id: 'pair',
+      id: `${((!isUndefined(from) && from) || toToken({ address: 'from' })).address}-${
+        ((!isUndefined(to) && to) || toToken({ address: 'to' })).address
+      }`,
       activePositionsPerInterval: [1, 2, 3, 4, 5, 6, 7, 8],
       swaps: [
         {
@@ -341,6 +358,8 @@ describe('Position Service', () => {
   let meanApiService: jest.MockedObject<MeanApiService>;
   let safeService: jest.MockedObject<SafeService>;
   let pairService: jest.MockedObject<PairService>;
+  let permit2Service: jest.MockedObject<Permit2Service>;
+  let sdkService: jest.MockedObject<SdkService>;
   let positionService: PositionService;
 
   beforeEach(() => {
@@ -350,6 +369,8 @@ describe('Position Service', () => {
     meanApiService = createMockInstance(MockedMeanApiService);
     safeService = createMockInstance(MockedSafeService);
     pairService = createMockInstance(MockedPairService);
+    permit2Service = createMockInstance(MockedPermit2Service);
+    sdkService = createMockInstance(MockedSdkService);
 
     walletService.getAccount.mockReturnValue('my account');
     providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: true });
@@ -360,7 +381,9 @@ describe('Position Service', () => {
       meanApiService,
       safeService,
       createGqlMock(),
-      providerService
+      providerService,
+      permit2Service,
+      sdkService
     );
   });
 
@@ -630,6 +653,7 @@ describe('Position Service', () => {
           rate: BigNumber.from(20),
           remainingSwaps: BigNumber.from(5),
           withdrawn: parseUnits('7', 18),
+          // pairId: 'pair',
           toWithdrawUnderlyingAccum: BigNumber.from(11),
           totalSwappedUnderlyingAccum: BigNumber.from(12),
           depositedRateUnderlying: BigNumber.from(21),
@@ -666,6 +690,7 @@ describe('Position Service', () => {
           rate: BigNumber.from(25),
           remainingSwaps: BigNumber.from(5),
           withdrawn: parseUnits('7', 18),
+          // pairId: 'pair',
           toWithdrawUnderlyingAccum: BigNumber.from(16),
           totalSwappedUnderlyingAccum: BigNumber.from(12),
           depositedRateUnderlying: BigNumber.from(26),
@@ -699,6 +724,7 @@ describe('Position Service', () => {
           positionId: 'position-3',
           id: `position-3-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: BigNumber.from(20),
+          // pairId: 'pair',
           rate: BigNumber.from(30),
           withdrawn: parseUnits('7', 18),
           remainingSwaps: BigNumber.from(5),
@@ -855,6 +881,7 @@ describe('Position Service', () => {
           pairLastSwappedAt: 10,
           pairNextSwapAvailableAt: '1686329816',
           swapped: parseUnits('15', 18),
+          pairId: 'pair',
         }),
         [`position-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -888,6 +915,7 @@ describe('Position Service', () => {
           depositedRateUnderlying: null,
           remainingLiquidityUnderlying: null,
           toWithdrawUnderlying: null,
+          pairId: 'pair',
           pairLastSwappedAt: 10,
           pairNextSwapAvailableAt: '1686329816',
           swapped: parseUnits('15', 18),
@@ -913,6 +941,7 @@ describe('Position Service', () => {
               }),
             ],
           }),
+          pairId: 'pair',
           positionId: 'position-3',
           id: `position-3-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: BigNumber.from(0),
@@ -981,11 +1010,11 @@ describe('Position Service', () => {
         await positionService.getSignatureForPermission(
           createPositionMock({}),
           'contractAddress',
-          PERMISSIONS.INCREASE,
+          DCAPermission.INCREASE,
           'providedPermissionManagerAddress'
         );
 
-        expect(MockedEthers.Contract).toHaveBeenCalledTimes(1);
+        expect(MockedEthers.Contract).toHaveBeenCalledTimes(2);
         expect(MockedEthers.Contract).toHaveBeenCalledWith(
           'providedPermissionManagerAddress',
           PERMISSION_MANAGER_ABI.abi,
@@ -999,7 +1028,7 @@ describe('Position Service', () => {
         await positionService.getSignatureForPermission(
           createPositionMock({}),
           'contractAddress',
-          PERMISSIONS.INCREASE,
+          DCAPermission.INCREASE,
           undefined,
           'erc712Name'
         );
@@ -1045,7 +1074,7 @@ describe('Position Service', () => {
       const result = await positionService.getSignatureForPermission(
         createPositionMock({}),
         'contractAddress',
-        PERMISSIONS.INCREASE
+        DCAPermission.INCREASE
       );
 
       // eslint-disable-next-line no-underscore-dangle
@@ -1129,7 +1158,18 @@ describe('Position Service', () => {
     beforeEach(() => {
       permissionManagerInstanceMock = {
         modify: jest.fn().mockResolvedValue('modify'),
+        populateTransaction: {
+          modify: jest.fn().mockResolvedValue({
+            from: 'account',
+            to: 'permissionManager',
+            data: 'modify',
+          }),
+        },
       } as unknown as jest.Mocked<DCAPermissionsManager>;
+
+      providerService.sendTransactionWithGasLimit.mockResolvedValue({
+        hash: 'modify-hash',
+      } as TransactionResponse);
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
     });
@@ -1138,19 +1178,27 @@ describe('Position Service', () => {
         {
           id: 'permission',
           operator: 'operator',
-          permissions: ['INCREASE', 'REDUCE', 'WITHDRAW'],
+          permissions: [Permission.INCREASE, Permission.REDUCE, Permission.WITHDRAW],
         },
       ]);
 
-      expect(permissionManagerInstanceMock.modify).toHaveBeenCalledTimes(1);
-      expect(permissionManagerInstanceMock.modify).toHaveBeenCalledWith('position-1', [
+      expect(permissionManagerInstanceMock.populateTransaction.modify).toHaveBeenCalledTimes(1);
+      expect(permissionManagerInstanceMock.populateTransaction.modify).toHaveBeenCalledWith('position-1', [
         {
           operator: 'operator',
           permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW],
         },
       ]);
 
-      expect(result).toEqual('modify');
+      expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+      expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
+        from: 'account',
+        to: 'permissionManager',
+        data: 'modify',
+      });
+      expect(result).toEqual({
+        hash: 'modify-hash',
+      });
     });
   });
 
@@ -1319,16 +1367,16 @@ describe('Position Service', () => {
         },
       } as unknown as jest.Mocked<HubContract>;
 
-      meanApiService.getDepositTx.mockResolvedValue({
+      sdkService.buildCreatePositionTx.mockResolvedValue({
         to: 'companion',
-        from: 'account',
+        data: 'data',
       });
 
       contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
     });
 
-    describe('when the from has yield', () => {
-      test('it should get the transaction from the mean api', async () => {
+    describe('when the from is not the protocol token', () => {
+      test('it should get the transaction from the sdk', async () => {
         const params = await positionService.buildDepositParams(
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
@@ -1346,31 +1394,42 @@ describe('Position Service', () => {
           ONE_DAY,
           '5',
           'fromYield',
-          'toYield'
+          'toYield',
+          {
+            deadline: 10,
+            nonce: BigNumber.from(0),
+            rawSignature: 'signature',
+          }
         );
 
-        expect(meanApiService.getDepositTx).toHaveBeenCalledTimes(1);
-        expect(meanApiService.getDepositTx).toHaveBeenCalledWith(
-          params.takeFrom,
-          params.from,
-          params.to,
-          params.totalAmmount,
-          params.swaps,
-          params.interval,
-          params.account,
-          params.permissions,
-          params.yieldFrom,
-          params.yieldTo
-        );
+        expect(sdkService.buildCreatePositionTx).toHaveBeenCalledTimes(1);
+        expect(sdkService.buildCreatePositionTx).toHaveBeenCalledWith({
+          chainId: 10,
+          from: { address: params.from, variantId: params.yieldFrom },
+          to: { address: params.to, variantId: params.yieldTo },
+          swapInterval: params.interval.toNumber(),
+          amountOfSwaps: params.swaps.toNumber(),
+          owner: params.account,
+          permissions: params.permissions,
+          deposit: {
+            permitData: {
+              amount: params.totalAmmount.toString(),
+              token: params.takeFrom,
+              nonce: '0',
+              deadline: '10',
+            },
+            signature: 'signature',
+          },
+        });
         expect(result).toEqual({
           to: 'companion',
-          from: 'account',
+          data: 'data',
         });
       });
     });
 
     describe('when the from is the protocol token', () => {
-      test('it should get the transaction from the mean api', async () => {
+      test('it should get the transaction from the sdk', async () => {
         const params = await positionService.buildDepositParams(
           getProtocolToken(10),
           toToken({ address: 'to' }),
@@ -1387,136 +1446,29 @@ describe('Position Service', () => {
           '5'
         );
 
-        expect(meanApiService.getDepositTx).toHaveBeenCalledTimes(1);
-        expect(meanApiService.getDepositTx).toHaveBeenCalledWith(
-          params.takeFrom,
-          params.from,
-          params.to,
-          params.totalAmmount,
-          params.swaps,
-          params.interval,
-          params.account,
-          params.permissions,
-          params.yieldFrom,
-          params.yieldTo
-        );
+        const wrappedProtocolToken = getWrappedProtocolToken(10);
+        expect(sdkService.buildCreatePositionTx).toHaveBeenCalledTimes(1);
+        expect(sdkService.buildCreatePositionTx).toHaveBeenCalledWith({
+          chainId: 10,
+          from: { address: params.from, variantId: wrappedProtocolToken.address },
+          to: { address: params.to, variantId: params.to },
+          swapInterval: params.interval.toNumber(),
+          amountOfSwaps: params.swaps.toNumber(),
+          owner: params.account,
+          permissions: params.permissions,
+          deposit: { token: params.takeFrom, amount: params.totalAmmount.toString() },
+        });
         expect(result).toEqual({
           to: 'companion',
-          from: 'account',
+          data: 'data',
         });
-      });
-    });
-
-    test('it should populate the transaction from the hub when the to is protocol', async () => {
-      const params = await positionService.buildDepositParams(
-        toToken({ address: 'from' }),
-        getProtocolToken(10),
-        '10',
-        ONE_DAY,
-        '5'
-      );
-
-      const result = await positionService.buildDepositTx(
-        toToken({ address: 'from' }),
-        getProtocolToken(10),
-        '10',
-        ONE_DAY,
-        '5'
-      );
-
-      expect(meanApiService.getDepositTx).not.toHaveBeenCalled();
-      expect(hubInstanceMock.populateTransaction.deposit).toHaveBeenCalledTimes(1);
-      expect(hubInstanceMock.populateTransaction.deposit).toHaveBeenCalledWith(
-        'from',
-        getWrappedProtocolToken(10).address,
-        params.totalAmmount,
-        params.swaps,
-        params.interval,
-        params.account,
-        params.permissions
-      );
-      expect(result).toEqual({
-        to: 'hub',
-        from: 'account',
-      });
-    });
-
-    test('it should populate the transaction from the hub when the to has yield', async () => {
-      const params = await positionService.buildDepositParams(
-        toToken({ address: 'from' }),
-        toToken({ address: 'to' }),
-        '10',
-        ONE_DAY,
-        '5',
-        undefined,
-        'toYield'
-      );
-
-      const result = await positionService.buildDepositTx(
-        toToken({ address: 'from' }),
-        toToken({ address: 'to' }),
-        '10',
-        ONE_DAY,
-        '5',
-        undefined,
-        'toYield'
-      );
-
-      expect(meanApiService.getDepositTx).not.toHaveBeenCalled();
-      expect(hubInstanceMock.populateTransaction.deposit).toHaveBeenCalledTimes(1);
-      expect(hubInstanceMock.populateTransaction.deposit).toHaveBeenCalledWith(
-        'from',
-        'toYield',
-        params.totalAmmount,
-        params.swaps,
-        params.interval,
-        params.account,
-        params.permissions
-      );
-      expect(result).toEqual({
-        to: 'hub',
-        from: 'account',
-      });
-    });
-
-    test('it should populate the transaction from the hub when the to is a random token', async () => {
-      const params = await positionService.buildDepositParams(
-        toToken({ address: 'from' }),
-        toToken({ address: 'to' }),
-        '10',
-        ONE_DAY,
-        '5'
-      );
-
-      const result = await positionService.buildDepositTx(
-        toToken({ address: 'from' }),
-        toToken({ address: 'to' }),
-        '10',
-        ONE_DAY,
-        '5'
-      );
-
-      expect(meanApiService.getDepositTx).not.toHaveBeenCalled();
-      expect(hubInstanceMock.populateTransaction.deposit).toHaveBeenCalledTimes(1);
-      expect(hubInstanceMock.populateTransaction.deposit).toHaveBeenCalledWith(
-        'from',
-        'to',
-        params.totalAmmount,
-        params.swaps,
-        params.interval,
-        params.account,
-        params.permissions
-      );
-      expect(result).toEqual({
-        to: 'hub',
-        from: 'account',
       });
     });
   });
 
   describe('approveAndDepositSafe', () => {
     beforeEach(() => {
-      walletService.buildApproveTx.mockResolvedValue({
+      walletService.buildApproveSpecificTokenTx.mockResolvedValue({
         to: 'companion',
         from: 'safe',
         data: 'approve',
@@ -1530,6 +1482,7 @@ describe('Position Service', () => {
       safeService.submitMultipleTxs.mockResolvedValue({
         safeTxHash: 'safeTxHash',
       });
+      positionService.getAllowanceTarget = jest.fn().mockReturnValue('resolved-allowance-target');
     });
 
     test('it should call the safeService with the bundled approve and deposit transactions', async () => {
@@ -1553,11 +1506,10 @@ describe('Position Service', () => {
         'yieldTo'
       );
 
-      expect(walletService.buildApproveTx).toHaveBeenCalledTimes(1);
-      expect(walletService.buildApproveTx).toHaveBeenCalledWith(
+      expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledTimes(1);
+      expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledWith(
         toToken({ address: 'from' }),
-        true,
-        PositionVersions.POSITION_VERSION_4,
+        'resolved-allowance-target',
         params.totalAmmount
       );
       expect(positionService.buildDepositTx).toHaveBeenCalledTimes(1);
@@ -1618,7 +1570,8 @@ describe('Position Service', () => {
         ONE_DAY,
         '5',
         'yieldFrom',
-        'yieldTo'
+        'yieldTo',
+        undefined
       );
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
@@ -1640,14 +1593,17 @@ describe('Position Service', () => {
         }),
       } as unknown as jest.Mocked<HubContract>;
 
-      meanApiService.withdrawSwappedUsingOtherToken.mockResolvedValue({
+      sdkService.buildWithdrawPositionTx.mockResolvedValue({
         to: 'companion',
-        from: 'account',
         data: 'withdrawSwapped',
-        hash: 'withdraw-hash',
+      });
+
+      providerService.sendTransactionWithGasLimit.mockResolvedValue({
+        hash: 'hash',
       } as unknown as TransactionResponse);
 
       contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
+      contractService.getHUBAddress.mockResolvedValue('hubAddress');
       contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
 
       positionService.companionHasPermission = jest.fn().mockResolvedValue(true);
@@ -1687,8 +1643,22 @@ describe('Position Service', () => {
           false
         );
 
-        expect(hubInstanceMock.withdrawSwapped).toHaveBeenCalledTimes(1);
-        expect(hubInstanceMock.withdrawSwapped).toHaveBeenCalledWith('position-1', 'my account');
+        expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
+        expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
+          chainId: 10,
+          positionId: 'position-1',
+          withdraw: {
+            convertTo: 'to',
+          },
+          dcaHub: 'hubAddress',
+          recipient: 'my account',
+          permissionPermit: undefined,
+        });
+        expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+        expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
+          to: 'companion',
+          data: 'withdrawSwapped',
+        });
         expect(result).toEqual({
           hash: 'hash',
         });
@@ -1720,26 +1690,31 @@ describe('Position Service', () => {
             PERMISSIONS.WITHDRAW
           );
 
-          expect(meanApiService.withdrawSwappedUsingOtherToken).toHaveBeenCalledTimes(1);
-          expect(meanApiService.withdrawSwappedUsingOtherToken).toHaveBeenCalledWith(
-            'position-1',
-            'my account',
-            PositionVersions.POSITION_VERSION_4,
-            'to',
-            {
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              convertTo: 'to',
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: {
               permissions: 'permissions',
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
               s: '0x01',
               tokenId: 'position-1',
-            }
-          );
-          expect(result).toEqual({
+            },
+          });
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
-            from: 'account',
             data: 'withdrawSwapped',
-            hash: 'withdraw-hash',
+          });
+          expect(result).toEqual({
+            hash: 'hash',
           });
         });
       });
@@ -1760,18 +1735,26 @@ describe('Position Service', () => {
 
           expect(positionService.getSignatureForPermission).not.toHaveBeenCalled();
 
-          expect(meanApiService.withdrawSwappedUsingOtherToken).toHaveBeenCalledTimes(1);
-          expect(meanApiService.withdrawSwappedUsingOtherToken).toHaveBeenCalledWith(
-            'position-1',
-            'my account',
-            PositionVersions.POSITION_VERSION_4,
-            'to'
-          );
-          expect(result).toEqual({
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              convertTo: 'to',
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: undefined,
+          });
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
-            from: 'account',
             data: 'withdrawSwapped',
-            hash: 'withdraw-hash',
+          });
+
+          expect(result).toEqual({
+            hash: 'hash',
           });
         });
       });
@@ -1788,8 +1771,22 @@ describe('Position Service', () => {
             false
           );
 
-          expect(hubInstanceMock.withdrawSwapped).toHaveBeenCalledTimes(1);
-          expect(hubInstanceMock.withdrawSwapped).toHaveBeenCalledWith('position-1', 'my account');
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              convertTo: getWrappedProtocolToken(10).address,
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: undefined,
+          });
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
+            to: 'companion',
+            data: 'withdrawSwapped',
+          });
           expect(result).toEqual({
             hash: 'hash',
           });
@@ -1820,26 +1817,31 @@ describe('Position Service', () => {
             PERMISSIONS.WITHDRAW
           );
 
-          expect(meanApiService.withdrawSwappedUsingOtherToken).toHaveBeenCalledTimes(1);
-          expect(meanApiService.withdrawSwappedUsingOtherToken).toHaveBeenCalledWith(
-            'position-1',
-            'my account',
-            PositionVersions.POSITION_VERSION_4,
-            PROTOCOL_TOKEN_ADDRESS,
-            {
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              convertTo: getProtocolToken(10).address,
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: {
               permissions: 'permissions',
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
               s: '0x01',
               tokenId: 'position-1',
-            }
-          );
-          return expect(result).toEqual({
+            },
+          });
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
-            from: 'account',
             data: 'withdrawSwapped',
-            hash: 'withdraw-hash',
+          });
+          expect(result).toEqual({
+            hash: 'hash',
           });
         });
       });
@@ -1860,18 +1862,24 @@ describe('Position Service', () => {
 
           expect(positionService.getSignatureForPermission).not.toHaveBeenCalled();
 
-          expect(meanApiService.withdrawSwappedUsingOtherToken).toHaveBeenCalledTimes(1);
-          expect(meanApiService.withdrawSwappedUsingOtherToken).toHaveBeenCalledWith(
-            'position-1',
-            'my account',
-            PositionVersions.POSITION_VERSION_4,
-            PROTOCOL_TOKEN_ADDRESS
-          );
-          return expect(result).toEqual({
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              convertTo: getProtocolToken(10).address,
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: undefined,
+          });
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
-            from: 'account',
             data: 'withdrawSwapped',
-            hash: 'withdraw-hash',
+          });
+          expect(result).toEqual({
+            hash: 'hash',
           });
         });
       });
@@ -1887,15 +1895,18 @@ describe('Position Service', () => {
         }),
       } as unknown as jest.Mocked<HubContract>;
 
-      meanApiService.terminateUsingOtherTokens.mockResolvedValue({
+      sdkService.buildTerminatePositionTx.mockResolvedValue({
         to: 'companion',
-        from: 'account',
         data: 'terminate',
-        hash: 'terminate-hash',
-      } as unknown as TransactionResponse);
+      });
 
       contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
+      contractService.getHUBAddress.mockResolvedValue('hubAddress');
       contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+
+      providerService.sendTransactionWithGasLimit.mockResolvedValue({
+        hash: 'terminate-hash',
+      } as unknown as TransactionResponse);
 
       positionService.companionHasPermission = jest.fn().mockResolvedValue(true);
       positionService.getSignatureForPermission = jest.fn().mockResolvedValue({
@@ -1936,10 +1947,26 @@ describe('Position Service', () => {
           false
         );
 
-        expect(hubInstanceMock.terminate).toHaveBeenCalledTimes(1);
-        expect(hubInstanceMock.terminate).toHaveBeenCalledWith('position-1', 'my account', 'my account');
+        expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
+        expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
+          chainId: 10,
+          positionId: 'position-1',
+          withdraw: {
+            unswappedConvertTo: 'from',
+            swappedConvertTo: 'to',
+          },
+          dcaHub: 'hubAddress',
+          recipient: 'my account',
+          permissionPermit: undefined,
+        });
+
+        expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+        expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
+          to: 'companion',
+          data: 'terminate',
+        });
         expect(result).toEqual({
-          hash: 'hash',
+          hash: 'terminate-hash',
         });
       });
     });
@@ -1972,27 +1999,32 @@ describe('Position Service', () => {
             undefined
           );
 
-          expect(meanApiService.terminateUsingOtherTokens).toHaveBeenCalledTimes(1);
-          expect(meanApiService.terminateUsingOtherTokens).toHaveBeenCalledWith(
-            'position-1',
-            'my account',
-            'my account',
-            PositionVersions.POSITION_VERSION_4,
-            'from',
-            'to',
-            {
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              unswappedConvertTo: 'from',
+              swappedConvertTo: 'to',
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: {
               permissions: 'permissions',
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
               s: '0x01',
               tokenId: 'position-1',
-            }
-          );
-          expect(result).toEqual({
+            },
+          });
+
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
-            from: 'account',
             data: 'terminate',
+          });
+          expect(result).toEqual({
             hash: 'terminate-hash',
           });
         });
@@ -2014,19 +2046,25 @@ describe('Position Service', () => {
 
           expect(positionService.getSignatureForPermission).not.toHaveBeenCalled();
 
-          expect(meanApiService.terminateUsingOtherTokens).toHaveBeenCalledTimes(1);
-          expect(meanApiService.terminateUsingOtherTokens).toHaveBeenCalledWith(
-            'position-1',
-            'my account',
-            'my account',
-            PositionVersions.POSITION_VERSION_4,
-            'from',
-            'to'
-          );
-          expect(result).toEqual({
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              unswappedConvertTo: 'from',
+              swappedConvertTo: 'to',
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: undefined,
+          });
+
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
-            from: 'account',
             data: 'terminate',
+          });
+          expect(result).toEqual({
             hash: 'terminate-hash',
           });
         });
@@ -2045,10 +2083,26 @@ describe('Position Service', () => {
             false
           );
 
-          expect(hubInstanceMock.terminate).toHaveBeenCalledTimes(1);
-          expect(hubInstanceMock.terminate).toHaveBeenCalledWith('position-1', 'my account', 'my account');
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              unswappedConvertTo: getWrappedProtocolToken(10).address,
+              swappedConvertTo: 'to',
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: undefined,
+          });
+
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
+            to: 'companion',
+            data: 'terminate',
+          });
           expect(result).toEqual({
-            hash: 'hash',
+            hash: 'terminate-hash',
           });
         });
       });
@@ -2080,27 +2134,32 @@ describe('Position Service', () => {
             undefined
           );
 
-          expect(meanApiService.terminateUsingOtherTokens).toHaveBeenCalledTimes(1);
-          expect(meanApiService.terminateUsingOtherTokens).toHaveBeenCalledWith(
-            'position-1',
-            'my account',
-            'my account',
-            PositionVersions.POSITION_VERSION_4,
-            getProtocolToken(10).address,
-            'to',
-            {
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              unswappedConvertTo: getProtocolToken(10).address,
+              swappedConvertTo: 'to',
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: {
               permissions: 'permissions',
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
               s: '0x01',
               tokenId: 'position-1',
-            }
-          );
-          expect(result).toEqual({
+            },
+          });
+
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
-            from: 'account',
             data: 'terminate',
+          });
+          expect(result).toEqual({
             hash: 'terminate-hash',
           });
         });
@@ -2122,19 +2181,24 @@ describe('Position Service', () => {
 
           expect(positionService.getSignatureForPermission).not.toHaveBeenCalled();
 
-          expect(meanApiService.terminateUsingOtherTokens).toHaveBeenCalledTimes(1);
-          expect(meanApiService.terminateUsingOtherTokens).toHaveBeenCalledWith(
-            'position-1',
-            'my account',
-            'my account',
-            PositionVersions.POSITION_VERSION_4,
-            getProtocolToken(10).address,
-            'to'
-          );
-          expect(result).toEqual({
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            withdraw: {
+              unswappedConvertTo: getProtocolToken(10).address,
+              swappedConvertTo: 'to',
+            },
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            permissionPermit: undefined,
+          });
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
+          expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
-            from: 'account',
             data: 'terminate',
+          });
+          expect(result).toEqual({
             hash: 'terminate-hash',
           });
         });
@@ -2265,7 +2329,7 @@ describe('Position Service', () => {
                 chainId: 137,
               }),
             ],
-            [PERMISSIONS.INCREASE],
+            [DCAPermission.INCREASE],
             'permittedAddress'
           );
           expect(1).toEqual(2);
@@ -2291,7 +2355,7 @@ describe('Position Service', () => {
             positionId: 'position-3',
           }),
         ],
-        [PERMISSIONS.INCREASE],
+        [DCAPermission.INCREASE],
         'permittedAddress'
       );
 
@@ -2583,12 +2647,14 @@ describe('Position Service', () => {
         },
       } as unknown as jest.Mocked<HubContract>;
 
-      meanApiService.getDepositTx.mockResolvedValue({
+      sdkService.buildIncreasePositionTx.mockResolvedValue({
         to: 'companion',
-        from: 'account',
+        data: 'data',
       });
 
       contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
+
+      contractService.getHUBAddress.mockResolvedValue('hubAddress');
 
       positionService.getModifyRateAndSwapsSignature = jest.fn().mockResolvedValue('permissionSignature');
     });
@@ -2600,8 +2666,7 @@ describe('Position Service', () => {
         newSwaps = '10';
 
         contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
-        meanApiService.getIncreasePositionUsingOtherTokenTx.mockResolvedValue({
-          from: 'account',
+        sdkService.buildIncreasePositionTx.mockResolvedValue({
           to: 'companion',
           data: 'meanapi-increase-data',
         });
@@ -2629,19 +2694,18 @@ describe('Position Service', () => {
           expect(positionService.companionHasPermission).toHaveBeenCalledTimes(1);
           expect(positionService.companionHasPermission).toHaveBeenCalledWith(position, PERMISSIONS.INCREASE);
           expect(positionService.getModifyRateAndSwapsSignature).not.toHaveBeenCalled();
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).toHaveBeenCalledTimes(1);
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).toHaveBeenCalledWith(
-            params.id,
-            params.amount,
-            params.swaps,
-            params.version,
-            params.tokenFrom,
-            undefined
-          );
+          expect(sdkService.buildReduceToBuyPositionTx).not.toHaveBeenCalled();
+          expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            dcaHub: 'hubAddress',
+            amountOfSwaps: params.swaps.toNumber(),
+            permissionPermit: undefined,
+            increase: { token: params.tokenFrom, amount: params.amount.toString() },
+          });
 
           expect(result).toEqual({
-            from: 'account',
             to: 'companion',
             data: 'meanapi-increase-data',
           });
@@ -2661,19 +2725,18 @@ describe('Position Service', () => {
             newSwaps,
             false
           );
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).toHaveBeenCalledTimes(1);
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).toHaveBeenCalledWith(
-            params.id,
-            params.amount,
-            params.swaps,
-            params.version,
-            params.tokenFrom,
-            'permissionSignature'
-          );
+          expect(sdkService.buildReduceToBuyPositionTx).not.toHaveBeenCalled();
+          expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            dcaHub: 'hubAddress',
+            amountOfSwaps: params.swaps.toNumber(),
+            permissionPermit: 'permissionSignature',
+            increase: { token: params.tokenFrom, amount: params.amount.toString() },
+          });
 
           expect(result).toEqual({
-            from: 'account',
             to: 'companion',
             data: 'meanapi-increase-data',
           });
@@ -2702,19 +2765,18 @@ describe('Position Service', () => {
           expect(positionService.companionHasPermission).toHaveBeenCalledTimes(1);
           expect(positionService.companionHasPermission).toHaveBeenCalledWith(position, PERMISSIONS.INCREASE);
           expect(positionService.getModifyRateAndSwapsSignature).not.toHaveBeenCalled();
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).toHaveBeenCalledTimes(1);
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).toHaveBeenCalledWith(
-            params.id,
-            params.amount,
-            params.swaps,
-            params.version,
-            params.tokenFrom,
-            undefined
-          );
+          expect(sdkService.buildReduceToBuyPositionTx).not.toHaveBeenCalled();
+          expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            dcaHub: 'hubAddress',
+            amountOfSwaps: params.swaps.toNumber(),
+            permissionPermit: undefined,
+            increase: { token: params.tokenFrom, amount: params.amount.toString() },
+          });
 
           expect(result).toEqual({
-            from: 'account',
             to: 'companion',
             data: 'meanapi-increase-data',
           });
@@ -2734,19 +2796,18 @@ describe('Position Service', () => {
             newSwaps,
             false
           );
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).toHaveBeenCalledTimes(1);
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).toHaveBeenCalledWith(
-            params.id,
-            params.amount,
-            params.swaps,
-            params.version,
-            params.tokenFrom,
-            'permissionSignature'
-          );
+          expect(sdkService.buildReduceToBuyPositionTx).not.toHaveBeenCalled();
+          expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            dcaHub: 'hubAddress',
+            amountOfSwaps: params.swaps.toNumber(),
+            permissionPermit: 'permissionSignature',
+            increase: { token: params.tokenFrom, amount: params.amount.toString() },
+          });
 
           expect(result).toEqual({
-            from: 'account',
             to: 'companion',
             data: 'meanapi-increase-data',
           });
@@ -2765,17 +2826,20 @@ describe('Position Service', () => {
 
         const result = await positionService.buildModifyRateAndSwapsTx(position, newRateUnderlying, newSwaps, false);
 
-        expect(meanApiService.getIncreasePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-        expect(meanApiService.getReducePositionUsingOtherTokenTx).not.toHaveBeenCalled();
+        expect(sdkService.buildReduceToBuyPositionTx).not.toHaveBeenCalled();
 
-        expect(hubInstanceMock.populateTransaction.increasePosition).toHaveBeenCalledTimes(1);
-        expect(hubInstanceMock.populateTransaction.increasePosition).toHaveBeenCalledWith(
-          params.id,
-          params.amount,
-          params.swaps
-        );
+        expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
+        expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
+          chainId: 10,
+          positionId: 'position-1',
+          dcaHub: 'hubAddress',
+          amountOfSwaps: params.swaps.toNumber(),
+          permissionPermit: undefined,
+          increase: { token: params.tokenFrom, amount: params.amount.toString() },
+        });
         expect(result).toEqual({
-          hash: 'increase-hash',
+          data: 'meanapi-increase-data',
+          to: 'companion',
         });
       });
     });
@@ -2787,8 +2851,7 @@ describe('Position Service', () => {
         newSwaps = '3';
 
         contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
-        meanApiService.getReducePositionUsingOtherTokenTx.mockResolvedValue({
-          from: 'account',
+        sdkService.buildReduceToBuyPositionTx.mockResolvedValue({
           to: 'companion',
           data: 'meanapi-reduce-data',
         });
@@ -2816,20 +2879,19 @@ describe('Position Service', () => {
           expect(positionService.companionHasPermission).toHaveBeenCalledTimes(1);
           expect(positionService.companionHasPermission).toHaveBeenCalledWith(position, PERMISSIONS.REDUCE);
           expect(positionService.getModifyRateAndSwapsSignature).not.toHaveBeenCalled();
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).toHaveBeenCalledTimes(1);
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).toHaveBeenCalledWith(
-            params.id,
-            params.amount,
-            params.swaps,
-            params.account,
-            params.version,
-            params.tokenFrom,
-            undefined
-          );
+          expect(sdkService.buildIncreasePositionTx).not.toHaveBeenCalled();
+          expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            dcaHub: 'hubAddress',
+            amountOfSwaps: params.swaps.toNumber(),
+            permissionPermit: undefined,
+            recipient: 'my account',
+            reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
+          });
 
           expect(result).toEqual({
-            from: 'account',
             to: 'companion',
             data: 'meanapi-reduce-data',
           });
@@ -2849,20 +2911,19 @@ describe('Position Service', () => {
             newSwaps,
             false
           );
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).toHaveBeenCalledTimes(1);
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).toHaveBeenCalledWith(
-            params.id,
-            params.amount,
-            params.swaps,
-            params.account,
-            params.version,
-            params.tokenFrom,
-            'permissionSignature'
-          );
+          expect(sdkService.buildIncreasePositionTx).not.toHaveBeenCalled();
+          expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            amountOfSwaps: params.swaps.toNumber(),
+            permissionPermit: 'permissionSignature',
+            reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
+          });
 
           expect(result).toEqual({
-            from: 'account',
             to: 'companion',
             data: 'meanapi-reduce-data',
           });
@@ -2891,20 +2952,19 @@ describe('Position Service', () => {
           expect(positionService.companionHasPermission).toHaveBeenCalledTimes(1);
           expect(positionService.companionHasPermission).toHaveBeenCalledWith(position, PERMISSIONS.REDUCE);
           expect(positionService.getModifyRateAndSwapsSignature).not.toHaveBeenCalled();
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).toHaveBeenCalledTimes(1);
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).toHaveBeenCalledWith(
-            params.id,
-            params.amount,
-            params.swaps,
-            params.account,
-            params.version,
-            params.tokenFrom,
-            undefined
-          );
+          expect(sdkService.buildIncreasePositionTx).not.toHaveBeenCalled();
+          expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            amountOfSwaps: params.swaps.toNumber(),
+            permissionPermit: undefined,
+            reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
+          });
 
           expect(result).toEqual({
-            from: 'account',
             to: 'companion',
             data: 'meanapi-reduce-data',
           });
@@ -2924,20 +2984,19 @@ describe('Position Service', () => {
             newSwaps,
             false
           );
-          expect(meanApiService.getIncreasePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).toHaveBeenCalledTimes(1);
-          expect(meanApiService.getReducePositionUsingOtherTokenTx).toHaveBeenCalledWith(
-            params.id,
-            params.amount,
-            params.swaps,
-            params.account,
-            params.version,
-            params.tokenFrom,
-            'permissionSignature'
-          );
+          expect(sdkService.buildIncreasePositionTx).not.toHaveBeenCalled();
+          expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
+          expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
+            chainId: 10,
+            positionId: 'position-1',
+            dcaHub: 'hubAddress',
+            recipient: 'my account',
+            amountOfSwaps: params.swaps.toNumber(),
+            permissionPermit: 'permissionSignature',
+            reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
+          });
 
           expect(result).toEqual({
-            from: 'account',
             to: 'companion',
             data: 'meanapi-reduce-data',
           });
@@ -2956,18 +3015,22 @@ describe('Position Service', () => {
 
         const result = await positionService.buildModifyRateAndSwapsTx(position, newRateUnderlying, newSwaps, false);
 
-        expect(meanApiService.getIncreasePositionUsingOtherTokenTx).not.toHaveBeenCalled();
-        expect(meanApiService.getReducePositionUsingOtherTokenTx).not.toHaveBeenCalled();
+        expect(sdkService.buildIncreasePositionTx).not.toHaveBeenCalled();
 
-        expect(hubInstanceMock.populateTransaction.reducePosition).toHaveBeenCalledTimes(1);
-        expect(hubInstanceMock.populateTransaction.reducePosition).toHaveBeenCalledWith(
-          params.id,
-          params.amount,
-          params.swaps,
-          params.account
-        );
+        expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
+        expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
+          chainId: 10,
+          positionId: 'position-1',
+          dcaHub: 'hubAddress',
+          recipient: 'my account',
+          amountOfSwaps: params.swaps.toNumber(),
+          permissionPermit: undefined,
+          reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
+        });
+
         expect(result).toEqual({
-          hash: 'reduce-hash',
+          data: 'meanapi-reduce-data',
+          to: 'companion',
         });
       });
     });
@@ -2977,8 +3040,8 @@ describe('Position Service', () => {
     beforeEach(() => {
       positionService.buildModifyRateAndSwapsParams = jest
         .fn()
-        .mockResolvedValue({ amount: BigNumber.from(10), tokenFrom: 'tokenFrom' });
-      walletService.buildApproveTx.mockResolvedValue({
+        .mockResolvedValue({ amount: BigNumber.from(10), tokenFrom: 'tokenFrom', isIncrease: true });
+      walletService.buildApproveSpecificTokenTx.mockResolvedValue({
         to: 'companion',
         from: 'account',
         data: 'approve-data',
@@ -2991,9 +3054,26 @@ describe('Position Service', () => {
       safeService.submitMultipleTxs.mockResolvedValue({
         safeTxHash: 'safeTxHash',
       });
+      walletService.getSpecificAllowance.mockResolvedValue({
+        allowance: '0',
+        token: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
+      });
+      positionService.getAllowanceTarget = jest.fn().mockReturnValue('companion');
+      positionService.companionHasPermission = jest.fn().mockResolvedValue(false);
+      positionService.fillAddressPermissions = jest.fn().mockResolvedValue([
+        {
+          operator: 'companion',
+          permissions: [Permission.TERMINATE],
+        },
+      ]);
+      positionService.getModifyPermissionsTx = jest.fn().mockResolvedValue({
+        from: 'account',
+        to: 'permissionManager',
+        data: 'modify-permission-data',
+      });
     });
     test('it should call the safeService with the bundled approve and modify transactions', async () => {
-      const result = await positionService.approveAndModifyRateAndSwapsSafe(
+      const result = await positionService.modifyRateAndSwapsSafe(
         createPositionMock({
           positionId: 'position-1',
           from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
@@ -3012,11 +3092,10 @@ describe('Position Service', () => {
         '5',
         false
       );
-      expect(walletService.buildApproveTx).toHaveBeenCalledTimes(1);
-      expect(walletService.buildApproveTx).toHaveBeenCalledWith(
+      expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledTimes(1);
+      expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledWith(
         toToken({ address: 'tokenFrom' }),
-        true,
-        PositionVersions.POSITION_VERSION_4,
+        'companion',
         BigNumber.from(10)
       );
       expect(positionService.buildModifyRateAndSwapsTx).toHaveBeenCalledTimes(1);
@@ -3027,6 +3106,7 @@ describe('Position Service', () => {
         }),
         '10',
         '5',
+        false,
         false
       );
       expect(result).toEqual({
@@ -3063,7 +3143,9 @@ describe('Position Service', () => {
         }),
         '10',
         '5',
-        false
+        false,
+        true,
+        undefined
       );
 
       expect(result).toEqual({
@@ -3138,6 +3220,7 @@ describe('Position Service', () => {
               ...toToken({ address: 'newToToken' }),
               underlyingTokens: [emptyTokenWithAddress('toYield')],
             },
+            pairId: `${getWrappedProtocolToken(10).address}-newToToken`,
             user: 'my account',
             positionId: 'pending-transaction-hash',
             chainId: 10,
@@ -3618,17 +3701,38 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`modify-permissions-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-permissions-position-v${LATEST_VERSION}`,
+              permissions: [
+                {
+                  id: 'operator-id',
+                  operator: 'new operator',
+                  permissions: [Permission.INCREASE],
+                },
+              ],
             }),
           },
           basePositions: {
             [`modify-permissions-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-permissions-position-v${LATEST_VERSION}`,
+              permissions: [
+                {
+                  id: 'operator-id',
+                  operator: 'new operator',
+                  permissions: [Permission.INCREASE, Permission.REDUCE],
+                },
+              ],
             }),
           },
           transaction: {
             type: TransactionTypes.modifyPermissions,
             typeData: {
               id: `modify-permissions-position-v${LATEST_VERSION}`,
+              permissions: [
+                {
+                  id: 'operator-id',
+                  operator: 'new operator',
+                  permissions: [Permission.INCREASE],
+                },
+              ],
             },
           },
         },
