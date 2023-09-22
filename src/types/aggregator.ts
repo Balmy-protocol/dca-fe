@@ -61,4 +61,10 @@ export interface SwapOptionWithTx extends SwapOption {
   tx: QuoteTransaction;
 }
 
-export type QuoteErrorType = 'Timeout' | 'ReferralCode' | 'BigIntConversion' | 'NetworkRequest' | 'Unknown';
+export enum QuoteErrors {
+  TIMEOUT = 'Timeout',
+  REFERRAL_CODE = 'ReferralCode',
+  BIGINT_CONVERSION = 'BigIntConversion',
+  NETWORK_REQUEST = 'NetworkRequest',
+  UNKNOWN = 'Unknown',
+}
