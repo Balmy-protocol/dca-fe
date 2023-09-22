@@ -11,9 +11,10 @@ import { Interface } from '@ethersproject/abi';
 import ERC20ABI from '@abis/erc20.json';
 import WRAPPEDABI from '@abis/weth.json';
 import { getProtocolToken } from '@common/mocks/tokens';
-import { quoteResponseToSwapOption } from '@common/utils/quotes';
+import { categorizeError, quoteResponseToSwapOption } from '@common/utils/quotes';
 import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
 import { GasKeys, SORT_MOST_PROFIT, SwapSortOptions, TimeoutKey } from '@constants/aggregator';
+import { compact } from 'lodash';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -21,6 +22,7 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import SafeService from './safeService';
 import SimulationService from './simulationService';
+import EventService from './eventService';
 
 export default class AggregatorService {
   signer: Signer;
@@ -39,6 +41,8 @@ export default class AggregatorService {
 
   simulationService: SimulationService;
 
+  eventService: EventService;
+
   constructor(
     walletService: WalletService,
     contractService: ContractService,
@@ -46,7 +50,8 @@ export default class AggregatorService {
     DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
     providerService: ProviderService,
     safeService: SafeService,
-    simulationService: SimulationService
+    simulationService: SimulationService,
+    eventService: EventService
   ) {
     this.contractService = contractService;
     this.walletService = walletService;
@@ -55,6 +60,7 @@ export default class AggregatorService {
     this.providerService = providerService;
     this.safeService = safeService;
     this.simulationService = simulationService;
+    this.eventService = eventService;
   }
 
   getSigner() {
@@ -145,14 +151,32 @@ export default class AggregatorService {
       sourceTimeout
     );
 
-    const filteredOptions = swapOptionsResponse.filter((option) => !('failed' in option)) as QuoteResponse[];
+    const validOptions = compact(
+      swapOptionsResponse.map((option) => {
+        if ('failed' in option) {
+          // eslint-disable-next-line no-void
+          void this.eventService.trackEvent('Aggregator - Fetching quote error', {
+            source: option.source.id,
+            sourceTimeout,
+            errorType: categorizeError(option.error),
+          });
+          return null;
+        }
+        // eslint-disable-next-line no-void
+        void this.eventService.trackEvent('Aggregator - Fetching quote successfull', {
+          source: option.source.id,
+          sourceTimeout,
+        });
+        return option;
+      }) as QuoteResponse[]
+    );
 
     const protocolToken = getProtocolToken(network);
 
     const sellToken = from.address === protocolToken.address ? protocolToken : toToken(from);
     const buyToken = to.address === protocolToken.address ? protocolToken : toToken(to);
 
-    let sortedOptions = filteredOptions.map<SwapOption>((quoteResponse) => ({
+    let sortedOptions = validOptions.map<SwapOption>((quoteResponse) => ({
       ...quoteResponseToSwapOption({
         ...quoteResponse,
         sellToken: {

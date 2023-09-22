@@ -3,7 +3,7 @@ import { parseUnits } from '@ethersproject/units';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
-import { SwapOption, SwapOptionWithTx } from '@types';
+import { QuoteErrors, SwapOption, SwapOptionWithTx } from '@types';
 import { defineMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toToken } from './currency';
@@ -307,3 +307,19 @@ export const swapOptionToEstimatedQuoteResponseWithTx: (option: SwapOptionWithTx
     : undefined,
   estimatedTx: option.tx,
 });
+
+export const categorizeError = (errorMsg: string): QuoteErrors => {
+  if (errorMsg.includes('timeouted')) {
+    return QuoteErrors.TIMEOUT;
+  }
+  if (errorMsg.includes('Invalid or unregistered referral code')) {
+    return QuoteErrors.REFERRAL_CODE;
+  }
+  if (errorMsg.includes('Cannot convert undefined to a BigInt')) {
+    return QuoteErrors.BIGINT_CONVERSION;
+  }
+  if (errorMsg.includes('Network request failed')) {
+    return QuoteErrors.NETWORK_REQUEST;
+  }
+  return QuoteErrors.UNKNOWN;
+};
