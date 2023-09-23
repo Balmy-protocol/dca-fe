@@ -140,6 +140,9 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xe9a15d436390beb7d9eb312546de3fb01b1468ea', // Optimism - USDC - Exactly
   '0x7eb7deac4929da076910c4aa35128ec70b0b820f', // Optimism - WETH - Exactly
   '0xa61ef65f330bb9f3fce823aee704052d8dcdb27a', // Optimism - wstETH - Exactly
+
+  '0x57F93E3Fcb2b7eF126aeedA1f959c9EE4625aa70', // Optimism - MAI - AAve
+  '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI - AAve
 ].map((a) => a.toLowerCase());
 
 export const DISABLED_YIELD_WITHDRAWS = [
