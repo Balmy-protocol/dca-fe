@@ -19,6 +19,7 @@ import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
 // MOCKS
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import ContractService from './contractService';
 import ProviderService from './providerService';
 
@@ -81,11 +82,13 @@ export default class MeanApiService {
     );
 
     const finalResponse = underlyingResponse.data.underlying;
-
     tokensWithoutAmount.forEach((tokenObj) => {
-      const underlyingToken = tokenObj.token.underlyingTokens[0];
-      finalResponse[`${tokenObj.token.chainId}-${underlyingToken.address}-0`] = {
-        underlying: underlyingToken.underlyingTokens[0].address,
+      const underlyingAddress = tokenObj.token.underlyingTokens[0].address;
+      const isProtocolToken = getProtocolToken(tokenObj.token.chainId).address === tokenObj.token.address;
+      const wrappedProtocolTokenAddress = getWrappedProtocolToken(tokenObj.token.chainId).address;
+
+      finalResponse[`${tokenObj.token.chainId}-${underlyingAddress}-0`] = {
+        underlying: isProtocolToken ? wrappedProtocolTokenAddress : tokenObj.token.address,
         underlyingAmount: '0',
       };
     });
