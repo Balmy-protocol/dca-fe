@@ -62,20 +62,35 @@ export default class MeanApiService {
   }
 
   async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
-    const tokensToUse = tokens.filter((tokenObj) => !!tokenObj.token.underlyingTokens.length);
+    const tokensWithoutAmount = tokens.filter(
+      (tokenObj) => !!tokenObj.token.underlyingTokens.length && tokenObj.amount.isZero()
+    );
+    const tokensToSend = tokens.filter(
+      (tokenObj) => !!tokenObj.token.underlyingTokens.length && !tokenObj.amount.isZero()
+    );
 
     // Call to api and get transaction
     const underlyingResponse = await this.axiosClient.post<MeanApiUnderlyingResponse>(
       `${MEAN_API_URL}/v2/transforms/to-underlying`,
       {
-        tokens: tokensToUse.map((tokenObj) => ({
+        tokens: tokensToSend.map((tokenObj) => ({
           dependent: `${tokenObj.token.chainId}:${tokenObj.token.underlyingTokens[0].address.toString()}`,
           dependentAmount: tokenObj.amount.toString(),
         })),
       }
     );
 
-    return underlyingResponse.data.underlying;
+    const finalResponse = underlyingResponse.data.underlying;
+
+    tokensWithoutAmount.forEach((tokenObj) => {
+      const underlyingToken = tokenObj.token.underlyingTokens[0];
+      finalResponse[`${tokenObj.token.chainId}-${underlyingToken.address}-0`] = {
+        underlying: underlyingToken.underlyingTokens[0].address,
+        underlyingAmount: '0',
+      };
+    });
+
+    return finalResponse;
   }
 
   async migratePosition(
