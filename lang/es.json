@@ -123,6 +123,10 @@
     "defaultMessage": "Posición Cerrada",
     "description": "timelineTypeWithdrawn"
   },
+  "3qQCTi": {
+    "defaultMessage": "No pudimos encontrar un token en la dirección proporcionada. Por favor, verifica y vuelve a intentarlo.",
+    "description": "customTokenError"
+  },
   "47ajSH": {
     "defaultMessage": "Redes compatibles:",
     "description": "supportedNetworks"
