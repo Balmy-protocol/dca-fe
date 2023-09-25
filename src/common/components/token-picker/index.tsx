@@ -139,6 +139,7 @@ interface RowData {
   isLoadingTokenBalances: boolean;
   customTokens: TokenList;
   balancesChainId?: number;
+  customTokenError?: string;
 }
 
 interface RowProps {
@@ -221,6 +222,17 @@ const EmptyRow = () => (
   </StyledTokenTextContainer>
 );
 
+const ErrorRow = () => (
+  <StyledTokenTextContainer>
+    <Typography variant="body1" sx={{ textAlign: 'center' }}>
+      <FormattedMessage
+        description="customTokenError"
+        defaultMessage="We could not find a token at the provided address. Please double-check and try again."
+      />
+    </Typography>
+  </StyledTokenTextContainer>
+);
+
 const Row = ({
   index,
   style,
@@ -234,6 +246,7 @@ const Row = ({
     customTokens,
     isLoadingTokenBalances,
     balancesChainId,
+    customTokenError,
   },
 }: RowProps) => {
   const classes = useListItemStyles();
@@ -244,6 +257,10 @@ const Row = ({
 
   if (index === 0 && tokenKeys.length === 1 && tokenKeys[0] === 'loading') {
     return <LoadingRow style={style} />;
+  }
+
+  if (customTokenError && customTokenError !== 'Invalid address') {
+    return <ErrorRow />;
   }
 
   if (index === 0 && !tokenKeys.length && !token) {
@@ -488,7 +505,7 @@ const TokenPicker = ({
     rawMemoTokenKeysToUse.map((tokenKey) => toToken({ address: tokenKey, chainId: currentNetwork.chainId }))
   );
 
-  const [customToken, isLoadingCustomToken] = useCustomToken(
+  const [customToken, isLoadingCustomToken, customTokenError] = useCustomToken(
     search,
     !isAggregator || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
   );
@@ -571,6 +588,7 @@ const TokenPicker = ({
       customToken: isAggregator ? customToken : undefined,
       isLoadingTokenBalances: isLoadingBalances,
       customTokens: isAggregator ? customTokens : {},
+      customTokenError,
     }),
     [
       memoizedTokenKeys,
@@ -581,6 +599,7 @@ const TokenPicker = ({
       isLoadingBalances,
       currentNetwork.chainId,
       isLoadingCustomToken,
+      customTokenError,
     ]
   );
 
