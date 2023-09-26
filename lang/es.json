@@ -951,6 +951,10 @@
     "defaultMessage": "Autorizar token",
     "description": "lowLiqApproveToken"
   },
+  "Y5SSY+": {
+    "defaultMessage": "Por favor, conecta tu billetera para ver las campañas",
+    "description": "claimModal walletNotConnected"
+  },
   "Y9R08Z": {
     "defaultMessage": "Ignorar transacción",
     "description": "ignoretransaction"

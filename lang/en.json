@@ -1539,6 +1539,10 @@
     "defaultMessage": "DONE",
     "description": "finishedPosition"
   },
+  "Y5SSY+": {
+    "defaultMessage": "Please connect your wallet to see any campaigns",
+    "description": "claimModal walletNotConnected"
+  },
   "Y9R08Z": {
     "defaultMessage": "Ignore transaction",
     "description": "ignoretransaction"
