@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import Grid from '@mui/material/Grid';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { Campaign, CampaignTypes, Campaigns, OptimismTypeData } from '@types';
+import useWeb3Service from '@hooks/useWeb3Service';
 import ClaimItem from './components/claim-items';
 import OptimismAirdropClaimItem from './components/optimism-campaign';
 
@@ -52,8 +53,41 @@ const getCampaigItemComponent = (campaign: Campaign) => {
 };
 
 const ClaimModal = ({ open, onCancel, campaigns, isLoadingCampaigns }: ClaimModalProps) => {
+  const web3Service = useWeb3Service();
+
   const handleCancel = () => {
     onCancel();
+  };
+
+  const renderCampaigns = () => {
+    if (!web3Service.getAccount()) {
+      return (
+        <StyledContent>
+          <FormattedMessage
+            description="claimModal walletNotConnected"
+            defaultMessage="Please connect your wallet to see any campaigns"
+          />
+        </StyledContent>
+      );
+    }
+
+    if (isLoadingCampaigns) {
+      return <CenteredLoadingIndicator />;
+    }
+
+    if (campaigns && !!campaigns.length) {
+      return campaigns.map((campaign) => (
+        <Grid item xs={12} key={campaign.id} sx={{ paddingTop: '0px !important' }}>
+          {getCampaigItemComponent(campaign)}
+        </Grid>
+      ));
+    }
+
+    return (
+      <StyledContent>
+        <FormattedMessage description="claimModal noCampaigns" defaultMessage="No campaigns to claim" />
+      </StyledContent>
+    );
   };
 
   return (
@@ -67,19 +101,7 @@ const ClaimModal = ({ open, onCancel, campaigns, isLoadingCampaigns }: ClaimModa
     >
       <StyledClaimContainer>
         <Grid container alignItems="stretch" rowSpacing={2}>
-          {isLoadingCampaigns && !campaigns && <CenteredLoadingIndicator />}
-          {campaigns &&
-            !!campaigns.length &&
-            campaigns.map((campaign) => (
-              <Grid item xs={12} key={campaign.id} sx={{ paddingTop: '0px !important' }}>
-                {getCampaigItemComponent(campaign)}
-              </Grid>
-            ))}
-          {campaigns && !campaigns.length && (
-            <StyledContent>
-              <FormattedMessage description="claimModal noCampaigns" defaultMessage="No campaigns to claim" />
-            </StyledContent>
-          )}
+          {renderCampaigns()}
         </Grid>
       </StyledClaimContainer>
     </Modal>
