@@ -1,23 +1,22 @@
 import { parseUnits } from '@ethersproject/units';
-import { getProtocolToken } from '@common/mocks/tokens';
 import { NETWORKS } from './addresses';
 
 export const MIN_AMOUNT_FOR_MAX_DEDUCTION = {
-  [NETWORKS.polygon.chainId]: parseUnits('0.1', getProtocolToken(NETWORKS.polygon.chainId).decimals),
-  [NETWORKS.arbitrum.chainId]: parseUnits('0.001', getProtocolToken(NETWORKS.arbitrum.chainId).decimals),
-  [NETWORKS.optimism.chainId]: parseUnits('0.001', getProtocolToken(NETWORKS.optimism.chainId).decimals),
-  [NETWORKS.mainnet.chainId]: parseUnits('0.1', getProtocolToken(NETWORKS.mainnet.chainId).decimals),
-  [NETWORKS.baseGoerli.chainId]: parseUnits('0.1', getProtocolToken(NETWORKS.mainnet.chainId).decimals),
-  [NETWORKS.bsc.chainId]: parseUnits('0.1', getProtocolToken(NETWORKS.bsc.chainId).decimals),
+  [NETWORKS.polygon.chainId]: parseUnits('0.1', 18),
+  [NETWORKS.bsc.chainId]: parseUnits('0.1', 18),
+  [NETWORKS.arbitrum.chainId]: parseUnits('0.001', 18),
+  [NETWORKS.optimism.chainId]: parseUnits('0.001', 18),
+  [NETWORKS.mainnet.chainId]: parseUnits('0.1', 18),
+  [NETWORKS.baseGoerli.chainId]: parseUnits('0.1', 18),
 };
 
 export const MAX_DEDUCTION = {
-  [NETWORKS.polygon.chainId]: parseUnits('0.045', getProtocolToken(NETWORKS.polygon.chainId).decimals),
-  [NETWORKS.bsc.chainId]: parseUnits('0.045', getProtocolToken(NETWORKS.bsc.chainId).decimals),
-  [NETWORKS.arbitrum.chainId]: parseUnits('0.00015', getProtocolToken(NETWORKS.arbitrum.chainId).decimals),
-  [NETWORKS.optimism.chainId]: parseUnits('0.000525', getProtocolToken(NETWORKS.optimism.chainId).decimals),
-  [NETWORKS.mainnet.chainId]: parseUnits('0.021', getProtocolToken(NETWORKS.mainnet.chainId).decimals),
-  [NETWORKS.baseGoerli.chainId]: parseUnits('0.021', getProtocolToken(NETWORKS.mainnet.chainId).decimals),
+  [NETWORKS.polygon.chainId]: parseUnits('0.045', 18),
+  [NETWORKS.bsc.chainId]: parseUnits('0.045', 18),
+  [NETWORKS.arbitrum.chainId]: parseUnits('0.00015', 18),
+  [NETWORKS.optimism.chainId]: parseUnits('0.000525', 18),
+  [NETWORKS.mainnet.chainId]: parseUnits('0.021', 18),
+  [NETWORKS.baseGoerli.chainId]: parseUnits('0.021', 18),
 };
 
 export const getMinAmountForMaxDeduction = (chainId: number) =>

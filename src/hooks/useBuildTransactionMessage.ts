@@ -131,87 +131,6 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TransactionTypes.addFundsPosition: {
-          const addFundsTypeData = tx.typeData;
-          const fundedPosition = find(positions, { id: addFundsTypeData.id });
-          if (fundedPosition) {
-            message = intl.formatMessage(
-              defineMessage({
-                description: 'transactionMessagesAddFunds',
-                defaultMessage: '{amount} {from} have been added to your {from}:{to} position',
-              }),
-              {
-                from: (fundedPosition as Position).from.symbol,
-                to: (fundedPosition as Position).to.symbol,
-                amount: addFundsTypeData.newFunds,
-              }
-            );
-          }
-          break;
-        }
-        case TransactionTypes.resetPosition: {
-          const resetPositionTypeData = tx.typeData;
-          const resettedPosition = find(positions, { id: resetPositionTypeData.id });
-          const swapInterval = BigNumber.from((resettedPosition as Position).swapInterval);
-
-          if (resettedPosition) {
-            message = intl.formatMessage(
-              defineMessage({
-                description: 'transactionMessagesReset',
-                defaultMessage:
-                  '{amount} {from} have been added to your {from}:{to} position and it has been set to run for {swaps} {frequency}',
-              }),
-              {
-                from: (resettedPosition as Position).from.symbol,
-                to: (resettedPosition as Position).to.symbol,
-                amount: resetPositionTypeData.newFunds,
-                swaps: resetPositionTypeData.newSwaps,
-                frequency: getFrequencyLabel(intl, swapInterval.toString(), resetPositionTypeData.newSwaps),
-              }
-            );
-          }
-          break;
-        }
-        case TransactionTypes.removeFunds: {
-          const removeFundsTypeData = tx.typeData;
-          const removeFundedPosition = find(positions, { id: removeFundsTypeData.id });
-          if (removeFundedPosition) {
-            message = intl.formatMessage(
-              defineMessage({
-                description: 'transactionMessagesRemoveFunds',
-                defaultMessage: '{amount} {from} have been removed from your {from}:{to} position',
-              }),
-              {
-                from: (removeFundedPosition as Position).from.symbol,
-                to: (removeFundedPosition as Position).to.symbol,
-                amount: removeFundsTypeData.ammountToRemove,
-              }
-            );
-          }
-          break;
-        }
-
-        case TransactionTypes.modifySwapsPosition: {
-          const modifySwapsPositionTypeData = tx.typeData;
-          const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
-          const swapInterval = BigNumber.from((modifiedPosition as Position).swapInterval);
-
-          if (modifiedPosition) {
-            message = intl.formatMessage(
-              defineMessage({
-                description: 'transactionMessagesModifySwaps',
-                defaultMessage: 'Your {from}:{to} position has now been set to run for {swaps} {frequency}',
-              }),
-              {
-                from: (modifiedPosition as Position).from.symbol,
-                to: (modifiedPosition as Position).to.symbol,
-                swaps: modifySwapsPositionTypeData.newSwaps,
-                frequency: getFrequencyLabel(intl, swapInterval.toString(), modifySwapsPositionTypeData.newSwaps),
-              }
-            );
-          }
-          break;
-        }
         case TransactionTypes.modifyRateAndSwapsPosition: {
           const modifyRateAndSwapsPositionTypeData = tx.typeData;
           const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
@@ -271,20 +190,6 @@ function useBuildTransactionMessages() {
             defineMessage({
               description: 'transactionMessagesApproveCompanion',
               defaultMessage: 'Our Hub Companion has been approved to modify your {from}:{to} position',
-            }),
-            {
-              from: approveCompanionTypeData.from,
-              to: approveCompanionTypeData.to,
-            }
-          );
-          break;
-        }
-        case TransactionTypes.migratePosition: {
-          const approveCompanionTypeData = tx.typeData;
-          message = intl.formatMessage(
-            defineMessage({
-              description: 'transactionMessagesMigrate',
-              defaultMessage: 'Your {from}:{to} position has been migrated',
             }),
             {
               from: approveCompanionTypeData.from,

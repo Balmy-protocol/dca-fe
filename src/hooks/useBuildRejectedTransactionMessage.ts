@@ -81,59 +81,6 @@ function useBuildTransactionMessages() {
           }
           break;
         }
-        case TransactionTypes.addFundsPosition: {
-          const addFundsTypeData = tx.typeData;
-          const fundedPosition = find(positions, { id: addFundsTypeData.id });
-          if (fundedPosition) {
-            message = `Adding ${addFundsTypeData.newFunds} ${(fundedPosition as Position).from.symbol} to your ${
-              (fundedPosition as Position).from.symbol
-            }:${(fundedPosition as Position).to.symbol} position`;
-          }
-          break;
-        }
-        case TransactionTypes.resetPosition: {
-          const resetPositionTypeData = tx.typeData;
-          const resettedPosition = find(positions, { id: resetPositionTypeData.id });
-          if (resettedPosition) {
-            message = `Adding ${resetPositionTypeData.newFunds} ${(resettedPosition as Position).from.symbol} to your ${
-              (resettedPosition as Position).from.symbol
-            }:${(resettedPosition as Position).to.symbol} position and setting it to run for ${
-              resetPositionTypeData.newSwaps
-            } ${getFrequencyLabel(
-              intl,
-              (resettedPosition as Position).swapInterval.toString(),
-              resetPositionTypeData.newSwaps
-            )}`;
-          }
-          break;
-        }
-        case TransactionTypes.removeFunds: {
-          const removeFundsTypeData = tx.typeData;
-          const removeFundedPosition = find(positions, { id: removeFundsTypeData.id });
-          if (removeFundedPosition) {
-            message = `Removing ${removeFundsTypeData.ammountToRemove} ${
-              (removeFundedPosition as Position).from.symbol
-            } from your ${(removeFundedPosition as Position).from.symbol}:${
-              (removeFundedPosition as Position).to.symbol
-            } position`;
-          }
-          break;
-        }
-
-        case TransactionTypes.modifySwapsPosition: {
-          const modifySwapsPositionTypeData = tx.typeData;
-          const modifiedPosition = find(positions, { id: modifySwapsPositionTypeData.id });
-          if (modifiedPosition) {
-            message = `Setting your ${(modifiedPosition as Position).from.symbol}:${
-              (modifiedPosition as Position).to.symbol
-            } position to run for ${modifySwapsPositionTypeData.newSwaps} ${getFrequencyLabel(
-              intl,
-              (modifiedPosition as Position).swapInterval.toString(),
-              modifySwapsPositionTypeData.newSwaps
-            )}`;
-          }
-          break;
-        }
         case TransactionTypes.modifyRateAndSwapsPosition: {
           const modifyRateAndSwapsPositionTypeData = tx.typeData;
           const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
@@ -157,11 +104,6 @@ function useBuildTransactionMessages() {
         case TransactionTypes.transferPosition: {
           const transferedTypeData = tx.typeData;
           message = `Transfering your ${transferedTypeData.from}:${transferedTypeData.to} position has to ${transferedTypeData.toAddress}`;
-          break;
-        }
-        case TransactionTypes.migratePosition: {
-          const transferedTypeData = tx.typeData;
-          message = `Migrating your ${transferedTypeData.from}:${transferedTypeData.to} position`;
           break;
         }
         case TransactionTypes.migratePositionYield: {

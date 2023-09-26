@@ -389,4 +389,47 @@ export default class SdkService {
       {}
     );
   }
+
+  // DCA Methods
+  getDCAAllowanceTarget(
+    args: Parameters<ReturnType<typeof buildSDK<{}>>['dcaService']['management']['getAllowanceTarget']>[0]
+  ) {
+    return this.sdk.dcaService.management.getAllowanceTarget(args);
+  }
+
+  buildCreatePositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<{}>>['dcaService']['management']['buildCreatePositionTx']>[0]
+  ) {
+    return this.sdk.dcaService.management.buildCreatePositionTx(args);
+  }
+
+  buildIncreasePositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<{}>>['dcaService']['management']['buildIncreasePositionTx']>[0]
+  ) {
+    return this.sdk.dcaService.management.buildIncreasePositionTx(args);
+  }
+
+  buildReducePositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<{}>>['dcaService']['management']['buildReducePositionTx']>[0]
+  ) {
+    return this.sdk.dcaService.management.buildReducePositionTx(args);
+  }
+
+  buildReduceToBuyPositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<{}>>['dcaService']['management']['buildReduceToBuyPositionTx']>[0]
+  ) {
+    return this.sdk.dcaService.management.buildReduceToBuyPositionTx(args);
+  }
+
+  buildWithdrawPositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<{}>>['dcaService']['management']['buildWithdrawPositionTx']>[0]
+  ) {
+    return this.sdk.dcaService.management.buildWithdrawPositionTx(args);
+  }
+
+  buildTerminatePositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<{}>>['dcaService']['management']['buildTerminatePositionTx']>[0]
+  ) {
+    return this.sdk.dcaService.management.buildTerminatePositionTx(args);
+  }
 }

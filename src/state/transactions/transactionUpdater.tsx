@@ -167,15 +167,6 @@ export default function Updater(): null {
                 };
               }
 
-              if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
-                const parsedLog = await transactionService.parseLog(receipt.logs, tx.chainId, 'Deposited');
-
-                extendedTypeData = {
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-                  newId: parsedLog.args.positionId.toString(),
-                };
-              }
-
               let realSafeHash;
               try {
                 if (loadedAsSafeApp) {

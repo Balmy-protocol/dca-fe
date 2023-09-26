@@ -87,8 +87,6 @@ export interface Position {
   pairId: string;
   pairLastSwappedAt: number;
   pairNextSwapAvailableAt: string;
-  yieldFrom?: string;
-  yieldTo?: string;
   toWithdrawUnderlying: Nullable<BigNumber>;
   remainingLiquidityUnderlying: Nullable<BigNumber>;
   permissions?: PermissionData[];
