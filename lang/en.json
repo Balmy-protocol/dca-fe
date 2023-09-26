@@ -219,6 +219,10 @@
     "defaultMessage": "Position Closed",
     "description": "timelineTypeWithdrawn"
   },
+  "3qQCTi": {
+    "defaultMessage": "We could not find a token at the provided address. Please double-check and try again.",
+    "description": "customTokenError"
+  },
   "3sYjkn": {
     "defaultMessage": "You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to add funds to this position.",
     "description": "disabledByUsdValueModify"
