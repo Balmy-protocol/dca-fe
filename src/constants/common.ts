@@ -141,8 +141,8 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x7eb7deac4929da076910c4aa35128ec70b0b820f', // Optimism - WETH - Exactly
   '0xa61ef65f330bb9f3fce823aee704052d8dcdb27a', // Optimism - wstETH - Exactly
 
-  '0x57F93E3Fcb2b7eF126aeedA1f959c9EE4625aa70', // Optimism - MAI - AAve
-  '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI - AAve
+  '0x57F93E3Fcb2b7eF126aeedA1f959c9EE4625aa70', // Optimism - MAI on Aave - Hiding because $MAI lost support on Aave
+  '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI on Aave - Hiding because $MAI lost support on Aave
 
   '0xb5c064f955d8e7f38fe0460c556a72987494ee17', // Polygon - QUICK - Hiding until release
   '0xe0b52e49357fd4daf2c15e02058dce6bc0057db4', // Polygon - agEUR - Hiding until release
