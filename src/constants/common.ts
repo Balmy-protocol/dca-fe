@@ -104,17 +104,17 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xf2f77fe7b8e66571e0fca7104c4d670bf1c8d722', // Polygon - jBRL
   '0xbd1fe73e1f12bd2bc237de9b626f056f21f86427', // Polygon - jMXN
   '0x250632378e573c6be1ac2f97fcdf00515d0aa91b', // BNB Chain - BETH
-  // BNB Chain - Beefy BUSD Valas - Blacklisting bc of terrible yield design
+  // BNB Chain - Beefy BUSD Valas - Hiding bc of terrible yield design
   '0x45c53c0068bf31715fb41685bab59fd0bbc387f9',
-  // BNB Chain - Beefy ETH Valas - Blacklisting bc of terrible yield design
+  // BNB Chain - Beefy ETH Valas - Hiding bc of terrible yield design
   '0x353699126117ba6ed8f5d5928dfa797564e99e40',
-  // BNB Chain - Beefy BTCB Valas - Blacklisting bc of terrible yield design
+  // BNB Chain - Beefy BTCB Valas - Hiding bc of terrible yield design
   '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e',
-  // BNB Chain - Beefy USDC on Valas - Blacklisting so we can test it out
+  // BNB Chain - Beefy USDC on Valas - Hiding so we can test it out
   '0x02d7eea2c017479ad319a0f24d6ad7a07f701d9d',
-  // BNB Chain - Beefy DAI on Valas - Blacklisting so we can test it out
+  // BNB Chain - Beefy DAI on Valas - Hiding so we can test it out
   '0x1f2ae034a096f8e3faf8216d3843075474558773',
-  // Polygon - Beefy GNS on Gains - Blacklisting so we can test it out
+  // Polygon - Beefy GNS on Gains - Hiding so we can test it out
   '0xb57f7f48b88ab6041e7d0a7ec28e8b4671094b12',
   '0x1A5B0aaF478bf1FDA7b934c76E7692D722982a6D', // Abitrum - BFR
   '0x1debd73e752beaf79865fd6446b0c970eae7732f', // Arbitrum - CBETH
@@ -129,12 +129,12 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x1bbc5845e7e2000938c840f0343a975269c348ef', // Yearn - WBTC
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI. Aave. Has less than 10k TVL so no defillama data.
 
-  '0xB562CC5300e2Dd51f9770923b52cE5F372f97a0e', // BNB Chain - Venus ADA - Blacklisting until release
-  '0xf3638ACAc71740e55C14d99e288F10ba4EDef348', // BNB Chain - Venus MATIC - Blacklisting until release
-  '0x0BADC4caa20E84e25e26a54CeC3faFeBcC7AB085', // BNB Chain - Venus DOGE - Blacklisting until release
-  '0xa2b783bB283cA621f32a8792FFE4A10ad817C039', // BNB Chain - Venus XRP - Blacklisting until release
+  '0xB562CC5300e2Dd51f9770923b52cE5F372f97a0e', // BNB Chain - Venus ADA - Hiding until release
+  '0xf3638ACAc71740e55C14d99e288F10ba4EDef348', // BNB Chain - Venus MATIC - Hiding until release
+  '0x0BADC4caa20E84e25e26a54CeC3faFeBcC7AB085', // BNB Chain - Venus DOGE - Hiding until release
+  '0xa2b783bB283cA621f32a8792FFE4A10ad817C039', // BNB Chain - Venus XRP - Hiding until release
 
-  '0x8214BC5875EF5A8A22a2d53F5E68c3Bb0b01B92e', // Optimism - Sonne MAI - Blacklisting until release
+  '0x8214BC5875EF5A8A22a2d53F5E68c3Bb0b01B92e', // Optimism - Sonne MAI - Hiding until release
 
   '0x67f70429750e38d6bae20839ace2692ff2eff52f', // Optimism - OP - Exactly
   '0xe9a15d436390beb7d9eb312546de3fb01b1468ea', // Optimism - USDC - Exactly
@@ -143,6 +143,13 @@ export const DCA_TOKEN_BLACKLIST = [
 
   '0x57F93E3Fcb2b7eF126aeedA1f959c9EE4625aa70', // Optimism - MAI - AAve
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI - AAve
+
+  '0xb5c064f955d8e7f38fe0460c556a72987494ee17', // Polygon - QUICK - Hiding until release
+  '0xe0b52e49357fd4daf2c15e02058dce6bc0057db4', // Polygon - agEUR - Hiding until release
+  '0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7', // Polygon - GHST - Hiding until release
+
+  '0xfdb794692724153d1488ccdbe0c56c252596735f', // Optimism - LDO - Hiding until release
+  '0x13ad51ed4f1b7e9dc168d8a00cb3f4ddd85efa60', // Arbitrum - LDO - Hiding until release
 ].map((a) => a.toLowerCase());
 
 export const DISABLED_YIELD_WITHDRAWS = [
