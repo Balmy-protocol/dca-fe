@@ -87,7 +87,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x72b25ce2f946c95a2194f5ac3322443d0057bc94', // Optimism - DAI Beefy wrapper
   '0x185d3a08140efaeb3c6bf173e751afb0bcb0d0c6', // Optimism - USDC Beefy wrapper
   '0xaab6af05e12faae0a5d9597c79588846f0df15b8', // Polygon - MVX optimism Beefy wrapper
-  '0xe0b52e49357fd4daf2c15e02058dce6bc0057db4', // Polygon - AGEUR
 
   '0xcd0e5871c97c663d43c62b5049c123bb45bfe2cc', // Ethereum - USDC. Euler. Disabled due to hack.
   '0xd4de9d2fc1607d1df63e1c95ecbfa8d7946f5457', // Ethereum - WETH. Euler. Disabled due to hack.
@@ -145,7 +144,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI on Aave - Hiding because $MAI lost support on Aave
 
   '0xb5c064f955d8e7f38fe0460c556a72987494ee17', // Polygon - QUICK - Hiding until release
-  '0xe0b52e49357fd4daf2c15e02058dce6bc0057db4', // Polygon - agEUR - Hiding until release
   '0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7', // Polygon - GHST - Hiding until release
 
   '0xfdb794692724153d1488ccdbe0c56c252596735f', // Optimism - LDO - Hiding until release
