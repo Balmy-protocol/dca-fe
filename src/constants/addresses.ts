@@ -734,3 +734,17 @@ export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
 
 export const UNSUPPORTED_WAGMI_CHAIN = [122, 128, 106, 42262];
 /* eslint-enable */
+
+const tokenAddressesForPriceFetching: Record<number, Record<string, string>> = {
+  [NETWORKS.arbitrum.chainId]: {
+    '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8': '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // Bridged USDC (USDC.e): Native USDC
+  },
+};
+
+export const getTokenAddressForPriceFetching = (chainId: number, address: string): string => {
+  const chainRecord = tokenAddressesForPriceFetching[chainId];
+  if (chainRecord && chainRecord[address]) {
+    return chainRecord[address];
+  }
+  return address;
+};
