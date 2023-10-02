@@ -1,0 +1,67 @@
+{
+  "name": "ui-library",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "dist/*",
+    "lib/**/style/*",
+    "*.scss"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsup",
+    "build-old": "tsup src --format cjs --dts --external react",
+    "clean": "rm -rf dist",
+    "dev": "tsup --watch",
+    "generate:component": "turbo gen react-component",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.22.10",
+    "@babel/preset-react": "^7.22.5",
+    "@babel/preset-typescript": "^7.22.11",
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest",
+    "@storybook/addon-essentials": "^7.3.2",
+    "@storybook/addon-interactions": "^7.3.2",
+    "@storybook/addon-links": "^7.3.2",
+    "@storybook/addon-onboarding": "^1.0.8",
+    "@storybook/addon-styling": "^1.3.7",
+    "@storybook/blocks": "^7.3.2",
+    "@storybook/react": "^7.3.2",
+    "@storybook/react-webpack5": "^7.3.2",
+    "@storybook/testing-library": "^0.2.0",
+    "@turbo/gen": "^1.10.12",
+    "@types/node": "^20.5.2",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/styled-components": "^5.1.27",
+    "eslint-config-custom": "*",
+    "eslint-plugin-storybook": "^0.6.13",
+    "less": "^4.2.0",
+    "postcss": "^8.4.29",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.3.2",
+    "tsconfig": "*",
+    "tsup": "^7.0.0",
+    "typescript": "^4.5.2",
+    "webpack": "^5.88.2"
+  },
+  "dependencies": {
+    "@babel/core": "^7.22.11",
+    "@mui/icons-material": "^5.14.6",
+    "@mui/material": "^5.14.6",
+    "@mui/styled-engine-sc": "^5.14.6",
+    "react-is": "^18.2.0",
+    "styled-components": "^5.3.1"
+  },
+  "resolutions": {
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+  }
+}

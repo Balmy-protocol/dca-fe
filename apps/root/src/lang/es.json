@@ -1,0 +1,7088 @@
+{
+  "+9NjvN": [
+    {
+      "type": 0,
+      "value": "Autorizar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "+CHvZG": [
+    {
+      "type": 0,
+      "value": "Dándole permisos sobre tu posición a nuestro Hub Companion"
+    }
+  ],
+  "+IzX5q": [
+    {
+      "type": 1,
+      "value": "readable"
+    }
+  ],
+  "+NIeZ0": [
+    {
+      "type": 0,
+      "value": "Lista de Token"
+    }
+  ],
+  "+O0pfN": [
+    {
+      "type": 0,
+      "value": "aquí"
+    }
+  ],
+  "+Pdo/e": [
+    {
+      "type": 0,
+      "value": "Tiempo de espera:"
+    }
+  ],
+  "+Q63Eo": [
+    {
+      "type": 0,
+      "value": "La liquides de Livepeer en Arbitrum bajo considerablemente, por esto agregar fondos esta deshabilitado hasta que esta situacion se revierta."
+    }
+  ],
+  "+Rzphv": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Transacción simulada"
+    }
+  ],
+  "+UA1IX": [
+    {
+      "type": 0,
+      "value": "No requiere cuenta"
+    }
+  ],
+  "+VGlht": [
+    {
+      "type": 0,
+      "value": "Esperando la autorización de su "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "+Y16Gv": [
+    {
+      "type": 0,
+      "value": "Poner la direccion del destinatario"
+    }
+  ],
+  "+a8ibZ": [
+    {
+      "type": 1,
+      "value": "readable"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " intercambios)"
+    }
+  ],
+  "+s/1rR": [
+    {
+      "type": 0,
+      "value": "En billetera: "
+    },
+    {
+      "type": 1,
+      "value": "balance"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "+tYhzH": [
+    {
+      "type": 0,
+      "value": "¿Cómo funciona Mean Finance?"
+    }
+  ],
+  "+uiQ/S": [
+    {
+      "type": 0,
+      "value": "¿Es seguro Mean Finance Meta Aggregator?"
+    }
+  ],
+  "+vAQ2s": [
+    {
+      "type": 0,
+      "value": "Cerrar posición"
+    }
+  ],
+  "+zKE+F": [
+    {
+      "type": 0,
+      "value": "1 hora"
+    }
+  ],
+  "//GmlN": [
+    {
+      "type": 0,
+      "value": "Calcular el momento oportuno en el mercado puede ser muy difícil. \nEl objetivo de realizar DCA es reducir el impacto general de la volatilidad en el precio del activo objetivo; Dado que el precio probablemente variará cada vez que se ejecute uno de los intercambios periódicos, la inversión no está tan sujeta a la volatilidad. DCA tiene como objetivo evitar cometer el error de hacer una inversión de suma global que está mal sincronizada con respecto a la fijación de precios de los activos"
+    }
+  ],
+  "/0oLaV": [
+    {
+      "type": 0,
+      "value": "Establecer o revocar permisos"
+    }
+  ],
+  "/F1L2v": [
+    {
+      "type": 0,
+      "value": "Dar nuevos permisos"
+    }
+  ],
+  "/LSdRt": [
+    {
+      "type": 0,
+      "value": "Los usuarios tienen que pagar tarifas de gas cuando interactúan con sus posiciónes. Al mismo tiempo, hay una comisión de protocolo que se cobra en cada intercambio. Esa comisión es actualmente del 0,6%."
+    }
+  ],
+  "/ePQOu": [
+    {
+      "type": 0,
+      "value": "Nuestro Hub Companion fue aprobado para modificar tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "/gkMmp": [
+    {
+      "type": 0,
+      "value": "Fondos insuficientes"
+    }
+  ],
+  "/uU6Pg": [
+    {
+      "type": 0,
+      "value": "El próximo intercambio se ejecutará dentro de la primera hora después de la creación de la posición"
+    }
+  ],
+  "/v9cwm": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Intercambiar tokens"
+    }
+  ],
+  "/vWyXL": [
+    {
+      "type": 0,
+      "value": "Primero tendrá que firmar un mensaje (que no tiene costo) para autorizar nuestro contrato de Companion. Luego, tendrá que enviar la transacción donde envía el "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    },
+    {
+      "type": 0,
+      "value": " necesario."
+    }
+  ],
+  "/wtb0w": [
+    {
+      "type": 0,
+      "value": "Modificar tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " para ejecutarse por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    }
+  ],
+  "00Lmy0": [
+    {
+      "type": 0,
+      "value": "Mitad"
+    }
+  ],
+  "07ZWiK": [
+    {
+      "type": 0,
+      "value": "hora"
+    }
+  ],
+  "07xzKO": [
+    {
+      "type": 0,
+      "value": "Aprobar "
+    },
+    {
+      "type": 1,
+      "value": "remainingLiquidityDifference"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "0CdUh0": [
+    {
+      "type": 0,
+      "value": "Creando su posición"
+    }
+  ],
+  "0aFe3m": [
+    {
+      "type": 0,
+      "value": "Transferido desde:"
+    }
+  ],
+  "0dHtRR": [
+    {
+      "type": 0,
+      "value": "Precio del DCA."
+    }
+  ],
+  "0dZuXG": [
+    {
+      "type": 1,
+      "value": "readable"
+    }
+  ],
+  "0jTBFS": [
+    {
+      "type": 0,
+      "value": "cada 30 minutos"
+    }
+  ],
+  "0t0iJb": [
+    {
+      "type": 0,
+      "value": "Migrando su posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "0tTtPb": [
+    {
+      "type": 0,
+      "value": "1 semana (1 intercambio)"
+    }
+  ],
+  "0v2uQH": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - La aprobación del token enviada"
+    }
+  ],
+  "0zC9ex": [
+    {
+      "type": 0,
+      "value": "Simulado de la transacción"
+    }
+  ],
+  "14X4uN": [
+    {
+      "type": 0,
+      "value": "Expira el "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "156xZf": [
+    {
+      "type": 0,
+      "value": "Gas ahorrado en USD"
+    }
+  ],
+  "1HDQ5y": [
+    {
+      "type": 0,
+      "value": "Cantidad de "
+    },
+    {
+      "type": 1,
+      "value": "type"
+    }
+  ],
+  "1W/BMl": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Transaccion simulada"
+    }
+  ],
+  "1ZfCXS": [
+    {
+      "type": 0,
+      "value": "Estimación de gas"
+    }
+  ],
+  "1c3wKa": [
+    {
+      "type": 0,
+      "value": "Tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " fue migrada"
+    }
+  ],
+  "1mv4e2": [
+    {
+      "type": 0,
+      "value": "No pudimos obtener el precio de uno de los tokens"
+    }
+  ],
+  "1uma6Q": [
+    {
+      "type": 0,
+      "value": "Discord de Euler."
+    }
+  ],
+  "27/rlO": [
+    {
+      "type": 0,
+      "value": "¿Cobran alguna comisión?"
+    }
+  ],
+  "2FHrOX": [
+    {
+      "type": 0,
+      "value": "Ver otras opciones"
+    }
+  ],
+  "2NZFot": [
+    {
+      "type": 0,
+      "value": "Seleccionar dirección"
+    }
+  ],
+  "2TSf/Q": [
+    {
+      "type": 0,
+      "value": "No necesita ejecutar sus intercambios usted mismo, ya que Mean Finance incentiva a otros usuarios a ejecutar intercambios para obtener ganancias. Ahora bien, estos incentivos pueden verse afectados por diferentes factores:"
+    }
+  ],
+  "2U1wB2": [
+    {
+      "type": 0,
+      "value": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción en la que recupera el saldo como "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "2iKKX6": [
+    {
+      "type": 0,
+      "value": "Retirar y cerrar posición"
+    }
+  ],
+  "2l6dgp": [
+    {
+      "type": 0,
+      "value": "Ver en el explorador"
+    }
+  ],
+  "2reF+A": [
+    {
+      "type": 0,
+      "value": "Redimir"
+    }
+  ],
+  "2sdL25": [
+    {
+      "type": 0,
+      "value": "Rapido"
+    }
+  ],
+  "3D9cPf": [
+    {
+      "type": 0,
+      "value": "menos recibido que el recomendado"
+    }
+  ],
+  "3IslZU": [
+    {
+      "type": 0,
+      "value": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro"
+    }
+  ],
+  "3Ovbmx": [
+    {
+      "type": 0,
+      "value": "Próximo intercambio:"
+    }
+  ],
+  "3fWv7O": [
+    {
+      "type": 0,
+      "value": "¡Transacción realizada con éxito!"
+    }
+  ],
+  "3oTxXg": [
+    {
+      "type": 0,
+      "value": "Posición Cerrada"
+    }
+  ],
+  "4/vG7I": [
+    {
+      "type": 0,
+      "value": "Transferir una posición"
+    }
+  ],
+  "47ajSH": [
+    {
+      "type": 0,
+      "value": "Redes compatibles:"
+    }
+  ],
+  "47pR2c": [
+    {
+      "type": 0,
+      "value": "Desconocido"
+    }
+  ],
+  "4IAoDw": [
+    {
+      "type": 0,
+      "value": "("
+    },
+    {
+      "type": 1,
+      "value": "toPrice"
+    },
+    {
+      "type": 0,
+      "value": " USD)"
+    }
+  ],
+  "4Y/d8a": [
+    {
+      "type": 0,
+      "value": "Error creando posición"
+    }
+  ],
+  "4ZHdrV": [
+    {
+      "type": 0,
+      "value": "Encontramos los mejores precios a través de todo DeFi para que vos no lo tengas que hacer. Ahora podes estar seguro que estas recibiendo el mejor precio posible."
+    }
+  ],
+  "4jGULT": [
+    {
+      "type": 0,
+      "value": "días"
+    }
+  ],
+  "4oJ0MN": [
+    {
+      "type": 0,
+      "value": "Tiene que darle a los Contratos Inteligentes de "
+    },
+    {
+      "type": 1,
+      "value": "target"
+    },
+    {
+      "type": 0,
+      "value": " permiso para usar tus "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "4t/CsS": [
+    {
+      "type": 0,
+      "value": "Wrapping"
+    }
+  ],
+  "4u19xh": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - La transacción va a ser simulada"
+    }
+  ],
+  "5B6pOD": [
+    {
+      "type": 0,
+      "value": "El sentimiento general del cripto mercado"
+    }
+  ],
+  "5CBYQl": [
+    {
+      "type": 0,
+      "value": "Configuración de sus permisos de posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "5DbBUx": [
+    {
+      "type": 0,
+      "value": "¿Qué es la simulación de transacciones?"
+    }
+  ],
+  "5H+bme": [
+    {
+      "type": 0,
+      "value": "Transacción confirmada!"
+    }
+  ],
+  "5LJrd3": [
+    {
+      "type": 0,
+      "value": "No cobramos comisiones por los intercambios que realice a través de Mean Finance. Obtendrá los mismos precios que si utilizara el Aggregator Dex/Dex específico de su aplicación"
+    }
+  ],
+  "5QXn5Y": [
+    {
+      "type": 0,
+      "value": "Confirmar esta transacción en su billetera"
+    }
+  ],
+  "5TdrSw": [
+    {
+      "type": 0,
+      "value": "pero en el futuro admitiremos más oráculos on-chain"
+    }
+  ],
+  "5biMGi": [
+    {
+      "type": 1,
+      "value": "readable"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " intercambios)"
+    }
+  ],
+  "5ncl7Y": [
+    {
+      "type": 0,
+      "value": "Migrar tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "5q/G80": [
+    {
+      "type": 0,
+      "value": "Duración modificada"
+    }
+  ],
+  "5rRvoj": [
+    {
+      "type": 0,
+      "value": "Buscando la mejor ruta para usted"
+    }
+  ],
+  "63iR05": [
+    {
+      "type": 0,
+      "value": "15 minutos"
+    }
+  ],
+  "6DIyJZ": [
+    {
+      "type": 0,
+      "value": "Los creadores de mercado ejecutarán su intercambio en cualquier momento."
+    }
+  ],
+  "6Ldaay": [
+    {
+      "type": 0,
+      "value": "Otro"
+    }
+  ],
+  "6Mir2W": [
+    {
+      "type": 0,
+      "value": "Balance: "
+    },
+    {
+      "type": 1,
+      "value": "balance"
+    }
+  ],
+  "6VIxBc": [
+    {
+      "type": 0,
+      "value": "El próximo intercambio para esta posicion sera ejecutado"
+    }
+  ],
+  "6lcY/P": [
+    {
+      "type": 0,
+      "value": "¿Cuándo se intercambiará mi posición?"
+    }
+  ],
+  "6tCmX2": [
+    {
+      "type": 0,
+      "value": "Velocidad de gas:"
+    }
+  ],
+  "6xtKel": [
+    {
+      "type": 0,
+      "value": "Cerrar posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "7CQ1xI": [
+    {
+      "type": 0,
+      "value": "Actualmente no ofrecemos ninguna plataforma para generar retornos con este token."
+    }
+  ],
+  "7NwTX3": [
+    {
+      "type": 0,
+      "value": "Migrar posición"
+    }
+  ],
+  "7PHuXr": [
+    {
+      "type": 0,
+      "value": "menos gas usado"
+    }
+  ],
+  "7S36Rv": [
+    {
+      "type": 0,
+      "value": "¿Cuánto "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " quieres invertir?"
+    }
+  ],
+  "7YJRiI": [
+    {
+      "type": 0,
+      "value": "Autorizar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "7fX0fL": [
+    {
+      "type": 0,
+      "value": "Retirar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " fondos de tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "7lJ5Ep": [
+    {
+      "type": 0,
+      "value": "Al terminar la posición actual "
+    },
+    {
+      "type": 1,
+      "value": "toWithdraw"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " se enviará a su billetera."
+    }
+  ],
+  "7mMiMn": [
+    {
+      "type": 0,
+      "value": "&nbsp;proximamente. Crea una posición para ser incluido en el proximo intercambio."
+    }
+  ],
+  "7nNkhI": [
+    {
+      "type": 0,
+      "value": "Retirar de una posición"
+    }
+  ],
+  "7oK1Kh": [
+    {
+      "type": 0,
+      "value": "Cuando un par específico tiene algunos intercambios que no se han ejecutado en bastante tiempo, el par se señala como parado."
+    }
+  ],
+  "8ZD9RJ": [
+    {
+      "type": 0,
+      "value": "Wrap"
+    }
+  ],
+  "8nVUyg": [
+    {
+      "type": 0,
+      "value": "minuto"
+    }
+  ],
+  "8okGX/": [
+    {
+      "type": 0,
+      "value": "sólo podrá"
+    }
+  ],
+  "8rEEmK": [
+    {
+      "type": 0,
+      "value": "DCA vs Lump sum"
+    }
+  ],
+  "8uwFtl": [
+    {
+      "type": 0,
+      "value": "Esta cadena aún no es compatible"
+    }
+  ],
+  "8xMdMb": [
+    {
+      "type": 0,
+      "value": "Todas las cotizaciones van a fallar"
+    }
+  ],
+  "94DkXG": [
+    {
+      "type": 0,
+      "value": "¿Qué es Mean Finance Meta Aggregator?"
+    }
+  ],
+  "96zib+": [
+    {
+      "type": 1,
+      "value": "increaseDecrease"
+    },
+    {
+      "type": 0,
+      "value": " rate from"
+    }
+  ],
+  "9NqfNn": [
+    {
+      "type": 0,
+      "value": "Tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " ahora va a intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "freq"
+    },
+    {
+      "type": 0,
+      "value": " por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    }
+  ],
+  "9PT4ds": [
+    {
+      "type": 0,
+      "value": "El "
+    },
+    {
+      "type": 1,
+      "value": "remainingLiquidity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " restante se utilizará para crear una nueva posición con la misma tasa y duración restante que la actual."
+    }
+  ],
+  "9Rp/uO": [
+    {
+      "type": 0,
+      "value": "FAQ"
+    }
+  ],
+  "9ka/f/": [
+    {
+      "type": 0,
+      "value": "Aún no hay posiciónes de "
+    },
+    {
+      "type": 1,
+      "value": "status"
+    }
+  ],
+  "9mxRvL": [
+    {
+      "type": 0,
+      "value": "Crear una posición y empezar a generar retornos"
+    }
+  ],
+  "9p6I3v": [
+    {
+      "type": 0,
+      "value": "Por favor ayúdanos a mejorar compartiendo tu feedback en la tab de Feedback, o manda un mensaje en Discord"
+    }
+  ],
+  "9ytfZe": [
+    {
+      "type": 0,
+      "value": "Continuar"
+    }
+  ],
+  "A/jHZp": [
+    {
+      "type": 0,
+      "value": "Añadir fondos a una posición existente"
+    }
+  ],
+  "A7a2Lo": [
+    {
+      "type": 0,
+      "value": "Frequencia:"
+    }
+  ],
+  "ALg0aQ": [
+    {
+      "type": 0,
+      "value": "Intercambiado:"
+    }
+  ],
+  "Aa5WQf": [
+    {
+      "type": 0,
+      "value": "Twitter"
+    }
+  ],
+  "Aap/Dp": [
+    {
+      "type": 0,
+      "value": "Unwrapping"
+    }
+  ],
+  "Adg2/y": [
+    {
+      "type": 0,
+      "value": "Migrar la posición y empezar a generar retornos"
+    }
+  ],
+  "Ah84aZ": [
+    {
+      "type": 0,
+      "value": "Audits"
+    }
+  ],
+  "AhEpzv": [
+    {
+      "type": 0,
+      "value": "Aquí encontrará la lista completa de direcciones que tienen permisos sobre su posición. También puede añadir nuevas direcciones o modificar los permisos de las ya existentes"
+    }
+  ],
+  "AiRKI+": [
+    {
+      "type": 0,
+      "value": "Retiro intercambiado"
+    }
+  ],
+  "Ak27ll": [
+    {
+      "type": 1,
+      "value": "tokenNumber"
+    },
+    {
+      "type": 0,
+      "value": " tokens"
+    }
+  ],
+  "Aq2WRe": [
+    {
+      "type": 0,
+      "value": "Valor total"
+    }
+  ],
+  "AqqLuk": [
+    {
+      "type": 0,
+      "value": "Total depositado:"
+    }
+  ],
+  "AvAcmR": [
+    {
+      "type": 0,
+      "value": "más gastado que el recomendado"
+    }
+  ],
+  "AzL+qV": [
+    {
+      "type": 0,
+      "value": "Descartar cambios"
+    }
+  ],
+  "B+lMoB": [
+    {
+      "type": 0,
+      "value": "Información adicional:"
+    }
+  ],
+  "B2rEXZ": [
+    {
+      "type": 0,
+      "value": "Aprobando el uso de "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "B4rVMp": [
+    {
+      "type": 0,
+      "value": "Presentado el Meta Aggregator de Mean Finance"
+    }
+  ],
+  "B5AfY/": [
+    {
+      "type": 1,
+      "value": "readable"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " intercambios)"
+    }
+  ],
+  "B5YHLB": [
+    {
+      "type": 1,
+      "value": "totalDepositted"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "B5YYgc": [
+    {
+      "type": 0,
+      "value": "¿Por qué mi posición está parada?"
+    }
+  ],
+  "BElDng": [
+    {
+      "type": 0,
+      "value": "Este es el máximo que gastarás en función de tus ajustes de deslizamiento"
+    }
+  ],
+  "BWP9H/": [
+    {
+      "type": 0,
+      "value": "Uniswap"
+    }
+  ],
+  "BZcZ2I": [
+    {
+      "type": 0,
+      "value": "Cuando configura una posición, está creando la intención de intercambiar un token por otro. Entonces, algún usuario externo puede venir y ejecutar el intercambio por usted, respetando la frecuencia deseada. Cuando ejecuten su intercambio, se le cobrará una comisión del 0,6% sobre el importe intercambiado. Esta comisión se reparte entre Mean Finance y el operador. Como no tiene que ejecutar el intercambio usted mismo, no necesita pagar gas."
+    }
+  ],
+  "Bh1aAA": [
+    {
+      "type": 0,
+      "value": "Deberá proporcionar un adicional de "
+    },
+    {
+      "type": 1,
+      "value": "addAmmount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "BjSXQD": [
+    {
+      "type": 0,
+      "value": "y"
+    }
+  ],
+  "Bq70E5": [
+    {
+      "type": 0,
+      "value": "Ver en el explorador"
+    }
+  ],
+  "BrtGyj": [
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " para usted por"
+    }
+  ],
+  "BrtSAY": [
+    {
+      "type": 0,
+      "value": "Desconectar"
+    }
+  ],
+  "BsPq9s": [
+    {
+      "type": 0,
+      "value": "Compite por quién tiene más posiciónes en Mean Finance"
+    }
+  ],
+  "Bxzkan": [
+    {
+      "type": 0,
+      "value": "La popularidad/demanda de los tokens que participan en el intercambio"
+    }
+  ],
+  "ByRaJ4": [
+    {
+      "type": 0,
+      "value": "Soporta generar retornos"
+    }
+  ],
+  "C/+PJR": [
+    {
+      "type": 0,
+      "value": "Ya redimido"
+    }
+  ],
+  "C5Zkoh": [
+    {
+      "type": 0,
+      "value": "Transfiriendo su posición a "
+    },
+    {
+      "type": 1,
+      "value": "toAddress"
+    }
+  ],
+  "C5cDUK": [
+    {
+      "type": 0,
+      "value": "Restante:"
+    }
+  ],
+  "CCmahn": [
+    {
+      "type": 1,
+      "value": "readable"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " intercambios)"
+    }
+  ],
+  "CEv5tx": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " han sido agregados a tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "CEw9Tp": [
+    {
+      "type": 0,
+      "value": "Instantaneo"
+    }
+  ],
+  "CNGClN": [
+    {
+      "type": 0,
+      "value": "Error aprovando token"
+    }
+  ],
+  "CUp6QA": [
+    {
+      "type": 1,
+      "value": "type"
+    },
+    {
+      "type": 0,
+      "value": " restantes"
+    }
+  ],
+  "CZmJ1O": [
+    {
+      "type": 0,
+      "value": "Modificar posición"
+    }
+  ],
+  "CdFs0C": [
+    {
+      "type": 0,
+      "value": "Los intercambios ya no se van a ejecutar, no vas a poder hacer modificaciones a esta posicion y el NFT se quemará."
+    }
+  ],
+  "CioUeM": [
+    {
+      "type": 0,
+      "value": "Uno o ambos tokens en esta posición permiten generar retornos mientras se intercambian sus posiciónes. Le sugerimos crear una nueva posición para que empiece a generar retornos para usted. Si está de acuerdo, le enviaremos a la página de creación con los mismos tokens especificados en su posición."
+    }
+  ],
+  "Cnxwym": [
+    {
+      "type": 0,
+      "value": "15 minutos"
+    }
+  ],
+  "Cxag1C": [
+    {
+      "type": 0,
+      "value": "Ver sus posiciónes"
+    }
+  ],
+  "DCQQov": [
+    {
+      "type": 0,
+      "value": "cada hora"
+    }
+  ],
+  "DHaqgV": [
+    {
+      "type": 0,
+      "value": "cada 4 horas"
+    }
+  ],
+  "DIJWGT": [
+    {
+      "type": 0,
+      "value": "Esperando la autorización de su "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "DPjSTq": [
+    {
+      "type": 0,
+      "value": "Actualmente no hay fondos depositados en Mean Finance"
+    }
+  ],
+  "DRsp33": [
+    {
+      "type": 0,
+      "value": "Fuentes habilitadas ("
+    },
+    {
+      "type": 1,
+      "value": "enabled"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "DZBKeH": [
+    {
+      "type": 1,
+      "value": "platform"
+    },
+    {
+      "type": 0,
+      "value": " (APY "
+    },
+    {
+      "type": 1,
+      "value": "apy"
+    },
+    {
+      "type": 0,
+      "value": "%)"
+    }
+  ],
+  "DaGzbO": [
+    {
+      "type": 0,
+      "value": "Error desconocido: "
+    },
+    {
+      "type": 1,
+      "value": "message"
+    }
+  ],
+  "DcWDCQ": [
+    {
+      "type": 0,
+      "value": "¿Por que necesito hacer esto?"
+    }
+  ],
+  "DmNbMo": [
+    {
+      "type": 0,
+      "value": "Feedback"
+    }
+  ],
+  "Dnzw43": [
+    {
+      "type": 0,
+      "value": "No exira"
+    }
+  ],
+  "Do1Kxz": [
+    {
+      "type": 0,
+      "value": "Transacciones recientes"
+    }
+  ],
+  "DtELNg": [
+    {
+      "type": 0,
+      "value": "Usuario temprano"
+    }
+  ],
+  "E6P1+X": [
+    {
+      "type": 0,
+      "value": "Intercambios"
+    }
+  ],
+  "E9JRmw": [
+    {
+      "type": 0,
+      "value": "Obtener "
+    },
+    {
+      "type": 1,
+      "value": "wrappedProtocolToken"
+    },
+    {
+      "type": 0,
+      "value": " como "
+    },
+    {
+      "type": 1,
+      "value": "protocolToken"
+    },
+    {
+      "type": 0,
+      "value": " en su lugar"
+    }
+  ],
+  "EDw+ss": [
+    {
+      "type": 0,
+      "value": "menos gastado"
+    }
+  ],
+  "EJMVdh": [
+    {
+      "type": 0,
+      "value": "El cambio de su tasa de posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " para intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequencyType"
+    },
+    {
+      "type": 0,
+      "value": " por "
+    },
+    {
+      "type": 1,
+      "value": "frequencyTypePlural"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente a la blockchain y se confirmará en breve"
+    }
+  ],
+  "EKvo9E": [
+    {
+      "type": 0,
+      "value": "Quitar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " de la posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "EOwwL1": [
+    {
+      "type": 0,
+      "value": "cada hora"
+    }
+  ],
+  "ER8GVt": [
+    {
+      "type": 0,
+      "value": "Su retiro de "
+    },
+    {
+      "type": 1,
+      "value": "toSymbol"
+    },
+    {
+      "type": 0,
+      "value": " de su posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente a la blockchain y se confirmará en breve"
+    }
+  ],
+  "EVgPpp": [
+    {
+      "type": 1,
+      "value": "readable"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " intercambios)"
+    }
+  ],
+  "EWsGHv": [
+    {
+      "type": 0,
+      "value": "30 minutos"
+    }
+  ],
+  "EY6I2K": [
+    {
+      "type": 0,
+      "value": "Más gas"
+    }
+  ],
+  "EeY1Iw": [
+    {
+      "type": 0,
+      "value": "Ejecutar para:"
+    }
+  ],
+  "EgufjG": [
+    {
+      "type": 0,
+      "value": "Órdenes de compra"
+    }
+  ],
+  "Eo86hF": [
+    {
+      "type": 0,
+      "value": "Permisos sobre su posición:"
+    }
+  ],
+  "EzTqXK": [
+    {
+      "type": 0,
+      "value": "Ver permisos"
+    }
+  ],
+  "EzesrO": [
+    {
+      "type": 1,
+      "value": "readable"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " intercambios)"
+    }
+  ],
+  "F5F9dl": [
+    {
+      "type": 0,
+      "value": "Transferir posición"
+    }
+  ],
+  "F7BoEV": [
+    {
+      "type": 0,
+      "value": "Gas ahorrado"
+    }
+  ],
+  "FBYtev": [
+    {
+      "type": 0,
+      "value": "Usuario beta"
+    }
+  ],
+  "FGbffU": [
+    {
+      "type": 0,
+      "value": "Autorizar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " y wrappear"
+    }
+  ],
+  "FMbBaD": [
+    {
+      "type": 0,
+      "value": "Invirtiendo en:"
+    }
+  ],
+  "FT80h0": [
+    {
+      "type": 0,
+      "value": "Simulando transacciones ("
+    },
+    {
+      "type": 1,
+      "value": "current"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "total"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "FW4Fp5": [
+    {
+      "type": 0,
+      "value": "Obtener "
+    },
+    {
+      "type": 1,
+      "value": "protocolToken"
+    },
+    {
+      "type": 0,
+      "value": " como "
+    },
+    {
+      "type": 1,
+      "value": "wrappedProtocolToken"
+    },
+    {
+      "type": 0,
+      "value": " en su lugar"
+    }
+  ],
+  "FYVhW/": [
+    {
+      "type": 0,
+      "value": "Cerrando su posición"
+    }
+  ],
+  "FfyCRZ": [
+    {
+      "type": 0,
+      "value": "stale"
+    }
+  ],
+  "FlMmaB": [
+    {
+      "type": 0,
+      "value": "Esperando confirmación"
+    }
+  ],
+  "Fm68m0": [
+    {
+      "type": 0,
+      "value": "Redimir campañas"
+    }
+  ],
+  "FnRMc5": [
+    {
+      "type": 0,
+      "value": "Al habilitar la Aprobación Universal, vas a poder usar Uniswap, Mean, aggregadores y muchos otros protocolos sin tener que autorizar cada uno de ellos"
+    }
+  ],
+  "FwDtZA": [
+    {
+      "type": 0,
+      "value": "Posiciones"
+    }
+  ],
+  "G0Aml3": [
+    {
+      "type": 0,
+      "value": "por"
+    }
+  ],
+  "G0w2LI": [
+    {
+      "type": 0,
+      "value": "Docs"
+    }
+  ],
+  "G5ZcuX": [
+    {
+      "type": 0,
+      "value": "Retornos:"
+    }
+  ],
+  "GChBDN": [
+    {
+      "type": 0,
+      "value": "Cambiar la red a "
+    },
+    {
+      "type": 1,
+      "value": "network"
+    }
+  ],
+  "GFyhCr": [
+    {
+      "type": 0,
+      "value": "Está desconectado de la red"
+    }
+  ],
+  "GHV69h": [
+    {
+      "type": 0,
+      "value": "Buscamos los mejores precios entre la mayoría de los Defi Dex’s y Dex Aggregators, para que siempre pueda obtener el mejor precio de ejecución para sus operaciones."
+    }
+  ],
+  "GIOkAT": [
+    {
+      "type": 0,
+      "value": "4 horas (1 intercambio)"
+    }
+  ],
+  "GLQaI9": [
+    {
+      "type": 0,
+      "value": "Error cerrando posición"
+    }
+  ],
+  "GNIJT2": [
+    {
+      "type": 0,
+      "value": "Elija una red"
+    }
+  ],
+  "GQtu7+": [
+    {
+      "type": 0,
+      "value": "Costo de la transacción:"
+    }
+  ],
+  "GZ31rF": [
+    {
+      "type": 0,
+      "value": "Su retiro de fondos de "
+    },
+    {
+      "type": 1,
+      "value": "fromSymbol"
+    },
+    {
+      "type": 0,
+      "value": " de su posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente al blockchain y se confirmará en breve."
+    }
+  ],
+  "GZNskB": [
+    {
+      "type": 0,
+      "value": "1 día (1 intercambio)"
+    }
+  ],
+  "Gcz9a9": [
+    {
+      "type": 0,
+      "value": "Competencia de jMXN"
+    }
+  ],
+  "Gg22iu": [
+    {
+      "type": 0,
+      "value": "Crear el par "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "Ggm1Xe": [
+    {
+      "type": 0,
+      "value": "Posición Retirada"
+    }
+  ],
+  "GlsY2O": [
+    {
+      "type": 0,
+      "value": "Es un agregador de DEX Aggregators"
+    }
+  ],
+  "Gn7TlR": [
+    {
+      "type": 0,
+      "value": "menos recibido"
+    }
+  ],
+  "GoFOv6": [
+    {
+      "type": 0,
+      "value": "Cambiar la frequencia de su posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " para intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequencyType"
+    },
+    {
+      "type": 0,
+      "value": " por "
+    },
+    {
+      "type": 1,
+      "value": "frequencyTypePlural"
+    }
+  ],
+  "Gvb3qN": [
+    {
+      "type": 0,
+      "value": "Los usuarios finales no tienen que pagar comisiones de gas cuando se ejecutan los intercambios"
+    }
+  ],
+  "Gyipsk": [
+    {
+      "type": 0,
+      "value": "Autorizar y crear posición"
+    }
+  ],
+  "Gzs80Q": [
+    {
+      "type": 0,
+      "value": "Frequencia:"
+    }
+  ],
+  "H/e6If": [
+    {
+      "type": 0,
+      "value": "Usted está importando un token personalizado, comercie bajo su propio riesgo."
+    }
+  ],
+  "H3V9SS": [
+    {
+      "type": 0,
+      "value": "Posición creada"
+    }
+  ],
+  "H82UVr": [
+    {
+      "type": 0,
+      "value": "¿Cómo funciona?/Riesgos"
+    }
+  ],
+  "HKZyB6": [
+    {
+      "type": 0,
+      "value": "Autorizar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " y crear posición"
+    }
+  ],
+  "Hbiw7t": [
+    {
+      "type": 0,
+      "value": "Para más información, consulte nuestro"
+    }
+  ],
+  "HdS4ZS": [
+    {
+      "type": 0,
+      "value": "Crear posición"
+    }
+  ],
+  "HgPtYX": [
+    {
+      "type": 0,
+      "value": "Intercambiar"
+    }
+  ],
+  "HgrJpp": [
+    {
+      "type": 0,
+      "value": "Intercambiar y transferir"
+    }
+  ],
+  "Hnf7Tg": [
+    {
+      "type": 0,
+      "value": "ACTIVO"
+    }
+  ],
+  "HsmM3H": [
+    {
+      "type": 0,
+      "value": "Retirar el "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    },
+    {
+      "type": 0,
+      "value": " restante"
+    }
+  ],
+  "HuMusT": [
+    {
+      "type": 0,
+      "value": "Retirar fondos"
+    }
+  ],
+  "HxyTxG": [
+    {
+      "type": 0,
+      "value": "Tiempo restante:"
+    }
+  ],
+  "HznJD1": [
+    {
+      "type": 0,
+      "value": "Todo el saldo de "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " se le enviará y todo el saldo de "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " se utilizará para crear una nueva posición con el mismo tipo y los intercambios restantes."
+    }
+  ],
+  "I0PpAd": [
+    {
+      "type": 0,
+      "value": "Precio medio de compra:"
+    }
+  ],
+  "I1BY0j": [
+    {
+      "type": 0,
+      "value": "¿Qué son las órdenes de compra?"
+    }
+  ],
+  "IEFMij": [
+    {
+      "type": 0,
+      "value": "No estas conectado a esta red"
+    }
+  ],
+  "ILcAj5": [
+    {
+      "type": 0,
+      "value": "Cambiar la duración"
+    }
+  ],
+  "IQ0+94": [
+    {
+      "type": 0,
+      "value": "Seleccionar una opción"
+    }
+  ],
+  "IhGLAD": [
+    {
+      "type": 0,
+      "value": "("
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " SWAP"
+    },
+    {
+      "type": 1,
+      "value": "plural"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "IiX/g2": [
+    {
+      "type": 0,
+      "value": "Tu nueva posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " fue creada"
+    }
+  ],
+  "IkKuzc": [
+    {
+      "type": 0,
+      "value": "Siempre el mejor precio"
+    }
+  ],
+  "IrR4U4": [
+    {
+      "type": 0,
+      "value": "Parado"
+    }
+  ],
+  "It+xt8": [
+    {
+      "type": 0,
+      "value": "* No recopilamos más datos que los que ha introducido aquí"
+    }
+  ],
+  "ItXuIA": [
+    {
+      "type": 0,
+      "value": "Cambiar la duración y la frequencia"
+    }
+  ],
+  "IuW2wC": [
+    {
+      "type": 0,
+      "value": "Retirando "
+    },
+    {
+      "type": 1,
+      "value": "toSymbol"
+    }
+  ],
+  "J2NpSo": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Firme la autorización del token con su billetera"
+    }
+  ],
+  "J4ZbBX": [
+    {
+      "type": 0,
+      "value": "Sin límites de intercambio"
+    }
+  ],
+  "J8hDoy": [
+    {
+      "type": 0,
+      "value": "Definir tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " permisos"
+    }
+  ],
+  "J9ovKV": [
+    {
+      "type": 0,
+      "value": "Usted recibe"
+    }
+  ],
+  "JJ1fcj": [
+    {
+      "type": 0,
+      "value": "Transacción confirmada!"
+    }
+  ],
+  "JOH6+p": [
+    {
+      "type": 0,
+      "value": "Retirar de tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "Jh14HF": [
+    {
+      "type": 0,
+      "value": "Esta acción una vez hecha, será irreversible."
+    }
+  ],
+  "JjGezL": [
+    {
+      "type": 0,
+      "value": "Soportamos:"
+    }
+  ],
+  "JkRQyY": [
+    {
+      "type": 0,
+      "value": "Primero necesitaras firmar un mensaje (que no tiene costo) para autorizar a nuestro contrato Companion. Luego, tendras que enviar la transacción donde se migrara tu posición."
+    }
+  ],
+  "JoH9Yo": [
+    {
+      "type": 0,
+      "value": "Encontramos una mejor cotización para vos"
+    }
+  ],
+  "K/HInO": [
+    {
+      "type": 0,
+      "value": "Esto permite a la dirección disminuir los fondos y modificar la duración de su posición"
+    }
+  ],
+  "KASP2B": [
+    {
+      "type": 0,
+      "value": "cada 15 minutos"
+    }
+  ],
+  "KAw6CL": [
+    {
+      "type": 0,
+      "value": "Mean Finance incentiva a otros usuarios a ejecutar intercambios para obtener ganancias. Ahora bien, estos incentivos pueden verse afectados por distintos factores:"
+    }
+  ],
+  "KK9T66": [
+    {
+      "type": 0,
+      "value": "Tasa modificada"
+    }
+  ],
+  "KKIhxJ": [
+    {
+      "type": 0,
+      "value": "Fijado para operar durante:"
+    }
+  ],
+  "KLrr1c": [
+    {
+      "type": 0,
+      "value": "Nuestro proveedor de subgráficos entrará en mantenimiento el 14 de Agosto a las 07:00 UTC. Puede haber algunos problemas para cargar posiciones durante un breve período de la ventana de mantenimiento. Ten en cuenta que las posiciones están seguras en todo momento y el servicio volverá a la normalidad en breve."
+    }
+  ],
+  "KTvwXg": [
+    {
+      "type": 0,
+      "value": "Cerrado"
+    }
+  ],
+  "Kbpl3O": [
+    {
+      "type": 0,
+      "value": "Seleccionar"
+    }
+  ],
+  "KiN4dM": [
+    {
+      "type": 0,
+      "value": "intercambios"
+    }
+  ],
+  "KmmquQ": [
+    {
+      "type": 0,
+      "value": "Seleccione un par para ver su historial de precios"
+    }
+  ],
+  "KpQxqG": [
+    {
+      "type": 0,
+      "value": "Cambiaremos "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " por "
+    },
+    {
+      "type": 1,
+      "value": "frequencyPlural"
+    },
+    {
+      "type": 0,
+      "value": " para usted"
+    }
+  ],
+  "Kq/AiW": [
+    {
+      "type": 0,
+      "value": "Pegar dirección del portapapeles"
+    }
+  ],
+  "KxGrUy": [
+    {
+      "type": 0,
+      "value": "Añadir permisos para nueva dirección"
+    }
+  ],
+  "KyAEIB": [
+    {
+      "type": 0,
+      "value": "1 semana"
+    }
+  ],
+  "L+sTrb": [
+    {
+      "type": 0,
+      "value": "Transferido a: "
+    },
+    {
+      "type": 1,
+      "value": "account"
+    }
+  ],
+  "LAaGdN": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Habilitar Aprobacion Universal para "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "LCk5hK": [
+    {
+      "type": 0,
+      "value": "Autorizar y modificar posición"
+    }
+  ],
+  "LFvqJr": [
+    {
+      "type": 0,
+      "value": "Aprobar Máximo "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "LJHU2o": [
+    {
+      "type": 0,
+      "value": "Retiros"
+    }
+  ],
+  "LLaqNx": [
+    {
+      "type": 0,
+      "value": "El volumen de los tokens incluidos en el intercambio"
+    }
+  ],
+  "LQAOnp": [
+    {
+      "type": 0,
+      "value": "Los permisos de tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " ahora estan definidos"
+    }
+  ],
+  "LQR2sQ": [
+    {
+      "type": 0,
+      "value": "Esto permite a la dirección aumentar los fondos y modificar la duración de su posición"
+    }
+  ],
+  "LRE2+L": [
+    {
+      "type": 0,
+      "value": "Abrir billetera"
+    }
+  ],
+  "LS2WKt": [
+    {
+      "type": 0,
+      "value": "No pudimos calcular el precio para "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 1,
+      "value": "and"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": ", esto implica que no podemos estimar el impacto en el precio. Por favor se cauteloso e intercambia bajo tu propio riesgo."
+    }
+  ],
+  "LY4QAG": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Cotizaciones validados y la transacción fue simulada"
+    }
+  ],
+  "LbRNWF": [
+    {
+      "type": 0,
+      "value": "Migrar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posición"
+    }
+  ],
+  "LogV+u": [
+    {
+      "type": 0,
+      "value": "Restablecer valores predeterminados"
+    }
+  ],
+  "LqWNDv": [
+    {
+      "type": 0,
+      "value": "Añadir nueva dirección"
+    }
+  ],
+  "M3Fb8p": [
+    {
+      "type": 0,
+      "value": "El cierre de su posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente al blockchain y se confirmará en breve"
+    }
+  ],
+  "MCA6GY": [
+    {
+      "type": 1,
+      "value": "increaseDecrease"
+    },
+    {
+      "type": 0,
+      "value": " duración a ejecutar para "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " desde "
+    },
+    {
+      "type": 1,
+      "value": "oldFrequency"
+    }
+  ],
+  "MFXOI0": [
+    {
+      "type": 0,
+      "value": "¿Que es la simulación de cotizaciones?"
+    }
+  ],
+  "MGGubs": [
+    {
+      "type": 0,
+      "value": "¿Mean Finance cobra alguna comisión por el intercambio?"
+    }
+  ],
+  "MYtzs2": [
+    {
+      "type": 0,
+      "value": "Luego de simular las cotizaciones, encontramos que todas las cotizaciones fallarían si se ejecutaran. Queremos disculparnos por esta ocurrencia. Podes probar buscando cotizaciones nuevamente."
+    }
+  ],
+  "Mcj/iy": [
+    {
+      "type": 0,
+      "value": "La transacción va a ser exitosa"
+    }
+  ],
+  "Mj3zFe": [
+    {
+      "type": 0,
+      "value": "menos rentable que el recomendado"
+    }
+  ],
+  "MzzvpH": [
+    {
+      "type": 0,
+      "value": "Nuevo intercambio"
+    }
+  ],
+  "N4Okjv": [
+    {
+      "type": 0,
+      "value": "Transacción en progreso"
+    }
+  ],
+  "N7zGCL": [
+    {
+      "type": 0,
+      "value": "No encontramos ningun token con esos parametros de busqueda"
+    }
+  ],
+  "NHDjvA": [
+    {
+      "type": 0,
+      "value": "Gas ahorrado"
+    }
+  ],
+  "NPuJa6": [
+    {
+      "type": 0,
+      "value": "Los contratos de Mean Finance han sido auditados por Pessimistic y PeckShield. Puede leer los informes"
+    }
+  ],
+  "NQzhfq": [
+    {
+      "type": 0,
+      "value": "Aumentar posición"
+    }
+  ],
+  "NSmm8H": [
+    {
+      "type": 0,
+      "value": "Agregar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " a la posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "NXDtFv": [
+    {
+      "type": 0,
+      "value": "Su creación de posición para intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " a "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente al blockchain y se confirmará en breve"
+    }
+  ],
+  "NcWBc1": [
+    {
+      "type": 0,
+      "value": "Empeza a invertir con jMXN y gana premios increibles!"
+    }
+  ],
+  "Nd61ag": [
+    {
+      "type": 0,
+      "value": "Esto permite a la dirección cerrar su posición"
+    }
+  ],
+  "Nh6p/v": [
+    {
+      "type": 0,
+      "value": "Para retirar:"
+    }
+  ],
+  "Nha1kE": [
+    {
+      "type": 0,
+      "value": "Transacción pendiente"
+    }
+  ],
+  "NlzM0l": [
+    {
+      "type": 0,
+      "value": "Pegar"
+    }
+  ],
+  "NpsctG": [
+    {
+      "type": 0,
+      "value": "Posiciones abiertas"
+    }
+  ],
+  "NsIFlt": [
+    {
+      "type": 0,
+      "value": "Ejecutado:"
+    }
+  ],
+  "NxEUb6": [
+    {
+      "type": 0,
+      "value": "Configuración de la posición"
+    }
+  ],
+  "O+yqTs": [
+    {
+      "type": 0,
+      "value": "Ver en el explorador"
+    }
+  ],
+  "O22yuw": [
+    {
+      "type": 1,
+      "value": "yield"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " para ti por"
+    }
+  ],
+  "O75EVP": [
+    {
+      "type": 1,
+      "value": "prefix"
+    },
+    {
+      "type": 1,
+      "value": "value"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "OHZobw": [
+    {
+      "type": 0,
+      "value": "y"
+    }
+  ],
+  "OPn8Nq": [
+    {
+      "type": 1,
+      "value": "readable"
+    }
+  ],
+  "OTXQIc": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " fueron agregados a tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " y va a ejecutarse por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    }
+  ],
+  "OTyRfW": [
+    {
+      "type": 0,
+      "value": "Intercambiar y transferir a otra dirección"
+    }
+  ],
+  "OV2Iz+": [
+    {
+      "type": 0,
+      "value": "Paciente"
+    }
+  ],
+  "OalKNY": [
+    {
+      "type": 0,
+      "value": "Compite por quién tiene el mayor volumen intercambiado fijado en Mean Finance. Esto incluye la liquidez intercambiada en sus posiciónes"
+    }
+  ],
+  "OdWJTU": [
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "hasYield"
+    }
+  ],
+  "OlMOmp": [
+    {
+      "type": 0,
+      "value": "Retirar"
+    }
+  ],
+  "Oo1GS9": [
+    {
+      "type": 0,
+      "value": "Terminando su posición"
+    }
+  ],
+  "OoEgv4": [
+    {
+      "type": 0,
+      "value": "intercambios"
+    }
+  ],
+  "OqTl06": [
+    {
+      "type": 0,
+      "value": "Este par no es compatible"
+    }
+  ],
+  "OttW6a": [
+    {
+      "type": 0,
+      "value": "Le devolveremos "
+    },
+    {
+      "type": 1,
+      "value": "returnAmmount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " a usted"
+    }
+  ],
+  "Oz/vZm": [
+    {
+      "type": 0,
+      "value": "Si no desea hacer esto, aún puede agregar fondos a su posición actual"
+    }
+  ],
+  "P/MnGd": [
+    {
+      "type": 0,
+      "value": "Debido a la grieta de seguridad de Euler, el protocolo Angle ah sido pausado. Como consequencia, los oraculos y los intercambios no pueden operar confiablemente y han sido pausados."
+    }
+  ],
+  "POGYlh": [
+    {
+      "type": 0,
+      "value": "Permisos de posición modificado"
+    }
+  ],
+  "PYOWcC": [
+    {
+      "type": 0,
+      "value": "Tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " fue transferida a "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "PbwFtv": [
+    {
+      "type": 0,
+      "value": "$"
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " USD saved"
+    }
+  ],
+  "Pmf45s": [
+    {
+      "type": 0,
+      "value": "Transferir a otra dirección:"
+    }
+  ],
+  "Ps7AYj": [
+    {
+      "type": 0,
+      "value": "Ver mi posición"
+    }
+  ],
+  "Puzw/+": [
+    {
+      "type": 0,
+      "value": "más rentable que el segundo mejor"
+    }
+  ],
+  "PwFUUt": [
+    {
+      "type": 0,
+      "value": "Vender"
+    }
+  ],
+  "PxOAUe": [
+    {
+      "type": 0,
+      "value": "cada 30 minutos"
+    }
+  ],
+  "PzWYQ5": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Permitir a "
+    },
+    {
+      "type": 1,
+      "value": "target"
+    },
+    {
+      "type": 0,
+      "value": " utilizar tus "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "Q1G3hW": [
+    {
+      "type": 0,
+      "value": "Poner la direccion del destinatario"
+    }
+  ],
+  "Q35rqD": [
+    {
+      "type": 0,
+      "value": "5 minutos (1 intercambio)"
+    }
+  ],
+  "Q5QZCV": [
+    {
+      "type": 0,
+      "value": "DefiLlama"
+    }
+  ],
+  "QC2PNc": [
+    {
+      "type": 0,
+      "value": "Cerrando tu posición"
+    }
+  ],
+  "QDVx7K": [
+    {
+      "type": 0,
+      "value": "Dados los ultimos desarrollos, Aaave pauso el prestamo y deposit de $jEUR. Como resultado, aumentar la posición ah sido deshabilitado. Leer mas aqui"
+    }
+  ],
+  "QYjgIw": [
+    {
+      "type": 0,
+      "value": "Actual: "
+    },
+    {
+      "type": 1,
+      "value": "type"
+    },
+    {
+      "type": 0,
+      "value": " sobrante"
+    }
+  ],
+  "Qe8t1L": [
+    {
+      "type": 0,
+      "value": "Conectar billetera"
+    }
+  ],
+  "Qej+wD": [
+    {
+      "type": 0,
+      "value": "¿Qué intentabas hacer?"
+    }
+  ],
+  "Qes1qB": [
+    {
+      "type": 0,
+      "value": "DCA vs Lump sum"
+    }
+  ],
+  "QkC4KE": [
+    {
+      "type": 0,
+      "value": "Esto se debió a: "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "QkhXLS": [
+    {
+      "type": 0,
+      "value": "Si, usar "
+    },
+    {
+      "type": 1,
+      "value": "swapper"
+    }
+  ],
+  "QpkEk9": [
+    {
+      "type": 0,
+      "value": "Retiraste "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " fondos de tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "QrYw4z": [
+    {
+      "type": 0,
+      "value": "5 minutos"
+    }
+  ],
+  "RCUD56": [
+    {
+      "type": 0,
+      "value": "Tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " ahora está generando retornos"
+    }
+  ],
+  "RK1KtY": [
+    {
+      "type": 1,
+      "value": "readable"
+    }
+  ],
+  "RWQPRO": [
+    {
+      "type": 0,
+      "value": "Total ganado:"
+    }
+  ],
+  "RXcwxI": [
+    {
+      "type": 0,
+      "value": "Mean Finance se basa en oráculos on-chain para determinar el precio en el momento del intercambio. Actualmente Mean Finance utiliza"
+    }
+  ],
+  "RY4HmH": [
+    {
+      "type": 0,
+      "value": "Cerrar posición"
+    }
+  ],
+  "RcB3pW": [
+    {
+      "type": 0,
+      "value": "La autorización del uso de "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente al blockchain y se confirmará en breve."
+    }
+  ],
+  "Rgfl8x": [
+    {
+      "type": 0,
+      "value": "Costo de gas considerado"
+    }
+  ],
+  "RknjsQ": [
+    {
+      "type": 0,
+      "value": "cada 4 horas"
+    }
+  ],
+  "Rm2Mnc": [
+    {
+      "type": 0,
+      "value": "Intercambiar"
+    }
+  ],
+  "Roq4rz": [
+    {
+      "type": 0,
+      "value": "Retirar "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "RyEoxs": [
+    {
+      "type": 0,
+      "value": "Configuración de la billetera"
+    }
+  ],
+  "S0PtrE": [
+    {
+      "type": 0,
+      "value": "Necesita autorización"
+    }
+  ],
+  "S2QomY": [
+    {
+      "type": 0,
+      "value": "Aquí verá los detalles de sus posiciónes abiertas y podrá ver más detalles sobre ellas. Sólo podrá interactuar con ellas si está en la red correcta"
+    }
+  ],
+  "S2dFpy": [
+    {
+      "type": 0,
+      "value": "COPY ERROR LOG"
+    }
+  ],
+  "S4SLAq": [
+    {
+      "type": 0,
+      "value": "Dado que los intercambios son ejecutados por usuarios externos, éstos pueden decidir cuándo ejecutarlos. Por ejemplo, supongamos que ha creado una posición con intercambios diarios. Esto significa que desde las 00 AM UTC hasta las 23:59 PM UTC, su posición sólo puede ejecutarse una vez. Una vez ejecutada, no se puede volver a ejecutar hasta las 00 AM del día siguiente. Lo mismo ocurre con otras frecuencias, como la semanal o la mensual."
+    }
+  ],
+  "SBun7c": [
+    {
+      "type": 0,
+      "value": "Actualización de rutas en "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": "s"
+    }
+  ],
+  "SE1aj0": [
+    {
+      "type": 0,
+      "value": "Intentar obtener otra ruta"
+    }
+  ],
+  "SNN905": [
+    {
+      "type": 0,
+      "value": "Para más información, consulte nuestra"
+    }
+  ],
+  "SNxage": [
+    {
+      "type": 0,
+      "value": "Empezar a generar retornos"
+    }
+  ],
+  "SVDYlT": [
+    {
+      "type": 0,
+      "value": "Discord"
+    }
+  ],
+  "Si3cOF": [
+    {
+      "type": 0,
+      "value": "Mayor cantidad de tokens recibidos"
+    }
+  ],
+  "SuOz7t": [
+    {
+      "type": 0,
+      "value": "Firmar con tu billetera"
+    }
+  ],
+  "SwiTok": [
+    {
+      "type": 0,
+      "value": "Retirar saldo de su posición"
+    }
+  ],
+  "SyQoGa": [
+    {
+      "type": 0,
+      "value": "más recibido"
+    }
+  ],
+  "SzmD9Z": [
+    {
+      "type": 0,
+      "value": "Dándole permisos sobre tu posición a nuestro Hub Companion se ha enviado correctamente a la blockchain y sera confirmado pronto."
+    }
+  ],
+  "TC32uH": [
+    {
+      "type": 0,
+      "value": "Agregar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " a tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " y va a ejecutarse por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    }
+  ],
+  "TGj1j/": [
+    {
+      "type": 0,
+      "value": "5 minutos"
+    }
+  ],
+  "TdURzq": [
+    {
+      "type": 0,
+      "value": "En progreso"
+    }
+  ],
+  "Ti+ws9": [
+    {
+      "type": 0,
+      "value": "¿Qué significa que un par esté parado?"
+    }
+  ],
+  "Tq773V": [
+    {
+      "type": 1,
+      "value": "readable"
+    }
+  ],
+  "U8Gqi0": [
+    {
+      "type": 0,
+      "value": "A veces queres intercambiar un token y enviárselo a otra dirección. Puede ser molesto ejecutar dos transacciones diferentes."
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "Con nuestro Meta Aggregator podes hacerlo todo en una sola transacción en los proveedores soportados."
+    }
+  ],
+  "UCfz8b": [
+    {
+      "type": 0,
+      "value": "Contamos como podemos mejorar esto para ti"
+    }
+  ],
+  "UHHRwl": [
+    {
+      "type": 0,
+      "value": "Agregar dirección"
+    }
+  ],
+  "UJ3vcm": [
+    {
+      "type": 0,
+      "value": "Personalizar"
+    }
+  ],
+  "UhD0bk": [
+    {
+      "type": 0,
+      "value": "Confirmar esta transacción en su billetera"
+    }
+  ],
+  "UmgvZJ": [
+    {
+      "type": 0,
+      "value": "$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
+    }
+  ],
+  "Umk6mn": [
+    {
+      "type": 0,
+      "value": "Ver NFT"
+    }
+  ],
+  "UpJRc6": [
+    {
+      "type": 0,
+      "value": "Ver resumen"
+    }
+  ],
+  "Ur4hZi": [
+    {
+      "type": 0,
+      "value": "Este es el mínimo que recibirás en función de tu configuración de deslizamiento"
+    }
+  ],
+  "V1Mw/j": [
+    {
+      "type": 0,
+      "value": "Ninguna campaña para redimir"
+    }
+  ],
+  "V314M5": [
+    {
+      "type": 0,
+      "value": "El promedio de costo en dólares es una herramienta que el inversor puede utilizar para acumular ahorros y riqueza a largo plazo, neutralizando al mismo tiempo la volatilidad a corto plazo del mercado."
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": " Las compras se producen independientemente del precio del activo y a intervalos regulares. En efecto, esta estrategia elimina gran parte del trabajo minucioso de intentar cronometrar el mercado para realizar compras de activos a los mejores precios."
+    }
+  ],
+  "VBCnJk": [
+    {
+      "type": 0,
+      "value": "Posiciones:"
+    }
+  ],
+  "VZcHUA": [
+    {
+      "type": 0,
+      "value": "Ver posiciones"
+    }
+  ],
+  "VaWvMp": [
+    {
+      "type": 0,
+      "value": "Ruta seleccionada:"
+    }
+  ],
+  "VdhnM+": [
+    {
+      "type": 0,
+      "value": "Intercambiado:"
+    }
+  ],
+  "VlRJuN": [
+    {
+      "type": 0,
+      "value": "Ordenar las rutas según la mejor relación entre el precio y el costo del gas"
+    }
+  ],
+  "Vm9A8k": [
+    {
+      "type": 0,
+      "value": "Depositado:"
+    }
+  ],
+  "VoFvlu": [
+    {
+      "type": 0,
+      "value": "Ejecuta"
+    }
+  ],
+  "VuiHqN": [
+    {
+      "type": 0,
+      "value": "1 "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " = "
+    },
+    {
+      "type": 1,
+      "value": "currencySymbol"
+    },
+    {
+      "type": 1,
+      "value": "swapRate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "Vz0lLC": [
+    {
+      "type": 0,
+      "value": "Usar "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "W6JmVw": [
+    {
+      "type": 0,
+      "value": "Parece que encontramos un error que no pudimos solucionar"
+    }
+  ],
+  "WFZFMN": [
+    {
+      "type": 0,
+      "value": "cada 15 minutos"
+    }
+  ],
+  "WJbxRJ": [
+    {
+      "type": 0,
+      "value": "Puedes empezar a generar retornos"
+    }
+  ],
+  "WaK61o": [
+    {
+      "type": 0,
+      "value": "El sentimiento general del cripto mercado"
+    }
+  ],
+  "Wad0yc": [
+    {
+      "type": 0,
+      "value": "Buscar token por simbolo, nombre o dirección"
+    }
+  ],
+  "WetLa9": [
+    {
+      "type": 0,
+      "value": "Aún no hay intercambios"
+    }
+  ],
+  "WflDui": [
+    {
+      "type": 0,
+      "value": "Comprar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    },
+    {
+      "type": 0,
+      "value": " en "
+    },
+    {
+      "type": 1,
+      "value": "target"
+    }
+  ],
+  "Wq6AJT": [
+    {
+      "type": 0,
+      "value": "Mínimo recibido:"
+    }
+  ],
+  "WszPax": [
+    {
+      "type": 0,
+      "value": "Error retirando"
+    }
+  ],
+  "X/B1lK": [
+    {
+      "type": 0,
+      "value": "Háganos saber que ha encontrado este error, sería útil copiar el registro de errores con el botón de abajo y pegarlo en el mensaje"
+    }
+  ],
+  "X1oKY8": [
+    {
+      "type": 0,
+      "value": "Autorizar Max "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "X2tycj": [
+    {
+      "type": 0,
+      "value": "Generando "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    },
+    {
+      "type": 0,
+      "value": " en "
+    },
+    {
+      "type": 1,
+      "value": "platform"
+    },
+    {
+      "type": 0,
+      "value": " con "
+    },
+    {
+      "type": 1,
+      "value": "apy"
+    },
+    {
+      "type": 0,
+      "value": "% APY"
+    }
+  ],
+  "X969ux": [
+    {
+      "type": 0,
+      "value": "Error redimiendo OP"
+    }
+  ],
+  "XI+HWn": [
+    {
+      "type": 0,
+      "value": "Máximo gastado:"
+    }
+  ],
+  "XOwvOZ": [
+    {
+      "type": 0,
+      "value": "Está migrando una posición de una versión obsoleta de Mean Finance a la más reciente"
+    }
+  ],
+  "XbrtpH": [
+    {
+      "type": 0,
+      "value": "Todo"
+    }
+  ],
+  "XmYRql": [
+    {
+      "type": 0,
+      "value": "Los fondos se depositarán en la plataforma seleccionada para genenerar retornos mientras esperan a ser cambiados o retirados. La seguridad de los fondos dependerá de la plataforma seleccionada, por lo que le aconsejamos que investigue por su cuenta para realizar una evaluación informada de la relación riesgo/rentabilidad"
+    }
+  ],
+  "Xq/LIk": [
+    {
+      "type": 0,
+      "value": "COMPLETADA"
+    }
+  ],
+  "XrLrtm": [
+    {
+      "type": 0,
+      "value": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción en la que recupera el saldo como "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "XtV8h8": [
+    {
+      "type": 0,
+      "value": "Autorizar token"
+    }
+  ],
+  "Y9R08Z": [
+    {
+      "type": 0,
+      "value": "Ignorar transacción"
+    }
+  ],
+  "YFISNq": [
+    {
+      "type": 0,
+      "value": "Ver recibo"
+    }
+  ],
+  "YGZ1lp": [
+    {
+      "type": 0,
+      "value": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro"
+    }
+  ],
+  "YRoLhe": [
+    {
+      "type": 0,
+      "value": "Esto transferirá su posición, su NFT y toda la liquidez almacenada en la posición a la nueva dirección"
+    }
+  ],
+  "YTU0JR": [
+    {
+      "type": 0,
+      "value": "menos gastado que el segundo mejor"
+    }
+  ],
+  "YVAdRx": [
+    {
+      "type": 0,
+      "value": "Ordenar las rutas por donde tenga que gastar menos tokens"
+    }
+  ],
+  "YWW6wc": [
+    {
+      "type": 0,
+      "value": "Oooops"
+    }
+  ],
+  "Yg3ywp": [
+    {
+      "type": 0,
+      "value": "Necesitas aprobar explicitamente a los Contratos Inteligentes de "
+    },
+    {
+      "type": 1,
+      "value": "target"
+    },
+    {
+      "type": 0,
+      "value": " para extraer tus "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    },
+    {
+      "type": 0,
+      "value": " de tu wallet para ser intercambiados"
+    }
+  ],
+  "YhEuCJ": [
+    {
+      "type": 0,
+      "value": "Retirar"
+    }
+  ],
+  "YhPAsu": [
+    {
+      "type": 0,
+      "value": "Total ganado:"
+    }
+  ],
+  "YhkTRN": [
+    {
+      "type": 0,
+      "value": "CERRADO"
+    }
+  ],
+  "Yi27Xb": [
+    {
+      "type": 0,
+      "value": "Crear posición"
+    }
+  ],
+  "YjbSf2": [
+    {
+      "type": 0,
+      "value": "La posición debe tener una tarifa mínima de $"
+    },
+    {
+      "type": 1,
+      "value": "minimum"
+    },
+    {
+      "type": 0,
+      "value": " USD ("
+    },
+    {
+      "type": 1,
+      "value": "minToken"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    },
+    {
+      "type": 0,
+      "value": ") por "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " para ser creada"
+    }
+  ],
+  "Yl6vl8": [
+    {
+      "type": 0,
+      "value": "intercambios"
+    }
+  ],
+  "YlFDyv": [
+    {
+      "type": 0,
+      "value": "más gas usado que el recomendado"
+    }
+  ],
+  "YmpFX8": [
+    {
+      "type": 0,
+      "value": "Tus posiciónes"
+    }
+  ],
+  "Yo7O05": [
+    {
+      "type": 0,
+      "value": "Precio desconocido"
+    }
+  ],
+  "YpaT9e": [
+    {
+      "type": 0,
+      "value": "Compite por ver quién tiene más valor total fijado en Mean Finance. Esto incluye tanto la liquidez intercambiada como la no intercambiada en sus posiciónes."
+    }
+  ],
+  "Z1Rsy/": [
+    {
+      "type": 0,
+      "value": "más gastado"
+    }
+  ],
+  "ZATHUb": [
+    {
+      "type": 0,
+      "value": "Ir a posición"
+    }
+  ],
+  "ZAcmjS": [
+    {
+      "type": 0,
+      "value": "Cambiar a "
+    },
+    {
+      "type": 1,
+      "value": "network"
+    }
+  ],
+  "ZBW4xA": [
+    {
+      "type": 0,
+      "value": "¿Está Mean Finance auditado?"
+    }
+  ],
+  "ZBiobz": [
+    {
+      "type": 0,
+      "value": "Rendimiento:"
+    }
+  ],
+  "ZCPyG3": [
+    {
+      "type": 0,
+      "value": "Método incompatible"
+    }
+  ],
+  "ZDwrbF": [
+    {
+      "type": 0,
+      "value": "Mejor"
+    }
+  ],
+  "ZDyEAS": [
+    {
+      "type": 0,
+      "value": "Su transferencia de posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " a "
+    },
+    {
+      "type": 1,
+      "value": "toAddress"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente al blockchain y se confirmará en breve"
+    }
+  ],
+  "ZIFOHu": [
+    {
+      "type": 0,
+      "value": "Posición transferida"
+    }
+  ],
+  "ZK0zNi": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - La transacción esta siendo simulada"
+    }
+  ],
+  "ZO613Q": [
+    {
+      "type": 0,
+      "value": "Posición modificada"
+    }
+  ],
+  "ZOHLH8": [
+    {
+      "type": 0,
+      "value": "Redimir "
+    },
+    {
+      "type": 1,
+      "value": "op"
+    },
+    {
+      "type": 0,
+      "value": " OP"
+    }
+  ],
+  "ZQb/dg": [
+    {
+      "type": 0,
+      "value": "Elegir red:"
+    }
+  ],
+  "ZRhYby": [
+    {
+      "type": 0,
+      "value": "¿Por qué debería usar Mean Finance?"
+    }
+  ],
+  "ZWFiru": [
+    {
+      "type": 0,
+      "value": "Tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " fue cerrada"
+    }
+  ],
+  "ZaSmdn": [
+    {
+      "type": 0,
+      "value": "Cerrar tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "ZaT+DW": [
+    {
+      "type": 1,
+      "value": "yield"
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " para usted por"
+    }
+  ],
+  "ZnA5+8": [
+    {
+      "type": 0,
+      "value": "más gas usado"
+    }
+  ],
+  "ZqLQ6b": [
+    {
+      "type": 0,
+      "value": "Bug bounty"
+    }
+  ],
+  "Zsuz+g": [
+    {
+      "type": 0,
+      "value": "cada 1 minuto"
+    }
+  ],
+  "ZuW4JN": [
+    {
+      "type": 0,
+      "value": "La transacción va a ser exitosa"
+    }
+  ],
+  "Zw7FaX": [
+    {
+      "type": 0,
+      "value": "Sólo puede depositar con un valor mínimo de "
+    },
+    {
+      "type": 1,
+      "value": "value"
+    },
+    {
+      "type": 0,
+      "value": " USD"
+    }
+  ],
+  "Zy/Hiu": [
+    {
+      "type": 0,
+      "value": "Billetera:"
+    }
+  ],
+  "a+Yvwn": [
+    {
+      "type": 0,
+      "value": "Modificar su posición"
+    }
+  ],
+  "aBc6K3": [
+    {
+      "type": 0,
+      "value": "Los intercambios ya no se van a ejecutar, no podrás hacer nuevas modificaciones en esta posición y el NFT se quemara."
+    }
+  ],
+  "aDA5jh": [
+    {
+      "type": 0,
+      "value": "Mayor cantidad de tokens recibidos / Menor cantidad de tokens gastados (para ordenes de compra)"
+    }
+  ],
+  "aEQUw9": [
+    {
+      "type": 0,
+      "value": "sección de retornos"
+    }
+  ],
+  "aPLZ1u": [
+    {
+      "type": 0,
+      "value": "Retirado:"
+    }
+  ],
+  "aPrJJm": [
+    {
+      "type": 0,
+      "value": "Se han eliminado todos los permisos para"
+    }
+  ],
+  "aT7Itp": [
+    {
+      "type": 0,
+      "value": "Error generando que la posición genere retornos"
+    }
+  ],
+  "agFL3X": [
+    {
+      "type": 0,
+      "value": "Crear"
+    }
+  ],
+  "amTVUS": [
+    {
+      "type": 0,
+      "value": "Creando una posición para intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " a "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "an/BOU": [
+    {
+      "type": 0,
+      "value": "Usted paga"
+    }
+  ],
+  "aoHWJU": [
+    {
+      "type": 0,
+      "value": "En posición: "
+    },
+    {
+      "type": 1,
+      "value": "balance"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "b0Bg0T": [
+    {
+      "type": 0,
+      "value": "El par "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " fue creado"
+    }
+  ],
+  "b6x2Rx": [
+    {
+      "type": 0,
+      "value": "Posición creada"
+    }
+  ],
+  "b9AGHu": [
+    {
+      "type": 0,
+      "value": "Atrás"
+    }
+  ],
+  "bBX0k1": [
+    {
+      "type": 0,
+      "value": "Ganado por token:"
+    }
+  ],
+  "bCOphI": [
+    {
+      "type": 0,
+      "value": "intercambios"
+    }
+  ],
+  "bIgRS1": [
+    {
+      "type": 0,
+      "value": "Aún no hay datos disponibles sobre esta posición"
+    }
+  ],
+  "bM1Gn3": [
+    {
+      "type": 0,
+      "value": "$"
+    },
+    {
+      "type": 1,
+      "value": "gasSaved"
+    },
+    {
+      "type": 0,
+      "value": " USD"
+    }
+  ],
+  "bQUS8A": [
+    {
+      "type": 0,
+      "value": "Cantidad de confetti:"
+    }
+  ],
+  "bZG2wW": [
+    {
+      "type": 0,
+      "value": "Crear posición"
+    }
+  ],
+  "bassi3": [
+    {
+      "type": 0,
+      "value": "Ir atrás y buscar de nuevo"
+    }
+  ],
+  "bdyKpA": [
+    {
+      "type": 0,
+      "value": "Cronología"
+    }
+  ],
+  "bjS3bz": [
+    {
+      "type": 0,
+      "value": "Leer sobre el oráculo de precios"
+    }
+  ],
+  "c5GoNs": [
+    {
+      "type": 0,
+      "value": "Posiciones"
+    }
+  ],
+  "c73eqf": [
+    {
+      "type": 0,
+      "value": "Error detectado"
+    }
+  ],
+  "c91iH2": [
+    {
+      "type": 0,
+      "value": "Modificar tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " para intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "rate"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "freq"
+    },
+    {
+      "type": 0,
+      "value": " por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    }
+  ],
+  "c9qXGP": [
+    {
+      "type": 0,
+      "value": "La migración de su posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente al blockchain y se confrimará en breve"
+    }
+  ],
+  "cA3qXj": [
+    {
+      "type": 0,
+      "value": "Approvar nuestro Hub Companion para modificar tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "cDcRwD": [
+    {
+      "type": 0,
+      "value": "Transferido a:"
+    }
+  ],
+  "cESB9o": [
+    {
+      "type": 0,
+      "value": "¡Transacción enviada!"
+    }
+  ],
+  "cmiLaP": [
+    {
+      "type": 0,
+      "value": "Precio de compra promedio"
+    }
+  ],
+  "cwqjrt": [
+    {
+      "type": 0,
+      "value": "Agregar fondos"
+    }
+  ],
+  "czPp3R": [
+    {
+      "type": 0,
+      "value": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion. Luego, tendrá que enviar la transacción en la que recupera el saldo como "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "d1oHnW": [
+    {
+      "type": 1,
+      "value": "readable"
+    }
+  ],
+  "d2mT2I": [
+    {
+      "type": 0,
+      "value": "Su posición se cerrará aquí y crearemos una nueva en"
+    }
+  ],
+  "d9VBkP": [
+    {
+      "type": 0,
+      "value": "Custom"
+    }
+  ],
+  "dHuWI1": [
+    {
+      "type": 0,
+      "value": "Debe dar permiso a los contratos inteligentes de Mean Finance para usar su "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "dINFAP": [
+    {
+      "type": 0,
+      "value": "1 día"
+    }
+  ],
+  "dMaFCd": [
+    {
+      "type": 0,
+      "value": "Restante:"
+    }
+  ],
+  "dNa4HH": [
+    {
+      "type": 0,
+      "value": "Presentando Mean Finance Meta Aggregator"
+    }
+  ],
+  "dPkxyg": [
+    {
+      "type": 0,
+      "value": "intercambios"
+    }
+  ],
+  "dR6SKH": [
+    {
+      "type": 0,
+      "value": "Crear nueva posición"
+    }
+  ],
+  "dSDGZh": [
+    {
+      "type": 0,
+      "value": "Retirar fondos "
+    },
+    {
+      "type": 1,
+      "value": "fromSymbol"
+    }
+  ],
+  "di6jKR": [
+    {
+      "type": 0,
+      "value": "Está desconectado de la red"
+    }
+  ],
+  "e0pQqu": [
+    {
+      "type": 0,
+      "value": "Transacción exitosa!"
+    }
+  ],
+  "e1vYrA": [
+    {
+      "type": 0,
+      "value": "Sin retornos"
+    }
+  ],
+  "e2q+Fu": [
+    {
+      "type": 0,
+      "value": "Frecuencia:"
+    }
+  ],
+  "e91MXw": [
+    {
+      "type": 0,
+      "value": "Error retirando funds"
+    }
+  ],
+  "eI4dm9": [
+    {
+      "type": 0,
+      "value": "Algunas veces no queres vender tokens y queres comprar una cantidad exacta. Por ejemplo: en vez de vender 1000 USDC por ETH, queres comprar 1 ETH con USDC."
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "La mayoría de los agregadores no ofrecen esta funcionalidad, así que nosotros te mostramos los que si la ofrecen, e intentamos estimar una orden de compra en los que no la ofrecen."
+    }
+  ],
+  "eQUdcX": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - La simulacion fallo"
+    }
+  ],
+  "eiCVwX": [
+    {
+      "type": 0,
+      "value": "No pudimos encontrar una ruta para su intercambio"
+    }
+  ],
+  "enTSiQ": [
+    {
+      "type": 0,
+      "value": "Gestionar lista y tokens"
+    }
+  ],
+  "eyJz83": [
+    {
+      "type": 0,
+      "value": "Precio promedio"
+    }
+  ],
+  "f++zf9": [
+    {
+      "type": 0,
+      "value": "Posición terminada"
+    }
+  ],
+  "f2UpW9": [
+    {
+      "type": 0,
+      "value": "Peor precio"
+    }
+  ],
+  "f42vtq": [
+    {
+      "type": 0,
+      "value": "Impacto en el precio:"
+    }
+  ],
+  "f4Og0x": [
+    {
+      "type": 0,
+      "value": "Autorizar y modificar posición"
+    }
+  ],
+  "f5KZm+": [
+    {
+      "type": 0,
+      "value": "Balanceado"
+    }
+  ],
+  "f8zceY": [
+    {
+      "type": 0,
+      "value": "¿Cómo funciona?/Riesgos"
+    }
+  ],
+  "fAutJH": [
+    {
+      "type": 0,
+      "value": "Ejecutado "
+    },
+    {
+      "type": 1,
+      "value": "executedSwaps"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "totalSwaps"
+    },
+    {
+      "type": 0,
+      "value": " intercambios"
+    }
+  ],
+  "fH26L2": [
+    {
+      "type": 0,
+      "value": "Optimista"
+    }
+  ],
+  "fJcP5V": [
+    {
+      "type": 0,
+      "value": "Enviar comentario"
+    }
+  ],
+  "fVfY1G": [
+    {
+      "type": 0,
+      "value": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Necesitamos que les des permisos directamente desde la pantalla de detalles de tu posición para volver a habilitar el agregado y retiro de fondos."
+    }
+  ],
+  "fatFLN": [
+    {
+      "type": 0,
+      "value": "Confirmo que la dirección anterior es correcta"
+    }
+  ],
+  "fe8hcE": [
+    {
+      "type": 0,
+      "value": "a nosotros"
+    }
+  ],
+  "fi6uGQ": [
+    {
+      "type": 0,
+      "value": "Esta posición no parece estar indexada todavía"
+    }
+  ],
+  "fohpme": [
+    {
+      "type": 0,
+      "value": "cada 1 minuto"
+    }
+  ],
+  "frLdYT": [
+    {
+      "type": 0,
+      "value": "Próximo intercambio:"
+    }
+  ],
+  "ftX4Ln": [
+    {
+      "type": 0,
+      "value": "La configuración de sus permisos de posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " se ha enviado correctamente al blockchain y se confirmará en breve"
+    }
+  ],
+  "g5MiM3": [
+    {
+      "type": 0,
+      "value": "Modificar una posición"
+    }
+  ],
+  "gIl4Bi": [
+    {
+      "type": 0,
+      "value": "¿Está seguro que quiere retirar "
+    },
+    {
+      "type": 1,
+      "value": "ammount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": "?"
+    }
+  ],
+  "gQEJk+": [
+    {
+      "type": 0,
+      "value": "intercambios"
+    }
+  ],
+  "gQubrG": [
+    {
+      "type": 0,
+      "value": "Intercambios"
+    }
+  ],
+  "gVbrRz": [
+    {
+      "type": 0,
+      "value": "Ver recibo"
+    }
+  ],
+  "gWebsb": [
+    {
+      "type": 0,
+      "value": "Establecer a qué dirección quiere dar permiso"
+    }
+  ],
+  "gZSAHC": [
+    {
+      "type": 0,
+      "value": "Menos gastado"
+    }
+  ],
+  "gblaCK": [
+    {
+      "type": 0,
+      "value": "Configuración avanzada"
+    }
+  ],
+  "gcCrpy": [
+    {
+      "type": 0,
+      "value": "No, usar "
+    },
+    {
+      "type": 1,
+      "value": "swapper"
+    }
+  ],
+  "gdQB3o": [
+    {
+      "type": 0,
+      "value": "Autorizar "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " e intercambiar"
+    }
+  ],
+  "gjyuVH": [
+    {
+      "type": 0,
+      "value": "Sólo tokens compatibles con "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "gm52Lx": [
+    {
+      "type": 0,
+      "value": "Probablemente escuchaste que muchas aplicaciones dicen ofrecer el mejor precio: ¡Ahora podes estar seguro! Vamos a pedirle a todos los proveedores de precio al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades."
+    }
+  ],
+  "gqaG8I": [
+    {
+      "type": 0,
+      "value": "Retirar el depósito"
+    }
+  ],
+  "gqiFWl": [
+    {
+      "type": 0,
+      "value": "Se ejecuto por:"
+    }
+  ],
+  "gtB9V2": [
+    {
+      "type": 0,
+      "value": "30 minutos"
+    }
+  ],
+  "h5NicW": [
+    {
+      "type": 0,
+      "value": "Intercambio ejecutado"
+    }
+  ],
+  "h96679": [
+    {
+      "type": 0,
+      "value": "Poner la dirección a la que quieres darle permisos"
+    }
+  ],
+  "hEJQ3q": [
+    {
+      "type": 0,
+      "value": "¿Qué es el Meta Aggregator de Mean Finance?"
+    }
+  ],
+  "hEvpJE": [
+    {
+      "type": 0,
+      "value": "Ordene las rutas por donde puede recibir más tokens/gastar menos tokens"
+    }
+  ],
+  "hUTWyY": [
+    {
+      "type": 0,
+      "value": "Esto permite a la dirección retirar la liquidez intercambiada de su posición"
+    }
+  ],
+  "hZOkep": [
+    {
+      "type": 0,
+      "value": "Los agregadores a veces fallan o dan menos de lo que se comprometieron a dar. Pésima experiencia, ¿verdad?"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "Ahora estas usando el Meta Agregador de Mean Finance, vamos a simular tu transacción para que estes seguro que no va a fallar cuando la mandes. Y, al mismo tiempo, te mostraremos como va a cambiar tu balance así podes estar 100% seguro de lo que vas a recibir."
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "Mostrar los cambios en el balance balance está solamente disponibles en:"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "- Ethereum"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "- Polygon"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": "¡Estaremos agregando más pronto!"
+    }
+  ],
+  "ha8PgS": [
+    {
+      "type": 0,
+      "value": "Autorizar y modificar posición"
+    }
+  ],
+  "haoCMr": [
+    {
+      "type": 0,
+      "value": "Canculando el costo de creación de esta posición"
+    }
+  ],
+  "hlpmTk": [
+    {
+      "type": 0,
+      "value": "Redimir la campaña "
+    },
+    {
+      "type": 1,
+      "value": "campaign"
+    }
+  ],
+  "hmyz7z": [
+    {
+      "type": 0,
+      "value": "Esto no se puede deshacer"
+    }
+  ],
+  "huUVCB": [
+    {
+      "type": 0,
+      "value": "Eres la primera persona que crea una posición para este par de tokens. Debido a esto, el costo del gas va a ser mayor que el de una creación de posición normal. Esto, sin embargo, será una operación de una sola vez. ¿Está seguro de que desea crear la posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": "?"
+    }
+  ],
+  "i1xngQ": [
+    {
+      "type": 0,
+      "value": "1 "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " = "
+    },
+    {
+      "type": 1,
+      "value": "currencySymbol"
+    },
+    {
+      "type": 1,
+      "value": "average"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "iUehtc": [
+    {
+      "type": 0,
+      "value": "Cambiaremos"
+    }
+  ],
+  "iWNnCB": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " wrapped a "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "iY28lu": [
+    {
+      "type": 0,
+      "value": "¿Tengo que pagar alguna tarifa?"
+    }
+  ],
+  "iZzIMa": [
+    {
+      "type": 0,
+      "value": "DEPRECATED"
+    }
+  ],
+  "iaCRAO": [
+    {
+      "type": 0,
+      "value": "Volver a la aplicación"
+    }
+  ],
+  "iaKvlj": [
+    {
+      "type": 0,
+      "value": "Ordenar las rutas por el menor gasto de gas"
+    }
+  ],
+  "ibMYRL": [
+    {
+      "type": 0,
+      "value": "Confirmo que la dirección anterior es correcta"
+    }
+  ],
+  "il3O2a": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - La autorización del token esta siendo confirmada"
+    }
+  ],
+  "io819p": [
+    {
+      "type": 0,
+      "value": "menos gas usado que el segundo mejor"
+    }
+  ],
+  "ioNoF4": [
+    {
+      "type": 0,
+      "value": "Cambiar la duración y el ritmo"
+    }
+  ],
+  "isJmoe": [
+    {
+      "type": 0,
+      "value": "semana"
+    }
+  ],
+  "iyoNsc": [
+    {
+      "type": 0,
+      "value": "Elija una red"
+    }
+  ],
+  "jJcSKd": [
+    {
+      "type": 0,
+      "value": "Error migrando la posición"
+    }
+  ],
+  "jKP6bq": [
+    {
+      "type": 0,
+      "value": "¿Cuándo tengo que pagar las tarifas de gas?"
+    }
+  ],
+  "jL8UGU": [
+    {
+      "type": 0,
+      "value": "Crear la posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "jPhXzy": [
+    {
+      "type": 0,
+      "value": "El valor de la transacción es estimado, ya que este intercambio no permite configurar el importe recibido"
+    }
+  ],
+  "jPjwIW": [
+    {
+      "type": 0,
+      "value": "Poca liquidez en el par"
+    }
+  ],
+  "jQqW/8": [
+    {
+      "type": 0,
+      "value": "Continuar"
+    }
+  ],
+  "jXIz7M": [
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " ahora está listo para usarse"
+    }
+  ],
+  "jb9Uav": [
+    {
+      "type": 0,
+      "value": "Ahora estas listo para usar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "jbB08u": [
+    {
+      "type": 0,
+      "value": "Redimir"
+    }
+  ],
+  "jbb8PB": [
+    {
+      "type": 0,
+      "value": "Y configurar qué permisos establecer para esta dirección"
+    }
+  ],
+  "k7+HKZ": [
+    {
+      "type": 0,
+      "value": "Precio del mercado vs precio DCA"
+    }
+  ],
+  "k7UbIH": [
+    {
+      "type": 0,
+      "value": "Conectado con "
+    },
+    {
+      "type": 1,
+      "value": "provider"
+    }
+  ],
+  "k9QmN/": [
+    {
+      "type": 0,
+      "value": "FINALIZADO"
+    }
+  ],
+  "kNNrdH": [
+    {
+      "type": 0,
+      "value": "Mean Finance es el protocolo DCA más avanzado. Te permite configurar acciones como “Intercambiar 10 USDC por WBTC cada día, durante 30 días”. Puedes crear estas acciones entre casi todos los tokens ERC20, con la frecuencia que elijas. Estos intercambios de token se producirán independientemente del precio del activo y a intervalos regulares, reduciendo el impacto de volatilidad en tu inversión."
+    }
+  ],
+  "kS1Q7P": [
+    {
+      "type": 0,
+      "value": "Desde la posición"
+    }
+  ],
+  "kY2alH": [
+    {
+      "type": 0,
+      "value": "Guardar"
+    }
+  ],
+  "kfIFAy": [
+    {
+      "type": 0,
+      "value": "Confirmar dirección"
+    }
+  ],
+  "kksiFn": [
+    {
+      "type": 0,
+      "value": "Tu posición"
+    }
+  ],
+  "kqwGga": [
+    {
+      "type": 0,
+      "value": "El próximo intercambio se ejecutará en la primera hora después de la creación de la posición"
+    }
+  ],
+  "ks0oAr": [
+    {
+      "type": 0,
+      "value": "Hacer que tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " empieze a generar retornos"
+    }
+  ],
+  "kuWbwN": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " wrapped a "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "l4VKpl": [
+    {
+      "type": 0,
+      "value": "El volumen de tokens incluidas en el intercambio"
+    }
+  ],
+  "l5M7uf": [
+    {
+      "type": 0,
+      "value": "Crear una posición"
+    }
+  ],
+  "lBEi1V": [
+    {
+      "type": 0,
+      "value": "Redimir la campaña "
+    },
+    {
+      "type": 1,
+      "value": "campaign"
+    }
+  ],
+  "lBsNBG": [
+    {
+      "type": 0,
+      "value": "Elegir retornos"
+    }
+  ],
+  "lJRhFc": [
+    {
+      "type": 0,
+      "value": "Le devolveremos "
+    },
+    {
+      "type": 1,
+      "value": "fromValue"
+    },
+    {
+      "type": 0,
+      "value": " y dejaremos de intercambiar esta posición"
+    }
+  ],
+  "lQ1Iy9": [
+    {
+      "type": 0,
+      "value": "Crear posición para "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "lVD3/C": [
+    {
+      "type": 0,
+      "value": "más rentable"
+    }
+  ],
+  "lltepo": [
+    {
+      "type": 0,
+      "value": "STALE"
+    }
+  ],
+  "lnpkd2": [
+    {
+      "type": 0,
+      "value": "Retirar "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "lsm/sD": [
+    {
+      "type": 0,
+      "value": "Vendes"
+    }
+  ],
+  "m3YpJM": [
+    {
+      "type": 0,
+      "value": "¿Cómo se calcula el precio de cada intercambio?"
+    }
+  ],
+  "m4HBLn": [
+    {
+      "type": 0,
+      "value": "4 horas"
+    }
+  ],
+  "mhGi8/": [
+    {
+      "type": 0,
+      "value": "¿Qué es intercambiar y transferir?"
+    }
+  ],
+  "mj2YEz": [
+    {
+      "type": 0,
+      "value": "Error encontrado dándole permisos a nuestro nuevo Hub Companion"
+    }
+  ],
+  "mljOZT": [
+    {
+      "type": 0,
+      "value": "No hay datos disponibles sobre este par"
+    }
+  ],
+  "mpwFVf": [
+    {
+      "type": 0,
+      "value": "Haciendo que su posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " empiece a generar retornos"
+    }
+  ],
+  "msqsvt": [
+    {
+      "type": 0,
+      "value": "y"
+    }
+  ],
+  "mu45Z3": [
+    {
+      "type": 0,
+      "value": "Deslizamiento:"
+    }
+  ],
+  "mxbJsT": [
+    {
+      "type": 0,
+      "value": "Retirar "
+    },
+    {
+      "type": 1,
+      "value": "wrappedProtocolToken"
+    }
+  ],
+  "mz7RzW": [
+    {
+      "type": 0,
+      "value": "Agregar dirección"
+    }
+  ],
+  "n+0Kho": [
+    {
+      "type": 0,
+      "value": "Probablemente escuchaste que muchas aplicaciones dicen ofrecer el mejor precio: ¡Ahora podes estar seguro! Vamos a pedirle a todos los proveedores de precio al mismo tiempo así vos no tenes que hacerlo. De ésta forma vas a poder elegir el que mejor se ajuste a tus necesidades."
+    }
+  ],
+  "n47KZD": [
+    {
+      "type": 0,
+      "value": "Transferir el intercambio a otra dirección"
+    }
+  ],
+  "nAoD6G": [
+    {
+      "type": 0,
+      "value": "Precio de compra promedio"
+    }
+  ],
+  "nFFzXV": [
+    {
+      "type": 0,
+      "value": "15 minutos (1 intercambio)"
+    }
+  ],
+  "nNVft5": [
+    {
+      "type": 0,
+      "value": "Vender "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
+  "nNo2x5": [
+    {
+      "type": 0,
+      "value": "Gas total ahorrado:"
+    }
+  ],
+  "nNqjn5": [
+    {
+      "type": 0,
+      "value": "¡Para empezar a invertir ya!"
+    }
+  ],
+  "nRsZv4": [
+    {
+      "type": 0,
+      "value": "Crear una posición"
+    }
+  ],
+  "nV5R/e": [
+    {
+      "type": 0,
+      "value": "día"
+    }
+  ],
+  "nWm9Qa": [
+    {
+      "type": 0,
+      "value": "Invertir (DCA)"
+    }
+  ],
+  "naApNE": [
+    {
+      "type": 0,
+      "value": "30 minutos (1 intercambio)"
+    }
+  ],
+  "naFo7E": [
+    {
+      "type": 0,
+      "value": "días"
+    }
+  ],
+  "ne8FlW": [
+    {
+      "type": 0,
+      "value": "Lamentablemente, el token CRV ya no puede utilizarse como garantía en Aave v3. Esto significa que no es posible intercambiar esta posición"
+    }
+  ],
+  "nxQJOZ": [
+    {
+      "type": 0,
+      "value": "Única ruta disponible"
+    }
+  ],
+  "o0WR6j": [
+    {
+      "type": 0,
+      "value": "Creando este par"
+    }
+  ],
+  "oGIpAl": [
+    {
+      "type": 0,
+      "value": "+ retornos generados"
+    }
+  ],
+  "oIVT9p": [
+    {
+      "type": 0,
+      "value": "Utilizar Aprobación Universal:"
+    }
+  ],
+  "oRE5f/": [
+    {
+      "type": 0,
+      "value": "Autorizar token y crear la posicicón de todas maneras"
+    }
+  ],
+  "ocCMPR": [
+    {
+      "type": 0,
+      "value": "Generar retornos"
+    }
+  ],
+  "oe086u": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - La autorización del token fue enviada"
+    }
+  ],
+  "on7qPn": [
+    {
+      "type": 1,
+      "value": "fromAmount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " para "
+    },
+    {
+      "type": 1,
+      "value": "toAmount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " para usted"
+    }
+  ],
+  "ooodz5": [
+    {
+      "type": 0,
+      "value": "Todos los intercambios se ejecutan directamente a cada contrato Dex/Dex Aggregator. Esto significa que si alguno de los aggregators que utilizas hace un airdrop en el futuro, todos los intercambios realizados en Mean Finance te harían elegible para su airdrop."
+    }
+  ],
+  "owBuje": [
+    {
+      "type": 0,
+      "value": "Intercambiar"
+    }
+  ],
+  "p3Xa0W": [
+    {
+      "type": 0,
+      "value": "Establezca a quién desea transferir su posición"
+    }
+  ],
+  "pAy7CA": [
+    {
+      "type": 0,
+      "value": "Github"
+    }
+  ],
+  "pBVKIR": [
+    {
+      "type": 0,
+      "value": "Tiene que invertir al menos una frequencia de $"
+    },
+    {
+      "type": 1,
+      "value": "minimum"
+    },
+    {
+      "type": 0,
+      "value": " USD ("
+    },
+    {
+      "type": 1,
+      "value": "minToken"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    },
+    {
+      "type": 0,
+      "value": ") por "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    },
+    {
+      "type": 0,
+      "value": " para habilitar esta opción."
+    }
+  ],
+  "pH36vJ": [
+    {
+      "type": 0,
+      "value": "Crea una posición y empeza a competir"
+    }
+  ],
+  "pMZxIC": [
+    {
+      "type": 0,
+      "value": "TERMINADA"
+    }
+  ],
+  "pVaAUz": [
+    {
+      "type": 0,
+      "value": "La posición no está generando retornos"
+    }
+  ],
+  "pWI5/m": [
+    {
+      "type": 0,
+      "value": "Sin retornos"
+    }
+  ],
+  "pc75Ig": [
+    {
+      "type": 0,
+      "value": "Visite nuestro"
+    }
+  ],
+  "pgGJ91": [
+    {
+      "type": 0,
+      "value": "Recibir"
+    }
+  ],
+  "pjRvxz": [
+    {
+      "type": 0,
+      "value": "Lamentablemente, el token CRV ya no puede utilizarse como garantía en Aave v3. Esto significa que no es posible intercambiar esta posición. Recomendamos cerrar esta posición"
+    }
+  ],
+  "pwMHax": [
+    {
+      "type": 0,
+      "value": "Por lo tanto, podría ocurrir que su intercambio no se ejecutara con la frecuencia especificada. Si esto ocurriera con su posición, recuerde que sólo se cobran tarifas por los intercambios, por lo que su saldo no se verá afectado"
+    }
+  ],
+  "pwNot7": [
+    {
+      "type": 0,
+      "value": "Ninguno de los tokens que seleccionaste soportan generar retornos."
+    }
+  ],
+  "q0I3lm": [
+    {
+      "type": 0,
+      "value": "No cobramos ningún tipo de comisión. Estas recibiendo exactamente los mismos precios que si hubieses interactuado con el agregador directamente."
+    }
+  ],
+  "q2gF9r": [
+    {
+      "type": 0,
+      "value": "Utilizas los contratos inteligents del Dex/Dex Aggregator con el que vas a intercambiar, eso significa que obtienes la misma seguridad que si utilizaras el Dex/Dex Aggregator específico de su aplicación"
+    }
+  ],
+  "q7gy3F": [
+    {
+      "type": 0,
+      "value": "Ver en el explorador de cadena"
+    }
+  ],
+  "qC950V": [
+    {
+      "type": 0,
+      "value": "Mean Finance te permitirá realizar DCA de forma descentralizada y sin gas. Esto significa que:"
+    }
+  ],
+  "qCNGJT": [
+    {
+      "type": 0,
+      "value": "Simulación de la transacción"
+    }
+  ],
+  "qCw/BH": [
+    {
+      "type": 0,
+      "value": "¿Se ha olvidado de su posición? Estas son las direcciones que tienen más valor para retirar entre sus posiciónes"
+    }
+  ],
+  "qD/8eI": [
+    {
+      "type": 0,
+      "value": "¿Es seguro?"
+    }
+  ],
+  "qHy8j2": [
+    {
+      "type": 0,
+      "value": "Volver a crear posición"
+    }
+  ],
+  "qKSABv": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Crear posición"
+    }
+  ],
+  "qKjiic": [
+    {
+      "type": 0,
+      "value": "Mean ahora necesita tu autorizacion explicita para usar "
+    },
+    {
+      "type": 1,
+      "value": "value"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "tokenFrom"
+    },
+    {
+      "type": 0,
+      "value": " para crear tu posición"
+    }
+  ],
+  "qQYnqF": [
+    {
+      "type": 0,
+      "value": "El TRUE DCAOR es aquel cuya posición se ha establecdo para ejecutarse durante más tiempo"
+    }
+  ],
+  "qQeTLj": [
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " fueron removidos de tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "qTiaEE": [
+    {
+      "type": 0,
+      "value": "Si acaba de crear la posición, espere unos minutos y vuelva a intentarlo"
+    }
+  ],
+  "qTkbKq": [
+    {
+      "type": 0,
+      "value": "Intercambio confirmado"
+    }
+  ],
+  "qaVSQ/": [
+    {
+      "type": 0,
+      "value": "Precio del mercado"
+    }
+  ],
+  "qbwUnh": [
+    {
+      "type": 0,
+      "value": "Modificaciones"
+    }
+  ],
+  "qdZe6N": [
+    {
+      "type": 0,
+      "value": "Competencia jBRL"
+    }
+  ],
+  "qodglE": [
+    {
+      "type": 0,
+      "value": "Error transfiriendo la posición"
+    }
+  ],
+  "qvNbVb": [
+    {
+      "type": 0,
+      "value": "Lanzamos un nuevo Hub Companion que nos permite darte una mejor experiencia. Dado que Gnosis Safe no permite firmar mensajes, necesitamos que explícitamente le des permisos a este nuevo Companion sobre tu posición, para que puedas usar libremente tu posición de Mean Finance."
+    }
+  ],
+  "r+KI3m": [
+    {
+      "type": 0,
+      "value": "Error cambiando la frequencia y duracion"
+    }
+  ],
+  "r0L/01": [
+    {
+      "type": 0,
+      "value": "Retirar "
+    },
+    {
+      "type": 1,
+      "value": "toSymbol"
+    },
+    {
+      "type": 0,
+      "value": " de "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " posición"
+    }
+  ],
+  "r3H6D4": [
+    {
+      "type": 0,
+      "value": "No está autorizado para realizar esta operación"
+    }
+  ],
+  "r7l7zf": [
+    {
+      "type": 0,
+      "value": "Retiraste de tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "rC4KKM": [
+    {
+      "type": 0,
+      "value": "La campaña "
+    },
+    {
+      "type": 1,
+      "value": "campaign"
+    },
+    {
+      "type": 0,
+      "value": " fue redimida"
+    }
+  ],
+  "rEo0yG": [
+    {
+      "type": 0,
+      "value": "MAX"
+    }
+  ],
+  "rJAtmd": [
+    {
+      "type": 0,
+      "value": "Fondos usados:"
+    }
+  ],
+  "rKNAVd": [
+    {
+      "type": 0,
+      "value": "Primero tendrá que firmar un mensaje (que no tiene costo) para aprobar nuestro contrato de Companion . Luego, tendrá que enviar la transacción en la que migra la posición"
+    }
+  ],
+  "rLp2yg": [
+    {
+      "type": 0,
+      "value": "proximamente. Crea una position ahora para ser incluido en el proximo intercambio"
+    }
+  ],
+  "reRP6P": [
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " intercambios"
+    },
+    {
+      "type": 1,
+      "value": "plural"
+    }
+  ],
+  "rjATQZ": [
+    {
+      "type": 0,
+      "value": "diariamente"
+    }
+  ],
+  "ruGk7y": [
+    {
+      "type": 0,
+      "value": "cada 5 minutos"
+    }
+  ],
+  "rxZhd8": [
+    {
+      "type": 0,
+      "value": "cada semana"
+    }
+  ],
+  "rxgILP": [
+    {
+      "type": 0,
+      "value": "¿Qué es Mean Finance?"
+    }
+  ],
+  "s+p6X2": [
+    {
+      "type": 0,
+      "value": "cada 5 minutos"
+    }
+  ],
+  "s5i7V0": [
+    {
+      "type": 0,
+      "value": "La cantidad de intercambios no puede ser superior a "
+    },
+    {
+      "type": 1,
+      "value": "MAX_UINT_32"
+    }
+  ],
+  "s7Nenf": [
+    {
+      "type": 0,
+      "value": "Nuestros Contratos Inteligentes fueron construidos para maximizar el poder de la Aprobación Universal, minimizando así cualquier exposición a una potencial vulnerabilidad en ellos. además, al utilizar la Aprobación Universal ahora podemos simular tus intercambios en cualquier red en la que estes, así que ahora podes saber exactamente cuanto vas a recibir una vez que el intercambio se confirme. Por último, nuestros Contratos Inteligentes fueron auditados por Omniscia y hay una bug bounty activa en ImmuneFi."
+    }
+  ],
+  "s7Q4TB": [
+    {
+      "type": 0,
+      "value": "Terminando su posición"
+    }
+  ],
+  "s7Trca": [
+    {
+      "type": 0,
+      "value": "más recibido que el segundo mejor"
+    }
+  ],
+  "sCqMd/": [
+    {
+      "type": 0,
+      "value": "DCA vs Lump Sum Profit %"
+    }
+  ],
+  "sGTW0U": [
+    {
+      "type": 1,
+      "value": "readable"
+    }
+  ],
+  "sMTz8x": [
+    {
+      "type": 0,
+      "value": "Posiciones en curso"
+    }
+  ],
+  "sWB1pz": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Validando las cotizaciones para darte el mejor precio ("
+    },
+    {
+      "type": 1,
+      "value": "current"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "total"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "sajNR4": [
+    {
+      "type": 0,
+      "value": "~ "
+    },
+    {
+      "type": 1,
+      "value": "fromPrice"
+    },
+    {
+      "type": 0,
+      "value": " USD"
+    }
+  ],
+  "sjxuA4": [
+    {
+      "type": 0,
+      "value": "Menos gas"
+    }
+  ],
+  "t0+OFx": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Firmar la autorización del token en tu billetera"
+    }
+  ],
+  "t0oI3L": [
+    {
+      "type": 0,
+      "value": "Volverás "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "fromSymbol"
+    },
+    {
+      "type": 0,
+      "value": " and "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "toSymbol"
+    }
+  ],
+  "t2bZTZ": [
+    {
+      "type": 0,
+      "value": "Crear posición de todas formas"
+    }
+  ],
+  "t2lqGa": [
+    {
+      "type": 0,
+      "value": "Retirar y cerrar posición"
+    }
+  ],
+  "tAHtfP": [
+    {
+      "type": 0,
+      "value": "para esa frecuencia. ¿Está seguro de que desea crear una posición?"
+    }
+  ],
+  "tAzRkq": [
+    {
+      "type": 0,
+      "value": "Autorizar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    }
+  ],
+  "tHbIgJ": [
+    {
+      "type": 0,
+      "value": "semanalmente"
+    }
+  ],
+  "tKrt0Y": [
+    {
+      "type": 0,
+      "value": "Hacer que su posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " comience a generar retornos se envió con éxito al blockchain y será confirmada en breve"
+    }
+  ],
+  "tSkT/G": [
+    {
+      "type": 0,
+      "value": "El próximo intercambio para esta posición se ejecutará "
+    },
+    {
+      "type": 1,
+      "value": "nextSwapAvailableAt"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "tX40vS": [
+    {
+      "type": 0,
+      "value": "Los usuarios sólo tienen que pagar gas cuando interactúan con las posiciónes. Esto incluye:"
+    }
+  ],
+  "taCH+c": [
+    {
+      "type": 0,
+      "value": "Transferir"
+    }
+  ],
+  "tdhen+": [
+    {
+      "type": 0,
+      "value": "Tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " ahora se va a ejecutar por "
+    },
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequency"
+    }
+  ],
+  "tfZ3sr": [
+    {
+      "type": 0,
+      "value": "menos rentable"
+    }
+  ],
+  "th+wsU": [
+    {
+      "type": 0,
+      "value": "Reducir posición"
+    }
+  ],
+  "tiJ3Vs": [
+    {
+      "type": 0,
+      "value": "1 minuto (1 intercambio)"
+    }
+  ],
+  "tqUUG8": [
+    {
+      "type": 0,
+      "value": "Para empezar a generar retornos, tendremos que cerrar su posición actual y crear una nueva. Los datos históricos de esta posición aparecerán como una posición cerrada"
+    }
+  ],
+  "ttC5dQ": [
+    {
+      "type": 0,
+      "value": "Invertir (DCA)"
+    }
+  ],
+  "twerhs": [
+    {
+      "type": 0,
+      "value": "Max"
+    }
+  ],
+  "u/XTL7": [
+    {
+      "type": 0,
+      "value": "Crear posición"
+    }
+  ],
+  "u19uie": [
+    {
+      "type": 0,
+      "value": "Unwrap"
+    }
+  ],
+  "uHCFsv": [
+    {
+      "type": 0,
+      "value": "aproximadamente "
+    },
+    {
+      "type": 1,
+      "value": "nextSwapAvailableAt"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "uHLMi9": [
+    {
+      "type": 0,
+      "value": "No agregamos ningun tipo de comision extra. Estas recibiendo extactamente los mismos precios como si hubieses interactuado con el Aggregador directamente. "
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 1,
+      "value": "br"
+    },
+    {
+      "type": 0,
+      "value": " Algunos agregadores soportan compartir su fee con los referidos, pero esto no es ningun cargo extra para ti."
+    }
+  ],
+  "uRlu53": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Se está confirmando la autorización del token"
+    }
+  ],
+  "uV7tE7": [
+    {
+      "type": 0,
+      "value": "Costo de Gas considerado"
+    }
+  ],
+  "uXkQfi": [
+    {
+      "type": 0,
+      "value": "Cambiar red a "
+    },
+    {
+      "type": 1,
+      "value": "network"
+    }
+  ],
+  "uZWTRx": [
+    {
+      "type": 0,
+      "value": "¿Cómo podemos mejorarlo?"
+    }
+  ],
+  "us01Br": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - La validación de las cotizaciones falló"
+    }
+  ],
+  "v/Er//": [
+    {
+      "type": 0,
+      "value": "Por favor, ayudanos a mejorar al compartir tu feedback en la tab de Feedback o mandanos un mensaje en"
+    }
+  ],
+  "v/LxnW": [
+    {
+      "type": 0,
+      "value": "aproximadamente "
+    },
+    {
+      "type": 1,
+      "value": "nextSwapAvailableAt"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "v1SP5g": [
+    {
+      "type": 0,
+      "value": "4 horas"
+    }
+  ],
+  "v1SUII": [
+    {
+      "type": 0,
+      "value": "minutos"
+    }
+  ],
+  "vCTA97": [
+    {
+      "type": 0,
+      "value": "Luego de simular las cotizaciones, encontramos que "
+    },
+    {
+      "type": 1,
+      "value": "toTarget"
+    },
+    {
+      "type": 0,
+      "value": " seria mejor para el criterio de slección que elegiste. ¿Queres usar "
+    },
+    {
+      "type": 1,
+      "value": "toTarget"
+    },
+    {
+      "type": 0,
+      "value": "?"
+    }
+  ],
+  "vHie/I": [
+    {
+      "type": 0,
+      "value": "Estarás teniendo exactamente la misma experiencia que tendrías al usar el agregador directamente. No construimos ningún contrato inteligente sobre ellos así que no hay riesgo agregado. Al mismo tiempo, ofrecemos simulación de transacciones en algunas redes."
+    }
+  ],
+  "vIbAYN": [
+    {
+      "type": 0,
+      "value": "Seleccionar por"
+    }
+  ],
+  "vNNVGj": [
+    {
+      "type": 0,
+      "value": "Por ejemplo, supongamos que ha creado una posición que intercambia 2000 USDC por ETH cada día. Supongamos también que, cuando se ejecuta el intercambio, 2000 USDC = 1 ETH. En lugar de obtener 1 ETH, estaría obteniendo 1 ETH - 0,6% = 0,994 ETH. Ese 0,6% se dividirá entre Mean Finance y el usuario que realmente ejecutó ese intercambio."
+    }
+  ],
+  "vQABrE": [
+    {
+      "type": 0,
+      "value": "Vista detallada"
+    }
+  ],
+  "vVsvjq": [
+    {
+      "type": 0,
+      "value": "Retirar como "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "vXfC3z": [
+    {
+      "type": 0,
+      "value": "Usted ha rechazado la transacción"
+    }
+  ],
+  "vedPfb": [
+    {
+      "type": 0,
+      "value": "Intercambio"
+    }
+  ],
+  "vlDLmo": [
+    {
+      "type": 0,
+      "value": "Invertirá"
+    }
+  ],
+  "vmGAxP": [
+    {
+      "type": 0,
+      "value": "Recibes"
+    }
+  ],
+  "vmZ52D": [
+    {
+      "type": 0,
+      "value": "Precio de mercado"
+    }
+  ],
+  "vqkOyW": [
+    {
+      "type": 0,
+      "value": "Más recibido"
+    }
+  ],
+  "vw/vGQ": [
+    {
+      "type": 0,
+      "value": "1 minuto"
+    }
+  ],
+  "vy3jnS": [
+    {
+      "type": 0,
+      "value": "Transferir posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "wEwpFI": [
+    {
+      "type": 0,
+      "value": "Crear posición"
+    }
+  ],
+  "wH5c58": [
+    {
+      "type": 0,
+      "value": "Discord."
+    }
+  ],
+  "wHKSsk": [
+    {
+      "type": 0,
+      "value": "Euler ha congelado sus contratos luego del hack, por esto modificar posiciones no es posible en este momento. Mantenete enterado de la situacion uniendote a nuestro"
+    }
+  ],
+  "wJOLei": [
+    {
+      "type": 0,
+      "value": "Intercambiando"
+    }
+  ],
+  "wXyOAT": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Las cotizaciones serán validadas"
+    }
+  ],
+  "wY55VA": [
+    {
+      "type": 0,
+      "value": "Sin comisiones por depósitos o retiros"
+    }
+  ],
+  "wZ9OAC": [
+    {
+      "type": 0,
+      "value": "La popularidad/demanda de los tokens incluido en el intercambio"
+    }
+  ],
+  "wnvvrB": [
+    {
+      "type": 0,
+      "value": "Error aprobando token"
+    }
+  ],
+  "wzEneQ": [
+    {
+      "type": 0,
+      "value": "Cerrar"
+    }
+  ],
+  "x0ZohV": [
+    {
+      "type": 0,
+      "value": "Luego de simular los cotizaciones, encontramos que "
+    },
+    {
+      "type": 1,
+      "value": "fromTarget"
+    },
+    {
+      "type": 0,
+      "value": " va a fallar si se ejecuta. "
+    },
+    {
+      "type": 1,
+      "value": "toTarget"
+    },
+    {
+      "type": 0,
+      "value": " esta actualmente ofreciendo los mejores resultados. ¿Queres usarlo??"
+    }
+  ],
+  "x0hPUt": [
+    {
+      "type": 0,
+      "value": "a"
+    }
+  ],
+  "x0ln0H": [
+    {
+      "type": 0,
+      "value": "Ver mi posición"
+    }
+  ],
+  "x2ydb5": [
+    {
+      "type": 0,
+      "value": "Transferir tu posición "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " a "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "xIIhB5": [
+    {
+      "type": 0,
+      "value": "+ retornos generados"
+    }
+  ],
+  "xOdkNW": [
+    {
+      "type": 0,
+      "value": "Como funciona / Riesgos"
+    }
+  ],
+  "xQGdu0": [
+    {
+      "type": 0,
+      "value": "Mean ahora necesita tu autorizacion explicita para intercambiar "
+    },
+    {
+      "type": 1,
+      "value": "tokenFrom"
+    },
+    {
+      "type": 0,
+      "value": " a "
+    },
+    {
+      "type": 1,
+      "value": "tokenTo"
+    }
+  ],
+  "xRD2R7": [
+    {
+      "type": 0,
+      "value": "La transacción va a fallar. Recomendamos elegir otra ruta"
+    }
+  ],
+  "xTAANF": [
+    {
+      "type": 0,
+      "value": "Este par es"
+    }
+  ],
+  "xTu77D": [
+    {
+      "type": 0,
+      "value": "Procesando"
+    }
+  ],
+  "xf12eg": [
+    {
+      "type": 0,
+      "value": "Cerrar una posición"
+    }
+  ],
+  "xqGD8L": [
+    {
+      "type": 0,
+      "value": "Empezar a generar retornos"
+    }
+  ],
+  "xu/Gut": [
+    {
+      "type": 0,
+      "value": "Posiciones cerradas"
+    }
+  ],
+  "xuOlAQ": [
+    {
+      "type": 0,
+      "value": "Testnet"
+    }
+  ],
+  "xurFDH": [
+    {
+      "type": 0,
+      "value": "Mean Finance"
+    }
+  ],
+  "xxuJDG": [
+    {
+      "type": 0,
+      "value": "semanas"
+    }
+  ],
+  "xybHU6": [
+    {
+      "type": 0,
+      "value": "Esto no se puede deshacer"
+    }
+  ],
+  "y2BvnY": [
+    {
+      "type": 0,
+      "value": "¿Qué es DCA?"
+    }
+  ],
+  "yVecas": [
+    {
+      "type": 0,
+      "value": "Frequencia:"
+    }
+  ],
+  "yhA8mK": [
+    {
+      "type": 0,
+      "value": "+ retornos"
+    }
+  ],
+  "yoTCFN": [
+    {
+      "type": 1,
+      "value": "readable"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " intercambios)"
+    }
+  ],
+  "yokaKf": [
+    {
+      "type": 0,
+      "value": "Estoy teniendo problemas, ¿Qué puedo hacer?"
+    }
+  ],
+  "yuK53B": [
+    {
+      "type": 0,
+      "value": "Error definiendo permisos"
+    }
+  ],
+  "yw4rkM": [
+    {
+      "type": 0,
+      "value": "horas"
+    }
+  ],
+  "yyT6co": [
+    {
+      "type": 0,
+      "value": "Luego de costo de transacción:"
+    }
+  ],
+  "z/57ga": [
+    {
+      "type": 1,
+      "value": "readable"
+    }
+  ],
+  "z0M49Z": [
+    {
+      "type": 0,
+      "value": "y"
+    }
+  ],
+  "z43qzX": [
+    {
+      "type": 0,
+      "value": "Conectar billetera"
+    }
+  ],
+  "zG7r/G": [
+    {
+      "type": 1,
+      "value": "readable"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " intercambios)"
+    }
+  ],
+  "zNOHJl": [
+    {
+      "type": 1,
+      "value": "step"
+    },
+    {
+      "type": 0,
+      "value": " - Se envió la autorización del token"
+    }
+  ],
+  "zPMSFC": [
+    {
+      "type": 0,
+      "value": "Esperando confirmación"
+    }
+  ],
+  "zSo0el": [
+    {
+      "type": 0,
+      "value": "cada día"
+    }
+  ],
+  "zTt+tt": [
+    {
+      "type": 0,
+      "value": "Seleccionado"
+    }
+  ],
+  "zfveEm": [
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
+  "zi0gLX": [
+    {
+      "type": 0,
+      "value": "Sin comisiones adicionales"
+    }
+  ],
+  "zlapVJ": [
+    {
+      "type": 0,
+      "value": "Costo de la transacción:"
+    }
+  ],
+  "znN7fQ": [
+    {
+      "type": 0,
+      "value": "Nunca ejecutado"
+    }
+  ],
+  "zpPKoQ": [
+    {
+      "type": 0,
+      "value": "Retirar"
+    }
+  ],
+  "zpSepL": [
+    {
+      "type": 0,
+      "value": "Autorizar "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
+  "zr2gP1": [
+    {
+      "type": 0,
+      "value": "Volver a posiciónes"
+    }
+  ],
+  "zuU6Ai": [
+    {
+      "type": 0,
+      "value": "1 hora (1 intercambio)"
+    }
+  ],
+  "zwn/c2": [
+    {
+      "type": 0,
+      "value": "Debido al bajo volumen es posible que el oráculo de precios para este par no sea confiable o preciso, lo que significa que los intercambios podrían no ejecutarse o ejecutarse con precios incorrectos. Proceda con precaución o pruebe con otro par"
+    }
+  ],
+  "zx0Lgo": [
+    {
+      "type": 0,
+      "value": "¿Seré elegible para airdrops usando Mean Finance Meta Aggregator?"
+    }
+  ]
+}
