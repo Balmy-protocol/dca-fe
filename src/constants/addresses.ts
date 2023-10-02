@@ -743,8 +743,5 @@ const tokenAddressesForPriceFetching: Record<number, Record<string, string>> = {
 
 export const getTokenAddressForPriceFetching = (chainId: number, address: string): string => {
   const chainRecord = tokenAddressesForPriceFetching[chainId];
-  if (chainRecord && chainRecord[address]) {
-    return chainRecord[address];
-  }
-  return address;
+  return (chainRecord && chainRecord[address]) || address;
 };
