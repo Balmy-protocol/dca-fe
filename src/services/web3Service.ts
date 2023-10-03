@@ -183,7 +183,8 @@ export default class Web3Service {
       this.walletService,
       this.contractService,
       this.axiosClient,
-      this.providerService
+      this.providerService,
+      this.sdkService
     );
     this.errorService = new ErrorService(this.meanApiService);
     this.simulationService = new SimulationService(

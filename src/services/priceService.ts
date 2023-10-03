@@ -14,12 +14,13 @@ import {
   NETWORKS,
   STABLE_COINS,
   ZRX_API_ADDRESS,
+  getTokenAddressForPriceFetching,
 } from '@constants';
 import { DateTime } from 'luxon';
-import { emptyTokenWithAddress } from '@common/utils/currency';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';
+import SdkService from './sdkService';
 
 interface TokenWithBase extends Token {
   isBaseToken: boolean;
@@ -36,58 +37,57 @@ export default class PriceService {
 
   providerService: ProviderService;
 
+  sdkService: SdkService;
+
   constructor(
     walletService: WalletService,
     contractService: ContractService,
     axiosClient: AxiosInstance,
-    providerService: ProviderService
+    providerService: ProviderService,
+    sdkService: SdkService
   ) {
     this.walletService = walletService;
     this.axiosClient = axiosClient;
     this.contractService = contractService;
     this.providerService = providerService;
+    this.sdkService = sdkService;
   }
 
   // TOKEN METHODS
   async getUsdHistoricPrice(tokens: Token[], date?: string, chainId?: number) {
     const network = await this.providerService.getNetwork();
     const chainIdToUse = chainId || network.chainId;
-    const defillamaId = DEFILLAMA_IDS[chainIdToUse] || findKey(NETWORKS, { chainId: chainIdToUse });
-    if (!tokens.length || !defillamaId) {
+    if (!tokens.length) {
       return {};
     }
-    const mappedTokens = tokens.map((token) =>
-      token.address === PROTOCOL_TOKEN_ADDRESS ? emptyTokenWithAddress(DEFILLAMA_PROTOCOL_TOKEN_ADDRESS) : token
-    );
-    const defillamaToknes = mappedTokens.map((token) => `${defillamaId}:${token.address}`).join(',');
+    const mappedTokens = tokens.map((token) => ({
+      ...token,
+      fetchingAddress: getTokenAddressForPriceFetching(token.chainId, token.address),
+    }));
+    const addresses = mappedTokens.map((token) => token.fetchingAddress);
 
-    const price = await this.axiosClient.get<{ coins: Record<string, { price: number }> }>(
-      date
-        ? `https://coins.llama.fi/prices/historical/${parseInt(date, 10)}/${defillamaToknes}`
-        : `https://coins.llama.fi/prices/current/${defillamaToknes}`
-    );
+    const prices = date
+      ? await this.sdkService.sdk.priceService.getHistoricalPricesForChain({
+          chainId: chainIdToUse,
+          addresses,
+          timestamp: parseInt(date, 10),
+        })
+      : await this.sdkService.sdk.priceService.getCurrentPricesForChain({ chainId: chainIdToUse, addresses });
 
     const tokensPrices = mappedTokens
-      .filter(
-        (token) =>
-          price.data.coins &&
-          price.data.coins[`${defillamaId}:${token.address}`] &&
-          price.data.coins[`${defillamaId}:${token.address}`].price
-      )
+      .filter((token) => prices[token.fetchingAddress] && prices[token.fetchingAddress].price)
       .reduce<Record<string, BigNumber>>((acc, token) => {
-        const tokenAddressToUse =
-          token.address === DEFILLAMA_PROTOCOL_TOKEN_ADDRESS ? PROTOCOL_TOKEN_ADDRESS : token.address;
         let returnedPrice = BigNumber.from(0);
 
         try {
-          returnedPrice = parseUnits(price.data.coins[`${defillamaId}:${token.address}`].price.toFixed(18), 18);
+          returnedPrice = parseUnits(prices[token.fetchingAddress].price.toFixed(18), 18);
         } catch (e) {
-          console.error('Error parsing price for', tokenAddressToUse, e);
+          console.error('Error parsing price for', token.address, e);
         }
 
         return {
           ...acc,
-          [tokenAddressToUse]: returnedPrice,
+          [token.address]: returnedPrice,
         };
       }, {});
 
@@ -168,33 +168,36 @@ export default class PriceService {
     const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
     const span = tentativeSpan || INDEX_TO_SPAN[periodIndex];
     const period = tentativePeriod || INDEX_TO_PERIOD[periodIndex];
-    const toAddress = to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to.address;
-    const fromAddress = from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address;
     const end = tentativeEnd || DateTime.now().toSeconds();
 
-    let tokenA: GraphToken = { ...emptyTokenWithAddress(fromAddress), isBaseToken: false };
-    let tokenB: GraphToken = { ...emptyTokenWithAddress(toAddress), isBaseToken: false };
-    if (fromAddress < toAddress) {
+    const adjustedFrom =
+      from.address === PROTOCOL_TOKEN_ADDRESS
+        ? wrappedProtocolToken
+        : { ...from, address: getTokenAddressForPriceFetching(from.chainId, from.address) };
+    const adjustedTo =
+      to.address === PROTOCOL_TOKEN_ADDRESS
+        ? wrappedProtocolToken
+        : { ...to, address: getTokenAddressForPriceFetching(to.chainId, to.address) };
+
+    let tokenA: GraphToken;
+    let tokenB: GraphToken;
+    if (adjustedFrom.address < adjustedTo.address) {
       tokenA = {
-        ...(from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from),
-        symbol: from.symbol,
-        isBaseToken: STABLE_COINS.includes(from.symbol),
+        ...adjustedFrom,
+        isBaseToken: STABLE_COINS.includes(adjustedFrom.symbol),
       };
       tokenB = {
-        ...(to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to),
-        symbol: to.symbol,
-        isBaseToken: STABLE_COINS.includes(to.symbol),
+        ...adjustedTo,
+        isBaseToken: STABLE_COINS.includes(adjustedTo.symbol),
       };
     } else {
       tokenA = {
-        ...(to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to),
-        symbol: to.symbol,
-        isBaseToken: STABLE_COINS.includes(to.symbol),
+        ...adjustedTo,
+        isBaseToken: STABLE_COINS.includes(adjustedTo.symbol),
       };
       tokenB = {
-        ...(from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from),
-        symbol: from.symbol,
-        isBaseToken: STABLE_COINS.includes(from.symbol),
+        ...adjustedFrom,
+        isBaseToken: STABLE_COINS.includes(adjustedFrom.symbol),
       };
     }
 
@@ -219,7 +222,7 @@ export default class PriceService {
     const tokenBPrices =
       coins && coins[`${defillamaId}:${tokenB.address}`] && coins[`${defillamaId}:${tokenB.address}`].prices;
 
-    const tokenAIsBaseToken = STABLE_COINS.includes(tokenA.symbol);
+    const tokenAIsBaseToken = STABLE_COINS.includes(tokenA.symbol) || !STABLE_COINS.includes(tokenB.symbol);
 
     const graphData = tokenAPrices.reduce<{ timestamp: number; rate: number }[]>((acc, { price, timestamp }, index) => {
       const tokenBPrice = tokenBPrices[index] && tokenBPrices[index].price;
