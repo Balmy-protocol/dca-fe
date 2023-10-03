@@ -145,7 +145,6 @@ export const DCA_TOKEN_BLACKLIST = [
 
   '0xb5c064f955d8e7f38fe0460c556a72987494ee17', // Polygon - QUICK - Hiding until release
 
-  '0xfdb794692724153d1488ccdbe0c56c252596735f', // Optimism - LDO - Hiding until release
   '0x13ad51ed4f1b7e9dc168d8a00cb3f4ddd85efa60', // Arbitrum - LDO - Hiding until release
 ].map((a) => a.toLowerCase());
 
