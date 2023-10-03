@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "React Library",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "lib": ["ES2015", "DOM", "es6"],
+    "module": "es6",
+    "target": "es6",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitThis": true,
+    "ignoreDeprecations": "5.0"
+  }
+}

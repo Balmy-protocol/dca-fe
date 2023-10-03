@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": true,
+    "jsx": "react",
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "es6"],
+    "module": "esnext",
+    "noEmit": false,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": true,
+    "ignoreDeprecations": "5.0",
+    "baseUrl": "./src",
+    "paths": {
+      "@*": [
+        "*"
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+import React from 'react';
+import type { Meta, StoryObj } from '@storybook/react';
+
+import { {{ pascalCase name }} } from '.';
+
+const meta: Meta<typeof {{ pascalCase name }}> = {
+  title: 'Components/{{ pascalCase name }}',
+  component: {{ pascalCase name }},
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
+};
+
+export default meta;
+type Story = StoryObj<typeof {{ pascalCase name }}>;
+
+export const Primary: Story = {
+  args: {},
+};
+
+export { {{ pascalCase name }} };

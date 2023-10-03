@@ -1,0 +1,15 @@
+{
+  "extends": "tsconfig/react-app.json",
+  "compilerOptions": {
+    "paths": {
+      "@*": [
+        "*"
+      ]
+    },
+    "baseUrl": "./src",
+  },
+  "include": [
+    "./src/**/*",
+  ],
+  "exclude": ["node_modules", "*.spec.ts", "*.spec.tsx"]
+}

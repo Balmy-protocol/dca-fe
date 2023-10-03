@@ -24,5 +24,8 @@ jobs:
       - name: Install deps
         run: yarn install --pure-lockfile
 
+      - name: Build
+        run: yarn build
+
       - name: Lint
         run: yarn lint

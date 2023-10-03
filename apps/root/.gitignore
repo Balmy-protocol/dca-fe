@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+.htaccess
+yarn-error.log
+.DS_Store
+.env
