@@ -688,7 +688,7 @@ export const TOKEN_LISTS = {
   },
 };
 
-export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST', 'jEUR', 'jGBP', 'jCHF'];
+export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST', 'jEUR', 'jGBP', 'jCHF', 'USDC.e'];
 
 export const MEAN_API_URL = 'https://api.mean.finance';
 
