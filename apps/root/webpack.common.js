@@ -83,6 +83,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.WC_PROJECT_ID': JSON.stringify(process.env.WC_PROJECT_ID),
     }),
+    new webpack.DefinePlugin({
+      'process.env.PUBLIC_PRIVY_APP_ID': JSON.stringify(process.env.PUBLIC_PRIVY_APP_ID),
+    }),
     new WebpackBar(),
   ],
   devtool: 'source-map',

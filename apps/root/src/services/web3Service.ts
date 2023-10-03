@@ -1,5 +1,5 @@
 import { ethers, Signer } from 'ethers';
-import { ExternalProvider, Provider, Network } from '@ethersproject/providers';
+import { ExternalProvider, Provider, Network, Web3Provider } from '@ethersproject/providers';
 import { configureChains, createClient, Client, Connector, Chain } from 'wagmi';
 import { getAllChains } from '@mean-finance/sdk';
 import {
@@ -69,6 +69,7 @@ import SafeService from './safeService';
 import EventService from './eventService';
 import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
+import AccountService from './accountService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -129,6 +130,8 @@ export default class Web3Service {
 
   permit2Service: Permit2Service;
 
+  accountService: AccountService;
+
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
@@ -148,6 +151,7 @@ export default class Web3Service {
     // initialize services
     this.providerService = new ProviderService(client);
     this.safeService = new SafeService();
+    this.accountService = new AccountService();
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
     this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
@@ -217,6 +221,10 @@ export default class Web3Service {
 
   getArcxClient() {
     return this.arcxSdk || DUMMY_ARCX_CLIENT;
+  }
+
+  getAccountService() {
+    return this.accountService;
   }
 
   getContractService() {
@@ -342,14 +350,14 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect(suppliedProvider?: Provider, connector?: Connector<Provider>, chainId?: number) {
+  async connect(suppliedProvider?: Web3Provider, connector?: Connector<Provider>, chainId?: number) {
     const connectorProvider = await connector?.getProvider();
 
     if (!suppliedProvider && !connectorProvider) {
       return;
     }
 
-    const provider: Provider = (suppliedProvider || connectorProvider) as Provider;
+    const provider: Provider = (suppliedProvider?.provider || connectorProvider) as Provider;
 
     this.providerService.setProviderInfo(provider);
     // A Web3Provider wraps a standard Web3 provider, which is
@@ -507,7 +515,7 @@ export default class Web3Service {
     ]);
 
     const wagmiClient = createClient({
-      autoConnect: true,
+      autoConnect: false,
       connectors,
       provider,
       webSocketProvider,
