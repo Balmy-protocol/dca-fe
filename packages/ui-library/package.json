@@ -19,6 +19,7 @@
     "clean": "rm -rf dist",
     "dev": "tsup --watch",
     "generate:component": "turbo gen react-component",
+    "generate:mui-component": "turbo gen mui-component",
     "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build"
   },
