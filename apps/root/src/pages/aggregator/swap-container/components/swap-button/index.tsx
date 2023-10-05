@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '@common/components/button';
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';

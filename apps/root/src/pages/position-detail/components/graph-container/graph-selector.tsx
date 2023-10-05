@@ -6,8 +6,7 @@ import { createStyles } from '@mui/material';
 import { withStyles } from 'tss-react/mui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import TimelineIcon from '@mui/icons-material/Timeline';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import { Menu, MenuItem } from 'ui-library';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({

@@ -6,7 +6,7 @@ import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/
 import styled from 'styled-components';
 import { Token, TransactionTypes } from '@types';
 import { BigNumber } from 'ethers';
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';

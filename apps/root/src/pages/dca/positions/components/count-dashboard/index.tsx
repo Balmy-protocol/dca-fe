@@ -1,16 +1,14 @@
 import React from 'react';
 import find from 'lodash/find';
 import orderBy from 'lodash/orderBy';
-import Grid from '@mui/material/Grid';
+import { Grid, Hidden, Typography, LinearProgress } from 'ui-library';
 import styled from 'styled-components';
 import intersection from 'lodash/intersection';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { NETWORKS } from '@constants';
-import LinearProgress from '@mui/material/LinearProgress';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
-import { Hidden, Typography } from '@mui/material';
 import { BigNumber } from 'ethers';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';

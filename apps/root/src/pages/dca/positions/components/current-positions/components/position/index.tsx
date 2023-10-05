@@ -1,11 +1,8 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import Card from '@mui/material/Card';
 import findIndex from 'lodash/findIndex';
 import { DateTime } from 'luxon';
-import LinearProgress from '@mui/material/LinearProgress';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
+import { Chip, Link, Typography, Tooltip, Card, CardContent, LinearProgress } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
@@ -35,7 +32,7 @@ import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
-import { Chip, Link, Theme, Tooltip } from '@mui/material';
+import { Theme } from '@mui/material';
 import useUsdPrice from '@hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 

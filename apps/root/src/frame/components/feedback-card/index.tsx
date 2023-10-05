@@ -4,7 +4,7 @@ import isUndefined from 'lodash/isUndefined';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Button from '@common/components/button';
-import { FormControl, InputLabel, MenuItem, Select, Slide, TextField, Typography } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, Slide, TextField, Typography } from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useMeanApiService from '@hooks/useMeanApiService';
 

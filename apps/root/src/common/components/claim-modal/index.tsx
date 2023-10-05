@@ -2,7 +2,7 @@ import React from 'react';
 import Modal from '@common/components/modal';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import Grid from '@mui/material/Grid';
+import { Grid } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { Campaign, CampaignTypes, Campaigns, OptimismTypeData } from '@types';
 import useWeb3Service from '@hooks/useWeb3Service';

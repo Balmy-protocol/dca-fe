@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
+import { Grid, Typography } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useSdkBalances from '@hooks/useSdkBalances';
 import { DAI, EULER_4626_ADDRESSES, EULER_4626_TOKENS, USDC, WETH } from '@pages/euler-claim/constants';
@@ -11,7 +11,6 @@ import Button from '@common/components/button';
 import usePrevious from '@hooks/usePrevious';
 import { COMPANION_ADDRESS, EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS } from '@constants';
 import { BigNumber } from 'ethers';
-import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import AffectedPositions from '@pages/euler-claim/affected-positions';
 import ClaimChecklist from '@pages/euler-claim/checklist';

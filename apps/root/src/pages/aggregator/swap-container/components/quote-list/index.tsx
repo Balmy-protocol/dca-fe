@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
-import Paper from '@mui/material/Paper';
+import { Paper, Typography } from 'ui-library';
 import { BigNumber } from 'ethers';
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
 import { SORT_MOST_PROFIT, SwapSortOptions } from '@constants/aggregator';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI, formatCurrencyAmount, emptyTokenWithDecimals } from '@common/utils/currency';
-import { Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
 
 const StyledContainer = styled(Paper)`

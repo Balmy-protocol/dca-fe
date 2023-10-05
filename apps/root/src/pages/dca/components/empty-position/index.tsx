@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Card from '@mui/material/Card';
+import { Card } from 'ui-library';
 
 const StyledCard = styled(Card)`
   ${({ theme }) => `

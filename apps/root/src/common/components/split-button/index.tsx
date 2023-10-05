@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Menu from '@mui/material/Menu';
+import { Menu, MenuItem } from 'ui-library';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import Button, { CustomButtonProps } from '@common/components/button';

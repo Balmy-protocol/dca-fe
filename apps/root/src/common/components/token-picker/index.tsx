@@ -5,19 +5,23 @@ import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Token, TokenList, YieldOptions } from '@types';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
+import {
+  Grid,
+  Typography,
+  Tooltip,
+  FilledInput,
+  IconButton,
+  Switch,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Skeleton,
+} from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import ListItem from '@mui/material/ListItem';
-// import Divider from '@mui/material/Divider';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Search from '@mui/icons-material/Search';
-import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-// import Chip from '@mui/material/Chip';
 import TokenIcon from '@common/components/token-icon';
 import { makeStyles, withStyles } from 'tss-react/mui';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -26,12 +30,10 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useTokenList from '@hooks/useTokenList';
 import TokenLists from '@common/components/token-lists';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
-import FilledInput from '@mui/material/FilledInput';
-import { createStyles, Skeleton, Tooltip } from '@mui/material';
+import { createStyles } from '@mui/material';
 import useBalances from '@hooks/useBalances';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
-import Switch from '@mui/material/Switch';
 import useCustomToken from '@hooks/useCustomToken';
 import useAllowedPairs from '@hooks/useAllowedPairs';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';

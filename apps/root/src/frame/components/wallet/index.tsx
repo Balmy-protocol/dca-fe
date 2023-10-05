@@ -5,9 +5,7 @@ import { useAllTransactions, useHasPendingTransactions } from '@state/transactio
 import { useBadgeNumber } from '@state/transactions-badge/hooks';
 import { updateBadgeNumber } from '@state/transactions-badge/actions';
 
-import Badge from '@mui/material/Badge';
-import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
+import { Typography, Badge, CircularProgress } from 'ui-library';
 import Button from '@common/components/button';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import Address from '@common/components/address';

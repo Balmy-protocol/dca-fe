@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import useSimulateTransaction from '@hooks/useSimulateTransaction';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import BlowfishLogo from '@assets/logo/powered_by_blowfish';
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import { FormattedMessage } from 'react-intl';

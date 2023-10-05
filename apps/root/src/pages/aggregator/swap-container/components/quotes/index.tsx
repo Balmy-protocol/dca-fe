@@ -1,5 +1,4 @@
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
+import { Typography, Chip, Paper } from 'ui-library';
 import Button from '@common/components/button';
 import EmptyRoutes from '@assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
@@ -10,7 +9,6 @@ import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutli
 import { withStyles } from 'tss-react/mui';
 import { SourceMetadata } from '@mean-finance/sdk/dist/services/quotes/types';
 import compact from 'lodash/compact';
-import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';

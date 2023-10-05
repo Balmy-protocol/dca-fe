@@ -1,13 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
+import { Grid, Link, Typography, Card, Paper } from 'ui-library';
 import Button from '@common/components/button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
-import Card from '@mui/material/Card';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@state/hooks';
 import { changeMainTab } from '@state/tabs/actions';

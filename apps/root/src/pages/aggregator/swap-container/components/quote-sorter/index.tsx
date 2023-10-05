@@ -7,10 +7,8 @@ import Button from '@common/components/button';
 import { createStyles, Theme } from '@mui/material';
 import { withStyles } from 'tss-react/mui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import Menu from '@mui/material/Menu';
-import Typography from '@mui/material/Typography';
-import MenuItem from '@mui/material/MenuItem';
-import Tooltip from '@mui/material/Tooltip';
+import { Typography, Tooltip, Menu, MenuItem } from 'ui-library';
+
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useAppDispatch } from '@state/hooks';
 import { setSorting } from '@state/aggregator-settings/actions';

@@ -1,22 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ChainId, Permission, PositionPermission } from '@types';
-
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import FormControl from '@mui/material/FormControl';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
+import {
+  Typography,
+  Tooltip,
+  Link,
+  FormControlLabel,
+  FormControl,
+  FormGroup,
+  Checkbox,
+  Card,
+  CardContent,
+} from 'ui-library';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import { useAppDispatch } from '@hooks/state';
 import { addPermission, removePermission } from '@state/position-permissions/actions';
 import { isCompanionAddress, STRING_PERMISSIONS } from '@constants';
 import { FormattedMessage, useIntl } from 'react-intl';
-import Tooltip from '@mui/material/Tooltip';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Address from '@common/components/address';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import Link from '@mui/material/Link';
+import { Link } from 'ui-library';
 import styled from 'styled-components';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import TwitterIcon from '@mui/icons-material/Twitter';

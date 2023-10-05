@@ -1,7 +1,6 @@
 import { Token } from 'types';
 import styled from 'styled-components';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
+import { Typography, IconButton } from 'ui-library';
 import TokenButton from '@pages/dca/create-position/components/token-button';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';

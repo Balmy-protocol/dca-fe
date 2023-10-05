@@ -1,6 +1,5 @@
 import React from 'react';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
+import { Typography, Paper } from 'ui-library';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithDecimals, formatCurrencyAmount } from '@common/utils/currency';

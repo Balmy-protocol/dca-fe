@@ -5,9 +5,8 @@ import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import useClaimableCampaigns from '@hooks/useClaimableCampaigns';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
-import Typography from '@mui/material/Typography';
+import { Typography, Badge } from 'ui-library';
 import ClaimModal from '@common/components/claim-modal';
-import Badge from '@mui/material/Badge';
 import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 

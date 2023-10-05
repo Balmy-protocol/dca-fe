@@ -5,7 +5,7 @@ import omit from 'lodash/omit';
 import values from 'lodash/values';
 import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
-import Zoom from '@mui/material/Zoom';
+import { Zoom } from 'ui-library';
 import { useGetBlockNumber } from '@state/block-number/hooks';
 import EtherscanLink from '@common/components/view-on-etherscan';
 import { TransactionDetails, TransactionTypes } from '@types';

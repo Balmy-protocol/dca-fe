@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Typography } from 'ui-library';
 import FrequencyTypeInput from '@pages/dca/components/frequency-type-input';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import React from 'react';

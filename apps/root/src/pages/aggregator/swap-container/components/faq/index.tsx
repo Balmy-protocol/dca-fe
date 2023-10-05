@@ -1,12 +1,16 @@
 import React from 'react';
-import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
-import Typography from '@mui/material/Typography';
+import {
+  Typography,
+  Link,
+  Accordion as MuiAccordion,
+  AccordionProps,
+  AccordionDetails,
+  AccordionSummary as MuiAccordionSummary,
+  AccordionSummaryProps,
+} from 'ui-library';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { Link } from '@mui/material';
 
 const StyledFAQContainer = styled.div`
   display: flex;

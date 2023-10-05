@@ -1,11 +1,10 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import Button from '@common/components/button';
-import Typography from '@mui/material/Typography';
+import { Typography, IconButton } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAppDispatch } from '@hooks/state';
 import { setTransferTo } from '@state/aggregator/actions';
-import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import useTrackEvent from '@hooks/useTrackEvent';

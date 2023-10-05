@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '@common/components/button';
-import Typography from '@mui/material/Typography';
-import Popover from '@mui/material/Popover';
+import { Typography, Popover } from 'ui-library';
 import { makeStyles } from 'tss-react/mui';
 import { Theme, createStyles } from '@mui/material';
 import useChangeLanguage from '@hooks/useChangeLanguage';

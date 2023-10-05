@@ -1,15 +1,13 @@
 import styled from 'styled-components';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import Typography from '@mui/material/Typography';
-import Switch from '@mui/material/Switch';
+import { Typography, Switch, Collapse } from 'ui-library';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { setFromYield, setToYield, setYieldEnabled } from '@state/create-position/actions';
 import { YieldOption, YieldOptions } from '@types';
 import YieldTokenSelector from '@common/components/yield-token-selector';
-import Collapse from '@mui/material/Collapse';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';

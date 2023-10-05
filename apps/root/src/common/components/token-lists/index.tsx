@@ -1,10 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
-import FormGroup from '@mui/material/FormGroup';
-import Switch from '@mui/material/Switch';
-import Typography from '@mui/material/Typography';
+import { Grid, Typography, FormGroup, Switch, Card } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useSavedAggregatorTokenLists, useSavedTokenLists, useTokensLists } from '@state/token-lists/hooks';
 import { useAppDispatch } from '@hooks/state';

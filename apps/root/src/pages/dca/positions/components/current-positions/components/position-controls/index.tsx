@@ -1,7 +1,7 @@
 import * as React from 'react';
 import find from 'lodash/find';
 import Button from '@common/components/button';
-import Typography from '@mui/material/Typography';
+import { Typography, Link, IconButton, Menu, MenuItem } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { NetworkStruct, Position, Token, YieldOptions } from '@types';
@@ -17,12 +17,8 @@ import {
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import Link from '@mui/material/Link';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import useWalletService from '@hooks/useWalletService';

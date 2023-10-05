@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid, Popper, Typography, Hidden, LinearProgress } from 'ui-library';
 import orderBy from 'lodash/orderBy';
 import union from 'lodash/union';
 import intersection from 'lodash/intersection';
@@ -8,11 +8,8 @@ import Button from '@common/components/button';
 import styled from 'styled-components';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
-import LinearProgress from '@mui/material/LinearProgress';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
-import Typography from '@mui/material/Typography';
-import Popper from '@mui/material/Popper';
 import { BigNumber } from 'ethers';
 import usePriceService from '@hooks/usePriceService';
 import { Token } from '@types';
@@ -23,7 +20,6 @@ import { emptyTokenWithSymbol, formatCurrencyAmount } from '@common/utils/curren
 import { FormattedMessage } from 'react-intl';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { usdFormatter } from '@common/utils/parsing';
-import { Hidden } from '@mui/material';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@hooks/state';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';

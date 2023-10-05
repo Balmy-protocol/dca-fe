@@ -12,9 +12,8 @@ import {
   Area,
   ReferenceLine,
 } from 'recharts';
-import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
+import { Typography, Paper } from 'ui-library';
 import { ActionState, FullPosition } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';

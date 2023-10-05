@@ -3,7 +3,7 @@ import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { SetStateCallback } from '@types';
-import Button from '@mui/material/Button';
+import { Button } from 'ui-library';
 
 interface SelectOption {
   value: BigNumber;

@@ -1,15 +1,12 @@
 import React from 'react';
-import Typography from '@mui/material/Typography';
+import { Typography, Chip, MenuItem, Select } from 'ui-library';
 import { toToken } from '@common/utils/currency';
 import find from 'lodash/find';
 import TokenIcon from '@common/components/token-icon';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { getGhTokenListLogoUrl, NETWORKS, SUPPORTED_NETWORKS_DCA } from '@constants';
 import styled from 'styled-components';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import Chip from '@mui/material/Chip';
 
 export const StyledNetworkContainer = styled.div`
   display: flex;

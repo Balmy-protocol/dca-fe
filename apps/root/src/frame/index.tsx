@@ -1,10 +1,8 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React, { Suspense, lazy } from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Grid from '@mui/material/Grid';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Container from '@mui/material/Container';
+import { Grid, CssBaseline, Container } from 'ui-library';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
 import BlockNumberUpdater from '@state/block-number/blockNumberUpdater';
 import { ThemeProvider, Theme } from '@mui/material/styles';

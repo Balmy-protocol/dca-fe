@@ -1,11 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
-import Slide from '@mui/material/Slide';
-import Grid from '@mui/material/Grid';
 import Button from '@common/components/button';
-import Typography from '@mui/material/Typography';
+import {
+  Typography,
+  Grid,
+  IconButton,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Switch,
+  Slide,
+  Collapse,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -22,11 +29,6 @@ import { GasKeys, TimeoutKey } from '@constants/aggregator';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import useSdkDexes from '@hooks/useSdkSources';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Collapse from '@mui/material/Collapse';
-import Switch from '@mui/material/Switch';
 import useTrackEvent from '@hooks/useTrackEvent';
 import SlippageInput from './components/slippage-input';
 import GasSelector from './components/gas-selector';

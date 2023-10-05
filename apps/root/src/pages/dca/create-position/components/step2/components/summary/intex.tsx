@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import TokenInput from '@common/components/token-input';
