@@ -43,6 +43,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   );
 };
 
-HomeFrame.whyDidYouRender = true;
+// HomeFrame.whyDidYouRender = true;
 
 export default HomeFrame;

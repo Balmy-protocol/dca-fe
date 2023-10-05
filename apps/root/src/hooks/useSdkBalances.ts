@@ -1,14 +1,18 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Token } from '@types';
+import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
-import { IntervalSetActions } from '@constants/timing';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
+import { useBlockNumber } from '@state/block-number/hooks';
+import useCurrentNetwork from './useCurrentNetwork';
+import useAccount from './useAccount';
 import useSdkService from './useSdkService';
-import useInterval from './useInterval';
 
 function useSdkBalances(
   tokens: Token[] | undefined | null
 ): [Record<number, Record<string, BigNumber>> | undefined, boolean, string?] {
+  const account = useAccount();
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -19,9 +23,17 @@ function useSdkBalances(
     result: undefined,
     error: undefined,
   });
+
+  const hasPendingTransactions = useHasPendingTransactions();
+  const prevTokens = usePrevious(tokens);
+  const prevPendingTrans = usePrevious(hasPendingTransactions);
+  const prevAccount = usePrevious(account);
+  const currentNetwork = useCurrentNetwork();
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
 
-  const fetchSdkBalances = useCallback(() => {
+  React.useEffect(() => {
     async function callPromise() {
       if (tokens) {
         try {
@@ -33,23 +45,42 @@ function useSdkBalances(
       }
     }
 
-    if (!isLoading) {
+    if (
+      (!isLoading && !result && !error) ||
+      !isEqual(prevTokens, tokens) ||
+      !isEqual(account, prevAccount) ||
+      !isEqual(prevPendingTrans, hasPendingTransactions) ||
+      (blockNumber &&
+        prevBlockNumber &&
+        blockNumber !== -1 &&
+        prevBlockNumber !== -1 &&
+        !isEqual(prevBlockNumber, blockNumber))
+    ) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [isLoading, sdkService, tokens]);
+  }, [
+    tokens,
+    prevTokens,
+    isLoading,
+    result,
+    error,
+    hasPendingTransactions,
+    prevAccount,
+    account,
+    prevBlockNumber,
+    blockNumber,
+    sdkService,
+    prevPendingTrans,
+  ]);
 
-  useInterval(fetchSdkBalances, IntervalSetActions.balance);
+  if (!tokens || !tokens.length) {
+    return [undefined, false, undefined];
+  }
 
-  return React.useMemo(() => {
-    if (!tokens || !tokens.length) {
-      return [undefined, false, undefined];
-    }
-
-    return [result || prevResult, isLoading, error];
-  }, [error, isLoading, prevResult, result, tokens]);
+  return [result || prevResult, isLoading, error];
 }
 
 export default useSdkBalances;

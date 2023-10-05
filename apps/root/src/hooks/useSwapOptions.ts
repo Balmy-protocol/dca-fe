@@ -3,6 +3,7 @@ import { SwapOption, Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { parseUnits } from '@ethersproject/units';
 import {
   GasKeys,
@@ -12,6 +13,7 @@ import {
   SwapSortOptions,
   TimeoutKey,
 } from '@constants/aggregator';
+import { useBlockNumber } from '@state/block-number/hooks';
 import { BigNumber } from 'ethers';
 import { MAX_UINT_32 } from '@constants';
 import useAggregatorService from './useAggregatorService';
@@ -39,13 +41,17 @@ function useSwapOptions(
     result?: SwapOption[];
     error?: string;
   }>({ isLoading: false, result: undefined, error: undefined });
+  const hasPendingTransactions = useHasPendingTransactions();
   const aggregatorService = useAggregatorService();
   const prevFrom = usePrevious(from);
   const prevTo = usePrevious(to);
   const prevValue = usePrevious(value);
   const prevIsBuyOrder = usePrevious(isBuyOrder);
+  const prevPendingTrans = usePrevious(hasPendingTransactions);
   const account = walletService.getAccount();
   const currentNetwork = useSelectedNetwork();
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const prevBlockNumber = usePrevious(blockNumber);
   const prevTransferTo = usePrevious(transferTo);
   const prevNetwork = usePrevious(currentNetwork.chainId);
   const prevResult = usePrevious(result, false);
@@ -54,7 +60,6 @@ function useSwapOptions(
   const prevDisabledDexes = usePrevious(disabledDexes);
   const prevIsPermit2Enabled = usePrevious(isPermit2Enabled);
   const prevSourceTimeout = usePrevious(sourceTimeout);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedCall = React.useCallback(
     debounce(
       async (
@@ -133,14 +138,13 @@ function useSwapOptions(
         sourceTimeout
       ),
     [
-      debouncedCall,
       from,
       to,
       value,
       isBuyOrder,
       transferTo,
-      gasSpeed,
       slippage,
+      gasSpeed,
       account,
       currentNetwork.chainId,
       disabledDexes,
@@ -153,6 +157,7 @@ function useSwapOptions(
     if (
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
+      // !isEqual(account, prevAccount) ||
       !isEqual(prevTo, to) ||
       !isEqual(prevValue, value) ||
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
@@ -185,7 +190,11 @@ function useSwapOptions(
     disabledDexes,
     sourceTimeout,
     prevSourceTimeout,
+    // prevAccount,
     account,
+    prevPendingTrans,
+    prevBlockNumber,
+    blockNumber,
     walletService,
     fetchOptions,
     prevTransferTo,
@@ -200,29 +209,27 @@ function useSwapOptions(
     prevIsPermit2Enabled,
   ]);
 
-  return React.useMemo(() => {
-    if (!from || !value) {
-      return [undefined, false, undefined, fetchOptions];
+  if (!from || !value) {
+    return [undefined, false, undefined, fetchOptions];
+  }
+
+  let resultToReturn = !error ? result || prevResult : undefined;
+
+  if (sorting === SORT_LEAST_GAS && resultToReturn) {
+    resultToReturn = [...resultToReturn].sort((a, b) =>
+      a.gas?.estimatedCost.lt(b.gas?.estimatedCost || MAX_UINT_32) ? -1 : 1
+    );
+  }
+
+  if (sorting === SORT_MOST_RETURN && resultToReturn) {
+    if (isBuyOrder) {
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount.lt(b.sellAmount.amount) ? -1 : 1));
+    } else {
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount.gt(b.buyAmount.amount) ? -1 : 1));
     }
+  }
 
-    let resultToReturn = !error ? result || prevResult : undefined;
-
-    if (sorting === SORT_LEAST_GAS && resultToReturn) {
-      resultToReturn = [...resultToReturn].sort((a, b) =>
-        a.gas?.estimatedCost.lt(b.gas?.estimatedCost || MAX_UINT_32) ? -1 : 1
-      );
-    }
-
-    if (sorting === SORT_MOST_RETURN && resultToReturn) {
-      if (isBuyOrder) {
-        resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount.lt(b.sellAmount.amount) ? -1 : 1));
-      } else {
-        resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount.gt(b.buyAmount.amount) ? -1 : 1));
-      }
-    }
-
-    return [resultToReturn, isLoading, error, fetchOptions];
-  }, [error, fetchOptions, from, isBuyOrder, isLoading, prevResult, result, sorting, value]);
+  return [resultToReturn, isLoading, error, fetchOptions];
 }
 
 export default useSwapOptions;

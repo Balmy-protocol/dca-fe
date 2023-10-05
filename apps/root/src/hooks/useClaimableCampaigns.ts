@@ -1,12 +1,12 @@
 import React from 'react';
-import find from 'lodash/find';
 import isEqual from 'lodash/isEqual';
+import find from 'lodash/find';
 import compact from 'lodash/compact';
 import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { parseUsdPrice } from '@common/utils/currency';
 import { Campaigns, Token } from '@types';
 import { TOKEN_TYPE_BASE } from '@constants';
-import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { useIsLoadingAggregatorTokenLists } from '@state/token-lists/hooks';
 import useAccount from './useAccount';
 import useCampaignService from './useCampaignService';
@@ -23,6 +23,7 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
     result: undefined,
     error: undefined,
   });
+
   const hasPendingTransactions = useHasPendingTransactions();
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
@@ -74,6 +75,11 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
       (!isLoading && !result && !error) ||
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions)
+      // (blockNumber &&
+      //   prevBlockNumber &&
+      //   blockNumber !== -1 &&
+      //   prevBlockNumber !== -1 &&
+      //   !isEqual(prevBlockNumber, blockNumber))
     ) {
       if (account && !isLoadingTokenList) {
         setState({ isLoading: true, result: undefined, error: undefined });
@@ -83,16 +89,17 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
       }
     }
   }, [
-    account,
-    campaignService,
-    error,
-    getToken,
-    hasPendingTransactions,
     isLoading,
-    isLoadingTokenList,
-    prevAccount,
-    prevPendingTrans,
     result,
+    error,
+    hasPendingTransactions,
+    prevAccount,
+    account,
+    isLoadingTokenList,
+    // prevBlockNumber,
+    // blockNumber,
+    getToken,
+    prevPendingTrans,
   ]);
 
   return [result || prevResult, isLoading, error];
