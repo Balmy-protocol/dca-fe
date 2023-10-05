@@ -30,7 +30,7 @@ function useTokenListUnfiltered(tokenAddress?: string, filterByLogoUri = false) 
     }
 
     return null;
-  }, [currentNetwork.chainId, filterByLogoUri, tokenAddress, tokensLists]);
+  }, [currentNetwork.chainId, tokenAddress, tokensLists]);
 
   return tokenList;
 }

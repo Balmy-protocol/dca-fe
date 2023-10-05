@@ -47,6 +47,6 @@ const AggregatorTokenPicker = ({
   </Modal>
 );
 
-AggregatorTokenPicker.whyDidYouRender = true;
+// AggregatorTokenPicker.whyDidYouRender = true;
 export default React.memo(AggregatorTokenPicker);
 // export default AggregatorTokenPicker;

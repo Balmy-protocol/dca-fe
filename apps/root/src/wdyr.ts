@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'development') {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   whyDidYouRender(React, {
     collapseGroups: true,
-    trackAllPureComponents: true,
+    // trackAllPureComponents: true,
     trackHooks: true,
     exclude: [/Icon$/],
   });

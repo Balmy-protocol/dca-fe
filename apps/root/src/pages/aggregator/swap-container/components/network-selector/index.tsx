@@ -179,6 +179,6 @@ const NetworkSelector = () => {
   );
 };
 
-NetworkSelector.whyDidYouRender = true;
+// NetworkSelector.whyDidYouRender = true;
 export default NetworkSelector;
 // export default React.memo(NetworkSelector);

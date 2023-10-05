@@ -46,7 +46,7 @@ function useYieldOptions(chainId?: number, useBlacklist = false): [YieldOptions 
     }
   }, [isLoading, result, error, account, currentNetwork, chainIdToUse, prevChainId, useBlacklist, prevUseBlacklist]);
 
-  return React.useMemo(() => [result || prevResult, isLoading, error], [error, isLoading, prevResult, result]);
+  return [result || prevResult, isLoading, error];
 }
 
 export default useYieldOptions;

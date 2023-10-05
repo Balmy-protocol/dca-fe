@@ -1,7 +1,11 @@
 import React from 'react';
 import { Token } from '@types';
+import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
+import isUndefined from 'lodash/isUndefined';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import usePairService from './usePairService';
+import useAccount from './useAccount';
 
 function useCanSupportPair(
   from: Token | undefined | null,
@@ -11,7 +15,13 @@ function useCanSupportPair(
   const pairService = usePairService();
   const [result, setResult] = React.useState<boolean | undefined>(undefined);
   const [error, setError] = React.useState<string | undefined>(undefined);
+  const hasPendingTransactions = useHasPendingTransactions();
+  const prevFrom = usePrevious(from);
+  const prevTo = usePrevious(to);
+  const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevResult = usePrevious(result, false);
+  const account = useAccount();
+  const prevAccount = usePrevious(account);
 
   React.useEffect(() => {
     async function callPromise() {
@@ -27,7 +37,13 @@ function useCanSupportPair(
       setIsLoading(false);
     }
 
-    if (!isLoading) {
+    if (
+      (!isLoading && isUndefined(result) && !error) ||
+      !isEqual(prevFrom, from) ||
+      !isEqual(prevTo, to) ||
+      !isEqual(prevPendingTrans, hasPendingTransactions) ||
+      !isEqual(account, prevAccount)
+    ) {
       setIsLoading(true);
       setResult(undefined);
       setError(undefined);
@@ -35,15 +51,13 @@ function useCanSupportPair(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, to, isLoading, pairService]);
+  }, [from, to, isLoading, result, error, hasPendingTransactions, account, prevAccount]);
 
-  return React.useMemo(() => {
-    if (!from) {
-      return [prevResult || true, false, undefined];
-    }
+  if (!from) {
+    return [prevResult || true, false, undefined];
+  }
 
-    return [result || prevResult, isLoading, error];
-  }, [error, from, isLoading, prevResult, result]);
+  return [result || prevResult, isLoading, error];
 }
 
 export default useCanSupportPair;
