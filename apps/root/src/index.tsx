@@ -2,7 +2,7 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { Client, WagmiConfig } from 'wagmi';
+import { Client, configureChains } from 'wagmi';
 import EnMessages from '@lang/en_US.json';
 import EsMessages from '@lang/es.json';
 import WalletContext from '@common/components/wallet-context';
@@ -11,10 +11,14 @@ import DCASubgraphs from '@common/utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
 import store, { axiosClient } from '@state';
 import { Settings } from 'luxon';
+import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth';
 import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
 import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
+import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
+import useWeb3Service from '@hooks/useWeb3Service';
+import useAccountService from '@hooks/useAccountService';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -34,6 +38,34 @@ function loadLocaleData(locale: SupportedLanguages) {
       return EnMessages;
   }
 }
+
+const WalletsUpdater = () => {
+  const { user, authenticated } = usePrivy();
+  const { wallets } = useWallets();
+  const web3Service = useWeb3Service();
+  const accountService = useAccountService();
+
+  React.useEffect(() => {
+    if (user && wallets.length) {
+      void accountService.setUser(user, wallets);
+    }
+  }, [authenticated, wallets]);
+
+  React.useEffect(() => {
+    if (wallets.length) {
+      wallets[0]
+        .getEthersProvider()
+        .then((provider) => {
+          const chainRegex = /.*:(.*)/;
+          void web3Service.connect(provider, undefined, Number(chainRegex.exec(wallets[0].chainId)![1]));
+          return;
+        })
+        .catch((e) => console.error('Error getting privy provider', e));
+    }
+  }, [wallets]);
+
+  return <></>;
+};
 
 const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: { wagmiClient, chains } }: AppProps) => {
   const [account, setAccount] = React.useState(web3Service.getAccount());
@@ -63,11 +95,27 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: {
         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
         <IntlProvider locale={selectedLocale} defaultLocale="en" messages={loadLocaleData(selectedLocale)}>
           <Provider store={store}>
-            <WagmiConfig client={wagmiClient}>
-              <RainbowKitProvider chains={chains} initialChain={chainId} theme={darkTheme()}>
-                <MainApp />
-              </RainbowKitProvider>
-            </WagmiConfig>
+            <PrivyProvider
+              appId={process.env.PUBLIC_PRIVY_APP_ID!}
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              onSuccess={(user) => web3Service.getAccountService().setUser(user)}
+              config={{
+                loginMethods: ['email', 'google', 'twitter', 'wallet'],
+                appearance: {
+                  theme: 'dark',
+                  accentColor: '#676FFF',
+                  logo: 'https://your-logo-url',
+                },
+              }}
+            >
+              <PrivyWagmiConnector wagmiChainsConfig={wagmiClient as unknown as ReturnType<typeof configureChains>}>
+                <RainbowKitProvider chains={chains} initialChain={chainId} theme={darkTheme()}>
+                  <MainApp />
+                  <WalletsUpdater />
+                </RainbowKitProvider>
+              </PrivyWagmiConnector>
+            </PrivyProvider>
           </Provider>
         </IntlProvider>
       </WalletContext.Provider>

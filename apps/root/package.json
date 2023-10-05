@@ -101,6 +101,8 @@
     "@mui/icons-material": "^5.14.7",
     "@mui/material": "^5.14.7",
     "@mui/styled-engine-sc": "^5.9.3",
+    "@privy-io/react-auth": "^1.41.0",
+    "@privy-io/wagmi-connector": "0.0.12",
     "@rainbow-me/rainbowkit": "^0.12.16",
     "@reduxjs/toolkit": "^1.6.0",
     "@safe-global/safe-apps-sdk": "^7.10.1",
