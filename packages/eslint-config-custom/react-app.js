@@ -82,6 +82,7 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
     '@typescript-eslint/no-duplicate-enum-values': 'off',
     'react/display-name': 'off',
+    'promise/catch-or-return': ['error', { allowFinally: true }],
   },
   overrides: [
     {
