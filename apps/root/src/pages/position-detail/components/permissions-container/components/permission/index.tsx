@@ -1,24 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ChainId, Permission, PositionPermission } from '@types';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {
   Typography,
   Tooltip,
-  Link,
+  LinkComponent,
   FormControlLabel,
   FormControl,
   FormGroup,
   Checkbox,
   Card,
   CardContent,
+  OpenInNew as OpenInNewIcon,
+  HelpOutline as HelpOutlineIcon,
 } from 'ui-library';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import { useAppDispatch } from '@hooks/state';
 import { addPermission, removePermission } from '@state/position-permissions/actions';
 import { isCompanionAddress, STRING_PERMISSIONS } from '@constants';
 import { FormattedMessage, useIntl } from 'react-intl';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Address from '@common/components/address';
 
 interface PositionPermissionProps {
@@ -29,7 +29,7 @@ interface PositionPermissionProps {
 
 const hasPermission = (permissions: Permission[], permission: Permission) => permissions.indexOf(permission) !== -1;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}

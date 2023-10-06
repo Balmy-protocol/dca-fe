@@ -2,8 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
-import { Typography } from 'ui-library';
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
+import { Typography, SentimentVeryDissatisfied as SentimentVeryDissatisfiedIcon } from 'ui-library';
 import usePushToHistory from '@hooks/usePushToHistory';
 
 const StyledContainer = styled.div`

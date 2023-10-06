@@ -1,7 +1,6 @@
 import React from 'react';
 import Button from '@common/components/button';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Grow, Paper, Popper, ButtonGroup, ClickAwayListener } from 'ui-library';
+import { Grow, Paper, Popper, ButtonGroup, ClickAwayListener, ArrowDropDown as ArrowDropDownIcon } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition } from '@types';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';

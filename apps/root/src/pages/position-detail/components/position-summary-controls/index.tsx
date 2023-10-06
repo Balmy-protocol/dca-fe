@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition } from '@types';
 import useWeb3Service from '@hooks/useWeb3Service';
-import { IconButton, Menu, MenuItem } from 'ui-library';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { IconButton, MenuComponent, MenuItem, MoreVert as MoreVertIcon } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import {
@@ -48,7 +47,7 @@ const PositionControlsMenuContainer = styled.div`
   background-color: rgba(216, 216, 216, 0.05);
 `;
 
-const StyledMenu = withStyles(Menu, () =>
+const StyledMenu = withStyles(MenuComponent, () =>
   createStyles({
     paper: {
       border: '2px solid #A5AAB5',

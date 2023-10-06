@@ -4,11 +4,14 @@ import isUndefined from 'lodash/isUndefined';
 import Button from '@common/components/button';
 import { createStyles } from '@mui/material';
 import { withStyles } from 'tss-react/mui';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import TimelineIcon from '@mui/icons-material/Timeline';
-import { Menu, MenuItem } from 'ui-library';
+import {
+  MenuComponent,
+  MenuItem,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  Timeline as TimelineIcon,
+} from 'ui-library';
 
-const StyledMenu = withStyles(Menu, () =>
+const StyledMenu = withStyles(MenuComponent, () =>
   createStyles({
     paper: {
       backgroundColor: '#1d1c1c',

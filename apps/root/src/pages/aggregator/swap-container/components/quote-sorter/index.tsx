@@ -6,10 +6,14 @@ import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } f
 import Button from '@common/components/button';
 import { createStyles, Theme } from '@mui/material';
 import { withStyles } from 'tss-react/mui';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Typography, Tooltip, Menu, MenuItem } from 'ui-library';
-
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import {
+  Typography,
+  Tooltip,
+  MenuComponent,
+  MenuItem,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  HelpOutline as HelpOutlineIcon,
+} from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { setSorting } from '@state/aggregator-settings/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -26,7 +30,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 5px;
 `;
 
-const StyledMenu = withStyles(Menu, () =>
+const StyledMenu = withStyles(MenuComponent, () =>
   createStyles({
     paper: {
       backgroundColor: '#1d1c1c',

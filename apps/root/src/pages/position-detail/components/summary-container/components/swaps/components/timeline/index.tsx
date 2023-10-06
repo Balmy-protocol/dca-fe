@@ -2,22 +2,27 @@ import React, { useState } from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
-import { Grid, Link, Typography, Tooltip } from 'ui-library';
+import {
+  Grid,
+  LinkComponent,
+  Typography,
+  Tooltip,
+  CompareArrows as CompareArrowsIcon,
+  OpenInNew as OpenInNewIcon,
+  Settings as SettingsIcon,
+  DeleteSweep as DeleteSweepIcon,
+  NewReleases as CreatedIcon,
+  HelpOutline as HelpOutlineIcon,
+  CardGiftcard as CardGiftcardIcon,
+  Fingerprint as FingerprintIcon,
+} from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import SettingsIcon from '@mui/icons-material/Settings';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import CreatedIcon from '@mui/icons-material/NewReleases';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { ActionState, FullPosition, PositionPermission } from '@types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS, isCompanionAddress } from '@constants';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
-import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
-import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import Address from '@common/components/address';
 import useUsdPrice from '@hooks/useUsdPrice';
 import { withStyles } from 'tss-react/mui';
@@ -39,7 +44,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   font-size: 15px;
 `;
 
-const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
+const StyledLink = styled(LinkComponent)<{ $isFirst?: boolean }>`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}

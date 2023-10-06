@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, Link, Tabs, Tab, Alert } from 'ui-library';
+import { Grid, Typography, LinkComponent, Tabs, TabComponent, Alert, ArrowBack as ArrowBackIcon } from 'ui-library';
 import styled from 'styled-components';
 import keyBy from 'lodash/keyBy';
 import { useQuery } from '@apollo/client';
@@ -11,7 +11,6 @@ import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionT
 import getPairSwaps from '@graphql/getPairSwaps.graphql';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
 import Button from '@common/components/button';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAppDispatch } from '@state/hooks';
@@ -52,7 +51,7 @@ import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
 
-const StyledTab = withStyles(Tab, () =>
+const StyledTab = withStyles(TabComponent, () =>
   createStyles({
     root: {
       textTransform: 'none',
@@ -81,7 +80,7 @@ const StyledTabs = withStyles(Tabs, () =>
   })
 );
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   margin: 0px 5px;
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
@@ -544,12 +543,12 @@ const PositionDetailFrame = () => {
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
           <Button variant="text" color="default">
             {/* <Button variant="text" color="default" onClick={onBackToPositions}> */}
-            <Link href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
+            <LinkComponent href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
               <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
                 <ArrowBackIcon fontSize="inherit" />{' '}
                 <FormattedMessage description="backToPositions" defaultMessage="Back to positions" />
               </Typography>
-            </Link>
+            </LinkComponent>
           </Button>
         </Grid>
         {((position.from.symbol === 'CRV' && position.from.underlyingTokens.length) ||

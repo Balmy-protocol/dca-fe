@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Token } from '@types';
-import { SvgIcon } from 'ui-library';
+import { SvgIcon, HelpOutlineOutlined as HelpOutlineOutlinedIcon } from 'ui-library';
 import CryptoIcons from '@assets/svg/color';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useTokenListUnfiltered from '@hooks/useTokenFromList';
 

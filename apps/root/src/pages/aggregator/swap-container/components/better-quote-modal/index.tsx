@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
-import EastIcon from '@mui/icons-material/East';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useAppDispatch } from '@state/hooks';
 import { setSelectedRoute } from '@state/aggregator/actions';
@@ -11,7 +10,7 @@ import { emptyTokenWithLogoURI, formatCurrencyAmount, emptyTokenWithDecimals } f
 import { getBetterBy, getBetterByLabel, getQuoteMetric } from '@common/utils/quotes';
 import { BigNumber } from 'ethers';
 import { BlowfishResponse, StateChangeKind, SwapOption, SwapOptionWithFailure } from '@types';
-import { Typography } from 'ui-library';
+import { Typography, East as EastIcon } from 'ui-library';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { getProtocolToken } from '@common/mocks/tokens';

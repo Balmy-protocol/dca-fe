@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Menu, MenuItem } from 'ui-library';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { MenuComponent, MenuItem, ArrowDropDown as ArrowDropDownIcon } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import Button, { CustomButtonProps } from '@common/components/button';
@@ -38,7 +37,7 @@ const SplitButtonContainer = styled.div<{ fullWidth?: boolean }>`
   ${({ fullWidth }) => fullWidth && 'width: 100%;'}
 `;
 
-const StyledMenu = withStyles(Menu, () =>
+const StyledMenu = withStyles(MenuComponent, () =>
   createStyles({
     paper: {
       border: '2px solid #A5AAB5',

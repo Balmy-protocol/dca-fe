@@ -1,10 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import isUndefined from 'lodash/isUndefined';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Button from '@common/components/button';
-import { FormControl, InputLabel, MenuItem, Select, Slide, TextField, Typography } from 'ui-library';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slide,
+  TextField,
+  Typography,
+  ArrowBackIosNew as ArrowBackIosNewIcon,
+  ArrowForwardIos as ArrowForwardIosIcon,
+} from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useMeanApiService from '@hooks/useMeanApiService';
 

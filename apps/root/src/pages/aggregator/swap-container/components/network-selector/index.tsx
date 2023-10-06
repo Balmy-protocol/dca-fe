@@ -13,8 +13,8 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
+  Search as SearchIcon,
 } from 'ui-library';
-import SearchIcon from '@mui/icons-material/Search';
 import useSdkChains from '@hooks/useSdkChains';
 import { getAllChains } from '@mean-finance/sdk';
 import { NETWORKS, REMOVED_AGG_CHAINS, getGhTokenListLogoUrl } from '@constants';

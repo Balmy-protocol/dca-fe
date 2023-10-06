@@ -1,17 +1,18 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-
-import { Link } from 'ui-library';
+import {
+  LinkComponent,
+  Typography,
+  BugReport as BugReportIcon,
+  Twitter as TwitterIcon,
+  Preview as PreviewIcon,
+  DescriptionOutlined as DescriptionOutlinedIcon,
+  HelpOutlineOutlined as HelpOutlineOutlinedIcon,
+  GitHub as GitHubIcon,
+} from 'ui-library';
 import styled from 'styled-components';
-import BugReportIcon from '@mui/icons-material/BugReport';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import DiscordIcon from '@assets/svg/atom/discord';
-import PreviewIcon from '@mui/icons-material/Preview';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import { useThemeMode } from '@state/config/hooks';
-import { Typography } from '@mui/material';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import usePushToHistory from '@hooks/usePushToHistory';
 import LanguageLabel from './components/lang-label';
@@ -40,7 +41,7 @@ const StyledFooterLinks = styled.div`
   align-items: center;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -60,9 +61,9 @@ const Footer = () => {
 
   return (
     <StyledFooterContainer isSmall={currentBreakPoint === 'xs'}>
-      <Link href="https://mean.finance">
+      <LinkComponent href="https://mean.finance">
         <MeanLogo theme={mode} />
-      </Link>
+      </LinkComponent>
       {currentBreakPoint !== 'xs' && (
         <>
           <StyledFooterMainContent>

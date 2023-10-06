@@ -11,9 +11,11 @@ import {
   Switch,
   Slide,
   Collapse,
+  Close as CloseIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import CloseIcon from '@mui/icons-material/Close';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAppDispatch } from '@state/hooks';
 import {
@@ -26,8 +28,6 @@ import {
   setSourceTimeout,
 } from '@state/aggregator-settings/actions';
 import { GasKeys, TimeoutKey } from '@constants/aggregator';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import useSdkDexes from '@hooks/useSdkSources';
 import useTrackEvent from '@hooks/useTrackEvent';
 import SlippageInput from './components/slippage-input';

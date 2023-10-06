@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Badge, BadgeProps } from '.';
+import { BadgeComponent, BadgeProps } from '.';
 
-const meta: Meta<typeof Badge> = {
+const meta: Meta<typeof BadgeComponent> = {
   title: 'Components/Badge',
-  component: Badge,
+  component: BadgeComponent,
   parameters: {
     layout: 'centered',
   },
@@ -13,11 +13,11 @@ const meta: Meta<typeof Badge> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Badge>;
+type Story = StoryObj<typeof BadgeComponent>;
 
 export const Primary: Story = {
   args: {},
-  render: (args: BadgeProps) => <Badge {...args} />,
+  render: (args: BadgeProps) => <BadgeComponent {...args} />,
 };
 
-export { Badge };
+export { BadgeComponent };

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Tabs, Tab, Paper } from 'ui-library';
+import { Typography, Tabs, TabComponent, Paper } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -50,7 +50,7 @@ const StyledPositionsContainer = styled.div`
   flex: 1;
 `;
 
-const StyledTab = withStyles(Tab, () =>
+const StyledTab = withStyles(TabComponent, () =>
   createStyles({
     root: {
       textTransform: 'none',

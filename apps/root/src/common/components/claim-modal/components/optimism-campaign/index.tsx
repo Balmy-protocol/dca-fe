@@ -2,16 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 import find from 'lodash/find';
 import TokenIcon from '@common/components/token-icon';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { Campaign, NetworkStruct, OptimismTypeData, TransactionTypes } from '@types';
 import { DateTime } from 'luxon';
-import { Typography, CircularProgress, Chip } from 'ui-library';
+import {
+  Typography,
+  CircularProgress,
+  Chip,
+  HelpOutlineOutlined as HelpOutlineOutlinedIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+} from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
 import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import useTransactionModal from '@hooks/useTransactionModal';
 import {
   useCampaignHasConfirmedTransaction,

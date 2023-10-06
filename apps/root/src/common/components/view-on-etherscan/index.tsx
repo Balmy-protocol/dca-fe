@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'ui-library';
+import { LinkComponent } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
@@ -9,7 +9,7 @@ interface EtherscanLinkProps {
   hash: string;
 }
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#093991'}
   `}

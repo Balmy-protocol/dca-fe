@@ -2,11 +2,10 @@ import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import Button from '@common/components/button';
-import { Typography, Link } from 'ui-library';
+import { Typography, LinkComponent, OpenInNew as OpenInNewIcon } from 'ui-library';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {
   useAllNotClearedTransactions,
   useHasPendingTransactions,
@@ -25,7 +24,7 @@ import { toToken } from '@common/utils/currency';
 import Address from '@common/components/address';
 import MinimalTimeline from './components/minimal-timeline';
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
     text-align: start;

@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link } from 'ui-library';
+import { Typography, LinkComponent } from 'ui-library';
 import { POSSIBLE_ACTIONS } from '@constants';
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}

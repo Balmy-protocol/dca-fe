@@ -5,7 +5,7 @@ import { useAllTransactions, useHasPendingTransactions } from '@state/transactio
 import { useBadgeNumber } from '@state/transactions-badge/hooks';
 import { updateBadgeNumber } from '@state/transactions-badge/actions';
 
-import { Typography, Badge, CircularProgress } from 'ui-library';
+import { Typography, BadgeComponent, CircularProgress } from 'ui-library';
 import Button from '@common/components/button';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import Address from '@common/components/address';
@@ -34,7 +34,7 @@ const StyledButton = styled(Button)`
   padding: 4px 8px;
 `;
 
-const StyledBadge = withStyles(Badge, () =>
+const StyledBadge = withStyles(BadgeComponent, () =>
   createStyles({
     badge: {
       backgroundColor: '#292929',

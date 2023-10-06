@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { List, ListProps } from '.';
+import { ListComponent, ListProps } from '.';
 
-const meta: Meta<typeof List> = {
+const meta: Meta<typeof ListComponent> = {
   title: 'Components/List',
-  component: List,
+  component: ListComponent,
   parameters: {
     layout: 'centered',
   },
@@ -13,11 +13,11 @@ const meta: Meta<typeof List> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof List>;
+type Story = StoryObj<typeof ListComponent>;
 
 export const Primary: Story = {
   args: {},
-  render: (args: ListProps) => <List {...args} />,
+  render: (args: ListProps) => <ListComponent {...args} />,
 };
 
-export { List };
+export { ListComponent };

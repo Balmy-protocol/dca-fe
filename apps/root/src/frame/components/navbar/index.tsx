@@ -4,30 +4,32 @@ import WalletContext from '@common/components/wallet-context';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import {
   IconButton,
-  List,
+  ListComponent,
   ListItemButton,
   ListItemIcon,
   Divider,
   ListItemText,
   Container,
   Tabs,
-  Tab,
+  TabComponent,
   Drawer,
   AppBar,
   Collapse,
+  Twitter as TwitterIcon,
+  HelpOutlineOutlined as HelpOutlineOutlinedIcon,
+  DescriptionOutlined as DescriptionOutlinedIcon,
+  GitHub as GitHubIcon,
+  Menu as MenuIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  Insights as InsightsIcon,
+  Add as AddIcon,
+  CurrencyExchange as CurrencyExchangeIcon,
+  ViewList as ViewListIcon,
+  Expand as ExpandLess,
+  Expand as ExpandMore,
 } from 'ui-library';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import DiscordIcon from '@assets/svg/atom/discord';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
-import MenuIcon from '@mui/icons-material/Menu';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import InsightsIcon from '@mui/icons-material/Insights';
-import AddIcon from '@mui/icons-material/Add';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
-import ViewListIcon from '@mui/icons-material/ViewList';
 import { useAppDispatch } from '@state/hooks';
 import { useMainTab, useSubTab } from '@state/tabs/hooks';
 import { changeMainTab, changeSubTab } from '@state/tabs/actions';
@@ -35,8 +37,6 @@ import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import { useLocation } from 'react-router-dom';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import usePushToHistory from '@hooks/usePushToHistory';
 import ClaimButton from '../claim';
 import ConnectWalletButtom from '../connect-wallet';
@@ -107,7 +107,7 @@ const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurr
   ${(props) => (props.breakpoint === 'xs' ? 'flex: 1;' : '')}
 `;
 
-const StyledTab = styled(Tab)`
+const StyledTab = styled(TabComponent)`
   text-transform: none;
   padding: 5px 10px;
 `;
@@ -229,7 +229,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       )}
       <StyledNavbarWrapper>
         <Drawer anchor="bottom" open={openDrawer} onClose={() => setOpenDrawer(false)}>
-          <List>
+          <ListComponent>
             <ListItemButton onClick={() => handleTabChange({ index: 0, url: 'create' }, false)}>
               <ListItemIcon>
                 <InsightsIcon />
@@ -238,7 +238,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               {openFirstSubTab ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={openFirstSubTab} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
+              <ListComponent component="div" disablePadding>
                 <ListItemButton
                   sx={{ pl: 4 }}
                   onClick={() => handleSubTabChange({ index: 0, mainIndex: 0, url: 'create' })}
@@ -257,7 +257,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                   </ListItemIcon>
                   <ListItemText primary={<FormattedMessage description="positions" defaultMessage="Positions" />} />
                 </ListItemButton>
-              </List>
+              </ListComponent>
             </Collapse>
             <ListItemButton onClick={() => handleTabChange({ index: 2, url: 'swap' })}>
               <ListItemIcon>
@@ -265,9 +265,9 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="swap" defaultMessage="Swap" />} />
             </ListItemButton>
-          </List>
+          </ListComponent>
           <Divider />
-          <List>
+          <ListComponent>
             <ListItemButton onClick={() => openExternalLink('https://github.com/Mean-Finance')}>
               <ListItemIcon>
                 <GitHubIcon />
@@ -298,7 +298,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="faq" defaultMessage="FAQ" />} />
             </ListItemButton>
-          </List>
+          </ListComponent>
         </Drawer>
         <Container sx={{ display: 'flex', paddingBottom: '10px' }}>
           {currentBreakPoint !== 'xs' && (

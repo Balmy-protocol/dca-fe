@@ -4,13 +4,12 @@ import { connect } from 'react-redux';
 import type { AppDispatch, RootState } from '@state';
 import { setError } from '@state/error/actions';
 import styled from 'styled-components';
-import { Typography, Link } from 'ui-library';
+import { Typography, LinkComponent, Sick as SickIcon } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import SickIcon from '@mui/icons-material/Sick';
 import Button from '@common/components/button';
 import WalletContext from '@common/components/wallet-context';
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}

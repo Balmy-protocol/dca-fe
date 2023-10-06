@@ -1,12 +1,11 @@
 import styled from 'styled-components';
 import React from 'react';
-import { IconButton } from 'ui-library';
+import { IconButton, SwapVert as SwapVertIcon } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
-import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { setSelectedRoute, toggleFromTo } from '@state/aggregator/actions';
 
 const StyledToggleContainer = styled.div`

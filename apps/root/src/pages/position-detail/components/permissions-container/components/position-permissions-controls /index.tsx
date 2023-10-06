@@ -2,8 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link } from 'ui-library';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Typography, LinkComponent, OpenInNew as OpenInNewIcon } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { FullPosition } from '@types';
 import useWeb3Service from '@hooks/useWeb3Service';
@@ -43,7 +42,7 @@ const PositionPermissionsControls = ({
 
   return isPending ? (
     <Button variant="contained" color="pending" size="large">
-      <Link
+      <LinkComponent
         href={buildEtherscanTransaction(pendingTransaction, position.chainId)}
         target="_blank"
         rel="noreferrer"
@@ -55,7 +54,7 @@ const PositionPermissionsControls = ({
           <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
         </Typography>
         <OpenInNewIcon style={{ fontSize: '1rem' }} />
-      </Link>
+      </LinkComponent>
     </Button>
   ) : (
     <>

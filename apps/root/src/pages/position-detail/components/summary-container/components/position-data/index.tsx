@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
   LinearProgress,
+  ArrowRightAlt as ArrowRightAltIcon,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
@@ -36,7 +37,6 @@ import {
   getGhTokenListLogoUrl,
 } from '@constants';
 import useUsdPrice from '@hooks/useUsdPrice';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
 import find from 'lodash/find';

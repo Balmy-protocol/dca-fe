@@ -3,12 +3,11 @@ import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import Button from '@common/components/button';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { Typography, FormControlLabel, FormGroup, Checkbox, TextField } from 'ui-library';
+import { Typography, FormControlLabel, FormGroup, Checkbox, TextField, OpenInNew as OpenInNewIcon } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import useWalletService from '@hooks/useWalletService';
 import useTrackEvent from '@hooks/useTrackEvent';
 

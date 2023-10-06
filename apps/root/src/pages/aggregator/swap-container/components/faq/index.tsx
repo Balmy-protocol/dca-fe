@@ -1,14 +1,14 @@
 import React from 'react';
 import {
   Typography,
-  Link,
+  LinkComponent,
   Accordion as MuiAccordion,
   AccordionProps,
   AccordionDetails,
   AccordionSummary as MuiAccordionSummary,
   AccordionSummaryProps,
+  ArrowForwardIosSharp as ArrowForwardIosSharpIcon,
 } from 'ui-library';
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -18,7 +18,7 @@ const StyledFAQContainer = styled.div`
   flex-direction: column;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}

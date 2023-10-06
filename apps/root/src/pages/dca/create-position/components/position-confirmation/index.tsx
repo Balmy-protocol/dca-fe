@@ -4,9 +4,14 @@ import Button from '@common/components/button';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
-import { Typography, Slide, CircularProgress, circularProgressClasses } from 'ui-library';
+import {
+  Typography,
+  Slide,
+  CircularProgress,
+  circularProgressClasses,
+  CheckCircle as CheckCircleIcon,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { LATEST_VERSION, NETWORKS } from '@constants';
 import usePrevious from '@hooks/usePrevious';

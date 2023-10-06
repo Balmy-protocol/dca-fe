@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Link, Typography, Card, Paper } from 'ui-library';
+import { Grid, LinkComponent, Typography, Card, Paper, ArrowBack as ArrowBackIcon } from 'ui-library';
 import Button from '@common/components/button';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@state/hooks';
@@ -48,7 +47,7 @@ const StyledCard = styled(Card)`
   padding: 16px;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}

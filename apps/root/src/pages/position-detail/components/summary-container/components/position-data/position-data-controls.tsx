@@ -1,7 +1,7 @@
 import * as React from 'react';
 import find from 'lodash/find';
 import Button from '@common/components/button';
-import { Typography, Link } from 'ui-library';
+import { Typography, LinkComponent, OpenInNew as OpenInNewIcon } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, NetworkStruct, YieldOptions } from '@types';
@@ -14,7 +14,6 @@ import {
 } from '@constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import useWalletService from '@hooks/useWalletService';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import { fullPositionToMappedPosition } from '@common/utils/parsing';
@@ -90,7 +89,7 @@ const PositionDataControls = ({
     return (
       <StyledCallToActionContainer>
         <StyledCardFooterButton variant="contained" color="pending" fullWidth>
-          <Link
+          <LinkComponent
             href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
             target="_blank"
             rel="noreferrer"
@@ -102,7 +101,7 @@ const PositionDataControls = ({
               <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
-          </Link>
+          </LinkComponent>
         </StyledCardFooterButton>
       </StyledCallToActionContainer>
     );

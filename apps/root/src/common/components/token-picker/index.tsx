@@ -16,16 +16,16 @@ import {
   ListItemIcon,
   ListItemText,
   Skeleton,
+  Search as SearchIcon,
+  Close as CloseIcon,
+  ContentCopy as ContentCopyIcon,
+  ContentPaste as ContentPasteIcon,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import Search from '@mui/icons-material/Search';
-import CloseIcon from '@mui/icons-material/Close';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 import TokenIcon from '@common/components/token-icon';
 import { makeStyles, withStyles } from 'tss-react/mui';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useTokenList from '@hooks/useTokenList';
 import TokenLists from '@common/components/token-lists';
@@ -658,7 +658,7 @@ const TokenPicker = ({
                     >
                       <StyledPasteIcon onClick={onPasteAddress} />
                     </Tooltip>
-                    <Search />
+                    <SearchIcon />
                   </StyledEndAdormentContainer>
                 }
                 type="text"

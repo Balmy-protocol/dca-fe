@@ -2,9 +2,12 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link } from 'ui-library';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import CancelIcon from '@mui/icons-material/Cancel';
+import {
+  Typography,
+  LinkComponent,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  Cancel as CancelIcon,
+} from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { TRANSACTION_ERRORS } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -17,7 +20,7 @@ const StyledContainer = styled.div`
   justify-content: center;
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}

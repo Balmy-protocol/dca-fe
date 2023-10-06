@@ -1,7 +1,15 @@
 import * as React from 'react';
 import find from 'lodash/find';
 import Button from '@common/components/button';
-import { Typography, Link, IconButton, Menu, MenuItem } from 'ui-library';
+import {
+  Typography,
+  LinkComponent,
+  IconButton,
+  MenuComponent,
+  MenuItem,
+  OpenInNew as OpenInNewIcon,
+  MoreVert as MoreVertIcon,
+} from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { NetworkStruct, Position, Token, YieldOptions } from '@types';
@@ -16,9 +24,7 @@ import {
 } from '@constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { withStyles } from 'tss-react/mui';
 import { createStyles } from '@mui/material/styles';
 import useWalletService from '@hooks/useWalletService';
@@ -48,7 +54,7 @@ const PositionControlsContainer = styled.div`
   background-color: rgba(216, 216, 216, 0.05);
 `;
 
-const StyledMenu = withStyles(Menu, () =>
+const StyledMenu = withStyles(MenuComponent, () =>
   createStyles({
     paper: {
       border: '2px solid #A5AAB5',
@@ -167,7 +173,7 @@ const PositionControls = ({
     return (
       <StyledCallToActionContainer>
         <StyledCardFooterButton variant="contained" color="pending" fullWidth>
-          <Link
+          <LinkComponent
             href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
             target="_blank"
             rel="noreferrer"
@@ -179,7 +185,7 @@ const PositionControls = ({
               <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
-          </Link>
+          </LinkComponent>
         </StyledCardFooterButton>
       </StyledCallToActionContainer>
     );
@@ -272,7 +278,7 @@ const PositionControls = ({
             </MenuItem>
           )}
           <MenuItem onClick={onViewDetails} disabled={disabled}>
-            <Link
+            <LinkComponent
               href={`/${chainId}/positions/${position.version}/${position.positionId}`}
               underline="none"
               color="inherit"
@@ -280,7 +286,7 @@ const PositionControls = ({
               <Typography variant="body2">
                 <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
               </Typography>
-            </Link>
+            </LinkComponent>
           </MenuItem>
           <MenuItem
             onClick={handleTerminate}

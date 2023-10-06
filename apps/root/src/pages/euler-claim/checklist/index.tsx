@@ -12,8 +12,8 @@ import {
   AccordionDetails as UnstyledAccordionDetails,
   AccordionSummary as MuiAccordionSummary,
   AccordionSummaryProps as AccordionSummaryPropsRaw,
+  CheckCircle as CheckCircleIcon,
 } from 'ui-library';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { FormattedMessage } from 'react-intl';
 import { ClaimWithBalance } from '@pages/euler-claim/types';
 import { BigNumber } from 'ethers';

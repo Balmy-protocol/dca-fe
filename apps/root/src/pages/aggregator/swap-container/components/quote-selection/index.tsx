@@ -1,8 +1,7 @@
-import { CircularProgress, Popover, Grid, Typography, Box } from 'ui-library';
+import * as React from 'react';
+import { CircularProgress, Popover, Grid, Typography, Box, ErrorOutline as ErrorOutlineIcon } from 'ui-library';
 import Button from '@common/components/button';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import * as React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { SwapOption } from '@types';

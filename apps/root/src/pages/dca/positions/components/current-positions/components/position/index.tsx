@@ -2,7 +2,17 @@ import * as React from 'react';
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import { DateTime } from 'luxon';
-import { Chip, Link, Typography, Tooltip, Card, CardContent, LinearProgress } from 'ui-library';
+import {
+  Chip,
+  LinkComponent,
+  Typography,
+  Tooltip,
+  Card,
+  CardContent,
+  LinearProgress,
+  ArrowRightAlt as ArrowRightAltIcon,
+  ErrorOutline as ErrorOutlineIcon,
+} from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
@@ -23,10 +33,8 @@ import {
   VERSIONS_ALLOWED_MODIFY,
 } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -107,7 +115,7 @@ const StyledCardTitleHeader = styled.div`
   }
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(LinkComponent)`
   margin: 0px 5px;
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}

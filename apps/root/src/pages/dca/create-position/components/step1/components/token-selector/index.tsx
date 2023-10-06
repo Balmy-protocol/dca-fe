@@ -1,11 +1,10 @@
+import React from 'react';
 import { Token } from 'types';
 import styled from 'styled-components';
-import { Typography, IconButton } from 'ui-library';
+import { Typography, IconButton, SwapHoriz as SwapHorizIcon } from 'ui-library';
 import TokenButton from '@pages/dca/create-position/components/token-button';
-import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';

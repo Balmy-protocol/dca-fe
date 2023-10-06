@@ -18,7 +18,7 @@ import {
   UnwrapTypeData,
   WrapTypeData,
 } from '@types';
-import { Typography, Tooltip, Grid, Paper } from 'ui-library';
+import { Typography, Tooltip, Grid, Paper, Send as SendIcon } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import useBalance from '@hooks/useBalance';
@@ -34,7 +34,6 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
 } from '@constants';
-import SendIcon from '@mui/icons-material/Send';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { emptyTokenWithAddress, emptyTokenWithDecimals, formatCurrencyAmount } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
