@@ -21,7 +21,7 @@ import usePositionService from '@hooks/usePositionService';
 import useTransactionModal from '@hooks/useTransactionModal';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS } from '@constants';
+import { EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS, PERMISSIONS } from '@constants';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import useContractService from '@hooks/useContractService';
@@ -35,7 +35,6 @@ import useWeb3Service from '@hooks/useWeb3Service';
 import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import { useEulerClaimSignature } from '@state/euler-claim/hooks';
-import { DCAPermission } from '@mean-finance/sdk';
 import { setEulerSignature } from '@state/euler-claim/actions';
 
 import useHasPendingMigratorApprovals from '../hooks/useHasPendingMigratorApprovals';
@@ -356,7 +355,7 @@ const ClaimChecklist = ({
       trackEvent('Euler claim - Permit many submitting');
       const result = await positionService.givePermissionToMultiplePositions(
         positions,
-        [DCAPermission.TERMINATE],
+        [PERMISSIONS.TERMINATE],
         companionAddress
       );
       trackEvent('Euler claim - Permit many submitted');
