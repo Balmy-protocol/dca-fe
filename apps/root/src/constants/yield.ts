@@ -502,29 +502,6 @@ export const ALLOWED_YIELDS: Record<
     },
   ],
   [NETWORKS.baseGoerli.chainId]: [],
-  [NETWORKS.bsc.chainId]: [
-    {
-      id: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
-      tokenAddress: '0x353699126117ba6ed8f5d5928dfa797564e99e40', // beefy ETH
-      poolId: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
-      name: 'Beefy',
-      token: emptyTokenWithAddress('BEEFY'),
-    },
-    {
-      id: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
-      tokenAddress: '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e', // beefy BTCB
-      poolId: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
-      name: 'Beefy',
-      token: emptyTokenWithAddress('BEEFY'),
-    },
-    {
-      id: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
-      tokenAddress: '0x45c53c0068bf31715fb41685bab59fd0bbc387f9', // beefy BUSD
-      poolId: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
-      name: 'Beefy',
-      token: emptyTokenWithAddress('BEEFY'),
-    },
-  ],
   [NETWORKS.mainnet.chainId]: [
     {
       id: '61b7623c-9ac2-4a73-a748-8db0b1c8c5bc', // euler USDC
@@ -667,6 +644,27 @@ export const ALLOWED_YIELDS: Record<
       poolId: '0204c8ff-0805-4515-a27e-742d23a15719', // Venus XRP
       name: 'Venus',
       token: emptyTokenWithAddress('VENUS'),
+    },
+    {
+      id: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
+      tokenAddress: '0x353699126117ba6ed8f5d5928dfa797564e99e40', // beefy ETH
+      poolId: '040aa2e6-372b-482c-98c1-7ad0feb2fa38', // beefy ETH
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
+      tokenAddress: '0xea35aae53b30465f7362d5ebcb5d3ba01e17926e', // beefy BTCB
+      poolId: '04b3c6cf-22c7-45eb-9de7-b5657477484e', // beefy BTCB
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
+    },
+    {
+      id: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
+      tokenAddress: '0x45c53c0068bf31715fb41685bab59fd0bbc387f9', // beefy BUSD
+      poolId: '1ef337a5-9881-4756-8c72-47922679625a', // beefy BUSD
+      name: 'Beefy',
+      token: emptyTokenWithAddress('BEEFY'),
     },
   ],
 };

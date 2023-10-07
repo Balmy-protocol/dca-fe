@@ -94,15 +94,13 @@ function useSimulateTransaction(
     prevForceProviderSimulation,
   ]);
 
-  return React.useMemo(() => {
-    if (!route) {
-      return [undefined, false, undefined, fetchOptions];
-    }
+  if (!route) {
+    return [undefined, false, undefined, fetchOptions];
+  }
 
-    const resultToReturn = !error ? result || prevResult : undefined;
+  const resultToReturn = !error ? result || prevResult : undefined;
 
-    return [resultToReturn, isLoading, error, fetchOptions];
-  }, [error, fetchOptions, isLoading, prevResult, result, route]);
+  return [resultToReturn, isLoading, error, fetchOptions];
 }
 
 export default useSimulateTransaction;

@@ -130,6 +130,6 @@ const SwapContainer = () => {
   );
 };
 
-SwapContainer.whyDidYouRender = true;
+// SwapContainer.whyDidYouRender = true;
 
 export default React.memo(SwapContainer);

@@ -1,18 +1,21 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Token } from '@types';
+import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { IntervalSetActions } from '@constants/timing';
+import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
+import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
 import useSdkService from './useSdkService';
-import useInterval from './useInterval';
 
 function useCustomToken(
   tokenAddress?: string | null,
   skip?: boolean
 ): [{ token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined, boolean, string?] {
+  const walletService = useWalletService();
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -25,10 +28,18 @@ function useCustomToken(
   });
 
   const priceService = usePriceService();
+  const hasPendingTransactions = useHasPendingTransactions();
+  const prevTokenAddress = usePrevious(tokenAddress);
+  const prevPendingTrans = usePrevious(hasPendingTransactions);
+  const prevAccount = usePrevious(walletService.getAccount());
+  const account = walletService.getAccount();
   const currentNetwork = useSelectedNetwork();
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
+  const prevSkip = usePrevious(skip);
 
-  const fetchCustomToken = useCallback(() => {
+  React.useEffect(() => {
     async function callPromise() {
       if (tokenAddress) {
         try {
@@ -60,23 +71,47 @@ function useCustomToken(
       }
     }
 
-    if (!skip && !isLoading) {
+    if (
+      !skip &&
+      ((!isLoading && !result && !error) ||
+        !isEqual(prevTokenAddress, tokenAddress) ||
+        !isEqual(prevSkip, skip) ||
+        !isEqual(account, prevAccount) ||
+        !isEqual(prevPendingTrans, hasPendingTransactions) ||
+        (blockNumber &&
+          prevBlockNumber &&
+          blockNumber !== -1 &&
+          prevBlockNumber !== -1 &&
+          !isEqual(prevBlockNumber, blockNumber)))
+    ) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [currentNetwork.chainId, isLoading, priceService, sdkService, skip, tokenAddress]);
+  }, [
+    tokenAddress,
+    skip,
+    prevSkip,
+    isLoading,
+    result,
+    error,
+    hasPendingTransactions,
+    prevAccount,
+    account,
+    prevBlockNumber,
+    blockNumber,
+    prevTokenAddress,
+    walletService,
+    prevPendingTrans,
+    priceService,
+  ]);
 
-  useInterval(fetchCustomToken, IntervalSetActions.tokens);
+  if (!tokenAddress) {
+    return [undefined, false, undefined];
+  }
 
-  return React.useMemo(() => {
-    if (!tokenAddress) {
-      return [undefined, false, undefined];
-    }
-
-    return [result || prevResult, isLoading, error];
-  }, [error, isLoading, prevResult, result, tokenAddress]);
+  return [result || prevResult, isLoading, error];
 }
 
 export default useCustomToken;

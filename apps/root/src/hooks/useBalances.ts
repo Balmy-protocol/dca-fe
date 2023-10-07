@@ -1,12 +1,14 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Token } from 'types';
+import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
-import { IntervalSetActions } from '@constants/timing';
+import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import usePriceService from './usePriceService';
+import useAccount from './useAccount';
 import useSdkService from './useSdkService';
-import useInterval from './useInterval';
 
 interface BalanceResponse {
   balance: BigNumber;
@@ -19,6 +21,7 @@ interface Result {
 }
 
 function useBalances(tokens: Token[] | undefined | null): [Result | undefined, boolean, string?] {
+  const account = useAccount();
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -30,11 +33,17 @@ function useBalances(tokens: Token[] | undefined | null): [Result | undefined, b
     error: undefined,
   });
 
+  const hasPendingTransactions = useHasPendingTransactions();
+  const prevTokens = usePrevious(tokens);
+  const prevPendingTrans = usePrevious(hasPendingTransactions);
+  const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const prevBlockNumber = usePrevious(blockNumber);
   const priceService = usePriceService();
   const prevResult = usePrevious(result, false);
 
-  const fetchBalances = useCallback(() => {
+  React.useEffect(() => {
     async function callPromise() {
       if (tokens) {
         try {
@@ -77,23 +86,42 @@ function useBalances(tokens: Token[] | undefined | null): [Result | undefined, b
       }
     }
 
-    if (!isLoading) {
+    if (
+      (!isLoading && !result && !error) ||
+      !isEqual(prevTokens, tokens) ||
+      !isEqual(account, prevAccount) ||
+      !isEqual(prevPendingTrans, hasPendingTransactions) ||
+      (blockNumber &&
+        prevBlockNumber &&
+        blockNumber !== -1 &&
+        prevBlockNumber !== -1 &&
+        !isEqual(prevBlockNumber, blockNumber))
+    ) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [currentNetwork.chainId, isLoading, priceService, sdkService, tokens]);
+  }, [
+    tokens,
+    prevTokens,
+    isLoading,
+    result,
+    error,
+    hasPendingTransactions,
+    prevAccount,
+    account,
+    prevBlockNumber,
+    blockNumber,
+    sdkService,
+    prevPendingTrans,
+  ]);
 
-  useInterval(fetchBalances, IntervalSetActions.balance);
+  if (!tokens || !tokens.length) {
+    return [undefined, false, undefined];
+  }
 
-  return React.useMemo(() => {
-    if (!tokens || !tokens.length) {
-      return [undefined, false, undefined];
-    }
-
-    return [result || prevResult, isLoading, error];
-  }, [error, isLoading, prevResult, result, tokens]);
+  return [result || prevResult, isLoading, error];
 }
 
 export default useBalances;

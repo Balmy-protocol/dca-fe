@@ -3,7 +3,6 @@ import { useAggregatorNetwork } from '@state/aggregator/hooks';
 import { useDCANetwork } from '@state/create-position/hooks';
 import { useMainTab } from '@state/tabs/hooks';
 import { NetworkStruct } from '@types';
-import React from 'react';
 
 function useSelectedNetwork() {
   const aggregatorNetwork = useAggregatorNetwork();
@@ -17,10 +16,7 @@ function useSelectedNetwork() {
     network = aggregatorNetwork;
   }
 
-  return React.useMemo(
-    () => (network && { ...network, isSet: true }) || { ...DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION], isSet: false },
-    [network]
-  );
+  return (network && { ...network, isSet: true }) || { ...DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION], isSet: false };
 }
 
 export default useSelectedNetwork;

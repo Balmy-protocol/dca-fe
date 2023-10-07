@@ -56,7 +56,7 @@ function useRawUsdPrice(
     }
   }, [from, isLoading, result, error, account, currentNetwork, chainId]);
 
-  return React.useMemo(() => [result, isLoading, error], [error, isLoading, result]);
+  return [result, isLoading, error];
 }
 
 export default useRawUsdPrice;

@@ -10,58 +10,6 @@ const theme = createTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: `
-        @font-face {
-          font-display: swap;
-          font-family: 'Lato';
-          font-style: normal;
-          font-weight: 300;
-          src: url('../fonts/lato-v23-latin-300.eot'); /* IE9 Compat Modes */
-          src: url('../fonts/lato-v23-latin-300.eot?#iefix') format('embedded-opentype'),
-            /* IE6-IE8 */ url('../fonts/lato-v23-latin-300.woff2') format('woff2'),
-            /* Super Modern Browsers */ url('../fonts/lato-v23-latin-300.woff') format('woff'),
-            /* Modern Browsers */ url('../fonts/lato-v23-latin-300.ttf') format('truetype'),
-            /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-300.svg#Lato') format('svg'); /* Legacy iOS */
-        }
-        /* lato-regular - latin */
-        @font-face {
-          font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-          font-family: 'Lato';
-          font-style: normal;
-          font-weight: 400;
-          src: url('../fonts/lato-v23-latin-regular.eot'); /* IE9 Compat Modes */
-          src: url('../fonts/lato-v23-latin-regular.eot?#iefix') format('embedded-opentype'),
-            /* IE6-IE8 */ url('../fonts/lato-v23-latin-regular.woff2') format('woff2'),
-            /* Super Modern Browsers */ url('../fonts/lato-v23-latin-regular.woff') format('woff'),
-            /* Modern Browsers */ url('../fonts/lato-v23-latin-regular.ttf') format('truetype'),
-            /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
-        }
-        /* lato-regular - 500 - latin */
-        @font-face {
-          font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-          font-family: 'Lato';
-          font-style: normal;
-          font-weight: 500;
-          src: url('../fonts/lato-v23-latin-regular.eot'); /* IE9 Compat Modes */
-          src: url('../fonts/lato-v23-latin-regular.eot?#iefix') format('embedded-opentype'),
-            /* IE6-IE8 */ url('../fonts/lato-v23-latin-regular.woff2') format('woff2'),
-            /* Super Modern Browsers */ url('../fonts/lato-v23-latin-regular.woff') format('woff'),
-            /* Modern Browsers */ url('../fonts/lato-v23-latin-regular.ttf') format('truetype'),
-            /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
-        }
-        /* lato-700 - latin */
-        @font-face {
-          font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-          font-family: 'Lato';
-          font-style: normal;
-          font-weight: 700;
-          src: url('../fonts/lato-v23-latin-700.eot'); /* IE9 Compat Modes */
-          src: url('../fonts/lato-v23-latin-700.eot?#iefix') format('embedded-opentype'),
-            /* IE6-IE8 */ url('../fonts/lato-v23-latin-700.woff2') format('woff2'),
-            /* Super Modern Browsers */ url('../fonts/lato-v23-latin-700.woff') format('woff'),
-            /* Modern Browsers */ url('../fonts/lato-v23-latin-700.ttf') format('truetype'),
-            /* Safari, Android, iOS */ url('../fonts/lato-v23-latin-700.svg#Lato') format('svg'); /* Legacy iOS */
-        }
-
         /* vanilla-extract-css-ns:src/css/reset.css.ts.vanilla.css?source=Lmlla2JjYzAgewogIGJvcmRlcjogMDsKICBib3gtc2l6aW5nOiBib3JkZXItYm94OwogIGZvbnQtc2l6ZTogMTAwJTsKICBsaW5lLWhlaWdodDogbm9ybWFsOwogIG1hcmdpbjogMDsKICBwYWRkaW5nOiAwOwogIHRleHQtYWxpZ246IGxlZnQ7CiAgdmVydGljYWwtYWxpZ246IGJhc2VsaW5lOwogIC13ZWJraXQtdGFwLWhpZ2hsaWdodC1jb2xvcjogdHJhbnNwYXJlbnQ7Cn0KLmlla2JjYzEgewogIGxpc3Qtc3R5bGU6IG5vbmU7Cn0KLmlla2JjYzIgewogIHF1b3Rlczogbm9uZTsKfQouaWVrYmNjMjpiZWZvcmUsIC5pZWtiY2MyOmFmdGVyIHsKICBjb250ZW50OiAnJzsKfQouaWVrYmNjMyB7CiAgYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsKICBib3JkZXItc3BhY2luZzogMDsKfQouaWVrYmNjNCB7CiAgYXBwZWFyYW5jZTogbm9uZTsKfQouaWVrYmNjNSB7CiAgb3V0bGluZTogbm9uZTsKfQouaWVrYmNjNTo6cGxhY2Vob2xkZXIgewogIG9wYWNpdHk6IDE7Cn0KLmlla2JjYzYgewogIGJhY2tncm91bmQtY29sb3I6IHRyYW5zcGFyZW50OwogIGNvbG9yOiBpbmhlcml0Owp9Ci5pZWtiY2M3OmRpc2FibGVkIHsKICBvcGFjaXR5OiAxOwp9Ci5pZWtiY2M3OjotbXMtZXhwYW5kIHsKICBkaXNwbGF5OiBub25lOwp9Ci5pZWtiY2M4OjotbXMtY2xlYXIgewogIGRpc3BsYXk6IG5vbmU7Cn0KLmlla2JjYzg6Oi13ZWJraXQtc2VhcmNoLWNhbmNlbC1idXR0b24gewogIC13ZWJraXQtYXBwZWFyYW5jZTogbm9uZTsKfQouaWVrYmNjOSB7CiAgYmFja2dyb3VuZDogbm9uZTsKICBjdXJzb3I6IHBvaW50ZXI7CiAgdGV4dC1hbGlnbjogbGVmdDsKfQouaWVrYmNjYSB7CiAgY29sb3I6IGluaGVyaXQ7CiAgdGV4dC1kZWNvcmF0aW9uOiBub25lOwp9 */
         [data-rk] .iekbcc0 {
           border: 0;

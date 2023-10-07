@@ -908,9 +908,9 @@ const TransactionSteps = ({ shouldShow, handleClose, transactions, onAction }: T
   );
 };
 
-TransactionSteps.whyDidYouRender = true;
+// TransactionSteps.whyDidYouRender = true;
 
 const memoed = memo(TransactionSteps);
 
-memoed.whyDidYouRender = true;
+// memoed.whyDidYouRender = true;
 export default memoed;

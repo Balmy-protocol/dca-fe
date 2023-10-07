@@ -77,13 +77,11 @@ function useUnderlyingAmount(
     }
   }, [isLoading, result, error, tokens, prevTokens]);
 
-  return React.useMemo(() => {
-    if (every(tokens, { returnSame: true })) {
-      return [tokens.map((tokenObj) => tokenObj.amount || BigNumber.from(0)), isLoading, error];
-    }
+  if (every(tokens, { returnSame: true })) {
+    return [tokens.map((tokenObj) => tokenObj.amount || BigNumber.from(0)), isLoading, error];
+  }
 
-    return [result, isLoading, error];
-  }, [error, isLoading, result, tokens]);
+  return [result, isLoading, error];
 }
 
 export default useUnderlyingAmount;

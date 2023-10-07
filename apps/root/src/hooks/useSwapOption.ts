@@ -3,7 +3,9 @@ import { SwapOption, SwapOptionWithTx } from '@types';
 import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
+import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { GasKeys } from '@constants/aggregator';
+import { useBlockNumber } from '@state/block-number/hooks';
 import useAggregatorService from './useAggregatorService';
 import useWalletService from './useWalletService';
 import useSelectedNetwork from './useSelectedNetwork';
@@ -24,10 +26,13 @@ function useSwapOptions(
     result?: SwapOptionWithTx;
     error?: string;
   }>({ isLoading: false, result: undefined, error: undefined });
+  const hasPendingTransactions = useHasPendingTransactions();
   const aggregatorService = useAggregatorService();
+  const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
-  const prevCurrentNetwork = usePrevious(currentNetwork);
+  const blockNumber = useBlockNumber(currentNetwork.chainId);
+  const prevBlockNumber = usePrevious(blockNumber);
   const prevTransferTo = usePrevious(transferTo);
   const prevNetwork = usePrevious(currentNetwork.chainId);
   const prevResult = usePrevious(result, false);
@@ -35,7 +40,6 @@ function useSwapOptions(
   const prevSlippage = usePrevious(slippage);
   const prevQuote = usePrevious(quote);
   const prevUsePermit2 = usePrevious(usePermit2);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedCall = React.useCallback(
     debounce(
       async (
@@ -78,7 +82,7 @@ function useSwapOptions(
 
   const fetchOptions = React.useCallback(
     () => debouncedCall(quote, transferTo, gasSpeed, slippage, account, currentNetwork.chainId, usePermit2),
-    [debouncedCall, quote, transferTo, gasSpeed, slippage, account, currentNetwork.chainId, usePermit2]
+    [quote, transferTo, slippage, gasSpeed, account, currentNetwork.chainId, usePermit2]
   );
 
   React.useEffect(() => {
@@ -92,8 +96,7 @@ function useSwapOptions(
         !isEqual(prevGasSpeed, gasSpeed) ||
         !isEqual(prevNetwork, currentNetwork.chainId) ||
         !isEqual(prevSlippage, slippage) ||
-        !isEqual(prevUsePermit2, usePermit2) ||
-        !isEqual(prevCurrentNetwork?.chainId, currentNetwork.chainId))
+        !isEqual(prevUsePermit2, usePermit2))
     ) {
       if (quote && account && !quote.tx) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -101,36 +104,37 @@ function useSwapOptions(
       }
     }
   }, [
-    account,
-    currentNetwork.chainId,
-    error,
-    fetchOptions,
-    gasSpeed,
+    quote,
+    prevQuote,
     isLoading,
+    result,
+    error,
     prevAccount,
-    prevCurrentNetwork?.chainId,
+    account,
+    prevPendingTrans,
+    prevBlockNumber,
+    blockNumber,
+    walletService,
+    fetchOptions,
+    prevTransferTo,
+    transferTo,
+    slippage,
+    prevSlippage,
+    gasSpeed,
     prevGasSpeed,
     prevNetwork,
-    prevQuote,
-    prevSlippage,
-    prevTransferTo,
-    prevUsePermit2,
-    quote,
-    result,
-    slippage,
-    transferTo,
+    currentNetwork.chainId,
     usePermit2,
+    prevUsePermit2,
   ]);
 
-  return React.useMemo(() => {
-    if (!quote) {
-      return [undefined, false, undefined, fetchOptions];
-    }
+  if (!quote) {
+    return [undefined, false, undefined, fetchOptions];
+  }
 
-    const resultToReturn = !error ? result || prevResult : undefined;
+  const resultToReturn = !error ? result || prevResult : undefined;
 
-    return [resultToReturn, isLoading, error, fetchOptions];
-  }, [error, fetchOptions, isLoading, prevResult, quote, result]);
+  return [resultToReturn, isLoading, error, fetchOptions];
 }
 
 export default useSwapOptions;

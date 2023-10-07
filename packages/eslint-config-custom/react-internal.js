@@ -78,5 +78,6 @@ module.exports = {
         peerDependencies: true,
       },
     ],
+    'promise/catch-or-return': ['error', { allowFinally: true }],
   },
 };

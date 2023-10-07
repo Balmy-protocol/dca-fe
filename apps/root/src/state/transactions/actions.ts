@@ -9,11 +9,18 @@ export const finalizeTransaction = createAction<{
   chainId: number;
   realSafeHash?: string;
 }>('transactions/finalizeTransaction');
+export const setTransactionsChecking = createAction<{ chainId: number; hash: string }[]>(
+  'transactions/setTransactionsChecking'
+);
 export const checkedTransaction = createAction<{
+  hash: string;
+  chainId: number;
+}>('transactions/checkedTransaction');
+export const checkedTransactionExist = createAction<{
   hash: string;
   blockNumber?: number;
   chainId: number;
-}>('transactions/checkedTransaction');
+}>('transactions/checkedTransactionExist');
 export const transactionFailed = createAction<{
   hash: string;
   blockNumber?: number;

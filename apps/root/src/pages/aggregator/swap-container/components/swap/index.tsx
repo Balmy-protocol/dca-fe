@@ -1267,5 +1267,5 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   );
 };
 
-Swap.whyDidYouRender = true;
+// Swap.whyDidYouRender = true;
 export default React.memo(Swap);
