@@ -21,6 +21,7 @@ import {
   PermissionPermit,
   TransactionTypes,
   PositionVersions,
+  PermissionSet as IPermissionSet,
 } from '@types';
 
 // GRAPHQL
@@ -39,12 +40,14 @@ import {
   LATEST_VERSION,
   SIGN_VERSION,
   TOKEN_TYPE_YIELD_BEARING_SHARES,
+  PERMISSIONS,
 } from '@constants';
 import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { getDisplayToken, sortTokens } from '@common/utils/parsing';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
+import { parsePermissionsForSdk } from '@common/utils/sdk';
 import { AddFunds, DCAPermission, timeoutPromise } from '@mean-finance/sdk';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
@@ -385,7 +388,7 @@ export default class PositionService {
   async fillAddressPermissions(
     position: Position,
     contractAddress: string,
-    permission: DCAPermission,
+    permission: PERMISSIONS,
     permissionManagerAddressProvided?: string
   ) {
     const signer = this.providerService.getSigner();
@@ -399,17 +402,17 @@ export default class PositionService {
     ) as unknown as PermissionManagerContract;
 
     const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
-      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.INCREASE),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.REDUCE),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.WITHDRAW),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, DCAPermission.TERMINATE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.INCREASE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.REDUCE),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.WITHDRAW),
+      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.TERMINATE),
     ]);
 
     const defaultPermissions = [
-      ...(hasIncrease ? [DCAPermission.INCREASE] : []),
-      ...(hasReduce ? [DCAPermission.REDUCE] : []),
-      ...(hasWithdraw ? [DCAPermission.WITHDRAW] : []),
-      ...(hasTerminate ? [DCAPermission.TERMINATE] : []),
+      ...(hasIncrease ? [PERMISSIONS.INCREASE] : []),
+      ...(hasReduce ? [PERMISSIONS.REDUCE] : []),
+      ...(hasWithdraw ? [PERMISSIONS.WITHDRAW] : []),
+      ...(hasTerminate ? [PERMISSIONS.TERMINATE] : []),
     ];
 
     return [{ operator: contractAddress, permissions: [...defaultPermissions, permission] }];
@@ -418,7 +421,7 @@ export default class PositionService {
   async getSignatureForPermission(
     position: Position,
     contractAddress: string,
-    permission: DCAPermission,
+    permission: PERMISSIONS,
     permissionManagerAddressProvided?: string,
     erc712Name?: string
   ) {
@@ -487,7 +490,7 @@ export default class PositionService {
   ): Promise<TransactionResponse> {
     const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
     let permissionsPermit: PermissionPermit | undefined;
-    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.TERMINATE);
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
     const currentNetwork = await this.providerService.getNetwork();
     const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
     const fromToUse =
@@ -498,7 +501,7 @@ export default class PositionService {
       const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
         position,
         companionAddress,
-        DCAPermission.TERMINATE
+        PERMISSIONS.TERMINATE
       );
       permissionsPermit = {
         permissions,
@@ -527,10 +530,7 @@ export default class PositionService {
     return permissionManagerInstance.hasPermission(position.positionId, companionAddress, permission);
   }
 
-  async getModifyPermissionsTx(
-    position: Position,
-    newPermissions: { operator: string; permissions: DCAPermission[] }[]
-  ): Promise<PopulatedTransaction> {
+  async getModifyPermissionsTx(position: Position, newPermissions: IPermissionSet[]): Promise<PopulatedTransaction> {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
 
     return permissionManagerInstance.populateTransaction.modify(position.positionId, newPermissions);
@@ -541,7 +541,7 @@ export default class PositionService {
       position,
       newPermissions.map(({ permissions, operator }) => ({
         operator,
-        permissions: permissions.map((permission) => DCAPermission[permission]),
+        permissions: permissions.map((permission) => PERMISSIONS[permission]),
       }))
     );
 
@@ -598,15 +598,15 @@ export default class PositionService {
     }
 
     if (yieldFrom) {
-      permissions = [...permissions, DCAPermission.INCREASE, DCAPermission.REDUCE];
+      permissions = [...permissions, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE];
     }
 
     if (yieldTo) {
-      permissions = [...permissions, DCAPermission.WITHDRAW];
+      permissions = [...permissions, PERMISSIONS.WITHDRAW];
     }
 
     if (yieldFrom || yieldTo) {
-      permissions = [...permissions, DCAPermission.TERMINATE];
+      permissions = [...permissions, PERMISSIONS.TERMINATE];
     }
 
     return {
@@ -673,7 +673,7 @@ export default class PositionService {
       swapInterval: interval.toNumber(),
       amountOfSwaps: swaps.toNumber(),
       owner: account,
-      permissions,
+      permissions: parsePermissionsForSdk(permissions),
       deposit,
     });
   }
@@ -747,14 +747,14 @@ export default class PositionService {
 
     const hasYield = position.to.underlyingTokens.length;
 
-    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.WITHDRAW);
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
 
     let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
 
     if (!companionHasPermission && (useProtocolToken || hasYield)) {
       const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
-      permissionPermit = await this.getSignatureForPermission(position, companionAddress, DCAPermission.WITHDRAW);
+      permissionPermit = await this.getSignatureForPermission(position, companionAddress, PERMISSIONS.WITHDRAW);
     }
 
     const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
@@ -767,7 +767,7 @@ export default class PositionService {
       dcaHub: hubAddress,
       recipient: position.user,
       permissionPermit: permissionPermit && {
-        permissions: permissionPermit.permissions,
+        permissions: parsePermissionsForSdk(permissionPermit.permissions),
         deadline: permissionPermit.deadline.toString(),
         v: permissionPermit.v,
         r: hexlify(permissionPermit.r),
@@ -786,7 +786,7 @@ export default class PositionService {
 
     const hasYield = position.to.underlyingTokens.length;
 
-    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.WITHDRAW);
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
 
     const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
 
@@ -804,7 +804,7 @@ export default class PositionService {
     if (!companionHasPermission && hasYield) {
       const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
-      const permissions = await this.fillAddressPermissions(position, companionAddress, DCAPermission.WITHDRAW);
+      const permissions = await this.fillAddressPermissions(position, companionAddress, PERMISSIONS.WITHDRAW);
       const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
 
       txs = [modifyPermissionTx, ...txs];
@@ -831,7 +831,7 @@ export default class PositionService {
       (position.from.underlyingTokens.length && position.remainingLiquidity.gt(BigNumber.from(0))) ||
       (position.to.underlyingTokens.length && position.toWithdraw.gt(BigNumber.from(0)));
 
-    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.TERMINATE);
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
     let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
 
@@ -849,7 +849,7 @@ export default class PositionService {
       permissionPermit = await this.getSignatureForPermission(
         position,
         companionAddress,
-        DCAPermission.TERMINATE,
+        PERMISSIONS.TERMINATE,
         permissionManagerAddress,
         erc712Name
       );
@@ -877,7 +877,7 @@ export default class PositionService {
       dcaHub: hubAddress,
       recipient: position.user,
       permissionPermit: permissionPermit && {
-        permissions: permissionPermit.permissions,
+        permissions: parsePermissionsForSdk(permissionPermit.permissions),
         deadline: permissionPermit.deadline.toString(),
         v: permissionPermit.v,
         r: hexlify(permissionPermit.r),
@@ -897,7 +897,7 @@ export default class PositionService {
       (position.from.underlyingTokens.length && position.remainingLiquidity.gt(BigNumber.from(0))) ||
       (position.to.underlyingTokens.length && position.toWithdraw.gt(BigNumber.from(0)));
 
-    const companionHasPermission = await this.companionHasPermission(position, DCAPermission.TERMINATE);
+    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
     const fromToUse =
       position.from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.from.address;
@@ -921,7 +921,7 @@ export default class PositionService {
     if (!companionHasPermission && hasYield) {
       const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
 
-      const permissions = await this.fillAddressPermissions(position, companionAddress, DCAPermission.TERMINATE);
+      const permissions = await this.fillAddressPermissions(position, companionAddress, PERMISSIONS.TERMINATE);
       const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
 
       txs = [modifyPermissionTx, ...txs];
@@ -962,7 +962,7 @@ export default class PositionService {
 
   async givePermissionToMultiplePositions(
     positions: Position[],
-    permissions: DCAPermission[],
+    permissions: PERMISSIONS[],
     permittedAddress: string
   ): Promise<TransactionResponse> {
     const { chainId, version } = positions[0];
@@ -985,10 +985,10 @@ export default class PositionService {
       );
 
       const defaultPermissions = [
-        ...(hasIncrease || permissions.includes(DCAPermission.INCREASE) ? [DCAPermission.INCREASE] : []),
-        ...(hasReduce || permissions.includes(DCAPermission.REDUCE) ? [DCAPermission.REDUCE] : []),
-        ...(hasWithdraw || permissions.includes(DCAPermission.WITHDRAW) ? [DCAPermission.WITHDRAW] : []),
-        ...(hasTerminate || permissions.includes(DCAPermission.TERMINATE) ? [DCAPermission.TERMINATE] : []),
+        ...(hasIncrease || permissions.includes(PERMISSIONS.INCREASE) ? [PERMISSIONS.INCREASE] : []),
+        ...(hasReduce || permissions.includes(PERMISSIONS.REDUCE) ? [PERMISSIONS.REDUCE] : []),
+        ...(hasWithdraw || permissions.includes(PERMISSIONS.WITHDRAW) ? [PERMISSIONS.WITHDRAW] : []),
+        ...(hasTerminate || permissions.includes(PERMISSIONS.TERMINATE) ? [PERMISSIONS.TERMINATE] : []),
       ];
 
       return {
@@ -1067,7 +1067,7 @@ export default class PositionService {
     const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
       position,
       companionAddress,
-      isIncrease ? DCAPermission.INCREASE : DCAPermission.REDUCE
+      isIncrease ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
     );
 
     return {
@@ -1109,9 +1109,9 @@ export default class PositionService {
       let companionHasPermission = true;
 
       if (isIncrease) {
-        companionHasPermission = await this.companionHasPermission(position, DCAPermission.INCREASE);
+        companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
       } else {
-        companionHasPermission = await this.companionHasPermission(position, DCAPermission.REDUCE);
+        companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
       }
 
       if (!companionHasPermission && getSignature) {
@@ -1145,7 +1145,10 @@ export default class PositionService {
         positionId: position.positionId,
         dcaHub: hubAddress,
         amountOfSwaps: swaps.toNumber(),
-        permissionPermit: permissionSignature,
+        permissionPermit: permissionSignature && {
+          ...permissionSignature,
+          permissions: parsePermissionsForSdk(permissionSignature.permissions),
+        },
         increase,
       });
     }
@@ -1160,7 +1163,10 @@ export default class PositionService {
       positionId: position.positionId,
       dcaHub: hubAddress,
       amountOfSwaps: swaps.toNumber(),
-      permissionPermit: permissionSignature,
+      permissionPermit: permissionSignature && {
+        ...permissionSignature,
+        permissions: parsePermissionsForSdk(permissionSignature.permissions),
+      },
       reduce,
       recipient: account,
     });
@@ -1237,9 +1243,9 @@ export default class PositionService {
       let companionHasPermission = true;
 
       if (isIncrease) {
-        companionHasPermission = await this.companionHasPermission(position, DCAPermission.INCREASE);
+        companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.INCREASE);
       } else {
-        companionHasPermission = await this.companionHasPermission(position, DCAPermission.REDUCE);
+        companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.REDUCE);
       }
 
       if (!companionHasPermission) {
@@ -1247,7 +1253,7 @@ export default class PositionService {
         const permissions = await this.fillAddressPermissions(
           position,
           companionAddress,
-          isIncrease ? DCAPermission.INCREASE : DCAPermission.REDUCE
+          isIncrease ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
         );
         const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
 
