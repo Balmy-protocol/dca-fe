@@ -2743,14 +2743,14 @@
   resolved "https://registry.yarnpkg.com/@mui/core-downloads-tracker/-/core-downloads-tracker-5.14.11.tgz#e829aceb5c0bbfc3383ed90a6a85445344dd65a7"
   integrity sha512-uY8FLQURhXe3f3O4dS5OSGML9KDm9+IE226cBu78jarVIzdQGPlXwGIlSI9VJR8MvZDA6C0+6XfWDhWCHruC5Q==
 
-"@mui/icons-material@^5.14.6", "@mui/icons-material@^5.14.7":
+"@mui/icons-material@^5.14.6":
   version "5.14.11"
   resolved "https://registry.yarnpkg.com/@mui/icons-material/-/icons-material-5.14.11.tgz#ce563d1b6c7abc76f8a8048c970135601e7b49b5"
   integrity sha512-aHReLasBuS/+hhPzbZCgZ0eTcZ2QRnoC2WNK7XvdAf3l+LjC1flzjh6GWw1tZJ5NHnZ+bivdwtLFQ8XTR96JkA==
   dependencies:
     "@babel/runtime" "^7.22.15"
 
-"@mui/material@^5.14.6", "@mui/material@^5.14.7":
+"@mui/material@^5.14.6":
   version "5.14.11"
   resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.14.11.tgz#7537f07c383a6cfa32a00fabc9959593478bc5c4"
   integrity sha512-DnSdJzcR7lwG12JA5L2t8JF+RDzMygu5rCNW+logWb/KW2/TRzwLyVWO+CorHTBjBRd38DBxnwOCDiYkDd+N3A==
@@ -2777,7 +2777,7 @@
     "@mui/utils" "^5.14.11"
     prop-types "^15.8.1"
 
-"@mui/styled-engine-sc@^5.14.6", "@mui/styled-engine-sc@^5.9.3", "@mui/styled-engine@^5.14.11", "@mui/styled-engine@npm:@mui/styled-engine-sc@latest":
+"@mui/styled-engine-sc@^5.14.6", "@mui/styled-engine@^5.14.11", "@mui/styled-engine@npm:@mui/styled-engine-sc@latest":
   version "5.14.11"
   resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-5.14.11.tgz#250d9879009779f8d735dda081c0969b1ce078ec"
   integrity sha512-phUkkvirhuxLPQihgMACyDCUknpOM/4g3PbZmfmMbvkCL+UEePUnECzlOKRbKvk9uyI5Xpz0zECFOtYkJsPvBg==
