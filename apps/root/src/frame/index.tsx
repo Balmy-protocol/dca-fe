@@ -2,10 +2,9 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Grid, CssBaseline, Container } from 'ui-library';
+import { Grid, CssBaseline, Container, ThemeProvider, Theme } from 'ui-library';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
 import BlockNumberUpdater from '@state/block-number/blockNumberUpdater';
-import { ThemeProvider, Theme } from '@mui/material/styles';
 import styled, { DefaultTheme, ThemeProvider as SCThemeProvider } from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';

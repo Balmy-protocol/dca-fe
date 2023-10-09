@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '@common/components/button';
-import { Typography, Popover } from 'ui-library';
+import { Typography, Popover, Theme, createStyles } from 'ui-library';
 import { makeStyles } from 'tss-react/mui';
-import { Theme, createStyles } from '@mui/material';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import { SupportedLanguages, SUPPORTED_LANGUAGES_STRING } from '@constants/lang';
 import { useSelectedLocale } from '@state/config/hooks';

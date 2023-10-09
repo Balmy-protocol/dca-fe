@@ -12,13 +12,13 @@ import {
   Checkbox,
   TextField,
   Delete as DeleteIcon,
+  createStyles,
 } from 'ui-library';
 import { useAppDispatch } from '@hooks/state';
 import { Permission } from '@types';
 import { addOperator } from '@state/position-permissions/actions';
 import { STRING_PERMISSIONS } from '@constants';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 
 const StyledGrid = styled(Grid)`
   display: flex;

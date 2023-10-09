@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '@common/components/button';
-import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
 import {
@@ -11,6 +10,7 @@ import {
   Slide,
   Divider,
   CheckCircle as CheckCircleIcon,
+  createStyles,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';

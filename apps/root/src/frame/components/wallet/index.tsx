@@ -4,13 +4,11 @@ import { useAppDispatch } from '@state/hooks';
 import { useAllTransactions, useHasPendingTransactions } from '@state/transactions/hooks';
 import { useBadgeNumber } from '@state/transactions-badge/hooks';
 import { updateBadgeNumber } from '@state/transactions-badge/actions';
-
-import { Typography, BadgeComponent, CircularProgress } from 'ui-library';
+import { Typography, BadgeComponent, CircularProgress, createStyles } from 'ui-library';
 import Button from '@common/components/button';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import Address from '@common/components/address';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import TokenIcon from '@common/components/token-icon';
 import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
 import { find } from 'lodash';

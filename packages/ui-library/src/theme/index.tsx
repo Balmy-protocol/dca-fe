@@ -1,3 +1,4 @@
+export { Theme, createTheme, ThemeProvider } from '@mui/material/styles';
 import type { Components, PaletteOptions } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
 

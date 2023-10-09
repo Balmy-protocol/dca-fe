@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Popper, Typography, Hidden, LinearProgress } from 'ui-library';
+import { Grid, Popper, Typography, Hidden, LinearProgress, createStyles } from 'ui-library';
 import orderBy from 'lodash/orderBy';
 import union from 'lodash/union';
 import intersection from 'lodash/intersection';
@@ -8,7 +8,6 @@ import Button from '@common/components/button';
 import styled from 'styled-components';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
-import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
 import { BigNumber } from 'ethers';
 import usePriceService from '@hooks/usePriceService';

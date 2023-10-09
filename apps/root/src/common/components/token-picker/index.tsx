@@ -20,6 +20,7 @@ import {
   Close as CloseIcon,
   ContentCopy as ContentCopyIcon,
   ContentPaste as ContentPasteIcon,
+  createStyles,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 
@@ -30,7 +31,6 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useTokenList from '@hooks/useTokenList';
 import TokenLists from '@common/components/token-lists';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
-import { createStyles } from '@mui/material';
 import useBalances from '@hooks/useBalances';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';

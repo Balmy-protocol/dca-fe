@@ -33,10 +33,9 @@ import {
   TRANSACTION_ACTION_CREATE_POSITION,
 } from '@constants';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
-import { Typography, CircularProgress, Tooltip, IconButton, Slide } from 'ui-library';
+import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Button from '@common/components/button';
 import useWeb3Service from '@hooks/useWeb3Service';

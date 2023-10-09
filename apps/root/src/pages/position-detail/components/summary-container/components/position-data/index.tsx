@@ -11,6 +11,8 @@ import {
   CardContent,
   LinearProgress,
   ArrowRightAlt as ArrowRightAltIcon,
+  createStyles,
+  Theme,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
@@ -37,7 +39,6 @@ import {
   getGhTokenListLogoUrl,
 } from '@constants';
 import useUsdPrice from '@hooks/useUsdPrice';
-import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
 import find from 'lodash/find';
 import CustomChip from '@common/components/custom-chip';
@@ -46,7 +47,6 @@ import { useShowBreakdown } from '@state/position-details/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { updateShowBreakdown } from '@state/position-details/actions';
 import { formatUnits } from '@ethersproject/units';
-import { Theme } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import PositionDataControls from './position-data-controls';
 

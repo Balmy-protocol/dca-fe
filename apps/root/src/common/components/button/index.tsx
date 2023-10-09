@@ -1,8 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
-import { Button, ButtonProps } from 'ui-library';
+import { Button, ButtonProps, Theme } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
-import { Theme } from '@mui/material/styles';
 
 const colors = {
   primary: {

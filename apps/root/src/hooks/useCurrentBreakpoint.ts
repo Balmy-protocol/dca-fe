@@ -1,4 +1,4 @@
-import { useTheme, useMediaQuery } from '@mui/material';
+import { useTheme, useMediaQuery } from 'ui-library';
 
 function useCurrentBreakpoint() {
   const theme = useTheme();

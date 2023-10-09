@@ -9,6 +9,7 @@ import {
   MenuItem,
   OpenInNew as OpenInNewIcon,
   MoreVert as MoreVertIcon,
+  createStyles,
 } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
@@ -26,7 +27,6 @@ import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import { setPosition } from '@state/position-details/actions';

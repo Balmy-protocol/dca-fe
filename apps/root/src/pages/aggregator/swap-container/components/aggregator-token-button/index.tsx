@@ -5,8 +5,13 @@ import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import isFinite from 'lodash/isFinite';
 import { Token } from '@types';
-import { FilledInput, Typography, FormHelperText, KeyboardArrowDown as KeyboardArrowDownIcon } from 'ui-library';
-import { createStyles } from '@mui/material';
+import {
+  FilledInput,
+  Typography,
+  FormHelperText,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  createStyles,
+} from 'ui-library';
 import { withStyles, makeStyles } from 'tss-react/mui';
 import TokenIcon from '@common/components/token-icon';
 import { FormattedMessage } from 'react-intl';

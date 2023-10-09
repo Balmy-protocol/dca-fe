@@ -1,5 +1,14 @@
 import React from 'react';
-import { Grid, Typography, LinkComponent, Tabs, TabComponent, Alert, ArrowBack as ArrowBackIcon } from 'ui-library';
+import {
+  Grid,
+  Typography,
+  LinkComponent,
+  Tabs,
+  TabComponent,
+  Alert,
+  ArrowBack as ArrowBackIcon,
+  createStyles,
+} from 'ui-library';
 import styled from 'styled-components';
 import keyBy from 'lodash/keyBy';
 import { useQuery } from '@apollo/client';
@@ -18,7 +27,6 @@ import { changeMainTab, changePositionDetailsTab, changeSubTab } from '@state/ta
 import { usePositionDetailsTab } from '@state/tabs/hooks';
 import { FormattedMessage } from 'react-intl';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import TerminateModal from '@common/components/terminate-modal';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';

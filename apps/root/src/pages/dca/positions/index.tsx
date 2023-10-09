@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Tabs, TabComponent, Paper } from 'ui-library';
+import { Typography, Tabs, TabComponent, Paper, createStyles } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { changeOpenClosePositionTab } from '@state/tabs/actions';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import usePositionService from '@hooks/usePositionService';
 import usePrevious from '@hooks/usePrevious';
 import useAccount from '@hooks/useAccount';

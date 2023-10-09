@@ -25,8 +25,9 @@ import {
   Add as AddIcon,
   CurrencyExchange as CurrencyExchangeIcon,
   ViewList as ViewListIcon,
-  Expand as ExpandLess,
-  Expand as ExpandMore,
+  ExpandLess,
+  ExpandMore,
+  createStyles,
 } from 'ui-library';
 import DiscordIcon from '@assets/svg/atom/discord';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
@@ -34,7 +35,6 @@ import { useAppDispatch } from '@state/hooks';
 import { useMainTab, useSubTab } from '@state/tabs/hooks';
 import { changeMainTab, changeSubTab } from '@state/tabs/actions';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import { useLocation } from 'react-router-dom';
 import usePushToHistory from '@hooks/usePushToHistory';

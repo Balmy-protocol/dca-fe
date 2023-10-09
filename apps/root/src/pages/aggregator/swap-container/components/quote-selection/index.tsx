@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { CircularProgress, Popover, Grid, Typography, Box, ErrorOutline as ErrorOutlineIcon } from 'ui-library';
+import {
+  CircularProgress,
+  Popover,
+  Grid,
+  Typography,
+  Box,
+  ErrorOutline as ErrorOutlineIcon,
+  createStyles,
+} from 'ui-library';
 import Button from '@common/components/button';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -14,7 +22,6 @@ import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@com
 import { setSelectedRoute } from '@state/aggregator/actions';
 import { useAppDispatch } from '@state/hooks';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';

@@ -3,9 +3,8 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition } from '@types';
 import useWeb3Service from '@hooks/useWeb3Service';
-import { IconButton, MenuComponent, MenuItem, MoreVert as MoreVertIcon } from 'ui-library';
+import { IconButton, MenuComponent, MenuItem, MoreVert as MoreVertIcon, createStyles } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import {
   DCA_TOKEN_BLACKLIST,
   LATEST_VERSION,

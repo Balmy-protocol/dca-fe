@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { MenuComponent, MenuItem, ArrowDropDown as ArrowDropDownIcon } from 'ui-library';
+import { MenuComponent, MenuItem, ArrowDropDown as ArrowDropDownIcon, createStyles } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import Button, { CustomButtonProps } from '@common/components/button';
 
 const StyledButton = styled(Button)`

@@ -15,6 +15,7 @@ import {
   HelpOutline as HelpOutlineIcon,
   CardGiftcard as CardGiftcardIcon,
   Fingerprint as FingerprintIcon,
+  Theme,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { ActionState, FullPosition, PositionPermission } from '@types';
@@ -26,7 +27,6 @@ import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/
 import Address from '@common/components/address';
 import useUsdPrice from '@hooks/useUsdPrice';
 import { withStyles } from 'tss-react/mui';
-import { Theme } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';

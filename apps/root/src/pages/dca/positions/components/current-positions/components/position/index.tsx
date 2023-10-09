@@ -12,6 +12,8 @@ import {
   LinearProgress,
   ArrowRightAlt as ArrowRightAltIcon,
   ErrorOutline as ErrorOutlineIcon,
+  createStyles,
+  Theme,
 } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -33,14 +35,12 @@ import {
   VERSIONS_ALLOWED_MODIFY,
 } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
-import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
-import { Theme } from '@mui/material';
 import useUsdPrice from '@hooks/useUsdPrice';
 import PositionControls from '../position-controls';
 
