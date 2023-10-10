@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { LinkComponent, LinkProps } from '.';
+import { Link, LinkProps } from '.';
 
-const meta: Meta<typeof LinkComponent> = {
+const meta: Meta<typeof Link> = {
   title: 'Components/Link',
-  component: LinkComponent,
+  component: Link,
   parameters: {
     layout: 'centered',
   },
@@ -13,11 +13,11 @@ const meta: Meta<typeof LinkComponent> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof LinkComponent>;
+type Story = StoryObj<typeof Link>;
 
 export const Primary: Story = {
   args: {},
-  render: (args: LinkProps) => <LinkComponent {...args} />,
+  render: (args: LinkProps) => <Link {...args} />,
 };
 
-export { LinkComponent };
+export { Link };

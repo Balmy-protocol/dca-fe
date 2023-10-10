@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { MenuComponent, MenuProps } from '.';
+import { Menu, MenuProps } from '.';
 
-const meta: Meta<typeof MenuComponent> = {
+const meta: Meta<typeof Menu> = {
   title: 'Components/Menu',
-  component: MenuComponent,
+  component: Menu,
   parameters: {
     layout: 'centered',
   },
@@ -13,11 +13,11 @@ const meta: Meta<typeof MenuComponent> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof MenuComponent>;
+type Story = StoryObj<typeof Menu>;
 
 export const Primary: Story = {
   args: {},
-  render: (args: MenuProps) => <MenuComponent {...args} />,
+  render: (args: MenuProps) => <Menu {...args} />,
 };
 
-export { MenuComponent };
+export { Menu };

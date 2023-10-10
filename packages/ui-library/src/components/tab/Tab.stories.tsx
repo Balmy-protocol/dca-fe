@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { TabComponent, TabProps } from '.';
+import { Tab, TabProps } from '.';
 
-const meta: Meta<typeof TabComponent> = {
+const meta: Meta<typeof Tab> = {
   title: 'Components/Tab',
-  component: TabComponent,
+  component: Tab,
   parameters: {
     layout: 'centered',
   },
@@ -13,11 +13,11 @@ const meta: Meta<typeof TabComponent> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof TabComponent>;
+type Story = StoryObj<typeof Tab>;
 
 export const Primary: Story = {
   args: {},
-  render: (args: TabProps) => <TabComponent {...args} />,
+  render: (args: TabProps) => <Tab {...args} />,
 };
 
-export { TabComponent };
+export { Tab };
