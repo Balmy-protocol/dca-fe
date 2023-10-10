@@ -1,7 +1,6 @@
 import React from 'react';
 import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 import Button from '@common/components/button';
-import useWeb3Service from '@hooks/useWeb3Service';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import styled from 'styled-components';
 import { Token, TransactionTypes } from '@types';
@@ -13,6 +12,7 @@ import useTransactionModal from '@hooks/useTransactionModal';
 import useWalletService from '@hooks/useWalletService';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledApproveItem = styled.div`
   display: flex;
@@ -25,10 +25,10 @@ interface ApproveItemProps {
 }
 
 const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
-  const web3Service = useWeb3Service();
+  const activeWallet = useActiveWallet();
   const hasPendingApproval = useHasPendingApproval(
     token,
-    web3Service.getAccount(),
+    activeWallet?.address,
     false,
     EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES]
   );

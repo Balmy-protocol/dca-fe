@@ -23,7 +23,6 @@ describe('Event Service', () => {
   beforeEach(() => {
     MockedMd5.mockImplementation((value: string) => `md5-${value}`);
     providerService = createMockInstance(MockedProviderService);
-    providerService.getAddress.mockResolvedValue('account');
     providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: false });
     setConfigMock = jest.fn();
     trackMock = jest.fn();
@@ -54,14 +53,6 @@ describe('Event Service', () => {
       );
       expect(setConfigMock).toHaveBeenCalledTimes(1);
       expect(setConfigMock).toHaveBeenCalledWith({ persistence: 'localStorage', ignore_dnt: true });
-    });
-  });
-
-  describe('getIdentifier', () => {
-    test('it should generate an md5 id from the account if present', async () => {
-      const result = await eventService.getIdentifier();
-
-      expect(result).toEqual('md5-account');
     });
   });
 

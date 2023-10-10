@@ -107,7 +107,7 @@ export default class ContractService {
   // CONTRACTS
   async getHubInstance(version?: PositionVersions): Promise<HubContract> {
     const hubAddress = await this.getHUBAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getProvider();
+    const provider = await this.providerService.getSigner();
 
     const hub = DCAHub__factory.connect(hubAddress, provider as Signer);
 
@@ -123,14 +123,14 @@ export default class ContractService {
 
   async getPermissionManagerInstance(version?: PositionVersions) {
     const permissionManagerAddress = await this.getPermissionManagerAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getProvider();
+    const provider = await this.providerService.getSigner();
 
     return DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
   }
 
   async getHUBCompanionInstance(version?: PositionVersions) {
     const hubCompanionAddress = await this.getHUBCompanionAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getProvider();
+    const provider = await this.providerService.getSigner();
 
     return DCAHubCompanion__factory.connect(hubCompanionAddress, provider);
   }
@@ -141,33 +141,33 @@ export default class ContractService {
     if (!this.client || !this.signer || this.network.chainId !== NETWORKS.optimism.chainId) {
       provider = new AlchemyProvider('optimism', 'rMtUNxulZtkQesuF2x8XwydCS_SfsF5U');
     } else {
-      provider = await this.providerService.getProvider();
+      provider = await this.providerService.getSigner();
     }
     return new ethers.Contract(OE_GAS_ORACLE_ADDRESS, OE_GAS_ORACLE_ABI.abi, provider) as unknown as OEGasOracle;
   }
 
   async getTokenInstance(tokenAddress: string): Promise<ERC20Contract> {
-    const provider = await this.providerService.getProvider();
+    const provider = await this.providerService.getSigner();
 
     return new ethers.Contract(tokenAddress, ERC20ABI, provider) as unknown as ERC20Contract;
   }
 
   async getPermit2Instance(): Promise<Permit2Contract> {
-    const provider = await this.providerService.getProvider();
+    const provider = await this.providerService.getSigner();
     const permit2Address = await this.getPermit2Address();
 
     return new ethers.Contract(permit2Address, PERMIT2ABI, provider) as unknown as Permit2Contract;
   }
 
   async getMeanPermit2Instance(): Promise<MeanPermit2Contract> {
-    const provider = await this.providerService.getProvider();
+    const provider = await this.providerService.getSigner();
     const meanPermit2Address = await this.getMeanPermit2Address();
 
     return new ethers.Contract(meanPermit2Address, MEANPERMIT2ABI, provider) as unknown as MeanPermit2Contract;
   }
 
   async getSmolDomainInstance(): Promise<SmolDomainContract> {
-    const provider = await this.providerService.getProvider();
+    const provider = await this.providerService.getSigner();
     const smolDomainAddress = await this.getSmolDomainAddress();
 
     return new ethers.Contract(smolDomainAddress, SMOL_DOMAIN_ABI, provider) as unknown as SmolDomainContract;

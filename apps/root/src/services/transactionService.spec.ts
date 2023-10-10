@@ -115,7 +115,7 @@ describe('Transaction Service', () => {
 
         const windowSpy = jest.spyOn(window, 'setInterval');
 
-        transactionService.onBlock(callback);
+        await transactionService.onBlock(callback);
 
         expect(windowSpy).toHaveBeenCalledWith(expect.any(Function), 10000);
         expect(callback).not.toHaveBeenCalled();
@@ -135,10 +135,10 @@ describe('Transaction Service', () => {
         transactionService.setLoadedAsSafeApp(false);
       });
 
-      test('it should call the providerService on block', () => {
+      test('it should call the providerService on block', async () => {
         const callback = jest.fn();
 
-        transactionService.onBlock(callback);
+        await transactionService.onBlock(callback);
 
         expect(providerService.on).toHaveBeenCalledWith('block', callback);
       });
@@ -146,8 +146,8 @@ describe('Transaction Service', () => {
   });
 
   describe('removeOnBlock', () => {
-    test('it should call the provider service to remove the block listener', () => {
-      transactionService.removeOnBlock();
+    test('it should call the provider service to remove the block listener', async () => {
+      await transactionService.removeOnBlock();
       expect(providerService.off).toHaveBeenCalledWith('block');
     });
   });

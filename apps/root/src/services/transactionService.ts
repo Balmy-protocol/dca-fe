@@ -42,15 +42,16 @@ export default class TransactionService {
     return this.providerService.waitForTransaction(txHash);
   }
 
-  getBlockNumber() {
-    return this.providerService.getBlockNumber();
+  async getBlockNumber() {
+    const blockNumber = await this.providerService.getBlockNumber();
+    return blockNumber || Promise.reject(new Error('No provider'));
   }
 
   onBlock(callback: ((blockNumber: Promise<number>) => Promise<void>) | ((blockNumber: number) => void)) {
     if (this.loadedAsSafeApp) {
       return window.setInterval(
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        () => (callback as (blockNumber: Promise<number>) => Promise<void>)(this.providerService.getBlockNumber()),
+        () => (callback as (blockNumber: Promise<number>) => Promise<void>)(this.getBlockNumber()),
         10000
       );
     }

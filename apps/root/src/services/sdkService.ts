@@ -104,7 +104,9 @@ export default class SdkService {
   }
 
   async resetProvider() {
-    this.provider = (await this.providerService.getBaseProvider()) as BaseProvider;
+    const provider = (await this.providerService.getProvider()) as BaseProvider;
+
+    this.provider = provider;
   }
 
   async getSwapOption(

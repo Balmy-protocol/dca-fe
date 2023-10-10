@@ -35,6 +35,7 @@ import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import { NetworkStruct } from '@types';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -93,6 +94,7 @@ const DcaButton = ({
   const replaceHistory = useReplaceHistory();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
+  const activeWallet = useActiveWallet();
 
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
@@ -378,7 +380,7 @@ const DcaButton = ({
 
   let ButtonToShow;
 
-  if (!web3Service.getAccount()) {
+  if (!activeWallet?.address) {
     ButtonToShow = NoWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;

@@ -20,6 +20,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
 import { DAI, WETH, USDC } from '@pages/euler-claim/constants';
 import useHasPendingClaim from '@pages/euler-claim/hooks/useHasPendingClaim';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledCard = styled(Card)`
   border-radius: 10px;
@@ -48,9 +49,14 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
   const addTransaction = useTransactionAdder();
   const providerService = useProviderService();
   const errorService = useErrorService();
+  const activeWallet = useActiveWallet();
 
   const handleClaimTokens = async () => {
     const { symbol } = token;
+
+    if (!activeWallet?.address) {
+      return null;
+    }
 
     try {
       setModalLoading({
@@ -65,7 +71,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
         ),
       });
       trackEvent('Euler claim - Claim token submitting');
-      const signer = providerService.getSigner();
+      const signer = await providerService.getSigner(activeWallet.address);
       const MigratorInterface = new Interface(EULERMIGRATORABI);
       const MigratorInstance = new Contract(
         EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],

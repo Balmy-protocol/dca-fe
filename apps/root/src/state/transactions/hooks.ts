@@ -6,7 +6,6 @@ import { TransactionDetails, TransactionTypes, Token, TransactionAdderCustomData
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
-import useWeb3Service from '@hooks/useWeb3Service';
 import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -15,6 +14,7 @@ import useWalletService from '@hooks/useWalletService';
 import useArcx from '@hooks/useArcx';
 import { useBlockNumber } from '@state/block-number/hooks';
 import { addTransaction } from './actions';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (response: TransactionResponse, customData: TransactionAdderCustomData) => void {
@@ -83,12 +83,12 @@ export function useTransaction(txHash?: string) {
 // returns all the transactions for the current chain
 export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((appState) => appState.transactions);
-  const web3Service = useWeb3Service();
   const currentNetwork = useCurrentNetwork();
+  const activeWallet = useActiveWallet();
 
   const returnValue = useMemo(
-    () => pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) => tx.from === web3Service.getAccount()),
-    [Object.keys(state[currentNetwork.chainId] || {}), web3Service.getAccount(), currentNetwork]
+    () => pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) => tx.from === activeWallet?.address),
+    [Object.keys(state[currentNetwork.chainId] || {}), activeWallet?.address, currentNetwork]
   );
   return returnValue || {};
 }
@@ -96,7 +96,7 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
 // returns all the transactions for the current chain that are not cleared
 export function useAllNotClearedTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((appState) => appState.transactions);
-  const web3Service = useWeb3Service();
+  const activeWallet = useActiveWallet();
 
   const mergedState = useMemo(
     () =>
@@ -107,13 +107,12 @@ export function useAllNotClearedTransactions(): { [txHash: string]: TransactionD
         }),
         {}
       ),
-    [web3Service.getAccount(), Object.keys(state)]
+    [activeWallet?.address, Object.keys(state)]
   );
 
   const returnValue = useMemo(
-    () =>
-      pickBy(mergedState, (tx: TransactionDetails) => tx.from === web3Service.getAccount() && tx.isCleared === false),
-    [Object.keys(mergedState || {}), web3Service.getAccount()]
+    () => pickBy(mergedState, (tx: TransactionDetails) => tx.from === activeWallet?.address && tx.isCleared === false),
+    [Object.keys(mergedState || {}), activeWallet?.address]
   );
   return returnValue || {};
 }

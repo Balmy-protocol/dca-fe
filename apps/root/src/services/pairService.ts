@@ -183,9 +183,6 @@ export default class PairService {
   }
 
   async canSupportPair(tokenFrom: Token, tokenTo: Token) {
-    // if they are not connected we show everything as available
-    if (!this.providerService.getProvider()) return true;
-
     const network = await this.providerService.getNetwork();
 
     const token0 = tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenFrom;

@@ -20,6 +20,7 @@ import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import { NetworkStruct } from '@types';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledButton = styled(Button)`
   padding: 10px 18px;
@@ -64,6 +65,7 @@ const SwapButton = ({
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const activeWallet = useActiveWallet();
 
   const shouldDisableApproveButton =
     !from ||
@@ -203,7 +205,7 @@ const SwapButton = ({
 
   let ButtonToShow;
 
-  if (!web3Service.getAccount()) {
+  if (!activeWallet?.address) {
     ButtonToShow = NoWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;

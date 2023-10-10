@@ -48,35 +48,25 @@ describe('Wallet Service', () => {
   });
 
   describe('setAccount', () => {
-    test('it should set the passed account as the account of the service', async () => {
-      await walletService.setAccount('new account');
+    test('it should set the passed account as the account of the service', () => {
+      walletService.setAccount('new account');
 
       expect(walletService.getAccount()).toEqual('new account');
     });
 
-    test('it should set the providerService address as the account of the service if no account is passed', async () => {
-      providerService.getAddress.mockResolvedValue('provider address');
-      await walletService.setAccount();
-
-      expect(walletService.getAccount()).toEqual('provider address');
-    });
-
-    test('it should call the callback with the new account', async () => {
+    test('it should call the callback with the new account', () => {
       const mockFunction = jest.fn();
 
-      await walletService.setAccount('new account', mockFunction);
+      walletService.setAccount('new account', mockFunction);
 
       expect(mockFunction).toHaveBeenCalledTimes(1);
       expect(mockFunction).toHaveBeenCalledWith('new account');
     });
 
-    test('it should call the callback with an empty account if none was set', async () => {
+    test('it should call the callback with an empty account if none was set', () => {
       const mockFunction = jest.fn();
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignores
-      providerService.getAddress.mockResolvedValue(undefined);
 
-      await walletService.setAccount(undefined, mockFunction);
+      walletService.setAccount(undefined, mockFunction);
 
       expect(mockFunction).toHaveBeenCalledTimes(1);
       expect(mockFunction).toHaveBeenCalledWith('');
@@ -304,7 +294,7 @@ describe('Wallet Service', () => {
       expect(result).toEqual(undefined);
     });
     test('it should call the multicall contract and return the token data', async () => {
-      await walletService.setAccount('account');
+      walletService.setAccount('account');
       const result = await walletService.getCustomToken('Address');
 
       expect(symbolMock).toHaveBeenCalledTimes(1);
@@ -380,7 +370,7 @@ describe('Wallet Service', () => {
     });
 
     test('it should use the set address if none passed', async () => {
-      await walletService.setAccount('set account');
+      walletService.setAccount('set account');
 
       const result = await walletService.getBalance('token');
 
@@ -390,7 +380,7 @@ describe('Wallet Service', () => {
     });
 
     test('it should call the provider service if the address is the protocol address', async () => {
-      await walletService.setAccount('set account');
+      walletService.setAccount('set account');
 
       const result = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS, 'account');
 
@@ -401,7 +391,7 @@ describe('Wallet Service', () => {
     });
 
     test('it should call the erc20 contract and return the balance', async () => {
-      await walletService.setAccount('set account');
+      walletService.setAccount('set account');
 
       const result = await walletService.getBalance('token', 'account');
 
@@ -451,12 +441,12 @@ describe('Wallet Service', () => {
   });
 
   describe('getSpecificAllowance', () => {
-    beforeEach(async () => {
-      await walletService.setAccount('account');
+    beforeEach(() => {
+      walletService.setAccount('account');
     });
 
     test('it should return the max amount if there is no set account', async () => {
-      await walletService.setAccount('');
+      walletService.setAccount('');
       const result = await walletService.getSpecificAllowance(toToken({ address: 'token' }), 'addressToCheck');
 
       expect(result).toEqual({
@@ -509,8 +499,8 @@ describe('Wallet Service', () => {
   describe('buildApproveSpecificTokenTx', () => {
     let approveMock: jest.Mock;
 
-    beforeEach(async () => {
-      await walletService.setAccount('account');
+    beforeEach(() => {
+      walletService.setAccount('account');
       approveMock = jest.fn().mockResolvedValue('populatedTransaction');
 
       contractService.getTokenInstance.mockResolvedValue({
@@ -640,8 +630,8 @@ describe('Wallet Service', () => {
   describe('approveSpecificToken', () => {
     let approveMock: jest.Mock;
 
-    beforeEach(async () => {
-      await walletService.setAccount('account');
+    beforeEach(() => {
+      walletService.setAccount('account');
       approveMock = jest.fn().mockResolvedValue('populatedTransaction');
 
       contractService.getTokenInstance.mockResolvedValue({

@@ -123,7 +123,10 @@ export default class MeanApiService {
       }
     );
 
-    return this.providerService.sendTransactionWithGasLimit(transactionResponse.data.tx);
+    return this.providerService.sendTransactionWithGasLimit({
+      ...transactionResponse.data.tx,
+      from: recipient,
+    });
   }
 
   async getAllowedPairs(chainId?: number): Promise<AllowedPairs> {
@@ -204,7 +207,7 @@ export default class MeanApiService {
         claimed: false,
       };
 
-      const provider = await this.providerService.getProvider();
+      const provider = await this.providerService.getSigner(address);
 
       const contract = new ethers.Contract(optimismClaimCampaign.claimContract, CLAIM_ABIS.optimismAirdrop, provider);
 

@@ -38,12 +38,12 @@ import ArrowLeft from '@assets/svg/atom/arrow-left';
 import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Button from '@common/components/button';
-import useWeb3Service from '@hooks/useWeb3Service';
 import Address from '@common/components/address';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
 import AllowanceSplitButton from '@common/components/allowance-split-button';
 import TransactionSimulation from '@common/components/transaction-simulation';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledIconButton = styled(IconButton)`
   margin-right: 5px;
@@ -241,8 +241,8 @@ const buildApproveTokenItem = ({
   explanation,
 }: TransactionActionApproveTokenProps) => ({
   content: () => {
-    const web3Service = useWeb3Service();
-    const account = web3Service.getAccount();
+    const activeWallet = useActiveWallet();
+    const account = activeWallet?.address;
 
     return (
       <>
@@ -268,7 +268,7 @@ const buildApproveTokenItem = ({
             )}
           </Typography>
           <Typography variant="body2" color="rgba(255, 255, 255, 0.5);">
-            <Address trimAddress address={account} />
+            <Address trimAddress address={account || ''} />
           </Typography>
           {isCurrentStep && (
             <StyledTransactionStepButtonContainer>
@@ -318,8 +318,8 @@ const buildApproveTokenSignItem = ({
   explanation,
 }: TransactionActionApproveTokenSignProps) => ({
   content: () => {
-    const web3Service = useWeb3Service();
-    const account = web3Service.getAccount();
+    const activeWallet = useActiveWallet();
+    const account = activeWallet?.address;
 
     return (
       <>
@@ -337,7 +337,7 @@ const buildApproveTokenSignItem = ({
             />
           </Typography>
           <Typography variant="body2" color="rgba(255, 255, 255, 0.5);">
-            <Address trimAddress address={account} />
+            <Address trimAddress address={account || ''} />
           </Typography>
           {isCurrentStep && (
             <StyledTransactionStepButtonContainer>

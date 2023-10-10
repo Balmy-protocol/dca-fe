@@ -24,8 +24,6 @@ const connectToweb3auth = async (Web3Auth: any, opts: IWeb3AuthConnectorOptions)
         clientId: clientID,
       });
 
-      console.log(web3auth);
-
       await web3auth.initModal();
 
       await web3auth.connect();
@@ -33,7 +31,6 @@ const connectToweb3auth = async (Web3Auth: any, opts: IWeb3AuthConnectorOptions)
       provider.web3auth = web3auth;
       resolve(provider);
     } catch (e) {
-      console.log(e);
       reject(e);
     }
   });

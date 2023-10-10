@@ -97,7 +97,7 @@
     "@mean-finance/sdk": "0.0.151",
     "@mean-finance/transformers": "^1.0.0",
     "@metamask/detect-provider": "^1.2.0",
-    "@privy-io/react-auth": "^1.41.0",
+    "@privy-io/react-auth": "^1.43.3",
     "@privy-io/wagmi-connector": "0.0.12",
     "@rainbow-me/rainbowkit": "^0.12.16",
     "@reduxjs/toolkit": "^1.6.0",
