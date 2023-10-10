@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import { IconButton, BadgeComponent, Settings as SettingsIcon } from 'ui-library';
+import { IconButton, Badge, SettingsIcon } from 'ui-library';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 import NetworkSelector from '../network-selector';
@@ -33,11 +33,11 @@ const TopBar = ({ onShowSettings }: Props) => {
   return (
     <>
       <StyledCogContainer>
-        <BadgeComponent color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
+        <Badge color="warning" variant="dot" invisible={!hasNonDefaultSettings}>
           <IconButton aria-label="settings" size="small" sx={{ padding: '3px' }} onClick={onShowSettings}>
             <SettingsIcon fontSize="inherit" />
           </IconButton>
-        </BadgeComponent>
+        </Badge>
       </StyledCogContainer>
       <NetworkSelector />
     </>

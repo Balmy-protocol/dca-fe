@@ -4,15 +4,15 @@ import { ChainId, Permission, PositionPermission } from '@types';
 import {
   Typography,
   Tooltip,
-  LinkComponent,
+  Link,
   FormControlLabel,
   FormControl,
   FormGroup,
   Checkbox,
   Card,
   CardContent,
-  OpenInNew as OpenInNewIcon,
-  HelpOutline as HelpOutlineIcon,
+  OpenInNewIcon,
+  HelpOutlineIcon,
 } from 'ui-library';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import { useAppDispatch } from '@hooks/state';
@@ -29,7 +29,7 @@ interface PositionPermissionProps {
 
 const hasPermission = (permissions: Permission[], permission: Permission) => permissions.indexOf(permission) !== -1;
 
-const StyledLink = styled(LinkComponent)`
+const StyledLink = styled(Link)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}

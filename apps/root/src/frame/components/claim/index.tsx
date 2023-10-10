@@ -5,7 +5,7 @@ import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import useClaimableCampaigns from '@hooks/useClaimableCampaigns';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
-import { Typography, BadgeComponent, createStyles } from 'ui-library';
+import { Typography, Badge, createStyles } from 'ui-library';
 import ClaimModal from '@common/components/claim-modal';
 import { withStyles } from 'tss-react/mui';
 
@@ -16,7 +16,7 @@ const StyledMeanLogoContainer = styled.div`
   padding: 5px;
 `;
 
-const StyledBadge = withStyles(BadgeComponent, () =>
+const StyledBadge = withStyles(Badge, () =>
   createStyles({
     root: {
       marginRight: '10px',

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
-import { IconButton, SwapVert as SwapVertIcon } from 'ui-library';
+import { IconButton, SwapVertIcon } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';

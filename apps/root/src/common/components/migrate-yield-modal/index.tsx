@@ -5,7 +5,7 @@ import isUndefined from 'lodash/isUndefined';
 import { Position, YieldOption, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { Typography, Grid, HelpOutlineOutlined as HelpOutlineOutlinedIcon } from 'ui-library';
+import { Typography, Grid, HelpOutlineOutlinedIcon } from 'ui-library';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { PERMISSIONS } from '@constants';
 import { ButtonTypes } from '@common/components/button';

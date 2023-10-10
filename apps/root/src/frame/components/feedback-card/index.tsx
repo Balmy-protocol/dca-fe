@@ -10,8 +10,8 @@ import {
   Slide,
   TextField,
   Typography,
-  ArrowBackIosNew as ArrowBackIosNewIcon,
-  ArrowForwardIos as ArrowForwardIosIcon,
+  ArrowBackIosNewIcon,
+  ArrowForwardIosIcon,
 } from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useMeanApiService from '@hooks/useMeanApiService';

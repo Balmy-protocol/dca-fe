@@ -4,17 +4,17 @@ import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
 import {
   Grid,
-  LinkComponent,
+  Link,
   Typography,
   Tooltip,
-  CompareArrows as CompareArrowsIcon,
-  OpenInNew as OpenInNewIcon,
-  Settings as SettingsIcon,
-  DeleteSweep as DeleteSweepIcon,
-  NewReleases as CreatedIcon,
-  HelpOutline as HelpOutlineIcon,
-  CardGiftcard as CardGiftcardIcon,
-  Fingerprint as FingerprintIcon,
+  CompareArrowsIcon,
+  OpenInNewIcon,
+  SettingsIcon,
+  DeleteSweepIcon,
+  NewReleasesIcon as CreatedIcon,
+  HelpOutlineIcon,
+  CardGiftcardIcon,
+  FingerprintIcon,
   Theme,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -44,7 +44,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   font-size: 15px;
 `;
 
-const StyledLink = styled(LinkComponent)<{ $isFirst?: boolean }>`
+const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
   `}

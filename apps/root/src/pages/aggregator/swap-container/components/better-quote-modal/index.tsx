@@ -10,7 +10,7 @@ import { emptyTokenWithLogoURI, formatCurrencyAmount, emptyTokenWithDecimals } f
 import { getBetterBy, getBetterByLabel, getQuoteMetric } from '@common/utils/quotes';
 import { BigNumber } from 'ethers';
 import { BlowfishResponse, StateChangeKind, SwapOption, SwapOptionWithFailure } from '@types';
-import { Typography, East as EastIcon } from 'ui-library';
+import { Typography, EastIcon } from 'ui-library';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { getProtocolToken } from '@common/mocks/tokens';

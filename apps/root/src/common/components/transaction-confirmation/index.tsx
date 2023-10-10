@@ -9,7 +9,7 @@ import {
   circularProgressClasses,
   Slide,
   Divider,
-  CheckCircle as CheckCircleIcon,
+  CheckCircleIcon,
   createStyles,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';

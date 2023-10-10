@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Button from '@common/components/button';
 import isUndefined from 'lodash/isUndefined';
 import find from 'lodash/find';
-import { Tooltip, Typography, HelpOutline as HelpOutlineIcon } from 'ui-library';
+import { Tooltip, Typography, HelpOutlineIcon } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { BigNumber } from 'ethers';

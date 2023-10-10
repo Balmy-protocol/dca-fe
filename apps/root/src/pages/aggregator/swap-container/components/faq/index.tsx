@@ -1,13 +1,13 @@
 import React from 'react';
 import {
   Typography,
-  LinkComponent,
+  Link,
   Accordion as MuiAccordion,
   AccordionProps,
   AccordionDetails,
   AccordionSummary as MuiAccordionSummary,
   AccordionSummaryProps,
-  ArrowForwardIosSharp as ArrowForwardIosSharpIcon,
+  ArrowForwardIosSharpIcon,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -18,7 +18,7 @@ const StyledFAQContainer = styled.div`
   flex-direction: column;
 `;
 
-const StyledLink = styled(LinkComponent)`
+const StyledLink = styled(Link)`
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}

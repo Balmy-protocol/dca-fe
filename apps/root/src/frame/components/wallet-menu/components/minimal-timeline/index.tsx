@@ -1,14 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  Grid,
-  Typography,
-  CircularProgress,
-  IconButton,
-  MenuComponent,
-  MenuItem,
-  OpenInNew as OpenInNewIcon,
-} from 'ui-library';
+import { Grid, Typography, CircularProgress, IconButton, Menu, MenuItem, OpenInNewIcon } from 'ui-library';
 
 const StyledTimeline = styled(Grid)`
   position: relative;
@@ -144,7 +136,7 @@ const MinimalTimeline = ({ items }: TimelineProps) => {
           </StyledTimelineLink>
         </StyledTimelineContainer>
       ))}
-      <MenuComponent
+      <Menu
         open={contextMenu !== null}
         onClose={handleClose}
         anchorReference="anchorPosition"
@@ -156,7 +148,7 @@ const MinimalTimeline = ({ items }: TimelineProps) => {
               {item.label}
             </MenuItem>
           ))}
-      </MenuComponent>
+      </Menu>
     </StyledTimeline>
   );
 };

@@ -2,15 +2,7 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import Button, { ButtonTypes } from '@common/components/button';
 import SplitButton, { SplitButtonOptions } from '@common/components/split-button';
-import {
-  Typography,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  IconButton,
-  Breakpoint,
-  Close as CloseIcon,
-} from 'ui-library';
+import { Typography, Dialog, DialogActions, DialogContent, IconButton, Breakpoint, CloseIcon } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { makeStyles } from 'tss-react/mui';
 

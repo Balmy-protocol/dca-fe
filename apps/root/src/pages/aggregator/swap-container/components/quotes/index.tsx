@@ -1,11 +1,5 @@
 import * as React from 'react';
-import {
-  Typography,
-  Chip,
-  Paper,
-  ErrorOutline as ErrorOutlineIcon,
-  CheckCircleOutlineOutlined as CheckCircleOutlineOutlinedIcon,
-} from 'ui-library';
+import { Typography, Chip, Paper, ErrorOutlineIcon, CheckCircleOutlineOutlinedIcon } from 'ui-library';
 import Button from '@common/components/button';
 import EmptyRoutes from '@assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';

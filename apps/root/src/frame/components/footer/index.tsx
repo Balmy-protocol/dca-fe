@@ -1,14 +1,14 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
-  LinkComponent,
+  Link,
   Typography,
-  BugReport as BugReportIcon,
-  Twitter as TwitterIcon,
-  Preview as PreviewIcon,
-  DescriptionOutlined as DescriptionOutlinedIcon,
-  HelpOutlineOutlined as HelpOutlineOutlinedIcon,
-  GitHub as GitHubIcon,
+  BugReportIcon,
+  TwitterIcon,
+  PreviewIcon,
+  DescriptionOutlinedIcon,
+  HelpOutlineOutlinedIcon,
+  GitHubIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import DiscordIcon from '@assets/svg/atom/discord';
@@ -41,7 +41,7 @@ const StyledFooterLinks = styled.div`
   align-items: center;
 `;
 
-const StyledLink = styled(LinkComponent)`
+const StyledLink = styled(Link)`
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -61,9 +61,9 @@ const Footer = () => {
 
   return (
     <StyledFooterContainer isSmall={currentBreakPoint === 'xs'}>
-      <LinkComponent href="https://mean.finance">
+      <Link href="https://mean.finance">
         <MeanLogo theme={mode} />
-      </LinkComponent>
+      </Link>
       {currentBreakPoint !== 'xs' && (
         <>
           <StyledFooterMainContent>

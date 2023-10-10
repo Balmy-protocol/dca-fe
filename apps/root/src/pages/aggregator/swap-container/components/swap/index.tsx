@@ -18,7 +18,7 @@ import {
   UnwrapTypeData,
   WrapTypeData,
 } from '@types';
-import { Typography, Tooltip, Grid, Paper, Send as SendIcon } from 'ui-library';
+import { Typography, Tooltip, Grid, Paper, SendIcon } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import useBalance from '@hooks/useBalance';

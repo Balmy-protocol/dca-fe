@@ -1,14 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  Typography,
-  Switch,
-  Collapse,
-  HelpOutlineOutlined as HelpOutlineOutlinedIcon,
-  ArrowDropDown as ArrowDropDownIcon,
-  ArrowDropUp as ArrowDropUpIcon,
-} from 'ui-library';
+import { Typography, Switch, Collapse, HelpOutlineOutlinedIcon, ArrowDropDownIcon, ArrowDropUpIcon } from 'ui-library';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';

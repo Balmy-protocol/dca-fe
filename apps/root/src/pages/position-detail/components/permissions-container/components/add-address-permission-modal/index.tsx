@@ -11,7 +11,7 @@ import {
   FormGroup,
   Checkbox,
   TextField,
-  Delete as DeleteIcon,
+  DeleteIcon,
   createStyles,
 } from 'ui-library';
 import { useAppDispatch } from '@hooks/state';

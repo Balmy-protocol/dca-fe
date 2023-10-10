@@ -11,9 +11,9 @@ import {
   Switch,
   Slide,
   Collapse,
-  Close as CloseIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
+  CloseIcon,
+  ExpandMoreIcon,
+  ExpandLessIcon,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';

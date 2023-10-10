@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Typography, ArrowBack as ArrowBackIcon } from 'ui-library';
+import { Grid, Typography, ArrowBackIcon } from 'ui-library';
 import { YieldOptions } from '@types';
 import { FormattedMessage } from 'react-intl';
 import Button from '@common/components/button';

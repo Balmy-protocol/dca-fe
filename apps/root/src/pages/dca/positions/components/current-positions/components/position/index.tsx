@@ -4,14 +4,14 @@ import findIndex from 'lodash/findIndex';
 import { DateTime } from 'luxon';
 import {
   Chip,
-  LinkComponent,
+  Link,
   Typography,
   Tooltip,
   Card,
   CardContent,
   LinearProgress,
-  ArrowRightAlt as ArrowRightAltIcon,
-  ErrorOutline as ErrorOutlineIcon,
+  ArrowRightAltIcon,
+  ErrorOutlineIcon,
   createStyles,
   Theme,
 } from 'ui-library';
@@ -115,7 +115,7 @@ const StyledCardTitleHeader = styled.div`
   }
 `;
 
-const StyledLink = styled(LinkComponent)`
+const StyledLink = styled(Link)`
   margin: 0px 5px;
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}

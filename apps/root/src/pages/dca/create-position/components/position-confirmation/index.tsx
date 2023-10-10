@@ -8,7 +8,7 @@ import {
   Slide,
   CircularProgress,
   circularProgressClasses,
-  CheckCircle as CheckCircleIcon,
+  CheckCircleIcon,
   createStyles,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import find from 'lodash/find';
 import Button from '@common/components/button';
-import { Typography, LinkComponent, OpenInNew as OpenInNewIcon } from 'ui-library';
+import { Typography, Link, OpenInNewIcon } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, NetworkStruct, YieldOptions } from '@types';
@@ -89,7 +89,7 @@ const PositionDataControls = ({
     return (
       <StyledCallToActionContainer>
         <StyledCardFooterButton variant="contained" color="pending" fullWidth>
-          <LinkComponent
+          <Link
             href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
             target="_blank"
             rel="noreferrer"
@@ -101,7 +101,7 @@ const PositionDataControls = ({
               <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
-          </LinkComponent>
+          </Link>
         </StyledCardFooterButton>
       </StyledCallToActionContainer>
     );

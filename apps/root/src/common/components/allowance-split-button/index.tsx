@@ -5,7 +5,7 @@ import { CustomButtonProps } from '@common/components/button';
 import { AllowanceType, Token, YieldOption } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useWeb3Service from '@hooks/useWeb3Service';
-import { Tooltip, HelpOutline as HelpOutlineIcon } from 'ui-library';
+import { Tooltip, HelpOutlineIcon } from 'ui-library';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { useHasPendingApproval } from '@state/transactions/hooks';

@@ -2,7 +2,7 @@ import * as React from 'react';
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import { DateTime } from 'luxon';
-import { Typography, Card, CardContent, Tooltip, ArrowRightAlt as ArrowRightAltIcon, Theme } from 'ui-library';
+import { Typography, Card, CardContent, Tooltip, ArrowRightAltIcon, Theme } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';

@@ -12,7 +12,7 @@ import {
   AccordionDetails as UnstyledAccordionDetails,
   AccordionSummary as MuiAccordionSummary,
   AccordionSummaryProps as AccordionSummaryPropsRaw,
-  CheckCircle as CheckCircleIcon,
+  CheckCircleIcon,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { ClaimWithBalance } from '@pages/euler-claim/types';

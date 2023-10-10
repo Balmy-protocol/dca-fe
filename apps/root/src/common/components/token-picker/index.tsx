@@ -16,10 +16,10 @@ import {
   ListItemIcon,
   ListItemText,
   Skeleton,
-  Search as SearchIcon,
-  Close as CloseIcon,
-  ContentCopy as ContentCopyIcon,
-  ContentPaste as ContentPasteIcon,
+  SearchIcon,
+  CloseIcon,
+  ContentCopyIcon,
+  ContentPasteIcon,
   createStyles,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';

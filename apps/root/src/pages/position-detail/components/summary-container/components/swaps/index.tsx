@@ -1,11 +1,11 @@
 import React from 'react';
-import { Grid, Tabs, TabComponent, Typography, createStyles } from 'ui-library';
+import { Grid, Tabs, Tab, Typography, createStyles } from 'ui-library';
 import { FullPosition } from '@types';
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
 import PositionTimeline from './components/timeline';
 
-const StyledTab = withStyles(TabComponent, () =>
+const StyledTab = withStyles(Tab, () =>
   createStyles({
     root: {
       textTransform: 'none',

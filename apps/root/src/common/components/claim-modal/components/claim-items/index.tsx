@@ -4,7 +4,7 @@ import TokenIcon from '@common/components/token-icon';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { Campaign } from '@types';
 import { DateTime } from 'luxon';
-import { Typography, HelpOutlineOutlined as HelpOutlineOutlinedIcon } from 'ui-library';
+import { Typography, HelpOutlineOutlinedIcon } from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
 import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';

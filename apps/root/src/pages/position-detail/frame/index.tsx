@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  Grid,
-  Typography,
-  LinkComponent,
-  Tabs,
-  TabComponent,
-  Alert,
-  ArrowBack as ArrowBackIcon,
-  createStyles,
-} from 'ui-library';
+import { Grid, Typography, Link, Tabs, Tab, Alert, ArrowBackIcon, createStyles } from 'ui-library';
 import styled from 'styled-components';
 import keyBy from 'lodash/keyBy';
 import { useQuery } from '@apollo/client';
@@ -59,7 +50,7 @@ import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
 
-const StyledTab = withStyles(TabComponent, () =>
+const StyledTab = withStyles(Tab, () =>
   createStyles({
     root: {
       textTransform: 'none',
@@ -88,7 +79,7 @@ const StyledTabs = withStyles(Tabs, () =>
   })
 );
 
-const StyledLink = styled(LinkComponent)`
+const StyledLink = styled(Link)`
   margin: 0px 5px;
   ${({ theme }) => `
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
@@ -551,12 +542,12 @@ const PositionDetailFrame = () => {
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
           <Button variant="text" color="default">
             {/* <Button variant="text" color="default" onClick={onBackToPositions}> */}
-            <LinkComponent href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
+            <Link href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
               <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
                 <ArrowBackIcon fontSize="inherit" />{' '}
                 <FormattedMessage description="backToPositions" defaultMessage="Back to positions" />
               </Typography>
-            </LinkComponent>
+            </Link>
           </Button>
         </Grid>
         {((position.from.symbol === 'CRV' && position.from.underlyingTokens.length) ||

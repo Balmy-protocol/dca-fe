@@ -1,6 +1,6 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import { Typography, Card, CardContent, ArrowRightAlt as ArrowRightAltIcon } from 'ui-library';
+import { Typography, Card, CardContent, ArrowRightAltIcon } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';

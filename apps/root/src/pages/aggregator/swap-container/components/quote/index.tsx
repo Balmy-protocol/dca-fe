@@ -9,10 +9,10 @@ import {
   Typography,
   Chip,
   Paper,
-  LocalGasStation as LocalGasStationIcon,
-  ErrorOutline as ErrorOutlineIcon,
-  CheckCircle as CheckCircleIcon,
-  RadioButtonUnchecked as RadioButtonUncheckedIcon,
+  LocalGasStationIcon,
+  ErrorOutlineIcon,
+  CheckCircleIcon,
+  RadioButtonUncheckedIcon,
 } from 'ui-library';
 import { emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
 import { withStyles } from 'tss-react/mui';

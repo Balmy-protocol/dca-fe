@@ -4,13 +4,7 @@ import isUndefined from 'lodash/isUndefined';
 import { Token, YieldOption, YieldOptions } from '@types';
 import { FormattedMessage } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
-import {
-  Typography,
-  Popper,
-  ClickAwayListener,
-  ArrowDropDown as ArrowDropDownIcon,
-  Cancel as CancelIcon,
-} from 'ui-library';
+import { Typography, Popper, ClickAwayListener, ArrowDropDownIcon, CancelIcon } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 
 const StyledYieldTokenSelectorContainer = styled.div`

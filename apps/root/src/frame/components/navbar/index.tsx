@@ -4,29 +4,29 @@ import WalletContext from '@common/components/wallet-context';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import {
   IconButton,
-  ListComponent,
+  List,
   ListItemButton,
   ListItemIcon,
   Divider,
   ListItemText,
   Container,
   Tabs,
-  TabComponent,
+  Tab,
   Drawer,
   AppBar,
   Collapse,
-  Twitter as TwitterIcon,
-  HelpOutlineOutlined as HelpOutlineOutlinedIcon,
-  DescriptionOutlined as DescriptionOutlinedIcon,
-  GitHub as GitHubIcon,
-  Menu as MenuIcon,
-  ArrowDropDown as ArrowDropDownIcon,
-  Insights as InsightsIcon,
-  Add as AddIcon,
-  CurrencyExchange as CurrencyExchangeIcon,
-  ViewList as ViewListIcon,
-  ExpandLess,
-  ExpandMore,
+  TwitterIcon,
+  HelpOutlineOutlinedIcon,
+  DescriptionOutlinedIcon,
+  GitHubIcon,
+  MenuIcon,
+  ArrowDropDownIcon,
+  InsightsIcon,
+  AddIcon,
+  CurrencyExchangeIcon,
+  ViewListIcon,
+  ExpandLessIcon,
+  ExpandMoreIcon,
   createStyles,
 } from 'ui-library';
 import DiscordIcon from '@assets/svg/atom/discord';
@@ -107,7 +107,7 @@ const StyledButtonContainer = styled.div<{ breakpoint: ReturnType<typeof useCurr
   ${(props) => (props.breakpoint === 'xs' ? 'flex: 1;' : '')}
 `;
 
-const StyledTab = styled(TabComponent)`
+const StyledTab = styled(Tab)`
   text-transform: none;
   padding: 5px 10px;
 `;
@@ -229,16 +229,16 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       )}
       <StyledNavbarWrapper>
         <Drawer anchor="bottom" open={openDrawer} onClose={() => setOpenDrawer(false)}>
-          <ListComponent>
+          <List>
             <ListItemButton onClick={() => handleTabChange({ index: 0, url: 'create' }, false)}>
               <ListItemIcon>
                 <InsightsIcon />
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="invest" defaultMessage="Invest (DCA)" />} />
-              {openFirstSubTab ? <ExpandLess /> : <ExpandMore />}
+              {openFirstSubTab ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </ListItemButton>
             <Collapse in={openFirstSubTab} timeout="auto" unmountOnExit>
-              <ListComponent component="div" disablePadding>
+              <List component="div" disablePadding>
                 <ListItemButton
                   sx={{ pl: 4 }}
                   onClick={() => handleSubTabChange({ index: 0, mainIndex: 0, url: 'create' })}
@@ -257,7 +257,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                   </ListItemIcon>
                   <ListItemText primary={<FormattedMessage description="positions" defaultMessage="Positions" />} />
                 </ListItemButton>
-              </ListComponent>
+              </List>
             </Collapse>
             <ListItemButton onClick={() => handleTabChange({ index: 2, url: 'swap' })}>
               <ListItemIcon>
@@ -265,9 +265,9 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="swap" defaultMessage="Swap" />} />
             </ListItemButton>
-          </ListComponent>
+          </List>
           <Divider />
-          <ListComponent>
+          <List>
             <ListItemButton onClick={() => openExternalLink('https://github.com/Mean-Finance')}>
               <ListItemIcon>
                 <GitHubIcon />
@@ -298,7 +298,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="faq" defaultMessage="FAQ" />} />
             </ListItemButton>
-          </ListComponent>
+          </List>
         </Drawer>
         <Container sx={{ display: 'flex', paddingBottom: '10px' }}>
           {currentBreakPoint !== 'xs' && (

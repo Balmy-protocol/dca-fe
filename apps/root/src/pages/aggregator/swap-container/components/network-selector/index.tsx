@@ -13,7 +13,7 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
-  Search as SearchIcon,
+  SearchIcon,
 } from 'ui-library';
 import useSdkChains from '@hooks/useSdkChains';
 import { getAllChains } from '@mean-finance/sdk';

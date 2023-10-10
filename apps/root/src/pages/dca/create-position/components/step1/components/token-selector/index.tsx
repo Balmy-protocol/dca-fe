@@ -1,7 +1,7 @@
 import React from 'react';
 import { Token } from 'types';
 import styled from 'styled-components';
-import { Typography, IconButton, SwapHoriz as SwapHorizIcon } from 'ui-library';
+import { Typography, IconButton, SwapHorizIcon } from 'ui-library';
 import TokenButton from '@pages/dca/create-position/components/token-button';
 import { FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress } from '@common/utils/currency';

@@ -8,10 +8,10 @@ import { withStyles } from 'tss-react/mui';
 import {
   Typography,
   Tooltip,
-  MenuComponent,
+  Menu,
   MenuItem,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  HelpOutline as HelpOutlineIcon,
+  KeyboardArrowDownIcon,
+  HelpOutlineIcon,
   createStyles,
   Theme,
 } from 'ui-library';
@@ -31,7 +31,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 5px;
 `;
 
-const StyledMenu = withStyles(MenuComponent, () =>
+const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
       backgroundColor: '#1d1c1c',

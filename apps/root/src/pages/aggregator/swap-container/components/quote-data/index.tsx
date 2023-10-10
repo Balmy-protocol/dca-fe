@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { SwapOption, Token } from '@types';
-import { Typography, Tooltip, HelpOutline as HelpOutlineIcon } from 'ui-library';
+import { Typography, Tooltip, HelpOutlineIcon } from 'ui-library';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';

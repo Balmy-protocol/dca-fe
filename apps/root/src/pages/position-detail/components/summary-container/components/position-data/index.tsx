@@ -10,7 +10,7 @@ import {
   Card,
   CardContent,
   LinearProgress,
-  ArrowRightAlt as ArrowRightAltIcon,
+  ArrowRightAltIcon,
   createStyles,
   Theme,
 } from 'ui-library';

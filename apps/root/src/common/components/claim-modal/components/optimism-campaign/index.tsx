@@ -5,13 +5,7 @@ import TokenIcon from '@common/components/token-icon';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { Campaign, NetworkStruct, OptimismTypeData, TransactionTypes } from '@types';
 import { DateTime } from 'luxon';
-import {
-  Typography,
-  CircularProgress,
-  Chip,
-  HelpOutlineOutlined as HelpOutlineOutlinedIcon,
-  CheckCircleOutline as CheckCircleOutlineIcon,
-} from 'ui-library';
+import { Typography, CircularProgress, Chip, HelpOutlineOutlinedIcon, CheckCircleOutlineIcon } from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
 import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';

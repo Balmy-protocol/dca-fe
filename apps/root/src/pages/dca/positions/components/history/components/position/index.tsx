@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Typography, Chip, Card, CardContent, ArrowRightAlt as ArrowRightAltIcon } from 'ui-library';
+import { Typography, Chip, Card, CardContent, ArrowRightAltIcon } from 'ui-library';
 import Button from '@common/components/button';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
