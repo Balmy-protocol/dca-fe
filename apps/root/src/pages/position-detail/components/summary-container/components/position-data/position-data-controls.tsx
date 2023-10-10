@@ -22,6 +22,7 @@ import useTokenList from '@hooks/useTokenList';
 import { setNetwork } from '@state/config/actions';
 import { useAppDispatch } from '@state/hooks';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -56,7 +57,8 @@ const PositionDataControls = ({
   const hasSignSupport = useSupportsSigning();
   const network = useCurrentNetwork();
   const web3Service = useWeb3Service();
-  const account = web3Service.getAccount();
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
   const tokenList = useTokenList();
   const dispatch = useAppDispatch();
 

@@ -29,6 +29,7 @@ import FeedbackCard from './components/feedback-card';
 import NavBar from './components/navbar';
 import theme from './theme';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
+import useAccountService from '@hooks/useAccountService';
 
 // FONTS
 // import Lato300EOT from 'lato-v32-latin-300.eot';
@@ -96,6 +97,7 @@ const StyledFooterGridContainer = styled(Grid)`
 `;
 const AppFrame = () => {
   const providerService = useProviderService();
+  const accountService = useAccountService();
   const web3Service = useWeb3Service();
   const account = useAccount();
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
@@ -108,7 +110,7 @@ const AppFrame = () => {
   React.useEffect(() => {
     async function getNetwork() {
       try {
-        const isConnected = providerService.getIsConnected();
+        const isConnected = !!accountService.getUser();
         if (isConnected) {
           const web3Network = await providerService.getNetwork();
           const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });

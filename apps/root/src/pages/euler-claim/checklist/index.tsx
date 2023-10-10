@@ -188,6 +188,7 @@ const ClaimChecklist = ({
   const hasPendingTerminateMany = useHasPendingTerminateManyTransactions();
   const hasPendingMigratorApproval = useHasPendingMigratorApprovals();
   const signedTerms = useEulerClaimSignature();
+  const user = positions[0].user;
   const web3Service = useWeb3Service();
   const dispatch = useAppDispatch();
   const needsToApproveTokens = React.useMemo(
@@ -316,7 +317,7 @@ const ClaimChecklist = ({
   };
 
   const handleSignTermsAndAgreements = async () => {
-    const signer = providerService.getSigner();
+    const signer = await providerService.getSigner(user);
 
     const termsAndConditionsHash = '0x427a506ff6e15bd1b7e4e93da52c8ec95f6af1279618a2f076946e83d8294996';
     const termsAndServices = `By signing this Release, clicking "I Agree" on the web interface at euler.finance or executing the EulerClaims smart contract and accepting the redemption, I and any protocol I represent hereby irrevocably and unconditionally release all claims I and any protocol I represent (or other separate related or affiliated legal entities) ("Releasing Parties") may have against Euler Labs, Ltd., the Euler Foundation, the Euler Decentralized Autonomous Organization, members of the Euler Decentralized Autonomous Organization, and any of their agents, affiliates, officers, employees, or principals ("Released Parties") related to this matter whether such claims are known or unknown at this time and regardless of how such claims arise and the laws governing such claims (which shall include but not be limited to any claims arising out of Euler's terms of use).  This release constitutes an express and voluntary binding waiver and relinquishment to the fullest extent permitted by law.  Releasing Parties further agree to indemnify the Released Parties from any and all third-party claims arising or related to this matter, including damages, attorneys fees, and any other costs related to those claims.  If I am acting for or on behalf of a company (or other such separate related or affiliated legal entity), by signing this Release, clicking "I Agree" on the web interface at euler.finance or executing the EulerClaims smart contract and accepting the redemption, I confirm that I am duly authorised to enter into this contract on its behalf.

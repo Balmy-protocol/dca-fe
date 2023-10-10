@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 
 // MOCKS
-import { SwapOption, SwapOptionWithTx, Token, PositionVersions } from '@types';
-import { TransactionReceipt, TransactionRequest } from '@ethersproject/providers';
+import { SwapOption, SwapOptionWithTx, Token, PositionVersions, TransactionRequestWithFrom } from '@types';
+import { TransactionReceipt } from '@ethersproject/providers';
 import { toToken } from '@common/utils/currency';
 import { Interface } from '@ethersproject/abi';
 import ERC20ABI from '@abis/erc20.json';
@@ -67,7 +67,7 @@ export default class AggregatorService {
     return this.signer;
   }
 
-  async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
+  async addGasLimit(tx: TransactionRequestWithFrom): Promise<TransactionRequestWithFrom> {
     const gasUsed = await this.providerService.estimateGas(tx);
 
     return {
@@ -193,6 +193,7 @@ export default class AggregatorService {
 
     if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap) {
       sortedOptions = await this.simulationService.simulateQuotes(
+        takerAddress,
         sortedOptions,
         sorting || SORT_MOST_PROFIT,
         undefined,

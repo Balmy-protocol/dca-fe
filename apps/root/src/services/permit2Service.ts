@@ -1,4 +1,4 @@
-import { BigNumber, VoidSigner, ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
 import { NULL_ADDRESS, ONE_DAY, PERMIT_2_WORDS } from '@constants';
 import { Token } from '@types';
@@ -30,8 +30,8 @@ export default class Permit2Service {
     this.providerService = providerService;
   }
 
-  async getPermit2SignedData(token: Token, amount: BigNumber, wordIndex?: number) {
-    const signer = this.providerService.getSigner();
+  async getPermit2SignedData(address: string, token: Token, amount: BigNumber, wordIndex?: number) {
+    const signer = await this.providerService.getSigner(address);
     const network = await this.providerService.getNetwork();
 
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
@@ -44,7 +44,7 @@ export default class Permit2Service {
     });
 
     // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await (signer as VoidSigner)._signTypedData(
+    const rawSignature = await signer._signTypedData(
       preparedSignature.dataToSign.domain,
       preparedSignature.dataToSign.types,
       preparedSignature.dataToSign.message
@@ -72,8 +72,8 @@ export default class Permit2Service {
     };
   }
 
-  async getPermit2DcaSignedData(token: Token, amount: BigNumber, wordIndex?: number) {
-    const signer = this.providerService.getSigner();
+  async getPermit2DcaSignedData(address: string, token: Token, amount: BigNumber, wordIndex?: number) {
+    const signer = await this.providerService.getSigner(address);
     const network = await this.providerService.getNetwork();
 
     const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
@@ -86,7 +86,7 @@ export default class Permit2Service {
     });
 
     // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await (signer as VoidSigner)._signTypedData(
+    const rawSignature = await signer._signTypedData(
       preparedSignature.dataToSign.domain,
       preparedSignature.dataToSign.types,
       preparedSignature.dataToSign.message

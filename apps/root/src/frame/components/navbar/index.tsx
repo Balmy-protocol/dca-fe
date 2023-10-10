@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import WalletContext from '@common/components/wallet-context';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import {
   IconButton,
@@ -42,6 +41,7 @@ import ClaimButton from '../claim';
 import ConnectWalletButtom from '../connect-wallet';
 import WalletButtom from '../wallet';
 import LanguageLabel from '../footer/components/lang-label';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledNavbarWrapper = styled.div`
   width: 100%;
@@ -147,6 +147,9 @@ const NavBar = ({ isLoading }: NavBarProps) => {
   const pushToHistory = usePushToHistory();
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const [openFirstSubTab, setOpenFirstSubtab] = React.useState(tabIndex === 0);
+  const activeWallet = useActiveWallet();
+
+  console.log(activeWallet);
 
   React.useEffect(() => {
     if (location.pathname === '/positions') {
@@ -335,15 +338,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             {!isLoading && <ClaimButton />}
             <StyledButtonContainer breakpoint={currentBreakPoint}>
               {/* <NetworkLabel network={currentNetwork} /> */}
-              <WalletContext.Consumer>
-                {({ web3Service }) =>
-                  !web3Service.getAccount() && !isLoading ? (
-                    <ConnectWalletButtom />
-                  ) : (
-                    <WalletButtom isLoading={isLoading} />
-                  )
-                }
-              </WalletContext.Consumer>
+              {!activeWallet?.address && !isLoading ? <ConnectWalletButtom /> : <WalletButtom isLoading={isLoading} />}
             </StyledButtonContainer>
             {currentBreakPoint === 'xs' && <LanguageLabel />}
           </StyledNavbarEndContent>

@@ -25,7 +25,7 @@ import {
   SIGN_VERSION,
 } from '@constants';
 import { emptyTokenWithAddress, toToken } from '@common/utils/currency';
-import { BigNumber, VoidSigner, ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { parseUnits } from '@ethersproject/units';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
@@ -33,7 +33,7 @@ import GET_POSITIONS from '@graphql/getPositions.graphql';
 import { DCAPermissionsManager } from '@mean-finance/dca-v2-core/dist';
 import { fromRpcSig } from 'ethereumjs-util';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
-import { TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcSigner, TransactionResponse } from '@ethersproject/providers';
 import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
 
 import ProviderService from './providerService';
@@ -963,7 +963,7 @@ describe('Position Service', () => {
 
   describe('getSignatureForPermission', () => {
     let mockedPermissionManagerInstance: jest.Mocked<DCAPermissionsManager>;
-    let mockedSigner: jest.Mocked<VoidSigner>;
+    let mockedSigner: jest.Mocked<JsonRpcSigner>;
     beforeEach(() => {
       mockedPermissionManagerInstance = {
         nonces: jest.fn().mockResolvedValue(10),
@@ -992,12 +992,12 @@ describe('Position Service', () => {
       mockedSigner = {
         getAddress: jest.fn().mockResolvedValue('address'),
         _signTypedData: jest.fn().mockResolvedValue('signed data'),
-      } as unknown as jest.Mocked<VoidSigner>;
+      } as unknown as jest.Mocked<JsonRpcSigner>;
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       MockedEthers.Contract.mockImplementation(() => mockedPermissionManagerInstance);
-      providerService.getSigner.mockReturnValue(mockedSigner);
+      providerService.getSigner.mockResolvedValue(mockedSigner);
       MockedFromRpcSig.mockReturnValue({
         v: 'v',
         r: 'r',
@@ -1553,6 +1553,7 @@ describe('Position Service', () => {
     });
     test('it should get the tx from buildDepositTx and submit it', async () => {
       const result = await positionService.deposit(
+        'user',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',

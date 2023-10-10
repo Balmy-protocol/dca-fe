@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition } from '@types';
-import useWeb3Service from '@hooks/useWeb3Service';
 import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
@@ -17,6 +16,7 @@ import SplitButton from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { BigNumber } from 'ethers';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -80,6 +80,7 @@ const PositionSummaryControls = ({
 }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const activeWallet = useActiveWallet();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -89,8 +90,7 @@ const PositionSummaryControls = ({
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
   const isPending = pendingTransaction !== null;
-  const web3Service = useWeb3Service();
-  const account = web3Service.getAccount();
+  const account = activeWallet?.address;
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const hasSignSupport = useSupportsSigning();
 

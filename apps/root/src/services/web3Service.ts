@@ -1,4 +1,4 @@
-import { ethers, Signer } from 'ethers';
+import { ethers } from 'ethers';
 import { ExternalProvider, Provider, Network, Web3Provider } from '@ethersproject/providers';
 import { configureChains, createClient, Client, Connector, Chain } from 'wagmi';
 import { getAllChains } from '@mean-finance/sdk';
@@ -74,10 +74,6 @@ import AccountService from './accountService';
 const WALLET_CONNECT_KEY = 'walletconnect';
 
 export default class Web3Service {
-  client: ethers.providers.Web3Provider;
-
-  signer: Signer;
-
   wagmiClient: Client;
 
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
@@ -134,8 +130,7 @@ export default class Web3Service {
 
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
-    setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
-    client?: ethers.providers.Web3Provider
+    setAccountCallback?: React.Dispatch<React.SetStateAction<string>>
   ) {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
@@ -149,9 +144,9 @@ export default class Web3Service {
     this.axiosClient = setupAxiosClient();
 
     // initialize services
-    this.providerService = new ProviderService(client);
+    this.accountService = new AccountService(this);
     this.safeService = new SafeService();
-    this.accountService = new AccountService();
+    this.providerService = new ProviderService(this.accountService);
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
     this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
@@ -303,18 +298,6 @@ export default class Web3Service {
     return this.apolloClient;
   }
 
-  // GETTERS AND SETTERS
-  setClient(client: ethers.providers.Web3Provider) {
-    this.providerService.setProvider(client);
-  }
-
-  setSigner(signer: Signer) {
-    this.signer = signer;
-
-    // [TODO] Refactor so there is only one source of truth
-    this.providerService.setSigner(signer);
-  }
-
   getLoadedAsSafeApp() {
     return this.loadedAsSafeApp;
   }
@@ -341,42 +324,35 @@ export default class Web3Service {
     return this.account;
   }
 
-  getSigner() {
-    return this.signer;
-  }
-
   getSignSupport() {
     return !this.loadedAsSafeApp;
   }
 
   // BOOTSTRAP
-  async connect(suppliedProvider?: Web3Provider, connector?: Connector<Provider>, chainId?: number) {
+  async connect(
+    suppliedProvider?: Web3Provider,
+    connector?: Connector<Provider>,
+    chainId?: number,
+    privyWallet?: boolean
+  ) {
+    console.log('connecting');
     const connectorProvider = await connector?.getProvider();
 
     if (!suppliedProvider && !connectorProvider) {
       return;
     }
 
+    console.log('got here');
     const provider: Provider = (suppliedProvider?.provider || connectorProvider) as Provider;
 
-    this.providerService.setProviderInfo(provider);
+    this.providerService.setProviderInfo(provider, privyWallet);
     // A Web3Provider wraps a standard Web3 provider, which is
     // what Metamask injects as window.ethereum into each page
     const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider, 'any');
 
-    // The Metamask plugin also allows signing transactions to
-    // send ether and pay to change state within the blockchain.
-    // For this, you need the account signer...
-    const signer = ethersProvider.getSigner();
-
-    this.providerService.setProvider(ethersProvider);
-    this.providerService.setSigner(signer);
-
-    this.setClient(ethersProvider);
-    this.setSigner(signer);
-
-    const account = await this.signer.getAddress();
-
+    console.log('getting account');
+    const account = await ethersProvider.getSigner().getAddress();
+    console.log('account got', account);
     // provider.on('network', (newNetwork: number, oldNetwork: null | number) => {
     //   // When a Provider makes its initial connection, it emits a "network"
     //   // event with a null oldNetwork along with the newNetwork. So, if the
@@ -391,21 +367,25 @@ export default class Web3Service {
     // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
 
     this.setAccount(account);
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
 
     try {
       if (chainId) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         await this.walletService.changeNetworkAutomatically(chainId, () => this.setNetwork(chainId));
       } else {
-        const providerChainId = (await this.providerService.getNetwork()).chainId;
+        console.log('here');
+        const providerNetwork = await this.providerService.getNetwork();
+        console.log('or here');
+        const providerChainId = providerNetwork.chainId;
+        console.log('not here');
         this.setNetwork(providerChainId);
+        console.log('definitely here');
       }
     } catch (e) {
-      console.error('Error changing network');
+      console.log('Error changing network', e);
     }
 
-    await this.walletService.setAccount(undefined, this.setAccountCallback);
+    console.log('motherfucker');
+    this.walletService.setAccount(account, this.setAccountCallback);
 
     await this.sdkService.resetProvider();
 
@@ -441,8 +421,6 @@ export default class Web3Service {
     this.walletService.setAccount(null, this.setAccountCallback);
 
     localStorage.removeItem(WALLET_CONNECT_KEY);
-    this.setClient(new ethers.providers.Web3Provider({}));
-    this.providerService.setProvider(new ethers.providers.Web3Provider({}));
   }
 
   setUpModal() {

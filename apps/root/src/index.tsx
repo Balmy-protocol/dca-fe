@@ -17,7 +17,6 @@ import { SupportedLanguages } from '@constants/lang';
 import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
 import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
-import useWeb3Service from '@hooks/useWeb3Service';
 import useAccountService from '@hooks/useAccountService';
 
 type AppProps = {
@@ -42,7 +41,6 @@ function loadLocaleData(locale: SupportedLanguages) {
 const WalletsUpdater = () => {
   const { user, authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const web3Service = useWeb3Service();
   const accountService = useAccountService();
 
   React.useEffect(() => {
@@ -51,24 +49,11 @@ const WalletsUpdater = () => {
     }
   }, [authenticated, wallets]);
 
-  React.useEffect(() => {
-    if (wallets.length) {
-      wallets[0]
-        .getEthersProvider()
-        .then((provider) => {
-          const chainRegex = /.*:(.*)/;
-          void web3Service.connect(provider, undefined, Number(chainRegex.exec(wallets[0].chainId)![1]));
-          return;
-        })
-        .catch((e) => console.error('Error getting privy provider', e));
-    }
-  }, [wallets]);
-
   return <></>;
 };
 
 const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: { wagmiClient, chains } }: AppProps) => {
-  const [account, setAccount] = React.useState(web3Service.getAccount());
+  const [account, setAccount] = React.useState('');
   const [selectedLocale, setSelectedLocale] = React.useState(locale || SupportedLanguages.english);
 
   React.useEffect(() => web3Service.setSetAccountFallback(setAccount), [web3Service]);
@@ -97,9 +82,6 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: {
           <Provider store={store}>
             <PrivyProvider
               appId={process.env.PUBLIC_PRIVY_APP_ID!}
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              onSuccess={(user) => web3Service.getAccountService().setUser(user)}
               config={{
                 loginMethods: ['email', 'google', 'twitter', 'wallet'],
                 appearance: {

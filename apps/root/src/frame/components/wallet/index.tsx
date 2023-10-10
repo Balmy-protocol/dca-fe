@@ -13,9 +13,9 @@ import TokenIcon from '@common/components/token-icon';
 import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
 import { find } from 'lodash';
 import { toToken } from '@common/utils/currency';
-import useWeb3Service from '@hooks/useWeb3Service';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import WalletMenu from '../wallet-menu';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -60,7 +60,7 @@ const WalletButton = ({ isLoading }: ConnectWalletButtonProps) => {
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const badge = useBadgeNumber(currentNetwork.chainId);
-  const web3Service = useWeb3Service();
+  const activeWallet = useActiveWallet();
 
   const onOpen = () => {
     dispatch(
@@ -74,7 +74,7 @@ const WalletButton = ({ isLoading }: ConnectWalletButtonProps) => {
 
   const foundNetwork = find(NETWORKS, { chainId: currentNetwork.chainId });
 
-  if (isLoading) return null;
+  if (isLoading || activeWallet?.address) return null;
 
   return (
     <>
@@ -103,7 +103,7 @@ const WalletButton = ({ isLoading }: ConnectWalletButtonProps) => {
             />
           </StyledTokenIconContainer>
           <Typography noWrap>
-            <Address address={web3Service.getAccount()} trimAddress />
+            <Address address={activeWallet?.address || ''} trimAddress />
           </Typography>
         </StyledButton>
       </StyledBadge>

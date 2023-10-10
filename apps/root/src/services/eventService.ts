@@ -1,4 +1,3 @@
-import md5 from 'md5';
 import MixpanelLibray, { Mixpanel } from 'mixpanel-browser';
 import { MEAN_PROXY_PANEL_URL, NETWORKS } from '@constants/addresses';
 import find from 'lodash/find';
@@ -14,11 +13,6 @@ export default class EventService {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.mixpanel = MixpanelLibray.init(process.env.MIXPANEL_TOKEN!, { api_host: MEAN_PROXY_PANEL_URL }, ' ');
     this.mixpanel.set_config({ persistence: 'localStorage', ignore_dnt: true });
-  }
-
-  async getIdentifier() {
-    const account = await this.providerService.getAddress();
-    return md5(account);
   }
 
   async trackEvent(action: string, extraData?: Record<string | number, unknown>) {

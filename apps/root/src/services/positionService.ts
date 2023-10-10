@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { ethers, Signer, BigNumber, VoidSigner, PopulatedTransaction } from 'ethers';
+import { ethers, Signer, BigNumber, PopulatedTransaction } from 'ethers';
 import keyBy from 'lodash/keyBy';
 import { TransactionRequest, TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
@@ -391,7 +391,7 @@ export default class PositionService {
     permission: PERMISSIONS,
     permissionManagerAddressProvided?: string
   ) {
-    const signer = this.providerService.getSigner();
+    const signer = await this.providerService.getSigner(position.user);
     const { positionId, version } = position;
     const permissionManagerAddress =
       permissionManagerAddressProvided || (await this.contractService.getPermissionManagerAddress(version));
@@ -425,7 +425,7 @@ export default class PositionService {
     permissionManagerAddressProvided?: string,
     erc712Name?: string
   ) {
-    const signer = this.providerService.getSigner();
+    const signer = await this.providerService.getSigner(position.user);
     const { positionId, version } = position;
     const permissionManagerAddress =
       permissionManagerAddressProvided || (await this.contractService.getPermissionManagerAddress(version));
@@ -439,7 +439,7 @@ export default class PositionService {
       signer
     ) as unknown as PermissionManagerContract;
 
-    const nextNonce = await permissionManagerInstance.nonces(await signer.getAddress());
+    const nextNonce = await permissionManagerInstance.nonces(position.user);
 
     const PermissionSet = [
       { name: 'operator', type: 'address' },
@@ -461,7 +461,7 @@ export default class PositionService {
     );
 
     // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await (signer as VoidSigner)._signTypedData(
+    const rawSignature = await signer._signTypedData(
       {
         name: signName,
         version: SIGN_VERSION[position.version],
@@ -545,7 +545,10 @@ export default class PositionService {
       }))
     );
 
-    return this.providerService.sendTransactionWithGasLimit(tx);
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: position.user,
+    });
   }
 
   async transfer(position: Position, toAddress: string): Promise<TransactionResponse> {
@@ -709,6 +712,7 @@ export default class PositionService {
   }
 
   async deposit(
+    user: string,
     from: Token,
     to: Token,
     fromValue: string,
@@ -729,7 +733,10 @@ export default class PositionService {
       signature
     );
 
-    return this.providerService.sendTransactionWithGasLimit(tx);
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: user,
+    });
   }
 
   async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
@@ -776,7 +783,10 @@ export default class PositionService {
       },
     });
 
-    return this.providerService.sendTransactionWithGasLimit(tx);
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: position.user,
+    });
   }
 
   async withdrawSafe(position: Position) {
@@ -886,7 +896,10 @@ export default class PositionService {
       },
     });
 
-    return this.providerService.sendTransactionWithGasLimit(tx);
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: position.user,
+    });
   }
 
   async terminateSafe(position: Position) {
@@ -1280,7 +1293,10 @@ export default class PositionService {
       signature
     );
 
-    return this.providerService.sendTransactionWithGasLimit(tx);
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: position.user,
+    });
   }
 
   async setPendingTransaction(transaction: TransactionDetails) {

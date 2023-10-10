@@ -1,4 +1,4 @@
-import { Log } from '@ethersproject/providers';
+import { Log, TransactionRequest } from '@ethersproject/providers';
 import { Permission, Position, PositionPermission, PositionVersions } from './positions';
 import { Token } from './tokens';
 
@@ -366,3 +366,7 @@ export type TransactionAdderPayloadBase = {
 
 export type TransactionAdderPayload<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
   TransactionAdderPayloadBase & T;
+
+export interface TransactionRequestWithFrom extends TransactionRequest {
+  from: string;
+}

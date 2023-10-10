@@ -165,7 +165,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const needsToApprove =
     !hasConfirmedApproval &&
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
-    position.user === account.toLowerCase() &&
+    position.user === account?.toLowerCase() &&
     allowance.allowance &&
     allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
     allowance.token.address === fromToUse.address &&
@@ -334,6 +334,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         const amountToSign = newAmount.sub(remainingLiquidity);
 
         signature = await permit2Service.getPermit2DcaSignedData(
+          position.user,
           position.from.address !== PROTOCOL_TOKEN_ADDRESS ? position.from : wrappedProtocolToken,
           amountToSign
         );

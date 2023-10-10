@@ -44,11 +44,14 @@ export function getProviderInfoFromChecksArray(checks: string[]): IProviderInfo 
   return filterProviders('check', check);
 }
 
-export function getProviderInfo(provider: any): IProviderInfo {
+export function getProviderInfo(provider: any, privyWallet?: boolean): IProviderInfo {
   if (!provider) return providers.FALLBACK;
   const checks = Object.values(providers)
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     .filter((x) => provider[x.check])
     .map((x) => x.check);
-  return getProviderInfoFromChecksArray(checks);
+  return {
+    ...getProviderInfoFromChecksArray(checks),
+    ...(privyWallet ? { name: 'privy' } : {}),
+  };
 }
