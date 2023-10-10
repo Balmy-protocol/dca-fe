@@ -5,7 +5,6 @@ import { TransactionResponse, Network, TransactionRequest } from '@ethersproject
 import { formatUnits } from '@ethersproject/units';
 import { Token, ERC20Contract, MulticallContract, PositionVersions } from '@types';
 import { MaxUint256 } from '@ethersproject/constants';
-import isUndefined from 'lodash/isUndefined';
 import { toToken } from '@common/utils/currency';
 
 // ABIS
@@ -32,8 +31,8 @@ export default class WalletService {
     this.providerService = providerService;
   }
 
-  async setAccount(account?: string | null, setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
-    this.account = isUndefined(account) ? await this.providerService.getAddress() : account;
+  setAccount(account?: string | null, setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
+    this.account = account || null;
 
     if (setAccountCallback) {
       setAccountCallback(this.account || '');
@@ -168,7 +167,11 @@ export default class WalletService {
 
     if (!address || !account) return Promise.resolve(BigNumber.from(0));
 
-    if (address === PROTOCOL_TOKEN_ADDRESS) return this.providerService.getBalance(account);
+    if (address === PROTOCOL_TOKEN_ADDRESS) {
+      const balance = await this.providerService.getBalance(account);
+
+      return balance || BigNumber.from(0);
+    }
 
     const ERC20Interface = new Interface(ERC20ABI);
 

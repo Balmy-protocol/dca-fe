@@ -61,7 +61,7 @@ export default function Updater(): null {
       if (loadedAsSafeApp) {
         clearInterval(interval as number);
       } else {
-        transactionService.removeOnBlock();
+        void transactionService.removeOnBlock();
       }
     };
   }, [dispatch, walletService.getAccount(), blockNumberCallback]);

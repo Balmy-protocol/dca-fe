@@ -25,6 +25,7 @@ import { useAppDispatch } from '@state/hooks';
 import useWeb3Service from '@hooks/useWeb3Service';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledContent = styled.div`
   background-color: #333333;
@@ -102,6 +103,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
   const hasConfirmedClaim = useCampaignHasConfirmedTransaction(campaign.id);
   const currentNetwork = useCurrentNetwork();
   const web3Service = useWeb3Service();
+  const activeWallet = useActiveWallet();
   const dispatch = useAppDispatch();
 
   const isOnCorrectNetwork = currentNetwork.chainId === campaign.chainId;
@@ -121,6 +123,10 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
   };
 
   const onClaim = async () => {
+    if (!activeWallet?.address) {
+      return null;
+    }
+
     try {
       setModalLoading({
         content: (
@@ -135,7 +141,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
       });
       trackEvent('Campaigns - Claim optimism campaign submitting');
 
-      const result = await campaignService.claim(campaign);
+      const result = await campaignService.claim(campaign, activeWallet.address);
       trackEvent('Campaigns - Claim optimism campaign submitted');
 
       addTransaction(result, {

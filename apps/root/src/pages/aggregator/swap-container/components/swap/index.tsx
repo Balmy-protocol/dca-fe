@@ -71,6 +71,7 @@ import TokenPicker from '../aggregator-token-picker';
 import SwapButton from '../swap-button';
 import BetterQuoteModal from '../better-quote-modal';
 import FailedQuotesModal from '../failed-quotes-modal';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledButtonContainer = styled.div`
   display: flex;
@@ -147,6 +148,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const trackEvent = useTrackEvent();
   const replaceHistory = useReplaceHistory();
   const permit2Service = usePermit2Service();
+  const activeWallet = useActiveWallet();
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(
@@ -726,7 +728,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   const handlePermit2Signed = React.useCallback(
     (transactions?: TransactionStep[]) => {
-      if (!transactions?.length) {
+      if (!transactions?.length || !activeWallet) {
         return Promise.resolve(null);
       }
 
@@ -756,6 +758,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
             if (signature) {
               const simulatePromise = simulationService.simulateQuotes(
+                activeWallet.address,
                 quotes,
                 sorting,
                 signature,
@@ -841,14 +844,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   const handleSignPermit2Approval = React.useCallback(
     async (amount?: BigNumber) => {
-      if (!from || !to || !selectedRoute || !amount) return;
+      if (!from || !to || !selectedRoute || !amount || !activeWallet) return;
 
       try {
         trackEvent('Aggregator - Sign permi2Approval submitting', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
         });
-        const result = await permit2Service.getPermit2SignedData(from, amount);
+        const result = await permit2Service.getPermit2SignedData(activeWallet.address, from, amount);
         trackEvent('Aggregator - Sign permi2Approval submitted', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,

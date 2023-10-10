@@ -1,14 +1,14 @@
 import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 import { EULER_4626_ADDRESSES } from '@pages/euler-claim/constants';
-import useWeb3Service from '@hooks/useWeb3Service';
 import { useMemo } from 'react';
 import { useAllTransactions } from '@state/transactions/hooks';
 import { TransactionTypes } from '@types';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const useHasPendingMigratorApprovals = () => {
   const allTransactions = useAllTransactions();
-  const web3Service = useWeb3Service();
-  const account = web3Service.getAccount();
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
 
   return useMemo(
     () =>

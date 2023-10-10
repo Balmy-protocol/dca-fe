@@ -76,6 +76,7 @@ import SwapSecondStep from '../step2';
 import DcaButton from '../dca-button';
 import NextSwapAvailable from '../next-swap-available';
 import PositionConfirmation from '../position-confirmation';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 export const StyledContentContainer = styled.div`
   background-color: #292929;
@@ -155,6 +156,7 @@ const Swap = ({
   const allowanceTarget = useDcaAllowanceTarget(currentNetwork.chainId, from, fromYield?.tokenAddress, canUsePermit2);
   const [balance, , balanceErrors] = useBalance(from);
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, allowanceTarget);
+  const activeWallet = useActiveWallet();
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -359,7 +361,7 @@ const Swap = ({
   };
 
   const handleSwap = async () => {
-    if (!from || !to) return;
+    if (!from || !to || !activeWallet?.address) return;
     setShouldShowStalePairModal(false);
     const fromSymbol = from.symbol;
 
@@ -388,6 +390,7 @@ const Swap = ({
 
       trackEvent('DCA - Create position submitting');
       const result = await positionService.deposit(
+        activeWallet.address,
         from,
         to,
         fromValue,
@@ -598,13 +601,13 @@ const Swap = ({
   };
 
   const handleSignPermit2Approval = async (amount?: BigNumber) => {
-    if (!from || !to || !amount) return;
+    if (!from || !to || !amount || !activeWallet?.address) return;
 
     try {
       trackEvent('DCA - Sign permi2Approval submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
-      const result = await permit2Service.getPermit2DcaSignedData(from, amount);
+      const result = await permit2Service.getPermit2DcaSignedData(activeWallet.address, from, amount);
       trackEvent('DCA - Sign permi2Approval submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });

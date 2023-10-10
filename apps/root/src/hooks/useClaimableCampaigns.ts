@@ -34,6 +34,10 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
 
   React.useEffect(() => {
     async function callPromise() {
+      if (!account) {
+        return;
+      }
+
       try {
         const promiseResult = await campaignService.getCampaigns(account);
 

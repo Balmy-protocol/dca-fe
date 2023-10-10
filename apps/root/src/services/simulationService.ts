@@ -51,13 +51,12 @@ export default class SimulationService {
   }
 
   async simulateQuotes(
+    user: string,
     quotes: SwapOption[],
     sorting: SwapSortOptions,
     signature?: { nonce: BigNumber; deadline: number; rawSignature: string },
     minimumReceived?: BigNumber
   ): Promise<SwapOption[]> {
-    const address = await this.providerService.getAddress();
-
     const network = await this.providerService.getNetwork();
 
     const transferTo = quotes.reduce((prev, current) => {
@@ -82,8 +81,8 @@ export default class SimulationService {
     const newQuotes = await this.sdkService.sdk.permit2Service.quotes.verifyAndPrepareQuotes({
       chainId: network.chainId,
       quotes: quotes.map(swapOptionToEstimatedQuoteResponseWithTx),
-      takerAddress: address,
-      recipient: transferTo || address,
+      takerAddress: user,
+      recipient: transferTo || user,
       config: {
         sort: {
           by: sorting,

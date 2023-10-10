@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { Typography, Link, OpenInNewIcon } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { FullPosition } from '@types';
-import useWeb3Service from '@hooks/useWeb3Service';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const PositionControlsContainer = styled.div`
   display: flex;
@@ -35,8 +35,8 @@ const PositionPermissionsControls = ({
   disabled,
 }: PositionPermissionsControlsProps) => {
   const isPending = pendingTransaction !== null;
-  const web3Service = useWeb3Service();
-  const account = web3Service.getAccount();
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
 
   if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
 

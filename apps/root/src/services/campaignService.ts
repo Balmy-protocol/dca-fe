@@ -97,22 +97,21 @@ export default class CampaginService {
     );
   }
 
-  async claim(campaign: Campaign) {
+  async claim(campaign: Campaign, user: string) {
     if (!campaign.claimContract) {
       throw new Error('Tried to claim a campaign without a contract');
     }
-    const provider = await this.providerService.getProvider();
-    const account = await this.providerService.getAddress();
+    const signer = await this.providerService.getSigner(user);
 
     const contract = new ethers.Contract(
       campaign.claimContract,
       CLAIM_ABIS[campaign.id as keyof typeof CLAIM_ABIS],
-      provider
+      signer
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return contract.claimAndSendToClaimee(
-      account,
+      user,
       campaign.tokens[0].balance,
       campaign.proof
     ) as Promise<TransactionResponse>;

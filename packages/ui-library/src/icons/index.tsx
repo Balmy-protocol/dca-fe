@@ -49,6 +49,10 @@ import NewReleases from '@mui/icons-material/NewReleases';
 import CardGiftcard from '@mui/icons-material/CardGiftcard';
 import Fingerprint from '@mui/icons-material/Fingerprint';
 import Menu from '@mui/icons-material/Menu';
+import EmailIcon from '@mui/icons-material/Email';
+import WalletIcon from '@mui/icons-material/Wallet';
+import GoogleIcon from '@mui/icons-material/Google';
+import AppleIcon from '@mui/icons-material/Apple';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -102,4 +106,8 @@ export {
   CardGiftcard as CardGiftcardIcon,
   Fingerprint as FingerprintIcon,
   Menu as MenuIcon,
+  EmailIcon,
+  WalletIcon,
+  GoogleIcon,
+  AppleIcon,
 };
