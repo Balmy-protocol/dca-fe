@@ -3,14 +3,18 @@ import styled from 'styled-components';
 import { Permission, Position, TransactionTypes } from '@types';
 import find from 'lodash/find';
 import Button from '@common/components/button';
-import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
-import UnstyledAccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary, { AccordionSummaryProps as AccordionSummaryPropsRaw } from '@mui/material/AccordionSummary';
-import Typography from '@mui/material/Typography';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CircularProgress from '@mui/material/CircularProgress';
+import {
+  Typography,
+  CircularProgress,
+  Paper,
+  Accordion as MuiAccordion,
+  AccordionProps,
+  AccordionDetails as UnstyledAccordionDetails,
+  AccordionSummary as MuiAccordionSummary,
+  AccordionSummaryProps as AccordionSummaryPropsRaw,
+  CheckCircleIcon,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import Paper from '@mui/material/Paper';
 import { ClaimWithBalance } from '@pages/euler-claim/types';
 import { BigNumber } from 'ethers';
 import CustomChip from '@common/components/custom-chip';

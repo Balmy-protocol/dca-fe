@@ -32,7 +32,6 @@
     "@formatjs/cli": "^6.0.4",
     "@formatjs/ts-transformer": "3.12.0",
     "@inrupt/jest-jsdom-polyfills": "^1.7.0",
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest",
     "@svgr/webpack": "^6.2.1",
     "@types/canvas-confetti": "^1.6.0",
     "@types/jest": "^29.5.1",
@@ -98,9 +97,6 @@
     "@mean-finance/sdk": "0.0.149",
     "@mean-finance/transformers": "^1.0.0",
     "@metamask/detect-provider": "^1.2.0",
-    "@mui/icons-material": "^5.14.7",
-    "@mui/material": "^5.14.7",
-    "@mui/styled-engine-sc": "^5.9.3",
     "@rainbow-me/rainbowkit": "^0.12.16",
     "@reduxjs/toolkit": "^1.6.0",
     "@safe-global/safe-apps-sdk": "^7.10.1",
@@ -152,6 +148,5 @@
     "webpackConfig": "./webpack.common.js"
   },
   "resolutions": {
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
   }
 }

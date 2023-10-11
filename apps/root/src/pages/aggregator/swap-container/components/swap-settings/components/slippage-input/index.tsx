@@ -3,9 +3,8 @@ import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import { SetStateCallback } from '@types';
 import findIndex from 'lodash/findIndex';
-import FilledInput from '@mui/material/FilledInput';
+import { FilledInput, createStyles } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import Button from '@common/components/button';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 

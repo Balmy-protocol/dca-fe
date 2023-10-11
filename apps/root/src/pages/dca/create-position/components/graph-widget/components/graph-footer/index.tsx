@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Paper from '@mui/material/Paper';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
+import { Typography, Paper } from 'ui-library';
 import Bulb from '@assets/svg/bulb';
 
 const StyledPaper = styled(Paper)`

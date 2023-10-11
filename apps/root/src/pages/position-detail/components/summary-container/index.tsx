@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
+import { Grid, Paper } from 'ui-library';
 import { FullPosition, GetPairSwapsData, YieldOptions } from '@types';
 import Sticky from 'react-stickynode';
 import { BigNumber } from 'ethers';

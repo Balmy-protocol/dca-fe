@@ -1,15 +1,11 @@
 import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
+import { Typography, Chip, Card, CardContent, ArrowRightAltIcon } from 'ui-library';
 import Button from '@common/components/button';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
 import { Position, Token } from '@types';
-import Chip from '@mui/material/Chip';
 import { getFrequencyLabel } from '@common/utils/parsing';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { NETWORKS } from '@constants';
 import { BigNumber } from 'ethers';

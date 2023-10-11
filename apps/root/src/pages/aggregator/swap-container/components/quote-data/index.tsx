@@ -1,12 +1,10 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { SwapOption, Token } from '@types';
-import Typography from '@mui/material/Typography';
+import { Typography, Tooltip, HelpOutlineIcon } from 'ui-library';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import Tooltip from '@mui/material/Tooltip';
 import { getProtocolToken } from '@common/mocks/tokens';
 
 const StyledQuoteDataContainer = styled.div`

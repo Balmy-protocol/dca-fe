@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import { ButtonTypes } from '@common/components/button';
 import { Position } from '@types';
 import { changeMainTab, changeSubTab } from '@state/tabs/actions';

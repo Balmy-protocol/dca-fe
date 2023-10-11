@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import { IconButton } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import Badge from '@mui/material/Badge';
+import { IconButton, Badge, SettingsIcon } from 'ui-library';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 import NetworkSelector from '../network-selector';

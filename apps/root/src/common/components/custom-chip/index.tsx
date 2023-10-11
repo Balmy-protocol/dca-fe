@@ -1,8 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
-import Typography from '@mui/material/Typography';
+import { Typography, Tooltip, TooltipProps, Theme } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
-import { Theme, Tooltip, TooltipProps } from '@mui/material';
 
 const StyledChipContainer = styled.div<{ tooltip?: boolean; pointer?: boolean }>`
   display: flex;

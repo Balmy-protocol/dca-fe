@@ -1,10 +1,9 @@
 import * as React from 'react';
 import Button from '@common/components/button';
-import Typography from '@mui/material/Typography';
+import { Typography, Link } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { Position } from '@types';
-import Link from '@mui/material/Link';
 import { useAppDispatch } from '@state/hooks';
 import { setPosition } from '@state/position-details/actions';
 import { changePositionDetailsTab } from '@state/tabs/actions';

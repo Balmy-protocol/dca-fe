@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
+import { Grid } from 'ui-library';
 import { Token } from '@types';
 import { BigNumber } from 'ethers';
 import AmountInput from './components/amount-input';

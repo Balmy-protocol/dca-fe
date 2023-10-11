@@ -3,8 +3,7 @@ import { useQuery } from '@apollo/client';
 import styled from 'styled-components';
 import some from 'lodash/some';
 import { ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Area, Line, ComposedChart } from 'recharts';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
+import { Typography, Chip, Paper } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import map from 'lodash/map';
 import find from 'lodash/find';
@@ -26,7 +25,6 @@ import useUsdPrice from '@hooks/useUsdPrice';
 import { parseUnits } from '@ethersproject/units';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { withStyles } from 'tss-react/mui';
-import Chip from '@mui/material/Chip';
 import MinimalTabs from '@common/components/minimal-tabs';
 import GraphFooter from './components/graph-footer';
 

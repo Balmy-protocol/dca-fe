@@ -2,11 +2,10 @@ import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import Button from '@common/components/button';
-import Typography from '@mui/material/Typography';
+import { Typography, Link, OpenInNewIcon } from 'ui-library';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {
   useAllNotClearedTransactions,
   useHasPendingTransactions,
@@ -16,7 +15,6 @@ import { NetworkStruct, TransactionDetails } from '@types';
 import useBuildTransactionDetail from '@hooks/useBuildTransactionDetail';
 import { clearAllTransactions, removeTransaction } from '@state/transactions/actions';
 import { useAppDispatch } from '@state/hooks';
-import Link from '@mui/material/Link';
 import { buildEtherscanTransaction, buildEtherscanAddress } from '@common/utils/etherscan';
 import useWeb3Service from '@hooks/useWeb3Service';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';

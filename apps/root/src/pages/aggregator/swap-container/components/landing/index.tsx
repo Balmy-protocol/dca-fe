@@ -1,12 +1,9 @@
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import EmptyRoutes from '@assets/svg/emptyRoutes';
 import * as React from 'react';
+import { Typography, Chip, Paper, CheckCircleOutlineOutlinedIcon } from 'ui-library';
+import EmptyRoutes from '@assets/svg/emptyRoutes';
 import { FormattedMessage } from 'react-intl';
-import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import { withStyles } from 'tss-react/mui';
 import compact from 'lodash/compact';
-import Chip from '@mui/material/Chip';
 import styled from 'styled-components';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Button from '@mui/material/Button';
+import { Button } from 'ui-library';
 import { TIMEOUT_KEYS, TimeoutKey, TIMEOUT_LABELS_BY_KEY } from '@constants/aggregator';
 import { useIntl } from 'react-intl';
 

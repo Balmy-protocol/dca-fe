@@ -4,7 +4,7 @@ import findIndex from 'lodash/findIndex';
 import isUndefined from 'lodash/isUndefined';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { AvailablePair } from '@types';
 import { SWAP_INTERVALS_MAP } from '@constants';

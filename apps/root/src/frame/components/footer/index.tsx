@@ -1,17 +1,18 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-
-import Link from '@mui/material/Link';
+import {
+  Link,
+  Typography,
+  BugReportIcon,
+  TwitterIcon,
+  PreviewIcon,
+  DescriptionOutlinedIcon,
+  HelpOutlineOutlinedIcon,
+  GitHubIcon,
+} from 'ui-library';
 import styled from 'styled-components';
-import BugReportIcon from '@mui/icons-material/BugReport';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import DiscordIcon from '@assets/svg/atom/discord';
-import PreviewIcon from '@mui/icons-material/Preview';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import { useThemeMode } from '@state/config/hooks';
-import { Typography } from '@mui/material';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import usePushToHistory from '@hooks/usePushToHistory';
 import LanguageLabel from './components/lang-label';

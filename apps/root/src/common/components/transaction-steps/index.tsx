@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
-import Slide from '@mui/material/Slide';
 import findIndex from 'lodash/findIndex';
 import { useIsTransactionPending } from '@state/transactions/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -34,21 +33,17 @@ import {
   TRANSACTION_ACTION_CREATE_POSITION,
 } from '@constants';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
+import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Button from '@common/components/button';
 import useWeb3Service from '@hooks/useWeb3Service';
 import Address from '@common/components/address';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import CircularProgress from '@mui/material/CircularProgress';
 import { BigNumber } from 'ethers';
 import AllowanceSplitButton from '@common/components/allowance-split-button';
 import TransactionSimulation from '@common/components/transaction-simulation';
-import Tooltip from '@mui/material/Tooltip';
 
 const StyledIconButton = styled(IconButton)`
   margin-right: 5px;

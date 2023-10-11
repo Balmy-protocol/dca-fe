@@ -2,17 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import find from 'lodash/find';
 import TokenIcon from '@common/components/token-icon';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { Campaign, NetworkStruct, OptimismTypeData, TransactionTypes } from '@types';
 import { DateTime } from 'luxon';
-import Typography from '@mui/material/Typography';
+import { Typography, CircularProgress, Chip, HelpOutlineOutlinedIcon, CheckCircleOutlineIcon } from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
 import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
-import Chip from '@mui/material/Chip';
 import useTrackEvent from '@hooks/useTrackEvent';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import useTransactionModal from '@hooks/useTransactionModal';
 import {
   useCampaignHasConfirmedTransaction,
@@ -23,7 +20,6 @@ import useCampaignService from '@hooks/useCampaignService';
 import { shouldTrackError } from '@common/utils/errors';
 import useWalletService from '@hooks/useWalletService';
 import useErrorService from '@hooks/useErrorService';
-import CircularProgress from '@mui/material/CircularProgress';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAppDispatch } from '@state/hooks';
 import useWeb3Service from '@hooks/useWeb3Service';

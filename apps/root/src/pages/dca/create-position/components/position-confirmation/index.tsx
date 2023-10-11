@@ -1,14 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
-import Slide from '@mui/material/Slide';
 import Button from '@common/components/button';
-import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
-import Typography from '@mui/material/Typography';
+import {
+  Typography,
+  Slide,
+  CircularProgress,
+  circularProgressClasses,
+  CheckCircleIcon,
+  createStyles,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CircularProgress, { circularProgressClasses } from '@mui/material/CircularProgress';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { LATEST_VERSION, NETWORKS } from '@constants';
 import usePrevious from '@hooks/usePrevious';

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid, Hidden } from 'ui-library';
 import find from 'lodash/find';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -14,7 +14,6 @@ import useToken from '@hooks/useToken';
 import useSwapOption from '@hooks/useSwapOption';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
-import Hidden from '@mui/material/Hidden';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import Swap from './components/swap';

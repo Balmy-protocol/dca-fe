@@ -1,4 +1,4 @@
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import capitalize from 'lodash/capitalize';
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';

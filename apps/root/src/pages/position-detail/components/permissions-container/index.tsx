@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
+import { Typography, Paper, Grid } from 'ui-library';
 import { FullPosition, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
@@ -9,11 +9,9 @@ import {
   useModifiedPermissions,
   usePositionPermissions,
 } from '@state/position-permissions/hooks';
-import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { discardChanges, submitPermissionChanges } from '@state/position-permissions/actions';
 import { useAppDispatch } from '@state/hooks';
-import Paper from '@mui/material/Paper';
 import usePositionService from '@hooks/usePositionService';
 import { fullPositionToMappedPosition } from '@common/utils/parsing';
 import useAccount from '@hooks/useAccount';

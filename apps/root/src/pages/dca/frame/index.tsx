@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid } from 'ui-library';
 import find from 'lodash/find';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useSubTab } from '@state/tabs/hooks';
