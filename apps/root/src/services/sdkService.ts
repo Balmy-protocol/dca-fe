@@ -56,6 +56,7 @@ export default class SdkService {
         },
       },
       quotes: {
+        defaultConfig: { global: { disableValidation: true } },
         sourceList: {
           type: 'overridable-source-list',
           lists: {
