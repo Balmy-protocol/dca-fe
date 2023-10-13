@@ -1,5 +1,5 @@
 import { ConnectedWallet, User as BasePrivyUser } from '@privy-io/react-auth';
-import { Provider } from '@ethersproject/providers';
+import { Provider, Web3Provider } from '@ethersproject/providers';
 import { Signer } from 'ethers';
 
 export enum WalletType {
@@ -11,7 +11,7 @@ export type Wallet = {
   type: WalletType;
   address: string;
   label: string;
-  getProvider(): Promise<Provider>;
+  getProvider(): Promise<Web3Provider>;
   getSigner?(): Signer;
 };
 

@@ -74,7 +74,7 @@ const WalletButton = ({ isLoading }: ConnectWalletButtonProps) => {
 
   const foundNetwork = find(NETWORKS, { chainId: currentNetwork.chainId });
 
-  if (isLoading || activeWallet?.address) return null;
+  if (isLoading || !activeWallet?.address) return null;
 
   return (
     <>

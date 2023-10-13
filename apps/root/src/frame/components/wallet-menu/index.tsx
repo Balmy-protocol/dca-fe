@@ -35,6 +35,8 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import useUser from '@hooks/useUser';
 import useAccountService from '@hooks/useAccountService';
 import useActiveWallet from '@hooks/useActiveWallet';
+import useWallets from '@hooks/useWallets';
+import { find } from 'lodash';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -106,6 +108,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
   const { linkDiscord, linkEmail, linkTwitter, linkWallet, linkGoogle, linkApple, linkGithub } = usePrivy();
   const { logout } = useLogout();
   const user = useUser();
+  const wallets = useWallets();
   const accountService = useAccountService();
   const allTransactions = useAllNotClearedTransactions();
   const hasPendingTransactions = useHasPendingTransactions();
@@ -266,22 +269,29 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
                 </Typography>
                 {user.privyUser?.linkedAccounts
                   .filter((linkedAccount) => linkedAccount.type === 'wallet')
-                  .map((wallet: WalletWithMetadata) => (
-                    <StyledExternalAccount key={wallet.address}>
-                      <Typography variant="subtitle1" fontWeight={500}>
-                        <Address address={wallet.address} trimAddress trimSize={10} /> connected with:{' '}
-                        {wallet.walletClientType}
-                      </Typography>
-                      <Button
-                        disabled={wallet.address.toLowerCase() === account?.toLowerCase()}
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => onSetActiveWallet(wallet.address)}
-                      >
-                        <FormattedMessage description="setAsActive" defaultMessage="Set as active wallet" />
-                      </Button>
-                    </StyledExternalAccount>
-                  ))}
+                  .map((wallet: WalletWithMetadata) => {
+                    const walletIsConnected = find(wallets, { address: wallet.address.toLowerCase() });
+                    return (
+                      <StyledExternalAccount key={wallet.address}>
+                        <Typography variant="subtitle1" fontWeight={500}>
+                          <Address address={wallet.address} trimAddress trimSize={10} /> connected with:{' '}
+                          {wallet.walletClientType}
+                        </Typography>
+                        <Button
+                          disabled={wallet.address.toLowerCase() === account?.toLowerCase() || !walletIsConnected}
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => onSetActiveWallet(wallet.address)}
+                        >
+                          {walletIsConnected ? (
+                            <FormattedMessage description="setAsActive" defaultMessage="Set as active wallet" />
+                          ) : (
+                            <FormattedMessage description="walletNotConnected" defaultMessage="Wallet not connected" />
+                          )}
+                        </Button>
+                      </StyledExternalAccount>
+                    );
+                  })}
               </StyledExternalWalletsContainer>
             </>
           )}

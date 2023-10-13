@@ -101,7 +101,9 @@ export default class ProviderService {
       if (provider?.getNetwork) {
         network = await timeoutPromise(provider?.getNetwork(), '1s');
 
-        return network;
+        if (network) {
+          return network;
+        }
       }
 
       if ((provider as ProviderWithChainId)?.chainId) {
@@ -288,7 +290,6 @@ export default class ProviderService {
   ) {
     const providerInfo = this.getProviderInfo();
 
-    console.log(providerInfo);
     if (AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name) || forceChangeNetwork) {
       return this.changeNetwork(newChainId, callbackBeforeReload);
     }

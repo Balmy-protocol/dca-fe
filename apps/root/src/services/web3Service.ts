@@ -335,14 +335,12 @@ export default class Web3Service {
     chainId?: number,
     privyWallet?: boolean
   ) {
-    console.log('connecting');
     const connectorProvider = await connector?.getProvider();
 
     if (!suppliedProvider && !connectorProvider) {
       return;
     }
 
-    console.log('got here');
     const provider: Provider = (suppliedProvider?.provider || connectorProvider) as Provider;
 
     this.providerService.setProviderInfo(provider, privyWallet);
@@ -350,9 +348,7 @@ export default class Web3Service {
     // what Metamask injects as window.ethereum into each page
     const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider, 'any');
 
-    console.log('getting account');
     const account = await ethersProvider.getSigner().getAddress();
-    console.log('account got', account);
     // provider.on('network', (newNetwork: number, oldNetwork: null | number) => {
     //   // When a Provider makes its initial connection, it emits a "network"
     //   // event with a null oldNetwork along with the newNetwork. So, if the
@@ -372,19 +368,14 @@ export default class Web3Service {
       if (chainId) {
         await this.walletService.changeNetworkAutomatically(chainId, () => this.setNetwork(chainId));
       } else {
-        console.log('here');
         const providerNetwork = await this.providerService.getNetwork();
-        console.log('or here');
         const providerChainId = providerNetwork.chainId;
-        console.log('not here');
         this.setNetwork(providerChainId);
-        console.log('definitely here');
       }
     } catch (e) {
       console.log('Error changing network', e);
     }
 
-    console.log('motherfucker');
     this.walletService.setAccount(account, this.setAccountCallback);
 
     await this.sdkService.resetProvider();

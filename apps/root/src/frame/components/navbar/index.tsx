@@ -149,8 +149,6 @@ const NavBar = ({ isLoading }: NavBarProps) => {
   const [openFirstSubTab, setOpenFirstSubtab] = React.useState(tabIndex === 0);
   const activeWallet = useActiveWallet();
 
-  console.log(activeWallet);
-
   React.useEffect(() => {
     if (location.pathname === '/positions') {
       dispatch(changeMainTab(0));
