@@ -143,8 +143,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI on Aave - Hiding because $MAI lost support on Aave
 
   '0xb5c064f955d8e7f38fe0460c556a72987494ee17', // Polygon - QUICK - Hiding until release
-
-  '0x13ad51ed4f1b7e9dc168d8a00cb3f4ddd85efa60', // Arbitrum - LDO - Hiding until release
 ].map((a) => a.toLowerCase());
 
 export const DISABLED_YIELD_WITHDRAWS = [
