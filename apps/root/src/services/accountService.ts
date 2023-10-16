@@ -35,21 +35,15 @@ export default class AccountService implements IAccountService {
       return undefined;
     }
 
-    const provider = await this.activeWallet.getProvider();
-
-    await provider.getNetwork();
-    // const web3provider = new ethers.providers.Web3Provider(provider, 'any');
-    return provider;
+    return this.getWalletProvider(this.activeWallet.address);
   }
 
   async getActiveWalletSigner() {
-    const provider = await this.getActiveWalletProvider();
-
-    if (!provider) {
+    if (!this.activeWallet) {
       return undefined;
     }
 
-    return provider.getSigner();
+    return this.getWalletSigner(this.activeWallet.address);
   }
 
   async getWalletProvider(wallet: string) {
@@ -60,6 +54,8 @@ export default class AccountService implements IAccountService {
     }
 
     const provider = await foundWallet.getProvider();
+
+    await provider.getNetwork();
 
     return provider;
   }
@@ -74,7 +70,14 @@ export default class AccountService implements IAccountService {
     return this.activeWallet;
   }
 
-  setUser(user: BasePrivyUser, wallets: ConnectedWallet[]): void {
+  setUser(user?: BasePrivyUser, wallets?: ConnectedWallet[]): void {
+    if (!user || !wallets) {
+      this.user = undefined;
+      this.activeWallet = undefined;
+      return;
+    }
+
+    console.log(user, wallets);
     this.user = {
       id: `privy-${user.id}`,
       type: UserType.privy,

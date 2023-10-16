@@ -2,7 +2,18 @@ import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import Button from '@common/components/button';
-import { Typography, Link, OpenInNewIcon } from 'ui-library';
+import {
+  Typography,
+  Link,
+  OpenInNewIcon,
+  EmailIcon,
+  TwitterIcon,
+  WalletIcon,
+  GoogleIcon,
+  AppleIcon,
+  GitHubIcon,
+  CheckCircleOutlineIcon,
+} from 'ui-library';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -23,15 +34,8 @@ import TokenIcon from '@common/components/token-icon';
 import { toToken } from '@common/utils/currency';
 import Address from '@common/components/address';
 import MinimalTimeline from './components/minimal-timeline';
-import EmailIcon from '@mui/icons-material/Email';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import WalletIcon from '@mui/icons-material/Wallet';
-import GoogleIcon from '@mui/icons-material/Google';
-import AppleIcon from '@mui/icons-material/Apple';
 import DiscordIcon from '@assets/svg/atom/discord';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import { WalletWithMetadata, useLogout, usePrivy } from '@privy-io/react-auth';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import useUser from '@hooks/useUser';
 import useAccountService from '@hooks/useAccountService';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -105,7 +109,17 @@ interface WalletMenuProps {
 }
 
 const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
-  const { linkDiscord, linkEmail, linkTwitter, linkWallet, linkGoogle, linkApple, linkGithub } = usePrivy();
+  const {
+    linkDiscord,
+    linkEmail,
+    linkTwitter,
+    linkWallet,
+    linkGoogle,
+    linkApple,
+    linkGithub,
+    connectWallet,
+    unlinkWallet,
+  } = usePrivy();
   const { logout } = useLogout();
   const user = useUser();
   const wallets = useWallets();
@@ -278,17 +292,22 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
                           {wallet.walletClientType}
                         </Typography>
                         <Button
-                          disabled={wallet.address.toLowerCase() === account?.toLowerCase() || !walletIsConnected}
+                          disabled={wallet.address.toLowerCase() === account?.toLowerCase()}
                           variant="contained"
                           color="secondary"
-                          onClick={() => onSetActiveWallet(wallet.address)}
+                          onClick={() => (walletIsConnected ? onSetActiveWallet(wallet.address) : connectWallet())}
                         >
                           {walletIsConnected ? (
                             <FormattedMessage description="setAsActive" defaultMessage="Set as active wallet" />
                           ) : (
-                            <FormattedMessage description="walletNotConnected" defaultMessage="Wallet not connected" />
+                            <FormattedMessage description="walletNotConnected" defaultMessage="Reconnect wallet" />
                           )}
                         </Button>
+                        {wallet.walletClientType !== 'privy' && (
+                          <Button variant="contained" color="secondary" onClick={() => unlinkWallet(wallet.address)}>
+                            <FormattedMessage description="unlinkWallet" defaultMessage="Unlink" />
+                          </Button>
+                        )}
                       </StyledExternalAccount>
                     );
                   })}

@@ -408,6 +408,8 @@ export default class Web3Service {
 
     this.setAccount('');
 
+    this.accountService.setUser(undefined);
+
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.walletService.setAccount(null, this.setAccountCallback);
 
