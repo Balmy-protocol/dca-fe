@@ -1,7 +1,6 @@
 import React from 'react';
-import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
+import { Grid, Paper } from 'ui-library';
 import CountDashboard from '../count-dashboard';
 import UsdDashboard from '../usd-dashboard';
 

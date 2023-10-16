@@ -2,7 +2,7 @@ import TokenInput from '@common/components/token-input';
 import styled from 'styled-components';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Typography } from '@mui/material';
+import { Typography } from 'ui-library';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from '@state/create-position/hooks';
 

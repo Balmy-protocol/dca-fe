@@ -1,6 +1,19 @@
 import React from 'react';
 import { FullPosition, GetPairSwapsData, YieldOptions } from '@types';
-import Typography from '@mui/material/Typography';
+import {
+  Typography,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+  Chip,
+  Tooltip,
+  Card,
+  CardContent,
+  LinearProgress,
+  ArrowRightAltIcon,
+  createStyles,
+  Theme,
+} from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -26,23 +39,14 @@ import {
   getGhTokenListLogoUrl,
 } from '@constants';
 import useUsdPrice from '@hooks/useUsdPrice';
-import LinearProgress from '@mui/material/LinearProgress';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
-import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import find from 'lodash/find';
 import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { useShowBreakdown } from '@state/position-details/hooks';
 import { useAppDispatch } from '@state/hooks';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import { updateShowBreakdown } from '@state/position-details/actions';
 import { formatUnits } from '@ethersproject/units';
-import { Chip, Theme, Tooltip } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import PositionDataControls from './position-data-controls';
 

@@ -1,14 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
-import Slide from '@mui/material/Slide';
 import Button from '@common/components/button';
-import { createStyles } from '@mui/material/styles';
 import { withStyles } from 'tss-react/mui';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
-import Typography from '@mui/material/Typography';
+import {
+  Typography,
+  CircularProgress,
+  circularProgressClasses,
+  Slide,
+  Divider,
+  CheckCircleIcon,
+  createStyles,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CircularProgress, { circularProgressClasses } from '@mui/material/CircularProgress';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { NETWORKS } from '@constants';
 import usePrevious from '@hooks/usePrevious';
@@ -19,7 +23,6 @@ import useWalletService from '@hooks/useWalletService';
 import { Token, TransactionTypes } from '@types';
 import { BigNumber } from 'ethers';
 import TokenIcon from '@common/components/token-icon';
-import { Divider } from '@mui/material';
 import { formatUnits } from '@ethersproject/units';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';

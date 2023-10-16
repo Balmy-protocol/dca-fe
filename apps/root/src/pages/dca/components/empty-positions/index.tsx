@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Card from '@mui/material/Card';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
+import { Typography, Card } from 'ui-library';
 
 const StyledCard = styled(Card)`
   ${({ theme }) => `

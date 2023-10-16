@@ -52,6 +52,7 @@ describe('Price Service', () => {
         getCurrentPricesForChain: mockGetCurrentPricesForChain,
         getCurrentPrices: jest.fn(),
         getHistoricalPrices: jest.fn(),
+        getBulkHistoricalPrices: jest.fn(),
       },
     };
     priceService = new PriceService(

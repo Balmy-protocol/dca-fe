@@ -1,11 +1,7 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid, Tabs, Tab, Typography, createStyles } from 'ui-library';
 import { FullPosition } from '@types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import PositionTimeline from './components/timeline';
 

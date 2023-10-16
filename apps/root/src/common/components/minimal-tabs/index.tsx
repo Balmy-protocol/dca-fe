@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Button from '@mui/material/Button';
+import { Button } from 'ui-library';
 
 const StyledTabsContainer = styled.div`
   ${({ theme }) => `

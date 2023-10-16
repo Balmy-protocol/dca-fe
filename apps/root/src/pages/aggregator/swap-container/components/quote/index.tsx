@@ -1,18 +1,20 @@
-import Chip from '@mui/material/Chip';
-import Paper from '@mui/material/Paper';
 import isNaN from 'lodash/isNaN';
 import isUndefined from 'lodash/isUndefined';
 import isFinite from 'lodash/isFinite';
 import * as React from 'react';
-import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
 import TokenIcon from '@common/components/token-icon';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import Typography from '@mui/material/Typography';
+import {
+  Typography,
+  Chip,
+  Paper,
+  LocalGasStationIcon,
+  ErrorOutlineIcon,
+  CheckCircleIcon,
+  RadioButtonUncheckedIcon,
+} from 'ui-library';
 import { emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
 import { parseUnits } from '@ethersproject/units';

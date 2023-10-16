@@ -1,5 +1,5 @@
 import React from 'react';
-import SvgIcon from '@mui/material/SvgIcon';
+import { SvgIcon } from 'ui-library';
 import { useThemeMode } from '@state/config/hooks';
 
 interface IconProps {

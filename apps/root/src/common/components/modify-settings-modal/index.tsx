@@ -7,7 +7,7 @@ import Modal from '@common/components/modal';
 import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
-import Typography from '@mui/material/Typography';
+import { Typography, Grid, FormControlLabel, FormGroup, Switch } from 'ui-library';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
@@ -22,7 +22,6 @@ import {
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { BigNumber } from 'ethers';
-import Grid from '@mui/material/Grid';
 import TokenInput from '@common/components/token-input';
 import { AllowanceTooltip } from '@common/components/allowance-split-button';
 import {
@@ -44,9 +43,6 @@ import useBalance from '@hooks/useBalance';
 import { useAppDispatch } from '@state/hooks';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from '@common/utils/currency';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
-import Switch from '@mui/material/Switch';
 import { ButtonTypes } from '@common/components/button';
 import { SplitButtonOptions } from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';

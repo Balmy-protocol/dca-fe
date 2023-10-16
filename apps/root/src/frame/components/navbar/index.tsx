@@ -2,39 +2,41 @@ import React from 'react';
 import styled from 'styled-components';
 import WalletContext from '@common/components/wallet-context';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
-import IconButton from '@mui/material/IconButton';
-import TwitterIcon from '@mui/icons-material/Twitter';
+import {
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  Divider,
+  ListItemText,
+  Container,
+  Tabs,
+  Tab,
+  Drawer,
+  AppBar,
+  Collapse,
+  TwitterIcon,
+  HelpOutlineOutlinedIcon,
+  DescriptionOutlinedIcon,
+  GitHubIcon,
+  MenuIcon,
+  ArrowDropDownIcon,
+  InsightsIcon,
+  AddIcon,
+  CurrencyExchangeIcon,
+  ViewListIcon,
+  ExpandLessIcon,
+  ExpandMoreIcon,
+  createStyles,
+} from 'ui-library';
 import DiscordIcon from '@assets/svg/atom/discord';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Drawer from '@mui/material/Drawer';
-import Divider from '@mui/material/Divider';
-import MenuIcon from '@mui/icons-material/Menu';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import InsightsIcon from '@mui/icons-material/Insights';
-import AddIcon from '@mui/icons-material/Add';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
-import ViewListIcon from '@mui/icons-material/ViewList';
 import { useAppDispatch } from '@state/hooks';
 import { useMainTab, useSubTab } from '@state/tabs/hooks';
 import { changeMainTab, changeSubTab } from '@state/tabs/actions';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
-import Collapse from '@mui/material/Collapse';
 import { useLocation } from 'react-router-dom';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import AppBar from '@mui/material/AppBar';
-import ListItemText from '@mui/material/ListItemText';
-import Container from '@mui/material/Container';
 import usePushToHistory from '@hooks/usePushToHistory';
 import ClaimButton from '../claim';
 import ConnectWalletButtom from '../connect-wallet';
@@ -233,7 +235,7 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                 <InsightsIcon />
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="invest" defaultMessage="Invest (DCA)" />} />
-              {openFirstSubTab ? <ExpandLess /> : <ExpandMore />}
+              {openFirstSubTab ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </ListItemButton>
             <Collapse in={openFirstSubTab} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>

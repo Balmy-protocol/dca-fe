@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { Typography } from '@mui/material';
+import { Typography } from 'ui-library';
 
 const StyledFailedQuotesContainer = styled.div`
   display: flex;

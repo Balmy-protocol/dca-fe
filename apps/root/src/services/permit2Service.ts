@@ -76,7 +76,7 @@ export default class Permit2Service {
     const signer = this.providerService.getSigner();
     const network = await this.providerService.getNetwork();
 
-    const preparedSignature = await this.sdkService.sdk.dcaService.management.preparePermitData({
+    const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId: network.chainId,
       signerAddress: this.walletService.getAccount(),

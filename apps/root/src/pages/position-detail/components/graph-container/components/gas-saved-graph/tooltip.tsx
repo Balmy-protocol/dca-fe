@@ -1,5 +1,5 @@
-import Typography from '@mui/material/Typography';
 import React from 'react';
+import { Typography } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';

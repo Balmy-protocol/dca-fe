@@ -3,20 +3,22 @@ import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import Button from '@common/components/button';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import Typography from '@mui/material/Typography';
+import {
+  Typography,
+  Grid,
+  FormControlLabel,
+  FormControl,
+  FormGroup,
+  Checkbox,
+  TextField,
+  DeleteIcon,
+  createStyles,
+} from 'ui-library';
 import { useAppDispatch } from '@hooks/state';
 import { Permission } from '@types';
 import { addOperator } from '@state/position-permissions/actions';
-import FormControl from '@mui/material/FormControl';
-import FormGroup from '@mui/material/FormGroup';
 import { STRING_PERMISSIONS } from '@constants';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import { withStyles } from 'tss-react/mui';
-import { createStyles } from '@mui/material/styles';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 const StyledGrid = styled(Grid)`
   display: flex;

@@ -1,9 +1,8 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid, Typography } from 'ui-library';
 import styled from 'styled-components';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import EmptyPositions from '@pages/dca/components/empty-positions';
-import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
 import { ChainId, Position, YieldOptions, TransactionTypes } from '@types';

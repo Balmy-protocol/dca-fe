@@ -2,29 +2,31 @@ import React, { useState } from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
-import Grid from '@mui/material/Grid';
+import {
+  Grid,
+  Link,
+  Typography,
+  Tooltip,
+  CompareArrowsIcon,
+  OpenInNewIcon,
+  SettingsIcon,
+  DeleteSweepIcon,
+  NewReleasesIcon as CreatedIcon,
+  HelpOutlineIcon,
+  CardGiftcardIcon,
+  FingerprintIcon,
+  Theme,
+} from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
-import Typography from '@mui/material/Typography';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import SettingsIcon from '@mui/icons-material/Settings';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import CreatedIcon from '@mui/icons-material/NewReleases';
-import Tooltip from '@mui/material/Tooltip';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { ActionState, FullPosition, PositionPermission } from '@types';
 import { DateTime } from 'luxon';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS, isCompanionAddress } from '@constants';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
-import Link from '@mui/material/Link';
-import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
-import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import Address from '@common/components/address';
 import useUsdPrice from '@hooks/useUsdPrice';
 import { withStyles } from 'tss-react/mui';
-import { Theme } from '@mui/material';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';

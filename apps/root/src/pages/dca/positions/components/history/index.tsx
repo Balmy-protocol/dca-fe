@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid } from 'ui-library';
 import usePastPositions from '@hooks/usePastPositions';
 import EmptyPositions from '@pages/dca/components/empty-positions';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';

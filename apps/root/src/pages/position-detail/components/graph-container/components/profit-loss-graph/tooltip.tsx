@@ -1,4 +1,4 @@
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import { BigNumber } from 'ethers';
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';

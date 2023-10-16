@@ -1,10 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
+import { Grid, Typography, ArrowBackIcon } from 'ui-library';
 import { YieldOptions } from '@types';
-import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Button from '@common/components/button';
 import { BigNumber } from 'ethers';
 import YieldSelector from './components/yield-selector';

@@ -1,11 +1,9 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid, Typography, Paper } from 'ui-library';
 import styled from 'styled-components';
 import { Position } from '@types';
-import Typography from '@mui/material/Typography';
 import { FormattedMessage } from 'react-intl';
 import useYieldOptions from '@hooks/useYieldOptions';
-import Paper from '@mui/material/Paper';
 import { NETWORKS } from '@constants';
 import ActivePosition from './components/position';
 

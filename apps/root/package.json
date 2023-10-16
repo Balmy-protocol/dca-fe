@@ -32,7 +32,6 @@
     "@formatjs/cli": "^6.0.4",
     "@formatjs/ts-transformer": "3.12.0",
     "@inrupt/jest-jsdom-polyfills": "^1.7.0",
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest",
     "@svgr/webpack": "^6.2.1",
     "@types/canvas-confetti": "^1.6.0",
     "@types/jest": "^29.5.1",
@@ -95,12 +94,9 @@
     "@gnosis.pm/safe-apps-sdk": "^6.1.0",
     "@mean-finance/dca-v2-core": "^3.1.5",
     "@mean-finance/dca-v2-periphery": "^3.3.0",
-    "@mean-finance/sdk": "0.0.145",
+    "@mean-finance/sdk": "0.0.151",
     "@mean-finance/transformers": "^1.0.0",
     "@metamask/detect-provider": "^1.2.0",
-    "@mui/icons-material": "^5.14.7",
-    "@mui/material": "^5.14.7",
-    "@mui/styled-engine-sc": "^5.9.3",
     "@privy-io/react-auth": "^1.41.0",
     "@privy-io/wagmi-connector": "0.0.12",
     "@rainbow-me/rainbowkit": "^0.12.16",
@@ -153,7 +149,5 @@
   "madge": {
     "webpackConfig": "./webpack.common.js"
   },
-  "resolutions": {
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
-  }
+  "resolutions": {}
 }

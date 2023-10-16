@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React from 'react';
 import isUndefined from 'lodash/isUndefined';
-import Typography from '@mui/material/Typography';
+import { Typography } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { Token } from '@types';

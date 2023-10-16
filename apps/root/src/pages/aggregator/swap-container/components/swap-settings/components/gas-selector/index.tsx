@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
-import Button from '@mui/material/Button';
+import { Button } from 'ui-library';
 import { GasKeys, GAS_KEYS, GAS_LABELS_BY_KEY } from '@constants/aggregator';
 
 const StyledTabsContainer = styled.div`

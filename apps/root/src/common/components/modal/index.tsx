@@ -2,14 +2,9 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import Button, { ButtonTypes } from '@common/components/button';
 import SplitButton, { SplitButtonOptions } from '@common/components/split-button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
+import { Typography, Dialog, DialogActions, DialogContent, IconButton, Breakpoint, CloseIcon } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { makeStyles } from 'tss-react/mui';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import { Breakpoint, Typography } from '@mui/material';
 
 const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
   display: flex;

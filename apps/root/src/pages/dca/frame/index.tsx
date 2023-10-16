@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid } from 'ui-library';
 import find from 'lodash/find';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useSubTab } from '@state/tabs/hooks';
@@ -28,6 +28,7 @@ import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import useWalletService from '@hooks/useWalletService';
 import useWeb3Service from '@hooks/useWeb3Service';
 import { fetchGraphTokenList } from '@state/token-lists/actions';
+import { identifyNetwork } from '@common/utils/parsing';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
 
@@ -57,15 +58,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   }, []);
 
   React.useEffect(() => {
-    const chainIdToUse = Number(chainId);
-
-    let networkToSet = find(sdkMappedNetworks, { chainId: chainIdToUse });
-    if (!networkToSet && chainId) {
-      networkToSet = find(
-        sdkMappedNetworks,
-        ({ name, ids }) => name.toLowerCase() === chainId.toLowerCase() || ids.includes(chainId.toLowerCase())
-      );
-    }
+    const networkToSet = identifyNetwork(sdkMappedNetworks, chainId);
 
     if (networkToSet && SUPPORTED_NETWORKS_DCA.includes(networkToSet.chainId)) {
       dispatch(setDCAChainId(networkToSet.chainId));
@@ -79,9 +72,11 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   }, []);
 
   React.useEffect(() => {
+    const networkToUse = identifyNetwork(sdkMappedNetworks, chainId);
+
     const fetchPairs = async () => {
       try {
-        await pairService.fetchAvailablePairs(Number(chainId) || selectedNetwork.chainId);
+        await pairService.fetchAvailablePairs(networkToUse?.chainId || selectedNetwork.chainId);
       } catch (e) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         errorService.logError('Error fetching pairs', JSON.stringify(e), {});

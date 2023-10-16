@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
+import { Grid, Alert } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
 import { SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { BigNumber } from 'ethers';
-import { Alert } from '@mui/material';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import useUsdPrice from '@hooks/useUsdPrice';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';

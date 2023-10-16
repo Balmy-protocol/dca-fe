@@ -1,8 +1,7 @@
 import * as React from 'react';
-import Grid from '@mui/material/Grid';
+import { Grid, Hidden } from 'ui-library';
 import orderBy from 'lodash/orderBy';
 import { getProtocolToken } from '@common/mocks/tokens';
-import Hidden from '@mui/material/Hidden';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, shouldEnableFrequency, STRING_SWAP_INTERVALS } from '@constants';
 import { GetSwapIntervalsGraphqlResponse } from '@types';

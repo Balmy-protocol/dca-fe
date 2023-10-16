@@ -1,8 +1,6 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
+import { Typography, Card, CardContent, ArrowRightAltIcon } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
@@ -10,7 +8,6 @@ import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from '@commo
 import { ChainId, Position, Token, YieldOptions } from '@types';
 import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';

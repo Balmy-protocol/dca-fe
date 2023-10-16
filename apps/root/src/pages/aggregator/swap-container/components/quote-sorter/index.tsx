@@ -4,14 +4,17 @@ import find from 'lodash/find';
 import { FormattedMessage } from 'react-intl';
 import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
 import Button from '@common/components/button';
-import { createStyles, Theme } from '@mui/material';
 import { withStyles } from 'tss-react/mui';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import Menu from '@mui/material/Menu';
-import Typography from '@mui/material/Typography';
-import MenuItem from '@mui/material/MenuItem';
-import Tooltip from '@mui/material/Tooltip';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import {
+  Typography,
+  Tooltip,
+  Menu,
+  MenuItem,
+  KeyboardArrowDownIcon,
+  HelpOutlineIcon,
+  createStyles,
+  Theme,
+} from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { setSorting } from '@state/aggregator-settings/actions';
 import useTrackEvent from '@hooks/useTrackEvent';

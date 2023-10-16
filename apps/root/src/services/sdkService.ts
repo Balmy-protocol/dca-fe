@@ -56,6 +56,7 @@ export default class SdkService {
         },
       },
       quotes: {
+        defaultConfig: { global: { disableValidation: true } },
         sourceList: {
           type: 'overridable-source-list',
           lists: {
@@ -391,45 +392,43 @@ export default class SdkService {
   }
 
   // DCA Methods
-  getDCAAllowanceTarget(
-    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['management']['getAllowanceTarget']>[0]
-  ) {
-    return this.sdk.dcaService.management.getAllowanceTarget(args);
+  getDCAAllowanceTarget(args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['getAllowanceTarget']>[0]) {
+    return this.sdk.dcaService.getAllowanceTarget(args);
   }
 
   buildCreatePositionTx(
-    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['management']['buildCreatePositionTx']>[0]
+    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildCreatePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.management.buildCreatePositionTx(args);
+    return this.sdk.dcaService.buildCreatePositionTx(args);
   }
 
   buildIncreasePositionTx(
-    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['management']['buildIncreasePositionTx']>[0]
+    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildIncreasePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.management.buildIncreasePositionTx(args);
+    return this.sdk.dcaService.buildIncreasePositionTx(args);
   }
 
   buildReducePositionTx(
-    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['management']['buildReducePositionTx']>[0]
+    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildReducePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.management.buildReducePositionTx(args);
+    return this.sdk.dcaService.buildReducePositionTx(args);
   }
 
   buildReduceToBuyPositionTx(
-    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['management']['buildReduceToBuyPositionTx']>[0]
+    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildReduceToBuyPositionTx']>[0]
   ) {
-    return this.sdk.dcaService.management.buildReduceToBuyPositionTx(args);
+    return this.sdk.dcaService.buildReduceToBuyPositionTx(args);
   }
 
   buildWithdrawPositionTx(
-    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['management']['buildWithdrawPositionTx']>[0]
+    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildWithdrawPositionTx']>[0]
   ) {
-    return this.sdk.dcaService.management.buildWithdrawPositionTx(args);
+    return this.sdk.dcaService.buildWithdrawPositionTx(args);
   }
 
   buildTerminatePositionTx(
-    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['management']['buildTerminatePositionTx']>[0]
+    args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildTerminatePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.management.buildTerminatePositionTx(args);
+    return this.sdk.dcaService.buildTerminatePositionTx(args);
   }
 }

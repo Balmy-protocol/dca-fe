@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Paper from '@mui/material/Paper';
+import { Paper } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition } from '@types';
 import { NETWORKS } from '@constants';

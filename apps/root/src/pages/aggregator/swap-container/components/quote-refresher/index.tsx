@@ -1,7 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import IconButton from '@mui/material/IconButton';
-import { SvgIcon } from '@mui/material';
+import { SvgIcon, IconButton } from 'ui-library';
 import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledRefresherContainer = styled.div`

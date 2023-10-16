@@ -1,6 +1,5 @@
 import React from 'react';
 import { parseUnits, formatUnits } from '@ethersproject/units';
-import Paper from '@mui/material/Paper';
 import styled from 'styled-components';
 import {
   Token,
@@ -11,8 +10,7 @@ import {
   TransactionActionCreatePositionData,
   AllowanceType,
 } from '@types';
-import Typography from '@mui/material/Typography';
-import Slide from '@mui/material/Slide';
+import { Typography, Grid, Slide, Paper } from 'ui-library';
 import TokenPicker from '@pages/dca/components/dca-token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
@@ -49,7 +47,6 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/t
 import useWalletService from '@hooks/useWalletService';
 import useContractService from '@hooks/useContractService';
 import usePositionService from '@hooks/usePositionService';
-import Grid from '@mui/material/Grid';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';

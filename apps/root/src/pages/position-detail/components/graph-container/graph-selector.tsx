@@ -2,12 +2,8 @@ import * as React from 'react';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import Button from '@common/components/button';
-import { createStyles } from '@mui/material';
 import { withStyles } from 'tss-react/mui';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import TimelineIcon from '@mui/icons-material/Timeline';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import { Menu, MenuItem, KeyboardArrowDownIcon, TimelineIcon, createStyles } from 'ui-library';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import CircularProgress from '@mui/material/CircularProgress';
+import { CircularProgress } from 'ui-library';
 
 const StyledLoadingIndicatorWrapper = styled.div<{ noFlex?: boolean }>`
   display: flex;

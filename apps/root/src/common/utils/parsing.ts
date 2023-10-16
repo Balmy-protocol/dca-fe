@@ -314,3 +314,16 @@ export const chainToWagmiNetwork = ({
   },
   testnet,
 });
+
+export const identifyNetwork = (sdkNetworks: Chain[], chainId?: string): Chain | undefined => {
+  const chainIdParsed = Number(chainId);
+
+  let foundNetwork = find(sdkNetworks, { chainId: chainIdParsed });
+  if (!foundNetwork && chainId) {
+    foundNetwork = find(
+      sdkNetworks,
+      ({ name, ids }) => name.toLowerCase() === chainId.toLowerCase() || ids.includes(chainId.toLowerCase())
+    );
+  }
+  return foundNetwork;
+};

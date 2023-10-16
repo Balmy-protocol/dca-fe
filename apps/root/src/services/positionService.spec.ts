@@ -35,7 +35,6 @@ import { fromRpcSig } from 'ethereumjs-util';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
 import { TransactionResponse } from '@ethersproject/providers';
 import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
-import { DCAPermission } from '@mean-finance/sdk';
 
 import ProviderService from './providerService';
 import WalletService from './walletService';
@@ -1011,7 +1010,7 @@ describe('Position Service', () => {
         await positionService.getSignatureForPermission(
           createPositionMock({}),
           'contractAddress',
-          DCAPermission.INCREASE,
+          PERMISSIONS.INCREASE,
           'providedPermissionManagerAddress'
         );
 
@@ -1029,7 +1028,7 @@ describe('Position Service', () => {
         await positionService.getSignatureForPermission(
           createPositionMock({}),
           'contractAddress',
-          DCAPermission.INCREASE,
+          PERMISSIONS.INCREASE,
           undefined,
           'erc712Name'
         );
@@ -1075,7 +1074,7 @@ describe('Position Service', () => {
       const result = await positionService.getSignatureForPermission(
         createPositionMock({}),
         'contractAddress',
-        DCAPermission.INCREASE
+        PERMISSIONS.INCREASE
       );
 
       // eslint-disable-next-line no-underscore-dangle
@@ -2330,7 +2329,7 @@ describe('Position Service', () => {
                 chainId: 137,
               }),
             ],
-            [DCAPermission.INCREASE],
+            [PERMISSIONS.INCREASE],
             'permittedAddress'
           );
           expect(1).toEqual(2);
@@ -2356,7 +2355,7 @@ describe('Position Service', () => {
             positionId: 'position-3',
           }),
         ],
-        [DCAPermission.INCREASE],
+        [PERMISSIONS.INCREASE],
         'permittedAddress'
       );
 

@@ -1,12 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import CircularProgress from '@mui/material/CircularProgress';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import { Grid, Typography, CircularProgress, IconButton, Menu, MenuItem, OpenInNewIcon } from 'ui-library';
 
 const StyledTimeline = styled(Grid)`
   position: relative;

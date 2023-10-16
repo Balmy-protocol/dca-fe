@@ -2,8 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
+import { Typography, Link } from 'ui-library';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
