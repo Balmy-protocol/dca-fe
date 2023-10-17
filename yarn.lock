@@ -2582,13 +2582,14 @@
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/sdk@0.0.151":
-  version "0.0.151"
-  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.151.tgz#4039471531b20844f826800fdbe71454836d515f"
-  integrity sha512-p2FHAG0kJffqCfv1flttkMX6cpSimIE32kFHj45YEJMVJ5/Voej1Qzms67qLzF4mPzlv2E/maoRiV9XujYaD6Q==
+"@mean-finance/sdk@0.0.152":
+  version "0.0.152"
+  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.152.tgz#21eb1fb47a7ff46953ba8f81bacb0f71d398b3b5"
+  integrity sha512-g3o/QxinM7YjmtsqiG8fF6o5BG7ct3+NQh8VxfVmA9dwR6ZCOw6YzmG7o5vNFBSe8TadevYrn8gjrSiXRPqfAw==
   dependencies:
     alchemy-sdk "2.9.2"
     cross-fetch "3.1.5"
+    crypto-js "4.1.1"
     lru-cache "9.0.3"
     ms "3.0.0-canary.1"
     qs "6.11.2"
@@ -8036,6 +8037,11 @@ crypto-browserify@^3.12.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
+
+crypto-js@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 crypto-random-string@^2.0.0:
   version "2.0.0"
