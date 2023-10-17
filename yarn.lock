@@ -67,10 +67,10 @@
     tslib "^2.3.0"
     zen-observable-ts "^1.2.5"
 
-"@arcxmoney/analytics@^1.6.0":
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/@arcxmoney/analytics/-/analytics-1.9.1.tgz#c3415ff20a4bb6758da5e1eae13204a456717ab4"
-  integrity sha512-I2SLyqOLl46Kpk3AuYZLjqicn2nBUWAJhSt2cT/1eKChylpy7bhynh5VsWLSXuyuWC33aa4MUqP5XHO1p16KgA==
+"@arcxmoney/analytics@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@arcxmoney/analytics/-/analytics-2.0.2.tgz#f44f85bbd0be8188e95cb92e19ad7d1e65c7757c"
+  integrity sha512-mJUJ33y4NLUjRE186OX4RVqKXIjqplhJJZP+u7WWAn4eTDnNUkOyYt72G8oMXLvuNiDR4b89pLeftfZ9+YYQfg==
   dependencies:
     "@restless/sanitizers" "^0.2.5"
     socket.io-client "^4.5.4"
