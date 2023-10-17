@@ -10,7 +10,7 @@ export enum WalletType {
 export type Wallet = {
   type: WalletType;
   address: string;
-  label: string;
+  label?: string;
   getProvider(): Promise<Web3Provider>;
   getSigner?(): Signer;
 };
@@ -21,7 +21,7 @@ export enum UserType {
 }
 
 export type BaseUser = {
-  id: string; // For privy: `privy-${id}`, for external wallets: `wallet-${address}`
+  id: string; // For privy: `privy:${id}`, for external wallets: `wallet:${address}`
   wallets: Wallet[];
 };
 
@@ -46,3 +46,9 @@ export type IAccountService = {
   getWalletSigner(wallet: string): Promise<Signer>;
   setUser(user: BasePrivyUser, wallets: ConnectedWallet[]): void;
 };
+
+export type AccountLabels = Record<string, string>;
+
+export interface PostAccountLabels {
+  labels: { label: string; wallet: string }[];
+}

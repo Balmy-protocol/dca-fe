@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { LATEST_VERSION, MEAN_API_URL } from '@constants';
+import { LATEST_VERSION, BALMY_API_URL } from '@constants';
 import {
   AllowedPairs,
   BlowfishResponse,
@@ -14,9 +14,13 @@ import {
   RawCampaigns,
   Token,
   PositionVersions,
+  AccountLabelsResponse,
+  AccountLabels,
+  PostAccountLabels,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
+import { getAccessToken } from '@privy-io/react-auth';
 
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -72,7 +76,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const underlyingResponse = await this.axiosClient.post<MeanApiUnderlyingResponse>(
-      `${MEAN_API_URL}/v2/transforms/to-underlying`,
+      `${BALMY_API_URL}/v2/transforms/to-underlying`,
       {
         tokens: tokensToSend.map((tokenObj) => ({
           dependent: `${tokenObj.token.chainId}:${tokenObj.token.underlyingTokens[0].address.toString()}`,
@@ -110,7 +114,7 @@ export default class MeanApiService {
 
     // Call to api and get transaction
     const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-migrate`,
+      `${BALMY_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-migrate`,
       {
         sourceHub: hubAddress,
         targetHub: newHubAddress,
@@ -134,7 +138,7 @@ export default class MeanApiService {
     const chainIdTouse = chainId || currentNetwork.chainId;
     try {
       const allowedPairsResponse = await this.axiosClient.get<MeanFinanceAllowedPairsResponse>(
-        `${MEAN_API_URL}/v1/dca/networks/${chainIdTouse}/config`
+        `${BALMY_API_URL}/v1/dca/networks/${chainIdTouse}/config`
       );
 
       return allowedPairsResponse.data.supportedPairs.map((allowedPair) => ({
@@ -147,7 +151,7 @@ export default class MeanApiService {
   }
 
   async logError(error: string, errorMessage: string, extraData?: unknown) {
-    return this.axiosClient.post(`${MEAN_API_URL}/v1/error-reporting`, {
+    return this.axiosClient.post(`${BALMY_API_URL}/v1/error-reporting`, {
       error,
       errorMessage,
       url: window.location.pathname,
@@ -156,7 +160,7 @@ export default class MeanApiService {
   }
 
   async logFeedback(action: string, description: string) {
-    return this.axiosClient.post(`${MEAN_API_URL}/v1/log-feedback`, {
+    return this.axiosClient.post(`${BALMY_API_URL}/v1/log-feedback`, {
       action,
       description,
     });
@@ -175,7 +179,7 @@ export default class MeanApiService {
     },
     chainId: number
   ) {
-    return this.axiosClient.post<BlowfishResponse>(`${MEAN_API_URL}/v1/simulate-blowfish-transaction/${chainId}`, {
+    return this.axiosClient.post<BlowfishResponse>(`${BALMY_API_URL}/v1/simulate-blowfish-transaction/${chainId}`, {
       txObject,
       userAccount,
       metadata,
@@ -186,7 +190,7 @@ export default class MeanApiService {
     let optimismClaimCampaign: RawCampaign | undefined;
     try {
       const getOptimismClaimCampaignData = await this.axiosClient.get<OptimismAirdropCampaingResponse>(
-        `${MEAN_API_URL}/v1/optimism-airdrop/${address}`
+        `${BALMY_API_URL}/v1/optimism-airdrop/${address}`
       );
 
       optimismClaimCampaign = {
@@ -224,5 +228,53 @@ export default class MeanApiService {
         ...((optimismClaimCampaign && { optimismAirdrop: optimismClaimCampaign }) || {}),
       },
     };
+  }
+
+  private async authorizedRequest<TResponse>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    url: string,
+    data?: unknown
+  ): Promise<TResponse> {
+    const authToken = await getAccessToken();
+    if (!authToken) {
+      throw new Error('Authorization token not available');
+    }
+
+    const headers = {
+      Authorization: `PRIVY token="${authToken}"`,
+    };
+
+    const response = await this.axiosClient.request<TResponse>({
+      method,
+      url,
+      headers,
+      data,
+    });
+    return response.data;
+  }
+
+  async getAccountLabels(accountId: string): Promise<AccountLabels> {
+    try {
+      const accountLabelsResponse = await this.authorizedRequest<AccountLabelsResponse>(
+        'GET',
+        `${BALMY_API_URL}/v1/accounts/${accountId}`
+      );
+      return accountLabelsResponse.labels;
+    } catch (e) {
+      console.error(e);
+      return {};
+    }
+  }
+
+  async postAccountLabels(labels: AccountLabels, accountId: string): Promise<void> {
+    const parsedLabels: PostAccountLabels = {
+      labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label })),
+    };
+
+    try {
+      await this.authorizedRequest('POST', `${BALMY_API_URL}/v1/accounts/${accountId}/labels`, parsedLabels);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
