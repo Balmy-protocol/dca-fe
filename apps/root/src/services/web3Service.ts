@@ -226,6 +226,10 @@ export default class Web3Service {
     return this.accountService;
   }
 
+  getLabelService() {
+    return this.labelService;
+  }
+
   getContractService() {
     return this.contractService;
   }

@@ -18,6 +18,7 @@ import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
 import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import useAccountService from '@hooks/useAccountService';
+import useLabelService from '@hooks/useLabelService';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -42,10 +43,12 @@ const WalletsUpdater = () => {
   const { user, authenticated } = usePrivy();
   const { wallets } = useWallets();
   const accountService = useAccountService();
+  const labelService = useLabelService();
 
   React.useEffect(() => {
     if (user && wallets.length) {
       void accountService.setUser(user, wallets);
+      void labelService.setWalletLabels();
     }
   }, [authenticated, wallets]);
   return <></>;
