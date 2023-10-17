@@ -409,8 +409,8 @@ export default class Web3Service {
       const network = await ethersProvider.getNetwork();
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      arcxClient.connectWallet({
-        chain: network.chainId,
+      arcxClient.wallet({
+        chainId: network.chainId,
         account,
       });
     } catch (e) {
