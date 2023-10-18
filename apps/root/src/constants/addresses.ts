@@ -690,8 +690,7 @@ export const TOKEN_LISTS = {
 
 export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST', 'jEUR', 'jGBP', 'jCHF', 'USDC.e'];
 
-export const BALMY_API_URL =
-  process.env.NODE_ENV === 'production' ? 'https://api.balmy.xyz' : 'https://staging.api.balmy.xyz';
+export const MEAN_API_URL = 'https://api.mean.finance';
 
 export const MEAN_PROXY_PANEL_URL = 'https://mean-finance-mixpanel-proxy.herokuapp.com';
 

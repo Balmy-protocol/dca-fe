@@ -14,7 +14,7 @@ import { BigNumber } from 'ethers';
 import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import { BALMY_API_URL, NULL_ADDRESS } from '@constants/addresses';
+import { MEAN_API_URL, NULL_ADDRESS } from '@constants/addresses';
 import ProviderService from './providerService';
 import WalletService from './walletService';
 import ContractService from './contractService';
@@ -68,7 +68,7 @@ export default class SdkService {
                 list: {
                   type: 'api',
                   baseUri: ({ chainId, sourceId }: { chainId: number; sourceId: SourceId }) =>
-                    `${BALMY_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
+                    `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
                   sources: SOURCES_METADATA,
                 },
                 sourceIds: ['1inch', 'uniswap', 'rango', '0x', 'firebird', 'changelly'],
