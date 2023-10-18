@@ -1,5 +1,5 @@
 import { ConnectedWallet, User as BasePrivyUser } from '@privy-io/react-auth';
-import { IAccountService, UserType, WalletType, User, Wallet } from '@types';
+import { IAccountService, UserType, WalletType, User, Wallet, AccountLabels } from '@types';
 import { find } from 'lodash';
 import Web3Service from './web3Service';
 
@@ -78,13 +78,12 @@ export default class AccountService implements IAccountService {
     }
 
     this.user = {
-      id: `privy-${user.id}`,
+      id: `privy:${user.id}`,
       type: UserType.privy,
       privyUser: user,
       wallets: wallets.map((wallet) => ({
         type: WalletType.embedded,
         address: wallet.address.toLowerCase(),
-        label: wallet.address,
         getProvider: wallet.getEthersProvider,
       })),
     };
@@ -94,5 +93,21 @@ export default class AccountService implements IAccountService {
     if (!this.activeWallet) {
       void this.setActiveWallet(embeddedWallet?.address || wallets[0].address);
     }
+  }
+
+  setWalletsLabels(labels: AccountLabels): void {
+    if (!this.user) {
+      return;
+    }
+
+    const userWallets = this.user.wallets;
+
+    this.user = {
+      ...this.user,
+      wallets: userWallets.map((wallet) => ({
+        ...wallet,
+        label: labels[wallet.address],
+      })),
+    };
   }
 }
