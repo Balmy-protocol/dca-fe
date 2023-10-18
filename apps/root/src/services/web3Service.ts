@@ -373,7 +373,7 @@ export default class Web3Service {
         this.setNetwork(providerChainId);
       }
     } catch (e) {
-      console.log('Error changing network', e);
+      console.error('Error changing network', e);
     }
 
     this.walletService.setAccount(account, this.setAccountCallback);

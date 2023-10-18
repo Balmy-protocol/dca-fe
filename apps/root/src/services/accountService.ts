@@ -77,7 +77,6 @@ export default class AccountService implements IAccountService {
       return;
     }
 
-    console.log(user, wallets);
     this.user = {
       id: `privy-${user.id}`,
       type: UserType.privy,
