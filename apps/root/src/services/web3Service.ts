@@ -70,6 +70,7 @@ import EventService from './eventService';
 import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
 import AccountService from './accountService';
+import LabelService from './labelService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -128,6 +129,8 @@ export default class Web3Service {
 
   accountService: AccountService;
 
+  labelService: LabelService;
+
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>
@@ -150,6 +153,7 @@ export default class Web3Service {
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
     this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
+    this.labelService = new LabelService(this.meanApiService, this.accountService);
     this.eventService = new EventService(this.providerService);
     this.pairService = new PairService(
       this.walletService,
@@ -220,6 +224,10 @@ export default class Web3Service {
 
   getAccountService() {
     return this.accountService;
+  }
+
+  getLabelService() {
+    return this.labelService;
   }
 
   getContractService() {

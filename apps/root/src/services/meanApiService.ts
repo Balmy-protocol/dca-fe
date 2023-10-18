@@ -14,9 +14,13 @@ import {
   RawCampaigns,
   Token,
   PositionVersions,
+  AccountLabelsResponse,
+  AccountLabels,
+  PostAccountLabels,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
+import { getAccessToken } from '@privy-io/react-auth';
 
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -224,5 +228,44 @@ export default class MeanApiService {
         ...((optimismClaimCampaign && { optimismAirdrop: optimismClaimCampaign }) || {}),
       },
     };
+  }
+
+  private async authorizedRequest<TResponse>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    url: string,
+    data?: unknown
+  ): Promise<TResponse> {
+    const authToken = await getAccessToken();
+    if (!authToken) {
+      throw new Error('Authorization token not available');
+    }
+
+    const headers = {
+      Authorization: `PRIVY token="${authToken}"`,
+    };
+
+    const response = await this.axiosClient.request<TResponse>({
+      method,
+      url,
+      headers,
+      data,
+    });
+    return response.data;
+  }
+
+  async getAccountLabels(accountId: string): Promise<AccountLabels> {
+    const accountLabelsResponse = await this.authorizedRequest<AccountLabelsResponse>(
+      'GET',
+      `${MEAN_API_URL}/v1/accounts/${accountId}`
+    );
+    return accountLabelsResponse.labels;
+  }
+
+  async postAccountLabels(labels: AccountLabels, accountId: string): Promise<void> {
+    const parsedLabels: PostAccountLabels = {
+      labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label })),
+    };
+
+    await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/labels`, parsedLabels);
   }
 }

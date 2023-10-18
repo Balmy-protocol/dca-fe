@@ -45,5 +45,18 @@ describe.skip('Mean API Service', () => {
       test('it should call the mean api to get the user proof and return the campaign', async () => {});
     });
   });
+
+  describe('authorizedRequest', () => {
+    test('it should throw error when getAccessToken fails', async () => {});
+    test('it should send an axios request with the authToken and return the response', async () => {});
+  });
+
+  describe('getAccountLabels', () => {
+    test('it should send a GET authorizedRequest and return the response', async () => {});
+  });
+
+  describe('postAccountLabels', () => {
+    test('it should send a POST authorizedRequest with parsed data', async () => {});
+  });
 });
 /* eslint-enable jest/expect-expect, jest/no-disabled-tests */

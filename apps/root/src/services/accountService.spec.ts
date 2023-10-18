@@ -159,5 +159,6 @@ describe('Position Service', () => {
   });
 
   describe('setUser', () => {});
+  describe('setWalletsLabels', () => {});
 });
 /* eslint-enable @typescript-eslint/unbound-method */
