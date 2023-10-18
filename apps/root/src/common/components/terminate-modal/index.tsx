@@ -35,13 +35,7 @@ const StyledTerminateContainer = styled.div`
   gap: 10px;
 `;
 
-const TerminateModal = ({
-  position,
-  open,
-  onCancel,
-  remainingLiquidityUnderlying,
-  toWithdrawUnderlying,
-}: TerminateModalProps) => {
+const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
@@ -50,9 +44,8 @@ const TerminateModal = ({
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [useProtocolToken, setUseProtocolToken] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const remainingLiquidity =
-    remainingLiquidityUnderlying || position.remainingLiquidityUnderlying || position.remainingLiquidity;
-  const toWithdraw = toWithdrawUnderlying || position.toWithdrawUnderlying || position.toWithdraw;
+  const remainingLiquidity = position.remainingLiquidity;
+  const toWithdraw = position.toWithdraw;
 
   const hasProtocolToken =
     position.from.address === protocolToken.address || position.to.address === protocolToken.address;

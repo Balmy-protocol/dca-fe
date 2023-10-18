@@ -110,7 +110,7 @@ interface TerminantedPositionProps {
 }
 
 const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
-  const { from, to, swapInterval, swapped, totalDeposited, totalExecutedSwaps, chainId } = position;
+  const { from, to, swapInterval, swapped, totalExecutedSwaps, chainId } = position;
 
   const intl = useIntl();
   const positionNetwork = React.useMemo(() => {
@@ -150,26 +150,6 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
               <Typography variant="body1">{to.symbol}</Typography>
             </StyledCardTitleHeader>
           </StyledCardHeader>
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="history deposited" defaultMessage="Deposited:" />
-            </Typography>
-            <Typography
-              variant="body1"
-              color={totalDeposited.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              <FormattedMessage
-                description="history full deposited"
-                defaultMessage="{totalDepositted} {from}"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                  totalDepositted: formatCurrencyAmount(totalDeposited, from, 4),
-                  from: from.symbol,
-                }}
-              />
-            </Typography>
-          </StyledDetailWrapper>
           {totalExecutedSwaps.gt(BigNumber.from(0)) && (
             <StyledDetailWrapper>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">

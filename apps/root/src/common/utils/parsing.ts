@@ -2,12 +2,22 @@ import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import some from 'lodash/some';
 import findIndex from 'lodash/findIndex';
-import { FullPosition, LastSwappedAt, Position, SwapInfo, Token, YieldOptions, AvailablePairs } from '@types';
-import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, toReadable } from '@constants';
+import {
+  FullPosition,
+  LastSwappedAt,
+  Position,
+  SwapInfo,
+  Token,
+  YieldOptions,
+  AvailablePairs,
+  PositionVersions,
+} from '@types';
+import { HUB_ADDRESS, LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
-import { Chain } from '@mean-finance/sdk';
+import { Chain, DCAPositionToken } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
+import { toToken } from './currency';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -156,6 +166,30 @@ export function getURLFromQuery(query: string) {
   return '';
 }
 
+export const sdkDcaTokenToToken = (token: DCAPositionToken, chainId: number): Token => {
+  const hasYield = token.variant.type === 'yield';
+  let newToken = toToken({
+    ...token,
+    chainId,
+  });
+
+  if (hasYield) {
+    newToken.underlyingTokens = [
+      toToken({
+        ...token,
+        chainId,
+      }),
+    ];
+
+    newToken = {
+      ...newToken,
+      address: token.variant.id,
+    };
+  }
+
+  return newToken;
+};
+
 export const getDisplayToken = (token: Token, chainId?: number) => {
   const chainIdToUse = chainId || token.chainId;
   const protocolToken = getProtocolToken(chainIdToUse);
@@ -186,7 +220,45 @@ export const getDisplayToken = (token: Token, chainId?: number) => {
   return underlyingToken || baseToken;
 };
 
-export function fullPositionToMappedPosition(position: FullPosition, positionVersion?: string): Position {
+export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, remainingSwaps: BigNumber) => {
+  const yieldFromGenerated = remainingLiquidity.sub(rate.mul(remainingSwaps));
+
+  return {
+    total: remainingLiquidity,
+    yieldGenerated: yieldFromGenerated,
+    base: remainingLiquidity.sub(yieldFromGenerated),
+  };
+};
+
+export function fullPositionToMappedPosition(
+  position: FullPosition,
+  remainingLiquidityUnderlying?: Nullable<BigNumber>,
+  toWithdrawUnderlying?: Nullable<BigNumber>,
+  totalWithdrawnUnderlying?: Nullable<BigNumber>,
+  positionVersion?: string
+): Position {
+  const toWithdraw = toWithdrawUnderlying || position.toWithdraw;
+  const toWithdrawYield =
+    position.toWithdrawUnderlyingAccum && toWithdrawUnderlying
+      ? toWithdrawUnderlying.sub(position.toWithdrawUnderlyingAccum)
+      : BigNumber.from(0);
+
+  const swapped =
+    (totalWithdrawnUnderlying &&
+      toWithdrawUnderlying &&
+      BigNumber.from(totalWithdrawnUnderlying).add(BigNumber.from(toWithdrawUnderlying))) ||
+    position.swapped;
+  const swappedYield =
+    position.totalSwappedUnderlyingAccum && totalWithdrawnUnderlying
+      ? swapped.sub(position.totalSwappedUnderlyingAccum)
+      : BigNumber.from(0);
+
+  const { total: totalRemainingLiquidity, yieldGenerated: yieldFromGenerated } = calculateYield(
+    remainingLiquidityUnderlying || BigNumber.from(position.remainingLiquidity),
+    position.rate,
+    position.remainingSwaps
+  );
+
   return {
     from: position.from,
     to: position.to,
@@ -197,32 +269,39 @@ export function fullPositionToMappedPosition(position: FullPosition, positionVer
     toWithdraw: BigNumber.from(position.toWithdraw),
     remainingLiquidity: BigNumber.from(position.remainingLiquidity),
     remainingSwaps: BigNumber.from(position.remainingSwaps),
-    withdrawn: BigNumber.from(position.totalWithdrawn),
     totalSwaps: BigNumber.from(position.totalSwaps),
-    toWithdrawUnderlying: null,
-    remainingLiquidityUnderlying: null,
-    depositedRateUnderlying: position.depositedRateUnderlying ? BigNumber.from(position.depositedRateUnderlying) : null,
-    totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
-      ? BigNumber.from(position.totalSwappedUnderlyingAccum)
-      : null,
-    toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
-      ? BigNumber.from(position.toWithdrawUnderlyingAccum)
-      : null,
+    toWithdrawYield: null,
+    remainingLiquidityYield: null,
     id: `${position.id}-v${position.version || LATEST_VERSION}`,
     positionId: position.id,
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),
-    totalDeposited: BigNumber.from(position.totalDeposited),
     totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
     pendingTransaction: '',
     version: position.version || positionVersion || LATEST_VERSION,
     chainId: position.chainId,
-    pairLastSwappedAt: parseInt(position.createdAtTimestamp, 10),
-    pairNextSwapAvailableAt: position.createdAtTimestamp,
     pairId: position.pair.id,
     permissions: position.permissions,
   };
 }
+
+export const findHubAddressVersion = (hubAddress: string) => {
+  const versions = Object.entries(HUB_ADDRESS);
+
+  for (const entry of versions) {
+    const [positionVersion, chainsAndAddresses] = entry;
+
+    const addresses = Object.values(chainsAndAddresses);
+
+    const isHubInVersion = addresses.filter((address) => address.toLowerCase() === hubAddress.toLowerCase());
+
+    if (isHubInVersion) {
+      return positionVersion as PositionVersions;
+    }
+  }
+
+  throw new Error('hub address not found');
+};
 
 export const usdFormatter = (num: number) => {
   const si = [
@@ -251,16 +330,6 @@ export const activePositionsPerIntervalToHasToExecute = (
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
-
-export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, remainingSwaps: BigNumber) => {
-  const yieldFromGenerated = remainingLiquidity.sub(rate.mul(remainingSwaps));
-
-  return {
-    total: remainingLiquidity,
-    yieldGenerated: yieldFromGenerated,
-    base: remainingLiquidity.sub(yieldFromGenerated),
-  };
-};
 
 export const calculateNextSwapAvailableAt = (
   interval: BigNumber,

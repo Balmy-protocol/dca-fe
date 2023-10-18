@@ -1,5 +1,6 @@
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { FullPosition, Permission, Position } from '@types';
+import { DCAPermission } from '@mean-finance/sdk';
+import { FullPosition, Position } from '@types';
 
 export const doesCompanionNeedWithdrawPermission = (position?: Nullable<FullPosition | Position>) => {
   if (!position) {
@@ -38,23 +39,23 @@ export const getCompanionNeededPermisssions = (position?: Nullable<FullPosition 
   if (!position) {
     return [];
   }
-  const permissionsNeeded: Permission[] = [];
+  const permissionsNeeded: DCAPermission[] = [];
 
   const needsIncreaseOrReduce = doesCompanionNeedIncreaseOrReducePermission(position);
   const needsWithdraw = doesCompanionNeedWithdrawPermission(position);
   const needsTerminate = doesCompanionNeedTerminatePermission(position);
 
   if (needsIncreaseOrReduce) {
-    permissionsNeeded.push(Permission.INCREASE);
-    permissionsNeeded.push(Permission.REDUCE);
+    permissionsNeeded.push(DCAPermission.INCREASE);
+    permissionsNeeded.push(DCAPermission.REDUCE);
   }
 
   if (needsWithdraw) {
-    permissionsNeeded.push(Permission.WITHDRAW);
+    permissionsNeeded.push(DCAPermission.WITHDRAW);
   }
 
   if (needsTerminate) {
-    permissionsNeeded.push(Permission.TERMINATE);
+    permissionsNeeded.push(DCAPermission.TERMINATE);
   }
 
   return permissionsNeeded;

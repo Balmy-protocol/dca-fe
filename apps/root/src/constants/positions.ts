@@ -1,7 +1,8 @@
 import { defineMessage, MessageDescriptor } from 'react-intl';
-import { Oracles, Permission, PositionActions, PositionStatus } from '@types';
+import { Oracles, PositionActions, PositionStatus } from '@types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
+import { DCAPermission } from '@mean-finance/sdk';
 
 export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.optimism.chainId]: 1,
@@ -184,7 +185,7 @@ export enum PERMISSIONS {
   TERMINATE = 3,
 }
 
-export const STRING_PERMISSIONS: Record<Permission, MessageDescriptor> = {
+export const STRING_PERMISSIONS: Record<DCAPermission, MessageDescriptor> = {
   INCREASE: defineMessage({ defaultMessage: 'Increase position', description: 'permissionsIncreasePermission' }),
   REDUCE: defineMessage({ defaultMessage: 'Reduce position', description: 'permissionsReducePermission' }),
   WITHDRAW: defineMessage({ defaultMessage: 'Withdraw', description: 'permissionsWithdrawPermission' }),

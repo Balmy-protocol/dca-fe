@@ -203,14 +203,7 @@ const Details = ({
   onSuggestMigrateYield,
   totalGasSaved,
 }: DetailsProps) => {
-  const {
-    from,
-    to,
-    swapInterval,
-    remainingLiquidity: remainingLiquidityRaw,
-    chainId,
-    totalWithdrawnUnderlying,
-  } = position;
+  const { from, to, swapInterval, chainId } = position;
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -219,41 +212,21 @@ const Details = ({
   }, [chainId]);
 
   const {
-    toWithdraw: rawToWithdraw,
-    depositedRateUnderlying,
-    rate: positionRate,
+    toWithdraw,
+    remainingLiquidity: totalRemainingLiquidity,
+    rate,
     remainingSwaps,
     totalSwaps,
-    totalSwappedUnderlyingAccum,
-    toWithdrawUnderlyingAccum,
-    swapped: rawSwapped,
+    toWithdrawYield,
+    swappedYield,
+    remainingLiquidityYield: yieldFromGenerated,
+    swapped,
   } = fullPositionToMappedPosition(position);
-  const rate = depositedRateUnderlying || positionRate;
   const showBreakdown = useShowBreakdown();
   const dispatch = useAppDispatch();
-  const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
-  const toWithdrawYield =
-    toWithdrawUnderlyingAccum && toWithdrawUnderlying
-      ? toWithdrawUnderlying.sub(toWithdrawUnderlyingAccum)
-      : BigNumber.from(0);
-  const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
-
-  const swapped =
-    (totalWithdrawnUnderlying &&
-      toWithdrawUnderlying &&
-      BigNumber.from(totalWithdrawnUnderlying).add(BigNumber.from(toWithdrawUnderlying))) ||
-    rawSwapped;
-  const swappedYield =
-    totalSwappedUnderlyingAccum && totalWithdrawnUnderlying
-      ? swapped.sub(totalSwappedUnderlyingAccum)
-      : BigNumber.from(0);
-  const swappedBase = swapped.sub(swappedYield);
-
-  const {
-    total: totalRemainingLiquidity,
-    yieldGenerated: yieldFromGenerated,
-    base: remainingLiquidity,
-  } = calculateYield(remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw), rate, remainingSwaps);
+  const toWithdrawBase = toWithdraw.sub(toWithdrawYield || BigNumber.from(0));
+  const swappedBase = swapped.sub(swappedYield || BigNumber.from(0));
+  const remainingLiquidity = totalRemainingLiquidity.sub(yieldFromGenerated || BigNumber.from(0));
 
   const isPending = pendingTransaction !== null;
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
@@ -605,7 +578,7 @@ const Details = ({
                 {formatCurrencyAmount(BigNumber.from(swappedToShow), position.to, 4)}
               </Typography>
             </CustomChip>
-            {swappedYield.gt(BigNumber.from(0)) && showBreakdown && (
+            {swappedYield?.gt(BigNumber.from(0)) && showBreakdown && (
               <>
                 +
                 {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
@@ -683,7 +656,7 @@ const Details = ({
                   {formatCurrencyAmount(BigNumber.from(remainingLiquidityToShow), position.from, 4)}
                 </Typography>
               </CustomChip>
-              {yieldFromGenerated.gt(BigNumber.from(0)) && showBreakdown && (
+              {yieldFromGenerated?.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
@@ -721,7 +694,7 @@ const Details = ({
                   {formatCurrencyAmount(BigNumber.from(toWithdrawToShow), position.to, 4)}
                 </Typography>
               </CustomChip>
-              {toWithdrawYield.gt(BigNumber.from(0)) && showBreakdown && (
+              {toWithdrawYield?.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">

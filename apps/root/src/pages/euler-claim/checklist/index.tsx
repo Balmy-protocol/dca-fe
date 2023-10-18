@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Permission, Position, TransactionTypes } from '@types';
+import { Position, TransactionTypes } from '@types';
 import find from 'lodash/find';
 import Button from '@common/components/button';
 import {
@@ -40,6 +40,7 @@ import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import { useEulerClaimSignature } from '@state/euler-claim/hooks';
 import { setEulerSignature } from '@state/euler-claim/actions';
+import { DCAPermission } from '@mean-finance/sdk';
 
 import useHasPendingMigratorApprovals from '../hooks/useHasPendingMigratorApprovals';
 import useHasPendingPermitManyTransactions from '../hooks/useHasPendingPermitManyTransaction';
@@ -370,7 +371,7 @@ const ClaimChecklist = ({
         typeData: {
           id: result.hash,
           positionIds: positions.map((position) => position.id),
-          permissions: [Permission.TERMINATE],
+          permissions: [DCAPermission.TERMINATE],
           permittedAddress: companionAddress,
         },
       });

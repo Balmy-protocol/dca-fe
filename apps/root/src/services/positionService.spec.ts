@@ -2,7 +2,6 @@
 import {
   HubContract,
   NewPositionTypeData,
-  Permission,
   PermissionData,
   Position,
   PositionVersions,
@@ -46,6 +45,7 @@ import GraphqlService from './graphql';
 import PositionService from './positionService';
 import Permit2Service from './permit2Service';
 import SdkService from './sdkService';
+import { DCAPermission } from '@mean-finance/sdk';
 
 jest.mock('./providerService');
 jest.mock('./walletService');
@@ -1178,7 +1178,7 @@ describe('Position Service', () => {
         {
           id: 'permission',
           operator: 'operator',
-          permissions: [Permission.INCREASE, Permission.REDUCE, Permission.WITHDRAW],
+          permissions: [DCAPermission.INCREASE, DCAPermission.REDUCE, DCAPermission.WITHDRAW],
         },
       ]);
 
@@ -3064,7 +3064,7 @@ describe('Position Service', () => {
       positionService.fillAddressPermissions = jest.fn().mockResolvedValue([
         {
           operator: 'companion',
-          permissions: [Permission.TERMINATE],
+          permissions: [DCAPermission.TERMINATE],
         },
       ]);
       positionService.getModifyPermissionsTx = jest.fn().mockResolvedValue({
@@ -3706,7 +3706,7 @@ describe('Position Service', () => {
                 {
                   id: 'operator-id',
                   operator: 'new operator',
-                  permissions: [Permission.INCREASE],
+                  permissions: [DCAPermission.INCREASE],
                 },
               ],
             }),
@@ -3718,7 +3718,7 @@ describe('Position Service', () => {
                 {
                   id: 'operator-id',
                   operator: 'new operator',
-                  permissions: [Permission.INCREASE, Permission.REDUCE],
+                  permissions: [DCAPermission.INCREASE, DCAPermission.REDUCE],
                 },
               ],
             }),
@@ -3731,7 +3731,7 @@ describe('Position Service', () => {
                 {
                   id: 'operator-id',
                   operator: 'new operator',
-                  permissions: [Permission.INCREASE],
+                  permissions: [DCAPermission.INCREASE],
                 },
               ],
             },

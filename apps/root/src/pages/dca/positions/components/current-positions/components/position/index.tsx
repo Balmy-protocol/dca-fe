@@ -18,13 +18,7 @@ import {
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
-import {
-  getTimeFrequencyLabel,
-  calculateStale,
-  STALE,
-  calculateYield,
-  sortTokensByAddress,
-} from '@common/utils/parsing';
+import { getTimeFrequencyLabel, calculateYield, sortTokensByAddress } from '@common/utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from '@types';
 import {
   getGhTokenListLogoUrl,
@@ -213,6 +207,7 @@ const ActivePosition = ({
     remainingLiquidityUnderlying,
     toWithdrawUnderlyingAccum,
     chainId,
+    isStale,
   } = position;
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -275,14 +270,6 @@ const ActivePosition = ({
   }, [from, to, availablePairs]);
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
-
-  const isStale =
-    calculateStale(
-      swapInterval,
-      position.startedAt,
-      pair?.lastExecutedAt || position.pairLastSwappedAt || 0,
-      pair?.swapInfo
-    ) === STALE;
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 

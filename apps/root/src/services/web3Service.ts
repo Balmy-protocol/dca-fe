@@ -184,7 +184,8 @@ export default class Web3Service {
       this.apolloClient,
       this.providerService,
       this.permit2Service,
-      this.sdkService
+      this.sdkService,
+      this.accountService
     );
     this.priceService = new PriceService(
       this.walletService,
