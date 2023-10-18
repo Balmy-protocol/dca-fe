@@ -83,6 +83,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.WC_PROJECT_ID': JSON.stringify(process.env.WC_PROJECT_ID),
     }),
+    new webpack.DefinePlugin({
+      'process.env.MEAN_API_URL': JSON.stringify(process.env.MEAN_API_URL),
+    }),
     new WebpackBar(),
   ],
   devtool: 'source-map',
