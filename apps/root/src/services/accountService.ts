@@ -84,7 +84,6 @@ export default class AccountService implements IAccountService {
       wallets: wallets.map((wallet) => ({
         type: WalletType.embedded,
         address: wallet.address.toLowerCase(),
-        label: wallet.address,
         getProvider: wallet.getEthersProvider,
       })),
     };

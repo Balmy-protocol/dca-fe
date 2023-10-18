@@ -53,12 +53,10 @@ describe.skip('Mean API Service', () => {
 
   describe('getAccountLabels', () => {
     test('it should send a GET authorizedRequest and return the response', async () => {});
-    test('it should return an empty object if request failed', async () => {});
   });
 
   describe('postAccountLabels', () => {
     test('it should send a POST authorizedRequest with parsed data', async () => {});
-    test('it should return an empty object if request failed', async () => {});
   });
 });
 /* eslint-enable jest/expect-expect, jest/no-disabled-tests */

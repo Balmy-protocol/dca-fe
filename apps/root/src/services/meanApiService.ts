@@ -254,16 +254,11 @@ export default class MeanApiService {
   }
 
   async getAccountLabels(accountId: string): Promise<AccountLabels> {
-    try {
-      const accountLabelsResponse = await this.authorizedRequest<AccountLabelsResponse>(
-        'GET',
-        `${BALMY_API_URL}/v1/accounts/${accountId}`
-      );
-      return accountLabelsResponse.labels;
-    } catch (e) {
-      console.error(e);
-      return {};
-    }
+    const accountLabelsResponse = await this.authorizedRequest<AccountLabelsResponse>(
+      'GET',
+      `${BALMY_API_URL}/v1/accounts/${accountId}`
+    );
+    return accountLabelsResponse.labels;
   }
 
   async postAccountLabels(labels: AccountLabels, accountId: string): Promise<void> {
@@ -271,10 +266,6 @@ export default class MeanApiService {
       labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label })),
     };
 
-    try {
-      await this.authorizedRequest('POST', `${BALMY_API_URL}/v1/accounts/${accountId}/labels`, parsedLabels);
-    } catch (e) {
-      console.error(e);
-    }
+    await this.authorizedRequest('POST', `${BALMY_API_URL}/v1/accounts/${accountId}/labels`, parsedLabels);
   }
 }
