@@ -33,6 +33,7 @@ jobs:
           ETHPLORER_KEY: ${{ secrets.ETHPLORER_KEY }}
           ETHERSCAN_API: ${{ secrets.ETHERSCAN_API }}
           WC_PROJECT_ID: ${{ secrets.WC_PROJECT_ID }}
+          MEAN_API_URL: ${{ secrets.PROD_MEAN_API_URL }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

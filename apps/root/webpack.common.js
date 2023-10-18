@@ -84,6 +84,9 @@ module.exports = {
       'process.env.WC_PROJECT_ID': JSON.stringify(process.env.WC_PROJECT_ID),
     }),
     new webpack.DefinePlugin({
+      'process.env.MEAN_API_URL': JSON.stringify(process.env.MEAN_API_URL),
+    }),
+    new webpack.DefinePlugin({
       'process.env.PUBLIC_PRIVY_APP_ID': JSON.stringify(process.env.PUBLIC_PRIVY_APP_ID),
     }),
     new WebpackBar(),

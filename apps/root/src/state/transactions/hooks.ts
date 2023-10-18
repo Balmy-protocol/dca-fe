@@ -44,7 +44,7 @@ export function useTransactionAdder(): (response: TransactionResponse, customDat
       try {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         arcxClient.transaction({
-          chain: currentNetwork.chainId,
+          chainId: currentNetwork.chainId,
           transactionHash: hash,
           metadata: {
             type: customData.type,
