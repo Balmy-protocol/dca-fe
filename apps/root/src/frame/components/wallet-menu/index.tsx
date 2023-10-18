@@ -254,7 +254,8 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
                   endIcon={user.privyUser?.google ? <StyledCheckCircleOutlineIcon /> : null}
                 >
                   <GoogleIcon />
-                  {user.privyUser?.google?.name}({user.privyUser?.google?.email})
+                  {user.privyUser?.google?.name}
+                  {user.privyUser?.google && `(${user.privyUser?.google?.email})`}
                 </Button>
                 <Button
                   variant="outlined"
