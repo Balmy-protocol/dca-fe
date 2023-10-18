@@ -26,8 +26,8 @@ const Address = ({ address, trimAddress, trimSize }: AddressProps) => {
 
   return (
     <>
-      {addressEns ||
-        storedLabels[address] ||
+      {storedLabels[address] ||
+        addressEns ||
         (trimAddress ? `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}` : address)}
     </>
   );
