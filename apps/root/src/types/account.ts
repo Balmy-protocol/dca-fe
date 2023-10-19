@@ -40,7 +40,8 @@ export type IAccountService = {
   user?: User;
   activeWallet?: Wallet;
   getUser(): User | undefined;
-  setActiveWallet(wallet: string): Promise<void>;
+  setActiveWallet(wallet: string): void;
+  setAndConnectActiveWallet(wallet: string): Promise<void>;
   getActiveWallet(): Wallet | undefined;
   getWalletProvider(wallet: string): Promise<Provider>;
   getWalletSigner(wallet: string): Promise<Signer>;

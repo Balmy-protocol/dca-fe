@@ -16,31 +16,34 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { LATEST_VERSION, MULTICALL_ADDRESS, MULTICALL_DEFAULT_ADDRESS, NETWORKS, NULL_ADDRESS } from '@constants';
 import ContractService from './contractService';
 import ProviderService from './providerService';
+import AccountService from './accountService';
 
 export default class WalletService {
   network: Network;
-
-  account: string | null;
 
   contractService: ContractService;
 
   providerService: ProviderService;
 
-  constructor(contractService: ContractService, providerService: ProviderService) {
+  accountService: AccountService;
+
+  constructor(contractService: ContractService, providerService: ProviderService, accountService: AccountService) {
     this.contractService = contractService;
     this.providerService = providerService;
+    this.accountService = accountService;
   }
 
   setAccount(account?: string | null, setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
-    this.account = account || null;
+    this.accountService.setActiveWallet(account || '');
 
     if (setAccountCallback) {
-      setAccountCallback(this.account || '');
+      setAccountCallback(account || '');
     }
   }
 
   getAccount() {
-    return this.account || '';
+    const activeWallet = this.accountService.getActiveWallet();
+    return activeWallet?.address || '';
   }
 
   async getEns(address: string) {

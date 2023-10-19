@@ -10,6 +10,7 @@ import { ERC20Contract, PositionVersions, SmolDomainContract } from '@types';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import WalletService from './walletService';
+import AccountService from './accountService';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('ethers', () => ({
@@ -25,20 +26,25 @@ jest.mock('ethers', () => ({
 
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
+const MockedAccountService = jest.mocked(AccountService, { shallow: true });
 const MockedEthers = jest.mocked(ethers, { shallow: true });
 
 describe('Wallet Service', () => {
   let walletService: WalletService;
   let providerService: jest.MockedObject<ProviderService>;
   let contractService: jest.MockedObject<ContractService>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let accountService: jest.MockedObject<AccountService>;
 
   beforeEach(() => {
     providerService = createMockInstance(MockedProviderService);
     contractService = createMockInstance(MockedContractService);
+    accountService = createMockInstance(MockedAccountService);
 
     walletService = new WalletService(
       contractService as unknown as ContractService,
-      providerService as unknown as ProviderService
+      providerService as unknown as ProviderService,
+      AccountService as unknown as AccountService
     );
   });
 
@@ -48,9 +54,11 @@ describe('Wallet Service', () => {
   });
 
   describe('setAccount', () => {
-    test('it should set the passed account as the account of the service', () => {
+    test('it should send the new account to setAccount method from accountService', () => {
       walletService.setAccount('new account');
 
+      expect(accountService.setActiveWallet).toHaveBeenCalledTimes(1);
+      expect(accountService.setActiveWallet).toHaveBeenCalledWith('new account');
       expect(walletService.getAccount()).toEqual('new account');
     });
 
@@ -75,7 +83,7 @@ describe('Wallet Service', () => {
 
   describe('getAccount', () => {
     test('it should return the set account', () => {
-      walletService.account = 'account';
+      walletService.setAccount('account');
       expect(walletService.getAccount()).toEqual('account');
     });
 

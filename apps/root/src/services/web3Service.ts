@@ -81,8 +81,6 @@ export default class Web3Service {
 
   network: Network;
 
-  account: string;
-
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
 
   axiosClient: AxiosInstance;
@@ -151,7 +149,7 @@ export default class Web3Service {
     this.safeService = new SafeService();
     this.providerService = new ProviderService(this.accountService);
     this.contractService = new ContractService(this.providerService);
-    this.walletService = new WalletService(this.contractService, this.providerService);
+    this.walletService = new WalletService(this.contractService, this.providerService, this.accountService);
     this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
     this.labelService = new LabelService(this.meanApiService, this.accountService);
     this.eventService = new EventService(this.providerService);
@@ -314,10 +312,6 @@ export default class Web3Service {
     this.loadedAsSafeApp = loadedAsSafeApp;
   }
 
-  setAccount(account: string) {
-    this.account = account;
-  }
-
   setNetwork(chainId: number) {
     const foundNetwork = find(NETWORKS, { chainId });
     if (foundNetwork) {
@@ -326,10 +320,6 @@ export default class Web3Service {
 
     // [TODO] Refactor so there is only one source of truth
     this.contractService.setNetwork(chainId);
-  }
-
-  getAccount() {
-    return this.account;
   }
 
   getSignSupport() {
@@ -370,8 +360,6 @@ export default class Web3Service {
 
     // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
 
-    this.setAccount(account);
-
     try {
       if (chainId) {
         await this.walletService.changeNetworkAutomatically(chainId, () => this.setNetwork(chainId));
@@ -384,7 +372,10 @@ export default class Web3Service {
       console.error('Error changing network', e);
     }
 
-    this.walletService.setAccount(account, this.setAccountCallback);
+    const currentAccount = this.walletService.getAccount();
+    if (currentAccount !== account) {
+      this.walletService.setAccount(account, this.setAccountCallback);
+    }
 
     await this.sdkService.resetProvider();
 
@@ -414,11 +405,8 @@ export default class Web3Service {
     this.wagmiClient.clearState();
     this.wagmiClient.storage.removeItem('connected');
 
-    this.setAccount('');
-
     this.accountService.setUser(undefined);
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.walletService.setAccount(null, this.setAccountCallback);
 
     localStorage.removeItem(WALLET_CONNECT_KEY);

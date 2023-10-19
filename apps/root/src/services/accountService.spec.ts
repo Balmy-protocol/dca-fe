@@ -52,12 +52,19 @@ describe('Position Service', () => {
     jest.restoreAllMocks();
   });
 
-  describe('setActiveWallet', () => {
+  describe('setAndConnectActiveWallet', () => {
     it('should call the connect method of the web3Service', async () => {
-      await accountService.setActiveWallet('0x123');
+      await accountService.setAndConnectActiveWallet('0x123');
 
       expect(web3Service.connect).toHaveBeenCalledTimes(1);
       expect(web3Service.connect).toHaveBeenCalledWith('provider', undefined, undefined, true);
+    });
+  });
+
+  describe('setActiveWallet', () => {
+    it('should set the new active wallet address', () => {
+      accountService.setActiveWallet('0x123');
+      expect(accountService.getActiveWallet()).toBe('0x123');
     });
   });
 

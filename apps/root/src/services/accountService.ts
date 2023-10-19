@@ -22,12 +22,15 @@ export default class AccountService implements IAccountService {
     return this.user?.wallets || [];
   }
 
-  async setActiveWallet(wallet: string): Promise<void> {
-    this.activeWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() })!;
-    const provider = await this.activeWallet.getProvider();
+  setActiveWallet(wallet: string): void {
+    const newActiveWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() })!;
+    this.activeWallet = newActiveWallet;
+  }
 
-    await this.web3Service.connect(provider, undefined, undefined, this.activeWallet.type === WalletType.embedded);
-    return;
+  async setAndConnectActiveWallet(wallet: string): Promise<void> {
+    this.setActiveWallet(wallet);
+    const provider = await this.activeWallet!.getProvider();
+    await this.web3Service.connect(provider, undefined, undefined, this.activeWallet!.type === WalletType.embedded);
   }
 
   async getActiveWalletProvider() {
@@ -91,7 +94,7 @@ export default class AccountService implements IAccountService {
     const embeddedWallet = find(this.user.wallets, { type: WalletType.embedded });
 
     if (!this.activeWallet) {
-      void this.setActiveWallet(embeddedWallet?.address || wallets[0].address);
+      void this.setAndConnectActiveWallet(embeddedWallet?.address || wallets[0].address);
     }
   }
 

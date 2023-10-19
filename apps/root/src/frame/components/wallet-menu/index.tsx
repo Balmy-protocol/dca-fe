@@ -160,7 +160,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
 
   const onSetActiveWallet = React.useCallback(
     (wallet: string) => {
-      void accountService.setActiveWallet(wallet);
+      void accountService.setAndConnectActiveWallet(wallet);
     },
     [accountService]
   );
