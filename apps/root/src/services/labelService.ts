@@ -71,9 +71,9 @@ export default class LabelService {
     }
     const currentLabels = this.labels;
     if (currentLabels.hasOwnProperty(labeledAddress)) {
-      const deletedLabel = this.labels[labeledAddress];
-      delete currentLabels[labeledAddress];
+      const deletedLabel = currentLabels[labeledAddress];
       try {
+        delete currentLabels[labeledAddress];
         this.labels = currentLabels;
         await this.meanApiService.deleteAccountLabel(labeledAddress, user.id);
       } catch (e) {
