@@ -58,5 +58,13 @@ describe.skip('Mean API Service', () => {
   describe('postAccountLabels', () => {
     test('it should send a POST authorizedRequest with parsed data', async () => {});
   });
+
+  describe('putAccountLabel', () => {
+    test('it should send a PUT authorizedRequest with the new label', async () => {});
+  });
+
+  describe('deleteAccountLabel', () => {
+    test('it should send a DELETE authorizedRequest to the right endpoint', async () => {});
+  });
 });
 /* eslint-enable jest/expect-expect, jest/no-disabled-tests */

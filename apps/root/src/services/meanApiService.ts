@@ -268,4 +268,14 @@ export default class MeanApiService {
 
     await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/labels`, parsedLabels);
   }
+
+  async putAccountLabel(newLabel: string, labeledAddress: string, accountId: string): Promise<void> {
+    await this.authorizedRequest('PUT', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`, {
+      newLabel,
+    });
+  }
+
+  async deleteAccountLabel(labeledAddress: string, accountId: string): Promise<void> {
+    await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`);
+  }
 }

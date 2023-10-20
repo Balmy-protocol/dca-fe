@@ -32,16 +32,56 @@ export default class LabelService {
 
   async postLabels(labels: AccountLabels): Promise<void> {
     const user = this.accountService.getUser();
-    const currentLabels = this.labels;
     if (!user) {
       return;
     }
+    const currentLabels = this.labels;
     try {
       this.labels = { ...currentLabels, ...labels };
       await this.meanApiService.postAccountLabels(labels, user.id);
     } catch (e) {
-      this.labels = { ...currentLabels };
+      this.labels = currentLabels;
       console.error(e);
+    }
+  }
+
+  async editLabel(newLabel: string, labeledAddress: string): Promise<void> {
+    const user = this.accountService.getUser();
+    if (!user) {
+      return;
+    }
+    const currentLabels = this.labels;
+    if (!currentLabels.hasOwnProperty(labeledAddress)) {
+      console.warn(`Label for address ${labeledAddress} does not exist.`);
+      return;
+    }
+    try {
+      this.labels = { ...currentLabels, [labeledAddress]: newLabel };
+      await this.meanApiService.putAccountLabel(newLabel, labeledAddress, user.id);
+    } catch (e) {
+      this.labels = currentLabels;
+      console.error(e);
+    }
+  }
+
+  async deleteLabel(labeledAddress: string): Promise<void> {
+    const user = this.accountService.getUser();
+    if (!user) {
+      return;
+    }
+    const currentLabels = this.labels;
+    if (currentLabels.hasOwnProperty(labeledAddress)) {
+      const deletedLabel = currentLabels[labeledAddress];
+      try {
+        delete currentLabels[labeledAddress];
+        this.labels = currentLabels;
+        await this.meanApiService.deleteAccountLabel(labeledAddress, user.id);
+      } catch (e) {
+        this.labels = { ...currentLabels, [labeledAddress]: deletedLabel };
+        console.error(e);
+      }
+    } else {
+      console.warn(`Label for address ${labeledAddress} does not exist.`);
     }
   }
 
