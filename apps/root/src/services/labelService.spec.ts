@@ -23,6 +23,20 @@ describe.skip('Label Service', () => {
     test('it should retain the original value of labels if the API call fails', async () => {});
   });
 
+  describe('editLabel', () => {
+    test('it should not make a request if no user is present', async () => {});
+    test('it should not make a request if the address has no label asociated');
+    test('it should update the labels data and then make a request with meanApiService', async () => {});
+    test('it should retain the original value if the API call fails', async () => {});
+  });
+
+  describe('deleteLabel', () => {
+    test('it should not make a request if no user is present', async () => {});
+    test('it should only make a request if the address has a label asociated');
+    test('it should update the labels data and then make a request with meanApiService', async () => {});
+    test('it should retain the original value if the API call fails', async () => {});
+  });
+
   describe('setWalletsLabels', () => {
     test('it should call setWalletsLabels from accountService with local labels property', () => {});
   });

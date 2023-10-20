@@ -204,7 +204,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
           </StyledRecentTransactionsTitleContainer>
           <StyledAccount>
             <Typography variant="subtitle1" fontWeight={500}>
-              <Address address={account || ''} trimAddress trimSize={10} />
+              <Address address={account || ''} trimAddress trimSize={10} editable />
             </Typography>
           </StyledAccount>
           {user?.type === UserType.privy && (
