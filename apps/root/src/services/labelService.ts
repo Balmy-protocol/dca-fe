@@ -29,8 +29,7 @@ export default class LabelService implements ILabelService {
     }
 
     try {
-      const accountLabelsAndContactList = await this.meanApiService.getAccountLabelsAndContactList(user.id);
-      return accountLabelsAndContactList;
+      return await this.meanApiService.getAccountLabelsAndContactList(user.id);
     } catch (e) {
       console.error(e);
     }
