@@ -1,30 +1,35 @@
-import { AccountLabels } from '@types';
+import { AccountLabels, AccountLabelsAndContactList, ILabelService } from '@types';
 import AccountService from './accountService';
 import MeanApiService from './meanApiService';
+import ContactListService from './conctactListService';
 
-export default class LabelService {
+export default class LabelService implements ILabelService {
   labels: AccountLabels = {};
 
   meanApiService: MeanApiService;
 
   accountService: AccountService;
 
-  constructor(meanApiService: MeanApiService, accountService: AccountService) {
+  contactListService: ContactListService;
+
+  constructor(meanApiService: MeanApiService, accountService: AccountService, contactListService: ContactListService) {
     this.meanApiService = meanApiService;
     this.accountService = accountService;
+    this.contactListService = contactListService;
   }
 
   getStoredLabels(): AccountLabels {
     return this.labels;
   }
 
-  async fetchLabels(): Promise<void> {
+  async fetchLabelsAndContactList(): Promise<AccountLabelsAndContactList | undefined> {
     const user = this.accountService.getUser();
     if (!user) {
       return;
     }
+
     try {
-      this.labels = await this.meanApiService.getAccountLabels(user.id);
+      return await this.meanApiService.getAccountLabelsAndContactList(user.id);
     } catch (e) {
       console.error(e);
     }
@@ -89,8 +94,14 @@ export default class LabelService {
     this.accountService.setWalletsLabels(this.labels);
   }
 
-  async initializeLabels(): Promise<void> {
-    await this.fetchLabels();
+  async initializeLabelsAndContacts(): Promise<void> {
+    const labelsAndContactList = await this.fetchLabelsAndContactList();
+    if (!labelsAndContactList) {
+      return;
+    }
+
+    this.labels = labelsAndContactList.labels;
+    this.contactListService.setContacts(labelsAndContactList.contacts);
     this.setWalletsLabels();
   }
 }

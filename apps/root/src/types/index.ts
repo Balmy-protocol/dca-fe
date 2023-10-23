@@ -15,6 +15,8 @@ export * from './aggregator';
 export * from './sdk';
 export * from './campaigns';
 export * from './account';
+export * from './contactList';
+export * from './accountLabels';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 

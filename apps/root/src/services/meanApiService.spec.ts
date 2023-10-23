@@ -51,7 +51,7 @@ describe.skip('Mean API Service', () => {
     test('it should send an axios request with the authToken and return the response', async () => {});
   });
 
-  describe('getAccountLabels', () => {
+  describe('getAccountLabelsAndContactList', () => {
     test('it should send a GET authorizedRequest and return the response', async () => {});
   });
 
