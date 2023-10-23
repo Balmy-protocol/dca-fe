@@ -37,5 +37,10 @@ export default {
     '^@services(.*)': '<rootDir>src/services$1',
     '^@state(.*)': '<rootDir>src/state$1',
     '^@types(.*)': '<rootDir>src/types$1',
+    '\\.(svg|png)$': '<rootDir>__mocks__/fileMock.ts',
+  },
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest', // Transforms .ts and .tsx files with ts-jest
+    '^.+\\.m?jsx?$': 'babel-jest', // Transforms .js and .jsx files with babel-jest
   },
 };
