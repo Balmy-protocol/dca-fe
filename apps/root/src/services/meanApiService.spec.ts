@@ -66,5 +66,13 @@ describe.skip('Mean API Service', () => {
   describe('deleteAccountLabel', () => {
     test('it should send a DELETE authorizedRequest to the right endpoint', async () => {});
   });
+
+  describe('postContacts', () => {
+    test('it should send a POST authorizedRequest with parsed data', async () => {});
+  });
+
+  describe('deleteContact', () => {
+    test('it should send a DELETE authorizedRequest to the right endpoint', async () => {});
+  });
 });
 /* eslint-enable jest/expect-expect, jest/no-disabled-tests */

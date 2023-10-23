@@ -1,26 +1,73 @@
-import { Contact, ContactList, IAccountService, IContactListService } from '@types';
+import { Contact, ContactList, IContactListService } from '@types';
 import ProviderService from './providerService';
+import MeanApiService from './meanApiService';
+import { findIndex, remove } from 'lodash';
+import AccountService from './accountService';
 
 export default class ContactListService implements IContactListService {
-  accountService: IAccountService;
+  accountService: AccountService;
 
   providerService: ProviderService;
 
+  meanApiService: MeanApiService;
+
   contactList: ContactList = [];
 
-  constructor(accountService: IAccountService, providerService: ProviderService) {
+  constructor(accountService: AccountService, providerService: ProviderService, meanApiService: MeanApiService) {
     this.accountService = accountService;
     this.providerService = providerService;
+    this.meanApiService = meanApiService;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  async addContact(contact: Contact): Promise<void> {}
+  async addContact(contact: Contact): Promise<void> {
+    const user = this.accountService.getUser();
+    if (!user) {
+      return;
+    }
+    const currentContacts = [...this.contactList];
+    try {
+      this.contactList = [...currentContacts, contact];
+      await this.meanApiService.postContacts([contact], user.id);
+    } catch (e) {
+      this.contactList = currentContacts;
+      console.error(e);
+    }
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  async removeContact(contact: Contact): Promise<void> {}
+  async removeContact(contact: Contact): Promise<void> {
+    const user = this.accountService.getUser();
+    if (!user) {
+      return;
+    }
+    const currentContacts = [...this.contactList];
+    try {
+      remove(this.contactList, { address: contact.address });
+      await this.meanApiService.deleteContact(contact.address, user.id);
+    } catch (e) {
+      this.contactList = currentContacts;
+      console.error(e);
+    }
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  async editContact(contact: Contact): Promise<void> {}
+  async editContact(contact: Contact): Promise<void> {
+    const user = this.accountService.getUser();
+    if (!user || !contact.label) {
+      return;
+    }
+    const contactIndex = findIndex(this.contactList, { address: contact.address });
+    if (contactIndex === -1) {
+      return;
+    }
+
+    const currentContacts = [...this.contactList];
+    try {
+      this.contactList[contactIndex] = contact;
+      await this.meanApiService.putAccountLabel(contact.label, contact.address, user.id);
+    } catch (e) {
+      this.contactList = currentContacts;
+      console.error(e);
+    }
+  }
 
   getContacts(): ContactList {
     return this.contactList;
