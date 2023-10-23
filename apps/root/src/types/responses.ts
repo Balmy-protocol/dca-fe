@@ -2,7 +2,8 @@ import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { PermissionData } from './positions';
 import { Token } from './tokens';
-import { AccountLabels } from './account';
+import { ContactList } from './contactList';
+import { AccountLabels } from './accountLabels';
 
 export interface PoolLiquidityData {
   id: string;
@@ -312,6 +313,7 @@ export interface BlowfishResponse {
   };
 }
 
-export interface AccountLabelsResponse {
+export interface AccountLabelsAndContactListResponse {
   labels: AccountLabels;
+  contacts: ContactList;
 }

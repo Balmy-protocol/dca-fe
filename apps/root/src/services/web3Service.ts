@@ -71,6 +71,7 @@ import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
 import AccountService from './accountService';
 import LabelService from './labelService';
+import ContactListService from './conctactListService';
 
 const WALLET_CONNECT_KEY = 'walletconnect';
 
@@ -131,6 +132,8 @@ export default class Web3Service {
 
   labelService: LabelService;
 
+  contactListService: ContactListService;
+
   constructor(
     DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
     setAccountCallback?: React.Dispatch<React.SetStateAction<string>>
@@ -151,9 +154,10 @@ export default class Web3Service {
     this.safeService = new SafeService();
     this.providerService = new ProviderService(this.accountService);
     this.contractService = new ContractService(this.providerService);
+    this.contactListService = new ContactListService(this.accountService, this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
     this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
-    this.labelService = new LabelService(this.meanApiService, this.accountService);
+    this.labelService = new LabelService(this.meanApiService, this.accountService, this.contactListService);
     this.eventService = new EventService(this.providerService);
     this.pairService = new PairService(
       this.walletService,
@@ -228,6 +232,10 @@ export default class Web3Service {
 
   getLabelService() {
     return this.labelService;
+  }
+
+  getContactListService() {
+    return this.contactListService;
   }
 
   getContractService() {

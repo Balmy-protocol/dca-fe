@@ -48,7 +48,7 @@ const WalletsUpdater = () => {
   React.useEffect(() => {
     if (user && wallets.length) {
       void accountService.setUser(user, wallets);
-      void labelService.initializeLabels();
+      void labelService.initializeLabelsAndContacts();
     }
   }, [authenticated, wallets]);
   return <></>;

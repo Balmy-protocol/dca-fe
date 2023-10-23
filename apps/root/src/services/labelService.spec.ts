@@ -11,10 +11,10 @@ describe.skip('Label Service', () => {
     test('it should return the correct value after a successfull fetch', async () => {});
   });
 
-  describe('fetchLabels', () => {
+  describe('fetchLabelsAndContactList', () => {
     test('it should not make a request if no user is present', async () => {});
-    test('it should make a request with meanApiService and assign the result to the labels property if successfull', async () => {});
-    test('it should not change the value of labels if the request fails', async () => {});
+    test('it should make a request with meanApiService and return the response', async () => {});
+    test('it should return undefined if the request fails', async () => {});
   });
 
   describe('postLabels', () => {
@@ -41,8 +41,9 @@ describe.skip('Label Service', () => {
     test('it should call setWalletsLabels from accountService with local labels property', () => {});
   });
 
-  describe('initializeLabels', () => {
-    test('it should execute fetchLabels and setWalletsLabels local methods', async () => {});
+  describe('initializeLabelsAndContacts', () => {
+    test('it should not call any other methods if labelsAndContactList is undefined', async () => {});
+    test('it should initialize received labels and ContactList to the corresponding services and should call setWalletsLabels', async () => {});
   });
 });
 

@@ -1,6 +1,8 @@
 import { ConnectedWallet, User as BasePrivyUser } from '@privy-io/react-auth';
 import { Provider, Web3Provider } from '@ethersproject/providers';
 import { Signer } from 'ethers';
+import { ContactList } from './contactList';
+import { AccountLabels } from './accountLabels';
 
 export enum WalletType {
   embedded = 'embedded',
@@ -47,8 +49,7 @@ export type IAccountService = {
   setUser(user: BasePrivyUser, wallets: ConnectedWallet[]): void;
 };
 
-export type AccountLabels = Record<string, string>;
-
-export interface PostAccountLabels {
-  labels: { label: string; wallet: string }[];
+export interface AccountLabelsAndContactList {
+  labels: AccountLabels;
+  contacts: ContactList;
 }

@@ -14,9 +14,10 @@ import {
   RawCampaigns,
   Token,
   PositionVersions,
-  AccountLabelsResponse,
+  AccountLabelsAndContactListResponse,
   AccountLabels,
   PostAccountLabels,
+  AccountLabelsAndContactList,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -253,12 +254,12 @@ export default class MeanApiService {
     return response.data;
   }
 
-  async getAccountLabels(accountId: string): Promise<AccountLabels> {
-    const accountLabelsResponse = await this.authorizedRequest<AccountLabelsResponse>(
+  async getAccountLabelsAndContactList(accountId: string): Promise<AccountLabelsAndContactList> {
+    const accountResponse = await this.authorizedRequest<AccountLabelsAndContactListResponse>(
       'GET',
       `${MEAN_API_URL}/v1/accounts/${accountId}`
     );
-    return accountLabelsResponse.labels;
+    return accountResponse;
   }
 
   async postAccountLabels(labels: AccountLabels, accountId: string): Promise<void> {
