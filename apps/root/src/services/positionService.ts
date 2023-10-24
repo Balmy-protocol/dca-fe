@@ -14,18 +14,12 @@ import {
   TransactionDetails,
   NFTData,
   PositionPermission,
-  PositionsGraphqlResponse,
-  PositionResponse,
   YieldOption,
   PermissionManagerContract,
   PermissionPermit,
   TransactionTypes,
-  PositionVersions,
   PermissionSet as IPermissionSet,
 } from '@types';
-
-// GRAPHQL
-import GET_POSITIONS from '@graphql/getPositions.graphql';
 
 // ABIS
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
@@ -35,7 +29,6 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } fro
 import {
   MAX_UINT_32,
   NETWORKS_FOR_MENU,
-  POSITIONS_VERSIONS,
   POSITION_VERSION_2,
   LATEST_VERSION,
   SIGN_VERSION,
@@ -45,11 +38,9 @@ import {
 import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { findHubAddressVersion, getDisplayToken, sdkDcaTokenToToken, sortTokens } from '@common/utils/parsing';
-import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
 import { parsePermissionsForSdk, sdkPermissionsToPermissionData } from '@common/utils/sdk';
 import { AddFunds, DCAPermission } from '@mean-finance/sdk';
-import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import PairService from './pairService';
@@ -84,8 +75,6 @@ export default class PositionService {
 
   sdkService: SdkService;
 
-  apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
-
   hasFetchedCurrentPositions: boolean;
 
   hasFetchedPastPositions: boolean;
@@ -98,7 +87,6 @@ export default class PositionService {
     contractService: ContractService,
     meanApiService: MeanApiService,
     safeService: SafeService,
-    DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
     providerService: ProviderService,
     permit2Service: Permit2Service,
     sdkService: SdkService,
@@ -110,7 +98,6 @@ export default class PositionService {
     this.pairService = pairService;
     this.meanApiService = meanApiService;
     this.providerService = providerService;
-    this.apolloClient = DCASubgraph;
     this.safeService = safeService;
     this.permit2Service = permit2Service;
     this.currentPositions = {};
@@ -149,22 +136,13 @@ export default class PositionService {
       return;
     }
 
-    const results = await this.sdkService.sdk.dcaService.getPositionsByAccount({
-      accounts: accounts.map((wallet) => wallet.address) as ArrayOneOrMore<string>,
-      chains: NETWORKS_FOR_MENU,
-      includeHistory: false,
-    });
+    const results = await this.sdkService.getUsersDcaPositions(
+      accounts.map((wallet) => wallet.address) as ArrayOneOrMore<string>
+    );
 
     const currentPositions = {
       ...this.currentPositions,
     };
-
-    const underlyingsNeededToFetch: {
-      positionId: string;
-      token: Token;
-      amount: BigNumber;
-      attr: 'remainingLiquidityUnderlying' | 'toWithdrawUnderlying';
-    }[] = [];
 
     this.currentPositions = NETWORKS_FOR_MENU.reduce<PositionKeyBy>((acc, network) => {
       const positions = results[network];
@@ -172,62 +150,48 @@ export default class PositionService {
         return {
           ...acc,
           ...keyBy(
-            positions.map<Position>((position) => {
-              const version = findHubAddressVersion(position.hub);
-              const existingPosition = this.currentPositions[`${position.tokenId}-v${version}`];
-              const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
-              const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
+            positions
+              .filter((position) => position.status !== 'terminated')
+              .map<Position>((position) => {
+                const version = findHubAddressVersion(position.hub);
+                const existingPosition = this.currentPositions[`${position.tokenId}-v${version}`];
+                const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
+                const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
 
-              const fromHasYield = position.from.variant.type === 'yield';
-              const toHasYield = position.to.variant.type === 'yield';
+                const fromHasYield = position.from.variant.type === 'yield';
+                const toHasYield = position.to.variant.type === 'yield';
 
-              if (fromToUse.underlyingTokens.length) {
-                underlyingsNeededToFetch.push({
-                  positionId: `${position.tokenId}-v${version}`,
-                  token: fromToUse,
-                  attr: 'remainingLiquidityUnderlying',
-                  amount: BigNumber.from(position.rate).mul(BigNumber.from(position.remainingSwaps)),
-                });
-              }
-              if (toToUse.underlyingTokens.length) {
-                underlyingsNeededToFetch.push({
-                  positionId: `${position.tokenId}-v${version}`,
-                  token: toToUse,
-                  attr: 'toWithdrawUnderlying',
-                  amount: BigNumber.from(position.funds.toWithdraw),
-                });
-              }
-
-              const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
-              return {
-                from: fromToUse,
-                to: toToUse,
-                user: position.owner,
-                swapInterval: BigNumber.from(position.swapInterval),
-                swapped: BigNumber.from(position.funds.swapped),
-                rate: BigNumber.from(position.rate),
-                remainingLiquidity: BigNumber.from(position.funds.remaining),
-                remainingSwaps: BigNumber.from(position.remainingSwaps),
-                toWithdraw: BigNumber.from(position.funds.toWithdraw),
-                totalSwaps: BigNumber.from(position.executedSwaps + position.remainingSwaps),
-                isStale: position.isStale,
-                pairId: position.pair.pairId,
-                remainingLiquidityUnderlying: fromHasYield ? BigNumber.from(position.funds.remaining) : null,
-                toWithdrawUnderlying: toHasYield ? BigNumber.from(position.funds.toWithdraw) : null,
-                toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
-                remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
-                id: `${position.tokenId}-v${version}`,
-                positionId: position.tokenId.toString(),
-                status: position.status,
-                totalExecutedSwaps: BigNumber.from(position.executedSwaps),
-                pendingTransaction,
-                version,
-                chainId: network,
-                nextSwapAvailableAt: position.nextSwapAvailableAt,
-                startedAt: position.createdAt,
-                ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
-              };
-            }),
+                const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
+                return {
+                  from: fromToUse,
+                  to: toToUse,
+                  user: position.owner,
+                  swapInterval: BigNumber.from(position.swapInterval),
+                  swapped: BigNumber.from(position.funds.swapped),
+                  rate: BigNumber.from(position.rate),
+                  remainingLiquidity: BigNumber.from(position.funds.remaining),
+                  remainingSwaps: BigNumber.from(position.remainingSwaps),
+                  toWithdraw: BigNumber.from(position.funds.toWithdraw),
+                  totalSwaps: BigNumber.from(position.executedSwaps + position.remainingSwaps),
+                  isStale: position.isStale,
+                  pairId: position.pair.pairId,
+                  swappedYield: toHasYield ? BigNumber.from(position.funds.swapped) : null,
+                  remainingLiquidityUnderlying: fromHasYield ? BigNumber.from(position.funds.remaining) : null,
+                  toWithdrawUnderlying: toHasYield ? BigNumber.from(position.funds.toWithdraw) : null,
+                  toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
+                  remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
+                  id: `${position.tokenId}-v${version}`,
+                  positionId: position.tokenId.toString(),
+                  status: position.status,
+                  totalExecutedSwaps: BigNumber.from(position.executedSwaps),
+                  pendingTransaction,
+                  version,
+                  chainId: network,
+                  nextSwapAvailableAt: position.nextSwapAvailableAt,
+                  startedAt: position.createdAt,
+                  ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
+                };
+              }),
             'id'
           ),
         };
@@ -241,99 +205,69 @@ export default class PositionService {
   async fetchPastPositions() {
     this.hasFetchedPastPositions = false;
 
-    const account = this.walletService.getAccount();
-
-    if (!account) {
+    const accounts = this.accountService.getWallets();
+    if (!accounts.length) {
       this.pastPositions = {};
       this.hasFetchedPastPositions = true;
       return;
     }
 
-    const promises: Promise<GraphqlResults<PositionsGraphqlResponse>>[] = [];
-    const networksAndVersions: { network: number; version: PositionVersions }[] = [];
-
-    POSITIONS_VERSIONS.forEach((version) =>
-      NETWORKS_FOR_MENU.forEach((network) => {
-        const currentApolloClient = this.apolloClient[version][network];
-        if (!currentApolloClient || !currentApolloClient.getClient()) {
-          return;
-        }
-        networksAndVersions.push({ version, network });
-        promises.push(
-          gqlFetchAll<PositionsGraphqlResponse>(
-            currentApolloClient.getClient(),
-            GET_POSITIONS,
-            {
-              address: account.toLowerCase(),
-              status: ['TERMINATED'],
-            },
-            'positions',
-            'network-only'
-          )
-        );
-      })
+    const results = await this.sdkService.getUsersDcaPositions(
+      accounts.map((wallet) => wallet.address) as ArrayOneOrMore<string>
     );
-
-    const results = await Promise.all(promises.map((promise) => promise.catch(() => ({ data: null, error: true }))));
 
     const pastPositions = {
       ...this.pastPositions,
     };
 
-    this.pastPositions = results.reduce<PositionKeyBy>((acc, gqlResult, index) => {
-      const { network, version } = networksAndVersions[index];
-      if (!gqlResult.error && gqlResult.data) {
+    this.pastPositions = NETWORKS_FOR_MENU.reduce<PositionKeyBy>((acc, network) => {
+      const positions = results[network];
+      if (positions) {
         return {
           ...acc,
           ...keyBy(
-            gqlResult.data.positions.map<Position>((position: PositionResponse) => {
-              const fromToUse = getDisplayToken(position.from, network);
-              const toToUse = getDisplayToken(position.to, network);
+            positions
+              .filter((position) => position.status === 'terminated')
+              .map<Position>((position) => {
+                const version = findHubAddressVersion(position.hub);
+                const existingPosition = this.currentPositions[`${position.tokenId}-v${version}`];
+                const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
+                const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
 
-              return {
-                from: fromToUse,
-                to: toToUse,
-                user: position.user,
-                swapInterval: BigNumber.from(position.swapInterval.interval),
-                swapped: BigNumber.from(position.totalSwapped),
-                rate: BigNumber.from(position.rate),
-                remainingLiquidity: BigNumber.from(position.remainingLiquidity),
-                remainingSwaps: BigNumber.from(position.remainingSwaps),
-                withdrawn: BigNumber.from(position.totalWithdrawn),
-                toWithdraw: BigNumber.from(position.toWithdraw),
-                totalSwaps: BigNumber.from(position.totalSwaps),
-                toWithdrawUnderlying: null,
-                remainingLiquidityUnderlying: null,
-                depositedRateUnderlying: position.depositedRateUnderlying
-                  ? BigNumber.from(position.depositedRateUnderlying)
-                  : null,
-                totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
-                  ? BigNumber.from(position.totalSwappedUnderlyingAccum)
-                  : null,
-                toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
-                  ? BigNumber.from(position.toWithdrawUnderlyingAccum)
-                  : null,
-                id: `${position.id}-v${version}`,
-                positionId: position.id,
-                status: position.status,
-                startedAt: position.createdAtTimestamp,
-                totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
-                totalDeposited: BigNumber.from(position.totalDeposited),
-                pendingTransaction: '',
-                permissions: position.permissions,
-                version,
-                pairId: position.pair.id,
-                chainId: network,
-                isStale: false,
-                nextSwapAvailableAt: 0,
-                toWithdrawYield: null,
-                remainingLiquidityYield: null,
-                pairLastSwappedAt:
-                  (position.pair.swaps[0] && parseInt(position.pair.swaps[0].executedAtTimestamp, 10)) ||
-                  position.createdAtTimestamp,
-                pairNextSwapAvailableAt: position.createdAtTimestamp.toString(),
-              };
-            }),
+                const fromHasYield = position.from.variant.type === 'yield';
+                const toHasYield = position.to.variant.type === 'yield';
+
+                const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
+                return {
+                  from: fromToUse,
+                  to: toToUse,
+                  user: position.owner,
+                  swapInterval: BigNumber.from(position.swapInterval),
+                  swapped: BigNumber.from(position.funds.swapped),
+                  rate: BigNumber.from(position.rate),
+                  remainingLiquidity: BigNumber.from(position.funds.remaining),
+                  remainingSwaps: BigNumber.from(position.remainingSwaps),
+                  toWithdraw: BigNumber.from(position.funds.toWithdraw),
+                  totalSwaps: BigNumber.from(position.executedSwaps + position.remainingSwaps),
+                  isStale: position.isStale,
+                  pairId: position.pair.pairId,
+                  swappedYield: toHasYield ? BigNumber.from(position.funds.swapped) : null,
+                  remainingLiquidityUnderlying: fromHasYield ? BigNumber.from(position.funds.remaining) : null,
+                  toWithdrawUnderlying: toHasYield ? BigNumber.from(position.funds.toWithdraw) : null,
+                  toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
+                  remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
+                  id: `${position.tokenId}-v${version}`,
+                  positionId: position.tokenId.toString(),
+                  status: position.status,
+                  totalExecutedSwaps: BigNumber.from(position.executedSwaps),
+                  pendingTransaction,
+                  version,
+                  chainId: network,
+                  nextSwapAvailableAt: position.nextSwapAvailableAt,
+                  startedAt: position.createdAt,
+                  ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
+                };
+              }),
             'id'
           ),
         };
@@ -351,10 +285,10 @@ export default class PositionService {
     permission: PERMISSIONS,
     permissionManagerAddressProvided?: string
   ) {
-    const signer = await this.providerService.getSigner(position.user);
+    const signer = await this.providerService.getSigner(position.user, position.chainId);
     const { positionId, version } = position;
     const permissionManagerAddress =
-      permissionManagerAddressProvided || (await this.contractService.getPermissionManagerAddress(version));
+      permissionManagerAddressProvided || this.contractService.getPermissionManagerAddress(position.chainId, version);
     const permissionManagerInstance = new ethers.Contract(
       permissionManagerAddress,
       PERMISSION_MANAGER_ABI.abi,
@@ -385,12 +319,11 @@ export default class PositionService {
     permissionManagerAddressProvided?: string,
     erc712Name?: string
   ) {
-    const signer = await this.providerService.getSigner(position.user);
+    const signer = await this.providerService.getSigner(position.user, position.chainId);
     const { positionId, version } = position;
     const permissionManagerAddress =
-      permissionManagerAddressProvided || (await this.contractService.getPermissionManagerAddress(version));
+      permissionManagerAddressProvided || this.contractService.getPermissionManagerAddress(position.chainId, version);
     const signName = erc712Name || 'Mean Finance - DCA Position';
-    const currentNetwork = await this.providerService.getNetwork();
     const MAX_UINT_256 = BigNumber.from('2').pow('256').sub(1);
 
     const permissionManagerInstance = new ethers.Contract(
@@ -425,7 +358,7 @@ export default class PositionService {
       {
         name: signName,
         version: SIGN_VERSION[position.version],
-        chainId: currentNetwork.chainId,
+        chainId: position.chainId,
         verifyingContract: permissionManagerAddress,
       },
       { PermissionSet, PermissionPermit: PermissionPermits },
@@ -448,11 +381,10 @@ export default class PositionService {
     fromYield?: YieldOption | null,
     toYield?: YieldOption | null
   ): Promise<TransactionResponse> {
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
     let permissionsPermit: PermissionPermit | undefined;
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
     const fromToUse =
       position.from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.from.address;
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
@@ -479,19 +411,28 @@ export default class PositionService {
       toYield?.tokenAddress || toToUse,
       this.walletService.getAccount(),
       position.version,
+      position.chainId,
       permissionsPermit
     );
   }
 
   async companionHasPermission(position: Position, permission: number) {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
+      position.chainId,
+      position.user,
+      position.version
+    );
+    const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
 
     return permissionManagerInstance.hasPermission(position.positionId, companionAddress, permission);
   }
 
   async getModifyPermissionsTx(position: Position, newPermissions: IPermissionSet[]): Promise<PopulatedTransaction> {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
+      position.chainId,
+      position.user,
+      position.version
+    );
 
     return permissionManagerInstance.populateTransaction.modify(position.positionId, newPermissions);
   }
@@ -512,13 +453,21 @@ export default class PositionService {
   }
 
   async transfer(position: Position, toAddress: string): Promise<TransactionResponse> {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
+      position.chainId,
+      position.user,
+      position.version
+    );
 
     return permissionManagerInstance.transferFrom(position.user, toAddress, position.positionId);
   }
 
   async getTokenNFT(position: Position): Promise<NFTData> {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(position.version);
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
+      position.chainId,
+      position.user,
+      position.version
+    );
 
     const tokenData = await permissionManagerInstance.tokenURI(position.positionId);
     return JSON.parse(atob(tokenData.substring(29))) as NFTData;
@@ -538,12 +487,13 @@ export default class PositionService {
     });
   }
 
-  async buildDepositParams(
+  buildDepositParams(
     from: Token,
     to: Token,
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
+    chainId: number,
     yieldFrom?: string,
     yieldTo?: string
   ) {
@@ -553,7 +503,7 @@ export default class PositionService {
 
     const amountOfSwaps = BigNumber.from(frequencyValue);
     const swapInterval = frequencyType;
-    const companionAddress = await this.contractService.getHUBCompanionAddress();
+    const companionAddress = this.contractService.getHUBCompanionAddress(chainId);
     let permissions: number[] = [];
 
     if (amountOfSwaps.gt(BigNumber.from(MAX_UINT_32))) {
@@ -592,17 +542,19 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
+    chainId: number,
     possibleYieldFrom?: string,
     possibleYieldTo?: string,
     signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
   ) {
     const { takeFrom, from, to, totalAmmount, swaps, interval, account, permissions, yieldFrom, yieldTo } =
-      await this.buildDepositParams(
+      this.buildDepositParams(
         fromToken,
         toToken,
         fromValue,
         frequencyType,
         frequencyValue,
+        chainId,
         possibleYieldFrom,
         possibleYieldTo
       );
@@ -647,15 +599,17 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
+    chainId: number,
     yieldFrom?: string,
     yieldTo?: string
   ) {
-    const { totalAmmount } = await this.buildDepositParams(
+    const { totalAmmount } = this.buildDepositParams(
       from,
       to,
       fromValue,
       frequencyType,
       frequencyValue,
+      chainId,
       yieldFrom,
       yieldTo
     );
@@ -664,9 +618,23 @@ export default class PositionService {
 
     const allowanceTarget = this.getAllowanceTarget(currentNetwork.chainId, from, yieldFrom, false);
 
-    const approveTx = await this.walletService.buildApproveSpecificTokenTx(from, allowanceTarget, totalAmmount);
+    const approveTx = await this.walletService.buildApproveSpecificTokenTx(
+      this.walletService.getAccount(),
+      from,
+      allowanceTarget,
+      totalAmmount
+    );
 
-    const depositTx = await this.buildDepositTx(from, to, fromValue, frequencyType, frequencyValue, yieldFrom, yieldTo);
+    const depositTx = await this.buildDepositTx(
+      from,
+      to,
+      fromValue,
+      frequencyType,
+      frequencyValue,
+      chainId,
+      yieldFrom,
+      yieldTo
+    );
 
     return this.safeService.submitMultipleTxs([approveTx, depositTx]);
   }
@@ -678,6 +646,7 @@ export default class PositionService {
     fromValue: string,
     frequencyType: BigNumber,
     frequencyValue: string,
+    chainId: number,
     passedYieldFrom?: string,
     passedYieldTo?: string,
     signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
@@ -688,6 +657,7 @@ export default class PositionService {
       fromValue,
       frequencyType,
       frequencyValue,
+      chainId,
       passedYieldFrom,
       passedYieldTo,
       signature
@@ -700,8 +670,7 @@ export default class PositionService {
   }
 
   async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : position.to;
 
     if (
@@ -709,7 +678,7 @@ export default class PositionService {
       position.to.address !== wrappedProtocolToken.address &&
       useProtocolToken
     ) {
-      throw new Error('Should not call withdraw without it being protocol token');
+      throw new Error('Should not call withdraw without it being protocol tokenm');
     }
 
     const hasYield = position.to.underlyingTokens.length;
@@ -719,14 +688,14 @@ export default class PositionService {
     let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
 
     if (!companionHasPermission && (useProtocolToken || hasYield)) {
-      const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+      const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
 
       permissionPermit = await this.getSignatureForPermission(position, companionAddress, PERMISSIONS.WITHDRAW);
     }
 
-    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
+    const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version || LATEST_VERSION);
     const tx = await this.sdkService.buildWithdrawPositionTx({
-      chainId: currentNetwork.chainId,
+      chainId: position.chainId,
       positionId: position.positionId,
       withdraw: {
         convertTo: useProtocolToken ? PROTOCOL_TOKEN_ADDRESS : toToUse.address,
@@ -750,18 +719,17 @@ export default class PositionService {
   }
 
   async withdrawSafe(position: Position) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : position.to;
 
     const hasYield = position.to.underlyingTokens.length;
 
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.WITHDRAW);
 
-    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
+    const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version || LATEST_VERSION);
 
     const withdrawTx = await this.sdkService.buildWithdrawPositionTx({
-      chainId: currentNetwork.chainId,
+      chainId: position.chainId,
       positionId: position.positionId,
       dcaHub: hubAddress,
       withdraw: {
@@ -772,7 +740,7 @@ export default class PositionService {
 
     let txs: TransactionRequest[] = [withdrawTx];
     if (!companionHasPermission && hasYield) {
-      const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+      const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
 
       const permissions = await this.fillAddressPermissions(position, companionAddress, PERMISSIONS.WITHDRAW);
       const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
@@ -784,8 +752,7 @@ export default class PositionService {
   }
 
   async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -806,13 +773,16 @@ export default class PositionService {
     let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
 
     if (!companionHasPermission && (useProtocolToken || hasYield)) {
-      let companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+      let companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
 
       if (!companionAddress) {
-        companionAddress = await this.contractService.getHUBCompanionAddress(position.version);
+        companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, position.version);
       }
 
-      const permissionManagerAddress = await this.contractService.getPermissionManagerAddress(position.version);
+      const permissionManagerAddress = this.contractService.getPermissionManagerAddress(
+        position.chainId,
+        position.version
+      );
 
       const erc712Name = position.version !== POSITION_VERSION_2 ? undefined : 'Mean Finance DCA';
 
@@ -835,10 +805,10 @@ export default class PositionService {
         ? wrappedProtocolToken.address
         : position.to.address;
 
-    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
+    const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version || LATEST_VERSION);
 
     const tx = await this.sdkService.buildTerminatePositionTx({
-      chainId: currentNetwork.chainId,
+      chainId: position.chainId,
       positionId: position.positionId,
       withdraw: {
         unswappedConvertTo: fromToUse,
@@ -863,8 +833,7 @@ export default class PositionService {
   }
 
   async terminateSafe(position: Position) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
     const hasYield =
       (position.from.underlyingTokens.length && position.remainingLiquidity.gt(BigNumber.from(0))) ||
@@ -877,9 +846,9 @@ export default class PositionService {
 
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
 
-    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
+    const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version || LATEST_VERSION);
     const terminateTx = await this.sdkService.buildTerminatePositionTx({
-      chainId: currentNetwork.chainId,
+      chainId: position.chainId,
       positionId: position.positionId,
       dcaHub: hubAddress,
       withdraw: {
@@ -892,7 +861,7 @@ export default class PositionService {
     let txs: TransactionRequest[] = [terminateTx];
 
     if (!companionHasPermission && hasYield) {
-      const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+      const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
 
       const permissions = await this.fillAddressPermissions(position, companionAddress, PERMISSIONS.TERMINATE);
       const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
@@ -904,7 +873,7 @@ export default class PositionService {
   }
 
   async terminateManyRaw(positions: Position[]): Promise<TransactionResponse> {
-    const { chainId } = positions[0];
+    const { chainId, user } = positions[0];
 
     // Check that all positions are from the same chain
     const isOneOnDifferentChain = positions.some((position) => position.chainId !== chainId);
@@ -912,14 +881,14 @@ export default class PositionService {
       throw new Error('Should not call terminate many for positions on different chains');
     }
 
-    const companionInstance = await this.contractService.getHUBCompanionInstance(LATEST_VERSION);
+    const companionInstance = await this.contractService.getHUBCompanionInstance(chainId, user, LATEST_VERSION);
     const account = this.walletService.getAccount();
     const terminatesData: string[] = [];
 
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < positions.length; i++) {
       const position = positions[i];
-      const hubAddress = await this.contractService.getHUBAddress(position.version);
+      const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version);
 
       const terminateData = companionInstance.interface.encodeFunctionData('terminate', [
         hubAddress,
@@ -938,7 +907,7 @@ export default class PositionService {
     permissions: PERMISSIONS[],
     permittedAddress: string
   ): Promise<TransactionResponse> {
-    const { chainId, version } = positions[0];
+    const { chainId, user, version } = positions[0];
 
     // Check that all positions are from the same chain and same version
     const isOneOnDifferentChainOrVersion = positions.some(
@@ -948,7 +917,7 @@ export default class PositionService {
       throw new Error('Should not call give permission many for positions on different chains or versions');
     }
 
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(version);
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(chainId, user, version);
 
     const positionsDataPromises = positions.map(async ({ positionId }) => {
       const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await permissionManagerInstance.hasPermissions(
@@ -980,15 +949,14 @@ export default class PositionService {
     return permissionManagerInstance.modifyMany(positionsData);
   }
 
-  async buildModifyRateAndSwapsParams(
+  buildModifyRateAndSwapsParams(
     position: Position,
     newRateUnderlying: string,
     newSwaps: string,
     useWrappedProtocolToken: boolean
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-    const companionAddress = await this.contractService.getHUBCompanionAddress(LATEST_VERSION);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
+    const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -1030,7 +998,7 @@ export default class PositionService {
     newSwaps: string,
     useWrappedProtocolToken: boolean
   ) {
-    const { companionAddress, isIncrease } = await this.buildModifyRateAndSwapsParams(
+    const { companionAddress, isIncrease } = this.buildModifyRateAndSwapsParams(
       position,
       newRateUnderlying,
       newSwaps,
@@ -1061,15 +1029,13 @@ export default class PositionService {
     getSignature = true,
     signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
   ) {
-    const { amount, swaps, account, isIncrease, tokenFrom } = await this.buildModifyRateAndSwapsParams(
+    const { amount, swaps, account, isIncrease, tokenFrom } = this.buildModifyRateAndSwapsParams(
       position,
       newRateUnderlying,
       newSwaps,
       useWrappedProtocolToken
     );
     const hasYield = position.from.underlyingTokens.length;
-
-    const currentNetwork = await this.providerService.getNetwork();
 
     const yieldFrom = hasYield && position.from.underlyingTokens[0].address;
 
@@ -1097,7 +1063,7 @@ export default class PositionService {
       }
     }
 
-    const hubAddress = await this.contractService.getHUBAddress(position.version || LATEST_VERSION);
+    const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version || LATEST_VERSION);
 
     if (isIncrease) {
       const increase: AddFunds =
@@ -1114,7 +1080,7 @@ export default class PositionService {
           : { token: tokenFrom, amount: amount.toString() };
 
       return this.sdkService.buildIncreasePositionTx({
-        chainId: currentNetwork.chainId,
+        chainId: position.chainId,
         positionId: position.positionId,
         dcaHub: hubAddress,
         amountOfSwaps: swaps.toNumber(),
@@ -1132,7 +1098,7 @@ export default class PositionService {
     } = { amountToBuy: amount.toString(), convertTo: tokenFrom };
 
     return this.sdkService.buildReduceToBuyPositionTx({
-      chainId: currentNetwork.chainId,
+      chainId: position.chainId,
       positionId: position.positionId,
       dcaHub: hubAddress,
       amountOfSwaps: swaps.toNumber(),
@@ -1151,7 +1117,7 @@ export default class PositionService {
     newSwaps: string,
     useWrappedProtocolToken: boolean
   ) {
-    const { amount, tokenFrom, isIncrease } = await this.buildModifyRateAndSwapsParams(
+    const { amount, tokenFrom, isIncrease } = this.buildModifyRateAndSwapsParams(
       position,
       newRateUnderlying,
       newSwaps,
@@ -1159,10 +1125,8 @@ export default class PositionService {
     );
     const hasYield = position.from.underlyingTokens.length;
 
-    const currentNetwork = await this.providerService.getNetwork();
-
     const allowanceTarget = this.getAllowanceTarget(
-      currentNetwork.chainId,
+      position.chainId,
       emptyTokenWithAddress(tokenFrom),
       (hasYield && position.from.underlyingTokens[0].address) || undefined,
       false
@@ -1179,14 +1143,15 @@ export default class PositionService {
     let txs: TransactionRequest[] = [modifyTx];
 
     let fromToUse = position.from;
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
     if (fromToUse.address === PROTOCOL_TOKEN_ADDRESS) {
       fromToUse = wrappedProtocolToken;
     }
 
     const allowance = await this.walletService.getSpecificAllowance(
       useWrappedProtocolToken ? wrappedProtocolToken : position.from,
-      allowanceTarget
+      allowanceTarget,
+      position.user
     );
 
     const remainingLiquidityDifference = position.remainingLiquidity
@@ -1205,6 +1170,7 @@ export default class PositionService {
 
     if (needsToApprove) {
       const approveTx = await this.walletService.buildApproveSpecificTokenTx(
+        position.user,
         emptyTokenWithAddress(tokenFrom),
         allowanceTarget,
         amount
@@ -1222,7 +1188,7 @@ export default class PositionService {
       }
 
       if (!companionHasPermission) {
-        const companionAddress = await this.contractService.getHUBCompanionAddress();
+        const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId);
         const permissions = await this.fillAddressPermissions(
           position,
           companionAddress,
@@ -1259,7 +1225,7 @@ export default class PositionService {
     });
   }
 
-  async setPendingTransaction(transaction: TransactionDetails) {
+  setPendingTransaction(transaction: TransactionDetails) {
     if (
       transaction.type === TransactionTypes.newPair ||
       transaction.type === TransactionTypes.approveToken ||
@@ -1274,14 +1240,13 @@ export default class PositionService {
 
     const { typeData } = transaction;
     let { id } = typeData;
-    const network = await this.providerService.getNetwork();
-    const protocolToken = getProtocolToken(network.chainId);
-    const wrappedProtocolToken = getWrappedProtocolToken(network.chainId);
 
     if (transaction.type === TransactionTypes.newPosition) {
       const newPositionTypeData = transaction.typeData;
       id = `pending-transaction-${transaction.hash}`;
       const { fromYield, toYield } = newPositionTypeData;
+      const protocolToken = getProtocolToken(transaction.chainId);
+      const wrappedProtocolToken = getWrappedProtocolToken(transaction.chainId);
 
       let fromToUse =
         newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
@@ -1306,7 +1271,7 @@ export default class PositionService {
         from: fromToUse,
         to: toToUse,
         user: this.walletService.getAccount(),
-        chainId: network.chainId,
+        chainId: transaction.chainId,
         positionId: id,
         toWithdraw: BigNumber.from(0),
         swapInterval: BigNumber.from(newPositionTypeData.frequencyType),
@@ -1325,6 +1290,7 @@ export default class PositionService {
         status: 'ACTIVE',
         version: LATEST_VERSION,
         isStale: false,
+        swappedYield: (toYield && BigNumber.from(0)) || null,
         toWithdrawYield: (toYield && BigNumber.from(0)) || null,
         remainingLiquidityYield:
           (fromYield && parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)) || null,

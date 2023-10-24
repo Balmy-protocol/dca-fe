@@ -4,7 +4,7 @@ import Button from '@common/components/button';
 import { Typography, Link, IconButton, Menu, MenuItem, OpenInNewIcon, MoreVertIcon, createStyles } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { NetworkStruct, Position, Token, YieldOptions } from '@types';
+import { NetworkStruct, Position, Token, WalletStatus, YieldOptions } from '@types';
 import {
   NETWORKS,
   OLD_VERSIONS,
@@ -26,8 +26,10 @@ import useTokenList from '@hooks/useTokenList';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { setNetwork } from '@state/config/actions';
 import useWeb3Service from '@hooks/useWeb3Service';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
+// import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useWallet from '@hooks/useWallet';
+import { usePrivy } from '@privy-io/react-auth';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -82,11 +84,13 @@ const PositionControls = ({
   hasSignSupport,
   yieldOptions,
 }: PositionControlsProps) => {
-  const { remainingSwaps, pendingTransaction, toWithdraw, chainId } = position;
+  const { remainingSwaps, pendingTransaction, toWithdraw, chainId, user } = position;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const web3Service = useWeb3Service();
-  const connectedNetwork = useCurrentNetwork();
+  // const connectedNetwork = useCurrentNetwork();
+  const wallet = useWallet(user);
+  const { connectWallet } = usePrivy();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -100,7 +104,8 @@ const PositionControls = ({
     return supportedNetwork;
   }, [chainId]);
 
-  const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
+  // const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
+  const isOnNetwork = true;
   const pushToHistory = usePushToHistory();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
@@ -182,7 +187,9 @@ const PositionControls = ({
     );
   }
 
-  const showSwitchAction = !isOnNetwork;
+  const walletIsConnected = wallet.status === WalletStatus.connected;
+
+  const showSwitchAction = walletIsConnected && !isOnNetwork;
 
   const fromIsSupportedInNewVersion = !!tokenList[position.from.address];
   const toIsSupportedInNewVersion = !!tokenList[position.to.address];
@@ -288,6 +295,13 @@ const PositionControls = ({
           </MenuItem>
         </StyledMenu>
       </>
+      {!walletIsConnected && (
+        <StyledCardFooterButton variant="contained" color="secondary" onClick={() => connectWallet()} fullWidth>
+          <Typography variant="body2">
+            <FormattedMessage description="incorrect network" defaultMessage="Reconnect wallet" />
+          </Typography>
+        </StyledCardFooterButton>
+      )}
       {showSwitchAction && (
         <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
           <Typography variant="body2">
@@ -299,7 +313,7 @@ const PositionControls = ({
           </Typography>
         </StyledCardFooterButton>
       )}
-      {!OLD_VERSIONS.includes(position.version) && isOnNetwork && (
+      {!OLD_VERSIONS.includes(position.version) && walletIsConnected && (
         <>
           {!disabled && (
             <StyledCardFooterButton
@@ -316,7 +330,7 @@ const PositionControls = ({
           )}
         </>
       )}
-      {OLD_VERSIONS.includes(position.version) && isOnNetwork && (
+      {OLD_VERSIONS.includes(position.version) && walletIsConnected && (
         <>
           {shouldShowMigrate && shouldMigrateToYield && (
             <StyledCardFooterButton

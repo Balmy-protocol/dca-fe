@@ -143,7 +143,7 @@ const ActivePosition = ({
 
   const isPending = !!pendingTransaction;
 
-  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rate, undefined, chainId);
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rate);
   const showRatePrice = !isLoadingRatePrice && !!ratePrice;
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));

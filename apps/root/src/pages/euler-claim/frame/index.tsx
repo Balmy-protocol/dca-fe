@@ -43,7 +43,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const prevAccount = usePrevious(account);
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
-  const [balances, isLoadingBalances] = useSdkBalances(EULER_4626_TOKENS);
+  const [balances, isLoadingBalances] = useSdkBalances(EULER_4626_TOKENS, account);
   const [allowances, isLoadingAllowances] = useSdkAllowances(EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS.mainnet.chainId);
 
   React.useEffect(() => {

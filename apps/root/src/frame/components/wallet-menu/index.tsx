@@ -22,7 +22,7 @@ import {
   useHasPendingTransactions,
   useIsTransactionPending,
 } from '@state/transactions/hooks';
-import { NetworkStruct, TransactionDetails, UserType } from '@types';
+import { NetworkStruct, TransactionDetails, UserType, WalletStatus, WalletType } from '@types';
 import useBuildTransactionDetail from '@hooks/useBuildTransactionDetail';
 import { clearAllTransactions, removeTransaction } from '@state/transactions/actions';
 import { useAppDispatch } from '@state/hooks';
@@ -35,12 +35,10 @@ import { toToken } from '@common/utils/currency';
 import Address from '@common/components/address';
 import MinimalTimeline from './components/minimal-timeline';
 import DiscordIcon from '@assets/svg/atom/discord';
-import { WalletWithMetadata, useLogout, usePrivy } from '@privy-io/react-auth';
+import { useLogout, usePrivy } from '@privy-io/react-auth';
 import useUser from '@hooks/useUser';
 import useAccountService from '@hooks/useAccountService';
 import useActiveWallet from '@hooks/useActiveWallet';
-import useWallets from '@hooks/useWallets';
-import { find } from 'lodash';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -122,7 +120,6 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
   } = usePrivy();
   const { logout } = useLogout();
   const user = useUser();
-  const wallets = useWallets();
   const accountService = useAccountService();
   const allTransactions = useAllNotClearedTransactions();
   const hasPendingTransactions = useHasPendingTransactions();
@@ -191,13 +188,13 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
       <StyledWalletContainer>
         <StyledWalletInformationContainer>
           <StyledRecentTransactionsTitleContainer>
-            <Typography variant="body2" component="span">
+            {/* <Typography variant="body2" component="span">
               <FormattedMessage
                 description="connected with"
                 defaultMessage="Connected with {provider}"
                 values={{ provider: web3Service.getProviderInfo().name }}
               />
-            </Typography>
+            </Typography> */}
             <Button variant="text" color="error" size="small" onClick={onDisconnect}>
               <FormattedMessage description="disconnect" defaultMessage="Disconnect" />
             </Button>
@@ -282,36 +279,34 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
                 <Typography variant="body2" component="span">
                   <FormattedMessage description="connected wallets" defaultMessage="Connected external wallets:" />
                 </Typography>
-                {user.privyUser?.linkedAccounts
-                  .filter((linkedAccount) => linkedAccount.type === 'wallet')
-                  .map((wallet: WalletWithMetadata) => {
-                    const walletIsConnected = find(wallets, { address: wallet.address.toLowerCase() });
-                    return (
-                      <StyledExternalAccount key={wallet.address}>
-                        <Typography variant="subtitle1" fontWeight={500}>
-                          <Address address={wallet.address} trimAddress trimSize={10} /> connected with:{' '}
-                          {wallet.walletClientType}
-                        </Typography>
-                        <Button
-                          disabled={wallet.address.toLowerCase() === account?.toLowerCase()}
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => (walletIsConnected ? onSetActiveWallet(wallet.address) : connectWallet())}
-                        >
-                          {walletIsConnected ? (
-                            <FormattedMessage description="setAsActive" defaultMessage="Set as active wallet" />
-                          ) : (
-                            <FormattedMessage description="walletNotConnected" defaultMessage="Reconnect wallet" />
-                          )}
-                        </Button>
-                        {wallet.walletClientType !== 'privy' && (
-                          <Button variant="contained" color="secondary" onClick={() => unlinkWallet(wallet.address)}>
-                            <FormattedMessage description="unlinkWallet" defaultMessage="Unlink" />
-                          </Button>
+                {user.wallets.map((wallet) => {
+                  const walletIsConnected = wallet.status === WalletStatus.connected;
+                  return (
+                    <StyledExternalAccount key={wallet.address}>
+                      <Typography variant="subtitle1" fontWeight={500}>
+                        <Address address={wallet.address} trimAddress trimSize={10} /> connected with:{' '}
+                        {walletIsConnected ? wallet.providerInfo.name : wallet.type}
+                      </Typography>
+                      <Button
+                        disabled={wallet.address.toLowerCase() === account?.toLowerCase()}
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => (walletIsConnected ? onSetActiveWallet(wallet.address) : connectWallet())}
+                      >
+                        {walletIsConnected ? (
+                          <FormattedMessage description="setAsActive" defaultMessage="Set as active wallet" />
+                        ) : (
+                          <FormattedMessage description="walletNotConnected" defaultMessage="Reconnect wallet" />
                         )}
-                      </StyledExternalAccount>
-                    );
-                  })}
+                      </Button>
+                      {wallet.type !== WalletType.embedded && (
+                        <Button variant="contained" color="secondary" onClick={() => unlinkWallet(wallet.address)}>
+                          <FormattedMessage description="unlinkWallet" defaultMessage="Unlink" />
+                        </Button>
+                      )}
+                    </StyledExternalAccount>
+                  );
+                })}
               </StyledExternalWalletsContainer>
             </>
           )}

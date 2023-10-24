@@ -92,7 +92,7 @@ interface ModifySettingsModalProps {
 }
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
-  const { swapInterval, from, remainingSwaps, rate: oldRate, depositedRateUnderlying } = position;
+  const { swapInterval, from, remainingSwaps, rate: oldRate } = position;
   const account = useAccount();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
@@ -107,7 +107,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const hasSignSupport = useSupportsSigning();
-  const remainingLiquidity = (depositedRateUnderlying || oldRate).mul(remainingSwaps);
+  const remainingLiquidity = oldRate.mul(remainingSwaps);
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const permit2Service = usePermit2Service();
@@ -131,9 +131,10 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const allowanceTarget = useDcaAllowanceTarget(position.chainId, fromToUse, yieldFrom || undefined, hasSignSupport);
   const [allowance] = useSpecificAllowance(
     useWrappedProtocolToken ? wrappedProtocolToken : position.from,
+    position.user,
     allowanceTarget
   );
-  const [balance] = useBalance(fromToUse);
+  const [balance] = useBalance(fromToUse, position.user);
   const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const realBalance = balance && balance.add(remainingLiquidity);
@@ -335,6 +336,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
         signature = await permit2Service.getPermit2DcaSignedData(
           position.user,
+          position.chainId,
           position.from.address !== PROTOCOL_TOKEN_ADDRESS ? position.from : wrappedProtocolToken,
           amountToSign
         );
@@ -507,6 +509,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       const result = await walletService.approveSpecificToken(
         fromToUse,
         allowanceTarget,
+        position.user,
         isExact ? remainingLiquidityDifference : undefined
       );
 

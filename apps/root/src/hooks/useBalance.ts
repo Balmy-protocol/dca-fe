@@ -6,11 +6,9 @@ import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
-import useAccount from './useAccount';
 import useSdkService from './useSdkService';
 
-function useBalance(from: Token | undefined | null): [BigNumber | undefined, boolean, string?] {
-  const account = useAccount();
+function useBalance(from: Token | undefined | null, account?: string): [BigNumber | undefined, boolean, string?] {
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -33,9 +31,9 @@ function useBalance(from: Token | undefined | null): [BigNumber | undefined, boo
 
   React.useEffect(() => {
     async function callPromise() {
-      if (from) {
+      if (from && account) {
         try {
-          const promiseResult = await sdkService.getMultipleBalances([from]);
+          const promiseResult = await sdkService.getMultipleBalances([from], account);
 
           if (!promiseResult[from.chainId][from.address]) {
             setState({ result: undefined, error: 'Could not find balance for token', isLoading: false });

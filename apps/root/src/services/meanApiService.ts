@@ -109,15 +109,15 @@ export default class MeanApiService {
     newTo: string,
     recipient: string,
     positionVersion: PositionVersions,
+    chainId: number,
     permissionPermit?: PermissionPermit
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
-    const newHubAddress = await this.contractService.getHUBAddress(LATEST_VERSION);
+    const hubAddress = this.contractService.getHUBAddress(chainId, positionVersion);
+    const newHubAddress = this.contractService.getHUBAddress(chainId, LATEST_VERSION);
 
     // Call to api and get transaction
     const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-migrate`,
+      `${MEAN_API_URL}/v1/dca/networks/${chainId}/actions/swap-and-migrate`,
       {
         sourceHub: hubAddress,
         targetHub: newHubAddress,
@@ -136,9 +136,8 @@ export default class MeanApiService {
     });
   }
 
-  async getAllowedPairs(chainId?: number): Promise<AllowedPairs> {
-    const currentNetwork = await this.providerService.getNetwork();
-    const chainIdTouse = chainId || currentNetwork.chainId;
+  async getAllowedPairs(chainId: number): Promise<AllowedPairs> {
+    const chainIdTouse = chainId;
     try {
       const allowedPairsResponse = await this.axiosClient.get<MeanFinanceAllowedPairsResponse>(
         `${MEAN_API_URL}/v1/dca/networks/${chainIdTouse}/config`

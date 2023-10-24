@@ -120,7 +120,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
   }, [chainId]);
 
   const pushToHistory = usePushToHistory();
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped, undefined, chainId);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped, undefined);
   const showToPrice = !isLoadingToPrice && !!toPrice;
   const dispatch = useAppDispatch();
 

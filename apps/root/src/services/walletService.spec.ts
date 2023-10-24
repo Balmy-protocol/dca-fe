@@ -410,9 +410,10 @@ describe('Wallet Service', () => {
     });
 
     test('it should call getSpecificAllowance with the hub address if it should not check the companion', async () => {
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
       const result = await walletService.getAllowance(
         toToken({ address: 'tokenAddress' }),
+        'account',
         false,
         PositionVersions.POSITION_VERSION_3
       );
@@ -425,9 +426,10 @@ describe('Wallet Service', () => {
     });
 
     test('it should call getSpecificAllowance with the companion address if it should check the companion', async () => {
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
       const result = await walletService.getAllowance(
         toToken({ address: 'tokenAddress' }),
+        'account',
         true,
         PositionVersions.POSITION_VERSION_3
       );
@@ -447,7 +449,11 @@ describe('Wallet Service', () => {
 
     test('it should return the max amount if there is no set account', async () => {
       walletService.setAccount('');
-      const result = await walletService.getSpecificAllowance(toToken({ address: 'token' }), 'addressToCheck');
+      const result = await walletService.getSpecificAllowance(
+        toToken({ address: 'token' }),
+        'addressToCheck',
+        'account'
+      );
 
       expect(result).toEqual({
         token: toToken({ address: 'token' }),
@@ -458,7 +464,8 @@ describe('Wallet Service', () => {
     test('it should return the max amount if the address is of the protocol token', async () => {
       const result = await walletService.getSpecificAllowance(
         toToken({ address: PROTOCOL_TOKEN_ADDRESS }),
-        'addressToCheck'
+        'addressToCheck',
+        'account'
       );
 
       expect(result).toEqual({
@@ -468,7 +475,7 @@ describe('Wallet Service', () => {
     });
 
     test('it should return the max amount if the address is of the null token', async () => {
-      const result = await walletService.getSpecificAllowance(toToken({ address: 'token' }), NULL_ADDRESS);
+      const result = await walletService.getSpecificAllowance(toToken({ address: 'token' }), NULL_ADDRESS, 'account');
 
       expect(result).toEqual({
         token: toToken({ address: 'token' }),
@@ -482,7 +489,11 @@ describe('Wallet Service', () => {
         allowance: allowanceMock,
       } as unknown as ERC20Contract);
 
-      const result = await walletService.getSpecificAllowance(toToken({ address: 'token' }), 'addressToCheck');
+      const result = await walletService.getSpecificAllowance(
+        toToken({ address: 'token' }),
+        'addressToCheck',
+        'account'
+      );
 
       expect(contractService.getTokenInstance).toHaveBeenCalledTimes(1);
       expect(contractService.getTokenInstance).toHaveBeenCalledWith('token');
@@ -512,6 +523,7 @@ describe('Wallet Service', () => {
 
     test('it should populate the transaction from the token contract', async () => {
       const result = await walletService.buildApproveSpecificTokenTx(
+        'account',
         toToken({ address: 'token' }),
         'addressToApprove',
         BigNumber.from(10)
@@ -523,7 +535,11 @@ describe('Wallet Service', () => {
     });
 
     test('it should populate the transaction from the token contract with the max value if no amount is passed', async () => {
-      const result = await walletService.buildApproveSpecificTokenTx(toToken({ address: 'token' }), 'addressToApprove');
+      const result = await walletService.buildApproveSpecificTokenTx(
+        'account',
+        toToken({ address: 'token' }),
+        'addressToApprove'
+      );
 
       expect(approveMock).toHaveBeenCalledTimes(1);
       expect(approveMock).toHaveBeenCalledWith('addressToApprove', MaxUint256);
@@ -539,8 +555,9 @@ describe('Wallet Service', () => {
     });
 
     test('it should call buildApproveSpecificTokenTx with the hub address if it should not check the companion', async () => {
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
       const result = await walletService.buildApproveTx(
+        'account',
         toToken({ address: 'tokenAddress' }),
         false,
         PositionVersions.POSITION_VERSION_3,
@@ -559,8 +576,9 @@ describe('Wallet Service', () => {
     });
 
     test('it should call buildApproveSpecificTokenTx with the companion address if it should check the companion', async () => {
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
       const result = await walletService.buildApproveTx(
+        'account',
         toToken({ address: 'tokenAddress' }),
         true,
         PositionVersions.POSITION_VERSION_3,
@@ -587,8 +605,9 @@ describe('Wallet Service', () => {
     });
 
     test('it should call approveSpecificToken with the hub address if it should not check the companion', async () => {
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
       const result = await walletService.approveToken(
+        'account',
         toToken({ address: 'tokenAddress' }),
         false,
         PositionVersions.POSITION_VERSION_3,
@@ -607,8 +626,9 @@ describe('Wallet Service', () => {
     });
 
     test('it should call approveSpecificToken with the companion address if it should check the companion', async () => {
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
       const result = await walletService.approveToken(
+        'account',
         toToken({ address: 'tokenAddress' }),
         true,
         PositionVersions.POSITION_VERSION_3,
@@ -643,6 +663,7 @@ describe('Wallet Service', () => {
       const result = await walletService.approveSpecificToken(
         toToken({ address: 'token' }),
         'addressToApprove',
+        'account',
         BigNumber.from(10)
       );
 
@@ -652,7 +673,11 @@ describe('Wallet Service', () => {
     });
 
     test('it should call the approve method of the token contract with the max value if no amount is passed', async () => {
-      const result = await walletService.approveSpecificToken(toToken({ address: 'token' }), 'addressToApprove');
+      const result = await walletService.approveSpecificToken(
+        toToken({ address: 'token' }),
+        'addressToApprove',
+        'account'
+      );
 
       expect(approveMock).toHaveBeenCalledTimes(1);
       expect(approveMock).toHaveBeenCalledWith('addressToApprove', MaxUint256);

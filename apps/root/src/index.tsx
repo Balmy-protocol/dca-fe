@@ -40,17 +40,20 @@ function loadLocaleData(locale: SupportedLanguages) {
 }
 
 const WalletsUpdater = () => {
-  const { user, authenticated } = usePrivy();
+  const { user, authenticated, ready } = usePrivy();
   const { wallets } = useWallets();
   const accountService = useAccountService();
   const labelService = useLabelService();
 
   React.useEffect(() => {
-    if (user && wallets.length) {
+    const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+    const embeddedWalletIsReady = !!embeddedWallet;
+
+    if (user && wallets.length && authenticated && ready && embeddedWalletIsReady) {
       void accountService.setUser(user, wallets);
       void labelService.initializeLabelsAndContacts();
     }
-  }, [authenticated, wallets]);
+  }, [authenticated, wallets, ready]);
   return <></>;
 };
 
@@ -85,11 +88,14 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: {
             <PrivyProvider
               appId={process.env.PUBLIC_PRIVY_APP_ID!}
               config={{
-                loginMethods: ['email', 'google', 'twitter', 'wallet'],
+                loginMethods: ['email', 'google', 'twitter', 'discord', 'apple', 'wallet'],
                 appearance: {
                   theme: 'dark',
                   accentColor: '#676FFF',
                   logo: 'https://your-logo-url',
+                },
+                embeddedWallets: {
+                  createOnLogin: 'all-users',
                 },
               }}
             >

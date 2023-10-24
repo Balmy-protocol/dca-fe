@@ -1,7 +1,9 @@
-import { ConnectedWallet, User as BasePrivyUser } from '@privy-io/react-auth';
-import { IAccountService, UserType, WalletType, User, Wallet, AccountLabels } from '@types';
+import { ConnectedWallet, User as BasePrivyUser, WalletWithMetadata } from '@privy-io/react-auth';
+import { IAccountService, UserType, WalletType, User, Wallet, AccountLabels, WalletStatus } from '@types';
 import { find } from 'lodash';
 import Web3Service from './web3Service';
+import { getProviderInfo } from '@common/utils/provider-info';
+import { IProviderInfo } from '@common/utils/provider-info/types';
 
 export default class AccountService implements IAccountService {
   user?: User;
@@ -24,9 +26,12 @@ export default class AccountService implements IAccountService {
 
   async setActiveWallet(wallet: string): Promise<void> {
     this.activeWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() })!;
+    if (!this.activeWallet || this.activeWallet.status !== WalletStatus.connected) {
+      throw new Error('Cannot find wallet');
+    }
     const provider = await this.activeWallet.getProvider();
 
-    await this.web3Service.connect(provider, undefined, undefined, this.activeWallet.type === WalletType.embedded);
+    await this.web3Service.connect(provider, undefined, undefined);
     return;
   }
 
@@ -49,7 +54,7 @@ export default class AccountService implements IAccountService {
   async getWalletProvider(wallet: string) {
     const foundWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() });
 
-    if (!foundWallet) {
+    if (!foundWallet || foundWallet?.status !== WalletStatus.connected) {
       throw new Error('Cannot find wallet');
     }
 
@@ -70,22 +75,71 @@ export default class AccountService implements IAccountService {
     return this.activeWallet;
   }
 
-  setUser(user?: BasePrivyUser, wallets?: ConnectedWallet[]): void {
+  getWallet(address: string): Wallet {
+    const wallet = find(this.user?.wallets, { address: address.toLowerCase() });
+
+    if (wallet) {
+      return wallet;
+    }
+
+    throw new Error('Wallet not found');
+  }
+
+  async setUser(user?: BasePrivyUser, wallets?: ConnectedWallet[]): Promise<void> {
     if (!user || !wallets) {
       this.user = undefined;
       this.activeWallet = undefined;
       return;
     }
 
+    const userWallets = user.linkedAccounts
+      .filter((account) => account.type === 'wallet')
+      .map<Wallet>((walletAccount: WalletWithMetadata) => {
+        const readyWallet = wallets.find(
+          (wallet) => wallet.address.toLowerCase() === walletAccount.address.toLowerCase()
+        );
+
+        return {
+          type: walletAccount.walletClientType === 'privy' ? WalletType.embedded : WalletType.external,
+          address: walletAccount.address.toLowerCase(),
+          status: !!readyWallet ? WalletStatus.connected : WalletStatus.disconnected,
+          getProvider: readyWallet?.getEthersProvider,
+          switchChain: readyWallet?.switchChain,
+        } as Wallet;
+      });
+
+    const providerInfoPromises: Promise<IProviderInfo | undefined>[] = [];
+
+    for (const userWallet of userWallets) {
+      if (userWallet.getProvider) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const infoPromise = userWallet
+          .getProvider()
+          .then((provider) =>
+            getProviderInfo(
+              provider.provider.walletProvider?.walletProvider || provider,
+              userWallet.type === WalletType.embedded
+            )
+          );
+        providerInfoPromises.push(infoPromise);
+      } else {
+        providerInfoPromises.push(Promise.resolve(undefined));
+      }
+    }
+
+    const providerInfos = await Promise.all(providerInfoPromises);
+
+    providerInfos.forEach((providerInfo, index) => {
+      userWallets[index].providerInfo = providerInfo;
+    });
+
     this.user = {
       id: `privy:${user.id}`,
       type: UserType.privy,
       privyUser: user,
-      wallets: wallets.map((wallet) => ({
-        type: WalletType.embedded,
-        address: wallet.address.toLowerCase(),
-        getProvider: wallet.getEthersProvider,
-      })),
+      wallets: userWallets,
     };
 
     const embeddedWallet = find(this.user.wallets, { type: WalletType.embedded });

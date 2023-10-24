@@ -357,7 +357,7 @@ const ClaimChecklist = ({
           </Typography>
         ),
       });
-      const companionAddress = await contractService.getHUBCompanionAddress();
+      const companionAddress = contractService.getHUBCompanionAddress(positions[0].chainId);
       trackEvent('Euler claim - Permit many submitting');
       const result = await positionService.givePermissionToMultiplePositions(
         positions,

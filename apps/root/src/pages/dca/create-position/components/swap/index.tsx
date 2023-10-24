@@ -154,9 +154,9 @@ const Swap = ({
   const intl = useIntl();
   const canUsePermit2 = useSupportsSigning();
   const allowanceTarget = useDcaAllowanceTarget(currentNetwork.chainId, from, fromYield?.tokenAddress, canUsePermit2);
-  const [balance, , balanceErrors] = useBalance(from);
-  const [allowance, , allowanceErrors] = useSpecificAllowance(from, allowanceTarget);
   const activeWallet = useActiveWallet();
+  const [balance, , balanceErrors] = useBalance(from, activeWallet?.address);
+  const [allowance, , allowanceErrors] = useSpecificAllowance(from, activeWallet?.address || '', allowanceTarget);
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -271,7 +271,7 @@ const Swap = ({
   };
 
   const handleApproveToken = async (amount?: BigNumber) => {
-    if (!from || !to) return;
+    if (!from || !to || !activeWallet?.address) return;
     const fromSymbol = from.symbol;
 
     try {
@@ -289,7 +289,7 @@ const Swap = ({
       trackEvent('DCA - Approve token submitting');
       const addressToApprove = PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId];
 
-      const result = await walletService.approveSpecificToken(from, addressToApprove, amount);
+      const result = await walletService.approveSpecificToken(from, addressToApprove, activeWallet.address, amount);
 
       trackEvent('DCA - Approve token submitted');
 
@@ -396,13 +396,14 @@ const Swap = ({
         fromValue,
         frequencyType,
         frequencyValue,
+        currentNetwork.chainId,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined,
         signature
       );
       trackEvent('DCA - Create position submitted');
-      const hubAddress = await contractService.getHUBAddress();
-      const companionAddress = await contractService.getHUBCompanionAddress();
+      const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
+      const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 
       addTransaction(result, {
         type: TransactionTypes.newPosition,
@@ -495,12 +496,13 @@ const Swap = ({
         fromValue,
         frequencyType,
         frequencyValue,
+        currentNetwork.chainId,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined
       );
       trackEvent('DCA - Safe approve and create position submitted');
-      const hubAddress = await contractService.getHUBAddress();
-      const companionAddress = await contractService.getHUBCompanionAddress();
+      const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
+      const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -607,7 +609,12 @@ const Swap = ({
       trackEvent('DCA - Sign permi2Approval submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
-      const result = await permit2Service.getPermit2DcaSignedData(activeWallet.address, from, amount);
+      const result = await permit2Service.getPermit2DcaSignedData(
+        activeWallet.address,
+        currentNetwork.chainId,
+        from,
+        amount
+      );
       trackEvent('DCA - Sign permi2Approval submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
@@ -998,6 +1005,7 @@ const Swap = ({
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
         ignoreValues={[]}
         yieldOptions={yieldOptions}
+        account={activeWallet?.address}
         isLoadingYieldOptions={isLoadingYieldOptions}
         otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
       />

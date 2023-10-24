@@ -151,7 +151,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         type: TransactionTypes.withdrawPosition,
         typeData: {
           id: position.id,
-          withdrawnUnderlying: position.toWithdrawUnderlying && position.toWithdrawUnderlying.toString(),
+          withdrawnUnderlying: position.toWithdraw.toString(),
         },
         position,
       });
@@ -208,11 +208,8 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setSelectedPosition(position);
     dispatch(
       initializeModifyRateSettings({
-        fromValue: formatUnits(
-          (position.depositedRateUnderlying || position.rate).mul(position.remainingSwaps),
-          position.from.decimals
-        ),
-        rate: formatUnits(position.depositedRateUnderlying || position.rate, position.from.decimals),
+        fromValue: formatUnits(position.rate.mul(position.remainingSwaps), position.from.decimals),
+        rate: formatUnits(position.rate, position.from.decimals),
         frequencyValue: position.remainingSwaps.toString(),
         modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0))
           ? ModeTypesIds.FULL_DEPOSIT_TYPE

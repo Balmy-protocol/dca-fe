@@ -20,15 +20,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
-import {
-  activePositionsPerIntervalToHasToExecute,
-  calculateNextSwapAvailableAt,
-  calculateStale,
-  calculateYield,
-  fullPositionToMappedPosition,
-  getTimeFrequencyLabel,
-  STALE,
-} from '@common/utils/parsing';
+import { fullPositionToMappedPosition, getTimeFrequencyLabel } from '@common/utils/parsing';
 import {
   NETWORKS,
   POSITION_ACTIONS,
@@ -221,7 +213,15 @@ const Details = ({
     swappedYield,
     remainingLiquidityYield: yieldFromGenerated,
     swapped,
-  } = fullPositionToMappedPosition(position);
+    isStale,
+    nextSwapAvailableAt,
+  } = fullPositionToMappedPosition(
+    position,
+    pair,
+    remainingLiquidityUnderlying,
+    toWithdrawUnderlying,
+    swappedUnderlying
+  );
   const showBreakdown = useShowBreakdown();
   const dispatch = useAppDispatch();
   const toWithdrawBase = toWithdraw.sub(toWithdrawYield || BigNumber.from(0));
@@ -261,23 +261,13 @@ const Details = ({
     ? summedPrices.div(swappedActions.length)
     : BigNumber.from(0);
 
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
-    position.from,
-    BigNumber.from(remainingLiquidity),
-    undefined,
-    chainId
-  );
-  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
-    position.from,
-    BigNumber.from(yieldFromGenerated),
-    undefined,
-    chainId
-  );
-  const [ratePrice, isLoadingRatePrice] = useUsdPrice(position.from, rate, undefined, chainId);
-  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase, undefined, chainId);
-  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield, undefined, chainId);
-  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase, undefined, chainId);
-  const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield, undefined, chainId);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigNumber.from(remainingLiquidity));
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(position.from, BigNumber.from(yieldFromGenerated));
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(position.from, rate);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase);
+  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield);
+  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase);
+  const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield);
   const showToFullPrice = !isLoadingToFullPrice && !!toFullPrice;
   const showToYieldFullPrice = !isLoadingToYieldFullPrice && !!toYieldFullPrice;
   const showToPrice = !isLoadingToPrice && !!toPrice;
@@ -288,39 +278,19 @@ const Details = ({
 
   const hasNoFunds = BigNumber.from(remainingLiquidity).lte(BigNumber.from(0));
 
-  const lastExecutedAt = (pair?.swaps && pair?.swaps[0] && pair?.swaps[0].executedAtTimestamp) || '0';
-
-  const isStale =
-    calculateStale(
-      BigNumber.from(position.swapInterval.interval),
-      parseInt(position.createdAtTimestamp, 10) || 0,
-      parseInt(lastExecutedAt, 10) || 0,
-      pair?.activePositionsPerInterval
-        ? activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval)
-        : null
-    ) === STALE;
-
   const foundYieldFrom =
     position.from.underlyingTokens[0] &&
     find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
   const foundYieldTo =
     position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
-  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdrawUnderlying || toWithdrawBase;
-  const swappedToShow = showBreakdown ? swappedBase : swappedUnderlying || swappedBase;
+  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdraw;
+  const swappedToShow = showBreakdown ? swappedBase : swapped;
   const remainingLiquidityToShow = showBreakdown ? remainingLiquidity : totalRemainingLiquidity;
 
   const executedSwaps = totalSwaps.toNumber() - remainingSwaps.toNumber();
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
-
-  const nextSwapAvailableAt = calculateNextSwapAvailableAt(
-    BigNumber.from(position.swapInterval.interval),
-    pair?.activePositionsPerInterval
-      ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
-      : [false, false, false, false, false, false, false, false],
-    pair?.lastSwappedAt || [0, 0, 0, 0, 0, 0, 0, 0]
-  );
 
   const isTestnet = TESTNETS.includes(positionNetwork.chainId);
 

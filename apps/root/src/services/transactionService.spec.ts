@@ -154,8 +154,8 @@ describe('Transaction Service', () => {
 
   describe('parseLog', () => {
     beforeEach(() => {
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
       contractService.getHubInstance.mockResolvedValue({
         interface: { parseLog: jest.fn().mockReturnValue({ name: 'hubLog' }) },
       } as unknown as HubContract);

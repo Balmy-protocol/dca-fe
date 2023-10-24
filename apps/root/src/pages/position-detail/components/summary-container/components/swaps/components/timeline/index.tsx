@@ -181,41 +181,26 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
     const rate = positionState.depositedRateUnderlying || positionState.rate;
     const yieldRate = positionState.rateUnderlying || positionState.depositedRateUnderlying || positionState.rate;
     const yieldFrom = BigNumber.from(yieldRate).sub(rate);
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(swapped),
-      undefined,
-      position.chainId
-    );
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(swapped));
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
       BigNumber.from(swapped),
-      positionState.createdAtTimestamp,
-      position.chainId
+      positionState.createdAtTimestamp
     );
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(rate),
-      undefined,
-      position.chainId
-    );
+    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigNumber.from(rate));
     const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
       BigNumber.from(rate),
-      positionState.createdAtTimestamp,
-      position.chainId
+      positionState.createdAtTimestamp
     );
     const [fromYieldCurrentPrice, isLoadingFromYieldCurrentPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(yieldFrom),
-      undefined,
-      position.chainId
+      BigNumber.from(yieldFrom)
     );
     const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
       position.from,
       BigNumber.from(yieldFrom),
-      positionState.createdAtTimestamp,
-      position.chainId
+      positionState.createdAtTimestamp
     );
 
     const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
@@ -684,17 +669,11 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
       ? BigNumber.from(withdrawnUnderlying).sub(BigNumber.from(withdrawnUnderlyingAccum))
       : null;
     const withdrawn = withdrawnUnderlyingAccum || withdrawnUnderlying || withdrawnBase;
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(withdrawn),
-      undefined,
-      position.chainId
-    );
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(withdrawn));
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
       BigNumber.from(withdrawn),
-      positionState.createdAtTimestamp,
-      position.chainId
+      positionState.createdAtTimestamp
     );
 
     const showPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
@@ -703,16 +682,13 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
 
     const [toCurrentYieldPrice, isLoadingToCurrentYieldPrice] = useUsdPrice(
       position.to,
-      BigNumber.from(yieldAmount || '0'),
-      undefined,
-      position.chainId
+      BigNumber.from(yieldAmount || '0')
     );
 
     const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(
       position.to,
       BigNumber.from(yieldAmount || '0'),
-      positionState.createdAtTimestamp,
-      position.chainId
+      positionState.createdAtTimestamp
     );
 
     const showYieldPrices =
@@ -796,17 +772,11 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
     const withdrawnSwapped = positionState.withdrawnSwappedUnderlying || positionState.withdrawnSwapped;
     const withdrawnRemaining = positionState.withdrawnRemainingUnderlying || positionState.withdrawnRemaining;
 
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(withdrawnSwapped),
-      undefined,
-      position.chainId
-    );
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(withdrawnSwapped));
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
       BigNumber.from(withdrawnSwapped),
-      positionState.createdAtTimestamp,
-      position.chainId
+      positionState.createdAtTimestamp
     );
 
     const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
@@ -814,15 +784,12 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
 
     const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(withdrawnRemaining),
-      undefined,
-      position.chainId
+      BigNumber.from(withdrawnRemaining)
     );
     const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
       BigNumber.from(withdrawnRemaining),
-      positionState.createdAtTimestamp,
-      position.chainId
+      positionState.createdAtTimestamp
     );
 
     const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;

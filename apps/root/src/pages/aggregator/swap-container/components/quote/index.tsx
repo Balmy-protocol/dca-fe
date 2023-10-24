@@ -17,10 +17,10 @@ import {
 import { emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
-import { parseUnits } from '@ethersproject/units';
+// import { parseUnits } from '@ethersproject/units';
 import { SORT_MOST_PROFIT, SORT_MOST_RETURN } from '@constants/aggregator';
-import useSpecificAllowance from '@hooks/useSpecificAllowance';
-import { BigNumber, constants } from 'ethers';
+// import useSpecificAllowance from '@hooks/useSpecificAllowance';
+// import { BigNumber, constants } from 'ethers';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { setSelectedRoute } from '@state/aggregator/actions';
@@ -209,10 +209,10 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
 
   let isWorsePrice = false;
 
-  const [allowance] = useSpecificAllowance(quote.sellToken, quote.swapper.allowanceTarget);
+  // const [allowance] = useSpecificAllowance(quote.sellToken, quote.swapper.allowanceTarget);
 
-  const parsedAllowance = allowance.allowance && parseUnits(allowance.allowance || '0', quote.sellToken.decimals);
-  const isApproved = (parsedAllowance || constants.MaxUint256).gte(BigNumber.from(quote.maxSellAmount.amount));
+  // const parsedAllowance = allowance.allowance && parseUnits(allowance.allowance || '0', quote.sellToken.decimals);
+  // const isApproved = (parsedAllowance || constants.MaxUint256).gte(BigNumber.from(quote.maxSellAmount.amount));
 
   if (isBuyOrder) {
     isWorsePrice = quote.sellAmount.amount.gt(bestQuote?.sellAmount.amount || 0);
@@ -273,14 +273,14 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
           </Typography>
         </StyledTitleDataContainer>
         <StyledTitleDataContainer $end>
-          {!isApproved && (
+          {/* {!isApproved && (
             <StatusChip
               label={<FormattedMessage description="needsApproval" defaultMessage="Needs approval" />}
               color="default"
               variant="outlined"
               size="small"
             />
-          )}
+          )} */}
           {sorting === SORT_MOST_PROFIT && isWorsePrice && (
             <StatusChip
               label={<FormattedMessage description="worsePrice" defaultMessage="Worse price" />}

@@ -11,6 +11,7 @@ import {
   YieldOptions,
   AvailablePairs,
   PositionVersions,
+  GetPairSwapsData,
 } from '@types';
 import { HUB_ADDRESS, LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -230,14 +231,61 @@ export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, r
   };
 };
 
+export const activePositionsPerIntervalToHasToExecute = (
+  activePositionsPerInterval: [number, number, number, number, number, number, number, number]
+): [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean] =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
+
+export const calculateNextSwapAvailableAt = (
+  interval: BigNumber,
+  activePositionsPerInterval: SwapInfo,
+  lastSwappedAt: LastSwappedAt
+) => {
+  const intervalIndex = findIndex(SWAP_INTERVALS_MAP, { value: interval });
+  let nextSwapAvailableAt = 0;
+
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i <= intervalIndex; i++) {
+    if (activePositionsPerInterval[i]) {
+      const nextSwapAvailableAtForInterval = BigNumber.from(lastSwappedAt[i]).div(interval).add(1).mul(interval);
+      if (nextSwapAvailableAtForInterval.gt(nextSwapAvailableAt)) {
+        nextSwapAvailableAt = nextSwapAvailableAtForInterval.toNumber();
+      }
+    }
+  }
+  return nextSwapAvailableAt;
+};
+
 export function fullPositionToMappedPosition(
   position: FullPosition,
+  pair?: GetPairSwapsData,
   remainingLiquidityUnderlying?: Nullable<BigNumber>,
   toWithdrawUnderlying?: Nullable<BigNumber>,
   totalWithdrawnUnderlying?: Nullable<BigNumber>,
   positionVersion?: string
 ): Position {
-  const toWithdraw = toWithdrawUnderlying || position.toWithdraw;
+  const lastExecutedAt = (pair?.swaps && pair?.swaps[0] && pair?.swaps[0].executedAtTimestamp) || '0';
+
+  const isStale =
+    calculateStale(
+      BigNumber.from(position.swapInterval.interval),
+      parseInt(position.createdAtTimestamp, 10) || 0,
+      parseInt(lastExecutedAt, 10) || 0,
+      pair?.activePositionsPerInterval
+        ? activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval)
+        : null
+    ) === STALE;
+
+  const nextSwapAvailableAt = calculateNextSwapAvailableAt(
+    BigNumber.from(position.swapInterval.interval),
+    pair?.activePositionsPerInterval
+      ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
+      : [false, false, false, false, false, false, false, false],
+    pair?.lastSwappedAt || [0, 0, 0, 0, 0, 0, 0, 0]
+  );
+  const toWithdraw = toWithdrawUnderlying || BigNumber.from(position.toWithdraw);
   const toWithdrawYield =
     position.toWithdrawUnderlyingAccum && toWithdrawUnderlying
       ? toWithdrawUnderlying.sub(position.toWithdrawUnderlyingAccum)
@@ -247,16 +295,16 @@ export function fullPositionToMappedPosition(
     (totalWithdrawnUnderlying &&
       toWithdrawUnderlying &&
       BigNumber.from(totalWithdrawnUnderlying).add(BigNumber.from(toWithdrawUnderlying))) ||
-    position.swapped;
+    BigNumber.from(position.totalSwapped);
   const swappedYield =
     position.totalSwappedUnderlyingAccum && totalWithdrawnUnderlying
       ? swapped.sub(position.totalSwappedUnderlyingAccum)
       : BigNumber.from(0);
 
-  const { total: totalRemainingLiquidity, yieldGenerated: yieldFromGenerated } = calculateYield(
+  const { total: remainingLiquidity, yieldGenerated: remainingLiquidityYield } = calculateYield(
     remainingLiquidityUnderlying || BigNumber.from(position.remainingLiquidity),
-    position.rate,
-    position.remainingSwaps
+    BigNumber.from(position.rate),
+    BigNumber.from(position.remainingSwaps)
   );
 
   return {
@@ -266,12 +314,15 @@ export function fullPositionToMappedPosition(
     swapInterval: BigNumber.from(position.swapInterval.interval),
     swapped: BigNumber.from(position.totalSwapped),
     rate: BigNumber.from(position.rate),
-    toWithdraw: BigNumber.from(position.toWithdraw),
-    remainingLiquidity: BigNumber.from(position.remainingLiquidity),
+    toWithdraw,
+    remainingLiquidity: remainingLiquidity,
     remainingSwaps: BigNumber.from(position.remainingSwaps),
     totalSwaps: BigNumber.from(position.totalSwaps),
-    toWithdrawYield: null,
-    remainingLiquidityYield: null,
+    toWithdrawYield,
+    remainingLiquidityYield,
+    swappedYield,
+    isStale,
+    nextSwapAvailableAt,
     id: `${position.id}-v${position.version || LATEST_VERSION}`,
     positionId: position.id,
     status: position.status,
@@ -293,7 +344,7 @@ export const findHubAddressVersion = (hubAddress: string) => {
 
     const addresses = Object.values(chainsAndAddresses);
 
-    const isHubInVersion = addresses.filter((address) => address.toLowerCase() === hubAddress.toLowerCase());
+    const isHubInVersion = addresses.filter((address) => address.toLowerCase() === hubAddress.toLowerCase()).length;
 
     if (isHubInVersion) {
       return positionVersion as PositionVersions;
@@ -322,33 +373,6 @@ export const usdFormatter = (num: number) => {
     }
   }
   return (num / si[i].value).toFixed(3).replace(rx, '$1') + si[i].symbol;
-};
-
-export const activePositionsPerIntervalToHasToExecute = (
-  activePositionsPerInterval: [number, number, number, number, number, number, number, number]
-): [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean] =>
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
-
-export const calculateNextSwapAvailableAt = (
-  interval: BigNumber,
-  activePositionsPerInterval: SwapInfo,
-  lastSwappedAt: LastSwappedAt
-) => {
-  const intervalIndex = findIndex(SWAP_INTERVALS_MAP, { value: interval });
-  let nextSwapAvailableAt = 0;
-
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i <= intervalIndex; i++) {
-    if (activePositionsPerInterval[i]) {
-      const nextSwapAvailableAtForInterval = BigNumber.from(lastSwappedAt[i]).div(interval).add(1).mul(interval);
-      if (nextSwapAvailableAtForInterval.gt(nextSwapAvailableAt)) {
-        nextSwapAvailableAt = nextSwapAvailableAtForInterval.toNumber();
-      }
-    }
-  }
-  return nextSwapAvailableAt;
 };
 
 export const chainToWagmiNetwork = ({

@@ -7,10 +7,9 @@ import {
   DEFAULT_NETWORK_FOR_VERSION,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
-import { TransactionRequestWithFrom } from '@types';
-import { getNetwork as getStringNetwork, Provider, Network } from '@ethersproject/providers';
+import { TransactionRequestWithFrom, WalletStatus } from '@types';
+import { getNetwork as getStringNetwork, Provider, Network, Web3Provider } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
-import { getProviderInfo } from '@common/utils/provider-info';
 import AccountService from './accountService';
 import { timeoutPromise } from '@mean-finance/sdk';
 
@@ -21,28 +20,8 @@ interface ProviderWithChainId extends Provider {
 export default class ProviderService {
   accountService: AccountService;
 
-  providerInfo: { id: string; logo: string; name: string };
-
   constructor(accountService: AccountService) {
     this.accountService = accountService;
-  }
-
-  setProviderInfo(provider: Provider, privyWallet?: boolean) {
-    this.providerInfo = getProviderInfo(provider, privyWallet);
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (this.providerInfo.id === 'walletconnect' && provider.connector && provider.connector.peerMeta) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        this.providerInfo.name = provider.connector.peerMeta.name;
-      }
-    } catch {
-      console.error('Failed to set providerInfo name for wc');
-    }
   }
 
   async estimateGas(tx: TransactionRequestWithFrom): Promise<BigNumber> {
@@ -57,18 +36,34 @@ export default class ProviderService {
     return signer.sendTransaction(transactionToSend);
   }
 
-  async getSigner(address?: string) {
+  async getWalletProvider(address?: string) {
+    let provider: Web3Provider | undefined;
     if (!address) {
-      const activeWalletSigner = await this.accountService.getActiveWalletSigner();
+      provider = await this.accountService.getActiveWalletProvider();
 
-      if (!activeWalletSigner) {
+      if (!provider) {
         throw new Error('No active wallet');
       }
+    } else {
+      provider = await this.accountService.getWalletProvider(address);
 
-      return activeWalletSigner;
+      if (!provider) {
+        throw new Error('No wallet provider found');
+      }
     }
 
-    return this.accountService.getWalletSigner(address);
+    return provider;
+  }
+
+  async getSigner(address?: string, chainId?: number) {
+    let provider = await this.getWalletProvider(address);
+
+    if (chainId && provider.network.chainId !== chainId) {
+      await this.changeNetwork(chainId, undefined, provider);
+      provider = await this.getWalletProvider(address);
+    }
+
+    return provider.getSigner();
   }
 
   async sendTransactionWithGasLimit(tx: TransactionRequestWithFrom) {
@@ -88,10 +83,6 @@ export default class ProviderService {
     const provider = await this.accountService.getWalletProvider(address);
 
     return provider.getBalance(address);
-  }
-
-  getProviderInfo() {
-    return this.providerInfo;
   }
 
   async getNetwork() {
@@ -182,8 +173,15 @@ export default class ProviderService {
     window.location.reload();
   }
 
-  handleChainChanged(newChainId: string) {
-    const providerInfo = this.getProviderInfo();
+  async handleChainChanged(newChainId: string) {
+    const provider = await this.getProvider();
+
+    if (!provider) {
+      throw new Error('no provider found');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+    const providerInfo = this.accountService.getActiveWallet()?.providerInfo!;
 
     if (window.location.pathname === '/' || window.location.pathname.startsWith('/create')) {
       window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
@@ -196,7 +194,7 @@ export default class ProviderService {
 
   async addEventListeners() {
     const provider = await this.getProvider();
-    const providerInfo = this.getProviderInfo();
+    const providerInfo = this.accountService.getActiveWallet()?.providerInfo;
 
     try {
       if (provider) {
@@ -222,10 +220,16 @@ export default class ProviderService {
   }
 
   async addNetwork(newChainId: number, callbackBeforeReload?: () => void) {
-    const providerInfo = this.getProviderInfo();
-
     try {
       const provider = await this.accountService.getActiveWalletProvider();
+
+      if (!provider) {
+        throw new Error('No provider found');
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+      const providerInfo = this.accountService.getActiveWallet()?.providerInfo!;
+
       const network = find(NETWORKS, { chainId: newChainId });
 
       if (network) {
@@ -245,36 +249,52 @@ export default class ProviderService {
         if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
           window.location.reload();
         }
+
+        await provider.getNetwork();
       }
     } catch (addError) {
       console.error('Error adding new chain to metamask');
     }
   }
 
-  async changeNetwork(newChainId: number, callbackBeforeReload?: () => void) {
-    const providerInfo = this.getProviderInfo();
-
+  async changeNetwork(newChainId: number, callbackBeforeReload?: () => void, providedProvider?: Web3Provider) {
     try {
-      const provider = await this.accountService.getActiveWalletProvider();
-      const response: { code?: number; message?: string } | null = (await provider?.send('wallet_switchEthereumChain', [
-        { chainId: `0x${newChainId.toString(16)}` },
-      ])) as { code?: number; message?: string } | null;
+      const provider = providedProvider || (await this.accountService.getActiveWalletProvider());
 
-      if (
-        response &&
-        ((response.code && response.code === 4902) || (response.message && response.message === 'Chain does not exist'))
-      ) {
-        await this.addNetwork(newChainId, callbackBeforeReload);
+      if (!provider) {
+        throw new Error('No provider found');
+      }
+      const walletAddress = await provider.getSigner().getAddress();
+      const wallet = this.accountService.getWallet(walletAddress);
+
+      if (wallet.status !== WalletStatus.connected) {
         return;
       }
+
+      const providerInfo = wallet.providerInfo;
+
+      await wallet.switchChain(newChainId);
+      // const response: { code?: number; message?: string } | null = (await provider?.send('wallet_switchEthereumChain', [
+      //   { chainId: `0x${newChainId.toString(16)}` },
+      // ])) as { code?: number; message?: string } | null;
+
+      // if (
+      //   response &&
+      //   ((response.code && response.code === 4902) || (response.message && response.message === 'Chain does not exist'))
+      // ) {
+      //   await this.addNetwork(newChainId, callbackBeforeReload);
+      //   return;
+      // }
 
       if (callbackBeforeReload) {
         callbackBeforeReload();
       }
 
-      if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
+      if (providerInfo && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
         window.location.reload();
       }
+
+      await provider.getNetwork();
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (switchError.code === 4902 || switchError.message === 'Chain does not exist') {
@@ -288,9 +308,15 @@ export default class ProviderService {
     callbackBeforeReload?: () => void,
     forceChangeNetwork?: boolean
   ) {
-    const providerInfo = this.getProviderInfo();
+    const provider = await this.accountService.getActiveWalletProvider();
+    if (!provider) {
+      return;
+    }
 
-    if (AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name) || forceChangeNetwork) {
+    const walletAddress = await provider.getSigner().getAddress();
+    const providerInfo = this.accountService.getWallet(walletAddress).providerInfo;
+
+    if ((providerInfo && AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) || forceChangeNetwork) {
       return this.changeNetwork(newChainId, callbackBeforeReload);
     }
 

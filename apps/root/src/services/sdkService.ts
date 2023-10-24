@@ -14,10 +14,11 @@ import { BigNumber } from 'ethers';
 import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import { MEAN_API_URL, NULL_ADDRESS } from '@constants/addresses';
+import { MEAN_API_URL, NETWORKS_FOR_MENU, NULL_ADDRESS } from '@constants/addresses';
 import ProviderService from './providerService';
 import WalletService from './walletService';
 import ContractService from './contractService';
+import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -112,7 +113,7 @@ export default class SdkService {
   async getSwapOption(
     quote: SwapOption,
     passedTakerAddress: string,
-    chainId?: number,
+    chainId: number,
     recipient?: string | null,
     slippagePercentage?: number,
     gasSpeed?: GasKeys,
@@ -121,7 +122,7 @@ export default class SdkService {
   ) {
     const currentNetwork = await this.providerService.getNetwork();
 
-    const meanPermit2Address = await this.contractService.getMeanPermit2Address();
+    const meanPermit2Address = this.contractService.getMeanPermit2Address(chainId);
 
     const network = chainId || currentNetwork.chainId;
 
@@ -283,16 +284,10 @@ export default class SdkService {
   }
 
   async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: BigNumber } | undefined> {
-    const currentNetwork = await this.providerService.getNetwork();
-    const account = this.walletService.getAccount();
     const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
 
     if (!validRegex.test(address)) {
       return undefined;
-    }
-
-    if (chainId === currentNetwork.chainId && !!account) {
-      return this.walletService.getCustomToken(address);
     }
 
     const tokenResponse = await this.sdk.metadataService.getMetadataForChain({
@@ -323,11 +318,7 @@ export default class SdkService {
     return this.sdk.providerService.getEthersProvider({ chainId }).getTransaction(txHash);
   }
 
-  async getMultipleBalances(tokens: Token[]): Promise<Record<number, Record<string, BigNumber>>> {
-    const account = this.walletService.getAccount();
-    if (!account) {
-      throw new Error('account must exist');
-    }
+  async getMultipleBalances(tokens: Token[], account: string): Promise<Record<number, Record<string, BigNumber>>> {
     const balances = await this.sdk.balanceService.getBalancesForTokens({
       account,
       tokens: tokens.reduce<Record<number, string[]>>((acc, token) => {
@@ -432,5 +423,13 @@ export default class SdkService {
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildTerminatePositionTx']>[0]
   ) {
     return this.sdk.dcaService.buildTerminatePositionTx(args);
+  }
+
+  getUsersDcaPositions(accounts: ArrayOneOrMore<string>) {
+    return this.sdk.dcaService.getPositionsByAccount({
+      accounts,
+      chains: NETWORKS_FOR_MENU,
+      includeHistory: false,
+    });
   }
 }

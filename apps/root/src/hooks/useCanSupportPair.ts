@@ -24,10 +24,10 @@ function useCanSupportPair(
   const prevAccount = usePrevious(account);
 
   React.useEffect(() => {
-    async function callPromise() {
+    function callPromise() {
       if (from && to) {
         try {
-          const promiseResult = await pairService.canSupportPair(from, to);
+          const promiseResult = pairService.canSupportPair(from, to);
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {

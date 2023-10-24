@@ -162,6 +162,7 @@ interface TokenPickerProps {
   onClose: () => void;
   onAddToken?: (token: Token) => void;
   isFrom: boolean;
+  account?: string;
   ignoreValues?: string[];
   otherSelected?: Token | null;
   yieldOptions?: YieldOptions;
@@ -399,6 +400,7 @@ const TokenPicker = ({
   isAggregator,
   showWrappedAndProtocol,
   onAddToken,
+  account,
 }: TokenPickerProps) => {
   const tokenList = useTokenList(isAggregator);
   const searchInputRef = React.useRef<HTMLElement>();
@@ -501,7 +503,8 @@ const TokenPicker = ({
   const rawMemoTokenKeysToUse = React.useMemo(() => tokenKeysToUse.sort(), [tokenKeysToUse]);
 
   const [tokenBalances, isLoadingTokenBalances] = useBalances(
-    rawMemoTokenKeysToUse.map((tokenKey) => toToken({ address: tokenKey, chainId: currentNetwork.chainId }))
+    rawMemoTokenKeysToUse.map((tokenKey) => toToken({ address: tokenKey, chainId: currentNetwork.chainId })),
+    account
   );
 
   const [customToken, isLoadingCustomToken, customTokenError] = useCustomToken(

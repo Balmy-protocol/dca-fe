@@ -166,18 +166,8 @@ const GraphWidget = ({ withFooter }: GraphWidgetProps) => {
   const availablePairs = useAvailablePairs();
   const currentNetwork = useSelectedNetwork();
   const client = useDCAGraphql(currentNetwork.chainId);
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
-    from,
-    parseUnits('1', from?.decimals || 18),
-    undefined,
-    currentNetwork.chainId
-  );
-  const [toPrice, isLoadingToPrice] = useUsdPrice(
-    to,
-    parseUnits('1', to?.decimals || 18),
-    undefined,
-    currentNetwork.chainId
-  );
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, parseUnits('1', from?.decimals || 18), undefined);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, parseUnits('1', to?.decimals || 18), undefined);
 
   const dateFilter = React.useMemo(
     () => parseInt(DateTime.now().minus({ days: PERIODS[tabIndex] }).toFormat('X'), 10),

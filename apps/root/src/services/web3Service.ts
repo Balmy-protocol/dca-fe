@@ -181,7 +181,6 @@ export default class Web3Service {
       this.contractService,
       this.meanApiService,
       this.safeService,
-      this.apolloClient,
       this.providerService,
       this.permit2Service,
       this.sdkService,
@@ -257,10 +256,6 @@ export default class Web3Service {
 
   getMeanApiService() {
     return this.meanApiService;
-  }
-
-  getProviderInfo() {
-    return this.providerService.getProviderInfo();
   }
 
   getTransactionService() {
@@ -346,12 +341,7 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect(
-    suppliedProvider?: Web3Provider,
-    connector?: Connector<Provider>,
-    chainId?: number,
-    privyWallet?: boolean
-  ) {
+  async connect(suppliedProvider?: Web3Provider, connector?: Connector<Provider>, chainId?: number) {
     const connectorProvider = await connector?.getProvider();
 
     if (!suppliedProvider && !connectorProvider) {
@@ -360,7 +350,6 @@ export default class Web3Service {
 
     const provider: Provider = (suppliedProvider?.provider || connectorProvider) as Provider;
 
-    this.providerService.setProviderInfo(provider, privyWallet);
     // A Web3Provider wraps a standard Web3 provider, which is
     // what Metamask injects as window.ethereum into each page
     const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider, 'any');
@@ -425,7 +414,7 @@ export default class Web3Service {
 
     this.setAccount('');
 
-    this.accountService.setUser(undefined);
+    void this.accountService.setUser(undefined);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.walletService.setAccount(null, this.setAccountCallback);

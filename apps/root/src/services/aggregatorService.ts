@@ -83,7 +83,9 @@ export default class AggregatorService {
   }
 
   async approveAndSwapSafe(route: SwapOptionWithTx) {
+    const account = this.walletService.getAccount();
     const approveTx = await this.walletService.buildApproveSpecificTokenTx(
+      account,
       route.sellToken,
       route.swapper.allowanceTarget,
       BigNumber.from(route.sellAmount.amount)
@@ -125,7 +127,7 @@ export default class AggregatorService {
 
       if (shouldValidate) {
         // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance(from.address);
+        const balance = await this.walletService.getBalance(from.address, takerAddress);
 
         if (balance.lt(sellAmount)) {
           shouldValidate = false;
@@ -231,7 +233,7 @@ export default class AggregatorService {
 
       if (shouldValidate) {
         // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance(quote.sellToken.address);
+        const balance = await this.walletService.getBalance(quote.sellToken.address, takerAddress);
 
         if (balance.lt(quote.sellAmount.amount)) {
           shouldValidate = false;

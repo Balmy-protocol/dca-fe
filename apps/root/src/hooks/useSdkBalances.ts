@@ -6,13 +6,12 @@ import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { BigNumber } from 'ethers';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useCurrentNetwork from './useCurrentNetwork';
-import useAccount from './useAccount';
 import useSdkService from './useSdkService';
 
 function useSdkBalances(
-  tokens: Token[] | undefined | null
+  tokens: Token[] | undefined | null,
+  account?: string
 ): [Record<number, Record<string, BigNumber>> | undefined, boolean, string?] {
-  const account = useAccount();
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -35,9 +34,9 @@ function useSdkBalances(
 
   React.useEffect(() => {
     async function callPromise() {
-      if (tokens) {
+      if (tokens && account) {
         try {
-          const promiseResult = await sdkService.getMultipleBalances(tokens);
+          const promiseResult = await sdkService.getMultipleBalances(tokens, account);
           setState({ isLoading: false, result: promiseResult, error: undefined });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });
