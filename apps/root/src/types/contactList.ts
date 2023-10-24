@@ -8,6 +8,11 @@ export type Contact = {
 
 export type ContactList = Contact[];
 
+export type PostContacts = {
+  contact: string;
+  label?: string;
+}[];
+
 export type IContactListService = {
   accountService: IAccountService;
   providerService: ProviderService;

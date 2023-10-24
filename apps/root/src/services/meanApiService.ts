@@ -18,6 +18,8 @@ import {
   AccountLabels,
   PostAccountLabels,
   AccountLabelsAndContactList,
+  ContactList,
+  PostContacts,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -278,5 +280,18 @@ export default class MeanApiService {
 
   async deleteAccountLabel(labeledAddress: string, accountId: string): Promise<void> {
     await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`);
+  }
+
+  async postContacts(contacts: ContactList, accountId: string): Promise<void> {
+    const parsedContacts: PostContacts = contacts.map((contact) => ({
+      contact: contact.address,
+      label: contact.label,
+    }));
+
+    await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts`, parsedContacts);
+  }
+
+  async deleteContact(contactAddress: string, accountId: string): Promise<void> {
+    await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts/${contactAddress}`);
   }
 }
