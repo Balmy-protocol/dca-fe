@@ -42,7 +42,6 @@ interface ClaimItemProps {
 }
 
 const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
-  const hasPendingClaim = useHasPendingClaim(token);
   // const isClaimed = balance.balance.lte(BigNumber.from(0));
   const trackEvent = useTrackEvent();
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
@@ -50,6 +49,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
   const providerService = useProviderService();
   const errorService = useErrorService();
   const activeWallet = useActiveWallet();
+  const hasPendingClaim = useHasPendingClaim(token, activeWallet?.address || '');
 
   const handleClaimTokens = async () => {
     const { symbol } = token;

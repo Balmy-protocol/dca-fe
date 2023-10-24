@@ -7,15 +7,14 @@ import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
-import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
 import useSdkService from './useSdkService';
+import useActiveWallet from './useActiveWallet';
 
 function useCustomToken(
   tokenAddress?: string | null,
   skip?: boolean
 ): [{ token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined, boolean, string?] {
-  const walletService = useWalletService();
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -31,8 +30,9 @@ function useCustomToken(
   const hasPendingTransactions = useHasPendingTransactions();
   const prevTokenAddress = usePrevious(tokenAddress);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(walletService.getAccount());
-  const account = walletService.getAccount();
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
+  const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
@@ -102,7 +102,6 @@ function useCustomToken(
     prevBlockNumber,
     blockNumber,
     prevTokenAddress,
-    walletService,
     prevPendingTrans,
     priceService,
   ]);

@@ -36,7 +36,7 @@ function useSdkAllowances(
     async function callPromise() {
       if (tokenChecks) {
         try {
-          const promiseResult = await sdkService.getMultipleAllowances(tokenChecks, chainId);
+          const promiseResult = await sdkService.getMultipleAllowances(tokenChecks, account, chainId);
           setState({ isLoading: false, result: promiseResult, error: undefined });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });

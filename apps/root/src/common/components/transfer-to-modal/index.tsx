@@ -8,8 +8,8 @@ import { useAppDispatch } from '@state/hooks';
 import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useWalletService from '@hooks/useWalletService';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -40,8 +40,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   const [toAddress, setToAddress] = React.useState(transferTo);
   const [validateCheckbox, setValidateCheckbox] = React.useState(false);
   const currentNetwork = useCurrentNetwork();
-  const walletService = useWalletService();
-  const account = walletService.getAccount();
+  const activeWallet = useActiveWallet();
   const intl = useIntl();
   const trackEvent = useTrackEvent();
 
@@ -65,7 +64,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   };
 
   const isValidAddress = validRegex.test(toAddress || '');
-  const isNotSameAddress = toAddress?.toLowerCase() !== account.toLowerCase();
+  const isNotSameAddress = toAddress?.toLowerCase() !== activeWallet?.address.toLowerCase();
   const isValid = isValidAddress && isNotSameAddress;
 
   const hasError = toAddress !== '' && toAddress !== null && !isValid;

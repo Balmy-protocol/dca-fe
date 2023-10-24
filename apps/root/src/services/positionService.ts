@@ -409,7 +409,7 @@ export default class PositionService {
       position.positionId,
       fromYield?.tokenAddress || fromToUse,
       toYield?.tokenAddress || toToUse,
-      this.walletService.getAccount(),
+      position.user,
       position.version,
       position.chainId,
       permissionsPermit
@@ -488,6 +488,7 @@ export default class PositionService {
   }
 
   buildDepositParams(
+    account: string,
     from: Token,
     to: Token,
     fromValue: string,
@@ -529,7 +530,7 @@ export default class PositionService {
       totalAmmount: weiValue,
       swaps: amountOfSwaps,
       interval: swapInterval,
-      account: this.walletService.getAccount(),
+      account,
       permissions: [{ operator: companionAddress, permissions }],
       yieldFrom,
       yieldTo,
@@ -537,6 +538,7 @@ export default class PositionService {
   }
 
   async buildDepositTx(
+    owner: string,
     fromToken: Token,
     toToken: Token,
     fromValue: string,
@@ -549,6 +551,7 @@ export default class PositionService {
   ) {
     const { takeFrom, from, to, totalAmmount, swaps, interval, account, permissions, yieldFrom, yieldTo } =
       this.buildDepositParams(
+        owner,
         fromToken,
         toToken,
         fromValue,
@@ -594,6 +597,7 @@ export default class PositionService {
   }
 
   async approveAndDepositSafe(
+    owner: string,
     from: Token,
     to: Token,
     fromValue: string,
@@ -604,6 +608,7 @@ export default class PositionService {
     yieldTo?: string
   ) {
     const { totalAmmount } = this.buildDepositParams(
+      owner,
       from,
       to,
       fromValue,
@@ -618,14 +623,10 @@ export default class PositionService {
 
     const allowanceTarget = this.getAllowanceTarget(currentNetwork.chainId, from, yieldFrom, false);
 
-    const approveTx = await this.walletService.buildApproveSpecificTokenTx(
-      this.walletService.getAccount(),
-      from,
-      allowanceTarget,
-      totalAmmount
-    );
+    const approveTx = await this.walletService.buildApproveSpecificTokenTx(owner, from, allowanceTarget, totalAmmount);
 
     const depositTx = await this.buildDepositTx(
+      owner,
       from,
       to,
       fromValue,
@@ -652,6 +653,7 @@ export default class PositionService {
     signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
   ): Promise<TransactionResponse> {
     const tx = await this.buildDepositTx(
+      user,
       from,
       to,
       fromValue,
@@ -882,7 +884,6 @@ export default class PositionService {
     }
 
     const companionInstance = await this.contractService.getHUBCompanionInstance(chainId, user, LATEST_VERSION);
-    const account = this.walletService.getAccount();
     const terminatesData: string[] = [];
 
     // eslint-disable-next-line no-plusplus
@@ -893,8 +894,8 @@ export default class PositionService {
       const terminateData = companionInstance.interface.encodeFunctionData('terminate', [
         hubAddress,
         position.positionId,
-        account,
-        account,
+        user,
+        user,
       ]);
       terminatesData.push(terminateData);
     }
@@ -982,7 +983,7 @@ export default class PositionService {
       amount: isIncrease ? newAmount.sub(remainingLiquidity) : remainingLiquidity.sub(newAmount),
       swaps: BigNumber.from(newSwaps),
       version: position.version,
-      account: this.walletService.getAccount(),
+      account: position.user,
       isIncrease,
       companionAddress,
       tokenFrom:
@@ -1270,7 +1271,7 @@ export default class PositionService {
       this.currentPositions[`${id}-v${newPositionTypeData.version}`] = {
         from: fromToUse,
         to: toToUse,
-        user: this.walletService.getAccount(),
+        user: transaction.from,
         chainId: transaction.chainId,
         positionId: id,
         toWithdraw: BigNumber.from(0),

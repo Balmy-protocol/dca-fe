@@ -327,11 +327,7 @@ const ClaimChecklist = ({
     try {
       await signer.signMessage(termsAndServices);
 
-      dispatch(
-        setEulerSignature(
-          solidityKeccak256(['address', 'bytes32'], [walletService.getAccount(), termsAndConditionsHash])
-        )
-      );
+      dispatch(setEulerSignature(solidityKeccak256(['address', 'bytes32'], [user, termsAndConditionsHash])));
     } catch (e) {
       setModalError({
         content: (

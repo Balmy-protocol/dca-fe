@@ -17,8 +17,8 @@ import { useBlockNumber } from '@state/block-number/hooks';
 import { BigNumber } from 'ethers';
 import { MAX_UINT_32 } from '@constants';
 import useAggregatorService from './useAggregatorService';
-import useWalletService from './useWalletService';
 import useSelectedNetwork from './useSelectedNetwork';
+import useActiveWallet from './useActiveWallet';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
@@ -35,7 +35,6 @@ function useSwapOptions(
   isPermit2Enabled = false,
   sourceTimeout = TimeoutKey.patient
 ): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
-  const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
     isLoading: boolean;
     result?: SwapOption[];
@@ -48,7 +47,8 @@ function useSwapOptions(
   const prevValue = usePrevious(value);
   const prevIsBuyOrder = usePrevious(isBuyOrder);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = walletService.getAccount();
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
   const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
@@ -195,7 +195,6 @@ function useSwapOptions(
     prevPendingTrans,
     prevBlockNumber,
     blockNumber,
-    walletService,
     fetchOptions,
     prevTransferTo,
     transferTo,

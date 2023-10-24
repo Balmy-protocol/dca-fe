@@ -37,7 +37,7 @@ export default class Permit2Service {
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId: network.chainId,
-      signerAddress: this.walletService.getAccount(),
+      signerAddress: address,
       token: token.address,
       amount: amount.toBigInt(),
       signatureValidFor: '1d',
@@ -78,7 +78,7 @@ export default class Permit2Service {
     const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId,
-      signerAddress: this.walletService.getAccount(),
+      signerAddress: address,
       token: token.address,
       amount: amount.toBigInt(),
       signatureValidFor: '1d',

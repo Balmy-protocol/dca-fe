@@ -256,7 +256,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
             effectiveGasPrice: BigNumber.from(transactionReceipt.receipt.effectiveGasPrice),
           },
           from.address || '',
-          { from: { address: walletService.getAccount() } }
+          { from: { address: transactionReceipt.from } }
         )[0] || null;
     } else if (balanceAfter && balanceBefore) {
       sentFrom = BigNumber.from(balanceBefore).sub(balanceAfter.add(gasUsed));
@@ -271,7 +271,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
             effectiveGasPrice: BigNumber.from(transactionReceipt.receipt.effectiveGasPrice),
           },
           to.address || '',
-          { to: { address: transferTo || walletService.getAccount() } }
+          { to: { address: transferTo || transactionReceipt.from } }
         )[0] || null;
     } else if (balanceAfter && balanceBefore) {
       gotTo = balanceAfter.sub(BigNumber.from(balanceBefore)).add(gasUsed);

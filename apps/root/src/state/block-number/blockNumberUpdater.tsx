@@ -3,11 +3,11 @@ import { useAppDispatch } from '@state/hooks';
 import useDebounce from '@hooks/useDebounce';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useTransactionService from '@hooks/useTransactionService';
-import useWalletService from '@hooks/useWalletService';
 import { updateBlockNumber } from './actions';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 export default function Updater(): null {
-  const walletService = useWalletService();
+  const activeWallet = useActiveWallet();
   const transactionService = useTransactionService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
@@ -39,7 +39,7 @@ export default function Updater(): null {
 
   // attach/detach listeners
   useEffect(() => {
-    if (!walletService.getAccount()) return undefined;
+    if (!activeWallet?.address) return undefined;
 
     setState({ blockNumber: null });
 
@@ -64,7 +64,7 @@ export default function Updater(): null {
         void transactionService.removeOnBlock();
       }
     };
-  }, [dispatch, walletService.getAccount(), blockNumberCallback]);
+  }, [dispatch, activeWallet?.address, blockNumberCallback]);
 
   const debouncedState = useDebounce(state, 100);
 

@@ -361,14 +361,14 @@ export default class SdkService {
 
   async getMultipleAllowances(
     tokenChecks: Record<string, string>,
+    user: string,
     chainId: number
   ): Promise<Record<string, Record<string, BigNumber>>> {
-    const account = this.walletService.getAccount();
     const allowances = await this.sdk.allowanceService.getMultipleAllowancesInChain({
       chainId,
       check: Object.keys(tokenChecks).map((tokenAddress) => ({
         token: tokenAddress,
-        owner: account,
+        owner: user,
         spender: tokenChecks[tokenAddress],
       })),
     });
@@ -377,7 +377,7 @@ export default class SdkService {
       (acc, address) => ({
         ...acc,
         [address]: {
-          [tokenChecks[address]]: BigNumber.from(allowances[address][account][tokenChecks[address]]),
+          [tokenChecks[address]]: BigNumber.from(allowances[address][user][tokenChecks[address]]),
         },
       }),
       {}

@@ -346,7 +346,6 @@ describe('Position Service', () => {
     sdkService = createMockInstance(MockedSdkService);
     accountService = createMockInstance(MockedAccountService);
 
-    walletService.getAccount.mockReturnValue('my account');
     providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: true });
     positionService = new PositionService(
       walletService,
@@ -522,8 +521,6 @@ describe('Position Service', () => {
       });
     });
     test('it should do nothing if the account is not connected', async () => {
-      walletService.getAccount.mockReturnValueOnce('');
-
       await positionService.fetchCurrentPositions();
 
       expect(positionService.currentPositions).toEqual({});
@@ -809,8 +806,6 @@ describe('Position Service', () => {
       });
     });
     test('it should do nothing if the account is not connected', async () => {
-      walletService.getAccount.mockReturnValueOnce('');
-
       await positionService.fetchPastPositions();
 
       expect(positionService.pastPositions).toEqual({});
@@ -1211,6 +1206,7 @@ describe('Position Service', () => {
       test('it should throw an error', () => {
         try {
           positionService.buildDepositParams(
+            'account',
             toToken({ address: 'from' }),
             toToken({ address: 'to' }),
             '10',
@@ -1231,6 +1227,7 @@ describe('Position Service', () => {
     describe('when the from has yield', () => {
       test('it should add the increase, reduce and terminate permissions', () => {
         const result = positionService.buildDepositParams(
+          'account',
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
           '10',
@@ -1263,6 +1260,7 @@ describe('Position Service', () => {
     describe('when the to has yield', () => {
       test('it should add the withdraw and terminate permissions', () => {
         const result = positionService.buildDepositParams(
+          'account',
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
           '10',
@@ -1291,6 +1289,7 @@ describe('Position Service', () => {
     describe('when no token has yield', () => {
       test('it should not add any permission to the position', () => {
         const result = positionService.buildDepositParams(
+          'account',
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
           '10',
@@ -1338,6 +1337,7 @@ describe('Position Service', () => {
     describe('when the from is not the protocol token', () => {
       test('it should get the transaction from the sdk', () => {
         const params = positionService.buildDepositParams(
+          'account',
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
           '10',
@@ -1349,6 +1349,7 @@ describe('Position Service', () => {
         );
 
         const result = positionService.buildDepositTx(
+          'account',
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
           '10',
@@ -1393,6 +1394,7 @@ describe('Position Service', () => {
     describe('when the from is the protocol token', () => {
       test('it should get the transaction from the sdk', () => {
         const params = positionService.buildDepositParams(
+          'account',
           getProtocolToken(10),
           toToken({ address: 'to' }),
           '10',
@@ -1402,6 +1404,7 @@ describe('Position Service', () => {
         );
 
         const result = positionService.buildDepositTx(
+          'account',
           getProtocolToken(10),
           toToken({ address: 'to' }),
           '10',
@@ -1451,6 +1454,7 @@ describe('Position Service', () => {
 
     test('it should call the safeService with the bundled approve and deposit transactions', async () => {
       const params = positionService.buildDepositParams(
+        'account',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
@@ -1462,6 +1466,7 @@ describe('Position Service', () => {
       );
 
       const result = await positionService.approveAndDepositSafe(
+        'account',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',

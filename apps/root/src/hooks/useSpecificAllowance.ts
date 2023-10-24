@@ -19,7 +19,7 @@ const dummyToken: Allowance = { token: EMPTY_TOKEN, allowance: undefined };
 
 function useSpecificAllowance(
   from: Token | undefined | null,
-  owner: string,
+  account: string,
   addressToCheck?: string | null
 ): AllowanceResponse {
   const walletService = useWalletService();
@@ -31,20 +31,18 @@ function useSpecificAllowance(
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(walletService.getAccount());
-  const account = walletService.getAccount();
+  const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false, 'allowance');
   const prevAddress = usePrevious(addressToCheck);
-  const prevOwner = usePrevious(owner);
 
   React.useEffect(() => {
     async function callPromise() {
       if (from && addressToCheck) {
         try {
-          const promiseResult = await walletService.getSpecificAllowance(from, addressToCheck, owner);
+          const promiseResult = await walletService.getSpecificAllowance(from, addressToCheck, account);
           setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: dummyToken, error: e as string, isLoading: false });
@@ -58,7 +56,6 @@ function useSpecificAllowance(
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       !isEqual(prevAddress, addressToCheck) ||
-      !isEqual(prevOwner, owner) ||
       (blockNumber &&
         prevBlockNumber &&
         blockNumber !== -1 &&
@@ -77,8 +74,6 @@ function useSpecificAllowance(
     result,
     error,
     addressToCheck,
-    prevOwner,
-    owner,
     prevAddress,
     hasPendingTransactions,
     prevAccount,

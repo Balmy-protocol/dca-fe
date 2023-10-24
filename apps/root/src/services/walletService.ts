@@ -1,5 +1,4 @@
 import { ethers, BigNumber } from 'ethers';
-import React from 'react';
 import { Interface } from '@ethersproject/abi';
 import { TransactionResponse, Network, TransactionRequest } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
@@ -20,8 +19,6 @@ import ProviderService from './providerService';
 export default class WalletService {
   network: Network;
 
-  account: string | null;
-
   contractService: ContractService;
 
   providerService: ProviderService;
@@ -29,18 +26,6 @@ export default class WalletService {
   constructor(contractService: ContractService, providerService: ProviderService) {
     this.contractService = contractService;
     this.providerService = providerService;
-  }
-
-  setAccount(account?: string | null, setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
-    this.account = account || null;
-
-    if (setAccountCallback) {
-      setAccountCallback(this.account || '');
-    }
-  }
-
-  getAccount() {
-    return this.account || '';
   }
 
   async getEns(address: string) {
@@ -106,11 +91,13 @@ export default class WalletService {
     }
   }
 
-  async getCustomToken(address: string): Promise<{ token: Token; balance: BigNumber } | undefined> {
-    const account = this.getAccount();
+  async getCustomToken(
+    address: string,
+    ownerAddress: string
+  ): Promise<{ token: Token; balance: BigNumber } | undefined> {
     const currentNetwork = await this.providerService.getNetwork();
 
-    if (!address || !account) return Promise.resolve(undefined);
+    if (!address) return Promise.resolve(undefined);
 
     const ERC20Interface = new Interface(ERC20ABI);
 
@@ -118,7 +105,7 @@ export default class WalletService {
 
     const erc20 = new ethers.Contract(address, ERC20Interface, provider) as unknown as ERC20Contract;
 
-    const balanceCall = erc20.populateTransaction.balanceOf(account).then((populatedTransaction) => ({
+    const balanceCall = erc20.populateTransaction.balanceOf(ownerAddress).then((populatedTransaction) => ({
       target: populatedTransaction.to as string,
       allowFailure: true,
       callData: populatedTransaction.data as string,
@@ -166,11 +153,7 @@ export default class WalletService {
     };
   }
 
-  async getBalance(address?: string, passedAccount?: string): Promise<BigNumber> {
-    const connectedAccount = this.getAccount();
-
-    const account = passedAccount || connectedAccount;
-
+  async getBalance(account?: string, address?: string): Promise<BigNumber> {
     if (!address || !account) return Promise.resolve(BigNumber.from(0));
 
     if (address === PROTOCOL_TOKEN_ADDRESS) {
@@ -202,9 +185,7 @@ export default class WalletService {
   }
 
   async getSpecificAllowance(token: Token, addressToCheck: string, ownerAddress: string) {
-    const account = this.getAccount();
-
-    if (token.address === PROTOCOL_TOKEN_ADDRESS || !account) {
+    if (token.address === PROTOCOL_TOKEN_ADDRESS || !ownerAddress) {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
     }
 
@@ -214,7 +195,7 @@ export default class WalletService {
 
     const erc20 = await this.contractService.getTokenInstance(token.chainId, token.address, ownerAddress);
 
-    const allowance = await erc20.allowance(account, addressToCheck);
+    const allowance = await erc20.allowance(ownerAddress, addressToCheck);
 
     return {
       token,

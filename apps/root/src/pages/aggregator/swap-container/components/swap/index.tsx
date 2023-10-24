@@ -360,8 +360,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
         balanceBefore = await walletService.getBalance(
-          PROTOCOL_TOKEN_ADDRESS,
-          selectedRoute.transferTo || activeWallet?.address
+          selectedRoute.transferTo || activeWallet?.address,
+          PROTOCOL_TOKEN_ADDRESS
         );
       }
 
@@ -524,7 +524,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       let balanceBefore: BigNumber | null = null;
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
-        balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS, activeWallet?.address);
+        balanceBefore = await walletService.getBalance(activeWallet?.address, PROTOCOL_TOKEN_ADDRESS);
       }
 
       trackEvent('Aggregator - Safe swap submitting', {

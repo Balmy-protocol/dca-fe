@@ -382,7 +382,7 @@ export default class Web3Service {
       console.error('Error changing network', e);
     }
 
-    this.walletService.setAccount(account, this.setAccountCallback);
+    this.setAccountCallback(account);
 
     await this.sdkService.resetProvider();
 
@@ -416,8 +416,7 @@ export default class Web3Service {
 
     void this.accountService.setUser(undefined);
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.walletService.setAccount(null, this.setAccountCallback);
+    this.setAccountCallback('');
 
     localStorage.removeItem(WALLET_CONNECT_KEY);
   }

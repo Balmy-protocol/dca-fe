@@ -112,17 +112,15 @@ export default class AccountService implements IAccountService {
 
     for (const userWallet of userWallets) {
       if (userWallet.getProvider) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const infoPromise = userWallet
-          .getProvider()
-          .then((provider) =>
-            getProviderInfo(
-              provider.provider.walletProvider?.walletProvider || provider,
-              userWallet.type === WalletType.embedded
-            )
-          );
+        const infoPromise = userWallet.getProvider()!.then((provider) =>
+          getProviderInfo(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            provider.provider.walletProvider?.walletProvider || provider,
+            userWallet.type === WalletType.embedded
+          )
+        );
         providerInfoPromises.push(infoPromise);
       } else {
         providerInfoPromises.push(Promise.resolve(undefined));

@@ -473,7 +473,7 @@ const Swap = ({
   };
 
   const handleSafeApproveAndSwap = async () => {
-    if (!from || !to || !loadedAsSafeApp) return;
+    if (!from || !to || !loadedAsSafeApp || !activeWallet?.address) return;
     setShouldShowStalePairModal(false);
     const fromSymbol = from.symbol;
 
@@ -491,6 +491,7 @@ const Swap = ({
       });
       trackEvent('DCA - Safe approve and create position submitting');
       const result = await positionService.approveAndDepositSafe(
+        activeWallet?.address,
         from,
         to,
         fromValue,
