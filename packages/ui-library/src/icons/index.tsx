@@ -53,6 +53,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import WalletIcon from '@mui/icons-material/Wallet';
 import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -110,4 +111,5 @@ export {
   WalletIcon,
   GoogleIcon,
   AppleIcon,
+  PersonOutlineIcon,
 };
