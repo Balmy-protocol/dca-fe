@@ -8,7 +8,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import map from 'lodash/map';
 import find from 'lodash/find';
 import orderBy from 'lodash/orderBy';
-import { AvailablePair, GetPairPriceResponseData, GetPairResponseSwapData, Token } from '@types';
+import { AvailablePair, GetPairPriceResponseData, GetPairResponseSwapData, Token, TokenType } from '@types';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount } from '@common/utils/currency';
@@ -18,7 +18,7 @@ import useDCAGraphql from '@hooks/useDCAGraphql';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import getPairPrices from '@graphql/getPairPrices.graphql';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { FAIL_ON_ERROR, ONE_DAY, ONE_HOUR, STABLE_COINS, TOKEN_TYPE_BASE } from '@constants';
+import { FAIL_ON_ERROR, ONE_DAY, ONE_HOUR, STABLE_COINS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import useGraphPrice from '@hooks/useGraphPrice';
 import useUsdPrice from '@hooks/useUsdPrice';
@@ -151,7 +151,7 @@ const EMPTY_GRAPH_TOKEN: TokenWithBase = {
   isBaseToken: false,
   name: '',
   chainId: 0,
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
 };
 const GraphWidget = ({ withFooter }: GraphWidgetProps) => {

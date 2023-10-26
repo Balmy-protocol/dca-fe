@@ -141,8 +141,9 @@ export default class WalletService {
 
     const populatedTransactions = await Promise.all([balanceCall, decimalsCall, nameCall, symbolCall]);
 
-    const [balanceResult, decimalResult, nameResult, symbolResult] =
-      await multicallInstance.callStatic.aggregate3(populatedTransactions);
+    const [balanceResult, decimalResult, nameResult, symbolResult] = await multicallInstance.callStatic.aggregate3(
+      populatedTransactions
+    );
 
     const balance = BigNumber.from(
       ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
@@ -197,7 +198,7 @@ export default class WalletService {
       return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
     }
 
-    const erc20 = await this.contractService.getTokenInstance(token.chainId, token.address, ownerAddress);
+    const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
 
     const allowance = await erc20.allowance(ownerAddress, addressToCheck);
 
@@ -213,7 +214,7 @@ export default class WalletService {
     addressToApprove: string,
     amount?: BigNumber
   ): Promise<TransactionRequest> {
-    const erc20 = await this.contractService.getTokenInstance(token.chainId, token.address, ownerAddress);
+    const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
 
     return erc20.populateTransaction.approve(addressToApprove, amount || MaxUint256);
   }
@@ -252,7 +253,7 @@ export default class WalletService {
     ownerAddress: string,
     amount?: BigNumber
   ): Promise<TransactionResponse> {
-    const erc20 = await this.contractService.getTokenInstance(token.chainId, token.address, ownerAddress);
+    const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
 
     return erc20.approve(addressToApprove, amount || MaxUint256);
   }

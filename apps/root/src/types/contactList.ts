@@ -1,5 +1,7 @@
-import { IAccountService } from '@types';
+import { IAccountService, Token } from '@types';
 import ProviderService from '@services/providerService';
+import { BigNumber } from 'ethers';
+import { TransactionResponse } from '@ethersproject/providers';
 
 export type Contact = {
   address: string;
@@ -21,14 +23,23 @@ export type IContactListService = {
   removeContact(contact: Contact): Promise<void>;
   editContact(contact: Contact): Promise<void>;
   getContacts(): ContactList;
-  //   transferToContact({
-  //     contact,
-  //     token,
-  //     amount,
-  //   }: {
-  //     contact: Contact;
-  //     token: Token;
-  //     amount: BigNumber;
-  //   }): Promise<TransactionResponse>;
+  transferTokenToContact({
+    contact,
+    token,
+    amount,
+  }: {
+    contact: Contact;
+    token: Token;
+    amount: BigNumber;
+  }): Promise<TransactionResponse | undefined>;
+  transferNFTToContact({
+    contact,
+    token,
+    tokenId,
+  }: {
+    contact: Contact;
+    token: Token;
+    tokenId: BigNumber;
+  }): Promise<TransactionResponse | undefined>;
   setContacts(contacts: ContactList): void;
 };

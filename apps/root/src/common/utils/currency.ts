@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { formatUnits, parseUnits } from '@ethersproject/units';
-import { TOKEN_TYPE_BASE } from '@constants/common';
 import { STABLE_COINS } from '@constants/addresses';
 import _Decimal from 'decimal.js-light';
 import { BigNumber } from 'ethers';
@@ -76,7 +75,7 @@ export const emptyTokenWithAddress: (address: string, type?: TokenType) => Token
   address,
   name: '',
   symbol: '',
-  type: type || TOKEN_TYPE_BASE,
+  type: type || TokenType.BASE,
   underlyingTokens: [],
 });
 
@@ -86,7 +85,7 @@ export const emptyTokenWithLogoURI: (logoURI: string) => Token = (logoURI: strin
   address: '0x00000000000000000',
   name: '',
   symbol: '',
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
   logoURI,
 });
@@ -97,7 +96,7 @@ export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) 
   symbol,
   name: '',
   address: '0x00000000000000000',
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
 });
 
@@ -107,7 +106,7 @@ export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: nu
   symbol: '',
   name: '',
   address: '0x00000000000000000',
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
 });
 
@@ -160,7 +159,7 @@ export const toToken: (overrides: {
   address: address || '',
   name: name || '',
   symbol: symbol || '',
-  type: type || TOKEN_TYPE_BASE,
+  type: type || TokenType.BASE,
   underlyingTokens: underlyingTokens || [],
   logoURI,
 });
@@ -181,7 +180,7 @@ export const toDcaPositionToken: (overrides: {
   address: address || '',
   name: name || '',
   symbol: symbol || '',
-  type: type || TOKEN_TYPE_BASE,
+  type: type || TokenType.BASE,
   underlyingTokens: underlyingTokens || [],
   logoURI,
   variant: variant || {

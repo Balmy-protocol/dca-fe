@@ -5,8 +5,7 @@ import compact from 'lodash/compact';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { parseUsdPrice } from '@common/utils/currency';
-import { Campaigns, Token } from '@types';
-import { TOKEN_TYPE_BASE } from '@constants';
+import { Campaigns, Token, TokenType } from '@types';
 import { useIsLoadingAggregatorTokenLists } from '@state/token-lists/hooks';
 import useAccount from './useAccount';
 import useCampaignService from './useCampaignService';
@@ -55,7 +54,7 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
                 name: token.name,
                 symbol: token.symbol,
                 chainId: campaign.chainId,
-                type: TOKEN_TYPE_BASE,
+                type: TokenType.BASE,
                 underlyingTokens: [],
                 ...(foundToken || {}),
               };

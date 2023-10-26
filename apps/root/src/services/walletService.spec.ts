@@ -433,7 +433,7 @@ describe('Wallet Service', () => {
 
     test('it should call the token contract and return the allowance', async () => {
       const allowanceMock = jest.fn().mockResolvedValue('10000000000000000000');
-      contractService.getTokenInstance.mockResolvedValue({
+      contractService.getERC20TokenInstance.mockResolvedValue({
         allowance: allowanceMock,
       } as unknown as ERC20Contract);
 
@@ -443,8 +443,8 @@ describe('Wallet Service', () => {
         'account'
       );
 
-      expect(contractService.getTokenInstance).toHaveBeenCalledTimes(1);
-      expect(contractService.getTokenInstance).toHaveBeenCalledWith(10, 'token', 'account');
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledWith(10, 'token', 'account');
 
       expect(allowanceMock).toHaveBeenCalledTimes(1);
       expect(allowanceMock).toHaveBeenCalledWith('account', 'addressToCheck');
@@ -461,7 +461,7 @@ describe('Wallet Service', () => {
     beforeEach(() => {
       approveMock = jest.fn().mockResolvedValue('populatedTransaction');
 
-      contractService.getTokenInstance.mockResolvedValue({
+      contractService.getERC20TokenInstance.mockResolvedValue({
         populateTransaction: {
           approve: approveMock,
         },
@@ -604,7 +604,7 @@ describe('Wallet Service', () => {
     beforeEach(() => {
       approveMock = jest.fn().mockResolvedValue('populatedTransaction');
 
-      contractService.getTokenInstance.mockResolvedValue({
+      contractService.getERC20TokenInstance.mockResolvedValue({
         approve: approveMock,
       } as unknown as ERC20Contract);
     });

@@ -161,7 +161,12 @@ export default class Web3Service {
       this.providerService,
       this.accountService
     );
-    this.contactListService = new ContactListService(this.accountService, this.providerService, this.meanApiService);
+    this.contactListService = new ContactListService(
+      this.accountService,
+      this.providerService,
+      this.meanApiService,
+      this.contractService
+    );
     this.labelService = new LabelService(this.meanApiService, this.accountService, this.contactListService);
     this.eventService = new EventService(this.providerService, this.accountService);
     this.pairService = new PairService(
