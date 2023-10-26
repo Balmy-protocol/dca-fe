@@ -22,7 +22,7 @@ export default {
   // https://github.com/bpedersen/jest-mock-console/issues/32
   injectGlobals: true,
   // collectCoverage: true,
-  // collectCoverageFrom: ["<rootDir>/src/**/*.ts"],
+  // collectCoverageFrom: ["<rootDir>/src/**/*.ts", "<rootDir>/src/**/*.tsx", "<rootDir>/src/**/*.js", "<rootDir>/src/**/*.jsx"],
   moduleNameMapper: {
     '^@common(.*)': '<rootDir>src/common$1',
     '^@assets(.*)': '<rootDir>src/assets$1',

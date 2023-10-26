@@ -4,7 +4,7 @@ import Button from '@common/components/button';
 import { Typography, Link, OpenInNewIcon } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition, NetworkStruct, YieldOptions } from '@types';
+import { FullPosition, YieldOptions } from '@types';
 import {
   DCA_TOKEN_BLACKLIST,
   NETWORKS,
@@ -14,15 +14,16 @@ import {
 } from '@constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import useWalletService from '@hooks/useWalletService';
+// import useWalletService from '@hooks/useWalletService';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import { fullPositionToMappedPosition } from '@common/utils/parsing';
-import useWeb3Service from '@hooks/useWeb3Service';
+// import useWeb3Service from '@hooks/useWeb3Service';
 import useTokenList from '@hooks/useTokenList';
-import { setNetwork } from '@state/config/actions';
-import { useAppDispatch } from '@state/hooks';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useActiveWallet from '@hooks/useActiveWallet';
+// import { setNetwork } from '@state/config/actions';
+// import { useAppDispatch } from '@state/hooks';
+// import useCurrentNetwork from '@hooks/useCurrentNetwork';
+// import useActiveWallet from '@hooks/useActiveWallet';
+import useWallets from '@hooks/useWallets';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -55,12 +56,13 @@ const PositionDataControls = ({
 }: PositionDataControlsProps) => {
   const { remainingSwaps, chainId } = fullPositionToMappedPosition(position);
   const hasSignSupport = useSupportsSigning();
-  const network = useCurrentNetwork();
-  const web3Service = useWeb3Service();
-  const activeWallet = useActiveWallet();
-  const account = activeWallet?.address;
+  // const network = useCurrentNetwork();
+  // const web3Service = useWeb3Service();
+  // const activeWallet = useActiveWallet();
+  // const account = activeWallet?.address;
   const tokenList = useTokenList();
-  const dispatch = useAppDispatch();
+  const wallets = useWallets();
+  // const dispatch = useAppDispatch();
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -68,22 +70,22 @@ const PositionDataControls = ({
     return supportedNetwork;
   }, [chainId]);
 
-  const isOnNetwork = network?.chainId === positionNetwork.chainId;
-  const walletService = useWalletService();
+  // const isOnNetwork = network?.chainId === positionNetwork.chainId;
+  // const walletService = useWalletService();
   const isPending = !!pendingTransaction;
 
-  const onChangeNetwork = () => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId, () => {
-      const networkToSet = find(NETWORKS, { chainId });
-      dispatch(setNetwork(networkToSet as NetworkStruct));
-      if (networkToSet) {
-        web3Service.setNetwork(networkToSet?.chainId);
-      }
-    });
-  };
+  // const onChangeNetwork = () => {
+  //   // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  //   walletService.changeNetwork(chainId, () => {
+  //     const networkToSet = find(NETWORKS, { chainId });
+  //     dispatch(setNetwork(networkToSet as NetworkStruct));
+  //     if (networkToSet) {
+  //       web3Service.setNetwork(networkToSet?.chainId);
+  //     }
+  //   });
+  // };
 
-  const isOwner = account && account.toLowerCase() === position.user.toLowerCase();
+  const isOwner = wallets.find((wallet) => wallet.address.toLowerCase() === position.user.toLowerCase());
 
   if (!isOwner || position.status === 'TERMINATED') return null;
 
@@ -109,21 +111,21 @@ const PositionDataControls = ({
     );
   }
 
-  if (!isOnNetwork) {
-    return (
-      <StyledCallToActionContainer>
-        <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
-          <Typography variant="body2">
-            <FormattedMessage
-              description="incorrect network"
-              defaultMessage="Switch to {network}"
-              values={{ network: positionNetwork.name }}
-            />
-          </Typography>
-        </StyledCardFooterButton>
-      </StyledCallToActionContainer>
-    );
-  }
+  // if (!isOnNetwork) {
+  //   return (
+  //     <StyledCallToActionContainer>
+  //       <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
+  //         <Typography variant="body2">
+  //           <FormattedMessage
+  //             description="incorrect network"
+  //             defaultMessage="Switch to {network}"
+  //             values={{ network: positionNetwork.name }}
+  //           />
+  //         </Typography>
+  //       </StyledCardFooterButton>
+  //     </StyledCallToActionContainer>
+  //   );
+  // }
 
   const fromIsSupportedInNewVersion = !!tokenList[position.from.address];
   const toIsSupportedInNewVersion = !!tokenList[position.to.address];

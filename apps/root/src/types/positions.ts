@@ -72,7 +72,7 @@ export interface Position {
   swappedYield: Nullable<BigNumber>;
   id: string;
   positionId: string;
-  status: string;
+  status: PositionStatus;
   startedAt: number;
   pendingTransaction: string;
   version: PositionVersions;
@@ -122,7 +122,7 @@ export interface FullPosition {
   totalSwaps: string; // cuanto puse originalmente
   id: string;
   positionId: string;
-  status: string;
+  status: PositionStatus;
   startedAt: number;
   totalExecutedSwaps: string;
   pendingTransaction: string;

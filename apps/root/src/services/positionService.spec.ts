@@ -4,6 +4,7 @@ import {
   NewPositionTypeData,
   PermissionData,
   Position,
+  PositionStatus,
   PositionVersions,
   Token,
   TransactionDetails,
@@ -131,7 +132,7 @@ function createPositionMock({
   totalExecutedSwaps?: BigNumber;
   id?: string;
   positionId?: string;
-  status?: string;
+  status?: PositionStatus;
   startedAt?: number;
   pendingTransaction?: string;
   version?: PositionVersions;
@@ -161,7 +162,7 @@ function createPositionMock({
     rate: (!isUndefined(rate) && rate) || parseUnits('2', 18),
     toWithdraw: (!isUndefined(toWithdraw) && toWithdraw) || parseUnits('5', 18),
     totalExecutedSwaps: (!isUndefined(totalExecutedSwaps) && totalExecutedSwaps) || BigNumber.from(5),
-    id: (!isUndefined(id) && id) || 'position-1',
+    id: (!isUndefined(id) && id) || '10-1-v4',
     positionId: (!isUndefined(positionId) && positionId) || '1',
     status: (!isUndefined(status) && status) || 'ACTIVE',
     startedAt: (!isUndefined(startedAt) && startedAt) || 1686329816,
@@ -220,6 +221,16 @@ function createPositionTypeDataMock({
   };
 }
 
+const buildPairId = (from?: DCAPositionToken, to?: DCAPositionToken): `${string}-${string}` =>
+  `${((!isUndefined(from) && from) || toToken({ address: 'from' })).address}-${
+    ((!isUndefined(to) && to) || toToken({ address: 'to' })).address
+  }`;
+
+const buildVariantPairId = (from?: DCAPositionToken, to?: DCAPositionToken): `${string}-${string}` =>
+  `${((!isUndefined(from) && toToken({ address: from.variant.id })) || toToken({ address: 'from' })).address}-${
+    ((!isUndefined(to) && toToken({ address: to.variant.id })) || toToken({ address: 'to' })).address
+  }`;
+
 function createSdkPositionMock({
   id,
   from,
@@ -256,7 +267,7 @@ function createSdkPositionMock({
     pairId: string;
     variantPairId: `${string}-${string}`;
   };
-  status?: 'ongoing' | 'empty' | 'terminated';
+  status?: 'ongoing' | 'empty' | 'terminated' | 'finished';
   totalExecutedSwaps?: BigNumber;
   swapInterval?: number;
   remainingSwaps?: number;
@@ -284,7 +295,7 @@ function createSdkPositionMock({
     hub: (!isUndefined(hub) && hub) || HUB_ADDRESS[POSITION_VERSION_4][10],
     tokenId: (!isUndefined(tokenId) && tokenId) || 10n,
     isStale: (!isUndefined(isStale) && isStale) || false,
-    executedSwaps: (!isUndefined(executedSwaps) && executedSwaps) || parseUnits('5', 18).toNumber(),
+    executedSwaps: (!isUndefined(executedSwaps) && executedSwaps) || 5,
     platformMessages: (!isUndefined(platformMessages) && platformMessages) || [],
     nextSwapAvailableAt: (!isUndefined(nextSwapAvailableAt) && nextSwapAvailableAt) || 10,
     history: (!isUndefined(history) && history) || [],
@@ -305,20 +316,16 @@ function createSdkPositionMock({
         toWithdraw: (!isUndefined(toWithdrawYield) && toWithdrawYield) || parseUnits('10', 18).toBigInt(),
       }) ||
       undefined,
-    remainingSwaps: (!isUndefined(remainingSwaps) && remainingSwaps) || parseUnits('5', 18).toNumber(),
-    totalSwaps: (!isUndefined(totalSwaps) && totalSwaps) || parseUnits('10', 18).toNumber(),
+    remainingSwaps: (!isUndefined(remainingSwaps) && remainingSwaps) || 5,
+    totalSwaps: (!isUndefined(totalSwaps) && totalSwaps) || 10,
     rate: (!isUndefined(rate) && rate) || parseUnits('2', 18).toBigInt(),
     id: (!isUndefined(id) && id) || '1-position-1',
     status: (!isUndefined(status) && status) || 'ongoing',
     createdAt: (!isUndefined(createdAt) && createdAt) || 1686329816,
     permissions: (!isUndefined(permissions) && permissions) || {},
     pair: (!isUndefined(pair) && pair) || {
-      pairId: `${((!isUndefined(from) && from) || toToken({ address: 'from' })).address}-${
-        ((!isUndefined(to) && to) || toToken({ address: 'to' })).address
-      }`,
-      variantPairId: `${((!isUndefined(from) && from) || toToken({ address: 'from' })).address}-${
-        ((!isUndefined(to) && to) || toToken({ address: 'to' })).address
-      }`,
+      pairId: buildPairId(from, to),
+      variantPairId: buildVariantPairId(from, to),
     },
   };
 }
@@ -416,6 +423,7 @@ describe('Position Service', () => {
                 platform: 'aave',
               },
             }),
+            tokenId: 1n,
             to: toDcaPositionToken({
               ...emptyTokenWithAddress('to'),
               variant: {
@@ -427,6 +435,7 @@ describe('Position Service', () => {
               },
             }),
             toWithdraw: 10n,
+            chainId: 10,
             rate: 20n,
             remainingSwaps: 5,
             toWithdrawYield: 11n,
@@ -444,6 +453,7 @@ describe('Position Service', () => {
                 platform: 'aave',
               },
             }),
+            tokenId: 2n,
             status: 'ongoing',
             to: toDcaPositionToken({
               ...emptyTokenWithAddress('to'),
@@ -455,6 +465,7 @@ describe('Position Service', () => {
                 platform: 'aave',
               },
             }),
+            chainId: 10,
             toWithdraw: 15n,
             rate: 25n,
             remainingSwaps: 5,
@@ -473,6 +484,8 @@ describe('Position Service', () => {
                 platform: 'aave',
               },
             }),
+            tokenId: 3n,
+            chainId: 10,
             status: 'ongoing',
             to: toDcaPositionToken({
               ...emptyTokenWithAddress('anotherto'),
@@ -521,6 +534,7 @@ describe('Position Service', () => {
       });
     });
     test('it should do nothing if the account is not connected', async () => {
+      accountService.getWallets.mockReturnValue([]);
       await positionService.fetchCurrentPositions();
 
       expect(positionService.currentPositions).toEqual({});
@@ -531,104 +545,19 @@ describe('Position Service', () => {
       expect(sdkService.getUsersDcaPositions).toHaveBeenCalledWith(['wallet-1', 'wallet-2']);
     });
 
-    test('it fetch the underlying balances of each of the tokens that are wrapped', async () => {
-      await positionService.fetchCurrentPositions();
-
-      expect(meanApiService.getUnderlyingTokens).toHaveBeenCalledTimes(1);
-      expect(meanApiService.getUnderlyingTokens).toHaveBeenCalledWith([
-        {
-          token: toToken({
-            address: 'from',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(100),
-        },
-        {
-          token: toToken({
-            address: 'to',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(10),
-        },
-        {
-          token: toToken({
-            address: 'from',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(125),
-        },
-        {
-          token: toToken({
-            address: 'to',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(15),
-        },
-        {
-          token: toToken({
-            address: 'anotherFrom',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'anotherFromYield',
-                underlyingTokens: [emptyTokenWithAddress('anotherFrom')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(150),
-        },
-        {
-          token: toToken({
-            address: 'anotherTo',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'anotherToYield',
-                underlyingTokens: [emptyTokenWithAddress('anotherTo')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(20),
-        },
-      ]);
-    });
-
     test('it should set the current positions of the current users', async () => {
       await positionService.fetchCurrentPositions();
 
       expect(positionService.currentPositions).toEqual({
-        [`position-1-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-1-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'from',
             chainId: 10,
             underlyingTokens: [
               toToken({
                 address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
+                chainId: 10,
+                underlyingTokens: [toToken({ address: 'from', chainId: 10 })],
               }),
             ],
           }),
@@ -638,19 +567,20 @@ describe('Position Service', () => {
             underlyingTokens: [
               toToken({
                 address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
+                chainId: 10,
+                underlyingTokens: [toToken({ address: 'to', chainId: 10 })],
               }),
             ],
           }),
-          positionId: 'position-1',
-          id: `position-1-v${PositionVersions.POSITION_VERSION_4}`,
+          positionId: '1',
+          id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: BigNumber.from(10),
           rate: BigNumber.from(20),
           remainingSwaps: BigNumber.from(5),
           // pairId: 'pair',
           swapped: parseUnits('15', 18),
         }),
-        [`position-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'from',
             chainId: 10,
@@ -672,13 +602,13 @@ describe('Position Service', () => {
             ],
           }),
           positionId: 'position-2',
-          id: `position-2-v${PositionVersions.POSITION_VERSION_4}`,
+          id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: BigNumber.from(15),
           rate: BigNumber.from(25),
           remainingSwaps: BigNumber.from(5),
           swapped: parseUnits('15', 18),
         }),
-        [`position-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-position-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'anotherFrom',
             chainId: 10,
@@ -700,7 +630,7 @@ describe('Position Service', () => {
             ],
           }),
           positionId: 'position-3',
-          id: `position-3-v${PositionVersions.POSITION_VERSION_4}`,
+          id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: BigNumber.from(20),
           // pairId: 'pair',
           rate: BigNumber.from(30),

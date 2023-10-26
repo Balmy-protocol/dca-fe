@@ -13,6 +13,7 @@ import {
   ArrowRightAltIcon,
   createStyles,
   Theme,
+  PersonOutlineIcon,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
@@ -41,6 +42,7 @@ import { updateShowBreakdown } from '@state/position-details/actions';
 import { formatUnits } from '@ethersproject/units';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import PositionDataControls from './position-data-controls';
+import Address from '@common/components/address';
 
 const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
@@ -687,6 +689,16 @@ const Details = ({
               )}
             </StyledDetailWrapper>
           )}
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="positionDetailsOwner" defaultMessage="Owner:" />
+            </Typography>
+            <CustomChip icon={<PersonOutlineIcon />}>
+              <Typography variant="body2" fontWeight={500}>
+                <Address address={position.user} trimAddress />
+              </Typography>
+            </CustomChip>
+          </StyledDetailWrapper>
           {(foundYieldFrom || foundYieldTo) && (
             <StyledDetailWrapper>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">

@@ -16,7 +16,8 @@ import SplitButton from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { BigNumber } from 'ethers';
-import useActiveWallet from '@hooks/useActiveWallet';
+// import useActiveWallet from '@hooks/useActiveWallet';
+import useWallets from '@hooks/useWallets';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -80,21 +81,22 @@ const PositionSummaryControls = ({
 }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const activeWallet = useActiveWallet();
+  // const activeWallet = useActiveWallet();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const wallets = useWallets();
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
   const isPending = pendingTransaction !== null;
-  const account = activeWallet?.address;
+  // const account = activeWallet?.address;
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const hasSignSupport = useSupportsSigning();
 
-  if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
+  if (!wallets.find((wallet) => wallet.address.toLowerCase() === position.user.toLowerCase())) return null;
 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&

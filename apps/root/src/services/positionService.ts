@@ -34,6 +34,7 @@ import {
   SIGN_VERSION,
   TOKEN_TYPE_YIELD_BEARING_SHARES,
   PERMISSIONS,
+  SDK_POSITION_STATUS_TO_POSITION_STATUSES,
 } from '@constants';
 import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
@@ -174,15 +175,15 @@ export default class PositionService {
                   toWithdraw: BigNumber.from(position.funds.toWithdraw),
                   totalSwaps: BigNumber.from(position.executedSwaps + position.remainingSwaps),
                   isStale: position.isStale,
-                  pairId: position.pair.pairId,
+                  pairId: position.pair.variantPairId || position.pair.pairId,
                   swappedYield: toHasYield ? BigNumber.from(position.funds.swapped) : null,
                   remainingLiquidityUnderlying: fromHasYield ? BigNumber.from(position.funds.remaining) : null,
                   toWithdrawUnderlying: toHasYield ? BigNumber.from(position.funds.toWithdraw) : null,
                   toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
                   remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
-                  id: `${position.tokenId}-v${version}`,
+                  id: `${position.chainId}-${position.tokenId}-v${version}`,
                   positionId: position.tokenId.toString(),
-                  status: position.status,
+                  status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],
                   totalExecutedSwaps: BigNumber.from(position.executedSwaps),
                   pendingTransaction,
                   version,
@@ -256,9 +257,9 @@ export default class PositionService {
                   toWithdrawUnderlying: toHasYield ? BigNumber.from(position.funds.toWithdraw) : null,
                   toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
                   remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
-                  id: `${position.tokenId}-v${version}`,
+                  id: `${position.chainId}-${position.tokenId}-v${version}`,
                   positionId: position.tokenId.toString(),
-                  status: position.status,
+                  status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],
                   totalExecutedSwaps: BigNumber.from(position.executedSwaps),
                   pendingTransaction,
                   version,
@@ -1393,7 +1394,7 @@ export default class PositionService {
           this.currentPositions[`${newId}-v${newPositionTypeData.version}`] = {
             ...this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
             pendingTransaction: '',
-            id: `${newId}-v${newPositionTypeData.version}`,
+            id: `${transaction.chainId}-${newId}-v${newPositionTypeData.version}`,
             positionId: newId,
           };
         }
@@ -1440,7 +1441,7 @@ export default class PositionService {
           pendingTransaction: '',
         };
         if (migratePositionYieldTypeData.newId) {
-          const newPositionId = `${migratePositionYieldTypeData.newId}-v${LATEST_VERSION}`;
+          const newPositionId = `${transaction.chainId}-${migratePositionYieldTypeData.newId}-v${LATEST_VERSION}`;
           this.currentPositions[newPositionId] = {
             ...this.currentPositions[migratePositionYieldTypeData.id],
             from: !migratePositionYieldTypeData.fromYield
