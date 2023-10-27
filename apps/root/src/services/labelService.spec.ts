@@ -25,14 +25,14 @@ describe.skip('Label Service', () => {
 
   describe('editLabel', () => {
     test('it should not make a request if no user is present', async () => {});
-    test('it should not make a request if the address has no label asociated');
+    test('it should not make a request if the address has no label asociated', async () => {});
     test('it should update the labels data and then make a request with meanApiService', async () => {});
     test('it should retain the original value if the API call fails', async () => {});
   });
 
   describe('deleteLabel', () => {
     test('it should not make a request if no user is present', async () => {});
-    test('it should only make a request if the address has a label asociated');
+    test('it should only make a request if the address has a label asociated', async () => {});
     test('it should update the labels data and then make a request with meanApiService', async () => {});
     test('it should retain the original value if the API call fails', async () => {});
   });

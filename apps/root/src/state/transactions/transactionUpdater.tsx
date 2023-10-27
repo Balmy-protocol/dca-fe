@@ -147,7 +147,12 @@ export default function Updater(): null {
             }
 
             if (tx.type === TransactionTypes.newPosition) {
-              const parsedLog = await transactionService.parseLog(receipt.logs, tx.chainId, 'Deposited');
+              const parsedLog = await transactionService.parseLog({
+                logs: receipt.logs,
+                chainId: tx.chainId,
+                eventToSearch: 'Deposited',
+                ownerAddress: receipt.from,
+              });
               extendedTypeData = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                 id: parsedLog.args.positionId.toString(),
@@ -155,7 +160,12 @@ export default function Updater(): null {
             }
 
             if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
-              const parsedLog = await transactionService.parseLog(receipt.logs, tx.chainId, 'Deposited');
+              const parsedLog = await transactionService.parseLog({
+                logs: receipt.logs,
+                chainId: tx.chainId,
+                eventToSearch: 'Deposited',
+                ownerAddress: receipt.from,
+              });
 
               extendedTypeData = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call

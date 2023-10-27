@@ -63,16 +63,22 @@ export default class TransactionService {
     return this.providerService.off('block');
   }
 
-  async parseLog(logs: Log[], chainId: number, eventToSearch: string) {
+  async parseLog({
+    logs,
+    chainId,
+    eventToSearch,
+    ownerAddress,
+  }: {
+    logs: Log[];
+    chainId: number;
+    eventToSearch: string;
+    ownerAddress: string;
+  }) {
     const hubAddress = this.contractService.getHUBAddress(chainId);
 
-    const activeWallet = await this.providerService.getSigner();
+    const hubInstance = await this.contractService.getHubInstance(chainId, ownerAddress);
 
-    const activeWalletAddress = await activeWallet.getAddress();
-
-    const hubInstance = await this.contractService.getHubInstance(chainId, activeWalletAddress);
-
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(chainId, activeWalletAddress);
+    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(chainId, ownerAddress);
 
     const hubCompanionAddress = this.contractService.getHUBCompanionAddress(chainId);
 

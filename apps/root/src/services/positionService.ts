@@ -159,11 +159,8 @@ export default class PositionService {
                 const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
                 const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
 
-                const fromHasYield = position.from.variant.type === 'yield';
-                const toHasYield = position.to.variant.type === 'yield';
-
                 const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
-                return {
+                const userPosition: Position = {
                   from: fromToUse,
                   to: toToUse,
                   user: position.owner,
@@ -176,9 +173,7 @@ export default class PositionService {
                   totalSwaps: BigNumber.from(position.executedSwaps + position.remainingSwaps),
                   isStale: position.isStale,
                   pairId: position.pair.variantPairId || position.pair.pairId,
-                  swappedYield: toHasYield ? BigNumber.from(position.funds.swapped) : null,
-                  remainingLiquidityUnderlying: fromHasYield ? BigNumber.from(position.funds.remaining) : null,
-                  toWithdrawUnderlying: toHasYield ? BigNumber.from(position.funds.toWithdraw) : null,
+                  swappedYield: (position.yield && BigNumber.from(position.yield.swapped)) || null,
                   toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
                   remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
@@ -192,6 +187,8 @@ export default class PositionService {
                   startedAt: position.createdAt,
                   ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
                 };
+
+                return userPosition;
               }),
             'id'
           ),
@@ -235,11 +232,8 @@ export default class PositionService {
                 const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
                 const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
 
-                const fromHasYield = position.from.variant.type === 'yield';
-                const toHasYield = position.to.variant.type === 'yield';
-
                 const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
-                return {
+                const userPosition: Position = {
                   from: fromToUse,
                   to: toToUse,
                   user: position.owner,
@@ -251,10 +245,8 @@ export default class PositionService {
                   toWithdraw: BigNumber.from(position.funds.toWithdraw),
                   totalSwaps: BigNumber.from(position.executedSwaps + position.remainingSwaps),
                   isStale: position.isStale,
-                  pairId: position.pair.pairId,
-                  swappedYield: toHasYield ? BigNumber.from(position.funds.swapped) : null,
-                  remainingLiquidityUnderlying: fromHasYield ? BigNumber.from(position.funds.remaining) : null,
-                  toWithdrawUnderlying: toHasYield ? BigNumber.from(position.funds.toWithdraw) : null,
+                  pairId: position.pair.variantPairId || position.pair.pairId,
+                  swappedYield: (position.yield && BigNumber.from(position.yield.swapped)) || null,
                   toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
                   remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
@@ -268,6 +260,8 @@ export default class PositionService {
                   startedAt: position.createdAt,
                   ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
                 };
+
+                return userPosition;
               }),
             'id'
           ),
@@ -538,7 +532,7 @@ export default class PositionService {
     };
   }
 
-  async buildDepositTx(
+  buildDepositTx(
     owner: string,
     fromToken: Token,
     toToken: Token,
@@ -563,8 +557,6 @@ export default class PositionService {
         possibleYieldTo
       );
 
-    const currentNetwork = await this.providerService.getNetwork();
-
     const deposit: AddFunds =
       takeFrom.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS.toLowerCase() && signature
         ? {
@@ -578,7 +570,7 @@ export default class PositionService {
           }
         : { token: takeFrom, amount: totalAmmount.toString() };
 
-    const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+    const wrappedProtocolToken = getWrappedProtocolToken(chainId);
 
     const fromToUse =
       yieldFrom || (from.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken.address : from);
@@ -586,7 +578,7 @@ export default class PositionService {
       yieldTo || (to.toLowerCase() === PROTOCOL_TOKEN_ADDRESS.toLowerCase() ? wrappedProtocolToken.address : to);
 
     return this.sdkService.buildCreatePositionTx({
-      chainId: currentNetwork.chainId,
+      chainId,
       from: { address: from, variantId: fromToUse },
       to: { address: to, variantId: toToUse },
       swapInterval: interval.toNumber(),
@@ -681,7 +673,7 @@ export default class PositionService {
       position.to.address !== wrappedProtocolToken.address &&
       useProtocolToken
     ) {
-      throw new Error('Should not call withdraw without it being protocol tokenm');
+      throw new Error('Should not call withdraw without it being protocol token');
     }
 
     const hasYield = position.to.underlyingTokens.length;
@@ -1269,7 +1261,8 @@ export default class PositionService {
       }
 
       const [tokenA, tokenB] = sortTokens(newPositionTypeData.from, newPositionTypeData.to);
-      this.currentPositions[`${id}-v${newPositionTypeData.version}`] = {
+
+      const newPosition: Position = {
         from: fromToUse,
         to: toToUse,
         user: transaction.from,
@@ -1294,11 +1287,12 @@ export default class PositionService {
         isStale: false,
         swappedYield: (toYield && BigNumber.from(0)) || null,
         toWithdrawYield: (toYield && BigNumber.from(0)) || null,
-        remainingLiquidityYield:
-          (fromYield && parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals)) || null,
+        remainingLiquidityYield: (fromYield && BigNumber.from(0)) || null,
         nextSwapAvailableAt: newPositionTypeData.startedAt,
         permissions: [],
       };
+
+      this.currentPositions[`${id}-v${newPositionTypeData.version}`] = newPosition;
     }
 
     if (!this.currentPositions[id] && transaction.position) {
@@ -1390,8 +1384,8 @@ export default class PositionService {
       case TransactionTypes.newPosition: {
         const newPositionTypeData = transaction.typeData;
         const newId = newPositionTypeData.id;
-        if (!this.currentPositions[`${newId}-v${newPositionTypeData.version}`]) {
-          this.currentPositions[`${newId}-v${newPositionTypeData.version}`] = {
+        if (!this.currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`]) {
+          this.currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`] = {
             ...this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
             pendingTransaction: '',
             id: `${transaction.chainId}-${newId}-v${newPositionTypeData.version}`,
@@ -1408,13 +1402,18 @@ export default class PositionService {
       }
       case TransactionTypes.terminatePosition: {
         const terminatePositionTypeData = transaction.typeData;
+
         this.pastPositions[terminatePositionTypeData.id] = {
           ...this.currentPositions[terminatePositionTypeData.id],
           toWithdraw: BigNumber.from(0),
           remainingLiquidity: BigNumber.from(0),
           remainingSwaps: BigNumber.from(0),
-          toWithdrawYield: BigNumber.from(0),
-          remainingLiquidityYield: BigNumber.from(0),
+          toWithdrawYield:
+            this.currentPositions[terminatePositionTypeData.id].toWithdrawYield !== null ? BigNumber.from(0) : null,
+          remainingLiquidityYield:
+            this.currentPositions[terminatePositionTypeData.id].remainingLiquidityYield !== null
+              ? BigNumber.from(0)
+              : null,
           pendingTransaction: '',
         };
         delete this.currentPositions[terminatePositionTypeData.id];
@@ -1480,7 +1479,8 @@ export default class PositionService {
         const withdrawPositionTypeData = transaction.typeData;
         this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
         this.currentPositions[withdrawPositionTypeData.id].toWithdraw = BigNumber.from(0);
-        this.currentPositions[withdrawPositionTypeData.id].toWithdrawYield = BigNumber.from(0);
+        this.currentPositions[withdrawPositionTypeData.id].toWithdrawYield =
+          this.currentPositions[withdrawPositionTypeData.id].toWithdrawYield !== null ? BigNumber.from(0) : null;
         break;
       }
       case TransactionTypes.modifyRateAndSwapsPosition: {

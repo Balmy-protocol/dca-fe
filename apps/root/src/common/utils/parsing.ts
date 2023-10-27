@@ -172,6 +172,7 @@ export const sdkDcaTokenToToken = (token: DCAPositionToken, chainId: number): To
   let newToken = toToken({
     ...token,
     chainId,
+    underlyingTokens: [],
   });
 
   if (hasYield) {
@@ -179,6 +180,7 @@ export const sdkDcaTokenToToken = (token: DCAPositionToken, chainId: number): To
       toToken({
         ...token,
         chainId,
+        underlyingTokens: [],
       }),
     ];
 
@@ -204,14 +206,24 @@ export const getDisplayToken = (token: Token, chainId?: number) => {
   underlyingToken = underlyingToken && {
     ...underlyingToken,
     chainId: chainIdToUse,
-    underlyingTokens: [token],
+    underlyingTokens: [
+      toToken({
+        ...token,
+        underlyingTokens: [],
+      }),
+    ],
   };
 
   if (underlyingToken && underlyingToken.address === wrappedProtocolToken.address) {
     underlyingToken = {
       ...protocolToken,
       chainId: chainIdToUse,
-      underlyingTokens: [token],
+      underlyingTokens: [
+        toToken({
+          ...token,
+          underlyingTokens: [],
+        }),
+      ],
     };
   }
 

@@ -50,7 +50,7 @@ import { chainToWagmiNetwork } from '@common/utils/parsing';
 import { NETWORKS, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 
 import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
-import { setupAxiosClient } from '@state';
+import { setupAxiosClient } from '@state/axios';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import TransactionService from './transactionService';
