@@ -5,6 +5,7 @@
     "clean": "turbo run clean",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "test": "turbo run test",
     "format": "prettier --write --ignore-unknown \"**/*.{js,jsx,ts,tsx,css,md}\"",
     "prepare-husky": "husky install",
     "prepare": "husky install"
