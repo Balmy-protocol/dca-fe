@@ -540,6 +540,7 @@ export const PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.POLYGON_ZKEVM.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.BASE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.LINEA.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.ROOTSTOCK.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
 export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
@@ -563,6 +564,7 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.POLYGON_ZKEVM.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [Chains.BASE.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [Chains.LINEA.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
+  [Chains.ROOTSTOCK.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
 };
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
@@ -670,6 +672,7 @@ export const DEFILLAMA_IDS = {
   [Chains.POLYGON_ZKEVM.chainId]: 'polygon_zkevm',
   [Chains.BASE.chainId]: 'base',
   [Chains.LINEA.chainId]: 'linea',
+  [Chains.ROOTSTOCK.chainId]: 'rsk',
 };
 
 export const TOKEN_LISTS = {
@@ -724,7 +727,7 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
 };
 
-export const REMOVED_AGG_CHAINS = [58];
+export const REMOVED_AGG_CHAINS = [30, 59144, 58];
 
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
   `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
