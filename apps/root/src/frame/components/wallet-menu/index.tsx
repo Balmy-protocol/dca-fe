@@ -284,7 +284,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
                   return (
                     <StyledExternalAccount key={wallet.address}>
                       <Typography variant="subtitle1" fontWeight={500}>
-                        <Address address={wallet.address} trimAddress trimSize={10} /> connected with:{' '}
+                        <Address editable address={wallet.address} trimAddress trimSize={10} /> connected with:{' '}
                         {walletIsConnected ? wallet.providerInfo.name : wallet.type}
                       </Typography>
                       <Button
