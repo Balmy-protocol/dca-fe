@@ -332,10 +332,6 @@ export default class Web3Service {
     this.contractService.setNetwork(chainId);
   }
 
-  getAccount() {
-    return this.account;
-  }
-
   getSignSupport() {
     return !this.loadedAsSafeApp;
   }

@@ -47,13 +47,21 @@ const WalletsUpdater = () => {
   const labelService = useLabelService();
 
   React.useEffect(() => {
-    const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
-    const embeddedWalletIsReady = !!embeddedWallet;
+    const initializeUserData = async () => {
+      const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+      const embeddedWalletIsReady = !!embeddedWallet;
 
-    if (user && wallets.length && authenticated && ready && embeddedWalletIsReady) {
-      void accountService.setUser(user, wallets);
-      void labelService.initializeLabelsAndContacts();
-    }
+      if (user && wallets.length && authenticated && ready && embeddedWalletIsReady) {
+        try {
+          await accountService.setUser(user, wallets);
+          await labelService.initializeLabelsAndContacts();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+
+    void initializeUserData();
   }, [authenticated, wallets, ready]);
   return <></>;
 };
