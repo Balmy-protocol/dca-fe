@@ -21,10 +21,8 @@ function useUnderlyingAmount(walletAddress: string): [Nullable<Network>, boolean
 
         const network = await provider?.getNetwork();
 
-        console.log(network, walletAddress);
         setParams({ isLoading: false, result: network || null, error: undefined });
       } catch (e) {
-        console.log(e);
         setParams({ isLoading: false, result: null, error: e as string });
       }
     }
