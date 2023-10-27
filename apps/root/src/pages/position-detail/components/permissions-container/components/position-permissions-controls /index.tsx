@@ -4,8 +4,11 @@ import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Link, OpenInNewIcon } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import { FullPosition } from '@types';
-import useActiveWallet from '@hooks/useActiveWallet';
+import { FullPosition, WalletStatus } from '@types';
+import useWallet from '@hooks/useWallet';
+import { CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH } from '@constants';
+import useWalletNetwork from '@hooks/useWalletNetwork';
+import useWallets from '@hooks/useWallets';
 
 const PositionControlsContainer = styled.div`
   display: flex;
@@ -22,7 +25,6 @@ interface PositionPermissionsControlsProps {
   onSave: () => void;
   onDiscardChanges: () => void;
   onAddAddress: () => void;
-  disabled: boolean;
 }
 
 const PositionPermissionsControls = ({
@@ -32,13 +34,25 @@ const PositionPermissionsControls = ({
   onSave,
   onDiscardChanges,
   onAddAddress,
-  disabled,
 }: PositionPermissionsControlsProps) => {
   const isPending = pendingTransaction !== null;
-  const activeWallet = useActiveWallet();
-  const account = activeWallet?.address;
+  const wallet = useWallet(position.user);
+  const wallets = useWallets();
 
-  if (!account || account.toLowerCase() !== position.user.toLowerCase()) return null;
+  const [connectedNetwork] = useWalletNetwork(position.user);
+
+  const isOnNetwork = connectedNetwork?.chainId === position.chainId;
+
+  const walletIsConnected = wallet.status === WalletStatus.connected;
+
+  const showSwitchAction =
+    walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
+
+  const isOwner = wallets.find((userWallet) => userWallet.address.toLowerCase() === position.user.toLowerCase());
+
+  const disabled = showSwitchAction || !walletIsConnected;
+
+  if (!isOwner) return null;
 
   return isPending ? (
     <Button variant="contained" color="pending" size="large">

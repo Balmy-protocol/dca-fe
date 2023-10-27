@@ -13,6 +13,7 @@ import {
   DISABLED_YIELD_WITHDRAWS,
   DCA_TOKEN_BLACKLIST,
   DCA_PAIR_BLACKLIST,
+  CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
 import { BigNumber } from 'ethers';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
@@ -30,6 +31,7 @@ import useWeb3Service from '@hooks/useWeb3Service';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useWallet from '@hooks/useWallet';
 import { usePrivy } from '@privy-io/react-auth';
+import useWalletNetwork from '@hooks/useWalletNetwork';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -88,7 +90,7 @@ const PositionControls = ({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const web3Service = useWeb3Service();
-  // const connectedNetwork = useCurrentNetwork();
+  const [connectedNetwork] = useWalletNetwork(user);
   const wallet = useWallet(user);
   const { connectWallet } = usePrivy();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -104,8 +106,8 @@ const PositionControls = ({
     return supportedNetwork;
   }, [chainId]);
 
-  // const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
-  const isOnNetwork = true;
+  // console.log(connectedNetwork);
+  const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
   const pushToHistory = usePushToHistory();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
@@ -126,7 +128,7 @@ const PositionControls = ({
   const onChangeNetwork = () => {
     trackEvent('DCA - Position List - Change network', { chainId });
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId, () => {
+    walletService.changeNetwork(chainId, position.user, () => {
       const networkToSet = find(NETWORKS, { chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
       if (networkToSet) {
@@ -189,7 +191,8 @@ const PositionControls = ({
 
   const walletIsConnected = wallet.status === WalletStatus.connected;
 
-  const showSwitchAction = walletIsConnected && !isOnNetwork;
+  const showSwitchAction =
+    walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
 
   const fromIsSupportedInNewVersion = !!tokenList[position.from.address];
   const toIsSupportedInNewVersion = !!tokenList[position.to.address];
@@ -246,7 +249,7 @@ const PositionControls = ({
           {toWithdraw.gt(BigNumber.from(0)) && (
             <MenuItem
               onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
-              disabled={disabled || !isOnNetwork || disabledWithdraw}
+              disabled={disabled || showSwitchAction || disabledWithdraw}
             >
               <Typography variant="body2">
                 <FormattedMessage
@@ -263,7 +266,10 @@ const PositionControls = ({
             </MenuItem>
           )}
           {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
-            <MenuItem onClick={() => handleOnWithdraw(false)} disabled={disabled || !isOnNetwork || disabledWithdraw}>
+            <MenuItem
+              onClick={() => handleOnWithdraw(false)}
+              disabled={disabled || showSwitchAction || disabledWithdraw}
+            >
               <Typography variant="body2">
                 <FormattedMessage
                   description="withdrawWrapped"
@@ -288,7 +294,7 @@ const PositionControls = ({
           </MenuItem>
           <MenuItem
             onClick={handleTerminate}
-            disabled={disabled || !isOnNetwork || disabledWithdraw}
+            disabled={disabled || showSwitchAction || disabledWithdraw}
             style={{ color: '#FF5359' }}
           >
             <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
@@ -298,7 +304,7 @@ const PositionControls = ({
       {!walletIsConnected && (
         <StyledCardFooterButton variant="contained" color="secondary" onClick={() => connectWallet()} fullWidth>
           <Typography variant="body2">
-            <FormattedMessage description="incorrect network" defaultMessage="Reconnect wallet" />
+            <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
           </Typography>
         </StyledCardFooterButton>
       )}
@@ -313,7 +319,7 @@ const PositionControls = ({
           </Typography>
         </StyledCardFooterButton>
       )}
-      {!OLD_VERSIONS.includes(position.version) && walletIsConnected && (
+      {!OLD_VERSIONS.includes(position.version) && walletIsConnected && !showSwitchAction && (
         <>
           {!disabled && (
             <StyledCardFooterButton
@@ -330,7 +336,7 @@ const PositionControls = ({
           )}
         </>
       )}
-      {OLD_VERSIONS.includes(position.version) && walletIsConnected && (
+      {OLD_VERSIONS.includes(position.version) && walletIsConnected && !showSwitchAction && (
         <>
           {shouldShowMigrate && shouldMigrateToYield && (
             <StyledCardFooterButton

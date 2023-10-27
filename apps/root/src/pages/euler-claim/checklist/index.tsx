@@ -45,6 +45,7 @@ import { DCAPermission } from '@mean-finance/sdk';
 import useHasPendingMigratorApprovals from '../hooks/useHasPendingMigratorApprovals';
 import useHasPendingPermitManyTransactions from '../hooks/useHasPendingPermitManyTransaction';
 import useHasPendingTerminateManyTransactions from '../hooks/useHasPendingTerminateManyTransaction';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledPositionsContainer = styled.div`
   display: flex;
@@ -212,6 +213,7 @@ const ClaimChecklist = ({
   const step4Completed = step3Completed && !needsToApproveTokens;
   const step5Completed = step4Completed && !needsToClaim;
   const providerService = useProviderService();
+  const activeWallet = useActiveWallet();
   const walletService = useWalletService();
 
   if (!step0Completed) {
@@ -253,7 +255,7 @@ const ClaimChecklist = ({
 
   const onChangeNetwork = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(NETWORKS.mainnet.chainId, () => {
+    walletService.changeNetwork(NETWORKS.mainnet.chainId, activeWallet?.address, () => {
       dispatch(setNetwork(NETWORKS.mainnet));
       web3Service.setNetwork(NETWORKS.mainnet.chainId);
     });

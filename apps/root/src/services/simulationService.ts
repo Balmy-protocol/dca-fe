@@ -57,7 +57,7 @@ export default class SimulationService {
     signature?: { nonce: BigNumber; deadline: number; rawSignature: string },
     minimumReceived?: BigNumber
   ): Promise<SwapOption[]> {
-    const network = await this.providerService.getNetwork();
+    const network = await this.providerService.getNetwork(user);
 
     const transferTo = quotes.reduce((prev, current) => {
       if (prev !== current.transferTo) {

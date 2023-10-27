@@ -12,7 +12,6 @@ import getPairSwaps from '@graphql/getPairSwaps.graphql';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
 import Button from '@common/components/button';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAppDispatch } from '@state/hooks';
 import { changeMainTab, changePositionDetailsTab, changeSubTab } from '@state/tabs/actions';
 import { usePositionDetailsTab } from '@state/tabs/hooks';
@@ -26,7 +25,6 @@ import useTransactionModal from '@hooks/useTransactionModal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
 import usePositionService from '@hooks/usePositionService';
-import useIsOnCorrectNetwork from '@hooks/useIsOnCorrectNetwork';
 import { setPosition } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
@@ -104,13 +102,8 @@ const PositionDetailFrame = () => {
   const dispatch = useAppDispatch();
   const positionService = usePositionService();
   const errorService = useErrorService();
-  const currentNetwork = useCurrentNetwork();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
-  const [isOnCorrectNetwork] = useIsOnCorrectNetwork();
   const trackEvent = useTrackEvent();
-
-  const shouldShowChangeNetwork = Number(chainId) !== currentNetwork.chainId || !isOnCorrectNetwork;
-
   const {
     loading: isLoading,
     data,
@@ -654,7 +647,6 @@ const PositionDetailFrame = () => {
               onViewNFT={handleViewNFT}
               position={positionInUse}
               pendingTransaction={pendingTransaction}
-              disabled={shouldShowChangeNetwork}
               onWithdrawFunds={onWithdrawFunds}
               onWithdraw={onWithdraw}
             />
@@ -670,7 +662,6 @@ const PositionDetailFrame = () => {
               swappedUnderlying={swappedUnderlying}
               remainingLiquidityUnderlying={remainingLiquidityUnderlying}
               onReusePosition={onShowModifyRateSettings}
-              disabled={shouldShowChangeNetwork}
               onMigrateYield={handleShowMigrateModal}
               onSuggestMigrateYield={handleShowSuggestMigrateModal}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -679,11 +670,7 @@ const PositionDetailFrame = () => {
             />
           )}
           {tabIndex === 1 && (
-            <PositionPermissionsContainer
-              position={positionInUse}
-              pendingTransaction={pendingTransaction}
-              disabled={shouldShowChangeNetwork}
-            />
+            <PositionPermissionsContainer position={positionInUse} pendingTransaction={pendingTransaction} />
           )}
         </Grid>
       </StyledPositionDetailsContainer>

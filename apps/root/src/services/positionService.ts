@@ -612,7 +612,7 @@ export default class PositionService {
       yieldTo
     );
 
-    const currentNetwork = await this.providerService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork(owner);
 
     const allowanceTarget = this.getAllowanceTarget(currentNetwork.chainId, from, yieldFrom, false);
 

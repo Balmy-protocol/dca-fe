@@ -35,7 +35,7 @@ export default class WalletService {
       return ens;
     }
 
-    const currentNetwork = await this.providerService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork(address);
 
     if (currentNetwork.chainId === NETWORKS.arbitrum.chainId) {
       try {
@@ -69,22 +69,26 @@ export default class WalletService {
     return ens;
   }
 
-  async changeNetwork(newChainId: number, callbackBeforeReload?: () => void): Promise<void> {
+  async changeNetwork(newChainId: number, address?: string, callbackBeforeReload?: () => void): Promise<void> {
     try {
-      const currentNetwork = await this.providerService.getNetwork();
+      const currentNetwork = await this.providerService.getNetwork(address);
       if (currentNetwork.chainId !== newChainId) {
-        await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, callbackBeforeReload, true);
+        await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, address, callbackBeforeReload, true);
       }
     } catch (switchError) {
       console.error('Error switching chains', switchError);
     }
   }
 
-  async changeNetworkAutomatically(newChainId: number, callbackBeforeReload?: () => void): Promise<void> {
+  async changeNetworkAutomatically(
+    newChainId: number,
+    address?: string,
+    callbackBeforeReload?: () => void
+  ): Promise<void> {
     try {
-      const currentNetwork = await this.providerService.getNetwork();
+      const currentNetwork = await this.providerService.getNetwork(address);
       if (currentNetwork.chainId !== newChainId) {
-        await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, callbackBeforeReload, false);
+        await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, address, callbackBeforeReload, false);
       }
     } catch (switchError) {
       console.error('Error switching chains', switchError);
@@ -95,7 +99,7 @@ export default class WalletService {
     address: string,
     ownerAddress: string
   ): Promise<{ token: Token; balance: BigNumber } | undefined> {
-    const currentNetwork = await this.providerService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork(ownerAddress);
 
     if (!address) return Promise.resolve(undefined);
 

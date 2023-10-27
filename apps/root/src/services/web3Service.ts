@@ -372,9 +372,9 @@ export default class Web3Service {
 
     try {
       if (chainId) {
-        await this.walletService.changeNetworkAutomatically(chainId, () => this.setNetwork(chainId));
+        await this.walletService.changeNetworkAutomatically(chainId, account, () => this.setNetwork(chainId));
       } else {
-        const providerNetwork = await this.providerService.getNetwork();
+        const providerNetwork = await this.providerService.getNetwork(account);
         const providerChainId = providerNetwork.chainId;
         this.setNetwork(providerChainId);
       }

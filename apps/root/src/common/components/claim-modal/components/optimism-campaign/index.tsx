@@ -112,7 +112,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
 
   const handleChangeNetwork = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(campaign.chainId, () => {
+    walletService.changeNetwork(campaign.chainId, activeWallet?.address, () => {
       const networkToSet = find(NETWORKS, { chainId: campaign.chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
       if (networkToSet) {

@@ -85,9 +85,9 @@ export default class ProviderService {
     return provider.getBalance(address);
   }
 
-  async getNetwork() {
+  async getNetwork(address?: string) {
     try {
-      const provider = await this.getProvider();
+      const provider = await this.getProvider(address);
       let network;
       if (provider?.getNetwork) {
         network = await timeoutPromise(provider?.getNetwork(), '1s');
@@ -110,11 +110,17 @@ export default class ProviderService {
     return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
 
-  async getProvider(network?: Network) {
-    const activeWalletProvider = await this.accountService.getActiveWalletProvider();
+  async getProvider(address?: string, network?: Network) {
+    let walletProvider;
 
-    if (activeWalletProvider) {
-      return activeWalletProvider;
+    if (address) {
+      walletProvider = await this.accountService.getWalletProvider(address);
+    } else {
+      walletProvider = await this.accountService.getActiveWalletProvider();
+    }
+
+    if (walletProvider) {
+      return walletProvider;
     }
 
     if (network) {
@@ -305,19 +311,32 @@ export default class ProviderService {
 
   async attempToAutomaticallyChangeNetwork(
     newChainId: number,
+    address?: string,
     callbackBeforeReload?: () => void,
     forceChangeNetwork?: boolean
   ) {
-    const provider = await this.accountService.getActiveWalletProvider();
+    let provider;
+    if (address) {
+      provider = await this.accountService.getWalletProvider(address);
+    } else {
+      provider = await this.accountService.getActiveWalletProvider();
+    }
+
     if (!provider) {
       return;
     }
 
-    const walletAddress = await provider.getSigner().getAddress();
-    const providerInfo = this.accountService.getWallet(walletAddress).providerInfo;
+    let wallet;
+    if (address) {
+      wallet = this.accountService.getWallet(address);
+    } else {
+      wallet = this.accountService.getActiveWallet();
+    }
+
+    const providerInfo = wallet?.providerInfo;
 
     if ((providerInfo && AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) || forceChangeNetwork) {
-      return this.changeNetwork(newChainId, callbackBeforeReload);
+      return this.changeNetwork(newChainId, callbackBeforeReload, provider);
     }
 
     return Promise.resolve();

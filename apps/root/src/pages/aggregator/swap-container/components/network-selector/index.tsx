@@ -29,6 +29,7 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import { setAggregatorChainId } from '@state/aggregator/actions';
 import { setNetwork } from '@state/config/actions';
 import { NetworkStruct } from '@types';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledNetworkContainer = styled.div`
   display: flex;
@@ -52,6 +53,7 @@ const NetworkSelector = () => {
   const trackEvent = useTrackEvent();
   const replaceHistory = useReplaceHistory();
   const selectedNetwork = useSelectedNetwork();
+  const activeWallet = useActiveWallet();
 
   const [chainSearch, setChainSearch] = React.useState('');
   const chainSearchRef = React.useRef<HTMLDivElement>();
@@ -97,7 +99,7 @@ const NetworkSelector = () => {
       replaceHistory(`/swap/${chainId}`);
       trackEvent('Aggregator - Change displayed network');
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      walletService.changeNetworkAutomatically(chainId, () => {
+      walletService.changeNetworkAutomatically(chainId, activeWallet?.address, () => {
         const networkToSet = find(NETWORKS, { chainId });
         dispatch(setNetwork(networkToSet as NetworkStruct));
         if (networkToSet) {

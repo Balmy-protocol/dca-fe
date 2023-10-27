@@ -109,7 +109,7 @@ export default class AggregatorService {
     usePermit2 = false,
     sourceTimeout = TimeoutKey.patient
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork(takerAddress);
 
     const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
     let shouldValidate = !buyAmount && isOnNetwork;
@@ -214,7 +214,7 @@ export default class AggregatorService {
     chainId?: number,
     usePermit2?: boolean
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork(takerAddress);
 
     const isBuyOrder = quote.type === 'buy';
 

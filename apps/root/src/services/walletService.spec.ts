@@ -162,16 +162,16 @@ describe('Wallet Service', () => {
     describe('when the new chain is not the current one', () => {
       test('it should call the wallet service with correct parameters to change the chain', async () => {
         const callback = jest.fn();
-        await walletService.changeNetwork(1, callback);
+        await walletService.changeNetwork(1, 'account', callback);
 
         expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledTimes(1);
-        expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledWith(1, callback, true);
+        expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledWith(1, 'account', callback, true);
       });
     });
     describe('when the new chain is the same as the current one', () => {
       test('it should do nothing', async () => {
         const callback = jest.fn();
-        await walletService.changeNetwork(10, callback);
+        await walletService.changeNetwork(10, 'account', callback);
 
         expect(providerService.attempToAutomaticallyChangeNetwork).not.toHaveBeenCalled();
       });
@@ -185,16 +185,16 @@ describe('Wallet Service', () => {
     describe('when the new chain is not the current one', () => {
       test('it should call the wallet service with correct parameters to change the chain', async () => {
         const callback = jest.fn();
-        await walletService.changeNetworkAutomatically(1, callback);
+        await walletService.changeNetworkAutomatically(1, 'account', callback);
 
         expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledTimes(1);
-        expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledWith(1, callback, false);
+        expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledWith(1, 'account', callback, false);
       });
     });
     describe('when the new chain is the same as the current one', () => {
       test('it should do nothing', async () => {
         const callback = jest.fn();
-        await walletService.changeNetworkAutomatically(10, callback);
+        await walletService.changeNetworkAutomatically(10, 'account', callback);
 
         expect(providerService.attempToAutomaticallyChangeNetwork).not.toHaveBeenCalled();
       });

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition } from '@types';
+import { FullPosition, WalletStatus } from '@types';
 import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
@@ -10,6 +10,7 @@ import {
   shouldEnableFrequency,
   DISABLED_YIELD_WITHDRAWS,
   DCA_PAIR_BLACKLIST,
+  CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
 import Button from '@common/components/button';
 import SplitButton from '@common/components/split-button';
@@ -18,6 +19,8 @@ import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/t
 import { BigNumber } from 'ethers';
 // import useActiveWallet from '@hooks/useActiveWallet';
 import useWallets from '@hooks/useWallets';
+import useWallet from '@hooks/useWallet';
+import useWalletNetwork from '@hooks/useWalletNetwork';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -64,7 +67,6 @@ interface PositionSummaryControlsProps {
   onWithdrawFunds: () => void;
   pendingTransaction: string | null;
   position: FullPosition;
-  disabled: boolean;
   onWithdraw: (useProtocolToken: boolean) => void;
 }
 
@@ -77,7 +79,6 @@ const PositionSummaryControls = ({
   pendingTransaction,
   position,
   onViewNFT,
-  disabled,
 }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -95,8 +96,20 @@ const PositionSummaryControls = ({
   // const account = activeWallet?.address;
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const hasSignSupport = useSupportsSigning();
+  const wallet = useWallet(position.user);
+  const [connectedNetwork] = useWalletNetwork(position.user);
 
-  if (!wallets.find((wallet) => wallet.address.toLowerCase() === position.user.toLowerCase())) return null;
+  const isOnNetwork = connectedNetwork?.chainId === position.chainId;
+  const walletIsConnected = wallet.status === WalletStatus.connected;
+
+  const showSwitchAction =
+    walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
+
+  const isOwner = wallets.find((userWallet) => userWallet.address.toLowerCase() === position.user.toLowerCase());
+
+  const disabled = showSwitchAction || !walletIsConnected;
+
+  if (!isOwner) return null;
 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&

@@ -38,7 +38,6 @@ interface PositionSummaryContainerProps {
   onMigrateYield: () => void;
   onSuggestMigrateYield: () => void;
   onReusePosition: () => void;
-  disabled: boolean;
   yieldOptions: YieldOptions;
   toWithdrawUnderlying?: BigNumber | null;
   remainingLiquidityUnderlying?: BigNumber | null;
@@ -51,7 +50,6 @@ const PositionSummaryContainer = ({
   pendingTransaction,
   swapsData,
   onReusePosition,
-  disabled,
   yieldOptions,
   toWithdrawUnderlying,
   remainingLiquidityUnderlying,
@@ -74,7 +72,6 @@ const PositionSummaryContainer = ({
                 pair={swapsData}
                 pendingTransaction={pendingTransaction}
                 onReusePosition={onReusePosition}
-                disabled={disabled}
                 yieldOptions={yieldOptions}
                 toWithdrawUnderlying={toWithdrawUnderlying}
                 remainingLiquidityUnderlying={remainingLiquidityUnderlying}

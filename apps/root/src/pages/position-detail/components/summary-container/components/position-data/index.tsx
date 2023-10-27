@@ -58,7 +58,6 @@ interface DetailsProps {
   onSuggestMigrateYield: () => void;
   pendingTransaction: string | null;
   onReusePosition: () => void;
-  disabled: boolean;
   yieldOptions: YieldOptions;
   toWithdrawUnderlying?: BigNumber | null;
   remainingLiquidityUnderlying?: BigNumber | null;
@@ -188,7 +187,6 @@ const Details = ({
   pair,
   pendingTransaction,
   onReusePosition,
-  disabled,
   yieldOptions,
   toWithdrawUnderlying,
   remainingLiquidityUnderlying,
@@ -760,7 +758,6 @@ const Details = ({
         </StyledContentContainer>
         <PositionDataControls
           onReusePosition={onReusePosition}
-          disabled={disabled}
           position={position}
           yieldOptions={yieldOptions}
           pendingTransaction={pendingTransaction}

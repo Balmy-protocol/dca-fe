@@ -32,7 +32,7 @@ export default class Permit2Service {
 
   async getPermit2SignedData(address: string, token: Token, amount: BigNumber, wordIndex?: number) {
     const signer = await this.providerService.getSigner(address);
-    const network = await this.providerService.getNetwork();
+    const network = await this.providerService.getNetwork(address);
 
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
