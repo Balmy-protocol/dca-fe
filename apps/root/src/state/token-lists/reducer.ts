@@ -118,7 +118,7 @@ export const getDefaultByUrl = () => ({
           ],
           []
         )
-        .filter((token) => [1101, 8453].includes(token.chainId)),
+        .filter((token) => [1101, 8453, 59144].includes(token.chainId)),
   },
 
   /* -------------------------------------------------------------------------- */
@@ -444,6 +444,26 @@ export const getDefaultByUrl = () => ({
   },
 
   /* -------------------------------------------------------------------------- */
+  /*                                    Linea                                   */
+  /* -------------------------------------------------------------------------- */
+
+  'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=59144&isWhitelisted=true&pageSize=100&page=1': {
+    name: 'Kyberswap Linea',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    chainId: 42262,
+    priority: 0,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    parser: (list: { data: { tokens: Token[] } }) => list.data.tokens,
+  },
+
+  /* -------------------------------------------------------------------------- */
   /*                                   Klatyn                                   */
   /* -------------------------------------------------------------------------- */
 
@@ -652,6 +672,9 @@ export const initialState: TokenListsState = {
 
     // Oasis
     'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
+
+    // Linea
+    'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=59144&isWhitelisted=true&pageSize=100&page=1',
 
     // Canto
     'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json',

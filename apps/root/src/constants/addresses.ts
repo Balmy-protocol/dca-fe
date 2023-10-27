@@ -539,6 +539,7 @@ export const PERMIT_2_ADDRESS: Record<number, string> = {
   [NETWORKS.okex.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.POLYGON_ZKEVM.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.BASE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.LINEA.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.ROOTSTOCK.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
@@ -562,6 +563,7 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
   [NETWORKS.okex.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [Chains.POLYGON_ZKEVM.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [Chains.BASE.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
+  [Chains.LINEA.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [Chains.ROOTSTOCK.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
 };
 
@@ -669,6 +671,7 @@ export const DEFILLAMA_IDS = {
   [Chains.KAVA.chainId]: 'kava',
   [Chains.POLYGON_ZKEVM.chainId]: 'polygon_zkevm',
   [Chains.BASE.chainId]: 'base',
+  [Chains.LINEA.chainId]: 'linea',
   [Chains.ROOTSTOCK.chainId]: 'rsk',
 };
 
