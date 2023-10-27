@@ -7,7 +7,6 @@ import { EMPTY_TOKEN } from '@common/mocks/tokens';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
-import useAccount from './useAccount';
 
 export type Allowance = {
   token: Token;
@@ -20,6 +19,7 @@ const dummyToken: Allowance = { token: EMPTY_TOKEN, allowance: undefined };
 
 function useAllowance(
   from: Token | undefined | null,
+  owner: string,
   usesYield?: boolean,
   version?: PositionVersions
 ): AllowanceResponse {
@@ -32,8 +32,7 @@ function useAllowance(
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = useAccount();
-  const prevAccount = usePrevious(account);
+  const prevAccount = usePrevious(owner);
   const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
@@ -45,7 +44,7 @@ function useAllowance(
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await walletService.getAllowance(from, usesYield, version);
+          const promiseResult = await walletService.getAllowance(from, owner, usesYield, version);
           setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: dummyToken, error: e as string, isLoading: false });
@@ -56,7 +55,7 @@ function useAllowance(
     if (
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
-      !isEqual(account, prevAccount) ||
+      !isEqual(owner, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
       !isEqual(prevUsesYield, usesYield) ||
       !isEqual(prevVersion, version) ||
@@ -83,7 +82,7 @@ function useAllowance(
     prevVersion,
     hasPendingTransactions,
     prevAccount,
-    account,
+    owner,
     prevPendingTrans,
     prevBlockNumber,
     blockNumber,

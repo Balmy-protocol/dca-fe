@@ -1,6 +1,7 @@
 import { Log, TransactionRequest } from '@ethersproject/providers';
-import { Permission, Position, PositionPermission, PositionVersions } from './positions';
+import { Position, PositionPermission, PositionVersions } from './positions';
 import { Token } from './tokens';
+import { DCAPermission } from '@mean-finance/sdk';
 
 export interface TransactionReceipt {
   to: string;
@@ -217,7 +218,7 @@ export interface EulerClaimPermitManyTypeData {
   typeData: {
     id: string;
     positionIds: string[];
-    permissions: Permission[];
+    permissions: DCAPermission[];
     permittedAddress: string;
   };
 }

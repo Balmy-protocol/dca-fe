@@ -9,7 +9,8 @@ import WalletContext from '@common/components/wallet-context';
 import Web3Service from '@services/web3Service';
 import DCASubgraphs from '@common/utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
-import store, { axiosClient } from '@state';
+import store from '@state';
+import { axiosClient } from '@state/axios';
 import { Settings } from 'luxon';
 import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth';
 import LanguageContext from '@common/components/language-context';
@@ -40,17 +41,28 @@ function loadLocaleData(locale: SupportedLanguages) {
 }
 
 const WalletsUpdater = () => {
-  const { user, authenticated } = usePrivy();
+  const { user, authenticated, ready } = usePrivy();
   const { wallets } = useWallets();
   const accountService = useAccountService();
   const labelService = useLabelService();
 
   React.useEffect(() => {
-    if (user && wallets.length) {
-      void accountService.setUser(user, wallets);
-      void labelService.initializeLabelsAndContacts();
-    }
-  }, [authenticated, wallets]);
+    const initializeUserData = async () => {
+      const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+      const embeddedWalletIsReady = !!embeddedWallet;
+
+      if (user && wallets.length && authenticated && ready && embeddedWalletIsReady) {
+        try {
+          await accountService.setUser(user, wallets);
+          await labelService.initializeLabelsAndContacts();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+
+    void initializeUserData();
+  }, [authenticated, wallets, ready]);
   return <></>;
 };
 
@@ -85,11 +97,14 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: {
             <PrivyProvider
               appId={process.env.PUBLIC_PRIVY_APP_ID!}
               config={{
-                loginMethods: ['email', 'google', 'twitter', 'wallet'],
+                loginMethods: ['email', 'google', 'twitter', 'discord', 'apple', 'wallet'],
                 appearance: {
                   theme: 'dark',
                   accentColor: '#676FFF',
                   logo: 'https://your-logo-url',
+                },
+                embeddedWallets: {
+                  createOnLogin: 'all-users',
                 },
               }}
             >

@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers';
 import { Token } from './tokens';
+import { DCAPermission } from '@mean-finance/sdk';
 
 export enum PositionVersions {
   POSITION_VERSION_1 = '1',
@@ -28,18 +29,11 @@ export interface NFTData {
   name: string;
 }
 
-export enum Permission {
-  INCREASE = 'INCREASE',
-  REDUCE = 'REDUCE',
-  WITHDRAW = 'WITHDRAW',
-  TERMINATE = 'TERMINATE',
-}
-
 export type PositionStatus = 'ACTIVE' | 'COMPLETED' | 'TERMINATED';
 export interface PositionPermission {
   id: string;
   operator: string;
-  permissions: Permission[];
+  permissions: DCAPermission[];
 }
 
 export type PositionActions =
@@ -56,11 +50,39 @@ export type PositionActions =
 export type PermissionData = {
   id: string;
   operator: string;
-  permissions: Permission[];
+  permissions: DCAPermission[];
 };
 
 export type FullPermission = { [key: string]: PermissionData };
 export interface Position {
+  from: Token;
+  to: Token;
+  user: string;
+  swapInterval: BigNumber; // daily/weekly/etc
+  swapped: BigNumber; // total de swappeado
+  remainingLiquidity: BigNumber;
+  remainingSwaps: BigNumber;
+  totalSwaps: BigNumber; // cuanto puse originalmente
+  isStale: boolean;
+  rate: BigNumber;
+  toWithdraw: BigNumber;
+  totalExecutedSwaps: BigNumber;
+  toWithdrawYield: Nullable<BigNumber>;
+  remainingLiquidityYield: Nullable<BigNumber>;
+  swappedYield: Nullable<BigNumber>;
+  id: string;
+  positionId: string;
+  status: PositionStatus;
+  startedAt: number;
+  pendingTransaction: string;
+  version: PositionVersions;
+  chainId: number;
+  pairId: string;
+  nextSwapAvailableAt: number;
+  permissions?: PermissionData[];
+}
+
+export interface SubgraphPosition {
   from: Token;
   to: Token;
   user: string;
@@ -100,7 +122,7 @@ export interface FullPosition {
   totalSwaps: string; // cuanto puse originalmente
   id: string;
   positionId: string;
-  status: string;
+  status: PositionStatus;
   startedAt: number;
   totalExecutedSwaps: string;
   pendingTransaction: string;

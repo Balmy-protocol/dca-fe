@@ -6,7 +6,7 @@ import { Typography, Card, CardContent, Tooltip, ArrowRightAltIcon, Theme } from
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
-import { calculateYield, sortTokensByAddress } from '@common/utils/parsing';
+import { sortTokensByAddress } from '@common/utils/parsing';
 import { Position, Token, YieldOptions } from '@types';
 import { NETWORKS, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
@@ -106,14 +106,12 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
     from,
     to,
     swapInterval,
-    remainingLiquidity: remainingLiquidityRaw,
+    remainingLiquidity: totalRemainingLiquidity,
     remainingSwaps,
     rate,
-    depositedRateUnderlying,
-    toWithdraw: rawToWithdraw,
-    toWithdrawUnderlying,
-    remainingLiquidityUnderlying,
-    toWithdrawUnderlyingAccum,
+    toWithdrawYield,
+    remainingLiquidityYield: yieldFromGenerated,
+    toWithdraw,
     chainId,
   } = position;
   const positionNetwork = React.useMemo(() => {
@@ -124,28 +122,19 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
 
   const availablePairs = useAvailablePairs();
 
-  const rateToUse = depositedRateUnderlying || rate;
   const intl = useIntl();
 
-  const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
-  const toWithdrawYield =
-    toWithdrawUnderlyingAccum && toWithdrawUnderlying
-      ? toWithdrawUnderlying.sub(toWithdrawUnderlyingAccum)
-      : BigNumber.from(0);
-  const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
+  const toWithdrawBase = toWithdraw.sub(toWithdrawYield || BigNumber.from(0));
 
-  const { yieldGenerated: yieldFromGenerated, base: remainingLiquidity } = calculateYield(
-    remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw),
-    rateToUse,
-    remainingSwaps
-  );
+  const remainingLiquidity = totalRemainingLiquidity.sub(yieldFromGenerated || BigNumber.from(0));
+
   const intervalIndex = findIndex(SWAP_INTERVALS_MAP, { value: swapInterval });
 
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase, undefined, chainId);
-  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield, undefined, chainId);
-  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rateToUse, undefined, chainId);
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity, undefined, chainId);
-  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(from, yieldFromGenerated, undefined, chainId);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase);
+  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield);
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rate);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity);
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(from, yieldFromGenerated);
 
   const showToPrice = !isLoadingToPrice && !!toPrice;
   const showToYieldPrice = !isLoadingToYieldPrice && !!toYieldPrice;
@@ -228,7 +217,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
                 {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
               </Typography>
             </CustomChip>
-            {yieldFromGenerated.gt(BigNumber.from(0)) && (
+            {yieldFromGenerated?.gt(BigNumber.from(0)) && (
               <>
                 +
                 <CustomChip
@@ -283,9 +272,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">
-                {formatCurrencyAmount(BigNumber.from(rateToUse), position.from, 4)}
-              </Typography>
+              <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -328,7 +315,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
                 {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
               </Typography>
             </CustomChip>
-            {toWithdrawYield.gt(BigNumber.from(0)) && (
+            {toWithdrawYield?.gt(BigNumber.from(0)) && (
               <>
                 +
                 {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">

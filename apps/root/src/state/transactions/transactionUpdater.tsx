@@ -11,7 +11,6 @@ import EtherscanLink from '@common/components/view-on-etherscan';
 import { TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';
 import useTransactionService from '@hooks/useTransactionService';
-import useWalletService from '@hooks/useWalletService';
 import useSafeService from '@hooks/useSafeService';
 import usePositionService from '@hooks/usePositionService';
 import { updatePosition } from '@state/position-details/actions';
@@ -27,13 +26,14 @@ import {
   transactionFailed,
 } from './actions';
 import { useAppDispatch, useAppSelector } from '../hooks';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
-  const walletService = useWalletService();
   const positionService = usePositionService();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const safeService = useSafeService();
+  const activeWallet = useActiveWallet();
 
   const getBlockNumber = useGetBlockNumber();
 
@@ -57,14 +57,14 @@ export default function Updater(): null {
 
   const getReceipt = useCallback(
     (hash: string, chainId: number) => {
-      if (!walletService.getAccount()) throw new Error('No library or chainId');
+      if (!activeWallet?.address) throw new Error('No library or chainId');
       return transactionService.getTransactionReceipt(hash, chainId);
     },
-    [walletService]
+    [activeWallet?.address]
   );
   const checkIfTransactionExists = useCallback(
     (hash: string, chainId: number) => {
-      if (!walletService.getAccount()) throw new Error('No library or chainId');
+      if (!activeWallet?.address) throw new Error('No library or chainId');
       return transactionService.getTransaction(hash, chainId).then((tx: ethers.providers.TransactionResponse) => {
         const lastBlockNumberForChain = getBlockNumber(chainId);
         if (!tx) {
@@ -107,7 +107,7 @@ export default function Updater(): null {
         return true;
       });
     },
-    [walletService, walletService.getAccount(), transactions, getBlockNumber, dispatch]
+    [transactions, getBlockNumber, dispatch, activeWallet?.address]
   );
 
   useEffect(() => {
@@ -147,7 +147,12 @@ export default function Updater(): null {
             }
 
             if (tx.type === TransactionTypes.newPosition) {
-              const parsedLog = await transactionService.parseLog(receipt.logs, tx.chainId, 'Deposited');
+              const parsedLog = await transactionService.parseLog({
+                logs: receipt.logs,
+                chainId: tx.chainId,
+                eventToSearch: 'Deposited',
+                ownerAddress: receipt.from,
+              });
               extendedTypeData = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                 id: parsedLog.args.positionId.toString(),
@@ -155,7 +160,12 @@ export default function Updater(): null {
             }
 
             if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
-              const parsedLog = await transactionService.parseLog(receipt.logs, tx.chainId, 'Deposited');
+              const parsedLog = await transactionService.parseLog({
+                logs: receipt.logs,
+                chainId: tx.chainId,
+                eventToSearch: 'Deposited',
+                ownerAddress: receipt.from,
+              });
 
               extendedTypeData = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -263,7 +273,7 @@ export default function Updater(): null {
           dispatch(checkedTransaction({ hash, chainId: transactions[hash].chainId }));
         });
     });
-  }, [walletService.getAccount(), transactions, dispatch, getReceipt, checkIfTransactionExists, loadedAsSafeApp]);
+  }, [transactions, dispatch, getReceipt, checkIfTransactionExists, loadedAsSafeApp, activeWallet?.address]);
 
   useInterval(transactionChecker, 1000);
 

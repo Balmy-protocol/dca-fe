@@ -1,6 +1,5 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import findIndex from 'lodash/findIndex';
 import { DateTime } from 'luxon';
 import {
   Chip,
@@ -14,35 +13,22 @@ import {
   ErrorOutlineIcon,
   createStyles,
   Theme,
+  PersonOutlineIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
-import {
-  getTimeFrequencyLabel,
-  calculateStale,
-  STALE,
-  calculateYield,
-  sortTokensByAddress,
-} from '@common/utils/parsing';
+import { getTimeFrequencyLabel } from '@common/utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from '@types';
-import {
-  getGhTokenListLogoUrl,
-  NETWORKS,
-  STRING_SWAP_INTERVALS,
-  SWAP_INTERVALS_MAP,
-  TESTNETS,
-  VERSIONS_ALLOWED_MODIFY,
-} from '@constants';
-import useAvailablePairs from '@hooks/useAvailablePairs';
+import { getGhTokenListLogoUrl, NETWORKS, STRING_SWAP_INTERVALS, TESTNETS, VERSIONS_ALLOWED_MODIFY } from '@constants';
 import { withStyles } from 'tss-react/mui';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
 import useUsdPrice from '@hooks/useUsdPrice';
 import PositionControls from '../position-controls';
+import Address from '@common/components/address';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
@@ -202,17 +188,16 @@ const ActivePosition = ({
     from,
     to,
     swapInterval,
-    remainingLiquidity: remainingLiquidityRaw,
+    remainingLiquidity: totalRemainingLiquidity,
     remainingSwaps,
     rate,
-    depositedRateUnderlying,
     totalSwaps,
     pendingTransaction,
-    toWithdraw: rawToWithdraw,
-    toWithdrawUnderlying,
-    remainingLiquidityUnderlying,
-    toWithdrawUnderlyingAccum,
+    toWithdraw,
+    toWithdrawYield,
     chainId,
+    isStale,
+    remainingLiquidityYield: yieldFromGenerated,
   } = position;
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -221,30 +206,16 @@ const ActivePosition = ({
   }, [chainId]);
   const yieldOptions = yieldOptionsByChain[chainId];
 
-  const availablePairs = useAvailablePairs();
-
-  const rateToUse = depositedRateUnderlying || rate;
   const intl = useIntl();
 
-  const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
-  const toWithdrawYield =
-    toWithdrawUnderlyingAccum && toWithdrawUnderlying
-      ? toWithdrawUnderlying.sub(toWithdrawUnderlyingAccum)
-      : BigNumber.from(0);
-  const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
+  const toWithdrawBase = toWithdraw.sub(toWithdrawYield || BigNumber.from(0));
+  const remainingLiquidity = totalRemainingLiquidity.sub(yieldFromGenerated || BigNumber.from(0));
 
-  const { yieldGenerated: yieldFromGenerated, base: remainingLiquidity } = calculateYield(
-    remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw),
-    rateToUse,
-    remainingSwaps
-  );
-  const intervalIndex = findIndex(SWAP_INTERVALS_MAP, { value: swapInterval });
-
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase, undefined, chainId);
-  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield, undefined, chainId);
-  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rateToUse, undefined, chainId);
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity, undefined, chainId);
-  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(from, yieldFromGenerated, undefined, chainId);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase);
+  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield);
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rate);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, remainingLiquidity);
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(from, yieldFromGenerated);
 
   const showToPrice = !isLoadingToPrice && !!toPrice;
   const showToYieldPrice = !isLoadingToYieldPrice && !!toYieldPrice;
@@ -253,36 +224,8 @@ const ActivePosition = ({
   const showFromYieldPrice = !isLoadingFromYieldPrice && !!fromYieldPrice;
 
   const isPending = !!pendingTransaction;
-  const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
-
-  const pair = React.useMemo(() => {
-    if (!from || !to) return undefined;
-    const tokenA =
-      (from.underlyingTokens[0] && from.underlyingTokens[0].address) ||
-      (from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : from.address);
-    const tokenB =
-      (to.underlyingTokens[0] && to.underlyingTokens[0].address) ||
-      (to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : to.address);
-
-    const [pairToken0, pairToken1] = sortTokensByAddress(tokenA, tokenB);
-
-    return find(
-      availablePairs,
-      (currentPair) =>
-        currentPair.token0.address === pairToken0.toLocaleLowerCase() &&
-        currentPair.token1.address === pairToken1.toLocaleLowerCase()
-    );
-  }, [from, to, availablePairs]);
 
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
-
-  const isStale =
-    calculateStale(
-      swapInterval,
-      position.startedAt,
-      pair?.lastExecutedAt || position.pairLastSwappedAt || 0,
-      pair?.swapInfo
-    ) === STALE;
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
@@ -392,7 +335,7 @@ const ActivePosition = ({
                 {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
               </Typography>
             </CustomChip>
-            {yieldFromGenerated.gt(BigNumber.from(0)) && (
+            {yieldFromGenerated?.gt(BigNumber.from(0)) && (
               <>
                 +
                 <CustomChip
@@ -447,9 +390,7 @@ const ActivePosition = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">
-                {formatCurrencyAmount(BigNumber.from(rateToUse), position.from, 4)}
-              </Typography>
+              <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -492,7 +433,7 @@ const ActivePosition = ({
                 {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
               </Typography>
             </CustomChip>
-            {toWithdrawYield.gt(BigNumber.from(0)) && (
+            {toWithdrawYield?.gt(BigNumber.from(0)) && (
               <>
                 +
                 {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
@@ -519,27 +460,25 @@ const ActivePosition = ({
               </>
             )}
           </StyledDetailWrapper>
-          {remainingSwaps.gt(BigNumber.from(0)) && !!pair?.nextSwapAvailableAt[intervalIndex] && (
+          {remainingSwaps.gt(BigNumber.from(0)) && (
             <StyledDetailWrapper>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage description="positionDetailsNextSwapTitle" defaultMessage="Next swap: " />
               </Typography>
-              {DateTime.now().toSeconds() <
-                DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toSeconds() && (
+              {DateTime.now().toSeconds() < DateTime.fromSeconds(position.nextSwapAvailableAt).toSeconds() && (
                 <DarkTooltip
-                  title={DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toLocaleString(
+                  title={DateTime.fromSeconds(position.nextSwapAvailableAt).toLocaleString(
                     DateTime.DATETIME_FULL_WITH_SECONDS
                   )}
                   arrow
                   placement="top"
                 >
                   <Typography variant="body1">
-                    {DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toRelative()}
+                    {DateTime.fromSeconds(position.nextSwapAvailableAt).toRelative()}
                   </Typography>
                 </DarkTooltip>
               )}
-              {DateTime.now().toSeconds() >
-                DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toSeconds() && (
+              {DateTime.now().toSeconds() > DateTime.fromSeconds(position.nextSwapAvailableAt).toSeconds() && (
                 <DarkTooltip
                   title={
                     <FormattedMessage
@@ -567,6 +506,13 @@ const ActivePosition = ({
               </Typography>
             </StyledDetailWrapper>
           )}
+          <StyledDetailWrapper alignItems="flex-start" flex $spacing>
+            <CustomChip icon={<PersonOutlineIcon />}>
+              <Typography variant="body2" fontWeight={500}>
+                <Address address={position.user} trimAddress />
+              </Typography>
+            </CustomChip>
+          </StyledDetailWrapper>
           {(foundYieldFrom || foundYieldTo) && (
             <StyledDetailWrapper alignItems="flex-start" flex $spacing>
               {foundYieldFrom && (

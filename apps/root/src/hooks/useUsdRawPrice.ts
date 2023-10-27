@@ -12,7 +12,6 @@ import useAccount from './useAccount';
 function useRawUsdPrice(
   from: Token | undefined | null,
   date?: string,
-  chainId?: number,
   skip = false
 ): [BigNumber | undefined, boolean, string?] {
   const [{ result, isLoading, error }, setResults] = React.useState<{
@@ -34,7 +33,7 @@ function useRawUsdPrice(
     async function callPromise() {
       if (from) {
         try {
-          const price = await priceService.getUsdHistoricPrice([from], date, chainId);
+          const price = await priceService.getUsdHistoricPrice([from], date, from.chainId);
           if (price && price[from.address]) {
             setResults({ result: price[from.address], error: undefined, isLoading: false });
           } else {
@@ -54,7 +53,7 @@ function useRawUsdPrice(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, account, currentNetwork, chainId]);
+  }, [from, isLoading, result, error, account, currentNetwork]);
 
   return [result, isLoading, error];
 }

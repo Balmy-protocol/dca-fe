@@ -21,7 +21,7 @@ import useRawUsdPrices from '@hooks/useUsdRawPrices';
 import useSdkAllowances from '@hooks/useSdkAllowances';
 import usePastPositions from '@hooks/usePastPositions';
 import TerminatedAffectedPositions from '@pages/euler-claim/terminated-affected-positions';
-import { Permission } from '@types';
+import { DCAPermission } from '@mean-finance/sdk';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -43,7 +43,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const prevAccount = usePrevious(account);
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
-  const [balances, isLoadingBalances] = useSdkBalances(EULER_4626_TOKENS);
+  const [balances, isLoadingBalances] = useSdkBalances(EULER_4626_TOKENS, account);
   const [allowances, isLoadingAllowances] = useSdkAllowances(EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS.mainnet.chainId);
 
   React.useEffect(() => {
@@ -176,7 +176,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
             COMPANION_ADDRESS[position.version][position.chainId].toLowerCase()
         )[0];
 
-        return !companionPermissions || !companionPermissions.permissions.includes(Permission.TERMINATE);
+        return !companionPermissions || !companionPermissions.permissions.includes(DCAPermission.TERMINATE);
       }),
     [affectedPositions]
   );

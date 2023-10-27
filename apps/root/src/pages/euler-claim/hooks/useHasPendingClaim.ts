@@ -1,13 +1,10 @@
-import useWalletService from '@hooks/useWalletService';
 import { useMemo } from 'react';
 import { useAllTransactions } from '@state/transactions/hooks';
 import { Token, TransactionTypes } from '@types';
 
-const useHasPendingClaim = (token: Token | null) => {
+const useHasPendingClaim = (token: Token | null, spender: string) => {
   const allTransactions = useAllTransactions();
   const tokenAddress = (token && token.address) || '';
-  const walletService = useWalletService();
-  const spender = walletService.getAccount();
 
   return useMemo(
     () =>

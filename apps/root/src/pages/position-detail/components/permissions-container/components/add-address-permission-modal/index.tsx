@@ -15,10 +15,10 @@ import {
   createStyles,
 } from 'ui-library';
 import { useAppDispatch } from '@hooks/state';
-import { Permission } from '@types';
 import { addOperator } from '@state/position-permissions/actions';
 import { STRING_PERMISSIONS } from '@constants';
 import { withStyles } from 'tss-react/mui';
+import { DCAPermission } from '@mean-finance/sdk';
 
 const StyledGrid = styled(Grid)`
   display: flex;
@@ -71,11 +71,12 @@ interface AddAddressPermissionModalProps {
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 const validRegex = RegExp(/^0x[A-Fa-f0-9]*$/);
 
-const hasPermission = (permissions: Permission[], permission: Permission) => permissions.indexOf(permission) !== -1;
+const hasPermission = (permissions: DCAPermission[], permission: DCAPermission) =>
+  permissions.indexOf(permission) !== -1;
 
 const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModalProps) => {
   const [toAddresses, setToAddresses] = React.useState(['']);
-  const [permissions, setPermissions] = React.useState<Permission[]>([]);
+  const [permissions, setPermissions] = React.useState<DCAPermission[]>([]);
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
@@ -113,7 +114,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
     setToAddresses(newAddressess);
   };
 
-  const handlePermissionChange = (permission: Permission, newValue: boolean) => {
+  const handlePermissionChange = (permission: DCAPermission, newValue: boolean) => {
     if (newValue) {
       setPermissions([...permissions, permission]);
     } else {
@@ -195,7 +196,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
         <FormControl component="fieldset">
           <FormGroup>
             <Grid container>
-              {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: Permission) => (
+              {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: DCAPermission) => (
                 <StyledGrid item xs={12} sm={6} key={stringPermissionKey}>
                   <FormControlLabel
                     control={

@@ -83,7 +83,9 @@ export default class AggregatorService {
   }
 
   async approveAndSwapSafe(route: SwapOptionWithTx) {
+    const account = route.tx.from;
     const approveTx = await this.walletService.buildApproveSpecificTokenTx(
+      account,
       route.sellToken,
       route.swapper.allowanceTarget,
       BigNumber.from(route.sellAmount.amount)
@@ -107,7 +109,7 @@ export default class AggregatorService {
     usePermit2 = false,
     sourceTimeout = TimeoutKey.patient
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork(takerAddress);
 
     const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
     let shouldValidate = !buyAmount && isOnNetwork;
@@ -125,7 +127,7 @@ export default class AggregatorService {
 
       if (shouldValidate) {
         // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance(from.address);
+        const balance = await this.walletService.getBalance(takerAddress, from.address);
 
         if (balance.lt(sellAmount)) {
           shouldValidate = false;
@@ -212,7 +214,7 @@ export default class AggregatorService {
     chainId?: number,
     usePermit2?: boolean
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
+    const currentNetwork = await this.providerService.getNetwork(takerAddress);
 
     const isBuyOrder = quote.type === 'buy';
 
@@ -231,7 +233,7 @@ export default class AggregatorService {
 
       if (shouldValidate) {
         // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance(quote.sellToken.address);
+        const balance = await this.walletService.getBalance(takerAddress, quote.sellToken.address);
 
         if (balance.lt(quote.sellAmount.amount)) {
           shouldValidate = false;

@@ -186,7 +186,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         //   fill = 'rgba(255, 255, 255, 0.5)';
         // }
 
-        const remainingLiquidity = position.remainingLiquidityUnderlying || position.remainingLiquidity;
+        const remainingLiquidity = position.remainingLiquidity;
 
         if (position.remainingLiquidity.gt(BigNumber.from(0))) {
           if (!newAcc[position.from.symbol]) {
@@ -211,7 +211,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
           }
         }
 
-        const toWithdraw = position.toWithdrawUnderlying || position.toWithdraw;
+        const toWithdraw = position.toWithdraw;
 
         if (position.toWithdraw.gt(BigNumber.from(0))) {
           if (!newAcc[position.to.symbol]) {

@@ -112,7 +112,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
 
   const handleChangeNetwork = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(campaign.chainId, () => {
+    walletService.changeNetwork(campaign.chainId, activeWallet?.address, () => {
       const networkToSet = find(NETWORKS, { chainId: campaign.chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
       if (networkToSet) {
@@ -158,7 +158,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
         trackEvent('Campaigns - Claim optimism campaign error');
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error claiming optimism campaign position', JSON.stringify(e), {
-          account: walletService.getAccount(),
+          account: activeWallet.address,
         });
       }
       setModalError({

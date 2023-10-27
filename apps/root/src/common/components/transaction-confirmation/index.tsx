@@ -217,7 +217,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
         transactionReceipt?.type === TransactionTypes.swap
       ) {
         walletService
-          .getBalance(PROTOCOL_TOKEN_ADDRESS, transactionReceipt?.typeData.transferTo || undefined)
+          .getBalance(PROTOCOL_TOKEN_ADDRESS, transactionReceipt?.typeData.transferTo || transactionReceipt.from)
           .then((newBalance) => setBalanceAfter(newBalance))
           .catch((e) => console.error('Error fetching balance after swap', e));
       }
@@ -256,7 +256,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
             effectiveGasPrice: BigNumber.from(transactionReceipt.receipt.effectiveGasPrice),
           },
           from.address || '',
-          { from: { address: walletService.getAccount() } }
+          { from: { address: transactionReceipt.from } }
         )[0] || null;
     } else if (balanceAfter && balanceBefore) {
       sentFrom = BigNumber.from(balanceBefore).sub(balanceAfter.add(gasUsed));
@@ -271,7 +271,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
             effectiveGasPrice: BigNumber.from(transactionReceipt.receipt.effectiveGasPrice),
           },
           to.address || '',
-          { to: { address: transferTo || walletService.getAccount() } }
+          { to: { address: transferTo || transactionReceipt.from } }
         )[0] || null;
     } else if (balanceAfter && balanceBefore) {
       gotTo = balanceAfter.sub(BigNumber.from(balanceBefore)).add(gasUsed);

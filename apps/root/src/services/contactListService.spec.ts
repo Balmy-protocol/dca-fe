@@ -54,6 +54,8 @@ describe('ContactList Service', () => {
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
       meanApiService.postContacts.mockRejectedValueOnce(new Error('Mocked Error'));
+      // disable console.error for this test
+      jest.spyOn(console, 'error').mockImplementation(() => {});
       await contactListService.addContact(contactMock);
 
       expect(meanApiService.postContacts).toHaveBeenCalledWith([contactMock], userMock.id);
@@ -83,6 +85,8 @@ describe('ContactList Service', () => {
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
       meanApiService.deleteContact.mockRejectedValueOnce(new Error('Mocked Error'));
+      // disable console.error for this test
+      jest.spyOn(console, 'error').mockImplementation(() => {});
       await contactListService.removeContact(contactMock);
 
       expect(meanApiService.deleteContact).toHaveBeenCalledTimes(1);
@@ -129,6 +133,8 @@ describe('ContactList Service', () => {
       );
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
+      // disable console.error for this test
+      jest.spyOn(console, 'error').mockImplementation(() => {});
       meanApiService.putAccountLabel.mockRejectedValueOnce(new Error('Mocked Error'));
       await contactListService.editContact(updatedContactMock);
 

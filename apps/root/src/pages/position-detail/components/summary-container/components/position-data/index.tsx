@@ -13,6 +13,7 @@ import {
   ArrowRightAltIcon,
   createStyles,
   Theme,
+  PersonOutlineIcon,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
@@ -20,15 +21,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
-import {
-  activePositionsPerIntervalToHasToExecute,
-  calculateNextSwapAvailableAt,
-  calculateStale,
-  calculateYield,
-  fullPositionToMappedPosition,
-  getTimeFrequencyLabel,
-  STALE,
-} from '@common/utils/parsing';
+import { fullPositionToMappedPosition, getTimeFrequencyLabel } from '@common/utils/parsing';
 import {
   NETWORKS,
   POSITION_ACTIONS,
@@ -49,6 +42,7 @@ import { updateShowBreakdown } from '@state/position-details/actions';
 import { formatUnits } from '@ethersproject/units';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import PositionDataControls from './position-data-controls';
+import Address from '@common/components/address';
 
 const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
@@ -64,7 +58,6 @@ interface DetailsProps {
   onSuggestMigrateYield: () => void;
   pendingTransaction: string | null;
   onReusePosition: () => void;
-  disabled: boolean;
   yieldOptions: YieldOptions;
   toWithdrawUnderlying?: BigNumber | null;
   remainingLiquidityUnderlying?: BigNumber | null;
@@ -194,7 +187,6 @@ const Details = ({
   pair,
   pendingTransaction,
   onReusePosition,
-  disabled,
   yieldOptions,
   toWithdrawUnderlying,
   remainingLiquidityUnderlying,
@@ -203,14 +195,7 @@ const Details = ({
   onSuggestMigrateYield,
   totalGasSaved,
 }: DetailsProps) => {
-  const {
-    from,
-    to,
-    swapInterval,
-    remainingLiquidity: remainingLiquidityRaw,
-    chainId,
-    totalWithdrawnUnderlying,
-  } = position;
+  const { from, to, swapInterval, chainId } = position;
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -219,41 +204,29 @@ const Details = ({
   }, [chainId]);
 
   const {
-    toWithdraw: rawToWithdraw,
-    depositedRateUnderlying,
-    rate: positionRate,
+    toWithdraw,
+    remainingLiquidity: totalRemainingLiquidity,
+    rate,
     remainingSwaps,
     totalSwaps,
-    totalSwappedUnderlyingAccum,
-    toWithdrawUnderlyingAccum,
-    swapped: rawSwapped,
-  } = fullPositionToMappedPosition(position);
-  const rate = depositedRateUnderlying || positionRate;
+    toWithdrawYield,
+    swappedYield,
+    remainingLiquidityYield: yieldFromGenerated,
+    swapped,
+    isStale,
+    nextSwapAvailableAt,
+  } = fullPositionToMappedPosition(
+    position,
+    pair,
+    remainingLiquidityUnderlying,
+    toWithdrawUnderlying,
+    swappedUnderlying
+  );
   const showBreakdown = useShowBreakdown();
   const dispatch = useAppDispatch();
-  const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
-  const toWithdrawYield =
-    toWithdrawUnderlyingAccum && toWithdrawUnderlying
-      ? toWithdrawUnderlying.sub(toWithdrawUnderlyingAccum)
-      : BigNumber.from(0);
-  const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
-
-  const swapped =
-    (totalWithdrawnUnderlying &&
-      toWithdrawUnderlying &&
-      BigNumber.from(totalWithdrawnUnderlying).add(BigNumber.from(toWithdrawUnderlying))) ||
-    rawSwapped;
-  const swappedYield =
-    totalSwappedUnderlyingAccum && totalWithdrawnUnderlying
-      ? swapped.sub(totalSwappedUnderlyingAccum)
-      : BigNumber.from(0);
-  const swappedBase = swapped.sub(swappedYield);
-
-  const {
-    total: totalRemainingLiquidity,
-    yieldGenerated: yieldFromGenerated,
-    base: remainingLiquidity,
-  } = calculateYield(remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw), rate, remainingSwaps);
+  const toWithdrawBase = toWithdraw.sub(toWithdrawYield || BigNumber.from(0));
+  const swappedBase = swapped.sub(swappedYield || BigNumber.from(0));
+  const remainingLiquidity = totalRemainingLiquidity.sub(yieldFromGenerated || BigNumber.from(0));
 
   const isPending = pendingTransaction !== null;
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
@@ -288,23 +261,13 @@ const Details = ({
     ? summedPrices.div(swappedActions.length)
     : BigNumber.from(0);
 
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
-    position.from,
-    BigNumber.from(remainingLiquidity),
-    undefined,
-    chainId
-  );
-  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
-    position.from,
-    BigNumber.from(yieldFromGenerated),
-    undefined,
-    chainId
-  );
-  const [ratePrice, isLoadingRatePrice] = useUsdPrice(position.from, rate, undefined, chainId);
-  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase, undefined, chainId);
-  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield, undefined, chainId);
-  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase, undefined, chainId);
-  const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield, undefined, chainId);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigNumber.from(remainingLiquidity));
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(position.from, BigNumber.from(yieldFromGenerated));
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(position.from, rate);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase);
+  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield);
+  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase);
+  const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield);
   const showToFullPrice = !isLoadingToFullPrice && !!toFullPrice;
   const showToYieldFullPrice = !isLoadingToYieldFullPrice && !!toYieldFullPrice;
   const showToPrice = !isLoadingToPrice && !!toPrice;
@@ -315,39 +278,19 @@ const Details = ({
 
   const hasNoFunds = BigNumber.from(remainingLiquidity).lte(BigNumber.from(0));
 
-  const lastExecutedAt = (pair?.swaps && pair?.swaps[0] && pair?.swaps[0].executedAtTimestamp) || '0';
-
-  const isStale =
-    calculateStale(
-      BigNumber.from(position.swapInterval.interval),
-      parseInt(position.createdAtTimestamp, 10) || 0,
-      parseInt(lastExecutedAt, 10) || 0,
-      pair?.activePositionsPerInterval
-        ? activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval)
-        : null
-    ) === STALE;
-
   const foundYieldFrom =
     position.from.underlyingTokens[0] &&
     find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
   const foundYieldTo =
     position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
-  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdrawUnderlying || toWithdrawBase;
-  const swappedToShow = showBreakdown ? swappedBase : swappedUnderlying || swappedBase;
+  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdraw;
+  const swappedToShow = showBreakdown ? swappedBase : swapped;
   const remainingLiquidityToShow = showBreakdown ? remainingLiquidity : totalRemainingLiquidity;
 
   const executedSwaps = totalSwaps.toNumber() - remainingSwaps.toNumber();
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
-
-  const nextSwapAvailableAt = calculateNextSwapAvailableAt(
-    BigNumber.from(position.swapInterval.interval),
-    pair?.activePositionsPerInterval
-      ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
-      : [false, false, false, false, false, false, false, false],
-    pair?.lastSwappedAt || [0, 0, 0, 0, 0, 0, 0, 0]
-  );
 
   const isTestnet = TESTNETS.includes(positionNetwork.chainId);
 
@@ -605,7 +548,7 @@ const Details = ({
                 {formatCurrencyAmount(BigNumber.from(swappedToShow), position.to, 4)}
               </Typography>
             </CustomChip>
-            {swappedYield.gt(BigNumber.from(0)) && showBreakdown && (
+            {swappedYield?.gt(BigNumber.from(0)) && showBreakdown && (
               <>
                 +
                 {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
@@ -683,7 +626,7 @@ const Details = ({
                   {formatCurrencyAmount(BigNumber.from(remainingLiquidityToShow), position.from, 4)}
                 </Typography>
               </CustomChip>
-              {yieldFromGenerated.gt(BigNumber.from(0)) && showBreakdown && (
+              {yieldFromGenerated?.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
@@ -721,7 +664,7 @@ const Details = ({
                   {formatCurrencyAmount(BigNumber.from(toWithdrawToShow), position.to, 4)}
                 </Typography>
               </CustomChip>
-              {toWithdrawYield.gt(BigNumber.from(0)) && showBreakdown && (
+              {toWithdrawYield?.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
@@ -744,6 +687,16 @@ const Details = ({
               )}
             </StyledDetailWrapper>
           )}
+          <StyledDetailWrapper>
+            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <FormattedMessage description="positionDetailsOwner" defaultMessage="Owner:" />
+            </Typography>
+            <CustomChip icon={<PersonOutlineIcon />}>
+              <Typography variant="body2" fontWeight={500}>
+                <Address address={position.user} trimAddress />
+              </Typography>
+            </CustomChip>
+          </StyledDetailWrapper>
           {(foundYieldFrom || foundYieldTo) && (
             <StyledDetailWrapper>
               <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
@@ -805,7 +758,6 @@ const Details = ({
         </StyledContentContainer>
         <PositionDataControls
           onReusePosition={onReusePosition}
-          disabled={disabled}
           position={position}
           yieldOptions={yieldOptions}
           pendingTransaction={pendingTransaction}

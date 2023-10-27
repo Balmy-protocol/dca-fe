@@ -2,7 +2,8 @@
 import { createMockInstance } from '@common/utils/tests';
 import AccountService from './accountService';
 import Web3Service from './web3Service';
-import { UserType, Wallet, WalletType } from '@types';
+import { UserType, Wallet, WalletStatus, WalletType } from '@types';
+import { Web3Provider } from '@ethersproject/providers';
 
 jest.mock('./web3Service');
 const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
@@ -10,32 +11,44 @@ const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
 describe('Position Service', () => {
   let web3Service: jest.MockedObject<Web3Service>;
   let accountService: AccountService;
-  let activeWallet;
+  let activeWallet: Wallet;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  let activeWalletProvider;
+  let activeWalletProvider: Web3Provider;
+  let getActiveWalletProvider;
 
   beforeEach(() => {
     web3Service = createMockInstance(MockedWeb3Service);
 
     accountService = new AccountService(web3Service);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    activeWalletProvider = jest.fn().mockResolvedValue({
+    activeWalletProvider = {
       getNetwork: jest.fn(),
       getSigner: jest.fn().mockResolvedValue('active signer'),
-    });
+    } as unknown as Web3Provider;
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    getActiveWalletProvider = jest.fn().mockResolvedValue(activeWalletProvider);
 
     activeWallet = {
       type: WalletType.embedded,
       address: '0x123',
       label: 'Embedded Wallet',
-      getProvider: activeWalletProvider,
+      getProvider: getActiveWalletProvider,
+      status: WalletStatus.connected,
+      switchChain: jest.fn(),
+      providerInfo: {
+        id: 'privy',
+        type: 'privy',
+        check: 'false',
+        name: 'privy',
+        logo: '',
+      },
     };
 
     accountService.user = {
       id: 'privy-123',
-      wallets: [activeWallet as unknown as Wallet],
+      wallets: [activeWallet],
       type: UserType.privy,
       privyUser: {
         id: 'privy-123',
@@ -44,7 +57,7 @@ describe('Position Service', () => {
       },
     };
 
-    accountService.activeWallet = activeWallet as unknown as Wallet;
+    accountService.activeWallet = activeWallet;
   });
 
   afterEach(() => {
@@ -57,7 +70,7 @@ describe('Position Service', () => {
       await accountService.setActiveWallet('0x123');
 
       expect(web3Service.connect).toHaveBeenCalledTimes(1);
-      expect(web3Service.connect).toHaveBeenCalledWith('provider', undefined, undefined, true);
+      expect(web3Service.connect).toHaveBeenCalledWith(activeWalletProvider, undefined, undefined);
     });
   });
 
@@ -74,10 +87,7 @@ describe('Position Service', () => {
     describe('when there is an active wallet', () => {
       it('should return the activeWalletProvider', async () => {
         const provider = await accountService.getActiveWalletProvider();
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        expect(provider).toEqual(activeWalletProvider);
+        expect(JSON.stringify(provider)).toEqual(JSON.stringify(activeWalletProvider));
       });
     });
   });
@@ -94,9 +104,9 @@ describe('Position Service', () => {
 
     describe('when there is an active wallet', () => {
       it('should return the activeWalletProvider', async () => {
-        const provider = await accountService.getActiveWalletProvider();
+        const provider = await accountService.getActiveWalletSigner();
 
-        expect(provider).toEqual('signer');
+        expect(provider).toEqual('active signer');
       });
     });
   });

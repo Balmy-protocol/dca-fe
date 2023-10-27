@@ -1,10 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
-import { setupCache, setup } from 'axios-cache-adapter';
-import axios from 'axios';
 import { SupportedLanguages } from '@constants/lang';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
-
+import { axiosClient } from './axios';
 import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
@@ -69,28 +67,6 @@ function checkStorageValidity() {
 }
 
 checkStorageValidity();
-
-// this should not be here
-// Create `axios-cache-adapter` instance
-const cache = setupCache({
-  maxAge: 15 * 60 * 1000,
-});
-
-// Create `axios` instance passing the newly created `cache.adapter`
-export const axiosClient = axios.create({
-  adapter: cache.adapter,
-});
-
-export const setupAxiosClient = () =>
-  setup({
-    cache: {
-      maxAge: 15 * 60 * 1000,
-      exclude: {
-        query: false,
-        methods: ['put', 'patch', 'delete'],
-      },
-    },
-  });
 
 const PERSISTED_STATES: string[] = [
   'transactions',

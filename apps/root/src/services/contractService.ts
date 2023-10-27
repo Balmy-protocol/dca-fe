@@ -62,52 +62,37 @@ export default class ContractService {
   }
 
   // ADDRESSES
-  async getHUBAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return HUB_ADDRESS[version || LATEST_VERSION][network.chainId] || HUB_ADDRESS[LATEST_VERSION][network.chainId];
+  getHUBAddress(chainId: number, version?: PositionVersions): string {
+    return HUB_ADDRESS[version || LATEST_VERSION][chainId] || HUB_ADDRESS[LATEST_VERSION][chainId];
   }
 
-  async getPermissionManagerAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
+  getPermissionManagerAddress(chainId: number, version?: PositionVersions): string {
     return (
-      PERMISSION_MANAGER_ADDRESS[version || LATEST_VERSION][network.chainId] ||
-      PERMISSION_MANAGER_ADDRESS[LATEST_VERSION][network.chainId]
+      PERMISSION_MANAGER_ADDRESS[version || LATEST_VERSION][chainId] ||
+      PERMISSION_MANAGER_ADDRESS[LATEST_VERSION][chainId]
     );
   }
 
-  async getHUBCompanionAddress(version?: PositionVersions): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return (
-      COMPANION_ADDRESS[version || LATEST_VERSION][network.chainId] ||
-      COMPANION_ADDRESS[LATEST_VERSION][network.chainId]
-    );
+  getHUBCompanionAddress(chainId: number, version?: PositionVersions): string {
+    return COMPANION_ADDRESS[version || LATEST_VERSION][chainId] || COMPANION_ADDRESS[LATEST_VERSION][chainId];
   }
 
-  async getMeanPermit2Address(): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return MEAN_PERMIT_2_ADDRESS[network.chainId];
+  getMeanPermit2Address(chainId: number): string {
+    return MEAN_PERMIT_2_ADDRESS[chainId];
   }
 
-  async getPermit2Address(): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return PERMIT_2_ADDRESS[network.chainId];
+  getPermit2Address(chainId: number): string {
+    return PERMIT_2_ADDRESS[chainId];
   }
 
-  async getSmolDomainAddress(): Promise<string> {
-    const network = await this.providerService.getNetwork();
-
-    return SMOL_DOMAIN_ADDRESS[network.chainId];
+  getSmolDomainAddress(chainId: number): string {
+    return SMOL_DOMAIN_ADDRESS[chainId];
   }
 
   // CONTRACTS
-  async getHubInstance(version?: PositionVersions): Promise<HubContract> {
-    const hubAddress = await this.getHUBAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getSigner();
+  async getHubInstance(chainId: number, wallet: string, version?: PositionVersions): Promise<HubContract> {
+    const hubAddress = this.getHUBAddress(chainId, version || LATEST_VERSION);
+    const provider = await this.providerService.getSigner(wallet, chainId);
 
     const hub = DCAHub__factory.connect(hubAddress, provider as Signer);
 
@@ -121,54 +106,54 @@ export default class ContractService {
     return hub as unknown as HubContract;
   }
 
-  async getPermissionManagerInstance(version?: PositionVersions) {
-    const permissionManagerAddress = await this.getPermissionManagerAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getSigner();
+  async getPermissionManagerInstance(chainId: number, wallet: string, version?: PositionVersions) {
+    const permissionManagerAddress = this.getPermissionManagerAddress(chainId, version || LATEST_VERSION);
+    const provider = await this.providerService.getSigner(wallet, chainId);
 
     return DCAPermissionsManager__factory.connect(permissionManagerAddress, provider);
   }
 
-  async getHUBCompanionInstance(version?: PositionVersions) {
-    const hubCompanionAddress = await this.getHUBCompanionAddress(version || LATEST_VERSION);
-    const provider = await this.providerService.getSigner();
+  async getHUBCompanionInstance(chainId: number, wallet: string, version?: PositionVersions) {
+    const hubCompanionAddress = this.getHUBCompanionAddress(chainId, version || LATEST_VERSION);
+    const provider = await this.providerService.getSigner(wallet, chainId);
 
     return DCAHubCompanion__factory.connect(hubCompanionAddress, provider);
   }
 
-  async getOEGasOracleInstance(): Promise<OEGasOracle> {
+  async getOEGasOracleInstance(chainId: number, wallet: string): Promise<OEGasOracle> {
     let provider;
 
     if (!this.client || !this.signer || this.network.chainId !== NETWORKS.optimism.chainId) {
       provider = new AlchemyProvider('optimism', 'rMtUNxulZtkQesuF2x8XwydCS_SfsF5U');
     } else {
-      provider = await this.providerService.getSigner();
+      provider = await this.providerService.getSigner(wallet, chainId);
     }
     return new ethers.Contract(OE_GAS_ORACLE_ADDRESS, OE_GAS_ORACLE_ABI.abi, provider) as unknown as OEGasOracle;
   }
 
-  async getTokenInstance(tokenAddress: string): Promise<ERC20Contract> {
-    const provider = await this.providerService.getSigner();
+  async getTokenInstance(chainId: number, tokenAddress: string, wallet: string): Promise<ERC20Contract> {
+    const provider = await this.providerService.getSigner(wallet, chainId);
 
     return new ethers.Contract(tokenAddress, ERC20ABI, provider) as unknown as ERC20Contract;
   }
 
-  async getPermit2Instance(): Promise<Permit2Contract> {
-    const provider = await this.providerService.getSigner();
-    const permit2Address = await this.getPermit2Address();
+  async getPermit2Instance(chainId: number, wallet: string): Promise<Permit2Contract> {
+    const provider = await this.providerService.getSigner(wallet, chainId);
+    const permit2Address = this.getPermit2Address(chainId);
 
     return new ethers.Contract(permit2Address, PERMIT2ABI, provider) as unknown as Permit2Contract;
   }
 
-  async getMeanPermit2Instance(): Promise<MeanPermit2Contract> {
-    const provider = await this.providerService.getSigner();
-    const meanPermit2Address = await this.getMeanPermit2Address();
+  async getMeanPermit2Instance(chainId: number, wallet: string): Promise<MeanPermit2Contract> {
+    const provider = await this.providerService.getSigner(wallet, chainId);
+    const meanPermit2Address = this.getMeanPermit2Address(chainId);
 
     return new ethers.Contract(meanPermit2Address, MEANPERMIT2ABI, provider) as unknown as MeanPermit2Contract;
   }
 
-  async getSmolDomainInstance(): Promise<SmolDomainContract> {
-    const provider = await this.providerService.getSigner();
-    const smolDomainAddress = await this.getSmolDomainAddress();
+  async getSmolDomainInstance(chainId: number, wallet: string): Promise<SmolDomainContract> {
+    const provider = await this.providerService.getSigner(wallet, chainId);
+    const smolDomainAddress = this.getSmolDomainAddress(chainId);
 
     return new ethers.Contract(smolDomainAddress, SMOL_DOMAIN_ABI, provider) as unknown as SmolDomainContract;
   }

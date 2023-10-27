@@ -1,4 +1,4 @@
-import { Log, TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcSigner, Log, TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
 import { ModuleMocker } from 'jest-mock';
 import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
 import { HubContract } from '@types';
@@ -154,14 +154,17 @@ describe('Transaction Service', () => {
 
   describe('parseLog', () => {
     beforeEach(() => {
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
       contractService.getHubInstance.mockResolvedValue({
         interface: { parseLog: jest.fn().mockReturnValue({ name: 'hubLog' }) },
       } as unknown as HubContract);
       contractService.getHUBCompanionInstance.mockResolvedValue({
         interface: { parseLog: jest.fn().mockReturnValue({ name: 'companionLog' }) },
       } as unknown as DCAHubCompanion);
+      providerService.getSigner.mockResolvedValue({
+        getAddress: jest.fn().mockResolvedValue('account'),
+      } as unknown as JsonRpcSigner);
     });
 
     it('should return the hub parsed log', async () => {
@@ -169,7 +172,12 @@ describe('Transaction Service', () => {
         address: 'hubAddress',
       } as Log;
 
-      const result = await transactionService.parseLog([hubLog], 1, 'hubLog');
+      const result = await transactionService.parseLog({
+        logs: [hubLog],
+        chainId: 1,
+        eventToSearch: 'hubLog',
+        ownerAddress: 'account',
+      });
 
       expect(result).toEqual({ name: 'hubLog' });
     });
@@ -179,7 +187,12 @@ describe('Transaction Service', () => {
         address: 'companionAddress',
       } as Log;
 
-      const result = await transactionService.parseLog([companionLog], 1, 'companionLog');
+      const result = await transactionService.parseLog({
+        logs: [companionLog],
+        chainId: 1,
+        eventToSearch: 'companionLog',
+        ownerAddress: 'account',
+      });
 
       expect(result).toEqual({ name: 'companionLog' });
     });
@@ -189,7 +202,12 @@ describe('Transaction Service', () => {
         address: 'anotherAddress',
       } as Log;
 
-      const result = await transactionService.parseLog([companionLog], 1, 'companionLog');
+      const result = await transactionService.parseLog({
+        logs: [companionLog],
+        chainId: 1,
+        eventToSearch: 'companionLog',
+        ownerAddress: 'account',
+      });
 
       expect(result).toEqual(undefined);
     });
@@ -209,7 +227,12 @@ describe('Transaction Service', () => {
         interface: { parseLog: jest.fn().mockReturnValue({ name: 'event', from: 'companion' }) },
       } as unknown as DCAHubCompanion);
 
-      const result = await transactionService.parseLog([hubLog, companionLog], 1, 'event');
+      const result = await transactionService.parseLog({
+        logs: [hubLog, companionLog],
+        chainId: 1,
+        eventToSearch: 'event',
+        ownerAddress: 'account',
+      });
 
       expect(result).toEqual({ name: 'event', from: 'hub' });
     });
@@ -233,7 +256,12 @@ describe('Transaction Service', () => {
         },
       } as unknown as DCAHubCompanion);
 
-      const result = await transactionService.parseLog([hubLog, companionLog], 1, 'event');
+      const result = await transactionService.parseLog({
+        logs: [hubLog, companionLog],
+        chainId: 1,
+        eventToSearch: 'event',
+        ownerAddress: 'account',
+      });
 
       expect(result).toEqual({ name: 'event', from: 'hub' });
     });

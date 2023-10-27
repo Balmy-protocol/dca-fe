@@ -1,6 +1,7 @@
-import { ConnectedWallet, User as BasePrivyUser } from '@privy-io/react-auth';
+import { ConnectedWallet as PrivyConnectedWallet, User as BasePrivyUser } from '@privy-io/react-auth';
 import { Provider, Web3Provider } from '@ethersproject/providers';
 import { Signer } from 'ethers';
+import { IProviderInfo } from '@common/utils/provider-info/types';
 import { ContactList } from './contactList';
 import { AccountLabels } from './accountLabels';
 
@@ -9,13 +10,32 @@ export enum WalletType {
   external = 'external',
 }
 
-export type Wallet = {
+export enum WalletStatus {
+  connected = 'connected',
+  disconnected = 'disconnected',
+}
+
+type BaseWallet = {
   type: WalletType;
+  // status: WalletStatus;
   address: string;
   label?: string;
-  getProvider(): Promise<Web3Provider>;
-  getSigner?(): Signer;
 };
+
+type UnconnectedWallet = BaseWallet & {
+  getProvider(): undefined;
+  providerInfo: undefined;
+  status: WalletStatus.disconnected;
+};
+
+type ConnectedWallet = BaseWallet & {
+  getProvider(): Promise<Web3Provider>;
+  providerInfo: IProviderInfo;
+  status: WalletStatus.connected;
+  switchChain(chainId: number): Promise<void>;
+};
+
+export type Wallet = UnconnectedWallet | ConnectedWallet;
 
 export enum UserType {
   privy = 'privy',
@@ -46,7 +66,7 @@ export type IAccountService = {
   getActiveWallet(): Wallet | undefined;
   getWalletProvider(wallet: string): Promise<Provider>;
   getWalletSigner(wallet: string): Promise<Signer>;
-  setUser(user: BasePrivyUser, wallets: ConnectedWallet[]): void;
+  setUser(user: BasePrivyUser, wallets: PrivyConnectedWallet[]): void;
 };
 
 export interface AccountLabelsAndContactList {

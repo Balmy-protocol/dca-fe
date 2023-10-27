@@ -32,12 +32,12 @@ export default class Permit2Service {
 
   async getPermit2SignedData(address: string, token: Token, amount: BigNumber, wordIndex?: number) {
     const signer = await this.providerService.getSigner(address);
-    const network = await this.providerService.getNetwork();
+    const network = await this.providerService.getNetwork(address);
 
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId: network.chainId,
-      signerAddress: this.walletService.getAccount(),
+      signerAddress: address,
       token: token.address,
       amount: amount.toBigInt(),
       signatureValidFor: '1d',
@@ -72,14 +72,13 @@ export default class Permit2Service {
     };
   }
 
-  async getPermit2DcaSignedData(address: string, token: Token, amount: BigNumber, wordIndex?: number) {
+  async getPermit2DcaSignedData(address: string, chainId: number, token: Token, amount: BigNumber, wordIndex?: number) {
     const signer = await this.providerService.getSigner(address);
-    const network = await this.providerService.getNetwork();
 
     const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
-      chainId: network.chainId,
-      signerAddress: this.walletService.getAccount(),
+      chainId,
+      signerAddress: address,
       token: token.address,
       amount: amount.toBigInt(),
       signatureValidFor: '1d',

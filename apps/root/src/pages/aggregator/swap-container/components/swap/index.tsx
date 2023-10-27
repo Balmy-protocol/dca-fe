@@ -134,7 +134,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
-  const [balance, , balanceErrors] = useBalance(from);
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const [shouldShowBetterQuoteModal, setShouldShowBetterQuoteModal] = React.useState(false);
   const [shouldShowFailedQuotesModal, setShouldShowFailedQuotesModal] = React.useState(false);
@@ -149,10 +148,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const replaceHistory = useReplaceHistory();
   const permit2Service = usePermit2Service();
   const activeWallet = useActiveWallet();
+  const [balance, , balanceErrors] = useBalance(from, activeWallet?.address);
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(
     from,
+    activeWallet?.address || '',
     isPermit2Enabled
       ? PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId]
       : selectedRoute?.swapper.allowanceTarget
@@ -199,7 +200,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   const handleApproveToken = React.useCallback(
     async (amount?: BigNumber) => {
-      if (!from || !to || !selectedRoute) return;
+      if (!from || !to || !selectedRoute || !activeWallet?.address) return;
       const fromSymbol = from.symbol;
 
       try {
@@ -225,7 +226,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           ? PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId]
           : selectedRoute.swapper.allowanceTarget;
 
-        const result = await walletService.approveSpecificToken(from, addressToApprove, amount);
+        const result = await walletService.approveSpecificToken(from, addressToApprove, activeWallet.address, amount);
         trackEvent('Aggregator - Approve token submitted', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
@@ -358,7 +359,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       let balanceBefore: BigNumber | null = null;
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
-        balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS, selectedRoute.transferTo || undefined);
+        balanceBefore = await walletService.getBalance(
+          selectedRoute.transferTo || activeWallet?.address,
+          PROTOCOL_TOKEN_ADDRESS
+        );
       }
 
       trackEvent('Aggregator - Swap submitting', {
@@ -520,7 +524,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       let balanceBefore: BigNumber | null = null;
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
-        balanceBefore = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS);
+        balanceBefore = await walletService.getBalance(activeWallet?.address, PROTOCOL_TOKEN_ADDRESS);
       }
 
       trackEvent('Aggregator - Safe swap submitting', {
@@ -1199,6 +1203,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           onChange={tokenPickerOnChange}
           isLoadingYieldOptions={false}
           onAddToken={addCustomTokenToList}
+          account={activeWallet?.address}
         />
         <StyledGrid container rowSpacing={2}>
           <Grid item xs={12}>

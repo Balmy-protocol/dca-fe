@@ -55,11 +55,10 @@ export default class PriceService {
 
   // TOKEN METHODS
   async getUsdHistoricPrice(tokens: Token[], date?: string, chainId?: number) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
     if (!tokens.length) {
       return {};
     }
+    const chainIdToUse = chainId || tokens[0].chainId;
     const mappedTokens = tokens.map((token) => ({
       ...token,
       fetchingAddress: getTokenAddressForPriceFetching(token.chainId, token.address),
@@ -94,10 +93,8 @@ export default class PriceService {
     return tokensPrices;
   }
 
-  async getProtocolHistoricPrices(dates: string[], chainId?: number) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
-    const defillamaId = DEFILLAMA_IDS[chainIdToUse] || findKey(NETWORKS, { chainId: chainIdToUse });
+  async getProtocolHistoricPrices(dates: string[], chainId: number) {
+    const defillamaId = DEFILLAMA_IDS[chainId] || findKey(NETWORKS, { chainId });
     if (!defillamaId) {
       return {};
     }
@@ -125,8 +122,7 @@ export default class PriceService {
   }
 
   async getZrxGasSwapQuote(from: Token, to: Token, amount: BigNumber, chainId?: number) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
+    const chainIdToUse = chainId || from.chainId;
     const api = ZRX_API_ADDRESS[chainIdToUse];
     const url =
       `${api}/swap/v1/quote` +
@@ -147,7 +143,10 @@ export default class PriceService {
     let estimatedOptimismGas: BigNumber | null = null;
 
     if (chainId === NETWORKS.optimism.chainId) {
-      const oeGasOracle = await this.contractService.getOEGasOracleInstance();
+      const activeWallet = await this.providerService.getSigner();
+
+      const activeWalletAddress = await activeWallet.getAddress();
+      const oeGasOracle = await this.contractService.getOEGasOracleInstance(chainId, activeWalletAddress);
       estimatedOptimismGas = await oeGasOracle.getL1GasUsed(data);
     }
 
@@ -163,8 +162,7 @@ export default class PriceService {
     tentativePeriod?: string,
     tentativeEnd?: string
   ) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
+    const chainIdToUse = chainId || from.chainId;
     const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
     const span = tentativeSpan || INDEX_TO_SPAN[periodIndex];
     const period = tentativePeriod || INDEX_TO_PERIOD[periodIndex];

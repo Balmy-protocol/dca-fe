@@ -8,8 +8,8 @@ import ProviderService from './providerService';
 jest.mock('./providerService');
 jest.mock('./walletService');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-jest.mock('@constants/yield', () => ({
-  ...jest.requireActual('@constants/yield'),
+jest.mock('@constants', () => ({
+  ...jest.requireActual('@constants'),
   ALLOWED_YIELDS: {
     '10': [
       {
@@ -51,7 +51,7 @@ jest.mock('@constants/yield', () => ({
       },
     ],
   },
-  DISABLED_YIELDS: ['disabledyield'],
+  DCA_TOKEN_BLACKLIST: ['disabledyield'],
 }));
 
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });

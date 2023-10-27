@@ -4,8 +4,9 @@ import Button from '@common/components/button';
 import { Typography, Link, OpenInNewIcon } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition, NetworkStruct, YieldOptions } from '@types';
+import { FullPosition, NetworkStruct, WalletStatus, YieldOptions } from '@types';
 import {
+  CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
   DCA_TOKEN_BLACKLIST,
   NETWORKS,
   OLD_VERSIONS,
@@ -21,8 +22,10 @@ import useWeb3Service from '@hooks/useWeb3Service';
 import useTokenList from '@hooks/useTokenList';
 import { setNetwork } from '@state/config/actions';
 import { useAppDispatch } from '@state/hooks';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useActiveWallet from '@hooks/useActiveWallet';
+import useWallets from '@hooks/useWallets';
+import useWalletNetwork from '@hooks/useWalletNetwork';
+import useWallet from '@hooks/useWallet';
+import { usePrivy } from '@privy-io/react-auth';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -38,7 +41,6 @@ interface PositionDataControlsProps {
   position: FullPosition;
   pendingTransaction: string | null;
   onReusePosition: () => void;
-  disabled: boolean;
   yieldOptions: YieldOptions;
   onMigrateYield: () => void;
   onSuggestMigrateYield: () => void;
@@ -48,18 +50,18 @@ const PositionDataControls = ({
   position,
   onMigrateYield,
   onReusePosition,
-  disabled,
   yieldOptions,
   pendingTransaction,
   onSuggestMigrateYield,
 }: PositionDataControlsProps) => {
-  const { remainingSwaps, chainId } = fullPositionToMappedPosition(position);
+  const { connectWallet } = usePrivy();
+  const { remainingSwaps, chainId, user } = fullPositionToMappedPosition(position);
   const hasSignSupport = useSupportsSigning();
-  const network = useCurrentNetwork();
   const web3Service = useWeb3Service();
-  const activeWallet = useActiveWallet();
-  const account = activeWallet?.address;
+  const wallet = useWallet(user);
+  const [connectedNetwork] = useWalletNetwork(user);
   const tokenList = useTokenList();
+  const wallets = useWallets();
   const dispatch = useAppDispatch();
 
   const positionNetwork = React.useMemo(() => {
@@ -68,13 +70,13 @@ const PositionDataControls = ({
     return supportedNetwork;
   }, [chainId]);
 
-  const isOnNetwork = network?.chainId === positionNetwork.chainId;
+  const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
   const walletService = useWalletService();
   const isPending = !!pendingTransaction;
 
   const onChangeNetwork = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId, () => {
+    walletService.changeNetwork(chainId, user, () => {
       const networkToSet = find(NETWORKS, { chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
       if (networkToSet) {
@@ -83,7 +85,14 @@ const PositionDataControls = ({
     });
   };
 
-  const isOwner = account && account.toLowerCase() === position.user.toLowerCase();
+  const walletIsConnected = wallet.status === WalletStatus.connected;
+
+  const showSwitchAction =
+    walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
+
+  const isOwner = wallets.find((userWallet) => userWallet.address.toLowerCase() === position.user.toLowerCase());
+
+  const disabled = showSwitchAction || !walletIsConnected;
 
   if (!isOwner || position.status === 'TERMINATED') return null;
 
@@ -109,7 +118,19 @@ const PositionDataControls = ({
     );
   }
 
-  if (!isOnNetwork) {
+  if (!walletIsConnected) {
+    return (
+      <StyledCallToActionContainer>
+        <StyledCardFooterButton variant="contained" color="secondary" onClick={connectWallet} fullWidth>
+          <Typography variant="body2">
+            <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
+          </Typography>
+        </StyledCardFooterButton>
+      </StyledCallToActionContainer>
+    );
+  }
+
+  if (showSwitchAction) {
     return (
       <StyledCallToActionContainer>
         <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>

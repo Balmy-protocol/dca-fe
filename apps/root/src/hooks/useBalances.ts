@@ -7,7 +7,6 @@ import { BigNumber } from 'ethers';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import usePriceService from './usePriceService';
-import useAccount from './useAccount';
 import useSdkService from './useSdkService';
 
 interface BalanceResponse {
@@ -20,8 +19,7 @@ interface Result {
   chainId: number;
 }
 
-function useBalances(tokens: Token[] | undefined | null): [Result | undefined, boolean, string?] {
-  const account = useAccount();
+function useBalances(tokens: Token[] | undefined | null, account?: string): [Result | undefined, boolean, string?] {
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -45,9 +43,9 @@ function useBalances(tokens: Token[] | undefined | null): [Result | undefined, b
 
   React.useEffect(() => {
     async function callPromise() {
-      if (tokens) {
+      if (tokens && account) {
         try {
-          const balanceResults = await sdkService.getMultipleBalances(tokens);
+          const balanceResults = await sdkService.getMultipleBalances(tokens, account);
 
           let priceResults: Record<string, BigNumber> = {};
 

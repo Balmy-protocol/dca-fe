@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Permission, Position, TransactionTypes } from '@types';
+import { Position, TransactionTypes } from '@types';
 import find from 'lodash/find';
 import Button from '@common/components/button';
 import {
@@ -40,10 +40,12 @@ import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import { useEulerClaimSignature } from '@state/euler-claim/hooks';
 import { setEulerSignature } from '@state/euler-claim/actions';
+import { DCAPermission } from '@mean-finance/sdk';
 
 import useHasPendingMigratorApprovals from '../hooks/useHasPendingMigratorApprovals';
 import useHasPendingPermitManyTransactions from '../hooks/useHasPendingPermitManyTransaction';
 import useHasPendingTerminateManyTransactions from '../hooks/useHasPendingTerminateManyTransaction';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledPositionsContainer = styled.div`
   display: flex;
@@ -211,6 +213,7 @@ const ClaimChecklist = ({
   const step4Completed = step3Completed && !needsToApproveTokens;
   const step5Completed = step4Completed && !needsToClaim;
   const providerService = useProviderService();
+  const activeWallet = useActiveWallet();
   const walletService = useWalletService();
 
   if (!step0Completed) {
@@ -252,7 +255,7 @@ const ClaimChecklist = ({
 
   const onChangeNetwork = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(NETWORKS.mainnet.chainId, () => {
+    walletService.changeNetwork(NETWORKS.mainnet.chainId, activeWallet?.address, () => {
       dispatch(setNetwork(NETWORKS.mainnet));
       web3Service.setNetwork(NETWORKS.mainnet.chainId);
     });
@@ -326,11 +329,7 @@ const ClaimChecklist = ({
     try {
       await signer.signMessage(termsAndServices);
 
-      dispatch(
-        setEulerSignature(
-          solidityKeccak256(['address', 'bytes32'], [walletService.getAccount(), termsAndConditionsHash])
-        )
-      );
+      dispatch(setEulerSignature(solidityKeccak256(['address', 'bytes32'], [user, termsAndConditionsHash])));
     } catch (e) {
       setModalError({
         content: (
@@ -356,7 +355,7 @@ const ClaimChecklist = ({
           </Typography>
         ),
       });
-      const companionAddress = await contractService.getHUBCompanionAddress();
+      const companionAddress = contractService.getHUBCompanionAddress(positions[0].chainId);
       trackEvent('Euler claim - Permit many submitting');
       const result = await positionService.givePermissionToMultiplePositions(
         positions,
@@ -370,7 +369,7 @@ const ClaimChecklist = ({
         typeData: {
           id: result.hash,
           positionIds: positions.map((position) => position.id),
-          permissions: [Permission.TERMINATE],
+          permissions: [DCAPermission.TERMINATE],
           permittedAddress: companionAddress,
         },
       });

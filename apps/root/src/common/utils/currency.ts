@@ -7,6 +7,7 @@ import { BigNumber } from 'ethers';
 import JSBI from 'jsbi';
 import toFormat from 'toformat';
 import { Token, TokenType } from '@types';
+import { DCAPositionToken, TokenVariant } from '@mean-finance/sdk';
 
 const Decimal = toFormat(_Decimal);
 
@@ -162,4 +163,29 @@ export const toToken: (overrides: {
   type: type || TOKEN_TYPE_BASE,
   underlyingTokens: underlyingTokens || [],
   logoURI,
+});
+
+export const toDcaPositionToken: (overrides: {
+  address?: string;
+  type?: TokenType;
+  decimals?: number;
+  chainId?: number;
+  symbol?: string;
+  name?: string;
+  underlyingTokens?: Token[];
+  logoURI?: string;
+  variant?: TokenVariant;
+}) => DCAPositionToken = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, variant }) => ({
+  decimals: decimals || 18,
+  chainId: chainId || 1,
+  address: address || '',
+  name: name || '',
+  symbol: symbol || '',
+  type: type || TOKEN_TYPE_BASE,
+  underlyingTokens: underlyingTokens || [],
+  logoURI,
+  variant: variant || {
+    type: 'original',
+    id: address || '',
+  },
 });

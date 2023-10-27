@@ -17,7 +17,11 @@ type AllowanceResponse = [Allowance, boolean, string?];
 
 const dummyToken: Allowance = { token: EMPTY_TOKEN, allowance: undefined };
 
-function useSpecificAllowance(from: Token | undefined | null, addressToCheck?: string | null): AllowanceResponse {
+function useSpecificAllowance(
+  from: Token | undefined | null,
+  account: string,
+  addressToCheck?: string | null
+): AllowanceResponse {
   const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -27,8 +31,7 @@ function useSpecificAllowance(from: Token | undefined | null, addressToCheck?: s
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(walletService.getAccount());
-  const account = walletService.getAccount();
+  const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
   const blockNumber = useBlockNumber(currentNetwork.chainId);
   const prevBlockNumber = usePrevious(blockNumber);
@@ -39,7 +42,7 @@ function useSpecificAllowance(from: Token | undefined | null, addressToCheck?: s
     async function callPromise() {
       if (from && addressToCheck) {
         try {
-          const promiseResult = await walletService.getSpecificAllowance(from, addressToCheck);
+          const promiseResult = await walletService.getSpecificAllowance(from, addressToCheck, account);
           setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: dummyToken, error: e as string, isLoading: false });

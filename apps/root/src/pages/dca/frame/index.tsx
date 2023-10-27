@@ -31,6 +31,7 @@ import { fetchGraphTokenList } from '@state/token-lists/actions';
 import { identifyNetwork } from '@common/utils/parsing';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -51,6 +52,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const selectedNetwork = useSelectedNetwork();
   const sdkMappedNetworks = useSdkMappedChains();
   const web3Service = useWeb3Service();
+  const activeWallet = useActiveWallet();
   // const hasInitiallySetNetwork = React.useState()
 
   React.useEffect(() => {
@@ -93,7 +95,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const handleChangeNetwork = (newChainId: number) => {
     if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      walletService.changeNetworkAutomatically(newChainId, () => {
+      walletService.changeNetworkAutomatically(newChainId, activeWallet?.address, () => {
         const networkToSet = find(NETWORKS, { chainId: newChainId });
         dispatch(setNetwork(networkToSet as NetworkStruct));
         if (networkToSet) {

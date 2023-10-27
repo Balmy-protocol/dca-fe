@@ -23,6 +23,7 @@ interface TokenPickerProps {
   otherSelected?: Token | null;
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
+  account?: string;
 }
 
 const DcaTokenPicker = ({
@@ -34,6 +35,7 @@ const DcaTokenPicker = ({
   otherSelected,
   yieldOptions,
   isLoadingYieldOptions,
+  account,
 }: TokenPickerProps) => (
   <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" actions={[]} fullHeight keepMounted>
     <StyledOverlay>
@@ -46,6 +48,7 @@ const DcaTokenPicker = ({
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         isOpen={shouldShow}
+        account={account}
       />
     </StyledOverlay>
   </Modal>

@@ -57,7 +57,9 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
       trackEvent('Euler claim - Approve token submitting');
       const result = await walletService.approveSpecificToken(
         token,
-        EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES]
+        EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],
+        // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+        activeWallet?.address!
       );
       trackEvent('Euler claim - Approve token submitted');
 

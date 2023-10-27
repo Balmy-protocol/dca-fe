@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ChainId, Permission, PositionPermission } from '@types';
+import { ChainId, PositionPermission } from '@types';
 import {
   Typography,
   Tooltip,
@@ -20,6 +20,7 @@ import { addPermission, removePermission } from '@state/position-permissions/act
 import { isCompanionAddress, STRING_PERMISSIONS } from '@constants';
 import { FormattedMessage, useIntl } from 'react-intl';
 import Address from '@common/components/address';
+import { DCAPermission } from '@mean-finance/sdk';
 
 interface PositionPermissionProps {
   positionPermission: PositionPermission;
@@ -27,7 +28,8 @@ interface PositionPermissionProps {
   chainId: ChainId;
 }
 
-const hasPermission = (permissions: Permission[], permission: Permission) => permissions.indexOf(permission) !== -1;
+const hasPermission = (permissions: DCAPermission[], permission: DCAPermission) =>
+  permissions.indexOf(permission) !== -1;
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
@@ -110,7 +112,7 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable, chainId }: 
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
-  const handlePermissionChange = (permission: Permission, newValue: boolean) => {
+  const handlePermissionChange = (permission: DCAPermission, newValue: boolean) => {
     if (newValue) {
       dispatch(addPermission({ operator: positionPermission.operator, permission }));
     } else {
@@ -146,7 +148,7 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable, chainId }: 
           </StyledCardHeader>
           <FormControl component="fieldset">
             <FormGroup>
-              {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: Permission) => (
+              {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: DCAPermission) => (
                 <FormControlLabel
                   key={stringPermissionKey}
                   control={

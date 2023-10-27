@@ -7,11 +7,10 @@ import useRawUsdPrice from './useUsdRawPrice';
 function useUsdPrice(
   from: Token | undefined | null,
   amount: BigNumber | null,
-  date?: string,
-  chainId?: number
+  date?: string
 ): [number | undefined, boolean, string?] {
   const isValueZero = !!amount && amount.eq(0);
-  const [result, isLoading, error] = useRawUsdPrice(from, date, chainId, isValueZero);
+  const [result, isLoading, error] = useRawUsdPrice(from, date, isValueZero);
 
   return React.useMemo(
     () => [parseUsdPrice(from, amount, result), isLoading, error],

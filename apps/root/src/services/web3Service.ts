@@ -50,7 +50,7 @@ import { chainToWagmiNetwork } from '@common/utils/parsing';
 import { NETWORKS, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 
 import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
-import { setupAxiosClient } from '@state';
+import { setupAxiosClient } from '@state/axios';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import TransactionService from './transactionService';
@@ -181,10 +181,10 @@ export default class Web3Service {
       this.contractService,
       this.meanApiService,
       this.safeService,
-      this.apolloClient,
       this.providerService,
       this.permit2Service,
-      this.sdkService
+      this.sdkService,
+      this.accountService
     );
     this.priceService = new PriceService(
       this.walletService,
@@ -256,10 +256,6 @@ export default class Web3Service {
 
   getMeanApiService() {
     return this.meanApiService;
-  }
-
-  getProviderInfo() {
-    return this.providerService.getProviderInfo();
   }
 
   getTransactionService() {
@@ -336,21 +332,12 @@ export default class Web3Service {
     this.contractService.setNetwork(chainId);
   }
 
-  getAccount() {
-    return this.account;
-  }
-
   getSignSupport() {
     return !this.loadedAsSafeApp;
   }
 
   // BOOTSTRAP
-  async connect(
-    suppliedProvider?: Web3Provider,
-    connector?: Connector<Provider>,
-    chainId?: number,
-    privyWallet?: boolean
-  ) {
+  async connect(suppliedProvider?: Web3Provider, connector?: Connector<Provider>, chainId?: number) {
     const connectorProvider = await connector?.getProvider();
 
     if (!suppliedProvider && !connectorProvider) {
@@ -359,7 +346,6 @@ export default class Web3Service {
 
     const provider: Provider = (suppliedProvider?.provider || connectorProvider) as Provider;
 
-    this.providerService.setProviderInfo(provider, privyWallet);
     // A Web3Provider wraps a standard Web3 provider, which is
     // what Metamask injects as window.ethereum into each page
     const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider, 'any');
@@ -382,9 +368,9 @@ export default class Web3Service {
 
     try {
       if (chainId) {
-        await this.walletService.changeNetworkAutomatically(chainId, () => this.setNetwork(chainId));
+        await this.walletService.changeNetworkAutomatically(chainId, account, () => this.setNetwork(chainId));
       } else {
-        const providerNetwork = await this.providerService.getNetwork();
+        const providerNetwork = await this.providerService.getNetwork(account);
         const providerChainId = providerNetwork.chainId;
         this.setNetwork(providerChainId);
       }
@@ -392,7 +378,7 @@ export default class Web3Service {
       console.error('Error changing network', e);
     }
 
-    this.walletService.setAccount(account, this.setAccountCallback);
+    this.setAccountCallback(account);
 
     await this.sdkService.resetProvider();
 
@@ -424,10 +410,9 @@ export default class Web3Service {
 
     this.setAccount('');
 
-    this.accountService.setUser(undefined);
+    void this.accountService.setUser(undefined);
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.walletService.setAccount(null, this.setAccountCallback);
+    this.setAccountCallback('');
 
     localStorage.removeItem(WALLET_CONNECT_KEY);
   }

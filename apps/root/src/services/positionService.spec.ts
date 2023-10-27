@@ -2,34 +2,31 @@
 import {
   HubContract,
   NewPositionTypeData,
-  Permission,
   PermissionData,
   Position,
+  PositionStatus,
   PositionVersions,
-  PositionsGraphqlResponse,
   Token,
   TransactionDetails,
   TransactionTypes,
+  WalletStatus,
+  WalletType,
 } from '@types';
 import { createMockInstance } from '@common/utils/tests';
 import isUndefined from 'lodash/isUndefined';
-// import gqlFetchAll from '@common/utils/gqlFetchAll';
 import {
   HUB_ADDRESS,
   LATEST_VERSION,
   MAX_UINT_32,
-  NETWORKS_FOR_MENU,
   ONE_DAY,
   PERMISSIONS,
-  POSITIONS_VERSIONS,
+  POSITION_VERSION_4,
   SIGN_VERSION,
 } from '@constants';
-import { emptyTokenWithAddress, toToken } from '@common/utils/currency';
+import { emptyTokenWithAddress, toDcaPositionToken, toToken } from '@common/utils/currency';
 import { BigNumber, ethers } from 'ethers';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { parseUnits } from '@ethersproject/units';
-import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
-import GET_POSITIONS from '@graphql/getPositions.graphql';
 import { DCAPermissionsManager } from '@mean-finance/dca-v2-core/dist';
 import { fromRpcSig } from 'ethereumjs-util';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
@@ -42,10 +39,19 @@ import ContractService from './contractService';
 import MeanApiService from './meanApiService';
 import SafeService from './safeService';
 import PairService from './pairService';
-import GraphqlService from './graphql';
 import PositionService from './positionService';
 import Permit2Service from './permit2Service';
 import SdkService from './sdkService';
+import {
+  DCAPermission,
+  DCAPositionAction,
+  DCAPositionToken,
+  PlatformMessage,
+  PositionId,
+  PositionSummary,
+} from '@mean-finance/sdk';
+import AccountService from './accountService';
+import { parsePermissionsForSdk } from '@common/utils/sdk';
 
 jest.mock('./providerService');
 jest.mock('./walletService');
@@ -54,6 +60,7 @@ jest.mock('./meanApiService');
 jest.mock('./safeService');
 jest.mock('./pairService');
 jest.mock('./sdkService');
+jest.mock('./accountService');
 jest.mock('./permit2Service');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('ethereumjs-util', () => ({
@@ -83,30 +90,8 @@ const MockedSafeService = jest.mocked(SafeService, { shallow: true });
 const MockedPairService = jest.mocked(PairService, { shallow: true });
 const MockedPermit2Service = jest.mocked(Permit2Service, { shallow: true });
 const MockedSdkService = jest.mocked(SdkService, { shallow: false });
-const MockedGqlFetchAll = jest.mocked(gqlFetchAll, { shallow: true });
+const MockedAccountService = jest.mocked(AccountService, { shallow: false });
 const MockedFromRpcSig = jest.mocked(fromRpcSig, { shallow: true });
-
-const createGqlMock = () =>
-  POSITIONS_VERSIONS.reduce<Record<PositionVersions, Record<number, GraphqlService>>>(
-    (acc, version) => ({
-      ...acc,
-      [version]: NETWORKS_FOR_MENU.reduce(
-        (networkAcc, network) => ({
-          ...networkAcc,
-          [network]: {
-            getClient: () => `gqlclient-${version}-${network}`,
-          },
-        }),
-        {}
-      ),
-    }),
-    {
-      [PositionVersions.POSITION_VERSION_1]: {},
-      [PositionVersions.POSITION_VERSION_2]: {},
-      [PositionVersions.POSITION_VERSION_3]: {},
-      [PositionVersions.POSITION_VERSION_4]: {},
-    }
-  );
 
 function createPositionMock({
   from,
@@ -116,15 +101,10 @@ function createPositionMock({
   swapped,
   remainingLiquidity,
   remainingSwaps,
-  totalDeposited,
-  withdrawn,
   totalSwaps,
   rate,
   toWithdraw,
   totalExecutedSwaps,
-  depositedRateUnderlying,
-  totalSwappedUnderlyingAccum,
-  toWithdrawUnderlyingAccum,
   id,
   positionId,
   status,
@@ -132,11 +112,12 @@ function createPositionMock({
   pendingTransaction,
   version,
   chainId,
-  pairLastSwappedAt,
-  pairNextSwapAvailableAt,
-  toWithdrawUnderlying,
-  remainingLiquidityUnderlying,
   permissions,
+  isStale,
+  toWithdrawYield,
+  remainingLiquidityYield,
+  swappedYield,
+  nextSwapAvailableAt,
 }: {
   from?: Token;
   to?: Token;
@@ -146,27 +127,23 @@ function createPositionMock({
   swapped?: BigNumber;
   remainingLiquidity?: BigNumber;
   remainingSwaps?: BigNumber;
-  totalDeposited?: BigNumber;
-  withdrawn?: BigNumber;
   totalSwaps?: BigNumber;
   rate?: BigNumber;
   toWithdraw?: BigNumber;
   totalExecutedSwaps?: BigNumber;
-  depositedRateUnderlying?: Nullable<BigNumber>;
-  totalSwappedUnderlyingAccum?: Nullable<BigNumber>;
-  toWithdrawUnderlyingAccum?: Nullable<BigNumber>;
   id?: string;
   positionId?: string;
-  status?: string;
+  status?: PositionStatus;
   startedAt?: number;
   pendingTransaction?: string;
   version?: PositionVersions;
   chainId?: number;
-  pairLastSwappedAt?: number;
-  pairNextSwapAvailableAt?: string;
-  toWithdrawUnderlying?: Nullable<BigNumber>;
-  remainingLiquidityUnderlying?: Nullable<BigNumber>;
   permissions?: PermissionData[];
+  isStale?: boolean;
+  toWithdrawYield?: BigNumber;
+  remainingLiquidityYield?: BigNumber;
+  swappedYield?: BigNumber;
+  nextSwapAvailableAt?: number;
 }): Position {
   const fromToUse = (!isUndefined(from) && from) || toToken({ address: 'from' });
   const toToUse = (!isUndefined(to) && to) || toToken({ address: 'to' });
@@ -182,27 +159,23 @@ function createPositionMock({
     swapped: (!isUndefined(swapped) && swapped) || parseUnits('10', 18),
     remainingLiquidity: (!isUndefined(remainingLiquidity) && remainingLiquidity) || parseUnits('10', 18),
     remainingSwaps: (!isUndefined(remainingSwaps) && remainingSwaps) || parseUnits('5', 18),
-    totalDeposited: (!isUndefined(totalDeposited) && totalDeposited) || parseUnits('20', 18),
-    withdrawn: (!isUndefined(withdrawn) && withdrawn) || parseUnits('5', 18),
     totalSwaps: (!isUndefined(totalSwaps) && totalSwaps) || parseUnits('10', 18),
     rate: (!isUndefined(rate) && rate) || parseUnits('2', 18),
     toWithdraw: (!isUndefined(toWithdraw) && toWithdraw) || parseUnits('5', 18),
     totalExecutedSwaps: (!isUndefined(totalExecutedSwaps) && totalExecutedSwaps) || BigNumber.from(5),
-    depositedRateUnderlying: (!isUndefined(depositedRateUnderlying) && depositedRateUnderlying) || null,
-    totalSwappedUnderlyingAccum: (!isUndefined(totalSwappedUnderlyingAccum) && totalSwappedUnderlyingAccum) || null,
-    toWithdrawUnderlyingAccum: (!isUndefined(toWithdrawUnderlyingAccum) && toWithdrawUnderlyingAccum) || null,
-    id: (!isUndefined(id) && id) || 'position-1',
+    id: (!isUndefined(id) && id) || '10-1-v4',
     positionId: (!isUndefined(positionId) && positionId) || '1',
     status: (!isUndefined(status) && status) || 'ACTIVE',
     startedAt: (!isUndefined(startedAt) && startedAt) || 1686329816,
     pendingTransaction: (!isUndefined(pendingTransaction) && pendingTransaction) || '',
     version: (!isUndefined(version) && version) || PositionVersions.POSITION_VERSION_4,
     chainId: (!isUndefined(chainId) && chainId) || 10,
-    pairLastSwappedAt: (!isUndefined(pairLastSwappedAt) && pairLastSwappedAt) || 1686329816,
-    pairNextSwapAvailableAt: (!isUndefined(pairNextSwapAvailableAt) && pairNextSwapAvailableAt) || '1686427016',
-    toWithdrawUnderlying: (!isUndefined(toWithdrawUnderlying) && toWithdrawUnderlying) || null,
-    remainingLiquidityUnderlying: (!isUndefined(remainingLiquidityUnderlying) && remainingLiquidityUnderlying) || null,
     permissions: (!isUndefined(permissions) && permissions) || [],
+    isStale: (!isUndefined(isStale) && isStale) || false,
+    toWithdrawYield: (!isUndefined(toWithdrawYield) && toWithdrawYield) || null,
+    remainingLiquidityYield: (!isUndefined(remainingLiquidityYield) && remainingLiquidityYield) || null,
+    swappedYield: (!isUndefined(swappedYield) && swappedYield) || null,
+    nextSwapAvailableAt: (!isUndefined(nextSwapAvailableAt) && nextSwapAvailableAt) || 10,
   };
 }
 
@@ -249,104 +222,114 @@ function createPositionTypeDataMock({
   };
 }
 
-function createGqlPositionMock({
+const buildPairId = (from?: DCAPositionToken, to?: DCAPositionToken): `${string}-${string}` =>
+  `${((!isUndefined(from) && from) || toToken({ address: 'from' })).address}-${
+    ((!isUndefined(to) && to) || toToken({ address: 'to' })).address
+  }`;
+
+const buildVariantPairId = (from?: DCAPositionToken, to?: DCAPositionToken): `${string}-${string}` =>
+  `${((!isUndefined(from) && toToken({ address: from.variant.id })) || toToken({ address: 'from' })).address}-${
+    ((!isUndefined(to) && toToken({ address: to.variant.id })) || toToken({ address: 'to' })).address
+  }`;
+
+function createSdkPositionMock({
   id,
   from,
   to,
-  user,
+  owner,
   pair,
   status,
-  totalExecutedSwaps,
   swapInterval,
   remainingSwaps,
   swapped,
-  withdrawn,
   remainingLiquidity,
   toWithdraw,
-  depositedRateUnderlying,
-  totalSwappedUnderlyingAccum,
-  toWithdrawUnderlyingAccum,
   rate,
-  totalDeposited,
   totalSwaps,
-  totalSwapped,
-  totalWithdrawn,
-  createdAtTimestamp,
+  createdAt,
   permissions,
+  toWithdrawYield,
+  remainingLiquidityYield,
+  swappedYield,
+  chainId,
+  hub,
+  tokenId,
+  isStale,
+  executedSwaps,
+  platformMessages,
+  nextSwapAvailableAt,
+  history,
 }: {
-  id?: string;
-  from?: Token;
-  to?: Token;
-  user?: string;
+  id?: PositionId;
+  from?: DCAPositionToken;
+  to?: DCAPositionToken;
+  owner?: string;
   pair?: {
-    id: string;
-    activePositionsPerInterval: number[];
-    swaps: {
-      id: string;
-      executedAtTimestamp: string;
-    }[];
+    pairId: string;
+    variantPairId: `${string}-${string}`;
   };
-  status?: string;
+  status?: 'ongoing' | 'empty' | 'terminated' | 'finished';
   totalExecutedSwaps?: BigNumber;
-  swapInterval?: {
-    id: string;
-    interval: BigNumber;
-    description: BigNumber;
-  };
-  remainingSwaps?: BigNumber;
-  swapped?: BigNumber;
-  withdrawn?: BigNumber;
-  remainingLiquidity?: BigNumber;
-  toWithdraw?: BigNumber;
-  depositedRateUnderlying?: Nullable<BigNumber>;
-  totalSwappedUnderlyingAccum?: Nullable<BigNumber>;
-  toWithdrawUnderlyingAccum?: Nullable<BigNumber>;
-  rate?: BigNumber;
-  totalDeposited?: BigNumber;
-  totalSwaps?: BigNumber;
-  totalSwapped?: BigNumber;
-  totalWithdrawn?: BigNumber;
-  createdAtTimestamp?: number;
-  permissions?: PermissionData[];
-}) {
+  swapInterval?: number;
+  remainingSwaps?: number;
+  swapped?: bigint;
+  remainingLiquidity?: bigint;
+  toWithdraw?: bigint;
+  rate?: bigint;
+  totalSwaps?: number;
+  createdAt?: number;
+  permissions?: Record<string, DCAPermission[]>;
+  toWithdrawYield?: Nullable<bigint>;
+  remainingLiquidityYield?: Nullable<bigint>;
+  swappedYield?: Nullable<bigint>;
+  chainId?: number;
+  hub?: string;
+  tokenId?: bigint;
+  isStale?: boolean;
+  executedSwaps?: number;
+  platformMessages?: PlatformMessage[];
+  nextSwapAvailableAt?: number;
+  history?: DCAPositionAction[];
+}): PositionSummary {
   return {
-    from: (!isUndefined(from) && from) || toToken({ address: 'from' }),
-    to: (!isUndefined(to) && to) || toToken({ address: 'to' }),
-    user: (!isUndefined(user) && user) || 'my account',
-    swapInterval: (!isUndefined(swapInterval) && swapInterval) || {
-      id: 'interval',
-      interval: ONE_DAY,
-      description: ONE_DAY,
+    chainId: (!isUndefined(chainId) && chainId) || 10,
+    hub: (!isUndefined(hub) && hub) || HUB_ADDRESS[POSITION_VERSION_4][10],
+    tokenId: (!isUndefined(tokenId) && tokenId) || 10n,
+    isStale: (!isUndefined(isStale) && isStale) || false,
+    executedSwaps: !isUndefined(executedSwaps) ? executedSwaps : 5,
+    platformMessages: (!isUndefined(platformMessages) && platformMessages) || [],
+    nextSwapAvailableAt: !isUndefined(nextSwapAvailableAt) ? nextSwapAvailableAt : 10,
+    history: (!isUndefined(history) && history) || [],
+    from: (!isUndefined(from) && from) || toDcaPositionToken({ address: 'from' }),
+    to: (!isUndefined(to) && to) || toDcaPositionToken({ address: 'to' }),
+    owner: (!isUndefined(owner) && owner) || 'my account',
+    swapInterval: !isUndefined(swapInterval) ? swapInterval : ONE_DAY.toNumber(),
+    funds: {
+      swapped: !isUndefined(swapped) ? swapped : parseUnits('10', 18).toBigInt(),
+      remaining: !isUndefined(remainingLiquidity) ? remainingLiquidity : parseUnits('10', 18).toBigInt(),
+      toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : parseUnits('5', 18).toBigInt(),
     },
-    totalSwapped: (!isUndefined(totalSwapped) && totalSwapped) || parseUnits('15', 18),
-    swapped: (!isUndefined(swapped) && swapped) || parseUnits('10', 18),
-    remainingLiquidity: (!isUndefined(remainingLiquidity) && remainingLiquidity) || parseUnits('10', 18),
-    remainingSwaps: (!isUndefined(remainingSwaps) && remainingSwaps) || parseUnits('5', 18),
-    totalDeposited: (!isUndefined(totalDeposited) && totalDeposited) || parseUnits('20', 18),
-    totalWithdrawn: (!isUndefined(totalWithdrawn) && totalWithdrawn) || parseUnits('7', 18),
-    withdrawn: (!isUndefined(withdrawn) && withdrawn) || parseUnits('5', 18),
-    totalSwaps: (!isUndefined(totalSwaps) && totalSwaps) || parseUnits('10', 18),
-    rate: (!isUndefined(rate) && rate) || parseUnits('2', 18),
-    toWithdraw: (!isUndefined(toWithdraw) && toWithdraw) || parseUnits('5', 18),
-    totalExecutedSwaps: (!isUndefined(totalExecutedSwaps) && totalExecutedSwaps) || BigNumber.from(5),
-    depositedRateUnderlying: (!isUndefined(depositedRateUnderlying) && depositedRateUnderlying) || null,
-    totalSwappedUnderlyingAccum: (!isUndefined(totalSwappedUnderlyingAccum) && totalSwappedUnderlyingAccum) || null,
-    toWithdrawUnderlyingAccum: (!isUndefined(toWithdrawUnderlyingAccum) && toWithdrawUnderlyingAccum) || null,
-    id: (!isUndefined(id) && id) || 'position-1',
-    status: (!isUndefined(status) && status) || 'ACTIVE',
-    createdAtTimestamp: (!isUndefined(createdAtTimestamp) && createdAtTimestamp) || 1686329816,
-    permissions: (!isUndefined(permissions) && permissions) || [],
+    yield:
+      ((toWithdrawYield || remainingLiquidityYield || swappedYield) && {
+        swapped: !isUndefined(swappedYield) && swappedYield !== null ? swappedYield : parseUnits('10', 18).toBigInt(),
+        remaining:
+          !isUndefined(remainingLiquidityYield) && remainingLiquidityYield !== null
+            ? remainingLiquidityYield
+            : parseUnits('10', 18).toBigInt(),
+        toWithdraw:
+          !isUndefined(toWithdrawYield) && toWithdrawYield !== null ? toWithdrawYield : parseUnits('10', 18).toBigInt(),
+      }) ||
+      undefined,
+    remainingSwaps: !isUndefined(remainingSwaps) ? remainingSwaps : 5,
+    totalSwaps: !isUndefined(totalSwaps) ? totalSwaps : 10,
+    rate: !isUndefined(rate) ? rate : parseUnits('2', 18).toBigInt(),
+    id: !isUndefined(id) ? id : '1-position-1',
+    status: (!isUndefined(status) && status) || 'ongoing',
+    createdAt: !isUndefined(createdAt) ? createdAt : 1686329816,
+    permissions: (!isUndefined(permissions) && permissions) || {},
     pair: (!isUndefined(pair) && pair) || {
-      id: `${((!isUndefined(from) && from) || toToken({ address: 'from' })).address}-${
-        ((!isUndefined(to) && to) || toToken({ address: 'to' })).address
-      }`,
-      activePositionsPerInterval: [1, 2, 3, 4, 5, 6, 7, 8],
-      swaps: [
-        {
-          id: 'swap-1',
-          executedAtTimestamp: 10,
-        },
-      ],
+      pairId: buildPairId(from, to),
+      variantPairId: buildVariantPairId(from, to),
     },
   };
 }
@@ -360,6 +343,7 @@ describe('Position Service', () => {
   let pairService: jest.MockedObject<PairService>;
   let permit2Service: jest.MockedObject<Permit2Service>;
   let sdkService: jest.MockedObject<SdkService>;
+  let accountService: jest.MockedObject<AccountService>;
   let positionService: PositionService;
 
   beforeEach(() => {
@@ -371,8 +355,8 @@ describe('Position Service', () => {
     pairService = createMockInstance(MockedPairService);
     permit2Service = createMockInstance(MockedPermit2Service);
     sdkService = createMockInstance(MockedSdkService);
+    accountService = createMockInstance(MockedAccountService);
 
-    walletService.getAccount.mockReturnValue('my account');
     providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: true });
     positionService = new PositionService(
       walletService,
@@ -380,10 +364,10 @@ describe('Position Service', () => {
       contractService,
       meanApiService,
       safeService,
-      createGqlMock(),
       providerService,
       permit2Service,
-      sdkService
+      sdkService,
+      accountService
     );
   });
 
@@ -410,108 +394,167 @@ describe('Position Service', () => {
 
   describe('fetchCurrentPositions', () => {
     beforeEach(() => {
-      MockedGqlFetchAll.mockImplementation((client) => {
-        if ((client as unknown as string) !== `gqlclient-${PositionVersions.POSITION_VERSION_4}-10`) {
-          return Promise.resolve({
-            error: undefined,
-            data: {
-              positions: [],
-            },
-            loading: false,
-          } as GraphqlResults<PositionsGraphqlResponse>);
-        }
-
-        return Promise.resolve({
-          error: undefined,
-          data: {
-            positions: [
-              createGqlPositionMock({
-                id: 'position-1',
-                from: toToken({
-                  address: 'fromYield',
-                  underlyingTokens: [emptyTokenWithAddress('from')],
-                }),
-                to: toToken({
-                  address: 'toYield',
-                  underlyingTokens: [emptyTokenWithAddress('to')],
-                }),
-                toWithdraw: BigNumber.from(10),
-                rate: BigNumber.from(20),
-                remainingSwaps: BigNumber.from(5),
-                toWithdrawUnderlyingAccum: BigNumber.from(11),
-                totalSwappedUnderlyingAccum: BigNumber.from(12),
-                depositedRateUnderlying: BigNumber.from(21),
-              }),
-              createGqlPositionMock({
-                id: 'position-2',
-                from: toToken({
-                  address: 'fromYield',
-                  underlyingTokens: [emptyTokenWithAddress('from')],
-                }),
-                to: toToken({
-                  address: 'toYield',
-                  underlyingTokens: [emptyTokenWithAddress('to')],
-                }),
-                toWithdraw: BigNumber.from(15),
-                rate: BigNumber.from(25),
-                remainingSwaps: BigNumber.from(5),
-                toWithdrawUnderlyingAccum: BigNumber.from(16),
-                totalSwappedUnderlyingAccum: BigNumber.from(12),
-                depositedRateUnderlying: BigNumber.from(26),
-              }),
-              createGqlPositionMock({
-                id: 'position-3',
-                from: toToken({
-                  address: 'anotherFromYield',
-                  underlyingTokens: [emptyTokenWithAddress('anotherFrom')],
-                }),
-                to: toToken({
-                  address: 'anotherToYield',
-                  underlyingTokens: [emptyTokenWithAddress('anotherTo')],
-                }),
-                toWithdraw: BigNumber.from(20),
-                rate: BigNumber.from(30),
-                remainingSwaps: BigNumber.from(5),
-                toWithdrawUnderlyingAccum: BigNumber.from(21),
-                totalSwappedUnderlyingAccum: BigNumber.from(12),
-                depositedRateUnderlying: BigNumber.from(31),
-              }),
-            ],
-          },
-          loading: false,
-        } as GraphqlResults<PositionsGraphqlResponse>);
-      });
-
-      meanApiService.getUnderlyingTokens.mockResolvedValue({
-        '10-fromYield-100': {
-          underlying: BigNumber.from(110).toString(),
-          underlyingAmount: BigNumber.from(110).toString(),
+      accountService.getWallets.mockReturnValue([
+        {
+          address: 'wallet-1',
+          status: WalletStatus.connected,
+          switchChain: jest.fn(),
+          type: WalletType.embedded,
+          getProvider: jest.fn(),
+          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
         },
-        '10-toYield-10': {
-          underlying: BigNumber.from(20).toString(),
-          underlyingAmount: BigNumber.from(20).toString(),
+        {
+          address: 'wallet-2',
+          status: WalletStatus.connected,
+          switchChain: jest.fn(),
+          type: WalletType.embedded,
+          getProvider: jest.fn(),
+          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
         },
-        '10-fromYield-125': {
-          underlying: BigNumber.from(135).toString(),
-          underlyingAmount: BigNumber.from(135).toString(),
-        },
-        '10-toYield-15': {
-          underlying: BigNumber.from(25).toString(),
-          underlyingAmount: BigNumber.from(25).toString(),
-        },
-        '10-anotherFromYield-150': {
-          underlying: BigNumber.from(160).toString(),
-          underlyingAmount: BigNumber.from(160).toString(),
-        },
-        '10-anotherToYield-20': {
-          underlying: BigNumber.from(30).toString(),
-          underlyingAmount: BigNumber.from(30).toString(),
-        },
+      ]);
+      sdkService.getUsersDcaPositions.mockResolvedValue({
+        10: [
+          createSdkPositionMock({
+            id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-1`,
+            status: 'ongoing',
+            from: toDcaPositionToken({
+              ...emptyTokenWithAddress('from'),
+              variant: {
+                id: 'fromYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            tokenId: 1n,
+            to: toDcaPositionToken({
+              ...emptyTokenWithAddress('to'),
+              variant: {
+                id: 'toYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            chainId: 10,
+            rate: 20n,
+            remainingSwaps: 5,
+            toWithdraw: 13n,
+            toWithdrawYield: 2n,
+            swappedYield: 4n,
+            swapped: 15n,
+            remainingLiquidity: 110n,
+            remainingLiquidityYield: 10n,
+          }),
+          createSdkPositionMock({
+            id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
+            from: toDcaPositionToken({
+              ...emptyTokenWithAddress('from'),
+              variant: {
+                id: 'fromYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            tokenId: 2n,
+            status: 'ongoing',
+            to: toDcaPositionToken({
+              ...emptyTokenWithAddress('to'),
+              variant: {
+                id: 'toYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            chainId: 10,
+            rate: 25n,
+            remainingSwaps: 5,
+            toWithdraw: 16n,
+            toWithdrawYield: 1n,
+            swappedYield: 4n,
+            swapped: 20n,
+            remainingLiquidity: 130n,
+            remainingLiquidityYield: 5n,
+          }),
+          createSdkPositionMock({
+            id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
+            from: toDcaPositionToken({
+              ...emptyTokenWithAddress('anotherFrom'),
+              variant: {
+                id: 'anotherFromYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            tokenId: 3n,
+            chainId: 10,
+            status: 'ongoing',
+            to: toDcaPositionToken({
+              ...emptyTokenWithAddress('anotherTo'),
+              variant: {
+                id: 'anotherToYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            rate: 30n,
+            remainingSwaps: 5,
+            toWithdraw: 21n,
+            toWithdrawYield: 1n,
+            swappedYield: 5n,
+            swapped: 30n,
+            remainingLiquidity: 160n,
+            remainingLiquidityYield: 10n,
+          }),
+          createSdkPositionMock({
+            id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
+            from: toDcaPositionToken({
+              ...emptyTokenWithAddress('anotherFrom'),
+              variant: {
+                id: 'anotherFromYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            tokenId: 3n,
+            chainId: 10,
+            status: 'terminated',
+            to: toDcaPositionToken({
+              ...emptyTokenWithAddress('anotherTo'),
+              variant: {
+                id: 'anotherToYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            rate: 30n,
+            remainingSwaps: 5,
+            toWithdraw: 21n,
+            toWithdrawYield: 1n,
+            swappedYield: 5n,
+            swapped: 30n,
+            remainingLiquidity: 160n,
+            remainingLiquidityYield: 10n,
+          }),
+        ],
       });
     });
     test('it should do nothing if the account is not connected', async () => {
-      walletService.getAccount.mockReturnValueOnce('');
-
+      accountService.getWallets.mockReturnValue([]);
       await positionService.fetchCurrentPositions();
 
       expect(positionService.currentPositions).toEqual({});
@@ -519,121 +562,21 @@ describe('Position Service', () => {
     });
     test('it should fetch positions from all chains and all versions', async () => {
       await positionService.fetchCurrentPositions();
-
-      POSITIONS_VERSIONS.forEach((version) =>
-        NETWORKS_FOR_MENU.forEach((network) => {
-          expect(MockedGqlFetchAll).toHaveBeenCalledWith(
-            `gqlclient-${version}-${network}`,
-            GET_POSITIONS,
-            {
-              address: 'my account',
-              status: ['ACTIVE', 'COMPLETED'],
-            },
-            'positions',
-            'network-only'
-          );
-        })
-      );
-    });
-
-    test('it fetch the underlying balances of each of the tokens that are wrapped', async () => {
-      await positionService.fetchCurrentPositions();
-
-      expect(meanApiService.getUnderlyingTokens).toHaveBeenCalledTimes(1);
-      expect(meanApiService.getUnderlyingTokens).toHaveBeenCalledWith([
-        {
-          token: toToken({
-            address: 'from',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(100),
-        },
-        {
-          token: toToken({
-            address: 'to',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(10),
-        },
-        {
-          token: toToken({
-            address: 'from',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(125),
-        },
-        {
-          token: toToken({
-            address: 'to',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(15),
-        },
-        {
-          token: toToken({
-            address: 'anotherFrom',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'anotherFromYield',
-                underlyingTokens: [emptyTokenWithAddress('anotherFrom')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(150),
-        },
-        {
-          token: toToken({
-            address: 'anotherTo',
-            chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'anotherToYield',
-                underlyingTokens: [emptyTokenWithAddress('anotherTo')],
-              }),
-            ],
-          }),
-          amount: BigNumber.from(20),
-        },
-      ]);
+      expect(sdkService.getUsersDcaPositions).toHaveBeenCalledWith(['wallet-1', 'wallet-2']);
     });
 
     test('it should set the current positions of the current users', async () => {
       await positionService.fetchCurrentPositions();
 
       expect(positionService.currentPositions).toEqual({
-        [`position-1-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-1-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'from',
             chainId: 10,
             underlyingTokens: [
               toToken({
                 address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
+                chainId: 10,
               }),
             ],
           }),
@@ -643,34 +586,30 @@ describe('Position Service', () => {
             underlyingTokens: [
               toToken({
                 address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
+                chainId: 10,
               }),
             ],
           }),
-          positionId: 'position-1',
-          id: `position-1-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: BigNumber.from(10),
+          positionId: '1',
+          id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
+          toWithdraw: BigNumber.from(13),
+          toWithdrawYield: BigNumber.from(2),
+          swapped: BigNumber.from(15),
+          swappedYield: BigNumber.from(4),
+          remainingLiquidity: BigNumber.from(110),
+          remainingLiquidityYield: BigNumber.from(10),
           rate: BigNumber.from(20),
           remainingSwaps: BigNumber.from(5),
-          withdrawn: parseUnits('7', 18),
-          // pairId: 'pair',
-          toWithdrawUnderlyingAccum: BigNumber.from(11),
-          totalSwappedUnderlyingAccum: BigNumber.from(12),
-          depositedRateUnderlying: BigNumber.from(21),
-          remainingLiquidityUnderlying: BigNumber.from(110),
-          toWithdrawUnderlying: BigNumber.from(20),
-          pairLastSwappedAt: 10,
-          pairNextSwapAvailableAt: '1686329816',
-          swapped: parseUnits('15', 18),
+          totalSwaps: BigNumber.from(10),
         }),
-        [`position-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'from',
             chainId: 10,
             underlyingTokens: [
               toToken({
                 address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
+                chainId: 10,
               }),
             ],
           }),
@@ -680,34 +619,30 @@ describe('Position Service', () => {
             underlyingTokens: [
               toToken({
                 address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
+                chainId: 10,
               }),
             ],
           }),
-          positionId: 'position-2',
-          id: `position-2-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: BigNumber.from(15),
+          positionId: '2',
+          id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
+          toWithdraw: BigNumber.from(16),
+          toWithdrawYield: BigNumber.from(1),
+          swapped: BigNumber.from(20),
+          swappedYield: BigNumber.from(4),
+          remainingLiquidity: BigNumber.from(130),
+          remainingLiquidityYield: BigNumber.from(5),
           rate: BigNumber.from(25),
           remainingSwaps: BigNumber.from(5),
-          withdrawn: parseUnits('7', 18),
-          // pairId: 'pair',
-          toWithdrawUnderlyingAccum: BigNumber.from(16),
-          totalSwappedUnderlyingAccum: BigNumber.from(12),
-          depositedRateUnderlying: BigNumber.from(26),
-          remainingLiquidityUnderlying: BigNumber.from(135),
-          toWithdrawUnderlying: BigNumber.from(25),
-          pairLastSwappedAt: 10,
-          pairNextSwapAvailableAt: '1686329816',
-          swapped: parseUnits('15', 18),
+          totalSwaps: BigNumber.from(10),
         }),
-        [`position-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'anotherFrom',
             chainId: 10,
             underlyingTokens: [
               toToken({
                 address: 'anotherFromYield',
-                underlyingTokens: [emptyTokenWithAddress('anotherFrom')],
+                chainId: 10,
               }),
             ],
           }),
@@ -717,25 +652,22 @@ describe('Position Service', () => {
             underlyingTokens: [
               toToken({
                 address: 'anotherToYield',
-                underlyingTokens: [emptyTokenWithAddress('anotherTo')],
+                chainId: 10,
               }),
             ],
           }),
-          positionId: 'position-3',
-          id: `position-3-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: BigNumber.from(20),
+          positionId: '3',
+          id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
           // pairId: 'pair',
+          toWithdraw: BigNumber.from(21),
+          toWithdrawYield: BigNumber.from(1),
+          swapped: BigNumber.from(30),
+          swappedYield: BigNumber.from(5),
+          remainingLiquidity: BigNumber.from(160),
+          remainingLiquidityYield: BigNumber.from(10),
           rate: BigNumber.from(30),
-          withdrawn: parseUnits('7', 18),
           remainingSwaps: BigNumber.from(5),
-          toWithdrawUnderlyingAccum: BigNumber.from(21),
-          totalSwappedUnderlyingAccum: BigNumber.from(12),
-          depositedRateUnderlying: BigNumber.from(31),
-          remainingLiquidityUnderlying: BigNumber.from(160),
-          toWithdrawUnderlying: BigNumber.from(30),
-          pairLastSwappedAt: 10,
-          pairNextSwapAvailableAt: '1686329816',
-          swapped: parseUnits('15', 18),
+          totalSwaps: BigNumber.from(10),
         }),
       });
     });
@@ -743,81 +675,167 @@ describe('Position Service', () => {
 
   describe('fetchPastPositions', () => {
     beforeEach(() => {
-      MockedGqlFetchAll.mockImplementation((client) => {
-        if ((client as unknown as string) !== `gqlclient-${PositionVersions.POSITION_VERSION_4}-10`) {
-          return Promise.resolve({
-            error: undefined,
-            data: {
-              positions: [],
-            },
-            loading: false,
-          } as GraphqlResults<PositionsGraphqlResponse>);
-        }
-
-        return Promise.resolve({
-          error: undefined,
-          data: {
-            positions: [
-              createGqlPositionMock({
-                id: 'position-1',
-                from: toToken({
-                  address: 'fromYield',
-                  underlyingTokens: [emptyTokenWithAddress('from')],
-                }),
-                to: toToken({
-                  address: 'toYield',
-                  underlyingTokens: [emptyTokenWithAddress('to')],
-                }),
-                toWithdraw: BigNumber.from(0),
-                rate: BigNumber.from(20),
-                remainingSwaps: BigNumber.from(0),
-                toWithdrawUnderlyingAccum: BigNumber.from(0),
-                totalSwappedUnderlyingAccum: null,
-                depositedRateUnderlying: null,
-              }),
-              createGqlPositionMock({
-                id: 'position-2',
-                from: toToken({
-                  address: 'fromYield',
-                  underlyingTokens: [emptyTokenWithAddress('from')],
-                }),
-                to: toToken({
-                  address: 'toYield',
-                  underlyingTokens: [emptyTokenWithAddress('to')],
-                }),
-                toWithdraw: BigNumber.from(0),
-                rate: BigNumber.from(25),
-                remainingSwaps: BigNumber.from(0),
-                toWithdrawUnderlyingAccum: BigNumber.from(0),
-                totalSwappedUnderlyingAccum: null,
-                depositedRateUnderlying: null,
-              }),
-              createGqlPositionMock({
-                id: 'position-3',
-                from: toToken({
-                  address: 'anotherFromYield',
-                  underlyingTokens: [emptyTokenWithAddress('anotherFrom')],
-                }),
-                to: toToken({
-                  address: 'anotherToYield',
-                  underlyingTokens: [emptyTokenWithAddress('anotherTo')],
-                }),
-                toWithdraw: BigNumber.from(0),
-                rate: BigNumber.from(30),
-                remainingSwaps: BigNumber.from(0),
-                toWithdrawUnderlyingAccum: BigNumber.from(0),
-                totalSwappedUnderlyingAccum: null,
-                depositedRateUnderlying: null,
-              }),
-            ],
-          },
-          loading: false,
-        } as GraphqlResults<PositionsGraphqlResponse>);
+      accountService.getWallets.mockReturnValue([
+        {
+          address: 'wallet-1',
+          status: WalletStatus.connected,
+          switchChain: jest.fn(),
+          type: WalletType.embedded,
+          getProvider: jest.fn(),
+          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
+        },
+        {
+          address: 'wallet-2',
+          status: WalletStatus.connected,
+          switchChain: jest.fn(),
+          type: WalletType.embedded,
+          getProvider: jest.fn(),
+          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
+        },
+      ]);
+      sdkService.getUsersDcaPositions.mockResolvedValue({
+        10: [
+          createSdkPositionMock({
+            id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-1`,
+            status: 'terminated',
+            from: toDcaPositionToken({
+              ...emptyTokenWithAddress('from'),
+              variant: {
+                id: 'fromYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            tokenId: 1n,
+            to: toDcaPositionToken({
+              ...emptyTokenWithAddress('to'),
+              variant: {
+                id: 'toYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            chainId: 10,
+            rate: 20n,
+            remainingSwaps: 0,
+            toWithdraw: 0n,
+            toWithdrawYield: 0n,
+            swappedYield: 4n,
+            swapped: 15n,
+            remainingLiquidity: 0n,
+            remainingLiquidityYield: 0n,
+          }),
+          createSdkPositionMock({
+            id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
+            from: toDcaPositionToken({
+              ...emptyTokenWithAddress('from'),
+              variant: {
+                id: 'fromYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            tokenId: 2n,
+            status: 'terminated',
+            to: toDcaPositionToken({
+              ...emptyTokenWithAddress('to'),
+              variant: {
+                id: 'toYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            chainId: 10,
+            rate: 25n,
+            remainingSwaps: 0,
+            toWithdraw: 0n,
+            toWithdrawYield: 0n,
+            swappedYield: 4n,
+            swapped: 20n,
+            remainingLiquidity: 0n,
+            remainingLiquidityYield: 0n,
+          }),
+          createSdkPositionMock({
+            id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
+            from: toDcaPositionToken({
+              ...emptyTokenWithAddress('anotherFrom'),
+              variant: {
+                id: 'anotherFromYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            tokenId: 3n,
+            chainId: 10,
+            status: 'terminated',
+            to: toDcaPositionToken({
+              ...emptyTokenWithAddress('anotherTo'),
+              variant: {
+                id: 'anotherToYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            rate: 30n,
+            remainingSwaps: 0,
+            toWithdraw: 0n,
+            toWithdrawYield: 0n,
+            swappedYield: 5n,
+            swapped: 30n,
+            remainingLiquidity: 0n,
+            remainingLiquidityYield: 0n,
+          }),
+          createSdkPositionMock({
+            id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
+            from: toDcaPositionToken({
+              ...emptyTokenWithAddress('anotherFrom'),
+              variant: {
+                id: 'anotherFromYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            tokenId: 3n,
+            chainId: 10,
+            status: 'ongoing',
+            to: toDcaPositionToken({
+              ...emptyTokenWithAddress('anotherTo'),
+              variant: {
+                id: 'anotherToYield',
+                type: 'yield',
+                apy: 0,
+                tvl: 0,
+                platform: 'aave',
+              },
+            }),
+            rate: 30n,
+            remainingSwaps: 0,
+            toWithdraw: 0n,
+            toWithdrawYield: 0n,
+            swappedYield: 5n,
+            swapped: 30n,
+            remainingLiquidity: 0n,
+            remainingLiquidityYield: 0n,
+          }),
+        ],
       });
     });
     test('it should do nothing if the account is not connected', async () => {
-      walletService.getAccount.mockReturnValueOnce('');
-
+      accountService.getWallets.mockReturnValue([]);
       await positionService.fetchPastPositions();
 
       expect(positionService.pastPositions).toEqual({});
@@ -826,34 +844,21 @@ describe('Position Service', () => {
     test('it should fetch positions from all chains and all versions', async () => {
       await positionService.fetchPastPositions();
 
-      POSITIONS_VERSIONS.forEach((version) =>
-        NETWORKS_FOR_MENU.forEach((network) => {
-          expect(MockedGqlFetchAll).toHaveBeenCalledWith(
-            `gqlclient-${version}-${network}`,
-            GET_POSITIONS,
-            {
-              address: 'my account',
-              status: ['TERMINATED'],
-            },
-            'positions',
-            'network-only'
-          );
-        })
-      );
+      expect(sdkService.getUsersDcaPositions).toHaveBeenCalledWith(['wallet-1', 'wallet-2']);
     });
 
     test('it should set the current positions of the current users', async () => {
       await positionService.fetchPastPositions();
 
       expect(positionService.pastPositions).toEqual({
-        [`position-1-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-1-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'from',
             chainId: 10,
             underlyingTokens: [
               toToken({
                 address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
+                chainId: 10,
               }),
             ],
           }),
@@ -863,34 +868,32 @@ describe('Position Service', () => {
             underlyingTokens: [
               toToken({
                 address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
+                chainId: 10,
               }),
             ],
           }),
-          positionId: 'position-1',
-          id: `position-1-v${PositionVersions.POSITION_VERSION_4}`,
+          positionId: '1',
+          status: 'TERMINATED',
           toWithdraw: BigNumber.from(0),
+          toWithdrawYield: BigNumber.from(0),
+          remainingLiquidity: BigNumber.from(0),
+          remainingLiquidityYield: BigNumber.from(0),
+          id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
           rate: BigNumber.from(20),
           remainingSwaps: BigNumber.from(0),
-          withdrawn: parseUnits('7', 18),
-          toWithdrawUnderlyingAccum: BigNumber.from(0),
-          totalSwappedUnderlyingAccum: null,
-          depositedRateUnderlying: null,
-          remainingLiquidityUnderlying: null,
-          toWithdrawUnderlying: null,
-          pairLastSwappedAt: 10,
-          pairNextSwapAvailableAt: '1686329816',
-          swapped: parseUnits('15', 18),
+          swapped: BigNumber.from(15),
+          swappedYield: BigNumber.from(4),
+          totalSwaps: BigNumber.from(5),
           pairId: 'pair',
         }),
-        [`position-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'from',
             chainId: 10,
             underlyingTokens: [
               toToken({
                 address: 'fromYield',
-                underlyingTokens: [emptyTokenWithAddress('from')],
+                chainId: 10,
               }),
             ],
           }),
@@ -900,34 +903,32 @@ describe('Position Service', () => {
             underlyingTokens: [
               toToken({
                 address: 'toYield',
-                underlyingTokens: [emptyTokenWithAddress('to')],
+                chainId: 10,
               }),
             ],
           }),
-          positionId: 'position-2',
-          id: `position-2-v${PositionVersions.POSITION_VERSION_4}`,
+          positionId: '2',
+          status: 'TERMINATED',
+          id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: BigNumber.from(0),
+          toWithdrawYield: BigNumber.from(0),
+          remainingLiquidity: BigNumber.from(0),
+          remainingLiquidityYield: BigNumber.from(0),
           rate: BigNumber.from(25),
           remainingSwaps: BigNumber.from(0),
-          withdrawn: parseUnits('7', 18),
-          toWithdrawUnderlyingAccum: BigNumber.from(0),
-          totalSwappedUnderlyingAccum: null,
-          depositedRateUnderlying: null,
-          remainingLiquidityUnderlying: null,
-          toWithdrawUnderlying: null,
           pairId: 'pair',
-          pairLastSwappedAt: 10,
-          pairNextSwapAvailableAt: '1686329816',
-          swapped: parseUnits('15', 18),
+          swapped: BigNumber.from(20),
+          swappedYield: BigNumber.from(4),
+          totalSwaps: BigNumber.from(5),
         }),
-        [`position-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
+        [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'anotherFrom',
             chainId: 10,
             underlyingTokens: [
               toToken({
                 address: 'anotherFromYield',
-                underlyingTokens: [emptyTokenWithAddress('anotherFrom')],
+                chainId: 10,
               }),
             ],
           }),
@@ -937,25 +938,23 @@ describe('Position Service', () => {
             underlyingTokens: [
               toToken({
                 address: 'anotherToYield',
-                underlyingTokens: [emptyTokenWithAddress('anotherTo')],
+                chainId: 10,
               }),
             ],
           }),
           pairId: 'pair',
-          positionId: 'position-3',
-          id: `position-3-v${PositionVersions.POSITION_VERSION_4}`,
+          positionId: '3',
+          status: 'TERMINATED',
           toWithdraw: BigNumber.from(0),
+          toWithdrawYield: BigNumber.from(0),
+          remainingLiquidity: BigNumber.from(0),
+          remainingLiquidityYield: BigNumber.from(0),
+          id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
           rate: BigNumber.from(30),
-          withdrawn: parseUnits('7', 18),
           remainingSwaps: BigNumber.from(0),
-          toWithdrawUnderlyingAccum: BigNumber.from(0),
-          totalSwappedUnderlyingAccum: null,
-          depositedRateUnderlying: null,
-          remainingLiquidityUnderlying: null,
-          toWithdrawUnderlying: null,
-          pairLastSwappedAt: 10,
-          pairNextSwapAvailableAt: '1686329816',
-          swapped: parseUnits('15', 18),
+          swapped: BigNumber.from(30),
+          swappedYield: BigNumber.from(5),
+          totalSwaps: BigNumber.from(5),
         }),
       });
     });
@@ -1003,7 +1002,7 @@ describe('Position Service', () => {
         r: 'r',
         s: 's',
       } as never);
-      contractService.getPermissionManagerAddress.mockResolvedValue('permissionManagerAddress');
+      contractService.getPermissionManagerAddress.mockReturnValue('permissionManagerAddress');
     });
     describe('when an address is passed', () => {
       test('it should use the specific permission manager address for the signature', async () => {
@@ -1138,7 +1137,7 @@ describe('Position Service', () => {
       } as unknown as jest.Mocked<DCAPermissionsManager>;
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
     });
     test('it should use the latest companion to call the permission manager to get the permission', async () => {
       const result = await positionService.companionHasPermission(
@@ -1146,8 +1145,12 @@ describe('Position Service', () => {
         PERMISSIONS.INCREASE
       );
 
-      expect(contractService.getPermissionManagerInstance).toHaveBeenCalledWith(PositionVersions.POSITION_VERSION_3);
-      expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(LATEST_VERSION);
+      expect(contractService.getPermissionManagerInstance).toHaveBeenCalledWith(
+        10,
+        'my account',
+        PositionVersions.POSITION_VERSION_3
+      );
+      expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(10, LATEST_VERSION);
 
       expect(result).toEqual(false);
     });
@@ -1178,7 +1181,7 @@ describe('Position Service', () => {
         {
           id: 'permission',
           operator: 'operator',
-          permissions: [Permission.INCREASE, Permission.REDUCE, Permission.WITHDRAW],
+          permissions: [DCAPermission.INCREASE, DCAPermission.REDUCE, DCAPermission.WITHDRAW],
         },
       ]);
 
@@ -1192,7 +1195,7 @@ describe('Position Service', () => {
 
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-        from: 'account',
+        from: 'my account',
         to: 'permissionManager',
         data: 'modify',
       });
@@ -1249,17 +1252,19 @@ describe('Position Service', () => {
 
   describe('buildDepositParams', () => {
     beforeEach(() => {
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
     });
     describe('when the amount of swaps is higher than the max', () => {
-      test('it should throw an error', async () => {
+      test('it should throw an error', () => {
         try {
-          await positionService.buildDepositParams(
+          positionService.buildDepositParams(
+            'account',
             toToken({ address: 'from' }),
             toToken({ address: 'to' }),
             '10',
             ONE_DAY,
             '4294967296',
+            10,
             'yieldFrom',
             'yieldTo'
           );
@@ -1272,13 +1277,15 @@ describe('Position Service', () => {
     });
 
     describe('when the from has yield', () => {
-      test('it should add the increase, reduce and terminate permissions', async () => {
-        const result = await positionService.buildDepositParams(
+      test('it should add the increase, reduce and terminate permissions', () => {
+        const result = positionService.buildDepositParams(
+          'account',
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
           '10',
           ONE_DAY,
           '5',
+          10,
           'yieldFrom'
         );
 
@@ -1289,7 +1296,7 @@ describe('Position Service', () => {
           totalAmmount: parseUnits('10', 18),
           swaps: BigNumber.from(5),
           interval: ONE_DAY,
-          account: 'my account',
+          account: 'account',
           permissions: [
             {
               operator: 'companionAddress',
@@ -1303,13 +1310,15 @@ describe('Position Service', () => {
     });
 
     describe('when the to has yield', () => {
-      test('it should add the withdraw and terminate permissions', async () => {
-        const result = await positionService.buildDepositParams(
+      test('it should add the withdraw and terminate permissions', () => {
+        const result = positionService.buildDepositParams(
+          'account',
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
           '10',
           ONE_DAY,
           '5',
+          10,
           undefined,
           'yieldTo'
         );
@@ -1321,7 +1330,7 @@ describe('Position Service', () => {
           totalAmmount: parseUnits('10', 18),
           swaps: BigNumber.from(5),
           interval: ONE_DAY,
-          account: 'my account',
+          account: 'account',
           permissions: [{ operator: 'companionAddress', permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE] }],
           yieldFrom: undefined,
           yieldTo: 'yieldTo',
@@ -1330,13 +1339,15 @@ describe('Position Service', () => {
     });
 
     describe('when no token has yield', () => {
-      test('it should not add any permission to the position', async () => {
-        const result = await positionService.buildDepositParams(
+      test('it should not add any permission to the position', () => {
+        const result = positionService.buildDepositParams(
+          'account',
           toToken({ address: 'from' }),
           toToken({ address: 'to' }),
           '10',
           ONE_DAY,
-          '5'
+          '5',
+          10
         );
 
         expect(result).toEqual({
@@ -1346,7 +1357,7 @@ describe('Position Service', () => {
           totalAmmount: parseUnits('10', 18),
           swaps: BigNumber.from(5),
           interval: ONE_DAY,
-          account: 'my account',
+          account: 'account',
           permissions: [{ operator: 'companionAddress', permissions: [] }],
           yieldFrom: undefined,
           yieldTo: undefined,
@@ -1377,22 +1388,26 @@ describe('Position Service', () => {
 
     describe('when the from is not the protocol token', () => {
       test('it should get the transaction from the sdk', async () => {
-        const params = await positionService.buildDepositParams(
-          toToken({ address: 'from' }),
-          toToken({ address: 'to' }),
+        const params = positionService.buildDepositParams(
+          'account',
+          toToken({ address: 'from', chainId: 10 }),
+          toToken({ address: 'to', chainId: 10 }),
           '10',
           ONE_DAY,
           '5',
+          10,
           'fromYield',
           'toYield'
         );
 
         const result = await positionService.buildDepositTx(
-          toToken({ address: 'from' }),
-          toToken({ address: 'to' }),
+          'account',
+          toToken({ address: 'from', chainId: 10 }),
+          toToken({ address: 'to', chainId: 10 }),
           '10',
           ONE_DAY,
           '5',
+          10,
           'fromYield',
           'toYield',
           {
@@ -1410,7 +1425,7 @@ describe('Position Service', () => {
           swapInterval: params.interval.toNumber(),
           amountOfSwaps: params.swaps.toNumber(),
           owner: params.account,
-          permissions: params.permissions,
+          permissions: parsePermissionsForSdk(params.permissions),
           deposit: {
             permitData: {
               amount: params.totalAmmount.toString(),
@@ -1430,20 +1445,24 @@ describe('Position Service', () => {
 
     describe('when the from is the protocol token', () => {
       test('it should get the transaction from the sdk', async () => {
-        const params = await positionService.buildDepositParams(
+        const params = positionService.buildDepositParams(
+          'account',
           getProtocolToken(10),
           toToken({ address: 'to' }),
           '10',
           ONE_DAY,
-          '5'
+          '5',
+          10
         );
 
         const result = await positionService.buildDepositTx(
+          'account',
           getProtocolToken(10),
           toToken({ address: 'to' }),
           '10',
           ONE_DAY,
-          '5'
+          '5',
+          10
         );
 
         const wrappedProtocolToken = getWrappedProtocolToken(10);
@@ -1486,39 +1505,46 @@ describe('Position Service', () => {
     });
 
     test('it should call the safeService with the bundled approve and deposit transactions', async () => {
-      const params = await positionService.buildDepositParams(
+      const params = positionService.buildDepositParams(
+        'account',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
         ONE_DAY,
         '5',
+        10,
         'yieldFrom',
         'yieldTo'
       );
 
       const result = await positionService.approveAndDepositSafe(
+        'account',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
         ONE_DAY,
         '5',
+        10,
         'yieldFrom',
         'yieldTo'
       );
 
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledTimes(1);
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledWith(
+        'account',
         toToken({ address: 'from' }),
         'resolved-allowance-target',
         params.totalAmmount
       );
       expect(positionService.buildDepositTx).toHaveBeenCalledTimes(1);
       expect(positionService.buildDepositTx).toHaveBeenCalledWith(
+        'account',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
         ONE_DAY,
         '5',
+        10,
         'yieldFrom',
         'yieldTo'
       );
@@ -1559,17 +1585,20 @@ describe('Position Service', () => {
         '10',
         ONE_DAY,
         '5',
+        10,
         'yieldFrom',
         'yieldTo'
       );
 
       expect(positionService.buildDepositTx).toHaveBeenCalledTimes(1);
       expect(positionService.buildDepositTx).toHaveBeenCalledWith(
+        'user',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
         ONE_DAY,
         '5',
+        10,
         'yieldFrom',
         'yieldTo',
         undefined
@@ -1604,12 +1633,17 @@ describe('Position Service', () => {
       } as unknown as TransactionResponse);
 
       contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
 
       positionService.companionHasPermission = jest.fn().mockResolvedValue(true);
       positionService.getSignatureForPermission = jest.fn().mockResolvedValue({
-        permissions: 'permissions',
+        permissions: [
+          {
+            operator: 'companion',
+            permissions: [PERMISSIONS.WITHDRAW],
+          },
+        ],
         deadline: 'deadline',
         v: 'v',
         r: [1],
@@ -1657,6 +1691,7 @@ describe('Position Service', () => {
         });
         expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
         expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
+          from: 'my account',
           to: 'companion',
           data: 'withdrawSwapped',
         });
@@ -1701,7 +1736,12 @@ describe('Position Service', () => {
             dcaHub: 'hubAddress',
             recipient: 'my account',
             permissionPermit: {
-              permissions: 'permissions',
+              permissions: [
+                {
+                  operator: 'companion',
+                  permissions: ['WITHDRAW'],
+                },
+              ],
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
@@ -1712,6 +1752,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
+            from: 'my account',
             data: 'withdrawSwapped',
           });
           expect(result).toEqual({
@@ -1750,6 +1791,7 @@ describe('Position Service', () => {
           });
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
+            from: 'my account',
             to: 'companion',
             data: 'withdrawSwapped',
           });
@@ -1786,6 +1828,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
+            from: 'my account',
             data: 'withdrawSwapped',
           });
           expect(result).toEqual({
@@ -1828,7 +1871,12 @@ describe('Position Service', () => {
             dcaHub: 'hubAddress',
             recipient: 'my account',
             permissionPermit: {
-              permissions: 'permissions',
+              permissions: [
+                {
+                  operator: 'companion',
+                  permissions: ['WITHDRAW'],
+                },
+              ],
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
@@ -1839,6 +1887,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
+            from: 'my account',
             data: 'withdrawSwapped',
           });
           expect(result).toEqual({
@@ -1877,6 +1926,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
+            from: 'my account',
             data: 'withdrawSwapped',
           });
           expect(result).toEqual({
@@ -1902,8 +1952,8 @@ describe('Position Service', () => {
       });
 
       contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
 
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: 'terminate-hash',
@@ -1911,7 +1961,12 @@ describe('Position Service', () => {
 
       positionService.companionHasPermission = jest.fn().mockResolvedValue(true);
       positionService.getSignatureForPermission = jest.fn().mockResolvedValue({
-        permissions: 'permissions',
+        permissions: [
+          {
+            operator: 'companion',
+            permissions: [PERMISSIONS.WITHDRAW],
+          },
+        ],
         deadline: 'deadline',
         v: 'v',
         r: [1],
@@ -1964,6 +2019,7 @@ describe('Position Service', () => {
         expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
         expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
           to: 'companion',
+          from: 'my account',
           data: 'terminate',
         });
         expect(result).toEqual({
@@ -2011,7 +2067,12 @@ describe('Position Service', () => {
             dcaHub: 'hubAddress',
             recipient: 'my account',
             permissionPermit: {
-              permissions: 'permissions',
+              permissions: [
+                {
+                  operator: 'companion',
+                  permissions: ['WITHDRAW'],
+                },
+              ],
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
@@ -2023,6 +2084,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
+            from: 'my account',
             data: 'terminate',
           });
           expect(result).toEqual({
@@ -2063,6 +2125,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
+            from: 'my account',
             data: 'terminate',
           });
           expect(result).toEqual({
@@ -2101,6 +2164,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
             data: 'terminate',
+            from: 'my account',
           });
           expect(result).toEqual({
             hash: 'terminate-hash',
@@ -2146,7 +2210,12 @@ describe('Position Service', () => {
             dcaHub: 'hubAddress',
             recipient: 'my account',
             permissionPermit: {
-              permissions: 'permissions',
+              permissions: [
+                {
+                  operator: 'companion',
+                  permissions: ['WITHDRAW'],
+                },
+              ],
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
@@ -2159,6 +2228,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
             data: 'terminate',
+            from: 'my account',
           });
           expect(result).toEqual({
             hash: 'terminate-hash',
@@ -2198,6 +2268,7 @@ describe('Position Service', () => {
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
             to: 'companion',
             data: 'terminate',
+            from: 'my account',
           });
           expect(result).toEqual({
             hash: 'terminate-hash',
@@ -2220,7 +2291,7 @@ describe('Position Service', () => {
       } as unknown as jest.Mocked<DCAHubCompanion>;
 
       contractService.getHUBCompanionInstance.mockResolvedValue(hubCompanionInstanceMock);
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
     });
 
     describe('when there are positions on different chains', () => {
@@ -2362,22 +2433,22 @@ describe('Position Service', () => {
 
       expect(permissionManagerInstanceMock.hasPermissions).toHaveBeenCalledTimes(3);
       expect(permissionManagerInstanceMock.hasPermissions).toHaveBeenCalledWith('position-1', 'permittedAddress', [
-        PERMISSIONS.INCREASE,
-        PERMISSIONS.REDUCE,
-        PERMISSIONS.WITHDRAW,
-        PERMISSIONS.TERMINATE,
+        DCAPermission.INCREASE,
+        DCAPermission.REDUCE,
+        DCAPermission.WITHDRAW,
+        DCAPermission.TERMINATE,
       ]);
       expect(permissionManagerInstanceMock.hasPermissions).toHaveBeenCalledWith('position-1', 'permittedAddress', [
-        PERMISSIONS.INCREASE,
-        PERMISSIONS.REDUCE,
-        PERMISSIONS.WITHDRAW,
-        PERMISSIONS.TERMINATE,
+        DCAPermission.INCREASE,
+        DCAPermission.REDUCE,
+        DCAPermission.WITHDRAW,
+        DCAPermission.TERMINATE,
       ]);
       expect(permissionManagerInstanceMock.hasPermissions).toHaveBeenCalledWith('position-1', 'permittedAddress', [
-        PERMISSIONS.INCREASE,
-        PERMISSIONS.REDUCE,
-        PERMISSIONS.WITHDRAW,
-        PERMISSIONS.TERMINATE,
+        DCAPermission.INCREASE,
+        DCAPermission.REDUCE,
+        DCAPermission.WITHDRAW,
+        DCAPermission.TERMINATE,
       ]);
 
       expect(permissionManagerInstanceMock.modifyMany).toHaveBeenCalledTimes(1);
@@ -2418,13 +2489,13 @@ describe('Position Service', () => {
 
   describe('buildModifyRateAndSwapsParams', () => {
     beforeEach(() => {
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
     });
 
     describe('when the from isnt protocol or wrapped token and useWrappedProtocolToken was passed', () => {
-      test('it should throw an error', async () => {
+      test('it should throw an error', () => {
         try {
-          await positionService.buildModifyRateAndSwapsParams(
+          positionService.buildModifyRateAndSwapsParams(
             createPositionMock({
               positionId: 'position-1',
               from: toToken({ address: 'from' }),
@@ -2442,9 +2513,9 @@ describe('Position Service', () => {
     });
 
     describe('when the amount of swaps is higher than the max', () => {
-      test('it should throw an error', async () => {
+      test('it should throw an error', () => {
         try {
-          await positionService.buildModifyRateAndSwapsParams(
+          positionService.buildModifyRateAndSwapsParams(
             createPositionMock({
               positionId: 'position-1',
               from: toToken({ address: 'from' }),
@@ -2462,8 +2533,8 @@ describe('Position Service', () => {
     });
 
     describe('when its increase', () => {
-      test('it should build the parameters for the modify', async () => {
-        const result = await positionService.buildModifyRateAndSwapsParams(
+      test('it should build the parameters for the modify', () => {
+        const result = positionService.buildModifyRateAndSwapsParams(
           createPositionMock({
             positionId: 'position-1',
             from: toToken({ address: 'from' }),
@@ -2488,8 +2559,8 @@ describe('Position Service', () => {
       });
     });
     describe('when its decrease', () => {
-      test('it should build the parameters for the modify', async () => {
-        const result = await positionService.buildModifyRateAndSwapsParams(
+      test('it should build the parameters for the modify', () => {
+        const result = positionService.buildModifyRateAndSwapsParams(
           createPositionMock({
             positionId: 'position-1',
             from: toToken({ address: 'from' }),
@@ -2518,7 +2589,12 @@ describe('Position Service', () => {
   describe('getModifyRateAndSwapsSignature', () => {
     beforeEach(() => {
       positionService.getSignatureForPermission = jest.fn().mockResolvedValue({
-        permissions: 'permissions',
+        permissions: [
+          {
+            operator: 'companion',
+            permissions: [PERMISSIONS.WITHDRAW],
+          },
+        ],
         deadline: 'deadline',
         v: 'v',
         r: [1],
@@ -2527,7 +2603,7 @@ describe('Position Service', () => {
     });
 
     test('it should build the signature to add the permissions for increaase', async () => {
-      positionService.buildModifyRateAndSwapsParams = jest.fn().mockResolvedValue({
+      positionService.buildModifyRateAndSwapsParams = jest.fn().mockReturnValue({
         companionAddress: 'companionAddress',
         isIncrease: true,
       });
@@ -2568,7 +2644,7 @@ describe('Position Service', () => {
         PERMISSIONS.INCREASE
       );
       expect(result).toEqual({
-        permissions: 'permissions',
+        permissions: [{ operator: 'companion', permissions: [PERMISSIONS.WITHDRAW] }],
         deadline: 'deadline',
         v: 'v',
         r: '0x01',
@@ -2578,7 +2654,7 @@ describe('Position Service', () => {
     });
 
     test('it should build the signature to add the permissions for reduce', async () => {
-      positionService.buildModifyRateAndSwapsParams = jest.fn().mockResolvedValue({
+      positionService.buildModifyRateAndSwapsParams = jest.fn().mockReturnValue({
         companionAddress: 'companionAddress',
         isIncrease: false,
       });
@@ -2619,7 +2695,7 @@ describe('Position Service', () => {
         PERMISSIONS.REDUCE
       );
       expect(result).toEqual({
-        permissions: 'permissions',
+        permissions: [{ operator: 'companion', permissions: [PERMISSIONS.WITHDRAW] }],
         deadline: 'deadline',
         v: 'v',
         r: '0x01',
@@ -2655,9 +2731,7 @@ describe('Position Service', () => {
 
       contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
 
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
-
-      positionService.getModifyRateAndSwapsSignature = jest.fn().mockResolvedValue('permissionSignature');
+      contractService.getHUBAddress.mockReturnValue('hubAddress');
     });
 
     describe('when its increasing the position', () => {
@@ -2666,15 +2740,24 @@ describe('Position Service', () => {
         newRateUnderlying = '20';
         newSwaps = '10';
 
-        contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+        contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
         sdkService.buildIncreasePositionTx.mockResolvedValue({
           to: 'companion',
           data: 'meanapi-increase-data',
         });
+
+        positionService.getModifyRateAndSwapsSignature = jest.fn().mockResolvedValue({
+          permissions: [{ operator: 'companionAddress', permissions: [PERMISSIONS.INCREASE] }],
+          deadline: 'deadline',
+          v: 'v',
+          r: '0x01',
+          s: '0x01',
+          tokenId: 'position-1',
+        });
       });
 
       describe('when the from has yield', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
           position = createPositionMock({
             positionId: 'position-1',
             from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
@@ -2682,7 +2765,7 @@ describe('Position Service', () => {
             remainingSwaps: BigNumber.from(5),
           });
 
-          params = await positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
+          params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
 
           return params;
         });
@@ -2733,7 +2816,14 @@ describe('Position Service', () => {
             positionId: 'position-1',
             dcaHub: 'hubAddress',
             amountOfSwaps: params.swaps.toNumber(),
-            permissionPermit: 'permissionSignature',
+            permissionPermit: {
+              permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.INCREASE] }],
+              deadline: 'deadline',
+              v: 'v',
+              r: '0x01',
+              s: '0x01',
+              tokenId: 'position-1',
+            },
             increase: { token: params.tokenFrom, amount: params.amount.toString() },
           });
 
@@ -2745,7 +2835,7 @@ describe('Position Service', () => {
       });
 
       describe('when the from is the protocol token', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
           position = createPositionMock({
             positionId: 'position-1',
             from: getProtocolToken(10),
@@ -2753,7 +2843,7 @@ describe('Position Service', () => {
             remainingSwaps: BigNumber.from(5),
           });
 
-          params = await positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
+          params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
 
           return params;
         });
@@ -2804,7 +2894,14 @@ describe('Position Service', () => {
             positionId: 'position-1',
             dcaHub: 'hubAddress',
             amountOfSwaps: params.swaps.toNumber(),
-            permissionPermit: 'permissionSignature',
+            permissionPermit: {
+              permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.INCREASE] }],
+              deadline: 'deadline',
+              v: 'v',
+              r: '0x01',
+              s: '0x01',
+              tokenId: 'position-1',
+            },
             increase: { token: params.tokenFrom, amount: params.amount.toString() },
           });
 
@@ -2823,7 +2920,7 @@ describe('Position Service', () => {
           remainingSwaps: BigNumber.from(5),
         });
 
-        params = await positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
+        params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
 
         const result = await positionService.buildModifyRateAndSwapsTx(position, newRateUnderlying, newSwaps, false);
 
@@ -2851,15 +2948,23 @@ describe('Position Service', () => {
         newRateUnderlying = '5';
         newSwaps = '3';
 
-        contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+        contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
         sdkService.buildReduceToBuyPositionTx.mockResolvedValue({
           to: 'companion',
           data: 'meanapi-reduce-data',
         });
+        positionService.getModifyRateAndSwapsSignature = jest.fn().mockResolvedValue({
+          permissions: [{ operator: 'companionAddress', permissions: [PERMISSIONS.REDUCE] }],
+          deadline: 'deadline',
+          v: 'v',
+          r: '0x01',
+          s: '0x01',
+          tokenId: 'position-1',
+        });
       });
 
       describe('when the from has yield', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
           position = createPositionMock({
             positionId: 'position-1',
             from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
@@ -2867,7 +2972,7 @@ describe('Position Service', () => {
             remainingSwaps: BigNumber.from(5),
           });
 
-          params = await positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
+          params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
 
           return params;
         });
@@ -2920,7 +3025,14 @@ describe('Position Service', () => {
             dcaHub: 'hubAddress',
             recipient: 'my account',
             amountOfSwaps: params.swaps.toNumber(),
-            permissionPermit: 'permissionSignature',
+            permissionPermit: {
+              permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.REDUCE] }],
+              deadline: 'deadline',
+              v: 'v',
+              r: '0x01',
+              s: '0x01',
+              tokenId: 'position-1',
+            },
             reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
           });
 
@@ -2932,7 +3044,7 @@ describe('Position Service', () => {
       });
 
       describe('when the from is the protocol token', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
           position = createPositionMock({
             positionId: 'position-1',
             from: getProtocolToken(10),
@@ -2940,7 +3052,7 @@ describe('Position Service', () => {
             remainingSwaps: BigNumber.from(5),
           });
 
-          params = await positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
+          params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
 
           return params;
         });
@@ -2993,7 +3105,14 @@ describe('Position Service', () => {
             dcaHub: 'hubAddress',
             recipient: 'my account',
             amountOfSwaps: params.swaps.toNumber(),
-            permissionPermit: 'permissionSignature',
+            permissionPermit: {
+              permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.REDUCE] }],
+              deadline: 'deadline',
+              v: 'v',
+              r: '0x01',
+              s: '0x01',
+              tokenId: 'position-1',
+            },
             reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
           });
 
@@ -3012,7 +3131,7 @@ describe('Position Service', () => {
           remainingSwaps: BigNumber.from(5),
         });
 
-        params = await positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
+        params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
 
         const result = await positionService.buildModifyRateAndSwapsTx(position, newRateUnderlying, newSwaps, false);
 
@@ -3041,7 +3160,7 @@ describe('Position Service', () => {
     beforeEach(() => {
       positionService.buildModifyRateAndSwapsParams = jest
         .fn()
-        .mockResolvedValue({ amount: BigNumber.from(10), tokenFrom: 'tokenFrom', isIncrease: true });
+        .mockReturnValue({ amount: BigNumber.from(10), tokenFrom: 'tokenFrom', isIncrease: true });
       walletService.buildApproveSpecificTokenTx.mockResolvedValue({
         to: 'companion',
         from: 'account',
@@ -3064,7 +3183,7 @@ describe('Position Service', () => {
       positionService.fillAddressPermissions = jest.fn().mockResolvedValue([
         {
           operator: 'companion',
-          permissions: [Permission.TERMINATE],
+          permissions: [DCAPermission.TERMINATE],
         },
       ]);
       positionService.getModifyPermissionsTx = jest.fn().mockResolvedValue({
@@ -3095,6 +3214,7 @@ describe('Position Service', () => {
       );
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledTimes(1);
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledWith(
+        'my account',
         toToken({ address: 'tokenFrom' }),
         'companion',
         BigNumber.from(10)
@@ -3174,19 +3294,19 @@ describe('Position Service', () => {
       { type: TransactionTypes.unwrap },
       { type: TransactionTypes.wrapEther },
     ].forEach((tx) => {
-      test(`it should do nothing for ${tx.type} transactions`, async () => {
+      test(`it should do nothing for ${tx.type} transactions`, () => {
         const previousCurrentPositions = {
           ...positionService.currentPositions,
         };
 
-        await positionService.setPendingTransaction(tx as unknown as TransactionDetails);
+        positionService.setPendingTransaction(tx as unknown as TransactionDetails);
 
         expect(positionService.currentPositions).toEqual(previousCurrentPositions);
       });
     });
 
     describe('when the transaction is for a new position', () => {
-      test('it should add the new position to the currentPositions object', async () => {
+      test('it should add the new position to the currentPositions object', () => {
         const newPositionTypeData: NewPositionTypeData = {
           type: TransactionTypes.newPosition,
           typeData: {
@@ -3204,9 +3324,10 @@ describe('Position Service', () => {
             version: LATEST_VERSION,
           },
         };
-        await positionService.setPendingTransaction({
+        positionService.setPendingTransaction({
           chainId: 10,
           hash: 'hash',
+          from: 'my account',
           ...newPositionTypeData,
         } as TransactionDetails);
 
@@ -3229,26 +3350,22 @@ describe('Position Service', () => {
             swapInterval: ONE_DAY,
             swapped: BigNumber.from(0),
             rate: parseUnits('10', 18).div(BigNumber.from('5')),
-            depositedRateUnderlying: parseUnits('10', 18).div(BigNumber.from('5')),
             permissions: [],
-            toWithdrawUnderlying: null,
-            remainingLiquidityUnderlying: null,
-            totalSwappedUnderlyingAccum: BigNumber.from(0),
-            toWithdrawUnderlyingAccum: BigNumber.from(0),
             remainingLiquidity: parseUnits('10', 18),
             remainingSwaps: BigNumber.from('5'),
             totalSwaps: BigNumber.from('5'),
-            withdrawn: BigNumber.from(0),
             totalExecutedSwaps: BigNumber.from(0),
             id: 'pending-transaction-hash',
             startedAt: 1686329816,
-            totalDeposited: parseUnits('10', 18),
             pendingTransaction: 'hash',
             status: 'ACTIVE',
             version: LATEST_VERSION,
-            pairLastSwappedAt: 1686329816,
-            pairNextSwapAvailableAt: '1686329816',
-          },
+            nextSwapAvailableAt: 1686329816,
+            isStale: false,
+            toWithdrawYield: BigNumber.from(0),
+            remainingLiquidityYield: BigNumber.from(0),
+            swappedYield: BigNumber.from(0),
+          } satisfies Position,
         });
       });
     });
@@ -3275,7 +3392,7 @@ describe('Position Service', () => {
         },
       },
     ].forEach((tx) => {
-      test(`it should update all the positions for the ${tx.type} transaction`, async () => {
+      test(`it should update all the positions for the ${tx.type} transaction`, () => {
         positionService.currentPositions = {
           ...positionService.currentPositions,
           'position-many-1': {
@@ -3288,7 +3405,7 @@ describe('Position Service', () => {
         const previousCurrentPositions = {
           ...positionService.currentPositions,
         };
-        await positionService.setPendingTransaction(tx as unknown as TransactionDetails);
+        positionService.setPendingTransaction(tx as unknown as TransactionDetails);
 
         expect(positionService.currentPositions).toEqual({
           ...previousCurrentPositions,
@@ -3304,12 +3421,12 @@ describe('Position Service', () => {
       });
     });
 
-    test('it should add the position from the transaction if it doesnt exist', async () => {
+    test('it should add the position from the transaction if it doesnt exist', () => {
       const previousCurrentPositions = {
         ...positionService.currentPositions,
       };
 
-      await positionService.setPendingTransaction({
+      positionService.setPendingTransaction({
         hash: 'hash',
         typeData: { id: 'position-2' },
         position: createPositionMock({ id: 'position-2' }),
@@ -3321,12 +3438,12 @@ describe('Position Service', () => {
       });
     });
 
-    test('it should set the position as pending', async () => {
+    test('it should set the position as pending', () => {
       const previousCurrentPositions = {
         ...positionService.currentPositions,
       };
 
-      await positionService.setPendingTransaction({
+      positionService.setPendingTransaction({
         hash: 'hash',
         typeData: { id: 'position-1' },
       } as unknown as TransactionDetails);
@@ -3434,7 +3551,7 @@ describe('Position Service', () => {
         },
       },
     ].forEach((tx) => {
-      test(`it should update all the positions for the ${tx.type} transaction`, async () => {
+      test(`it should update all the positions for the ${tx.type} transaction`, () => {
         positionService.currentPositions = {
           ...positionService.currentPositions,
           'position-many-1': {
@@ -3449,7 +3566,7 @@ describe('Position Service', () => {
           ...positionService.currentPositions,
         };
 
-        await positionService.setPendingTransaction(tx as unknown as TransactionDetails);
+        positionService.setPendingTransaction(tx as unknown as TransactionDetails);
 
         positionService.handleTransactionRejection(tx as unknown as TransactionDetails);
 
@@ -3457,12 +3574,12 @@ describe('Position Service', () => {
       });
     });
 
-    test('it should remove the pending status of the position', async () => {
+    test('it should remove the pending status of the position', () => {
       const previousCurrentPositions = {
         ...positionService.currentPositions,
       };
 
-      await positionService.setPendingTransaction({
+      positionService.setPendingTransaction({
         hash: 'hash',
         typeData: { id: 'position-1' },
       } as unknown as TransactionDetails);
@@ -3510,22 +3627,23 @@ describe('Position Service', () => {
       [
         {
           expectedPositionChanges: {
-            [`create-position-v${LATEST_VERSION}`]: createPositionMock({
-              id: `create-position-v${LATEST_VERSION}`,
+            [`10-create-position-v${LATEST_VERSION}`]: createPositionMock({
+              id: `10-create-position-v${LATEST_VERSION}`,
               positionId: 'create-position',
-              pairNextSwapAvailableAt: '1686329816',
               remainingLiquidity: parseUnits('20', 18),
               remainingSwaps: BigNumber.from(10),
               swapped: BigNumber.from(0),
               toWithdraw: BigNumber.from(0),
               totalExecutedSwaps: BigNumber.from(0),
               totalSwaps: BigNumber.from(10),
-              withdrawn: BigNumber.from(0),
+              nextSwapAvailableAt: 1686329816,
             }),
           },
           basePositions: {},
           transaction: {
+            from: 'my account',
             type: TransactionTypes.newPosition,
+            chainId: 10,
             typeData: createPositionTypeDataMock({
               id: 'create-position',
               fromYield: undefined,
@@ -3537,21 +3655,15 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`withdraw-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-position-v${LATEST_VERSION}`,
-              withdrawn: BigNumber.from(20),
               swapped: BigNumber.from(20),
               toWithdraw: BigNumber.from(0),
-              toWithdrawUnderlying: BigNumber.from(0),
-              toWithdrawUnderlyingAccum: BigNumber.from(0),
             }),
           },
           basePositions: {
             [`withdraw-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-position-v${LATEST_VERSION}`,
-              withdrawn: BigNumber.from(10),
               swapped: BigNumber.from(20),
               toWithdraw: BigNumber.from(10),
-              toWithdrawUnderlying: BigNumber.from(10),
-              toWithdrawUnderlyingAccum: BigNumber.from(10),
             }),
           },
           transaction: {
@@ -3569,8 +3681,6 @@ describe('Position Service', () => {
               totalSwaps: BigNumber.from(25),
               remainingSwaps: BigNumber.from(15),
               remainingLiquidity: parseUnits('300', 18),
-              depositedRateUnderlying: parseUnits('20', 18),
-              remainingLiquidityUnderlying: parseUnits('300', 18),
             }),
           },
           basePositions: {
@@ -3580,8 +3690,6 @@ describe('Position Service', () => {
               totalSwaps: BigNumber.from(20),
               remainingSwaps: BigNumber.from(10),
               remainingLiquidity: parseUnits('100', 18),
-              depositedRateUnderlying: parseUnits('11', 18),
-              remainingLiquidityUnderlying: parseUnits('110', 18),
             }),
           },
           transaction: {
@@ -3602,8 +3710,6 @@ describe('Position Service', () => {
               totalSwaps: BigNumber.from(15),
               remainingSwaps: BigNumber.from(5),
               remainingLiquidity: parseUnits('20', 18),
-              depositedRateUnderlying: parseUnits('4', 18),
-              remainingLiquidityUnderlying: parseUnits('20', 18),
             }),
           },
           basePositions: {
@@ -3613,8 +3719,6 @@ describe('Position Service', () => {
               totalSwaps: BigNumber.from(20),
               remainingSwaps: BigNumber.from(10),
               remainingLiquidity: parseUnits('100', 18),
-              depositedRateUnderlying: parseUnits('11', 18),
-              remainingLiquidityUnderlying: parseUnits('110', 18),
             }),
           },
           transaction: {
@@ -3631,11 +3735,9 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`withdraw-funds-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-funds-position-v${LATEST_VERSION}`,
-              depositedRateUnderlying: BigNumber.from(0),
               rate: BigNumber.from(0),
               totalSwaps: BigNumber.from(10),
               remainingLiquidity: BigNumber.from(0),
-              remainingLiquidityUnderlying: BigNumber.from(0),
               remainingSwaps: BigNumber.from(0),
             }),
           },
@@ -3646,8 +3748,6 @@ describe('Position Service', () => {
               totalSwaps: BigNumber.from(20),
               remainingSwaps: BigNumber.from(10),
               remainingLiquidity: parseUnits('100', 18),
-              depositedRateUnderlying: parseUnits('11', 18),
-              remainingLiquidityUnderlying: parseUnits('110', 18),
             }),
           },
           transaction: {
@@ -3688,7 +3788,6 @@ describe('Position Service', () => {
               toWithdraw: BigNumber.from(0),
               remainingLiquidity: BigNumber.from(0),
               remainingSwaps: BigNumber.from(0),
-              remainingLiquidityUnderlying: BigNumber.from(0),
             }),
           },
           transaction: {
@@ -3706,7 +3805,7 @@ describe('Position Service', () => {
                 {
                   id: 'operator-id',
                   operator: 'new operator',
-                  permissions: [Permission.INCREASE],
+                  permissions: [DCAPermission.INCREASE],
                 },
               ],
             }),
@@ -3718,7 +3817,7 @@ describe('Position Service', () => {
                 {
                   id: 'operator-id',
                   operator: 'new operator',
-                  permissions: [Permission.INCREASE, Permission.REDUCE],
+                  permissions: [DCAPermission.INCREASE, DCAPermission.REDUCE],
                 },
               ],
             }),
@@ -3731,7 +3830,7 @@ describe('Position Service', () => {
                 {
                   id: 'operator-id',
                   operator: 'new operator',
-                  permissions: [Permission.INCREASE],
+                  permissions: [DCAPermission.INCREASE],
                 },
               ],
             },

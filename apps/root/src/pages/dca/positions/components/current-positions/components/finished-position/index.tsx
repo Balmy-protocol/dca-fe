@@ -4,13 +4,11 @@ import { Typography, Card, CardContent, ArrowRightAltIcon } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
-import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from '@common/utils/parsing';
+import { getTimeFrequencyLabel } from '@common/utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from '@types';
 import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from '@constants';
-import useAvailablePairs from '@hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
 import useUsdPrice from '@hooks/useUsdPrice';
@@ -133,17 +131,8 @@ const ActivePosition = ({
   hasSignSupport,
   yieldOptionsByChain,
 }: ActivePositionProps) => {
-  const {
-    from,
-    to,
-    swapInterval,
-    remainingLiquidity,
-    remainingSwaps,
-    pendingTransaction,
-    chainId,
-    rate,
-    depositedRateUnderlying,
-  } = position;
+  const { from, to, swapInterval, remainingLiquidity, remainingSwaps, pendingTransaction, chainId, rate, isStale } =
+    position;
   const intl = useIntl();
   const yieldOptions = yieldOptionsByChain[chainId];
   const positionNetwork = React.useMemo(() => {
@@ -152,28 +141,12 @@ const ActivePosition = ({
     return supportedNetwork;
   }, [chainId]);
 
-  const availablePairs = useAvailablePairs();
-
   const isPending = !!pendingTransaction;
-  const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
-  const [token0, token1] = sortTokens(
-    from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : from,
-    to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : to
-  );
-  const rateToUse = depositedRateUnderlying || rate;
 
-  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rateToUse, undefined, chainId);
+  const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rate);
   const showRatePrice = !isLoadingRatePrice && !!ratePrice;
 
-  const pair = find(
-    availablePairs,
-    (findigPair) => findigPair.token0.address === token0.address && findigPair.token1.address === token1.address
-  );
-
   const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
-
-  const isStale =
-    calculateStale(swapInterval, position.startedAt, pair?.lastExecutedAt || position.pairLastSwappedAt || 0) === STALE;
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
@@ -261,9 +234,7 @@ const ActivePosition = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">
-                {formatCurrencyAmount(BigNumber.from(rateToUse), position.from, 4)}
-              </Typography>
+              <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"

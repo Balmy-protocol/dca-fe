@@ -30,6 +30,7 @@ import NavBar from './components/navbar';
 import theme from './theme';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useAccountService from '@hooks/useAccountService';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 // FONTS
 // import Lato300EOT from 'lato-v32-latin-300.eot';
@@ -103,6 +104,7 @@ const AppFrame = () => {
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
   const aggSupportedNetworks = useSdkChains();
   const currentBreakPoint = useCurrentBreakpoint();
+  const activeWallet = useActiveWallet();
 
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
@@ -112,7 +114,7 @@ const AppFrame = () => {
       try {
         const isConnected = !!accountService.getUser();
         if (isConnected) {
-          const web3Network = await providerService.getNetwork();
+          const web3Network = await providerService.getNetwork(activeWallet?.address);
           const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
           if (
             (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) &&
@@ -136,7 +138,7 @@ const AppFrame = () => {
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getNetwork();
-  }, [account]);
+  }, [account, activeWallet?.address]);
 
   const isLoadingNetwork = !currentNetwork || !hasSetNetwork;
 

@@ -43,14 +43,9 @@ const StyledPaper = styled(Paper)`
 interface PositionPermissionsContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
-  disabled: boolean;
 }
 
-const PositionPermissionsContainer = ({
-  position,
-  pendingTransaction,
-  disabled,
-}: PositionPermissionsContainerProps) => {
+const PositionPermissionsContainer = ({ position, pendingTransaction }: PositionPermissionsContainerProps) => {
   const permissions = usePositionPermissions(position.id);
   const hasModifiedPermissions = useHasModifiedPermissions();
   const modifiedPermissions = useModifiedPermissions();
@@ -169,7 +164,6 @@ const PositionPermissionsContainer = ({
               onSave={onSave}
               onDiscardChanges={onDiscardChanges}
               onAddAddress={() => setShouldShowAddAddressModal(true)}
-              disabled={disabled}
             />
           )}
         </StyledControlsWrapper>

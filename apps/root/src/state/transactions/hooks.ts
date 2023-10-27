@@ -10,7 +10,6 @@ import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import usePositionService from '@hooks/usePositionService';
-import useWalletService from '@hooks/useWalletService';
 import useArcx from '@hooks/useArcx';
 import { useBlockNumber } from '@state/block-number/hooks';
 import { addTransaction } from './actions';
@@ -19,23 +18,20 @@ import useActiveWallet from '@hooks/useActiveWallet';
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (response: TransactionResponse, customData: TransactionAdderCustomData) => void {
   const positionService = usePositionService();
-  const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const arcxClient = useArcx();
 
   return useCallback(
     (response: TransactionResponse, customData: TransactionAdderCustomData) => {
-      if (!walletService.getAccount()) return;
-
-      const { hash } = response;
+      const { hash, from } = response;
       if (!hash) {
         throw Error('No transaction hash found.');
       }
       dispatch(
         addTransaction({
           hash,
-          from: walletService.getAccount(),
+          from,
           chainId: currentNetwork.chainId,
           ...customData,
           position: customData.position && { ...customData.position },
@@ -57,7 +53,7 @@ export function useTransactionAdder(): (response: TransactionResponse, customDat
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction({
         hash,
-        from: walletService.getAccount(),
+        from,
         chainId: currentNetwork.chainId,
         addedTime: new Date().getTime(),
         retries: 0,
@@ -65,7 +61,7 @@ export function useTransactionAdder(): (response: TransactionResponse, customDat
         position: customData.position && { ...customData.position },
       });
     },
-    [dispatch, walletService.getAccount(), currentNetwork]
+    [dispatch, currentNetwork]
   );
 }
 

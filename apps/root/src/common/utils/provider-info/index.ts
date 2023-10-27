@@ -50,8 +50,25 @@ export function getProviderInfo(provider: any, privyWallet?: boolean): IProvider
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     .filter((x) => provider[x.check])
     .map((x) => x.check);
-  return {
+
+  const providerInfo = {
     ...getProviderInfoFromChecksArray(checks),
     ...(privyWallet ? { name: 'privy' } : {}),
   };
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (providerInfo.id === 'walletconnect' && provider.connector && provider.connector.peerMeta) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      providerInfo.name = provider.connector.peerMeta.name;
+    }
+  } catch {
+    console.error('Failed to set providerInfo name for wc');
+  }
+
+  return providerInfo;
 }
