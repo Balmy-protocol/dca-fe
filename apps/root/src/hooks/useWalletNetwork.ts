@@ -3,7 +3,7 @@ import { useWallets } from '@privy-io/react-auth';
 import useAccountService from './useAccountService';
 import { Network } from '@ethersproject/providers';
 
-function useUnderlyingAmount(walletAddress: string): [Nullable<Network>, boolean, string?] {
+function useWalletNetwork(walletAddress: string): [Nullable<Network>, boolean, string?] {
   const [{ result, isLoading, error }, setParams] = React.useState<{
     result: Nullable<Network>;
     error: string | undefined;
@@ -38,4 +38,4 @@ function useUnderlyingAmount(walletAddress: string): [Nullable<Network>, boolean
   return [result, isLoading, error];
 }
 
-export default useUnderlyingAmount;
+export default useWalletNetwork;

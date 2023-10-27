@@ -106,7 +106,6 @@ const PositionControls = ({
     return supportedNetwork;
   }, [chainId]);
 
-  // console.log(connectedNetwork);
   const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
   const pushToHistory = usePushToHistory();
   const walletService = useWalletService();
