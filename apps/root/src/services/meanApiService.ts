@@ -20,6 +20,7 @@ import {
   AccountLabelsAndContactList,
   ContactList,
   PostContacts,
+  UserType,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -29,6 +30,7 @@ import { getAccessToken } from '@privy-io/react-auth';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import ContractService from './contractService';
 import ProviderService from './providerService';
+import AccountService from './accountService';
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
   slippagePercentage: 0.1, // 0.1%
@@ -42,14 +44,22 @@ export default class MeanApiService {
 
   providerService: ProviderService;
 
+  accountService: AccountService;
+
   client: ethers.providers.Web3Provider;
 
   loadedAsSafeApp: boolean;
 
-  constructor(contractService: ContractService, axiosClient: AxiosInstance, providerService: ProviderService) {
+  constructor(
+    contractService: ContractService,
+    axiosClient: AxiosInstance,
+    providerService: ProviderService,
+    accountService: AccountService
+  ) {
     this.axiosClient = axiosClient;
     this.contractService = contractService;
     this.providerService = providerService;
+    this.accountService = accountService;
     this.loadedAsSafeApp = false;
   }
 
@@ -237,13 +247,33 @@ export default class MeanApiService {
     url: string,
     data?: unknown
   ): Promise<TResponse> {
-    const authToken = await getAccessToken();
-    if (!authToken) {
-      throw new Error('Authorization token not available');
+    const user = this.accountService.getUser();
+
+    if (!user) {
+      throw new Error('User not existent');
+    }
+
+    let authToken: Nullable<string> = null;
+    let authorizationHeader: Nullable<string> = null;
+
+    if (user.type === UserType.privy) {
+      authToken = await getAccessToken();
+
+      if (!authToken) {
+        throw new Error('Authorization token not available');
+      }
+
+      authorizationHeader = `PRIVY token="${authToken}"`;
+    } else if (user.type === UserType.wallet) {
+      authorizationHeader = `WALLET expiration="${user.signature.expiration}", signature="${user.signature.message}"`;
+    }
+
+    if (!authorizationHeader) {
+      throw new Error('Could not create authorization header');
     }
 
     const headers = {
-      Authorization: `PRIVY token="${authToken}"`,
+      Authorization: authorizationHeader,
     };
 
     const response = await this.axiosClient.request<TResponse>({

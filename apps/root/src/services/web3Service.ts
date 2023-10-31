@@ -38,7 +38,7 @@ import {
 } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
-import { PositionVersions } from '@types';
+import { PositionVersions, UserType } from '@types';
 
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
@@ -155,7 +155,12 @@ export default class Web3Service {
     this.providerService = new ProviderService(this.accountService);
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
-    this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
+    this.meanApiService = new MeanApiService(
+      this.contractService,
+      this.axiosClient,
+      this.providerService,
+      this.accountService
+    );
     this.contactListService = new ContactListService(this.accountService, this.providerService, this.meanApiService);
     this.labelService = new LabelService(this.meanApiService, this.accountService, this.contactListService);
     this.eventService = new EventService(this.providerService);
@@ -486,8 +491,9 @@ export default class Web3Service {
       },
     ]);
 
+    const lastLoggedWithWallet = this.accountService.getLastLoggedInWith() === UserType.wallet;
     const wagmiClient = createClient({
-      autoConnect: false,
+      autoConnect: lastLoggedWithWallet,
       connectors,
       provider,
       webSocketProvider,
@@ -507,7 +513,10 @@ export default class Web3Service {
       (curr, prev) => {
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          this.connect(undefined, curr.connector, curr.chainId);
+          this.accountService
+            .setExternalUser(curr.connector)
+            .then(() => this.labelService.initializeLabelsAndContacts())
+            .catch((e) => console.error('Error while connecting external user', e));
         }
 
         if (curr.status === 'connected' && prev.status === 'connected' && curr.account !== prev.account) {
