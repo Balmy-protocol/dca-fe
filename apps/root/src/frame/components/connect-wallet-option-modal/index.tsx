@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useLogin } from '@privy-io/react-auth';
+import PrivyLogo from '@assets/logo/privy_logo';
 
 const StyledWalletOptionsContainer = styled.div`
   display: flex;
@@ -21,6 +22,7 @@ const StyledOptionContainer = styled(Paper)`
   border: 1px solid #fafafa;
   flex-direction: column;
   cursor: pointer;
+  flex: 1;
 `;
 
 interface ConnectWalletOptionModalProps {
@@ -44,9 +46,14 @@ const ConnectWalletOptionModal = ({ open, onClose }: ConnectWalletOptionModalPro
           <Typography variant="h6">
             <FormattedMessage description="loginOptionPrivyTitle" defaultMessage="Log in with privy" />
           </Typography>
-
           <Typography variant="h6">
-            <FormattedMessage description="loginOptionPrivyDesc" defaultMessage="Log in with privy" />
+            <PrivyLogo size="inherit" />
+          </Typography>
+          <Typography variant="body1">
+            <FormattedMessage
+              description="loginOptionPrivyDesc"
+              defaultMessage="Wow such benefits, mmm multiaccount so good"
+            />
           </Typography>
         </StyledOptionContainer>
         <ConnectButton.Custom>
@@ -59,8 +66,8 @@ const ConnectWalletOptionModal = ({ open, onClose }: ConnectWalletOptionModalPro
                     defaultMessage="Directly connect your wallet"
                   />
                 </Typography>
-                <WalletIcon />
-                <Typography variant="h6">
+                <WalletIcon fontSize="inherit" />
+                <Typography variant="body1">
                   <FormattedMessage
                     description="loginOptionPrivyDesc"
                     defaultMessage="You wont get the amazing benefits of multi-wallet but its not privy :shrug:"
