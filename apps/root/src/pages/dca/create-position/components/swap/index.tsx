@@ -11,7 +11,7 @@ import {
   AllowanceType,
 } from '@types';
 import { Typography, Grid, Slide, Paper } from 'ui-library';
-import TokenPicker from '@pages/dca/components/dca-token-picker';
+import TokenPickerModal from '@common/components/token-picker-modal';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
 import useBalance from '@hooks/useBalance';
@@ -999,7 +999,7 @@ const Swap = ({
         onCancel={() => setShouldShowStalePairModal(false)}
       />
 
-      <TokenPicker
+      <TokenPickerModal
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
         isFrom={selecting === from}

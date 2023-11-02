@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 import React from 'react';
 import { Token } from '@types';
-import TokenPickerModal from './components/token-picker-modal';
+import TokenPickerModal from '@common/components/token-picker-modal';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { addCustomToken } from '@state/token-lists/actions';
-import FromAmountInput from './components/token-amount-input';
+import TokenPickerWithAmount from './components/token-picker-with-amount';
 import useUsdPrice from '@hooks/useUsdPrice';
 import { parseUnits } from '@ethersproject/units';
 import useBalance from '@hooks/useBalance';
@@ -85,9 +85,10 @@ const TokenSelector = ({ tokenParam: tokenParamAddress }: TokenSelectorProps) =>
         isLoadingYieldOptions={false}
         onAddToken={addCustomTokenToList}
         account={activeWallet?.address}
+        isAggregator
       />
       <StyledContentContainer>
-        <FromAmountInput
+        <TokenPickerWithAmount
           cantFund={cantFund}
           balance={balance}
           fromValue={amount}

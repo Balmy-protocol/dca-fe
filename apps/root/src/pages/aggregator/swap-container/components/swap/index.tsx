@@ -67,11 +67,11 @@ import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
-import TokenPicker from '../aggregator-token-picker';
 import SwapButton from '../swap-button';
 import BetterQuoteModal from '../better-quote-modal';
 import FailedQuotesModal from '../failed-quotes-modal';
 import useActiveWallet from '@hooks/useActiveWallet';
+import TokenPickerModal from '@common/components/token-picker-modal';
 
 const StyledButtonContainer = styled.div`
   display: flex;
@@ -1196,7 +1196,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           transactions={transactionsToExecute}
           onAction={transactionOnAction}
         />
-        <TokenPicker
+        <TokenPickerModal
           shouldShow={shouldShowPicker}
           onClose={onTokenPickerClose}
           isFrom={selecting === from}
@@ -1204,6 +1204,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           isLoadingYieldOptions={false}
           onAddToken={addCustomTokenToList}
           account={activeWallet?.address}
+          isAggregator
         />
         <StyledGrid container rowSpacing={2}>
           <Grid item xs={12}>

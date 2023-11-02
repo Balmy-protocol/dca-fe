@@ -1,128 +1,243 @@
-import styled from 'styled-components';
 import React from 'react';
-import isUndefined from 'lodash/isUndefined';
 import Button from '@common/components/button';
-import useAccount from '@hooks/useAccount';
-import { Typography, FormHelperText } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
+import isUndefined from 'lodash/isUndefined';
+import styled from 'styled-components';
+import isNaN from 'lodash/isNaN';
+import isFinite from 'lodash/isFinite';
 import { Token } from '@types';
-import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
-import { formatUnits } from '@ethersproject/units';
-import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import AggregatorTokenInput from '../token-button';
-import { useAppDispatch } from '@hooks/state';
-import { setAmount } from '@state/transfer/actions';
-
-const StyledFormHelperText = styled(FormHelperText)`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
-
-const StyledButton = styled(Button)`
-  padding: 0;
-  min-width: 10px;
-`;
-
-const StyledTokensContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-direction: column;
-`;
-
-const StyledTitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
+import { FilledInput, Typography, FormHelperText, KeyboardArrowDownIcon, createStyles } from 'ui-library';
+import { withStyles, makeStyles } from 'tss-react/mui';
+import TokenIcon from '@common/components/token-icon';
+import { FormattedMessage } from 'react-intl';
 
 const StyledTokenInputContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  gap: 30px;
-  align-items: stretch;
+  flex-direction: column;
+  flex: 1;
 `;
 
-type TokenAmountInputProps = {
-  cantFund: boolean | null;
-  balance?: BigNumber;
-  fromValue: string;
-  isLoadingFromPrice: boolean;
-  fromPrice?: number;
-  selectedToken: Token | null;
-  startSelectingCoin: (newToken: Token) => void;
+const StyledControls = styled.div`
+  display: flex;
+  flex: 1;
+  gap: 8px;
+`;
+
+const StyledSelectorContainer = styled.div`
+  display: flex;
+`;
+
+const StyledFirstPartContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const StyledSecondPartContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-left: 10px;
+`;
+
+const StyledButton = styled(Button)`
+  padding: 4px 8px;
+  align-self: flex-start;
+
+  .MuiButton-endIcon {
+    margin: 0;
+  }
+  .MuiButton-startIcon {
+    margin: 0;
+    margin-right: 4px;
+  }
+`;
+
+const StyledFilledInput = withStyles(FilledInput, () =>
+  createStyles({
+    root: {
+      paddingLeft: '0px',
+      background: 'none !important',
+    },
+    input: {
+      paddingTop: '0px',
+      paddingBottom: '0px',
+      textAlign: 'right',
+      paddingRight: '0px',
+    },
+  })
+);
+
+const StyledAmountContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+`;
+
+const StyledFormControl = styled.div`
+  display: flex;
+  background-color: rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  cursor: text;
+  justify-content: center;
+  flex: 1;
+  flex-direction: column;
+  padding: 10px 20px 10px 10px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.13);
+  }
+`;
+
+const StyledUsdContainer = styled.div`
+  display: flex;
+  gap: 5px;
+  padding-left: 12px;
+`;
+
+const typographyStyles = {
+  fontWeight: '400',
+  fontSize: '1.25rem',
+  lineHeight: '1.6',
 };
 
+const useButtonStyles = makeStyles()({
+  root: {
+    ...typographyStyles,
+  },
+});
+
+interface TokenInputProps {
+  id: string;
+  value: string;
+  disabled?: boolean;
+  onChange: (newValue: string) => void;
+  token: Token | null;
+  error?: string;
+  fullWidth?: boolean;
+  usdValue?: string;
+  onTokenSelect: () => void;
+  impact?: string | null | boolean;
+  isLoadingPrice?: boolean;
+}
+
 const TokenAmountInput = ({
-  cantFund,
-  balance,
-  fromValue,
-  isLoadingFromPrice,
-  fromPrice,
-  selectedToken,
-  startSelectingCoin,
-}: TokenAmountInputProps) => {
-  const dispatch = useAppDispatch();
-  const account = useAccount();
-  const currentNetwork = useCurrentNetwork();
+  id,
+  onChange,
+  value,
+  disabled,
+  token,
+  error,
+  fullWidth,
+  usdValue,
+  onTokenSelect,
+  impact,
+  isLoadingPrice,
+}: TokenInputProps) => {
+  const inputRef = React.createRef();
+  const validator = (nextValue: string) => {
+    // sanitize value
+    const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${(token && token.decimals) || 18}}$`);
 
-  const onSetAmount = (newAmount: string) => {
-    if (!selectedToken) return;
-    dispatch(setAmount(newAmount));
-  };
-
-  const onSetMaxBalance = () => {
-    if (balance && selectedToken) {
-      if (selectedToken.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue = balance.gte(getMinAmountForMaxDeduction(currentNetwork.chainId))
-          ? balance.sub(getMaxDeduction(currentNetwork.chainId))
-          : balance;
-        onSetAmount(formatUnits(maxValue, selectedToken.decimals));
-      } else {
-        onSetAmount(formatUnits(balance, selectedToken.decimals));
-      }
+    if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
+      onChange(nextValue.startsWith('.') ? `0${nextValue}` : nextValue);
     }
   };
 
+  const onFocusInput = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+    (inputRef.current as any).focus();
+  };
+
+  const { classes: buttonClasses } = useButtonStyles();
   return (
-    <StyledTokensContainer>
-      <StyledTitleContainer>
-        <Typography variant="body1">
-          <FormattedMessage description="tokenToTransfer" defaultMessage="Token to transfer:" />
-        </Typography>
-        {balance && selectedToken && (
-          <StyledFormHelperText onClick={onSetMaxBalance}>
-            <FormattedMessage
-              description="in wallet"
-              defaultMessage="Balance: {balance}"
-              values={{
-                balance: formatCurrencyAmount(balance, selectedToken, 4),
-              }}
-            />
-            <StyledButton onClick={onSetMaxBalance} color="secondary" variant="text">
-              <FormattedMessage description="maxWallet" defaultMessage="MAX" />
-            </StyledButton>
-          </StyledFormHelperText>
-        )}
-      </StyledTitleContainer>
-      <StyledTokenInputContainer>
-        <AggregatorTokenInput
-          id="from-value"
-          error={cantFund && account ? 'Amount cannot exceed balance' : ''}
-          value={fromValue}
-          onChange={onSetAmount}
-          token={selectedToken}
-          fullWidth
-          isLoadingPrice={isLoadingFromPrice}
-          usdValue={(!isUndefined(fromPrice) && parseFloat(fromPrice.toFixed(2)).toFixed(2)) || undefined}
-          onTokenSelect={() => startSelectingCoin(selectedToken || emptyTokenWithAddress('token'))}
-        />
-      </StyledTokenInputContainer>
-    </StyledTokensContainer>
+    <StyledTokenInputContainer>
+      <StyledControls>
+        <StyledFormControl onClick={onFocusInput}>
+          <Typography variant="h6" component={StyledFirstPartContainer}>
+            <StyledSelectorContainer>
+              <StyledButton
+                size="large"
+                color="transparent"
+                variant="text"
+                startIcon={<TokenIcon size="24px" token={token || undefined} />}
+                endIcon={<KeyboardArrowDownIcon fontSize="small" />}
+                onClick={onTokenSelect}
+                classes={buttonClasses}
+              >
+                {token && token.symbol ? (
+                  token.symbol
+                ) : (
+                  <FormattedMessage description="select" defaultMessage="Select" />
+                )}
+              </StyledButton>
+            </StyledSelectorContainer>
+            <StyledAmountContainer>
+              <StyledFilledInput
+                id={id}
+                value={value}
+                error={!!error}
+                inputRef={inputRef}
+                placeholder="0"
+                inputMode="decimal"
+                autoComplete="off"
+                autoCorrect="off"
+                type="text"
+                margin="none"
+                disabled={disabled}
+                disableUnderline
+                spellCheck="false"
+                fullWidth={fullWidth}
+                onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+                inputProps={{
+                  style: { paddingBottom: usdValue ? '0px' : '8px', ...typographyStyles },
+                }}
+              />
+            </StyledAmountContainer>
+          </Typography>
+          <StyledSecondPartContainer>
+            <Typography variant="body2" color="#939494">
+              {token?.name}
+            </Typography>
+            <StyledUsdContainer>
+              {isUndefined(usdValue) &&
+                !isLoadingPrice &&
+                !!value &&
+                value !== '0' &&
+                value !== '...' &&
+                Number(value) !== 0 && (
+                  <Typography variant="body2" color="#EB5757">
+                    <FormattedMessage description="unkown" defaultMessage="Unknown price" />
+                  </Typography>
+                )}
+              {!isUndefined(usdValue) && (
+                <>
+                  <Typography variant="body2" color="#939494">
+                    ${usdValue}
+                  </Typography>
+                  {impact && !isNaN(impact) && isFinite(Number(impact)) && (
+                    <Typography
+                      variant="body2"
+                      color={
+                        // eslint-disable-next-line no-nested-ternary
+                        Number(impact) < -2.5 ? '#EB5757' : Number(impact) > 0 ? '#219653' : 'rgba(255, 255, 255, 0.5)'
+                      }
+                    >
+                      ({Number(impact) > 0 ? '+' : ''}
+                      {impact}%)
+                    </Typography>
+                  )}
+                </>
+              )}
+            </StyledUsdContainer>
+          </StyledSecondPartContainer>
+        </StyledFormControl>
+      </StyledControls>
+      {!!error && (
+        <FormHelperText error id="component-error-text">
+          {error}
+        </FormHelperText>
+      )}
+    </StyledTokenInputContainer>
   );
 };
-
 export default TokenAmountInput;

@@ -1,10 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import TokenPicker from '@common/components/token-picker-modal/token-picker';
 import Modal from '@common/components/modal';
 import { Token, YieldOptions } from '@types';
-import TokenPicker from '@common/components/token-picker';
-
-type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
 
 const StyledOverlay = styled.div`
   background-color: #1b1b1c;
@@ -14,44 +12,51 @@ const StyledOverlay = styled.div`
   text-align: start;
 `;
 
-interface TokenPickerProps {
+interface TokenPickerModalProps {
   shouldShow: boolean;
-  onChange: SetFromToState;
+  onChange: React.Dispatch<React.SetStateAction<Token>>;
   onClose: () => void;
   isFrom: boolean;
-  ignoreValues: string[];
-  otherSelected?: Token | null;
-  yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
+  onAddToken?: (token: Token) => void;
+  ignoreValues?: string[];
+  otherSelected?: Token | null;
+  yieldOptions?: YieldOptions;
   account?: string;
+  isAggregator?: boolean;
 }
 
-const DcaTokenPicker = ({
+const TokenPickerModal = ({
   shouldShow,
   isFrom,
   onClose,
   onChange,
-  ignoreValues,
-  otherSelected,
   yieldOptions,
   isLoadingYieldOptions,
+  onAddToken,
   account,
-}: TokenPickerProps) => (
-  <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" actions={[]} fullHeight keepMounted>
+  ignoreValues,
+  otherSelected,
+  isAggregator,
+}: TokenPickerModalProps) => (
+  <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" fullHeight keepMounted>
     <StyledOverlay>
       <TokenPicker
+        isOpen={shouldShow}
         isFrom={isFrom}
         onClose={onClose}
         onChange={onChange}
-        ignoreValues={ignoreValues}
-        otherSelected={otherSelected}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
-        isOpen={shouldShow}
+        onAddToken={onAddToken}
         account={account}
+        showWrappedAndProtocol
+        isAggregator={isAggregator}
+        ignoreValues={ignoreValues}
+        otherSelected={otherSelected}
       />
     </StyledOverlay>
   </Modal>
 );
 
-export default DcaTokenPicker;
+export default TokenPickerModal;
