@@ -81,10 +81,12 @@ export default class ContactListService implements IContactListService {
   }
 
   async transferTokenToContact({
+    from,
     contact,
     token,
     amount,
   }: {
+    from: string;
     contact: Contact;
     token: Token;
     amount: BigNumber;
@@ -92,11 +94,7 @@ export default class ContactListService implements IContactListService {
     if (amount.lte(0)) {
       throw new Error('Amount must be greater than zero');
     }
-    const signer = await this.accountService.getActiveWalletSigner();
-    if (!signer) {
-      throw new Error('No active wallet signer available');
-    }
-    const from = await signer.getAddress();
+    const signer = await this.providerService.getSigner(from, token.chainId);
 
     if (token.type === TokenType.ERC20_TOKEN || token.type === TokenType.WRAPPED_PROTOCOL_TOKEN) {
       const erc20Contract = await this.contractService.getERC20TokenInstance(token.chainId, token.address, from);
@@ -112,21 +110,23 @@ export default class ContactListService implements IContactListService {
     throw new Error('Token must be of type Base or ERC20');
   }
 
-  async transferNFTToContact({ contact, token, tokenId }: { contact: Contact; token: Token; tokenId: BigNumber }) {
+  async transferNFTToContact({
+    from,
+    contact,
+    token,
+    tokenId,
+  }: {
+    from: string;
+    contact: Contact;
+    token: Token;
+    tokenId: BigNumber;
+  }) {
     if (token.type !== TokenType.ERC721_TOKEN) {
       throw new Error('Token must be of type ERC721');
     }
 
-    const signer = await this.accountService.getActiveWalletSigner();
-    if (!signer) {
-      throw new Error('No active wallet signer available');
-    }
-    const from = await signer.getAddress();
-
-    if (token.type === TokenType.ERC721_TOKEN) {
-      const erc721Contract = await this.contractService.getERC721TokenInstance(token.chainId, token.address, from);
-      return erc721Contract.transferFrom(from, contact.address, tokenId);
-    }
+    const erc721Contract = await this.contractService.getERC721TokenInstance(token.chainId, token.address, from);
+    return erc721Contract.transferFrom(from, contact.address, tokenId);
   }
 
   getContacts(): ContactList {

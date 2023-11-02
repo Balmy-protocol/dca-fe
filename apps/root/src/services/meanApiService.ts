@@ -297,7 +297,16 @@ export default class MeanApiService {
       'GET',
       `${MEAN_API_URL}/v1/accounts/${accountId}`
     );
-    return accountResponse;
+
+    const parsedAccountData: AccountLabelsAndContactList = {
+      ...accountResponse,
+      contacts: accountResponse.contacts.map((contact) => ({
+        address: contact.wallet,
+        label: accountResponse.labels[contact.wallet],
+      })),
+    };
+
+    return parsedAccountData;
   }
 
   async postAccountLabels(labels: AccountLabels): Promise<void> {
@@ -347,12 +356,16 @@ export default class MeanApiService {
       throw new Error('User not signed in');
     }
 
-    const parsedContacts: PostContacts = contacts.map((contact) => ({
-      contact: contact.address,
-      label: contact.label,
-    }));
+    const parsedContacts: PostContacts = {
+      contacts: contacts.map((contact) => ({
+        contact: contact.address,
+        label: contact.label,
+      })),
+    };
 
-    await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts`, parsedContacts);
+    await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts`, {
+      contacts: parsedContacts,
+    });
   }
 
   async deleteContact(contactAddress: string): Promise<void> {

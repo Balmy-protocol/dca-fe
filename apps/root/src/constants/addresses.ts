@@ -394,6 +394,8 @@ export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct
 
 export const DEFAULT_NETWORK_FOR_AGGREGATOR = NETWORKS.mainnet;
 
+export const DEFAULT_NETWORK_FOR_TRANSFER = NETWORKS.mainnet;
+
 export const HUB_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_1]: {
     [NETWORKS.optimism.chainId]: '0x24F85583FAa9F8BD0B8Aa7B1D1f4f53F0F450038',

@@ -18,6 +18,7 @@ import tabs from './tabs/reducer';
 import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 import error from './error/reducer';
+import transfer from './transfer/reducer';
 
 const LATEST_VERSION = '1.0.6';
 const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.7';
@@ -95,6 +96,7 @@ const store = configureStore({
     positionDetails,
     aggregatorSettings,
     eulerClaim,
+    transfer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: { extraArgument: axiosClient }, serializableCheck: false }).concat([

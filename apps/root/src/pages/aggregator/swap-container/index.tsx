@@ -18,6 +18,7 @@ import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import Swap from './components/swap';
 import AggregatorLanding from './components/landing';
+import { identifyNetwork } from '@common/utils/parsing';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
@@ -59,17 +60,11 @@ const SwapContainer = () => {
   );
 
   React.useEffect(() => {
-    let networkToSet = find(mappedNetworks, { chainId: Number(chainId) });
-    if (!networkToSet && chainId) {
-      networkToSet = find(
-        mappedNetworks,
-        (network) => network.name === chainId.toLowerCase() || network.ids.includes(chainId.toLowerCase())
-      );
-    }
+    const networkToSet = identifyNetwork(mappedNetworks, chainId);
     dispatch(
       setAggregatorChainId(Number(networkToSet?.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId))
     );
-  }, [mappedNetworks]);
+  }, [mappedNetworks, identifyNetwork]);
 
   React.useEffect(() => {
     if (fromParamToken) {

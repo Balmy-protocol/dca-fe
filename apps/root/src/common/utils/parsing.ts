@@ -420,13 +420,13 @@ export const chainToWagmiNetwork = ({
   testnet,
 });
 
-export const identifyNetwork = (sdkNetworks: Chain[], chainId?: string): Chain | undefined => {
+export const identifyNetwork = (networks: Chain[], chainId?: string): Chain | undefined => {
   const chainIdParsed = Number(chainId);
 
-  let foundNetwork = find(sdkNetworks, { chainId: chainIdParsed });
+  let foundNetwork = find(networks, { chainId: chainIdParsed });
   if (!foundNetwork && chainId) {
     foundNetwork = find(
-      sdkNetworks,
+      networks,
       ({ name, ids }) => name.toLowerCase() === chainId.toLowerCase() || ids.includes(chainId.toLowerCase())
     );
   }

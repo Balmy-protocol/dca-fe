@@ -45,10 +45,9 @@ describe('ContactList Service', () => {
 
     accountService.getUser.mockReturnValue(userMock);
     const mockedSigner = {
-      getAddress: jest.fn().mockResolvedValue('activeAddress'),
       sendTransaction: signerSendTransaction.mockResolvedValue('sendTransaction'),
     } as unknown as jest.Mocked<JsonRpcSigner>;
-    accountService.getActiveWalletSigner.mockResolvedValue(mockedSigner);
+    providerService.getSigner.mockResolvedValue(mockedSigner);
   });
 
   afterEach(() => {
@@ -176,6 +175,7 @@ describe('ContactList Service', () => {
     test('it should not proceed if amount is not greater than zero', async () => {
       try {
         await contactListService.transferTokenToContact({
+          from: 'from',
           contact: contactMock,
           token: nativeTokenMock,
           amount: BigNumber.from(0),
@@ -186,20 +186,6 @@ describe('ContactList Service', () => {
         expect(e).toEqual(Error('Amount must be greater than zero'));
       }
     });
-    test('it should not proceed if there is no signer is available', async () => {
-      accountService.getActiveWalletSigner.mockResolvedValueOnce(undefined);
-      try {
-        await contactListService.transferTokenToContact({
-          contact: contactMock,
-          token: erc20TokenMock,
-          amount: BigNumber.from(10),
-        });
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('No active wallet signer available'));
-      }
-    });
     test("it should transfer tokens using the ERC20 interface if it's an ERC20 token", async () => {
       const transferFn = jest.fn().mockResolvedValue('transfer');
       contractService.getERC20TokenInstance.mockResolvedValue({
@@ -207,6 +193,7 @@ describe('ContactList Service', () => {
       } as unknown as ERC20Contract);
 
       const txResponse = await contactListService.transferTokenToContact({
+        from: 'from',
         contact: contactMock,
         token: erc20TokenMock,
         amount: BigNumber.from(10),
@@ -218,6 +205,7 @@ describe('ContactList Service', () => {
     });
     test('it should generate a transaction from the signer if the token is a protocol token', async () => {
       const txResponse = await contactListService.transferTokenToContact({
+        from: 'from',
         contact: contactMock,
         token: nativeTokenMock,
         amount: BigNumber.from(10),
@@ -226,7 +214,7 @@ describe('ContactList Service', () => {
       expect(txResponse).toEqual('sendTransaction');
       expect(signerSendTransaction).toHaveBeenCalledTimes(1);
       expect(signerSendTransaction).toHaveBeenCalledWith({
-        from: 'activeAddress',
+        from: 'from',
         to: contactMock.address,
         value: BigNumber.from(10),
       });
@@ -234,6 +222,7 @@ describe('ContactList Service', () => {
     test('it should not proceed if token is not of type Base or ERC20', async () => {
       try {
         await contactListService.transferTokenToContact({
+          from: 'from',
           contact: contactMock,
           token: erc721TokenMock,
           amount: BigNumber.from(10),
@@ -253,6 +242,7 @@ describe('ContactList Service', () => {
     test('it should not proceed if token is not of type ERC721', async () => {
       try {
         await contactListService.transferNFTToContact({
+          from: 'from',
           contact: contactMock,
           token: erc20TokenMock,
           tokenId: BigNumber.from(1111),
@@ -263,20 +253,6 @@ describe('ContactList Service', () => {
         expect(e).toEqual(Error('Token must be of type ERC721'));
       }
     });
-    test('it should not proceed if no signer is available', async () => {
-      accountService.getActiveWalletSigner.mockResolvedValueOnce(undefined);
-      try {
-        await contactListService.transferNFTToContact({
-          contact: contactMock,
-          token: erc721TokenMock,
-          tokenId: BigNumber.from(1111),
-        });
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('No active wallet signer available'));
-      }
-    });
     test("it should transfer token using the ERC721 interface if it's an ERC721 token", async () => {
       const transferFromFn = jest.fn().mockResolvedValue('transferFrom');
       contractService.getERC721TokenInstance.mockResolvedValue({
@@ -284,6 +260,7 @@ describe('ContactList Service', () => {
       } as unknown as ERC721Contract);
 
       const txResponse = await contactListService.transferNFTToContact({
+        from: 'from',
         contact: contactMock,
         token: erc721TokenMock,
         tokenId: BigNumber.from(1111),
@@ -291,7 +268,7 @@ describe('ContactList Service', () => {
 
       expect(txResponse).toEqual('transferFrom');
       expect(transferFromFn).toHaveBeenCalledTimes(1);
-      expect(transferFromFn).toHaveBeenCalledWith('activeAddress', contactMock.address, BigNumber.from(1111));
+      expect(transferFromFn).toHaveBeenCalledWith('from', contactMock.address, BigNumber.from(1111));
     });
   });
 
