@@ -48,7 +48,7 @@ const TransferForm = () => {
         <>
           <WalletSelector />
           <NetworkSelector chainIdParam={chainIdParam} />
-          <TokenSelector tokenParam={tokenParam} />
+          <TokenSelector tokenParamAddress={tokenParam} />
           <RecipientAddress recipientParam={recipientParam} isValid={isRecipientValid} />
           <TransferButton isRecipientValid={isRecipientValid} />
         </>

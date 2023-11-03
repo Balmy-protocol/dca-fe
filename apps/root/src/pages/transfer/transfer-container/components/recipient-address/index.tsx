@@ -42,7 +42,7 @@ const RecipientAddress = ({ isValid, recipientParam }: RecipientAddressProps) =>
 
   let error = '';
   if (hasError) {
-    if (recipient === activeWallet?.address) {
+    if (recipient.toLowerCase() === activeWallet?.address.toLowerCase()) {
       error = 'Transfer address cannot be the same as your address';
     } else {
       error = 'This is not a valid address';

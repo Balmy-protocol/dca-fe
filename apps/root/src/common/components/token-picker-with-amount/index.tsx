@@ -2,19 +2,16 @@ import styled from 'styled-components';
 import React from 'react';
 import isUndefined from 'lodash/isUndefined';
 import Button from '@common/components/button';
+import TokenAmountInput from '@common/components/token-picker-with-amount/components/token-amount-input';
 import useAccount from '@hooks/useAccount';
 import { Typography, FormHelperText } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
 import { Token } from '@types';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
 import { formatUnits } from '@ethersproject/units';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import TokenAmountInput from '../token-amount-input';
-import { useAppDispatch } from '@hooks/state';
-import { setAmount } from '@state/transfer/actions';
 
 const StyledFormHelperText = styled(FormHelperText)`
   cursor: pointer;
@@ -47,42 +44,49 @@ const StyledTokenInputContainer = styled.div`
 `;
 
 type TokenPickerWithAmountProps = {
-  cantFund: boolean | null;
+  id: string;
+  label: React.ReactNode;
+  cantFund?: boolean;
   balance?: BigNumber;
-  fromValue: string;
-  isLoadingFromPrice: boolean;
-  fromPrice?: number;
+  tokenAmount: string;
+  isLoadingRoute?: boolean;
+  isLoadingPrice?: boolean;
+  tokenPrice?: number;
   selectedToken: Token | null;
   startSelectingCoin: (newToken: Token) => void;
+  onSetTokenAmount: (newAmount: string) => void;
+  maxBalanceBtn?: boolean;
+  currentChainId?: number;
+  priceImpact?: string | boolean;
 };
 
 const TokenPickerWithAmount = ({
+  id,
+  label,
   cantFund,
   balance,
-  fromValue,
-  isLoadingFromPrice,
-  fromPrice,
+  tokenAmount,
+  isLoadingRoute,
+  isLoadingPrice,
+  tokenPrice,
   selectedToken,
+  onSetTokenAmount,
   startSelectingCoin,
+  maxBalanceBtn,
+  currentChainId,
+  priceImpact,
 }: TokenPickerWithAmountProps) => {
-  const dispatch = useAppDispatch();
   const account = useAccount();
-  const currentNetwork = useCurrentNetwork();
-
-  const onSetAmount = (newAmount: string) => {
-    if (!selectedToken) return;
-    dispatch(setAmount(newAmount));
-  };
 
   const onSetMaxBalance = () => {
-    if (balance && selectedToken) {
+    if (balance && selectedToken && currentChainId) {
       if (selectedToken.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue = balance.gte(getMinAmountForMaxDeduction(currentNetwork.chainId))
-          ? balance.sub(getMaxDeduction(currentNetwork.chainId))
+        const maxValue = balance.gte(getMinAmountForMaxDeduction(currentChainId))
+          ? balance.sub(getMaxDeduction(currentChainId))
           : balance;
-        onSetAmount(formatUnits(maxValue, selectedToken.decimals));
+        onSetTokenAmount(formatUnits(maxValue, selectedToken.decimals));
       } else {
-        onSetAmount(formatUnits(balance, selectedToken.decimals));
+        onSetTokenAmount(formatUnits(balance, selectedToken.decimals));
       }
     }
   };
@@ -90,10 +94,8 @@ const TokenPickerWithAmount = ({
   return (
     <StyledTokensContainer>
       <StyledTitleContainer>
-        <Typography variant="body1">
-          <FormattedMessage description="tokenToTransfer" defaultMessage="Token to transfer:" />
-        </Typography>
-        {balance && selectedToken && (
+        <Typography variant="body1">{label}</Typography>
+        {maxBalanceBtn && balance && selectedToken && (
           <StyledFormHelperText onClick={onSetMaxBalance}>
             <FormattedMessage
               description="in wallet"
@@ -110,15 +112,17 @@ const TokenPickerWithAmount = ({
       </StyledTitleContainer>
       <StyledTokenInputContainer>
         <TokenAmountInput
-          id="token-amount"
+          id={id}
           error={cantFund && account ? 'Amount cannot exceed balance' : ''}
-          value={fromValue}
-          onChange={onSetAmount}
+          value={tokenAmount}
+          onChange={onSetTokenAmount}
           token={selectedToken}
           fullWidth
-          isLoadingPrice={isLoadingFromPrice}
-          usdValue={(!isUndefined(fromPrice) && parseFloat(fromPrice.toFixed(2)).toFixed(2)) || undefined}
+          isLoadingPrice={isLoadingPrice}
+          usdValue={(!isUndefined(tokenPrice) && parseFloat(tokenPrice.toFixed(2)).toFixed(2)) || undefined}
           onTokenSelect={() => startSelectingCoin(selectedToken || emptyTokenWithAddress('token'))}
+          impact={priceImpact}
+          disabled={isLoadingRoute}
         />
       </StyledTokenInputContainer>
     </StyledTokensContainer>

@@ -9,13 +9,16 @@ import { formatUnits, parseUnits } from '@ethersproject/units';
 import useUsdPrice from '@hooks/useUsdPrice';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
+import { useAppDispatch } from '@hooks/state';
+import useTrackEvent from '@hooks/useTrackEvent';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import { setFromValue, setToValue } from '@state/aggregator/actions';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import QuoteSimulation from '../quote-simulation';
 import TopBar from '../top-bar';
-import FromAmountInput from '../from-amount-input';
+import TokenPickerWithAmount from '@common/components/token-picker-with-amount';
 import ToggleButton from '../toggle-button';
-import ToAmountInput from '../to-amount-input';
 import QuoteSelection from '../quote-selection';
 
 const StyledGrid = styled(Grid)`
@@ -43,7 +46,7 @@ interface SwapFirstStepProps {
   to: Token | null;
   toValue: string;
   startSelectingCoin: (token: Token) => void;
-  cantFund: boolean | null;
+  cantFund: boolean;
   balance?: BigNumber;
   selectedRoute: SwapOption | null;
   isBuyOrder: boolean;
@@ -83,6 +86,10 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   } = props;
 
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const trackEvent = useTrackEvent();
+  const currentNetwork = useCurrentNetwork();
+
   let fromValueToUse =
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address &&
@@ -134,6 +141,21 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       ) / 100
     ).toFixed(2);
 
+  const onSetFromAmount = (newFromAmount: string) => {
+    if (!from) return;
+    dispatch(setFromValue({ value: newFromAmount, updateMode: true }));
+    if (isBuyOrder) {
+      trackEvent('Aggregator - Set sell order');
+    }
+  };
+  const onSetToAmount = (newToAmount: string) => {
+    if (!to) return;
+    dispatch(setToValue({ value: newToAmount, updateMode: true }));
+    if (!isBuyOrder) {
+      trackEvent('Aggregator - Set buy order');
+    }
+  };
+
   return (
     <StyledGrid container rowSpacing={2} ref={ref}>
       <Grid item xs={12} sx={{ position: 'relative' }}>
@@ -143,28 +165,36 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       </Grid>
       <Grid item xs={12} sx={{ position: 'relative' }}>
         <StyledContentContainer hasArrow>
-          <FromAmountInput
+          <TokenPickerWithAmount
+            id="from-value"
+            label={<FormattedMessage description="youPay" defaultMessage="You pay" />}
             cantFund={cantFund}
             balance={balance}
-            fromValue={fromValueToUse}
+            tokenAmount={fromValueToUse}
             isLoadingRoute={isLoadingRoute}
-            isLoadingFromPrice={isLoadingFromPrice}
-            fromPrice={fromPriceToShow}
+            isLoadingPrice={isLoadingFromPrice}
+            tokenPrice={fromPriceToShow}
             startSelectingCoin={startSelectingCoin}
-            isBuyOrder={isBuyOrder}
+            selectedToken={from}
+            onSetTokenAmount={onSetFromAmount}
+            currentChainId={currentNetwork.chainId}
+            maxBalanceBtn
           />
         </StyledContentContainer>
         <ToggleButton isLoadingRoute={isLoadingRoute} />
       </Grid>
       <Grid item xs={12} sx={{ paddingTop: '8px !important' }}>
         <StyledContentContainer>
-          <ToAmountInput
-            toValue={toValueToUse}
+          <TokenPickerWithAmount
+            id="to-value"
+            label={<FormattedMessage description="youReceive" defaultMessage="You receive" />}
+            tokenAmount={toValueToUse}
             isLoadingRoute={isLoadingRoute}
-            isLoadingToPrice={isLoadingToPrice}
-            toPrice={toPriceToShow}
+            isLoadingPrice={isLoadingToPrice}
+            tokenPrice={toPriceToShow}
             startSelectingCoin={startSelectingCoin}
-            isBuyOrder={isBuyOrder}
+            selectedToken={to}
+            onSetTokenAmount={onSetToAmount}
             priceImpact={priceImpact}
           />
         </StyledContentContainer>

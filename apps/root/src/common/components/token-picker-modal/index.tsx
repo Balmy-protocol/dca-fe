@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import TokenPicker from '@common/components/token-picker-modal/token-picker';
+import TokenPicker from '@common/components/token-picker-modal/components/token-picker';
 import Modal from '@common/components/modal';
 import { Token, YieldOptions } from '@types';
 
