@@ -7,7 +7,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import getPosition from '@graphql/getPosition.graphql';
 import useDCAGraphql from '@hooks/useDCAGraphql';
 import { useParams } from 'react-router-dom';
-import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionTypes } from '@types';
+import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionTypes, YieldName } from '@types';
 import getPairSwaps from '@graphql/getPairSwaps.graphql';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
 import Button from '@common/components/button';
@@ -49,6 +49,7 @@ import PositionSummaryContainer from '../components/summary-container';
 import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
+import find from 'lodash/find';
 
 const StyledTab = withStyles(Tab, () =>
   createStyles({
@@ -231,6 +232,13 @@ const PositionDetailFrame = () => {
   if (positionNotFound || !position || !positionInUse) {
     return <PositionNotFound />;
   }
+
+  const foundYieldFrom =
+    position.from.underlyingTokens[0] &&
+    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
+
+  const foundYieldTo =
+    position.from.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
   const handleViewNFT = async () => {
     if (!positionInUse) return;
@@ -618,6 +626,40 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
+        {foundYieldFrom?.name === YieldName.aave && position.chainId === 137 && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionAaveVulnerabilityFrom"
+                defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won't be able to increase your position. Swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,"
+              />
+              <StyledLink href="https://x.com/aave/status/1720868368331219100?s=20" target="_blank">
+                <FormattedMessage
+                  description="clickhereForAnnouncement"
+                  defaultMessage="click here to read their official announcement."
+                />
+              </StyledLink>
+            </Alert>
+          </Grid>
+        )}
+        {foundYieldTo?.name === YieldName.aave &&
+          position.chainId === 137 &&
+          foundYieldFrom?.name !== YieldName.aave && (
+            <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+              <Alert severity="warning">
+                <FormattedMessage
+                  description="positionAaveVulnerabilityTo"
+                  defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. In the meantime swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,"
+                />
+                <StyledLink href="https://x.com/aave/status/1720868368331219100?s=20" target="_blank">
+                  <FormattedMessage
+                    description="clickhereForAnnouncement"
+                    defaultMessage="click here to read their official announcement."
+                  />
+                </StyledLink>
+              </Alert>
+            </Grid>
+          )}
         <Grid
           item
           xs={12}

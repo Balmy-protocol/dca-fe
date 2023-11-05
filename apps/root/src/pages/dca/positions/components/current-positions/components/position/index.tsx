@@ -25,7 +25,7 @@ import {
   calculateYield,
   sortTokensByAddress,
 } from '@common/utils/parsing';
-import { ChainId, Position, Token, YieldOptions } from '@types';
+import { ChainId, Position, Token, YieldName, YieldOptions } from '@types';
 import {
   getGhTokenListLogoUrl,
   NETWORKS,
@@ -704,6 +704,46 @@ const ActivePosition = ({
                   />
                   <StyledLink href="https://mean.finance/euler-claim" target="_blank">
                     <FormattedMessage description="EulerClaim ClaimPage" defaultMessage="claim page" />
+                  </StyledLink>
+                </Typography>
+              </StyledDetailWrapper>
+            )}
+          {foundYieldFrom?.name === YieldName.aave && position.chainId === 137 && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ flex: '1' }}>
+                <FormattedMessage
+                  description="positionAaveVulnerabilityFrom"
+                  defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won't be able to increase your position. Swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,"
+                />
+                <StyledLink href="https://x.com/aave/status/1720868368331219100?s=20" target="_blank">
+                  <FormattedMessage
+                    description="clickhereForAnnouncement"
+                    defaultMessage="click here to read their official announcement."
+                  />
+                </StyledLink>
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {foundYieldTo?.name === YieldName.aave &&
+            position.chainId === 137 &&
+            foundYieldFrom?.name !== YieldName.aave && (
+              <StyledDetailWrapper alignItems="flex-start">
+                <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                  <ErrorOutlineIcon fontSize="inherit" />
+                </Typography>
+                <Typography variant="caption" color="#db9e00" sx={{ flex: '1' }}>
+                  <FormattedMessage
+                    description="positionAaveVulnerabilityTo"
+                    defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. In the meantime swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,"
+                  />
+                  <StyledLink href="https://x.com/aave/status/1720868368331219100?s=20" target="_blank">
+                    <FormattedMessage
+                      description="clickhereForAnnouncement"
+                      defaultMessage="click here to read their official announcement."
+                    />
                   </StyledLink>
                 </Typography>
               </StyledDetailWrapper>

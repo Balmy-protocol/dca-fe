@@ -525,6 +525,12 @@
       "value": "Posición Cerrada"
     }
   ],
+  "3qQCTi": [
+    {
+      "type": 0,
+      "value": "No pudimos encontrar un token en la dirección proporcionada. Por favor, verifica y vuelve a intentarlo."
+    }
+  ],
   "4/vG7I": [
     {
       "type": 0,
@@ -2337,6 +2343,12 @@
       "value": "to"
     }
   ],
+  "JVx+R1": [
+    {
+      "type": 0,
+      "value": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Los intercambios seguirán siendo ejecutados de forma normal. Para entender más sobre la decisión de Aave,"
+    }
+  ],
   "Jh14HF": [
     {
       "type": 0,
@@ -2395,6 +2407,12 @@
     {
       "type": 0,
       "value": "Nuestro proveedor de subgráficos entrará en mantenimiento el 14 de Agosto a las 07:00 UTC. Puede haber algunos problemas para cargar posiciones durante un breve período de la ventana de mantenimiento. Ten en cuenta que las posiciones están seguras en todo momento y el servicio volverá a la normalidad en breve."
+    }
+  ],
+  "KM5Egv": [
+    {
+      "type": 0,
+      "value": "Aprobación Universal,"
     }
   ],
   "KTvwXg": [
@@ -3825,6 +3843,12 @@
       "value": "Todo"
     }
   ],
+  "XgzzQX": [
+    {
+      "type": 0,
+      "value": "haga clic aquí para leer su anuncio oficial."
+    }
+  ],
   "XmYRql": [
     {
       "type": 0,
@@ -3855,6 +3879,12 @@
     {
       "type": 0,
       "value": "Autorizar token"
+    }
+  ],
+  "Y5SSY+": [
+    {
+      "type": 0,
+      "value": "Por favor, conecta tu billetera para ver las campañas"
     }
   ],
   "Y9R08Z": [
@@ -4525,6 +4555,12 @@
     {
       "type": 0,
       "value": "¡Transacción enviada!"
+    }
+  ],
+  "cZjfXa": [
+    {
+      "type": 0,
+      "value": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrá agregar fondos a su posición. Los intercambios seguirán siendo ejecutados de forma normal. Para entender más sobre la decisión de Aave, "
     }
   ],
   "cmiLaP": [
@@ -5489,6 +5525,12 @@
       "value": "4 horas"
     }
   ],
+  "mKCay0": [
+    {
+      "type": 0,
+      "value": "minimizando así cualquier exposición a una potencial vulnerabilidad en ellos. además, al utilizar la Aprobación Universal ahora podemos simular tus intercambios en cualquier red en la que estes, así que ahora podes saber exactamente cuanto vas a recibir una vez que el intercambio se confirme. Por último, nuestros Contratos Inteligentes fueron auditados por Omniscia y hay una bug bounty activa en ImmuneFi."
+    }
+  ],
   "mhGi8/": [
     {
       "type": 0,
@@ -6073,6 +6115,12 @@
     {
       "type": 0,
       "value": " fue redimida"
+    }
+  ],
+  "rD49H1": [
+    {
+      "type": 0,
+      "value": "Nuestros Contratos Inteligentes fueron construidos para maximizar el poder de la "
     }
   ],
   "rEo0yG": [

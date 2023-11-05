@@ -143,6 +143,24 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI on Aave - Hiding because $MAI lost support on Aave
 
   '0xb5c064f955d8e7f38fe0460c556a72987494ee17', // Polygon - QUICK - Hiding until release
+
+  '0xe3e5e1946d6e4d8a5e5f155b6e059a2ca7c43c58', // aave-v3 USDC - Disable due to aave vulnerability
+  '0xd01eaff32ca784b07e04776f605cdcb39221b017', // aave-v3 stMATIC - Disable due to aave vulnerability
+  '0xa7a7ffe0520e90491e58c9c77f78d7cfc32d019e', // aave-v3 WETH - Disable due to aave vulnerability
+  '0x42474cdc4a9d9c06e91c745984dd319c1f107f9a', // aave-v3 WBTC - Disable due to aave vulnerability
+  '0x021c618f299e0f55e8a684898b03b027eb51df5c', // aave-v3 WMATIC - Disable due to aave vulnerability
+  '0x83c0936d916d036f99234fa35de12988abd66a7f', // aave-v3 GHST - Disable due to aave vulnerability
+  '0x6e6bbc7b9fe1a8e5b9f27cc5c6478f65f120fe52', // aave-v3 DAI - Disable due to aave vulnerability
+  '0x018532fde0251473f3bc379e133cdb508c412eed', // aave-v3 USDT - Disable due to aave vulnerability
+  '0xcc0da22f5e89a7401255682b2e2e74edd4c62fc4', // aave-v3 AAVE - Disable due to aave vulnerability
+  '0x5e474399c0d3da173a76ad6676f3c32c97babeaf', // aave-v3 LINK - Disable due to aave vulnerability
+  '0x1dd5629903441b2dd0d03f76ec7673add920e765', // aave-v3 jEUR - Disable due to aave vulnerability
+  '0xc0b8d48064b9137858ccc2d6c07b7432aae2aa90', // aave-v3 agEUR - Disable due to aave vulnerability
+  '0x53e41d76892c681ef0d10df5a0262a3791b771ab', // aave-v3 EURS - Disable due to aave vulnerability
+  '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11', // aave-v3 CRV - Disable due to aave vulnerability
+  '0xbf3df32b05efc5d5a084fbe4d2076fbc3ce88f00', // aave-v3 SUSHI - Disable due to aave vulnerability
+  '0x68f677e667dac3b29c646f44a154dec80db6e811', // aave-v3 BAL - Disable due to aave vulnerability
+  '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // aave-v3 MaticX - Disable due to aave vulnerability
 ].map((a) => a.toLowerCase());
 
 export const DISABLED_YIELD_WITHDRAWS = [
