@@ -103,10 +103,6 @@
     "defaultMessage": "{step} - Swap tokens",
     "description": "transationStepSwapTokens"
   },
-  "/wtb0w": {
-    "defaultMessage": "Modify {from}:{to} position to run for {swaps} {frequency}",
-    "description": "transactionDetailsModifySwaps"
-  },
   "00Lmy0": {
     "defaultMessage": "Half",
     "description": "half"
@@ -162,10 +158,6 @@
   "1W+K73": {
     "defaultMessage": "4 - Terminate your open positions",
     "description": "eulerClaimTerminatePositions"
-  },
-  "1c3wKa": {
-    "defaultMessage": "Your {from}:{to} position has been migrated",
-    "description": "transactionMessagesMigrate"
   },
   "1mv4e2": {
     "defaultMessage": "We could not fetch the price of one of the tokens",
@@ -290,10 +282,6 @@
   "5biMGi": {
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "oneDayPlural"
-  },
-  "5ncl7Y": {
-    "defaultMessage": "Migrate your {from}:{to} position",
-    "description": "transactionDetailsMigrate"
   },
   "5q/G80": {
     "defaultMessage": "Changed duration",
@@ -575,10 +563,6 @@
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "oneWeekPlural"
   },
-  "CEv5tx": {
-    "defaultMessage": "{amount} {from} have been added to your {from}:{to} position",
-    "description": "transactionMessagesAddFunds"
-  },
   "CEw9Tp": {
     "defaultMessage": "Instant",
     "description": "swapSettingsTimeoutInstantKey"
@@ -682,10 +666,6 @@
   "EJMVdh": {
     "defaultMessage": "Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon",
     "description": "success modify rate for position"
-  },
-  "EKvo9E": {
-    "defaultMessage": "Remove {amount} {from} from the {from}:{to} position",
-    "description": "transactionDetailsRemoveFunds"
   },
   "EOwwL1": {
     "defaultMessage": "every hour",
@@ -947,6 +927,10 @@
     "defaultMessage": "Withdraw from {from}:{to} position",
     "description": "transactionDetailsWithdraw"
   },
+  "JVx+R1": {
+    "defaultMessage": "Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. In the meantime swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,",
+    "description": "positionAaveVulnerabilityTo"
+  },
   "Jh14HF": {
     "defaultMessage": "This cannot be undone.",
     "description": "transfer warning"
@@ -1115,10 +1099,6 @@
     "defaultMessage": "Increase position",
     "description": "permissionsIncreasePermission"
   },
-  "NSmm8H": {
-    "defaultMessage": "Add {amount} {from} to the {from}:{to} position",
-    "description": "transactionDetailsAddFunds"
-  },
   "Nd61ag": {
     "defaultMessage": "This allows the address to close your position",
     "description": "terminate permission helptext"
@@ -1162,10 +1142,6 @@
   "OPn8Nq": {
     "defaultMessage": "{readable}",
     "description": "thirtyMinutesPluralTime"
-  },
-  "OTXQIc": {
-    "defaultMessage": "{amount} {from} have been added to your {from}:{to} position and it has been set to run for {swaps} {frequency}",
-    "description": "transactionMessagesReset"
   },
   "OTyRfW": {
     "defaultMessage": "Swap and transfer to another address",
@@ -1375,10 +1351,6 @@
     "defaultMessage": "more received",
     "description": "betterByLabelMostReturnSellOrderWithoutRecommended"
   },
-  "TC32uH": {
-    "defaultMessage": "Add {amount} {from} to your {from}:{to} position and set it to run for {swaps} {frequency}",
-    "description": "transactionDetailsReset"
-  },
   "TGj1j/": {
     "defaultMessage": "5 minutes",
     "description": "fiveMinutesSingularTime"
@@ -1534,6 +1506,10 @@
   "XbrtpH": {
     "defaultMessage": "All",
     "description": "all"
+  },
+  "XgzzQX": {
+    "defaultMessage": "click here to read their official announcement.",
+    "description": "clickhereForAnnouncement"
   },
   "XmYRql": {
     "defaultMessage": "Funds will be deposited into your selected platform to generate yield while they wait to be swapped or withdrawn. The safety of the funds will be up to the selected platform, so please do your own research to perform an educated risk/reward assessment.",
@@ -1806,6 +1782,10 @@
   "cESB9o": {
     "defaultMessage": "Transaction sent!",
     "description": "Operation successfull"
+  },
+  "cZjfXa": {
+    "defaultMessage": "Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won't be able to increase your position. Swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,",
+    "description": "positionAaveVulnerabilityFrom"
   },
   "cmiLaP": {
     "defaultMessage": "Average buy price",
@@ -2407,10 +2387,6 @@
     "defaultMessage": "Mean now needs your explicit authorization to move {value} {tokenFrom} in order to create your position",
     "description": "permit2SignExplanation"
   },
-  "qQeTLj": {
-    "defaultMessage": "{amount} {from} have been removed from your {from}:{to} position",
-    "description": "transactionMessagesRemoveFunds"
-  },
   "qTiaEE": {
     "defaultMessage": "If you have just created the position, wait a few minutes and try again.",
     "description": "positionNotFoundDescription"
@@ -2550,10 +2526,6 @@
   "taCH+c": {
     "defaultMessage": "Transfer",
     "description": "Transfer"
-  },
-  "tdhen+": {
-    "defaultMessage": "Your {from}:{to} position has now been set to run for {swaps} {frequency}",
-    "description": "transactionMessagesModifySwaps"
   },
   "tfZ3sr": {
     "defaultMessage": "less profitable",
