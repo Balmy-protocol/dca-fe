@@ -238,7 +238,7 @@ const PositionDetailFrame = () => {
     find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
 
   const foundYieldTo =
-    position.from.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
+    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
   const handleViewNFT = async () => {
     if (!positionInUse) return;
