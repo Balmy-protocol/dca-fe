@@ -8,6 +8,7 @@ import { TRANSACTION_ERRORS, shouldTrackError } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import Modal from '@common/components/modal';
 import Button from '../button';
+import useProviderService from '@hooks/useProviderService';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -97,7 +98,8 @@ export const TransactionModal = ({
 }: CreatePairModalProps) => {
   const open = selectedConfig !== 'closed';
   const currentNetwork = useCurrentNetwork();
-
+  const providerService = useProviderService();
+  const providerInfo = providerService.getProviderInfo();
   const fallbackCopyTextToClipboard = (text: string) => {
     const textArea = document.createElement('textarea');
     textArea.value = text;
@@ -171,7 +173,6 @@ export const TransactionModal = ({
     </>
   );
 
-  console.log(errorConfig);
   const ErrorContent = (
     <>
       <StyledLoadingIndicatorWrapper>
@@ -225,6 +226,7 @@ export const TransactionModal = ({
             copyTextToClipboard(
               `\`\`\`${JSON.stringify({
                 ...errorConfig.error,
+                providerInfo,
               })}\`\`\``
             )
           }
