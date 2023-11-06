@@ -353,7 +353,16 @@ const Swap = ({
       setModalError({
         content: <FormattedMessage description="modalErrorApprove" defaultMessage="Error approving token" />,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            from: from.address,
+            to: to.address,
+            chainId: currentNetwork.chainId,
+          },
+        },
       });
     }
   };
@@ -462,7 +471,16 @@ const Swap = ({
       setModalError({
         content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            from: from.address,
+            to: to.address,
+            chainId: currentNetwork.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
@@ -547,7 +565,16 @@ const Swap = ({
       setModalError({
         content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            from: from.address,
+            to: to.address,
+            chainId: currentNetwork.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }

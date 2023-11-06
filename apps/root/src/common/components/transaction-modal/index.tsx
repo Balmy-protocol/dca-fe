@@ -4,9 +4,10 @@ import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Link, CheckCircleOutlineIcon, CancelIcon } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import { TRANSACTION_ERRORS } from '@common/utils/errors';
+import { TRANSACTION_ERRORS, shouldTrackError } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import Modal from '@common/components/modal';
+import Button from '../button';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -46,6 +47,7 @@ interface ErrorConfig {
     data: {
       message: string;
     } | null;
+    extraData?: unknown;
   };
 }
 
@@ -96,6 +98,38 @@ export const TransactionModal = ({
   const open = selectedConfig !== 'closed';
   const currentNetwork = useCurrentNetwork();
 
+  const fallbackCopyTextToClipboard = (text: string) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      console.error('Fallback: Oops, unable to copy', err);
+    }
+
+    document.body.removeChild(textArea);
+  };
+
+  const copyTextToClipboard = (text: string) => {
+    if (!navigator.clipboard) {
+      fallbackCopyTextToClipboard(text);
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    navigator.clipboard.writeText(text);
+  };
+
   const LoadingContent = (
     <>
       <Typography variant="h6">
@@ -137,6 +171,7 @@ export const TransactionModal = ({
     </>
   );
 
+  console.log(errorConfig);
   const ErrorContent = (
     <>
       <StyledLoadingIndicatorWrapper>
@@ -181,6 +216,22 @@ export const TransactionModal = ({
           </>
         )}
       </Typography>
+      {shouldTrackError(errorConfig.error as unknown as Error) && (
+        <Button
+          variant="contained"
+          color="secondary"
+          sx={{ marginTop: '10px' }}
+          onClick={() =>
+            copyTextToClipboard(
+              `\`\`\`${JSON.stringify({
+                ...errorConfig.error,
+              })}\`\`\``
+            )
+          }
+        >
+          <FormattedMessage description="errorEncounteredButtonCopyLog" defaultMessage="Copy error log" />
+        </Button>
+      )}
     </>
   );
 

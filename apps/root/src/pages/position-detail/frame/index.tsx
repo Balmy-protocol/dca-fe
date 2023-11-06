@@ -344,7 +344,15 @@ const PositionDetailFrame = () => {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            useProtocolToken,
+            chainId: position.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
@@ -462,7 +470,15 @@ const PositionDetailFrame = () => {
         content: (
           <FormattedMessage description="modalErrorWithdrawFunds" defaultMessage="Error while withdrawing funds" />
         ),
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            useProtocolToken,
+            chainId: position.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }

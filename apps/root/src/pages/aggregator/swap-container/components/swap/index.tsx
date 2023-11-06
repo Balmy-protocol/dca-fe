@@ -299,7 +299,20 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           setModalError({
             content: 'Error approving token',
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            error: { code: e.code, message: e.message, data: e.data },
+            error: {
+              code: e.code,
+              message: e.message,
+              data: e.data,
+              extraData: {
+                swapper: selectedRoute.swapper.id,
+                chainId: currentNetwork.chainId,
+                from: selectedRoute.sellToken.address,
+                to: selectedRoute.buyToken.address,
+                buyAmount: selectedRoute.buyAmount.amountInUnits,
+                sellAmount: selectedRoute.sellAmount.amountInUnits,
+                type: selectedRoute.type,
+              },
+            },
           });
         } else {
           setModalClosed({});
@@ -459,7 +472,24 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           isPermit2Enabled,
         });
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
+        setModalError({
+          content: 'Error swapping',
+          error: {
+            code: e.code,
+            message: e.message,
+            data: e.data,
+            extraData: {
+              swapper: selectedRoute.swapper.id,
+              chainId: currentNetwork.chainId,
+              from: selectedRoute.sellToken.address,
+              to: selectedRoute.buyToken.address,
+              buyAmount: selectedRoute.buyAmount.amountInUnits,
+              sellAmount: selectedRoute.sellAmount.amountInUnits,
+              type: selectedRoute.type,
+              isPermit2Enabled,
+            },
+          },
+        });
       } else {
         setModalClosed({});
       }
@@ -619,7 +649,23 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           type: selectedRoute.type,
         });
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        setModalError({ content: 'Error swapping', error: { code: e.code, message: e.message, data: e.data } });
+        setModalError({
+          content: 'Error swapping',
+          error: {
+            code: e.code,
+            message: e.message,
+            data: e.data,
+            extraData: {
+              swapper: selectedRoute.swapper.id,
+              chainId: currentNetwork.chainId,
+              from: selectedRoute.sellToken.address,
+              to: selectedRoute.buyToken.address,
+              buyAmount: selectedRoute.buyAmount.amountInUnits,
+              sellAmount: selectedRoute.sellAmount.amountInUnits,
+              type: selectedRoute.type,
+            },
+          },
+        });
       } else {
         setModalClosed({});
       }
