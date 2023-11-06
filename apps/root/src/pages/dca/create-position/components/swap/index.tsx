@@ -353,7 +353,19 @@ const Swap = ({
       setModalError({
         content: <FormattedMessage description="modalErrorApprove" defaultMessage="Error approving token" />,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          code: e.code,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          message: e.message,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          data: e.data,
+          extraData: {
+            from: from.address,
+            to: to.address,
+            chainId: currentNetwork.chainId,
+          },
+        },
       });
     }
   };
@@ -459,10 +471,34 @@ const Swap = ({
           chainId: currentNetwork.chainId,
         });
       }
+
+      let signature;
+      let signatureData;
+
+      if (transactionsToExecute?.length) {
+        const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_CREATE_POSITION });
+
+        if (index !== -1) {
+          signature = (transactionsToExecute[index].extraData as TransactionActionCreatePositionData).signature;
+          signatureData = await permit2Service.getPermit2DcaSignatureInfo(from, parseUnits(fromValue, from.decimals));
+        }
+      }
+
       setModalError({
         content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            from: from.address,
+            to: to.address,
+            chainId: currentNetwork.chainId,
+            signature,
+            signatureData,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
@@ -547,7 +583,16 @@ const Swap = ({
       setModalError({
         content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            from: from.address,
+            to: to.address,
+            chainId: currentNetwork.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }

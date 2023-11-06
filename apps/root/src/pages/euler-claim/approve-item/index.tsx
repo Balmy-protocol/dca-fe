@@ -82,8 +82,21 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
         });
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      setModalError({ content: 'Error approving token', error: { code: e.code, message: e.message, data: e.data } });
+      setModalError({
+        content: 'Error approving token',
+        error: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          code: e.code,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          message: e.message,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          data: e.data,
+          extraData: {
+            target: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],
+            token: token.address,
+          },
+        },
+      });
     }
   };
 

@@ -30,8 +30,7 @@ export default class Permit2Service {
     this.providerService = providerService;
   }
 
-  async getPermit2SignedData(token: Token, amount: BigNumber, wordIndex?: number) {
-    const signer = this.providerService.getSigner();
+  async getPermit2SignatureInfo(token: Token, amount: BigNumber, wordIndex?: number) {
     const network = await this.providerService.getNetwork();
 
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
@@ -42,6 +41,14 @@ export default class Permit2Service {
       amount: amount.toBigInt(),
       signatureValidFor: '1d',
     });
+
+    return preparedSignature;
+  }
+
+  async getPermit2SignedData(token: Token, amount: BigNumber, wordIndex?: number) {
+    const signer = this.providerService.getSigner();
+
+    const preparedSignature = await this.getPermit2SignatureInfo(token, amount, wordIndex);
 
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await (signer as VoidSigner)._signTypedData(
@@ -72,8 +79,7 @@ export default class Permit2Service {
     };
   }
 
-  async getPermit2DcaSignedData(token: Token, amount: BigNumber, wordIndex?: number) {
-    const signer = this.providerService.getSigner();
+  async getPermit2DcaSignatureInfo(token: Token, amount: BigNumber, wordIndex?: number) {
     const network = await this.providerService.getNetwork();
 
     const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
@@ -84,6 +90,14 @@ export default class Permit2Service {
       amount: amount.toBigInt(),
       signatureValidFor: '1d',
     });
+
+    return preparedSignature;
+  }
+
+  async getPermit2DcaSignedData(token: Token, amount: BigNumber, wordIndex?: number) {
+    const signer = this.providerService.getSigner();
+
+    const preparedSignature = await this.getPermit2DcaSignatureInfo(token, amount, wordIndex);
 
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await (signer as VoidSigner)._signTypedData(

@@ -107,7 +107,15 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
             defaultMessage="Error while transfering position"
           />
         ),
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            to: toAddress,
+            chainId: position.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
