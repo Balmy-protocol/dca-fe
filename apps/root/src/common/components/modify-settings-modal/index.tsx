@@ -574,10 +574,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       }
       setModalError({
         content: <FormattedMessage description="modalErrorApprovingToken" defaultMessage="Error approving token" />,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         error: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           code: e.code,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           message: e.message,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           data: e.data,
           extraData: {
             chainId: position.chainId,

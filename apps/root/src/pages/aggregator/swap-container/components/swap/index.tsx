@@ -298,10 +298,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           });
           setModalError({
             content: 'Error approving token',
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             error: {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
               code: e.code,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
               message: e.message,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
               data: e.data,
               extraData: {
                 swapper: selectedRoute.swapper.id,
@@ -471,6 +473,18 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           type: selectedRoute.type,
           isPermit2Enabled,
         });
+
+        const swapIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_SWAP });
+        let signature;
+        let signatureData;
+        if (swapIndex !== -1) {
+          signature = (transactionsToExecute[swapIndex].extraData as TransactionActionSwapData).signature;
+          signatureData = await permit2Service.getPermit2SignatureInfo(
+            from,
+            BigNumber.from(selectedRoute.sellAmount.amountInUnits)
+          );
+        }
+
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         setModalError({
           content: 'Error swapping',
@@ -487,6 +501,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               sellAmount: selectedRoute.sellAmount.amountInUnits,
               type: selectedRoute.type,
               isPermit2Enabled,
+              signature,
+              signatureData,
             },
           },
         });
