@@ -128,7 +128,7 @@ const store = configureStore({
       },
       tokenLists: {
         activeLists: ['Mean Finance Graph Allowed Tokens'],
-        activeAggregatorLists: [
+        activeAllTokenLists: [
           // General
           'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
           'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',

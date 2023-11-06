@@ -60,7 +60,7 @@ const PositionDataControls = ({
   const web3Service = useWeb3Service();
   const wallet = useWallet(user);
   const [connectedNetwork] = useWalletNetwork(user);
-  const tokenList = useTokenList();
+  const tokenList = useTokenList({});
   const wallets = useWallets();
   const dispatch = useAppDispatch();
 

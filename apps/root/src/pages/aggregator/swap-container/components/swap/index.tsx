@@ -1159,6 +1159,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const onShowSettings = React.useCallback(() => {
     setShouldShowSettings(true);
   }, []);
+
+  const tokenPickerModalTitle =
+    selecting === from ? (
+      <FormattedMessage description="You sell" defaultMessage="You sell" />
+    ) : (
+      <FormattedMessage description="You receive" defaultMessage="You receive" />
+    );
+
   return (
     <>
       <TransferToModal
@@ -1199,12 +1207,15 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         <TokenPickerModal
           shouldShow={shouldShowPicker}
           onClose={onTokenPickerClose}
-          isFrom={selecting === from}
+          modalTitle={tokenPickerModalTitle}
           onChange={tokenPickerOnChange}
           isLoadingYieldOptions={false}
           onAddToken={addCustomTokenToList}
           account={activeWallet?.address}
           isAggregator
+          allowCustomTokens
+          allowAllTokens
+          showWrappedAndProtocol
         />
         <StyledGrid container rowSpacing={2}>
           <Grid item xs={12}>

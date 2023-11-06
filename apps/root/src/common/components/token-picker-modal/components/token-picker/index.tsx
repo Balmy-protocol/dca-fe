@@ -41,7 +41,7 @@ import { useCustomTokens } from '@state/token-lists/hooks';
 import { memoWithDeepComparison } from '@common/utils/react';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 
-type SetFromToState = React.Dispatch<React.SetStateAction<Token>>;
+type SetTokenState = React.Dispatch<React.SetStateAction<Token>>;
 
 const StyledSwitchGrid = styled(Grid)`
   display: flex;
@@ -158,16 +158,18 @@ interface EmptyRowProps {
 
 interface TokenPickerProps {
   isOpen?: boolean;
-  onChange: SetFromToState;
+  onChange: SetTokenState;
   onClose: () => void;
   onAddToken?: (token: Token) => void;
-  isFrom: boolean;
+  modalTitle: React.ReactNode;
   account?: string;
   ignoreValues?: string[];
   otherSelected?: Token | null;
   yieldOptions?: YieldOptions;
   isLoadingYieldOptions: boolean;
   isAggregator?: boolean;
+  allowAllTokens?: boolean;
+  allowCustomTokens?: boolean;
   showWrappedAndProtocol?: boolean;
 }
 
@@ -389,7 +391,7 @@ const SizeList = memoWithDeepComparison(
 );
 
 const TokenPicker = ({
-  isFrom,
+  modalTitle,
   onClose,
   onChange,
   ignoreValues = [],
@@ -398,11 +400,13 @@ const TokenPicker = ({
   yieldOptions = [],
   isLoadingYieldOptions,
   isAggregator,
+  allowAllTokens,
+  allowCustomTokens,
   showWrappedAndProtocol,
   onAddToken,
   account,
 }: TokenPickerProps) => {
-  const tokenList = useTokenList(isAggregator);
+  const tokenList = useTokenList({ allowAllTokens });
   const searchInputRef = React.useRef<HTMLElement>();
   const [search, setSearch] = React.useState('');
   const [shouldShowTokenLists, setShouldShowTokenLists] = React.useState(false);
@@ -509,7 +513,7 @@ const TokenPicker = ({
 
   const [customToken, isLoadingCustomToken, customTokenError] = useCustomToken(
     search,
-    !isAggregator || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
+    !allowCustomTokens || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
   );
 
   const balances = React.useMemo(
@@ -590,9 +594,9 @@ const TokenPicker = ({
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
       tokenBalances: isLoadingBalances && (!balances || !Object.keys(balances).length) ? {} : balances || {},
       balancesChainId: tokenBalances?.chainId,
-      customToken: isAggregator ? customToken : undefined,
+      customToken: allowCustomTokens ? customToken : undefined,
       isLoadingTokenBalances: isLoadingBalances,
-      customTokens: isAggregator ? customTokens : {},
+      customTokens: allowCustomTokens ? customTokens : {},
       customTokenError,
     }),
     [
@@ -620,16 +624,12 @@ const TokenPicker = ({
       </IconButton>
       <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
         {shouldShowTokenLists ? (
-          <TokenLists isAggregator />
+          <TokenLists allowAllTokens />
         ) : (
           <>
             <Grid item xs={12} style={{ flexBasis: 'auto' }}>
               <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
-                {isFrom ? (
-                  <FormattedMessage description="You sell" defaultMessage="You sell" />
-                ) : (
-                  <FormattedMessage description="You receive" defaultMessage="You receive" />
-                )}
+                {modalTitle}
               </Typography>
             </Grid>
             <StyledGrid item xs={12} customSpacing={12} style={{ flexBasis: 'auto' }}>

@@ -8,8 +8,8 @@ export function useSavedTokenLists() {
   return useAppSelector((state) => state.tokenLists.activeLists);
 }
 
-export function useSavedAggregatorTokenLists() {
-  return useAppSelector((state) => state.tokenLists.activeAggregatorLists);
+export function useSavedAllTokenLists() {
+  return useAppSelector((state) => state.tokenLists.activeAllTokenLists);
 }
 
 export function useTokensLists(): { [tokenListUrl: string]: TokensLists } {
@@ -21,11 +21,8 @@ export function useCustomTokens(): TokenList {
 }
 
 export function useIsLoadingAggregatorTokenLists() {
-  const aggregatorTokenLists = useSavedAggregatorTokenLists();
+  const allTokenLists = useSavedAllTokenLists();
   const tokenLists = useTokensLists();
 
-  return React.useMemo(
-    () => some(aggregatorTokenLists, (list) => !tokenLists[list].hasLoaded),
-    [aggregatorTokenLists, tokenLists]
-  );
+  return React.useMemo(() => some(allTokenLists, (list) => !tokenLists[list].hasLoaded), [allTokenLists, tokenLists]);
 }

@@ -86,12 +86,14 @@ const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
       <TokenPickerModal
         shouldShow={shouldShowPicker}
         onClose={onTokenPickerClose}
-        isFrom={true}
+        modalTitle={<FormattedMessage description="youTransfer" defaultMessage="You transfer" />}
         onChange={onSetToken}
         isLoadingYieldOptions={false}
         onAddToken={addCustomTokenToList}
         account={activeWallet?.address}
-        isAggregator
+        showWrappedAndProtocol
+        allowAllTokens
+        allowCustomTokens
       />
       <StyledContentContainer>
         <TokenPickerWithAmount

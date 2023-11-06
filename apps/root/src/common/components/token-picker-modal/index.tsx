@@ -16,7 +16,7 @@ interface TokenPickerModalProps {
   shouldShow: boolean;
   onChange: React.Dispatch<React.SetStateAction<Token>>;
   onClose: () => void;
-  isFrom: boolean;
+  modalTitle: React.ReactNode;
   isLoadingYieldOptions: boolean;
   onAddToken?: (token: Token) => void;
   ignoreValues?: string[];
@@ -24,11 +24,14 @@ interface TokenPickerModalProps {
   yieldOptions?: YieldOptions;
   account?: string;
   isAggregator?: boolean;
+  showWrappedAndProtocol?: boolean;
+  allowAllTokens?: boolean;
+  allowCustomTokens?: boolean;
 }
 
 const TokenPickerModal = ({
   shouldShow,
-  isFrom,
+  modalTitle,
   onClose,
   onChange,
   yieldOptions,
@@ -38,22 +41,27 @@ const TokenPickerModal = ({
   ignoreValues,
   otherSelected,
   isAggregator,
+  showWrappedAndProtocol,
+  allowAllTokens,
+  allowCustomTokens,
 }: TokenPickerModalProps) => (
   <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" fullHeight keepMounted>
     <StyledOverlay>
       <TokenPicker
         isOpen={shouldShow}
-        isFrom={isFrom}
+        modalTitle={modalTitle}
         onClose={onClose}
         onChange={onChange}
         yieldOptions={yieldOptions}
         isLoadingYieldOptions={isLoadingYieldOptions}
         onAddToken={onAddToken}
         account={account}
-        showWrappedAndProtocol
+        showWrappedAndProtocol={showWrappedAndProtocol}
         isAggregator={isAggregator}
         ignoreValues={ignoreValues}
         otherSelected={otherSelected}
+        allowAllTokens={allowAllTokens}
+        allowCustomTokens={allowCustomTokens}
       />
     </StyledOverlay>
   </Modal>

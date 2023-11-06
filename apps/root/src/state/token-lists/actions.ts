@@ -12,10 +12,10 @@ export const enableTokenList = createAction<{
   enabled: boolean;
 }>('tokenLists/enableTokenList');
 
-export const enableAggregatorTokenList = createAction<{
+export const enableAllTokenList = createAction<{
   tokenList: string;
   enabled: boolean;
-}>('tokenLists/enableAggregatorTokenList');
+}>('tokenLists/enableAllTokenList');
 
 export const addCustomToken = createAction<Token>('tokenLists/addCustomToken');
 

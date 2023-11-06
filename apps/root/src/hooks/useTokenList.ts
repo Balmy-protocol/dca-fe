@@ -7,16 +7,16 @@ import orderBy from 'lodash/orderBy';
 import keyBy from 'lodash/keyBy';
 import { ALLOWED_YIELDS, DCA_TOKEN_BLACKLIST, TOKEN_BLACKLIST } from '@constants';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
-import { useSavedAggregatorTokenLists, useTokensLists } from '@state/token-lists/hooks';
+import { useSavedAllTokenLists, useTokensLists } from '@state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 
-function useTokenList(isAggregator = false, filter = true, filterChainId = true) {
+function useTokenList({ allowAllTokens = false, filter = true, filterChainId = true }) {
   const currentNetwork = useSelectedNetwork();
   const tokensLists = useTokensLists();
   const savedDCATokenLists = ['Mean Finance Graph Allowed Tokens'];
-  const savedAggregatorTokenLists = useSavedAggregatorTokenLists();
+  const savedAllTokenLists = useSavedAllTokenLists();
 
-  const savedTokenLists = isAggregator ? savedAggregatorTokenLists : savedDCATokenLists;
+  const savedTokenLists = allowAllTokens ? savedAllTokenLists : savedDCATokenLists;
   const reducedYieldTokens = React.useMemo(
     () =>
       ALLOWED_YIELDS[currentNetwork.chainId].reduce(
@@ -43,8 +43,8 @@ function useTokenList(isAggregator = false, filter = true, filterChainId = true)
               (token) =>
                 (!filterChainId || token.chainId === currentNetwork.chainId) &&
                 !Object.keys(acc).includes(token.address) &&
-                (isAggregator || !reducedYieldTokens.includes(token.address)) &&
-                (!filter || !(isAggregator ? TOKEN_BLACKLIST : DCA_TOKEN_BLACKLIST).includes(token.address))
+                (allowAllTokens || !reducedYieldTokens.includes(token.address)) &&
+                (!filter || !(allowAllTokens ? TOKEN_BLACKLIST : DCA_TOKEN_BLACKLIST).includes(token.address))
             )
             .map((token) => ({ ...token, name: TOKEN_MAP_SYMBOL[token.address] || token.name })),
           'address'
@@ -52,7 +52,7 @@ function useTokenList(isAggregator = false, filter = true, filterChainId = true)
       }),
       { [PROTOCOL_TOKEN_ADDRESS]: getProtocolToken(currentNetwork.chainId) }
     );
-  }, [currentNetwork.chainId, savedTokenLists, reducedYieldTokens, filter, isAggregator]);
+  }, [currentNetwork.chainId, savedTokenLists, reducedYieldTokens, filter, allowAllTokens]);
 
   return tokenList;
 }

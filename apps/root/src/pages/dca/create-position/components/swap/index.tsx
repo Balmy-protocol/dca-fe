@@ -980,6 +980,13 @@ const Swap = ({
       )
   );
 
+  const tokenPickerModalTitle =
+    selecting === from ? (
+      <FormattedMessage description="You sell" defaultMessage="You sell" />
+    ) : (
+      <FormattedMessage description="You receive" defaultMessage="You receive" />
+    );
+
   return (
     <StyledPaper variant="outlined" ref={containerRef}>
       <TransactionSteps
@@ -1002,7 +1009,7 @@ const Swap = ({
       <TokenPickerModal
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
-        isFrom={selecting === from}
+        modalTitle={tokenPickerModalTitle}
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
         ignoreValues={[]}
         yieldOptions={yieldOptions}
