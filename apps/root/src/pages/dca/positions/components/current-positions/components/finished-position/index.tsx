@@ -1,12 +1,12 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import { Typography, Card, CardContent, ArrowRightAltIcon } from 'ui-library';
+import { Typography, Card, CardContent, ArrowRightAltIcon, ErrorOutlineIcon, Link } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
 import { getTimeFrequencyLabel, sortTokens, calculateStale, STALE } from '@common/utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from '@types';
-import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from '@constants';
+import { AAVE_FROZEN_TOKENS, NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import { BigNumber } from 'ethers';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
@@ -15,6 +15,13 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
 import useUsdPrice from '@hooks/useUsdPrice';
 import PositionControls from '../position-controls';
+
+const StyledLink = styled(Link)`
+  margin: 0px 5px;
+  ${({ theme }) => `
+    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
+  `}
+`;
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;
@@ -347,6 +354,29 @@ const ActivePosition = ({
                   </Typography>
                 </CustomChip>
               )}
+            </StyledDetailWrapper>
+          )}
+          {(AAVE_FROZEN_TOKENS.includes(foundYieldTo?.tokenAddress.toLowerCase() || '') ||
+            AAVE_FROZEN_TOKENS.includes(foundYieldFrom?.tokenAddress.toLowerCase() || '')) && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ flex: '1' }}>
+                <FormattedMessage
+                  description="positionAaveVulnerability"
+                  defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,"
+                />
+                <StyledLink
+                  href="https://governance.aave.com/t/aave-v2-v3-security-incident-04-11-2023/15335/1"
+                  target="_blank"
+                >
+                  <FormattedMessage
+                    description="clickhereForAnnouncement"
+                    defaultMessage="click here to read their official announcement."
+                  />
+                </StyledLink>
+              </Typography>
             </StyledDetailWrapper>
           )}
         </StyledContentContainer>
