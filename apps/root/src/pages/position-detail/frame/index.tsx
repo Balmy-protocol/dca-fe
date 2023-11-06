@@ -7,7 +7,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import getPosition from '@graphql/getPosition.graphql';
 import useDCAGraphql from '@hooks/useDCAGraphql';
 import { useParams } from 'react-router-dom';
-import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionTypes, YieldName } from '@types';
+import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionTypes } from '@types';
 import getPairSwaps from '@graphql/getPairSwaps.graphql';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
 import Button from '@common/components/button';
@@ -21,7 +21,14 @@ import { withStyles } from 'tss-react/mui';
 import TerminateModal from '@common/components/terminate-modal';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';
-import { PERMISSIONS, ModeTypesIds, DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, FAIL_ON_ERROR } from '@constants';
+import {
+  PERMISSIONS,
+  ModeTypesIds,
+  DEFAULT_NETWORK_FOR_VERSION,
+  LATEST_VERSION,
+  FAIL_ON_ERROR,
+  AAVE_FROZEN_TOKENS,
+} from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
 import { formatUnits } from '@ethersproject/units';
@@ -642,14 +649,18 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
-        {foundYieldFrom?.name === YieldName.aave && position.chainId === 137 && (
+        {(AAVE_FROZEN_TOKENS.includes(foundYieldTo?.tokenAddress.toLowerCase() || '') ||
+          AAVE_FROZEN_TOKENS.includes(foundYieldFrom?.tokenAddress.toLowerCase() || '')) && (
           <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
             <Alert severity="warning">
               <FormattedMessage
-                description="positionAaveVulnerabilityFrom"
-                defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won't be able to increase your position. Swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,"
+                description="positionAaveVulnerability"
+                defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,"
               />
-              <StyledLink href="https://x.com/aave/status/1720868368331219100?s=20" target="_blank">
+              <StyledLink
+                href="https://governance.aave.com/t/aave-v2-v3-security-incident-04-11-2023/15335/1"
+                target="_blank"
+              >
                 <FormattedMessage
                   description="clickhereForAnnouncement"
                   defaultMessage="click here to read their official announcement."
@@ -658,24 +669,6 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
-        {foundYieldTo?.name === YieldName.aave &&
-          position.chainId === 137 &&
-          foundYieldFrom?.name !== YieldName.aave && (
-            <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
-              <Alert severity="warning">
-                <FormattedMessage
-                  description="positionAaveVulnerabilityTo"
-                  defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. In the meantime swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,"
-                />
-                <StyledLink href="https://x.com/aave/status/1720868368331219100?s=20" target="_blank">
-                  <FormattedMessage
-                    description="clickhereForAnnouncement"
-                    defaultMessage="click here to read their official announcement."
-                  />
-                </StyledLink>
-              </Alert>
-            </Grid>
-          )}
         <Grid
           item
           xs={12}

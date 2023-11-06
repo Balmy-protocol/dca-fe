@@ -711,6 +711,10 @@
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "thirtyMinutesPlural"
   },
+  "F0Hsc/": {
+    "defaultMessage": "Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,",
+    "description": "positionAaveVulnerability"
+  },
   "F5F9dl": {
     "defaultMessage": "Transfer position",
     "description": "transferPosition"
@@ -926,10 +930,6 @@
   "JOH6+p": {
     "defaultMessage": "Withdraw from {from}:{to} position",
     "description": "transactionDetailsWithdraw"
-  },
-  "JVx+R1": {
-    "defaultMessage": "Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. In the meantime swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,",
-    "description": "positionAaveVulnerabilityTo"
   },
   "Jh14HF": {
     "defaultMessage": "This cannot be undone.",
@@ -1782,10 +1782,6 @@
   "cESB9o": {
     "defaultMessage": "Transaction sent!",
     "description": "Operation successfull"
-  },
-  "cZjfXa": {
-    "defaultMessage": "Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave's DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won't be able to increase your position. Swaps will continue to be executed as normal. For a comprehensive understanding of Aave's decision,",
-    "description": "positionAaveVulnerabilityFrom"
   },
   "cmiLaP": {
     "defaultMessage": "Average buy price",

@@ -1729,6 +1729,12 @@
       "value": " intercambios)"
     }
   ],
+  "F0Hsc/": [
+    {
+      "type": 0,
+      "value": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrás interactuar con tu posición y no podremos ejecutar los intercambios. Para entender más sobre la decisión de Aave,"
+    }
+  ],
   "F5F9dl": [
     {
       "type": 0,
@@ -2341,12 +2347,6 @@
     {
       "type": 1,
       "value": "to"
-    }
-  ],
-  "JVx+R1": [
-    {
-      "type": 0,
-      "value": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Los intercambios seguirán siendo ejecutados de forma normal. Para entender más sobre la decisión de Aave,"
     }
   ],
   "Jh14HF": [
@@ -4555,12 +4555,6 @@
     {
       "type": 0,
       "value": "¡Transacción enviada!"
-    }
-  ],
-  "cZjfXa": [
-    {
-      "type": 0,
-      "value": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrá agregar fondos a su posición. Los intercambios seguirán siendo ejecutados de forma normal. Para entender más sobre la decisión de Aave, "
     }
   ],
   "cmiLaP": [
