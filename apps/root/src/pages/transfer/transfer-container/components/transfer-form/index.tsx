@@ -6,7 +6,6 @@ import WalletSelector from '../wallet-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
 import TransferButton from '../transfer-button';
-import { useTransferState } from '@state/transfer/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { FormattedMessage } from 'react-intl';
 import { useParams } from 'react-router-dom';
@@ -29,14 +28,7 @@ const TransferForm = () => {
     recipient: recipientParam,
   } = useParams<{ chainId?: string; token?: string; recipient?: string }>();
 
-  const { recipient } = useTransferState();
   const activeWallet = useActiveWallet();
-
-  const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
-
-  const isValidAddress = validRegex.test(recipient || '');
-  const isNotSameAddress = recipient?.toLowerCase() !== activeWallet?.address.toLowerCase();
-  const isRecipientValid = isValidAddress && isNotSameAddress;
 
   return (
     <StyledPaper variant="outlined">
@@ -49,8 +41,8 @@ const TransferForm = () => {
           <WalletSelector />
           <NetworkSelector chainIdParam={chainIdParam} />
           <TokenSelector tokenParamAddress={tokenParam} />
-          <RecipientAddress recipientParam={recipientParam} isValid={isRecipientValid} />
-          <TransferButton isRecipientValid={isRecipientValid} />
+          <RecipientAddress recipientParam={recipientParam} />
+          <TransferButton />
         </>
       )}
     </StyledPaper>

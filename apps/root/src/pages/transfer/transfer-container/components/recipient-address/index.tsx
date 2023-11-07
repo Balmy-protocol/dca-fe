@@ -1,51 +1,77 @@
 import React from 'react';
 import { useAppDispatch } from '@hooks/state';
 import useActiveWallet from '@hooks/useActiveWallet';
+import useReplaceHistory from '@hooks/useReplaceHistory';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setRecipient } from '@state/transfer/actions';
 import { useTransferState } from '@state/transfer/hooks';
 import { defineMessage, useIntl } from 'react-intl';
 import { DescriptionOutlinedIcon, IconButton, InputAdornment, TextField } from 'ui-library';
+import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
 
 interface RecipientAddressProps {
-  isValid: boolean;
   recipientParam?: string;
 }
 
-const RecipientAddress = ({ isValid, recipientParam }: RecipientAddressProps) => {
+const RecipientAddress = ({ recipientParam }: RecipientAddressProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const replaceHistory = useReplaceHistory();
   const activeWallet = useActiveWallet();
-  const { recipient } = useTransferState();
+  const [recipientInput, setRecipientInput] = React.useState<string>('');
+  const { token, recipient: storedRecipient } = useTransferState();
+  const currentNetwork = useCurrentNetwork();
   const [shouldShowContactList, setShouldShowContactList] = React.useState<boolean>(false);
 
+  const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
+  const { isValidRecipient } = validateAddress(recipientInput, activeWallet?.address);
+
   React.useEffect(() => {
-    if (recipientParam) {
+    const { isValidRecipient: isValid } = validateAddress(recipientParam || '', activeWallet?.address);
+    if (recipientParam && isValid) {
+      setRecipientInput(recipientParam);
       dispatch(setRecipient(recipientParam));
     }
-  }, [setRecipient]);
+  }, [dispatch, validateAddress]);
 
-  const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
+  const onRecipientChange = (nextValue: string) => {
+    if (!inputRegex.test(nextValue)) {
+      return;
+    }
+    setRecipientInput(nextValue);
+    const { isValidRecipient: isValid } = validateAddress(nextValue, activeWallet?.address);
 
-  const onSetRecipient = (newRecipient: string) => {
-    dispatch(setRecipient(newRecipient));
-  };
-
-  const validator = (nextValue: string) => {
-    // sanitize value
-    if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
-      onSetRecipient(nextValue);
+    if (isValid) {
+      dispatch(setRecipient(nextValue));
+      if (token) {
+        replaceHistory(`/transfer/${currentNetwork.chainId}/${token.address}/${nextValue}`);
+      }
+    } else if (storedRecipient) {
+      // Clear the stored recipient if the input is not valid
+      dispatch(setRecipient(''));
     }
   };
 
-  const hasError = recipient !== '' && recipient !== null && !isValid;
+  const onClickContact = (contactAddress: string) => {
+    onRecipientChange(contactAddress);
+    setShouldShowContactList(false);
+  };
+
+  const hasError = recipientInput !== '' && recipientInput !== null && !isValidRecipient;
 
   let error = '';
   if (hasError) {
-    if (recipient.toLowerCase() === activeWallet?.address.toLowerCase()) {
-      error = 'Transfer address cannot be the same as your address';
+    if (recipientInput.toLowerCase() === activeWallet?.address.toLowerCase()) {
+      error = intl.formatMessage({
+        defaultMessage: 'Transfer address cannot be the same as your address',
+        description: 'errorSameAddress',
+      });
     } else {
-      error = 'This is not a valid address';
+      error = intl.formatMessage({
+        defaultMessage: 'This is not a valid address',
+        description: 'errorInvalidAddress',
+      });
     }
   }
 
@@ -54,11 +80,11 @@ const RecipientAddress = ({ isValid, recipientParam }: RecipientAddressProps) =>
       <ContactListModal
         shouldShow={shouldShowContactList}
         setShouldShow={setShouldShowContactList}
-        onClickContact={onSetRecipient}
+        onClickContact={onClickContact}
       />
       <TextField
         id="recipientAddress"
-        value={recipient}
+        value={recipientInput}
         placeholder={intl.formatMessage(
           defineMessage({
             defaultMessage: 'Recipient Address',
@@ -73,7 +99,7 @@ const RecipientAddress = ({ isValid, recipientParam }: RecipientAddressProps) =>
         type="text"
         margin="normal"
         spellCheck="false"
-        onChange={(evt) => validator(evt.target.value)}
+        onChange={(evt) => onRecipientChange(evt.target.value)}
         inputProps={{
           pattern: '^0x[A-Fa-f0-9]*$',
           minLength: 1,

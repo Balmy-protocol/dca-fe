@@ -14,11 +14,6 @@ interface ContactListModalProps {
 const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: ContactListModalProps) => {
   const contactList = useStoredContactList();
 
-  const contactClickHandler = (contactAddress: string) => {
-    onClickContact(contactAddress);
-    setShouldShow(false);
-  };
-
   return (
     <Modal
       open={shouldShow}
@@ -26,7 +21,7 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
       title={<FormattedMessage description="contactListModalTitle" defaultMessage="Select contact" />}
     >
       {contactList.map((contact) => (
-        <Button key={contact.address} onClick={() => contactClickHandler(contact.address)}>
+        <Button key={contact.address} onClick={() => onClickContact(contact.address)}>
           <Address address={contact.address} trimAddress />
         </Button>
       ))}

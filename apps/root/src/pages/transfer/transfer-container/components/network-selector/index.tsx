@@ -25,7 +25,6 @@ import { setNetwork } from '@state/config/actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { setChainId } from '@state/transfer/actions';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { identifyNetwork } from '@common/utils/parsing';
 import { getAllChains } from '@mean-finance/sdk';
 
@@ -53,7 +52,6 @@ const NetworkSelector = ({ chainIdParam }: NetworkSelectorProps) => {
   const replaceHistory = useReplaceHistory();
   const activeWallet = useActiveWallet();
   const selectedNetwork = useSelectedNetwork();
-  const currentNetwork = useCurrentNetwork();
   const [chainSearch, setChainSearch] = React.useState('');
   const chainSearchRef = React.useRef<HTMLDivElement>();
 
@@ -69,7 +67,7 @@ const NetworkSelector = ({ chainIdParam }: NetworkSelectorProps) => {
 
   React.useEffect(() => {
     const networkToSet = identifyNetwork(mappedNetworks, chainIdParam);
-    dispatch(setChainId(Number(networkToSet?.chainId || currentNetwork.chainId || NETWORKS.mainnet.chainId)));
+    dispatch(setChainId(networkToSet?.chainId || NETWORKS.mainnet.chainId));
   }, []);
 
   const handleChangeNetwork = React.useCallback(

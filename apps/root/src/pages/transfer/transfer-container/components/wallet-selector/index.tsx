@@ -5,6 +5,8 @@ import { Typography, MenuItem, Select, SelectChangeEvent, WalletIcon } from 'ui-
 import useWallets from '@hooks/useWallets';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useAccountService from '@hooks/useAccountService';
+import { WalletStatus } from '@types';
+import Address from '@common/components/address';
 
 const StyledWalletContainer = styled.div`
   display: flex;
@@ -54,9 +56,11 @@ const WalletSelector = () => {
               key={wallet.address}
               sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}
               value={wallet.address}
+              disabled={wallet.status === WalletStatus.disconnected}
             >
               <WalletIcon />
-              {wallet.label || wallet.address}
+              <Address address={wallet.address} trimAddress />
+              {wallet.status === WalletStatus.disconnected && '(Not connected)'}
             </MenuItem>
           ))}
         </Select>

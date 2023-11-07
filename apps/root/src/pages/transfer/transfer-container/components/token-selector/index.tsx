@@ -4,7 +4,6 @@ import { Token } from '@types';
 import TokenPickerModal from '@common/components/token-picker-modal';
 import TokenPickerWithAmount from '@common/components/token-picker-with-amount';
 import useActiveWallet from '@hooks/useActiveWallet';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { addCustomToken } from '@state/token-lists/actions';
 import useUsdPrice from '@hooks/useUsdPrice';
@@ -15,6 +14,7 @@ import { useTransferState } from '@state/transfer/hooks';
 import { setAmount, setToken } from '@state/transfer/actions';
 import useToken from '@hooks/useToken';
 import { FormattedMessage } from 'react-intl';
+import useSelectedNetwork from '@hooks/useSelectedNetwork';
 
 interface TokenSelectorProps {
   tokenParamAddress?: string;
@@ -32,7 +32,7 @@ const StyledContentContainer = styled.div`
 const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
-  const currentNetwork = useCurrentNetwork();
+  const selectedNetwork = useSelectedNetwork();
   const activeWallet = useActiveWallet();
   const { token: selectedToken, amount, recipient } = useTransferState();
   const [balance] = useBalance(selectedToken, activeWallet?.address);
@@ -47,10 +47,10 @@ const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
   const cantFund = !!selectedToken && !!amount && !!balance && parseUnits(amount, selectedToken.decimals).gt(balance);
 
   React.useEffect(() => {
-    if (tokenParam && tokenParam.chainId === currentNetwork.chainId) {
+    if (tokenParam) {
       dispatch(setToken(tokenParam));
     }
-  }, [currentNetwork.chainId]);
+  }, [selectedNetwork.chainId]);
 
   const onTokenPickerClose = React.useCallback(() => {
     setShouldShowPicker(false);
@@ -59,9 +59,9 @@ const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
   const onSetToken = React.useCallback(
     (newToken: Token) => {
       dispatch(setToken(newToken));
-      replaceHistory(`/transfer/${currentNetwork.chainId}/${newToken.address}/${recipient || ''}`);
+      replaceHistory(`/transfer/${selectedNetwork.chainId}/${newToken.address}/${recipient || ''}`);
     },
-    [currentNetwork, dispatch, replaceHistory]
+    [selectedNetwork.chainId, dispatch, replaceHistory]
   );
 
   const onSetTokenAmount = (newAmount: string) => {
@@ -73,13 +73,8 @@ const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
     (customToken: Token) => {
       dispatch(addCustomToken(customToken));
     },
-    [currentNetwork.chainId, dispatch]
+    [selectedNetwork.chainId, dispatch]
   );
-
-  const startSelectingCoin = (token: Token) => {
-    dispatch(setToken(token));
-    setShouldShowPicker(true);
-  };
 
   return (
     <>
@@ -105,9 +100,9 @@ const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
           selectedToken={selectedToken}
           isLoadingPrice={loadingTokenPrice}
           tokenPrice={fetchedTokenPrice}
-          startSelectingCoin={startSelectingCoin}
+          startSelectingCoin={() => setShouldShowPicker(true)}
           onSetTokenAmount={onSetTokenAmount}
-          currentChainId={currentNetwork.chainId}
+          currentChainId={selectedNetwork.chainId}
           maxBalanceBtn
         />
       </StyledContentContainer>

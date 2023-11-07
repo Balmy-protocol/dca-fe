@@ -432,3 +432,22 @@ export const identifyNetwork = (networks: Chain[], chainId?: string): Chain | un
   }
   return foundNetwork;
 };
+
+export const validateAddress = (
+  address: string,
+  activeWalletAddress?: string
+): {
+  isValidFormat: boolean;
+  isValidRecipient?: boolean;
+} => {
+  const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
+  const isValidFormat = validRegex.test(address);
+  const isValidRecipient = activeWalletAddress
+    ? isValidFormat && address.toLowerCase() !== activeWalletAddress.toLowerCase()
+    : undefined;
+
+  return {
+    isValidFormat,
+    isValidRecipient,
+  };
+};

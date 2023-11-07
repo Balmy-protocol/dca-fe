@@ -8,11 +8,7 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { Token, TokenType } from '@types';
 import useActiveWallet from '@hooks/useActiveWallet';
 
-interface TransferButtonProps {
-  isRecipientValid?: boolean;
-}
-
-const TransferButton = ({ isRecipientValid }: TransferButtonProps) => {
+const TransferButton = () => {
   const { token, amount, recipient } = useTransferState();
   const contactListService = useContactListService();
   const activeWallet = useActiveWallet();
@@ -39,12 +35,7 @@ const TransferButton = ({ isRecipientValid }: TransferButtonProps) => {
   };
 
   return (
-    <Button
-      variant="outlined"
-      fullWidth
-      onClick={onTransfer}
-      disabled={!isRecipientValid || !recipient || !token || parsedAmount.lte(0)}
-    >
+    <Button variant="outlined" fullWidth onClick={onTransfer} disabled={!recipient || !token || parsedAmount.lte(0)}>
       <Typography variant="body1">
         <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
       </Typography>
