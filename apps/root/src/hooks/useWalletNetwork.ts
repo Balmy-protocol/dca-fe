@@ -19,7 +19,15 @@ function useWalletNetwork(walletAddress: string): [Nullable<Network>, boolean, s
 
         const provider = await wallet.getProvider();
 
-        const network = await provider?.getNetwork();
+        let network;
+
+        if (provider?.getNetwork) {
+          network = await provider.getNetwork();
+        } else if (provider?.detectNetwork) {
+          network = await provider.detectNetwork();
+        } else if (provider?.network) {
+          network = provider.network;
+        }
 
         setParams({ isLoading: false, result: network || null, error: undefined });
       } catch (e) {

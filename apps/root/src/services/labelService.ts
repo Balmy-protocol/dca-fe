@@ -29,7 +29,7 @@ export default class LabelService implements ILabelService {
     }
 
     try {
-      return await this.meanApiService.getAccountLabelsAndContactList(user.id);
+      return await this.meanApiService.getAccountLabelsAndContactList();
     } catch (e) {
       console.error(e);
     }
@@ -43,7 +43,7 @@ export default class LabelService implements ILabelService {
     const currentLabels = this.labels;
     try {
       this.labels = { ...currentLabels, ...labels };
-      await this.meanApiService.postAccountLabels(labels, user.id);
+      await this.meanApiService.postAccountLabels(labels);
     } catch (e) {
       this.labels = currentLabels;
       console.error(e);
@@ -62,7 +62,7 @@ export default class LabelService implements ILabelService {
     }
     try {
       this.labels = { ...currentLabels, [labeledAddress]: newLabel };
-      await this.meanApiService.putAccountLabel(newLabel, labeledAddress, user.id);
+      await this.meanApiService.putAccountLabel(newLabel, labeledAddress);
     } catch (e) {
       this.labels = currentLabels;
       console.error(e);
@@ -80,7 +80,7 @@ export default class LabelService implements ILabelService {
       try {
         delete currentLabels[labeledAddress];
         this.labels = currentLabels;
-        await this.meanApiService.deleteAccountLabel(labeledAddress, user.id);
+        await this.meanApiService.deleteAccountLabel(labeledAddress);
       } catch (e) {
         this.labels = { ...currentLabels, [labeledAddress]: deletedLabel };
         console.error(e);

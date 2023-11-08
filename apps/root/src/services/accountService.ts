@@ -4,6 +4,12 @@ import { find } from 'lodash';
 import Web3Service from './web3Service';
 import { getProviderInfo } from '@common/utils/provider-info';
 import { IProviderInfo } from '@common/utils/provider-info/types';
+import { Connector } from 'wagmi';
+import { ExternalProvider } from '@ethersproject/providers';
+import { ethers } from 'ethers';
+
+export const LAST_LOGIN_KEY = 'last_logged_in_with';
+export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
 
 export default class AccountService implements IAccountService {
   user?: User;
@@ -60,7 +66,11 @@ export default class AccountService implements IAccountService {
 
     const provider = await foundWallet.getProvider();
 
-    await provider.getNetwork();
+    if (provider.getNetwork) {
+      await provider.getNetwork();
+    } else if (provider.detectNetwork) {
+      await provider.detectNetwork();
+    }
 
     return provider;
   }
@@ -104,7 +114,6 @@ export default class AccountService implements IAccountService {
           address: walletAccount.address.toLowerCase(),
           status: !!readyWallet ? WalletStatus.connected : WalletStatus.disconnected,
           getProvider: readyWallet?.getEthersProvider,
-          switchChain: readyWallet?.switchChain,
         } as Wallet;
       });
 
@@ -145,6 +154,87 @@ export default class AccountService implements IAccountService {
     if (!this.activeWallet) {
       void this.setActiveWallet(embeddedWallet?.address || wallets[0].address);
     }
+
+    localStorage.setItem(LAST_LOGIN_KEY, UserType.wallet);
+  }
+
+  async setExternalUser(connector?: Connector): Promise<void> {
+    if (!connector) {
+      return;
+    }
+
+    const baseProvider = (await connector.getProvider()) as ExternalProvider;
+
+    const provider = new ethers.providers.Web3Provider(baseProvider, 'any');
+
+    const address = (await provider.getSigner().getAddress()).toLowerCase();
+
+    const wallet: Wallet = {
+      type: WalletType.external,
+      address,
+      status: WalletStatus.connected,
+      getProvider: async () =>
+        new ethers.providers.Web3Provider((await connector.getProvider()) as ExternalProvider, 'any'),
+      providerInfo: getProviderInfo(baseProvider),
+    };
+
+    const tomorrow = new Date();
+
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    this.user = {
+      id: `wallet:${address}`,
+      type: UserType.wallet,
+      wallets: [wallet],
+      signature: {
+        message: '0x',
+        expiration: tomorrow.toDateString(),
+      },
+    };
+
+    if (!this.activeWallet || this.activeWallet.address !== address) {
+      void this.setActiveWallet(address);
+    }
+
+    localStorage.setItem(LAST_LOGIN_KEY, UserType.wallet);
+
+    await this.getWalletVerifyingSignature(address, this.user.signature.expiration);
+  }
+
+  async getWalletVerifyingSignature(address: string, expiration: string) {
+    if (this.user?.type !== UserType.wallet) return;
+
+    const lastSignatureRaw = localStorage.getItem(WALLET_SIGNATURE_KEY);
+
+    if (lastSignatureRaw) {
+      const lastSignature = JSON.parse(lastSignatureRaw) as { id: string; expiration: string; message: string };
+
+      const lastExpiration = new Date(lastSignature.expiration).getTime();
+      const today = new Date().getTime();
+
+      if (lastSignature.id === this.user?.id && today < lastExpiration) {
+        this.user.signature.expiration = lastSignature.expiration;
+        this.user.signature.message = lastSignature.message;
+
+        return;
+      }
+    }
+
+    const signer = await this.getWalletSigner(address);
+
+    const message = await signer.signMessage(`Sign in until ${expiration}`);
+
+    this.user.signature.message = message;
+    this.user.signature.expiration = expiration;
+
+    localStorage.setItem(
+      WALLET_SIGNATURE_KEY,
+      JSON.stringify({
+        id: this.user.id,
+        expiration,
+        message,
+      })
+    );
   }
 
   setWalletsLabels(labels: AccountLabels): void {
@@ -161,5 +251,11 @@ export default class AccountService implements IAccountService {
         label: labels[wallet.address],
       })),
     };
+  }
+
+  getLastLoggedInWith(): UserType {
+    const lastLoggedInWith = localStorage.getItem(LAST_LOGIN_KEY) as UserType;
+
+    return lastLoggedInWith;
   }
 }

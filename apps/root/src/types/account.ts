@@ -32,7 +32,6 @@ type ConnectedWallet = BaseWallet & {
   getProvider(): Promise<Web3Provider>;
   providerInfo: IProviderInfo;
   status: WalletStatus.connected;
-  switchChain(chainId: number): Promise<void>;
 };
 
 export type Wallet = UnconnectedWallet | ConnectedWallet;
@@ -43,17 +42,22 @@ export enum UserType {
 }
 
 export type BaseUser = {
-  id: string; // For privy: `privy:${id}`, for external wallets: `wallet:${address}`
   wallets: Wallet[];
 };
 
 export interface PrivyUser extends BaseUser {
+  id: `privy:${string}`;
   type: UserType.privy;
   privyUser: BasePrivyUser;
 }
 
 export interface WalletUser extends BaseUser {
+  id: `wallet:${string}`;
   type: UserType.wallet;
+  signature: {
+    message: string;
+    expiration: string;
+  };
 }
 
 export type User = PrivyUser | WalletUser;

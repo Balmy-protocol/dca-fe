@@ -398,7 +398,6 @@ describe('Position Service', () => {
         {
           address: 'wallet-1',
           status: WalletStatus.connected,
-          switchChain: jest.fn(),
           type: WalletType.embedded,
           getProvider: jest.fn(),
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
@@ -406,7 +405,6 @@ describe('Position Service', () => {
         {
           address: 'wallet-2',
           status: WalletStatus.connected,
-          switchChain: jest.fn(),
           type: WalletType.embedded,
           getProvider: jest.fn(),
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
@@ -679,7 +677,6 @@ describe('Position Service', () => {
         {
           address: 'wallet-1',
           status: WalletStatus.connected,
-          switchChain: jest.fn(),
           type: WalletType.embedded,
           getProvider: jest.fn(),
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
@@ -687,7 +684,6 @@ describe('Position Service', () => {
         {
           address: 'wallet-2',
           status: WalletStatus.connected,
-          switchChain: jest.fn(),
           type: WalletType.embedded,
           getProvider: jest.fn(),
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },

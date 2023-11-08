@@ -256,7 +256,11 @@ export default class ProviderService {
           window.location.reload();
         }
 
-        await provider.getNetwork();
+        if (provider.getNetwork) {
+          await provider.getNetwork();
+        } else if (provider.detectNetwork) {
+          await provider.detectNetwork();
+        }
       }
     } catch (addError) {
       console.error('Error adding new chain to metamask');
@@ -279,18 +283,17 @@ export default class ProviderService {
 
       const providerInfo = wallet.providerInfo;
 
-      await wallet.switchChain(newChainId);
-      // const response: { code?: number; message?: string } | null = (await provider?.send('wallet_switchEthereumChain', [
-      //   { chainId: `0x${newChainId.toString(16)}` },
-      // ])) as { code?: number; message?: string } | null;
+      const response: { code?: number; message?: string } | null = (await provider?.send('wallet_switchEthereumChain', [
+        { chainId: `0x${newChainId.toString(16)}` },
+      ])) as { code?: number; message?: string } | null;
 
-      // if (
-      //   response &&
-      //   ((response.code && response.code === 4902) || (response.message && response.message === 'Chain does not exist'))
-      // ) {
-      //   await this.addNetwork(newChainId, callbackBeforeReload);
-      //   return;
-      // }
+      if (
+        response &&
+        ((response.code && response.code === 4902) || (response.message && response.message === 'Chain does not exist'))
+      ) {
+        await this.addNetwork(newChainId, callbackBeforeReload);
+        return;
+      }
 
       if (callbackBeforeReload) {
         callbackBeforeReload();
@@ -300,7 +303,11 @@ export default class ProviderService {
         window.location.reload();
       }
 
-      await provider.getNetwork();
+      if (provider.getNetwork) {
+        await provider.getNetwork();
+      } else if (provider.detectNetwork) {
+        await provider.detectNetwork();
+      }
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (switchError.code === 4902 || switchError.message === 'Chain does not exist') {

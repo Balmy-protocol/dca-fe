@@ -13,7 +13,12 @@ const MockedAccountService = jest.mocked(AccountService, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 
-const userMock: User = { id: 'validUserId', wallets: [], type: UserType.wallet };
+const userMock: User = {
+  id: 'wallet:validUserId',
+  wallets: [],
+  type: UserType.wallet,
+  signature: { expiration: '', message: '0x' },
+};
 const contactMock: Contact = { address: 'address-1', label: 'contact-1' };
 
 describe('ContactList Service', () => {

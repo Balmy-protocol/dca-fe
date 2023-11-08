@@ -31,6 +31,7 @@ jobs:
           ETHERSCAN_API: ${{ secrets.ETHERSCAN_API }}
           WC_PROJECT_ID: ${{ secrets.WC_PROJECT_ID }}
           MEAN_API_URL: ${{ secrets.STAGING_MEAN_API_URL }}
+          PUBLIC_PRIVY_APP_ID: ${{ secrets.PUBLIC_PRIVY_APP_ID }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

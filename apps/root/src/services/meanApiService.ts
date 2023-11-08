@@ -20,6 +20,7 @@ import {
   AccountLabelsAndContactList,
   ContactList,
   PostContacts,
+  UserType,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -29,6 +30,7 @@ import { getAccessToken } from '@privy-io/react-auth';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import ContractService from './contractService';
 import ProviderService from './providerService';
+import AccountService from './accountService';
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
   slippagePercentage: 0.1, // 0.1%
@@ -42,14 +44,22 @@ export default class MeanApiService {
 
   providerService: ProviderService;
 
+  accountService: AccountService;
+
   client: ethers.providers.Web3Provider;
 
   loadedAsSafeApp: boolean;
 
-  constructor(contractService: ContractService, axiosClient: AxiosInstance, providerService: ProviderService) {
+  constructor(
+    contractService: ContractService,
+    axiosClient: AxiosInstance,
+    providerService: ProviderService,
+    accountService: AccountService
+  ) {
     this.axiosClient = axiosClient;
     this.contractService = contractService;
     this.providerService = providerService;
+    this.accountService = accountService;
     this.loadedAsSafeApp = false;
   }
 
@@ -237,13 +247,33 @@ export default class MeanApiService {
     url: string,
     data?: unknown
   ): Promise<TResponse> {
-    const authToken = await getAccessToken();
-    if (!authToken) {
-      throw new Error('Authorization token not available');
+    const user = this.accountService.getUser();
+
+    if (!user) {
+      throw new Error('User not existent');
+    }
+
+    let authToken: Nullable<string> = null;
+    let authorizationHeader: Nullable<string> = null;
+
+    if (user.type === UserType.privy) {
+      authToken = await getAccessToken();
+
+      if (!authToken) {
+        throw new Error('Authorization token not available');
+      }
+
+      authorizationHeader = `PRIVY token="${authToken}"`;
+    } else if (user.type === UserType.wallet) {
+      authorizationHeader = `WALLET expiration="${user.signature.expiration}", signature="${user.signature.message}"`;
+    }
+
+    if (!authorizationHeader) {
+      throw new Error('Could not create authorization header');
     }
 
     const headers = {
-      Authorization: `PRIVY token="${authToken}"`,
+      Authorization: authorizationHeader,
     };
 
     const response = await this.axiosClient.request<TResponse>({
@@ -255,7 +285,14 @@ export default class MeanApiService {
     return response.data;
   }
 
-  async getAccountLabelsAndContactList(accountId: string): Promise<AccountLabelsAndContactList> {
+  async getAccountLabelsAndContactList(): Promise<AccountLabelsAndContactList> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     const accountResponse = await this.authorizedRequest<AccountLabelsAndContactListResponse>(
       'GET',
       `${MEAN_API_URL}/v1/accounts/${accountId}`
@@ -263,7 +300,14 @@ export default class MeanApiService {
     return accountResponse;
   }
 
-  async postAccountLabels(labels: AccountLabels, accountId: string): Promise<void> {
+  async postAccountLabels(labels: AccountLabels): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     const parsedLabels: PostAccountLabels = {
       labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label })),
     };
@@ -271,17 +315,38 @@ export default class MeanApiService {
     await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/labels`, parsedLabels);
   }
 
-  async putAccountLabel(newLabel: string, labeledAddress: string, accountId: string): Promise<void> {
+  async putAccountLabel(newLabel: string, labeledAddress: string): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     await this.authorizedRequest('PUT', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`, {
       newLabel,
     });
   }
 
-  async deleteAccountLabel(labeledAddress: string, accountId: string): Promise<void> {
+  async deleteAccountLabel(labeledAddress: string): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`);
   }
 
-  async postContacts(contacts: ContactList, accountId: string): Promise<void> {
+  async postContacts(contacts: ContactList): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     const parsedContacts: PostContacts = contacts.map((contact) => ({
       contact: contact.address,
       label: contact.label,
@@ -290,7 +355,14 @@ export default class MeanApiService {
     await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts`, parsedContacts);
   }
 
-  async deleteContact(contactAddress: string, accountId: string): Promise<void> {
+  async deleteContact(contactAddress: string): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts/${contactAddress}`);
   }
 }

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { Client, configureChains } from 'wagmi';
+import { Client, WagmiConfig } from 'wagmi';
 import EnMessages from '@lang/en_US.json';
 import EsMessages from '@lang/es.json';
 import WalletContext from '@common/components/wallet-context';
@@ -17,7 +17,6 @@ import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
 import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
-import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import useAccountService from '@hooks/useAccountService';
 import useLabelService from '@hooks/useLabelService';
 
@@ -108,12 +107,12 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: {
                 },
               }}
             >
-              <PrivyWagmiConnector wagmiChainsConfig={wagmiClient as unknown as ReturnType<typeof configureChains>}>
+              <WagmiConfig client={wagmiClient}>
                 <RainbowKitProvider chains={chains} initialChain={chainId} theme={darkTheme()}>
                   <MainApp />
                   <WalletsUpdater />
                 </RainbowKitProvider>
-              </PrivyWagmiConnector>
+              </WagmiConfig>
             </PrivyProvider>
           </Provider>
         </IntlProvider>
