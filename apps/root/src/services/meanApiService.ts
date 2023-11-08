@@ -285,7 +285,14 @@ export default class MeanApiService {
     return response.data;
   }
 
-  async getAccountLabelsAndContactList(accountId: string): Promise<AccountLabelsAndContactList> {
+  async getAccountLabelsAndContactList(): Promise<AccountLabelsAndContactList> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     const accountResponse = await this.authorizedRequest<AccountLabelsAndContactListResponse>(
       'GET',
       `${MEAN_API_URL}/v1/accounts/${accountId}`
@@ -293,7 +300,14 @@ export default class MeanApiService {
     return accountResponse;
   }
 
-  async postAccountLabels(labels: AccountLabels, accountId: string): Promise<void> {
+  async postAccountLabels(labels: AccountLabels): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     const parsedLabels: PostAccountLabels = {
       labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label })),
     };
@@ -301,17 +315,38 @@ export default class MeanApiService {
     await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/labels`, parsedLabels);
   }
 
-  async putAccountLabel(newLabel: string, labeledAddress: string, accountId: string): Promise<void> {
+  async putAccountLabel(newLabel: string, labeledAddress: string): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     await this.authorizedRequest('PUT', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`, {
       newLabel,
     });
   }
 
-  async deleteAccountLabel(labeledAddress: string, accountId: string): Promise<void> {
+  async deleteAccountLabel(labeledAddress: string): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`);
   }
 
-  async postContacts(contacts: ContactList, accountId: string): Promise<void> {
+  async postContacts(contacts: ContactList): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     const parsedContacts: PostContacts = contacts.map((contact) => ({
       contact: contact.address,
       label: contact.label,
@@ -320,7 +355,14 @@ export default class MeanApiService {
     await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts`, parsedContacts);
   }
 
-  async deleteContact(contactAddress: string, accountId: string): Promise<void> {
+  async deleteContact(contactAddress: string): Promise<void> {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
     await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts/${contactAddress}`);
   }
 }
