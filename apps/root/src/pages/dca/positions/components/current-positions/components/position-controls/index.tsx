@@ -215,6 +215,10 @@ const PositionControls = ({
   const disabledWithdraw =
     disabled || DISABLED_YIELD_WITHDRAWS.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '');
 
+  const disabledTerminate =
+    disabledWithdraw ||
+    DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '');
+
   return (
     <StyledCallToActionContainer>
       <>
@@ -281,7 +285,7 @@ const PositionControls = ({
           </MenuItem>
           <MenuItem
             onClick={handleTerminate}
-            disabled={disabled || !isOnNetwork || disabledWithdraw}
+            disabled={disabled || !isOnNetwork || disabledTerminate}
             style={{ color: '#FF5359' }}
           >
             <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
