@@ -4,6 +4,8 @@ import { MEAN_PROXY_PANEL_URL } from '@constants';
 import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import EventService from './eventService';
 import ProviderService from './providerService';
+import AccountService from './accountService';
+import { UserType } from '@types';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('mixpanel-browser');
@@ -11,19 +13,23 @@ jest.mock('./providerService');
 jest.mock('md5');
 
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
+const MockedAccountService = jest.mocked(AccountService, { shallow: true });
 const MockedMd5 = jest.mocked(md5, { shallow: true });
 const MockedMixpanelBrowser = jest.mocked(mixpanel, { shallow: true });
 
 describe('Event Service', () => {
   let eventService: EventService;
   let providerService: jest.MockedObject<ProviderService>;
+  let accountService: jest.MockedObject<AccountService>;
   let setConfigMock: jest.Mock;
   let trackMock: jest.Mock;
 
   beforeEach(() => {
     MockedMd5.mockImplementation((value: string) => `md5-${value}`);
     providerService = createMockInstance(MockedProviderService);
+    accountService = createMockInstance(MockedAccountService);
     providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: false });
+    accountService.getUser.mockReturnValue({ id: 'wallet:userId', type: UserType.wallet, wallets: [] });
     setConfigMock = jest.fn();
     trackMock = jest.fn();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -35,7 +41,7 @@ describe('Event Service', () => {
     process.env = {
       MIXPANEL_TOKEN: 'MIXPANEL_TOKEN',
     };
-    eventService = new EventService(providerService as unknown as ProviderService);
+    eventService = new EventService(providerService, accountService);
   });
 
   afterEach(() => {
