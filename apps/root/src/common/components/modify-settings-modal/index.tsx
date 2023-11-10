@@ -165,6 +165,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const needsToApprove =
     !hasConfirmedApproval &&
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
+    account &&
     position.user === account.toLowerCase() &&
     allowance.allowance &&
     allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&

@@ -745,6 +745,9 @@ const tokenAddressesForPriceFetching: Record<number, Record<string, string>> = {
   [NETWORKS.arbitrum.chainId]: {
     '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8': '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // Bridged USDC (USDC.e): Native USDC
   },
+  [NETWORKS.optimism.chainId]: {
+    '0x7f5c764cbc14f9669b88837ca1490cca17c31607': '0x0b2c639c533813f4aa9d7837caf62653d097ff85', // Bridged USDC (USDC.e): Native USDC
+  },
 };
 
 export const getTokenAddressForPriceFetching = (chainId: number, address: string): string => {
