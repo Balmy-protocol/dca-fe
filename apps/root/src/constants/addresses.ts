@@ -748,6 +748,9 @@ const tokenAddressesForPriceFetching: Record<number, Record<string, string>> = {
   [NETWORKS.optimism.chainId]: {
     '0x7f5c764cbc14f9669b88837ca1490cca17c31607': '0x0b2c639c533813f4aa9d7837caf62653d097ff85', // Bridged USDC (USDC.e): Native USDC
   },
+  [NETWORKS.polygon.chainId]: {
+    '0x2791bca1f2de4661ed88a30c99a7a9449aa84174': '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359', // Bridged USDC (USDC.e): Native USDC
+  },
 };
 
 export const getTokenAddressForPriceFetching = (chainId: number, address: string): string => {
