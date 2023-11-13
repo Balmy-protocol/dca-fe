@@ -5,10 +5,15 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setRecipient } from '@state/transfer/actions';
 import { useTransferState } from '@state/transfer/hooks';
-import { defineMessage, useIntl } from 'react-intl';
-import { DescriptionOutlinedIcon, IconButton, InputAdornment, TextField } from 'ui-library';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import { ContentPasteIcon, DescriptionOutlinedIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
 import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
+import styled from 'styled-components';
+
+const StyledPasteIcon = styled(ContentPasteIcon)`
+  cursor: pointer;
+`;
 
 const RecipientAddress = () => {
   const intl = useIntl();
@@ -44,6 +49,11 @@ const RecipientAddress = () => {
   const onClickContact = (contactAddress: string) => {
     onRecipientChange(contactAddress);
     setShouldShowContactList(false);
+  };
+
+  const onPasteAddress = async () => {
+    const value = await navigator.clipboard.readText();
+    onRecipientChange(value);
   };
 
   const hasError = recipientInput !== '' && recipientInput !== null && !isValidRecipient;
@@ -96,6 +106,13 @@ const RecipientAddress = () => {
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
+              <Tooltip
+                title={<FormattedMessage description="pasteAddress" defaultMessage="Paste address from clipboard" />}
+                arrow
+                placement="top"
+              >
+                <StyledPasteIcon onClick={onPasteAddress} />
+              </Tooltip>
               <IconButton edge="end" onClick={() => setShouldShowContactList(true)}>
                 <DescriptionOutlinedIcon />
               </IconButton>

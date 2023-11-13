@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers';
 
 export enum TokenType {
   BASE = 'BASE',
+  NATIVE = 'NATIVE',
   WRAPPED_PROTOCOL_TOKEN = 'WRAPPED_PROTOCOL_TOKEN',
   YIELD_BEARING_SHARE = 'YIELD_BEARING_SHARE',
   ERC20_TOKEN = 'ERC20_TOKEN',

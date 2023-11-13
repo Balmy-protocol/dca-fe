@@ -21,7 +21,7 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const WalletSelector = () => {
+const ActiveWalletSelector = () => {
   const wallets = useWallets();
   const activeWallet = useActiveWallet();
   const accountService = useAccountService();
@@ -69,4 +69,4 @@ const WalletSelector = () => {
   );
 };
 
-export default WalletSelector;
+export default ActiveWalletSelector;

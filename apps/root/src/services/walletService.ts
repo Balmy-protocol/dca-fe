@@ -2,7 +2,7 @@ import { ethers, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
 import { TransactionResponse, Network, TransactionRequest } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
-import { Token, ERC20Contract, MulticallContract, PositionVersions } from '@types';
+import { Token, ERC20Contract, MulticallContract, PositionVersions, TokenType } from '@types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { toToken } from '@common/utils/currency';
 
@@ -141,9 +141,8 @@ export default class WalletService {
 
     const populatedTransactions = await Promise.all([balanceCall, decimalsCall, nameCall, symbolCall]);
 
-    const [balanceResult, decimalResult, nameResult, symbolResult] = await multicallInstance.callStatic.aggregate3(
-      populatedTransactions
-    );
+    const [balanceResult, decimalResult, nameResult, symbolResult] =
+      await multicallInstance.callStatic.aggregate3(populatedTransactions);
 
     const balance = BigNumber.from(
       ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
@@ -256,5 +255,54 @@ export default class WalletService {
     const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
 
     return erc20.approve(addressToApprove, amount || MaxUint256);
+  }
+
+  async transferToken({
+    from,
+    to,
+    token,
+    amount,
+  }: {
+    from: string;
+    to: string;
+    token: Token;
+    amount: BigNumber;
+  }): Promise<TransactionResponse> {
+    if (amount.lte(0)) {
+      throw new Error('Amount must be greater than zero');
+    }
+    const signer = await this.providerService.getSigner(from, token.chainId);
+
+    if (token.type === TokenType.ERC20_TOKEN || token.type === TokenType.WRAPPED_PROTOCOL_TOKEN) {
+      const erc20Contract = await this.contractService.getERC20TokenInstance(token.chainId, token.address, from);
+      return erc20Contract.transfer(to, amount);
+    } else if (token.type === TokenType.NATIVE) {
+      return signer.sendTransaction({
+        from,
+        to,
+        value: amount,
+      });
+    }
+
+    throw new Error('Token must be of type Native or ERC20');
+  }
+
+  async transferNFT({
+    from,
+    to,
+    token,
+    tokenId,
+  }: {
+    from: string;
+    to: string;
+    token: Token;
+    tokenId: BigNumber;
+  }): Promise<TransactionResponse> {
+    if (token.type !== TokenType.ERC721_TOKEN) {
+      throw new Error('Token must be of type ERC721');
+    }
+
+    const erc721Contract = await this.contractService.getERC721TokenInstance(token.chainId, token.address, from);
+    return erc721Contract.transferFrom(from, to, tokenId);
   }
 }

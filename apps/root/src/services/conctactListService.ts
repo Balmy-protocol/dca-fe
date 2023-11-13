@@ -1,8 +1,6 @@
-import { Contact, ContactList, IContactListService, Token, TokenType } from '@types';
+import { Contact, ContactList, IContactListService } from '@types';
 import ProviderService from './providerService';
-import { BigNumber } from 'ethers';
 import ContractService from './contractService';
-import { TransactionResponse } from '@ethersproject/providers';
 import MeanApiService from './meanApiService';
 import { findIndex, remove } from 'lodash';
 import AccountService from './accountService';
@@ -78,55 +76,6 @@ export default class ContactListService implements IContactListService {
       this.contactList = currentContacts;
       console.error(e);
     }
-  }
-
-  async transferTokenToContact({
-    from,
-    contact,
-    token,
-    amount,
-  }: {
-    from: string;
-    contact: Contact;
-    token: Token;
-    amount: BigNumber;
-  }): Promise<TransactionResponse> {
-    if (amount.lte(0)) {
-      throw new Error('Amount must be greater than zero');
-    }
-    const signer = await this.providerService.getSigner(from, token.chainId);
-
-    if (token.type === TokenType.ERC20_TOKEN || token.type === TokenType.WRAPPED_PROTOCOL_TOKEN) {
-      const erc20Contract = await this.contractService.getERC20TokenInstance(token.chainId, token.address, from);
-      return erc20Contract.transfer(contact.address, amount);
-    } else if (token.type === TokenType.BASE) {
-      return signer.sendTransaction({
-        from,
-        to: contact.address,
-        value: amount,
-      });
-    }
-
-    throw new Error('Token must be of type Base or ERC20');
-  }
-
-  async transferNFTToContact({
-    from,
-    contact,
-    token,
-    tokenId,
-  }: {
-    from: string;
-    contact: Contact;
-    token: Token;
-    tokenId: BigNumber;
-  }) {
-    if (token.type !== TokenType.ERC721_TOKEN) {
-      throw new Error('Token must be of type ERC721');
-    }
-
-    const erc721Contract = await this.contractService.getERC721TokenInstance(token.chainId, token.address, from);
-    return erc721Contract.transferFrom(from, contact.address, tokenId);
   }
 
   getContacts(): ContactList {

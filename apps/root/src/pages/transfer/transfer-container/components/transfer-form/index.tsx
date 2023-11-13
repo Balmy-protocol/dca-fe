@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Paper, Typography } from 'ui-library';
 import NetworkSelector from '@common/components/network-selector';
-import WalletSelector from '../wallet-selector';
+import ActiveWalletSelector from '@common/components/active-wallet-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
 import TransferButton from '../transfer-button';
@@ -68,7 +68,7 @@ const TransferForm = () => {
     if (isValidRecipient) {
       dispatch(setRecipient(recipientParam));
     }
-  }, [dispatch, validateAddress]);
+  }, [dispatch]);
 
   const handleChangeNetworkCallback = React.useCallback(
     (chainId: number) => {
@@ -86,7 +86,7 @@ const TransferForm = () => {
         </Typography>
       ) : (
         <>
-          <WalletSelector />
+          <ActiveWalletSelector />
           <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
           <TokenSelector />
           <RecipientAddress />
