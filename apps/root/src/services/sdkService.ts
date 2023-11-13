@@ -56,7 +56,7 @@ export default class SdkService {
         },
       },
       quotes: {
-        defaultConfig: { global: { disableValidation: true } },
+        defaultConfig: { global: { disableValidation: true }, custom: { squid: { integratorId: 'meanfinance-api' } } },
         sourceList: {
           type: 'overridable-source-list',
           lists: {
