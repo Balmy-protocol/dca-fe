@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import React from 'react';
 import isUndefined from 'lodash/isUndefined';
 import Button from '@common/components/button';
-import TokenAmountInput from '@common/components/token-picker-with-amount/components/token-amount-input';
+import AmountInput from '@common/components/token-amount-input/components/amount-input';
 import useAccount from '@hooks/useAccount';
 import { Typography, FormHelperText } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
@@ -43,7 +43,7 @@ const StyledTokenInputContainer = styled.div`
   align-items: stretch;
 `;
 
-type TokenPickerWithAmountProps = {
+type TokenAmountInputProps = {
   id: string;
   label: React.ReactNode;
   cantFund?: boolean;
@@ -56,11 +56,10 @@ type TokenPickerWithAmountProps = {
   startSelectingCoin: (newToken: Token) => void;
   onSetTokenAmount: (newAmount: string) => void;
   maxBalanceBtn?: boolean;
-  currentChainId?: number;
   priceImpact?: string | boolean;
 };
 
-const TokenPickerWithAmount = ({
+const TokenAmountInput = ({
   id,
   label,
   cantFund,
@@ -73,16 +72,15 @@ const TokenPickerWithAmount = ({
   onSetTokenAmount,
   startSelectingCoin,
   maxBalanceBtn,
-  currentChainId,
   priceImpact,
-}: TokenPickerWithAmountProps) => {
+}: TokenAmountInputProps) => {
   const account = useAccount();
 
   const onSetMaxBalance = () => {
-    if (balance && selectedToken && currentChainId) {
+    if (balance && selectedToken) {
       if (selectedToken.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue = balance.gte(getMinAmountForMaxDeduction(currentChainId))
-          ? balance.sub(getMaxDeduction(currentChainId))
+        const maxValue = balance.gte(getMinAmountForMaxDeduction(selectedToken.chainId))
+          ? balance.sub(getMaxDeduction(selectedToken.chainId))
           : balance;
         onSetTokenAmount(formatUnits(maxValue, selectedToken.decimals));
       } else {
@@ -104,14 +102,14 @@ const TokenPickerWithAmount = ({
                 balance: formatCurrencyAmount(balance, selectedToken, 4),
               }}
             />
-            <StyledButton onClick={onSetMaxBalance} color="secondary" variant="text">
+            <StyledButton onClick={onSetMaxBalance} disabled={isLoadingRoute} color="secondary" variant="text">
               <FormattedMessage description="maxWallet" defaultMessage="MAX" />
             </StyledButton>
           </StyledFormHelperText>
         )}
       </StyledTitleContainer>
       <StyledTokenInputContainer>
-        <TokenAmountInput
+        <AmountInput
           id={id}
           error={cantFund && account ? 'Amount cannot exceed balance' : ''}
           value={tokenAmount}
@@ -129,4 +127,4 @@ const TokenPickerWithAmount = ({
   );
 };
 
-export default TokenPickerWithAmount;
+export default TokenAmountInput;

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import React from 'react';
 import { Token } from '@types';
 import TokenPickerModal from '@common/components/token-picker-modal';
-import TokenPickerWithAmount from '@common/components/token-picker-with-amount';
+import TokenPickerWithAmount from '@common/components/token-amount-input';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { addCustomToken } from '@state/token-lists/actions';
@@ -12,13 +12,8 @@ import useBalance from '@hooks/useBalance';
 import { useAppDispatch } from '@state/hooks';
 import { useTransferState } from '@state/transfer/hooks';
 import { setAmount, setToken } from '@state/transfer/actions';
-import useToken from '@hooks/useToken';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-
-interface TokenSelectorProps {
-  tokenParamAddress?: string;
-}
 
 const StyledContentContainer = styled.div`
   position: relative;
@@ -29,14 +24,13 @@ const StyledContentContainer = styled.div`
   flex-direction: column;
 `;
 
-const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
+const TokenSelector = () => {
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const selectedNetwork = useSelectedNetwork();
   const activeWallet = useActiveWallet();
   const { token: selectedToken, amount, recipient } = useTransferState();
   const [balance] = useBalance(selectedToken, activeWallet?.address);
-  const tokenParam = useToken(tokenParamAddress, undefined, true);
 
   const [fetchedTokenPrice, loadingTokenPrice] = useUsdPrice(
     selectedToken,
@@ -45,12 +39,6 @@ const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
 
   const cantFund = !!selectedToken && !!amount && !!balance && parseUnits(amount, selectedToken.decimals).gt(balance);
-
-  React.useEffect(() => {
-    if (tokenParam) {
-      dispatch(setToken(tokenParam));
-    }
-  }, [selectedNetwork.chainId]);
 
   const onTokenPickerClose = React.useCallback(() => {
     setShouldShowPicker(false);
@@ -73,7 +61,7 @@ const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
     (customToken: Token) => {
       dispatch(addCustomToken(customToken));
     },
-    [selectedNetwork.chainId, dispatch]
+    [dispatch]
   );
 
   return (
@@ -102,7 +90,6 @@ const TokenSelector = ({ tokenParamAddress }: TokenSelectorProps) => {
           tokenPrice={fetchedTokenPrice}
           startSelectingCoin={() => setShouldShowPicker(true)}
           onSetTokenAmount={onSetTokenAmount}
-          currentChainId={selectedNetwork.chainId}
           maxBalanceBtn
         />
       </StyledContentContainer>

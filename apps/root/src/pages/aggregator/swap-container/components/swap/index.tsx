@@ -107,6 +107,9 @@ const StyledGrid = styled(Grid)`
   z-index: 90;
 `;
 
+const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
+const receiveMessage = <FormattedMessage description="You receive" defaultMessage="You receive" />;
+
 interface SwapProps {
   isLoadingRoute: boolean;
   quotes: SwapOption[];
@@ -1160,12 +1163,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     setShouldShowSettings(true);
   }, []);
 
-  const tokenPickerModalTitle =
-    selecting === from ? (
-      <FormattedMessage description="You sell" defaultMessage="You sell" />
-    ) : (
-      <FormattedMessage description="You receive" defaultMessage="You receive" />
-    );
+  const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
 
   return (
     <>
@@ -1212,7 +1210,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           isLoadingYieldOptions={false}
           onAddToken={addCustomTokenToList}
           account={activeWallet?.address}
-          isAggregator
           allowCustomTokens
           allowAllTokens
           showWrappedAndProtocol

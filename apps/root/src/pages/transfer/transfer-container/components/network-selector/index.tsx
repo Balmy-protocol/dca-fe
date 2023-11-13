@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
-import orderBy from 'lodash/orderBy';
 import { FormattedMessage } from 'react-intl';
 import {
   Typography,
@@ -25,11 +24,10 @@ import { setNetwork } from '@state/config/actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { setChainId } from '@state/transfer/actions';
-import { identifyNetwork } from '@common/utils/parsing';
-import { getAllChains } from '@mean-finance/sdk';
+import { Chain } from '@mean-finance/sdk';
 
 interface NetworkSelectorProps {
-  chainIdParam?: string;
+  networkList: Chain[];
 }
 
 const StyledNetworkContainer = styled.div`
@@ -45,7 +43,7 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const NetworkSelector = ({ chainIdParam }: NetworkSelectorProps) => {
+const NetworkSelector = ({ networkList }: NetworkSelectorProps) => {
   const walletService = useWalletService();
   const web3Service = useWeb3Service();
   const dispatch = useAppDispatch();
@@ -55,20 +53,10 @@ const NetworkSelector = ({ chainIdParam }: NetworkSelectorProps) => {
   const [chainSearch, setChainSearch] = React.useState('');
   const chainSearchRef = React.useRef<HTMLDivElement>();
 
-  const mappedNetworks = React.useMemo(
-    () =>
-      orderBy(Object.values(getAllChains()), ['testnet'], ['desc']).filter(
-        (network) =>
-          (!network.testnet || network.ids.includes('base-goerli')) &&
-          network?.name.toLowerCase().includes(chainSearch.toLowerCase())
-      ),
-    [NETWORKS, chainSearch]
+  const renderNetworks = React.useMemo(
+    () => networkList.filter((network) => network?.name.toLowerCase().includes(chainSearch.toLowerCase())),
+    [chainSearch]
   );
-
-  React.useEffect(() => {
-    const networkToSet = identifyNetwork(mappedNetworks, chainIdParam);
-    dispatch(setChainId(networkToSet?.chainId || NETWORKS.mainnet.chainId));
-  }, []);
 
   const handleChangeNetwork = React.useCallback(
     (evt: SelectChangeEvent<number>) => {
@@ -137,7 +125,7 @@ const NetworkSelector = ({ chainIdParam }: NetworkSelectorProps) => {
               }}
             />
           </ListSubheader>
-          {mappedNetworks.map((network) => (
+          {renderNetworks.map((network) => (
             <MenuItem
               key={network.chainId}
               sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}

@@ -10,11 +10,7 @@ import { DescriptionOutlinedIcon, IconButton, InputAdornment, TextField } from '
 import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
 
-interface RecipientAddressProps {
-  recipientParam?: string;
-}
-
-const RecipientAddress = ({ recipientParam }: RecipientAddressProps) => {
+const RecipientAddress = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
@@ -26,14 +22,6 @@ const RecipientAddress = ({ recipientParam }: RecipientAddressProps) => {
 
   const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
   const { isValidRecipient } = validateAddress(recipientInput, activeWallet?.address);
-
-  React.useEffect(() => {
-    const { isValidRecipient: isValid } = validateAddress(recipientParam || '', activeWallet?.address);
-    if (recipientParam && isValid) {
-      setRecipientInput(recipientParam);
-      dispatch(setRecipient(recipientParam));
-    }
-  }, [dispatch, validateAddress]);
 
   const onRecipientChange = (nextValue: string) => {
     if (!inputRegex.test(nextValue)) {
@@ -84,7 +72,7 @@ const RecipientAddress = ({ recipientParam }: RecipientAddressProps) => {
       />
       <TextField
         id="recipientAddress"
-        value={recipientInput}
+        value={recipientInput || storedRecipient}
         placeholder={intl.formatMessage(
           defineMessage({
             defaultMessage: 'Recipient Address',

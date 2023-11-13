@@ -167,7 +167,6 @@ interface TokenPickerProps {
   otherSelected?: Token | null;
   yieldOptions?: YieldOptions;
   isLoadingYieldOptions: boolean;
-  isAggregator?: boolean;
   allowAllTokens?: boolean;
   allowCustomTokens?: boolean;
   showWrappedAndProtocol?: boolean;
@@ -399,7 +398,6 @@ const TokenPicker = ({
   otherSelected,
   yieldOptions = [],
   isLoadingYieldOptions,
-  isAggregator,
   allowAllTokens,
   allowCustomTokens,
   showWrappedAndProtocol,
@@ -668,7 +666,7 @@ const TokenPicker = ({
                 margin="none"
               />
             </StyledGrid>
-            {otherSelected && !isAggregator && (
+            {otherSelected && !allowAllTokens && (
               <StyledSwitchGrid item xs={12}>
                 <FormattedMessage
                   description="createdPairsSwitchToken"

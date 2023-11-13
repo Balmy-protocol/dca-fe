@@ -10,7 +10,7 @@ import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS, TOKEN_MAP_SYMBOL } from '@com
 import { useSavedAllTokenLists, useTokensLists } from '@state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 
-function useTokenList({ allowAllTokens = false, filter = true, filterChainId = true }) {
+function useTokenList({ allowAllTokens = false, filter = true, filterChainId = true } = {}) {
   const currentNetwork = useSelectedNetwork();
   const tokensLists = useTokensLists();
   const savedDCATokenLists = ['Mean Finance Graph Allowed Tokens'];

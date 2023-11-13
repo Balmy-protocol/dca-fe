@@ -64,7 +64,7 @@ const SwapContainer = () => {
     dispatch(
       setAggregatorChainId(Number(networkToSet?.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId))
     );
-  }, [mappedNetworks, identifyNetwork]);
+  }, [mappedNetworks]);
 
   React.useEffect(() => {
     if (fromParamToken) {

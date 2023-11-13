@@ -4,8 +4,8 @@ import React from 'react';
 import some from 'lodash/some';
 import { TokenList, TokensLists } from '@types';
 
-export function useSavedTokenLists() {
-  return useAppSelector((state) => state.tokenLists.activeLists);
+export function useSavedDcaTokenLists() {
+  return useAppSelector((state) => state.tokenLists.activeDcaLists);
 }
 
 export function useSavedAllTokenLists() {
@@ -20,7 +20,7 @@ export function useCustomTokens(): TokenList {
   return useAppSelector((state) => keyBy(state.tokenLists.customTokens.tokens, 'address'));
 }
 
-export function useIsLoadingAggregatorTokenLists() {
+export function useIsLoadingAllTokenLists() {
   const allTokenLists = useSavedAllTokenLists();
   const tokenLists = useTokensLists();
 

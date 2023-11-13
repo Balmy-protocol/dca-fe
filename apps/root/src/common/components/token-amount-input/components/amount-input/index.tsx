@@ -10,7 +10,7 @@ import { withStyles, makeStyles } from 'tss-react/mui';
 import TokenIcon from '@common/components/token-icon';
 import { FormattedMessage } from 'react-intl';
 
-const StyledTokenInputContainer = styled.div`
+const StyledAmountInputContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -106,7 +106,7 @@ const useButtonStyles = makeStyles()({
   },
 });
 
-interface TokenInputProps {
+interface AmountInputProps {
   id: string;
   value: string;
   disabled?: boolean;
@@ -120,7 +120,7 @@ interface TokenInputProps {
   isLoadingPrice?: boolean;
 }
 
-const TokenAmountInput = ({
+const AmountInput = ({
   id,
   onChange,
   value,
@@ -132,7 +132,7 @@ const TokenAmountInput = ({
   onTokenSelect,
   impact,
   isLoadingPrice,
-}: TokenInputProps) => {
+}: AmountInputProps) => {
   const inputRef = React.createRef();
   const validator = (nextValue: string) => {
     // sanitize value
@@ -150,7 +150,7 @@ const TokenAmountInput = ({
 
   const { classes: buttonClasses } = useButtonStyles();
   return (
-    <StyledTokenInputContainer>
+    <StyledAmountInputContainer>
       <StyledControls>
         <StyledFormControl onClick={onFocusInput}>
           <Typography variant="h6" component={StyledFirstPartContainer}>
@@ -164,11 +164,7 @@ const TokenAmountInput = ({
                 onClick={onTokenSelect}
                 classes={buttonClasses}
               >
-                {token && token.symbol ? (
-                  token.symbol
-                ) : (
-                  <FormattedMessage description="select" defaultMessage="Select" />
-                )}
+                {token?.symbol ?? <FormattedMessage description="select" defaultMessage="Select" />}
               </StyledButton>
             </StyledSelectorContainer>
             <StyledAmountContainer>
@@ -237,7 +233,7 @@ const TokenAmountInput = ({
           {error}
         </FormHelperText>
       )}
-    </StyledTokenInputContainer>
+    </StyledAmountInputContainer>
   );
 };
-export default TokenAmountInput;
+export default AmountInput;

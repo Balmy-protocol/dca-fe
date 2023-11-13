@@ -14,9 +14,10 @@ const TransferButton = () => {
   const activeWallet = useActiveWallet();
 
   const parsedAmount = parseUnits(amount || '0', token?.decimals);
+  const disableTransfer = !recipient || !token || parsedAmount.lte(0) || !activeWallet;
 
   const onTransfer = async () => {
-    if (!recipient || !token || parsedAmount.lte(0) || !activeWallet) {
+    if (disableTransfer) {
       return;
     }
     try {
@@ -35,7 +36,7 @@ const TransferButton = () => {
   };
 
   return (
-    <Button variant="outlined" fullWidth onClick={onTransfer} disabled={!recipient || !token || parsedAmount.lte(0)}>
+    <Button variant="outlined" fullWidth onClick={onTransfer} disabled={disableTransfer}>
       <Typography variant="body1">
         <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
       </Typography>

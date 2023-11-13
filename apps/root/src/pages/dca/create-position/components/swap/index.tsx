@@ -103,6 +103,9 @@ export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
   z-index: 90;
 `;
 
+const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
+const receiveMessage = <FormattedMessage description="You receive" defaultMessage="You receive" />;
+
 interface AvailableSwapInterval {
   label: {
     singular: string;
@@ -980,12 +983,7 @@ const Swap = ({
       )
   );
 
-  const tokenPickerModalTitle =
-    selecting === from ? (
-      <FormattedMessage description="You sell" defaultMessage="You sell" />
-    ) : (
-      <FormattedMessage description="You receive" defaultMessage="You receive" />
-    );
+  const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
 
   return (
     <StyledPaper variant="outlined" ref={containerRef}>

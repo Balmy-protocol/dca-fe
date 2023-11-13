@@ -127,7 +127,7 @@ const store = configureStore({
         position: null,
       },
       tokenLists: {
-        activeLists: ['Mean Finance Graph Allowed Tokens'],
+        activeDcaLists: ['Mean Finance Graph Allowed Tokens'],
         activeAllTokenLists: [
           // General
           'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',

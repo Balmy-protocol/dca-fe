@@ -6,7 +6,7 @@ import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { parseUsdPrice } from '@common/utils/currency';
 import { Campaigns, Token, TokenType } from '@types';
-import { useIsLoadingAggregatorTokenLists } from '@state/token-lists/hooks';
+import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import useAccount from './useAccount';
 import useCampaignService from './useCampaignService';
 import useGetToken from './useGetToken';
@@ -28,7 +28,7 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
   const prevAccount = usePrevious(account);
   const prevResult = usePrevious(result, false);
   const campaignService = useCampaignService();
-  const isLoadingTokenList = useIsLoadingAggregatorTokenLists();
+  const isLoadingTokenList = useIsLoadingAllTokenLists();
   const getToken = useGetToken();
 
   React.useEffect(() => {

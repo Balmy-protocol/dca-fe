@@ -112,7 +112,7 @@ const PositionControls = ({
   const dispatch = useAppDispatch();
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
-  const tokenList = useTokenList({});
+  const tokenList = useTokenList();
   const trackEvent = useTrackEvent();
 
   const onViewDetails = (event: React.MouseEvent) => {

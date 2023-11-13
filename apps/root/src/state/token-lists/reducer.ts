@@ -2,7 +2,7 @@ import { createReducer } from '@reduxjs/toolkit';
 import find from 'lodash/find';
 import { TokensLists, Token } from '@types';
 import { toToken } from '@common/utils/currency';
-import { addCustomToken, enableAllTokenList, enableTokenList, fetchGraphTokenList, fetchTokenList } from './actions';
+import { addCustomToken, enableAllTokenList, enableDcaTokenList, fetchGraphTokenList, fetchTokenList } from './actions';
 
 export interface TokenListsWithParser extends TokensLists {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,7 +12,7 @@ export interface TokenListsWithParser extends TokensLists {
 
 export interface TokenListsState {
   byUrl: { [tokenListUrl: string]: TokenListsWithParser };
-  activeLists: string[];
+  activeDcaLists: string[];
   activeAllTokenLists: string[];
   hasLoaded: boolean;
   customTokens: TokensLists;
@@ -605,7 +605,7 @@ export const getDefaultByUrl = () => ({
   // },
 });
 export const initialState: TokenListsState = {
-  activeLists: ['Mean Finance Graph Allowed Tokens'],
+  activeDcaLists: ['Mean Finance Graph Allowed Tokens'],
   activeAllTokenLists: [
     // General
     'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
@@ -700,12 +700,12 @@ export const initialState: TokenListsState = {
 
 export default createReducer(initialState, (builder) =>
   builder
-    .addCase(enableTokenList, (state, { payload: { tokenList, enabled } }) => {
-      if (enabled && !state.activeLists.includes(tokenList)) {
-        state.activeLists.push(tokenList);
+    .addCase(enableDcaTokenList, (state, { payload: { tokenList, enabled } }) => {
+      if (enabled && !state.activeDcaLists.includes(tokenList)) {
+        state.activeDcaLists.push(tokenList);
       }
-      if (!enabled && state.activeLists.includes(tokenList)) {
-        state.activeLists = state.activeLists.filter((item) => item !== tokenList);
+      if (!enabled && state.activeDcaLists.includes(tokenList)) {
+        state.activeDcaLists = state.activeDcaLists.filter((item) => item !== tokenList);
       }
     })
     .addCase(enableAllTokenList, (state, { payload: { tokenList, enabled } }) => {

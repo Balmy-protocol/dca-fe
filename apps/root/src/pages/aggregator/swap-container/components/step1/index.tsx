@@ -11,13 +11,12 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAppDispatch } from '@hooks/state';
 import useTrackEvent from '@hooks/useTrackEvent';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setFromValue, setToValue } from '@state/aggregator/actions';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import QuoteSimulation from '../quote-simulation';
 import TopBar from '../top-bar';
-import TokenPickerWithAmount from '@common/components/token-picker-with-amount';
+import TokenPickerWithAmount from '@common/components/token-amount-input';
 import ToggleButton from '../toggle-button';
 import QuoteSelection from '../quote-selection';
 
@@ -88,7 +87,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
-  const currentNetwork = useCurrentNetwork();
 
   let fromValueToUse =
     isBuyOrder && selectedRoute
@@ -177,7 +175,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             startSelectingCoin={startSelectingCoin}
             selectedToken={from}
             onSetTokenAmount={onSetFromAmount}
-            currentChainId={currentNetwork.chainId}
             maxBalanceBtn
           />
         </StyledContentContainer>

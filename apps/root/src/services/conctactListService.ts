@@ -90,7 +90,7 @@ export default class ContactListService implements IContactListService {
     contact: Contact;
     token: Token;
     amount: BigNumber;
-  }): Promise<TransactionResponse | undefined> {
+  }): Promise<TransactionResponse> {
     if (amount.lte(0)) {
       throw new Error('Amount must be greater than zero');
     }

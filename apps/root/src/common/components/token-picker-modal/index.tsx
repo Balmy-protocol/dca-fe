@@ -23,7 +23,6 @@ interface TokenPickerModalProps {
   otherSelected?: Token | null;
   yieldOptions?: YieldOptions;
   account?: string;
-  isAggregator?: boolean;
   showWrappedAndProtocol?: boolean;
   allowAllTokens?: boolean;
   allowCustomTokens?: boolean;
@@ -40,7 +39,6 @@ const TokenPickerModal = ({
   account,
   ignoreValues,
   otherSelected,
-  isAggregator,
   showWrappedAndProtocol,
   allowAllTokens,
   allowCustomTokens,
@@ -57,7 +55,6 @@ const TokenPickerModal = ({
         onAddToken={onAddToken}
         account={account}
         showWrappedAndProtocol={showWrappedAndProtocol}
-        isAggregator={isAggregator}
         ignoreValues={ignoreValues}
         otherSelected={otherSelected}
         allowAllTokens={allowAllTokens}
