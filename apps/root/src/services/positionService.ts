@@ -1228,7 +1228,8 @@ export default class PositionService {
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther
+      transaction.type === TransactionTypes.wrapEther ||
+      transaction.type === TransactionTypes.transferToken
     )
       return;
 
@@ -1328,7 +1329,8 @@ export default class PositionService {
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther
+      transaction.type === TransactionTypes.wrapEther ||
+      transaction.type === TransactionTypes.transferToken
     )
       return;
     const { typeData } = transaction;
@@ -1360,7 +1362,8 @@ export default class PositionService {
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther
+      transaction.type === TransactionTypes.wrapEther ||
+      transaction.type === TransactionTypes.transferToken
     ) {
       return;
     }

@@ -28,6 +28,7 @@ export enum TransactionTypes {
   // Common
   approveToken = 'APPROVE_TOKEN',
   approveTokenExact = 'APPROVE_TOKEN_EXACT',
+  transferToken = 'TRANSFER_TOKEN',
   // DCA
   newPosition = 'NEW_POSITION',
   newPair = 'NEW_PAIR',
@@ -198,6 +199,16 @@ export interface ApproveTokenExactTypeData {
   };
 }
 
+export interface TransferTokenTypeData {
+  type: TransactionTypes.transferToken;
+  typeData: {
+    // id: string;
+    token: Token;
+    to: string;
+    amount: string;
+  };
+}
+
 export interface WrapEtherTypeData {
   type: TransactionTypes.wrapEther;
   typeData: {
@@ -306,6 +317,7 @@ export type TransactionTypeDataOptions =
   | ModifyRateAndSwapsPositionTypeData
   | TerminatePositionTypeData
   | ApproveTokenTypeData
+  | TransferTokenTypeData
   | WrapEtherTypeData
   | NewPositionTypeData
   | NewPairTypeData
