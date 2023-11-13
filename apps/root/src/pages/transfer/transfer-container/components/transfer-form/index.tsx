@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Paper, Typography } from 'ui-library';
-import NetworkSelector from '../network-selector';
+import NetworkSelector from '@common/components/network-selector';
 import WalletSelector from '../wallet-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
@@ -17,6 +17,7 @@ import { setChainId, setRecipient, setToken } from '@state/transfer/actions';
 import { identifyNetwork, validateAddress } from '@common/utils/parsing';
 import { getAllChains } from '@mean-finance/sdk';
 import { NETWORKS } from '@constants';
+import useReplaceHistory from '@hooks/useReplaceHistory';
 
 const StyledPaper = styled(Paper)`
   margin-top: 16px;
@@ -38,6 +39,7 @@ const TransferForm = () => {
 
   const activeWallet = useActiveWallet();
   const dispatch = useAppDispatch();
+  const replaceHistory = useReplaceHistory();
   const { token: selectedToken } = useTransferState();
   const tokenParam = useToken(tokenParamAddress, undefined, true);
 
@@ -68,6 +70,14 @@ const TransferForm = () => {
     }
   }, [dispatch, validateAddress]);
 
+  const handleChangeNetworkCallback = React.useCallback(
+    (chainId: number) => {
+      dispatch(setChainId(chainId));
+      replaceHistory(`/transfer/${chainId}`);
+    },
+    [dispatch, replaceHistory]
+  );
+
   return (
     <StyledPaper variant="outlined">
       {!activeWallet ? (
@@ -77,7 +87,7 @@ const TransferForm = () => {
       ) : (
         <>
           <WalletSelector />
-          <NetworkSelector networkList={networkList} />
+          <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
           <TokenSelector />
           <RecipientAddress />
           <TransferButton />

@@ -301,7 +301,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   },
 };
 
-const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken, testnet }: Chain) => ({
+export const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken, testnet }: Chain) => ({
   chainId,
   name,
   mainCurrency: `${chainId}-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`,
