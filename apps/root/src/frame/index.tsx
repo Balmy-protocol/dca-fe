@@ -31,6 +31,7 @@ import theme from './theme';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useAccountService from '@hooks/useAccountService';
 import useActiveWallet from '@hooks/useActiveWallet';
+import NewAccountModal from './components/new-account-modal';
 
 // FONTS
 // import Lato300EOT from 'lato-v32-latin-300.eot';
@@ -59,6 +60,7 @@ const Aggregator = lazy(() => import('@pages/aggregator'));
 const FAQ = lazy(() => import('@pages/faq'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 const EulerClaimFrame = lazy(() => import('@pages/euler-claim/frame'));
+const SettingsFrame = lazy(() => import('@pages/settings'));
 
 const StyledVector1Container = styled.div`
   position: fixed;
@@ -106,9 +108,18 @@ const AppFrame = () => {
   const aggSupportedNetworks = useSdkChains();
   const currentBreakPoint = useCurrentBreakpoint();
   const activeWallet = useActiveWallet();
+  const [isNewAccountModalOpen, setIsNewAccountModalOpen] = React.useState(false);
 
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
+
+  const onOpenNewAccountModal = React.useCallback(() => {
+    setIsNewAccountModalOpen(true);
+  }, [setIsNewAccountModalOpen]);
+
+  React.useEffect(() => {
+    accountService.setOpenNewAccountModalHandler(setIsNewAccountModalOpen);
+  }, [setIsNewAccountModalOpen]);
 
   React.useEffect(() => {
     async function getNetwork() {
@@ -156,7 +167,8 @@ const AppFrame = () => {
               </>
             )}
             <Router>
-              <NavBar isLoading={isLoadingNetwork} />
+              <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} />
+              <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
               <FeedbackCard />
               <StyledVector1Container>
                 <Vector1 />
@@ -179,6 +191,7 @@ const AppFrame = () => {
                             element={<Transfer isLoading={isLoadingNetwork} />}
                           />
                           <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
+                          <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
                           <Route path="/create/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
                           <Route
                             path="/swap/:chainId?/:from?/:to?"

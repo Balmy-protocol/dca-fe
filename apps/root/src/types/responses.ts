@@ -316,3 +316,7 @@ export interface AccountLabelsAndContactListResponse {
   labels: AccountLabels;
   contacts: { wallet: string }[];
 }
+
+export type ApiWallet = { address: string; isAuth: boolean };
+export type ApiNewWallet = { address: string } & ApiWalletAdminConfig;
+export type ApiWalletAdminConfig = { isAuth: true; signature: string; expiration: string } | { isAuth: false };

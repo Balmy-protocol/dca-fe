@@ -1,5 +1,5 @@
 import { createMockInstance } from '@common/utils/tests';
-import { Contact, User, UserType } from '@types';
+import { Contact, User, UserStatus } from '@types';
 
 import AccountService from './accountService';
 import ProviderService from './providerService';
@@ -20,8 +20,9 @@ const MockedContractService = jest.mocked(ContractService, { shallow: true });
 const userMock: User = {
   id: 'wallet:validUserId',
   wallets: [],
-  type: UserType.wallet,
-  signature: { expiration: '', message: '0x' },
+  status: UserStatus.loggedIn,
+  label: 'validUser',
+  signature: { expiration: '', message: '0x', signer: 'validUserId' },
 };
 const contactMock: Contact = { address: 'address-1', label: 'contact-1' };
 

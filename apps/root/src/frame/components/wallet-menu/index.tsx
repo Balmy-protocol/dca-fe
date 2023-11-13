@@ -2,18 +2,7 @@ import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import Button from '@common/components/button';
-import {
-  Typography,
-  Link,
-  OpenInNewIcon,
-  EmailIcon,
-  TwitterIcon,
-  WalletIcon,
-  GoogleIcon,
-  AppleIcon,
-  GitHubIcon,
-  CheckCircleOutlineIcon,
-} from 'ui-library';
+import { Typography, Link, OpenInNewIcon } from 'ui-library';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -22,7 +11,7 @@ import {
   useHasPendingTransactions,
   useIsTransactionPending,
 } from '@state/transactions/hooks';
-import { NetworkStruct, TransactionDetails, UserType, WalletStatus, WalletType } from '@types';
+import { NetworkStruct, TransactionDetails } from '@types';
 import useBuildTransactionDetail from '@hooks/useBuildTransactionDetail';
 import { clearAllTransactions, removeTransaction } from '@state/transactions/actions';
 import { useAppDispatch } from '@state/hooks';
@@ -34,10 +23,7 @@ import TokenIcon from '@common/components/token-icon';
 import { toToken } from '@common/utils/currency';
 import Address from '@common/components/address';
 import MinimalTimeline from './components/minimal-timeline';
-import DiscordIcon from '@assets/svg/atom/discord';
-import { useLogout, usePrivy } from '@privy-io/react-auth';
-import useUser from '@hooks/useUser';
-import useAccountService from '@hooks/useAccountService';
+import { useLogout } from '@privy-io/react-auth';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledLink = styled(Link)`
@@ -53,16 +39,6 @@ const StyledAccount = styled.div`
   background: rgba(216, 216, 216, 0.1);
   box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
-`;
-
-const StyledExternalAccount = styled(StyledAccount)`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)`
-  color: rgb(17 147 34);
 `;
 
 const StyledWalletContainer = styled.div`
@@ -85,42 +61,13 @@ const StyledRecentTransactionsTitleContainer = styled.div<{ withMargin?: boolean
   ${(props) => (props.withMargin ? 'margin-bottom: 10px' : '')};
 `;
 
-const StyledLoginOptionsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-`;
-
-const StyledExternalWalletsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-`;
-
 interface WalletMenuProps {
   open: boolean;
   onClose: () => void;
 }
 
 const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
-  const {
-    linkDiscord,
-    linkEmail,
-    linkTwitter,
-    linkWallet,
-    linkGoogle,
-    linkApple,
-    linkGithub,
-    connectWallet,
-    unlinkWallet,
-  } = usePrivy();
   const { logout } = useLogout();
-  const user = useUser();
-  const accountService = useAccountService();
   const allTransactions = useAllNotClearedTransactions();
   const hasPendingTransactions = useHasPendingTransactions();
   const isPendingTransaction = useIsTransactionPending();
@@ -153,13 +100,6 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
         'desc'
       ),
     [allTransactions, hasPendingTransactions, currentNetwork]
-  );
-
-  const onSetActiveWallet = React.useCallback(
-    (wallet: string) => {
-      void accountService.setActiveWallet(wallet);
-    },
-    [accountService]
   );
 
   const onClearAll = () => {
@@ -204,112 +144,6 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
               <Address address={account || ''} trimAddress trimSize={10} editable />
             </Typography>
           </StyledAccount>
-          {user?.type === UserType.privy && (
-            <>
-              <Typography variant="body2" component="span">
-                <FormattedMessage description="connect another account" defaultMessage="Connect another account:" />
-              </Typography>
-              <StyledLoginOptionsContainer>
-                <Button
-                  variant="outlined"
-                  color="default"
-                  disabled={!!user.privyUser?.discord}
-                  onClick={linkDiscord}
-                  endIcon={user.privyUser?.discord ? <StyledCheckCircleOutlineIcon /> : null}
-                >
-                  <DiscordIcon size="24px" />
-                  {user.privyUser?.discord?.username}
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="default"
-                  disabled={!!user.privyUser?.email}
-                  onClick={linkEmail}
-                  endIcon={user.privyUser?.email ? <StyledCheckCircleOutlineIcon /> : null}
-                >
-                  <EmailIcon />
-                  {user.privyUser?.email?.address}
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="default"
-                  disabled={!!user.privyUser?.twitter}
-                  onClick={linkTwitter}
-                  endIcon={user.privyUser?.twitter ? <StyledCheckCircleOutlineIcon /> : null}
-                >
-                  <TwitterIcon />
-                  {user.privyUser?.twitter?.username}
-                </Button>
-                <Button variant="outlined" color="default" onClick={linkWallet}>
-                  <WalletIcon />
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="default"
-                  disabled={!!user.privyUser?.google}
-                  onClick={linkGoogle}
-                  endIcon={user.privyUser?.google ? <StyledCheckCircleOutlineIcon /> : null}
-                >
-                  <GoogleIcon />
-                  {user.privyUser?.google?.name}
-                  {user.privyUser?.google && `(${user.privyUser?.google?.email})`}
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="default"
-                  disabled={!!user.privyUser?.apple}
-                  onClick={linkApple}
-                  endIcon={user.privyUser?.apple ? <StyledCheckCircleOutlineIcon /> : null}
-                >
-                  <AppleIcon />
-                  {user.privyUser?.apple?.email}
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="default"
-                  disabled={!!user.privyUser?.github}
-                  onClick={linkGithub}
-                  endIcon={user.privyUser?.github ? <StyledCheckCircleOutlineIcon /> : null}
-                >
-                  <GitHubIcon />
-                  {user.privyUser?.github?.username}
-                </Button>
-              </StyledLoginOptionsContainer>
-              <StyledExternalWalletsContainer>
-                <Typography variant="body2" component="span">
-                  <FormattedMessage description="connected wallets" defaultMessage="Connected external wallets:" />
-                </Typography>
-                {user.wallets.map((wallet) => {
-                  const walletIsConnected = wallet.status === WalletStatus.connected;
-                  return (
-                    <StyledExternalAccount key={wallet.address}>
-                      <Typography variant="subtitle1" fontWeight={500}>
-                        <Address editable address={wallet.address} trimAddress trimSize={10} /> connected with:{' '}
-                        {walletIsConnected ? wallet.providerInfo.name : wallet.type}
-                      </Typography>
-                      <Button
-                        disabled={wallet.address.toLowerCase() === account?.toLowerCase()}
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => (walletIsConnected ? onSetActiveWallet(wallet.address) : connectWallet())}
-                      >
-                        {walletIsConnected ? (
-                          <FormattedMessage description="setAsActive" defaultMessage="Set as active wallet" />
-                        ) : (
-                          <FormattedMessage description="walletNotConnected" defaultMessage="Reconnect wallet" />
-                        )}
-                      </Button>
-                      {wallet.type !== WalletType.embedded && (
-                        <Button variant="contained" color="secondary" onClick={() => unlinkWallet(wallet.address)}>
-                          <FormattedMessage description="unlinkWallet" defaultMessage="Unlink" />
-                        </Button>
-                      )}
-                    </StyledExternalAccount>
-                  );
-                })}
-              </StyledExternalWalletsContainer>
-            </>
-          )}
           <StyledLink
             underline="none"
             href={buildEtherscanAddress(activeWallet?.address || '', currentNetwork.chainId)}

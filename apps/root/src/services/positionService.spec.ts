@@ -401,6 +401,7 @@ describe('Position Service', () => {
           type: WalletType.embedded,
           getProvider: jest.fn(),
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
+          isAuth: true,
         },
         {
           address: 'wallet-2',
@@ -408,6 +409,7 @@ describe('Position Service', () => {
           type: WalletType.embedded,
           getProvider: jest.fn(),
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
+          isAuth: true,
         },
       ]);
       sdkService.getUsersDcaPositions.mockResolvedValue({
@@ -680,6 +682,7 @@ describe('Position Service', () => {
           type: WalletType.embedded,
           getProvider: jest.fn(),
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
+          isAuth: true,
         },
         {
           address: 'wallet-2',
@@ -687,6 +690,7 @@ describe('Position Service', () => {
           type: WalletType.embedded,
           getProvider: jest.fn(),
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
+          isAuth: true,
         },
       ]);
       sdkService.getUsersDcaPositions.mockResolvedValue({

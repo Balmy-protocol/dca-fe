@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Paper, Typography } from 'ui-library';
 import NetworkSelector from '@common/components/network-selector';
-import ActiveWalletSelector from '@common/components/active-wallet-selector';
+import WalletSelector from '@common/components/wallet-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
 import TransferButton from '../transfer-button';
@@ -83,7 +83,7 @@ const TransferForm = () => {
         </Typography>
       ) : (
         <>
-          <ActiveWalletSelector />
+          <WalletSelector />
           <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
           <TokenSelector />
           <RecipientAddress />

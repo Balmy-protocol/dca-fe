@@ -2,6 +2,7 @@ import React from 'react';
 import { useWallets } from '@privy-io/react-auth';
 import useAccountService from './useAccountService';
 import { Network } from '@ethersproject/providers';
+import { WalletStatus } from '@types';
 
 function useWalletNetwork(walletAddress: string): [Nullable<Network>, boolean, string?] {
   const [{ result, isLoading, error }, setParams] = React.useState<{
@@ -17,6 +18,9 @@ function useWalletNetwork(walletAddress: string): [Nullable<Network>, boolean, s
       try {
         const wallet = accountService.getWallet(walletAddress);
 
+        if (wallet.status === WalletStatus.disconnected) {
+          throw new Error('Wallet is not connected');
+        }
         const provider = await wallet.getProvider();
 
         let network;

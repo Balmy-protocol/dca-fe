@@ -13,6 +13,7 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import NetworkSelector from '@common/components/network-selector';
 import { useAppDispatch } from '@state/hooks';
 import { setAggregatorChainId } from '@state/aggregator/actions';
+import WalletSelector from '@common/components/wallet-selector';
 
 const StyledCogContainer = styled.div`
   position: absolute;
@@ -90,6 +91,7 @@ const TopBar = ({ onShowSettings }: Props) => {
         </Badge>
       </StyledCogContainer>
       <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
+      <WalletSelector />
     </>
   );
 };

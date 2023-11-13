@@ -9,6 +9,7 @@ import TokenSelector from './components/token-selector';
 import NetworkSelector from '@common/components/network-selector';
 import { NETWORKS, SUPPORTED_NETWORKS_DCA } from '@constants';
 import { compact, find, orderBy } from 'lodash';
+import WalletSelector from '@common/components/wallet-selector';
 
 export const StyledContentContainer = styled.div`
   background-color: #292929;
@@ -66,6 +67,11 @@ const SwapFirstStep = ({
     <Grid container rowSpacing={2}>
       <Grid item xs={12}>
         <StyledContentContainer>
+          <WalletSelector />
+        </StyledContentContainer>
+      </Grid>
+      <Grid item xs={12}>
+        <StyledContentContainer>
           <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
         </StyledContentContainer>
       </Grid>
@@ -91,6 +97,6 @@ const SwapFirstStep = ({
       </Grid>
     </Grid>
   );
-};
+}
 
 export default SwapFirstStep;

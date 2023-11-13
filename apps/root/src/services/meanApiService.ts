@@ -20,11 +20,13 @@ import {
   AccountLabelsAndContactList,
   ContactList,
   PostContacts,
-  UserType,
+  Account,
+  AccountId,
+  ApiNewWallet,
+  ApiWalletAdminConfig,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
-import { getAccessToken } from '@privy-io/react-auth';
 
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -253,20 +255,11 @@ export default class MeanApiService {
       throw new Error('User not existent');
     }
 
-    let authToken: Nullable<string> = null;
     let authorizationHeader: Nullable<string> = null;
 
-    if (user.type === UserType.privy) {
-      authToken = await getAccessToken();
+    const signature = await this.accountService.getWalletVerifyingSignature({});
 
-      if (!authToken) {
-        throw new Error('Authorization token not available');
-      }
-
-      authorizationHeader = `PRIVY token="${authToken}"`;
-    } else if (user.type === UserType.wallet) {
-      authorizationHeader = `WALLET expiration="${user.signature.expiration}", signature="${user.signature.message}"`;
-    }
+    authorizationHeader = `WALLET expiration="${signature.expiration}", signature="${signature.message}"`;
 
     if (!authorizationHeader) {
       throw new Error('Could not create authorization header');
@@ -377,5 +370,44 @@ export default class MeanApiService {
     }
 
     await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts/${contactAddress}`);
+  }
+
+  async getAccounts() {
+    return this.authorizedRequest<{ accounts: Account[] }>('GET', `${MEAN_API_URL}/v1/accounts`);
+  }
+
+  async createAccount({ label }: { label: string }) {
+    return this.authorizedRequest<{ accountId: AccountId }>('POST', `${MEAN_API_URL}/v1/accounts`, {
+      label,
+    });
+  }
+
+  async linkWallet({ wallet }: { wallet: ApiNewWallet }) {
+    const user = this.accountService.getUser();
+    const accountId = user?.id;
+
+    if (!accountId) {
+      throw new Error('User not signed in');
+    }
+
+    return this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/wallets`, {
+      wallets: [wallet],
+    });
+  }
+
+  async modifyWallet({
+    walletConfig,
+    address,
+    accountId,
+  }: {
+    address: string;
+    accountId: string;
+    walletConfig: ApiWalletAdminConfig;
+  }) {
+    return this.authorizedRequest('PUT', `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`, walletConfig);
+  }
+
+  async unlinkWallet({ address, accountId }: { address: string; accountId: string }) {
+    return this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`);
   }
 }
