@@ -33,7 +33,7 @@ describe('Event Service', () => {
       id: 'wallet:userId',
       type: UserType.wallet,
       wallets: [],
-      signature: { expiration: 'exp', message: 'hi' },
+      signature: { expiration: '', message: '0x' },
     });
     setConfigMock = jest.fn();
     trackMock = jest.fn();
@@ -42,6 +42,7 @@ describe('Event Service', () => {
     MockedMixpanelBrowser.init.mockReturnValue({
       set_config: setConfigMock,
       track: trackMock,
+      identify: jest.fn(),
     } as unknown as Mixpanel);
     process.env = {
       MIXPANEL_TOKEN: 'MIXPANEL_TOKEN',
