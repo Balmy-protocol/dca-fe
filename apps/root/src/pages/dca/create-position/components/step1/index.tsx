@@ -24,6 +24,23 @@ interface AvailableSwapInterval {
   value: BigNumber;
 }
 
+const networkList = compact(
+  orderBy(
+    SUPPORTED_NETWORKS_DCA.map((chainId) => {
+      const foundNetwork = find(NETWORKS, { chainId });
+
+      if (!foundNetwork) {
+        return null;
+      }
+      return {
+        ...(foundNetwork || {}),
+      };
+    }),
+    ['testnet'],
+    ['desc']
+  )
+);
+
 interface SwapFirstStepProps {
   startSelectingCoin: (token: Token) => void;
   cantFund: boolean | null;
@@ -45,26 +62,6 @@ const SwapFirstStep = ({
   onChangeNetwork,
   handleFromValueChange,
 }: SwapFirstStepProps) => {
-  const networkList = React.useMemo(
-    () =>
-      compact(
-        orderBy(
-          SUPPORTED_NETWORKS_DCA.map((chainId) => {
-            const foundNetwork = find(NETWORKS, { chainId });
-
-            if (!foundNetwork) {
-              return null;
-            }
-            return {
-              ...(foundNetwork || {}),
-            };
-          }),
-          ['testnet'],
-          ['desc']
-        )
-      ),
-    []
-  );
   return (
     <Grid container rowSpacing={2}>
       <Grid item xs={12}>

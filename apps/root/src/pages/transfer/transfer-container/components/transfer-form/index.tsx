@@ -68,15 +68,12 @@ const TransferForm = () => {
     if (isValidRecipient) {
       dispatch(setRecipient(recipientParam));
     }
-  }, [dispatch]);
+  }, []);
 
-  const handleChangeNetworkCallback = React.useCallback(
-    (chainId: number) => {
-      dispatch(setChainId(chainId));
-      replaceHistory(`/transfer/${chainId}`);
-    },
-    [dispatch, replaceHistory]
-  );
+  const handleChangeNetworkCallback = React.useCallback((chainId: number) => {
+    dispatch(setChainId(chainId));
+    replaceHistory(`/transfer/${chainId}`);
+  }, []);
 
   return (
     <StyledPaper variant="outlined">
