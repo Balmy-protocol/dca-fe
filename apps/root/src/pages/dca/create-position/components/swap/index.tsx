@@ -11,7 +11,7 @@ import {
   AllowanceType,
 } from '@types';
 import { Typography, Grid, Slide, Paper } from 'ui-library';
-import TokenPicker from '@pages/dca/components/dca-token-picker';
+import TokenPickerModal from '@common/components/token-picker-modal';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
 import useBalance from '@hooks/useBalance';
@@ -102,6 +102,9 @@ export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
   right: 16px;
   z-index: 90;
 `;
+
+const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
+const receiveMessage = <FormattedMessage description="You receive" defaultMessage="You receive" />;
 
 interface AvailableSwapInterval {
   label: {
@@ -980,6 +983,8 @@ const Swap = ({
       )
   );
 
+  const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
+
   return (
     <StyledPaper variant="outlined" ref={containerRef}>
       <TransactionSteps
@@ -999,10 +1004,10 @@ const Swap = ({
         onCancel={() => setShouldShowStalePairModal(false)}
       />
 
-      <TokenPicker
+      <TokenPickerModal
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
-        isFrom={selecting === from}
+        modalTitle={tokenPickerModalTitle}
         onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
         ignoreValues={[]}
         yieldOptions={yieldOptions}

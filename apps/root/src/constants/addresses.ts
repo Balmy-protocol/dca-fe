@@ -301,7 +301,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   },
 };
 
-const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken, testnet }: Chain) => ({
+export const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken, testnet }: Chain) => ({
   chainId,
   name,
   mainCurrency: `${chainId}-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`,
@@ -393,6 +393,8 @@ export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct
 };
 
 export const DEFAULT_NETWORK_FOR_AGGREGATOR = NETWORKS.mainnet;
+
+export const DEFAULT_NETWORK_FOR_TRANSFER = NETWORKS.mainnet;
 
 export const HUB_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_1]: {

@@ -29,7 +29,12 @@ describe('Event Service', () => {
     providerService = createMockInstance(MockedProviderService);
     accountService = createMockInstance(MockedAccountService);
     providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: false });
-    accountService.getUser.mockReturnValue({ id: 'wallet:userId', type: UserType.wallet, wallets: [] });
+    accountService.getUser.mockReturnValue({
+      id: 'wallet:userId',
+      type: UserType.wallet,
+      wallets: [],
+      signature: { expiration: '', message: '0x' },
+    });
     setConfigMock = jest.fn();
     trackMock = jest.fn();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -37,6 +42,7 @@ describe('Event Service', () => {
     MockedMixpanelBrowser.init.mockReturnValue({
       set_config: setConfigMock,
       track: trackMock,
+      identify: jest.fn(),
     } as unknown as Mixpanel);
     process.env = {
       MIXPANEL_TOKEN: 'MIXPANEL_TOKEN',

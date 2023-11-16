@@ -9,9 +9,11 @@ export type Contact = {
 export type ContactList = Contact[];
 
 export type PostContacts = {
-  contact: string;
-  label?: string;
-}[];
+  contacts: {
+    contact: string;
+    label?: string;
+  }[];
+};
 
 export type IContactListService = {
   accountService: IAccountService;
@@ -21,14 +23,5 @@ export type IContactListService = {
   removeContact(contact: Contact): Promise<void>;
   editContact(contact: Contact): Promise<void>;
   getContacts(): ContactList;
-  //   transferToContact({
-  //     contact,
-  //     token,
-  //     amount,
-  //   }: {
-  //     contact: Contact;
-  //     token: Token;
-  //     amount: BigNumber;
-  //   }): Promise<TransactionResponse>;
   setContacts(contacts: ContactList): void;
 };

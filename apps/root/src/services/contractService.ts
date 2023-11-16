@@ -7,6 +7,7 @@ import find from 'lodash/find';
 
 // ABIS
 import ERC20ABI from '@abis/erc20.json';
+import ERC721ABI from '@abis/erc721.json';
 import PERMIT2ABI from '@abis/Permit2.json';
 import MEANPERMIT2ABI from '@abis/MeanPermit2.json';
 import OE_GAS_ORACLE_ABI from '@abis/OEGasOracle.json';
@@ -32,6 +33,7 @@ import {
   PositionVersions,
   Permit2Contract,
   MeanPermit2Contract,
+  ERC721Contract,
 } from '@types';
 import ProviderService from './providerService';
 
@@ -131,10 +133,14 @@ export default class ContractService {
     return new ethers.Contract(OE_GAS_ORACLE_ADDRESS, OE_GAS_ORACLE_ABI.abi, provider) as unknown as OEGasOracle;
   }
 
-  async getTokenInstance(chainId: number, tokenAddress: string, wallet: string): Promise<ERC20Contract> {
+  async getERC20TokenInstance(chainId: number, tokenAddress: string, wallet: string): Promise<ERC20Contract> {
     const provider = await this.providerService.getSigner(wallet, chainId);
-
     return new ethers.Contract(tokenAddress, ERC20ABI, provider) as unknown as ERC20Contract;
+  }
+
+  async getERC721TokenInstance(chainId: number, tokenAddress: string, wallet: string): Promise<ERC721Contract> {
+    const signer = await this.providerService.getSigner(wallet, chainId);
+    return new ethers.Contract(tokenAddress, ERC721ABI, signer) as unknown as ERC721Contract;
   }
 
   async getPermit2Instance(chainId: number, wallet: string): Promise<Permit2Contract> {

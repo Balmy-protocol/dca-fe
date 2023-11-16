@@ -2,21 +2,16 @@ import styled from 'styled-components';
 import React from 'react';
 import isUndefined from 'lodash/isUndefined';
 import Button from '@common/components/button';
+import AmountInput from '@common/components/token-amount-input/components/amount-input';
 import useAccount from '@hooks/useAccount';
 import { Typography, FormHelperText } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
 import { Token } from '@types';
-import { useAggregatorState } from '@state/aggregator/hooks';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
 import { formatUnits } from '@ethersproject/units';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { useAppDispatch } from '@state/hooks';
-import { setFromValue } from '@state/aggregator/actions';
-import useTrackEvent from '@hooks/useTrackEvent';
-import AggregatorTokenInput from '../aggregator-token-button';
 
 const StyledFormHelperText = styled(FormHelperText)`
   cursor: pointer;
@@ -48,50 +43,48 @@ const StyledTokenInputContainer = styled.div`
   align-items: stretch;
 `;
 
-type Props = {
-  cantFund: boolean | null;
+type TokenAmountInputProps = {
+  id: string;
+  label: React.ReactNode;
+  cantFund?: boolean;
   balance?: BigNumber;
-  fromValue: string;
-  isLoadingRoute: boolean;
-  isLoadingFromPrice: boolean;
-  fromPrice?: number;
+  tokenAmount: string;
+  isLoadingRoute?: boolean;
+  isLoadingPrice?: boolean;
+  tokenPrice?: number;
+  selectedToken: Token | null;
   startSelectingCoin: (newToken: Token) => void;
-  isBuyOrder: boolean;
+  onSetTokenAmount: (newAmount: string) => void;
+  maxBalanceBtn?: boolean;
+  priceImpact?: string | boolean;
 };
 
-const FromAmountInput = ({
+const TokenAmountInput = ({
+  id,
+  label,
   cantFund,
   balance,
-  fromValue,
+  tokenAmount,
   isLoadingRoute,
-  isLoadingFromPrice,
-  fromPrice,
+  isLoadingPrice,
+  tokenPrice,
+  selectedToken,
+  onSetTokenAmount,
   startSelectingCoin,
-  isBuyOrder,
-}: Props) => {
-  const { from } = useAggregatorState();
+  maxBalanceBtn,
+  priceImpact,
+}: TokenAmountInputProps) => {
   const account = useAccount();
-  const currentNetwork = useCurrentNetwork();
-  const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
-
-  const onSetFromValue = (newFromValue: string) => {
-    if (!from) return;
-    dispatch(setFromValue({ value: newFromValue, updateMode: true }));
-    if (isBuyOrder) {
-      trackEvent('Aggregator - Set sell order');
-    }
-  };
 
   const onSetMaxBalance = () => {
-    if (balance && from) {
-      if (from.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue = balance.gte(getMinAmountForMaxDeduction(currentNetwork.chainId))
-          ? balance.sub(getMaxDeduction(currentNetwork.chainId))
+    if (balance && selectedToken) {
+      if (selectedToken.address === PROTOCOL_TOKEN_ADDRESS) {
+        const maxValue = balance.gte(getMinAmountForMaxDeduction(selectedToken.chainId))
+          ? balance.sub(getMaxDeduction(selectedToken.chainId))
           : balance;
-        onSetFromValue(formatUnits(maxValue, from.decimals));
+        onSetTokenAmount(formatUnits(maxValue, selectedToken.decimals));
       } else {
-        onSetFromValue(formatUnits(balance, from.decimals));
+        onSetTokenAmount(formatUnits(balance, selectedToken.decimals));
       }
     }
   };
@@ -99,16 +92,14 @@ const FromAmountInput = ({
   return (
     <StyledTokensContainer>
       <StyledTitleContainer>
-        <Typography variant="body1">
-          <FormattedMessage description="youPay" defaultMessage="You pay" />
-        </Typography>
-        {balance && from && (
+        <Typography variant="body1">{label}</Typography>
+        {maxBalanceBtn && balance && selectedToken && (
           <StyledFormHelperText onClick={onSetMaxBalance}>
             <FormattedMessage
               description="in wallet"
               defaultMessage="Balance: {balance}"
               values={{
-                balance: formatCurrencyAmount(balance, from, 4),
+                balance: formatCurrencyAmount(balance, selectedToken, 4),
               }}
             />
             <StyledButton onClick={onSetMaxBalance} disabled={isLoadingRoute} color="secondary" variant="text">
@@ -118,21 +109,22 @@ const FromAmountInput = ({
         )}
       </StyledTitleContainer>
       <StyledTokenInputContainer>
-        <AggregatorTokenInput
-          id="from-value"
+        <AmountInput
+          id={id}
           error={cantFund && account ? 'Amount cannot exceed balance' : ''}
-          value={fromValue}
-          disabled={isLoadingRoute}
-          onChange={onSetFromValue}
-          token={from}
+          value={tokenAmount}
+          onChange={onSetTokenAmount}
+          token={selectedToken}
           fullWidth
-          isLoadingPrice={isLoadingFromPrice}
-          usdValue={(!isUndefined(fromPrice) && parseFloat(fromPrice.toFixed(2)).toFixed(2)) || undefined}
-          onTokenSelect={() => startSelectingCoin(from || emptyTokenWithAddress('from'))}
+          isLoadingPrice={isLoadingPrice}
+          usdValue={(!isUndefined(tokenPrice) && parseFloat(tokenPrice.toFixed(2)).toFixed(2)) || undefined}
+          onTokenSelect={() => startSelectingCoin(selectedToken || emptyTokenWithAddress('token'))}
+          impact={priceImpact}
+          disabled={isLoadingRoute}
         />
       </StyledTokenInputContainer>
     </StyledTokensContainer>
   );
 };
 
-export default FromAmountInput;
+export default TokenAmountInput;

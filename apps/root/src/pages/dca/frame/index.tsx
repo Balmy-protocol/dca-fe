@@ -1,21 +1,13 @@
 import React from 'react';
 import { Grid } from 'ui-library';
-import find from 'lodash/find';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useSubTab } from '@state/tabs/hooks';
 import { useParams } from 'react-router-dom';
-import {
-  DEFAULT_NETWORK_FOR_VERSION,
-  FAIL_ON_ERROR,
-  POSITION_VERSION_4,
-  SUPPORTED_NETWORKS_DCA,
-  NETWORKS,
-} from '@constants';
-import { GetSwapIntervalsGraphqlResponse, NetworkStruct } from '@types';
+import { DEFAULT_NETWORK_FOR_VERSION, FAIL_ON_ERROR, POSITION_VERSION_4, SUPPORTED_NETWORKS_DCA } from '@constants';
+import { GetSwapIntervalsGraphqlResponse } from '@types';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useQuery } from '@apollo/client';
 import getAvailableIntervals from '@graphql/getAvailableIntervals.graphql';
-import { setNetwork } from '@state/config/actions';
 import useDCAGraphql from '@hooks/useDCAGraphql';
 import usePairService from '@hooks/usePairService';
 import { useAppDispatch } from '@state/hooks';
@@ -25,13 +17,10 @@ import useErrorService from '@hooks/useErrorService';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useSdkMappedChains from '@hooks/useMappedSdkChains';
-import useWalletService from '@hooks/useWalletService';
-import useWeb3Service from '@hooks/useWeb3Service';
 import { fetchGraphTokenList } from '@state/token-lists/actions';
 import { identifyNetwork } from '@common/utils/parsing';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
-import useActiveWallet from '@hooks/useActiveWallet';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -43,7 +32,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const { chainId } = useParams<{ chainId: string }>();
   const client = useDCAGraphql();
   const pairService = usePairService();
-  const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const errorService = useErrorService();
@@ -51,8 +39,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
   const selectedNetwork = useSelectedNetwork();
   const sdkMappedNetworks = useSdkMappedChains();
-  const web3Service = useWeb3Service();
-  const activeWallet = useActiveWallet();
   // const hasInitiallySetNetwork = React.useState()
 
   React.useEffect(() => {
@@ -92,23 +78,18 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     }
   }, [isLoading, hasLoadedPairs]);
 
-  const handleChangeNetwork = (newChainId: number) => {
-    if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      walletService.changeNetworkAutomatically(newChainId, activeWallet?.address, () => {
-        const networkToSet = find(NETWORKS, { chainId: newChainId });
-        dispatch(setNetwork(networkToSet as NetworkStruct));
-        if (networkToSet) {
-          web3Service.setNetwork(networkToSet?.chainId);
-        }
-      });
-      replaceHistory(`/create/${newChainId}`);
-      dispatch(setDCAChainId(newChainId));
-      setHasLoadedPairs(false);
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispatch(fetchGraphTokenList(newChainId));
-    }
-  };
+  const handleChangeNetwork = React.useCallback(
+    (newChainId: number) => {
+      if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
+        replaceHistory(`/create/${newChainId}`);
+        dispatch(setDCAChainId(newChainId));
+        setHasLoadedPairs(false);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        dispatch(fetchGraphTokenList(newChainId));
+      }
+    },
+    [replaceHistory, dispatch]
+  );
 
   const { loading: isLoadingSwapIntervals, data: swapIntervalsData } = useQuery<GetSwapIntervalsGraphqlResponse>(
     getAvailableIntervals,

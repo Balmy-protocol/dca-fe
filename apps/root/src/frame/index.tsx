@@ -54,6 +54,7 @@ declare module 'styled-components' {
 }
 
 const DCA = lazy(() => import('@pages/dca'));
+const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const FAQ = lazy(() => import('@pages/faq'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
@@ -173,6 +174,10 @@ const AppFrame = () => {
                           <Route path="/positions/:positionId" element={<PositionDetail />} />
                           <Route path="/:chainId/positions/:positionVersion/:positionId" element={<PositionDetail />} />
                           <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
+                          <Route
+                            path="/transfer/:chainId?/:token?/:recipient?"
+                            element={<Transfer isLoading={isLoadingNetwork} />}
+                          />
                           <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
                           <Route path="/create/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
                           <Route

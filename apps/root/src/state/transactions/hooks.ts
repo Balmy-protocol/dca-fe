@@ -83,7 +83,11 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   const activeWallet = useActiveWallet();
 
   const returnValue = useMemo(
-    () => pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) => tx.from === activeWallet?.address),
+    () =>
+      pickBy(
+        state[currentNetwork.chainId],
+        (tx: TransactionDetails) => tx.from.toLowerCase() === activeWallet?.address.toLowerCase()
+      ),
     [Object.keys(state[currentNetwork.chainId] || {}), activeWallet?.address, currentNetwork]
   );
   return returnValue || {};
@@ -107,7 +111,12 @@ export function useAllNotClearedTransactions(): { [txHash: string]: TransactionD
   );
 
   const returnValue = useMemo(
-    () => pickBy(mergedState, (tx: TransactionDetails) => tx.from === activeWallet?.address && tx.isCleared === false),
+    () =>
+      pickBy(
+        mergedState,
+        (tx: TransactionDetails) =>
+          tx.from.toLowerCase() === activeWallet?.address.toLowerCase() && tx.isCleared === false
+      ),
     [Object.keys(mergedState || {}), activeWallet?.address]
   );
   return returnValue || {};
@@ -193,7 +202,9 @@ export function useHasPendingApproval(
         }
 
         return (
-          tx.typeData.token.address === tokenAddress && tx.typeData.addressFor === addressToCheck && tx.from === spender
+          tx.typeData.token.address === tokenAddress &&
+          tx.typeData.addressFor === addressToCheck &&
+          tx.from.toLowerCase() === spender.toLowerCase()
         );
       }),
     [allTransactions, spender, tokenAddress, addressToCheck]
@@ -266,7 +277,8 @@ export function usePositionHasPendingTransaction(position: string): string | nul
         transaction.type === TransactionTypes.swap ||
         transaction.type === TransactionTypes.wrap ||
         transaction.type === TransactionTypes.unwrap ||
-        transaction.type === TransactionTypes.wrapEther
+        transaction.type === TransactionTypes.wrapEther ||
+        transaction.type === TransactionTypes.transferToken
       )
         return false;
       if (transaction.receipt) {
@@ -363,7 +375,7 @@ export function useHasConfirmedApproval(
           tx.typeData.token.address === tokenAddress &&
           tx.typeData.addressFor === addressToCheck &&
           (blockNumber || 0) - (tx.receipt.blockNumber || 0) <= 3 &&
-          tx.from === spender
+          tx.from.toLowerCase() === spender.toLowerCase()
         );
       }),
     [allTransactions, spender, tokenAddress, blockNumber, addressToCheck]

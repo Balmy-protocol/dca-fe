@@ -311,6 +311,22 @@ function useBuildTransactionDetail() {
             );
             break;
           }
+          case TransactionTypes.transferToken: {
+            const { amount, token, to } = tx.typeData;
+
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionMessagesTokenTransfer',
+                defaultMessage: 'Transfer {amount} {symbol} to {to}',
+              }),
+              {
+                amount,
+                symbol: token.symbol,
+                to,
+              }
+            );
+            break;
+          }
           default:
             break;
         }

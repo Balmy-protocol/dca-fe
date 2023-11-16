@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
-import orderBy from 'lodash/orderBy';
-import compact from 'lodash/compact';
 import { FormattedMessage } from 'react-intl';
 import {
   Typography,
@@ -15,21 +13,23 @@ import {
   TextField,
   SearchIcon,
 } from 'ui-library';
-import useSdkChains from '@hooks/useSdkChains';
-import { getAllChains } from '@mean-finance/sdk';
-import { NETWORKS, REMOVED_AGG_CHAINS, getGhTokenListLogoUrl } from '@constants';
+import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { toToken } from '@common/utils/currency';
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import useWeb3Service from '@hooks/useWeb3Service';
-import useTrackEvent from '@hooks/useTrackEvent';
-import useReplaceHistory from '@hooks/useReplaceHistory';
-import { setAggregatorChainId } from '@state/aggregator/actions';
 import { setNetwork } from '@state/config/actions';
-import { NetworkStruct } from '@types';
 import useActiveWallet from '@hooks/useActiveWallet';
+import { NetworkStruct } from '@types';
+import { Chain } from '@mean-finance/sdk';
+
+interface NetworkSelectorProps {
+  networkList: (NetworkStruct | Chain)[];
+  handleChangeCallback: (chainId: number) => void;
+  disableSearch?: boolean;
+}
 
 const StyledNetworkContainer = styled.div`
   display: flex;
@@ -44,70 +44,35 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const NetworkSelector = () => {
-  const supportedChains = useSdkChains();
-
+const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: NetworkSelectorProps) => {
   const walletService = useWalletService();
-  const dispatch = useAppDispatch();
   const web3Service = useWeb3Service();
-  const trackEvent = useTrackEvent();
-  const replaceHistory = useReplaceHistory();
-  const selectedNetwork = useSelectedNetwork();
+  const dispatch = useAppDispatch();
   const activeWallet = useActiveWallet();
-
+  const selectedNetwork = useSelectedNetwork();
   const [chainSearch, setChainSearch] = React.useState('');
   const chainSearchRef = React.useRef<HTMLDivElement>();
 
-  const mappedNetworks = React.useMemo(
-    () =>
-      compact(
-        orderBy(
-          supportedChains
-            .map((networkId) => {
-              const foundSdkNetwork = find(
-                getAllChains().filter((chain) => !chain.testnet || chain.ids.includes('base-goerli')),
-                { chainId: networkId }
-              );
-              const foundNetwork = find(NETWORKS, { chainId: networkId });
-
-              if (!foundSdkNetwork) {
-                return null;
-              }
-
-              return {
-                ...foundSdkNetwork,
-                ...(foundNetwork || {}),
-              };
-            })
-            .filter(
-              (network) =>
-                !REMOVED_AGG_CHAINS.includes(network?.chainId || -1) &&
-                network?.name.toLowerCase().includes(chainSearch.toLowerCase())
-            ),
-          ['testnet'],
-          ['desc']
-        )
-      ),
-    [supportedChains, chainSearch]
+  const renderNetworks = React.useMemo(
+    () => networkList.filter((network) => network?.name.toLowerCase().includes(chainSearch.toLowerCase())),
+    [chainSearch]
   );
 
   const handleChangeNetwork = React.useCallback(
     (evt: SelectChangeEvent<number>) => {
       const chainId = Number(evt.target.value);
       setChainSearch('');
-      dispatch(setAggregatorChainId(chainId));
-      replaceHistory(`/swap/${chainId}`);
-      trackEvent('Aggregator - Change displayed network');
+      handleChangeCallback(chainId);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       walletService.changeNetworkAutomatically(chainId, activeWallet?.address, () => {
         const networkToSet = find(NETWORKS, { chainId });
-        dispatch(setNetwork(networkToSet as NetworkStruct));
         if (networkToSet) {
-          web3Service.setNetwork(networkToSet?.chainId);
+          dispatch(setNetwork(networkToSet));
+          web3Service.setNetwork(networkToSet.chainId);
         }
       });
     },
-    [dispatch, replaceHistory, trackEvent, walletService, web3Service]
+    [dispatch, walletService, web3Service]
   );
 
   const handleOnClose = React.useCallback(() => setChainSearch(''), []);
@@ -134,32 +99,34 @@ const NetworkSelector = () => {
             },
           }}
         >
-          <ListSubheader sx={{ backgroundColor: '#1e1e1e' }}>
-            <TextField
-              size="small"
-              // Autofocus on textfield
-              autoFocus
-              placeholder="Type to search..."
-              fullWidth
-              value={chainSearch}
-              inputRef={chainSearchRef}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              onChange={(e) => setChainSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key !== 'Escape') {
-                  // Prevents autoselecting item while typing (default Select behaviour)
-                  e.stopPropagation();
-                }
-              }}
-            />
-          </ListSubheader>
-          {mappedNetworks.map((network) => (
+          {!disableSearch && (
+            <ListSubheader sx={{ backgroundColor: '#1e1e1e' }}>
+              <TextField
+                size="small"
+                // Autofocus on textfield
+                autoFocus
+                placeholder="Type to search..."
+                fullWidth
+                value={chainSearch}
+                inputRef={chainSearchRef}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={(e) => setChainSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Escape') {
+                    // Prevents autoselecting item while typing (default Select behaviour)
+                    e.stopPropagation();
+                  }
+                }}
+              />
+            </ListSubheader>
+          )}
+          {renderNetworks.map((network) => (
             <MenuItem
               key={network.chainId}
               sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}
@@ -168,7 +135,7 @@ const NetworkSelector = () => {
               <TokenIcon
                 size="20px"
                 token={toToken({
-                  address: network.mainCurrency || network.wToken,
+                  address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
                   chainId: network.chainId,
                   logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
                 })}
@@ -189,6 +156,5 @@ const NetworkSelector = () => {
   );
 };
 
-// NetworkSelector.whyDidYouRender = true;
 export default NetworkSelector;
 // export default React.memo(NetworkSelector);

@@ -105,6 +105,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: {
                 embeddedWallets: {
                   createOnLogin: 'all-users',
                 },
+                supportedChains: chains,
               }}
             >
               <WagmiConfig client={wagmiClient}>

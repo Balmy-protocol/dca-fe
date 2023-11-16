@@ -67,11 +67,11 @@ import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
-import TokenPicker from '../aggregator-token-picker';
 import SwapButton from '../swap-button';
 import BetterQuoteModal from '../better-quote-modal';
 import FailedQuotesModal from '../failed-quotes-modal';
 import useActiveWallet from '@hooks/useActiveWallet';
+import TokenPickerModal from '@common/components/token-picker-modal';
 
 const StyledButtonContainer = styled.div`
   display: flex;
@@ -106,6 +106,9 @@ const StyledGrid = styled(Grid)`
   right: 16px;
   z-index: 90;
 `;
+
+const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
+const receiveMessage = <FormattedMessage description="You receive" defaultMessage="You receive" />;
 
 interface SwapProps {
   isLoadingRoute: boolean;
@@ -1159,6 +1162,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const onShowSettings = React.useCallback(() => {
     setShouldShowSettings(true);
   }, []);
+
+  const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
+
   return (
     <>
       <TransferToModal
@@ -1196,14 +1202,17 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           transactions={transactionsToExecute}
           onAction={transactionOnAction}
         />
-        <TokenPicker
+        <TokenPickerModal
           shouldShow={shouldShowPicker}
           onClose={onTokenPickerClose}
-          isFrom={selecting === from}
+          modalTitle={tokenPickerModalTitle}
           onChange={tokenPickerOnChange}
           isLoadingYieldOptions={false}
           onAddToken={addCustomTokenToList}
           account={activeWallet?.address}
+          allowCustomTokens
+          allowAllTokens
+          showWrappedAndProtocol
         />
         <StyledGrid container rowSpacing={2}>
           <Grid item xs={12}>

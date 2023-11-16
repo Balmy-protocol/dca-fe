@@ -420,15 +420,34 @@ export const chainToWagmiNetwork = ({
   testnet,
 });
 
-export const identifyNetwork = (sdkNetworks: Chain[], chainId?: string): Chain | undefined => {
+export const identifyNetwork = (networks: Chain[], chainId?: string): Chain | undefined => {
   const chainIdParsed = Number(chainId);
 
-  let foundNetwork = find(sdkNetworks, { chainId: chainIdParsed });
+  let foundNetwork = find(networks, { chainId: chainIdParsed });
   if (!foundNetwork && chainId) {
     foundNetwork = find(
-      sdkNetworks,
+      networks,
       ({ name, ids }) => name.toLowerCase() === chainId.toLowerCase() || ids.includes(chainId.toLowerCase())
     );
   }
   return foundNetwork;
+};
+
+export const validateAddress = (
+  address: string,
+  activeWalletAddress?: string
+): {
+  isValidFormat: boolean;
+  isValidRecipient?: boolean;
+} => {
+  const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
+  const isValidFormat = validRegex.test(address);
+  const isValidRecipient = activeWalletAddress
+    ? isValidFormat && address.toLowerCase() !== activeWalletAddress.toLowerCase()
+    : undefined;
+
+  return {
+    isValidFormat,
+    isValidRecipient,
+  };
 };

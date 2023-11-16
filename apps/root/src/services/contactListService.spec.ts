@@ -1,17 +1,21 @@
+import { createMockInstance } from '@common/utils/tests';
+import { Contact, User, UserType } from '@types';
+
 import AccountService from './accountService';
 import ProviderService from './providerService';
 import MeanApiService from './meanApiService';
+import ContractService from './contractService';
 import ContactListService from './conctactListService';
-import { createMockInstance } from '@common/utils/tests';
-import { Contact, User, UserType } from '@types';
 
 jest.mock('./accountService');
 jest.mock('./providerService');
 jest.mock('./meanApiService');
+jest.mock('./contractService.ts');
 
 const MockedAccountService = jest.mocked(AccountService, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
+const MockedContractService = jest.mocked(ContractService, { shallow: true });
 
 const userMock: User = {
   id: 'wallet:validUserId',
@@ -25,13 +29,15 @@ describe('ContactList Service', () => {
   let accountService: jest.MockedObject<AccountService>;
   let providerService: jest.MockedObject<ProviderService>;
   let meanApiService: jest.MockedObject<MeanApiService>;
+  let contractService: jest.MockedObject<ContractService>;
   let contactListService: ContactListService;
 
   beforeEach(() => {
     accountService = createMockInstance(MockedAccountService);
     providerService = createMockInstance(MockedProviderService);
     meanApiService = createMockInstance(MockedMeanApiService);
-    contactListService = new ContactListService(accountService, providerService, meanApiService);
+    contractService = createMockInstance(MockedContractService);
+    contactListService = new ContactListService(accountService, providerService, meanApiService, contractService);
 
     accountService.getUser.mockReturnValue(userMock);
   });
@@ -55,7 +61,7 @@ describe('ContactList Service', () => {
 
       expect(contactListService.getContacts()).toEqual([contactMock]);
       expect(meanApiService.postContacts).toHaveBeenCalledTimes(1);
-      expect(meanApiService.postContacts).toHaveBeenCalledWith([contactMock], userMock.id);
+      expect(meanApiService.postContacts).toHaveBeenCalledWith([contactMock]);
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
       meanApiService.postContacts.mockRejectedValueOnce(new Error('Mocked Error'));
@@ -63,7 +69,7 @@ describe('ContactList Service', () => {
       jest.spyOn(console, 'error').mockImplementation(() => {});
       await contactListService.addContact(contactMock);
 
-      expect(meanApiService.postContacts).toHaveBeenCalledWith([contactMock], userMock.id);
+      expect(meanApiService.postContacts).toHaveBeenCalledWith([contactMock]);
       expect(contactListService.getContacts()).toEqual([]);
     });
   });
@@ -86,7 +92,7 @@ describe('ContactList Service', () => {
 
       expect(contactListService.getContacts()).toEqual([]);
       expect(meanApiService.deleteContact).toHaveBeenCalledTimes(1);
-      expect(meanApiService.deleteContact).toHaveBeenCalledWith(contactMock.address, userMock.id);
+      expect(meanApiService.deleteContact).toHaveBeenCalledWith(contactMock.address);
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
       meanApiService.deleteContact.mockRejectedValueOnce(new Error('Mocked Error'));
@@ -95,7 +101,7 @@ describe('ContactList Service', () => {
       await contactListService.removeContact(contactMock);
 
       expect(meanApiService.deleteContact).toHaveBeenCalledTimes(1);
-      expect(meanApiService.deleteContact).toHaveBeenCalledWith(contactMock.address, userMock.id);
+      expect(meanApiService.deleteContact).toHaveBeenCalledWith(contactMock.address);
       expect(contactListService.getContacts()).toEqual([contactMock]);
     });
   });
@@ -131,11 +137,7 @@ describe('ContactList Service', () => {
 
       expect(contactListService.getContacts()).toEqual([updatedContactMock]);
       expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
-      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith(
-        updatedContactMock.label,
-        updatedContactMock.address,
-        userMock.id
-      );
+      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith(updatedContactMock.label, updatedContactMock.address);
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
       // disable console.error for this test
@@ -144,11 +146,7 @@ describe('ContactList Service', () => {
       await contactListService.editContact(updatedContactMock);
 
       expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
-      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith(
-        updatedContactMock.label,
-        updatedContactMock.address,
-        userMock.id
-      );
+      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith(updatedContactMock.label, updatedContactMock.address);
       expect(contactListService.getContacts()).toEqual([contactMock]);
     });
   });

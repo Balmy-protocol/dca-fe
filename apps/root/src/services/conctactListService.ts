@@ -1,5 +1,6 @@
 import { Contact, ContactList, IContactListService } from '@types';
 import ProviderService from './providerService';
+import ContractService from './contractService';
 import MeanApiService from './meanApiService';
 import { findIndex, remove } from 'lodash';
 import AccountService from './accountService';
@@ -9,13 +10,21 @@ export default class ContactListService implements IContactListService {
 
   providerService: ProviderService;
 
+  contractService: ContractService;
+
   meanApiService: MeanApiService;
 
   contactList: ContactList = [];
 
-  constructor(accountService: AccountService, providerService: ProviderService, meanApiService: MeanApiService) {
+  constructor(
+    accountService: AccountService,
+    providerService: ProviderService,
+    meanApiService: MeanApiService,
+    contractService: ContractService
+  ) {
     this.accountService = accountService;
     this.providerService = providerService;
+    this.contractService = contractService;
     this.meanApiService = meanApiService;
   }
 

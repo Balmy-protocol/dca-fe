@@ -19,6 +19,7 @@ import {
   PermissionPermit,
   TransactionTypes,
   PermissionSet as IPermissionSet,
+  TokenType,
 } from '@types';
 
 // ABIS
@@ -32,7 +33,6 @@ import {
   POSITION_VERSION_2,
   LATEST_VERSION,
   SIGN_VERSION,
-  TOKEN_TYPE_YIELD_BEARING_SHARES,
   PERMISSIONS,
   SDK_POSITION_STATUS_TO_POSITION_STATUSES,
 } from '@constants';
@@ -1228,7 +1228,8 @@ export default class PositionService {
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther
+      transaction.type === TransactionTypes.wrapEther ||
+      transaction.type === TransactionTypes.transferToken
     )
       return;
 
@@ -1328,7 +1329,8 @@ export default class PositionService {
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther
+      transaction.type === TransactionTypes.wrapEther ||
+      transaction.type === TransactionTypes.transferToken
     )
       return;
     const { typeData } = transaction;
@@ -1360,7 +1362,8 @@ export default class PositionService {
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther
+      transaction.type === TransactionTypes.wrapEther ||
+      transaction.type === TransactionTypes.transferToken
     ) {
       return;
     }
@@ -1448,7 +1451,7 @@ export default class PositionService {
               : {
                   ...this.currentPositions[migratePositionYieldTypeData.id].from,
                   underlyingTokens: [
-                    emptyTokenWithAddress(migratePositionYieldTypeData.fromYield, TOKEN_TYPE_YIELD_BEARING_SHARES),
+                    emptyTokenWithAddress(migratePositionYieldTypeData.fromYield, TokenType.YIELD_BEARING_SHARE),
                   ],
                 },
             to: !migratePositionYieldTypeData.toYield
@@ -1456,7 +1459,7 @@ export default class PositionService {
               : {
                   ...this.currentPositions[migratePositionYieldTypeData.id].to,
                   underlyingTokens: [
-                    emptyTokenWithAddress(migratePositionYieldTypeData.toYield, TOKEN_TYPE_YIELD_BEARING_SHARES),
+                    emptyTokenWithAddress(migratePositionYieldTypeData.toYield, TokenType.YIELD_BEARING_SHARE),
                   ],
                 },
             rate: this.currentPositions[migratePositionYieldTypeData.id].rate,

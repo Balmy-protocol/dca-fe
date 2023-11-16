@@ -6,7 +6,7 @@ import { changeMainTab } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useIsLoadingAggregatorTokenLists } from '@state/token-lists/hooks';
+import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import SwapContainer from '../swap-container';
 
 const StyledGrid = styled(Grid)<{ isSmall?: boolean }>`
@@ -20,7 +20,7 @@ interface HomeFrameProps {
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const dispatch = useAppDispatch();
   const currentBreakPoint = useCurrentBreakpoint();
-  const isLoadingLists = useIsLoadingAggregatorTokenLists();
+  const isLoadingLists = useIsLoadingAllTokenLists();
   const trackEvent = useTrackEvent();
 
   React.useEffect(() => {

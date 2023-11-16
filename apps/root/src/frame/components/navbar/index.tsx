@@ -27,6 +27,7 @@ import {
   ExpandLessIcon,
   ExpandMoreIcon,
   createStyles,
+  SendIcon,
 } from 'ui-library';
 import DiscordIcon from '@assets/svg/atom/discord';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
@@ -159,6 +160,10 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       setOpenFirstSubtab(false);
       dispatch(changeMainTab(2));
       pushToHistory('/swap');
+    } else if (location.pathname === '/transfer') {
+      setOpenFirstSubtab(false);
+      dispatch(changeMainTab(3));
+      pushToHistory('/transfer');
     } else if (location.pathname === '/' || location.pathname === '/create') {
       dispatch(changeMainTab(0));
       dispatch(changeSubTab(0));
@@ -221,6 +226,11 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                 label={<FormattedMessage description="swap" defaultMessage="Swap" />}
                 value={2}
               />
+              <StyledTab
+                onClick={() => handleTabChange({ index: 3, url: 'transfer' })}
+                label={<FormattedMessage description="transfer" defaultMessage="Transfer" />}
+                value={3}
+              />
             </StyledTabs>
             <IconButton onClick={() => setOpenDrawer(true)}>
               <MenuIcon />
@@ -265,6 +275,12 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                 <CurrencyExchangeIcon />
               </ListItemIcon>
               <ListItemText primary={<FormattedMessage description="swap" defaultMessage="Swap" />} />
+            </ListItemButton>
+            <ListItemButton onClick={() => handleTabChange({ index: 3, url: 'transfer' })}>
+              <ListItemIcon>
+                <SendIcon />
+              </ListItemIcon>
+              <ListItemText primary={<FormattedMessage description="transfer" defaultMessage="Transfer" />} />
             </ListItemButton>
           </List>
           <Divider />
@@ -328,6 +344,11 @@ const NavBar = ({ isLoading }: NavBarProps) => {
                   onClick={() => handleTabChange({ index: 2, url: 'swap' })}
                   label={<FormattedMessage description="swap" defaultMessage="Swap" />}
                   value={2}
+                />
+                <StyledTab
+                  onClick={() => handleTabChange({ index: 3, url: 'transfer' })}
+                  label={<FormattedMessage description="transfer" defaultMessage="Transfer" />}
+                  value={3}
                 />
               </StyledTabs>
             </StyledNavbarMainContent>

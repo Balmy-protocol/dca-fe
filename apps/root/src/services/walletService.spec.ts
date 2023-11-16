@@ -1,12 +1,12 @@
 import { createMockInstance } from '@common/utils/tests';
 import { BigNumber, ethers } from 'ethers';
-import { toToken } from '@common/utils/currency';
+import { emptyTokenWithAddress, toToken } from '@common/utils/currency';
 import { BaseProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
 import { MULTICALL_ADDRESS, NULL_ADDRESS } from '@constants';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { formatUnits } from '@ethersproject/units';
 import { MaxUint256 } from '@ethersproject/constants';
-import { ERC20Contract, PositionVersions, SmolDomainContract } from '@types';
+import { ERC20Contract, ERC721Contract, PositionVersions, SmolDomainContract, TokenType } from '@types';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -433,7 +433,7 @@ describe('Wallet Service', () => {
 
     test('it should call the token contract and return the allowance', async () => {
       const allowanceMock = jest.fn().mockResolvedValue('10000000000000000000');
-      contractService.getTokenInstance.mockResolvedValue({
+      contractService.getERC20TokenInstance.mockResolvedValue({
         allowance: allowanceMock,
       } as unknown as ERC20Contract);
 
@@ -443,8 +443,8 @@ describe('Wallet Service', () => {
         'account'
       );
 
-      expect(contractService.getTokenInstance).toHaveBeenCalledTimes(1);
-      expect(contractService.getTokenInstance).toHaveBeenCalledWith(10, 'token', 'account');
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledWith(10, 'token', 'account');
 
       expect(allowanceMock).toHaveBeenCalledTimes(1);
       expect(allowanceMock).toHaveBeenCalledWith('account', 'addressToCheck');
@@ -461,7 +461,7 @@ describe('Wallet Service', () => {
     beforeEach(() => {
       approveMock = jest.fn().mockResolvedValue('populatedTransaction');
 
-      contractService.getTokenInstance.mockResolvedValue({
+      contractService.getERC20TokenInstance.mockResolvedValue({
         populateTransaction: {
           approve: approveMock,
         },
@@ -604,7 +604,7 @@ describe('Wallet Service', () => {
     beforeEach(() => {
       approveMock = jest.fn().mockResolvedValue('populatedTransaction');
 
-      contractService.getTokenInstance.mockResolvedValue({
+      contractService.getERC20TokenInstance.mockResolvedValue({
         approve: approveMock,
       } as unknown as ERC20Contract);
     });
@@ -632,6 +632,119 @@ describe('Wallet Service', () => {
       expect(approveMock).toHaveBeenCalledTimes(1);
       expect(approveMock).toHaveBeenCalledWith('addressToApprove', MaxUint256);
       expect(result).toEqual('populatedTransaction');
+    });
+  });
+
+  describe('transferToken', () => {
+    const erc20TokenMock = emptyTokenWithAddress('token', TokenType.ERC20_TOKEN);
+    const nativeTokenMock = emptyTokenWithAddress('nativeToken', TokenType.NATIVE);
+    const erc721TokenMock = emptyTokenWithAddress('nftToken', TokenType.ERC721_TOKEN);
+    const signerSendTransaction = jest.fn();
+
+    beforeEach(() => {
+      const mockedSigner = {
+        sendTransaction: signerSendTransaction.mockResolvedValue('sendTransaction'),
+      } as unknown as jest.Mocked<JsonRpcSigner>;
+      providerService.getSigner.mockResolvedValue(mockedSigner);
+    });
+
+    test('it should not proceed if amount is not greater than zero', async () => {
+      try {
+        await walletService.transferToken({
+          from: 'from',
+          to: 'to',
+          token: nativeTokenMock,
+          amount: BigNumber.from(0),
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Amount must be greater than zero'));
+      }
+    });
+    test("it should transfer tokens using the ERC20 interface if it's an ERC20 token", async () => {
+      const transferFn = jest.fn().mockResolvedValue('transfer');
+      contractService.getERC20TokenInstance.mockResolvedValue({
+        transfer: transferFn,
+      } as unknown as ERC20Contract);
+
+      const txResponse = await walletService.transferToken({
+        from: 'from',
+        to: 'to',
+        token: erc20TokenMock,
+        amount: BigNumber.from(10),
+      });
+
+      expect(txResponse).toEqual('transfer');
+      expect(transferFn).toHaveBeenCalledTimes(1);
+      expect(transferFn).toHaveBeenCalledWith('to', BigNumber.from(10));
+    });
+    test('it should generate a transaction from the signer if the token is a protocol token', async () => {
+      const txResponse = await walletService.transferToken({
+        from: 'from',
+        to: 'to',
+        token: nativeTokenMock,
+        amount: BigNumber.from(10),
+      });
+
+      expect(txResponse).toEqual('sendTransaction');
+      expect(signerSendTransaction).toHaveBeenCalledTimes(1);
+      expect(signerSendTransaction).toHaveBeenCalledWith({
+        from: 'from',
+        to: 'to',
+        value: BigNumber.from(10),
+      });
+    });
+    test('it should not proceed if token is not of type Native or ERC20', async () => {
+      try {
+        await walletService.transferToken({
+          from: 'from',
+          to: 'to',
+          token: erc721TokenMock,
+          amount: BigNumber.from(10),
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Token must be of type Native or ERC20'));
+      }
+    });
+  });
+
+  describe('transferNFT', () => {
+    const erc20TokenMock = emptyTokenWithAddress('token', TokenType.ERC20_TOKEN);
+    const erc721TokenMock = emptyTokenWithAddress('nftToken', TokenType.ERC721_TOKEN);
+
+    test('it should not proceed if token is not of type ERC721', async () => {
+      try {
+        await walletService.transferNFT({
+          from: 'from',
+          to: 'to',
+          token: erc20TokenMock,
+          tokenId: BigNumber.from(1111),
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Token must be of type ERC721'));
+      }
+    });
+    test("it should transfer token using the ERC721 interface if it's an ERC721 token", async () => {
+      const transferFromFn = jest.fn().mockResolvedValue('transferFrom');
+      contractService.getERC721TokenInstance.mockResolvedValue({
+        transferFrom: transferFromFn,
+      } as unknown as ERC721Contract);
+
+      const txResponse = await walletService.transferNFT({
+        from: 'from',
+        to: 'to',
+        token: erc721TokenMock,
+        tokenId: BigNumber.from(1111),
+      });
+
+      expect(txResponse).toEqual('transferFrom');
+      expect(transferFromFn).toHaveBeenCalledTimes(1);
+      expect(transferFromFn).toHaveBeenCalledWith('from', 'to', BigNumber.from(1111));
     });
   });
 });

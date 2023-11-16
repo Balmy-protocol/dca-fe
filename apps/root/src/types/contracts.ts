@@ -43,11 +43,31 @@ export class ERC20Contract extends Contract {
 
   symbol: () => Promise<string>;
 
-  deposit: (toDeposit: { value: string }) => Promise<TransactionResponse>;
+  transfer: (recipient: string, amount: BigNumber) => Promise<TransactionResponse>;
 
   allowance: (address: string, contract: string) => Promise<string>;
 
   approve: (address: string, value: BigNumber) => Promise<TransactionResponse>;
+}
+
+export class ERC721Contract extends Contract {
+  balanceOf: (address: string) => Promise<BigNumber>;
+
+  name: () => Promise<string>;
+
+  symbol: () => Promise<string>;
+
+  ownerOf: (tokenId: BigNumber) => Promise<string>;
+
+  transferFrom: (from: string, to: string, tokenId: BigNumber) => Promise<TransactionResponse>;
+
+  approve: (approved: string, tokenId: BigNumber) => Promise<TransactionResponse>;
+
+  getApproved: (tokenId: BigNumber) => Promise<string>;
+
+  setApprovalForAll: (operator: string, approved: boolean) => Promise<TransactionResponse>;
+
+  isApprovedForAll: (owner: string, operator: string) => Promise<boolean>;
 }
 
 export class Permit2Contract extends Contract {

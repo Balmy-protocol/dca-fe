@@ -44,8 +44,12 @@ describe('Contract Service', () => {
     test('it should return an instance of the oe gas oracle', async () => {});
   });
 
-  describe('getTokenInstance', () => {
+  describe('getERC20TokenInstance', () => {
     test('it should return an instance of the erc20', async () => {});
+  });
+
+  describe('getERC721TokenInstance', () => {
+    test('it should return an instance of the erc721', async () => {});
   });
 
   describe('getSmolDomainInstance', () => {

@@ -7,15 +7,15 @@ import gqlFetchAll from '@common/utils/gqlFetchAll';
 import { getURLFromQuery } from '@common/utils/parsing';
 import GET_TOKEN_LIST from '@graphql/getTokenList.graphql';
 
-export const enableTokenList = createAction<{
+export const enableDcaTokenList = createAction<{
   tokenList: string;
   enabled: boolean;
-}>('tokenLists/enableTokenList');
+}>('tokenLists/enableDcaTokenList');
 
-export const enableAggregatorTokenList = createAction<{
+export const enableAllTokenList = createAction<{
   tokenList: string;
   enabled: boolean;
-}>('tokenLists/enableAggregatorTokenList');
+}>('tokenLists/enableAllTokenList');
 
 export const addCustomToken = createAction<Token>('tokenLists/addCustomToken');
 

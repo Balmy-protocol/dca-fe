@@ -10,7 +10,7 @@ import { withStyles, makeStyles } from 'tss-react/mui';
 import TokenIcon from '@common/components/token-icon';
 import { FormattedMessage } from 'react-intl';
 
-const StyledTokenInputContainer = styled.div`
+const StyledAmountInputContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -106,7 +106,7 @@ const useButtonStyles = makeStyles()({
   },
 });
 
-interface TokenInputProps {
+interface AmountInputProps {
   id: string;
   value: string;
   disabled?: boolean;
@@ -120,7 +120,7 @@ interface TokenInputProps {
   isLoadingPrice?: boolean;
 }
 
-const AggregatorTokenInput = ({
+const AmountInput = ({
   id,
   onChange,
   value,
@@ -132,7 +132,7 @@ const AggregatorTokenInput = ({
   onTokenSelect,
   impact,
   isLoadingPrice,
-}: TokenInputProps) => {
+}: AmountInputProps) => {
   const inputRef = React.createRef();
   const validator = (nextValue: string) => {
     // sanitize value
@@ -149,9 +149,8 @@ const AggregatorTokenInput = ({
   };
 
   const { classes: buttonClasses } = useButtonStyles();
-
   return (
-    <StyledTokenInputContainer>
+    <StyledAmountInputContainer>
       <StyledControls>
         <StyledFormControl onClick={onFocusInput}>
           <Typography variant="h6" component={StyledFirstPartContainer}>
@@ -165,7 +164,7 @@ const AggregatorTokenInput = ({
                 onClick={onTokenSelect}
                 classes={buttonClasses}
               >
-                {token ? token.symbol : <FormattedMessage description="select" defaultMessage="Select" />}
+                {token?.symbol ?? <FormattedMessage description="select" defaultMessage="Select" />}
               </StyledButton>
             </StyledSelectorContainer>
             <StyledAmountContainer>
@@ -234,7 +233,7 @@ const AggregatorTokenInput = ({
           {error}
         </FormHelperText>
       )}
-    </StyledTokenInputContainer>
+    </StyledAmountInputContainer>
   );
 };
-export default AggregatorTokenInput;
+export default AmountInput;

@@ -1,10 +1,13 @@
 import { BigNumber } from 'ethers';
 
-type TokenTypeBase = 'BASE';
-type TokenTypeWrapped = 'WRAPPED_PROTOCOL_TOKEN';
-type TokenTypeYieldBearingShares = 'YIELD_BEARING_SHARE';
-
-export type TokenType = TokenTypeBase | TokenTypeWrapped | TokenTypeYieldBearingShares;
+export enum TokenType {
+  BASE = 'BASE',
+  NATIVE = 'NATIVE',
+  WRAPPED_PROTOCOL_TOKEN = 'WRAPPED_PROTOCOL_TOKEN',
+  YIELD_BEARING_SHARE = 'YIELD_BEARING_SHARE',
+  ERC20_TOKEN = 'ERC20_TOKEN',
+  ERC721_TOKEN = 'ERC721_TOKEN',
+}
 
 export type Token = {
   decimals: number;

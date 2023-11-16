@@ -6,7 +6,9 @@ import { BigNumber } from 'ethers';
 import AmountInput from './components/amount-input';
 import FrequencySelector from './components/frequency-selector';
 import TokenSelector from './components/token-selector';
-import NetworkSelector from './components/network-selector';
+import NetworkSelector from '@common/components/network-selector';
+import { NETWORKS, SUPPORTED_NETWORKS_DCA } from '@constants';
+import { compact, find, orderBy } from 'lodash';
 
 export const StyledContentContainer = styled.div`
   background-color: #292929;
@@ -21,6 +23,23 @@ interface AvailableSwapInterval {
   };
   value: BigNumber;
 }
+
+const networkList = compact(
+  orderBy(
+    SUPPORTED_NETWORKS_DCA.map((chainId) => {
+      const foundNetwork = find(NETWORKS, { chainId });
+
+      if (!foundNetwork) {
+        return null;
+      }
+      return {
+        ...(foundNetwork || {}),
+      };
+    }),
+    ['testnet'],
+    ['desc']
+  )
+);
 
 interface SwapFirstStepProps {
   startSelectingCoin: (token: Token) => void;
@@ -42,34 +61,36 @@ const SwapFirstStep = ({
   fromValueUsdPrice,
   onChangeNetwork,
   handleFromValueChange,
-}: SwapFirstStepProps) => (
-  <Grid container rowSpacing={2}>
-    <Grid item xs={12}>
-      <StyledContentContainer>
-        <NetworkSelector onChangeNetwork={onChangeNetwork} />
-      </StyledContentContainer>
+}: SwapFirstStepProps) => {
+  return (
+    <Grid container rowSpacing={2}>
+      <Grid item xs={12}>
+        <StyledContentContainer>
+          <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
+        </StyledContentContainer>
+      </Grid>
+      <Grid item xs={12}>
+        <StyledContentContainer>
+          <TokenSelector startSelectingCoin={startSelectingCoin} />
+        </StyledContentContainer>
+      </Grid>
+      <Grid item xs={12}>
+        <StyledContentContainer>
+          <AmountInput
+            balance={balance}
+            cantFund={cantFund}
+            fromValueUsdPrice={fromValueUsdPrice}
+            handleFromValueChange={handleFromValueChange}
+          />
+        </StyledContentContainer>
+      </Grid>
+      <Grid item xs={12}>
+        <StyledContentContainer>
+          <FrequencySelector frequencies={frequencies} handleFrequencyChange={handleFrequencyChange} />
+        </StyledContentContainer>
+      </Grid>
     </Grid>
-    <Grid item xs={12}>
-      <StyledContentContainer>
-        <TokenSelector startSelectingCoin={startSelectingCoin} />
-      </StyledContentContainer>
-    </Grid>
-    <Grid item xs={12}>
-      <StyledContentContainer>
-        <AmountInput
-          balance={balance}
-          cantFund={cantFund}
-          fromValueUsdPrice={fromValueUsdPrice}
-          handleFromValueChange={handleFromValueChange}
-        />
-      </StyledContentContainer>
-    </Grid>
-    <Grid item xs={12}>
-      <StyledContentContainer>
-        <FrequencySelector frequencies={frequencies} handleFrequencyChange={handleFrequencyChange} />
-      </StyledContentContainer>
-    </Grid>
-  </Grid>
-);
+  );
+};
 
 export default SwapFirstStep;

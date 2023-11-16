@@ -3,7 +3,7 @@ import React from 'react';
 import useTokenList from './useTokenList';
 
 function useGetToken() {
-  const tokenList = useTokenList(true, true, false);
+  const tokenList = useTokenList({ allowAllTokens: true, filter: true, filterChainId: false });
 
   return React.useCallback(
     (tokenAddress: string, checkForSymbol = false) => {
