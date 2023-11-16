@@ -1,5 +1,5 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { AxiosInstance } from 'axios';
+import { ExtraArgument } from '@state';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, MEAN_GRAPHQL_URL } from '@constants';
 import GraphqlService from '@services/graphql';
 import { Token, TokenListResponse, TokensLists } from '@types';
@@ -19,16 +19,16 @@ export const enableAllTokenList = createAction<{
 
 export const addCustomToken = createAction<Token>('tokenLists/addCustomToken');
 
-export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extra: AxiosInstance }>(
+export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extra: ExtraArgument }>(
   'tokenLists/fetchTokenLists',
-  async (tokenListUrl, { extra: axiosClient }) => {
+  async (tokenListUrl, { extra: { axiosClient } }) => {
     const response = await axiosClient.get<TokenListResponse>(getURLFromQuery(tokenListUrl));
 
     return response.data;
   }
 );
 
-export const fetchGraphTokenList = createAsyncThunk<Token[], number | undefined, { extra: AxiosInstance }>(
+export const fetchGraphTokenList = createAsyncThunk<Token[], number | undefined>(
   'tokenLists/fetchGraphTokenList',
   async (passedChainId, { getState }) => {
     const {

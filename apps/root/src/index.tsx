@@ -9,13 +9,17 @@ import WalletContext from '@common/components/wallet-context';
 import Web3Service from '@services/web3Service';
 import DCASubgraphs from '@common/utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
-import store from '@state';
+import createStore, { StoreType } from '@state';
 import { axiosClient } from '@state/axios';
 import { Settings } from 'luxon';
 import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
 import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
+import useAccountService from '@hooks/useAccountService';
+import { useAppDispatch } from '@hooks/state';
+import useTokenListByChainId from '@hooks/useTokenListByChainId';
+import { fetchBalances } from '@state/balances/actions';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -25,6 +29,7 @@ type AppProps = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     chains: any[];
   };
+  store: StoreType;
 };
 
 function loadLocaleData(locale: SupportedLanguages) {
@@ -36,7 +41,28 @@ function loadLocaleData(locale: SupportedLanguages) {
   }
 }
 
-const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: { wagmiClient, chains } }: AppProps) => {
+const BalancesInitializer = () => {
+  const dispatch = useAppDispatch();
+  const accountService = useAccountService();
+  const wallets = accountService.getWallets();
+  const [hasDispatched, setHasDispatched] = React.useState<boolean>(false);
+  const tokenListByChainId = useTokenListByChainId();
+
+  React.useEffect(() => {
+    if (!hasDispatched && !!wallets.length) {
+      void dispatch(fetchBalances({ tokenListByChainId }));
+      setHasDispatched(true);
+    }
+  }, [wallets]);
+  return <></>;
+};
+
+const App: React.FunctionComponent<AppProps> = ({
+  locale,
+  web3Service,
+  config: { wagmiClient, chains },
+  store,
+}: AppProps) => {
   const [account, setAccount] = React.useState('');
   const [selectedLocale, setSelectedLocale] = React.useState(locale || SupportedLanguages.english);
 
@@ -67,6 +93,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config: {
             <WagmiConfig client={wagmiClient}>
               <RainbowKitProvider chains={chains} initialChain={chainId} theme={darkTheme()}>
                 <MainApp />
+                <BalancesInitializer />
               </RainbowKitProvider>
             </WagmiConfig>
           </Provider>
@@ -83,10 +110,12 @@ function bootstrapApplication(locale: SupportedLanguages) {
 
   const web3Service = new Web3Service(DCASubgraphs);
 
+  const store = createStore(web3Service);
+
   const config = web3Service.setUpModal();
   root.render(
     <React.StrictMode>
-      <App locale={locale} web3Service={web3Service} config={config} />
+      <App locale={locale} web3Service={web3Service} config={config} store={store} />
     </React.StrictMode>
   );
 }
