@@ -1,10 +1,12 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { Token, TokenList, TokenListByChainId } from '@types';
 import { TokenBalancesAndPrices } from './reducer';
 import { PriceResult } from '@mean-finance/sdk';
 import { ExtraArgument, RootState } from '@state';
 
 export type PriceResponse = Record<string, PriceResult>;
+
+export const setLoadingState = createAction<boolean>('balances/setLoadingState');
 
 export const fetchBalancesForChain = createAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices },
@@ -67,12 +69,14 @@ export const fetchPricesForChain = createAsyncThunk<
 export const fetchBalances = createAsyncThunk<void, { tokenListByChainId: TokenListByChainId }>(
   'balances/fetchBalances',
   async ({ tokenListByChainId }, { dispatch }) => {
+    dispatch(setLoadingState(true));
     const balanceAndPricePromises = Object.entries(tokenListByChainId).map(async ([chainId, tokenListByChain]) => {
       await dispatch(fetchBalancesForChain({ chainId: Number(chainId), tokenList: tokenListByChain }));
       return dispatch(fetchPricesForChain({ chainId: Number(chainId) }));
     });
 
     await Promise.all(balanceAndPricePromises);
+    dispatch(setLoadingState(false));
   }
 );
 

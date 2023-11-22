@@ -2,14 +2,14 @@ import { IntervalSetActions } from '@constants/timing';
 import { useAppDispatch } from '@hooks/state';
 import useInterval from '@hooks/useInterval';
 import React from 'react';
-import { useStoredBalances } from './hooks';
+import { useAllBalances } from './hooks';
 import { fetchBalancesForChain, fetchPricesForChain } from './actions';
 import useTokenListByChainId from '@hooks/useTokenListByChainId';
 
 const BalancesUpdater = () => {
   const dispatch = useAppDispatch();
   const tokenListByChainId = useTokenListByChainId();
-  const balances = useStoredBalances();
+  const balances = useAllBalances();
 
   const updateBalances = React.useCallback(async () => {
     const balancePromises = Object.entries(tokenListByChainId).map(async ([chainId, tokenListByChain]) =>

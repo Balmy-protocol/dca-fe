@@ -30,8 +30,7 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/t
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useTokenList from '@hooks/useTokenList';
 import TokenLists from '@common/components/token-lists';
-import { formatCurrencyAmount, toToken } from '@common/utils/currency';
-import useBalances from '@hooks/useBalances';
+import { formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
 import { formatUnits } from '@ethersproject/units';
 import useCustomToken from '@hooks/useCustomToken';
@@ -40,6 +39,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { memoWithDeepComparison } from '@common/utils/react';
 import { copyTextToClipboard } from '@common/utils/clipboard';
+import { useWalletBalances } from '@state/balances/hooks';
 
 type SetTokenState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -142,7 +142,6 @@ interface RowData {
   customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
   isLoadingTokenBalances: boolean;
   customTokens: TokenList;
-  balancesChainId?: number;
   customTokenError?: string;
 }
 
@@ -251,7 +250,6 @@ const RawRow = ({
     customToken,
     customTokens,
     isLoadingTokenBalances,
-    balancesChainId,
     customTokenError,
   },
 }: RowProps) => {
@@ -345,10 +343,8 @@ const RawRow = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {(!Object.keys(tokenBalances).length || balancesChainId !== token.chainId) && isLoadingTokenBalances && (
-          <CenteredLoadingIndicator size={10} />
-        )}
-        {tokenBalances && !!Object.keys(tokenBalances).length && balancesChainId === token.chainId && (
+        {!Object.keys(tokenBalances).length && isLoadingTokenBalances && <CenteredLoadingIndicator size={10} />}
+        {tokenBalances && !!Object.keys(tokenBalances).length && (
           <>
             {tokenBalance && (
               <Typography variant="body1" color="#FFFFFF">
@@ -502,30 +498,18 @@ const TokenPicker = ({
     wrappedProtocolToken.address,
   ]);
 
-  const rawMemoTokenKeysToUse = React.useMemo(() => tokenKeysToUse.sort(), [tokenKeysToUse]);
-
-  const [tokenBalances, isLoadingTokenBalances] = useBalances(
-    rawMemoTokenKeysToUse.map((tokenKey) => toToken({ address: tokenKey, chainId: currentNetwork.chainId })),
-    account
-  );
+  const { balances, isLoading: isLoadingTokenBalances } = useWalletBalances(account || '', currentNetwork.chainId);
 
   const [customToken, isLoadingCustomToken, customTokenError] = useCustomToken(
     search,
     !allowCustomTokens || memoizedUnorderedTokenKeys.includes(search.toLowerCase())
   );
 
-  const balances = React.useMemo(
-    () => ({
-      ...(tokenBalances?.balances || {}),
-    }),
-    [tokenBalances]
-  );
-
   const memoizedTokenKeys = React.useMemo(
     () => [
       ...(customToken ? [customToken.token.address] : []),
       ...memoizedUnorderedTokenKeys.sort((tokenKeyA, tokenKeyB) => {
-        if (!balances) return tokenKeyA < tokenKeyB ? -1 : 1;
+        if (!Object.keys(balances).length) return tokenKeyA < tokenKeyB ? -1 : 1;
 
         const ABalanceToUse =
           (balances[tokenKeyA] && (balances[tokenKeyA].balanceUsd || balances[tokenKeyA].balance)) || BigNumber.from(0);
@@ -591,7 +575,6 @@ const TokenPicker = ({
       tokenKeys: !memoizedTokenKeys.length && isLoadingCustomToken ? ['loading'] : memoizedTokenKeys,
       yieldOptions: isLoadingYieldOptions ? [] : yieldOptions,
       tokenBalances: isLoadingBalances && (!balances || !Object.keys(balances).length) ? {} : balances || {},
-      balancesChainId: tokenBalances?.chainId,
       customToken: allowCustomTokens ? customToken : undefined,
       isLoadingTokenBalances: isLoadingBalances,
       customTokens: allowCustomTokens ? customTokens : {},
