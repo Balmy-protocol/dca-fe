@@ -39,7 +39,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { memoWithDeepComparison } from '@common/utils/react';
 import { copyTextToClipboard } from '@common/utils/clipboard';
-import { useWalletBalances } from '@state/balances/hooks';
+import { TokenBalances, useWalletBalances } from '@state/balances/hooks';
 
 type SetTokenState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -138,9 +138,10 @@ interface RowData {
   tokenKeys: string[];
   onClick: (token: Token, isCustomToken: boolean) => void;
   yieldOptions: YieldOptions;
-  tokenBalances: Record<string, { balance: BigNumber; balanceUsd?: BigNumber }>;
+  tokenBalances: TokenBalances;
   customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
   isLoadingTokenBalances: boolean;
+  isLoadingTokenPrices: boolean;
   customTokens: TokenList;
   customTokenError?: string;
 }
@@ -250,6 +251,7 @@ const RawRow = ({
     customToken,
     customTokens,
     isLoadingTokenBalances,
+    isLoadingTokenPrices,
     customTokenError,
   },
 }: RowProps) => {
@@ -343,20 +345,21 @@ const RawRow = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {!Object.keys(tokenBalances).length && isLoadingTokenBalances && <CenteredLoadingIndicator size={10} />}
-        {tokenBalances && !!Object.keys(tokenBalances).length && (
-          <>
-            {tokenBalance && (
-              <Typography variant="body1" color="#FFFFFF">
-                {formatCurrencyAmount(tokenBalance, token, 6)}
-              </Typography>
-            )}
-            {!!tokenValue && (
-              <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-                ${tokenValue.toFixed(2)}
-              </Typography>
-            )}
-          </>
+        {isLoadingTokenBalances || (tokenBalances[token.address] && !tokenBalances[token.address].balance) ? (
+          <CenteredLoadingIndicator size={10} />
+        ) : (
+          <Typography variant="body1" color="#FFFFFF">
+            {formatCurrencyAmount(tokenBalance, token, 6)}
+          </Typography>
+        )}
+        {isLoadingTokenPrices || (tokenBalances[token.address] && !tokenBalances[token.address].balanceUsd) ? (
+          <CenteredLoadingIndicator size={8} />
+        ) : (
+          !tokenBalance.isZero() && (
+            <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+              ${tokenValue.toFixed(2)}
+            </Typography>
+          )
         )}
       </StyledBalanceContainer>
     </StyledListItem>
@@ -498,7 +501,7 @@ const TokenPicker = ({
     wrappedProtocolToken.address,
   ]);
 
-  const { balances, isLoading: isLoadingTokenBalances } = useWalletBalances(account || '', currentNetwork.chainId);
+  const { balances, isLoadingBalances, isLoadingPrices } = useWalletBalances(account || '', currentNetwork.chainId);
 
   const [customToken, isLoadingCustomToken, customTokenError] = useCustomToken(
     search,
@@ -566,8 +569,6 @@ const TokenPicker = ({
     setSearch(value);
   };
 
-  const isLoadingBalances = isLoadingTokenBalances;
-
   const itemData: RowData = React.useMemo(
     () => ({
       onClick: handleItemSelected,
@@ -577,6 +578,7 @@ const TokenPicker = ({
       tokenBalances: isLoadingBalances && (!balances || !Object.keys(balances).length) ? {} : balances || {},
       customToken: allowCustomTokens ? customToken : undefined,
       isLoadingTokenBalances: isLoadingBalances,
+      isLoadingTokenPrices: isLoadingPrices,
       customTokens: allowCustomTokens ? customTokens : {},
       customTokenError,
     }),

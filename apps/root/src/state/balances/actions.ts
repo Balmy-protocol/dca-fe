@@ -6,13 +6,18 @@ import { ExtraArgument, RootState } from '@state';
 
 export type PriceResponse = Record<string, PriceResult>;
 
-export const setLoadingState = createAction<boolean>('balances/setLoadingState');
+export const setLoadingBalanceState = createAction<{ chainId: number; isLoading: boolean }>(
+  'balances/setLoadingBalanceState'
+);
+export const setLoadingPriceState = createAction<{ chainId: number; isLoading: boolean }>(
+  'balances/setLoadingPriceState'
+);
 
 export const fetchBalancesForChain = createAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices },
   { tokenList: TokenList; chainId: number },
   { extra: ExtraArgument }
->('balances/fetchBalancesForChain', async ({ tokenList, chainId }, { extra: { web3Service } }) => {
+>('balances/fetchBalancesForChain', async ({ tokenList, chainId }, { extra: { web3Service }, dispatch }) => {
   const { sdkService, accountService } = web3Service;
   const wallets = accountService.getWallets();
   const tokens = Object.values(tokenList);
@@ -25,9 +30,11 @@ export const fetchBalancesForChain = createAsyncThunk<
         return null;
       })
   );
+  dispatch(setLoadingBalanceState({ chainId, isLoading: true }));
   const balances = await Promise.all(balancePromises);
-  const tokenAccountBalances: TokenBalancesAndPrices = {};
+  dispatch(setLoadingBalanceState({ chainId, isLoading: false }));
 
+  const tokenAccountBalances: TokenBalancesAndPrices = {};
   balances.forEach((result) => {
     if (result) {
       const { wallet, tokenBalances } = result;
@@ -45,23 +52,26 @@ export const fetchPricesForChain = createAsyncThunk<
   { chainId: number; prices: PriceResponse },
   { chainId: number },
   { extra: ExtraArgument }
->('prices/fetchPricesForChain', async ({ chainId }, { extra: { web3Service }, getState }) => {
+>('prices/fetchPricesForChain', async ({ chainId }, { extra: { web3Service }, getState, dispatch }) => {
   const { sdkService } = web3Service;
   const state = getState() as RootState;
-  const storedTokensByChain = Object.values(state.balances[Number(chainId)] || {}).map(
+  const storedTokensByChain = Object.values(state.balances[chainId].balancesAndPrices || {}).map(
     (tokenBalance) => tokenBalance.token
   );
   const tokenAddresses = storedTokensByChain.map((token) => token.address);
   let priceResponse: PriceResponse = {};
-  try {
-    if (!!tokenAddresses.length) {
+  if (!!tokenAddresses.length) {
+    try {
+      console.log('fetchingPrices for chainId:', chainId);
+      dispatch(setLoadingPriceState({ chainId, isLoading: true }));
       priceResponse = await sdkService.sdk.priceService.getCurrentPricesForChain({
         chainId,
         addresses: tokenAddresses,
       });
+    } catch (e) {
+      console.error(e);
     }
-  } catch (e) {
-    console.error(e);
+    dispatch(setLoadingPriceState({ chainId, isLoading: false }));
   }
   return { chainId, prices: priceResponse };
 });
@@ -69,14 +79,12 @@ export const fetchPricesForChain = createAsyncThunk<
 export const fetchBalances = createAsyncThunk<void, { tokenListByChainId: TokenListByChainId }>(
   'balances/fetchBalances',
   async ({ tokenListByChainId }, { dispatch }) => {
-    dispatch(setLoadingState(true));
     const balanceAndPricePromises = Object.entries(tokenListByChainId).map(async ([chainId, tokenListByChain]) => {
       await dispatch(fetchBalancesForChain({ chainId: Number(chainId), tokenList: tokenListByChain }));
       return dispatch(fetchPricesForChain({ chainId: Number(chainId) }));
     });
 
     await Promise.all(balanceAndPricePromises);
-    dispatch(setLoadingState(false));
   }
 );
 

@@ -3,10 +3,10 @@ import { RootState } from '../index';
 import { BigNumber } from 'ethers';
 import { parseUnits } from '@ethersproject/units';
 
-interface TokenBalances {
+export interface TokenBalances {
   [tokenAddress: string]: {
     balance: BigNumber;
-    balanceUsd?: BigNumber;
+    balanceUsd: BigNumber;
   };
 }
 
@@ -17,18 +17,17 @@ export function useAllBalances() {
 export function useWalletBalances(
   walletAddress: string,
   chainId: number
-): { balances: TokenBalances; isLoading: boolean } {
-  const { isLoading, ...allBalances } = useAllBalances();
-  const chainBalances = allBalances[chainId] || {};
-  const balances: TokenBalances = {};
+): { balances: TokenBalances; isLoadingBalances: boolean; isLoadingPrices: boolean } {
+  const allBalances = useAppSelector((state: RootState) => state.balances);
+  const { balancesAndPrices = {}, isLoadingBalances, isLoadingPrices } = allBalances[chainId] || {};
+  const tokenBalances: TokenBalances = {};
 
-  Object.entries(chainBalances).forEach(([tokenAddress, tokenInfo]) => {
+  Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
     const balance = tokenInfo.balances[walletAddress] || BigNumber.from(0);
-    const price = tokenInfo.price ? parseUnits(tokenInfo.price.toFixed(18), 18) : undefined;
-    const balanceUsd = price ? balance.mul(price) : undefined;
+    const price = tokenInfo.price ? parseUnits(tokenInfo.price.toFixed(18), 18) : BigNumber.from(0);
+    const balanceUsd = balance.mul(price);
 
-    balances[tokenAddress] = { balance, balanceUsd };
+    tokenBalances[tokenAddress] = { balance, balanceUsd };
   });
-
-  return { balances, isLoading };
+  return { balances: tokenBalances, isLoadingBalances, isLoadingPrices };
 }
