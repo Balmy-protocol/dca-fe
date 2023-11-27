@@ -55,7 +55,6 @@ interface DcaButtonProps {
   isApproved: boolean;
   rateUsdPrice: number;
   fromValueUsdPrice: number;
-  balanceErrors?: string;
   allowanceErrors?: string;
   fromCanHaveYield: boolean;
   toCanHaveYield: boolean;
@@ -71,7 +70,6 @@ const DcaButton = ({
   allowanceErrors,
   shouldEnableYield,
   balance,
-  balanceErrors,
   fromCanHaveYield,
   toCanHaveYield,
   isLoadingUsdPrice,
@@ -113,7 +111,6 @@ const DcaButton = ({
     !frequencyValue ||
     cantFund ||
     !balance ||
-    balanceErrors ||
     allowanceErrors ||
     parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
     BigNumber.from(frequencyValue).lte(BigNumber.from(0)) ||

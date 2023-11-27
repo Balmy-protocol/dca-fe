@@ -307,6 +307,30 @@ const RawRow = ({
     yieldOption.enabledTokens.includes(token?.address)
   );
 
+  const tokenBalanceElement = React.useMemo(
+    () =>
+      isLoadingTokenBalances || (tokenBalances[token.address] && !tokenBalances[token.address].balance) ? (
+        <CenteredLoadingIndicator size={10} />
+      ) : (
+        <Typography variant="body1" color="#FFFFFF">
+          {formatCurrencyAmount(tokenBalance, token, 6)}
+        </Typography>
+      ),
+    [isLoadingTokenBalances, tokenBalances[token.address]]
+  );
+
+  const tokenBalanceUsdElement = React.useMemo(
+    () =>
+      isLoadingTokenPrices || (tokenBalances[token.address] && !tokenBalances[token.address].balanceUsd) ? (
+        <CenteredLoadingIndicator size={8} />
+      ) : (
+        <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+          ${tokenValue.toFixed(2)}
+        </Typography>
+      ),
+    [isLoadingTokenPrices, tokenBalances[token.address]]
+  );
+
   return (
     <StyledListItem classes={classes} onClick={() => onClick(token, isCustomToken)} style={style}>
       <StyledListItemIcon>
@@ -345,22 +369,8 @@ const RawRow = ({
         )}
       </ListItemText>
       <StyledBalanceContainer>
-        {isLoadingTokenBalances || (tokenBalances[token.address] && !tokenBalances[token.address].balance) ? (
-          <CenteredLoadingIndicator size={10} />
-        ) : (
-          <Typography variant="body1" color="#FFFFFF">
-            {formatCurrencyAmount(tokenBalance, token, 6)}
-          </Typography>
-        )}
-        {isLoadingTokenPrices || (tokenBalances[token.address] && !tokenBalances[token.address].balanceUsd) ? (
-          <CenteredLoadingIndicator size={8} />
-        ) : (
-          !tokenBalance.isZero() && (
-            <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-              ${tokenValue.toFixed(2)}
-            </Typography>
-          )
-        )}
+        {tokenBalanceElement}
+        {!tokenBalance.isZero() && tokenBalanceUsdElement}
       </StyledBalanceContainer>
     </StyledListItem>
   );

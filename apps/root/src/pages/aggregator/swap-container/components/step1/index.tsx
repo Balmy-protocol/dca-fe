@@ -69,7 +69,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     toValue,
     startSelectingCoin,
     cantFund,
-    balance,
     selectedRoute,
     isBuyOrder,
     isLoadingRoute,
@@ -167,7 +166,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             id="from-value"
             label={<FormattedMessage description="youPay" defaultMessage="You pay" />}
             cantFund={cantFund}
-            balance={balance}
             tokenAmount={fromValueToUse}
             isLoadingRoute={isLoadingRoute}
             isLoadingPrice={isLoadingFromPrice}

@@ -8,12 +8,12 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import { addCustomToken } from '@state/token-lists/actions';
 import useUsdPrice from '@hooks/useUsdPrice';
 import { parseUnits } from '@ethersproject/units';
-import useBalance from '@hooks/useBalance';
 import { useAppDispatch } from '@state/hooks';
 import { useTransferState } from '@state/transfer/hooks';
 import { setAmount, setToken } from '@state/transfer/actions';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { useTokenBalance } from '@state/balances/hooks';
 
 const StyledContentContainer = styled.div`
   position: relative;
@@ -30,7 +30,7 @@ const TokenSelector = () => {
   const selectedNetwork = useSelectedNetwork();
   const activeWallet = useActiveWallet();
   const { token: selectedToken, amount, recipient } = useTransferState();
-  const [balance] = useBalance(selectedToken, activeWallet?.address);
+  const { balance } = useTokenBalance(selectedToken, activeWallet?.address);
 
   const [fetchedTokenPrice, loadingTokenPrice] = useUsdPrice(
     selectedToken,

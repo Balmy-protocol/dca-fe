@@ -163,7 +163,6 @@ interface ClaimChecklistProps {
   hydratedBalances: ClaimWithBalance;
   rawPrices: Record<string, BigNumber> | undefined;
   allowances: Record<string, Record<string, BigNumber>> | undefined;
-  isLoadingBalances: boolean;
   isLoadingAllowances: boolean;
 }
 
@@ -175,7 +174,6 @@ const ClaimChecklist = ({
   needsToClaim,
   rawPrices,
   allowances,
-  isLoadingBalances,
   isLoadingAllowances,
 }: ClaimChecklistProps) => {
   let activeStep = 0;
@@ -617,7 +615,7 @@ const ClaimChecklist = ({
               expanded={activeStep === 5 && !step5Completed}
               last
               completed={step5Completed}
-              loading={activeStep === 5 && isLoadingBalances}
+              loading={activeStep === 5}
             >
               <Typography variant="h6">
                 <FormattedMessage description="eulerClaimClaimTokens" defaultMessage="6 - Claim your tokens" />

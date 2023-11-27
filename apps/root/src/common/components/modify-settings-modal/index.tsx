@@ -39,7 +39,7 @@ import {
   useModifyRateSettingsRate,
   useModifyRateSettingsUseWrappedProtocolToken,
 } from '@state/modify-rate-settings/hooks';
-import useBalance from '@hooks/useBalance';
+import { useTokenBalance } from '@state/balances/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from '@common/utils/currency';
@@ -134,7 +134,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     position.user,
     allowanceTarget
   );
-  const [balance] = useBalance(fromToUse, position.user);
+  const { balance } = useTokenBalance(fromToUse, position.user);
   const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const realBalance = balance && balance.add(remainingLiquidity);

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Grid, Typography } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import useSdkBalances from '@hooks/useSdkBalances';
+import { useTokensBalances } from '@state/balances/hooks';
 import { DAI, EULER_4626_ADDRESSES, EULER_4626_TOKENS, USDC, WETH } from '@pages/euler-claim/constants';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import usePositionService from '@hooks/usePositionService';
@@ -43,7 +43,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const prevAccount = usePrevious(account);
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
-  const [balances, isLoadingBalances] = useSdkBalances(EULER_4626_TOKENS, account);
+  const balances = useTokensBalances(EULER_4626_TOKENS, account);
   const [allowances, isLoadingAllowances] = useSdkAllowances(EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS.mainnet.chainId);
 
   React.useEffect(() => {
@@ -195,11 +195,10 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
     isLoadingClaimRates ||
     isLoadingPositions ||
     isLoadingNetwork ||
-    (!balances && isLoadingBalances) ||
+    !balances ||
     (!allowances && isLoadingAllowances);
 
-  const hasAnythingToClaim =
-    needsToTerminatePositions || needsToClaim || isLoadingBalances || affectedPastPositions.length;
+  const hasAnythingToClaim = needsToTerminatePositions || needsToClaim || affectedPastPositions.length;
 
   return (
     <Grid container spacing={3}>
@@ -275,7 +274,6 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
                     hydratedBalances={hydratedBalances}
                     rawPrices={rawPrices}
                     allowances={allowances}
-                    isLoadingBalances={isLoadingBalances}
                     isLoadingAllowances={isLoadingAllowances}
                   />
                 </Grid>

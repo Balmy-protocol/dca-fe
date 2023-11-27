@@ -21,7 +21,6 @@ import {
 import { Typography, Tooltip, Grid, Paper, SendIcon } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
-import useBalance from '@hooks/useBalance';
 import Button from '@common/components/button';
 import {
   BLOWFISH_ENABLED_CHAINS,
@@ -72,6 +71,7 @@ import BetterQuoteModal from '../better-quote-modal';
 import FailedQuotesModal from '../failed-quotes-modal';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPickerModal from '@common/components/token-picker-modal';
+import { useTokenBalance } from '@state/balances/hooks';
 
 const StyledButtonContainer = styled.div`
   display: flex;
@@ -151,7 +151,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const replaceHistory = useReplaceHistory();
   const permit2Service = usePermit2Service();
   const activeWallet = useActiveWallet();
-  const [balance, , balanceErrors] = useBalance(from, activeWallet?.address);
+  const { balance } = useTokenBalance(from, activeWallet?.address);
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(
@@ -1244,7 +1244,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                 isApproved={isApproved}
                 allowanceErrors={allowanceErrors}
                 balance={balance}
-                balanceErrors={balanceErrors}
                 isLoadingRoute={isLoadingRoute}
                 transactionWillFail={transactionWillFail}
                 handleMultiSteps={handleMultiSteps}
