@@ -25,6 +25,7 @@ import {
   ApiNewWallet,
   ApiWalletAdminConfig,
   WalletSignature,
+  IndexedUserTokensResponse,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -459,6 +460,20 @@ export default class MeanApiService {
     return this.authorizedRequest({
       method: 'DELETE',
       url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`,
+      signature,
+    });
+  }
+
+  async getIndexedUserTokens({
+    accountId,
+    signature,
+  }: {
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<IndexedUserTokensResponse> {
+    return this.authorizedRequest<IndexedUserTokensResponse>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/indexedtokens`,
       signature,
     });
   }

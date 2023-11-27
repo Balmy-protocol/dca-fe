@@ -1,7 +1,7 @@
 import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { PermissionData } from './positions';
-import { Token } from './tokens';
+import { Token, TokenListByChainId } from './tokens';
 import { AccountLabels } from './accountLabels';
 
 export interface PoolLiquidityData {
@@ -320,3 +320,11 @@ export interface AccountLabelsAndContactListResponse {
 export type ApiWallet = { address: string; isAuth: boolean };
 export type ApiNewWallet = { address: string } & ApiWalletAdminConfig;
 export type ApiWalletAdminConfig = { isAuth: true; signature: string; expiration: string } | { isAuth: false };
+export interface IndexedUserTokensResponse {
+  lastIndexedBlocks: {
+    [chainId: number]: {
+      [wallet: string]: number;
+    };
+  };
+  usedTokens: { [wallet: string]: TokenListByChainId };
+}

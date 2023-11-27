@@ -18,7 +18,6 @@ import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
 import useAccountService from '@hooks/useAccountService';
 import { useAppDispatch } from '@hooks/state';
-import useTokenListByChainId from '@hooks/useTokenListByChainId';
 import { fetchBalances } from '@state/balances/actions';
 
 type AppProps = {
@@ -45,13 +44,12 @@ const BalancesInitializer = () => {
   const dispatch = useAppDispatch();
   const accountService = useAccountService();
   const wallets = accountService.getWallets();
-  const [hasDispatched, setHasDispatched] = React.useState<boolean>(false);
-  const tokenListByChainId = useTokenListByChainId();
+  const [shouldFetch, setShouldFetch] = React.useState<boolean>(true);
 
   React.useEffect(() => {
-    if (!hasDispatched && !!wallets.length) {
-      void dispatch(fetchBalances({ tokenListByChainId }));
-      setHasDispatched(true);
+    if (shouldFetch && !!wallets.length) {
+      void dispatch(fetchBalances());
+      setShouldFetch(false);
     }
   }, [wallets]);
   return <></>;

@@ -1,5 +1,10 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { fetchBalancesForChain, fetchPricesForChain, setLoadingBalanceState, setLoadingPriceState } from './actions';
+import {
+  fetchWalletBalancesForChain,
+  fetchPricesForChain,
+  setLoadingBalanceState,
+  setLoadingPriceState,
+} from './actions';
 import { BigNumber } from 'ethers';
 import { Token } from '@types';
 
@@ -23,12 +28,16 @@ const initialState: BalancesState = {};
 
 export default createReducer(initialState, (builder) =>
   builder
-    .addCase(fetchBalancesForChain.fulfilled, (state, { payload: { tokenBalances, chainId } }) => {
+    .addCase(fetchWalletBalancesForChain.fulfilled, (state, { payload: { tokenBalances, chainId } }) => {
       Object.entries(tokenBalances).forEach(([tokenAddress, tokenBalance]) => {
         if (!state[chainId].balancesAndPrices) {
           state[chainId].balancesAndPrices = {};
         }
-        state[chainId].balancesAndPrices[tokenAddress] = tokenBalance;
+        state[chainId].balancesAndPrices[tokenAddress] = {
+          ...state[chainId].balancesAndPrices[tokenAddress],
+          token: tokenBalance.token,
+          balances: tokenBalance.balances,
+        };
       });
     })
     .addCase(fetchPricesForChain.fulfilled, (state, { payload: { chainId, prices } }) => {
