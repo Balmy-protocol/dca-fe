@@ -11,7 +11,6 @@ import {
 import { find, findIndex } from 'lodash';
 import Web3Service from './web3Service';
 import { Connector } from 'wagmi';
-import { ethers } from 'ethers';
 import { getConnectorData } from '@common/utils/wagmi';
 import { toWallet } from '@common/utils/accounts';
 
@@ -137,8 +136,8 @@ export default class AccountService {
   async changeUser(userId: string) {
     const user = this.accounts.find(({ id }) => id === userId);
 
-    if (!user || !this.activeWallet) {
-      throw new Error('User or active wallet not found');
+    if (!user) {
+      throw new Error('User is not connected');
     }
 
     if (!this.activeWallet) {
@@ -177,19 +176,19 @@ export default class AccountService {
 
   async logInUser(connector?: Connector): Promise<void> {
     if (!connector) {
-      return;
+      throw new Error('Connector not defined');
     }
 
     if (this.user && this.user.status === UserStatus.loggedIn) {
       return this.linkWallet({ connector, isAuth: false });
     }
 
-    const { address, providerInfo, baseProvider } = await getConnectorData(connector);
+    const { address, providerInfo, provider } = await getConnectorData(connector);
 
     const wallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: () => Promise.resolve(new ethers.providers.Web3Provider(baseProvider, 'any')),
+      getProvider: () => Promise.resolve(provider),
       providerInfo: providerInfo,
       isAuth: true,
     });
@@ -232,10 +231,6 @@ export default class AccountService {
       this.user.status = UserStatus.loggedIn;
     }
 
-    await this.getWalletVerifyingSignature({
-      address,
-    });
-
     this.signedWith = this.activeWallet;
 
     if (!this.accounts.length && this.openNewAccountModal) {
@@ -244,13 +239,18 @@ export default class AccountService {
   }
 
   async createUser({ label }: { label: string }) {
-    if (!this.activeWallet || !this.user) {
+    if (!this.user) {
+      throw new Error('User is not connected');
+    }
+
+    if (!this.activeWallet) {
       throw new Error('Should be an active wallet for this');
     }
 
     const meanApiService = this.web3Service.getMeanApiService();
 
-    const veryfingSignature = await this.getWalletVerifyingSignature({
+    // update saved signature
+    await this.getWalletVerifyingSignature({
       forceAddressMatch: true,
       address: this.activeWallet.address,
     });
@@ -275,15 +275,6 @@ export default class AccountService {
     this.accounts = [...this.accounts, newAccount];
 
     await this.changeUser(newAccountId.accountId);
-
-    localStorage.setItem(
-      WALLET_SIGNATURE_KEY,
-      JSON.stringify({
-        id: this.user.wallets[0].address,
-        expiration: veryfingSignature.expiration,
-        message: veryfingSignature.message,
-      })
-    );
   }
 
   async linkWallet({ connector, isAuth }: { connector?: Connector; isAuth: boolean }) {
@@ -295,7 +286,7 @@ export default class AccountService {
       throw new Error('Connector not defined');
     }
 
-    const { baseProvider, providerInfo, signer, address } = await getConnectorData(connector);
+    const { provider, providerInfo, signer, address } = await getConnectorData(connector);
 
     let expirationDate;
     let expiration;
@@ -334,8 +325,9 @@ export default class AccountService {
     const wallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: async () => Promise.resolve(new ethers.providers.Web3Provider(baseProvider, 'any')),
+      getProvider: async () => Promise.resolve(provider),
       providerInfo,
+      isAuth,
     });
 
     this.user.wallets = [...this.user.wallets, wallet];
@@ -343,7 +335,7 @@ export default class AccountService {
     const accountIndex = findIndex(this.accounts, { id: this.user.id });
 
     if (accountIndex !== -1) {
-      this.accounts[accountIndex].wallets = [...this.accounts[accountIndex].wallets, { address, isAuth: false }];
+      this.accounts[accountIndex].wallets = [...this.accounts[accountIndex].wallets, { address, isAuth }];
     } else {
       throw new Error('tried to link a wallet to a user that was not set');
     }
@@ -358,12 +350,12 @@ export default class AccountService {
       throw new Error('Connector not defined');
     }
 
-    const { baseProvider, providerInfo, address } = await getConnectorData(connector);
+    const { provider, providerInfo, address } = await getConnectorData(connector);
 
     const newWallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: async () => Promise.resolve(new ethers.providers.Web3Provider(baseProvider, 'any')),
+      getProvider: async () => Promise.resolve(provider),
       providerInfo,
       isAuth: true,
     });
@@ -511,6 +503,18 @@ export default class AccountService {
   }
 
   async changeWalletAdmin({ address, isAuth, userId }: { address: string; isAuth: boolean; userId: string }) {
+    const accountIndex = findIndex(this.accounts, { id: userId });
+
+    if (accountIndex === -1) {
+      throw new Error('Account not found');
+    }
+
+    const walletIndex = findIndex(this.accounts[accountIndex].wallets, { address });
+
+    if (walletIndex === -1) {
+      throw new Error('Wallet not found');
+    }
+
     const meanApiService = this.web3Service.getMeanApiService();
 
     let walletConfig: ApiWalletAdminConfig;
@@ -535,18 +539,6 @@ export default class AccountService {
       walletConfig,
       accountId: userId,
     });
-
-    const accountIndex = findIndex(this.accounts, { id: userId });
-
-    if (accountIndex === -1) {
-      throw new Error('Account not found');
-    }
-
-    const walletIndex = findIndex(this.accounts[accountIndex].wallets, { address });
-
-    if (accountIndex === -1) {
-      throw new Error('Wallet not found');
-    }
 
     this.accounts[accountIndex].wallets[walletIndex].isAuth = isAuth;
 

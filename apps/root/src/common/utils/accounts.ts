@@ -1,6 +1,8 @@
 import { Wallet, WalletStatus, WalletType } from '@types';
 
-export const toWallet = (wallet: Partial<Wallet>): Wallet => {
+type ToWalletParameter = Partial<Omit<Wallet, 'status'>> & { status: WalletStatus };
+
+export const toWallet = (wallet: ToWalletParameter): Wallet => {
   let baseWallet: Wallet = {
     address: '0xaddress',
     status: WalletStatus.disconnected,
@@ -27,6 +29,8 @@ export const toWallet = (wallet: Partial<Wallet>): Wallet => {
       providerInfo: wallet.providerInfo,
     };
   } else if (wallet.status === WalletStatus.disconnected) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     baseWallet = {
       ...baseWallet,
       ...wallet,
